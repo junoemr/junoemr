@@ -460,6 +460,12 @@
 					</td>
 					<td align=right>
 							<span class="HelpAboutLogout">
+								<c:if test="${junoEncounterForm.pageData.linkToOldEncounterPageEnabled}">
+									<a style="font-size:10px;font-style:normal;"
+									   href="javascript:void(0)"
+									   onClick="popupPage(700,1024, 'Encounter', 'IncomingEncounter.do?<c:out value="${requestScope['javax.servlet.forward.query_string']}" />&old_encounter=1'); return false;">
+										Open Old Encounter</a> |
+								</c:if>
 								<oscar:help
 										keywords="&Title=Chart+Interface&portal_type%3Alist=Document"
 										key="app.top1" style="font-size:10px;font-style:normal;"/>&nbsp;|

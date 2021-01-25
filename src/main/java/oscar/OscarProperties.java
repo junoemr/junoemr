@@ -665,6 +665,11 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("juno_encounter.enabled");
 	}
 
+	public boolean isJunoEncounterLinkToOldEncounterPageEnabled()
+	{
+		return isPropertyActive("juno_encounter.link_to_old_encounter_page");
+	}
+
 	public boolean isHealthcareTeamEnabled()
 	{
 		return isPropertyActive("DEMOGRAPHIC_PATIENT_HEALTH_CARE_TEAM");
