@@ -27,10 +27,8 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import oscar.oscarRx.data.RxPrescriptionData.Prescription;
 import oscar.util.ConversionUtils;
-import oscar.util.DateUtils;
 import oscar.util.StringUtils;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
