@@ -24,7 +24,6 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
-import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
 import org.oscarehr.demographicImport.model.medication.FrequencyCode;
 import org.oscarehr.demographicImport.model.medication.Medication;
@@ -61,8 +60,8 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
 		medicationsAndTreatments.setQuantity(medication.getQuantity());
 		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
-		medicationsAndTreatments.setLongTermMedication(getLongTermIndicator(medication));
-		medicationsAndTreatments.setPastMedications(getPastMedicationIndicator(medication));
+		medicationsAndTreatments.setLongTermMedication(toYnIndicator(medication.getLongTerm()));
+		medicationsAndTreatments.setPastMedications(toYnIndicator(medication.getPastMed()));
 
 		Provider prescribingProvider = medication.getPrescribingProvider();
 		if(prescribingProvider != null)
@@ -75,7 +74,7 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 
 		medicationsAndTreatments.setNotes(medication.getComment());
 		medicationsAndTreatments.setPrescriptionInstructions(medication.getInstructions());
-		medicationsAndTreatments.setPatientCompliance(getComplianceIndicator(medication));
+		medicationsAndTreatments.setPatientCompliance(toYnIndicator(medication.getPatientCompliance()));
 		medicationsAndTreatments.setTreatmentType(medication.getETreatmentType());
 		medicationsAndTreatments.setPrescriptionStatus(medication.getRxStatus());
 		medicationsAndTreatments.setNonAuthoritativeIndicator(toStringOrNull(medication.getNonAuthoritative()));
@@ -107,7 +106,7 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setDosageUnitOfMeasure(medication.getUnit());
 		medicationsAndTreatments.setStrength(getDrugMeasure(medication));
 
-		medicationsAndTreatments.setSubstitutionNotAllowed(getSubsNotAllowedIndicator(medication));
+		medicationsAndTreatments.setSubstitutionNotAllowed(getSubsNotAllowedIndicator(medication.getNoSubs()));
 
 		return medicationsAndTreatments;
 	}
@@ -133,27 +132,9 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		return drugMeasure;
 	}
 
-	protected YnIndicator getLongTermIndicator(Medication exportStructure)
+	protected String getSubsNotAllowedIndicator(Boolean noSubs)
 	{
-		YnIndicator ynIndicator = objectFactory.createYnIndicator();
-		ynIndicator.setBoolean(exportStructure.getLongTerm());
-		return ynIndicator;
-	}
-	protected YnIndicator getPastMedicationIndicator(Medication exportStructure)
-	{
-		YnIndicator ynIndicator = objectFactory.createYnIndicator();
-		ynIndicator.setBoolean(exportStructure.getPastMed());
-		return ynIndicator;
-	}
-	protected YnIndicator getComplianceIndicator(Medication exportStructure)
-	{
-		YnIndicator ynIndicator = objectFactory.createYnIndicator();
-		ynIndicator.setBoolean(exportStructure.getPatientCompliance());
-		return ynIndicator;
-	}
-	protected String getSubsNotAllowedIndicator(StandardMedication exportStructure)
-	{
-		return exportStructure.getNoSubs() ? Y_INDICATOR_TRUE : Y_INDICATOR_FALSE;
+		return ((noSubs != null) && noSubs) ? Y_INDICATOR_TRUE : Y_INDICATOR_FALSE;
 	}
 
 	protected String toStringOrNull(Boolean bool)

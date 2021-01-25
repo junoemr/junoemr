@@ -32,6 +32,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
+import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.Address;
@@ -248,5 +249,16 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 			return LifeStage.fromValue(lifeStage);
 		}
 		return null;
+	}
+
+	protected YnIndicator toYnIndicator(Boolean indicator)
+	{
+		YnIndicator ynIndicator = null;
+		if(indicator != null)
+		{
+			ynIndicator = objectFactory.createYnIndicator();
+			ynIndicator.setBoolean(indicator);
+		}
+		return ynIndicator;
 	}
 }

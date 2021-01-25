@@ -33,6 +33,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
+import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PartialDate;
@@ -44,6 +45,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -389,5 +391,22 @@ public class CDSExportMapperTest
 		assertEquals("2021-04-06", String.valueOf(dateFullOrPartial.getFullDate()));
 	}
 
+	@Test
+	public void testToYnIndicator_Null()
+	{
+		assertNull(cdsExportMapper.toYnIndicator(null));
+	}
+	@Test
+	public void testToYnIndicator_False()
+	{
+		YnIndicator ynIndicator = cdsExportMapper.toYnIndicator(false);
+		assertFalse(ynIndicator.isBoolean());
+	}
+	@Test
+	public void testToYnIndicator_True()
+	{
+		YnIndicator ynIndicator = cdsExportMapper.toYnIndicator(true);
+		assertTrue(ynIndicator.isBoolean());
+	}
 
 }
