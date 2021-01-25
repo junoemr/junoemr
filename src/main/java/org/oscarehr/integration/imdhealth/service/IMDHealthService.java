@@ -49,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import oscar.OscarProperties;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
@@ -71,8 +72,11 @@ public class IMDHealthService
 	@Autowired
 	SiteDao siteDao;
 
-	protected static final String HOST_URL = "v5.app.imdhealth.com";      // Production: https://app.imdhealth.com
-	protected static final String DEFAULT_SCHEME= "https";
+	private static final String PROP_KEY_APP = "imdhealth_app_domain";
+	private static final String PROP_KEY_SCHEME = "imdhealth_scheme";
+
+	protected static final String HOST_URL = OscarProperties.getInstance().getProperty(PROP_KEY_APP);
+	protected static final String DEFAULT_SCHEME= OscarProperties.getInstance().getProperty(PROP_KEY_SCHEME);
 
 	private static final Logger logger = MiscUtils.getLogger();
 

@@ -34,13 +34,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import oscar.OscarProperties;
 import oscar.util.RESTClient;
 
 @Service
 class IMDCommunicationService extends RESTClient
 {
-	protected static String apiUrl = "ca-v5.api.imdhealth.com";   // Production: api.imdhealth.com
+	private static String PROP_KEY_API = "imdhealth_api_domain";
 	private static final String HEADER_AUTHORIZATION = "Authorization";
+
+	protected static String apiUrl = OscarProperties.getInstance().getProperty(PROP_KEY_API);
 
 	/**
 	 * Connect to iMD oauth endpoint and retrieve a bearer token
