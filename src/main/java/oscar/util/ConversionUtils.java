@@ -747,6 +747,12 @@ public class ConversionUtils {
 				xmlGregorianCalendar.getSecond());
 	}
 
+	public static LocalTime toNullableLocalTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		if(xmlGregorianCalendar == null) return null;
+		return toLocalTime(xmlGregorianCalendar);
+	}
+
 	public static LocalTime toLocalTime(XMLGregorianCalendar xmlGregorianCalendar)
 	{
 		// TODO raise custom non-nullable exception if null?

@@ -32,10 +32,10 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.math.BigInteger;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 import static org.oscarehr.common.model.Appointment.DEFAULT_APPOINTMENT_DURATION_MIN;
 import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_BILLED;
@@ -71,7 +71,11 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 	protected LocalDateTime getAppointmentStartDateTime(Appointments importStructure)
 	{
 		LocalDate appointmentDate = toNullableLocalDate(importStructure.getAppointmentDate());
-		LocalTime appointmentTime = ConversionUtils.toLocalTime(importStructure.getAppointmentTime());
+		LocalTime appointmentTime = ConversionUtils.toNullableLocalTime(importStructure.getAppointmentTime());
+		if(appointmentDate == null || appointmentTime == null)
+		{
+			throw new DateTimeException("Appointment must have a valid date and time");
+		}
 		return LocalDateTime.of(appointmentDate, appointmentTime);
 	}
 
@@ -81,7 +85,7 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 		{
 			duration = BigInteger.valueOf(DEFAULT_APPOINTMENT_DURATION_MIN);
 		}
-		return appointmentDateTime.plus(duration.longValue(), ChronoUnit.MINUTES);
+		return appointmentDateTime.plusMinutes(duration.longValue());
 	}
 
 	protected Provider getImportProvider(Appointments importStructure)
