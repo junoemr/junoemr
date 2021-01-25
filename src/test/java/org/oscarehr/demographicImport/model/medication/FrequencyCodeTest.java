@@ -246,10 +246,10 @@ public class FrequencyCodeTest
 	}
 
 	@Test
-	public void testToScalar_Parse_AtBedtime()
+	public void testToScalar_Parse_Evening()
 	{
 		Double expectedFrequency = 1.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("every day at bedtime").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("every evening").toScalar());
 	}
 
 	@Test
@@ -257,6 +257,13 @@ public class FrequencyCodeTest
 	{
 		Double expectedFrequency = 1.0;
 		assertEquals(expectedFrequency, FrequencyCode.from("every morning").toScalar());
+	}
+
+	@Test
+	public void testToScalar_Parse_AtBedtime()
+	{
+		Double expectedFrequency = 1.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("every day at bedtime").toScalar());
 	}
 
 }

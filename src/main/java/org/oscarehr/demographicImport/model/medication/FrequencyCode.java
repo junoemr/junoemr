@@ -203,7 +203,7 @@ public class FrequencyCode extends AbstractTransientModel
 	private Double toScalarByParseTimes(String code)
 	{
 		// match this pattern for something like 'n times daily'
-		Matcher match = Pattern.compile("(\\d+)\\s*times?\\s*(\\w+)").matcher(code);
+		Matcher match = Pattern.compile("(\\d+)\\s+times?\\s+(\\w+)").matcher(code);
 		if (match.matches())
 		{
 			double num = Double.parseDouble(match.group(1));
@@ -216,12 +216,26 @@ public class FrequencyCode extends AbstractTransientModel
 	private Double toScalarByParseEvery(String code)
 	{
 		// match this pattern for something like 'every n days' or 'every n-m days'
-		Matcher match = Pattern.compile("every\\s*((\\d+-)?(\\d+))\\s*(\\w+)").matcher(code);
-		if (match.matches())
+		Matcher matchV1 = Pattern.compile("every\\s+((\\d+-)?(\\d+))\\s+(\\w+)").matcher(code);
+		if (matchV1.matches())
 		{
-			double num = Double.parseDouble(match.group(3));
-			String unit = match.group(4).toLowerCase();
+			double num = Double.parseDouble(matchV1.group(3));
+			String unit = matchV1.group(4).toLowerCase();
 			return getFrequencyEveryUnit(num, unit);
+		}
+		// match this pattern for something like 'every day' or 'every evening before bed'
+		Matcher matchV2 = Pattern.compile("every\\s+(\\w+).*").matcher(code);
+		if (matchV2.matches())
+		{
+			String unit = matchV2.group(1).toLowerCase();
+			switch(unit)
+			{
+				case "morning":
+				case "evening":
+				case "afternoon":
+				case "night":
+				case "day": return 1.0;
+			}
 		}
 		return null;
 	}
@@ -296,9 +310,9 @@ public class FrequencyCode extends AbstractTransientModel
 	{
 		switch (code.toLowerCase())
 		{
-			case "every morning":
-			case "every day at bedtime": return 1.0;
 			case "now":
+			case "once":
+			case "one time":
 			case "one time only": return -1.0;
 		}
 		return null;
