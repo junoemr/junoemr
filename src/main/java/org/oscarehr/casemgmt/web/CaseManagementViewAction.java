@@ -93,6 +93,7 @@ import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.BillingONCHeader1;
+import org.oscarehr.common.service.UserPropertyService;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Demographic;
@@ -141,6 +142,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 	private BillingONCHeader1Dao billingONCHeader1Dao = (BillingONCHeader1Dao) SpringUtils.getBean("billingONCHeader1Dao");
 	private NoteService noteService = SpringUtils.getBean(NoteService.class);
 	private TicklerManager ticklerManager = SpringUtils.getBean(TicklerManager.class);
+	private UserPropertyService userPropertyService = SpringUtils.getBean(UserPropertyService.class);
 
 	static {
 		//temporary..need something generic;
@@ -272,11 +274,15 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 
 		logger.debug("Starting VIEW");
 		String tab = request.getParameter("tab");
-		if (tab == null) {
+		if (tab == null)
+		{
 			tab = CaseManagementViewFormBean.tabs[0];
 		}
 		HttpSession se = request.getSession();
-		if (se.getAttribute("userrole") == null) return mapping.findForward("expired");
+		if (se.getAttribute("userrole") == null)
+		{
+			return mapping.findForward("expired");
+		}
 
 		String demoNo = getDemographicNo(request);
 
@@ -284,14 +290,17 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
 		String roles = (String) se.getAttribute("userrole");
-		if (OscarProperties.getInstance().isOscarLearning() && roles != null && roles.indexOf("moderator") != -1) {
+		if (OscarProperties.getInstance().isOscarLearning() && roles != null && roles.indexOf("moderator") != -1)
+		{
 			logger.info("skipping domain check..provider is a moderator");
-		} else if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)) {
+		}
+		else if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
+		{
 			return mapping.findForward("domain-error");
 		}
 
 		current = System.currentTimeMillis();
-		logger.debug("client in program " + String.valueOf(current - start));
+		logger.debug("client in program " + (current - start));
 		start = current;
 
 		request.setAttribute("casemgmt_demoName", getDemoName(demoNo));
@@ -301,18 +310,16 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 
 		logger.debug("client Image?");
 		// get client image
-		ClientImage img = clientImageMgr.getClientImage(Integer.parseInt(demoNo));
-		if (img != null) {
-			request.setAttribute("image_exists", "true");
-		}
+		getClientImageExistsAttribute(request, demoNo);
 
 		current = System.currentTimeMillis();
-		logger.debug("client image " + String.valueOf(current - start));
+		logger.debug("client image " + (current - start));
 		start = current;
 
 		String programId = (String) request.getSession().getAttribute("case_program_id");
 
-		if (programId == null || programId.length() == 0) {
+		if (StringUtils.isEmpty(programId))
+		{
 			programId = "0";
 		}
 
@@ -321,60 +328,76 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		// if there is see if casemanagemententry has already handled it
 		// if it has, disregard unsaved note; if it has not then set attribute
 		CaseManagementTmpSave tmpsavenote = this.caseManagementMgr.restoreTmpSave(loggedInInfo.getLoggedInProviderNo(), demoNo, programId);
-		if (tmpsavenote != null) {
+		if (tmpsavenote != null)
+		{
 			String restoring = (String) se.getAttribute("restoring");
-			if (restoring == null) request.setAttribute("can_restore", new Boolean(true));
-			else se.setAttribute("restoring", null);
+			if (restoring == null)
+			{
+				request.setAttribute("can_restore", Boolean.TRUE);
+			}
+			else
+			{
+				se.setAttribute("restoring", null);
+			}
 		}
 
 		current = System.currentTimeMillis();
-		logger.debug("tmp note " + String.valueOf(current - start));
+		logger.debug("tmp note " + (current - start));
 		start = current;
 
 		logger.debug("Get admission");
-		String teamName = "";
 		Admission admission = admissionMgr.getCurrentAdmission(programId, Integer.valueOf(demoNo));
 		current = System.currentTimeMillis();
-		logger.debug("Get admission " + String.valueOf(current - start));
+		logger.debug("Get admission " + (current - start));
 		start = current;
 
-		if (admission != null && admission.getTeamId() != null) {
+		String teamName = "";
+		if (admission != null && admission.getTeamId() != null)
+		{
 			logger.debug("Get teams");
 			List<ProgramTeam> teams = programMgr.getProgramTeams(programId);
 			current = System.currentTimeMillis();
-			logger.debug("Get teams " + String.valueOf(current - start));
+			logger.debug("Get teams " + (current - start));
 			start = current;
 
-			for (Iterator<ProgramTeam> i = teams.iterator(); i.hasNext();) {
+			for (Iterator<ProgramTeam> i = teams.iterator(); i.hasNext(); )
+			{
 				logger.debug("Searching teams");
 				ProgramTeam team = i.next();
 				String id1 = Integer.toString(team.getId());
 				String id2 = Integer.toString(admission.getTeamId());
-				if (id1.equals(id2)) teamName = team.getName();
+				if (id1.equals(id2))
+				{
+					teamName = team.getName();
+				}
 			}
 		}
 		request.setAttribute("teamName", teamName);
 
-		if (OscarProperties.getInstance().isCaisiLoaded() && !useNewCaseMgmt) {
+		if (OscarProperties.getInstance().isCaisiLoaded() && !useNewCaseMgmt)
+		{
 
 			logger.debug("Get program providers");
 			List<String> teamMembers = new ArrayList<String>();
 			List<ProgramProvider> ps = programMgr.getProgramProviders(programId);
 			current = System.currentTimeMillis();
-			logger.debug("Get program providers " + String.valueOf(current - start));
+			logger.debug("Get program providers " + (current - start));
 			start = current;
 
-			for (Iterator<ProgramProvider> j = ps.iterator(); j.hasNext();) {
+			for (Iterator<ProgramProvider> j = ps.iterator(); j.hasNext(); )
+			{
 				ProgramProvider pp = j.next();
 				logger.debug("Get program provider teams");
-				for (Iterator<ProgramTeam> k = pp.getTeams().iterator(); k.hasNext();) {
+				for (Iterator<ProgramTeam> k = pp.getTeams().iterator(); k.hasNext(); )
+				{
 					ProgramTeam pt = k.next();
-					if (pt.getName().equals(teamName)) {
+					if (pt.getName().equals(request.getAttribute("teamName")))
+					{
 						teamMembers.add(pp.getProvider().getFormattedName());
 					}
 				}
 				current = System.currentTimeMillis();
-				logger.debug("Get program provider teams " + String.valueOf(current - start));
+				logger.debug("Get program provider teams " + (current - start));
 				start = current;
 
 			}
@@ -394,7 +417,8 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		/* Dx */
 		List<Dxresearch> dxList = this.caseManagementMgr.getDxByDemographicNo(demoNo);
 		Map<String, Dxresearch> dxMap = new HashMap<String, Dxresearch>();
-		for (Dxresearch dx : dxList) {
+		for (Dxresearch dx : dxList)
+		{
 			dxMap.put(dx.getDxresearchCode(), dx);
 		}
 		request.setAttribute("dxMap", dxMap);
@@ -403,25 +427,25 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		logger.debug("Fetch Survey List");
 		request.setAttribute("survey_list", surveyMgr.getAllFormsForCurrentProviderAndCurrentFacility(loggedInInfo));
 		current = System.currentTimeMillis();
-		logger.debug("Fetch Survey List " + String.valueOf(current - start));
+		logger.debug("Fetch Survey List " + (current - start));
 
 		/* ISSUES */
-		if (tab.equals("Current Issues")) {
-			if (useNewCaseMgmt) viewCurrentIssuesTab_newCme(request, caseForm, demoNo, programId);
-			else viewCurrentIssuesTab_oldCme(request, caseForm, demoNo, programId);
+		if (tab.equals("Current Issues"))
+		{
+			if (useNewCaseMgmt)
+			{
+				viewCurrentIssuesTab_newCme(request, caseForm, demoNo, programId);
+			}
+			else
+			{
+				viewCurrentIssuesTab_oldCme(request, caseForm, demoNo, programId);
+			}
 		} // end Current Issues Tab
 
 		logger.debug("Get CPP");
+		getCpp(request, caseForm);
 		current = System.currentTimeMillis();
-		CaseManagementCPP cpp = this.caseManagementMgr.getCPP(this.getDemographicNo(request));
-		if (cpp == null) {
-			cpp = new CaseManagementCPP();
-			cpp.setDemographic_no(getDemographicNo(request));
-		}
-		request.setAttribute("cpp", cpp);
-		caseForm.setCpp(cpp);
-		current = System.currentTimeMillis();
-		logger.debug("Get CPP " + String.valueOf(current - start));
+		logger.debug("Get CPP " + (current - start));
 		start = current;
 
 		/* get allergies */
@@ -429,37 +453,16 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		List<Allergy> allergies = this.caseManagementMgr.getAllergies(this.getDemographicNo(request));
 		request.setAttribute("Allergies", allergies);
 		current = System.currentTimeMillis();
-		logger.debug("Get Allergies " + String.valueOf(current - start));
-		start = current;
+		logger.debug("Get Allergies " + (current - start));
 
 		/* get prescriptions */
-		if (tab.equals("Prescriptions")) {
-			List<Drug> prescriptions = null;
-			boolean viewAll = caseForm.getPrescipt_view().equals("all");
-			String demographicId = getDemographicNo(request);
-			request.setAttribute("isIntegratorEnabled", loggedInInfo.getCurrentFacility().isIntegratorEnabled());
-			prescriptions = caseManagementMgr.getPrescriptions(loggedInInfo, Integer.parseInt(demographicId), viewAll);
-
-			request.setAttribute("Prescriptions", prescriptions);
-
-			// Setup RX bean start
-			RxSessionBean bean = new RxSessionBean();
-			bean.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-			bean.setDemographicNo(Integer.parseInt(demoNo));
-			request.getSession().setAttribute("RxSessionBean", bean);
-			// set up RX end
-
-		}
+		getPrescriptionAttribute(request, loggedInInfo, caseForm, tab, demoNo);
 
 		/* tickler */
-		if (tab != null && tab.equalsIgnoreCase("Ticklers")) {
-			CustomFilter cf = new CustomFilter();
-			cf.setDemographicNo(this.getDemographicNo(request));
-			cf.setStatus("A");
-			request.setAttribute("ticklers", ticklerManager.getTicklers(loggedInInfo, cf));
-		}
+		getTicklerAttribute(request, loggedInInfo, tab);
 
-		if (tab != null && tab.equalsIgnoreCase("Search")) {
+		if (tab != null && tab.equalsIgnoreCase("Search"))
+		{
 			request.setAttribute("roles", roleMgr.getRoles());
 			request.setAttribute("program_domain", programMgr.getProgramDomain(getProviderNo(request)));
 		}
@@ -477,43 +480,140 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		// if we have just saved a note, remove saveNote flag
 		String varName = "saveNote" + demoNo;
 		Boolean saved = (Boolean) se.getAttribute(varName);
-		if (saved != null && saved == true) {
-			request.setAttribute("saveNote", saved);
+		if (saved != null && saved == true)
+		{
+			request.setAttribute("saveNote", true);
 			se.removeAttribute(varName);
 		}
 		current = System.currentTimeMillis();
 
 		//load up custom JavaScript
+		getCmeJavaScriptAttribute(request);
 
+		logger.debug("VIEW Exiting " + (current - beginning));
+
+		String printPreview = (String) request.getAttribute("patientCppPrintPreview");
+		if ("true".equals(printPreview))
+		{
+			request.setAttribute("patientCppPrintPreview", "false");
+			return mapping.findForward("clientHistoryPrintPreview");
+		}
+		else
+		{
+
+			if (useNewCaseMgmt)
+			{
+				String fwdName = request.getParameter("ajaxview");
+				if (StringUtils.isEmpty(fwdName) || fwdName.equalsIgnoreCase("null"))
+				{
+					return mapping.findForward("page.newcasemgmt.view");
+				}
+				else
+				{
+					return mapping.findForward(fwdName);
+				}
+			}
+			else
+			{
+				return mapping.findForward("page.casemgmt.view");
+			}
+		}
+	}
+
+	/**
+	 * Gets the Case Management CPP for the request and case form.
+	 * @param request
+	 * @param caseForm
+	 */
+	private void getCpp(HttpServletRequest request, CaseManagementViewFormBean caseForm)
+	{
+		CaseManagementCPP cpp = this.caseManagementMgr.getCPP(this.getDemographicNo(request));
+		if (cpp == null) {
+			cpp = new CaseManagementCPP();
+			cpp.setDemographic_no(getDemographicNo(request));
+		}
+		request.setAttribute("cpp", cpp);
+		caseForm.setCpp(cpp);
+	}
+
+	/**
+	 * Gets the value indicating whether the client image exists for the request.
+	 * @param request
+	 * @param demoNo
+	 */
+	private void getClientImageExistsAttribute(HttpServletRequest request, String demoNo)
+	{
+		ClientImage img = clientImageMgr.getClientImage(Integer.parseInt(demoNo));
+		if (img != null) {
+			request.setAttribute("image_exists", "true");
+		}
+	}
+
+	/**
+	 * Gets the prescriptions attribute for the request.
+	 * @param request
+	 * @param loggedInInfo
+	 * @param caseForm
+	 * @param tab
+	 * @param demoNo
+	 */
+	private void getPrescriptionAttribute(HttpServletRequest request, LoggedInInfo loggedInInfo, CaseManagementViewFormBean caseForm, String tab, String demoNo)
+	{
+		if (tab.equals("Prescriptions"))
+		{
+			boolean viewAll = caseForm.getPrescipt_view().equals("all");
+			String demographicId = getDemographicNo(request);
+			request.setAttribute("isIntegratorEnabled", loggedInInfo.getCurrentFacility().isIntegratorEnabled());
+			List<Drug> prescriptions = caseManagementMgr.getPrescriptions(loggedInInfo, Integer.parseInt(demographicId), viewAll);
+
+			request.setAttribute("Prescriptions", prescriptions);
+
+			// Setup RX bean start
+			RxSessionBean bean = new RxSessionBean();
+			bean.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+			bean.setDemographicNo(Integer.parseInt(demoNo));
+			request.getSession().setAttribute("RxSessionBean", bean);
+			// set up RX end
+
+		}
+	}
+
+	/**
+	 * Gets the value for the Ticklers attribute for the request.
+	 * @param request
+	 * @param loggedInInfo
+	 * @param tab
+	 */
+	private void getTicklerAttribute(HttpServletRequest request, LoggedInInfo loggedInInfo, String tab)
+	{
+		if (tab != null && tab.equalsIgnoreCase("Ticklers")) {
+			CustomFilter cf = new CustomFilter();
+			cf.setDemographicNo(this.getDemographicNo(request));
+			cf.setStatus("A");
+			request.setAttribute("ticklers", ticklerManager.getTicklers(loggedInInfo, cf));
+		}
+	}
+
+	/**
+	 * Gets the value for the CME JavaScript attribute for the request.
+	 * @param request
+	 */
+	private void getCmeJavaScriptAttribute(HttpServletRequest request)
+	{
 		//1. try from Properties
-		String customCmeJs = OscarProperties.getInstance().getProperty("cme_js");
-		if (customCmeJs == null || customCmeJs.length() == 0) {
+		Boolean hasOceanToolBar = userPropertyService.getPropertyBoolValue(UserProperty.OCEAN_TOOLBAR_ENABLED);
+		if (Boolean.TRUE.equals(hasOceanToolBar))
+		{
+			request.setAttribute("cme_js", "ocean_toolbar");
+		}
+		else
+		{
 			request.setAttribute("cme_js", "default");
-		} else {
-			request.setAttribute("cme_js", customCmeJs);
 		}
 
 		//2. Override from provider preferences?
 
 		//3. Override based on appointment type?
-
-		logger.debug("VIEW Exiting " + String.valueOf(current - beginning));
-
-		String printPreview = (String) request.getAttribute("patientCppPrintPreview");
-		if ("true".equals(printPreview)) {
-			request.setAttribute("patientCppPrintPreview", "false");
-			return mapping.findForward("clientHistoryPrintPreview");
-		} else {
-
-			if (useNewCaseMgmt) {
-				String fwdName = request.getParameter("ajaxview");
-				if (fwdName == null || fwdName.equals("") || fwdName.equalsIgnoreCase("null")) {
-					return mapping.findForward("page.newcasemgmt.view");
-				} else {
-					return mapping.findForward(fwdName);
-				}
-			} else return mapping.findForward("page.casemgmt.view");
-		}
 	}
 
 	public static class IssueDisplay implements Serializable {
