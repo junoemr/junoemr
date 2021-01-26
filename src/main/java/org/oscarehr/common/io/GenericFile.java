@@ -85,6 +85,8 @@ public class GenericFile
 
 	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
 
+	public static final String TEMP_DIRECTORY = System.getProperty("java.io.tmpdir");
+
 	// file info
 	protected File javaFile;
 

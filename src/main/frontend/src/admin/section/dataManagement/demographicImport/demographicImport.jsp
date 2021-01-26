@@ -91,8 +91,11 @@
 			<div class="row">
 				<div class="col-md-12">
 					<p class="juno-text">* The merge strategy determines how the importer will handle demographic conflicts.
-						A merge conflict will occur if an import record has a matching similar Health Number, or a matching date of birth, first and last name combination.
+						A merge conflict will occur if an import record has a matching Health Number and matching date of birth.
 						In this case, the merge strategy will determine how the data is imported.
+					</p>
+					<p class="juno-text notice">
+						{{ $ctrl.getSelectedMergeDescription() }}
 					</p>
 				</div>
 			</div>
@@ -105,6 +108,19 @@
 					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.FILL;>
 						Run Import
 					</juno-button>
+				</div>
+			</div>
+
+			<div class="row" ng-if="$ctrl.results">
+				<div class="col-md-12">
+					<h6>Results:</h6>
+					<div>Completed: {{$ctrl.results.successCount}}</div>
+					<div>Duplicates: {{$ctrl.results.duplicateCount}}</div>
+					<div>Errors: {{$ctrl.results.failureCount}}</div>
+
+					<div ng-repeat="message in $ctrl.results.messages">
+						<span>{{message}}</span>
+					</div>
 				</div>
 			</div>
 		</panel-body>

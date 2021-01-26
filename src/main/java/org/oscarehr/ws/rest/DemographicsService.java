@@ -37,8 +37,8 @@ import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
-import org.oscarehr.demographicImport.service.DemographicImporter;
-import org.oscarehr.demographicImport.service.ImportExportWrapperService;
+import org.oscarehr.demographicImport.service.ImportWrapperService;
+import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -89,7 +89,7 @@ public class DemographicsService extends AbstractServiceImpl
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	private ImportExportWrapperService importExportWrapperService;
+	private ImportWrapperService importWrapperService;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -288,19 +288,18 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@POST
 	@Path("/import")
-	public RestResponse<String> demographicImport(@QueryParam("type") String type,
-	                                              @QueryParam("source") String importSource,
-	                                              @QueryParam("merge") String mergeStrategyStr,
-	                                              List<FileTransfer> fileListTransfer) throws IOException, InterruptedException
+	public RestResponse<ImportTransferOutbound> demographicImport(
+			@QueryParam("type") String type,
+			@QueryParam("source") String importSource,
+			@QueryParam("merge") String mergeStrategy,
+			List<FileTransfer> fileListTransfer) throws IOException, InterruptedException
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
 
 		List<GenericFile> genericFileList = new ArrayList<>();
 		List<GenericFile> importFileList = new ArrayList<>();
-		String documentLocation = System.getProperty("java.io.tmpdir");
-
-		DemographicImporter.MERGE_STRATEGY mergeStrategy = DemographicImporter.MERGE_STRATEGY.valueOf(mergeStrategyStr);
+		String documentLocation = GenericFile.TEMP_DIRECTORY;
 
 		for(FileTransfer file : fileListTransfer)
 		{
@@ -316,14 +315,13 @@ public class DemographicsService extends AbstractServiceImpl
 			//TODO handle zip files?
 		}
 
-		importExportWrapperService.importDemographics(
+		ImportTransferOutbound transferOutbound = importWrapperService.importDemographics(
 				type,
 				importSource,
+				mergeStrategy,
 				importFileList,
 				documentLocation,
-				false,
-				mergeStrategy,
-				null);
+				false);
 
 		// clean up temp files
 		for(GenericFile tempFile : genericFileList)
@@ -331,7 +329,7 @@ public class DemographicsService extends AbstractServiceImpl
 			tempFile.deleteFile();
 		}
 
-		return RestResponse.successResponse("success");
+		return RestResponse.successResponse(transferOutbound);
 	}
 
 

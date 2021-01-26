@@ -22,20 +22,16 @@
  */
 package org.oscarehr.util.task;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.service.DemographicImporter;
-import org.oscarehr.demographicImport.service.ImportExportWrapperService;
-import org.oscarehr.demographicImport.service.ImporterExporterFactory;
-import org.oscarehr.demographicImport.util.ImportCallback;
+import org.oscarehr.demographicImport.service.ImportWrapperService;
 import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;
 import org.oscarehr.util.task.args.StringArg;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,13 +40,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class CommandLineImporter implements CommandLineTask, ImportCallback
+@Service
+public class CommandLineImporter extends ImportWrapperService implements CommandLineTask
 {
 	private static final Logger logger = Logger.getLogger(CommandLineImporter.class);
-
-	@Autowired
-	private ImportExportWrapperService importExportWrapperService;
 
 	public String taskName()
 	{
@@ -63,7 +56,7 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 				new StringArg("file-directory", null, true),
 				new StringArg("document-directory", null, false),
 				new StringArg("source-type", null, false),
-				new StringArg("mergeStrategy", "SKIP", false),
+				new StringArg("mergeStrategy", DemographicImporter.MERGE_STRATEGY.SKIP.name(), false),
 				new BooleanArg("skipMissingDocs", false, false)
 				);
 	}
@@ -96,32 +89,6 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 			throw new InvalidCommandLineArgumentsException("Invalid document directory: " + importDocumentLocation);
 		}
 
-		if(!EnumUtils.isValidEnum(DemographicImporter.MERGE_STRATEGY.class, mergeStrategyStr))
-		{
-			throw new InvalidCommandLineArgumentsException(importType + " is not a valid MERGE_STRATEGY enum. must be one of " +
-					java.util.Arrays.asList(DemographicImporter.MERGE_STRATEGY.values()));
-		}
-		DemographicImporter.MERGE_STRATEGY mergeStrategy = DemographicImporter.MERGE_STRATEGY.valueOf(mergeStrategyStr);
-
-		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importType))
-		{
-			throw new InvalidCommandLineArgumentsException(importType + " is not a valid IMPORTER_TYPE enum. must be one of " +
-					java.util.Arrays.asList(ImporterExporterFactory.IMPORTER_TYPE.values()));
-		}
-		ImporterExporterFactory.IMPORTER_TYPE importerType = ImporterExporterFactory.IMPORTER_TYPE.valueOf(importType);
-
-		ImporterExporterFactory.IMPORT_SOURCE importSource;
-		if(EnumUtils.isValidEnum(ImporterExporterFactory.IMPORT_SOURCE.class, importSourceStr))
-		{
-			logger.info("Import source: " + importSourceStr);
-			importSource = ImporterExporterFactory.IMPORT_SOURCE.valueOf(importSourceStr);
-		}
-		else
-		{
-			logger.warn("Unknown import source. Defaulting to UNKNOWN");
-			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
-		}
-
 		try
 		{
 			List<GenericFile> genericFileList = new ArrayList<>();
@@ -138,14 +105,13 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 				genericFileList.add(FileFactory.getExistingFile(file));
 			}
 
-			importExportWrapperService.importDemographics(
-					importerType,
-					importSource,
+			importDemographics(
+					importType,
+					importSourceStr,
+					mergeStrategyStr,
 					genericFileList,
 					importDocumentLocation,
-					skipMissingDocs,
-					mergeStrategy,
-					this);
+					skipMissingDocs);
 		}
 		catch(Exception e)
 		{
@@ -167,20 +133,20 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 	}
 
 	@Override
-	public void onFileImportSuccess(GenericFile genericFile)
+	protected void onSuccess(GenericFile genericFile)
 	{
 		moveTo(genericFile, genericFile.getDirectory(), "completed");
 	}
 
 	@Override
-	public void onFileImportFailure(GenericFile genericFile)
+	protected void onDuplicate(GenericFile genericFile)
 	{
-		moveTo(genericFile, genericFile.getDirectory(), "failed");
+		moveTo(genericFile, genericFile.getDirectory(), "duplicate");
 	}
 
 	@Override
-	public void onImportComplete(long successCount, long failureCount)
+	protected void onError(GenericFile genericFile)
 	{
-		logger.info("IMPORT PROCESS COMPLETE (" + successCount + " files imported. " + failureCount + " failures)");
+		moveTo(genericFile, genericFile.getDirectory(), "failed");
 	}
 }

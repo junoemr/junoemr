@@ -52,10 +52,13 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						{
 							label: 'Skip duplicates',
 							value: 'SKIP',
+							description: "Duplicates will not be imported",
 						},
 						{
 							label: 'Merge duplicates',
 							value: 'MERGE',
+							description: "Duplicates will be merged with their existing file. The demographic master file will not be updated, " +
+								"and imported chart notes, documents etc. will be added to the existing record. This may cause chart elements to appear duplicated.",
 						},
 					]
 				);
@@ -95,19 +98,19 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				ctrl.selectedImportType = ctrl.importTypeOptions[0].value;
 				ctrl.selectedFiles = [];
 
+				ctrl.results = null;
+
 				ctrl.importRunning = false;
 
 				ctrl.$onInit = function inInit()
 				{
-					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
+					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				}
 
 				ctrl.onRunImport = async function onRunImport()
 				{
 					ctrl.importRunning = true;
-
 					let formattedFileList = await ctrl.formatSelectedFiles();
-					console.info("formattedFileList", formattedFileList);
 
 					demographicsService.demographicImport(
 						ctrl.selectedImportType,
@@ -115,7 +118,8 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						ctrl.selectedMergeStrategy,
 						formattedFileList).then((response) =>
 						{
-							console.info("files uploaded success");
+							ctrl.results = response.data;
+							ctrl.clearSelectedFiles();
 						}
 					).finally(() =>
 					{
@@ -164,6 +168,16 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				ctrl.canRunImport = () =>
 				{
 					return ctrl.selectedFiles && ctrl.selectedFiles.length > 0;
+				}
+
+				ctrl.clearSelectedFiles = () =>
+				{
+					ctrl.selectedFiles = [];
+				}
+
+				ctrl.getSelectedMergeDescription = () =>
+				{
+					return ctrl.mergeOptions.find(option => option.value === ctrl.selectedMergeStrategy).description;
 				}
 
 			}]

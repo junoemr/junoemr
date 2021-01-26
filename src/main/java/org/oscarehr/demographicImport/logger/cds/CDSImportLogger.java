@@ -27,16 +27,24 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.util.MiscUtils;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CDSImportLogger implements ImportLogger
 {
 	private static final Logger logger = MiscUtils.getLogger();
+	private final List<String> messageList;
+
+	public CDSImportLogger()
+	{
+		messageList = new ArrayList<>();
+	}
 
 	@Override
-	public void log(String message) throws IOException
+	public void log(String message)
 	{
 		logger.info(message);
+		messageList.add(message);
 	}
 
 	@Override
@@ -49,5 +57,11 @@ public class CDSImportLogger implements ImportLogger
 	public GenericFile getLogFile()
 	{
 		return null;
+	}
+
+	@Override
+	public List<String> getMessages()
+	{
+		return messageList;
 	}
 }

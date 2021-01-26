@@ -27,9 +27,10 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
+import org.oscarehr.demographicImport.exception.DuplicateDemographicException;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.demographicImport.util.ImportCallback;
+import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,9 +40,9 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.NEVER)
-public class ImportExportWrapperService
+public class ImportWrapperService
 {
-	private static final Logger logger = Logger.getLogger(ImportExportWrapperService.class);
+	private static final Logger logger = Logger.getLogger(ImportWrapperService.class);
 
 	@Autowired
 	private ImportExportService importExportService;
@@ -49,18 +50,19 @@ public class ImportExportWrapperService
 	@Autowired
 	private ImporterExporterFactory importerExporterFactory;
 
-	public void importDemographics(ImporterExporterFactory.IMPORTER_TYPE importerType,
-	                               ImporterExporterFactory.IMPORT_SOURCE importSource,
-	                               List<GenericFile> importFileList,
-	                               String documentLocation,
-	                               boolean skipMissingDocs,
-	                               DemographicImporter.MERGE_STRATEGY mergeStrategy,
-	                               ImportCallback importCallback)
+	public ImportTransferOutbound importDemographics(ImporterExporterFactory.IMPORTER_TYPE importerType,
+	                                                 ImporterExporterFactory.IMPORT_SOURCE importSource,
+	                                                 DemographicImporter.MERGE_STRATEGY mergeStrategy,
+	                                                 List<GenericFile> importFileList,
+	                                                 String documentLocation,
+	                                                 boolean skipMissingDocs)
 	{
-
 		long importCount = 0;
+		long duplicateCount = 0;
 		long failureCount = 0;
-		long fileCounter = 0;
+
+		ImportLogger importLogger = importerExporterFactory.getImportLogger(importerType);
+		ImportTransferOutbound transferOutbound = new ImportTransferOutbound();
 
 		try
 		{
@@ -68,8 +70,6 @@ public class ImportExportWrapperService
 
 			for(GenericFile importFile : importFileList)
 			{
-				fileCounter++;
-				ImportLogger importLogger = importerExporterFactory.getImportLogger(importerType);
 				try
 				{
 					importExportService.importDemographic(importerType,
@@ -82,26 +82,27 @@ public class ImportExportWrapperService
 
 					importCount++;
 
-					if(importCallback != null)
-					{
-						importCallback.onFileImportSuccess(importFile);
-					}
+					onSuccess(importFile);
 				}
 				catch(InvalidImportFileException e)
 				{
-					logger.info("Skip (invalid import file): " + importFile.getName());
+					importLogger.log(importFile.getName() + ": Skipped (invalid import file)");
+				}
+				catch(DuplicateDemographicException e)
+				{
+					importLogger.log(importFile.getName() + ": Skipped (" + e.getMessage() + ")");
+					duplicateCount++;
+					onDuplicate(importFile);
 				}
 				catch(Exception e)
 				{
+					importLogger.log(importFile.getName() + ": Failed to import");
 					logger.error("Failed to import: " + importFile.getName(), e);
 
 					// clear the provider cache on failures for now so that un-persisted providers are not referenced by future lookups
 					BaseModelToDbConverter.clearProviderCache();
 					failureCount++;
-					if(importCallback != null)
-					{
-						importCallback.onFileImportFailure(importFile);
-					}
+					onError(importFile);
 				}
 				finally
 				{
@@ -115,19 +116,22 @@ public class ImportExportWrapperService
 			BaseModelToDbConverter.clearProviderCache();
 		}
 
-		if(importCallback != null)
-		{
-			importCallback.onImportComplete(importCount, failureCount);
-		}
+		onImportComplete(importCount, duplicateCount, failureCount);
+
+		transferOutbound.setSuccessCount(importCount);
+		transferOutbound.setDuplicateCount(duplicateCount);
+		transferOutbound.setFailureCount(failureCount);
+		transferOutbound.setMessages(importLogger.getMessages());
+
+		return transferOutbound;
 	}
 
-	public void importDemographics(String importerTypeStr,
+	public ImportTransferOutbound importDemographics(String importerTypeStr,
 	                               String importSourceStr,
+	                               String mergeStrategyStr,
 	                               List<GenericFile> importFileList,
 	                               String documentLocation,
-	                               boolean skipMissingDocs,
-	                               DemographicImporter.MERGE_STRATEGY mergeStrategy,
-	                               ImportCallback importCallback)
+	                               boolean skipMissingDocs)
 	{
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importerTypeStr))
 		{
@@ -135,6 +139,13 @@ public class ImportExportWrapperService
 					java.util.Arrays.asList(ImporterExporterFactory.IMPORTER_TYPE.values()));
 		}
 		ImporterExporterFactory.IMPORTER_TYPE importerType = ImporterExporterFactory.IMPORTER_TYPE.valueOf(importerTypeStr);
+
+		if(!EnumUtils.isValidEnum(DemographicImporter.MERGE_STRATEGY.class, mergeStrategyStr))
+		{
+			throw new InvalidCommandLineArgumentsException(mergeStrategyStr + " is not a valid MERGE_STRATEGY enum. must be one of " +
+					java.util.Arrays.asList(DemographicImporter.MERGE_STRATEGY.values()));
+		}
+		DemographicImporter.MERGE_STRATEGY mergeStrategy = DemographicImporter.MERGE_STRATEGY.valueOf(mergeStrategyStr);
 
 		ImporterExporterFactory.IMPORT_SOURCE importSource;
 		if(EnumUtils.isValidEnum(ImporterExporterFactory.IMPORT_SOURCE.class, importSourceStr))
@@ -148,6 +159,26 @@ public class ImportExportWrapperService
 			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
-		importDemographics(importerType, importSource, importFileList, documentLocation, skipMissingDocs, mergeStrategy, importCallback);
+		return importDemographics(importerType, importSource, mergeStrategy, importFileList, documentLocation, skipMissingDocs);
+	}
+
+	protected void onSuccess(GenericFile genericFile)
+	{
+		// no-op
+	}
+
+	protected void onDuplicate(GenericFile genericFile)
+	{
+		// no-op
+	}
+
+	protected void onError(GenericFile genericFile)
+	{
+		// no-op
+	}
+
+	protected void onImportComplete(long importCount, long duplicateCount, long failureCount)
+	{
+		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures. " + duplicateCount + " duplicates)");
 	}
 }

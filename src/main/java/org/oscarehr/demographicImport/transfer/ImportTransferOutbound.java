@@ -20,13 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.demographicImport.transfer;
 
-import org.oscarehr.common.io.GenericFile;
+import lombok.Data;
 
-public interface ImportCallback
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+public class ImportTransferOutbound
 {
-	void onFileImportSuccess(GenericFile genericFile);
-	void onFileImportFailure(GenericFile genericFile);
-	void onImportComplete(long successCount, long failureCount);
+	private List<String> messages;
+	private long successCount;
+	private long duplicateCount;
+	private long failureCount;
+
+	public void addMessage(String message)
+	{
+		if(messages == null)
+		{
+			messages = new ArrayList<>();
+		}
+		messages.add(message);
+	}
 }

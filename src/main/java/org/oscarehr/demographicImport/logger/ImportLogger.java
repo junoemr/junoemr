@@ -24,7 +24,7 @@ package org.oscarehr.demographicImport.logger;
 
 import org.oscarehr.common.io.GenericFile;
 
-import java.io.IOException;
+import java.util.List;
 
 public interface ImportLogger
 {
@@ -32,7 +32,7 @@ public interface ImportLogger
 	 * 	adds a log statement to the import log
 	 * @param message - the statement to log
  	 */
-	void log(String message) throws IOException;
+	void log(String message);
 
 	/**
 	 * forces all unwritten log data to be written to the log file.
@@ -44,4 +44,10 @@ public interface ImportLogger
 	 * @return - the log file
 	 */
 	GenericFile getLogFile();
+
+	/**
+	 * Get the log as a list. this may be the same as the log file contents, but it can be delivered to users etc.
+	 * @return - a list of messages.
+	 */
+	List<String> getMessages();
 }
