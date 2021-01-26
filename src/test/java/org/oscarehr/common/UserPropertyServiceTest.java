@@ -54,7 +54,7 @@ public class UserPropertyServiceTest
 	}
 
 	/**
-	 * Service should return the True Boolean if the property value is "true".
+	 * Service should return true if the property value is "true".
 	 */
 	@Test
 	public void getPropertyBoolValue_TrueLowerCase_ReturnsTrue()
@@ -64,14 +64,14 @@ public class UserPropertyServiceTest
 		property.setValue("true");
 		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
 
-		Boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
 
 		assertTrue(actual);
 		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
 	}
 
 	/**
-	 * Service should return the True Boolean if the property value is "TRUE".
+	 * Service should return true if the property value is "TRUE".
 	 */
 	@Test
 	public void getPropertyBoolValue_TrueUpperCase_ReturnsTrue()
@@ -81,31 +81,82 @@ public class UserPropertyServiceTest
 		property.setValue("TRUE");
 		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
 
-		Boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
 
 		assertTrue(actual);
 		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
 	}
 
 	/**
-	 * Service should return the False Boolean if the property value is "false".
+	 * Service should return true if the property value is "ON".
 	 */
 	@Test
-	public void getPropertyBoolValue_FalseLowerCase_ReturnsFalse()
+	public void getPropertyBoolValue_OnUpperCase_ReturnsTrue()
 	{
-		String propertyName = "FalseProperty";
+		String propertyName = "OnProperty";
 		UserProperty property = new UserProperty();
-		property.setValue("false");
+		property.setValue("ON");
 		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
 
-		Boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
 
-		assertFalse(actual);
+		assertTrue(actual);
 		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
 	}
 
 	/**
-	 * Service should return the False Boolean if the property value is "FALSE".
+	 * Service should return true if the property value is "on".
+	 */
+	@Test
+	public void getPropertyBoolValue_OnLowerCase_ReturnsTrue()
+	{
+		String propertyName = "OnProperty";
+		UserProperty property = new UserProperty();
+		property.setValue("on");
+		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
+
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+
+		assertTrue(actual);
+		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
+	}
+
+	/**
+	 * Service should return true if the property value is "YES".
+	 */
+	@Test
+	public void getPropertyBoolValue_YesUpperCase_ReturnsTrue()
+	{
+		String propertyName = "OnProperty";
+		UserProperty property = new UserProperty();
+		property.setValue("YES");
+		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
+
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+
+		assertTrue(actual);
+		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
+	}
+
+	/**
+	 * Service should return true if the property value is "yes".
+	 */
+	@Test
+	public void getPropertyBoolValue_YesLowerCase_ReturnsTrue()
+	{
+		String propertyName = "OnProperty";
+		UserProperty property = new UserProperty();
+		property.setValue("yes");
+		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
+
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+
+		assertTrue(actual);
+		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
+	}
+
+	/**
+	 * Service should return false if the property value is "FALSE".
 	 */
 	@Test
 	public void getPropertyBoolValue_FalseUpperCase_ReturnsFalse()
@@ -115,14 +166,48 @@ public class UserPropertyServiceTest
 		property.setValue("FALSE");
 		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
 
-		Boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
 
 		assertFalse(actual);
 		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
 	}
 
 	/**
-	 * Service should return null if the property is not in the database.
+	 * Service should return false if the property value is "false".
+	 */
+	@Test
+	public void getPropertyBoolValue_FalseLowerCase_ReturnsFalse()
+	{
+		String propertyName = "FalseProperty";
+		UserProperty property = new UserProperty();
+		property.setValue("false");
+		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
+
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+
+		assertFalse(actual);
+		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
+	}
+
+	/**
+	 * Service should return false if the property value is not a boolean value.
+	 */
+	@Test
+	public void getPropertyBoolValue_OtherValue_ReturnsFalse()
+	{
+		String propertyName = "OtherProperty";
+		UserProperty property = new UserProperty();
+		property.setValue("Other");
+		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
+
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+
+		assertFalse(actual);
+		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
+	}
+
+	/**
+	 * Service should return false if the property is not in the database.
 	 */
 	@Test
 	public void getPropertyBoolValue_PropertyNotFound_ReturnsNull()
@@ -130,39 +215,25 @@ public class UserPropertyServiceTest
 		String propertyName = "NonExistentProperty";
 		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(null);
 
-		Boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
 
-		assertNull(actual);
+		assertFalse(actual);
 		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
 	}
 
 	/**
-	 * Service should return null if the property's value is null.
+	 * Service should return false if the property's value is null.
 	 */
 	@Test
-	public void getPropertyBoolValue_PropertyValueIsNull_ReturnsNull()
+	public void getPropertyBoolValue_PropertyValueIsNull_ReturnsFalse()
 	{
 		String propertyName = "NullProperty";
 		UserProperty property = new UserProperty();
 		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
 
-		Boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
+		boolean actual = userPropertyService.getPropertyBoolValue(propertyName);
 
-		assertNull(actual);
+		assertFalse(actual);
 		Mockito.verify(userPropertyDAO, times(1)).getProp(propertyName);
-	}
-
-	/**
-	 * Service should throw an exception if the property's value is not true, false, or null.
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void getPropertyBoolValue_PropertyValueIsInvalid_ThrowsException()
-	{
-		String propertyName = "InvalidProperty";
-		UserProperty property = new UserProperty();
-		property.setValue("Invalid Value");
-		Mockito.when(userPropertyDAO.getProp(propertyName)).thenReturn(property);
-
-		userPropertyService.getPropertyBoolValue(propertyName);
 	}
 }

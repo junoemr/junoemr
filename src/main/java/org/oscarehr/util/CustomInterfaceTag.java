@@ -77,14 +77,14 @@ public class CustomInterfaceTag extends TagSupport {
 	{
 		String customJs = "default";
 
-		if (name != null && name.length() > 0)
+		if (StringUtils.isNotEmpty(name))
 		{
 			customJs = name;
 		}
 		else
 		{
-			Boolean hasOceanToolBar = userPropertyService.getPropertyBoolValue(UserProperty.OCEAN_TOOLBAR_ENABLED);
-			if (Boolean.TRUE.equals(hasOceanToolBar))
+			boolean hasOceanToolBar = userPropertyService.getPropertyBoolValue(UserProperty.OCEAN_TOOLBAR_ENABLED);
+			if (hasOceanToolBar)
 			{
 				customJs = "ocean_toolbar";
 			}

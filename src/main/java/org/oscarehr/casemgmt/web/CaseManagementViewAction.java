@@ -601,15 +601,9 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 	private void getCmeJavaScriptAttribute(HttpServletRequest request)
 	{
 		//1. try from Properties
-		Boolean hasOceanToolBar = userPropertyService.getPropertyBoolValue(UserProperty.OCEAN_TOOLBAR_ENABLED);
-		if (Boolean.TRUE.equals(hasOceanToolBar))
-		{
-			request.setAttribute("cme_js", "ocean_toolbar");
-		}
-		else
-		{
-			request.setAttribute("cme_js", "default");
-		}
+		boolean hasOceanToolBar = userPropertyService.getPropertyBoolValue(UserProperty.OCEAN_TOOLBAR_ENABLED);
+		String attrValue = hasOceanToolBar ? "ocean_toolbar" : "default";
+		request.setAttribute("cme_js", attrValue);
 
 		//2. Override from provider preferences?
 

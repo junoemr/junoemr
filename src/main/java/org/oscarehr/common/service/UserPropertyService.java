@@ -42,29 +42,12 @@ public class UserPropertyService
 	 * Retrieves the Boolean value of a property in the database that is stored as a bool ("true", "false").
 	 *
 	 * @param name The name of the property.
-	 * @return Boolean true if the property is true, false if it is false, null if the property does not exist or
-	 * has a null value.
-	 * @throws IllegalArgumentException If the property has a value that isn't a valid Boolean value.
+	 * @return boolean true if the property is "true", "on" or "yes", false otherwise.
 	 */
-	public Boolean getPropertyBoolValue(String name)
+	public boolean getPropertyBoolValue(String name)
 	{
-		Boolean value = null;
 		String valueStr = getPropertyValue(name);
-
-		if ("TRUE".equalsIgnoreCase(valueStr))
-		{
-			value = Boolean.TRUE;
-		}
-		else if ("FALSE".equalsIgnoreCase(valueStr))
-		{
-			value = Boolean.FALSE;
-		}
-		else if (valueStr != null)
-		{
-			throw new IllegalArgumentException("Property \"" + name + "\" in the database is not a valid bool.");
-		}
-
-		return value;
+		return "TRUE".equalsIgnoreCase(valueStr) || "ON".equalsIgnoreCase(valueStr) || "YES".equalsIgnoreCase(valueStr);
 	}
 
 	/**

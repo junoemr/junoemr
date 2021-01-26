@@ -53,7 +53,7 @@ angular.module('Admin.Integration').component('integrationModules',
 				configUrl: "#!/admin/manageAppointmentQueues",
 			},
 			{
-				name: "iMD Health",
+				name: "Ocean ToolBar",
 				enabled: false,
 				propertyName: "integration.OceanToolBar.enabled",
 				configUrl:""
