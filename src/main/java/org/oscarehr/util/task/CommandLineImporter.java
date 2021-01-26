@@ -27,9 +27,10 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.util.ImportCallback;
+import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.service.ImportExportWrapperService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.oscarehr.demographicImport.util.ImportCallback;
 import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;
 import org.oscarehr.util.task.args.StringArg;
@@ -62,9 +63,9 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 				new StringArg("file-directory", null, true),
 				new StringArg("document-directory", null, false),
 				new StringArg("source-type", null, false),
-				new BooleanArg("skipMissingDocs", false, false),
-				new BooleanArg("mergeDemographics", false, false)
-		);
+				new StringArg("mergeStrategy", "SKIP", false),
+				new BooleanArg("skipMissingDocs", false, false)
+				);
 	}
 
 	public void run(Map<String, CommandLineArg<?>> args)
@@ -76,7 +77,7 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 		String importDocumentLocation = (String) args.get("document-directory").getValue();
 		String importSourceStr = (String) args.get("source-type").getValue();
 		Boolean skipMissingDocs = (Boolean) args.get("skipMissingDocs").getValue();
-		Boolean mergeDemographics = (Boolean) args.get("mergeDemographics").getValue();
+		String mergeStrategyStr = (String) args.get("mergeStrategy").getValue();
 
 		File importFileDirectory = new File(importFileLocation);
 		if(!(importFileDirectory.exists() && importFileDirectory.isDirectory()))
@@ -94,6 +95,13 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 		{
 			throw new InvalidCommandLineArgumentsException("Invalid document directory: " + importDocumentLocation);
 		}
+
+		if(!EnumUtils.isValidEnum(DemographicImporter.MERGE_STRATEGY.class, mergeStrategyStr))
+		{
+			throw new InvalidCommandLineArgumentsException(importType + " is not a valid MERGE_STRATEGY enum. must be one of " +
+					java.util.Arrays.asList(DemographicImporter.MERGE_STRATEGY.values()));
+		}
+		DemographicImporter.MERGE_STRATEGY mergeStrategy = DemographicImporter.MERGE_STRATEGY.valueOf(mergeStrategyStr);
 
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importType))
 		{
@@ -136,7 +144,7 @@ public class CommandLineImporter implements CommandLineTask, ImportCallback
 					genericFileList,
 					importDocumentLocation,
 					skipMissingDocs,
-					mergeDemographics,
+					mergeStrategy,
 					this);
 		}
 		catch(Exception e)

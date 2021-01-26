@@ -20,26 +20,16 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.exception;
 
-import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.exception.InvalidImportFileException;
-import org.oscarehr.demographicImport.model.PatientRecord;
-import org.oscarehr.demographicImport.util.ExportPreferences;
-
-import java.io.IOException;
-import java.util.List;
-
-public interface DemographicImporter
+public class DuplicateDemographicException extends RuntimeException
 {
-	enum MERGE_STRATEGY {
-		SKIP,
-		MERGE,
+	public DuplicateDemographicException()
+	{
+		super();
 	}
-
-	void verifyFileFormat(GenericFile importFile) throws InvalidImportFileException;
-
-	PatientRecord importDemographic(GenericFile importFile) throws Exception;
-
-	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
+	public DuplicateDemographicException(String message)
+	{
+		super(message);
+	}
 }

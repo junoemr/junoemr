@@ -37,6 +37,7 @@ import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.service.ImportExportWrapperService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -289,17 +290,17 @@ public class DemographicsService extends AbstractServiceImpl
 	@Path("/import")
 	public RestResponse<String> demographicImport(@QueryParam("type") String type,
 	                                              @QueryParam("source") String importSource,
-	                                              @QueryParam("merge") String mergeStrategy,
+	                                              @QueryParam("merge") String mergeStrategyStr,
 	                                              List<FileTransfer> fileListTransfer) throws IOException, InterruptedException
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
 
-		logger.info(fileListTransfer);
-
 		List<GenericFile> genericFileList = new ArrayList<>();
 		List<GenericFile> importFileList = new ArrayList<>();
 		String documentLocation = System.getProperty("java.io.tmpdir");
+
+		DemographicImporter.MERGE_STRATEGY mergeStrategy = DemographicImporter.MERGE_STRATEGY.valueOf(mergeStrategyStr);
 
 		for(FileTransfer file : fileListTransfer)
 		{
@@ -321,7 +322,7 @@ public class DemographicsService extends AbstractServiceImpl
 				importFileList,
 				documentLocation,
 				false,
-				false,
+				mergeStrategy,
 				null);
 
 		// clean up temp files

@@ -54,7 +54,7 @@ public class ImportExportWrapperService
 	                               List<GenericFile> importFileList,
 	                               String documentLocation,
 	                               boolean skipMissingDocs,
-	                               boolean mergeDemographics,
+	                               DemographicImporter.MERGE_STRATEGY mergeStrategy,
 	                               ImportCallback importCallback)
 	{
 
@@ -78,7 +78,7 @@ public class ImportExportWrapperService
 							importFile,
 							documentLocation,
 							skipMissingDocs,
-							mergeDemographics);
+							mergeStrategy);
 
 					importCount++;
 
@@ -126,7 +126,7 @@ public class ImportExportWrapperService
 	                               List<GenericFile> importFileList,
 	                               String documentLocation,
 	                               boolean skipMissingDocs,
-	                               boolean mergeDemographics,
+	                               DemographicImporter.MERGE_STRATEGY mergeStrategy,
 	                               ImportCallback importCallback)
 	{
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importerTypeStr))
@@ -148,6 +148,6 @@ public class ImportExportWrapperService
 			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
-		importDemographics(importerType, importSource, importFileList, documentLocation, skipMissingDocs, mergeDemographics, importCallback);
+		importDemographics(importerType, importSource, importFileList, documentLocation, skipMissingDocs, mergeStrategy, importCallback);
 	}
 }

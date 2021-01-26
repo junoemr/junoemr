@@ -38,6 +38,7 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicContactService;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.converter.in.PharmacyModelToDbConverter;
@@ -45,9 +46,11 @@ import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.PatientRecordModelConverter;
+import org.oscarehr.demographicImport.exception.DuplicateDemographicException;
 import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.model.PatientRecord;
+import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
@@ -70,10 +73,13 @@ import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.service.MedicationService;
+import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
@@ -227,18 +233,36 @@ public class ImportExportService
 	                              GenericFile importFile,
 	                              String documentLocation,
 	                              boolean skipMissingDocs,
-	                              boolean mergeDemographics) throws Exception
+	                              DemographicImporter.MERGE_STRATEGY mergeStrategy) throws Exception
 	{
 		DemographicImporter importer = importerExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
 		importer.verifyFileFormat(importFile);
 		PatientRecord patientRecord = importer.importDemographic(importFile);
 
-		// TODO handle demographic merging & duplicate check
+		Demographic demographicModel = patientRecord.getDemographic();
+		org.oscarehr.demographic.model.Demographic dbDemographicDuplicate = findDuplicate(demographicModel);
+		boolean duplicateDetected = (dbDemographicDuplicate != null);
 
-		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, patientRecord.getDemographic());
+		org.oscarehr.demographic.model.Demographic dbDemographic;
+		if(duplicateDetected)
+		{
+			dbDemographic = dbDemographicDuplicate;
+			if(DemographicImporter.MERGE_STRATEGY.MERGE.equals(mergeStrategy))
+			{
+				logger.warn("Merge with existing demographic: " + dbDemographic.getId());
+			}
+			else
+			{
+				throw new DuplicateDemographicException("Duplicate demographic: " + dbDemographic.getId());
+			}
+		}
+		else
+		{
+			dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographicModel);
+			logger.info("Persisted new demographic: " + dbDemographic.getId());
+		}
+
 		patientRecord.getDemographic().setId(dbDemographic.getId());
-		logger.info("persisted new demographic: " + patientRecord.getDemographic().getId());
-
 		demographicContactService.addNewContacts(patientRecord.getContactList(), dbDemographic);
 		persistNotes(patientRecord, dbDemographic);
 		persistLabs(patientRecord, dbDemographic);
@@ -252,10 +276,12 @@ public class ImportExportService
 		allergyService.saveNewAllergies(patientRecord.getAllergyList(), dbDemographic);
 
 		persistPreventions(patientRecord, dbDemographic);
+		persistPharmacy(patientRecord, dbDemographic);
 
+		// persist documents last to minimize import errors with disk IO
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
 
-		persistPharmacy(patientRecord, dbDemographic);
+		writeAuditLogImportStatement(dbDemographic, importType, importSource, duplicateDetected);
 	}
 
 	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
@@ -334,7 +360,6 @@ public class ImportExportService
 				parser.postUpload();
 
 				// indexes are assumed to line up since this is the same iteration happening in the JunoGenericImportLabWriter
-				// TODO find a better way to get indexes?
 				int obrIndex = 0;
 				for(LabObservation labObservation : lab.getLabObservationList())
 				{
@@ -386,5 +411,52 @@ public class ImportExportService
 			demographicPharmacy.setPreferredOrder(1);
 			demographicPharmacyDao.persist(demographicPharmacy);
 		}
+	}
+
+	private org.oscarehr.demographic.model.Demographic findDuplicate(Demographic demographicModel)
+	{
+		String hin = demographicModel.getHealthNumber();
+		if(hin != null)
+		{
+			DemographicCriteriaSearch searchQuery = new DemographicCriteriaSearch();
+			searchQuery.setHin(hin);
+			searchQuery.setDateOfBirth(demographicModel.getDateOfBirth());
+
+			List<org.oscarehr.demographic.model.Demographic> possibleMatches = demographicDao.criteriaSearch(searchQuery);
+			if(possibleMatches.size() == 1)
+			{
+				return possibleMatches.get(0);
+			}
+			else if(possibleMatches.size() > 1)
+			{
+				throw new RuntimeException("Multiple duplicate record found for hin: " + hin);
+			}
+		}
+		return null;
+	}
+
+	private void writeAuditLogImportStatement(org.oscarehr.demographic.model.Demographic dbDemographic,
+	                                          ImporterExporterFactory.IMPORTER_TYPE importType,
+	                                          ImporterExporterFactory.IMPORT_SOURCE importSource,
+	                                          boolean duplicateDetected)
+	{
+		String logAction;
+		String logMessage = "[" + importType.toString() + "] import data (from source '" +importSource.toString() + "') ";
+		if(duplicateDetected)
+		{
+			logMessage += "merged";
+			logAction = LogConst.ACTION_UPDATE;
+		}
+		else
+		{
+			logMessage += "saved as new patient record";
+			logAction = LogConst.ACTION_ADD;
+		}
+		LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo(),
+				dbDemographic.getId(),
+				logAction,
+				LogConst.CON_DEMOGRAPHIC,
+				LogConst.STATUS_SUCCESS,
+				logMessage);
 	}
 }

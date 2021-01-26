@@ -51,15 +51,11 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					[
 						{
 							label: 'Skip duplicates',
-							value: 'skip',
+							value: 'SKIP',
 						},
 						{
-							label: 'Add new',
-							value: 'new',
-						},
-						{
-							label: 'Replace existing',
-							value: 'replace',
+							label: 'Merge duplicates',
+							value: 'MERGE',
 						},
 					]
 				);
