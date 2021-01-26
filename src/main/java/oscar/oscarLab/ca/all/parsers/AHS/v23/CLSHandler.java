@@ -40,6 +40,8 @@ import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.
@@ -149,17 +151,31 @@ public class CLSHandler extends AHSHandler
 		return get("/.OBR-20");
 	}
 
-	////this.isUnstructuredDoc = "TX".equals(handler.getOBXValueType(0,0));
-	public boolean isUnstructured() {
-		boolean result=true;
-		for(int j = 0; j<this.getOBRCount();j++) {
-			for(int k=0;k<this.getOBXCount(j);k++) {
-				if(!"TX".equals(getOBXValueType(j, k))) {
-					result=false;
+	public boolean isUnstructured()
+	{
+		String DATA_TYPE_TEXT = "TX";
+		String DATA_TYPE_STRING = "ST";
+
+		Set<String> unstructuredTypes = new HashSet<>();
+		unstructuredTypes.add(DATA_TYPE_TEXT);
+		unstructuredTypes.add(DATA_TYPE_STRING);
+
+		for (int j = 0; j < this.getOBRCount(); j++)
+		{
+			for(int k = 0; k < this.getOBXCount(j); k++)
+			{
+				String obxValueType = getOBXValueType(j, k);
+				if (!unstructuredTypes.contains(obxValueType)
+						|| !getOBXReferenceRange(j, k).isEmpty()
+						|| isAbnormal()
+						|| !getOBXUnits(j, k).isEmpty())
+				{
+					return false;
 				}
 			}
 		}
-		return result;
+
+		return true;
 	}
 
 
