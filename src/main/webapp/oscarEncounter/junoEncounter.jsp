@@ -212,13 +212,16 @@
 				filteredProviders: [],
 				filteredRoles: [],
 				filteredIssues: [],
+				minDelta: 0.93,
+				minMain: null,
+				minWin: null,
 			};
 
 
 			var eChartUUID = "${junoEncounterForm.pageData.echartUuid}";
 
 			<%@ include file="js/JunoEncounter.js" %>
-			var junoEncounter = new Juno.OscarEncounter.JunoEncounter(pageData);
+			var junoEncounter = new Juno.OscarEncounter.JunoEncounter(pageData, pageState);
 
 			<%@ include file="js/JunoEncounter/CppNote.js" %>
 			var cppNote = new Juno.OscarEncounter.JunoEncounter.CppNote(pageData, junoEncounter);
@@ -287,6 +290,8 @@
 				junoEncounter.initOceanToolbar();
 
 				junoEncounter.resizeContent();
+
+				junoEncounter.initNavBarMonitor();
 
 				if(!junoEncounter.configureNifty())
 				{
@@ -655,7 +660,7 @@
 									<fmt:formatDate value="${parsedUpdateDate}"
 													pattern="dd-MMM-yyyy" var="updateDate"/>
 									<c:if test="${not empty updateDate}">
-										<span class="encounterNoteDate">
+										<span class="encounterNoteDate ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 											...<a
 												class="links"
 												style="margin-right: 2px; color: ${note.colour};"

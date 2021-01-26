@@ -438,11 +438,11 @@ div.encounterNavBar li.encounterNote {
 	white-space:nowrap;
 }
 
-div.encounterNavBar li.encounterNoteEven, div.topBox li.encounterNoteEven {
+div.encounterNavBar li.encounterNoteEven, div.encounterNavBar li.encounterNoteEven span.encounterNoteEven, div.topBox li.encounterNoteEven {
 	background-color: #f3f3f3;
 }
 
-div.encounterNavBar li.encounterNoteOdd, div.topBox li.encounterNoteOdd {
+div.encounterNavBar li.encounterNoteOdd, div.encounterNavBar li.encounterNoteOdd span.encounterNoteOdd, div.topBox li.encounterNoteOdd {
 	background-color: white;
 }
 
