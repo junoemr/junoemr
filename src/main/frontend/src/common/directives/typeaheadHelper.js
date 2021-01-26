@@ -106,7 +106,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.hasButtons = function hasButtons()
 			{
-				return  !helper.defaultTypeaheadScope().isDisabled && ($scope.hasSearchButton() || $scope.hasAddButton());
+				return !$scope.isDisabled && ($scope.hasSearchButton() || $scope.hasAddButton());
 			};
 
 			$scope.hasSearchButton = function hasSearchButton()
