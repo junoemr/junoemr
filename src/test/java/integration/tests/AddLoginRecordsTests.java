@@ -101,7 +101,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
-	public void removeExpiryDate(String userName, String providerNo)////
+	public void removeExpiryDate(String userName, String providerNo) throws InterruptedException////
 	{
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		String currWindowHandle1 = driver.getWindowHandle();
@@ -123,8 +123,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addLoginRecordsClassicUITest()
-	{
+	public void addLoginRecordsClassicUITest() throws InterruptedException {
 		String currWindowHandle = driver.getWindowHandle();
 		//Assign Roles
 		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
@@ -162,8 +161,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addLoginRecordsJUNOUITest()
-	{
+	public void addLoginRecordsJUNOUITest() throws InterruptedException {
 		String xpathProvider = "(//td[contains(., '" + drBerry.providerNo + "')])";
 		String xpathDropdown = xpathProvider + xpathOption;
 		//Assign Roles
