@@ -32,6 +32,7 @@
 package oscar.oscarRx.pageUtil;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,11 +71,31 @@ public final class RxManagePharmacyAction extends DispatchAction {
 
            String actionType = frm.getPharmacyAction();
            RxPharmacyData pharmacy = new RxPharmacyData();
+			PharmacyInfo pharmacyInfo = new PharmacyInfo();
+			if (frm.getID() != null && !frm.getID().isEmpty())
+			{
+				pharmacyInfo.setId(Integer.parseInt(frm.getID()));
+			}
+			pharmacyInfo.setName(frm.getName());
+			pharmacyInfo.setAddress(frm.getAddress());
+			pharmacyInfo.setCity(frm.getCity());
+			pharmacyInfo.setProvince(frm.getProvince());
+			pharmacyInfo.setPostalCode(frm.getPostalCode());
+			pharmacyInfo.setPhone1(frm.getPhone1());
+			pharmacyInfo.setPhone2(frm.getPhone2());
+			pharmacyInfo.setFax(frm.getFax());
+			pharmacyInfo.setEmail(frm.getEmail());
+			pharmacyInfo.setServiceLocationIdentifier(frm.getServiceLocationIdentifier());
+			pharmacyInfo.setNotes(frm.getNotes());
+			pharmacyInfo.setAddDate(new Date());
+			pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
 
-           if(actionType.equals("Add")){
-              pharmacy.addPharmacy(frm.getName(), frm.getAddress(), frm.getCity(), frm.getProvince(), frm.getPostalCode(), frm.getPhone1(), frm.getPhone2(), frm.getFax(), frm.getEmail(),frm.getServiceLocationIdentifier(), frm.getNotes());
+		if(actionType.equals("Add")){
+			pharmacy.addPharmacy(pharmacyInfo);
            }else if(actionType.equals("Edit")){
-              pharmacy.updatePharmacy(frm.getID(),frm.getName(), frm.getAddress(), frm.getCity(), frm.getProvince(), frm.getPostalCode(), frm.getPhone1(), frm.getPhone2(), frm.getFax(), frm.getEmail(), frm.getServiceLocationIdentifier(), frm.getNotes());
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+			pharmacy.updatePharmacy(pharmacyInfo, loggedInInfo);
+
            }else if(actionType.equals("Delete")){
               pharmacy.deletePharmacy(frm.getID());
            }
@@ -167,14 +188,26 @@ public final class RxManagePharmacyAction extends DispatchAction {
     
     public ActionForward add(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
     	RxPharmacyData pharmacy = new RxPharmacyData();
-    	
-    	String status = "{\"success\":true}";
+		PharmacyInfo pharmacyInfo = new PharmacyInfo();
+		pharmacyInfo.setName(request.getParameter("pharmacyName"));
+		pharmacyInfo.setAddress(request.getParameter("pharmacyAddress"));
+		pharmacyInfo.setCity(request.getParameter("pharmacyCity"));
+		pharmacyInfo.setProvince(request.getParameter("pharmacyProvince"));
+		pharmacyInfo.setPostalCode(request.getParameter("pharmacyPostalCode"));
+		pharmacyInfo.setPhone1(request.getParameter("pharmacyPhone1"));
+		pharmacyInfo.setPhone2(request.getParameter("pharmacyPhone2"));
+		pharmacyInfo.setFax(request.getParameter("pharmacyFax"));
+		pharmacyInfo.setEmail(request.getParameter("pharmacyEmail"));
+		pharmacyInfo.setServiceLocationIdentifier(request.getParameter("pharmacyServiceLocationId"));
+		pharmacyInfo.setNotes(request.getParameter("pharmacyNotes"));
+		pharmacyInfo.setAddDate(new Date());
+		pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
+
+		String status = "{\"success\":true}";
     	
     	try {
-    		pharmacy.addPharmacy(request.getParameter("pharmacyName"), request.getParameter("pharmacyAddress"), request.getParameter("pharmacyCity"), 
-    			request.getParameter("pharmacyProvince"), request.getParameter("pharmacyPostalCode"), request.getParameter("pharmacyPhone1"), request.getParameter("pharmacyPhone2"), 
-    			request.getParameter("pharmacyFax"), request.getParameter("pharmacyEmail"), request.getParameter("pharmacyServiceLocationId"), request.getParameter("pharmacyNotes"));
-    	}
+			pharmacy.addPharmacy(pharmacyInfo);
+		}
     	catch( Exception e ) {
     		MiscUtils.getLogger().error("Error Updating Pharmacy " + request.getParameter("pharmacyId"), e);
     		status = "{\"success\":false}";    		
@@ -193,12 +226,17 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	return null;
     }
     
-    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-    	
-    	
-    	RxPharmacyData pharmacy = new RxPharmacyData();
-    	PharmacyInfo pharmacyInfo = new PharmacyInfo();
-    	pharmacyInfo.setId(Integer.parseInt(request.getParameter("pharmacyId")));
+    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		RxPharmacyData pharmacy = new RxPharmacyData();
+		PharmacyInfo pharmacyInfo = new PharmacyInfo();
+
+		try
+		{
+			pharmacyInfo.setId(Integer.parseInt(request.getParameter("pharmacyId")));
+		}
+		catch (NumberFormatException ignored) {}
+
     	pharmacyInfo.setName(request.getParameter("pharmacyName"));
     	pharmacyInfo.setAddress(request.getParameter("pharmacyAddress"));
     	pharmacyInfo.setCity(request.getParameter("pharmacyCity"));
@@ -210,26 +248,37 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	pharmacyInfo.setEmail(request.getParameter("pharmacyEmail"));
     	pharmacyInfo.setServiceLocationIdentifier(request.getParameter("pharmacyServiceLocationId"));
     	pharmacyInfo.setNotes(request.getParameter("pharmacyNotes"));
-    	
-    	try {
-    		pharmacy.updatePharmacy(request.getParameter("pharmacyId"),request.getParameter("pharmacyName"), request.getParameter("pharmacyAddress"), request.getParameter("pharmacyCity"), 
-    			request.getParameter("pharmacyProvince"), request.getParameter("pharmacyPostalCode"), request.getParameter("pharmacyPhone1"), request.getParameter("pharmacyPhone2"), 
-    			request.getParameter("pharmacyFax"), request.getParameter("pharmacyEmail"), request.getParameter("pharmacyServiceLocationId"), request.getParameter("pharmacyNotes"));
-    	}
-    	catch( Exception e ) {
-    		MiscUtils.getLogger().error("Error Updating Pharmacy " + request.getParameter("pharmacyId"), e);
+		pharmacyInfo.setAddDate(new Date());
+		pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
+
+		try
+		{
+			if (pharmacyInfo.getId() == null)
+			{
+				pharmacy.addPharmacy(pharmacyInfo);
+			}
+			else
+			{
+				LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+				pharmacy.updatePharmacy(pharmacyInfo, loggedInInfo);
+			}
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("Error Updating Pharmacy " + request.getParameter("pharmacyId"), e);
     		return null;
     	}
     	
-    	try {
-    		response.setContentType("text/x-json");
-    		ObjectMapper mapper = new ObjectMapper();
-    		mapper.writeValue(response.getWriter(), pharmacyInfo);    		
-    		
-    	}
-    	catch( IOException e ) {
-    		MiscUtils.getLogger().error("Error writing response",e);
-    	}
+		try
+		{
+			response.setContentType("text/x-json");
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.writeValue(response.getWriter(), pharmacyInfo);
+		}
+		catch (IOException e)
+		{
+			MiscUtils.getLogger().error("Error writing response", e);
+		}
     	
     	return null;
     }

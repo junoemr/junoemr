@@ -39,8 +39,11 @@ import org.oscarehr.common.dao.DemographicPharmacyDao;
 import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.model.DemographicPharmacy;
 import org.oscarehr.common.model.PharmacyInfo;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 /**
  *
@@ -50,49 +53,87 @@ import org.oscarehr.util.SpringUtils;
  */
 public class RxPharmacyData {
 
-	private PharmacyInfoDao pharmacyInfoDao = (PharmacyInfoDao)SpringUtils.getBean(PharmacyInfoDao.class);
-	private DemographicPharmacyDao demographicPharmacyDao = (DemographicPharmacyDao)SpringUtils.getBean(DemographicPharmacyDao.class);
+	private PharmacyInfoDao pharmacyInfoDao = SpringUtils.getBean(PharmacyInfoDao.class);
+	private DemographicPharmacyDao demographicPharmacyDao = SpringUtils.getBean(DemographicPharmacyDao.class);
 
    /** Creates a new instance of RxPharmacyData */
    public RxPharmacyData() {
    }
 
+	/**
+	 * Part of an effort to clean up this intermediate layer.
+	 * Given a model representing a pharmacy, attempt to persist it.
+	 * @param pharmacyInfo pharmacy model we want to save
+	 */
+	synchronized public void addPharmacy(PharmacyInfo pharmacyInfo)
+	{
+		pharmacyInfoDao.persist(pharmacyInfo);
+	}
 
-   /**
-    * Used to add a new pharmacy
-    * @param name
-    * @param address
-    * @param city
-    * @param province
-    * @param postalCode
-    * @param phone1
-    * @param phone2
-    * @param fax
-    * @param email
-    * @param notes
-    */
-   synchronized public void addPharmacy(String name,String address,String city,String province,String postalCode, String phone1, String phone2, String fax, String email,String serviceLocationIdentifier, String notes){
-	   pharmacyInfoDao.addPharmacy(name, address, city, province, postalCode, phone1, phone2, fax, email, serviceLocationIdentifier, notes);
-   }
+	/**
+	 * Update an existing pharmacy entry, and log every relevant change.
+	 * The log should be detailed enough so that someone can go looking for pharmacy edits
+	 * and fully reverse the changes if they were applied to the wrong entry.
+	 * @param pharmacyInfo pharmacy model that contains all info that was requested to be updated
+	 * @param loggedInInfo session information that we can use to determine who made this change
+	 */
+	public void updatePharmacy(PharmacyInfo pharmacyInfo, LoggedInInfo loggedInInfo)
+	{
+		PharmacyInfo oldEntry = pharmacyInfoDao.getPharmacy(pharmacyInfo.getId());
+		// Build a list of all things that are different for logging purposes
+		String differences = "";
 
+		// UI doesn't allow for a null or 0-length name
+		if (!oldEntry.getName().equals(pharmacyInfo.getName()))
+		{
+			differences += "Old name: " + oldEntry.getName() + " | New name: " + pharmacyInfo.getName() + "\n";
+		}
+		if (oldEntry.getAddress() != null && !oldEntry.getAddress().equals(pharmacyInfo.getAddress()))
+		{
+			differences += "Old address: " + oldEntry.getAddress() + " | New address: " + pharmacyInfo.getAddress() + "\n";
+		}
+		if (oldEntry.getCity() != null && !oldEntry.getCity().equals(pharmacyInfo.getCity()))
+		{
+			differences += "Old city: " + oldEntry.getCity() + " | New city: " + pharmacyInfo.getCity() + "\n";
+		}
+		if (oldEntry.getProvince() != null && !oldEntry.getProvince().equals(pharmacyInfo.getProvince()))
+		{
+			differences += "Old province: " + oldEntry.getProvince() + " | New province: " + pharmacyInfo.getProvince() + "\n";
+		}
+		if (oldEntry.getPostalCode() != null && !oldEntry.getPostalCode().equals(pharmacyInfo.getPostalCode()))
+		{
+			differences += "Old postal code: " + oldEntry.getPostalCode()
+					+ " | New postal code: " + pharmacyInfo.getPostalCode() + "\n";
+		}
+		if (oldEntry.getPhone1() != null && !oldEntry.getPostalCode().equals(pharmacyInfo.getPostalCode()))
+		{
+			differences += "Old phone1: " + oldEntry.getPhone1()
+					+ " | New phone1: " + pharmacyInfo.getPhone1() + "\n";
+		}
+		if (oldEntry.getPhone2() != null && !oldEntry.getPhone2().equals(pharmacyInfo.getPhone2()))
+		{
+			differences += "Old phone2: " + oldEntry.getPhone2()
+					+ " | New phone2: " + pharmacyInfo.getPhone2() + "\n";
+		}
+		if (!oldEntry.getFax().equals(pharmacyInfo.getFax()))
+		{
+			differences += "Old fax: " + oldEntry.getFax() + " | New fax: " + pharmacyInfo.getFax() + "\n";
+		}
+		if (oldEntry.getEmail() != null && !oldEntry.getEmail().equals(pharmacyInfo.getEmail()))
+		{
+			differences += "Old email: " + oldEntry.getEmail() + " | New email: "+ pharmacyInfo.getEmail() + "\n";
+		}
 
-   /**
-    * Used to update an new pharmacy.  Creates a new record for this pharmacy with the same pharmacyID
-    * @param ID pharmacy ID
-    * @param name
-    * @param address
-    * @param city
-    * @param province
-    * @param postalCode
-    * @param phone1
-    * @param phone2
-    * @param fax
-    * @param email
-    * @param notes
-    */
-   public void updatePharmacy(String ID,String name,String address,String city,String province,String postalCode, String phone1, String phone2, String fax, String email, String serviceLocationIdentifier, String notes){
-		pharmacyInfoDao.updatePharmacy(Integer.parseInt(ID), name, address, city, province, postalCode, phone1, phone2, fax, email, serviceLocationIdentifier, notes);
-   }
+		pharmacyInfoDao.merge(pharmacyInfo);
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				null,
+				LogConst.ACTION_UPDATE,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + pharmacyInfo.getId(),
+				loggedInInfo.getIp(),
+				differences);
+	}
 
    /**
     * set the status of the pharmacy to 0, this will not be found in the getAllPharmacy queries
