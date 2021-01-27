@@ -65,9 +65,17 @@ public class RxPharmacyData {
 	 * Given a model representing a pharmacy, attempt to persist it.
 	 * @param pharmacyInfo pharmacy model we want to save
 	 */
-	synchronized public void addPharmacy(PharmacyInfo pharmacyInfo)
+	synchronized public void addPharmacy(PharmacyInfo pharmacyInfo, LoggedInInfo loggedInInfo)
 	{
 		pharmacyInfoDao.persist(pharmacyInfo);
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				null,
+				LogConst.ACTION_ADD,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + pharmacyInfo.getId(),
+				loggedInInfo.getIp(),
+				"Added pharmacy: " + pharmacyInfo.getName());
 	}
 
 	/**

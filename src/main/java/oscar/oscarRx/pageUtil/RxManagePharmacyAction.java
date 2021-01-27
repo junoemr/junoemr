@@ -90,10 +90,12 @@ public final class RxManagePharmacyAction extends DispatchAction {
 			pharmacyInfo.setAddDate(new Date());
 			pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
 
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+
 		if(actionType.equals("Add")){
-			pharmacy.addPharmacy(pharmacyInfo);
+			pharmacy.addPharmacy(pharmacyInfo, loggedInInfo);
            }else if(actionType.equals("Edit")){
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			pharmacy.updatePharmacy(pharmacyInfo, loggedInInfo);
 
            }else if(actionType.equals("Delete")){
@@ -203,10 +205,12 @@ public final class RxManagePharmacyAction extends DispatchAction {
 		pharmacyInfo.setAddDate(new Date());
 		pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
 
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
 		String status = "{\"success\":true}";
     	
     	try {
-			pharmacy.addPharmacy(pharmacyInfo);
+			pharmacy.addPharmacy(pharmacyInfo, loggedInInfo);
 		}
     	catch( Exception e ) {
     		MiscUtils.getLogger().error("Error Updating Pharmacy " + request.getParameter("pharmacyId"), e);
@@ -251,15 +255,16 @@ public final class RxManagePharmacyAction extends DispatchAction {
 		pharmacyInfo.setAddDate(new Date());
 		pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
 
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
 		try
 		{
 			if (pharmacyInfo.getId() == null)
 			{
-				pharmacy.addPharmacy(pharmacyInfo);
+				pharmacy.addPharmacy(pharmacyInfo, loggedInInfo);
 			}
 			else
 			{
-				LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 				pharmacy.updatePharmacy(pharmacyInfo, loggedInInfo);
 			}
 		}
