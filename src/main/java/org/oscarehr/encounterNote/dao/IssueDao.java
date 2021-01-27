@@ -42,11 +42,30 @@ public class IssueDao extends AbstractDao<Issue>
 	public Issue findByCode(String code)
 	{
 		// select model name must match specified @Entity name in model object
-		String queryString = "SELECT x FROM model.Issue x WHERE x.code=:code ORDER BY x.issueId ASC";
+		String queryString = "SELECT x FROM model.Issue x WHERE x.code = :code ORDER BY x.issueId ASC";
 		Query query = entityManager.createQuery(queryString);
 		query.setParameter("code", code);
 		query.setMaxResults(1);
 
 		return (Issue) query.getSingleResult();
+	}
+
+	public String getIssueCodeForCPPNote(int noteId)
+	{
+		String queryString =
+			"SELECT i.issue_id, i.code, i.description, i.role, " +
+					"i.update_date, i.priority, i.type, i.sortOrderId " +
+			"FROM issue i " +
+			"LEFT JOIN casemgmt_issue ci ON ci.issue_id = i.issue_id " +
+			"LEFT JOIN casemgmt_issue_notes cin ON cin.id = ci.id " +
+			"LEFT JOIN casemgmt_note cm ON cm.note_id = cin.note_id " +
+			"WHERE cm.note_id = :noteId";
+
+		Query query = entityManager.createNativeQuery(queryString, Issue.class);
+		query.setParameter("noteId", noteId);
+		query.setMaxResults(1);
+
+		Issue issue = (Issue) query.getSingleResult();
+		return issue.getCode();
 	}
 }
