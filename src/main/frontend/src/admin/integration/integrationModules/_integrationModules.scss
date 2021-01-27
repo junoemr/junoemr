@@ -5,6 +5,9 @@
 		margin-top: 0;
 	}
 
+    .integration-modules:not(:first-child) {
+      margin-top: 64px;
+    }
 
 	.integration-list {
 		flex-wrap: wrap;

@@ -39,6 +39,22 @@ public class RESTClient
 {
 	private ResponseErrorHandler errorHandler = new DefaultResponseErrorHandler();
 
+	protected static final String DEFAULT_PROTOCOL = "https";
+
+	public static String concatEndpointStrings(String baseString, String concatString)
+	{
+		baseString = baseString.replaceAll("/$", "");
+		baseString = baseString.replaceAll("http(s)?://", "");
+		concatString = concatString.replaceAll("^/", "");
+		return baseString + "/" + concatString;
+	}
+
+	public static String buildUrl(String protocol, String endPoint)
+	{
+		endPoint = endPoint.replaceAll("http(s)?://", "");
+		return protocol + "://" + endPoint;
+	}
+
 	public RESTClient()
 	{
 
