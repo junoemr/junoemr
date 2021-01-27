@@ -28,10 +28,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static integration.tests.util.SeleniumTestBase.WEB_DRIVER_EXPLICIT_TIMEOUT;
+import static integration.tests.util.seleniumUtil.PageUtil.isExistsBy;
 
 public class SectionAccessUtil
 {
-
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
 	{
 		driver.findElement(By.id("admin-panel")).click();
@@ -43,25 +43,37 @@ public class SectionAccessUtil
 	}
 
 	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
+			throws InterruptedException
 	{
 		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-
+		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
+		{
+			// open JUNO UI page
+			driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		}
 		// open administration panel
 		driver.manage().window().maximize();
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Admin")));
 		driver.findElement(By.linkText("Admin")).click();
 		driver.findElement(By.linkText(sectionName)).click();
 		driver.findElement(By.linkText(subSectionName)).click();
-		driver.switchTo().frame("content-frame");
+		Thread.sleep(2000);
+		if (isExistsBy(By.tagName("iframe"), driver))
+		{
+			driver.switchTo().frame("content-frame");
+		}
 	}
 
 	public static void accessSectionJUNOUI(WebDriver driver, String sectionName)
 	{
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
+		{
+			// open JUNO UI page
+			driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		}
 		driver.manage().window().maximize();
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 	}
 }
