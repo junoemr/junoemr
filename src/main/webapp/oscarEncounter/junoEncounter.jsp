@@ -609,6 +609,11 @@
 
 							<c:forEach items="${section.notes}" var="note" varStatus="loop">
 
+								<%-- ============================================================================== --%>
+								<%-- NOTE: This template is duplicated in sectionNoteTemplate.html and any          --%>
+								<%--       modifications will need to be done in both places.  This should be       --%>
+								<%--       changed at some point to share a template.                               --%>
+								<%-- ============================================================================== --%>
 								<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 
 									<%-- Expand arrows if neccessary --%>
@@ -754,6 +759,11 @@
 								<fmt:formatDate value="${parsedObservationDate}"
 												pattern="dd-MMM-yyyy"
 												var="observationDate"/>
+								<%-- ============================================================================== --%>
+								<%-- NOTE: This template is duplicated in sectionCPPNoteTemplate.html and any       --%>
+								<%--       modifications will need to be done in both places.  This should be       --%>
+								<%--       changed at some point to share a template.                               --%>
+								<%-- ============================================================================== --%>
 								<li class="cpp ${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 									<span id="spanListNote${fn:escapeXml(noteLoop.index)}">
 										<a class="topLinks"

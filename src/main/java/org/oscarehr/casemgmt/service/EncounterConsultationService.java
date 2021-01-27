@@ -168,6 +168,8 @@ public class EncounterConsultationService extends EncounterSectionService
 			sectionNote.setText(title);
 			sectionNote.setUpdateDate(ConversionUtils.toNullableLocalDate(date).atStartOfDay());
 
+			sectionNote.setTitle(title + " " + ConversionUtils.toDateString(date, ConversionUtils.DEFAULT_DATE_PATTERN));
+
 			out.add(sectionNote);
 		}
 

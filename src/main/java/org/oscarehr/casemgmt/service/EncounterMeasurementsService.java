@@ -350,6 +350,9 @@ public class EncounterMeasurementsService extends EncounterSectionService
 
 				sectionNote.setText(title);
 
+				sectionNote.setTitle(title + " " +
+						ConversionUtils.toDateString(date, ConversionUtils.DEFAULT_DATE_PATTERN));
+
 				sectionNote.setValue(data.getDataField());
 
 				String winName = type + sectionParams.getDemographicNo();

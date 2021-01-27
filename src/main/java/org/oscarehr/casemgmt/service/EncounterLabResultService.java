@@ -35,6 +35,7 @@ import oscar.oscarEncounter.pageUtil.EctDisplayLabAction2;
 import oscar.oscarLab.ca.all.web.LabDisplayHelper;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -253,6 +254,8 @@ public class EncounterLabResultService extends EncounterSectionService
 
 			sectionNote.setText(labRead + labDisplayName + labRead);
 
+			sectionNote.setTitle(labDisplayName + " " +
+					ConversionUtils.toDateTimeString(serviceDate, ConversionUtils.DEFAULT_DATE_PATTERN));
 
 			// Link onClick
 			String remoteFacilityIdQueryString = "";
