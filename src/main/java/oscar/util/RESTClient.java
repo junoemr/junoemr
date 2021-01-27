@@ -39,6 +39,22 @@ public class RESTClient
 {
 	private ResponseErrorHandler errorHandler = new DefaultResponseErrorHandler();
 
+	protected static final String DEFAULT_PROTOCOL = "https";
+
+	public static String concatEndpointStrings(String baseString, String concatString)
+	{
+		baseString = baseString.replaceAll("/$", "");
+		baseString = baseString.replaceAll("http(s)?://", "");
+		concatString = concatString.replaceAll("^/", "");
+		return baseString + "/" + concatString;
+	}
+
+	public static String buildUrl(String protocol, String endPoint)
+	{
+		endPoint = endPoint.replaceAll("http(s)?://", "");
+		return protocol + "://" + endPoint;
+	}
+
 	public RESTClient()
 	{
 
@@ -50,6 +66,11 @@ public class RESTClient
 	}
 
 	// ---------------------------- HTTP POST ----------------------------------------- //
+	public <U, T> T doPost(String url, U body, Class<T> responseClass)
+	{
+		return executeRequest(url, HttpMethod.POST, null, null, body, responseClass);
+	}
+
 	public <U, T> T doPost(String url, HttpHeaders headers, U body, Class<T> responseClass)
 	{
 		return executeRequest(url, HttpMethod.POST, headers, null, body, responseClass);
@@ -61,6 +82,11 @@ public class RESTClient
 	}
 
 	// ---------------------------- HTTP GET ----------------------------------------- //
+	public <T> T doGet(String url, Class<T> responseClass)
+	{
+		return executeRequest(url, HttpMethod.GET, null, null, null, responseClass);
+	}
+
 	public <T> T doGet(String url, HttpHeaders headers, Class<T> responseClass)
 	{
 		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass);
@@ -70,6 +96,23 @@ public class RESTClient
 	{
 		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, responseClass);
 	}
+
+	// ---------------------------- HTTP PUT ----------------------------------------- //
+	public <U, T> T doPut(String url, U body, Class<T> responseClass)
+	{
+		return executeRequest(url, HttpMethod.PUT, null, null, body, responseClass);
+	}
+
+	public <U, T> T doPut(String url, HttpHeaders headers, U body, Class<T> responseClass)
+	{
+		return executeRequest(url, HttpMethod.PUT, headers, null, body, responseClass);
+	}
+
+	public <U, T> T doPut(String url, HttpHeaders headers, Map<String, Object> queryParams, U body, Class<T> responseClass)
+	{
+		return executeRequest(url, HttpMethod.PUT, headers, queryParams, body, responseClass);
+	}
+
 
 	/**
 	 * make a request to a rest endpoint

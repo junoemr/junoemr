@@ -168,8 +168,7 @@
 	boolean caisiEnabled = moduleNames != null && org.apache.commons.lang.StringUtils.containsIgnoreCase(moduleNames, "Caisi");
 	boolean locationEnabled = caisiEnabled && (useProgramLocation != null && useProgramLocation.equals("true"));
 %>
-<%@page import="java.util.GregorianCalendar" %>
-<%@page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.oscarehr.common.IsPropertiesOn" %>
