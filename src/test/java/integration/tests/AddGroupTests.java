@@ -83,8 +83,7 @@ public class AddGroupTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addGroupsClassicUITest()
-	{
+	public void addGroupsClassicUITest() throws InterruptedException {
 		//Add a New Group with two providers: Dr. Apple and Dr. Berry
 		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
 		addGroup(groupName, 2);
@@ -113,8 +112,7 @@ public class AddGroupTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addGroupsJUNOUITest()
-	{
+	public void addGroupsJUNOUITest() throws InterruptedException {
 		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group");
 
 		//Add a New Group with two providers: Dr. Apple and Dr. Berry

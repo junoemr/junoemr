@@ -69,7 +69,7 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 				"tickler_text_suggest" );
 	}
 
-	public String apptStatusHoverOver()
+	public static String apptStatusHoverOver()
 	{
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.className("apptStatus")));
 		WebElement statusButton = driver.findElement(By.className("apptStatus"));
@@ -89,6 +89,7 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
 		addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 
@@ -114,13 +115,13 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void changeAppointmentStatusTestsJUNOUI()
-	{
+	public void changeAppointmentStatusTestsJUNOUI() throws InterruptedException {
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();
 		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
 		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 

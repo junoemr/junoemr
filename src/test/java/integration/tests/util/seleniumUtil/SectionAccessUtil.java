@@ -24,29 +24,37 @@ package integration.tests.util.seleniumUtil;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import static integration.tests.util.SeleniumTestBase.webDriverWait;
 
 public class SectionAccessUtil
 {
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
+			throws InterruptedException
 	{
+		Thread.sleep(2000);
 		driver.findElement(By.id("admin-panel")).click();
-		driver.manage().window().maximize();
 		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 		driver.findElement(By.linkText(subSectionName)).click();
 		driver.switchTo().frame("myFrame");
 	}
 
 	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
+			throws InterruptedException
 	{
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 
 		// open administration panel
-		driver.manage().window().maximize();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-nav-collapse")));
 		driver.findElement(By.linkText("Admin")).click();
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 		driver.findElement(By.linkText(subSectionName)).click();
+		Thread.sleep(2000);
 		driver.switchTo().frame("content-frame");
 	}
 
@@ -54,7 +62,9 @@ public class SectionAccessUtil
 	{
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-		driver.manage().window().maximize();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-nav-collapse")));
+		driver.findElement(By.id("main-nav-collapse")).click();
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 	}
 }
