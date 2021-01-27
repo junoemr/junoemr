@@ -126,8 +126,8 @@ public class CaseManagementPrint {
 		if (printCPP)
 		{
 			cpp = new HashMap<>();
-			List<CaseManagementNote> allCPPNotes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, true);
 
+			List<CaseManagementNote> allCPPNotes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, true);
 			List<CaseManagementNote> medicalHistoryNotes = new ArrayList<>();
 			List<CaseManagementNote> socialHistoryNotes = new ArrayList<>();
 			List<CaseManagementNote> familyHistoryNotes = new ArrayList<>();
@@ -141,10 +141,10 @@ public class CaseManagementPrint {
 			{
 				// Get the issue code
 				int currentNoteId = note.getId().intValue();
-				String currentIssueCode = issueDao.getIssueCodeForCPPNote(currentNoteId);
+				Issue currentIssue = issueDao.getIssueForCPPNote(currentNoteId);
 
 				// Find a match and add the note to the correct list
-				switch (currentIssueCode)
+				switch (currentIssue.getCode())
 				{
 					case Issue.SUMMARY_CODE_MEDICAL_HISTORY:
 						medicalHistoryNotes.add(note);

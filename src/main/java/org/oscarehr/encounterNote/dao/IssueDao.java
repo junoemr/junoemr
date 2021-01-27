@@ -50,7 +50,7 @@ public class IssueDao extends AbstractDao<Issue>
 		return (Issue) query.getSingleResult();
 	}
 
-	public String getIssueCodeForCPPNote(int noteId)
+	public Issue getIssueForCPPNote(int noteId)
 	{
 		String queryString =
 			"SELECT i.issue_id, i.code, i.description, i.role, " +
@@ -66,6 +66,6 @@ public class IssueDao extends AbstractDao<Issue>
 		query.setMaxResults(1);
 
 		Issue issue = (Issue) query.getSingleResult();
-		return issue.getCode();
+		return issue;
 	}
 }
