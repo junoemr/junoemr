@@ -93,10 +93,10 @@ import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.BillingONCHeader1;
-import org.oscarehr.common.service.UserPropertyService;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.GroupNoteLink;
@@ -111,6 +111,7 @@ import org.oscarehr.eyeform.model.EyeformTestBook;
 import org.oscarehr.eyeform.model.Macro;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.provider.web.CppPreferencesUIBean;
+import org.oscarehr.integration.model.CmeJs;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -142,7 +143,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 	private BillingONCHeader1Dao billingONCHeader1Dao = (BillingONCHeader1Dao) SpringUtils.getBean("billingONCHeader1Dao");
 	private NoteService noteService = SpringUtils.getBean(NoteService.class);
 	private TicklerManager ticklerManager = SpringUtils.getBean(TicklerManager.class);
-	private UserPropertyService userPropertyService = SpringUtils.getBean(UserPropertyService.class);
+	private SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	static {
 		//temporary..need something generic;
@@ -434,11 +435,11 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		{
 			if (useNewCaseMgmt)
 			{
-				viewCurrentIssuesTab_newCme(request, caseForm, demoNo, programId);
+				viewCurrentIssuesTabForNewCme(request, caseForm, demoNo, programId);
 			}
 			else
 			{
-				viewCurrentIssuesTab_oldCme(request, caseForm, demoNo, programId);
+				viewCurrentIssuesTabForOldCme(request, caseForm, demoNo, programId);
 			}
 		} // end Current Issues Tab
 
@@ -601,9 +602,9 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 	private void getCmeJavaScriptAttribute(HttpServletRequest request)
 	{
 		//1. try from Properties
-		boolean hasOceanToolBar = userPropertyService.getPropertyBoolValue(UserProperty.OCEAN_TOOLBAR_ENABLED);
-		String attrValue = hasOceanToolBar ? "ocean_toolbar" : "default";
-		request.setAttribute("cme_js", attrValue);
+		boolean hasOceanToolBar = systemPreferenceService.isPreferenceEnabled(UserProperty.OCEAN_TOOLBAR_ENABLED, false);
+		CmeJs attrValue = hasOceanToolBar ? CmeJs.OCEAN_TOOLBAR : CmeJs.DEFAULT;
+		request.setAttribute("cme_js", attrValue.label);
 
 		//2. Override from provider preferences?
 
@@ -725,7 +726,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		}
 	}
 
-	private void viewCurrentIssuesTab_oldCme(HttpServletRequest request, CaseManagementViewFormBean caseForm, String demoNo, String programId) throws Exception {
+	private void viewCurrentIssuesTabForOldCme(HttpServletRequest request, CaseManagementViewFormBean caseForm, String demoNo, String programId) throws Exception {
 		long startTime = System.currentTimeMillis();
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -974,7 +975,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 	/**
 	 * New CME
 	 */
-	private void viewCurrentIssuesTab_newCme(HttpServletRequest request, CaseManagementViewFormBean caseForm, String demoNo, String programId) throws Exception {
+	private void viewCurrentIssuesTabForNewCme(HttpServletRequest request, CaseManagementViewFormBean caseForm, String demoNo, String programId) throws Exception {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 

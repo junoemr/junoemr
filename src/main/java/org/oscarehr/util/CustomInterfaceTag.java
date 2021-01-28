@@ -36,17 +36,18 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.common.service.UserPropertyService;
+import org.oscarehr.integration.model.CmeJs;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.web.CppPreferencesUIBean;
 
 public class CustomInterfaceTag extends TagSupport {
 
 	private Logger logger = MiscUtils.getLogger();
-	private UserPropertyService userPropertyService = SpringUtils.getBean(UserPropertyService.class);
+	private SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	private String name;
 	private String section;
-	
+
 	@Override
 	public int doStartTag() throws JspException {
 		String customJs = getCustomJs();
@@ -54,7 +55,7 @@ public class CustomInterfaceTag extends TagSupport {
 		HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-		if ("default".equals(customJs) && getSection().equals("cme"))
+		if (CmeJs.DEFAULT.label.equals(customJs) && getSection().equals("cme"))
 		{
 			//check preferences
 			CppPreferencesUIBean bean = new CppPreferencesUIBean(loggedInInfo.getLoggedInProviderNo());
@@ -75,7 +76,7 @@ public class CustomInterfaceTag extends TagSupport {
 
 	private String getCustomJs()
 	{
-		String customJs = "default";
+		String customJs = CmeJs.DEFAULT.label;
 
 		if (StringUtils.isNotEmpty(name))
 		{
@@ -83,10 +84,10 @@ public class CustomInterfaceTag extends TagSupport {
 		}
 		else
 		{
-			boolean hasOceanToolBar = userPropertyService.getPropertyBoolValue(UserProperty.OCEAN_TOOLBAR_ENABLED);
+			boolean hasOceanToolBar = systemPreferenceService.isPreferenceEnabled(UserProperty.OCEAN_TOOLBAR_ENABLED, false);
 			if (hasOceanToolBar)
 			{
-				customJs = "ocean_toolbar";
+				customJs = CmeJs.OCEAN_TOOLBAR.label;
 			}
 		}
 
@@ -121,7 +122,6 @@ public class CustomInterfaceTag extends TagSupport {
 		String contextPath = this.pageContext.getServletContext().getContextPath();
 		try
 		{
-			// out.println("<link rel=\"stylesheet\" href=\""+contextPath+"/js/custom/global.css\" type=\"text/css\">");
 			out.println("<script src=\"" + contextPath + "/js/custom/" + customJs + "/global.js\"></script>");
 			if (StringUtils.isNotEmpty(getSection()))
 			{
