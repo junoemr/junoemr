@@ -78,6 +78,8 @@ public final class LoggedInInfo implements Serializable {
 	 * setup the thread local loggedInInfo. It should do basic checks to see if 
 	 * there's lingering data, then set the thread local internalThreadDescription 
 	 * to the name of the class that called this method, i.e. your thread class name.
+	 *
+	 * Note: This seems to not populate providerNo correctly.
 	 */
 	public static LoggedInInfo getLoggedInInfoAsCurrentClassAndMethod() {
 		// get caller
