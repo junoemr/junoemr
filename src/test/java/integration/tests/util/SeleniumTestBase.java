@@ -52,7 +52,7 @@ public class SeleniumTestBase
 	public static WebDriverWait webDriverWait;
 
 	@BeforeClass
-	public static void buildWebDriver() throws SQLException, InstantiationException,
+	synchronized public static void buildWebDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException
 	{
 		//load database (during the integration-test phase this will only populate table creation maps)

@@ -25,15 +25,18 @@ package integration.tests.util.seleniumUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static integration.tests.util.SeleniumTestBase.WEB_DRIVER_EXPLICIT_TIMEOUT;
 import static integration.tests.util.SeleniumTestBase.webDriverWait;
+import static integration.tests.util.seleniumUtil.PageUtil.isExistsBy;
 
 public class SectionAccessUtil
 {
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
 			throws InterruptedException
 	{
-		Thread.sleep(2000);
+		//Thread.sleep(2000);
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
@@ -45,9 +48,12 @@ public class SectionAccessUtil
 	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
 			throws InterruptedException
 	{
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
+		{
+			// open JUNO UI page
+			driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		}
 		// open administration panel
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-nav-collapse")));
 		driver.findElement(By.linkText("Admin")).click();
@@ -55,15 +61,20 @@ public class SectionAccessUtil
 		driver.findElement(By.linkText(sectionName)).click();
 		driver.findElement(By.linkText(subSectionName)).click();
 		Thread.sleep(2000);
-		driver.switchTo().frame("content-frame");
+		if (isExistsBy(By.tagName("iframe"), driver))
+		{
+			driver.switchTo().frame("content-frame");
+		}
 	}
 
 	public static void accessSectionJUNOUI(WebDriver driver, String sectionName)
 	{
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-nav-collapse")));
-		driver.findElement(By.id("main-nav-collapse")).click();
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
+		{
+			// open JUNO UI page
+			driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		}
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 	}

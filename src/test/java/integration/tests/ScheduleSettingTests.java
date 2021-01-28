@@ -52,12 +52,16 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 public class ScheduleSettingTests extends SeleniumTestBase
 {
 	public static String templateTitleGeneral = "P:General";
-	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	//static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
+		SchemaUtils.restoreTable("admission", "log", "program_provider",
+				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
+				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
 		loadSpringBeans();
 		DatabaseUtil.createTestProvider();
+
 	}
 
 	@AfterClass
@@ -137,6 +141,7 @@ public class ScheduleSettingTests extends SeleniumTestBase
 
 	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
 	{
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		//webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
