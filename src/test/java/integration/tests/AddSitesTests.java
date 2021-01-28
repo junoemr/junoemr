@@ -44,19 +44,15 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class AddSitesTests extends SeleniumTestBase
 {
-	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-	@BeforeClass
-	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
-		//SchemaUtils.restoreTable("admission", "log", "site");
-	}
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "site");
 	}
 
-	public void addNewSites(SiteTestData site)
+	public static void addNewSites(SiteTestData site)
 	{
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//a[contains(.,'System Management')]")));
 		driver.findElement(By.xpath(".//a[contains(.,'System Management')]")).click();
 		driver.findElement(By.xpath(".//a[contains(.,'Satellite-sites Admin')]")).click();
 		if (PageUtil.isExistsBy(By.id("myFrame"), driver))
@@ -67,8 +63,9 @@ public class AddSitesTests extends SeleniumTestBase
 		{
 			driver.switchTo().frame("content-frame");
 		}
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='Add New Site']")));
 		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='site.name']")));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@name='site.name']")));
 		driver.findElement(By.xpath("//input[@name='site.name']")).sendKeys(site.siteName);
 		driver.findElement(By.xpath("//input[@name='site.shortName']")).sendKeys(site.shortName);
 		driver.findElement(By.xpath("//input[@name='site.bgColor']")).sendKeys(site.address);
@@ -107,6 +104,3 @@ public class AddSitesTests extends SeleniumTestBase
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 	}
 }
-
-
-
