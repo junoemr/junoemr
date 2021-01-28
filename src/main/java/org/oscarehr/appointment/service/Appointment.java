@@ -45,6 +45,7 @@ import org.oscarehr.schedule.dto.CalendarEvent;
 import org.oscarehr.site.service.SiteService;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -240,6 +241,37 @@ public class Appointment
 				request.getRemoteAddr());
 
 		return appointment;
+	}
+
+	/**
+	 * just like updateAppointment but takes a transfer object instead.
+	 * @param calendarAppointment - the transfer object that represents the appointment.
+	 * @param loggedInInfo - logged in info
+	 * @param request - http request
+	 * @return
+	 */
+	public org.oscarehr.common.model.Appointment updateAppointment(CalendarAppointment calendarAppointment,
+			LoggedInInfo loggedInInfo, HttpServletRequest request)
+	{
+		AppointmentConverter converter = new AppointmentConverter();
+		org.oscarehr.common.model.Appointment appointment = converter.getAsDomainObject(calendarAppointment);
+
+		// if appointment is confirmed make sure not to overwrite confirmation values.
+		if (calendarAppointment.getAppointmentNo() != null && calendarAppointment.isConfirmed())
+		{
+			org.oscarehr.common.model.Appointment existingAppointment = oscarAppointmentDao.find(calendarAppointment.getAppointmentNo());
+
+			// only preserve the confirmation values if the start / end time of the appointment has not changed.
+			if (existingAppointment.getStartTimeAsFullDate().equals(appointment.getStartTimeAsFullDate()) &&
+					existingAppointment.getEndTimeAsFullDate().equals(appointment.getEndTimeAsFullDate()))
+			{
+				existingAppointment.getConfirmedAt().ifPresent(appointment::setConfirmedAt);
+				existingAppointment.getConfirmedBy().ifPresent(appointment::setConfirmedBy);
+				existingAppointment.getConfirmedByType().ifPresent(appointment::setConfirmedByType);
+			}
+		}
+
+		return updateAppointment(appointment, loggedInInfo, request);
 	}
 
 	/**
