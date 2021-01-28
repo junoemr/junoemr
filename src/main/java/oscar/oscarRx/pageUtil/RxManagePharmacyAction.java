@@ -61,50 +61,50 @@ import oscar.oscarRx.data.RxPharmacyData;
  */
 public final class RxManagePharmacyAction extends DispatchAction {
 
-    public ActionForward unspecified(ActionMapping mapping,
-				 ActionForm form,
-				 HttpServletRequest request,
-				 HttpServletResponse response)
-	throws IOException, ServletException {
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException
+	{
+		RxManagePharmacyForm frm = (RxManagePharmacyForm) form;
 
-           RxManagePharmacyForm frm = (RxManagePharmacyForm) form;
-
-           String actionType = frm.getPharmacyAction();
-           RxPharmacyData pharmacy = new RxPharmacyData();
-			PharmacyInfo pharmacyInfo = new PharmacyInfo();
-			if (frm.getID() != null && !frm.getID().isEmpty())
-			{
-				pharmacyInfo.setId(Integer.parseInt(frm.getID()));
-			}
-			pharmacyInfo.setName(frm.getName());
-			pharmacyInfo.setAddress(frm.getAddress());
-			pharmacyInfo.setCity(frm.getCity());
-			pharmacyInfo.setProvince(frm.getProvince());
-			pharmacyInfo.setPostalCode(frm.getPostalCode());
-			pharmacyInfo.setPhone1(frm.getPhone1());
-			pharmacyInfo.setPhone2(frm.getPhone2());
-			pharmacyInfo.setFax(frm.getFax());
-			pharmacyInfo.setEmail(frm.getEmail());
-			pharmacyInfo.setServiceLocationIdentifier(frm.getServiceLocationIdentifier());
-			pharmacyInfo.setNotes(frm.getNotes());
-			pharmacyInfo.setAddDate(new Date());
-			pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
+		String actionType = frm.getPharmacyAction();
+		RxPharmacyData pharmacy = new RxPharmacyData();
+		PharmacyInfo pharmacyInfo = new PharmacyInfo();
+		if (frm.getID() != null && !frm.getID().isEmpty())
+		{
+			pharmacyInfo.setId(Integer.parseInt(frm.getID()));
+		}
+		pharmacyInfo.setName(frm.getName());
+		pharmacyInfo.setAddress(frm.getAddress());
+		pharmacyInfo.setCity(frm.getCity());
+		pharmacyInfo.setProvince(frm.getProvince());
+		pharmacyInfo.setPostalCode(frm.getPostalCode());
+		pharmacyInfo.setPhone1(frm.getPhone1());
+		pharmacyInfo.setPhone2(frm.getPhone2());
+		pharmacyInfo.setFax(frm.getFax());
+		pharmacyInfo.setEmail(frm.getEmail());
+		pharmacyInfo.setServiceLocationIdentifier(frm.getServiceLocationIdentifier());
+		pharmacyInfo.setNotes(frm.getNotes());
+		pharmacyInfo.setAddDate(new Date());
+		pharmacyInfo.setStatus(PharmacyInfo.ACTIVE);
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-
-		if(actionType.equals("Add")){
+		if(actionType.equals("Add"))
+		{
 			pharmacy.addPharmacy(pharmacyInfo, loggedInInfo);
-           }else if(actionType.equals("Edit")){
+		}
+		else if(actionType.equals("Edit"))
+		{
 			pharmacy.updatePharmacy(pharmacyInfo, loggedInInfo);
+		}
+		else if(actionType.equals("Delete"))
+		{
+			pharmacy.deletePharmacy(frm.getID());
+		}
 
-           }else if(actionType.equals("Delete")){
-              pharmacy.deletePharmacy(frm.getID());
-           }
+	   return mapping.findForward("success");
+	}
 
-       return mapping.findForward("success");
-    }
-    
  public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException {
     	
 	 
