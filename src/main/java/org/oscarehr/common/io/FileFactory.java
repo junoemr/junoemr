@@ -99,6 +99,30 @@ public class FileFactory
 	}
 
 	/**
+	 * save and load a new log with the given name and input stream
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the file to be saved and opened
+	 * @return - the file
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
+	 */
+	public static GenericFile createImportLogFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
+	{
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.LOG_IMPORT_DIR, false);
+	}
+
+	/**
+	 * save and load a new log with the given name and input stream
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the file to be saved and opened
+	 * @return - the file
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
+	 */
+	public static GenericFile createExportLogFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
+	{
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.LOG_EXPORT_DIR, false);
+	}
+
+	/**
 	 * create a new temp file
 	 * @param suffix - suffix of filename, usually the desired extension
 	 * @return the file

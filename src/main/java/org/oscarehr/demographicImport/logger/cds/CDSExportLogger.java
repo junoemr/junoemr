@@ -22,121 +22,37 @@
  */
 package org.oscarehr.demographicImport.logger.cds;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.logger.ExportLogger;
-import org.oscarehr.demographicImport.model.PatientRecord;
-import org.oscarehr.util.MiscUtils;
+import oscar.util.ConversionUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
-public class CDSExportLogger implements ExportLogger
+public class CDSExportLogger extends CDSBaseLogger implements ExportLogger
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private static final int LOG_COLUMN_WIDTH = 14;
-
-	private final GenericFile logFile;
-
-	public CDSExportLogger() throws IOException
+	public CDSExportLogger() throws IOException, InterruptedException
 	{
-		logFile = FileFactory.createTempFile(".log");
-		logFile.rename("ExportEvent.log");
+		super();
+	}
+	protected GenericFile initSummaryLogFile() throws IOException, InterruptedException
+	{
+		String header = "CDS Export Summary " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + "\n";
+		return initLogFile(header, "-ExportSummary.log");
+	}
+	protected GenericFile initEventLogFile() throws IOException, InterruptedException
+	{
+		String header = "CDS Export Events " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + "\n";
+		return initLogFile(header, "-ExportEvent.log");
 	}
 
-	@Override
-	public void log(String message) throws IOException
+	protected GenericFile initLogFile(String header, String fileName) throws IOException, InterruptedException
 	{
-		logger.info(message);
-		Files.write(Paths.get(logFile.getFileObject().getPath()), message.getBytes(), StandardOpenOption.APPEND);
-	}
-
-	@Override
-	public GenericFile getLogFile()
-	{
-		return this.logFile;
-	}
-
-
-	public void logSummaryHeaderLine() throws IOException
-	{
-		String summaryLine = buildSummaryLine("Patient ID", "Family", "Past Health", "Problem List",
-				"Risk Factor", "Allergy &", "Medication", "Immunization",
-				"Labs", "Appointments", "Clinical", "Reports", "Reports",
-				"Care Elements", "Alerts and");
-		String summaryLine2 = buildSummaryLine("", "History", "", "",
-				"", "Adv. Reaction", "", "",
-				"", "", "Notes", "Text", "Binary",
-				"", "Special Needs");
-
-		this.log(summaryLine);
-		this.log(summaryLine2);
-
-		int summaryItemCount = 15; // number of columns in the summary line above
-		this.log(StringUtils.rightPad("-", (LOG_COLUMN_WIDTH * summaryItemCount) + summaryItemCount, "-") + "\n");
-	}
-
-	@Override
-	public void logSummaryLine(PatientRecord patientRecord) throws IOException
-	{
-		String summaryLine = buildSummaryLine(
-				String.valueOf(patientRecord.getDemographic().getId()),
-				String.valueOf(patientRecord.getFamilyHistoryNoteList().size()),
-				String.valueOf(patientRecord.getMedicalHistoryNoteList().size()),
-				String.valueOf(patientRecord.getConcernNoteList().size()),
-				String.valueOf(patientRecord.getRiskFactorNoteList().size()),
-				String.valueOf(patientRecord.getAllergyList().size()),
-				String.valueOf(patientRecord.getMedicationList().size()),
-				String.valueOf(patientRecord.getImmunizationList().size()),
-				String.valueOf(patientRecord.getLabList().size()),
-				String.valueOf(patientRecord.getAppointmentList().size()),
-				String.valueOf(patientRecord.getEncounterNoteList().size()),
-				String.valueOf(patientRecord.getDocumentList().size()),
-				String.valueOf(patientRecord.getDocumentList().size()),
-				String.valueOf(patientRecord.getMeasurementList().size()),
-				String.valueOf(patientRecord.getReminderNoteList().size()));
-		this.log(summaryLine);
-	}
-
-	private String buildSummaryLine(String patientId,
-	                                String familyHistCount,
-	                                String pastHealth,
-	                                String problems,
-	                                String riskFactor,
-	                                String allergy,
-	                                String medications,
-	                                String immunizations,
-	                                String labs,
-	                                String appointments,
-	                                String clinicalNotes,
-	                                String reportsText,
-	                                String reportsBinary,
-	                                String careElements,
-	                                String alerts)
-	{
-		return paddedSummaryItem(patientId) +
-				paddedSummaryItem(familyHistCount) +
-				paddedSummaryItem(pastHealth) +
-				paddedSummaryItem(problems) +
-				paddedSummaryItem(riskFactor) +
-				paddedSummaryItem(allergy) +
-				paddedSummaryItem(medications) +
-				paddedSummaryItem(immunizations) +
-				paddedSummaryItem(labs) +
-				paddedSummaryItem(appointments) +
-				paddedSummaryItem(clinicalNotes) +
-				paddedSummaryItem(reportsText) +
-				paddedSummaryItem(reportsBinary) +
-				paddedSummaryItem(careElements) +
-				paddedSummaryItem(alerts) + "\n";
-	}
-
-	private String paddedSummaryItem(String name)
-	{
-		return StringUtils.rightPad(name, LOG_COLUMN_WIDTH) + "|";
+		InputStream stream = new ByteArrayInputStream(header.getBytes(StandardCharsets.UTF_8));
+		return FileFactory.createExportLogFile(stream, fileName);
 	}
 }

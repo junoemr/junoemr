@@ -185,7 +185,7 @@ public class ImportExportService
 	                                            List<PatientRecord> patientRecords,
 	                                            ExportPreferences preferences) throws Exception
 	{
-		exportLogger.logSummaryHeaderLine();
+		exportLogger.logSummaryHeader();
 		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
 		List<GenericFile> fileList = new ArrayList<>(patientRecords.size() + 2);
 
@@ -197,6 +197,7 @@ public class ImportExportService
 				GenericFile file = exporter.exportDemographic(patientRecord);
 				fileList.add(file);
 			}
+			exportLogger.logSummaryFooter();
 			fileList.addAll(exporter.getAdditionalFiles(preferences));
 		}
 		finally
@@ -281,6 +282,7 @@ public class ImportExportService
 		// persist documents last to minimize import errors with disk IO
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
 
+		importLogger.logSummaryLine(patientRecord);
 		writeAuditLogImportStatement(dbDemographic, importType, importSource, duplicateDetected);
 	}
 

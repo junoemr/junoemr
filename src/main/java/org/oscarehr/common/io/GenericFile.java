@@ -42,9 +42,12 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 public class GenericFile
@@ -82,6 +85,10 @@ public class GenericFile
 	public static final String BILLING_REMITTANCE_FAILED_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_FAILED_DIR")).getPath();
 
 	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
+
+	public static final String LOG_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("LOG_BASE_DIR")).getPath();
+	public static final String LOG_IMPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_IMPORT_DIR")).getPath();
+	public static final String LOG_EXPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_EXPORT_DIR")).getPath();
 
 	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
 
@@ -138,6 +145,14 @@ public class GenericFile
 	public boolean moveToOriginal() throws IOException
 	{
 		return moveFile(DOCUMENT_ORIGINAL_DIR);
+	}
+	public boolean moveToLogImport() throws IOException
+	{
+		return moveFile(LOG_IMPORT_DIR);
+	}
+	public boolean moveToLogExport() throws IOException
+	{
+		return moveFile(LOG_EXPORT_DIR);
 	}
 
 	public boolean moveFile(String directory) throws IOException
@@ -213,6 +228,21 @@ public class GenericFile
 		this.isValid = replacementFile.isValid();
 		this.reasonInvalid = replacementFile.getReasonInvalid();
 		this.invalidContentType = replacementFile.getInvalidContentType();
+	}
+
+	/**
+	 * append the contents of the give file(s) to this file
+	 * modifies the file referenced by this generic file
+	 * @param contentFiles - file(s) with content to append
+	 * @throws IOException
+	 */
+	public void appendContents(GenericFile ... contentFiles) throws IOException
+	{
+		for(GenericFile contentFile : contentFiles)
+		{
+			List<String> lines = Files.readAllLines(Paths.get(contentFile.getPath()), StandardCharsets.UTF_8);
+			Files.write(Paths.get(javaFile.getPath()), lines, StandardOpenOption.APPEND);
+		}
 	}
 
 	public void process() throws IOException, InterruptedException

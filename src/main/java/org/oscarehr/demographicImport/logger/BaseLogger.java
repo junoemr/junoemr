@@ -22,19 +22,47 @@
  */
 package org.oscarehr.demographicImport.logger;
 
-import java.util.List;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.model.PatientRecord;
 
-public interface ImportLogger extends BaseLogger
+public interface BaseLogger
 {
 	/**
-	 * forces all unwritten log data to be written to the log file.
-	 * This may be useful for loggers that need to collect amalgamated data before writing it to the log.
+	 * 	adds a log statement to the event log
+	 * @param message - the statement to log
 	 */
-	void flush();
+	void logEvent(String message);
 
 	/**
-	 * Get the log as a list. this may be the same as the log file contents, but it can be delivered to users etc.
-	 * @return - a list of messages.
+	 * log a summary header
+	 * this is the first thing in the summary file
 	 */
-	List<String> getMessages();
+	void logSummaryHeader();
+
+	/**
+	 * create a summary line from the given string
+	 * @param message - the statement to log
+	 */
+	void logSummaryLine(String message);
+	/**
+	 * create a summary line from the given patient record
+	 * @param patientRecord - the record to summarize
+	 */
+	void logSummaryLine(PatientRecord patientRecord);
+
+	/**
+	 * log a summary footer
+	 * this is the last thing in the summary file
+	 */
+	void logSummaryFooter();
+
+	/**
+	 * @return - the summary log file
+	 */
+	GenericFile getSummaryLogFile();
+
+	/**
+	 * @return - the event log file
+	 */
+	GenericFile getEventLogFile();
 }

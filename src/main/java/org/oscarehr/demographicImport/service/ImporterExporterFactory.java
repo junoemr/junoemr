@@ -72,7 +72,7 @@ public class ImporterExporterFactory
 		UNKNOWN
 	}
 
-	public ImportLogger getImportLogger(IMPORTER_TYPE type)
+	public ImportLogger getImportLogger(IMPORTER_TYPE type) throws IOException, InterruptedException
 	{
 		switch(type)
 		{
@@ -82,7 +82,7 @@ public class ImporterExporterFactory
 		}
 	}
 
-	public ExportLogger getExportLogger(EXPORTER_TYPE type) throws IOException
+	public ExportLogger getExportLogger(EXPORTER_TYPE type) throws IOException, InterruptedException
 	{
 		switch(type)
 		{

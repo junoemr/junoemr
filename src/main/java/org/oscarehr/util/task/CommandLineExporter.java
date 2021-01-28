@@ -130,7 +130,7 @@ public class CommandLineExporter implements CommandLineTask
 			zipFile.rename(ZIPFile.getSanitizedFileName(exportZipName));
 			zipFile.moveFile(exportDirectory);
 
-			logger.info("Created zip file: " + zipFile.getPath() + zipFile.getName());
+			logger.info("Created zip file: " + zipFile.getPath());
 		}
 		catch(Exception e)
 		{

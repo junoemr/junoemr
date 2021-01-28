@@ -22,17 +22,6 @@
  */
 package org.oscarehr.demographicImport.logger;
 
-import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.model.PatientRecord;
-
-import java.io.IOException;
-
-public interface ExportLogger
+public interface ExportLogger extends BaseLogger
 {
-	void log(String message) throws IOException;
-
-	void logSummaryHeaderLine() throws IOException;
-	void logSummaryLine(PatientRecord patientRecord) throws IOException;
-
-	GenericFile getLogFile();
 }

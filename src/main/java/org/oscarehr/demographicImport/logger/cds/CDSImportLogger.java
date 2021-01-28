@@ -23,45 +23,67 @@
 package org.oscarehr.demographicImport.logger.cds;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.util.MiscUtils;
+import oscar.util.ConversionUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CDSImportLogger implements ImportLogger
+public class CDSImportLogger extends CDSBaseLogger implements ImportLogger
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final List<String> messageList;
+	private static final Logger log4jLogger = MiscUtils.getLogger();
 
-	public CDSImportLogger()
+	public CDSImportLogger() throws IOException, InterruptedException
 	{
-		messageList = new ArrayList<>();
+		super();
 	}
-
-	@Override
-	public void log(String message)
+	protected GenericFile initSummaryLogFile() throws IOException, InterruptedException
 	{
-		logger.info(message);
-		messageList.add(message);
+		String header = "CDS Import Summary " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + "\n";
+		return initLogFile(header, "-ImportSummary.log");
+	}
+	protected GenericFile initEventLogFile() throws IOException, InterruptedException
+	{
+		String header = "CDS Import Events " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + "\n";
+		return initLogFile(header, "-ImportEvent.log");
 	}
 
 	@Override
 	public void flush()
 	{
-
-	}
-
-	@Override
-	public GenericFile getLogFile()
-	{
-		return null;
 	}
 
 	@Override
 	public List<String> getMessages()
 	{
-		return messageList;
+		List<String> messages;
+		try
+		{
+			messages = Files.readAllLines(Paths.get(getEventLogFile().getPath()), StandardCharsets.UTF_8);
+		}
+		catch(IOException e)
+		{
+			String errorMessage = "Error reading import event log";
+			log4jLogger.error(errorMessage, e);
+			messages = new ArrayList<>(1);
+			messages.add(errorMessage);
+		}
+		return messages;
+	}
+
+	protected GenericFile initLogFile(String header, String fileName) throws IOException, InterruptedException
+	{
+		InputStream stream = new ByteArrayInputStream(header.getBytes(StandardCharsets.UTF_8));
+		return FileFactory.createImportLogFile(stream, fileName);
 	}
 }

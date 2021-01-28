@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -55,7 +56,7 @@ public class ImportWrapperService
 	                                                 DemographicImporter.MERGE_STRATEGY mergeStrategy,
 	                                                 List<GenericFile> importFileList,
 	                                                 String documentLocation,
-	                                                 boolean skipMissingDocs)
+	                                                 boolean skipMissingDocs) throws IOException, InterruptedException
 	{
 		long importCount = 0;
 		long duplicateCount = 0;
@@ -67,6 +68,7 @@ public class ImportWrapperService
 		try
 		{
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
+			importLogger.logSummaryHeader();
 
 			for(GenericFile importFile : importFileList)
 			{
@@ -86,17 +88,17 @@ public class ImportWrapperService
 				}
 				catch(InvalidImportFileException e)
 				{
-					importLogger.log(importFile.getName() + ": Skipped (invalid import file)");
+					importLogger.logEvent(importFile.getName() + ": Skipped (invalid import file)");
 				}
 				catch(DuplicateDemographicException e)
 				{
-					importLogger.log(importFile.getName() + ": Skipped (" + e.getMessage() + ")");
+					importLogger.logEvent(importFile.getName() + ": Skipped (" + e.getMessage() + ")");
 					duplicateCount++;
 					onDuplicate(importFile);
 				}
 				catch(Exception e)
 				{
-					importLogger.log(importFile.getName() + ": Failed to import");
+					importLogger.logEvent(importFile.getName() + ": Failed to import");
 					logger.error("Failed to import: " + importFile.getName(), e);
 
 					// clear the provider cache on failures for now so that un-persisted providers are not referenced by future lookups
@@ -109,6 +111,7 @@ public class ImportWrapperService
 					importLogger.flush();
 				}
 			}
+			importLogger.logSummaryFooter();
 		}
 		finally
 		{
@@ -131,7 +134,7 @@ public class ImportWrapperService
 	                               String mergeStrategyStr,
 	                               List<GenericFile> importFileList,
 	                               String documentLocation,
-	                               boolean skipMissingDocs)
+	                               boolean skipMissingDocs) throws IOException, InterruptedException
 	{
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importerTypeStr))
 		{

@@ -89,7 +89,8 @@ public class CDSExporter implements DemographicExporter
 	public List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException
 	{
 		List<GenericFile> additionalExportFiles = new ArrayList<>(2);
-		additionalExportFiles.add(exportProperties.getExportLogger().getLogFile());
+
+		additionalExportFiles.add(createEventLog());
 		additionalExportFiles.add(createReadme());
 
 		return additionalExportFiles;
@@ -125,6 +126,18 @@ public class CDSExporter implements DemographicExporter
 		{
 			providerExportCountHash.put(providerKey, 1);
 		}
+	}
+
+	protected GenericFile createEventLog() throws IOException
+	{
+		GenericFile eventLog = FileFactory.createTempFile(".txt");
+		eventLog.rename("ExportEventLog.txt");
+
+		eventLog.appendContents(
+				exportProperties.getExportLogger().getSummaryLogFile(),
+				exportProperties.getExportLogger().getEventLogFile());
+
+		return eventLog;
 	}
 
 	protected GenericFile createReadme() throws IOException
