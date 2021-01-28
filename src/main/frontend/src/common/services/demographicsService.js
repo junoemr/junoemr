@@ -185,6 +185,12 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
+		service.importLogUrl = function importLogUrl(fileNames)
+		{
+			let formatArray = fileNames.map(name => 'logName=' + encodeURIComponent(name));
+			return service.apiPath + '/import/logs/download?' + formatArray.join('&');
+		};
+
 		// add the default roster statuses to the roster status list.
 		service.addDefaultRosterStatuses = (rosterList) =>
 		{

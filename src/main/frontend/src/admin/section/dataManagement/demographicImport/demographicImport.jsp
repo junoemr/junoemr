@@ -24,7 +24,7 @@
 	<panel id="cds-import-panel"
 	       component-style="$ctrl.componentStyle">
 		<panel-header>
-			<h6 class="juno-text">CDS Import</h6>
+			<h6 class="juno-text">Demographic Import</h6>
 		</panel-header>
 		<panel-body>
 			<div class="row">
@@ -45,6 +45,7 @@
 					                   label-position="LABEL_POSITION.TOP"
 					                   component-style="$ctrl.componentStyle"
 					                   placeholder="Choose Import Files"
+					                   disabled="$ctrl.importRunning"
 					                   change="$ctrl.onFileSelected(files)"
 					></juno-file-chooser>
 				</div>
@@ -113,14 +114,28 @@
 
 			<div class="row" ng-if="$ctrl.results">
 				<div class="col-md-12">
-					<h6>Results:</h6>
+					<h6>Summary:</h6>
 					<div>Completed: {{$ctrl.results.successCount}}</div>
 					<div>Duplicates: {{$ctrl.results.duplicateCount}}</div>
 					<div>Errors: {{$ctrl.results.failureCount}}</div>
-
+				</div>
+			</div>
+			<div class="row" ng-if="$ctrl.results">
+				<div class="col-md-12">
+					<h6>Messages:</h6>
 					<div ng-repeat="message in $ctrl.results.messages">
 						<span>{{message}}</span>
 					</div>
+				</div>
+			</div>
+			<div class="row" ng-if="$ctrl.results">
+				<div class="col-md-12">
+					<juno-button ng-click="$ctrl.onDownloadLogFiles()"
+					             disabled="!$ctrl.results || ctrl.results.logFileNames || $ctrl.importRunning"
+					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.DEFAULT;>
+						Download Import Logs
+					</juno-button>
 				</div>
 			</div>
 		</panel-body>

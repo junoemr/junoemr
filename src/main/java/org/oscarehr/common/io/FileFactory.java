@@ -259,6 +259,26 @@ public class FileFactory
 	}
 
 	/**
+	 * load an existing log file
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getImportLogFile(String fileName) throws IOException
+	{
+		return getExistingFile(GenericFile.LOG_IMPORT_DIR, fileName);
+	}
+
+	/**
+	 * load an existing log file
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getExportLogFile(String fileName) throws IOException
+	{
+		return getExistingFile(GenericFile.LOG_EXPORT_DIR, fileName);
+	}
+
+	/**
 	 * overwrite a resource file
 	 * @param newFileContent the content to overwrite the file with
 	 * @param fileName the name of the file to overwrite

@@ -102,12 +102,12 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 
 				ctrl.importRunning = false;
 
-				ctrl.$onInit = function inInit()
+				ctrl.$onInit = () =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				}
 
-				ctrl.onRunImport = async function onRunImport()
+				ctrl.onRunImport = async () =>
 				{
 					ctrl.importRunning = true;
 					let formattedFileList = await ctrl.formatSelectedFiles();
@@ -127,7 +127,17 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					});
 				}
 
-				ctrl.formatSelectedFiles = async function formatSelectedFiles()
+				ctrl.onDownloadLogFiles = async () =>
+				{
+					if(ctrl.results && ctrl.results.logFileNames && ctrl.results.logFileNames.length > 0)
+					{
+						let url = demographicsService.importLogUrl(ctrl.results.logFileNames);
+						let windowName = "importLogs";
+						window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+					}
+				}
+
+				ctrl.formatSelectedFiles = async () =>
 				{
 					const encodedFiles = await Promise.all(Array.from(this.selectedFiles).map( async (file) =>
 					{
@@ -142,7 +152,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					return encodedFiles;
 				}
 
-				ctrl.toBase64 = function toBase64(file)
+				ctrl.toBase64 = (file) =>
 				{
 					return new Promise((resolve, reject) =>
 					{
@@ -165,14 +175,11 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					ctrl.selectedFiles = files;
 					$scope.$apply();
 				}
-				ctrl.canRunImport = () =>
-				{
-					return ctrl.selectedFiles && ctrl.selectedFiles.length > 0;
-				}
 
 				ctrl.clearSelectedFiles = () =>
 				{
 					ctrl.selectedFiles = [];
+					$scope.$apply();
 				}
 
 				ctrl.getSelectedMergeDescription = () =>
@@ -180,5 +187,14 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					return ctrl.mergeOptions.find(option => option.value === ctrl.selectedMergeStrategy).description;
 				}
 
+				ctrl.canRunImport = () =>
+				{
+					return (ctrl.selectedFiles && ctrl.selectedFiles.length > 0);
+				}
+
+				ctrl.canDownloadLogs = () =>
+				{
+					return ($ctrl.results && ctrl.results.logFileNames && !$ctrl.importRunning);
+				}
 			}]
 	});

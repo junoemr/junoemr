@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.transfer;
 
 import lombok.Data;
+import org.oscarehr.common.io.GenericFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
 public class ImportTransferOutbound
 {
 	private List<String> messages;
+	private List<String> logFileNames;
 	private long successCount;
 	private long duplicateCount;
 	private long failureCount;
@@ -42,5 +44,22 @@ public class ImportTransferOutbound
 			messages = new ArrayList<>();
 		}
 		messages.add(message);
+	}
+
+	public void addLogFileName(String name)
+	{
+		if(logFileNames == null)
+		{
+			logFileNames = new ArrayList<>();
+		}
+		logFileNames.add(name);
+	}
+
+	public void setLogFiles(GenericFile ... files)
+	{
+		for(GenericFile file : files)
+		{
+			addLogFileName(file.getName());
+		}
 	}
 }

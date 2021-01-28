@@ -33,6 +33,7 @@ import org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
+import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
@@ -43,6 +44,7 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.DemographicSearchHelper;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -59,6 +61,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -332,6 +335,26 @@ public class DemographicsService extends AbstractServiceImpl
 		return RestResponse.successResponse(transferOutbound);
 	}
 
+	@GET
+	@Path("/import/logs/download")
+	@Produces("application/zip")
+	@SkipContentLoggingOutbound
+	public Response download(@QueryParam("logName") final List<String> logFileNames) throws IOException
+	{
+		List<GenericFile> logFiles = new ArrayList<>(logFileNames.size());
+		for(String fileName : logFileNames)
+		{
+			logFiles.add(FileFactory.getImportLogFile(fileName));
+		}
+		ZIPFile zipFile = FileFactory.packageZipFile(logFiles);
+
+		String filename = "import-logs.zip";
+		Response.ResponseBuilder response = Response.ok(zipFile.toFileInputStream());
+
+		response.header("Content-Disposition", "filename="+filename);
+		response.type("application/zip");
+		return response.build();
+	}
 
 	private DemographicService.SEARCH_MODE getSearchMode(String searchType)
 	{

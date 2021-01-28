@@ -125,6 +125,7 @@ public class ImportWrapperService
 		transferOutbound.setDuplicateCount(duplicateCount);
 		transferOutbound.setFailureCount(failureCount);
 		transferOutbound.setMessages(importLogger.getMessages());
+		transferOutbound.setLogFiles(importLogger.getEventLogFile(), importLogger.getSummaryLogFile());
 
 		return transferOutbound;
 	}
