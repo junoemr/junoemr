@@ -104,7 +104,7 @@
 			<div class="row">
 				<div class="col-md-12">
 					<juno-button ng-click="$ctrl.onRunImport()"
-					             disabled="!$ctrl.canRunImport() || $ctrl.importRunning"
+					             disabled="!$ctrl.canRunImport()"
 					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.FILL;>
 						Run Import
@@ -131,7 +131,7 @@
 			<div class="row" ng-if="$ctrl.results">
 				<div class="col-md-12">
 					<juno-button ng-click="$ctrl.onDownloadLogFiles()"
-					             disabled="!$ctrl.results || ctrl.results.logFileNames || $ctrl.importRunning"
+					             disabled="!$ctrl.canDownloadLogs()"
 					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.DEFAULT;>
 						Download Import Logs

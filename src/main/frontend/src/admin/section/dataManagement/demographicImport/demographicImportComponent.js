@@ -30,8 +30,9 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 		},
 		controller: [
 			'$scope',
+			'$uibModal',
 			'demographicsService',
-			function ($scope, demographicsService)
+			function ($scope, $uibModal, demographicsService)
 			{
 				let ctrl = this;
 
@@ -99,7 +100,6 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				ctrl.selectedFiles = [];
 
 				ctrl.results = null;
-
 				ctrl.importRunning = false;
 
 				ctrl.$onInit = () =>
@@ -109,6 +109,11 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 
 				ctrl.onRunImport = async () =>
 				{
+					if(!ctrl.canRunImport())
+					{
+						return;
+					}
+
 					ctrl.importRunning = true;
 					let formattedFileList = await ctrl.formatSelectedFiles();
 
@@ -116,18 +121,23 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						ctrl.selectedImportType,
 						ctrl.selectedImportSource,
 						ctrl.selectedMergeStrategy,
-						formattedFileList).then((response) =>
+						formattedFileList
+					).then((response) =>
 						{
 							ctrl.results = response.data;
-							ctrl.clearSelectedFiles();
+						}
+					).catch(() =>
+						{
+							Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Import Not Completed");
 						}
 					).finally(() =>
-					{
-						ctrl.importRunning = false;
-					});
+						{
+							ctrl.importRunning = false;
+						}
+					);
 				}
 
-				ctrl.onDownloadLogFiles = async () =>
+				ctrl.onDownloadLogFiles = () =>
 				{
 					if(ctrl.results && ctrl.results.logFileNames && ctrl.results.logFileNames.length > 0)
 					{
@@ -139,7 +149,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 
 				ctrl.formatSelectedFiles = async () =>
 				{
-					const encodedFiles = await Promise.all(Array.from(this.selectedFiles).map( async (file) =>
+					const encodedFiles = await Promise.all(Array.from(ctrl.selectedFiles).map( async (file) =>
 					{
 						return {
 							name: file.name,
@@ -148,7 +158,6 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 							data: await this.toBase64(file),
 						};
 					}));
-
 					return encodedFiles;
 				}
 
@@ -176,12 +185,6 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					$scope.$apply();
 				}
 
-				ctrl.clearSelectedFiles = () =>
-				{
-					ctrl.selectedFiles = [];
-					$scope.$apply();
-				}
-
 				ctrl.getSelectedMergeDescription = () =>
 				{
 					return ctrl.mergeOptions.find(option => option.value === ctrl.selectedMergeStrategy).description;
@@ -189,12 +192,12 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 
 				ctrl.canRunImport = () =>
 				{
-					return (ctrl.selectedFiles && ctrl.selectedFiles.length > 0);
+					return (!ctrl.importRunning && Boolean(ctrl.selectedFiles) && ctrl.selectedFiles.length > 0);
 				}
 
 				ctrl.canDownloadLogs = () =>
 				{
-					return ($ctrl.results && ctrl.results.logFileNames && !$ctrl.importRunning);
+					return (!ctrl.importRunning && ctrl.results && ctrl.results.logFileNames && ctrl.results.logFileNames.length > 0);
 				}
 			}]
 	});

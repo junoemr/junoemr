@@ -49,7 +49,6 @@ angular.module('Common.Components').component('junoFileChooser', {
 			}
 		}
 
-
 		ctrl.labelClasses = () =>
 		{
 			return [ctrl.labelPosition];
@@ -65,7 +64,7 @@ angular.module('Common.Components').component('junoFileChooser', {
 			return [ctrl.buttonColor, ctrl.buttonColorPattern];
 		}
 
-		$scope.onInputChange = function onInputChange(files)
+		$scope.onInputChange = (files) =>
 		{
 			if(ctrl.change)
 			{
@@ -73,12 +72,18 @@ angular.module('Common.Components').component('junoFileChooser', {
 			}
 		}
 
-		ctrl.onButtonClick = function onButtonClick()
+		ctrl.onButtonClick = () =>
 		{
 			if(!ctrl.disabled)
 			{
-				angular.element(document.querySelector('#file-select')).click();
+				ctrl.getInputRef().click();
 			}
+		}
+
+		ctrl.getInputRef = () =>
+		{
+			// this would be nice to replace with a ref, if it was supported
+			return angular.element(document.querySelector('#file-select'));
 		}
 	}]
 });
