@@ -2,9 +2,10 @@
 
 if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
-if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = function JunoEncounter(pageData)
+if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = function JunoEncounter(pageData, pageState)
 {
 	this.pageData = pageData;
+	this.pageState = pageState;
 
 	var openWindows = {};
 	var measurementWindows = [];
@@ -59,6 +60,36 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			$("encMainDiv").style.height = divHeight + 'px';
 		}
 	};
+
+	// Set the initial width of the page and set up a monitor to make sure it doesn't get smaller
+	this.initNavBarMonitor = function initNavBarMonitor()
+	{
+	    this.emulateMinWidth(null);
+		Element.observe(window, "resize", this.emulateMinWidth);
+	}
+
+	// Keep the encounter window from getting smaller
+	this.emulateMinWidth = function emulateMinWidth(e)
+	{
+		var win = pageWidth();
+		var main = Element.getWidth("body");
+
+		if (e == null)
+		{
+			this.pageState.minMain = Math.round(main * this.pageState.minDelta);
+			this.pageState.minWin = Math.round(win * this.pageState.minDelta);
+		}
+
+		if (main < this.pageState.minMain)
+		{
+			$("body").style.width = this.pageState.minMain + "px";
+		}
+		else if (win >= this.pageState.minWin && main == this.pageState.minMain)
+		{
+			$("body").style.width = "100%";
+		}
+
+	}
 
 	this.configureNifty = function configureNifty()
 	{
