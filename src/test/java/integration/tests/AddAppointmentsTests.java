@@ -97,7 +97,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 			throws InterruptedException
 	{
 
-		Thread.sleep(2000);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(timeFrame));
 		driver.findElement(timeFrame).click();
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);
@@ -224,7 +224,6 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		String windowHandleScheduleSetting = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
-
 		setupSchedule(windowHandleScheduleSetting, AuthUtils.TEST_PROVIDER_ID, templateTitleGeneral, templateTitleGeneral);
 		List<String> daySchedule = getDailySchedule();
 		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.",
@@ -248,6 +247,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		driver.findElement(By.xpath(xpathFirst)).click();
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(2), driver);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[name='appointment_date']")));
 		WebElement appointmentDateElement = driver.findElement(By.cssSelector("input[name='appointment_date']"));
 		String appointmentDate = appointmentDateElement.getAttribute("value");
 		addAppointmentPageWithDemo(secCurrWindowHandle, "P");//Picked
@@ -266,7 +266,8 @@ public class AddAppointmentsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addAppointmentsGroupViewTest() throws InterruptedException {
+	public void addAppointmentsGroupViewTest() throws InterruptedException
+	{
 		String groupName = "TestGroup";
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();

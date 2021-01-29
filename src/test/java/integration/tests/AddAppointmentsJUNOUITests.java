@@ -108,9 +108,11 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 
 	public void addSiteNAssignRole(String providerLName, String siteName)
 	{
-		driver.findElement(By.xpath("//td[contains(., '" + providerLName + "')]//following-sibling::" +
+		String xpathProvider = "//td[contains(., '" + providerLName + "')]//following-sibling::" +
 				"td[@class='provider-button-column flex-row justify-content-center']" +
-				"//button[@title='Edit Provider']")).click();
+				"//button[@title='Edit Provider']";
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpathProvider)));
+		driver.findElement(By.xpath(xpathProvider)).click();
 
 		//Scroll down to "Contact Information"
 		JavascriptExecutor js = (JavascriptExecutor) driver;

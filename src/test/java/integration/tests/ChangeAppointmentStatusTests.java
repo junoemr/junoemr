@@ -137,6 +137,7 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
+		Thread.sleep(1000);//wait for clicking to change the status.
 		String statusDP = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']"))
 				.getAttribute("title");
 		Assert.assertEquals("Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);

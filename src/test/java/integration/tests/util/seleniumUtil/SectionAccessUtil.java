@@ -36,7 +36,6 @@ public class SectionAccessUtil
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
 			throws InterruptedException
 	{
-		Thread.sleep(2000);
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
@@ -69,7 +68,6 @@ public class SectionAccessUtil
 
 	public static void accessSectionJUNOUI(WebDriver driver, String sectionName)
 	{
-
 		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
 		{
