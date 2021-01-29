@@ -40,11 +40,10 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandle
 import oscar.oscarEncounter.pageUtil.EctDisplayMeasurementsAction;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
@@ -199,7 +198,7 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				String onClickString = "popupPage(700,1000,'" + hash + "','" + url + "');";
 				sectionNote.setOnClick(onClickString);
 
-				String displayName = StringUtils.maxLenString(fullDisplayName, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
+				String displayName = EncounterSectionService.getTrimmedText(fullDisplayName);
 				sectionNote.setText(displayName);
 
 				sectionNote.setTitle(fullDisplayName);
@@ -247,8 +246,6 @@ public class EncounterMeasurementsService extends EncounterSectionService
 
 				EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-				String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
-
 				String winName = flowsheetName + sectionParams.getDemographicNo();
 				String uuid = UUID.randomUUID().toString();
 				int hash = Math.abs(winName.hashCode());
@@ -261,9 +258,9 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				String onClickString = "popupPage(700,1000,'" + hash + "','" + url + "');";
 				sectionNote.setOnClick(onClickString);
 
-
-				dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-				sectionNote.setText(dispname);
+				String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
+				sectionNote.setText(EncounterSectionService.getTrimmedText(dispname));
+				sectionNote.setTitle(dispname);
 				out.add(sectionNote);
 			}
 		}
@@ -339,19 +336,19 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				EncounterSectionNote sectionNote = new EncounterSectionNote();
 
 				data = measures.get(0);
-				Date date = data.getDateObservedAsDate();
+				LocalDateTime date = ConversionUtils.toLocalDateTime(data.getDateObservedAsDate());
 				if (date == null)
 				{
-					date = data.getDateEnteredAsDate();
+					date = ConversionUtils.toLocalDateTime(data.getDateEnteredAsDate());
 				}
-				sectionNote.setUpdateDate(ConversionUtils.toNullableLocalDate(date).atStartOfDay());
+				sectionNote.setUpdateDate(date);
 
 				title = EctDisplayMeasurementsAction.padd(title, data.getDataField());
 
 				sectionNote.setText(title);
 
-				sectionNote.setTitle(title + " " +
-						ConversionUtils.toDateString(date, ConversionUtils.DEFAULT_DATE_PATTERN));
+				sectionNote.setTitle(
+						EncounterSectionService.formatTitleWithLocalDateTime(title + " " + data.getDataField(), date));
 
 				sectionNote.setValue(data.getDataField());
 

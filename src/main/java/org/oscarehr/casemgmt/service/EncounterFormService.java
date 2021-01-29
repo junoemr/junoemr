@@ -299,6 +299,8 @@ public class EncounterFormService extends EncounterSectionService
 			}
 		}
 
+		Collections.sort(out, new EncounterSectionNote.SortChronologic());
+
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 

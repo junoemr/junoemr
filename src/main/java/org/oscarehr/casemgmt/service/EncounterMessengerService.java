@@ -31,9 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import oscar.oscarMessenger.data.MsgMessageData;
 import oscar.oscarMessenger.util.MsgDemoMap;
 import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,9 +97,6 @@ public class EncounterMessengerService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		//set text for lefthand module title
-		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.LeftNavBar.Messages"));
-
 		MsgDemoMap msgDemoMap = new MsgDemoMap();
 		List<String> msgList = msgDemoMap.getMsgList(sectionParams.getDemographicNo(), OscarMsgType.GENERAL_TYPE);
 
@@ -110,14 +106,13 @@ public class EncounterMessengerService extends EncounterSectionService
 
 			String msgId = msgList.get(i);
 			MsgMessageData msgData = new MsgMessageData(msgId);
-			String msgSubject = StringUtils.maxLenString(msgData.getSubject(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-			sectionNote.setText(msgSubject);
+			sectionNote.setText(EncounterSectionService.getTrimmedText(msgData.getSubject()));
 
 			String msgDate = msgData.getDate();
-			LocalDate date = ConversionUtils.toLocalDate(msgDate);
-			sectionNote.setUpdateDate(date.atStartOfDay());
+			LocalDateTime date = ConversionUtils.toLocalDate(msgDate).atStartOfDay();
+			sectionNote.setUpdateDate(date);
 
-			sectionNote.setTitle(msgData.getSubject() + " " + ConversionUtils.toDateString(date));
+			sectionNote.setTitle(EncounterSectionService.formatTitleWithLocalDateTime(msgData.getSubject(), date));
 
 			String winName = "SendMsg" + sectionParams.getDemographicNo();
 			int hash = winName.hashCode();

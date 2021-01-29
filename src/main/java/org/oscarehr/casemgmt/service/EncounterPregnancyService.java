@@ -31,7 +31,7 @@ import org.oscarehr.common.model.Episode;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.OscarProperties;
 import oscar.oscarEncounter.data.EctFormData;
-import oscar.util.StringUtils;
+import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -190,9 +190,6 @@ public class EncounterPregnancyService extends EncounterSectionService
 		{
 			Episode episode = existingCurEpisodes.get(0);
 
-
-			String itemHeader = StringUtils.maxLenString(episode.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-
 			int hash = Math.abs(winName.hashCode());
 			String url = sectionParams.getContextPath() + "/Pregnancy.do" +
 					"?method=complete" +
@@ -200,9 +197,8 @@ public class EncounterPregnancyService extends EncounterSectionService
 
 			String onClickString = "popupPage(500,900,'" + hash + "','" + url +"'); return false;";
 
-
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
-			sectionNote.setText(itemHeader);
+			sectionNote.setText(episode.getDescription());
 			sectionNote.setTitle("");
 			sectionNote.setUpdateDate(LocalDateTime.ofInstant(episode.getStartDate().toInstant(), ZoneId.systemDefault()));
 			sectionNote.setOnClick(onClickString);
@@ -219,7 +215,6 @@ public class EncounterPregnancyService extends EncounterSectionService
 		String red = "red";
 		for(Episode episode:existingPastEpisodes)
 		{
-			String itemHeader = StringUtils.maxLenString(episode.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 			String onClickString = "return false;";
 
 			String linkTitle = "";
@@ -228,11 +223,13 @@ public class EncounterPregnancyService extends EncounterSectionService
 				linkTitle = episode.getNotes();
 			}
 
+			LocalDateTime date = ConversionUtils.toLocalDateTime(episode.getStartDate());
+
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
-			sectionNote.setText(itemHeader);
+			sectionNote.setText(EncounterSectionService.getTrimmedText(episode.getDescription()));
 			sectionNote.setTitle(linkTitle);
 			sectionNote.setColour(COLOUR_RED);
-			sectionNote.setUpdateDate(LocalDateTime.ofInstant(episode.getStartDate().toInstant(), ZoneId.systemDefault()));
+			sectionNote.setUpdateDate(date);
 			sectionNote.setOnClick(onClickString);
 
 			out.add(sectionNote);

@@ -31,7 +31,6 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -45,6 +44,8 @@ public class EncounterTicklerService extends EncounterSectionService
 	public static final String SECTION_ID = "tickler";
 	protected static final String SECTION_TITLE_KEY = "global.viewTickler";
 	protected static final String SECTION_TITLE_COLOUR = "#FF6600";
+
+	private static final String BEFORE_COLOUR = "#FF0000";
 
 	@Autowired
 	protected SecurityInfoManager securityInfoManager;
@@ -142,7 +143,7 @@ public class EncounterTicklerService extends EncounterSectionService
 				Integer.parseInt(sectionParams.getDemographicNo()),
 				limit,
 				offset,
-				AbstractDao.SORT_DESC
+				AbstractDao.SORT_ASC
 		);
 
 		for (Tickler t : ticklers)
@@ -156,15 +157,14 @@ public class EncounterTicklerService extends EncounterSectionService
 			// Colour
 			if(serviceDate.isBefore(LocalDateTime.now()))
 			{
-				sectionNote.setColour("#FF0000");
+				sectionNote.setColour(BEFORE_COLOUR);
 			}
 
 			// title
-			String itemHeader = StringUtils.maxLenString(t.getMessage(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-			sectionNote.setText(itemHeader);
+			sectionNote.setText(EncounterSectionService.getTrimmedText(t.getMessage()));
 
 			// Link title
-			sectionNote.setTitle(t.getMessage() + " " + ConversionUtils.toDateTimeString(serviceDate, ConversionUtils.DEFAULT_DATE_PATTERN));
+			sectionNote.setTitle(EncounterSectionService.formatTitleWithLocalDateTime(t.getMessage(), serviceDate));
 
 			// onClick
 			String winName = StringUtils.maxLenString(t.getMessage(), MAX_LEN_TITLE, MAX_LEN_TITLE, "");
@@ -173,7 +173,8 @@ public class EncounterTicklerService extends EncounterSectionService
 			if (org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable())
 			{
 				url = sectionParams.getContextPath() + "/Tickler.do?method=view&id=" + t.getId();
-			} else
+			}
+			else
 			{
 				url = sectionParams.getContextPath() + "/tickler/ticklerMain.jsp" +
 						"?demoview=" + encodeUrlParam(sectionParams.getDemographicNo()) +
@@ -185,8 +186,6 @@ public class EncounterTicklerService extends EncounterSectionService
 
 			notes.add(sectionNote);
 		}
-
-		//Collections.sort(notes, new EncounterSectionNote.SortChronologic());
 
 		int noteCount = ticklerManager.getActiveByDemographicNoCount(
 				sectionParams.getLoggedInInfo(),

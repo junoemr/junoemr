@@ -27,7 +27,6 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import oscar.oscarRx.data.RxPrescriptionData.Prescription;
 import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,14 +118,13 @@ public class EncounterMedicationService extends EncounterSectionService
 			{
 				fullTitle = drug.getFullOutLine().replaceAll(";", " ");
 			}
-			String title = StringUtils.maxLenString(fullTitle, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 
-			sectionNote.setText(title);
+			sectionNote.setText(EncounterSectionService.getTrimmedText(fullTitle));
 			sectionNote.setTitleClasses(getTitleClasses(drug, now, month).toArray(new String[0]));
 
 			String startDate = ConversionUtils.toDateString(drug.getRxDate());
 			String endDate = ConversionUtils.toDateString(drug.getEndDate());
-			sectionNote.setTitle(fullTitle + " " + startDate + " - " + drug.getEndDate());
+			sectionNote.setTitle(fullTitle + " " + startDate + " - " + endDate);
 
 			out.add(sectionNote);
 		}

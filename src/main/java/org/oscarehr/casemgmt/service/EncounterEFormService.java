@@ -32,7 +32,6 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.eform.EFormUtil;
 import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -143,9 +142,8 @@ public class EncounterEFormService extends EncounterSectionService
 
 			sectionNote.setOnClick(onClickString);
 
-			String strTitle = StringUtils.maxLenString(eFormData.getFormName() + ": " + eFormData.getSubject(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-
-			sectionNote.setText(strTitle);
+			String text = EncounterSectionService.getTrimmedText(eFormData.getFormName() + ": " + eFormData.getSubject());
+			sectionNote.setText(text);
 
 			sectionNote.setTitle(eFormData.getSubject());
 

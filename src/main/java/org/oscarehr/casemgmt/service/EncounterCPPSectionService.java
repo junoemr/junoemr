@@ -152,7 +152,6 @@ public abstract class EncounterCPPSectionService extends EncounterSectionService
 			sectionNote.setEditors(note.getEditors());
 			sectionNote.setRevision(note.getRevision());
 			sectionNote.setObservationDate(note.getObservationDate());
-			sectionNote.setUpdateDate(note.getUpdateDate());
 			sectionNote.setNoteIssuesString(getNoteIssueString(note));
 			sectionNote.setNoteExtsString(getNoteExtString(note));
 			sectionNote.setOnClick(getShowEditJavascriptCallString(note, notes.size(), sectionParams, cppIssues));
