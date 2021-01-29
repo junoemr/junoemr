@@ -32,10 +32,6 @@ import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.springframework.stereotype.Component;
 
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MILD;
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MODERATE;
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_SEVERE;
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_UNKNOWN;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DRUG_IDENTIFICATION_NUMBER;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ONSET_REACTION;

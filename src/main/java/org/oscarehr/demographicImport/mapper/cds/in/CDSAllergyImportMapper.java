@@ -51,7 +51,7 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		//TODO reaction type?
 		allergy.setStartDate(toNullablePartialDate(importStructure.getStartDate()));
 		allergy.setLifeStage(getLifeStage(importStructure.getLifeStage()));
-		allergy.setSeverityOfReaction(getSeverity(importStructure));
+		allergy.setSeverityOfReaction(getSeverity(importStructure.getSeverity()));
 		allergy.setReaction(importStructure.getReaction());
 		allergy.setEntryDateTime(toNullableLocalDateTime(importStructure.getRecordedDate()));
 		allergy.setAnnotation(importStructure.getNotes());
@@ -93,9 +93,8 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		return din;
 	}
 
-	protected Allergy.REACTION_SEVERITY getSeverity(AllergiesAndAdverseReactions importStructure)
+	protected Allergy.REACTION_SEVERITY getSeverity(AdverseReactionSeverity adverseReactionSeverity)
 	{
-		AdverseReactionSeverity adverseReactionSeverity = importStructure.getSeverity();
 		Allergy.REACTION_SEVERITY severity = Allergy.REACTION_SEVERITY.UNKNOWN;
 
 		if(adverseReactionSeverity != null)
