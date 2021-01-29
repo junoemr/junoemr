@@ -40,6 +40,8 @@ import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.demographicImport.util.ImportProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -58,6 +60,9 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
 	private static final Logger logger = Logger.getLogger(AbstractCDSImportMapper.class);
+
+	@Autowired
+	protected ImportProperties importProperties;
 
 	public AbstractCDSImportMapper()
 	{
@@ -234,6 +239,32 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return phoneNumber;
 	}
 
+	protected String getSubregionCode(String subDivisionCode)
+	{
+		String regionCode = null;
+		if(subDivisionCode != null)
+		{
+			// most expected case, something like 'CA-BC'
+			if(!subDivisionCode.startsWith("-") && subDivisionCode.contains("-"))
+			{
+				regionCode = subDivisionCode.split("-")[1];
+			}
+			else if(subDivisionCode.length() == 2) // something like 'BC' or 'ON'
+			{
+				regionCode = subDivisionCode.toUpperCase();
+			}
+			// if it's not one of these special case codes (which we can't use anyways, but are valid)
+			else if(!subDivisionCode.equals("-50") // not available or temporary
+					&& !subDivisionCode.equals("-70") // asked, unknown
+					&& !subDivisionCode.equals("-90")) // Not applicable
+			{
+				importProperties.getImportLogger().logEvent("Unknown CountrySubdivisionCode: " + subDivisionCode);
+			}
+		}
+
+		return regionCode;
+	}
+
 	protected Address getAddress(org.oscarehr.common.xml.cds.v5_0.model.Address importAddress)
 	{
 		Address address = null;
@@ -247,8 +278,10 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 				address.setAddressLine2(StringUtils.trimToNull(
 						StringUtils.trimToEmpty(structured.getLine2()) + "\n" + StringUtils.trimToEmpty(structured.getLine3())));
 				address.setCity(structured.getCity());
-				address.setRegionCode(structured.getCountrySubdivisionCode());
 
+				String subDivisionCode = structured.getCountrySubdivisionCode();
+
+				String countryCode = null;
 				PostalZipCode postalZipCode = structured.getPostalZipCode();
 				if(postalZipCode != null)
 				{
@@ -256,15 +289,30 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 					String zipCode = postalZipCode.getZipCode();
 					if(postalCode != null)
 					{
-						address.setCountryCode(COUNTRY_CODE_CANADA);
+						countryCode = COUNTRY_CODE_CANADA;
 						address.setPostalCode(postalCode);
 					}
 					else if(zipCode != null)
 					{
-						address.setCountryCode(COUNTRY_CODE_USA);
+						countryCode = COUNTRY_CODE_USA;
 						address.setPostalCode(zipCode);
 					}
 				}
+
+				if(subDivisionCode != null)
+				{
+					// if the country code is valid, use this instead of the implied code based on postal code
+					if(subDivisionCode.startsWith(COUNTRY_CODE_CANADA))
+					{
+						countryCode = COUNTRY_CODE_CANADA;
+					}
+					else if(subDivisionCode.startsWith(COUNTRY_CODE_USA))
+					{
+						countryCode = COUNTRY_CODE_USA;
+					}
+				}
+				address.setRegionCode(getSubregionCode(subDivisionCode));
+				address.setCountryCode(countryCode);
 			}
 			else
 			{

@@ -25,6 +25,8 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
@@ -36,12 +38,15 @@ import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
+import org.oscarehr.demographicImport.logger.ImportLogger;
+import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.demographicImport.util.ImportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.ConversionUtils;
 
@@ -64,6 +69,9 @@ public class CDSImportMapperTest
 	@Autowired
 	@InjectMocks
 	private CDSImportMapper cdsImportMapper;
+
+	@Mock
+	private ImportProperties importProperties;
 
 	@Before
 	public void setUp()
@@ -102,13 +110,47 @@ public class CDSImportMapperTest
 	}
 
 	@Test
+	public void testGetSubregionCode_Null()
+	{
+		assertNull(cdsImportMapper.getSubregionCode(null));
+	}
+
+	@Test
+	public void testGetSubregionCode_ProvinceOnly()
+	{
+		assertEquals("BC", cdsImportMapper.getSubregionCode("BC"));
+	}
+
+	@Test
+	public void testGetSubregionCode_CountryAndProvince()
+	{
+		assertEquals("BC", cdsImportMapper.getSubregionCode("CA-BC"));
+	}
+
+	@Test
+	public void testGetSubregionCode_SpecialCodes()
+	{
+		assertNull(cdsImportMapper.getSubregionCode("-50"));
+		assertNull(cdsImportMapper.getSubregionCode("-70"));
+		assertNull(cdsImportMapper.getSubregionCode("-90"));
+	}
+
+	@Test
+	public void testGetSubregionCode_Invalid()
+	{
+		ImportLogger mockLogger = Mockito.mock(CDSImportLogger.class);
+		Mockito.when(importProperties.getImportLogger()).thenReturn(mockLogger);
+		assertNull(cdsImportMapper.getSubregionCode("notValid"));
+	}
+
+	@Test
 	public void testGetAddress_Null()
 	{
 		assertNull(cdsImportMapper.getAddress(null));
 	}
 
 	@Test
-	public void testGetAddress_StructuredCA()
+	public void testGetAddress_StructuredCA_Full()
 	{
 		String expectedAddressLine1 = "line 1";
 		String expectedAddressLine2 = "line 2";
@@ -117,18 +159,13 @@ public class CDSImportMapperTest
 		String expectedCountry = "CA";
 		String expectedPostal = "V8V0T0";
 
-		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
-		AddressStructured addressStructured = objectFactory.createAddressStructured();
-		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
-
-		addressStructured.setLine1(expectedAddressLine1);
-		addressStructured.setLine2(expectedAddressLine2);
-		addressStructured.setCity(expectedCity);
-		addressStructured.setCountrySubdivisionCode(expectedProvince);
-		postalZipCode.setPostalCode(expectedPostal);
-		addressStructured.setPostalZipCode(postalZipCode);
-		importAddress.setStructured(addressStructured);
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				expectedCountry + "-" + expectedProvince,
+				expectedPostal
+		);
 
 		Address resultAddress = cdsImportMapper.getAddress(importAddress);
 
@@ -141,7 +178,91 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testGetAddress_StructuredUS()
+	public void testGetAddress_StructuredCA_NoPostal()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedProvince = "BC";
+		String expectedCountry = "CA";
+		String expectedPostal = null;
+
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				expectedCountry + "-" + expectedProvince,
+				expectedPostal
+		);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedProvince, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedPostal, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_StructuredCA_NoSubdivisionCode()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedProvince = null;
+		String expectedCountry = "CA";
+		String expectedPostal = "V8V0T0";
+
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				null,
+				expectedPostal
+		);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedProvince, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedPostal, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_StructuredCA_NoCountry()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedProvince = null;
+		String expectedCountry = null;
+		String expectedPostal = null;
+
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				null,
+				expectedPostal
+		);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedProvince, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedPostal, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_StructuredUS_Full()
 	{
 		String expectedAddressLine1 = "line 1";
 		String expectedAddressLine2 = "line 2";
@@ -150,18 +271,97 @@ public class CDSImportMapperTest
 		String expectedCountry = "US";
 		String expectedZip = "99750-0077";
 
-		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
-		AddressStructured addressStructured = objectFactory.createAddressStructured();
-		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				expectedCountry + "-" + expectedState,
+				expectedZip
+		);
 
-		addressStructured.setLine1(expectedAddressLine1);
-		addressStructured.setLine2(expectedAddressLine2);
-		addressStructured.setCity(expectedCity);
-		addressStructured.setCountrySubdivisionCode(expectedState);
-		postalZipCode.setZipCode(expectedZip);
-		addressStructured.setPostalZipCode(postalZipCode);
-		importAddress.setStructured(addressStructured);
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedState, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedZip, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_StructuredUS_NoZip()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedState = "NY";
+		String expectedCountry = "US";
+		String expectedZip = null;
+
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				expectedCountry + "-" + expectedState,
+				expectedZip
+		);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedState, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedZip, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_StructuredUS_NoSubdivisionCode()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedState = null;
+		String expectedCountry = "US";
+		String expectedZip = "99750-0077";
+
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				null,
+				expectedZip
+		);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedState, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedZip, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_StructuredUS_NoCountry()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedState = null;
+		String expectedCountry = null;
+		String expectedZip = null;
+
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+				expectedAddressLine1,
+				expectedAddressLine2,
+				expectedCity,
+				null,
+				expectedZip
+		);
 
 		Address resultAddress = cdsImportMapper.getAddress(importAddress);
 
@@ -759,5 +959,51 @@ public class CDSImportMapperTest
 		dateTimeFullOrPartial.setFullDateTime(calendar);
 
 		assertEquals(expectedDate, cdsImportMapper.toNullableLocalDate(dateTimeFullOrPartial));
+	}
+
+	private org.oscarehr.common.xml.cds.v5_0.model.Address createTestImportAddressCA(
+			String addressLine1,
+			String addressLine2,
+			String city,
+			String subDivisionCode,
+			String postal)
+	{
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		AddressStructured addressStructured = objectFactory.createAddressStructured();
+		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
+
+		addressStructured.setLine1(addressLine1);
+		addressStructured.setLine2(addressLine2);
+		addressStructured.setCity(city);
+		addressStructured.setCountrySubdivisionCode(subDivisionCode);
+		postalZipCode.setPostalCode(postal);
+		addressStructured.setPostalZipCode(postalZipCode);
+		importAddress.setStructured(addressStructured);
+
+		return importAddress;
+	}
+
+	private org.oscarehr.common.xml.cds.v5_0.model.Address createTestImportAddressUS(
+			String addressLine1,
+			String addressLine2,
+			String city,
+			String subDivisionCode,
+			String zip)
+	{
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		AddressStructured addressStructured = objectFactory.createAddressStructured();
+		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
+
+		addressStructured.setLine1(addressLine1);
+		addressStructured.setLine2(addressLine2);
+		addressStructured.setCity(city);
+		addressStructured.setCountrySubdivisionCode(subDivisionCode);
+		postalZipCode.setZipCode(zip);
+		addressStructured.setPostalZipCode(postalZipCode);
+		importAddress.setStructured(addressStructured);
+
+		return importAddress;
 	}
 }
