@@ -31,14 +31,11 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class EncounterConsultationService extends EncounterSectionService
@@ -125,9 +122,8 @@ public class EncounterConsultationService extends EncounterSectionService
 			countback = countback * -1;
 		}
 		cal.add(Calendar.MONTH, countback);
-		Date cutoffDate = cal.getTime();
+		LocalDateTime cutoffDate = ConversionUtils.toLocalDateTime(cal.getTime());
 
-		String dbFormat = "yyyy-MM-dd";
 		for (int idx = theRequests.ids.size() - 1; idx >= 0; --idx )
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
@@ -135,23 +131,22 @@ public class EncounterConsultationService extends EncounterSectionService
 			String service = theRequests.service.get(idx);
 			String dateStr = theRequests.date.get(idx);
 			String status = theRequests.status.get(idx);
-			DateFormat formatter = new SimpleDateFormat(dbFormat);
 
-			Date date;
-			//String serviceDateStr;
+			LocalDateTime date;
 			try
 			{
-				date = formatter.parse(dateStr);
-				//serviceDateStr = DateUtils.formatDate(date, request.getLocale());
+				date = ConversionUtils.toNullableLocalDate(dateStr).atStartOfDay();
+
 				//if we are after cut off date and not completed set to red
-				if( date.before(cutoffDate) && !status.equals("4") )
+				if( date.isBefore(cutoffDate) && !status.equals("4") )
 				{
 					sectionNote.setColour(COLOUR_RED);
 				}
 			}
-			catch(ParseException ex ) {
-				MiscUtils.getLogger().debug("EctDisplayConsultationAction: Error creating date " + ex.getMessage());
-				//serviceDateStr = "Error";
+			catch(DateTimeParseException ex)
+			{
+				MiscUtils.getLogger().debug("Error creating date " + ex.getMessage(), ex);
+
 				date = null;
 			}
 
@@ -162,11 +157,9 @@ public class EncounterConsultationService extends EncounterSectionService
 			String onClickString = "popupPage(700,960,'" + winName + "','" + url + "');";
 			sectionNote.setOnClick(onClickString);
 
-
-			String title = StringUtils.maxLenString(service, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-
-			sectionNote.setText(title);
-			sectionNote.setUpdateDate(ConversionUtils.toNullableLocalDate(date).atStartOfDay());
+			sectionNote.setText(EncounterSectionService.getTrimmedText(service));
+			sectionNote.setUpdateDate(date);
+			sectionNote.setTitle(EncounterSectionService.formatTitleWithLocalDateTime(service, date));
 
 			out.add(sectionNote);
 		}

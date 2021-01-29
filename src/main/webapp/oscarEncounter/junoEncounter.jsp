@@ -614,6 +614,11 @@
 
 							<c:forEach items="${section.notes}" var="note" varStatus="loop">
 
+								<%-- ============================================================================== --%>
+								<%-- NOTE: This template is duplicated in sectionNoteTemplate.html and any          --%>
+								<%--       modifications will need to be done in both places.  This should be       --%>
+								<%--       changed at some point to share a template.                               --%>
+								<%-- ============================================================================== --%>
 								<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 
 									<%-- Expand arrows if neccessary --%>
@@ -647,7 +652,7 @@
 												onmouseout="this.className='links ${fn:join(note.titleClasses, ' ')}'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="${note.text}"
+												title="${note.title}"
 										>
 											<c:out value="${note.text}"/>
 										</a>
@@ -668,7 +673,7 @@
 												onmouseout="this.className='links'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="${note.text}"
+												title="${note.title}"
 										>
 												<c:out value="${note.value}"/>
 												<c:out value="${updateDate}"/>
@@ -759,12 +764,17 @@
 								<fmt:formatDate value="${parsedObservationDate}"
 												pattern="dd-MMM-yyyy"
 												var="observationDate"/>
+								<%-- ============================================================================== --%>
+								<%-- NOTE: This template is duplicated in sectionCPPNoteTemplate.html and any       --%>
+								<%--       modifications will need to be done in both places.  This should be       --%>
+								<%--       changed at some point to share a template.                               --%>
+								<%-- ============================================================================== --%>
 								<li class="cpp ${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 									<span id="spanListNote${fn:escapeXml(noteLoop.index)}">
 										<a class="topLinks"
 										   onmouseover="this.className='topLinkhover'"
 										   onmouseout="this.className='topLinks'"
-										   title="Rev:${note.revision} - Last update:${updateDate}"
+										   title="${note.title}"
 										   id="listNote${note.id}"
 										   href="#"
 										   onclick="${note.onClick}"

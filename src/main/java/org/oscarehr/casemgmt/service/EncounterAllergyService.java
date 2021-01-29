@@ -130,6 +130,8 @@ public class EncounterAllergyService extends EncounterSectionService
 
 		sectionNote.setText(StringUtils.maxLenString(description, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES));
 
+		sectionNote.setTitle(description + " " + entryDate);
+
 		//item.setLinkTitle(description + " " + DateUtils.formatDate(entryDate, locale));
 		//item.setURL("return false;");
 

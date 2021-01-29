@@ -152,6 +152,12 @@ public class CaseManagementIssueService
 				continue;
 			}
 
+			String[] ticklerCode = {Issue.SUMMARY_CODE_TICKLER_NOTE};
+			if(containsIssue(ticklerCode, issue.getIssue().getCode()))
+			{
+				continue;
+			}
+
 			if(org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED.equals(type))
 			{
 				if(!issue.isResolved())
