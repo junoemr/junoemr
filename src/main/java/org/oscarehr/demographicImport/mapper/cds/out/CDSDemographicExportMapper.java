@@ -22,7 +22,6 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
@@ -85,7 +84,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.setUniqueVendorIdSequence(String.valueOf(exportDemographic.getId()));
 		demographics.getAddress().addAll(getExportAddresses(exportDemographic));
 		demographics.getPhoneNumber().addAll(getExportPhones(exportDemographic));
-		demographics.setPreferredOfficialLanguage(getExportOfficialLanguage(exportDemographic));
+		demographics.setPreferredOfficialLanguage(getExportOfficialLanguage(exportDemographic.getOfficialLanguage()));
 		demographics.setPreferredSpokenLanguage(exportDemographic.getSpokenLanguage());
 		demographics.getContact().addAll(getContacts(exportStructure.getContactList()));
 		demographics.setNoteAboutPatient(exportDemographic.getPatientNote());
@@ -260,13 +259,15 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		return personStatusCode;
 	}
 
-	protected OfficialSpokenLanguageCode getExportOfficialLanguage(Demographic exportStructure)
+	protected OfficialSpokenLanguageCode getExportOfficialLanguage(Demographic.OFFICIAL_LANGUAGE officialLanguage)
 	{
-		String officialLanguage = StringUtils.trimToEmpty(exportStructure.getOfficialLanguage());
-		switch(officialLanguage)
+		if(officialLanguage != null)
 		{
-			case "French" : return OfficialSpokenLanguageCode.FRE;
-			case "English" : return OfficialSpokenLanguageCode.ENG;
+			switch(officialLanguage)
+			{
+				case FRENCH: return OfficialSpokenLanguageCode.FRE;
+				case ENGLISH: return OfficialSpokenLanguageCode.ENG;
+			}
 		}
 		return null;
 	}

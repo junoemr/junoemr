@@ -53,7 +53,7 @@ public class DemographicModelToDbConverter
 		}
 
 		Demographic dbDemographic = new Demographic();
-		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth", "title", "sex");
+		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth", "title", "sex", "officialLanguage");
 
 		dbDemographic.setDemographicId(input.getId());
 		dbDemographic.setDateOfBirth(input.getDateOfBirth());
@@ -69,6 +69,7 @@ public class DemographicModelToDbConverter
 		dbDemographic.setChartNo(input.getChartNumber());
 		dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDate(input.getRosterDate()));
 		dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(input.getRosterTerminationDate()));
+		dbDemographic.setOfficialLanguage((input.getOfficialLanguage() != null) ? input.getOfficialLanguage().getValue() : null);
 
 		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
 		if(dbProvider != null)

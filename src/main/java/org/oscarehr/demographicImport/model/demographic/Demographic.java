@@ -39,6 +39,36 @@ import java.util.List;
 @Data
 public class Demographic extends AbstractTransientModel implements Person, Contact
 {
+	public enum OFFICIAL_LANGUAGE
+	{
+		ENGLISH("English"),
+		FRENCH("French");
+
+		private final String value;
+
+		OFFICIAL_LANGUAGE(String value)
+		{
+			this.value = value;
+		}
+
+		public String getValue()
+		{
+			return this.value;
+		}
+
+		public static OFFICIAL_LANGUAGE fromValueString(String value)
+		{
+			for(OFFICIAL_LANGUAGE language : OFFICIAL_LANGUAGE.values())
+			{
+				if(language.getValue().equalsIgnoreCase(value))
+				{
+					return language;
+				}
+			}
+			return null;
+		}
+	}
+
 	private Integer id;
 
 	// base info
@@ -84,7 +114,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	private String alias;
 	private String citizenship;
 	private String spokenLanguage;
-	private String officialLanguage;
+	private OFFICIAL_LANGUAGE officialLanguage;
 	private String countryOfOrigin;
 	private String newsletter;
 	private String nameOfMother;

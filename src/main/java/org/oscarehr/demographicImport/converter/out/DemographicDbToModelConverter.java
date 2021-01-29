@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
+import static org.oscarehr.demographicImport.model.demographic.Demographic.OFFICIAL_LANGUAGE;
 
 @Component
 public class DemographicDbToModelConverter extends
@@ -54,7 +55,7 @@ public class DemographicDbToModelConverter extends
 		}
 
 		org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic = new org.oscarehr.demographicImport.model.demographic.Demographic();
-		BeanUtils.copyProperties(input, exportDemographic, "address", "dateOfBirth", "title");
+		BeanUtils.copyProperties(input, exportDemographic, "address", "dateOfBirth", "title", "officialLanguage");
 
 		exportDemographic.setId(input.getDemographicId());
 		exportDemographic.setDateOfBirth(input.getDateOfBirth());
@@ -75,6 +76,7 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setReferralDoctor(getReferralProvider(input));
 		exportDemographic.setFamilyDoctor(getFamilyProvider(input));
 		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
+		exportDemographic.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
 
 		Address address = new Address();
 		address.setAddressLine1(input.getAddress());

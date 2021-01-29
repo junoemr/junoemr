@@ -81,8 +81,8 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		OfficialSpokenLanguageCode officialLanguage = importStructure.getPreferredOfficialLanguage();
 		if(officialLanguage != null)
 		{
-			//TODO language enum/constants
-			demographic.setOfficialLanguage(OfficialSpokenLanguageCode.FRE.equals(officialLanguage) ? "French" : "English");
+			demographic.setOfficialLanguage(OfficialSpokenLanguageCode.FRE.equals(officialLanguage) ?
+					Demographic.OFFICIAL_LANGUAGE.FRENCH : Demographic.OFFICIAL_LANGUAGE.ENGLISH);
 		}
 		demographic.setSpokenLanguage(importStructure.getPreferredSpokenLanguage());
 		demographic.setPatientNote(importStructure.getNoteAboutPatient());
