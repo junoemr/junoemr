@@ -29,10 +29,6 @@ import org.oscarehr.common.xml.cds.v5_0.model.PropertyOfOffendingAgent;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.springframework.stereotype.Component;
 
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MILD;
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MODERATE;
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_SEVERE;
-import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_UNKNOWN;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ONSET_REACTION;
 
@@ -97,19 +93,19 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		return din;
 	}
 
-	protected String getSeverity(AllergiesAndAdverseReactions importStructure)
+	protected Allergy.REACTION_SEVERITY getSeverity(AllergiesAndAdverseReactions importStructure)
 	{
 		AdverseReactionSeverity adverseReactionSeverity = importStructure.getSeverity();
-		String severity = null;
+		Allergy.REACTION_SEVERITY severity = Allergy.REACTION_SEVERITY.UNKNOWN;
 
 		if(adverseReactionSeverity != null)
 		{
 			switch(adverseReactionSeverity)
 			{
-				case MI: severity = SEVERITY_CODE_MILD; break;
-				case MO: severity = SEVERITY_CODE_MODERATE; break;
-				case LT: severity = SEVERITY_CODE_SEVERE; break;
-				case NO: severity = SEVERITY_CODE_UNKNOWN; break;
+				case MI: severity = Allergy.REACTION_SEVERITY.MILD; break;
+				case MO: severity = Allergy.REACTION_SEVERITY.MODERATE; break;
+				case LT: severity = Allergy.REACTION_SEVERITY.SEVERE; break;
+				case NO: severity = Allergy.REACTION_SEVERITY.UNKNOWN; break;
 			}
 		}
 

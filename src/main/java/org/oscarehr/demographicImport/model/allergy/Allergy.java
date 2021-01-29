@@ -28,26 +28,33 @@ import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+
+import static org.oscarehr.allergy.model.Allergy.ONSET_DESC_GRADUAL;
+import static org.oscarehr.allergy.model.Allergy.ONSET_DESC_IMMEDIATE;
+import static org.oscarehr.allergy.model.Allergy.ONSET_DESC_SLOW;
+import static org.oscarehr.allergy.model.Allergy.ONSET_DESC_UNKNOWN;
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_DESC_MILD;
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_DESC_MODERATE;
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_DESC_SEVERE;
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_DESC_UNKNOWN;
 
 @Data
 public class Allergy extends AbstractTransientModel
 {
 	// enum with custom values, for backwards compatibility
-	public enum REACTION_ONSET {
-		IMMEDIATE(1, "Immediate"),
-		GRADUAL(2, "Gradual"),
-		SLOW(3, "Slow"),
-		UNKNOWN(4, "Unknown")
-		;
+	public enum REACTION_ONSET
+	{
+		IMMEDIATE(1, ONSET_DESC_IMMEDIATE),
+		GRADUAL(2, ONSET_DESC_GRADUAL),
+		SLOW(3, ONSET_DESC_SLOW),
+		UNKNOWN(4, ONSET_DESC_UNKNOWN);
 
 		private final int onsetCode;
 		private final String description;
 
-		REACTION_ONSET(int onsetCode, String description)
+		REACTION_ONSET(int code, String description)
 		{
-			this.onsetCode = onsetCode;
+			this.onsetCode = code;
 			this.description = description;
 		}
 		public int getOnsetCode()
@@ -59,33 +66,74 @@ public class Allergy extends AbstractTransientModel
 			return description;
 		}
 
-		//Lookup table
-		private static final Map<Integer, REACTION_ONSET> codeLookup = new HashMap<>();
-		private static final Map<String, REACTION_ONSET> descriptionLookup = new HashMap<>();
-
-		//Populate the lookup table on loading time
-		static
+		public static REACTION_ONSET fromCodeString(Integer code)
 		{
 			for(REACTION_ONSET onset : REACTION_ONSET.values())
 			{
-				codeLookup.put(onset.getOnsetCode(), onset);
-				descriptionLookup.put(onset.getDescription(), onset);
-			}
-		}
-
-		public static REACTION_ONSET fromCodeString(Integer code)
-		{
-			if(code != null)
-			{
-				return codeLookup.get(code);
+				if(onset.getOnsetCode() == code)
+				{
+					return onset;
+				}
 			}
 			return null;
 		}
 		public static REACTION_ONSET fromDescription(String description)
 		{
-			if(description != null)
+			for(REACTION_ONSET onset : REACTION_ONSET.values())
 			{
-				return descriptionLookup.get(description);
+				if(onset.getDescription().equalsIgnoreCase(description))
+				{
+					return onset;
+				}
+			}
+			return null;
+		}
+	}
+
+	// enum with custom values, for backwards compatibility
+	public enum REACTION_SEVERITY
+	{
+		MILD(1, SEVERITY_DESC_MILD),
+		MODERATE(2, SEVERITY_DESC_MODERATE),
+		SEVERE(3, SEVERITY_DESC_SEVERE),
+		UNKNOWN(4, SEVERITY_DESC_UNKNOWN);
+
+		private final int severityCode;
+		private final String description;
+
+		REACTION_SEVERITY(int code, String description)
+		{
+			this.severityCode = code;
+			this.description = description;
+		}
+		public int getSeverityCode()
+		{
+			return severityCode;
+		}
+		public String getDescription()
+		{
+			return description;
+		}
+
+		public static REACTION_SEVERITY fromCodeString(Integer code)
+		{
+			for(REACTION_SEVERITY onset : REACTION_SEVERITY.values())
+			{
+				if(onset.getSeverityCode() == code)
+				{
+					return onset;
+				}
+			}
+			return null;
+		}
+		public static REACTION_SEVERITY fromDescription(String description)
+		{
+			for(REACTION_SEVERITY onset : REACTION_SEVERITY.values())
+			{
+				if(onset.getDescription().equalsIgnoreCase(description))
+				{
+					return onset;
+				}
 			}
 			return null;
 		}
@@ -98,7 +146,7 @@ public class Allergy extends AbstractTransientModel
 	private Integer typeCode;
 	private Long ageOfOnset;
 	private String lifeStage;
-	private String severityOfReaction;
+	private REACTION_SEVERITY severityOfReaction;
 	private REACTION_ONSET onsetOfReaction;
 	private String drugIdentificationNumber;
 

@@ -99,16 +99,16 @@ public class CDSAllergyExportMapper extends AbstractCDSExportMapper<AllergiesAnd
 		return null;
 	}
 
-	protected AdverseReactionSeverity getSeverity(String severity)
+	protected AdverseReactionSeverity getSeverity(Allergy.REACTION_SEVERITY severity)
 	{
 		if(severity != null)
 		{
 			switch(severity)
 			{
-				case SEVERITY_CODE_MILD : return AdverseReactionSeverity.MI;
-				case SEVERITY_CODE_MODERATE : return AdverseReactionSeverity.MO;
-				case SEVERITY_CODE_SEVERE : return AdverseReactionSeverity.LT;
-				case SEVERITY_CODE_UNKNOWN:
+				case MILD: return AdverseReactionSeverity.MI;
+				case MODERATE: return AdverseReactionSeverity.MO;
+				case SEVERE: return AdverseReactionSeverity.LT;
+				case UNKNOWN:
 				default: return AdverseReactionSeverity.NO;
 			}
 		}

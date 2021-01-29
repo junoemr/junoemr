@@ -27,6 +27,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import static org.oscarehr.demographicImport.model.allergy.Allergy.REACTION_ONSET;
+import static org.oscarehr.demographicImport.model.allergy.Allergy.REACTION_SEVERITY;
+
 @Component
 public class AllergyModelToDbConverter extends BaseModelToDbConverter<org.oscarehr.demographicImport.model.allergy.Allergy, Allergy>
 {
@@ -44,11 +47,11 @@ public class AllergyModelToDbConverter extends BaseModelToDbConverter<org.oscare
 		allergy.setAgeOfOnset((input.getAgeOfOnset()) != null ? String.valueOf(input.getAgeOfOnset()) : null);
 		allergy.setRegionalIdentifier(input.getDrugIdentificationNumber());
 
-		org.oscarehr.demographicImport.model.allergy.Allergy.REACTION_ONSET reactionOnset = input.getOnsetOfReaction();
-		if(reactionOnset != null)
-		{
-			allergy.setOnsetOfReaction(String.valueOf(reactionOnset.getOnsetCode()));
-		}
+		REACTION_ONSET reactionOnset = (input.getOnsetOfReaction() != null) ? input.getOnsetOfReaction() : REACTION_ONSET.UNKNOWN;
+		allergy.setOnsetOfReaction(String.valueOf(reactionOnset.getOnsetCode()));
+
+		REACTION_SEVERITY severity = (input.getSeverityOfReaction() != null) ? input.getSeverityOfReaction() : REACTION_SEVERITY.UNKNOWN;
+		allergy.setSeverityOfReaction(String.valueOf(severity.getSeverityCode()));
 
 		if(allergy.getTypeCode() == null)
 		{
