@@ -94,8 +94,6 @@ public class EncounterNoteService
 	@Autowired
 	DemographicDao demographicDao;
 
-	private CaseManagementNoteDao newCaseManagementNoteDao = (CaseManagementNoteDao) SpringUtils.getBean("encounterNote.dao.CaseManagementNoteDao");
-
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
 		return saveChartNote(note, null);
@@ -475,7 +473,7 @@ public class EncounterNoteService
 	{
 		HashMap<String, List<CaseManagementNote>>cpp = new HashMap<>();
 
-		List<CaseManagementNote> allCPPNotes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, true);
+		List<CaseManagementNote> allCPPNotes = caseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, true);
 		List<CaseManagementNote> medicalHistoryNotes = new ArrayList<>();
 		List<CaseManagementNote> socialHistoryNotes = new ArrayList<>();
 		List<CaseManagementNote> familyHistoryNotes = new ArrayList<>();
