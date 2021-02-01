@@ -98,7 +98,7 @@ public final class RxManagePharmacyAction extends DispatchAction {
 		else if(actionType.equals("Delete"))
 		{
 			Integer id = Integer.parseInt(frm.getID());
-			pharmacy.deletePharmacy(id, loggedInInfo); // frm.getID());
+			pharmacy.deletePharmacy(id, loggedInInfo);
 		}
 
 	   return mapping.findForward("success");
