@@ -361,10 +361,9 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 			logger.debug("Get teams " + (current - start));
 			start = current;
 
-			for (Iterator<ProgramTeam> i = teams.iterator(); i.hasNext(); )
+			for (ProgramTeam team : teams)
 			{
 				logger.debug("Searching teams");
-				ProgramTeam team = i.next();
 				String id1 = Integer.toString(team.getId());
 				String id2 = Integer.toString(admission.getTeamId());
 				if (id1.equals(id2))
@@ -385,13 +384,11 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 			logger.debug("Get program providers " + (current - start));
 			start = current;
 
-			for (Iterator<ProgramProvider> j = ps.iterator(); j.hasNext(); )
+			for (ProgramProvider pp : ps)
 			{
-				ProgramProvider pp = j.next();
 				logger.debug("Get program provider teams");
-				for (Iterator<ProgramTeam> k = pp.getTeams().iterator(); k.hasNext(); )
+				for (ProgramTeam pt : pp.getTeams())
 				{
-					ProgramTeam pt = k.next();
 					if (pt.getName().equals(request.getAttribute("teamName")))
 					{
 						teamMembers.add(pp.getProvider().getFormattedName());
@@ -587,11 +584,12 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 	 */
 	private void getTicklerAttribute(HttpServletRequest request, LoggedInInfo loggedInInfo, String tab)
 	{
-		if (tab != null && tab.equalsIgnoreCase("Ticklers")) {
-			CustomFilter cf = new CustomFilter();
-			cf.setDemographicNo(this.getDemographicNo(request));
-			cf.setStatus("A");
-			request.setAttribute("ticklers", ticklerManager.getTicklers(loggedInInfo, cf));
+		if ("Ticklers".equalsIgnoreCase(tab))
+		{
+			CustomFilter customFilter = new CustomFilter();
+			customFilter.setDemographicNo(this.getDemographicNo(request));
+			customFilter.setStatus("A");
+			request.setAttribute("ticklers", ticklerManager.getTicklers(loggedInInfo, customFilter));
 		}
 	}
 
