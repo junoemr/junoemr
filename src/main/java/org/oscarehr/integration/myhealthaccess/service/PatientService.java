@@ -28,6 +28,8 @@ import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
+import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.PatientInviteTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
@@ -108,9 +110,11 @@ public class PatientService extends BaseService
 
 		try
 		{
-			String url = formatEndpoint("/clinic/" + integration.getRemoteId() +
+			RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+			String url = restClient.formatEndpoint("/clinic/" + integration.getRemoteId() +
 											"/patients?search_by=hin&health_number=%s&health_care_province=%s", hin, hinProvince);
-			PatientSingleSearchResponseTo1 response = get(url, integration.getApiKey(), PatientSingleSearchResponseTo1.class);
+			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
 
 			if (response.isSuccess())
 			{
@@ -143,9 +147,11 @@ public class PatientService extends BaseService
 	{
 		try
 		{
-			String url = formatEndpoint("/clinic/" + integration.getRemoteId() +
+			RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+			String url = restClient.formatEndpoint("/clinic/" + integration.getRemoteId() +
 					"/patients?search_by=remote_id&remote_id=%s", demographicNo);
-			PatientSingleSearchResponseTo1 response = get(url, integration.getApiKey(), PatientSingleSearchResponseTo1.class);
+			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
 
 			if (response.isSuccess())
 			{
@@ -209,9 +215,13 @@ public class PatientService extends BaseService
 			}
 
 			String action = rejected ? "reject_connection" : "cancel_reject_connection";
-			return postWithToken(
-							formatEndpoint("/clinic_user/self/clinic/patient/" + patient.getId() + "/" + action),
-							integration.getApiKey(), null, Boolean.class, loginToken);
+
+			RestClientBase restClient = RestClientFactory.getRestClient(integration);
+			return restClient.doPostWithToken(
+					restClient.formatEndpoint("/clinic_user/self/clinic/patient/" + patient.getId() + "/" + action),
+					loginToken,
+					null,
+					Boolean.class);
 		}
 		catch(InvalidIntegrationException e)
 		{
@@ -223,7 +233,8 @@ public class PatientService extends BaseService
 
 	public void patientInvite(Integration integration, String loginToken, Demographic demographic)
 	{
-		String url = formatEndpoint("/clinic_user/self/clinic/patient_invite");
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+		String url = restClient.formatEndpoint("/clinic_user/self/clinic/patient_invite");
 
 		// get cell phone etc. from ext table
 		DemographicExt ext = demographicExtDao.getDemographicExt(demographic.getId(), DemographicExt.KEY_DEMO_CELL);
@@ -231,7 +242,8 @@ public class PatientService extends BaseService
 
 		PatientTo1 patientTransfer = new PatientTo1(demographic, cellPhone);
 		PatientInviteTo1 patientInvite = new PatientInviteTo1(patientTransfer, String.valueOf(demographic.getId()), demographic.getProviderNo());
-		Boolean response = postWithToken(url, integration.getApiKey(), patientInvite, Boolean.class, loginToken);
+
+		Boolean response = restClient.doPostWithToken(url, loginToken, patientInvite, Boolean.class);
 	}
 
 	private void logInvalidIntegrationWarn(InvalidIntegrationException e)

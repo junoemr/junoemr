@@ -50,7 +50,28 @@ public class SecurityInfoManager {
 	public static final String DELETE = "d";
 	public static final String NORIGHTS = "o";
 	
-	
+	public enum PRIVILEGE_LEVEL
+	{
+		READ ("r"),
+		WRITE ("w"),
+		UPDATE ("u"),
+		DELETE ("d"),
+		NO_RIGHTS ("o");
+
+		String level;
+
+		PRIVILEGE_LEVEL(String level)
+		{
+			this.level = level;
+		}
+
+		public String asString()
+		{
+			return this.level;
+		}
+	}
+
+
 	@Autowired
 	private SecuserroleDao secUserRoleDao;
 	

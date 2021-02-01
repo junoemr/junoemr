@@ -24,9 +24,10 @@ package integration.tests.util;
 
 import integration.tests.util.junoUtil.Navigation;
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -39,56 +40,49 @@ import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
 
 public class SeleniumTestBase
 {
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
-	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 60;
+	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
 
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
-	protected WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	public static WebDriverWait webDriverWait;
 
 	@BeforeClass
-	public static void buildWebDriver() throws SQLException, InstantiationException,
+	synchronized public static void buildWebDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException
 	{
 		//load database (during the integration-test phase this will only populate table creation maps)
 		SchemaUtils.createDatabaseAndTables();
 
 		//build and start selenium web driver
-		createWebDriver();
+		System.setProperty("webdriver.gecko.driver", GECKO_DRIVER);
 
 		//practically all integration tests rely on the security table. restore it.
 		SchemaUtils.restoreTable("security");
 
-		//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}
 
 	@Before
 	public void login()
 	{
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-		driver.manage().window().maximize();
-	}
-
-	@AfterClass
-	public static void closeWebDriver()
-	{
-		driver.quit();
-	}
-
-	private static void createWebDriver()
-	{
-		System.setProperty("webdriver.gecko.driver", GECKO_DRIVER);
 		FirefoxBinary ffb = new FirefoxBinary();
 		FirefoxOptions ffo = new FirefoxOptions();
 		ffb.addCommandLineOptions("--headless");
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
-		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		driver.manage().window().setSize(new Dimension(1920, 1080));
+		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	}
+
+	@After
+	public void closeWebDriver()
+	{
+		driver.quit();
 	}
 
 	protected static void loadSpringBeans()

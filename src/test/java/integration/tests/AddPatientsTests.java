@@ -44,7 +44,6 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 public class AddPatientsTests extends SeleniumTestBase
 {
-	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
@@ -53,7 +52,7 @@ public class AddPatientsTests extends SeleniumTestBase
 				"program", "provider_recent_demographic_access");
 	}
 
-	public boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
+	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
 	{
 		driver.findElement(searchPage).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchTerm));
@@ -177,6 +176,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		// Add a demographic record page
 		driver.findElement(By.xpath("//button[@title=\"Add a new Patient\"]")).click();
 		PatientTestData son = PatientTestCollection.patientMap.get(patientLNames[2]);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-lastName")));
 		driver.findElement(By.id("input-lastName")).sendKeys(son.lastName);
 		driver.findElement(By.id("input-firstName")).sendKeys(son.firstName);
 		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.sex);
@@ -190,8 +190,8 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("input-postal-code")).sendKeys(son.postal);
 		driver.findElement(By.id("input-email")).sendKeys(son.email);
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click='$ctrl.onAdd()']")));
-		driver.findElement(By.xpath("//button[@ng-click='$ctrl.onAdd()']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")));
+		driver.findElement(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title='Search']")));
 
 		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,

@@ -76,6 +76,7 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         String currWindowHandle = driver.getWindowHandle();
         AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
         addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle);
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
         Assert.assertTrue("Appointments is NOT added successfully.",
                 PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 
@@ -93,6 +94,7 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         PageUtil.switchToWindow(currWindowHandle, driver);
         webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("09:45")));
         String apptXpath = "//a[@title='9:45 AM - 10:00 AM']/../../td/a[contains(., '" + patientName +"')]";
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(apptXpath)));
         Assert.assertTrue("Appointment is NOT Cut/Pasted to 9:45am successfully",
                 PageUtil.isExistsBy(By.xpath(apptXpath), driver));
 
@@ -113,12 +115,13 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
     }
 
     @Test
-    public void rescheduleAppointmentTestsJUNOUI() throws AWTException {
+    public void rescheduleAppointmentTestsJUNOUI() throws AWTException, InterruptedException {
         // Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
         driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
         String currWindowHandle = driver.getWindowHandle();
         AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
         addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle);
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
         Assert.assertTrue("Appointments is NOT added successfully.",
                 PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 

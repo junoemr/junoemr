@@ -74,8 +74,7 @@ public class AssignRolesTests extends SeleniumTestBase
     }
 
     @Test
-    public void assignRolesClassicUITest()
-    {
+    public void assignRolesClassicUITest() throws InterruptedException {
         accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
         driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);
         driver.findElement(By.xpath("//input[@name='search']")).click();

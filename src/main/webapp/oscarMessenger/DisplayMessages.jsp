@@ -30,6 +30,8 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
+<%@ page import="oscar.oscarMessenger.data.MsgDisplayMessage" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -46,20 +48,26 @@ if(!authed) {
 %>
 
 <%
-int pageType = 0;
-String boxType = request.getParameter("boxType");
-if (boxType == null || boxType.equals("")){
-    pageType = 0;
-}else if (boxType.equals("1")){
-    pageType = 1;
-}else if (boxType.equals("2")){
-    pageType = 2;
-}else if (boxType.equals("3")){
-    pageType = 3;    
-}else{
-    pageType = 0;
-}   //messageid
+    final int PAGE_TYPE_DEFAULT = 0;
+    final int PAGE_TYPE_SENT = 1;
+    final int PAGE_TYPE_DELETED = 2;
+    final int PAGE_TYPE_DEMOGRAPHIC = 3;
 
+    int pageType = PAGE_TYPE_DEFAULT;
+
+    String boxType = request.getParameter("boxType");
+    if ("1".equals(boxType))
+    {
+        pageType = PAGE_TYPE_SENT;
+    }
+    else if ("2".equals(boxType))
+    {
+        pageType = PAGE_TYPE_DELETED;
+    }
+    else if ("3".equals(boxType))
+    {
+        pageType = PAGE_TYPE_DEMOGRAPHIC;
+    }
 
 String demographic_no = request.getParameter("demographic_no");
 String demographic_name = "";
@@ -71,6 +79,7 @@ if ( demographic_no != null ) {
     }
 }
 
+    String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
 pageContext.setAttribute("pageType",""+pageType);
 
@@ -187,19 +196,19 @@ function checkAll(formId){
                            String sentStyle = "messengerButtonsA";
                            String delStyle  = "messengerButtonsA";
                         switch(pageType){
-                            case 0: %>
+                            case PAGE_TYPE_DEFAULT: %>
      		                    <div class="DivContentTitle"><bean:message key="oscarMessenger.DisplayMessages.msgInbox"/></div>
                         <%      inbxStyle = "messengerButtonsD";
                             break;
-                            case 1: %>
+                            case PAGE_TYPE_SENT: %>
                                 <div class="DivContentTitle"><bean:message key="oscarMessenger.DisplayMessages.msgSentTitle"/></div>
                         <%      sentStyle = "messengerButtonsD";
                             break;
-                            case 2: %>
+                            case PAGE_TYPE_DELETED: %>
                                 <div class="DivContentTitle"><bean:message key="oscarMessenger.DisplayMessages.msgArchived"/></div>
                         <%      delStyle =  "messengerButtonsD";
                             break;
-                            case 3: %>
+                            case PAGE_TYPE_DEMOGRAPHIC: %>
                                 <div class="DivContentTitle">Messages related to <%=demographic_name%> </div> 
                         <%      delStyle =  "messengerButtonsD";
                             break;
@@ -272,27 +281,30 @@ function checkAll(formId){
                         </td>
                     </tr>
                     <%String strutsAction = "/oscarMessenger/DisplayMessages";
-                        if (pageType == 2){
+                        if (pageType == PAGE_TYPE_DELETED){
                             strutsAction = "/oscarMessenger/ReDisplayMessages";
                         }
                     %>
 
                          <html:form action="<%=strutsAction%>" styleId="msgList" >
                     <%
-                           java.util.Vector theMessages2 = new java.util.Vector() ;
-                        switch(pageType){
-                            case 0:
-                                theMessages2 = DisplayMessagesBeanId.estInbox(orderby,pageNum);
-                            break;
-                            case 1:
-                                theMessages2 = DisplayMessagesBeanId.estSentItemsInbox(orderby,pageNum);
-                            break;
-                            case 2:
-                                theMessages2 = DisplayMessagesBeanId.estDeletedInbox(orderby,pageNum);
-                            break;
-                            case 3:
-                                theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderby,demographic_no);
-                            break;
+                        List<MsgDisplayMessage> theMessages2;
+                        switch(pageType)
+                        {
+                            case PAGE_TYPE_SENT:
+                                theMessages2 = DisplayMessagesBeanId.estSentItemsInbox(orderby, pageNum, providerNo);
+                                break;
+                            case PAGE_TYPE_DELETED:
+                                theMessages2 = DisplayMessagesBeanId.estDeletedInbox(orderby, pageNum, providerNo);
+                                break;
+                            case PAGE_TYPE_DEMOGRAPHIC:
+                                theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderby, demographic_no);
+                                break;
+                            case PAGE_TYPE_DEFAULT:
+                            default:
+                                theMessages2 = DisplayMessagesBeanId.estInbox(orderby, pageNum, providerNo);
+                                break;
+
                         }   //messageid
 %>
 
@@ -304,9 +316,16 @@ function checkAll(formId){
                     <table style="width:100%;">
                     <tr>
                         <td>
-                            <%if (pageType == 0){%>
+                            <%
+                                if (pageType == PAGE_TYPE_DEFAULT)
+                                {
+                            %>
                                     <input name="btnDelete" type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formArchive"/>">
-                            <%}else if (pageType == 2){%>
+                            <%
+                                }
+                                else if (pageType == PAGE_TYPE_DELETED)
+                                {
+                            %>
                                     <input type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formUnarchive"/>">
                             <%}%>
                             &nbsp;
@@ -318,27 +337,24 @@ function checkAll(formId){
 		                    String previous = "";
 		                    String next = "";
 		                    String path = request.getContextPath()+"/oscarMessenger/DisplayMessages.jsp?boxType=" + pageType + "&page=";
-		                    Boolean search = false;
-		                    if(request.getParameter("searchString")!=null){
-		                    	search = true;
-		                    }
-		                    
-		                    if (pageType != 3){
-		                    
-		                    int totalMsgs = DisplayMessagesBeanId.getTotalMessages(pageType);
-		                    
-		                    int totalPages = totalMsgs / recordsToDisplay + (totalMsgs % recordsToDisplay == 0 ? 0 : 1);
 
-		                    if(pageNum>1){
-		                    	previous = "<a href='" + path + (pageNum-1) + "' title='previous page'><< Previous</a> ";
-		                    	out.print(previous);
-							}
-		                    
-		                    if(pageNum<totalPages){
-		                    	next = "<a href='" + path + (pageNum+1) + "' title='next page'>Next >></a>";
-		                    	out.print(next);
+		                    if (pageType != PAGE_TYPE_DEMOGRAPHIC)
+		                    {
+                                int totalMsgs = DisplayMessagesBeanId.getTotalMessages(pageType);
+                                int totalPages = totalMsgs / recordsToDisplay + (totalMsgs % recordsToDisplay == 0 ? 0 : 1);
+                                if(pageNum > 1)
+                                {
+                                    previous = "<a href='" + path + (pageNum - 1) + "' title='previous page'><< Previous</a> ";
+                                    out.print(previous);
+                                }
+
+                                if(pageNum < totalPages)
+                                {
+                                    next = "<a href='" + path + (pageNum + 1) + "' title='next page'>Next >></a>";
+                                    out.print(next);
+                                }
 		                    }
-		                    }%>
+                            %>
                         </td>
                    </tr>
                    </table>
@@ -346,7 +362,10 @@ function checkAll(formId){
                    
                                 <tr>
                                     <th align="left" bgcolor="#DDDDFF" width="75">
-                                    <%if( pageType!=1 ) {%>
+                                    <%
+                                        if (pageType != PAGE_TYPE_SENT)
+                                        {
+                                    %>
                                        <input type="checkbox" name="checkAll2" onclick="checkAll('msgList')" id="checkA" />
                                     <%} %>   
                                     </th>
@@ -356,11 +375,18 @@ function checkAll(formId){
                                         </html:link>
                                     </th>
                                     <th align="left" bgcolor="#DDDDFF">
-                                      <%if( pageType == 1 ) {%>
+                                      <%
+                                          if (pageType == PAGE_TYPE_SENT)
+                                          {
+                                      %>
                                                 <html:link page="/oscarMessenger/DisplayMessages.jsp?orderby=sentto" paramId="boxType" paramName="pageType">
                                                 <bean:message key="oscarMessenger.DisplayMessages.msgTo"/>
                                                 </html:link>
-                                       <%} else {%>
+                                       <%
+                                          }
+                                          else
+                                          {
+                                       %>
                                                 <html:link page="/oscarMessenger/DisplayMessages.jsp?orderby=from" paramId="boxType" paramName="pageType">
                                                 <bean:message key="oscarMessenger.DisplayMessages.msgFrom"/>
                                                 </html:link>
@@ -385,83 +411,108 @@ function checkAll(formId){
                                 
                                
                                 <!--   for loop Control Initiliation variabe changed to nextMessage   -->
-                            <% 
-                                    for (int i = 0; i < theMessages2.size() ; i++) {
-                                        oscar.oscarMessenger.data.MsgDisplayMessage dm;
-                                        dm = (oscar.oscarMessenger.data.MsgDisplayMessage) theMessages2.get(i);
-                                        String key = "oscarMessenger.DisplayMessages.msgStatus"+dm.status.substring(0,1).toUpperCase()+dm.status.substring(1); 
-                                        %>
-                                        
-                                <% if ("oscarMessenger.DisplayMessages.msgStatusNew".equals(key)){%>        
+                            <%
+                                for (MsgDisplayMessage displayMessage : theMessages2)
+                                {
+                                    String key = "oscarMessenger.DisplayMessages.msgStatus" + displayMessage.status.substring(0, 1).toUpperCase() + displayMessage.status.substring(1);
+                                    if ("oscarMessenger.DisplayMessages.msgStatusNew".equals(key))
+                                    {
+                                %>
                                 <tr class="newMessage">
-                                <%}else{%>
+                                <%
+                                    }
+                                    else
+                                    {
+                                %>
                                 <tr>
-                                <%}%>
-                                    <td bgcolor="#EEEEFF"  width="75">
-                                    <%if (pageType != 1){%>
-                                        <html:checkbox property="messageNo" value="<%=dm.messageId %>" />
-                                     <% } %>
-                                    &nbsp;
-                                    <% 
-                                       String atta = dm.attach;
-                                       String pdfAtta = dm.pdfAttach; 
-                                       if (atta.equals("1") || pdfAtta.equals("1") ){ %>
-                                            <img src="img/clip4.jpg">
-                                    <% } %>
+                                    <%}%>
+                                    <td bgcolor="#EEEEFF" width="75">
+                                        <%
+                                            if (pageType != PAGE_TYPE_SENT)
+                                            {
+                                        %>
+                                        <html:checkbox property="messageNo" value="<%=displayMessage.messageId %>"/>
+                                        <% } %>
+                                        &nbsp;
+                                        <%
+                                            String atta = displayMessage.attach;
+                                            String pdfAtta = displayMessage.pdfAttach;
+                                            if (atta.equals("1") || pdfAtta.equals("1"))
+                                            { %>
+                                        <img src="img/clip4.jpg">
+                                        <% } %>
 
 
                                     </td>
                                     <td bgcolor="#EEEEFF">
-                                     <bean:message key="<%= key %>"/>
+                                        <bean:message key="<%= key %>"/>
                                     </td>
                                     <td bgcolor="#EEEEFF">
                                         <%
-                                            if( pageType == 1 ) {
-                                                int pos = dm.sentto.indexOf(",");
-                                                if( pos == -1 )
-                                                    out.print(dm.sentto);
+                                            if (pageType == PAGE_TYPE_SENT)
+                                            {
+                                                int pos = displayMessage.sentto.indexOf(",");
+                                                if (pos == -1)
+                                                {
+                                                    out.print(displayMessage.sentto);
+                                                }
                                                 else
-                                                    out.print(dm.sentto.substring(0,pos));
+                                                {
+                                                    out.print(displayMessage.sentto.substring(0, pos));
+                                                }
                                             }
-                                            else {
-                                                out.print(dm.sentby);
-                                           }
+                                            else
+                                            {
+                                                out.print(displayMessage.sentby);
+                                            }
                                         %>
-                                    
-                                    </td>
-                                    <td bgcolor="#EEEEFF">
-                                    <a href="<%=request.getContextPath()%>/oscarMessenger/ViewMessage.do?messageID=<%=dm.messageId%>&boxType=<%=pageType%>">
-                                        <%=dm.thesubject%>
-                                    </a>
 
                                     </td>
                                     <td bgcolor="#EEEEFF">
-                                    	<%= dm.thedate %>
-                                    	&nbsp;&nbsp;
-                                    	<%= dm.theime %>
+                                        <a href="<%=request.getContextPath()%>/oscarMessenger/ViewMessage.do?messageID=<%=displayMessage.messageId%>&boxType=<%=pageType%>">
+                                            <%=displayMessage.thesubject%>
+                                        </a>
+
                                     </td>
                                     <td bgcolor="#EEEEFF">
-                                    <%if(dm.demographic_no != null  && !dm.demographic_no.equalsIgnoreCase("null")) {%>
-                                        <oscar:nameage demographicNo="<%=dm.demographic_no%>"></oscar:nameage>
-                                    <%} %>
+                                        <%= displayMessage.thedate %>
+                                        &nbsp;&nbsp;
+                                        <%= displayMessage.theime %>
+                                    </td>
+                                    <td bgcolor="#EEEEFF">
+                                        <%
+                                            if (displayMessage.demographic_no != null && !displayMessage.demographic_no.equalsIgnoreCase("null"))
+                                            {
+                                        %>
+                                        <oscar:nameage
+                                                demographicNo="<%=displayMessage.demographic_no%>"></oscar:nameage>
+                                        <%} %>
                                     </td>
                                 </tr>
-                            <%}%>
+                                <%}%>
                             
                             <tr><td colspan="6">
                                <table width="100%">
                                 <tr>
                                     <td>
-                                         <%if (pageType == 0){%>
+                                         <%
+                                             if (pageType == PAGE_TYPE_DEFAULT)
+                                             {
+                                         %>
                                             <input name="btnDelete" type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formArchive"/>">
-                                             <%}else if (pageType == 2){%>
+                                         <%
+                                             }
+                                             else if (pageType == PAGE_TYPE_DELETED)
+                                             {
+                                         %>
                                             <input type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formUnarchive"/>">
                                             <%}%>  
                                     </td>
 
                                     <td align="right">
                                     <%                                    	
-                                    if(pageType!=3){
+                                    if (pageType != PAGE_TYPE_DEMOGRAPHIC)
+                                    {
                                     	out.print(previous + next);
                                     }
                                     %>    

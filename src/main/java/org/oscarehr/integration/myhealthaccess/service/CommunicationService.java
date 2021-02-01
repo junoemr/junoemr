@@ -23,7 +23,8 @@
 package org.oscarehr.integration.myhealthaccess.service;
 
 import org.oscarehr.integration.model.Integration;
-import org.oscarehr.integration.myhealthaccess.dto.AppointmentSearchTo1;
+import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
+import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.SmsMessageDto;
 import org.springframework.stereotype.Service;
 
@@ -41,14 +42,13 @@ public class CommunicationService extends BaseService
 	 */
 	public void sendSms(Integration integration, String smsNumber, String smsText)
 	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 		SmsMessageDto smsMessageDto = new SmsMessageDto();
 		smsMessageDto.setSmsNumber(smsNumber);
 		smsMessageDto.setSmsText(smsText);
 		smsMessageDto.setClinicId(UUID.fromString(integration.getRemoteId()));
 
-		String url = formatEndpoint("/integration/communication/send_sms");
-		AppointmentSearchTo1 result = post(url, integration.getApiKey(), smsMessageDto, null);
+		String url = restClient.formatEndpoint("/integration/communication/send_sms");
+		restClient.doPost(url, smsMessageDto, null);
 	}
-
-
 }

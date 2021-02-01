@@ -29,16 +29,21 @@ import org.openqa.selenium.support.ui.Select;
 
 public class ActionUtil
 {
+	public static void dropdownSelectByVisibleText(WebDriver driver, By dropdown, String visibleText)
+	{
+		Select dropdownList = new Select(driver.findElement(dropdown));
+		dropdownList.selectByVisibleText(visibleText);
+	}
 	public static void dropdownSelectByValue(WebDriver driver, By dropdown, String dropdownSelection)
 	{
-		Select langOfficial = new Select(driver.findElement(dropdown));
-		langOfficial.selectByValue(dropdownSelection);
+		Select dropdownList = new Select(driver.findElement(dropdown));
+		dropdownList.selectByValue(dropdownSelection);
 	}
 
 	public static void dropdownSelectByIndex(WebDriver driver, By dropdown, int dropdownIndex)
 	{
-		Select doctor = new Select(driver.findElement(dropdown));
-		doctor.selectByIndex(dropdownIndex);
+		Select dropdownList = new Select(driver.findElement(dropdown));
+		dropdownList.selectByIndex(dropdownIndex);
 	}
 
 	public static void textEdit(WebDriver driver, By textField, String textNew)
