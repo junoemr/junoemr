@@ -132,14 +132,14 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	
     	try {
     		String data = request.getParameter("preferedPharmacy");
-    		String demographicNo = request.getParameter("demographicNo");
-    		
+			Integer demographicNo = Integer.parseInt(request.getParameter("demographicNo"));
+
     		ObjectMapper mapper = new ObjectMapper();       		
     		PharmacyInfo pharmacyInfo =  mapper.readValue(data, PharmacyInfo.class);
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			RxPharmacyData pharmacy = new RxPharmacyData();
 
-			pharmacy.unlinkPharmacy(String.valueOf(pharmacyInfo.getId()), demographicNo, loggedInInfo);
+			pharmacy.unlinkPharmacy(pharmacyInfo.getId(), demographicNo, loggedInInfo);
 
 			response.setContentType("application/json");
 			String retVal = "{\"id\":\"" + pharmacyInfo.getId() + "\"}";

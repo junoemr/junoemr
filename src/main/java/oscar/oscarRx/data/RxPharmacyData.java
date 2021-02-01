@@ -102,28 +102,29 @@ public class RxPharmacyData {
 	}
 
    /**
-	* set the status of the pharmacy to 0, this will not be found in the getAllPharmacy queries
-	* @param id
+	* Set the status of the pharmacy to 0, this will not be found in the getAllPharmacy queries
+	* @param id id of the pharmacy we want to deactivate
+	* @param loggedInInfo information object containing details about who requested this
 	*/
-   public void deletePharmacy(Integer id, LoggedInInfo loggedInInfo){
-	   
-	   List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findAllByPharmacyId(id);
-	   
-	   for( DemographicPharmacy demographicPharmacy : demographicPharmacies ) {
-		   demographicPharmacyDao.unlinkPharmacy(id, demographicPharmacy.getDemographicNo());
-	   }
-	   
-	   pharmacyInfoDao.deletePharmacy(id);
-	   LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
-			   null,
-			   LogConst.ACTION_DELETE,
-			   LogConst.CON_PHARMACY,
-			   LogConst.STATUS_SUCCESS,
-			   "Pharmacy ID: " + id,
-			   loggedInInfo.getIp(),
-			   "Deleted pharmacy: " + id);
+	public void deletePharmacy(Integer id, LoggedInInfo loggedInInfo)
+	{
+		List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findAllByPharmacyId(id);
 
-   }
+		for (DemographicPharmacy demographicPharmacy : demographicPharmacies )
+		{
+			demographicPharmacyDao.unlinkPharmacy(id, demographicPharmacy.getDemographicNo());
+		}
+
+		pharmacyInfoDao.deletePharmacy(id);
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				null,
+				LogConst.ACTION_DELETE,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + id,
+				loggedInInfo.getIp(),
+				"Deleted pharmacy: " + id);
+	}
 
    /**
     * Returns the latest data about a pharmacy.
@@ -240,14 +241,13 @@ public class RxPharmacyData {
 		
 	}
 	
-	public void unlinkPharmacy( String pharmacyId, String demographicNo, LoggedInInfo loggedInInfo) {
-		
-		demographicPharmacyDao.unlinkPharmacy(Integer.parseInt(pharmacyId), Integer.parseInt(demographicNo));
-
-		PharmacyInfo pharmacyInfo = pharmacyInfoDao.find(Integer.parseInt(pharmacyId));
+	public void unlinkPharmacy(Integer pharmacyId, Integer demographicNo, LoggedInInfo loggedInInfo)
+	{
+		demographicPharmacyDao.unlinkPharmacy(pharmacyId, demographicNo);
+		PharmacyInfo pharmacyInfo = pharmacyInfoDao.find(pharmacyId);
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
-				Integer.parseInt(demographicNo),
+				demographicNo,
 				LogConst.ACTION_DELETE,
 				LogConst.CON_PHARMACY,
 				LogConst.STATUS_SUCCESS,
