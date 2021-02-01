@@ -51,9 +51,10 @@ public abstract class CDSBaseLogger implements BaseLogger
 
 	public void log(GenericFile logFile, String message)
 	{
+		String messageLine = message + "\n";
 		try
 		{
-			Files.write(Paths.get(logFile.getFileObject().getPath()), message.getBytes(), StandardOpenOption.APPEND);
+			Files.write(Paths.get(logFile.getFileObject().getPath()), messageLine.getBytes(), StandardOpenOption.APPEND);
 		}
 		catch(IOException e)
 		{
@@ -94,13 +95,13 @@ public abstract class CDSBaseLogger implements BaseLogger
 		this.logSummaryLine(summaryLine);
 		this.logSummaryLine(summaryLine2);
 
-		this.logSummaryLine(StringUtils.rightPad("-", (SUMMARY_LOG_COLUMN_WIDTH * SUMMARY_LOG_ITEM_COUNT) + SUMMARY_LOG_ITEM_COUNT, "-") + "\n");
+		this.logSummaryLine(StringUtils.rightPad("-", (SUMMARY_LOG_COLUMN_WIDTH * SUMMARY_LOG_ITEM_COUNT) + SUMMARY_LOG_ITEM_COUNT, "-"));
 	}
 
 	@Override
 	public void logSummaryFooter()
 	{
-		this.logSummaryLine(StringUtils.rightPad("-", (SUMMARY_LOG_COLUMN_WIDTH * SUMMARY_LOG_ITEM_COUNT) + SUMMARY_LOG_ITEM_COUNT, "-") + "\n\n");
+		this.logSummaryLine(StringUtils.rightPad("-", (SUMMARY_LOG_COLUMN_WIDTH * SUMMARY_LOG_ITEM_COUNT) + SUMMARY_LOG_ITEM_COUNT, "-") + "\n");
 	}
 
 	@Override
@@ -161,7 +162,7 @@ public abstract class CDSBaseLogger implements BaseLogger
 				paddedSummaryItem(reportsText) +
 				paddedSummaryItem(reportsBinary) +
 				paddedSummaryItem(careElements) +
-				paddedSummaryItem(alerts) + "\n";
+				paddedSummaryItem(alerts);
 	}
 
 	private String paddedSummaryItem(String name)
