@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="JunoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="oscar" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.oscarehr.JunoApplication" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

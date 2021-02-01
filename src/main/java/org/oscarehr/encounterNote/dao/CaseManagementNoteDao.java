@@ -107,7 +107,9 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"GROUP BY note.note_id\n" +
 			")\n" +
 			"AS cpp_note ON cpp_note.note_id = cm.note_id\n" +
-			"WHERE cm.demographic_no = :demographicNo\n";
+			"LEFT JOIN casemgmt_note_ext cme ON cm.note_id = cme.note_id " +
+			"WHERE cm.demographic_no = :demographicNo\n" +
+			"AND (cme.value IS NULL OR cme.value = 0)\n";
 
 		if (isCPPNote)
 		{

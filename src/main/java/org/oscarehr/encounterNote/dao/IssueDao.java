@@ -65,7 +65,8 @@ public class IssueDao extends AbstractDao<Issue>
 		query.setParameter("noteId", noteId);
 		query.setMaxResults(1);
 
-		Issue issue = (Issue) query.getSingleResult();
+		Issue issue = this.getSingleResultOrNull(query);
+
 		return issue;
 	}
 }
