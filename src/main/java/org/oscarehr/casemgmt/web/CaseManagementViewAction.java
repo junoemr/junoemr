@@ -279,8 +279,8 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		{
 			tab = CaseManagementViewFormBean.tabs[0];
 		}
-		HttpSession se = request.getSession();
-		if (se.getAttribute("userrole") == null)
+		HttpSession session = request.getSession();
+		if (session.getAttribute("userrole") == null)
 		{
 			return mapping.findForward("expired");
 		}
@@ -290,7 +290,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		logger.debug("is client in program");
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
-		String roles = (String) se.getAttribute("userrole");
+		String roles = (String) session.getAttribute("userrole");
 		if (OscarProperties.getInstance().isOscarLearning() && roles != null && roles.indexOf("moderator") != -1)
 		{
 			logger.info("skipping domain check..provider is a moderator");
@@ -331,14 +331,14 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		CaseManagementTmpSave tmpsavenote = this.caseManagementMgr.restoreTmpSave(loggedInInfo.getLoggedInProviderNo(), demoNo, programId);
 		if (tmpsavenote != null)
 		{
-			String restoring = (String) se.getAttribute("restoring");
+			String restoring = (String) session.getAttribute("restoring");
 			if (restoring == null)
 			{
 				request.setAttribute("can_restore", Boolean.TRUE);
 			}
 			else
 			{
-				se.setAttribute("restoring", null);
+				session.setAttribute("restoring", null);
 			}
 		}
 
@@ -379,19 +379,20 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 
 			logger.debug("Get program providers");
 			List<String> teamMembers = new ArrayList<String>();
-			List<ProgramProvider> ps = programMgr.getProgramProviders(programId);
+			List<ProgramProvider> programProviders = programMgr.getProgramProviders(programId);
 			current = System.currentTimeMillis();
 			logger.debug("Get program providers " + (current - start));
 			start = current;
 
-			for (ProgramProvider pp : ps)
+			for (ProgramProvider programProvider : programProviders)
 			{
 				logger.debug("Get program provider teams");
-				for (ProgramTeam pt : pp.getTeams())
+				for (ProgramTeam programTeam : programProvider.getTeams())
 				{
-					if (pt.getName().equals(request.getAttribute("teamName")))
+					String programTeamName = programTeam.getName();
+					if (programTeamName != null && programTeamName.equals(request.getAttribute("teamName")))
 					{
-						teamMembers.add(pp.getProvider().getFormattedName());
+						teamMembers.add(programProvider.getProvider().getFormattedName());
 					}
 				}
 				current = System.currentTimeMillis();
@@ -403,13 +404,13 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 
 			/* prepare new form list for patient */
 			EncounterFormDao encounterFormDao = (EncounterFormDao) SpringUtils.getBean("encounterFormDao");
-			se.setAttribute("casemgmt_newFormBeans", encounterFormDao.findAll());
+			session.setAttribute("casemgmt_newFormBeans", encounterFormDao.findAll());
 
 			/* prepare messenger list */
-			se.setAttribute("casemgmt_msgBeans", this.caseManagementMgr.getMsgBeans(new Integer(demoNo)));
+			session.setAttribute("casemgmt_msgBeans", this.caseManagementMgr.getMsgBeans(new Integer(demoNo)));
 
 			// readonly access to define creat a new note button in jsp.
-			se.setAttribute("readonly", new Boolean(this.caseManagementMgr.hasAccessRight("note-read-only", "access", loggedInInfo.getLoggedInProviderNo(), demoNo, (String) se.getAttribute("case_program_id"))));
+			session.setAttribute("readonly", new Boolean(this.caseManagementMgr.hasAccessRight("note-read-only", "access", loggedInInfo.getLoggedInProviderNo(), demoNo, (String) session.getAttribute("case_program_id"))));
 
 		}
 		/* Dx */
@@ -428,7 +429,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		logger.debug("Fetch Survey List " + (current - start));
 
 		/* ISSUES */
-		if (tab.equals("Current Issues"))
+		if ("Current Issues".equals(tab))
 		{
 			if (useNewCaseMgmt)
 			{
@@ -459,7 +460,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		/* tickler */
 		getTicklerAttribute(request, loggedInInfo, tab);
 
-		if (tab != null && tab.equalsIgnoreCase("Search"))
+		if ("Search".equalsIgnoreCase(tab))
 		{
 			request.setAttribute("roles", roleMgr.getRoles());
 			request.setAttribute("program_domain", programMgr.getProgramDomain(getProviderNo(request)));
@@ -467,21 +468,21 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 
 		/* set form value for e-chart */
 
-		Locale vLocale = (Locale) se.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
+		Locale vLocale = (Locale) session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
 		caseForm.setVlCountry(vLocale.getCountry());
 		caseForm.setDemographicNo(getDemographicNo(request));
 
-		se.setAttribute("casemgmt_DemoNo", demoNo);
-		caseForm.setRootCompURL((String) se.getAttribute("casemgmt_oscar_baseurl"));
-		se.setAttribute("casemgmt_VlCountry", vLocale.getCountry());
+		session.setAttribute("casemgmt_DemoNo", demoNo);
+		caseForm.setRootCompURL((String) session.getAttribute("casemgmt_oscar_baseurl"));
+		session.setAttribute("casemgmt_VlCountry", vLocale.getCountry());
 
 		// if we have just saved a note, remove saveNote flag
 		String varName = "saveNote" + demoNo;
-		Boolean saved = (Boolean) se.getAttribute(varName);
+		Boolean saved = (Boolean) session.getAttribute(varName);
 		if (saved != null && saved == true)
 		{
 			request.setAttribute("saveNote", true);
-			se.removeAttribute(varName);
+			session.removeAttribute(varName);
 		}
 		current = System.currentTimeMillis();
 
