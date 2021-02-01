@@ -45,6 +45,7 @@ import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -53,7 +54,9 @@ import oscar.util.ConversionUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -91,10 +94,13 @@ public class EncounterNoteService
 	@Autowired
 	DemographicDao demographicDao;
 
+	private CaseManagementNoteDao newCaseManagementNoteDao = (CaseManagementNoteDao) SpringUtils.getBean("encounterNote.dao.CaseManagementNoteDao");
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
 		return saveChartNote(note, null);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, String providerNo, Integer demographicNo)
 	{
 		return saveChartNote(note, null, providerNo, demographicNo);
@@ -456,5 +462,74 @@ public class EncounterNoteService
 		note.setHistory(note.getNote());
 		caseManagementNoteDao.merge(note);
 		return note;
+	}
+
+	/**
+	 * This method is intended for use of building a hashmap of CPP notes for a specific demographic
+	 * This should be avoided in any other use case if at all possible.
+	 * @deprecated to discourage future use of returning a hash-map
+	 * @return the completed hash-map with all cpp notes to print
+	 */
+	@Deprecated
+	public HashMap<String, List<CaseManagementNote>> buildCPPHashMapForDemographic(Integer demographicNo)
+	{
+		HashMap<String, List<CaseManagementNote>>cpp = new HashMap<>();
+
+		List<CaseManagementNote> allCPPNotes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, true);
+		List<CaseManagementNote> medicalHistoryNotes = new ArrayList<>();
+		List<CaseManagementNote> socialHistoryNotes = new ArrayList<>();
+		List<CaseManagementNote> familyHistoryNotes = new ArrayList<>();
+		List<CaseManagementNote> reminderNotes = new ArrayList<>();
+		List<CaseManagementNote> otherMedsNotes = new ArrayList<>();
+		List<CaseManagementNote> concernsNotes = new ArrayList<>();
+		List<CaseManagementNote> riskFactorsNotes = new ArrayList<>();
+
+		// For each cpp note, use the note id to determine the issue code string
+		for (CaseManagementNote note : allCPPNotes)
+		{
+			// Get the issue code
+			List<CaseManagementIssueNote> issueNotes = note.getIssueNoteList();
+
+			for (CaseManagementIssueNote issueNote : issueNotes)
+			{
+				// Find a match and add the note to the correct list
+				Issue currentIssue = issueNote.getId().getCaseManagementIssue().getIssue();
+
+				switch (currentIssue.getCode())
+				{
+					case Issue.SUMMARY_CODE_MEDICAL_HISTORY:
+						medicalHistoryNotes.add(note);
+						break;
+					case Issue.SUMMARY_CODE_SOCIAL_HISTORY:
+						socialHistoryNotes.add(note);
+						break;
+					case Issue.SUMMARY_CODE_FAMILY_HISTORY:
+						familyHistoryNotes.add(note);
+						break;
+					case Issue.SUMMARY_CODE_REMINDERS:
+						reminderNotes.add(note);
+						break;
+					case Issue.SUMMARY_CODE_OTHER_MEDS:
+						otherMedsNotes.add(note);
+						break;
+					case Issue.SUMMARY_CODE_CONCERNS:
+						concernsNotes.add(note);
+						break;
+					case Issue.SUMMARY_CODE_RISK_FACTORS:
+						riskFactorsNotes.add(note);
+						break;
+				}
+			}
+		}
+
+		cpp.put(Issue.SUMMARY_CODE_MEDICAL_HISTORY, medicalHistoryNotes);
+		cpp.put(Issue.SUMMARY_CODE_SOCIAL_HISTORY, socialHistoryNotes);
+		cpp.put(Issue.SUMMARY_CODE_FAMILY_HISTORY, familyHistoryNotes);
+		cpp.put(Issue.SUMMARY_CODE_REMINDERS, reminderNotes);
+		cpp.put(Issue.SUMMARY_CODE_OTHER_MEDS, otherMedsNotes);
+		cpp.put(Issue.SUMMARY_CODE_CONCERNS, concernsNotes);
+		cpp.put(Issue.SUMMARY_CODE_RISK_FACTORS, riskFactorsNotes);
+
+		return cpp;
 	}
 }

@@ -49,24 +49,4 @@ public class IssueDao extends AbstractDao<Issue>
 
 		return (Issue) query.getSingleResult();
 	}
-
-	public Issue getIssueForCPPNote(int noteId)
-	{
-		String queryString =
-			"SELECT i.issue_id, i.code, i.description, i.role, " +
-					"i.update_date, i.priority, i.type, i.sortOrderId " +
-			"FROM issue i " +
-			"LEFT JOIN casemgmt_issue ci ON ci.issue_id = i.issue_id " +
-			"LEFT JOIN casemgmt_issue_notes cin ON cin.id = ci.id " +
-			"LEFT JOIN casemgmt_note cm ON cm.note_id = cin.note_id " +
-			"WHERE cm.note_id = :noteId";
-
-		Query query = entityManager.createNativeQuery(queryString, Issue.class);
-		query.setParameter("noteId", noteId);
-		query.setMaxResults(1);
-
-		Issue issue = this.getSingleResultOrNull(query);
-
-		return issue;
-	}
 }

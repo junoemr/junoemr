@@ -58,6 +58,7 @@ import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -81,6 +82,7 @@ public class CaseManagementPrint {
 	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
 	private DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
 	private IssueDao issueDao = (IssueDao)SpringUtils.getBean("encounterNote.dao.IssueDao");
+	private EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 
 	/*
 	 *This method was in CaseManagementEntryAction but has been moved out so that both the classic Echart and the flat echart can use the same printing method.
@@ -125,58 +127,7 @@ public class CaseManagementPrint {
 		HashMap<String, List<CaseManagementNote>> cpp = null;
 		if (printCPP)
 		{
-			cpp = new HashMap<>();
-
-			List<CaseManagementNote> allCPPNotes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, true);
-			List<CaseManagementNote> medicalHistoryNotes = new ArrayList<>();
-			List<CaseManagementNote> socialHistoryNotes = new ArrayList<>();
-			List<CaseManagementNote> familyHistoryNotes = new ArrayList<>();
-			List<CaseManagementNote> reminderNotes = new ArrayList<>();
-			List<CaseManagementNote> otherMedsNotes = new ArrayList<>();
-			List<CaseManagementNote> concernsNotes = new ArrayList<>();
-			List<CaseManagementNote> riskFactorsNotes = new ArrayList<>();
-
-			// For each cpp note, use the note id to determine the issue code string
-			for (CaseManagementNote note : allCPPNotes)
-			{
-				// Get the issue code
-				int currentNoteId = note.getId().intValue();
-				Issue currentIssue = issueDao.getIssueForCPPNote(currentNoteId);
-
-				// Find a match and add the note to the correct list
-				switch (currentIssue.getCode())
-				{
-					case Issue.SUMMARY_CODE_MEDICAL_HISTORY:
-						medicalHistoryNotes.add(note);
-						break;
-					case Issue.SUMMARY_CODE_SOCIAL_HISTORY:
-						socialHistoryNotes.add(note);
-						break;
-					case Issue.SUMMARY_CODE_FAMILY_HISTORY:
-						familyHistoryNotes.add(note);
-						break;
-					case Issue.SUMMARY_CODE_REMINDERS:
-						reminderNotes.add(note);
-						break;
-					case Issue.SUMMARY_CODE_OTHER_MEDS:
-						otherMedsNotes.add(note);
-						break;
-					case Issue.SUMMARY_CODE_CONCERNS:
-						concernsNotes.add(note);
-						break;
-					case Issue.SUMMARY_CODE_RISK_FACTORS:
-						riskFactorsNotes.add(note);
-						break;
-				}
-			}
-
-			cpp.put(Issue.SUMMARY_CODE_MEDICAL_HISTORY, medicalHistoryNotes);
-			cpp.put(Issue.SUMMARY_CODE_SOCIAL_HISTORY, socialHistoryNotes);
-			cpp.put(Issue.SUMMARY_CODE_FAMILY_HISTORY, familyHistoryNotes);
-			cpp.put(Issue.SUMMARY_CODE_REMINDERS, reminderNotes);
-			cpp.put(Issue.SUMMARY_CODE_OTHER_MEDS, otherMedsNotes);
-			cpp.put(Issue.SUMMARY_CODE_CONCERNS, concernsNotes);
-			cpp.put(Issue.SUMMARY_CODE_RISK_FACTORS, riskFactorsNotes);
+			cpp = encounterNoteService.buildCPPHashMapForDemographic(demographicNo);
 		}
 
 		List<CaseManagementNote> othermeds = null;
