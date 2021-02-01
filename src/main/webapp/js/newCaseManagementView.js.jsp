@@ -3714,6 +3714,7 @@
 		var msnote;
 		var pos;
 		var imgId;
+		var maxNcId = parseInt($("maxId").value);
 
 		for (idx = 1; idx <= maxNcId; ++idx)
 		{
