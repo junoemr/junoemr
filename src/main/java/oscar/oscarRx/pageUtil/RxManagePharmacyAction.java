@@ -51,8 +51,6 @@ import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.log.LogAction;
-import oscar.log.LogConst;
 import oscar.oscarRx.data.RxPharmacyData;
 
 /**
@@ -99,7 +97,8 @@ public final class RxManagePharmacyAction extends DispatchAction {
 		}
 		else if(actionType.equals("Delete"))
 		{
-			pharmacy.deletePharmacy(frm.getID());
+			Integer id = Integer.parseInt(frm.getID());
+			pharmacy.deletePharmacy(id, loggedInInfo); // frm.getID());
 		}
 
 	   return mapping.findForward("success");
@@ -111,21 +110,19 @@ public final class RxManagePharmacyAction extends DispatchAction {
 	String retVal = "{\"success\":true}";
     try {
     	String pharmacyId = request.getParameter("pharmacyId");
-    	
-    	RxPharmacyData pharmacy = new RxPharmacyData();
-    	pharmacy.deletePharmacy(pharmacyId);
-    	
-    	LoggedInInfo loggedInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-    	
-    	LogAction.addLog(loggedInfo.getLoggedInProviderNo(), LogConst.ACTION_DELETE, LogConst.CON_PHARMACY, pharmacyId);
-    }
+		Integer id = Integer.parseInt(pharmacyId);
+		RxPharmacyData pharmacy = new RxPharmacyData();
+		LoggedInInfo loggedInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+		pharmacy.deletePharmacy(id, loggedInfo);
+	}
     catch( Exception e) {
     	MiscUtils.getLogger().error("CANNOT DELETE PHARMACY ",e);
     	retVal = "{\"success\":false}";
     }
     
-    response.setContentType("text/x-json");
-    JSONObject jsonObject = JSONObject.fromObject(retVal);
+	response.setContentType("application/json");
+	JSONObject jsonObject = JSONObject.fromObject(retVal);
     jsonObject.write(response.getWriter());
     
     return null;
@@ -138,15 +135,14 @@ public final class RxManagePharmacyAction extends DispatchAction {
     		String demographicNo = request.getParameter("demographicNo");
     		
     		ObjectMapper mapper = new ObjectMapper();       		
-    	
     		PharmacyInfo pharmacyInfo =  mapper.readValue(data, PharmacyInfo.class);
-    		
-    		RxPharmacyData pharmacy = new RxPharmacyData();
-    		
-    		pharmacy.unlinkPharmacy(String.valueOf(pharmacyInfo.getId()), demographicNo);
-    		
-    		response.setContentType("text/x-json");
-    		String retVal = "{\"id\":\"" + pharmacyInfo.getId() + "\"}";
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+			RxPharmacyData pharmacy = new RxPharmacyData();
+
+			pharmacy.unlinkPharmacy(String.valueOf(pharmacyInfo.getId()), demographicNo, loggedInInfo);
+
+			response.setContentType("application/json");
+			String retVal = "{\"id\":\"" + pharmacyInfo.getId() + "\"}";
     		JSONObject jsonObject = JSONObject.fromObject(retVal);
     		jsonObject.write(response.getWriter());
     	}
@@ -165,8 +161,8 @@ public final class RxManagePharmacyAction extends DispatchAction {
         List<PharmacyInfo> pharmacyList;
         pharmacyList = pharmacyData.getPharmacyFromDemographic(demographicNo);
         
-        response.setContentType("text/x-json");
-        ObjectMapper mapper = new ObjectMapper();
+		response.setContentType("application/json");
+		ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getWriter(), pharmacyList);
         
     	return null;
@@ -176,10 +172,11 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	RxPharmacyData pharmacy = new RxPharmacyData();
     	
     	try {
-    		PharmacyInfo pharmacyInfo = pharmacy.addPharmacyToDemographic(request.getParameter("pharmacyId"), request.getParameter("demographicNo"), request.getParameter("preferredOrder"));
-    		ObjectMapper mapper = new ObjectMapper();
-    		response.setContentType("text/x-json");
-    		mapper.writeValue(response.getWriter(), pharmacyInfo);
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+			PharmacyInfo pharmacyInfo = pharmacy.addPharmacyToDemographic(request.getParameter("pharmacyId"), request.getParameter("demographicNo"), request.getParameter("preferredOrder"), loggedInInfo);
+			ObjectMapper mapper = new ObjectMapper();
+			response.setContentType("application/json");
+			mapper.writeValue(response.getWriter(), pharmacyInfo);
     	}
     	catch( Exception e ) {
     		MiscUtils.getLogger().error("ERROR SETTING PREFERRED ORDER", e);
@@ -220,8 +217,8 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	JSONObject jsonObject = JSONObject.fromObject(status);
     	
     	try {
-    		response.setContentType("text/x-json");
-    		jsonObject.write(response.getWriter());
+			response.setContentType("application/json");
+			jsonObject.write(response.getWriter());
     	}
     	catch( IOException e ) {
     		MiscUtils.getLogger().error("Cannot write response", e);    		
@@ -276,7 +273,7 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	
 		try
 		{
-			response.setContentType("text/x-json");
+			response.setContentType("application/json");
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.writeValue(response.getWriter(), pharmacyInfo);
 		}
@@ -296,8 +293,8 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	
     	List<PharmacyInfo>pharmacyList = pharmacy.searchPharmacy(searchStr);
     	
-    	response.setContentType("text/x-json");
-    	ObjectMapper mapper = new ObjectMapper();
+		response.setContentType("application/json");
+		ObjectMapper mapper = new ObjectMapper();
     	
     	try {
     		mapper.writeValue(response.getWriter(), pharmacyList);
@@ -316,8 +313,8 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	
     	RxPharmacyData pharmacy = new RxPharmacyData();
     	
-    	response.setContentType("text/x-json");
-    	ObjectMapper mapper = new ObjectMapper();
+		response.setContentType("application/json");
+		ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> cityList = pharmacy.searchPharmacyCity(searchStr);
     	

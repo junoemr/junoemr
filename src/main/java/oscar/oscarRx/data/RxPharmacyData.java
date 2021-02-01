@@ -75,7 +75,7 @@ public class RxPharmacyData {
 				LogConst.STATUS_SUCCESS,
 				"Pharmacy ID: " + pharmacyInfo.getId(),
 				loggedInInfo.getIp(),
-				"Added pharmacy: " + pharmacyInfo.getName());
+				"Added pharmacy: " + pharmacyInfo.toString());
 	}
 
 	/**
@@ -87,52 +87,10 @@ public class RxPharmacyData {
 	 */
 	public void updatePharmacy(PharmacyInfo pharmacyInfo, LoggedInInfo loggedInInfo)
 	{
+		// Get a reference to the old entry before we overwrite it
 		PharmacyInfo oldEntry = pharmacyInfoDao.getPharmacy(pharmacyInfo.getId());
-		// Build a list of all things that are different for logging purposes
-		String differences = "";
-
-		// UI doesn't allow for a null or 0-length name
-		if (!oldEntry.getName().equals(pharmacyInfo.getName()))
-		{
-			differences += "Old name: " + oldEntry.getName() + " | New name: " + pharmacyInfo.getName() + "\n";
-		}
-		if (oldEntry.getAddress() != null && !oldEntry.getAddress().equals(pharmacyInfo.getAddress()))
-		{
-			differences += "Old address: " + oldEntry.getAddress() + " | New address: " + pharmacyInfo.getAddress() + "\n";
-		}
-		if (oldEntry.getCity() != null && !oldEntry.getCity().equals(pharmacyInfo.getCity()))
-		{
-			differences += "Old city: " + oldEntry.getCity() + " | New city: " + pharmacyInfo.getCity() + "\n";
-		}
-		if (oldEntry.getProvince() != null && !oldEntry.getProvince().equals(pharmacyInfo.getProvince()))
-		{
-			differences += "Old province: " + oldEntry.getProvince() + " | New province: " + pharmacyInfo.getProvince() + "\n";
-		}
-		if (oldEntry.getPostalCode() != null && !oldEntry.getPostalCode().equals(pharmacyInfo.getPostalCode()))
-		{
-			differences += "Old postal code: " + oldEntry.getPostalCode()
-					+ " | New postal code: " + pharmacyInfo.getPostalCode() + "\n";
-		}
-		if (oldEntry.getPhone1() != null && !oldEntry.getPostalCode().equals(pharmacyInfo.getPostalCode()))
-		{
-			differences += "Old phone1: " + oldEntry.getPhone1()
-					+ " | New phone1: " + pharmacyInfo.getPhone1() + "\n";
-		}
-		if (oldEntry.getPhone2() != null && !oldEntry.getPhone2().equals(pharmacyInfo.getPhone2()))
-		{
-			differences += "Old phone2: " + oldEntry.getPhone2()
-					+ " | New phone2: " + pharmacyInfo.getPhone2() + "\n";
-		}
-		if (!oldEntry.getFax().equals(pharmacyInfo.getFax()))
-		{
-			differences += "Old fax: " + oldEntry.getFax() + " | New fax: " + pharmacyInfo.getFax() + "\n";
-		}
-		if (oldEntry.getEmail() != null && !oldEntry.getEmail().equals(pharmacyInfo.getEmail()))
-		{
-			differences += "Old email: " + oldEntry.getEmail() + " | New email: "+ pharmacyInfo.getEmail() + "\n";
-		}
-
 		pharmacyInfoDao.merge(pharmacyInfo);
+
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
 				null,
 				LogConst.ACTION_UPDATE,
@@ -140,22 +98,31 @@ public class RxPharmacyData {
 				LogConst.STATUS_SUCCESS,
 				"Pharmacy ID: " + pharmacyInfo.getId(),
 				loggedInInfo.getIp(),
-				differences);
+				"old pharmacy: " + oldEntry.toString() + " || new pharmacy: " + pharmacyInfo.toString());
 	}
 
    /**
-    * set the status of the pharmacy to 0, this will not be found in the getAllPharmacy queries
-    * @param ID
-    */
-   public void deletePharmacy(String ID){
+	* set the status of the pharmacy to 0, this will not be found in the getAllPharmacy queries
+	* @param id
+	*/
+   public void deletePharmacy(Integer id, LoggedInInfo loggedInInfo){
 	   
-	   List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findAllByPharmacyId(Integer.parseInt(ID));
+	   List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findAllByPharmacyId(id);
 	   
 	   for( DemographicPharmacy demographicPharmacy : demographicPharmacies ) {
-		   demographicPharmacyDao.unlinkPharmacy(Integer.parseInt(ID), demographicPharmacy.getDemographicNo());
+		   demographicPharmacyDao.unlinkPharmacy(id, demographicPharmacy.getDemographicNo());
 	   }
 	   
-	   pharmacyInfoDao.deletePharmacy(Integer.parseInt(ID));
+	   pharmacyInfoDao.deletePharmacy(id);
+	   LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+			   null,
+			   LogConst.ACTION_DELETE,
+			   LogConst.CON_PHARMACY,
+			   LogConst.STATUS_SUCCESS,
+			   "Pharmacy ID: " + id,
+			   loggedInInfo.getIp(),
+			   "Deleted pharmacy: " + id);
+
    }
 
    /**
@@ -191,13 +158,23 @@ public class RxPharmacyData {
     * @param pharmacyId Id of the pharmacy
     * @param demographicNo Patient demographic number
     */
-   public PharmacyInfo addPharmacyToDemographic(String pharmacyId,String demographicNo, String preferredOrder){
+   public PharmacyInfo addPharmacyToDemographic(String pharmacyId,String demographicNo, String preferredOrder, LoggedInInfo loggedInInfo)
+   {
       demographicPharmacyDao.addPharmacyToDemographic(Integer.parseInt(pharmacyId), Integer.parseInt(demographicNo), Integer.parseInt(preferredOrder));
       
       PharmacyInfo pharmacyInfo = pharmacyInfoDao.find(Integer.parseInt(pharmacyId));
       pharmacyInfo.setPreferredOrder(Integer.parseInt(preferredOrder));
-      
-      return pharmacyInfo;
+
+	   LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+			   Integer.parseInt(demographicNo),
+			   LogConst.ACTION_ADD,
+			   LogConst.CON_PHARMACY,
+			   LogConst.STATUS_SUCCESS,
+			   "Pharmacy ID: " + pharmacyInfo.getId(),
+			   loggedInInfo.getIp(),
+			   "Added preferred pharmacy to demographic:  " + pharmacyInfo.getName());
+
+	   return pharmacyInfo;
       
    }
 
@@ -263,9 +240,21 @@ public class RxPharmacyData {
 		
 	}
 	
-	public void unlinkPharmacy( String pharmacyId, String demographicNo ) {
+	public void unlinkPharmacy( String pharmacyId, String demographicNo, LoggedInInfo loggedInInfo) {
 		
 		demographicPharmacyDao.unlinkPharmacy(Integer.parseInt(pharmacyId), Integer.parseInt(demographicNo));
-		
+
+		PharmacyInfo pharmacyInfo = pharmacyInfoDao.find(Integer.parseInt(pharmacyId));
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				Integer.parseInt(demographicNo),
+				LogConst.ACTION_DELETE,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + pharmacyId,
+				loggedInInfo.getIp(),
+				"Removed pharmacy preference from demographic: " + pharmacyInfo.getName());
+
+
 	}
 }
