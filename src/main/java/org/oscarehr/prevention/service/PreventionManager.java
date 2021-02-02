@@ -94,6 +94,22 @@ public class PreventionManager
 		return preventionTypeList;
 	}
 
+	public HashMap<String, String> getPreventionByNameOrType(String nameOrType)
+	{
+		PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
+		for(HashMap<String, String> prevTypeHash : pdc.getPreventions())
+		{
+			String hcType = prevTypeHash.get("healthCanadaType");
+			String name = prevTypeHash.get("name");
+
+			if(StringUtils.filled(name) && name.equals(nameOrType) || StringUtils.filled(hcType) && hcType.equals(nameOrType))
+			{
+				return prevTypeHash;
+			}
+		}
+		return null;
+	}
+
 	@Deprecated
 	public ArrayList<HashMap<String, String>> getPreventionTypeDescList()
 	{

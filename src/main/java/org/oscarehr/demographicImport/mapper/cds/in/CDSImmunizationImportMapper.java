@@ -33,7 +33,7 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE;
@@ -44,7 +44,7 @@ public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immuniz
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	private static final String DEFAULT_PREVENTION_TYPE = "OtherA";
+	public static final String DEFAULT_PREVENTION_TYPE = "OtherA";
 
 	@Autowired
 	private PreventionManager preventionManager;
@@ -105,11 +105,22 @@ public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immuniz
 		{
 			codeValue = getResidualDataElementAsString(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE);
 		}
-		ArrayList<String> typeList = preventionManager.getPreventionTypeList();
-		if(codeValue == null || !typeList.contains(codeValue))
+		if(codeValue == null)
 		{
-			logger.warn("Unknown or invalid prevention type: " + codeValue);
-			return DEFAULT_PREVENTION_TYPE;
+			codeValue = DEFAULT_PREVENTION_TYPE;
+		}
+		else
+		{
+			HashMap<String, String> preventionHash = preventionManager.getPreventionByNameOrType(codeValue);
+			if(preventionHash != null)
+			{
+				codeValue = preventionHash.get("name");
+			}
+			else
+			{
+				logger.warn("Unknown or invalid prevention type: " + codeValue);
+				codeValue = DEFAULT_PREVENTION_TYPE;
+			}
 		}
 		return codeValue;
 	}
