@@ -155,7 +155,7 @@ public class EncounterTicklerService extends EncounterSectionService
 			sectionNote.setUpdateDate(serviceDate);
 
 			// Colour
-			if(serviceDate.isBefore(LocalDateTime.now()))
+			if(serviceDate.isBefore(LocalDateTime.now().toLocalDate().atStartOfDay()))
 			{
 				sectionNote.setColour(BEFORE_COLOUR);
 			}
