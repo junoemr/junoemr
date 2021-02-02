@@ -2,9 +2,10 @@
 
 if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
-if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = function JunoEncounter(pageData)
+if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = function JunoEncounter(pageData, pageState)
 {
 	this.pageData = pageData;
+	this.pageState = pageState;
 
 	var openWindows = {};
 	var measurementWindows = [];
@@ -15,13 +16,13 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		delete Array.prototype.toJSON;
 
 		// Monkey Patch from https://stackoverflow.com/a/16208232
-		if (typeof jQuery.when.all === 'undefined')
+		if (typeof junoJQuery.when.all === 'undefined')
 		{
-			jQuery.when.all = function (deferreds)
+			junoJQuery.when.all = function (deferreds)
 			{
-				return jQuery.Deferred(function (def)
+				return junoJQuery.Deferred(function (def)
 				{
-					jQuery.when.apply(jQuery, deferreds).then(
+					junoJQuery.when.apply(jQuery, deferreds).then(
 						function ()
 						{
 							def.resolveWith(this, [Array.prototype.slice.call(arguments)]);
@@ -59,6 +60,36 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			$("encMainDiv").style.height = divHeight + 'px';
 		}
 	};
+
+	// Set the initial width of the page and set up a monitor to make sure it doesn't get smaller
+	this.initNavBarMonitor = function initNavBarMonitor()
+	{
+	    this.emulateMinWidth(null);
+		Element.observe(window, "resize", this.emulateMinWidth);
+	}
+
+	// Keep the encounter window from getting smaller
+	this.emulateMinWidth = function emulateMinWidth(e)
+	{
+		var win = pageWidth();
+		var main = Element.getWidth("body");
+
+		if (e == null)
+		{
+			this.pageState.minMain = Math.round(main * this.pageState.minDelta);
+			this.pageState.minWin = Math.round(win * this.pageState.minDelta);
+		}
+
+		if (main < this.pageState.minMain)
+		{
+			$("body").style.width = this.pageState.minMain + "px";
+		}
+		else if (win >= this.pageState.minWin && main == this.pageState.minMain)
+		{
+			$("body").style.width = "100%";
+		}
+
+	}
 
 	this.configureNifty = function configureNifty()
 	{
@@ -250,7 +281,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 
 	this.getAssignedIssueArray = function getAssignedIssueArray(issueIdArray, async)
 	{
-		var deferred = jQuery.Deferred();
+		var deferred = junoJQuery.Deferred();
 
 		var deferredArray = [];
 
@@ -258,7 +289,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		{
 			var issueId = issueIdArray[i];
 
-			var ajaxPromise = jQuery.ajax({
+			var ajaxPromise = junoJQuery.ajax({
 				async: async,
 				type: "POST",
 				url: "../ws/rs/notes/getIssueById/" + issueId
@@ -267,7 +298,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			deferredArray.push(ajaxPromise);
 		}
 
-		jQuery.when.all(deferredArray).then(function (response)
+		junoJQuery.when.all(deferredArray).then(function (response)
 		{
 			var adjustedArray = response;
 			if (deferredArray.length === 1)
@@ -325,18 +356,18 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		}
 
 		var me = this;
-		jQuery.ajax({
+		junoJQuery.ajax({
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
 			url: encounterNote.getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset),
 			success: function (response)
 			{
-				var containerDiv = jQuery('#' + sectionName + 'list');
+				var containerDiv = junoJQuery('#' + sectionName + 'list');
 
 				containerDiv.empty();
 
-				jQuery.each(response.body.notes, function (index, note)
+				junoJQuery.each(response.body.notes, function (index, note)
 				{
 					note.sectionName = sectionName;
 					note.contextPath = me.pageData.contextPath;
@@ -372,10 +403,10 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 					var newNode;
 					if (me.isCppSection(sectionName))
 					{
-						newNode = jQuery('#sectionCppNoteTemplate').tmpl(note);
+						newNode = junoJQuery('#sectionCppNoteTemplate').tmpl(note);
 					} else
 					{
-						newNode = jQuery('#sectionNoteTemplate').tmpl(note);
+						newNode = junoJQuery('#sectionNoteTemplate').tmpl(note);
 					}
 
 					return newNode.appendTo(containerDiv);
@@ -383,13 +414,33 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			}
 		});
 	};
+/*
 
+	this.fillJQueryTemplate = function fillJQueryTemplate(templateElement, templateData)
+	{
+		if(templateElement.length && !junoJQuery.isFunction(templateElement.tmpl))
+		{
+			junoJQuery.ajax({
+				url: "../share/documentUploader/jquery.tmpl.min.js",
+				cache: true,
+				dataType: "script",
+				success: function(response)
+				{
+
+				}
+			});
+		}
+
+		return templateElement.tmpl(templateData);
+	};
+
+*/
 
 	this.initOceanToolbar = function initOceanToolbar()
 	{
 		if(this.pageData.cmeJs == 'ocean_toolbar')
 		{
-			jQuery.ajax({ url: "../eform/displayImage.do?imagefile=oceanToolbar.js", cache: true, dataType: "script" });
+			junoJQuery.ajax({ url: "../eform/displayImage.do?imagefile=oceanToolbar.js", cache: true, dataType: "script" });
 		}
 	};
 
@@ -448,7 +499,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 	 * functionality to achieve an effect similar to onClick for a select option element.
 	 * (onClick on the option element doesn't work in Chrome (or IE), and onClick on the select doesn't work in FireFox)
 	 *
-	 * @param calculatorMenu jQuery element referencing a select with urls as option values
+	 * @param calculatorMenu junoJQuery element referencing a select with urls as option values
 	 */
 	this.bindCalculatorListener = function bindCalculatorListener(calculatorMenu)
 	{
@@ -489,7 +540,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 	{
 		if(this.pageData.encounterWindowMaximize)
 		{
-			jQuery(document).ready(function(){window.resizeTo(screen.width,screen.height);});
+			junoJQuery(document).ready(function(){window.resizeTo(screen.width,screen.height);});
 		}
 		else if(this.pageData.encounterWindowCustomSize)
 		{
@@ -499,7 +550,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 
 	this.configureCalculator = function configureCalculator()
 	{
-		var calculatorMenu = jQuery('#calculators_menu');
+		var calculatorMenu = junoJQuery('#calculators_menu');
 		junoEncounter.bindCalculatorListener(calculatorMenu);
 	};
 
@@ -515,12 +566,12 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		}
 
 
-		jQuery("#enTemplate").autocomplete({
+		junoJQuery("#enTemplate").autocomplete({
 			source: function(request, response)
 			{
-				jQuery.getJSON(searchAutocompleteUrl + request.term + appointmentQueryString, function(data)
+				junoJQuery.getJSON(searchAutocompleteUrl + request.term + appointmentQueryString, function(data)
 				{
-					response(jQuery.map(data.body, function(section, index)
+					response(junoJQuery.map(data.body, function(section, index)
 					{
 						return {
 							label: section.text,
@@ -537,7 +588,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			{
 				event.preventDefault();
 				new Function(ui.item.value)();
-				jQuery("#enTemplate").val(ui.item.label);
+				junoJQuery("#enTemplate").val(ui.item.label);
 			},
 			minLength: 2,
 			delay: 100

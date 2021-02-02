@@ -317,6 +317,19 @@ public class ConversionUtils {
 		return toDateString(date, DEFAULT_DATE_PATTERN);
 	}
 
+	/**
+	 * Formats the local datetime instance into a date string.
+	 *
+	 * @param date
+	 * 		LocalDateTime to be formatted using {@link #DEFAULT_DATE_PATTERN}
+	 * @return
+	 * 		Returns the formatted string
+	 */
+	public static String toDateString(LocalDateTime date)
+	{
+		return toDateTimeString(date, DEFAULT_DATE_PATTERN);
+	}
+
 	public static String toDateTimeString(LocalDateTime date)
 	{
 		return toDateTimeString(date, DEFAULT_TS_PATTERN);

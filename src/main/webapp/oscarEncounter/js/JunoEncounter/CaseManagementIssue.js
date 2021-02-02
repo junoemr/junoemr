@@ -38,19 +38,19 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 	{
 		var me = this;
 
-		jQuery.ajax({
+		junoJQuery.ajax({
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
 			url: "../ws/rs/demographic/" + this.pageData.demographicNo + "/" + method,
 			success: function (response)
 			{
-				if(!response || !jQuery.isArray(response.body))
+				if(!response || !junoJQuery.isArray(response.body))
 				{
 					return false;
 				}
 
-				jQuery('#' + divId).empty();
+				junoJQuery('#' + divId).empty();
 				me.displayExistingIssueList(clickContext, response.body, divId, title, resolved);
 			}
 		});
@@ -60,7 +60,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 	{
 		var issueIdArray = [];
 
-		if(!jQuery.isArray(assignedCMIssues))
+		if(!junoJQuery.isArray(assignedCMIssues))
 		{
 			return issueIdArray;
 		}
@@ -75,18 +75,18 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 	this.removeMatchingIssueCheckboxes = function removeMatchingIssueCheckboxes(issueIdArray)
 	{
-		jQuery("#noteIssueIdList input:checkbox[name=issue_id]").each(function ()
+		junoJQuery("#noteIssueIdList input:checkbox[name=issue_id]").each(function ()
 		{
-			var issueId = parseInt(jQuery(this).val());
+			var issueId = parseInt(junoJQuery(this).val());
 			console.log('"' + issueId + '"');
 			console.log(issueIdArray);
-			console.log(jQuery.inArray(issueId, issueIdArray));
-			console.log(jQuery.inArray(6279, issueIdArray));
-			console.log(jQuery.inArray("6279", issueIdArray));
+			console.log(junoJQuery.inArray(issueId, issueIdArray));
+			console.log(junoJQuery.inArray(6279, issueIdArray));
+			console.log(junoJQuery.inArray("6279", issueIdArray));
 
-			if(jQuery.inArray(issueId, issueIdArray) >= 0)
+			if(junoJQuery.inArray(issueId, issueIdArray) >= 0)
 			{
-				jQuery(this).remove();
+				junoJQuery(this).remove();
 			}
 		});
 	};
@@ -162,7 +162,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 			]
 		};
 
-		clickContext.jQuery('#existingIssueTemplate').tmpl(templateParameters).appendTo('#' + divId);
+		clickContext.junoJQuery('#existingIssueTemplate').tmpl(templateParameters).appendTo('#' + divId);
 
 		Element.show(divId);
 	};
@@ -187,7 +187,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 		var me = this;
 
-		jQuery.ajax({
+		junoJQuery.ajax({
 			type: "POST",
 			contentType: "application/json",
 			dataType: "json",
@@ -208,7 +208,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 	this.toggleIssueWidget = function toggleIssueWidget(issueId)
 	{
-		var widget = jQuery('#setIssueListWidget' + issueId);
+		var widget = junoJQuery('#setIssueListWidget' + issueId);
 
 		if(widget.is(":visible"))
 		{
@@ -219,7 +219,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 		else
 		{
 			var me = this;
-			jQuery.ajax({
+			junoJQuery.ajax({
 				type: "GET",
 				url: "../ws/rs/demographic/" + this.pageData.demographicNo + "/caseManagementIssue/" + issueId,
 				success: function(response)
@@ -253,13 +253,13 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 			field = trueField;
 		}
 
-		jQuery('#issueCheckList' + issueId + '\\.' + field).prop('checked', true);
+		junoJQuery('#issueCheckList' + issueId + '\\.' + field).prop('checked', true);
 	};
 
 	this.addIssueToCurrentNote = function addIssueToCurrentNote(event)
 	{
-		var nodeId = jQuery('input#issueSearchSelectedId').val();
-		var issueDescription = jQuery('input#issueSearchSelected').val();
+		var nodeId = junoJQuery('input#issueSearchSelectedId').val();
+		var issueDescription = junoJQuery('input#issueSearchSelected').val();
 
 		if(!nodeId)
 		{
@@ -268,8 +268,8 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 		this.addIssue("caseManagementEntryForm", "noteIssueIdList", "issueAutocomplete", nodeId, issueDescription);
 
-		jQuery('input#issueSearchSelectedId').val("");
-		jQuery('input#issueSearchSelected').val("");
+		junoJQuery('input#issueSearchSelectedId').val("");
+		junoJQuery('input#issueSearchSelected').val("");
 	};
 
 	this.addIssue = function addIssue(formName, parentNodeId, autocompleteId, nodeId, issueDescription)
@@ -335,7 +335,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 	this.changeIssue = function changeIssue(clickContext)
 	{
-		var newIssueId = jQuery('input#issueSearchSelectedId').val();
+		var newIssueId = junoJQuery('input#issueSearchSelectedId').val();
 
 		if(!newIssueId)
 		{
@@ -350,7 +350,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 		var me = this;
 
-		jQuery.ajax({
+		junoJQuery.ajax({
 			type: "POST",
 			contentType: "application/json",
 			dataType: "json",
@@ -367,8 +367,8 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 					me.displayUnresolvedIssues(clickContext);
 				}
 
-				jQuery('input#issueSearchSelectedId').val("");
-				jQuery('input#issueSearchSelected').val("");
+				junoJQuery('input#issueSearchSelectedId').val("");
+				junoJQuery('input#issueSearchSelected').val("");
 			}
 		});
 	};
@@ -378,8 +378,8 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 		issueIdToChange = issueId;
 		changeModeResolved = resolved;
 
-		jQuery("#asgnIssues").hide();
-		jQuery("#changeIssues").show();
+		junoJQuery("#asgnIssues").hide();
+		junoJQuery("#changeIssues").show();
 	};
 
 
@@ -387,8 +387,8 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 	this.saveIssueId = function saveIssueId(txtField, listItem)
 	{
-		jQuery('input#issueSearchSelectedId').val(listItem.id);
-		jQuery('input#issueSearchSelected').val(listItem.innerHTML);
+		junoJQuery('input#issueSearchSelectedId').val(listItem.id);
+		junoJQuery('input#issueSearchSelected').val(listItem.innerHTML);
 	};
 
 	this.addIssueToCPP = function addIssueToCPP(txtField, listItem)
@@ -482,16 +482,16 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 	this.configureIssueButtons = function configureIssueButtons()
 	{
 		// Click handlers for the resolved/unresolved issue buttons.  They pass in the
-		// jQuery object from this context because it wouldn't work with the local context
+		// junoJQuery object from this context because it wouldn't work with the local context
 		// inside the handler.  I don't know why, but this made it work.
 
 		var me = this;
-		jQuery('#displayResolvedIssuesButton').click({jQuery: jQuery}, function(event)
+		junoJQuery('#displayResolvedIssuesButton').click({junoJQuery: junoJQuery}, function(event)
 		{
 			me.displayResolvedIssues(event.data);
 		});
 
-		jQuery('#displayUnresolvedIssuesButton').click({jQuery: jQuery}, function(event)
+		junoJQuery('#displayUnresolvedIssuesButton').click({junoJQuery: junoJQuery}, function(event)
 		{
 			me.displayUnresolvedIssues(event.data);
 		});

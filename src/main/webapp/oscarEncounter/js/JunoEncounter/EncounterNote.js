@@ -32,8 +32,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			true
 		).then(function ()
 		{
-			pageState.notesOffset += (pageData.notesIncrement * 2);
-			pageState.notesScrollCheckInterval = setInterval(function ()
+			me.pageState.notesOffset += (pageData.notesIncrement * 2);
+			me.pageState.notesScrollCheckInterval = setInterval(function ()
 			{
 				me.notesIncrementAndLoadMore(demographicNo)
 			}, 50);
@@ -42,7 +42,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.pasteToEncounterNote = function pasteToEncounterNote(txt)
 	{
-		var currentlyEditedNoteId = jQuery('input#editNoteId').val();
+		var currentlyEditedNoteId = junoJQuery('input#editNoteId').val();
 		var currentTextAreaId = "caseNote_note" + currentlyEditedNoteId;
 
 		$(currentTextAreaId).value += "\n" + txt;
@@ -53,13 +53,13 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.updateNoteInPageState = function updateNoteInPageState(noteData, assignedIssueArray)
 	{
-		pageState.currentNoteData = jQuery.extend(true, {}, noteData);
-		pageState.currentAssignedCMIssues = jQuery.extend(true, [], assignedIssueArray);
+		pageState.currentNoteData = junoJQuery.extend(true, {}, noteData);
+		pageState.currentAssignedCMIssues = junoJQuery.extend(true, [], assignedIssueArray);
 	};
 
 	this.createNewNote = function createNewNote()
 	{
-		var currentNoteId = jQuery("input#editNoteId").val();
+		var currentNoteId = junoJQuery("input#editNoteId").val();
 		var noteData = this.getNoteDataById(currentNoteId);
 
 		if(noteData.noteId === 0 && noteData.note.trim() === pageState.currentNoteData.note.trim())
@@ -73,7 +73,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.editEncounterNote = function editEncounterNote(event, noteId)
 	{
-		var currentNoteId = jQuery("input#editNoteId").val();
+		var currentNoteId = junoJQuery("input#editNoteId").val();
 		var noteData = this.getNoteDataById(currentNoteId);
 
 		this.unobserveTextArea();
@@ -127,10 +127,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		    // If there is a note with noteId 0, just create and select it, it's not a real note yet
 			var emptyNote = this.getEmptyNote(this.pageData.providerNo, this.pageData.appointmentNo);
 			var blankIssues = [];
-			var noteDiv = jQuery('div#n' + noteId);
+			var noteDiv = junoJQuery('div#n' + noteId);
 			if(!noteDiv.length)
 			{
-				var containerDiv = jQuery('div#encMainDiv');
+				var containerDiv = junoJQuery('div#encMainDiv');
 				var newNoteNode = this.appendNoteEntry(containerDiv, noteId, emptyNote, blankIssues, demographicNo, false);
 				newNoteNode[0].scrollIntoView();
 			}
@@ -140,7 +140,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		{
 			var me = this;
 
-			jQuery.ajax({
+			junoJQuery.ajax({
 				type: "GET",
 				contentType: "application/json",
 				dataType: "json",
@@ -170,14 +170,14 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	this.enableEditMode = function enableEditMode(noteId, demographicNo, note, issues)
 	{
 		// Disable any notes currently being edited
-		var currentlyEditedNoteId = jQuery('input#editNoteId').val();
-		var currentlyEditedNoteDiv = jQuery('div#n' + currentlyEditedNoteId).parent();
+		var currentlyEditedNoteId = junoJQuery('input#editNoteId').val();
+		var currentlyEditedNoteDiv = junoJQuery('div#n' + currentlyEditedNoteId).parent();
 
 
 		this.replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, null, demographicNo, false);
 
 		// Make the note editable
-		var noteDiv = jQuery('div#n' + noteId).parent();
+		var noteDiv = junoJQuery('div#n' + noteId).parent();
 
 		this.replaceNoteEntry(noteDiv, note, issues, demographicNo, true);
 		this.updateNoteInPageState(note, issues);
@@ -375,7 +375,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.displayNotes = function displayNotes(demographicNo, noteArray, noteToEdit, tmpSave, issues, scrollToBottom, offset)
 	{
-		var containerDiv = jQuery('div#encMainDiv');
+		var containerDiv = junoJQuery('div#encMainDiv');
 
 		var noteToEditUuid = null;
 		if (noteToEdit != null)
@@ -386,7 +386,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var firstNoteNode = null;
 		var foundNoteToEdit = false;
 		var me = this;
-		jQuery.each(noteArray, function (index, note)
+		junoJQuery.each(noteArray, function (index, note)
 		{
 			var noteNode = null;
 
@@ -523,7 +523,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		};
 
 
-		var newNode = jQuery('#encounterNonNoteTemplate').tmpl(templateParameters);
+		var newNode = junoJQuery('#encounterNonNoteTemplate').tmpl(templateParameters);
 
 		return newNode.prependTo(containerDiv);
 	};
@@ -586,7 +586,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			colour: noteColour,
 		};
 
-		return jQuery('#encounterNoteTemplate').tmpl(templateParameters);
+		return junoJQuery('#encounterNoteTemplate').tmpl(templateParameters);
 	};
 
 	this.getEditTextAreaName = function getEditTextAreaName()
@@ -601,14 +601,14 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.getNoteDataById = function getNoteDataById(noteId)
 	{
-		var uuid = jQuery("input#uuid" + noteId).val();
-		var providerNo = jQuery("input#providerNo" + noteId).val();
-		var observationDate = jQuery("input#observationDateInput" + noteId).val();
-		var encounterType = jQuery("select#encounterTypeSelect" + noteId).val();
-		var isSigned = jQuery("input#isSigned" + noteId).val();
-		var isVerified = jQuery("input#isVerified" + noteId).val();
-		var appointmentNo = jQuery("input#appointmentNo" + noteId).val();
-		var noteText = jQuery("textarea#caseNote_note" + noteId).val();
+		var uuid = junoJQuery("input#uuid" + noteId).val();
+		var providerNo = junoJQuery("input#providerNo" + noteId).val();
+		var observationDate = junoJQuery("input#observationDateInput" + noteId).val();
+		var encounterType = junoJQuery("select#encounterTypeSelect" + noteId).val();
+		var isSigned = junoJQuery("input#isSigned" + noteId).val();
+		var isVerified = junoJQuery("input#isVerified" + noteId).val();
+		var appointmentNo = junoJQuery("input#appointmentNo" + noteId).val();
+		var noteText = junoJQuery("textarea#caseNote_note" + noteId).val();
 
 		var observationMoment = moment();
 		if(observationDate)
@@ -673,7 +673,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		// Gather information to save the note
 		var demographicNo = this.pageData.demographicNo;
-		var noteId = jQuery("input#editNoteId").val();
+		var noteId = junoJQuery("input#editNoteId").val();
 
 
 		// Prepare data
@@ -691,7 +691,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		}
 
 		var me = this;
-		jQuery.ajax({
+		junoJQuery.ajax({
 			type: "POST",
 			contentType: "application/json",
 			dataType: "json",
@@ -723,7 +723,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		}
 
 		// Prepare data
-		var noteId = jQuery("input#editNoteId").val();
+		var noteId = junoJQuery("input#editNoteId").val();
 		var noteData = this.getNoteDataById(noteId);
 
 		// Trim the notes because that happens when the note is saved
@@ -776,7 +776,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.saveEncounterNote = function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async, redirectToBilling)
 	{
-		var deferred = jQuery.Deferred();
+		var deferred = junoJQuery.Deferred();
 
 		if(this.pageState.savingNote)
 		{
@@ -792,7 +792,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		// Gather information to save the note
 		var demographicNo = this.pageData.demographicNo;
-		var noteId = jQuery("input#editNoteId").val();
+		var noteId = junoJQuery("input#editNoteId").val();
 
 		// Prepare data
 		var noteData = this.getNoteDataById(noteId);
@@ -820,11 +820,11 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		}
 
 		var issueIdArray = [];
-		jQuery(
+		junoJQuery(
 			"#noteIssueIdList input:checkbox[name=issue_id]:checked, #noteIssues input:checkbox[name=issue_id]:checked"
 		).each(function()
 		{
-			issueIdArray.push(jQuery(this).val());
+			issueIdArray.push(junoJQuery(this).val());
 		});
 
 		var me = this;
@@ -832,7 +832,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		{
 			noteData.assignedIssues = assignedIssueArray;
 
-			jQuery.ajax({
+			junoJQuery.ajax({
 				async: async,
 				type: "POST",
 				contentType: "application/json",
@@ -849,7 +849,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 					{
 						// Set the saved note as the current note
 						me.updateNoteInPageState(response.body, assignedIssueArray);
-						var currentlyEditedNoteDiv = jQuery('div#n' + noteId).parent();
+						var currentlyEditedNoteDiv = junoJQuery('div#n' + noteId).parent();
 						me.replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, assignedIssueArray, demographicNo, true);
 
 						lastTmpSaveNote = null;
@@ -902,7 +902,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.setNoteError = function setNoteError(errorMessage)
 	{
-		jQuery("div#noteSaveErrorMessage").text(errorMessage);
+		junoJQuery("div#noteSaveErrorMessage").text(errorMessage);
 	};
 
 	this.clearNoteError = function clearNoteError()
@@ -912,7 +912,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.setNoteStatus = function setNoteStatus(message)
 	{
-		jQuery("div#noteSaveStatusMessage").text(message);
+		junoJQuery("div#noteSaveStatusMessage").text(message);
 	};
 
 	this.clearNoteStatus = function clearNoteStatus()
@@ -948,27 +948,27 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var url = "../ws/rs/notes/" + demographicNo + "/all?numToReturn=" + numToReturn +
 		"&offset=" + offset;
 
-		if(jQuery.isArray(this.pageState.filteredProviders))
+		if(junoJQuery.isArray(this.pageState.filteredProviders))
 		{
 			//for(var i = 0; i < filteredProviders.length; i++)
-			jQuery.each(this.pageState.filteredProviders, function(index, value)
+			junoJQuery.each(this.pageState.filteredProviders, function(index, value)
 			{
 				url += "&providerNoFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(jQuery.isArray(this.pageState.filteredRoles))
+		if(junoJQuery.isArray(this.pageState.filteredRoles))
 		{
-			jQuery.each(this.pageState.filteredRoles, function(index, value)
+			junoJQuery.each(this.pageState.filteredRoles, function(index, value)
 			{
 				url += "&roleNoFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(jQuery.isArray(this.pageState.filteredIssues))
+		if(junoJQuery.isArray(this.pageState.filteredIssues))
 		{
 			//for(var i = 0; i < filteredIssues.length; i++)
-			jQuery.each(this.pageState.filteredIssues, function(index, value)
+			junoJQuery.each(this.pageState.filteredIssues, function(index, value)
 			{
 				url += "&issueFilter=" + encodeURIComponent(value);
 			});
@@ -984,29 +984,29 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.clearNotes = function clearNotes()
 	{
-		jQuery('div#encMainDiv').empty();
+		junoJQuery('div#encMainDiv').empty();
 	};
 
 	this.notesLoader = function notesLoader(ctx, offset, numToReturn, demographicNo, scrollToBottom)
 	{
-		var deferred = jQuery.Deferred();
+		var deferred = junoJQuery.Deferred();
 		$("notesLoading").style.display = "inline";
 
-		var noteToEditDeferred = jQuery.ajax({
+		var noteToEditDeferred = junoJQuery.ajax({
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
 			url: "../ws/rs/notes/" + demographicNo + "/noteToEdit/latest"
 		});
 
-		var noteListDeferred = jQuery.ajax({
+		var noteListDeferred = junoJQuery.ajax({
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
 			url: this.buildNoteLoaderUrl(demographicNo, numToReturn, offset),
 		});
 
-		var tmpSaveDeferred = jQuery.ajax({
+		var tmpSaveDeferred = junoJQuery.ajax({
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
@@ -1014,7 +1014,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		});
 
 		var me = this;
-		jQuery.when(noteListDeferred, noteToEditDeferred, tmpSaveDeferred).done(
+		junoJQuery.when(noteListDeferred, noteToEditDeferred, tmpSaveDeferred).done(
 			function (noteListResponse, noteToEditResponse, tmpSaveResponse)
 			{
 				// XXX: handle error (check response[1] = 'success')
@@ -1134,7 +1134,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.expandAllNotes = function expandAllNotes()
 	{
-		var shrunkNotes = jQuery("[id^=minimizedNote]").filter(":visible");
+		var shrunkNotes = junoJQuery("[id^=minimizedNote]").filter(":visible");
 
 		var me = this;
 		shrunkNotes.each(function()
@@ -1155,32 +1155,32 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		if (shrink)
 		{
-			jQuery(noteDivId).hide();
-			jQuery(minimizedNoteDivId).show();
+			junoJQuery(noteDivId).hide();
+			junoJQuery(minimizedNoteDivId).show();
 		}
 		else
 		{
-			jQuery(minimizedNoteDivId).hide();
-			jQuery(noteDivId).show();
+			junoJQuery(minimizedNoteDivId).hide();
+			junoJQuery(noteDivId).show();
 		}
 	};
 
 	this.copyCppToCurrentNote = function copyCppToCurrentNote()
 	{
-		var noteId = jQuery("input#editNoteId").val();
+		var noteId = junoJQuery("input#editNoteId").val();
 		var noteData = this.getNoteDataById(noteId);
 
 		var currentNoteText = noteData.note;
 
 		currentNoteText += "\n";
-		currentNoteText += jQuery("#noteEditTxt").val();
+		currentNoteText += junoJQuery("#noteEditTxt").val();
 
-		jQuery("#caseNote_note" + noteId).val(currentNoteText);
+		junoJQuery("#caseNote_note" + noteId).val(currentNoteText);
 	};
 
 	this.spellCheck = function spellCheck()
 	{
-		var noteId = jQuery("input#editNoteId").val();
+		var noteId = junoJQuery("input#editNoteId").val();
 		var caseNote = "caseNote_note" + noteId;
 
 		// Build an array of form elements (not there values)
@@ -1195,7 +1195,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.onClosing = function onClosing()
 	{
-		var noteId = jQuery("input#editNoteId").val();
+		var noteId = junoJQuery("input#editNoteId").val();
 
 		// Prepare data
 		var noteData = this.getNoteDataById(noteId);

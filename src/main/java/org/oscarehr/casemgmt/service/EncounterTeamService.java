@@ -48,6 +48,21 @@ public class EncounterTeamService extends EncounterSectionService
 	private static final String SECTION_CONTACTS_TITLE_KEY = "global.contacts";
 	private static final String SECTION_TITLE_COLOUR = "#6699CC";
 
+	private static final String CONTACT_OK = "Ok to contact";
+	private static final String CONTACT_NOT_OK = "Do not contact";
+	private static final String CONTACT_OK_PREFIX = "";
+	private static final String CONTACT_NOT_OK_PREFIX = "*";
+
+	private static final int NAME_MAX_LENGTH = 20;
+	private static final int NAME_SHORTED = 17;
+	private static final int SPECIALTY_MAX_LENGTH = 14;
+	private static final int SPECIALTY_SHORTED = 11;
+	private static final int PHONE_MAX_LENGTH = 17;
+	private static final int PHONE_SHORTED = 14;
+
+	private static final String WIN_NAME_PREFIX = "AddContact";
+
+
 	@Autowired
 	DemographicContactDao demographicContactDao;
 
@@ -107,7 +122,7 @@ public class EncounterTeamService extends EncounterSectionService
 			height = 900;
 		}
 
-		String winName = "AddContact" + sectionParams.getDemographicNo();
+		String winName = WIN_NAME_PREFIX + sectionParams.getDemographicNo();
 		return "popupPage(" + height + "," + width + ",'" + winName + "','" + pathedit + "');";
 	}
 
@@ -195,13 +210,31 @@ public class EncounterTeamService extends EncounterSectionService
 
 				EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-				String itemHeader = StringUtils.maxLenString(name, 20, 17, ELLIPSES) +
-						((specialty.length()>0)?StringUtils.maxLenString("  "+ specialty, 14, 11, ELLIPSES):"") +
-						((workPhone.length()>0)?StringUtils.maxLenString("  "+workPhone, 17, 14, ELLIPSES):"");
+				String text = StringUtils.maxLenString(name, NAME_MAX_LENGTH, NAME_SHORTED, ELLIPSES);
 
-				sectionNote.setText((contact.isConsentToContact()?"":"*") + itemHeader);
+				if(specialty.length() > 0)
+				{
+					text += StringUtils.maxLenString("  " + specialty, SPECIALTY_MAX_LENGTH, SPECIALTY_SHORTED, ELLIPSES);
+				}
 
-				String winName = "AddContact" + sectionParams.getDemographicNo();
+				if(workPhone.length() > 0)
+				{
+					text += StringUtils.maxLenString("  " + workPhone, PHONE_MAX_LENGTH, PHONE_SHORTED, ELLIPSES);
+				}
+
+
+				String consent = CONTACT_OK;
+				String consentPrefix = CONTACT_OK_PREFIX;
+				if(!contact.isConsentToContact())
+				{
+					consent = CONTACT_NOT_OK;
+					consentPrefix = CONTACT_NOT_OK_PREFIX;
+				}
+
+				sectionNote.setText(consentPrefix + text);
+				sectionNote.setTitle(name + " " + specialty + " " + workPhone + " " + consent);
+
+				String winName = WIN_NAME_PREFIX + sectionParams.getDemographicNo();
 				int hash = Math.abs(winName.hashCode());
 				String onClickString = "";
 

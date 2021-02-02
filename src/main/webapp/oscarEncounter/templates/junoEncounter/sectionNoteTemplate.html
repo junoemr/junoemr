@@ -1,3 +1,8 @@
+{{! ============================================================================== }}
+{{! NOTE: This template is duplicated in junoEncounter.jsp and any                 }}
+{{!       modifications will need to be done in both places.  This should be       }}
+{{!       changed at some point to share a template.                               }}
+{{! ============================================================================== }}
 <li class="encounterNote \${rowClass}">
     {{if showExpand }}
     <a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', true, false); return false;" title="\${remainingNotes} more items">
@@ -20,12 +25,12 @@
                             onmouseout="this.className='links'"
                             href="#"
                             onclick="\${onClick};return false;"
-                            title="Flu=Influenza vaccine"
+                            title="\${title}"
                     >
 						\${text}
 					</a>
 				</span>
-    <span class="encounterNoteDate">
+    <span class="encounterNoteDate \${rowClass}">
 					{{if updateDateFormatted}}...{{/if}}<a
             class="links"
             style="margin-right: 2px; color: \${colour};"
@@ -33,7 +38,7 @@
             onmouseout="this.className='links'"
             href="#"
             onclick="\${onClick};return false;"
-            title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+            title="\${title}"
     >
 						\${value}
 						\${updateDateFormatted}

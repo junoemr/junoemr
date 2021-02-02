@@ -29,7 +29,10 @@ import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.casemgmt.exception.EncounterSectionException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.UrlUtils;
+import oscar.util.ConversionUtils;
+import oscar.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -168,6 +171,23 @@ public abstract class EncounterSectionService
 		menuItem.setText(text);
 		menuItem.setTextKey(textKey);
 		menuItems.add(menuItem);
+	}
+
+	protected static String formatTitleWithLocalDateTime(String title, LocalDateTime dateTime)
+	{
+		String formattedTitle = title;
+
+		if(dateTime != null)
+		{
+			formattedTitle += " " + ConversionUtils.toDateString(dateTime);
+		}
+
+		return formattedTitle;
+	}
+
+	protected static String getTrimmedText(String text)
+	{
+		return StringUtils.maxLenString(text, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 	}
 
 	public static class SectionParameters

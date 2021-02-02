@@ -36,7 +36,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 	{
 		if(this.pageState.filterShows)
 		{
-			jQuery('#filter').hide();
+			junoJQuery('#filter').hide();
 			this.pageState.filterShows = false;
 		}
 	};
@@ -105,7 +105,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 		this.pageState.filteredIssues = [];
 
 		var me = this;
-		jQuery("input[name=filter_providers]:checked").each(function(index, object)
+		junoJQuery("input[name=filter_providers]:checked").each(function(index, object)
 		{
 			if(object.value === 'a')
 			{
@@ -115,7 +115,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 			me.pageState.filteredProviders.push(object.value);
 		});
 
-		jQuery("input[name=filter_roles]:checked").each(function(index, object)
+		junoJQuery("input[name=filter_roles]:checked").each(function(index, object)
 		{
 			if(object.value === 'a')
 			{
@@ -125,7 +125,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 			me.pageState.filteredRoles.push(object.value);
 		});
 
-		jQuery("input[name=filter_issues]:checked").each(function(index, object)
+		junoJQuery("input[name=filter_issues]:checked").each(function(index, object)
 		{
 			if(object.value === 'a')
 			{
@@ -135,7 +135,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 			me.pageState.filteredIssues.push(object.value);
 		});
 
-		var note_sort = jQuery("input[name=note_sort]:checked");
+		var note_sort = junoJQuery("input[name=note_sort]:checked");
 
 		if(note_sort.val())
 		{
@@ -197,23 +197,23 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 	this.showFiltersOfType = function showFiltersOfType(containerDivId, valueArray, textIdPrefix)
 	{
 		// Clear existing filters
-		var containerDiv = jQuery("#" + containerDivId + "Content");
+		var containerDiv = junoJQuery("#" + containerDivId + "Content");
 
 		containerDiv.empty();
 
-		if(!jQuery.isArray(valueArray) || valueArray.length === 0 ||
+		if(!junoJQuery.isArray(valueArray) || valueArray.length === 0 ||
 			(valueArray.length === 1 && !valueArray[0])
 		)
 		{
-			jQuery("#" + containerDivId).hide();
+			junoJQuery("#" + containerDivId).hide();
 			return;
 		}
 
-		jQuery("#" + containerDivId).show();
+		junoJQuery("#" + containerDivId).show();
 
-		jQuery.each(valueArray, function(index, value)
+		junoJQuery.each(valueArray, function(index, value)
 		{
-			var value = jQuery(textIdPrefix + value).text().trim();
+			var value = junoJQuery(textIdPrefix + value).text().trim();
 
 			containerDiv.append(value + "<br />");
 		});
@@ -222,6 +222,6 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 
 	this.selectIssueFilterValue = function selectIssueFilterValue(value)
 	{
-		jQuery("input[name='filter_issues'][value='" + value + "']").prop("checked", true);
+		junoJQuery("input[name='filter_issues'][value='" + value + "']").prop("checked", true);
 	}
 };

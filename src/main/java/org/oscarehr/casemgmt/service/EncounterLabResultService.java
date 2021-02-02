@@ -35,10 +35,9 @@ import oscar.oscarEncounter.pageUtil.EctDisplayLabAction2;
 import oscar.oscarLab.ca.all.web.LabDisplayHelper;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
-import oscar.util.StringUtils;
+import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -215,9 +214,8 @@ public class EncounterLabResultService extends EncounterSectionService
 
 			// Date
 			Date date = EctDisplayLabAction2.getServiceDate(sectionParams.getLoggedInInfo(), result);
-			LocalDateTime serviceDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+			LocalDateTime serviceDate = ConversionUtils.toLocalDateTime(date);
 			sectionNote.setUpdateDate(serviceDate);
-
 
 			// Colour
 			if (result.isAbnormal())
@@ -237,22 +235,21 @@ public class EncounterLabResultService extends EncounterSectionService
 				labDisplayName = label;
 			}
 
-			// XXX: Boooo!
+			// Put stars around a lab if it is not read
 			String labRead = "";
 			if (!oscarLogDao.hasRead(sectionParams.getProviderNo(), "lab", result.segmentID))
 			{
 				labRead = "*";
 			}
 
-
-			labDisplayName = StringUtils.maxLenString(labDisplayName, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 			if (labDisplayName == null)
 			{
 				labDisplayName = "";
 			}
 
-			sectionNote.setText(labRead + labDisplayName + labRead);
+			sectionNote.setText(EncounterSectionService.getTrimmedText(labRead + labDisplayName + labRead));
 
+			sectionNote.setTitle(EncounterSectionService.formatTitleWithLocalDateTime(labDisplayName, serviceDate));
 
 			// Link onClick
 			String remoteFacilityIdQueryString = "";

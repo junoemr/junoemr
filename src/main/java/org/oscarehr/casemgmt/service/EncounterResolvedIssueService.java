@@ -28,7 +28,6 @@ import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
-import oscar.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,11 +92,10 @@ public class EncounterResolvedIssueService extends EncounterSectionService
 			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 
 			CaseManagementIssue issue = issues.get(idx);
-			String tmp = issue.getIssue().getDescription();
+			String text = issue.getIssue().getDescription();
 
-			String strTitle = StringUtils.maxLenString(tmp, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-
-			sectionNote.setText(strTitle);
+			sectionNote.setText(EncounterSectionService.getTrimmedText(text));
+			sectionNote.setTitle(text);
 
 			String onClickString = "noteFilter.selectIssueFilterValue('" + issue.getIssue().getId() + "');return noteFilter.filter(false);";
 			sectionNote.setOnClick(onClickString);

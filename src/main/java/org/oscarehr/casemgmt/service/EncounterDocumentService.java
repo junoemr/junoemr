@@ -29,6 +29,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.time.LocalDate;
@@ -168,14 +169,18 @@ public class EncounterDocumentService extends EncounterSectionService
 			String dateString = curDoc.getObservationDate();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dbFormat);
 			LocalDate date;
+			String formattedDate = "";
 			try
 			{
 				date = LocalDate.parse(dateString, formatter);
 				sectionNote.setUpdateDate(date.atStartOfDay());
+				formattedDate = ConversionUtils.toDateTimeString(date.atStartOfDay(), ConversionUtils.DEFAULT_DATE_PATTERN);
 			}
 			catch(DateTimeParseException ignored) {}
 
 			sectionNote.setText(title);
+
+			sectionNote.setTitle(curDoc.getDescription() + " " + formattedDate);
 
 			String winName = curDoc.getFileName() + sectionParams.getDemographicNo();
 			int hash = Math.abs(winName.hashCode());

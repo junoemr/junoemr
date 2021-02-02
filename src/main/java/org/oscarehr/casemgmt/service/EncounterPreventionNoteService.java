@@ -38,7 +38,6 @@ import oscar.oscarPrevention.Prevention;
 import oscar.oscarPrevention.PreventionDS;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.PreventionDisplayConfig;
-import oscar.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -203,8 +202,7 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 					}
 				}
 
-				String title = StringUtils.maxLenString(h.get("name"),  MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-				sectionNote.setText(title);
+				sectionNote.setText(h.get("name"));
 				sectionNote.setOnClick(onClickString);
 
 				//if there's a warning associated with this prevention set item apart

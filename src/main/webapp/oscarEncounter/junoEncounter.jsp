@@ -164,6 +164,9 @@
 				]
 			}
 
+			// A renamed jQuery.  See the init() method for more info.
+			var junoJQuery = null;
+
 			var pageData = {
 				contextPath: "<c:out value='${pageContext.request.contextPath}' />",
 				demographicNo: "<c:out value='${junoEncounterForm.pageData.demographicNo}' />",
@@ -209,13 +212,16 @@
 				filteredProviders: [],
 				filteredRoles: [],
 				filteredIssues: [],
+				minDelta: 0.93,
+				minMain: null,
+				minWin: null,
 			};
 
 
 			var eChartUUID = "${junoEncounterForm.pageData.echartUuid}";
 
 			<%@ include file="js/JunoEncounter.js" %>
-			var junoEncounter = new Juno.OscarEncounter.JunoEncounter(pageData);
+			var junoEncounter = new Juno.OscarEncounter.JunoEncounter(pageData, pageState);
 
 			<%@ include file="js/JunoEncounter/CppNote.js" %>
 			var cppNote = new Juno.OscarEncounter.JunoEncounter.CppNote(pageData, junoEncounter);
@@ -274,11 +280,18 @@
 			<%-- this runs on $(document).ready() --%>
 			function init()
 			{
+				// Save a copy of the initially-loaded jQuery before the Ocean Toolbar can replace it.
+				// Use this for query calls, especially ones that use plugins, like templating, because they don't get
+				// loaded by the Ocean-toolbar version of jQuery.
+				junoJQuery = jQuery;
+
 				junoEncounter.monkeyPatches();
 
 				junoEncounter.initOceanToolbar();
 
 				junoEncounter.resizeContent();
+
+				junoEncounter.initNavBarMonitor();
 
 				if(!junoEncounter.configureNifty())
 				{
@@ -452,6 +465,12 @@
 					</td>
 					<td align=right>
 							<span class="HelpAboutLogout">
+								<c:if test="${junoEncounterForm.pageData.linkToOldEncounterPageEnabled}">
+									<a style="font-size:10px;font-style:normal;"
+									   href="javascript:void(0)"
+									   onClick="popupPage(700,1024, 'Encounter', 'IncomingEncounter.do?<c:out value="${requestScope['javax.servlet.forward.query_string']}" />&old_encounter=1'); return false;">
+										Open Old Encounter</a> |
+								</c:if>
 								<oscar:help
 										keywords="&Title=Chart+Interface&portal_type%3Alist=Document"
 										key="app.top1" style="font-size:10px;font-style:normal;"/>&nbsp;|
@@ -595,6 +614,11 @@
 
 							<c:forEach items="${section.notes}" var="note" varStatus="loop">
 
+								<%-- ============================================================================== --%>
+								<%-- NOTE: This template is duplicated in sectionNoteTemplate.html and any          --%>
+								<%--       modifications will need to be done in both places.  This should be       --%>
+								<%--       changed at some point to share a template.                               --%>
+								<%-- ============================================================================== --%>
 								<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 
 									<%-- Expand arrows if neccessary --%>
@@ -628,7 +652,7 @@
 												onmouseout="this.className='links ${fn:join(note.titleClasses, ' ')}'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="${note.text}"
+												title="${note.title}"
 										>
 											<c:out value="${note.text}"/>
 										</a>
@@ -641,7 +665,7 @@
 									<fmt:formatDate value="${parsedUpdateDate}"
 													pattern="dd-MMM-yyyy" var="updateDate"/>
 									<c:if test="${not empty updateDate}">
-										<span class="encounterNoteDate">
+										<span class="encounterNoteDate ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 											...<a
 												class="links"
 												style="margin-right: 2px; color: ${note.colour};"
@@ -649,7 +673,7 @@
 												onmouseout="this.className='links'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="${note.text}"
+												title="${note.title}"
 										>
 												<c:out value="${note.value}"/>
 												<c:out value="${updateDate}"/>
@@ -740,12 +764,17 @@
 								<fmt:formatDate value="${parsedObservationDate}"
 												pattern="dd-MMM-yyyy"
 												var="observationDate"/>
+								<%-- ============================================================================== --%>
+								<%-- NOTE: This template is duplicated in sectionCPPNoteTemplate.html and any       --%>
+								<%--       modifications will need to be done in both places.  This should be       --%>
+								<%--       changed at some point to share a template.                               --%>
+								<%-- ============================================================================== --%>
 								<li class="cpp ${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 									<span id="spanListNote${fn:escapeXml(noteLoop.index)}">
 										<a class="topLinks"
 										   onmouseover="this.className='topLinkhover'"
 										   onmouseout="this.className='topLinks'"
-										   title="Rev:${note.revision} - Last update:${updateDate}"
+										   title="${note.title}"
 										   id="listNote${note.id}"
 										   href="#"
 										   onclick="${note.onClick}"
@@ -1149,7 +1178,7 @@
 									   type="button"
 									   id="changeIssues"
 									   style="display: none;"
-									   onclick="caseManagementIssue.changeIssue({jQuery: jQuery}); return false;"
+									   onclick="caseManagementIssue.changeIssue({jQuery: junoJQuery}); return false;"
 									   value="<bean:message key="oscarEncounter.change.title"/>">
 								<span id="busy" style="display: none">
 									<img style="position: absolute;"

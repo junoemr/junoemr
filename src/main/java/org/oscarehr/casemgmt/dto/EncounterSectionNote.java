@@ -46,8 +46,6 @@ public class EncounterSectionNote extends MultiSearchResult
 	private String colour;
 	private String[] titleClasses;
 
-
-
 	public Integer getId()
 	{
 		return id;

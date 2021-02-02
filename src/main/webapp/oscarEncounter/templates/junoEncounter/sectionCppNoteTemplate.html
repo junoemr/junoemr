@@ -1,9 +1,14 @@
+{{! ============================================================================== }}
+{{! NOTE: This template is duplicated in junoEncounter.jsp and any                 }}
+{{!       modifications will need to be done in both places.  This should be       }}
+{{!       changed at some point to share a template.                               }}
+{{! ============================================================================== }}
 <li class="\${rowClass}">
 	<span id="spanListNote\${index}">
 		<a class="topLinks"
           onmouseover="this.className='topLinkhover'"
           onmouseout="this.className='topLinks'"
-          title="Rev:\${revision} - Last update:\${updateDateFormatted}"
+          title="\${title}"
           id="listNote\${noteId}"
           href="#"
           onclick="\${onClick};return false;"

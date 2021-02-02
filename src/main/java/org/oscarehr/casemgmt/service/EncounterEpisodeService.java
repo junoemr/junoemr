@@ -30,7 +30,6 @@ import org.oscarehr.common.model.Episode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +39,7 @@ public class EncounterEpisodeService extends EncounterSectionService
 	public static final String SECTION_ID = "episode";
 	private static final String SECTION_TITLE_KEY = "global.episode";
 	private static final String SECTION_TITLE_COLOUR = "#045228";
+	private static final String WIN_NAME = "AddEpisode";
 
 	@Override
 	public String getSectionId()
@@ -62,7 +62,7 @@ public class EncounterEpisodeService extends EncounterSectionService
 	@Override
 	protected String getOnClickPlus(SectionParameters sectionParams)
 	{
-		String winName = "AddEpisode" + sectionParams.getDemographicNo();
+		String winName = WIN_NAME + sectionParams.getDemographicNo();
 		String url = sectionParams.getContextPath() + "/Episode.do" +
 				"?method=edit" +
 				"&demographicNo=" + encodeUrlParam(sectionParams.getDemographicNo());
@@ -98,17 +98,18 @@ public class EncounterEpisodeService extends EncounterSectionService
 
 			for(Episode episode:episodes)
 			{
-				String itemHeader = StringUtils.maxLenString(episode.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
+				String text = EncounterSectionService.getTrimmedText(episode.getDescription());
 
 				EncounterSectionNote sectionNote = new EncounterSectionNote();
-				sectionNote.setText(itemHeader);
+				sectionNote.setText(text);
+				sectionNote.setTitle(episode.getDescription());
 				sectionNote.setUpdateDate(ConversionUtils.toNullableLocalDateTime(episode.getStartDate()));
 
-				String winName = "AddEpisode" + sectionParams.getDemographicNo();
+				String winName = WIN_NAME + sectionParams.getDemographicNo();
 				int hash = Math.abs(winName.hashCode());
 				String url = sectionParams.getContextPath() + "/Episode.do" +
 						"?method=edit" +
-						"&episode.id="+ encodeUrlParam(episode.getId().toString());
+						"&episode.id=" + encodeUrlParam(episode.getId().toString());
 				String onClickString = "popupPage(500,900,'" + hash + "','" + url +"');";
 				sectionNote.setOnClick(onClickString);
 

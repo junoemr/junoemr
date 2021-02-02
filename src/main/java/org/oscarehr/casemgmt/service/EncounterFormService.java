@@ -34,6 +34,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.oscarEncounter.data.EctFormData;
 import oscar.oscarLab.LabRequestReportLink;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.time.LocalDate;
@@ -216,10 +217,12 @@ public class EncounterFormService extends EncounterSectionService
 					String dateString = pfrm.getCreated();
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dbFormat);
 					LocalDate date;
+					String formattedDate = "";
 					try
 					{
 						date = LocalDate.parse(dateString, formatter);
 						sectionNote.setUpdateDate(date.atStartOfDay());
+						formattedDate = ConversionUtils.toDateString(date, ConversionUtils.DEFAULT_DATE_PATTERN);
 					}
 					catch(DateTimeParseException ignored) {}
 
@@ -240,6 +243,9 @@ public class EncounterFormService extends EncounterSectionService
 					}
 
 					sectionNote.setText(strTitle.toString());
+
+					// Link title
+					sectionNote.setTitle(fullTitle + " " + formattedDate);
 
 					// OnClick link
 					int hash = Math.abs(getWinName(sectionParams).hashCode());
@@ -292,6 +298,8 @@ public class EncounterFormService extends EncounterSectionService
 				}
 			}
 		}
+
+		Collections.sort(out, new EncounterSectionNote.SortChronologic());
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}

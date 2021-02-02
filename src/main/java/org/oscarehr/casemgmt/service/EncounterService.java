@@ -365,6 +365,9 @@ public class EncounterService
 		encounterPageData.setEncounterWindowWidth(encounterWindowWidth);
 		encounterPageData.setEncounterWindowMaximize(encounterWindowMaximize);
 
+		encounterPageData.setLinkToOldEncounterPageEnabled(
+				OscarProperties.getInstance().isJunoEncounterLinkToOldEncounterPageEnabled());
+
 		return encounterPageData;
 	}
 
