@@ -168,7 +168,7 @@ public class IntegrationPushUpdateService
 					// +1 to account for increment that is not added yet
 					if(update.getSendCount() + 1 >= MAX_SEND_ATTEMPTS)
 					{
-						update.setStatusError();
+						update.setStatusError(e);
 					}
 				}
 				finally

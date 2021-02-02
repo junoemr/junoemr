@@ -24,6 +24,7 @@ package org.oscarehr.integration.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 
@@ -102,6 +103,10 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 
 	@Column(name = "json_data")
 	private String jsonData;
+
+	@Getter @Setter
+	@Column(name = "error_message")
+	private String errorMessage;
 
 	// The identifier of the target of the update.
 	// Can be NULL. This identifier, if not NULL
@@ -217,9 +222,10 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 		this.setStatus(PUSH_STATUS.SENT);
 	}
 
-	public void setStatusError()
+	public void setStatusError(Exception e)
 	{
 		this.setStatus(PUSH_STATUS.ERROR);
+		this.setErrorMessage(e.toString() + "\n" + ExceptionUtils.getStackTrace(e));
 	}
 
 	public Integer getSendCount()
