@@ -792,18 +792,18 @@ function refreshTabAlerts(id) {
         
         List<String> ps = providerDao.getProvidersInTeam(providerDao.getProvider(curUser_no).getTeam());
         ps.add(curUser_no);
-        sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),'A',ps);
+        sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),ScheduleDate.STATUS_ACTIVE,ps);
    		
    	} else
     if(providerview.equals("all") || providerview.startsWith("_grp_",0)) {
 	      param[0] = year+"-"+month+"-"+"1";
 	      param[1] = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"1";
 		  if (selectedSite == null) {  
-		      sds = scheduleDateDao.search_scheduledate_datep(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),'A');
+		      sds = scheduleDateDao.search_scheduledate_datep(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),ScheduleDate.STATUS_ACTIVE);
 	    	}
 	    	else	{
 	    	  List<String> ps = providerSiteDao.findByProviderNoBySiteName(selectedSite);
-	    	  sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),'A',ps);
+	    	  sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),ScheduleDate.STATUS_ACTIVE,ps);
 	     		
 	      }
     } else {
@@ -811,7 +811,7 @@ function refreshTabAlerts(id) {
       param1[0] = year+"-"+month+"-"+"1";
       param1[1] = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"1";
       param1[2] = providerview;
-      sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),'A',Arrays.asList(new String[]{providerview}));
+      sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),ScheduleDate.STATUS_ACTIVE,Arrays.asList(new String[]{providerview}));
    	
     }
 

@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -155,7 +156,7 @@ public class EncounterTicklerService extends EncounterSectionService
 			sectionNote.setUpdateDate(serviceDate);
 
 			// Colour
-			if(serviceDate.isBefore(LocalDateTime.now().toLocalDate().atStartOfDay()))
+			if(serviceDate.isBefore(LocalDate.now().atStartOfDay()))
 			{
 				sectionNote.setColour(BEFORE_COLOUR);
 			}
