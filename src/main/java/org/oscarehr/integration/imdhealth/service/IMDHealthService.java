@@ -296,7 +296,8 @@ public class IMDHealthService
 			if (siteId == null)
 			{
 				Clinic clinic = clinicDao.getClinic();
-				organization = SSOOrganization.fromClinic(clinic, practiceId);
+				String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
+				organization = SSOOrganization.fromClinic(clinic, practiceId, provinceCode);
 			}
 			else
 			{
