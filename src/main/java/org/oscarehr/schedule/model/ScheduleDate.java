@@ -46,6 +46,7 @@ import javax.persistence.TemporalType;
 @Table(name="scheduledate")
 public class ScheduleDate extends AbstractModel<Integer>
 {
+	public static final char STATUS_ACTIVE = 'A';
 	public static final char STATUS_DELETED = 'D';
 	public static final String AVAILABLE = "1";
 	public static final String UNAVAILABLE = "0";
