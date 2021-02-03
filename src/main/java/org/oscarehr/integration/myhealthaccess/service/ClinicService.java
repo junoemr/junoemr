@@ -28,17 +28,16 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.model.UserIntegrationAccess;
-import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
 import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
-import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidUserIntegrationException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
@@ -99,6 +98,11 @@ public class ClinicService extends BaseService
 	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(Integration integration, Integer securityNo) throws InvalidIntegrationException
 	{
 		Security security = securityDao.find(securityNo);
+		if (security == null)
+		{
+			throw new RecordNotFoundException("Security record [" + securityNo + "] was not found");
+		}
+
 		ProviderData provider = providerDataDao.find(security.getProviderNo());
 		if (security != null && provider != null)
 		{

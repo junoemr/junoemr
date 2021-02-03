@@ -56,6 +56,11 @@ public class GenericErrorTo1 implements Serializable
 
 	@Getter
 	@Setter
+	@JsonProperty("error_description")
+	private String errorDescription;
+
+	@Getter
+	@Setter
 	@JsonProperty("data")
 	private Map<String, String> data;
 
@@ -71,6 +76,7 @@ public class GenericErrorTo1 implements Serializable
 
 		return "Error Code: " + this.code +
 				"\nError Message: " + this.message +
+				"\nError Description: " + this.errorDescription +
 				"\nError Data: " + dataString;
 	}
 }

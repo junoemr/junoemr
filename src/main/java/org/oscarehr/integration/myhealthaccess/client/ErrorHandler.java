@@ -26,6 +26,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.oscarehr.integration.myhealthaccess.dto.GenericErrorTo1;
 import org.oscarehr.integration.myhealthaccess.exception.CommunicationException;
+import org.oscarehr.integration.myhealthaccess.exception.DuplicateRecordException;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
+import org.oscarehr.integration.myhealthaccess.exception.SessionExpiredException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -49,7 +53,7 @@ public class ErrorHandler implements ResponseErrorHandler
 		try
 		{
 			GenericErrorTo1 genericError = new ObjectMapper().readValue(body, GenericErrorTo1.class);
-			throw new CommunicationException("MHA server responded with error.", genericError);
+			this.throwExceptionByErrorType(genericError);
 		}
 		catch(IOException e)
 		{
@@ -57,6 +61,25 @@ public class ErrorHandler implements ResponseErrorHandler
 					"Failed to deserialize MHA error response with error:\n" + e + "\n" + clientHttpResponse.getBody().toString(),
 					null,
 					e);
+		}
+	}
+
+	public void throwExceptionByErrorType(GenericErrorTo1 genericErrorTo1)
+	{
+		switch (genericErrorTo1.getCode())
+		{
+			case GenericErrorTo1.ERROR_RECORD_NOT_FOUND:
+				throw new RecordNotFoundException("Unable to find MyHealthAccess record");
+			case GenericErrorTo1.ERROR_DUPLICATE_RECORD:
+				throw new DuplicateRecordException("Duplicate MyHealthAccess record for key found");
+			case GenericErrorTo1.ERROR_SESSION_EXPIRED:
+				throw new SessionExpiredException("Your session has expired");
+			case GenericErrorTo1.ERROR_AUTHENTICATION:
+				throw new InvalidAccessException("Authentication Failure");
+			case GenericErrorTo1.ERROR_ACCESS:
+				throw new InvalidAccessException("Invalid Email/Password");
+			default:
+				throw new CommunicationException("MHA server responded with error.", genericErrorTo1);
 		}
 	}
 }
