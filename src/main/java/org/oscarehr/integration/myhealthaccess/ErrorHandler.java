@@ -86,6 +86,8 @@ public class ErrorHandler <T> extends DefaultResponseErrorHandler
 
 	public static void handleError(BaseException e)
 	{
+		// YES IT KNOW THIS FUNCTIONALITY WAS LOST. I WILL FIX TOMORROW. I CANT USE UPSOURCE FROM HOME, I JUST
+		// SEE, "SERVICE UNAVAILABLE". WIP WIP WIP WIP WIP
 		MiscUtils.getLogger().error("HANDLING base exception");
 		if (e.getErrorObject().hasGenericErrors())
 		{

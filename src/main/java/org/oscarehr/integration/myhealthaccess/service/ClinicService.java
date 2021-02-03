@@ -70,15 +70,8 @@ public class ClinicService extends BaseService
 		ClinicUserCreateResponseTo1 response = null;
 		String clinicId = integrationData.getIntegration().getRemoteId();
 
-		try
-		{
-			endpoint = restClient.formatEndpoint(endpoint, clinicId);
-			response = restClient.doPost(endpoint, newUser, ClinicUserCreateResponseTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
+		endpoint = restClient.formatEndpoint(endpoint, clinicId);
+		response = restClient.doPost(endpoint, newUser, ClinicUserCreateResponseTo1.class);
 
 		return response;
 	}
@@ -161,17 +154,11 @@ public class ClinicService extends BaseService
 		String remoteUserId = integrationData.getRemoteUserId();
 
 		ClinicUserLoginTokenTo1 loginToken = null;
-		try
-		{
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("X-API-Key", integrationData.getUserApiKey());
-			endpoint = restClient.formatEndpoint(endpoint, remoteUserId);
-			loginToken = restClient.doPost(endpoint, headers, null, ClinicUserLoginTokenTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("X-API-Key", integrationData.getUserApiKey());
+		endpoint = restClient.formatEndpoint(endpoint, remoteUserId);
+		loginToken = restClient.doPost(endpoint, headers, null, ClinicUserLoginTokenTo1.class);
 
 		return loginToken;
 	}
@@ -185,15 +172,8 @@ public class ClinicService extends BaseService
 
 		ClinicStatusResponseTo1 response = null;
 
-		try
-		{
-			endpoint = restClient.formatEndpoint(endpoint, clinicId);
-			response = restClient.doGet(endpoint, ClinicStatusResponseTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
+		endpoint = restClient.formatEndpoint(endpoint, clinicId);
+		response = restClient.doGet(endpoint, ClinicStatusResponseTo1.class);
 
 		return response;
 	}

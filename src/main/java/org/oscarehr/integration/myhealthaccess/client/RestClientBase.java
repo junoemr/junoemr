@@ -57,6 +57,7 @@ public abstract class RestClientBase extends RESTClient
 	public RestClientBase(Integration integration)
 	{
 		this.integration = integration;
+		this.setErrorHandler(new ErrorHandler());
 	}
 
 	public String formatEndpoint(String endpoint, Object... args)

@@ -70,18 +70,11 @@ public class AppointmentService extends BaseService
 		String clinicId = integrationData.getIntegration().getRemoteId();
 		String appointmentId = appointmentTransfer.getId();
 
-		try
+		endpoint = restClient.formatEndpoint(endpoint, clinicId, appointmentId);
+		Boolean response = restClient.doPut(endpoint, appointmentTransfer, Boolean.class);
+		if(!response)
 		{
-			endpoint = restClient.formatEndpoint(endpoint, clinicId, appointmentId);
-			Boolean response = restClient.doPut(endpoint, appointmentTransfer, Boolean.class);
-			if(!response)
-			{
-				throw new RuntimeException("Got bad response status: " + response);
-			}
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
+			throw new RuntimeException("Got bad response status: " + response);
 		}
 	}
 
