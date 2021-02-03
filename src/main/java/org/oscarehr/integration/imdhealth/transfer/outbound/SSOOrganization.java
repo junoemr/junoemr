@@ -54,7 +54,7 @@ public class SSOOrganization implements Serializable
 
     */
 
-	public static SSOOrganization fromClinic(Clinic clinic, String practiceId)
+	public static SSOOrganization fromClinic(Clinic clinic, String practiceId, String provCode)
 	{
 		if (StringUtils.isBlank(practiceId))
 		{
@@ -70,8 +70,10 @@ public class SSOOrganization implements Serializable
 		org.setExternalId("juno_"+ practiceId);
 		org.setMunicipality(clinic.getClinicCity());
 		org.setName(clinic.getClinicName());
-		org.setSubdivisionCode(clinic.getClinicProvince());
 
+		// Use the instance type as the province code, instead of the clinic's province, because the former is enumerated
+		// to ISO-3166 and the latter is a raw string.
+		org.setSubdivisionCode(provCode);
 		return org;
 	}
 

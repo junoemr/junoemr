@@ -36,9 +36,9 @@ public class SSOCredentials implements Serializable
 	@JsonProperty("access_token")
 	private String accessToken;
 
-	@JsonProperty("membershipId")
+	@JsonProperty("membership_id")
 	private String membershipId;
 
-	@JsonProperty("organizationId")
+	@JsonProperty("organization_id")
 	private String organizationId;
 }
