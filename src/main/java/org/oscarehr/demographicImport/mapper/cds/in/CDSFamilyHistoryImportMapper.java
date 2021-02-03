@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CDSFamilyHistoryImportMapper extends AbstractCDSImportMapper<FamilyHistory, FamilyHistoryNote>
+public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<FamilyHistory, FamilyHistoryNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSFamilyHistoryImportMapper.class);
 

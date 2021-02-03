@@ -39,7 +39,7 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_IN
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_START_DATE;
 
 @Component
-public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<PersonalHistory, SocialHistoryNote>
+public class CDSPersonalHistoryImportMapper extends AbstractCDSNoteImportMapper<PersonalHistory, SocialHistoryNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSPersonalHistoryImportMapper.class);
 
@@ -101,6 +101,12 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 		if(note.getNoteText().isEmpty())
 		{
 			logger.warn("SocialHistoryNote has no text value");
+		}
+
+		// use another date if no observation date
+		if(note.getObservationDate() == null)
+		{
+			note.setObservationDate(coalescePartialDates(note.getStartDate(), note.getResolutionDate()));
 		}
 
 		return note;

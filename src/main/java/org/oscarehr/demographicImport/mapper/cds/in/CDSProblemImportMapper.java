@@ -23,12 +23,11 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ProblemList;
-import org.oscarehr.common.xml.cds.v5_0.model.StandardCoding;
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList, ConcernNote>
+public class CDSProblemImportMapper extends AbstractCDSNoteImportMapper<ProblemList, ConcernNote>
 {
 	public CDSProblemImportMapper()
 	{
@@ -40,42 +39,15 @@ public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList,
 	{
 		ConcernNote note = new ConcernNote();
 
-		note.setNoteText(getNoteText(importStructure));
+		note.setNoteText(getDiagnosisNoteText(importStructure.getProblemDiagnosisDescription(), importStructure.getDiagnosisCode()));
 		note.setProblemDescription(importStructure.getProblemDescription());
 		note.setProblemStatus(importStructure.getProblemStatus());
 		note.setStartDate(toNullablePartialDate(importStructure.getOnsetDate()));
 		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));
 		note.setResolutionDate(toNullablePartialDate(importStructure.getResolutionDate()));
 		note.setAnnotation(importStructure.getNotes());
+		note.setObservationDate(coalescePartialDates(note.getStartDate(), note.getResolutionDate()));
 
 		return note;
-	}
-
-	protected String getNoteText(ProblemList importStructure)
-	{
-		String noteText;
-		String description = importStructure.getProblemDiagnosisDescription();
-		StandardCoding diagnosisCode = importStructure.getDiagnosisCode();
-		if(diagnosisCode != null)
-		{
-			String codeDescription = diagnosisCode.getStandardCodeDescription();
-			noteText = "Diagnosis Code [" + diagnosisCode.getStandardCodingSystem() + "]: " + diagnosisCode.getStandardCode()
-					+ "\n" + codeDescription;
-
-			// sometimes the two descriptions will be the same, according to spec. in that case no need to duplicate it
-			if(description != null && !description.equals(codeDescription))
-			{
-				noteText += "\n" + description;
-			}
-		}
-		else if(description != null)
-		{
-			noteText = description;
-		}
-		else
-		{
-			noteText = "Import: No description available";
-		}
-		return  noteText;
 	}
 }

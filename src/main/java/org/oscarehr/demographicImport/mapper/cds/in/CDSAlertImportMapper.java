@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpecialNeeds, ReminderNote>
+public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndSpecialNeeds, ReminderNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSAlertImportMapper.class);
 
@@ -44,6 +44,7 @@ public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpeci
 		ReminderNote reminderNote = new ReminderNote();
 		reminderNote.setStartDate(toNullablePartialDate(importStructure.getDateActive()));
 		reminderNote.setResolutionDate(toNullablePartialDate(importStructure.getEndDate()));
+		reminderNote.setObservationDate(coalescePartialDates(reminderNote.getStartDate(), reminderNote.getResolutionDate()));
 
 		String noteText = StringUtils.trimToEmpty(
 				StringUtils.trimToEmpty(importStructure.getAlertDescription()) + "\n" + StringUtils.trimToEmpty(importStructure.getNotes())

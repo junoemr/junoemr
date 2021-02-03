@@ -1,0 +1,140 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+package org.oscarehr.demographicImport.mapper.cds.in;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
+import org.oscarehr.common.xml.cds.v5_0.model.StandardCoding;
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class CDSNoteImportMapperTest
+{
+	@Autowired
+	@InjectMocks
+	private CDSProblemImportMapper cdsProblemImportMapper;
+
+	@Before
+	public void setUp()
+	{
+		MockitoAnnotations.initMocks(this);
+	}
+
+	@Test
+	public void testCoalescePartialDates_Null()
+	{
+		assertNull(cdsProblemImportMapper.coalescePartialDates((PartialDate) null));
+		assertNull(cdsProblemImportMapper.coalescePartialDates(null, null));
+		assertNull(cdsProblemImportMapper.coalescePartialDates(null, null, null));
+	}
+
+	@Test
+	public void testCoalescePartialDates_FirstChoice()
+	{
+		PartialDate expectedPartialDate = new PartialDate(2021, 2, 3);
+		LocalDateTime expectedDateTime = LocalDateTime.of(2021, 2, 3, 0,0,0);
+
+		assertEquals(expectedDateTime, cdsProblemImportMapper.coalescePartialDates(expectedPartialDate));
+	}
+
+	@Test
+	public void testCoalescePartialDates_SecondChoice()
+	{
+		PartialDate expectedPartialDate = new PartialDate(2021, 2, 3);
+		LocalDateTime expectedDateTime = LocalDateTime.of(2021, 2, 3, 0,0,0);
+
+		assertEquals(expectedDateTime, cdsProblemImportMapper.coalescePartialDates(null, expectedPartialDate));
+	}
+
+	@Test
+	public void testGetDiagnosisNoteText_Null()
+	{
+		assertEquals(AbstractCDSNoteImportMapper.DEFAULT_NOTE_TEXT, cdsProblemImportMapper.getDiagnosisNoteText(null, null));
+	}
+
+	@Test
+	public void testGetDiagnosisNoteText_Description_NullCode()
+	{
+		String expectedDescription = "This is a note description";
+		assertEquals(expectedDescription, cdsProblemImportMapper.getDiagnosisNoteText(expectedDescription, null));
+	}
+
+	@Test
+	public void testGetDiagnosisNoteText_Description_UniqueCode()
+	{
+		String expectedDescription = "This is a note description";
+		String expectedCode = "E11";
+		String expectedCodeDescription = "Type 2 diabetes mellitus";
+		String expectedCodeSystem = "ICD-10-CA";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		StandardCoding standardCoding = objectFactory.createStandardCoding();
+		standardCoding.setStandardCode(expectedCode);
+		standardCoding.setStandardCodeDescription(expectedCodeDescription);
+		standardCoding.setStandardCodingSystem(expectedCodeSystem);
+
+		String resultText = cdsProblemImportMapper.getDiagnosisNoteText(expectedDescription, standardCoding);
+		assertTrue(resultText.contains(expectedCode));
+		assertTrue(resultText.contains(expectedCodeSystem));
+		assertTrue(resultText.contains(expectedCodeDescription));
+		assertTrue(resultText.contains(expectedDescription));
+	}
+
+	@Test
+	public void testGetDiagnosisNoteText_Description_CodeMatchesDescription()
+	{
+		String expectedCode = "E11";
+		String expectedCodeDescription = "Type 2 diabetes mellitus";
+		String expectedCodeSystem = "ICD-10-CA";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		StandardCoding standardCoding = objectFactory.createStandardCoding();
+		standardCoding.setStandardCode(expectedCode);
+		standardCoding.setStandardCodeDescription(expectedCodeDescription);
+		standardCoding.setStandardCodingSystem(expectedCodeSystem);
+
+		String resultText = cdsProblemImportMapper.getDiagnosisNoteText(expectedCodeDescription, standardCoding);
+		assertTrue(resultText.contains(expectedCode));
+		assertTrue(resultText.contains(expectedCodeSystem));
+		assertTrue(resultText.contains(expectedCodeDescription));
+		assertTrue(containsExactlyOnce(resultText, expectedCodeDescription));
+	}
+
+	private boolean containsExactlyOnce(String string, String substring)
+	{
+		Pattern pattern = Pattern.compile(substring);
+		Matcher matcher = pattern.matcher(string);
+		return matcher.find() && !matcher.find();
+	}
+}

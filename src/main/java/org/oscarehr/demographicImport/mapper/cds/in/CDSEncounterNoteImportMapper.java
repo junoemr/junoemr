@@ -32,7 +32,7 @@ import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<ClinicalNotes, EncounterNote>
+public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<ClinicalNotes, EncounterNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSEncounterNoteImportMapper.class);
 
