@@ -9,6 +9,7 @@ import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
 import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
+import HinValidator from "../common/util/hinValidator";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -282,6 +283,22 @@ angular.module('Schedule').component('eventComponent', {
 						$scope.cancel();
 					});
 				}
+
+				controller.validations = {
+					appointmentTime: Juno.Validations.validationCustom(() =>
+					{
+							if (controller.ngModel.hin)
+							{
+								return HinValidator.healthCardNumber(controller.ngModel.hcType, controller.ngModel.hin);
+							}
+							else
+							{
+								return true;
+							}
+						return false;
+					}),
+					appointmentDuration: Juno.Validations.validationCustom(() => controller.effectiveDateValid),
+				};
 
 				// resolve data from opener
 				controller.loadedSettings = controller.resolve.loadedSettings;
@@ -667,6 +684,8 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 				var momentEnd = controller.calculateEndTime();
 
+				if (!momentEnd) { return; }
+
 				controller.isDoubleBook = false;
 				controller.isDoubleBookPrevented = false;
 				modalContent.removeClass("double-book double-book-prevented");
@@ -932,7 +951,18 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				var momentStart = Juno.Common.Util.getDateAndTimeMoment(
 					$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-				return momentStart.add($scope.eventData.duration, 'minutes');
+				var momentEnd = momentStart.clone();
+				momentEnd.add($scope.eventData.duration, 'minutes');
+
+				var momentStartDay = momentStart.date();
+				var momentEndDay = momentEnd.date();
+
+				if (momentEndDay > momentStartDay)
+				{
+					window.alert("Test");//"<bean:message key="Appointment.msgCheckDuration"/>");
+				}
+
+				return momentEnd;
 			};
 
 			$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
