@@ -803,6 +803,8 @@ angular.module('Schedule').component('eventComponent', {
 
 				if (!allValid)
 				{
+					$scope.displayMessages.add_field_error('startTime', 'Appointment cannot span to the next day');
+					$scope.displayMessages.add_field_error('duration', 'Appointment cannot span to the next day');
 					Juno.Common.Util.errorAlert($uibModal, "Error", "Please correct highlighted fields");
 				}
 
