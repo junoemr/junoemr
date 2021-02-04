@@ -285,19 +285,22 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				controller.validations = {
-					appointmentTime: Juno.Validations.validationCustom(() =>
+					appointmentTimeValid: Juno.Validations.validationCustom(() =>
 					{
-							if (controller.ngModel.hin)
-							{
-								return HinValidator.healthCardNumber(controller.ngModel.hcType, controller.ngModel.hin);
-							}
-							else
-							{
-								return true;
-							}
-						return false;
+						let momentStart = Juno.Common.Util.getDateAndTimeMoment(
+							$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+						let momentEnd = controller.calculateEndTime();
+
+						let momentStartDay = momentStart.date();
+						let momentEndDay = momentEnd.date();
+
+						if (momentEndDay > momentStartDay)
+						{
+							return false;
+						}
+
+						return true;
 					}),
-					appointmentDuration: Juno.Validations.validationCustom(() => controller.effectiveDateValid),
 				};
 
 				// resolve data from opener
@@ -684,8 +687,6 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 				var momentEnd = controller.calculateEndTime();
 
-				if (!momentEnd) { return; }
-
 				controller.isDoubleBook = false;
 				controller.isDoubleBookPrevented = false;
 				modalContent.removeClass("double-book double-book-prevented");
@@ -798,7 +799,14 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
 				}
 
-				return !$scope.displayMessages.has_errors();
+				let allValid = Juno.Validations.allValidationsValid(controller.validations);
+
+				if (!allValid)
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Error", "Please correct highlighted fields");
+				}
+
+				return (!$scope.displayMessages.has_errors() && allValid);
 			};
 
 			controller.updateRepeatBookingDates = function updateRepeatBookingDates()
@@ -953,14 +961,6 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 				var momentEnd = momentStart.clone();
 				momentEnd.add($scope.eventData.duration, 'minutes');
-
-				var momentStartDay = momentStart.date();
-				var momentEndDay = momentEnd.date();
-
-				if (momentEndDay > momentStartDay)
-				{
-					window.alert("Test");//"<bean:message key="Appointment.msgCheckDuration"/>");
-				}
 
 				return momentEnd;
 			};
