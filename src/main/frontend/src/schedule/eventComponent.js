@@ -9,7 +9,6 @@ import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
 import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
-import HinValidator from "../common/util/hinValidator";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
