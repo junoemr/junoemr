@@ -957,12 +957,11 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.calculateEndTime = function calculateEndTime()
 			{
-				var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+				let momentStart = Juno.Common.Util.getDateAndTimeMoment(
 					$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-				var momentEnd = momentStart.clone();
-				momentEnd.add($scope.eventData.duration, 'minutes');
+				momentStart.add($scope.eventData.duration, 'minutes');
 
-				return momentEnd;
+				return momentStart;
 			};
 
 			$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
