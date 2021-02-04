@@ -42,7 +42,6 @@ import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -98,21 +97,23 @@ public class ClinicService extends BaseService
 	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(Integration integration, Integer securityNo) throws InvalidIntegrationException
 	{
 		Security security = securityDao.find(securityNo);
-		if (security == null)
-		{
-			throw new RecordNotFoundException("Security record [" + securityNo + "] was not found");
-		}
 
-		ProviderData provider = providerDataDao.find(security.getProviderNo());
-		if (security != null && provider != null)
+		if (security != null)
 		{
-			return loginOrCreateClinicUser(security, provider.getFirstName(), provider.getLastName(),
-					integration.getSite() != null ? integration.getSite().getName() : null);
+			ProviderData provider = providerDataDao.find(security.getProviderNo());
+			if (provider != null)
+			{
+				return loginOrCreateClinicUser(security, provider.getFirstName(), provider.getLastName(),
+						integration.getSite() != null ? integration.getSite().getName() : null);
+			}
+			else
+			{
+				throw new RecordNotFoundException("Provider record [" + security.getProviderNo() + "] was not found");
+			}
 		}
 		else
 		{
-			MiscUtils.getLogger().warn("Failed to create or login to MHA clinic_user. Security lookup failed. Security No:" + securityNo);
-			return null;
+			throw new RecordNotFoundException("Security record [" + securityNo + "] was not found");
 		}
 	}
 
