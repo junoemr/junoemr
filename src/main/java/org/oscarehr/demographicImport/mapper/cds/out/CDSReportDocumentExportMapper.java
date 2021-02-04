@@ -58,7 +58,7 @@ public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper
 
 		reports.setFileExtensionAndVersion(documentFile.getExtension().toLowerCase());
 
-		reports.setClazz(toReportClass(exportStructure.getDocumentClass()));
+		reports.setClazz(toReportClass(exportStructure.getDocumentClass())); //TODO make sure it's mapped to valid enum
 		reports.setSubClass(exportStructure.getDocumentSubClass());
 		reports.setEventDateTime(toNullableDateTimeFullOrPartial(exportStructure.getObservationDate().atStartOfDay()));
 		reports.setReceivedDateTime(toNullableDateTimeFullOrPartial(exportStructure.getCreatedAt()));
@@ -75,7 +75,7 @@ public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper
 			2.SendingFacilityID
 			3.SendingFacilityReport
 			4.OBRContent/AccompanyingSubClass
-			5.OBRContent/ AccompanyingMnemonic
+			5.OBRContent/AccompanyingMnemonic
 			6.OBRContent/AccompanyingDescription
 			7.OBRContent/ObservationDateTime
 			8.HRMResultStatus

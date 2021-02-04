@@ -20,25 +20,16 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.out;
+package org.oscarehr.demographicImport.model.hrm;
 
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.hrm.HrmDocument;
-import org.springframework.stereotype.Component;
+import lombok.Data;
 
-@Component
-public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmDocument>
+@Data
+public class HrmDocumentMatchingData
 {
-	public CDSReportHrmExportMapper()
-	{
-		super();
-	}
-
-	@Override
-	public Reports exportFromJuno(HrmDocument exportStructure)
-	{
-		Reports reports = objectFactory.createReports();
-
-		return reports;
-	}
+	private String reportHash;
+	private String reportLessTransactionInfoHash;
+	private String reportLessDemographicInfoHash;
+	private String unmatchedProviders;
+	private Integer numDuplicatesReceived;
 }

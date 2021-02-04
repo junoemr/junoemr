@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.contact.DemographicContact;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.document.Document;
-import org.oscarehr.demographicImport.model.document.HrmDocument;
+import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;

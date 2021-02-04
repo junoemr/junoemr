@@ -20,38 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.document;
+package org.oscarehr.demographicImport.model.hrm;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 import java.time.LocalDateTime;
 
 @Data
-public class HrmDocument extends AbstractTransientModel
+public class HrmObservation
 {
-	public enum STATUS
-	{
-		ACTIVE,
-		DELETED,
-	}
-
 	private Integer id;
-
-	private LocalDateTime reportDateTime;
-	private LocalDateTime receivedDateTime;
-
-	private String reportType;
-	private String reportHash;
-	private String reportLessTransactionInfoHash;
-	private String reportLessDemographicInfoHash;
-	private STATUS reportStatus;
-	private String reportFile;
-	private String sourceFacility;
-
-	private String unmatchedProviders;
-	private Integer numDuplicatesReceived;
-	private Integer parentReport;
-	private Integer hrmCategoryId;
-	private String description;
+	private String accompanyingSubClass;
+	private String accompanyingMnemonic;
+	private String accompanyingDescription;
+	private LocalDateTime ObservationDateTime;
 }

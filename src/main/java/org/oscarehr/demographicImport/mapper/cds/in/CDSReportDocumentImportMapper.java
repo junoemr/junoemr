@@ -22,22 +22,11 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportClass;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.document.Document;
-import org.oscarehr.demographicImport.model.provider.Provider;
-import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DEFAULT_DOCUMENT_DESCRIPTION;
 
@@ -70,74 +59,6 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		document.setDescription(getDocumentDescription(importStructure));
 
 		return document;
-	}
-
-	protected GenericFile getDocumentFile(Reports importStructure) throws IOException, InterruptedException
-	{
-		GenericFile tempFile;
-
-		ReportFormat format = importStructure.getFormat();
-		if(format.equals(ReportFormat.BINARY)) //Document file
-		{
-			String filePath = importStructure.getFilePath();
-			if(filePath != null) // external document
-			{
-				GenericFile externalFile = FileFactory.getExistingFile(importProperties.getExternalDocumentPath(), filePath);
-				tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(), "." + externalFile.getExtension().toLowerCase());
-			}
-			else
-			{
-				String fileExtension = importStructure.getFileExtensionAndVersion();
-				byte[] base64Media = importStructure.getContent().getMedia();
-				tempFile = FileFactory.createTempFile(new ByteArrayInputStream(base64Media), "." + fileExtension.toLowerCase());
-			}
-		}
-		else //text report
-		{
-			String textContent = importStructure.getContent().getTextContent();
-			tempFile = FileFactory.createTempFile(new ByteArrayInputStream(textContent.getBytes(StandardCharsets.UTF_8)), ".txt");
-		}
-		return tempFile;
-	}
-
-	protected String getReportClass(ReportClass clazz)
-	{
-		if(clazz != null)
-		{
-			return clazz.value();
-		}
-		return null;
-	}
-
-	protected Provider getAuthorPhysician(Reports.SourceAuthorPhysician authorPhysician)
-	{
-		Provider provider = null;
-		if(authorPhysician != null)
-		{
-			PersonNameSimple personNameSimple = authorPhysician.getAuthorName();
-			if(personNameSimple != null)
-			{
-				provider = toProvider(authorPhysician.getAuthorName());
-			}
-			else
-			{
-				provider = toProviderNames(authorPhysician.getAuthorFreeText());
-			}
-		}
-		return provider;
-	}
-
-	protected Reviewer getReviewer(List<Reports.ReportReviewed> reviewers)
-	{
-		Reviewer reviewer = null;
-		if(reviewers != null && !reviewers.isEmpty())
-		{
-			Reports.ReportReviewed reviewed = reviewers.get(0);
-			reviewer = Reviewer.fromProvider(toProvider(reviewed.getName()));
-			reviewer.setReviewDateTime(PartialDateTime.from(toNullablePartialDate(reviewed.getDateTimeReportReviewed())));
-			reviewer.setOhipNumber(reviewed.getReviewingOHIPPhysicianId());
-		}
-		return reviewer;
 	}
 
 	protected String getDocumentDescription(Reports importStructure)

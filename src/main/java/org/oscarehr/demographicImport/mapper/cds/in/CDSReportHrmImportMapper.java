@@ -23,11 +23,20 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.document.HrmDocument;
+import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.hrm.HrmComment;
+import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.oscarehr.demographicImport.model.hrm.HrmObservation;
+import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmDocument>
@@ -40,23 +49,63 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 	}
 
 	@Override
-	public HrmDocument importToJuno(Reports importStructure)
+	public HrmDocument importToJuno(Reports importStructure) throws IOException, InterruptedException
 	{
 		HrmDocument document = new HrmDocument();
 
-		ReportFormat format = importStructure.getFormat();
-		if(format.equals(ReportFormat.BINARY))
+		document.setFile(getDocumentFile(importStructure));
+
+		document.setReportClass(HrmDocument.REPORT_CLASS.fromValueString(getReportClass(importStructure.getClazz())));
+		document.setReportSubClass(importStructure.getSubClass());
+		document.setReportDateTime(toNullableLocalDateTime(importStructure.getEventDateTime()));
+		document.setReceivedDateTime(toNullableLocalDateTime(importStructure.getReceivedDateTime()));
+
+		document.setCreatedBy(getAuthorPhysician(importStructure.getSourceAuthorPhysician()));
+		Reviewer reviewer = getReviewer(importStructure.getReportReviewed());
+		if(reviewer != null)
 		{
-			//Document
-		}
-		else
-		{
-			//text report
+			document.addReviewer(reviewer);
 		}
 
-		//TODO finish HRM document import when HRM documents are re-worked
-		logger.error("HRM Document found in CDS, but conversion is not implemented");
+		document.setReportStatus(HrmDocument.REPORT_STATUS.fromValueString(importStructure.getHRMResultStatus()));
+		document.setObservations(getObservations(importStructure.getOBRContent()));
+		document.addComment(getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()));
+		document.setDescription(CDSConstants.DEFAULT_HRM_DESCRIPTION);
+
+		document.setSourceFacility(importStructure.getSourceFacility());
+		document.setSendingFacilityId(importStructure.getSendingFacilityId());
+		document.setSendingFacilityReport(importStructure.getSendingFacilityReport());
+		document.setMessageUniqueId(importStructure.getMessageUniqueID());
 
 		return document;
+	}
+
+	protected List<HrmObservation> getObservations(List<Reports.OBRContent> obrContents)
+	{
+		List<HrmObservation> observationList = new ArrayList<>(obrContents.size());
+		for(Reports.OBRContent obrContent : obrContents)
+		{
+			HrmObservation observation = new HrmObservation();
+			observation.setAccompanyingDescription(obrContent.getAccompanyingDescription());
+			observation.setAccompanyingMnemonic(obrContent.getAccompanyingMnemonic());
+			observation.setAccompanyingSubClass(obrContent.getAccompanyingSubClass());
+			observation.setObservationDateTime(toNullableLocalDateTime(obrContent.getObservationDateTime()));
+
+			observationList.add(observation);
+		}
+		return observationList;
+	}
+
+	protected HrmComment getNoteAsHrmComment(String note, Provider commentProvider, LocalDateTime dateTime)
+	{
+		HrmComment comment = null;
+		if(note != null)
+		{
+			comment = new HrmComment();
+			comment.setText(note);
+			comment.setProvider(commentProvider);
+			comment.setObservationDateTime(dateTime);
+		}
+		return comment;
 	}
 }
