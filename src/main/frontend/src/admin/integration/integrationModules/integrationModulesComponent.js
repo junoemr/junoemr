@@ -57,7 +57,13 @@ angular.module('Admin.Integration').component('integrationModules',
                 enabled: false,
                 propertyName: "integration.imdHealth.enabled",
                 configUrl: "#!/admin/imdHealth"
-            }
+            },
+			{
+				name: "Ocean ToolBar",
+				enabled: false,
+				propertyName: "integration.OceanToolBar.enabled",
+				configUrl:""
+			}
 		];
 
 		ctrl.$onInit = function()
