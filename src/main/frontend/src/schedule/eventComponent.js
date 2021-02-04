@@ -808,7 +808,7 @@ angular.module('Schedule').component('eventComponent', {
 					Juno.Common.Util.errorAlert($uibModal, "Error", "Please correct highlighted fields");
 				}
 
-				return (!$scope.displayMessages.has_errors());
+				return !$scope.displayMessages.has_errors();
 			};
 
 			controller.updateRepeatBookingDates = function updateRepeatBookingDates()
