@@ -49,7 +49,7 @@ public class CommunicationException extends BaseException
 	@Override
 	public String toString()
 	{
-		return super.toString() + getGenericError().map(GenericErrorTo1::toString).orElse("");
+		return super.toString() + "\n" + getGenericError().map(GenericErrorTo1::toString).orElse("");
 	}
 
 	//==========================================================================

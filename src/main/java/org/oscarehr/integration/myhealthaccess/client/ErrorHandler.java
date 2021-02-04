@@ -31,18 +31,17 @@ import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.SessionExpiredException;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ErrorHandler implements ResponseErrorHandler
+public class ErrorHandler extends DefaultResponseErrorHandler
 {
-	@Override
-	public boolean hasError(ClientHttpResponse clientHttpResponse) throws IOException
-	{
-		return clientHttpResponse.getRawStatusCode() != 200;
-	}
+
+	//==========================================================================
+	// Public Methods
+	//==========================================================================
 
 	@Override
 	public void handleError(ClientHttpResponse clientHttpResponse) throws IOException
