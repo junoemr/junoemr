@@ -223,7 +223,7 @@
 												ca-title="Time"
 												ca-name="startTime"
 												ca-model="eventData.startTime"
-												ca-error="{{eventController.validations.appointmentTimeValid() ? null: true}}"
+												ca-error="{{displayMessages.field_errors()['startTime']}}"
 												ca-template="no_button"
 												ca-disable-widget="true"
 												ca-minute-step="parentScope.timeIntervalMinutes()">
@@ -234,7 +234,7 @@
 												ca-title="Duration"
 												ca-name="duration"
 												ca-model="eventData.duration"
-												ca-error="{{eventController.validations.appointmentTimeValid() ? null: true}}"
+												ca-error="{{displayMessages.field_errors()['duration']}}"
 												ca-rows="1">
 										</ca-field-text>
 									</div>
