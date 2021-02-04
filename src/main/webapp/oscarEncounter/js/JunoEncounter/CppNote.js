@@ -321,8 +321,14 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		}
 		noteIssueUl += "</ul>";
 
-		var noteInfo = "<div style='float:right;'><i>Encounter Date:&nbsp;" + date + "&nbsp;rev<a href='#' onclick='return showHistory(\"" + noteId + "\",event);'>" + revision + "</a></i></div>" +
-			editorSpan + "<div>" + editorUl + noteIssueUl + "</div><br style='clear:both;'>";
+		var noteInfo = "<div style='float:right;'>"
+				+ "<i>Encounter Date:&nbsp;" + date + "&nbsp;rev"
+				+ "<a href='#' onclick='return junoEncounter.showHistory(\"" + noteId + "\",event);'>" + revision + "</a>"
+				+ "</i>"
+				+ "</div>"
+				+ editorSpan
+				+ "<div>" + editorUl + noteIssueUl + "</div>"
+				+ "<br style='clear:both;'>";
 
 		$("issueNoteInfo").update(noteInfo);
 
