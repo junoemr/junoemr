@@ -799,16 +799,16 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
 				}
 
-				let allValid = Juno.Validations.allValidationsValid(controller.validations);
+				let appointmentSpansToNextDay = !controller.validations.appointmentTimeValid();
 
-				if (!allValid)
+				if (appointmentSpansToNextDay)
 				{
 					$scope.displayMessages.add_field_error('startTime', 'Appointment cannot span to the next day');
 					$scope.displayMessages.add_field_error('duration', 'Appointment cannot span to the next day');
 					Juno.Common.Util.errorAlert($uibModal, "Error", "Please correct highlighted fields");
 				}
 
-				return (!$scope.displayMessages.has_errors() && allValid);
+				return (!$scope.displayMessages.has_errors());
 			};
 
 			controller.updateRepeatBookingDates = function updateRepeatBookingDates()
