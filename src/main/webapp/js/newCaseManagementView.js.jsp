@@ -37,6 +37,7 @@
 	var defaultDiv;
 	var changeIssueFunc;
 	var addIssueFunc;
+	var maxNcId;
 
 	var X = 10;
 	var small = 60;
@@ -3714,7 +3715,6 @@
 		var msnote;
 		var pos;
 		var imgId;
-		var maxNcId;
 
 		if (!$("maxId"))
 		{
@@ -3887,6 +3887,14 @@
 		var notesDiv;
 		var pos;
 		var imgId;
+        if (!$("maxId"))
+        {
+            maxNcId = 0;
+        }
+        else
+        {
+            maxNcId = parseInt($("maxId").value);
+        }
 
 		Event.stop(e);
 
