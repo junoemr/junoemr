@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
 import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
@@ -84,8 +85,8 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			demographic.setOfficialLanguage(OfficialSpokenLanguageCode.FRE.equals(officialLanguage) ?
 					Demographic.OFFICIAL_LANGUAGE.FRENCH : Demographic.OFFICIAL_LANGUAGE.ENGLISH);
 		}
-		demographic.setSpokenLanguage(importStructure.getPreferredSpokenLanguage());
-		demographic.setPatientNote(importStructure.getNoteAboutPatient());
+		demographic.setSpokenLanguage(StringUtils.trimToNull(importStructure.getPreferredSpokenLanguage()));
+		demographic.setPatientNote(StringUtils.trimToNull(importStructure.getNoteAboutPatient()));
 	}
 
 	protected void mapHealthInsuranceInfo(Demographics importStructure, Demographic demographic)
@@ -93,9 +94,9 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		HealthCard healthCard = importStructure.getHealthCard();
 		if(healthCard != null)
 		{
-			demographic.setHealthNumber(healthCard.getNumber());
-			demographic.setHealthNumberVersion(healthCard.getVersion());
-			demographic.setHealthNumberProvinceCode(getSubregionCode(healthCard.getProvinceCode()));
+			demographic.setHealthNumber(StringUtils.trimToNull(healthCard.getNumber()));
+			demographic.setHealthNumberVersion(StringUtils.trimToNull(healthCard.getVersion()));
+			demographic.setHealthNumberProvinceCode(getSubregionCode(StringUtils.trimToNull(healthCard.getProvinceCode())));
 			demographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(healthCard.getExpirydate()));
 		}
 	}

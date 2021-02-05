@@ -62,14 +62,14 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
 		exportDemographic.setSex(Person.SEX.getIgnoreCase(input.getSex()));
 
-		exportDemographic.setHealthNumber(input.getHin());
-		exportDemographic.setHealthNumberVersion(input.getVer());
-		exportDemographic.setHealthNumberProvinceCode(input.getHcType());
+		exportDemographic.setHealthNumber(StringUtils.trimToNull(input.getHin()));
+		exportDemographic.setHealthNumberVersion(StringUtils.trimToNull(input.getVer()));
+		exportDemographic.setHealthNumberProvinceCode(StringUtils.trimToNull(input.getHcType()));
 		exportDemographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(input.getHcRenewDate()));
 		exportDemographic.setHealthNumberEffectiveDate(ConversionUtils.toNullableLocalDate(input.getHcEffectiveDate()));
 		exportDemographic.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
 		exportDemographic.setDateEnded(ConversionUtils.toNullableLocalDate(input.getEndDate()));
-		exportDemographic.setChartNumber(input.getChartNo());
+		exportDemographic.setChartNumber(StringUtils.trimToNull(input.getChartNo()));
 		exportDemographic.setRosterDate(ConversionUtils.toNullableLocalDate(input.getRosterDate()));
 		exportDemographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(input.getRosterTerminationDate()));
 		exportDemographic.setMrpProvider(findProvider(input.getProviderNo()));
@@ -79,9 +79,9 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
 
 		Address address = new Address();
-		address.setAddressLine1(input.getAddress());
-		address.setCity(input.getCity());
-		address.setRegionCode(input.getProvince());
+		address.setAddressLine1(StringUtils.trimToNull(input.getAddress()));
+		address.setCity(StringUtils.trimToNull(input.getCity()));
+		address.setRegionCode(StringUtils.trimToNull(input.getProvince()));
 		address.setCountryCode(COUNTRY_CODE_CANADA);
 		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
 		address.setResidencyStatusCurrent();
