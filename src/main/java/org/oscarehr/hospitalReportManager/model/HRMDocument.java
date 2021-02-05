@@ -63,7 +63,7 @@ public class HRMDocument extends AbstractModel<Integer>
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument")
 	private List<HRMDocumentToDemographic> documentToDemographicList;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument")
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument", cascade = CascadeType.PERSIST)
 	private List<HRMDocumentToProvider> documentToProviderList;
 
 	@Override

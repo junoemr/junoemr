@@ -12,6 +12,7 @@ package org.oscarehr.hospitalReportManager.model;
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -33,6 +34,8 @@ public class HRMDocumentSubClass extends AbstractModel<Integer>
 	private String subClassMnemonic;
 	private String subClassDescription;
 	private Date subClassDateTime;
+
+	@Column(name="isActive")
 	private boolean active;
 
 	@ManyToOne(fetch = FetchType.LAZY)

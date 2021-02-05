@@ -48,7 +48,7 @@ ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
 
 Integer demoNo = null;
 if(demographicLink != null){
-	demoNo = Integer.parseInt(demographicLink.getDemographicNo());
+	demoNo = demographicLink.getDemographicNo();
 }
 LogAction.addLogEntry((String) session.getAttribute("user"), demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, ""+hrmReportId, request.getRemoteAddr());
 
@@ -324,7 +324,7 @@ String btnDisabled = "disabled";
 String demographicNo = "";
 if(demographicLink != null) {
 	btnDisabled="";
-	demographicNo = demographicLink.getDemographicNo();
+	demographicNo = String.valueOf(demographicLink.getDemographicNo());
 }
 String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());	
 
@@ -453,7 +453,7 @@ String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 				<% if (providerLinkList != null || providerLinkList.size() >= 1) {
 					for (HRMDocumentToProvider p : providerLinkList) { 
 						if (!p.getProviderNo().equalsIgnoreCase("-1")) { %>
-						<%=providerDao.getProviderName(p.getProviderNo())%> <%=p.getSignedOff() !=null && p.getSignedOff()  == 1 ? "<abbr title='" + p.getSignedOffTimestamp() + "'>(Signed-Off)</abbr>" : "" %> <a href="#" onclick="removeProvFromHrm('<%=p.getId() %>', '<%=hrmReportId %>')">(remove)</a><br />
+						<%=providerDao.getProviderName(p.getProviderNo())%> <%=p.isSignedOff() ? "<abbr title='" + p.getSignedOffTimestamp() + "'>(Signed-Off)</abbr>" : "" %> <a href="#" onclick="removeProvFromHrm('<%=p.getId() %>', '<%=hrmReportId %>')">(remove)</a><br />
 				<%		}  
 					}
 				} else { %>
@@ -534,7 +534,7 @@ String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 				<input type="button" style="display: none;" value="Save" id="save<%=hrmReportId %>hrm" />
 				<% 
 				HRMDocumentToProvider hrmDocumentToProvider = HRMDisplayReportAction.getHRMDocumentFromProvider(loggedInInfo.getLoggedInProviderNo(), hrmReportId);
-				if (hrmDocumentToProvider != null && hrmDocumentToProvider.getSignedOff() != null && hrmDocumentToProvider.getSignedOff() == 1) {
+				if (hrmDocumentToProvider != null && hrmDocumentToProvider.isSignedOff()) {
 				%>
 				<input type="button" id="signoff<%=hrmReportId %>" value="Revoke Sign-Off" onClick="revokeSignOffHrm('<%=hrmReportId %>')" />
 				<%
@@ -573,7 +573,7 @@ List<HRMDocumentComment> documentComments = (List<HRMDocumentComment>) request.g
 if (documentComments != null) {
 	%>Displaying <%=documentComments.size() %> comment<%=documentComments.size() != 1 ? "s" : "" %><br />
 	<% for (HRMDocumentComment comment : documentComments) { %>
-		<div class="documentComment"><strong><%=providerDao.getProviderName(comment.getProviderNo()) %> on <%=comment.getCommentTime().toString() %> wrote...</strong><br />
+		<div class="documentComment"><strong><%=providerDao.getProviderName(comment.getProvider().getId()) %> on <%=comment.getCommentTime().toString() %> wrote...</strong><br />
 		<%=comment.getComment() %><br />
 		<a href="#" onClick="deleteComment('<%=comment.getId() %>', '<%=hrmReportId %>'); return false;">(Delete this comment)</a></div>
 	<% }

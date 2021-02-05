@@ -9,22 +9,23 @@
 
 package org.oscarehr.hospitalReportManager.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Query;
+import java.util.List;
+
 @Repository
-public class HRMDocumentToDemographicDao extends AbstractDao<HRMDocumentToDemographic> {
-	
-	public HRMDocumentToDemographicDao() {
+public class HRMDocumentToDemographicDao extends AbstractDao<HRMDocumentToDemographic>
+{
+	public HRMDocumentToDemographicDao()
+	{
 		super(HRMDocumentToDemographic.class);
 	}
-	
-	public List<HRMDocumentToDemographic> findByDemographicNo(String demographicNo) {
+
+	public List<HRMDocumentToDemographic> findByDemographicNo(Integer demographicNo)
+	{
 		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
@@ -33,12 +34,23 @@ public class HRMDocumentToDemographicDao extends AbstractDao<HRMDocumentToDemogr
 		return documentToDemographics;
 	}
 
-	public List<HRMDocumentToDemographic> findByHrmDocumentId(String hrmDocumentId) {
+	public List<HRMDocumentToDemographic> findByHrmDocumentId(Integer hrmDocumentId)
+	{
 		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hrmDocumentId);
 		@SuppressWarnings("unchecked")
 		List<HRMDocumentToDemographic> documentToDemographics = query.getResultList();
 		return documentToDemographics;
+	}
+
+	public HRMDocumentToDemographic findByHrmDocumentIdAndDemographicNo(Integer hrmDocumentId, Integer demographicId)
+	{
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.hrmDocumentId=:documentId AND x.demographicNo=:demographicId";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("documentId", hrmDocumentId);
+		query.setParameter("demographicId", demographicId);
+
+		return this.getSingleResultOrNull(query);
 	}
 }

@@ -31,13 +31,12 @@ public class HRMDocumentToProvider extends AbstractModel<Integer>
 	private Integer id;
 
 	private String providerNo;
-	private String hrmDocumentId;
-	private Integer signedOff = 0;
+	private boolean viewed;
+	private boolean signedOff;
 	private Date signedOffTimestamp;
-	private Integer viewed = 0;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "hrmDocumentId", insertable = false, updatable = false)
+	@JoinColumn(name = "hrmDocumentId")
 	private HRMDocument hrmDocument;
 
 	@ManyToOne(fetch = FetchType.LAZY)

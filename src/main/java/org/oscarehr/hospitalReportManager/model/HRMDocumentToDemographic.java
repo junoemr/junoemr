@@ -30,8 +30,8 @@ public class HRMDocumentToDemographic extends AbstractModel<Integer>
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	private String demographicNo;
-	private String hrmDocumentId;
+	private Integer demographicNo;
+	private Integer hrmDocumentId;
 	private Date timeAssigned;
 
 	@ManyToOne(fetch = FetchType.LAZY)

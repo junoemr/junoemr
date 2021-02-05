@@ -10,11 +10,6 @@
 
 package oscar.oscarLab.ca.on;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
@@ -30,6 +25,11 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class HRMResultsData {
 
@@ -69,7 +69,7 @@ public class HRMResultsData {
 		HashMap<String,HRMReport> labReports=new HashMap<String,HRMReport>();
 
 		for (HRMDocumentToProvider hrmDocResult : hrmDocResultsProvider) {
-			Integer id = Integer.parseInt(hrmDocResult.getHrmDocumentId());
+			Integer id = hrmDocResult.getHrmDocument().getId();
 			LabResultData lbData = new LabResultData(LabResultData.HRM);
 
 			List<HRMDocument> hrmDocument = hrmDocumentDao.findById(id);
@@ -82,7 +82,7 @@ public class HRMResultsData {
 			lbData.patientName = "Not, Assigned";
 
 			// check if patient is matched
-			List<HRMDocumentToDemographic> hrmDocResultsDemographic = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocument.get(0).getId().toString());
+			List<HRMDocumentToDemographic> hrmDocResultsDemographic = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocument.get(0).getId());
 			HRMReport hrmReport = HRMReportParser.parseReport(loggedInInfo, hrmDocument.get(0).getReportFile());
 			if (hrmReport == null) continue;
 

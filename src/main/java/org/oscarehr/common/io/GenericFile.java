@@ -85,6 +85,7 @@ public class GenericFile
 	public static final String BILLING_REMITTANCE_FAILED_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_FAILED_DIR")).getPath();
 
 	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
+	public static final String HRM_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("HRM_BASE_DIR")).getPath();
 
 	public static final String LOG_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("LOG_BASE_DIR")).getPath();
 	public static final String LOG_IMPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_IMPORT_DIR")).getPath();
@@ -153,6 +154,10 @@ public class GenericFile
 	public boolean moveToLogExport() throws IOException
 	{
 		return moveFile(LOG_EXPORT_DIR);
+	}
+	public boolean moveToHRMDocuments() throws IOException
+	{
+		return moveFile(HRM_BASE_DIR);
 	}
 
 	public boolean moveFile(String directory) throws IOException

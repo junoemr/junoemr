@@ -52,7 +52,7 @@ public class HRMUtil {
     public static ArrayList<HashMap<String, ? extends Object>> listHRMDocuments(LoggedInInfo loggedInInfo, String sortBy, String demographicNo){
 		ArrayList<HashMap<String, ? extends Object>> hrmdocslist = new ArrayList<HashMap<String, ?>>();
 		
-		List<HRMDocumentToDemographic> hrmDocResultsDemographic = hrmDocumentToDemographicDao.findByDemographicNo(demographicNo);
+		List<HRMDocumentToDemographic> hrmDocResultsDemographic = hrmDocumentToDemographicDao.findByDemographicNo(Integer.parseInt(demographicNo));
 		List<HRMDocument> hrmDocumentsAll = new LinkedList<HRMDocument>();
 		
 		HashMap<String,ArrayList<Integer>> duplicateLabIds=new HashMap<String, ArrayList<Integer>>();
@@ -129,8 +129,8 @@ public class HRMUtil {
 
 		 for (HRMDocumentToDemographic hrmDocumentToDemographic : hrmDocumentToDemographics)
 		 {
-			String id = hrmDocumentToDemographic.getHrmDocumentId();
-			List<HRMDocument> hrmDocuments = hrmDocumentDao.findById(Integer.parseInt(id));
+			Integer id = hrmDocumentToDemographic.getHrmDocumentId();
+			List<HRMDocument> hrmDocuments = hrmDocumentDao.findById(id);
 
 			for (HRMDocument hrmDocument : hrmDocuments)
 			{

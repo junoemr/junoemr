@@ -65,6 +65,7 @@ import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
 import org.oscarehr.encounterNote.service.ReminderNoteService;
 import org.oscarehr.encounterNote.service.RiskFactorNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.prevention.dao.PreventionDao;
@@ -180,6 +181,9 @@ public class ImportExportService
 	@Autowired
 	private PharmacyModelToDbConverter pharmacyModelToDbConverter;
 
+	@Autowired
+	private HRMService hrmService;
+
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                            ExportLogger exportLogger,
 	                                            List<PatientRecord> patientRecords,
@@ -280,6 +284,7 @@ public class ImportExportService
 		persistPharmacy(patientRecord, dbDemographic);
 
 		// persist documents last to minimize import errors with disk IO
+		hrmService.uploadAllNewHRMDocuments(patientRecord.getHrmDocumentList(), dbDemographic);
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
 
 		importLogger.logSummaryLine(patientRecord);

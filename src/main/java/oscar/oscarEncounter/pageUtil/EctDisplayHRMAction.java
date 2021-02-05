@@ -42,11 +42,11 @@ import oscar.util.StringUtils;
 
 public class EctDisplayHRMAction extends EctDisplayAction {
 
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 	private static final String cmd = "HRM";
-	private HRMDocumentToDemographicDao hrmDocumentToDemographicDao = (HRMDocumentToDemographicDao) SpringUtils.getBean("HRMDocumentToDemographicDao");
-	private HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
-	private OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
+	private final HRMDocumentToDemographicDao hrmDocumentToDemographicDao = (HRMDocumentToDemographicDao) SpringUtils.getBean("HRMDocumentToDemographicDao");
+	private final HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
+	private final OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 	
 	public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages) {
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -68,7 +68,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 
 			StringBuilder javascript = new StringBuilder("<script type=\"text/javascript\">");
 			String js = "";
-			List<HRMDocumentToDemographic> hrmDocListDemographic = hrmDocumentToDemographicDao.findByDemographicNo(bean.demographicNo);
+			List<HRMDocumentToDemographic> hrmDocListDemographic = hrmDocumentToDemographicDao.findByDemographicNo(Integer.parseInt(bean.demographicNo));
 			String dbFormat = "yyyy-MM-dd";
 			String serviceDateStr = "";
 			String key;
@@ -79,7 +79,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 
 			List<HRMDocument> allHrmDocsForDemo = new LinkedList<HRMDocument>();
 			for (HRMDocumentToDemographic hrmDemoDocResult : hrmDocListDemographic) {
-				List<HRMDocument> hrmDoc = hrmDocumentDao.findById(Integer.parseInt(hrmDemoDocResult.getHrmDocumentId()));
+				List<HRMDocument> hrmDoc = hrmDocumentDao.findById(hrmDemoDocResult.getHrmDocumentId());
 				allHrmDocsForDemo.addAll(hrmDoc);
 			}
 

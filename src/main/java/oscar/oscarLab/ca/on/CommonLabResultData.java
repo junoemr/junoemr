@@ -657,7 +657,7 @@ public class CommonLabResultData {
 		boolean ret = false;
 		try {
 			HRMDocumentToDemographicDao hrmDocumentToDemographicDao = (HRMDocumentToDemographicDao)  SpringUtils.getBean("HRMDocumentToDemographicDao");
-			List<HRMDocumentToDemographic> docToDemo = hrmDocumentToDemographicDao.findByHrmDocumentId(labId);
+			List<HRMDocumentToDemographic> docToDemo = hrmDocumentToDemographicDao.findByHrmDocumentId(Integer.parseInt(labId));
 			if(docToDemo != null && docToDemo.size() > 0){
 				ret = true;
 			}
