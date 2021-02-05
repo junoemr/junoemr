@@ -116,6 +116,26 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 	@Column(name = "target_id")
 	private String targetId;
 
+	/**
+	 * set this record to an error state
+	 * @param errorMessage - error message describing why the error occurred
+	 */
+	public void recordError(String errorMessage)
+	{
+		this.setStatus(PUSH_STATUS.ERROR);
+		this.setErrorMessage(errorMessage);
+	}
+
+	/**
+	 * set this record to an error state
+	 * @param e - the exception that caused the error status
+	 */
+	public void recordError(Exception e)
+	{
+		this.setStatus(PUSH_STATUS.ERROR);
+		this.setErrorMessage(ExceptionUtils.getStackTrace(e));
+	}
+
 	@Override
 	public Integer getId()
 	{
@@ -210,22 +230,6 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 	public void setStatus(PUSH_STATUS status)
 	{
 		this.status = status;
-	}
-
-	public void setStatusQueued()
-	{
-		this.setStatus(PUSH_STATUS.QUEUED);
-	}
-
-	public void setStatusSent()
-	{
-		this.setStatus(PUSH_STATUS.SENT);
-	}
-
-	public void setStatusError(Exception e)
-	{
-		this.setStatus(PUSH_STATUS.ERROR);
-		this.setErrorMessage(ExceptionUtils.getStackTrace(e));
 	}
 
 	public Integer getSendCount()
