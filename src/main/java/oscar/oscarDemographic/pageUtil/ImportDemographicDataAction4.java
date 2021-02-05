@@ -1929,7 +1929,7 @@ import java.util.zip.ZipInputStream;
                         hrmDocDao.persist(hrmDoc);
 
                         if (repR[i].getNotes()!=null) {
-                            hrmDocComment.setHrmDocumentId(hrmDoc.getId());
+                            hrmDocComment.setHrmDocument(hrmDoc);
                             hrmDocComment.setComment(repR[i].getNotes());
                             hrmDocCommentDao.persist(hrmDocComment);
                         }
@@ -1945,7 +1945,7 @@ import java.util.zip.ZipInputStream;
                             if (obr[j].getAccompanyingDescription()!=null) hrmDocSc.setSubClassDescription(obr[j].getAccompanyingDescription());
                             if (obr[j].getAccompanyingMnemonic()!=null) hrmDocSc.setSubClassMnemonic(obr[j].getAccompanyingMnemonic());
                             if (obr[j].getObservationDateTime()!=null) hrmDocSc.setSubClassDateTime(dateTimeFPtoDate(obr[j].getObservationDateTime(), timeShiftInDays));
-                            hrmDocSc.setHrmDocumentId(hrmDoc.getId());
+                            hrmDocSc.setHrmDocument(hrmDoc);
                             hrmDocSc.setActive(true);
                             hrmDocSubClassDao.persist(hrmDocSc);
                         }

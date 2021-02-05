@@ -8,9 +8,6 @@
  */
 package org.oscarehr.hospitalReportManager;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -20,8 +17,11 @@ import org.oscarehr.hospitalReportManager.model.HRMProviderConfidentialityStatem
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
-public class HRMStatementModifyAction extends DispatchAction {
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+public class HRMStatementModifyAction extends DispatchAction
+{
 	HRMProviderConfidentialityStatementDao hrmProviderConfidentialityStatementDao = (HRMProviderConfidentialityStatementDao) SpringUtils.getBean("HRMProviderConfidentialityStatementDao");
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
@@ -39,7 +39,7 @@ public class HRMStatementModifyAction extends DispatchAction {
 		}
 
 		confStatement.setStatement(statement);
-		confStatement.setId(providerNo);
+		confStatement.setProviderNo(providerNo);
 		try {
 			hrmProviderConfidentialityStatementDao.merge(confStatement);
 			request.setAttribute("statementSuccess", true);

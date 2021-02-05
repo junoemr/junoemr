@@ -188,7 +188,7 @@ public class HRMReportParser {
 					HRMReportParser.routeReportToProvider(document.getId().toString(), "-1");
 				}
 
-				HRMReportParser.routeReportToSubClass(report, document.getId());
+				HRMReportParser.routeReportToSubClass(report, document);
 			}
 		} else if (exactMatchList != null && exactMatchList.size() > 0) {
 			// We've seen this one before.  Increment the counter on how many times we've seen it before
@@ -339,7 +339,7 @@ public class HRMReportParser {
 	}
 
 
-	public static void routeReportToSubClass(HRMReport report, Integer reportId) {
+	public static void routeReportToSubClass(HRMReport report, HRMDocument document) {
 		if(report == null) {
 			logger.info("routeReportToSubClass cannot continue, report parameter is null");
 			return;
@@ -366,7 +366,7 @@ public class HRMReportParser {
 					newSubClass.setActive(true);
 					firstSubClass = false;
 				}
-				newSubClass.setHrmDocumentId(reportId);
+				newSubClass.setHrmDocument(document);
 
 				hrmDocumentSubClassDao.merge(newSubClass);
 			}

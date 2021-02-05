@@ -9,12 +9,6 @@
 
 package org.oscarehr.hospitalReportManager;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -30,9 +24,15 @@ import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.List;
 
 public class HRMModifyDocumentAction extends DispatchAction {
 
@@ -41,6 +41,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	HRMDocumentToProviderDao hrmDocumentToProviderDao = (HRMDocumentToProviderDao) SpringUtils.getBean("HRMDocumentToProviderDao");
 	HRMDocumentSubClassDao hrmDocumentSubClassDao = (HRMDocumentSubClassDao) SpringUtils.getBean("HRMDocumentSubClassDao");
 	HRMDocumentCommentDao hrmDocumentCommentDao = (HRMDocumentCommentDao) SpringUtils.getBean("HRMDocumentCommentDao");
+	ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
 	 private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	 
 	public ActionForward undefined(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
@@ -318,10 +319,10 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		try {
 			HRMDocumentComment comment = new HRMDocumentComment();
 
-			comment.setHrmDocumentId(Integer.parseInt(documentId));
+			comment.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(documentId)));
 			comment.setComment(commentString);
 			comment.setCommentTime(new Date());
-			comment.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+			comment.setProvider(providerDataDao.find(loggedInInfo.getLoggedInProviderNo()));
 
 			hrmDocumentCommentDao.merge(comment);
 			request.setAttribute("success", true);

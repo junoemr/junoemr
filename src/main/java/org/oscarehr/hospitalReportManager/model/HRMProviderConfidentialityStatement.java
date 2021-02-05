@@ -8,34 +8,23 @@
  */
 package org.oscarehr.hospitalReportManager.model;
 
+import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.oscarehr.common.model.AbstractModel;
-
+@Data
 @Entity
-public class HRMProviderConfidentialityStatement extends AbstractModel<String> {
-
+public class HRMProviderConfidentialityStatement extends AbstractModel<String>
+{
 	@Id
 	private String providerNo;
-	
 	private String statement;
-	
+
 	@Override
-	public String getId() {
+	public String getId()
+	{
 		return providerNo;
 	}
-	
-	public void setId(String id) {
-		this.providerNo = id;
-	}
-
-	public String getStatement() {
-    	return statement;
-    }
-
-	public void setStatement(String statement) {
-    	this.statement = statement;
-    }
-
 }

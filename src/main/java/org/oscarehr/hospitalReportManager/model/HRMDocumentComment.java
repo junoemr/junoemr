@@ -8,71 +8,42 @@
  */
 package org.oscarehr.hospitalReportManager.model;
 
-import java.util.Date;
+import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.util.Date;
 
-import org.oscarehr.common.model.AbstractModel;
-
+@Data
 @Entity
-public class HRMDocumentComment extends AbstractModel<Integer> {
-
+public class HRMDocumentComment extends AbstractModel<Integer>
+{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	private String providerNo;
-	private Integer hrmDocumentId;
 	private String comment;
 	private Date commentTime;
-	private Boolean deleted = false;
-	
+	private boolean deleted;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "providerNo")
+	private ProviderData provider;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "hrmDocumentId")
+	private HRMDocument hrmDocument;
+
 	@Override
-	public Integer getId() {
+	public Integer getId()
+	{
 		return id;
 	}
-
-	public String getProviderNo() {
-    	return providerNo;
-    }
-
-	public void setProviderNo(String providerNo) {
-    	this.providerNo = providerNo;
-    }
-
-	public Integer getHrmDocumentId() {
-    	return hrmDocumentId;
-    }
-
-	public void setHrmDocumentId(Integer hrmDocumentId) {
-    	this.hrmDocumentId = hrmDocumentId;
-    }
-
-	public String getComment() {
-    	return comment;
-    }
-
-	public void setComment(String comment) {
-    	this.comment = comment;
-    }
-
-	public Date getCommentTime() {
-    	return commentTime;
-    }
-
-	public void setCommentTime(Date commentTime) {
-    	this.commentTime = commentTime;
-    }
-
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
-	}
-	
-	public Boolean isDeleted() {
-		return this.deleted;
-	}
-	
 }
