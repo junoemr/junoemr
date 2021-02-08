@@ -56,6 +56,10 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setTimeReceived(ConversionUtils.toNullableLegacyDateTime(input.getReceivedDateTime()));
 		hrmDocument.setReportDate(ConversionUtils.toNullableLegacyDateTime(input.getReportDateTime()));
 		hrmDocument.setSourceFacility(input.getSourceFacility());
+		hrmDocument.setSendingFacilityId(input.getSendingFacilityId());
+		hrmDocument.setSendingFacilityReportId(input.getSendingFacilityReport());
+		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
+		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
 
 		hrmDocument.setDocument(documentModelToDbConverter.convert(input.getDocument()));
 

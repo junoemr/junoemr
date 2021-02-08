@@ -103,6 +103,7 @@ public class HrmDocument extends AbstractTransientModel
 
 	private Integer id;
 	private String messageUniqueId;
+	private String deliverToUserId;
 
 	private LocalDateTime reportDateTime;
 	private LocalDateTime receivedDateTime;

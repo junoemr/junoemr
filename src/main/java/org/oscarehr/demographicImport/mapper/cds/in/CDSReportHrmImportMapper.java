@@ -79,6 +79,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 		document.setSendingFacilityId(importStructure.getSendingFacilityId());
 		document.setSendingFacilityReport(importStructure.getSendingFacilityReport());
 		document.setMessageUniqueId(importStructure.getMessageUniqueID());
+		document.setDeliverToUserId(null); // can this be derived somehow?
 
 		return document;
 	}

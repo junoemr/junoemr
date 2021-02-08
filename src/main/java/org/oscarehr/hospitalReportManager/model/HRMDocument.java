@@ -43,6 +43,10 @@ public class HRMDocument extends AbstractModel<Integer>
 	private String reportStatus;
 	private String reportFile;
 	private String sourceFacility;
+	private String sendingFacilityId;
+	private String sendingFacilityReportId;
+	private String messageUniqueId;
+	private String deliverToUserId;
 
 	private String unmatchedProviders;
 	private Integer numDuplicatesReceived;

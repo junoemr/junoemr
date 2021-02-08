@@ -13,6 +13,7 @@ package oscar.oscarLab.ca.on;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
@@ -195,6 +196,33 @@ public class HRMResultsData {
 
 		// at this point I have to make a random guess, we know it's a duplicate but we can't tell which is newer.
 		return(currentEntry.getHrmDocumentId()>previousEntry.getHrmDocumentId());
+	}
+
+	public static boolean isNewer(HRMDocument currentEntry, HRMDocument previousEntry)
+	{
+		Date currentDate=currentEntry.getReportDate();
+		Date previousDate=previousEntry.getReportDate();
+
+		if(currentDate != null && previousDate != null)
+		{
+			return currentDate.after(previousDate);
+		}
+		else // try to pick the one that's not canceled.
+		{
+			String cancelledValue = HrmDocument.REPORT_STATUS.CANCELLED.getValue();
+			String currentStatus = currentEntry.getReportStatus();
+			String previousStatus = previousEntry.getReportStatus();
+
+			if(!cancelledValue.equals(currentStatus) && cancelledValue.equals(previousStatus))
+			{
+				return (true);
+			}
+			if(cancelledValue.equals(currentStatus) && !cancelledValue.equals(previousStatus))
+			{
+				return (false);
+			}
+			return (currentEntry.getId() > previousEntry.getId());
+		}
 	}
 
 	/*
