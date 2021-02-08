@@ -147,7 +147,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				url: "../ws/rs/notes/" + demographicNo + "/getNoteToEdit/" + noteId,
 				success: function (result)
 				{
-					var note = me.getEmptyNote();
+					var note = me.getEmptyNote(me.pageData.providerNo, me.pageData.appointmentNo);
 					var issues = [];
 
 					if(result.body !== null)
