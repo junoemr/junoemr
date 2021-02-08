@@ -36,7 +36,6 @@ import org.oscarehr.common.dao.forms.FormsDao;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.OscarCommLocations;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -137,7 +136,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * @return Vector, Contains the messageids for use on the DisplayMessage.jsp
 	 */
 	public Vector<String> getMessageid() {
-		getMessageIDs();
+		// this looks like it's not used
+		getMessageIDs(null);
 		getInfo();
 
 		return this.messageid;
@@ -158,7 +158,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getStatus() {
 		if (status == null) {
-			getMessageIDs();
+			// this looks like it's not used
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.status;
@@ -175,7 +176,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getDate() {
 		if (date == null) {
-			getMessageIDs();
+			// this looks like it's not used
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.date;
@@ -196,7 +198,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getSentby() {
 		if (sentby == null) {
-			getMessageIDs();
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.sentby;
@@ -217,7 +219,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getSubject() {
 		if (subject == null) {
-			getMessageIDs();
+			// this looks like it's not used
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.subject;
@@ -227,8 +230,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getMessageIDs() {
-		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
+	void getMessageIDs(String providerNo) {
 
 		messageid = new Vector<String>();
 		status = new Vector<String>();
@@ -426,9 +428,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		return msg;
 	}
 
-	public int getTotalMessages(int type)
+	public int getTotalMessages(int type, String providerNo)
 	{
-		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
 		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		Integer location = Integer.parseInt(getCurrentLocationId());
 		switch(type)
@@ -521,8 +522,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getDeletedMessageIDs() {
-		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
+	void getDeletedMessageIDs(String providerNo) {
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		try {
@@ -540,8 +540,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getSentMessageIDs() {
-		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
+	void getSentMessageIDs(String providerNo) {
 
 		messageid = new Vector<String>();
 		status = new Vector<String>();
