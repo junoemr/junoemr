@@ -284,7 +284,7 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				controller.validations = {
-					appointmentTimeValid: Juno.Validations.validationCustom(() =>
+					appointmentDurationValid: Juno.Validations.validationCustom(() =>
 					{
 						let momentStart = Juno.Common.Util.getDateAndTimeMoment(
 							$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
@@ -798,7 +798,7 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
 				}
 
-				let appointmentSpansToNextDay = !controller.validations.appointmentTimeValid();
+				let appointmentSpansToNextDay = !controller.validations.appointmentDurationValid();
 
 				if (appointmentSpansToNextDay)
 				{
