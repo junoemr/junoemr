@@ -23,8 +23,9 @@
 package org.oscarehr.demographicImport.model.hrm;
 
 import lombok.Data;
-import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 
@@ -111,7 +112,8 @@ public class HrmDocument extends AbstractTransientModel
 	private REPORT_CLASS reportClass;
 	private String reportSubClass;
 	private REPORT_STATUS reportStatus;
-	private GenericFile file;
+	private XMLFile reportFile;
+	private Document document;
 	private String sourceFacility;
 	private String sendingFacilityId;
 	private String sendingFacilityReport;

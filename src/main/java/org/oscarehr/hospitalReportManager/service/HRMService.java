@@ -26,6 +26,7 @@ package org.oscarehr.hospitalReportManager.service;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
@@ -58,14 +59,30 @@ public class HRMService
 	@Autowired
 	private HRMDocumentToProviderDao hrmDocumentToProviderDao;
 
+	@Autowired
+	private DocumentService documentService;
+
+	/**
+	 * upload a new HRM document to the database with an associated document reference.
+	 * @param hrmDocumentModel - the model
+	 * @param demographic - the demographic entity
+	 * @return - the persisted HRM entity
+	 * @throws IOException
+	 */
 	public HRMDocument uploadNewHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic) throws IOException
 	{
-		HRMDocument document = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
-		hrmDocumentDao.persist(document);
-		routeToDemographic(document, demographic);
+		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
 
-		hrmDocumentModel.getFile().moveToHRMDocuments();
-		return document;
+		// save document as an unassigned document record
+		documentService.uploadNewDemographicDocument(hrmDocument.getDocument(), hrmDocumentModel.getDocument().getFile(), null);
+
+		// persist hrm database info and associated objects through cascade
+		hrmDocumentDao.persist(hrmDocument);
+
+		// assign the hrm document to the demographic
+		routeToDemographic(hrmDocument, demographic);
+
+		return hrmDocument;
 	}
 
 	public void uploadAllNewHRMDocuments(List<HrmDocument> hrmDocumentModels, Demographic demographic) throws IOException

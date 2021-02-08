@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.converter.in.hrm;
 
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
+import org.oscarehr.demographicImport.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.hrm.HrmComment;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
@@ -32,6 +33,7 @@ import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -41,6 +43,9 @@ import java.util.List;
 @Component
 public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDocument, HRMDocument>
 {
+	@Autowired
+	private DocumentModelToDbConverter documentModelToDbConverter;
+
 	@Override
 	public HRMDocument convert(HrmDocument input)
 	{
@@ -52,7 +57,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setReportDate(ConversionUtils.toNullableLegacyDateTime(input.getReportDateTime()));
 		hrmDocument.setSourceFacility(input.getSourceFacility());
 
-		hrmDocument.setReportFile(input.getFile().getName());
+		hrmDocument.setDocument(documentModelToDbConverter.convert(input.getDocument()));
 
 		hrmDocument.setDocumentSubClassList(convertSubClassList(hrmDocument, input.getObservations()));
 		hrmDocument.setCommentList(convertCommentList(hrmDocument, input.getComments()));

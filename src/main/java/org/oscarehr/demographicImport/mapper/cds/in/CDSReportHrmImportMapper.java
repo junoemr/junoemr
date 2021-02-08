@@ -31,6 +31,7 @@ import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -43,6 +44,9 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
+	@Autowired
+	protected CDSReportDocumentImportMapper documentImportMapper;
+
 	public CDSReportHrmImportMapper()
 	{
 		super();
@@ -53,8 +57,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 	{
 		HrmDocument document = new HrmDocument();
 
-		document.setFile(getDocumentFile(importStructure));
-
+		document.setDocument(documentImportMapper.importToJuno(importStructure));
 		document.setReportClass(HrmDocument.REPORT_CLASS.fromValueString(getReportClass(importStructure.getClazz())));
 		document.setReportSubClass(importStructure.getSubClass());
 		document.setReportDateTime(toNullableLocalDateTime(importStructure.getEventDateTime()));
