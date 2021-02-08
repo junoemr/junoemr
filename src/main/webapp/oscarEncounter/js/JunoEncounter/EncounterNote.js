@@ -665,7 +665,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			isSigned: false,
 			isVerified: false,
 			appointmentNo: appointmentNo,
-			note: ""
+			note: this.getFormattedReason()
 		};
 	};
 
@@ -1040,7 +1040,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				else
 				{
 					noteToEdit = me.getEmptyNote(me.pageData.providerNo, me.pageData.appointmentNo);
-					noteToEdit.note = me.getFormattedReason();
 				}
 
 				me.updateNoteInPageState(noteToEdit, issues);
