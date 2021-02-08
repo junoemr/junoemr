@@ -46,6 +46,8 @@ import static org.apache.commons.lang.StringUtils.stripToNull;
 
 public class MsgDisplayMessagesBean implements java.io.Serializable {
 
+	private MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private static final int TYPE_SENT = 1;
@@ -237,8 +239,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		messagePosition = new Vector<String>();
 		int index = 0;
 
-		MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
-		for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+		for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 			messagePosition.add(Integer.toString(index));
 			messageid.add("" + ml.getMessage());
 			status.add(ml.getStatus());
@@ -430,7 +431,6 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 
 	public int getTotalMessages(int type, String providerNo)
 	{
-		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		Integer location = Integer.parseInt(getCurrentLocationId());
 		switch(type)
 		{
@@ -526,8 +526,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		try {
-			MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
-			for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+			for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 				messageid.add("" + ml.getMessage());
 				status.add("deleted");
 			}
