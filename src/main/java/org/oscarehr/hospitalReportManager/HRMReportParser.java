@@ -47,8 +47,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-
-public class HRMReportParser {
+public class HRMReportParser
+{
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final HRMDocumentDao hrmDocumentDao = SpringUtils.getBean(HRMDocumentDao.class);
@@ -56,15 +56,17 @@ public class HRMReportParser {
 	private HRMReportParser() {}
 
 
-	public static HRMReport parseReport(LoggedInInfo loggedInInfo, String hrmReportFileLocation) {
+	public static HRMReport parseReport(LoggedInInfo loggedInInfo, String hrmReportFileLocation)
+	{
 		OmdCds root = null;
-		
-		logger.info("Parsing the Report in the location:"+hrmReportFileLocation);
+
+		logger.info("Parsing the Report in the location:" + hrmReportFileLocation);
 		
 		String fileData = null;
-		if (hrmReportFileLocation != null) {
-			
-			try {
+		if(hrmReportFileLocation != null)
+		{
+			try
+			{
 				//a lot of the parsers need to refer to a file and even when they provide functions like parse(String text)
 				//it will not parse the same way because it will treat the text as a URL
 				//so we take the lab and store them temporarily in a random filename in /tmp/oscar-sftp/
@@ -101,20 +103,25 @@ public class HRMReportParser {
 
 				tmpXMLholder = null;
 
-			} catch (SAXException e) {
+			}
+			catch(SAXException e)
+			{
 				logger.error("SAX ERROR PARSING XML " + e);
-			} catch (ParserConfigurationException e) {
+			}
+			catch(ParserConfigurationException e)
+			{
 				logger.error("PARSER ERROR PARSING XML " + e);
-			} catch (JAXBException e) {
-				// TODO-legacy Auto-generated catch block
-				logger.error("error",e);
-
+			}
+			catch(JAXBException e)
+			{
+				logger.error("error", e);
 			}
 
-                        if (root!=null && hrmReportFileLocation!=null && fileData!=null)
-                            return new HRMReport(root, hrmReportFileLocation, fileData);
+			if(root != null && fileData != null)
+			{
+				return new HRMReport(root, hrmReportFileLocation, fileData);
+			}
 		}
-
 		return null;
 	}
 

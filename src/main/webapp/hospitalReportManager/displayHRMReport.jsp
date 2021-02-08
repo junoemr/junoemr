@@ -435,7 +435,7 @@ String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 			<td>
 				<div id="demostatus<%=hrmReportId %>"></div>
 				<% if (demographicLink != null) { %>
-					<oscar:nameage demographicNo="<%=demographicLink.getDemographicNo() %>" /> <a href="#" onclick="removeDemoFromHrm('<%=hrmReportId %>')">(remove)</a>
+					<oscar:nameage demographicNo="<%=String.valueOf(demographicLink.getDemographicNo()) %>" /> <a href="#" onclick="removeDemoFromHrm('<%=hrmReportId %>')">(remove)</a>
 				<% } else { %>
 					<i>Not currently linked</i><br />
 					<input type="hidden" id="demofind<%=hrmReportId %>hrm" value="" />
