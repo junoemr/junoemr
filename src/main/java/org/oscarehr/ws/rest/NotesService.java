@@ -527,9 +527,7 @@ public class NotesService extends AbstractServiceImpl
 				if (note.getNote().equals(note.getNote()) && issueTo1.isIssueChange() && !extChanged && note.isArchived()) return null;
 			}
 
-			if (note.isArchived()) {
-				caseMangementNote.setArchived(true);
-			}
+			caseMangementNote.setArchived(note.isArchived());
 
 			if (!newNote) {
 				note.setRevision(Integer.parseInt(note.getRevision()) + 1 + "");
