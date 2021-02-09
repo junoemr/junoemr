@@ -22,11 +22,11 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
-import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.PersonalHistory;
+import xml.cds.v5_0.ResidualInformation;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ANNOTATION;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_NOTE;

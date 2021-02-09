@@ -24,20 +24,7 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
-import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
-import org.oscarehr.common.xml.cds.v5_0.model.Gender;
-import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
-import org.oscarehr.common.xml.cds.v5_0.model.OfficialSpokenLanguageCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePartTypeCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePurposeCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimpleWithMiddleName;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameStandard;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
-import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
-import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
-import org.oscarehr.common.xml.cds.v5_0.model.PurposeEnumOrPlainText;
+import org.oscarehr.demographicImport.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.Person;
@@ -47,6 +34,20 @@ import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.AddressType;
+import xml.cds.v5_0.Demographics;
+import xml.cds.v5_0.Gender;
+import xml.cds.v5_0.HealthCard;
+import xml.cds.v5_0.OfficialSpokenLanguageCode;
+import xml.cds.v5_0.PersonNamePartTypeCode;
+import xml.cds.v5_0.PersonNamePrefixCode;
+import xml.cds.v5_0.PersonNamePurposeCode;
+import xml.cds.v5_0.PersonNameSimpleWithMiddleName;
+import xml.cds.v5_0.PersonNameStandard;
+import xml.cds.v5_0.PersonStatus;
+import xml.cds.v5_0.PhoneNumber;
+import xml.cds.v5_0.PhoneNumberType;
+import xml.cds.v5_0.PurposeEnumOrPlainText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
 @Component
-public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demographics, PatientRecord>
+public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemographicInterface, PatientRecord>
 {
 	private static final Logger logger = Logger.getLogger(CDSDemographicExportMapper.class);
 
@@ -168,10 +169,10 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		return healthCard;
 	}
 
-	protected List<org.oscarehr.common.xml.cds.v5_0.model.Address> getExportAddresses(Demographic exportStructure)
+	protected List<xml.cds.v5_0.Address> getExportAddresses(Demographic exportStructure)
 	{
 		List<Address> addressList = exportStructure.getAddressList();
-		List<org.oscarehr.common.xml.cds.v5_0.model.Address> exportAddressList = new ArrayList<>(addressList.size());
+		List<xml.cds.v5_0.Address> exportAddressList = new ArrayList<>(addressList.size());
 
 		for(Address address : addressList)
 		{

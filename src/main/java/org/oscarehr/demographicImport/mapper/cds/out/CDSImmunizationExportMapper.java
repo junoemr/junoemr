@@ -23,14 +23,14 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.common.xml.cds.v5_0.model.Code;
-import org.oscarehr.common.xml.cds.v5_0.model.ImmunizationType;
-import org.oscarehr.common.xml.cds.v5_0.model.Immunizations;
-import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
-import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.Code;
+import xml.cds.v5_0.ImmunizationType;
+import xml.cds.v5_0.Immunizations;
+import xml.cds.v5_0.ResidualInformation;
+import xml.cds.v5_0.YnIndicator;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DRUG_IDENTIFICATION_NUMBER;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE;

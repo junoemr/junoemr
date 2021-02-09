@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.mapper.hrm.out;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.demographicImport.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.springframework.stereotype.Component;
 import xml.hrm.v4_3.Demographics;
@@ -33,7 +34,7 @@ import xml.hrm.v4_3.PersonNamePurposeCode;
 import xml.hrm.v4_3.PersonNameStandard;
 
 @Component
-public class HRMDemographicExportMapper extends AbstractHRMExportMapper<Demographics, Demographic>
+public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemographicInterface, Demographic>
 {
 	private static final Logger logger = Logger.getLogger(HRMDemographicExportMapper.class);
 

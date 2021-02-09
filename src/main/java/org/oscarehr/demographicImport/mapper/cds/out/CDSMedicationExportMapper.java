@@ -22,14 +22,14 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
-import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
 import org.oscarehr.demographicImport.model.medication.FrequencyCode;
 import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.DrugMeasure;
+import xml.cds.v5_0.MedicationsAndTreatments;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_FALSE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;

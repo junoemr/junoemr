@@ -22,9 +22,9 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.document.Document;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.Reports;
 
 import java.io.IOException;
 

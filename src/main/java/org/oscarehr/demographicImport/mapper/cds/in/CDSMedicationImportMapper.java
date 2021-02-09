@@ -24,8 +24,6 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
-import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
 import org.oscarehr.demographicImport.exception.InvalidFrequencyCodeException;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
@@ -35,6 +33,8 @@ import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.DrugMeasure;
+import xml.cds.v5_0.MedicationsAndTreatments;
 
 import java.time.LocalDate;
 

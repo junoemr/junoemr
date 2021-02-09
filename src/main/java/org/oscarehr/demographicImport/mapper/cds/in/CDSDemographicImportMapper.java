@@ -24,17 +24,17 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
-import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
-import org.oscarehr.common.xml.cds.v5_0.model.OfficialSpokenLanguageCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.Demographics;
+import xml.cds.v5_0.HealthCard;
+import xml.cds.v5_0.OfficialSpokenLanguageCode;
+import xml.cds.v5_0.PersonNamePrefixCode;
+import xml.cds.v5_0.PersonStatus;
 
 import java.time.LocalDate;
 
@@ -105,12 +105,12 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 	{
 		demographic.setEmail(importStructure.getEmail());
 
-		for(org.oscarehr.common.xml.cds.v5_0.model.Address importAddr : importStructure.getAddress())
+		for(xml.cds.v5_0.Address importAddr : importStructure.getAddress())
 		{
 			demographic.addAddress(getAddress(importAddr));
 		}
 
-		for(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber : importStructure.getPhoneNumber())
+		for(xml.cds.v5_0.PhoneNumber importNumber : importStructure.getPhoneNumber())
 		{
 			PhoneNumber phoneNumber = getPhoneNumber(importNumber);
 

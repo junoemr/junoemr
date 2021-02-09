@@ -24,14 +24,14 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportClass;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.PersonNameSimple;
+import xml.cds.v5_0.ReportClass;
+import xml.cds.v5_0.ReportFormat;
+import xml.cds.v5_0.Reports;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

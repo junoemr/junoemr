@@ -22,9 +22,9 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.ProblemList;
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.ProblemList;
 
 @Component
 public class CDSProblemImportMapper extends AbstractCDSNoteImportMapper<ProblemList, ConcernNote>

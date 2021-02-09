@@ -22,9 +22,9 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
 import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.Demographics;
 
 @Component
 public class CDSPharmacyImportMapper extends AbstractCDSImportMapper<Demographics.PreferredPharmacy, Pharmacy>

@@ -22,20 +22,6 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.BloodPressure;
-import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
-import org.oscarehr.common.xml.cds.v5_0.model.DiabetesComplicationScreening;
-import org.oscarehr.common.xml.cds.v5_0.model.DiabetesEducationalSelfManagement;
-import org.oscarehr.common.xml.cds.v5_0.model.DiabetesMotivationalCounselling;
-import org.oscarehr.common.xml.cds.v5_0.model.DiabetesSelfManagementChallenges;
-import org.oscarehr.common.xml.cds.v5_0.model.DiabetesSelfManagementCollaborative;
-import org.oscarehr.common.xml.cds.v5_0.model.Height;
-import org.oscarehr.common.xml.cds.v5_0.model.HypoglycemicEpisodes;
-import org.oscarehr.common.xml.cds.v5_0.model.SelfMonitoringBloodGlucose;
-import org.oscarehr.common.xml.cds.v5_0.model.SmokingPacks;
-import org.oscarehr.common.xml.cds.v5_0.model.SmokingStatus;
-import org.oscarehr.common.xml.cds.v5_0.model.WaistCircumference;
-import org.oscarehr.common.xml.cds.v5_0.model.Weight;
 import org.oscarehr.demographicImport.model.measurement.BloodPressureMeasurement;
 import org.oscarehr.demographicImport.model.measurement.DiabetesComplicationsScreeningMeasurement;
 import org.oscarehr.demographicImport.model.measurement.DiabetesMotivationalCounselingMeasurement;
@@ -52,6 +38,20 @@ import org.oscarehr.demographicImport.model.measurement.WaistCircumferenceMeasur
 import org.oscarehr.demographicImport.model.measurement.WeightMeasurement;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.BloodPressure;
+import xml.cds.v5_0.CareElements;
+import xml.cds.v5_0.DiabetesComplicationScreening;
+import xml.cds.v5_0.DiabetesEducationalSelfManagement;
+import xml.cds.v5_0.DiabetesMotivationalCounselling;
+import xml.cds.v5_0.DiabetesSelfManagementChallenges;
+import xml.cds.v5_0.DiabetesSelfManagementCollaborative;
+import xml.cds.v5_0.Height;
+import xml.cds.v5_0.HypoglycemicEpisodes;
+import xml.cds.v5_0.SelfMonitoringBloodGlucose;
+import xml.cds.v5_0.SmokingPacks;
+import xml.cds.v5_0.SmokingStatus;
+import xml.cds.v5_0.WaistCircumference;
+import xml.cds.v5_0.Weight;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

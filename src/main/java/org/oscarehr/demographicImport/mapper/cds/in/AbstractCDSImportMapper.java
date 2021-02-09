@@ -25,15 +25,6 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
-import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
-import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
-import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
-import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
-import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PartialDate;
@@ -44,6 +35,15 @@ import org.oscarehr.demographicImport.util.ImportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.AddressStructured;
+import xml.cds.v5_0.DateFullOrPartial;
+import xml.cds.v5_0.DateTimeFullOrPartial;
+import xml.cds.v5_0.LifeStage;
+import xml.cds.v5_0.PersonNameSimple;
+import xml.cds.v5_0.PhoneNumberType;
+import xml.cds.v5_0.PostalZipCode;
+import xml.cds.v5_0.ResidualInformation;
+import xml.cds.v5_0.YnIndicator;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -177,7 +177,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected PhoneNumber getPhoneNumber(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber)
+	protected PhoneNumber getPhoneNumber(xml.cds.v5_0.PhoneNumber importNumber)
 	{
 		if(importNumber == null)
 		{
@@ -265,7 +265,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return regionCode;
 	}
 
-	protected Address getAddress(org.oscarehr.common.xml.cds.v5_0.model.Address importAddress)
+	protected Address getAddress(xml.cds.v5_0.Address importAddress)
 	{
 		Address address = null;
 		if(importAddress != null)

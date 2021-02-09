@@ -23,10 +23,10 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportClass;
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.ReportClass;
+import xml.cds.v5_0.Reports;
 
 @Component
 public abstract class AbstractCDSReportExportMapper<E> extends AbstractCDSExportMapper<Reports, E>

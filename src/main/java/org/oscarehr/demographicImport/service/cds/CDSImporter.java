@@ -24,7 +24,6 @@ package org.oscarehr.demographicImport.service.cds;
 
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.mapper.cds.in.CDSImportMapper;
 import org.oscarehr.demographicImport.model.PatientRecord;
@@ -33,6 +32,7 @@ import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xml.cds.v5_0.OmdCds;
 
 import java.util.ArrayList;
 import java.util.List;

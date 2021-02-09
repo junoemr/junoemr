@@ -24,9 +24,9 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.FamilyHistory;
 
 @Component
 public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<FamilyHistory, FamilyHistoryNote>

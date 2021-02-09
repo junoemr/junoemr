@@ -23,16 +23,6 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
-import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
-import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
-import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
-import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
-import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
-import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.Address;
@@ -41,6 +31,16 @@ import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.AddressStructured;
+import xml.cds.v5_0.AddressType;
+import xml.cds.v5_0.DateFullOrPartial;
+import xml.cds.v5_0.DateTimeFullOrPartial;
+import xml.cds.v5_0.LifeStage;
+import xml.cds.v5_0.ObjectFactory;
+import xml.cds.v5_0.PersonNameSimple;
+import xml.cds.v5_0.PostalZipCode;
+import xml.cds.v5_0.ResidualInformation;
+import xml.cds.v5_0.YnIndicator;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
@@ -64,9 +64,9 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 
 	/* ==== common helper methods for cds ==== */
 
-	protected org.oscarehr.common.xml.cds.v5_0.model.Address toCdsAddress(Address addressModel, AddressType addressType)
+	protected xml.cds.v5_0.Address toCdsAddress(Address addressModel, AddressType addressType)
 	{
-		org.oscarehr.common.xml.cds.v5_0.model.Address cdsAddress = null;
+		xml.cds.v5_0.Address cdsAddress = null;
 		if(addressModel != null)
 		{
 			cdsAddress = objectFactory.createAddress();

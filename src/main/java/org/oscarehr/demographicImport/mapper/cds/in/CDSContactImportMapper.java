@@ -22,12 +22,12 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
-import org.oscarehr.common.xml.cds.v5_0.model.PurposeEnumOrPlainText;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.contact.DemographicContact;
 import org.oscarehr.demographicImport.model.contact.ExternalContact;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.Demographics;
+import xml.cds.v5_0.PurposeEnumOrPlainText;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,7 +52,7 @@ public class CDSContactImportMapper extends AbstractCDSImportMapper<Demographics
 		contact.setLastName(importContact.getName().getLastName());
 		contact.setEmail(importContact.getEmailAddress());
 
-		for(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber : importContact.getPhoneNumber())
+		for(xml.cds.v5_0.PhoneNumber importNumber : importContact.getPhoneNumber())
 		{
 			PhoneNumber phoneNumber = getPhoneNumber(importNumber);
 

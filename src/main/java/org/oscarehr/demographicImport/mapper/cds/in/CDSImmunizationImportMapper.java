@@ -24,14 +24,14 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.Code;
-import org.oscarehr.common.xml.cds.v5_0.model.ImmunizationType;
-import org.oscarehr.common.xml.cds.v5_0.model.Immunizations;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.Code;
+import xml.cds.v5_0.ImmunizationType;
+import xml.cds.v5_0.Immunizations;
 
 import java.util.HashMap;
 

@@ -25,8 +25,6 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
-import org.oscarehr.common.xml.cds.v5_0.model.ResultNormalAbnormalFlag;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
@@ -34,6 +32,8 @@ import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.LaboratoryResults;
+import xml.cds.v5_0.ResultNormalAbnormalFlag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

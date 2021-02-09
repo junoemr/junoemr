@@ -20,8 +20,8 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.xml.cds;
+package org.oscarehr.demographicImport.mapper.cds;
 
-public interface CDSDemographicInterface
+public interface CDSReportInterface
 {
 }

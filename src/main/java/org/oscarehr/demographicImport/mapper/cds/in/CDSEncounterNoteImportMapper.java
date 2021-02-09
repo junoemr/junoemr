@@ -24,12 +24,12 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
-import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.ClinicalNotes;
+import xml.cds.v5_0.DateTimeFullOrPartial;
 
 @Component
 public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<ClinicalNotes, EncounterNote>

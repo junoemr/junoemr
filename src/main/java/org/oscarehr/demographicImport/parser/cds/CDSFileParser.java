@@ -23,9 +23,9 @@
 package org.oscarehr.demographicImport.parser.cds;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.parser.AbstractXMLFileParser;
+import xml.cds.v5_0.OmdCds;
+import xml.cds.v5_0.PatientRecord;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

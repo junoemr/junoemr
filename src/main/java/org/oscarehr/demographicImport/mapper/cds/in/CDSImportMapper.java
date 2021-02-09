@@ -22,14 +22,14 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.CareElements;
+import xml.cds.v5_0.OmdCds;
+import xml.cds.v5_0.PatientRecord;
+import xml.cds.v5_0.Reports;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

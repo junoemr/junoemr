@@ -22,12 +22,12 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.AdverseReactionSeverity;
-import org.oscarehr.common.xml.cds.v5_0.model.AllergiesAndAdverseReactions;
-import org.oscarehr.common.xml.cds.v5_0.model.DrugCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PropertyOfOffendingAgent;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.AdverseReactionSeverity;
+import xml.cds.v5_0.AllergiesAndAdverseReactions;
+import xml.cds.v5_0.DrugCode;
+import xml.cds.v5_0.PropertyOfOffendingAgent;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ONSET_REACTION;

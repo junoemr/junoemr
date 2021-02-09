@@ -24,9 +24,9 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.AlertsAndSpecialNeeds;
 import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.AlertsAndSpecialNeeds;
 
 @Component
 public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndSpecialNeeds, ReminderNote>

@@ -22,13 +22,13 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.LaboratoryResults;
+import xml.cds.v5_0.OmdCds;
+import xml.cds.v5_0.PatientRecord;
 
 import java.util.List;
 import java.util.stream.Collectors;

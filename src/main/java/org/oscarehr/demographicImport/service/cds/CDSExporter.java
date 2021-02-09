@@ -25,7 +25,6 @@ package org.oscarehr.demographicImport.service.cds;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
@@ -39,6 +38,7 @@ import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.oscarClinic.ClinicData;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.OmdCds;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

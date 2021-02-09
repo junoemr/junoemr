@@ -22,9 +22,9 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.Reports;
 
 @Component
 public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmDocument>
