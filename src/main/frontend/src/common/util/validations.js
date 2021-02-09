@@ -217,7 +217,7 @@ Juno.Validations.validationEmail = function (obj, field, ...validationFunc)
 	{
 		let value = Juno.Validations.getAttribute(obj, field);
 		// valid if undefined, blank or matches regex
-		if (value && (value === "" || !value.match(/^[^@]+@[^.]+\.[^.]+$/)))
+		if (value && (value === "" || !value.match(/^[^@ ]+@([A-z0-9-]+\.)+[A-z0-9-]+$/)))
 		{
 			return false;
 		}

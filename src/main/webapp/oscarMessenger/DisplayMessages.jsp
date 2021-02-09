@@ -79,6 +79,7 @@ if ( demographic_no != null ) {
     }
 }
 
+    String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
 pageContext.setAttribute("pageType",""+pageType);
 
@@ -291,17 +292,17 @@ function checkAll(formId){
                         switch(pageType)
                         {
                             case PAGE_TYPE_SENT:
-                                theMessages2 = DisplayMessagesBeanId.estSentItemsInbox(orderby,pageNum);
+                                theMessages2 = DisplayMessagesBeanId.estSentItemsInbox(orderby, pageNum, providerNo);
                                 break;
                             case PAGE_TYPE_DELETED:
-                                theMessages2 = DisplayMessagesBeanId.estDeletedInbox(orderby,pageNum);
+                                theMessages2 = DisplayMessagesBeanId.estDeletedInbox(orderby, pageNum, providerNo);
                                 break;
                             case PAGE_TYPE_DEMOGRAPHIC:
-                                theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderby,demographic_no);
+                                theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderby, demographic_no);
                                 break;
                             case PAGE_TYPE_DEFAULT:
                             default:
-                                theMessages2 = DisplayMessagesBeanId.estInbox(orderby,pageNum);
+                                theMessages2 = DisplayMessagesBeanId.estInbox(orderby, pageNum, providerNo);
                                 break;
 
                         }   //messageid
@@ -339,7 +340,7 @@ function checkAll(formId){
 
 		                    if (pageType != PAGE_TYPE_DEMOGRAPHIC)
 		                    {
-                                int totalMsgs = DisplayMessagesBeanId.getTotalMessages(pageType);
+                                int totalMsgs = DisplayMessagesBeanId.getTotalMessages(pageType, providerNo);
                                 int totalPages = totalMsgs / recordsToDisplay + (totalMsgs % recordsToDisplay == 0 ? 0 : 1);
                                 if(pageNum > 1)
                                 {

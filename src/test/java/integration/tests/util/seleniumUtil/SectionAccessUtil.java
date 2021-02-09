@@ -28,15 +28,17 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static integration.tests.util.SeleniumTestBase.WEB_DRIVER_EXPLICIT_TIMEOUT;
+import static integration.tests.util.SeleniumTestBase.webDriverWait;
 import static integration.tests.util.seleniumUtil.PageUtil.isExistsBy;
 
 public class SectionAccessUtil
 {
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
+			throws InterruptedException
 	{
 		driver.findElement(By.id("admin-panel")).click();
-		driver.manage().window().maximize();
 		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 		driver.findElement(By.linkText(subSectionName)).click();
 		driver.switchTo().frame("myFrame");
@@ -45,16 +47,16 @@ public class SectionAccessUtil
 	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
 			throws InterruptedException
 	{
-		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
 		{
 			// open JUNO UI page
 			driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 		}
 		// open administration panel
-		driver.manage().window().maximize();
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Admin")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-nav-collapse")));
 		driver.findElement(By.linkText("Admin")).click();
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 		driver.findElement(By.linkText(subSectionName)).click();
 		Thread.sleep(2000);
@@ -72,7 +74,6 @@ public class SectionAccessUtil
 			// open JUNO UI page
 			driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 		}
-		driver.manage().window().maximize();
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();
 	}
