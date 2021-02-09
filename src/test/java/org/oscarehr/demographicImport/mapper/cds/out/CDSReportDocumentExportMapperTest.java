@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
+import xml.cds.v5_0.Reports;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.provider.Reviewer;

@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.common.xml.cds.v5_0.model.AdverseReactionSeverity;
+import xml.cds.v5_0.AdverseReactionSeverity;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.springframework.beans.factory.annotation.Autowired;
 

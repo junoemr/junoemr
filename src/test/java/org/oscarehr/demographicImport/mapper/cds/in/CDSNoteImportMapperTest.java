@@ -26,8 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
-import org.oscarehr.common.xml.cds.v5_0.model.StandardCoding;
+import xml.cds.v5_0.ObjectFactory;
+import xml.cds.v5_0.StandardCoding;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.springframework.beans.factory.annotation.Autowired;
 

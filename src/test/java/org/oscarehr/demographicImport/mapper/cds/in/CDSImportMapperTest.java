@@ -28,16 +28,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
-import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
-import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
-import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
-import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
-import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
-import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
+import xml.cds.v5_0.AddressStructured;
+import xml.cds.v5_0.DateFullOrPartial;
+import xml.cds.v5_0.DateTimeFullOrPartial;
+import xml.cds.v5_0.LifeStage;
+import xml.cds.v5_0.ObjectFactory;
+import xml.cds.v5_0.PersonNameSimple;
+import xml.cds.v5_0.PhoneNumberType;
+import xml.cds.v5_0.PostalZipCode;
+import xml.cds.v5_0.ResidualInformation;
+import xml.cds.v5_0.YnIndicator;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
@@ -159,7 +159,7 @@ public class CDSImportMapperTest
 		String expectedCountry = "CA";
 		String expectedPostal = "V8V0T0";
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressCA(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -187,7 +187,7 @@ public class CDSImportMapperTest
 		String expectedCountry = "CA";
 		String expectedPostal = null;
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressCA(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -215,7 +215,7 @@ public class CDSImportMapperTest
 		String expectedCountry = "CA";
 		String expectedPostal = "V8V0T0";
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressCA(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -243,7 +243,7 @@ public class CDSImportMapperTest
 		String expectedCountry = null;
 		String expectedPostal = null;
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressCA(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressCA(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -271,7 +271,7 @@ public class CDSImportMapperTest
 		String expectedCountry = "US";
 		String expectedZip = "99750-0077";
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressUS(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -299,7 +299,7 @@ public class CDSImportMapperTest
 		String expectedCountry = "US";
 		String expectedZip = null;
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressUS(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -327,7 +327,7 @@ public class CDSImportMapperTest
 		String expectedCountry = "US";
 		String expectedZip = "99750-0077";
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressUS(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -355,7 +355,7 @@ public class CDSImportMapperTest
 		String expectedCountry = null;
 		String expectedZip = null;
 
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = createTestImportAddressUS(
+		xml.cds.v5_0.Address importAddress = createTestImportAddressUS(
 				expectedAddressLine1,
 				expectedAddressLine2,
 				expectedCity,
@@ -379,7 +379,7 @@ public class CDSImportMapperTest
 		String expectedFormattedAddress = "any address string";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		xml.cds.v5_0.Address importAddress = objectFactory.createAddress();
 		importAddress.setFormatted(expectedFormattedAddress);
 
 		Address resultAddress = cdsImportMapper.getAddress(importAddress);
@@ -399,7 +399,7 @@ public class CDSImportMapperTest
 		String expectedNumber = "2505551111";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
 
 		// add the number element
@@ -418,7 +418,7 @@ public class CDSImportMapperTest
 		String expectedExtension = "123";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
 
 		// add the number element
@@ -441,7 +441,7 @@ public class CDSImportMapperTest
 		String expectedNumber = "5551111";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
 
 		// add area code element
@@ -464,7 +464,7 @@ public class CDSImportMapperTest
 		String expectedExtension = "123";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
 
 		// add area code element
@@ -492,7 +492,7 @@ public class CDSImportMapperTest
 		String expectedNumber = "1111";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
 
 		// add area code element
@@ -520,7 +520,7 @@ public class CDSImportMapperTest
 		String expectedExtension = "123";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
 
 		// add area code element
@@ -550,7 +550,7 @@ public class CDSImportMapperTest
 		String expectedNumber = "2505551111";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 
 		// add the number element
 		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
@@ -568,7 +568,7 @@ public class CDSImportMapperTest
 		String expectedNumber = "2505551111";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 
 		// add the number element
 		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
@@ -586,7 +586,7 @@ public class CDSImportMapperTest
 		String expectedNumber = "2505551111";
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		xml.cds.v5_0.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
 
 		// add the number element
 		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
@@ -961,7 +961,7 @@ public class CDSImportMapperTest
 		assertEquals(expectedDate, cdsImportMapper.toNullableLocalDate(dateTimeFullOrPartial));
 	}
 
-	private org.oscarehr.common.xml.cds.v5_0.model.Address createTestImportAddressCA(
+	private xml.cds.v5_0.Address createTestImportAddressCA(
 			String addressLine1,
 			String addressLine2,
 			String city,
@@ -969,7 +969,7 @@ public class CDSImportMapperTest
 			String postal)
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		xml.cds.v5_0.Address importAddress = objectFactory.createAddress();
 		AddressStructured addressStructured = objectFactory.createAddressStructured();
 		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
 
@@ -984,7 +984,7 @@ public class CDSImportMapperTest
 		return importAddress;
 	}
 
-	private org.oscarehr.common.xml.cds.v5_0.model.Address createTestImportAddressUS(
+	private xml.cds.v5_0.Address createTestImportAddressUS(
 			String addressLine1,
 			String addressLine2,
 			String city,
@@ -992,7 +992,7 @@ public class CDSImportMapperTest
 			String zip)
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		xml.cds.v5_0.Address importAddress = objectFactory.createAddress();
 		AddressStructured addressStructured = objectFactory.createAddressStructured();
 		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
 

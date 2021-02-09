@@ -26,9 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
-import org.oscarehr.common.xml.cds.v5_0.model.Gender;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
+import xml.cds.v5_0.Demographics;
+import xml.cds.v5_0.Gender;
+import xml.cds.v5_0.PersonStatus;
 import org.oscarehr.demographicImport.model.common.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 
