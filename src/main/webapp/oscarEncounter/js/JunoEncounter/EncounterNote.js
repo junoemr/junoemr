@@ -147,16 +147,22 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				url: "../ws/rs/notes/" + demographicNo + "/getNoteToEdit/" + noteId,
 				success: function (result)
 				{
-					var note = result.body.encounterNote;
-					var issues = result.body.assignedCMIssues;
+					var note = me.getEmptyNote(me.pageData.providerNo, me.pageData.appointmentNo);
+					var issues = [];
 
-
-					// Show a warning if an unsigned note was created by a different provider
-					var editWarn = (!note.isSigned && note.providerNo !== me.pageData.providerNo);
-
-					if (editWarn && !confirm(pageData.editUnsignedMsg))
+					if(result.body !== null)
 					{
-						return false;
+						note = result.body.encounterNote;
+						issues = result.body.assignedCMIssues;
+
+
+						// Show a warning if an unsigned note was created by a different provider
+						var editWarn = (!note.isSigned && note.providerNo !== me.pageData.providerNo);
+
+						if (editWarn && !confirm(pageData.editUnsignedMsg))
+						{
+							return false;
+						}
 					}
 
 					me.enableEditMode(noteId, demographicNo, note, issues);

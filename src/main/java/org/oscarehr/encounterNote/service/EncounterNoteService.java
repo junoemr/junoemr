@@ -114,7 +114,7 @@ public class EncounterNoteService
 	{
 		CaseManagementNote note = caseManagementNoteDao.find(noteId.longValue());
 
-		if (!note.getDemographic().getId().equals(demographicNo))
+		if (note == null || !note.getDemographic().getId().equals(demographicNo))
 		{
 			return null;
 		}
