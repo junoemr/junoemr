@@ -763,6 +763,17 @@
 			<artifactId>jaxb-api</artifactId>
 			<version>2.3.0</version>
 		</dependency>
+		<!-- for xsd generation -->
+		<dependency>
+			<groupId>org.jvnet.jaxb2_commons</groupId>
+			<artifactId>jaxb2-basics-runtime</artifactId>
+			<version>1.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.jaxb2.maven2</groupId>
+			<artifactId>maven-jaxb2-plugin</artifactId>
+			<version>0.14.0</version>
+		</dependency>
 
 		<!-- hsfo -->
 		<dependency>
@@ -1691,7 +1702,8 @@
 						<exclude>src/main/webapp/web/**</exclude>
 
 						<!-- omit generated models -->
-						<exclude>src/main/java/org/oscarehr/common/xml/cds/v5_0/model/**</exclude>
+						<exclude>src/main/java/org/oscarehr/common/xml/**</exclude>
+						<exclude>src/gen/java/**</exclude>
 					</excludes>
 					<strictCheck>true</strictCheck>
 				</configuration>
@@ -1999,6 +2011,85 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!-- plugin allows more than one source to be accessed in the project -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/gen/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- plugin to generate java files from xsd schema, and allow similar ones to implement a shared interface -->
+			<!-- this is used for CDS and HRM schemas for example -->
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.14.0</version>
+				<executions>
+					<execution>
+						<id>cds5.0-schema-generation</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<extension>true</extension>
+							<args>
+								<arg>-Xinheritance</arg>
+							</args>
+							<bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/cds/v5_0</bindingDirectory>
+							<bindingIncludes>
+								<include>bindings.xjb</include>
+							</bindingIncludes>
+							<schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/cds/v5_0</schemaDirectory>
+							<generateDirectory>${basedir}/src/gen/java</generateDirectory>
+							<generatePackage>xml.cds.v5_0</generatePackage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>hrm4.3-schema-generation</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<extension>true</extension>
+							<args>
+								<arg>-Xinheritance</arg>
+							</args>
+							<bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_3</bindingDirectory>
+							<bindingIncludes>
+								<include>bindings.xjb</include>
+							</bindingIncludes>
+							<schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_3</schemaDirectory>
+							<generateDirectory>${basedir}/src/gen/java</generateDirectory>
+							<generatePackage>xml.hrm.v4_3</generatePackage>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<extension>true</extension>
+					<plugins>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics</artifactId>
+							<version>1.11.1</version>
+						</plugin>
+					</plugins>
+				</configuration>
 			</plugin>
 
 			<!-- This is a terrible hack to counteract a bug in the openapi-generator library.  -->

@@ -26,7 +26,6 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
-import org.oscarehr.demographicImport.parser.AbstractFileParser;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
