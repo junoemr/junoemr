@@ -23,24 +23,22 @@
 package org.oscarehr.demographicImport.parser.cds;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
-import org.oscarehr.demographicImport.parser.AbstractXMLFileParser;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
-public class CDSFileParser extends AbstractXMLFileParser<OmdCds>
+public class CDSNamespaceMapper extends NamespacePrefixMapper
 {
-	@Override
-	protected JAXBContext getNewInstance() throws JAXBException
-	{
-		return JAXBContext.newInstance(PatientRecord.class);
-	}
+	public static final String NAMESPACE_CDS_URI = "cds";
+	public static final String NAMESPACE_CDS = "";
+	public static final String NAMESPACE_CDS_DATA_URI = "cds_dt";
+	public static final String NAMESPACE_CDS_DATA = "cdsd";
 
 	@Override
-	protected NamespacePrefixMapper getNamespaceMapper()
+	public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix)
 	{
-		return new CDSNamespaceMapper();
+		switch(namespaceUri)
+		{
+			case NAMESPACE_CDS_URI: return NAMESPACE_CDS;
+			case NAMESPACE_CDS_DATA_URI: return NAMESPACE_CDS_DATA;
+			default: return namespaceUri;
+		}
 	}
 }

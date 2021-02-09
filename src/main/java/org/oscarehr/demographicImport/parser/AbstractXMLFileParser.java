@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.parser.cds;
+package org.oscarehr.demographicImport.parser;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.oscarehr.common.io.FileFactory;
@@ -34,9 +34,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 
-public abstract class AbstractCDSFileParser<T> extends AbstractFileParser<T>
+public abstract class AbstractXMLFileParser<T> extends AbstractFileParser<T>
 {
 	@Override
+	@SuppressWarnings("unchecked")
 	public T parse(GenericFile genericFile) throws IOException
 	{
 		if(!(genericFile instanceof XMLFile))
@@ -69,7 +70,7 @@ public abstract class AbstractCDSFileParser<T> extends AbstractFileParser<T>
 			// output pretty printed
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			// set correct namespaces
-			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new CDSNamespaceMapper());
+			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNamespaceMapper());
 			// write to file
 			marshaller.marshal(formatObject, tempFile.getFileObject());
 		}
@@ -83,23 +84,5 @@ public abstract class AbstractCDSFileParser<T> extends AbstractFileParser<T>
 	}
 
 	protected abstract JAXBContext getNewInstance() throws JAXBException;
-
-	protected static class CDSNamespaceMapper extends NamespacePrefixMapper
-	{
-		public static final String NAMESPACE_CDS_URI = "cds";
-		public static final String NAMESPACE_CDS = "";
-		public static final String NAMESPACE_CDS_DATA_URI = "cds_dt";
-		public static final String NAMESPACE_CDS_DATA = "cdsd";
-
-		@Override
-		public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix)
-		{
-			switch(namespaceUri)
-			{
-				case NAMESPACE_CDS_URI: return NAMESPACE_CDS;
-				case NAMESPACE_CDS_DATA_URI: return NAMESPACE_CDS_DATA;
-				default: return namespaceUri;
-			}
-		}
-	}
+	protected abstract NamespacePrefixMapper getNamespaceMapper();
 }
