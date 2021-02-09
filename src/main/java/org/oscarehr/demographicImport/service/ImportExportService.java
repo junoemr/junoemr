@@ -32,6 +32,7 @@ import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.DemographicPharmacy;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.Measurement;
@@ -52,6 +53,7 @@ import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
+import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
@@ -284,7 +286,7 @@ public class ImportExportService
 		persistPharmacy(patientRecord, dbDemographic);
 
 		// persist documents last to minimize import errors with disk IO
-		hrmService.uploadAllNewHRMDocuments(patientRecord.getHrmDocumentList(), dbDemographic);
+		persistHrmDocuments(patientRecord, dbDemographic);
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
 
 		importLogger.logSummaryLine(patientRecord);
@@ -388,6 +390,25 @@ public class ImportExportService
 				logger.warn("Hl7 Lab Could Not be Uploaded");
 			}
 		}
+	}
+
+	private void persistHrmDocuments(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic) throws Exception
+	{
+		// for imports, we build our own HRM documents before saving the record
+		DemographicExporter exporter = importerExporterFactory.getExporter(ImporterExporterFactory.EXPORTER_TYPE.HRM_4);
+
+		for(HrmDocument hrmDocument : patientRecord.getHrmDocumentList())
+		{
+			/* HRM docs can have multiple records per file, just like CDS. However we need 1 file per report.
+			* To do this, we create a temporary data structure for each report */
+			PatientRecord tempRecord = new PatientRecord();
+			tempRecord.setDemographic(patientRecord.getDemographic());
+			tempRecord.addHrmDocument(hrmDocument);
+			XMLFile hrmFile = (XMLFile) exporter.exportDemographic(tempRecord);
+			hrmDocument.setReportFile(hrmFile);
+		}
+
+		hrmService.uploadAllNewHRMDocuments(patientRecord.getHrmDocumentList(), dbDemographic);
 	}
 
 	private void persistPharmacy(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)

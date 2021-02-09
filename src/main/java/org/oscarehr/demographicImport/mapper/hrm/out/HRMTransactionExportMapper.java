@@ -20,19 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.parser.cds;
+package org.oscarehr.demographicImport.mapper.hrm.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
+import org.oscarehr.common.xml.hrm.v4_3.model.TransactionInformation;
+import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
-public class CDSFileParser extends AbstractCDSFileParser<OmdCds>
+@Component
+public class HRMTransactionExportMapper extends AbstractHRMExportMapper<TransactionInformation, HrmDocument>
 {
-	@Override
-	protected JAXBContext getNewInstance() throws JAXBException
+	public HRMTransactionExportMapper()
 	{
-		return JAXBContext.newInstance(PatientRecord.class);
+		super();
+	}
+
+	@Override
+	public TransactionInformation exportFromJuno(HrmDocument exportStructure)
+	{
+		TransactionInformation transactionInformation = objectFactory.createTransactionInformation();
+		//TODO
+
+		return transactionInformation;
 	}
 }

@@ -32,12 +32,12 @@ import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 public class CDSImporter implements DemographicImporter
 {
 	@Autowired

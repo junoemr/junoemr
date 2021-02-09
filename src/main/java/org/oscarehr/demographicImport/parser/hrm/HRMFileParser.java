@@ -20,15 +20,16 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.parser.cds;
+package org.oscarehr.demographicImport.parser.hrm;
 
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
+import org.oscarehr.common.xml.hrm.v4_3.model.OmdCds;
+import org.oscarehr.common.xml.hrm.v4_3.model.PatientRecord;
+import org.oscarehr.demographicImport.parser.cds.AbstractCDSFileParser;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-public class CDSFileParser extends AbstractCDSFileParser<OmdCds>
+public class HRMFileParser extends AbstractCDSFileParser<OmdCds>
 {
 	@Override
 	protected JAXBContext getNewInstance() throws JAXBException

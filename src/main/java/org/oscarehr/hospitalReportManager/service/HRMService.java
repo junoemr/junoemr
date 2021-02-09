@@ -78,6 +78,7 @@ public class HRMService
 
 		// persist hrm database info and associated objects through cascade
 		hrmDocumentDao.persist(hrmDocument);
+		hrmDocumentModel.getReportFile().moveToHRMDocuments();
 
 		// assign the hrm document to the demographic
 		routeToDemographic(hrmDocument, demographic);

@@ -194,6 +194,15 @@ public class PatientRecord extends AbstractTransientModel
 		this.contactList.add(contact);
 	}
 
+	public void addHrmDocument(HrmDocument document)
+	{
+		if(this.hrmDocumentList == null)
+		{
+			this.hrmDocumentList = new ArrayList<>();
+		}
+		this.hrmDocumentList.add(document);
+	}
+
 	@Override
 	public String toString()
 	{

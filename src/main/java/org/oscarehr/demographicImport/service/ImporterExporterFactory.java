@@ -25,9 +25,10 @@ package org.oscarehr.demographicImport.service;
 import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.logger.cds.CDSExportLogger;
-import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
+import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
+import org.oscarehr.demographicImport.service.hrm.HRMExporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.demographicImport.util.ExportProperties;
 import org.oscarehr.demographicImport.util.ImportProperties;
@@ -46,6 +47,9 @@ public class ImporterExporterFactory
 	private CDSExporter cdsExporter;
 
 	@Autowired
+	private HRMExporter hrmExporter;
+
+	@Autowired
 	private ImportProperties importProperties;
 
 	@Autowired
@@ -60,6 +64,7 @@ public class ImporterExporterFactory
 	public enum EXPORTER_TYPE
 	{
 		CDS_5,
+		HRM_4,
 	}
 
 	public enum IMPORT_SOURCE
@@ -114,10 +119,15 @@ public class ImporterExporterFactory
 	{
 		exportProperties.setExportLogger(exportLogger);
 		exportProperties.setExportPreferences(exportPreferences);
+		return getExporter(type);
+	}
 
+	public DemographicExporter getExporter(EXPORTER_TYPE type)
+	{
 		switch(type)
 		{
 			case CDS_5: return cdsExporter;
+			case HRM_4: return hrmExporter;
 			default: throw new RuntimeException(type + " exporter not implemented");
 		}
 	}

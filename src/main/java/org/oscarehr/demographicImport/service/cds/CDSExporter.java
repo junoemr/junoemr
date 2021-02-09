@@ -35,7 +35,7 @@ import org.oscarehr.demographicImport.service.DemographicExporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.demographicImport.util.ExportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.oscarClinic.ClinicData;
 import oscar.util.ConversionUtils;
@@ -53,7 +53,7 @@ import static oscar.util.ConversionUtils.DATE_PATTERN_DAY;
 import static oscar.util.ConversionUtils.DATE_PATTERN_MONTH;
 import static oscar.util.ConversionUtils.DATE_PATTERN_YEAR;
 
-@Component
+@Service
 public class CDSExporter implements DemographicExporter
 {
 	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
