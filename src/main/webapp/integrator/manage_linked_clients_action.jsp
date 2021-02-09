@@ -57,5 +57,5 @@
 	Provider provider=(Provider)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
 	manageLinkedClientsAction.saveLinkedIds(loggedInInfo, currentFacility, provider, currentDemographicId);
 
-	response.sendRedirect("../close.html");
+	response.sendRedirect("../close.jsp");
 %>

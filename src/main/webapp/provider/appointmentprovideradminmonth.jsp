@@ -810,7 +810,7 @@ function refreshTabAlerts(id) {
       String[] param1 = new String[3];
       param1[0] = year+"-"+month+"-"+"1";
       param1[1] = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"1";
-      param1[2] = providerview;
+      
       sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),ScheduleDate.STATUS_ACTIVE,Arrays.asList(new String[]{providerview}));
    	
     }
