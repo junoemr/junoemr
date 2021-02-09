@@ -671,11 +671,12 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    false AS is_cpp_note,\n" +
 					"    '' AS encounter_time,\n" +
 					"    '' AS encounter_transportation_time\n" +
-					"FROM eform_data ed " +
-					"LEFT JOIN eform_instance ei ON ed.fid = ei.eform_id " +
-					"WHERE ed.demographic_no = :demographicNo " +
-					"AND ed.patient_independent = false " +
-					"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted) " +
+					"FROM eform_data ed\n" +
+					"LEFT JOIN eform_instance ei\n" +
+					"    ON ed.eform_instance_id = ei.id\n" +
+					"WHERE ed.demographic_no = :demographicNo\n" +
+					"AND ed.patient_independent = false\n" +
+					"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted)\n" +
 			") UNION ALL (" +
 				buildFormQuery();
 		}
