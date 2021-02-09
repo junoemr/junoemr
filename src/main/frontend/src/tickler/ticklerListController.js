@@ -157,7 +157,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 						{
 							// ajax request to api
 							controller.search.count = params.url().count;
-							controller.search.serviceEndDate = moment(controller.search.serviceEndDate).endOf('day').toDate();
 							controller.search.page = params.url().page;
 							controller.search.includeLinks = 'true';
 							controller.search.includeComments = 'true';
