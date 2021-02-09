@@ -112,10 +112,11 @@ angular.module('Record.Details').component('careTeamSection', {
 		{
 			referralDoctorsService.searchReferralDoctors(docSearchString, docReferralNo, 1, 10).then(
 				function success(results) {
-					var referralDoctors = new Array(results.length);
-					for (var i = 0; i < results.length; i++)
+					let referralDoctors = new Array(results.length);
+
+					for (let i = 0; i < results.length; i++)
 					{
-						var displayName = results[i].lastName + ', ' + results[i].firstName;
+						let displayName = results[i].lastName + ', ' + results[i].firstName;
 						referralDoctors[i] = {
 							label: displayName,
 							value: displayName,
@@ -123,7 +124,7 @@ angular.module('Record.Details').component('careTeamSection', {
 						};
 						if (results[i].specialtyType != null && results[i].specialtyType != "")
 						{
-							referralDoctors[i].label += " [" + results[i].specialtyType + "]";
+							referralDoctors[i].label += " [" + results[i].referralNo + "]";
 						}
 					}
 
@@ -139,6 +140,11 @@ angular.module('Record.Details').component('careTeamSection', {
 		{
 			ctrl.ngModel.scrReferralDocNo = value.referralNo;
 		}
+
+		ctrl.updateFamilyDocNo = (value) =>
+        {
+            ctrl.ngModel.scrFamilyDocNo = value.referralNo;
+        }
 
 		ctrl.openAddPatientStatusModal = async () =>
 		{

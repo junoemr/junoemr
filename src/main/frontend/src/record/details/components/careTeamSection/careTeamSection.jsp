@@ -19,6 +19,19 @@
 							component-style="$ctrl.componentStyle">
 			</juno-select>
 
+            <!-- Family Doctor -->
+            <juno-typeahead model="$ctrl.ngModel.scrFamilyDoc"
+                            options="$ctrl.referralDoctors"
+                            filter-options="false"
+                            name="FamilyDoctor"
+                            title="Family Doctor"
+                            placeholder="Family Doctor"
+                            label-position="LABEL_POSITION.LEFT"
+                            on-change="$ctrl.updateReferralDoctors(value)"
+                            on-selected="$ctrl.updateFamilyDocNo(value)"
+                            component-style="$ctrl.componentStyle">
+            </juno-typeahead>
+
 			<!-- Referral Doctor -->
 			<juno-typeahead model="$ctrl.ngModel.scrReferralDoc"
 							options="$ctrl.referralDoctors"
@@ -104,6 +117,14 @@
 							label="Resident"
 							component-style="$ctrl.componentStyle">
 			</juno-select>
+
+            <!-- Family Doctor Number -->
+            <juno-input ng-model="$ctrl.ngModel.scrFamilyDocNo"
+                        label="Family Doctor #"
+                        placeholder="Family Doctor #"
+                        valid-regex="$ctrl.numberRegex"
+                        component-style="$ctrl.componentStyle">
+            </juno-input>
 
 			<!-- Referral Doctor Number -->
 			<juno-input ng-model="$ctrl.ngModel.scrReferralDocNo"
