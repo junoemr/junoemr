@@ -316,11 +316,11 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"FROM casemgmt_note AS cmn_outer\n" +
 				"JOIN " +
 				"(\n" +
-				"SELECT DISTINCT cmn.note_id\n" +
+				"SELECT cmn.note_id\n" +
 				"FROM casemgmt_note cmn\n" +
 				"LEFT JOIN casemgmt_note AS cmn_filter \n" +
 				"  ON cmn_filter.uuid = cmn.uuid\n" +
-				"  AND NOT cmn_filter.signed\n" +
+				"  " +
 				"AND (cmn.update_date < cmn_filter.update_date " +
 				"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
 				"LEFT JOIN casemgmt_issue_notes cmin ON cmin.note_id = cmn.note_id\n" +
@@ -329,18 +329,16 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"  ON i.issue_id = cmi.issue_id\n" +
 				"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication')\n" +
 				"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
-				"WHERE NOT cmn.signed\n" +
-				"AND cmn_filter.note_id IS NULL\n" +
+				"WHERE " +
+				"cmn_filter.note_id IS NULL\n" +
 				"AND i.issue_id IS NULL\n" +
 				"AND cnl.id IS NULL\n" +
 				"AND cmn.demographic_no = :demographicNo\n" +
 				"AND cmn.provider_no = :providerNo\n" +
-				"ORDER BY cmn.update_date DESC\n" +
-				"    " +
 				") AS latest_notes\n" +
 				"ON cmn_outer.note_id = latest_notes.note_id\n" +
-				"WHERE cmn_outer.signed\n" +
-				"\n";
+				"WHERE NOT cmn_outer.signed\n" +
+				"ORDER BY cmn_outer.update_date DESC\n";
 
 		Query query = entityManager.createNativeQuery(sql);
 
@@ -673,11 +671,12 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    false AS is_cpp_note,\n" +
 					"    '' AS encounter_time,\n" +
 					"    '' AS encounter_transportation_time\n" +
-					"FROM eform_data ed " +
-					"LEFT JOIN eform_instance ei ON ed.fid = ei.eform_id " +
-					"WHERE ed.demographic_no = :demographicNo " +
-					"AND ed.patient_independent = false " +
-					"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted) " +
+					"FROM eform_data ed\n" +
+					"LEFT JOIN eform_instance ei\n" +
+					"    ON ed.eform_instance_id = ei.id\n" +
+					"WHERE ed.demographic_no = :demographicNo\n" +
+					"AND ed.patient_independent = false\n" +
+					"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted)\n" +
 			") UNION ALL (" +
 				buildFormQuery();
 		}

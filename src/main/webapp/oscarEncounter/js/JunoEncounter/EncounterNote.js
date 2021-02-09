@@ -87,7 +87,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				this.saveEncounterNote(
 					false,
 					false,
-					true,
+					false,
 					false,
 					false
 				).then(
@@ -402,7 +402,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 					noteData = noteToEdit;
 					noteIssues = issues;
 				}
-				else if(tmpSave && tmpSave.noteId === note.noteId)
+
+				if(tmpSave && tmpSave.noteId === note.noteId)
 				{
 					foundNoteToEdit = true;
 					editThisNote = true;
