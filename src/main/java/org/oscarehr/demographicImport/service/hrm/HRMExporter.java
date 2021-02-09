@@ -24,7 +24,6 @@ package org.oscarehr.demographicImport.service.hrm;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.hrm.v4_3.model.OmdCds;
 import org.oscarehr.demographicImport.mapper.hrm.out.HRMExportMapper;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
@@ -34,6 +33,7 @@ import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.demographicImport.util.ExportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xml.hrm.v4_3.OmdCds;
 
 import java.util.ArrayList;
 import java.util.List;

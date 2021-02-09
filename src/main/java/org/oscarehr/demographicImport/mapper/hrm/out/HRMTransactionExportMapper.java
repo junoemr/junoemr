@@ -22,9 +22,9 @@
  */
 package org.oscarehr.demographicImport.mapper.hrm.out;
 
-import org.oscarehr.common.xml.hrm.v4_3.model.TransactionInformation;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.springframework.stereotype.Component;
+import xml.hrm.v4_3.TransactionInformation;
 
 @Component
 public class HRMTransactionExportMapper extends AbstractHRMExportMapper<TransactionInformation, HrmDocument>

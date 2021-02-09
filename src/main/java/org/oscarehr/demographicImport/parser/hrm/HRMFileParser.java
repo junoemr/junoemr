@@ -23,10 +23,10 @@
 package org.oscarehr.demographicImport.parser.hrm;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import org.oscarehr.common.xml.hrm.v4_3.model.OmdCds;
-import org.oscarehr.common.xml.hrm.v4_3.model.PatientRecord;
 import org.oscarehr.demographicImport.parser.AbstractXMLFileParser;
 import org.oscarehr.demographicImport.parser.cds.CDSNamespaceMapper;
+import xml.hrm.v4_3.OmdCds;
+import xml.hrm.v4_3.PatientRecord;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

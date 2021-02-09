@@ -23,10 +23,10 @@
 package org.oscarehr.demographicImport.mapper.hrm.out;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.hrm.v4_3.model.ReportClass;
-import org.oscarehr.common.xml.hrm.v4_3.model.ReportsReceived;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.springframework.stereotype.Component;
+import xml.hrm.v4_3.ReportClass;
+import xml.hrm.v4_3.ReportsReceived;
 
 @Component
 public class HRMReportExportMapper extends AbstractHRMExportMapper<ReportsReceived, HrmDocument>

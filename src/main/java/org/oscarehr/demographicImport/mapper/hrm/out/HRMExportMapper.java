@@ -22,10 +22,10 @@
  */
 package org.oscarehr.demographicImport.mapper.hrm.out;
 
-import org.oscarehr.common.xml.hrm.v4_3.model.OmdCds;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xml.hrm.v4_3.OmdCds;
 
 @Component
 public class HRMExportMapper extends AbstractHRMExportMapper<OmdCds, PatientRecord>
@@ -48,7 +48,7 @@ public class HRMExportMapper extends AbstractHRMExportMapper<OmdCds, PatientReco
 	public OmdCds exportFromJuno(PatientRecord exportStructure) throws Exception
 	{
 		OmdCds omdCds = objectFactory.createOmdCds();
-		org.oscarehr.common.xml.hrm.v4_3.model.PatientRecord patientRecord = objectFactory.createPatientRecord();
+		xml.hrm.v4_3.PatientRecord patientRecord = objectFactory.createPatientRecord();
 
 		patientRecord.setDemographics(hrmDemographicExportMapper.exportFromJuno(exportStructure.getDemographic()));
 		patientRecord.getReportsReceived().addAll(hrmReportExportMapper.exportAll(exportStructure.getHrmDocumentList()));

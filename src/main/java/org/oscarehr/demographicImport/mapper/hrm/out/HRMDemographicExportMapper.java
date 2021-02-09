@@ -24,13 +24,13 @@ package org.oscarehr.demographicImport.mapper.hrm.out;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.hrm.v4_3.model.Demographics;
-import org.oscarehr.common.xml.hrm.v4_3.model.PersonNamePartTypeCode;
-import org.oscarehr.common.xml.hrm.v4_3.model.PersonNamePrefixCode;
-import org.oscarehr.common.xml.hrm.v4_3.model.PersonNamePurposeCode;
-import org.oscarehr.common.xml.hrm.v4_3.model.PersonNameStandard;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.springframework.stereotype.Component;
+import xml.hrm.v4_3.Demographics;
+import xml.hrm.v4_3.PersonNamePartTypeCode;
+import xml.hrm.v4_3.PersonNamePrefixCode;
+import xml.hrm.v4_3.PersonNamePurposeCode;
+import xml.hrm.v4_3.PersonNameStandard;
 
 @Component
 public class HRMDemographicExportMapper extends AbstractHRMExportMapper<Demographics, Demographic>

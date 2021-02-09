@@ -22,9 +22,9 @@
  */
 package org.oscarehr.demographicImport.mapper.hrm.out;
 
-import org.oscarehr.common.xml.hrm.v4_3.model.ObjectFactory;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.springframework.stereotype.Component;
+import xml.hrm.v4_3.ObjectFactory;
 
 @Component
 public abstract class AbstractHRMExportMapper<I, E> extends AbstractExportMapper<I, E>
