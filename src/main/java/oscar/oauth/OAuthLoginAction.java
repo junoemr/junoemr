@@ -113,10 +113,14 @@ public final class OAuthLoginAction extends DispatchAction
 					Provider provider = providerDao.getProvider(security.getProviderNo());
 					List<SecUserRole> roles = secUserRoleDao.getUserRoles(security.getProviderNo());
 					String rolename = null;
-					for (SecUserRole role : roles) {
-						if (rolename == null) {
+					for (SecUserRole role : roles)
+					{
+						if (rolename == null)
+						{
 							rolename = role.getRoleName();
-						} else {
+						}
+						else
+						{
 							rolename += "," + role.getRoleName();
 						}
 					}
