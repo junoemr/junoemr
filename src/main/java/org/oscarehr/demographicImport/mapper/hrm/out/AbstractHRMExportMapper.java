@@ -23,8 +23,17 @@
 package org.oscarehr.demographicImport.mapper.hrm.out;
 
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
+import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.ObjectFactory;
+import xml.hrm.v4_3.PersonNameSimple;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 public abstract class AbstractHRMExportMapper<I, E> extends AbstractExportMapper<I, E>
@@ -40,5 +49,57 @@ public abstract class AbstractHRMExportMapper<I, E> extends AbstractExportMapper
 	public ObjectFactory getObjectFactory()
 	{
 		return this.objectFactory;
+	}
+
+	/* ==== common helper methods for cds ==== */
+
+	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+
+		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
+		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(localDate);
+		dateFullOrPartial.setFullDate(calendar);
+		return dateFullOrPartial;
+	}
+
+	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) return null;
+		return toNullableDateFullOrPartial(localDateTime.toLocalDate());
+	}
+
+	protected DateFullOrPartial toNullableDateFullOrPartial(PartialDate partialDate)
+	{
+		if(partialDate == null) return null;
+
+		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
+		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(partialDate.toLocalDate());
+
+		if(partialDate.isFullDate())
+		{
+			dateFullOrPartial.setFullDate(calendar);
+		}
+		else if(partialDate.isYearMonth())
+		{
+			dateFullOrPartial.setYearMonth(calendar);
+		}
+		else if(partialDate.isYearOnly())
+		{
+			dateFullOrPartial.setYearOnly(calendar);
+		}
+		return dateFullOrPartial;
+	}
+
+	protected PersonNameSimple toPersonNameSimple(Provider provider)
+	{
+		if(provider == null)
+		{
+			return null;
+		}
+		PersonNameSimple personNameSimple = objectFactory.createPersonNameSimple();
+		personNameSimple.setFirstName(provider.getFirstName());
+		personNameSimple.setLastName(provider.getLastName());
+		return personNameSimple;
 	}
 }

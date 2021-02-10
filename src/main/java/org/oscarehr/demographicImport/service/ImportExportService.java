@@ -32,7 +32,6 @@ import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.DemographicPharmacy;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.Measurement;
@@ -404,8 +403,7 @@ public class ImportExportService
 			PatientRecord tempRecord = new PatientRecord();
 			tempRecord.setDemographic(patientRecord.getDemographic());
 			tempRecord.addHrmDocument(hrmDocument);
-			XMLFile hrmFile = (XMLFile) exporter.exportDemographic(tempRecord);
-			hrmDocument.setReportFile(hrmFile);
+			hrmDocument.setReportFile(exporter.exportDemographic(tempRecord));
 		}
 
 		hrmService.uploadAllNewHRMDocuments(patientRecord.getHrmDocumentList(), dbDemographic);

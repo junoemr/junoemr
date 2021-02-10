@@ -38,7 +38,9 @@ public class HRMTransactionExportMapper extends AbstractHRMExportMapper<Transact
 	public TransactionInformation exportFromJuno(HrmDocument exportStructure)
 	{
 		TransactionInformation transactionInformation = objectFactory.createTransactionInformation();
-		//TODO
+
+		transactionInformation.setMessageUniqueID(exportStructure.getMessageUniqueId());
+		transactionInformation.setDeliverToUserID(exportStructure.getDeliverToUserId());
 
 		return transactionInformation;
 	}

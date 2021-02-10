@@ -50,7 +50,7 @@ public class HRMExportMapper extends AbstractHRMExportMapper<OmdCds, PatientReco
 		OmdCds omdCds = objectFactory.createOmdCds();
 		xml.hrm.v4_3.PatientRecord patientRecord = objectFactory.createPatientRecord();
 
-		patientRecord.setDemographics(hrmDemographicExportMapper.exportFromJuno(exportStructure.getDemographic()));
+		patientRecord.setDemographics(hrmDemographicExportMapper.exportFromJuno(exportStructure));
 		patientRecord.getReportsReceived().addAll(hrmReportExportMapper.exportAll(exportStructure.getHrmDocumentList()));
 		patientRecord.getTransactionInformation().addAll(hrmTransactionExportMapper.exportAll(exportStructure.getHrmDocumentList()));
 
