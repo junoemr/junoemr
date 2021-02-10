@@ -28,11 +28,11 @@ import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -69,6 +69,7 @@ public class AddGroupTests extends SeleniumTestBase
 
 	public void addGroup(String groupName, int groupSize)
 	{
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='mygroup_no']")));
 		driver.findElement(By.xpath("//input[@name='mygroup_no']")).sendKeys(groupName);
 		for (int i = 1; i <= groupSize; i ++)
 		{
@@ -89,8 +90,7 @@ public class AddGroupTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addGroupsClassicUITest()
-	{
+	public void addGroupsClassicUITest() throws InterruptedException {
 		//Add a New Group with two providers: Dr. Apple and Dr. Berry
 		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
 		addGroup(groupName, 2);
@@ -119,8 +119,7 @@ public class AddGroupTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addGroupsJUNOUITest()
-	{
+	public void addGroupsJUNOUITest() throws InterruptedException {
 		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group");
 
 		//Add a New Group with two providers: Dr. Apple and Dr. Berry

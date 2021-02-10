@@ -58,6 +58,8 @@ public class ZHF extends AbstractSegment
 			this.add(ST.class, false, 1, 5, new Object[]{message}, "Age at death");
 			this.add(ST.class, false, 1, 200, new Object[]{message}, "Cause of death");
 			this.add(ST.class, false, 1, 64000, new Object[]{message}, "Comments");
+			this.add(ST.class, false, 1, 64000, new Object[]{message}, "Wolf Custom Segment");
+
 		}
 		catch(HL7Exception e)
 		{
@@ -162,6 +164,19 @@ public class ZHF extends AbstractSegment
 		try
 		{
 			Type t = this.getField(8, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZhf9_wolf_custom() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(9, 0);
 			return (ST) t;
 		}
 		catch(ClassCastException var4)

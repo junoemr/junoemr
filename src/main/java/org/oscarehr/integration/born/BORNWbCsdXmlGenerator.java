@@ -313,18 +313,24 @@ public class BORNWbCsdXmlGenerator {
 	}
 	
 	private String getStatusText(String status) {
-		String val = "N/A";
-		
-		if("1".equals(status)) {
-			return "Nothing";
-		} else if("2".equals(status)) {
-			return "Pending Specialist Callback";
-		} if("3".equals(status)) {
-			return "Pending Patient Callback";
-		} if("4".equals(status)) {
-			return "Completed";
+		switch (status) {
+			case ConsultationRequest.STATUS_ACTIVE:
+				return "Nothing";
+			case ConsultationRequest.STATUS_PEND_SPECIAL:
+				return "Pending Specialist Callback";
+			case ConsultationRequest.STATUS_PEND_PATIENT:
+				return "Pending Patient Callback";
+			case ConsultationRequest.STATUS_COMPLETE:
+				return "Completed";
+			case ConsultationRequest.STATUS_CANCEL:
+				return "Cancelled";
+			case ConsultationRequest.STATUS_APPT_BOOK:
+				return "Appointment Booked";
+			case ConsultationRequest.STATUS_DELETE:
+				return "Deleted";
+			default:
+				return "N/A";
 		}
-		return val;
 	}
 	
 	public void setReferralCategory(ReferralCategoryName result,String serviceName) {

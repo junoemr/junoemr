@@ -535,6 +535,18 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
+			controller.getPatientToolTip = () =>
+            {
+                if ($scope.eventData.virtual && controller.inEditMode())
+                {
+                    return "Patients can't be changed once a telehealth appointment is set";
+                }
+                else
+                {
+                    return "Patient";
+                }
+            }
+
 			controller.getSiteChangeToolTip = () =>
             {
                 if ($scope.eventData.virtual && controller.inEditMode())

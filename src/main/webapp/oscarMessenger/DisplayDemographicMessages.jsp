@@ -79,7 +79,6 @@ if ( stripToNull(demographic_no) != null ) {
 %>
 <jsp:useBean id="DisplayMessagesBeanId" scope="session"
 	class="oscar.oscarMessenger.pageUtil.MsgDisplayMessagesBean" />
-<% DisplayMessagesBeanId.setProviderNo(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());%>
 <jsp:setProperty name="DisplayMessagesBeanId" property="*" />
 <jsp:useBean id="ViewMessageForm" scope="session"
 	class="oscar.oscarMessenger.pageUtil.MsgViewMessageForm" />

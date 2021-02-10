@@ -178,42 +178,43 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      		}
      	%>
      	
-         getComment = function getComment(segmentID, action)
-             {
-                 var saveComment = true;
-                 var comment = "";
-
-                 var text = "V" + <%=version%> + "commentText" + segmentID;
-		         if ($(text) != null)
-                 {
-                     comment = $(text).innerHTML;
-                     if (!comment)
+       getComment = function getComment(labId, action)
+         {
+                 jQuery.ajax(
                      {
-                         comment = "";
-                     }
-                 }
-                 var commentVal = prompt('<bean:message key = "oscarMDS.segmentDisplay.msgComment"/>', comment);
+                         url: "../ws/rs/lab/" + labId + "/provider/" + providerNo + "/labRouting",
+                         type: "GET",
+                         success: function(result)
+                         {
+                             var commentVal = "";
 
-                 if (!commentVal)
-                 {
-                     saveComment = false;
-                 }
-                 else if (commentVal && commentVal.length > 0)
-                 {
-                     document.forms['acknowledgeForm_' + segmentID].comment.value = commentVal;
-                 }
-                 else
-                 {
-                     document.forms['acknowledgeForm_' + segmentID].comment.value = comment;
-                 }
+                             if (result.body)
+                             {
+                                 commentVal = result.body.comment;
+                             }
 
-                 if (saveComment)
-                 {
-                     handleLab('acknowledgeForm_' + segmentID, segmentID, action);
-                 }
+                             var commentID = "comment_" + labId;
+                             var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
 
-                 return false;
-             }
+                             if (comment == null)
+                             {
+                                 return;
+                             }
+                             //The empty string case is handled in addComment()
+                             if (comment)
+                             {
+                                 $(commentID).value = comment;
+                             }
+
+                             handleLab('acknowledgeForm_' + labId, labId, action);
+                         },
+                         error: function(error)
+                         {
+                            console.log("Error getting lab comment", error);
+                            window.alert("Failed to load comments");
+                         }
+                     });
+         }
 
          printPDF=function(doclabid){
             document.forms['acknowledgeForm_'+doclabid].action="../lab/CA/ALL/PrintPDF.do";

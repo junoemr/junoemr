@@ -144,9 +144,18 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			tickler.message = controller.tickler.message;
 
 			var givenDate = controller.tickler.serviceDateDate;
-			var givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
+			var givenTime;
+			var midnight = "12:00 AM";
+			if (controller.tickler.serviceDateTime === midnight)
+			{
+				givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A').add(1, 'minutes');
+			}else
+			{
+				givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
+			}
 			givenDate.setHours(givenTime.get('hour'));
 			givenDate.setMinutes(givenTime.get('minute'));
+			givenDate.setSeconds(givenTime.get('second'));
 
 			tickler.serviceDate = givenDate;
             ticklerService.add(tickler, writeEncounter).then(

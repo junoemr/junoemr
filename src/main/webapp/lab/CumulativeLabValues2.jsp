@@ -26,6 +26,7 @@
 
 <%@page
 	import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarLab.ca.on.*,oscar.util.*,oscar.oscarLab.*"%>
+<%@ page import="java.io.Serializable" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -50,7 +51,7 @@ if(!authed) {
   //int demographic_no = Integer.parseInt(request.getParameter("demographic_no")); 
   String demographic_no = request.getParameter("demographic_no"); 
   
-  ArrayList prevList = CommonLabTestValues.findUniqueLabsForPatient(demographic_no);          
+  ArrayList prevList = CommonLabTestValues.findUniqueLabsForPatient(demographic_no);
 %>
 
 
@@ -198,26 +199,26 @@ function addLabToList(req){
 		</td>
 	</tr>
 	<tr>
-		<td class="MainTableLeftColumn" valign="top"><!--div class="leftBox">
-                  <h3>&nbsp;Labs</h3>
-                  <div style="background-color: #EEEEFF;" >
-                  <ul >               
+		<td class="MainTableLeftColumn" valign="top"><!--
+
                   <%  ArrayList labTestDates = new ArrayList();
                       Hashtable labsBasedOnName = new Hashtable();
                   for (int i = 0 ; i < prevList.size(); i++){ 
                       Hashtable h = (Hashtable) prevList.get(i);
                       String prevName = (String) h.get("testName");
-                      
-                      
+
+
                       //TEMPORARY
                       String labType = (String) h.get("labType");
+                      String identCode = (String) h.get("identCode");
    
-                      ArrayList list   = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), prevName);
+                      ArrayList <Map<String, Serializable>> list   = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), prevName, identCode);
+
                       Hashtable labsBasedOnDate = new Hashtable();
                       for (int g = 0; g < list.size(); g++){
-                          Hashtable hdata = (Hashtable) list.get(g);
-                         //String latestDate = (String) hdata.get("collDate");
-                         Date latestDate = (Date) hdata.get("collDateDate");
+                          HashMap mapdata = (HashMap) list.get(g);
+                          Hashtable hdata = new Hashtable(mapdata);
+                          Date latestDate = (Date) hdata.get("collDateDate");
                            
                          if (latestDate != null && !labTestDates.contains(latestDate)){
                              labTestDates.add(latestDate);
@@ -226,17 +227,9 @@ function addLabToList(req){
                       }
                       labsBasedOnName.put(labType+"|"+prevName,labsBasedOnDate);
                       //TEMPORARY
-                      
-                      if (prevName == null){prevName ="";} %>
-                     <li style="margin-top:2px;">
-                        <a title="fade=[on] header=[<%=prevName%>] body=[]"      href="javascript: function myFunction() {return false; }"  onclick="javascript:addLabToProfile2('<%=h.get("labType")%>','<%= java.net.URLEncoder.encode(prevName) %>');">                        
-                           <%=StringUtils.maxLenString(prevName, 13, 8, "...")%>
-                        </a>
-                     </li>          
-                  <%}%>
-                  </ul>
-                  </div>
-               </div--></td>
+                  }%>
+
+              --></td>
 		<td valign="top" class="MainTableRightColumn">
 		<table class="cumlatable">
 			<tr>

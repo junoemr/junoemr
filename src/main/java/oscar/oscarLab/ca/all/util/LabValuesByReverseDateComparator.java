@@ -36,12 +36,13 @@ package oscar.oscarLab.ca.all.util;
 
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Hashtable;
 
-import oscar.util.UtilDateUtilities;
+import java.util.Map;
+
+import oscar.util.ConversionUtils;
 
 /**
- *  A custom comparator used to compare the Hashtables within an array by the 
+ *  A custom comparator used to compare the HashMaps within an array by the
  *  date value.
  *
  *  Used by /oscar/lab/CumulativeLabValues3.jsp
@@ -49,20 +50,14 @@ import oscar.util.UtilDateUtilities;
  *
  * @author wrighd
  */
-public class CumulativeLabValuesComparator implements Comparator{
-    
-    public int compare(Object o1, Object o2) {
-        Date dateA = UtilDateUtilities.getDateFromString((String) ((Hashtable) o1).get("date") , "yyyy-MM-dd HH:mm:ss");
-        Date dateB = UtilDateUtilities.getDateFromString((String) ((Hashtable) o2).get("date") , "yyyy-MM-dd HH:mm:ss");
-        int ret = 0;
-        
-        if (dateA.after( dateB )){
-            ret = -1;
-        }else if(dateA.before( dateB )){
-            ret = 1;
-        }
-        
-        return ret;
+public class LabValuesByReverseDateComparator implements Comparator<Map<String, String>>
+{
+    public int compare(Map<String, String> o1, Map<String, String> o2)
+    {
+        Date dateA = ConversionUtils.fromDateString(o1.get("date") , ConversionUtils.DEFAULT_TS_PATTERN);
+        Date dateB = ConversionUtils.fromDateString(o2.get("date") , ConversionUtils.DEFAULT_TS_PATTERN);
+
+        return dateA.compareTo(dateB) * -1;
     }
     
 }

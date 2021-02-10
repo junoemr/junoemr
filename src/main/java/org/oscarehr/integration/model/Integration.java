@@ -47,6 +47,7 @@ public class Integration extends AbstractModel<Integer> implements Serializable
 {
     public static final String INTEGRATION_TYPE_MHA = "my_health_access";
     public static final String INTEGRATION_TYPE_CLOUD_MD = "cloud_md";
+    public static final String INTEGRATION_TYPE_IMD_HEALTH = "imd_health";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -119,5 +120,15 @@ public class Integration extends AbstractModel<Integer> implements Serializable
     public void setIntegrationType(String integrationType)
     {
         this.integrationType = integrationType;
+    }
+
+    public boolean isCloudMd()
+    {
+        return this.getIntegrationType().equals(INTEGRATION_TYPE_CLOUD_MD);
+    }
+
+    public boolean isMha()
+    {
+        return this.getIntegrationType().equals(INTEGRATION_TYPE_MHA);
     }
 }

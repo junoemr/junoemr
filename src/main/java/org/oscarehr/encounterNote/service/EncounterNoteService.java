@@ -477,6 +477,11 @@ public class EncounterNoteService
 		return saveHistoryNote(note, Issue.SUMMARY_CODE_REMINDERS);
 	}
 
+	public CaseManagementNote saveConcernNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_CONCERNS);
+	}
+
 	private CaseManagementNote saveHistoryNote(CaseManagementNote note, String summaryCode)
 	{
 		CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueCode(

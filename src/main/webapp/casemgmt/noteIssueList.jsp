@@ -215,14 +215,16 @@ if(currentFacility.isEnableEncounterTransportationTime() || (currentProgram != n
 		<html:option value="face to face encounter with client"><bean:message key="oscarEncounter.faceToFaceEnc.title"/></html:option>
 		<html:option value="telephone encounter with client"><bean:message key="oscarEncounter.telephoneEnc.title"/></html:option>
 		<html:option value="email encounter with client"><bean:message key="oscarEncounter.emailEnc.title"/></html:option>
+		<html:option value="video encounter with client"><bean:message key="oscarEncounter.videoEnc.title"/></html:option>
 		<html:option value="encounter without client"><bean:message key="oscarEncounter.noClientEnc.title"/></html:option>
-		
+
 		<%
 			if(loggedInInfo73557.getCurrentFacility().isEnableGroupNotes()) {
 		%>
 		
 		<html:option value="group face to face encounter"><bean:message key="oscarEncounter.groupFaceEnc.title"/></html:option>
 		<html:option value="group telephone encounter"><bean:message key="oscarEncounter.groupTelephoneEnc.title"/></html:option>
+		<html:option value="group video encounter"><bean:message key="oscarEncounter.groupVideoEnc.title"/></html:option>
 		<html:option value="group encounter with client"><bean:message key="oscarEncounter.emailEnc.title"/></html:option>
 		<html:option value="group encounter without group"><bean:message key="oscarEncounter.groupNoClientEnc.title"/></html:option>
 		
