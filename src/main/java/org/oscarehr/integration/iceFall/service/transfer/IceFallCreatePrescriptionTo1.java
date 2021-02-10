@@ -23,6 +23,7 @@
 package org.oscarehr.integration.iceFall.service.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -42,6 +43,7 @@ public class IceFallCreatePrescriptionTo1
 	@JsonDeserialize(using = LocalDateDeserializer.class)
 	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate registrationExpiry;
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String type;
 	@JsonProperty("thclimit")
 	private Float thcLimit;

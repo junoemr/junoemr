@@ -330,7 +330,7 @@ int maxId = 0;
 			
 			strCurrentNcId = offset.toString() + String.valueOf(idx+1);
 			currentNcId = Integer.parseInt(strCurrentNcId);
-			
+
 			if( currentNcId > maxId ) {
 			    maxId = currentNcId;
 			}
@@ -341,7 +341,7 @@ int maxId = 0;
 			boolean isMagicNote = note.isDocument() || note.isCpp() || note.isEformData() || note.isEncounterForm() || note.isInvoice();
 			String noteClassAttribute = new StringBuilder("note").append(isMagicNote ? "" : " noteRounded").toString(); 
 		%>
-		
+
 		<div id="<%=noteIdAttribute%>" 
 			 style="display:<%=noteDisplay%>" 
 			 class="<%=noteClassAttribute%>">
@@ -368,7 +368,7 @@ int maxId = 0;
  							_setupNewNote();
  						</script>
  						<% } %>
- 												
+
 						<img title="<bean:message key="oscarEncounter.print.title"/>" id='print<%=globalNoteId%>' alt="<bean:message key="oscarEncounter.togglePrintNote.title"/>" onclick="togglePrint(<%=globalNoteId%>, event)" style='float: right; margin-right: 5px;' src='<%=ctx %>/oscarEncounter/graphics/printer.png' />
 						<textarea tabindex="7" cols="84" rows="10" class="txtArea" wrap="soft" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=caseNote_note%></textarea>
 						
@@ -784,7 +784,8 @@ int maxId = 0;
 		}
 
 } //end for */
-					%>
+	%>
+	<input type="hidden" id="maxId" value="<%=maxId%>" />
 </c:if> <%-- END OF "not empty notesToDisplay" --%>
 
 
@@ -820,12 +821,7 @@ int maxId = 0;
 
  	<%
 	}
-	%>	
-	
-<script type="text/javascript">
-	maxNcId = <%=maxId%>;		
-</script>
-
+	%>
 
 <% if (request.getAttribute("moreNotes") == null) { %>
 <script type="text/javascript">	

@@ -33,10 +33,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.List;
 
 @Entity(name = "model.CaseManagementIssue")
 @Table(name = "casemgmt_issue")
@@ -80,6 +82,9 @@ public class CaseManagementIssue extends AbstractModel<Long>
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "issue_id")
 	private Issue issue;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="id.caseManagementNote")
+	private List<CaseManagementIssueNote> caseManagementIssueNoteList;
 
 	@Override
 	public Long getId()
@@ -180,5 +185,15 @@ public class CaseManagementIssue extends AbstractModel<Long>
 	public void setIssue(Issue issue)
 	{
 		this.issue = issue;
+	}
+
+	public List<CaseManagementIssueNote> getCaseManagementIssueNoteList()
+	{
+		return caseManagementIssueNoteList;
+	}
+
+	public void setCaseManagementIssueNoteList(List<CaseManagementIssueNote> caseManagementIssueNoteList)
+	{
+		this.caseManagementIssueNoteList = caseManagementIssueNoteList;
 	}
 }

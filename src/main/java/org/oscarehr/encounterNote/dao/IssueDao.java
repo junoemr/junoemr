@@ -42,7 +42,7 @@ public class IssueDao extends AbstractDao<Issue>
 	public Issue findByCode(String code)
 	{
 		// select model name must match specified @Entity name in model object
-		String queryString = "SELECT x FROM model.Issue x WHERE x.code=:code ORDER BY x.issueId ASC";
+		String queryString = "SELECT x FROM model.Issue x WHERE x.code = :code ORDER BY x.issueId ASC";
 		Query query = entityManager.createQuery(queryString);
 		query.setParameter("code", code);
 		query.setMaxResults(1);

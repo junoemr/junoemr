@@ -39,8 +39,11 @@ import org.oscarehr.common.dao.DemographicPharmacyDao;
 import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.model.DemographicPharmacy;
 import org.oscarehr.common.model.PharmacyInfo;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 /**
  *
@@ -50,64 +53,78 @@ import org.oscarehr.util.SpringUtils;
  */
 public class RxPharmacyData {
 
-	private PharmacyInfoDao pharmacyInfoDao = (PharmacyInfoDao)SpringUtils.getBean(PharmacyInfoDao.class);
-	private DemographicPharmacyDao demographicPharmacyDao = (DemographicPharmacyDao)SpringUtils.getBean(DemographicPharmacyDao.class);
+	private PharmacyInfoDao pharmacyInfoDao = SpringUtils.getBean(PharmacyInfoDao.class);
+	private DemographicPharmacyDao demographicPharmacyDao = SpringUtils.getBean(DemographicPharmacyDao.class);
 
    /** Creates a new instance of RxPharmacyData */
    public RxPharmacyData() {
    }
 
+	/**
+	 * Part of an effort to clean up this intermediate layer.
+	 * Given a model representing a pharmacy, attempt to persist it.
+	 * @param pharmacyInfo pharmacy model we want to save
+	 */
+	synchronized public void addPharmacy(PharmacyInfo pharmacyInfo, LoggedInInfo loggedInInfo)
+	{
+		pharmacyInfoDao.persist(pharmacyInfo);
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				null,
+				LogConst.ACTION_ADD,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + pharmacyInfo.getId(),
+				loggedInInfo.getIp(),
+				"Added pharmacy: " + pharmacyInfo.toString());
+	}
+
+	/**
+	 * Update an existing pharmacy entry, and log every relevant change.
+	 * The log should be detailed enough so that someone can go looking for pharmacy edits
+	 * and fully reverse the changes if they were applied to the wrong entry.
+	 * @param pharmacyInfo pharmacy model that contains all info that was requested to be updated
+	 * @param loggedInInfo session information that we can use to determine who made this change
+	 */
+	public void updatePharmacy(PharmacyInfo pharmacyInfo, LoggedInInfo loggedInInfo)
+	{
+		// Get a reference to the old entry before we overwrite it
+		PharmacyInfo oldEntry = pharmacyInfoDao.getPharmacy(pharmacyInfo.getId());
+		pharmacyInfoDao.merge(pharmacyInfo);
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				null,
+				LogConst.ACTION_UPDATE,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + pharmacyInfo.getId(),
+				loggedInInfo.getIp(),
+				"old pharmacy: " + oldEntry.toString() + " || new pharmacy: " + pharmacyInfo.toString());
+	}
 
    /**
-    * Used to add a new pharmacy
-    * @param name
-    * @param address
-    * @param city
-    * @param province
-    * @param postalCode
-    * @param phone1
-    * @param phone2
-    * @param fax
-    * @param email
-    * @param notes
-    */
-   synchronized public void addPharmacy(String name,String address,String city,String province,String postalCode, String phone1, String phone2, String fax, String email,String serviceLocationIdentifier, String notes){
-	   pharmacyInfoDao.addPharmacy(name, address, city, province, postalCode, phone1, phone2, fax, email, serviceLocationIdentifier, notes);
-   }
+	* Set the status of the pharmacy to 0, this will not be found in the getAllPharmacy queries
+	* @param id id of the pharmacy we want to deactivate
+	* @param loggedInInfo information object containing details about who requested this
+	*/
+	public void deletePharmacy(Integer id, LoggedInInfo loggedInInfo)
+	{
+		List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findAllByPharmacyId(id);
 
+		for (DemographicPharmacy demographicPharmacy : demographicPharmacies )
+		{
+			demographicPharmacyDao.unlinkPharmacy(id, demographicPharmacy.getDemographicNo());
+		}
 
-   /**
-    * Used to update an new pharmacy.  Creates a new record for this pharmacy with the same pharmacyID
-    * @param ID pharmacy ID
-    * @param name
-    * @param address
-    * @param city
-    * @param province
-    * @param postalCode
-    * @param phone1
-    * @param phone2
-    * @param fax
-    * @param email
-    * @param notes
-    */
-   public void updatePharmacy(String ID,String name,String address,String city,String province,String postalCode, String phone1, String phone2, String fax, String email, String serviceLocationIdentifier, String notes){
-		pharmacyInfoDao.updatePharmacy(Integer.parseInt(ID), name, address, city, province, postalCode, phone1, phone2, fax, email, serviceLocationIdentifier, notes);
-   }
-
-   /**
-    * set the status of the pharmacy to 0, this will not be found in the getAllPharmacy queries
-    * @param ID
-    */
-   public void deletePharmacy(String ID){
-	   
-	   List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findAllByPharmacyId(Integer.parseInt(ID));
-	   
-	   for( DemographicPharmacy demographicPharmacy : demographicPharmacies ) {
-		   demographicPharmacyDao.unlinkPharmacy(Integer.parseInt(ID), demographicPharmacy.getDemographicNo());
-	   }
-	   
-	   pharmacyInfoDao.deletePharmacy(Integer.parseInt(ID));
-   }
+		pharmacyInfoDao.deletePharmacy(id);
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				null,
+				LogConst.ACTION_DELETE,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + id,
+				loggedInInfo.getIp(),
+				"Deleted pharmacy: " + id);
+	}
 
    /**
     * Returns the latest data about a pharmacy.
@@ -142,13 +159,23 @@ public class RxPharmacyData {
     * @param pharmacyId Id of the pharmacy
     * @param demographicNo Patient demographic number
     */
-   public PharmacyInfo addPharmacyToDemographic(String pharmacyId,String demographicNo, String preferredOrder){
+   public PharmacyInfo addPharmacyToDemographic(String pharmacyId,String demographicNo, String preferredOrder, LoggedInInfo loggedInInfo)
+   {
       demographicPharmacyDao.addPharmacyToDemographic(Integer.parseInt(pharmacyId), Integer.parseInt(demographicNo), Integer.parseInt(preferredOrder));
       
       PharmacyInfo pharmacyInfo = pharmacyInfoDao.find(Integer.parseInt(pharmacyId));
       pharmacyInfo.setPreferredOrder(Integer.parseInt(preferredOrder));
-      
-      return pharmacyInfo;
+
+	   LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+			   Integer.parseInt(demographicNo),
+			   LogConst.ACTION_ADD,
+			   LogConst.CON_PHARMACY,
+			   LogConst.STATUS_SUCCESS,
+			   "Pharmacy ID: " + pharmacyInfo.getId(),
+			   loggedInInfo.getIp(),
+			   "Added preferred pharmacy to demographic:  " + pharmacyInfo.getName());
+
+	   return pharmacyInfo;
       
    }
 
@@ -214,9 +241,20 @@ public class RxPharmacyData {
 		
 	}
 	
-	public void unlinkPharmacy( String pharmacyId, String demographicNo ) {
-		
-		demographicPharmacyDao.unlinkPharmacy(Integer.parseInt(pharmacyId), Integer.parseInt(demographicNo));
-		
+	public void unlinkPharmacy(Integer pharmacyId, Integer demographicNo, LoggedInInfo loggedInInfo)
+	{
+		demographicPharmacyDao.unlinkPharmacy(pharmacyId, demographicNo);
+		PharmacyInfo pharmacyInfo = pharmacyInfoDao.find(pharmacyId);
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				demographicNo,
+				LogConst.ACTION_DELETE,
+				LogConst.CON_PHARMACY,
+				LogConst.STATUS_SUCCESS,
+				"Pharmacy ID: " + pharmacyId,
+				loggedInInfo.getIp(),
+				"Removed pharmacy preference from demographic: " + pharmacyInfo.getName());
+
+
 	}
 }

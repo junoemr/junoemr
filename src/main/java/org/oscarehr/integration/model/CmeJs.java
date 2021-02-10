@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,29 +16,24 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This software was written for
- * CloudPractice Inc.
- * Victoria, British Columbia
- * Canada
+ * Centre for Research on Inner City Health, St. Michael's Hospital,
+ * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.integration.imdhealth.transfer.inbound;
+package org.oscarehr.integration.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
-import java.io.Serializable;
-
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SSOCredentials implements Serializable
+/**
+ * Possible values for the CME Javascript variable.
+ */
+public enum CmeJs
 {
-	@JsonProperty("access_token")
-	private String accessToken;
+	DEFAULT("default"),
+	OCEAN_TOOLBAR("ocean_toolbar");
 
-	@JsonProperty("membership_id")
-	private String membershipId;
+	public final String label;
 
-	@JsonProperty("organization_id")
-	private String organizationId;
+	CmeJs(String label)
+	{
+		this.label = label;
+	}
 }
