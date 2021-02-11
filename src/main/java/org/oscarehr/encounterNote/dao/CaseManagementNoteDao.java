@@ -986,14 +986,9 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 	public List<CaseManagementNote> findByDemographicAndIssue(Integer demographicNo, Long issueId)
 	{
-<<<<<<< HEAD
-		String queryString = "SELECT cm FROM model_CaseManagementNote cm " +
-				"WHERE cm.demographic.demographicId=:demographicNo " +
-=======
 		String queryString =
-				"SELECT cm FROM model.CaseManagementNote cm " +
-				"WHERE cm.demographic.demographicId = :demographicNo " +
->>>>>>> juno-staging
+				"SELECT cm FROM model_CaseManagementNote cm " +
+				"WHERE cm.demographic.demographicId=:demographicNo " +
 				"AND :issueId = ANY (" +
 					"SELECT cin.id.caseManagementIssue.issue.issueId " +
 					"FROM cm.issueNoteList cin" +
@@ -1015,10 +1010,6 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	 */
 	public List<CaseManagementNote> findLatestRevisionOfAllNotes(Integer demographicNo, boolean isCPPNote)
 	{
-<<<<<<< HEAD
-		String queryString = "SELECT cm FROM model_CaseManagementNote cm " +
-				"WHERE cm.demographic.demographicId=:demographicNo";
-=======
 		/* Grabs every column from the casemgmt_note table by joining the following:
 		  --casemgmt_note_filter: grabs the most-recently updated version of the note
 		  --cpp_note: determines if the note is a cpp note */
@@ -1052,7 +1043,6 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"AND cme.value = 1 " +
 			"WHERE cm.demographic_no = :demographicNo\n" +
 			"AND cme.value IS NULL\n";
->>>>>>> juno-staging
 
 		if (isCPPNote)
 		{
