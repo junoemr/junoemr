@@ -58,6 +58,7 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                     .then((response) =>
                     {
                         const result = response.data.body;
+                        console.log(result);
                         ctrl.fetchIntegrations();
                     })
                     .catch((error) =>

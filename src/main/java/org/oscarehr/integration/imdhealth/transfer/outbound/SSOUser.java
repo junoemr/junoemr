@@ -58,7 +58,15 @@ public class SSOUser implements Serializable
 
 		// externalId must be globally unique across the credential.  This implementation should be safe
 		// regardless of whether we decide to go with issuing the credential to cloudpractice vs individual clinics
-		user.externalId = "juno_" + practiceId + "_" + loggedInInfo.getLoggedInProviderNo();
+
+		if (loggedInInfo.getSession().getAttribute("initializingProvider") != null)
+		{
+			user.externalId = "juno_" + practiceId + "_" + loggedInInfo.getSession().getAttribute("initializingProvider");
+		}
+		else
+		{
+			user.externalId = "juno_" + practiceId + "_" + loggedInInfo.getLoggedInProviderNo();
+		}
 		user.firstName = loggedInInfo.getLoggedInProvider().getFirstName();
 		user.lastName = loggedInInfo.getLoggedInProvider().getLastName();
 

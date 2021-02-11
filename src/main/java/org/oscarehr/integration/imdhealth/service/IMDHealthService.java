@@ -26,10 +26,12 @@ package org.oscarehr.integration.imdhealth.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.Clinic;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.exception.IntegrationException;
@@ -43,8 +45,10 @@ import org.oscarehr.integration.imdhealth.transfer.outbound.SSORequest;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSOUser;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -53,6 +57,10 @@ import oscar.OscarProperties;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.oscarehr.util.JsfUtils.getHttpServletRequest;
 
 @Service
 public class IMDHealthService
@@ -108,16 +116,68 @@ public class IMDHealthService
 		}
 		else
 		{
+			//load the organization not attached to a specific site
 			Integration imdIntegration = new Integration();
 			imdIntegration.setIntegrationType(Integration.INTEGRATION_TYPE_IMD_HEALTH);
 			imdIntegration.setRemoteId(clientId);
 			imdIntegration.setApiKey(encryptedSecret);
 			integrationDao.persist(imdIntegration);
 
+			//pre-load all site specific organizations
+			initializeAllSites(session, clientId, clientSecret);
+
 			return imdIntegration;
 		}
 	}
 
+	public void initializeAllSites(HttpSession session, String clientId, String clientSecret)
+	{
+		String encryptedSecret = StringEncryptor.encrypt(clientSecret);
+		List<Integration> allIntegrations = new ArrayList<>();
+		SiteDao siteDao = (SiteDao) SpringUtils.getBean("siteDao");
+
+		List<Site> sites = siteDao.getAllActiveSites();
+		for (Site site : sites)
+			{
+				Integer siteId = site.getId();
+				Integration imdIntegration = new Integration();
+				imdIntegration.setIntegrationType(Integration.INTEGRATION_TYPE_IMD_HEALTH);
+				imdIntegration.setRemoteId(clientId);
+				imdIntegration.setApiKey(encryptedSecret);
+				imdIntegration.setSite(site);
+				integrationDao.persist(imdIntegration);
+				allIntegrations.add(imdIntegration);
+			}
+				initializeAllUsers(session, allIntegrations);
+	}
+
+
+	public void initializeAllUsers(HttpSession session, List<Integration> allIntegrations )
+	{
+		ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
+		List<Provider> allProviders = providerDao.getActiveProviders();
+		SiteDao siteDao = (SiteDao) SpringUtils.getBean("siteDao");
+
+		for (Provider provider : allProviders)
+		{
+			List<Site> sites = siteDao.getActiveSitesByProviderNo(provider.getProviderNo());
+			for (Site site : sites)
+			{
+				try
+				{
+					session.setAttribute("initializingProvider", provider.getProviderNo());
+					String ssoLink = getSSOLink(session, site.getId());
+					session.removeAttribute("initializingProvider");
+				}
+				catch (IntegrationException e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+
+		}
+	}
 	/**
 	 * Generate the SSO link needed to connect to iMDHealth, logging in if necessary.
 	 *
@@ -259,7 +319,6 @@ public class IMDHealthService
 		{
 			junoPracticeId = "CloudPracticeDefault";
 		}
-
 		SSOCredentials ssoInfo = getSSOCredentials(token, loggedInInfo, junoPracticeId, siteId);
 		credentials.loadSSOCredentials(ssoInfo);
 
@@ -291,7 +350,6 @@ public class IMDHealthService
 		try
 		{
 			SSOUser user = SSOUser.fromLoggedInInfo(loggedInInfo, practiceId);
-
 			SSOOrganization organization;
 			if (siteId == null)
 			{
@@ -303,7 +361,8 @@ public class IMDHealthService
 			{
 				// NOT YET IMPLEMENTED, WILL THROW RUNTIME EXCEPTION //
 				Site site = siteDao.find(siteId);
-				organization = SSOOrganization.fromSite(site, practiceId);
+				String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
+				organization = SSOOrganization.fromSite(site, practiceId, provinceCode);
 			}
 
 			SSORequest ssoRequest = new SSORequest(user, organization);
