@@ -231,12 +231,11 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		{
 			patientStatus = STATUS_ACTIVE;
 		}
-		PersonStatus personStatus = null;
+		PersonStatus personStatus = PersonStatus.A;
 		switch(patientStatus)
 		{
 			case STATUS_INACTIVE: personStatus = PersonStatus.I; break;
 			case STATUS_DECEASED: personStatus = PersonStatus.D; break;
-			case STATUS_ACTIVE:   personStatus = PersonStatus.A; break;
 		}
 		return personStatus;
 	}

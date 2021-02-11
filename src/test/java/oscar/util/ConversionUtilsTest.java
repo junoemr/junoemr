@@ -1386,4 +1386,67 @@ public class ConversionUtilsTest
 		LocalDateTime testDateTime = LocalDateTime.of(2019, 4, 30, 12,45, 15);
 		assertThat(xmlGregorianCalendar, is(ConversionUtils.toXmlGregorianCalendar(testDateTime)));
 	}
+
+	@Test
+	public void fillPartialCalendar_fullDate_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2019, 1, 10, 0, 0, 0);
+
+		XMLGregorianCalendar fullDate =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-01-10");
+		XMLGregorianCalendar yearMonth =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2020-02-20");
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDate, yearMonth, yearOnly)));
+	}
+
+	@Test
+	public void fillPartialCalendar_yearMonth_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2020, 2, 1, 0, 0, 0);
+
+		XMLGregorianCalendar fullDate = null;
+		XMLGregorianCalendar yearMonth =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2020-02-20");
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDate, yearMonth, yearOnly)));
+	}
+
+	@Test
+	public void fillPartialCalendar_yearOnly_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2021, 1, 1, 0, 0, 0);
+
+		XMLGregorianCalendar fullDate = null;
+		XMLGregorianCalendar yearMonth = null;
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDate, yearMonth, yearOnly)));
+	}
+
+	@Test
+	public void fillPartialCalendar_fullDateTime_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2019, 1, 10, 12, 45, 15);
+
+		XMLGregorianCalendar fullDateTime =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-01-10");
+		fullDateTime.setHour(12);
+		fullDateTime.setMinute(45);
+		fullDateTime.setSecond(15);
+		XMLGregorianCalendar fullDate =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-01-10");
+		XMLGregorianCalendar yearMonth =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2020-02-20");
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDateTime, fullDate, yearMonth, yearOnly)));
+	}
+
 }
