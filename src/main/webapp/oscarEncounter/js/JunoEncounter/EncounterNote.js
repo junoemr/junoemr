@@ -62,7 +62,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var currentNoteId = junoJQuery("input#editNoteId").val();
 		var noteData = this.getNoteDataById(currentNoteId);
 
-		if(noteData.noteId === 0 && noteData.note.trim() === pageState.currentNoteData.note.trim())
+		if(parseInt(noteData.noteId) === 0 && noteData.note.trim() === pageState.currentNoteData.note.trim())
 		{
 			// do nothing, this is already an new, empty note
 			return false;
@@ -224,9 +224,9 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		}
 	};
 
-	this.prependNoteEntry = function prependNoteEntry(containerDiv, index, note, issues, demographicNo, enableEdit)
+	this.prependNoteEntry = function prependNoteEntry(containerDiv, index, note, issues, demographicNo, enableEdit, tmpSave)
 	{
-		var newNode = this.buildNoteEntry(index, note, issues, demographicNo, enableEdit);
+		var newNode = this.buildNoteEntry(index, note, issues, demographicNo, enableEdit, tmpSave);
 		var returnNode = newNode.prependTo(containerDiv);
 
 		if(enableEdit)
@@ -237,9 +237,9 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		return returnNode;
 	};
 
-	this.appendNoteEntry = function appendNoteEntry(containerDiv, index, note, issues, demographicNo, enableEdit)
+	this.appendNoteEntry = function appendNoteEntry(containerDiv, index, note, issues, demographicNo, enableEdit, tmpSave)
 	{
-		var newNode = this.buildNoteEntry(index, note, issues, demographicNo, enableEdit);
+		var newNode = this.buildNoteEntry(index, note, issues, demographicNo, enableEdit, tmpSave);
 		var returnNode = newNode.appendTo(containerDiv);
 
 		if(enableEdit)
@@ -413,11 +413,9 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				{
 					foundNoteToEdit = true;
 					editThisNote = true;
-					noteData.noteId = tmpSave.noteId;
-					noteData.note = tmpSave.note;
 				}
 
-				noteNode = me.prependNoteEntry(containerDiv, index + offset + 1, noteData, noteIssues, demographicNo, editThisNote);
+				noteNode = me.prependNoteEntry(containerDiv, index + offset + 1, noteData, noteIssues, demographicNo, editThisNote, tmpSave);
 			}
 			else
 			{
@@ -436,7 +434,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			if (!foundNoteToEdit)
 			{
 				// Add an extra, editable note to the end
-				var noteNode = this.appendNoteEntry(containerDiv, noteToEdit.noteId, noteToEdit, issues, demographicNo, true);
+				var noteNode = this.appendNoteEntry(containerDiv, noteToEdit.noteId, noteToEdit, issues, demographicNo, true, tmpSave);
 			}
 
 			if (firstNoteNode === null)
@@ -536,11 +534,16 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	};
 
 
-	this.buildNoteEntry = function buildNoteEntry(index, note, issues, demographicNo, enableEdit)
+	this.buildNoteEntry = function buildNoteEntry(index, note, issues, demographicNo, enableEdit, tmpSave)
 	{
-	    if(enableEdit)
+	  if(enableEdit)
 		{
 			this.updateNoteInPageState(note, issues);
+		}
+
+	  if(tmpSave && tmpSave.noteId === note.noteId)
+		{
+			note.note = tmpSave.note
 		}
 
 		var date = moment(note.observationDate);
