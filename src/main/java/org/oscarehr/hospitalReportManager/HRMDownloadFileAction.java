@@ -23,28 +23,28 @@
  */
 package org.oscarehr.hospitalReportManager;
 
-import java.io.File;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.util.StringUtils;
 
-public class HRMDownloadFileAction extends DownloadAction{
-    
-	private static HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.List;
+
+public class HRMDownloadFileAction extends DownloadAction
+{
+	private static final HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
+	private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	 
     /** Creates a new instance of DownloadFileAction */
     public HRMDownloadFileAction() {
@@ -55,12 +55,9 @@ public class HRMDownloadFileAction extends DownloadAction{
                                        HttpServletRequest request, 
                                        HttpServletResponse response)
             throws Exception {
-      
-    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "r", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+
+	    securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+			    SecurityInfoManager.READ, null, SecObjectName._HRM);
     	
     	String hash = request.getParameter("hash");
     	if(StringUtils.isNullOrEmpty(hash)) {
@@ -94,32 +91,40 @@ public class HRMDownloadFileAction extends DownloadAction{
     	}
     	
     	byte[] data = report.getBinaryContent();
-    	
-    	
-    	
-    	String fileName = (report.getLegalLastName() + "-" + report.getLegalFirstName()  + "-" + report.getFirstReportClass() + report.getFileExtension()).replaceAll("\\s", "_");
-    	
+
+    	String fileExtension = report.getFileExtension().toLowerCase();
+    	if(!fileExtension.startsWith("."))
+	    {
+		    fileExtension = "." + fileExtension;
+	    }
+
+	    String fileName = GenericFile.getSanitizedFileName(
+			    report.getLegalLastName() + "-" +
+					    report.getLegalFirstName() + "-" +
+					    report.getFirstReportClass() + fileExtension
+	    );
+
     	String contentType = "application/octet-stream";
     	
-    	if(report.getFileExtension().equals(".pdf")) {
+    	if(fileExtension.equals(".pdf")) {
     		contentType = "application/pdf";
     	}
-    	if(report.getFileExtension().equals(".tiff")) {
+    	if(fileExtension.equals(".tiff")) {
     		contentType = "image/tiff";
     	}
-    	if(report.getFileExtension().equals(".rtf")) {
+    	if(fileExtension.equals(".rtf")) {
     		contentType = "text/enriched";
     	}
-    	if(report.getFileExtension().equals(".jpg")) {
+    	if(fileExtension.equals(".jpg")) {
     		contentType = "image/jpeg";
     	}
-    	if(report.getFileExtension().equals(".gif")) {
+    	if(fileExtension.equals(".gif")) {
     		contentType = "image/gif";
     	}
-    	if(report.getFileExtension().equals(".png")) {
+    	if(fileExtension.equals(".png")) {
     		contentType = "image/png";
     	}
-    	if(report.getFileExtension().equals(".html")) {
+    	if(fileExtension.equals(".html")) {
     		contentType = "text/html";
     	}
     	
@@ -127,7 +132,7 @@ public class HRMDownloadFileAction extends DownloadAction{
         response.setHeader("Content-disposition", 
                            "attachment; filename=" + fileName);
         
-        File temp = File.createTempFile("HRMDownloadFile", report.getFileExtension()); 
+        File temp = File.createTempFile("HRMDownloadFile", fileExtension);
         temp.deleteOnExit();
         
         FileUtils.writeByteArrayToFile(temp, data);

@@ -27,6 +27,7 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
@@ -77,6 +78,7 @@ public class HRMService
 		documentService.uploadNewDemographicDocument(hrmDocument.getDocument(), hrmDocumentModel.getDocument().getFile(), null);
 
 		// persist hrm database info and associated objects through cascade
+		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
 		hrmDocumentDao.persist(hrmDocument);
 		hrmDocumentModel.getReportFile().moveToHRMDocuments();
 

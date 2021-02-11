@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
@@ -149,20 +150,7 @@ public class HRMReportParser
 		document.setReportType(report.getFirstReportClass());
 		document.setTimeReceived(new Date());
 
-		String reportFileData = report.getFileData();
-
-		String noMessageIdFileData = reportFileData.replaceAll("<MessageUniqueID>.*?</MessageUniqueID>", "<MessageUniqueID></MessageUniqueID>");
-		String noTransactionInfoFileData = reportFileData.replaceAll("<TransactionInformation>.*?</TransactionInformation>", "<TransactionInformation></TransactionInformation>");
-		String noDemograhpicInfoFileData = reportFileData.replaceAll("<Demographics>.*?</Demographics>", "<Demographics></Demographics").replaceAll("<MessageUniqueID>.*?</MessageUniqueID>", "<MessageUniqueID></MessageUniqueID>");
-
-		String noMessageIdHash = DigestUtils.md5Hex(noMessageIdFileData);
-		String noTransactionInfoHash = DigestUtils.md5Hex(noTransactionInfoFileData);
-		String noDemographicInfoHash = DigestUtils.md5Hex(noDemograhpicInfoFileData);
-
-		document.setReportHash(noMessageIdHash);
-		document.setReportLessTransactionInfoHash(noTransactionInfoHash);
-		document.setReportLessDemographicInfoHash(noDemographicInfoHash);
-
+		fillDocumentHashData(document, report.getFileData());
 		document.setReportDate(HRMReportParser.getAppropriateDateFromReport(report));
 
 		document.setDescription("");
@@ -171,10 +159,10 @@ public class HRMReportParser
 		// report hash matches = duplicate report for same recipient
 		// no transaction info hash matches = duplicate report, but different recipient
 		HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
-		List<Integer> exactMatchList = hrmDocumentDao.findByHash(noMessageIdHash);
+		List<Integer> exactMatchList = hrmDocumentDao.findByHash(document.getReportHash());
 
 		if (exactMatchList == null || exactMatchList.size() == 0) {
-			List<HRMDocument> sameReportDifferentRecipientReportList = hrmDocumentDao.findByNoTransactionInfoHash(noTransactionInfoHash);
+			List<HRMDocument> sameReportDifferentRecipientReportList = hrmDocumentDao.findByNoTransactionInfoHash(document.getReportLessTransactionInfoHash());
 
 			if (sameReportDifferentRecipientReportList != null && sameReportDifferentRecipientReportList.size() > 0) {
 				logger.info("Same Report Different Recipient, for file:"+report.getFileLocation());
@@ -212,6 +200,31 @@ public class HRMReportParser
 
 			hrmDocumentDao.merge(existingDocument);
 		}
+	}
+
+	/**
+	 * fill hrm document hash data based on the file string
+	 * @param document
+	 */
+	public static void fillDocumentHashData(HRMDocument document, String reportFileData)
+	{
+		String noMessageIdFileData = reportFileData.replaceAll("<MessageUniqueID>.*?</MessageUniqueID>", "<MessageUniqueID></MessageUniqueID>");
+		String noTransactionInfoFileData = reportFileData.replaceAll("<TransactionInformation>.*?</TransactionInformation>", "<TransactionInformation></TransactionInformation>");
+		String noDemograhpicInfoFileData = reportFileData.replaceAll("<Demographics>.*?</Demographics>", "<Demographics></Demographics").replaceAll("<MessageUniqueID>.*?</MessageUniqueID>", "<MessageUniqueID></MessageUniqueID>");
+
+		String noMessageIdHash = DigestUtils.md5Hex(noMessageIdFileData);
+		String noTransactionInfoHash = DigestUtils.md5Hex(noTransactionInfoFileData);
+		String noDemographicInfoHash = DigestUtils.md5Hex(noDemograhpicInfoFileData);
+
+		document.setReportHash(noMessageIdHash);
+		document.setReportLessTransactionInfoHash(noTransactionInfoHash);
+		document.setReportLessDemographicInfoHash(noDemographicInfoHash);
+	}
+
+	public static void fillDocumentHashData(HRMDocument document, GenericFile hrmFile)
+	{
+		String reportFileData = FileUtils.getStringFromFile(hrmFile.getFileObject());
+		fillDocumentHashData(document, reportFileData);
 	}
 
 	private static void routeReportToDemographic(HRMReport report, HRMDocument mergedDocument) {
