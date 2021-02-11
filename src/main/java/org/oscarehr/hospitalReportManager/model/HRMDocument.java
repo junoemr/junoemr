@@ -42,6 +42,7 @@ public class HRMDocument extends AbstractModel<Integer>
 	private String reportLessDemographicInfoHash;
 	private String reportStatus;
 	private String reportFile;
+	private String reportFileSchemaVersion;
 	private String sourceFacility;
 	private String sendingFacilityId;
 	private String sendingFacilityReportId;

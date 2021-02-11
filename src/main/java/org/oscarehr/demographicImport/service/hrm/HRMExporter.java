@@ -77,4 +77,10 @@ public class HRMExporter implements DemographicExporter
 
 		return GenericFile.getFormattedFileName(name);
 	}
+
+	@Override
+	public String getSchemaVersion()
+	{
+		return "4.3";
+	}
 }

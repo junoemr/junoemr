@@ -69,7 +69,7 @@ public class HRMDisplayReportAction extends DispatchAction {
 
                     if (document != null) {
                         logger.debug("reading repotFile : "+document.getReportFile());
-                        HRMReport report = HRMReportParser.parseReport(loggedInInfo, document.getReportFile());
+                        HRMReport report = HRMReportParser.parseReport(document.getReportFile(), document.getReportFileSchemaVersion());
                         
                         request.setAttribute("hrmDocument", document);
 
@@ -83,7 +83,7 @@ public class HRMDisplayReportAction extends DispatchAction {
                             HRMDocumentToDemographic demographicLink = (demographicLinkList.size() > 0 ? demographicLinkList.get(0) : null);
                             request.setAttribute("demographicLink", demographicLink);
 
-                            List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(document.getId().toString());
+                            List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(document.getId());
                             request.setAttribute("providerLinkList", providerLinkList);
 
                             List<HRMDocumentSubClass> subClassList = hrmDocumentSubClassDao.getSubClassesByDocumentId(document.getId());

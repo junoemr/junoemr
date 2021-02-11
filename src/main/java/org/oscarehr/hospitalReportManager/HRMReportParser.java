@@ -14,8 +14,11 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographicImport.parser.hrm.HRMFileParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
@@ -24,25 +27,23 @@ import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_1;
+import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.hospitalReportManager.xsd.OmdCds;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.SAXException;
-import oscar.OscarProperties;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,13 +57,10 @@ public class HRMReportParser
 	private HRMReportParser() {}
 
 
-	public static HRMReport parseReport(LoggedInInfo loggedInInfo, String hrmReportFileLocation)
+	public static HRMReport parseReport(String hrmReportFileLocation, String schemaVersion)
 	{
-		OmdCds root = null;
-
 		logger.info("Parsing the Report in the location:" + hrmReportFileLocation);
 		
-		String fileData = null;
 		if(hrmReportFileLocation != null)
 		{
 			try
@@ -70,59 +68,64 @@ public class HRMReportParser
 				//a lot of the parsers need to refer to a file and even when they provide functions like parse(String text)
 				//it will not parse the same way because it will treat the text as a URL
 				//so we take the lab and store them temporarily in a random filename in /tmp/oscar-sftp/
-				File tmpXMLholder = new File(hrmReportFileLocation);
-				
+				File tmpXMLHolder = new File(hrmReportFileLocation);
+
 				//check the DOCUMENT_DIR
-				if(!tmpXMLholder.exists()) {
-					String place= OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-					tmpXMLholder = new File(place + File.separator + hrmReportFileLocation);
+				if(!tmpXMLHolder.exists())
+				{
+					tmpXMLHolder = FileFactory.getHrmFile(hrmReportFileLocation).getFileObject();
 				}
 
-				if(!tmpXMLholder.exists()) {
+				if(!tmpXMLHolder.exists())
+				{
 					logger.warn("unable to find the HRM report. checked " + hrmReportFileLocation + ", and in the document_dir");
 					return null;
 				}
-				if (tmpXMLholder.exists()) fileData = FileUtils.getStringFromFile(tmpXMLholder);
-				// Parse an XML document into a DOM tree.
-				DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-				// Create a SchemaFactory capable of understanding WXS schemas.
+				String fileData = FileUtils.getStringFromFile(tmpXMLHolder);
 
+				//TODO - this should not need to be hard coded
+				if("4.3".equals(schemaVersion)) // HRM 4.3 schema
+				{
+					xml.hrm.v4_3.OmdCds root = new HRMFileParser().parse(new XMLFile(tmpXMLHolder));
+					return new HRMReport_4_3(root, hrmReportFileLocation, fileData);
 
-				//SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");//XMLConstants.W3C_XML_SCHEMA_NS_URI);
-				SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+				}
+				else // legacy load HRM 4.1 or other
+				{
+					// Load a WXS schema, represented by a Schema instance.
+					// Create a SchemaFactory capable of understanding WXS schemas.
+					SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-				// Load a WXS schema, represented by a Schema instance.
-				Source schemaFile = new StreamSource(new File(SFTPConnector.OMD_directory + "report_manager_cds.xsd"));
-				Schema schema = factory.newSchema(schemaFile); 
+					String OMDDirectory = SFTPConnector.OMD_directory;
+					File schemaFile = new File(OMDDirectory, "report_manager_cds.xsd");
+					Schema schema = factory.newSchema(new StreamSource(schemaFile));
 
-				JAXBContext jc = JAXBContext.newInstance("org.oscarehr.hospitalReportManager.xsd");
-				Unmarshaller u = jc.createUnmarshaller();
-				u.setSchema(schema);
-				
-				root = (OmdCds) u.unmarshal(tmpXMLholder);
+					JAXBContext jc = JAXBContext.newInstance("org.oscarehr.hospitalReportManager.xsd");
+					Unmarshaller u = jc.createUnmarshaller();
+					u.setSchema(schema);
 
-				tmpXMLholder = null;
-
+					OmdCds root = (OmdCds) u.unmarshal(tmpXMLHolder);
+					return new HRMReport_4_1(root, hrmReportFileLocation, fileData);
+				}
 			}
 			catch(SAXException e)
 			{
 				logger.error("SAX ERROR PARSING XML " + e);
 			}
-			catch(ParserConfigurationException e)
-			{
-				logger.error("PARSER ERROR PARSING XML " + e);
-			}
-			catch(JAXBException e)
+			catch(IOException | JAXBException e)
 			{
 				logger.error("error", e);
 			}
-
-			if(root != null && fileData != null)
-			{
-				return new HRMReport(root, hrmReportFileLocation, fileData);
-			}
 		}
 		return null;
+	}
+
+	/**
+	 * legacy method signature
+ 	 */
+	public static HRMReport parseReport(LoggedInInfo loggedInInfo, String hrmReportFileLocation)
+	{
+		return parseReport(hrmReportFileLocation, null);
 	}
 
 	public static void addReportToInbox(LoggedInInfo loggedInInfo, HRMReport report) {
@@ -333,7 +336,7 @@ public class HRMReportParser
 			for (HRMDocumentToDemographic matchingHrmDocument : matchingHrmDocumentList) {
 				HRMDocument hrmDocument = hrmDocumentDao.find(matchingHrmDocument.getHrmDocumentId());
 
-				HRMReport hrmReport = HRMReportParser.parseReport(loggedInInfo, hrmDocument.getReportFile());
+				HRMReport hrmReport = HRMReportParser.parseReport(hrmDocument.getReportFile(), hrmDocument.getReportFileSchemaVersion());
 				hrmReport.setHrmDocumentId(hrmDocument.getId());
 				hrmReport.setHrmParentDocumentId(hrmDocument.getParentReport());
 				allRoutedReports.add(hrmReport);
@@ -423,7 +426,7 @@ public class HRMReportParser
 		HRMDocument hrmDocument = hrmDocumentDao.find(reportId);
 		for (Provider p : sendToProviderList) {
 						
-			List<HRMDocumentToProvider> existingHRMDocumentToProviders =  hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNoList(reportId.toString(), p.getProviderNo());
+			List<HRMDocumentToProvider> existingHRMDocumentToProviders =  hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNoList(reportId, p.getProviderNo());
 			
 			if (existingHRMDocumentToProviders == null || existingHRMDocumentToProviders.size() == 0) {	
 				HRMDocumentToProvider providerRouting = new HRMDocumentToProvider();

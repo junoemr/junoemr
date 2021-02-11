@@ -44,4 +44,11 @@ public class HRMFileParser extends AbstractXMLFileParser<OmdCds>
 	{
 		return new CDSNamespaceMapper();
 	}
+
+	@Override
+	protected String getHeadersForMarshaller()
+	{
+		return "Generated HRM file. This is not an original HRM document. It was generated based on available data byt Juno EMR.\n" +
+				"This is most likely due to a data migration";
+	}
 }

@@ -83,7 +83,7 @@ public class HRMDownloadFileAction extends DownloadAction{
     		throw new Exception("HRMDocument not found - " + ids.get(0));
     	}
     	
-    	HRMReport report = HRMReportParser.parseReport(loggedInInfo, hd.getReportFile());
+    	HRMReport report = HRMReportParser.parseReport(hd.getReportFile(), hd.getReportFileSchemaVersion());
         
     	if(report == null) {
     		throw new Exception("Failed to parse HRMDocument with id " + hd.getId());

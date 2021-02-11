@@ -67,7 +67,7 @@ public class HRMUtil {
 			List<HRMDocumentSubClass> subClassList = hrmDocumentSubClassDao.getSubClassesByDocumentId(hrmDocument.getId());
 			
 			
-			HRMReport report = HRMReportParser.parseReport(loggedInInfo, hrmDocument.getReportFile());
+			HRMReport report = HRMReportParser.parseReport(hrmDocument.getReportFile(), hrmDocument.getReportFileSchemaVersion());
 			if (report.getFirstReportClass().equalsIgnoreCase("Diagnostic Imaging Report") || report.getFirstReportClass().equalsIgnoreCase("Cardio Respiratory Report")) {
 				// We'll only care about the first one, as long as there is at least one
 				if (subClassList != null && subClassList.size() > 0) {
@@ -134,7 +134,7 @@ public class HRMUtil {
 
 			for (HRMDocument hrmDocument : hrmDocuments)
 			{
-				HRMReport hrmReport = HRMReportParser.parseReport(loggedInInfo, hrmDocument.getReportFile());
+				HRMReport hrmReport = HRMReportParser.parseReport(hrmDocument.getReportFile(), hrmDocument.getReportFileSchemaVersion());
 				if (hrmReport == null) continue;
 				hrmReport.setHrmDocumentId(hrmDocument.getId());
 				String duplicateKey=hrmReport.getSendingFacilityId()+':'+hrmReport.getSendingFacilityReportNo()+':'+hrmReport.getDeliverToUserId();

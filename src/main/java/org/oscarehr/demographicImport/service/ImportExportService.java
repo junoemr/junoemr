@@ -404,6 +404,7 @@ public class ImportExportService
 			tempRecord.setDemographic(patientRecord.getDemographic());
 			tempRecord.addHrmDocument(hrmDocument);
 			hrmDocument.setReportFile(exporter.exportDemographic(tempRecord));
+			hrmDocument.setReportFileSchemaVersion(exporter.getSchemaVersion());
 		}
 
 		hrmService.uploadAllNewHRMDocuments(patientRecord.getHrmDocumentList(), dbDemographic);

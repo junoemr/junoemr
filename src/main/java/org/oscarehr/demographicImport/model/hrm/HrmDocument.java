@@ -114,6 +114,7 @@ public class HrmDocument extends AbstractTransientModel
 	private String reportSubClass;
 	private REPORT_STATUS reportStatus;
 	private GenericFile reportFile;
+	private String reportFileSchemaVersion;
 	private Document document;
 	private String sourceFacility;
 	private String sendingFacilityId;

@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.converter.in.hrm;
 
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
@@ -62,12 +63,23 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
 
 		hrmDocument.setDocument(documentModelToDbConverter.convert(input.getDocument()));
+		hrmDocument.setReportFile(getReportFileName(input.getReportFile()));
+		hrmDocument.setReportFileSchemaVersion(input.getReportFileSchemaVersion());
 
 		hrmDocument.setDocumentSubClassList(convertSubClassList(hrmDocument, input.getObservations()));
 		hrmDocument.setCommentList(convertCommentList(hrmDocument, input.getComments()));
 		hrmDocument.setDocumentToProviderList(convertProviderLinks(hrmDocument, input.getReviewers()));
 
 		return hrmDocument;
+	}
+
+	protected String getReportFileName(GenericFile file)
+	{
+		if(file != null)
+		{
+			return file.getName();
+		}
+		return null;
 	}
 
 	protected String reportType(HrmDocument.REPORT_CLASS reportClass)

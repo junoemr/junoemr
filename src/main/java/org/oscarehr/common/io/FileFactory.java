@@ -184,6 +184,24 @@ public class FileFactory
 	}
 
 	/**
+	 * load an existing hrm file with the given name
+	 * checks the hrm directory with a fallback to the main document location
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getHrmFile(String fileName) throws IOException
+	{
+		if(fileExists(GenericFile.HRM_BASE_DIR, fileName))
+		{
+			return getExistingFile(GenericFile.HRM_BASE_DIR, fileName);
+		}
+		else
+		{
+			return getDocumentFile(fileName);
+		}
+	}
+
+	/**
 	 * load an existing eform image with the given name
 	 * @param fileName - name of the file to load
 	 * @return - the file

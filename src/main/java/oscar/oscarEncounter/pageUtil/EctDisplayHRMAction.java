@@ -79,33 +79,38 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 			List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
 
 			List<Integer> doNotShowList = new LinkedList<>();
-			// the key = SendingFacility+':'+ReportNumber+':'+DeliverToUserID as per HRM spec can be used to signify duplicate report
 			HashMap<String, HRMDocument> docsToDisplay = new HashMap<>();
 			HashMap<String, HRMDocument> labReports = new HashMap<>();
 			HashMap<String, ArrayList<Integer>> duplicateLabIds = new HashMap<>();
 
 			for (HRMDocument doc : allHrmDocsForDemo)
 			{
+				String facilityId = doc.getSendingFacilityId();
+				String facilityReportId = doc.getSendingFacilityReportId();
+				String deliverToUserId = doc.getDeliverToUserId();
+
 				// filter duplicate reports
 				String duplicateKey;
-				if(doc.getReportFile() != null) // legacy xml lookup
+				if(facilityId == null && facilityReportId == null && deliverToUserId == null) // legacy xml lookup
 				{
-					HRMReport hrmReport = HRMReportParser.parseReport(loggedInInfo, doc.getReportFile());
-					if(hrmReport == null) continue;
-					hrmReport.setHrmDocumentId(doc.getId());
-					duplicateKey = hrmReport.getSendingFacilityId() + ':' + hrmReport.getSendingFacilityReportNo() + ':' + hrmReport.getDeliverToUserId();
+					HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
+					if(hrmReport != null)
+					{
+						facilityId = hrmReport.getSendingFacilityId();
+						facilityReportId = hrmReport.getSendingFacilityReportNo();
+						deliverToUserId = hrmReport.getDeliverToUserId();
+					}
 				}
-				else // can use database values, don't need to parse the xml
+
+				// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
+				if(facilityId == null && facilityReportId == null)
 				{
-					// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
-					if(doc.getSendingFacilityId() == null && doc.getSendingFacilityReportId() == null)
-					{
-						duplicateKey = String.valueOf(doc.getId());
-					}
-					else
-					{
-						duplicateKey = doc.getSendingFacilityId() + ':' + doc.getSendingFacilityReportId() + ':' + doc.getDeliverToUserId();
-					}
+					duplicateKey = String.valueOf(doc.getId());
+				}
+				else
+				{
+					// the key = SendingFacility+':'+ReportNumber+':'+DeliverToUserID as per HRM spec can be used to signify duplicate report
+					duplicateKey = facilityId + ':' + facilityReportId + ':' + deliverToUserId;
 				}
 
 				List<HRMDocument> relationshipDocs = hrmDocumentDao.findAllDocumentsWithRelationship(doc.getId());

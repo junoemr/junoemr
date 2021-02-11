@@ -70,6 +70,12 @@ public abstract class AbstractXMLFileParser<T> extends AbstractFileParser<T>
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			// set correct namespaces
 			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNamespaceMapper());
+
+			String customHeaders = getHeadersForMarshaller();
+			if(customHeaders != null)
+			{
+				marshaller.setProperty("com.sun.xml.bind.xmlHeaders", "\n<!-- " + customHeaders + " -->");
+			}
 			// write to file
 			marshaller.marshal(formatObject, tempFile.getFileObject());
 		}
@@ -83,5 +89,11 @@ public abstract class AbstractXMLFileParser<T> extends AbstractFileParser<T>
 	}
 
 	protected abstract JAXBContext getNewInstance() throws JAXBException;
+
 	protected abstract NamespacePrefixMapper getNamespaceMapper();
+
+	protected String getHeadersForMarshaller()
+	{
+		return null;
+	}
 }

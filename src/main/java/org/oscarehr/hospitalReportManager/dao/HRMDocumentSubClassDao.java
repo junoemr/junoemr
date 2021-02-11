@@ -25,7 +25,7 @@ public class HRMDocumentSubClassDao extends AbstractDao<HRMDocumentSubClass> {
 	}
 
 	public List<HRMDocumentSubClass> getSubClassesByDocumentId(Integer id) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocument.id=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);
 		@SuppressWarnings("unchecked")
@@ -34,7 +34,7 @@ public class HRMDocumentSubClassDao extends AbstractDao<HRMDocumentSubClass> {
 	}
 	
 	public List<HRMDocumentSubClass> getActiveSubClassesByDocumentId(Integer id) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1 and x.isActive=1";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocument.id=?1 and x.isActive=1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);
 		@SuppressWarnings("unchecked")
@@ -43,7 +43,7 @@ public class HRMDocumentSubClassDao extends AbstractDao<HRMDocumentSubClass> {
 	}
 	
 	public boolean setAllSubClassesForDocumentAsInactive(Integer id) {
-		String sql = "update " + this.modelClass.getName() + " x set isActive=false where x.hrmDocumentId=?1";
+		String sql = "update " + this.modelClass.getName() + " x set isActive=false where x.hrmDocument.id=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);
 		return query.executeUpdate() > 0;

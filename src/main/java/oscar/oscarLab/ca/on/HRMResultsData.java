@@ -84,7 +84,7 @@ public class HRMResultsData {
 
 			// check if patient is matched
 			List<HRMDocumentToDemographic> hrmDocResultsDemographic = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocument.get(0).getId());
-			HRMReport hrmReport = HRMReportParser.parseReport(loggedInInfo, hrmDocument.get(0).getReportFile());
+			HRMReport hrmReport = HRMReportParser.parseReport(hrmDocument.get(0).getReportFile(), hrmDocument.get(0).getReportFileSchemaVersion());
 			if (hrmReport == null) continue;
 
 			hrmReport.setHrmDocumentId(id);

@@ -34,4 +34,6 @@ public interface DemographicExporter
 	GenericFile exportDemographic(PatientRecord patientRecord) throws Exception;
 
 	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
+
+	String getSchemaVersion();
 }

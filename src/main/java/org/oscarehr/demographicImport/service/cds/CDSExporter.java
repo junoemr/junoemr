@@ -96,6 +96,12 @@ public class CDSExporter implements DemographicExporter
 		return additionalExportFiles;
 	}
 
+	@Override
+	public String getSchemaVersion()
+	{
+		return "5.1";
+	}
+
 	/**
 	 * creates the filename string according to CDS requirement PatientFN_PatientLN_PatientUniqueID_DOB
 	 */
