@@ -948,4 +948,51 @@ public class ConversionUtils {
 		calendar.setSecond(localDateTime.getSecond());
 		return calendar;
 	}
+
+
+	public static LocalDateTime fillPartialCalendar(
+			XMLGregorianCalendar fullDateTime,
+			XMLGregorianCalendar fullDate,
+			XMLGregorianCalendar yearMonth,
+			XMLGregorianCalendar yearOnly)
+	{
+		if(fullDateTime != null)
+		{
+			return ConversionUtils.toNullableLocalDateTime(fullDateTime);
+		}
+		else
+		{
+			return fillPartialCalendar(fullDate, yearMonth, yearOnly);
+		}
+	}
+	public static LocalDateTime fillPartialCalendar(
+			XMLGregorianCalendar fullDate,
+			XMLGregorianCalendar yearMonth,
+			XMLGregorianCalendar yearOnly)
+	{
+		XMLGregorianCalendar xmlGregorianCalendar = null;
+		if(fullDate != null)
+		{
+			xmlGregorianCalendar = fullDate;
+		}
+		else if(yearMonth != null)
+		{
+			xmlGregorianCalendar = yearMonth;
+			xmlGregorianCalendar.setDay(1);
+		}
+		else if(yearOnly != null)
+		{
+			xmlGregorianCalendar = yearOnly;
+			xmlGregorianCalendar.setMonth(1);
+			xmlGregorianCalendar.setDay(1);
+		}
+
+		if(xmlGregorianCalendar != null)
+		{
+			xmlGregorianCalendar.setHour(0);
+			xmlGregorianCalendar.setMinute(0);
+			xmlGregorianCalendar.setSecond(0);
+		}
+		return ConversionUtils.toNullableLocalDateTime(xmlGregorianCalendar);
+	}
 }

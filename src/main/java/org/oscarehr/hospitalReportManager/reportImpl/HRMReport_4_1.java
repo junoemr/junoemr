@@ -10,6 +10,7 @@
 package org.oscarehr.hospitalReportManager.reportImpl;
 
 import org.apache.commons.codec.binary.Base64;
+import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.xsd.DateFullOrPartial;
 import org.oscarehr.hospitalReportManager.xsd.Demographics;
@@ -17,13 +18,13 @@ import org.oscarehr.hospitalReportManager.xsd.OmdCds;
 import org.oscarehr.hospitalReportManager.xsd.PersonNameStandard;
 import org.oscarehr.hospitalReportManager.xsd.PersonNameStandard.LegalName.OtherName;
 import org.oscarehr.hospitalReportManager.xsd.ReportFormat;
-import org.oscarehr.hospitalReportManager.xsd.ReportsReceived.OBRContent;
+import org.oscarehr.hospitalReportManager.xsd.ReportsReceived;
 import org.oscarehr.util.MiscUtils;
+import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -350,30 +351,30 @@ public class HRMReport_4_1 implements HRMReport
 		return hrmReport.getPatientRecord().getReportsReceived().get(0).getResultStatus();
 	}
 
-	public List<List<Object>> getAccompanyingSubclassList()
+	public List<HrmObservation> getObservations()
 	{
-		LinkedList<List<Object>> subclassList = new LinkedList<List<Object>>();
-
+		List<HrmObservation> observationList = new ArrayList<>();
 		if(hrmReport.getPatientRecord().getReportsReceived() != null || !hrmReport.getPatientRecord().getReportsReceived().isEmpty())
 		{
-			for(OBRContent o : hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent())
+			List<ReportsReceived.OBRContent> obrContents = hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent();
+
+			for(ReportsReceived.OBRContent obrContent : obrContents)
 			{
-				LinkedList<Object> obrContentList = new LinkedList<Object>();
+				HrmObservation observation = new HrmObservation();
+				observation.setAccompanyingDescription(obrContent.getAccompanyingDescription());
+				observation.setAccompanyingMnemonic(obrContent.getAccompanyingMnemonic());
+				observation.setAccompanyingSubClass(obrContent.getAccompanyingSubClass());
 
-				obrContentList.add(o.getAccompanyingSubClass());
-				obrContentList.add(o.getAccompanyingMnemonic());
-				obrContentList.add(o.getAccompanyingDescription());
-
-				if(o.getObservationDateTime() != null)
-				{
-					Date date = dateFP(o.getObservationDateTime()).toGregorianCalendar().getTime();
-					obrContentList.add(date);
-				}
-
-				subclassList.add(obrContentList);
+				observation.setObservationDateTime(
+						ConversionUtils.fillPartialCalendar(
+								obrContent.getObservationDateTime().getFullDate(),
+								obrContent.getObservationDateTime().getYearMonth(),
+								obrContent.getObservationDateTime().getYearOnly())
+				);
+				observationList.add(observation);
 			}
 		}
-		return subclassList;
+		return observationList;
 	}
 
 	public Calendar getFirstAccompanyingSubClassDateTime()

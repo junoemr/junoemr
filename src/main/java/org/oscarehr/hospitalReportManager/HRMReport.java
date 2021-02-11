@@ -9,6 +9,8 @@
 
 package org.oscarehr.hospitalReportManager;
 
+import org.oscarehr.demographicImport.model.hrm.HrmObservation;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -85,7 +87,7 @@ public interface HRMReport
 
 	String getResultStatus();
 
-	List<List<Object>> getAccompanyingSubclassList();
+	List<HrmObservation> getObservations();
 
 	Calendar getFirstAccompanyingSubClassDateTime();
 

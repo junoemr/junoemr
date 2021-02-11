@@ -24,20 +24,21 @@
 package org.oscarehr.hospitalReportManager.reportImpl;
 
 import org.apache.commons.codec.binary.Base64;
+import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.util.MiscUtils;
+import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.Demographics;
 import xml.hrm.v4_3.OmdCds;
 import xml.hrm.v4_3.PersonNameStandard;
 import xml.hrm.v4_3.PersonNameStandard.LegalName.OtherName;
 import xml.hrm.v4_3.ReportFormat;
-import xml.hrm.v4_3.ReportsReceived.OBRContent;
+import xml.hrm.v4_3.ReportsReceived;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -364,30 +365,30 @@ public class HRMReport_4_3 implements HRMReport
 		return hrmReport.getPatientRecord().getReportsReceived().get(0).getResultStatus();
 	}
 
-	public List<List<Object>> getAccompanyingSubclassList()
+	public List<HrmObservation> getObservations()
 	{
-		LinkedList<List<Object>> subclassList = new LinkedList<List<Object>>();
-
+		List<HrmObservation> observationList = new ArrayList<>();
 		if(hrmReport.getPatientRecord().getReportsReceived() != null || !hrmReport.getPatientRecord().getReportsReceived().isEmpty())
 		{
-			for(OBRContent o : hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent())
+			List<ReportsReceived.OBRContent> obrContents = hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent();
+
+			for(ReportsReceived.OBRContent obrContent : obrContents)
 			{
-				LinkedList<Object> obrContentList = new LinkedList<Object>();
+				HrmObservation observation = new HrmObservation();
+				observation.setAccompanyingDescription(obrContent.getAccompanyingDescription());
+				observation.setAccompanyingMnemonic(obrContent.getAccompanyingMnemonic());
+				observation.setAccompanyingSubClass(obrContent.getAccompanyingSubClass());
 
-				obrContentList.add(o.getAccompanyingSubClass());
-				obrContentList.add(o.getAccompanyingMnemonic());
-				obrContentList.add(o.getAccompanyingDescription());
-
-				if(o.getObservationDateTime() != null)
-				{
-					Date date = dateFP(o.getObservationDateTime()).toGregorianCalendar().getTime();
-					obrContentList.add(date);
-				}
-
-				subclassList.add(obrContentList);
+				observation.setObservationDateTime(
+						ConversionUtils.fillPartialCalendar(
+								obrContent.getObservationDateTime().getFullDate(),
+								obrContent.getObservationDateTime().getYearMonth(),
+								obrContent.getObservationDateTime().getYearOnly())
+				);
+				observationList.add(observation);
 			}
 		}
-		return subclassList;
+		return observationList;
 	}
 
 	public Calendar getFirstAccompanyingSubClassDateTime()

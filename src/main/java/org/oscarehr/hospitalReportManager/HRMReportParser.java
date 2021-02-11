@@ -18,6 +18,8 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.demographicImport.parser.hrm.HRMFileParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
@@ -34,6 +36,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.SAXException;
+import oscar.util.ConversionUtils;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -348,7 +351,8 @@ public class HRMReportParser
 	}
 
 
-	public static void routeReportToSubClass(HRMReport report, HRMDocument document) {
+	public static void routeReportToSubClass(HRMReport report, HRMDocument document)
+	{
 		if(report == null) {
 			logger.info("routeReportToSubClass cannot continue, report parameter is null");
 			return;
@@ -358,20 +362,24 @@ public class HRMReportParser
 		
 		HRMDocumentSubClassDao hrmDocumentSubClassDao = (HRMDocumentSubClassDao) SpringUtils.getBean("HRMDocumentSubClassDao");
 
-		if (report.getFirstReportClass().equalsIgnoreCase("Diagnostic Imaging Report") || report.getFirstReportClass().equalsIgnoreCase("Cardio Respiratory Report")) {
-			List<List<Object>> subClassList = report.getAccompanyingSubclassList();
+		if(report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.DIAGNOSTIC_IMAGING.getValue())
+				|| report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.CARDIO_RESPIRATORY.getValue()))
+		{
+			List<HrmObservation> subClassList = report.getObservations();
 
 			boolean firstSubClass = true;
 			
-			for (List<Object> subClass : subClassList) {
+			for (HrmObservation subClass : subClassList)
+			{
 				HRMDocumentSubClass newSubClass = new HRMDocumentSubClass();
 
-				newSubClass.setSubClass((String) subClass.get(0));
-				newSubClass.setSubClassMnemonic((String) subClass.get(1));
-				newSubClass.setSubClassDescription((String) subClass.get(2));
-				newSubClass.setSubClassDateTime((Date) subClass.get(3));
+				newSubClass.setSubClass(subClass.getAccompanyingSubClass());
+				newSubClass.setSubClassMnemonic(subClass.getAccompanyingMnemonic());
+				newSubClass.setSubClassDescription(subClass.getAccompanyingDescription());
+				newSubClass.setSubClassDateTime(ConversionUtils.toLegacyDateTime(subClass.getObservationDateTime()));
 
-				if (firstSubClass) {
+				if(firstSubClass)
+				{
 					newSubClass.setActive(true);
 					firstSubClass = false;
 				}
@@ -379,14 +387,20 @@ public class HRMReportParser
 
 				hrmDocumentSubClassDao.merge(newSubClass);
 			}
-		} else {
-			// There aren't subclasses on a Medical Records Report
 		}
+		// There aren't subclasses on a Medical Records Report
 	}
 
-	public static Date getAppropriateDateFromReport(HRMReport report) {
-		if (report.getFirstReportClass().equalsIgnoreCase("Diagnostic Imaging Report") || report.getFirstReportClass().equalsIgnoreCase("Cardio Respiratory Report")) {
-			return ((Date) (report.getAccompanyingSubclassList().get(0).get(3)));
+	public static Date getAppropriateDateFromReport(HRMReport report)
+	{
+		if(report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.DIAGNOSTIC_IMAGING.getValue())
+				|| report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.CARDIO_RESPIRATORY.getValue()))
+		{
+			List<HrmObservation> subClassList = report.getObservations();
+			if(!subClassList.isEmpty())
+			{
+				return ConversionUtils.toLegacyDateTime(subClassList.get(0).getObservationDateTime());
+			}
 		}
 
 		// Medical Records Report

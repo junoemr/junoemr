@@ -381,7 +381,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 	{
 		if(fullOrPartial != null)
 		{
-			return fillPartialCalendar(
+			return ConversionUtils.fillPartialCalendar(
 					fullOrPartial.getFullDateTime(),
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
@@ -394,7 +394,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 	{
 		if(fullOrPartial != null)
 		{
-			return fillPartialCalendar(
+			return ConversionUtils.fillPartialCalendar(
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
 					fullOrPartial.getYearOnly());
@@ -406,7 +406,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 	{
 		if(fullOrPartial != null)
 		{
-			LocalDateTime dateTime = fillPartialCalendar(
+			LocalDateTime dateTime = ConversionUtils.fillPartialCalendar(
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
 					fullOrPartial.getYearOnly());
@@ -421,7 +421,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 	{
 		if(fullOrPartial != null)
 		{
-			LocalDateTime dateTime = fillPartialCalendar(
+			LocalDateTime dateTime = ConversionUtils.fillPartialCalendar(
 					fullOrPartial.getFullDateTime(),
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
@@ -432,52 +432,5 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 			}
 		}
 		return null;
-	}
-
-	private LocalDateTime fillPartialCalendar(
-			XMLGregorianCalendar fullDateTime,
-			XMLGregorianCalendar fullDate,
-			XMLGregorianCalendar yearMonth,
-			XMLGregorianCalendar yearOnly)
-	{
-		if(fullDateTime != null)
-		{
-			return ConversionUtils.toNullableLocalDateTime(fullDateTime);
-		}
-		else
-		{
-			return fillPartialCalendar(fullDate, yearMonth, yearOnly);
-		}
-	}
-
-	private LocalDateTime fillPartialCalendar(
-			XMLGregorianCalendar fullDate,
-			XMLGregorianCalendar yearMonth,
-			XMLGregorianCalendar yearOnly)
-	{
-		XMLGregorianCalendar xmlGregorianCalendar = null;
-		if(fullDate != null)
-		{
-			xmlGregorianCalendar = fullDate;
-		}
-		else if (yearMonth != null)
-		{
-			xmlGregorianCalendar = yearMonth;
-			xmlGregorianCalendar.setDay(1);
-		}
-		else if(yearOnly != null)
-		{
-			xmlGregorianCalendar = yearOnly;
-			xmlGregorianCalendar.setMonth(1);
-			xmlGregorianCalendar.setDay(1);
-		}
-
-		if(xmlGregorianCalendar != null)
-		{
-			xmlGregorianCalendar.setHour(0);
-			xmlGregorianCalendar.setMinute(0);
-			xmlGregorianCalendar.setSecond(0);
-		}
-		return ConversionUtils.toNullableLocalDateTime(xmlGregorianCalendar);
 	}
 }
