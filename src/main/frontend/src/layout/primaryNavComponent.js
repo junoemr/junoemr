@@ -331,7 +331,7 @@ angular.module('Layout').component("primaryNavigation", {
 			ticklerService.search(
 				{
 					status: 'A',
-					creator: ctrl.me.providerNo,
+					assignee: ctrl.me.providerNo,
 					overdueOnly: 'property'
 				}, 0, 6).then(
 				function success(results)
@@ -487,6 +487,11 @@ angular.module('Layout').component("primaryNavigation", {
 						newWindow.focus();
 					}
 				}
+			}
+			else if (angular.isDefined(item) && angular.isDefined(item.url) &&
+					item.url !== null && item.openNewTab)
+			{
+				window.open(item.url, "_blank");
 			}
 			else if (angular.isDefined(item) &&
 				angular.isDefined(item.url) &&

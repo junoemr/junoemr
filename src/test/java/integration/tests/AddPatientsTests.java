@@ -34,7 +34,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
@@ -45,8 +44,6 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 public class AddPatientsTests extends SeleniumTestBase
 {
-	WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
@@ -55,10 +52,10 @@ public class AddPatientsTests extends SeleniumTestBase
 				"program", "provider_recent_demographic_access");
 	}
 
-	public boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
+	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
 	{
 		driver.findElement(searchPage).click();
-		wait.until(ExpectedConditions.visibilityOfElementLocated(searchTerm));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchTerm));
 		WebElement searchTermField = driver.findElement(searchTerm);
 		searchTermField.sendKeys(lastName + ", " + firstName);
 		searchTermField.sendKeys(Keys.ENTER);
@@ -174,11 +171,12 @@ public class AddPatientsTests extends SeleniumTestBase
 	{
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title=\"Add a new Patient\"]")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title=\"Add a new Patient\"]")));
 
 		// Add a demographic record page
 		driver.findElement(By.xpath("//button[@title=\"Add a new Patient\"]")).click();
 		PatientTestData son = PatientTestCollection.patientMap.get(patientLNames[2]);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-lastName")));
 		driver.findElement(By.id("input-lastName")).sendKeys(son.lastName);
 		driver.findElement(By.id("input-firstName")).sendKeys(son.firstName);
 		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.sex);
@@ -192,8 +190,9 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("input-postal-code")).sendKeys(son.postal);
 		driver.findElement(By.id("input-email")).sendKeys(son.email);
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
-		driver.findElement(By.xpath("//button[@ng-click='$ctrl.onAdd()']")).click();
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title='Search']")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")));
+		driver.findElement(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title='Search']")));
 
 		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,
 				By.xpath("//button[@title='Search']"),

@@ -62,6 +62,7 @@ public class LogConst {
 	/* Content/Module constants
 	 * These should describe what module the action applies to.
 	 * Example: action ADD module CON_DOCUMENT */
+	public static final String CON_CASELOAD = "Caseload";
 	public static final String CON_LOGIN_AGREEMENT = "login agreement";
 	public static final String CON_LOGIN = "login";
 	public static final String CON_LOGOUT = "logout";

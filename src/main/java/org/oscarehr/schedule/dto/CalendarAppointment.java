@@ -62,6 +62,8 @@ public class CalendarAppointment implements Serializable
 	private String tagSystemCodes;
 	private String appointmentName;
 	private boolean isConfirmed;
+	private Integer creatorSecurityId;
+	private String bookingSource;
 
 	public CalendarAppointment()
 	{}
@@ -74,7 +76,8 @@ public class CalendarAppointment implements Serializable
 	                           String eventStatusModifier, Integer numInvoices, String reason, Integer reasonCode,
 	                           String notes, String tagNames, String site, String type,
 	                           String resources, String urgency, boolean doNotBook, boolean tagSelfBooked,
-	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes, boolean isConfirmed)
+	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes, boolean isConfirmed, Integer creatorSecurityId,  String bookingSource)
+
 	{
 		this.appointmentNo = appointmentNo;
 		this.billingRegion = billingRegion;
@@ -107,6 +110,8 @@ public class CalendarAppointment implements Serializable
 		this.tagSystemCodes = tagSystemCodes;
 		this.virtual = virtual;
 		this.isConfirmed = isConfirmed;
+		this.creatorSecurityId = creatorSecurityId;
+		this.bookingSource = bookingSource;
 	}
 
 	public Integer getAppointmentNo()
@@ -419,6 +424,26 @@ public class CalendarAppointment implements Serializable
 		this.appointmentName = appointmentName;
 	}
 
+	public String getBookingSource()
+	{
+		return bookingSource;
+	}
+
+	public void setBookingSource(String bookingSource)
+	{
+		this.bookingSource = bookingSource;
+	}
+
+	public Integer getCreatorSecurityId()
+	{
+		return creatorSecurityId;
+	}
+
+	public void setCreatorSecurityId(Integer creatorSecurityId)
+	{
+		this.creatorSecurityId = creatorSecurityId;
+	}
+
 	public boolean isSendNotification()
 	{
 		return sendNotification;
@@ -473,14 +498,16 @@ public class CalendarAppointment implements Serializable
 				Objects.equals(resources, that.resources) &&
 				Objects.equals(urgency, that.urgency) &&
 				Objects.equals(tagSystemCodes, that.tagSystemCodes) &&
-				Objects.equals(isConfirmed, that.isConfirmed);
+				Objects.equals(isConfirmed, that.isConfirmed) &&
+				Objects.equals(bookingSource, that.bookingSource) &&
+				Objects.equals(creatorSecurityId, that.creatorSecurityId);
 	}
 
 	@Override
 	public int hashCode()
 	{
 
-		return Objects.hash(appointmentNo, billingRegion, billingForm, billingRdohip, userProviderNo, userFirstName, userLastName, demographicDob, demographicName, demographicPhone, demographicNo, providerNo, startTime, endTime, eventStatusCode, eventStatusModifier, numInvoices, reason, notes, tagNames, site, type, resources, urgency, tagSelfBooked, tagSelfCancelled, tagSystemCodes);
+		return Objects.hash(appointmentNo, billingRegion, billingForm, billingRdohip, userProviderNo, userFirstName, userLastName, demographicDob, demographicName, demographicPhone, demographicNo, providerNo, startTime, endTime, eventStatusCode, eventStatusModifier, numInvoices, reason, notes, tagNames, site, type, resources, urgency, tagSelfBooked, tagSelfCancelled, tagSystemCodes, bookingSource,creatorSecurityId);
 	}
 
 	@Override
@@ -515,7 +542,9 @@ public class CalendarAppointment implements Serializable
 				", tagSelfCancelled=" + tagSelfCancelled +
 				", isVirtual=" + virtual +
 				", tagSystemCodes='" + tagSystemCodes + '\'' +
-				", isConfirmed=" + isConfirmed +
+				", isConfirmed=" + isConfirmed + '\'' +
+				", bookingSource='" + bookingSource + '\'' +
+				", creatorSecurityId='" + creatorSecurityId + '\'' +
 				'}';
 	}
 }

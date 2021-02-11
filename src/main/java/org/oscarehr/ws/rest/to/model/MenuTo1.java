@@ -99,5 +99,18 @@ public class MenuTo1 implements Serializable {
 
 		return this;
 	}
+
+	public MenuTo1 addNewTab(Integer id, String label, String extra, String url) {
+		MenuItemTo1 item = new MenuItemTo1();
+		item.setId(id);
+		item.setLabel(label);
+		item.setExtra(extra);
+		item.setUrl(url);
+		item.setOpenNewTab(true);
+
+		getItems().add(item);
+
+		return this;
+	}
 	 
 }

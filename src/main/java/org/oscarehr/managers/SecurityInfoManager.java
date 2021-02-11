@@ -50,7 +50,28 @@ public class SecurityInfoManager {
 	public static final String DELETE = "d";
 	public static final String NORIGHTS = "o";
 	
-	
+	public enum PRIVILEGE_LEVEL
+	{
+		READ ("r"),
+		WRITE ("w"),
+		UPDATE ("u"),
+		DELETE ("d"),
+		NO_RIGHTS ("o");
+
+		String level;
+
+		PRIVILEGE_LEVEL(String level)
+		{
+			this.level = level;
+		}
+
+		public String asString()
+		{
+			return this.level;
+		}
+	}
+
+
 	@Autowired
 	private SecuserroleDao secUserRoleDao;
 	
@@ -286,18 +307,29 @@ public class SecurityInfoManager {
 	}
 
 	/**
-	 * throws a security exception if the current non super-admin provider attempts to modify a super-admin provider
+	 *  Action that requires logined provider/user has superadmin provilege
+	 * @param currentProviderNo logged in provider
+	 * @param providerNoToModify provider that will be changed
+	 */
+	public void requireSuperAdminPrivilege(String currentProviderNo, String providerNoToModify) throws SecurityException
+	{
+		if (!superAdminModificationCheck(currentProviderNo,providerNoToModify))
+		{
+			throw new SecurityException("Super Admin privileges are required");
+		}
+	}
+
+	/**
+	 * check if it's a non super-admin provider attempts to modify a super-admin provider
 	 * @param currentProviderNo - the providerId of the current user
 	 * @param providerNoToModify - the providerId of the user they are attempting to modify
+	 * @return  true if current user has priviledge to set a provider
 	 */
-	public void superAdminModificationCheck(String currentProviderNo, String providerNoToModify)
+	public boolean superAdminModificationCheck(String currentProviderNo, String providerNoToModify)
 	{
 		ProviderData providerToModify = providerDataDao.find(providerNoToModify);
 		ProviderData currentProvider = providerDataDao.find(currentProviderNo);
 
-		if(!currentProvider.isSuperAdmin() && providerToModify.isSuperAdmin())
-		{
-			throw new SecurityException("Super Admin privileges are required");
-		}
+		return currentProvider.isSuperAdmin() || !providerToModify.isSuperAdmin();
 	}
 }

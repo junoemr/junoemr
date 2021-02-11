@@ -99,8 +99,7 @@
 	        	
 		</div><!-- modal-body -->		
 		<div class="modal-footer">		
-			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.cancelPrint()" value="<bean:message key="global.btnCancel"/>"> 
-			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.sendToPhr();" value="<bean:message key="global.btnSendToPHR"/>">
+			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.cancelPrint()" value="<bean:message key="global.btnCancel"/>">
 			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.print();" value="<bean:message key="global.btnPrint"/>" >
 		</div>
 	</div>

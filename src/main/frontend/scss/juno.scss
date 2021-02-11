@@ -36,8 +36,10 @@
 @import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
 @import "../src/common/components/junoButton/junoButton";
+@import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
 @import "../src/common/components/junoInput/junoInput";
+@import "../src/common/components/junoPatientSelect/junoPatientSelect";
 @import "../src/common/components/junoSelect/junoSelect";
 @import "../src/common/components/junoTab/junoTab";
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
@@ -54,6 +56,7 @@
 @import "../src/common/modals/junoSimpleModal/junoSimpleModal";
 @import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
 @import "../src/common/modals/appointmentQueueModal/appointmentQueueModal";
+@import "../src/common/modals/bookAppointmentModal/bookAppointmentModal";
 @import "../src/common/modals/appointmentQueueModal/components/availabilitySettings/availabilitySettings";
 
 // Section-specific things
@@ -96,6 +99,9 @@
 @import "../src/admin/integration/iceFall/iceFall";
 @import "../src/admin/integration/iceFall/settings/iceFallAdminSettings";
 @import "../src/admin/integration/iceFall/activity/iceFallAdminActivity";
+@import "../src/admin/integration/imdHealth/imdHealthAdmin";
+@import "../src/admin/integration/imdHealth/imdHealthLanding";
+@import "../src/admin/integration/editProviderPage/editProviderAdmin";
 @import "../src/admin/integration/editProviderPage/editProviderAdmin";
 @import "../src/admin/integration/manageUserPage/manageUserAdmin";
 @import "../src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueues";

@@ -337,6 +337,8 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ConstraintViolationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.MhaBaseExceptionMapper"/>
+            <bean class="org.oscarehr.ws.rest.exceptionMapping.ScheduleExceptionMapper"/>
+            <bean class="org.oscarehr.ws.rest.exceptionMapping.IntegrationExceptionMapper"/>
 
 			<!-- Juno filters. -->
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterInternal"/>
@@ -376,6 +378,8 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
 			<!-- AQS -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
+            <bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
+            <bean autowire="byName" class="org.oscarehr.ws.rest.LabWebService"/>
 
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MessagingService"/>
 			<!-- MHA -->

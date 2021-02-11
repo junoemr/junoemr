@@ -67,7 +67,7 @@ public class EctValidation
 		List<Validations> result = new ArrayList<Validations>();
 
 		MeasurementTypeDao dao = SpringUtils.getBean(MeasurementTypeDao.class);
-		List<MeasurementType> types = dao.findByTypeAndMeasuringInstruction(inputType, mInstrc);
+		List<MeasurementType> types = dao.findByType(inputType);
 		if (types.isEmpty())
 		{
 			return result;
@@ -193,8 +193,8 @@ public class EctValidation
 			}
 			// Measurements uses following function to record date, which is different from the above check
 			// Sanity check by calling it and ensuring we won't get a null value back
-			inputValue = ConversionUtils.padDateTimeString(inputValue);
-			if (getLegacyDateFromDateString(inputValue) == null)
+			String paddedInputValue= ConversionUtils.padDateTimeString(inputValue);
+			if (getLegacyDateFromDateString(inputValue) == null || !inputValue.equals(paddedInputValue))
 			{
 				validation = false;
 			}

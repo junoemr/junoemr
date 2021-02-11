@@ -25,6 +25,7 @@
 --%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ page errorPage="../errorpage.jsp" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.oscarehr.common.dao.SecRoleDao" %>
@@ -37,6 +38,7 @@
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%
 	SecRoleDao secRoleDao = SpringUtils.getBean(SecRoleDao.class);
@@ -69,7 +71,7 @@
 
 <%
 	String msg = StringUtils.trimToEmpty((String)request.getAttribute("message"));
-
+	boolean unauthorizedMSG = ConversionUtils.parseBoolean((String) request.getAttribute("messageNotAuthorized"));
 	// get role from database
 	List<SecRole> secRoles;
 	String[] omitList = null;
@@ -105,6 +107,7 @@
 <html>
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/admin/provider/providerProfile.js"></script>
 	<title>
 		PROVIDER
 	</title>
@@ -112,6 +115,18 @@
 	<script src="../js/jquery-1.7.1.min.js"></script>
 
 	<script>
+		$(document).ready(function()
+		{
+				<%
+			if(unauthorizedMSG)
+			{
+				%>
+				alert(document.getElementById("no_authorization_error_msg").value);
+				<%
+			}
+				%>
+		});
+
 		function setfocus()
 		{
 			this.focus();
@@ -168,22 +183,21 @@
 			}
 		}
 
-		function updateProviderRoles(form, actionMethod, isClickedAccountSuperAdmin)
+		function updateProviderRoles(form, actionMethod, isClickedProviderSuperAdmin)
 		{
-			var isCurrentLoginSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
-
-			if (isClickedAccountSuperAdmin && !isCurrentLoginSuperAdmin)
+			var isLoginUserSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
+			var hasPermission = Juno.Admin.Provider.Profile.checkProviderPermission(isLoginUserSuperAdmin, isClickedProviderSuperAdmin,document.getElementById("no_authorization_error_msg").value);
+			if (hasPermission)
 			{
-				alert("You are trying to modify a system user. This user cannot be modified.");
-				return false;
+				form.action = "providerRole.do?method=" + actionMethod;
 			}
-			form.action = "providerRole.do?method=" + actionMethod;
-			return true;
+			return hasPermission;
 		}
 	</script>
 
 </head>
 <body bgproperties="fixed" bgcolor="ivory" onLoad="setfocus()" topmargin="0" leftmargin="0" rightmargin="0">
+<input type="hidden" id="no_authorization_error_msg" value="<bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" />">
 <form name="myform" action="providerRole.jsp" method="POST">
 	<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr bgcolor="#486ebd">

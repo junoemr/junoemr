@@ -255,6 +255,21 @@
 									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
+					<!-- Booking Phones -->
+					<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.bookingNotificationNumbers()">
+						Phone number must only contain digits, dashes, parentheses, spaces and commas.
+					</div>
+					<div ng-class="{'field-error': !$ctrl.providerValidations.bookingNotificationNumbers()}">
+						<ca-field-text
+										ca-name="BookingNotificationPhones"
+										ca-title="Booking Notification Phone(s)"
+										ca-text-placeholder="(xxx) xxx-xxxx, (xxx) xxx-xxxx, ..."
+										ca-model="$ctrl.provider.bookingNotificationNumbers"
+										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-text>
+					</div>
 					<!-- Fax -->
 					<ca-field-text
 									ca-name="fax"
@@ -782,7 +797,7 @@
 					<!-- 3rd Party Billing No -->
 					<ca-field-text
 									ca-name="thirdPartyBillingNo"
-									ca-title="3'rd Party Billing #"
+									ca-title="3rd Party Billing #"
 									ca-model="$ctrl.provider.thirdPartyBillingNo"
 									ca-rows="1"
 									ca-text-placeholder=""

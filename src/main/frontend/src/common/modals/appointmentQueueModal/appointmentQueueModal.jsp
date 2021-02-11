@@ -38,6 +38,19 @@
 						component-style="$ctrl.resolve.style">
 				</juno-input>
 			</div>
+			<div class="options-on-demand">
+				<juno-input
+								label="Appointment Duration (Min)"
+								ng-model="$ctrl.queueModel.defaultAppointmentDurationMinutes"
+								only-numeric="true"
+								component-style="$ctrl.resolve.style">
+				</juno-input>
+				<juno-input
+								label="Text Notification Phone(s)"
+								ng-model="$ctrl.notifyPhoneNumbers"
+								component-style="$ctrl.resolve.style">
+				</juno-input>
+			</div>
 			<div class="options-availability">
 				<availability-settings ng-if="$ctrl.queueModel.availabilitySettings"
 				                       settings-model="$ctrl.queueModel.availabilitySettings"

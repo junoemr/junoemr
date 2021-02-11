@@ -88,6 +88,9 @@ public class ScheduleWs extends AbstractWs {
 	private ScheduleManager scheduleManager;
 
 	@Autowired
+	private org.oscarehr.appointment.service.Appointment appointmentService;
+
+	@Autowired
 	private ScheduleTemplateDao scheduleTemplateDao;
 
 	@Autowired
@@ -200,7 +203,7 @@ public class ScheduleWs extends AbstractWs {
 
 			if (violatedRules.isEmpty())
 			{
-				scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+				appointmentService.saveNewAppointment(appointment, getLoggedInInfo(), getHttpServletRequest(), false);
 			}
 
 			AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
@@ -275,7 +278,7 @@ public class ScheduleWs extends AbstractWs {
 
 		if (violatedRules.isEmpty())
 		{
-			scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+			appointmentService.saveNewAppointment(appointment, getLoggedInInfo(), getHttpServletRequest(), false);
 		}
 
 		AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
@@ -321,7 +324,7 @@ public class ScheduleWs extends AbstractWs {
 			appointment.setReason("");
 		}
 
-		scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+		appointmentService.saveNewAppointment(appointment, getLoggedInInfo(), getHttpServletRequest(), false);
 		return (appointment.getId());
 	}
 

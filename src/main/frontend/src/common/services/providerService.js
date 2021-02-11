@@ -26,16 +26,22 @@
 
  */
 
+import {SitesApi} from "../../../generated";
+
 angular.module("Common.Services").service("providerService", [
 	'$http',
 	'$q',
 	'junoHttp',
-	function($http, $q, junoHttp)
+	'$httpParamSerializer',
+	function($http, $q, junoHttp, $httpParamSerializer)
 	{
 
 		var service = {};
 
 		service.apiPath = '../ws/rs/providerService';
+
+		service.sitesApi = new SitesApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		service.getMe = function getMe()
 		{
@@ -118,6 +124,32 @@ angular.module("Common.Services").service("providerService", [
 					deferred.reject("An error occured while fetching provider settings");
 				});
 
+			return deferred.promise;
+		};
+
+		service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
+		{
+			var deferred = $q.defer();
+
+			service.sitesApi.getSitesByProvider(provNo).then(
+
+				function success(results)
+				{
+					var assigned = false;
+					for(var result in results.data.body)
+					{
+						if (results.data.body[result].siteId === siteNo)
+						{
+							assigned = true;
+						}
+					}
+					deferred.resolve(assigned);
+				},
+				function error(errors)
+				{
+					console.log("providerService::getProviderList error", errors);
+					deferred.reject("An error occurred fetching the Provider");
+				});
 			return deferred.promise;
 		};
 

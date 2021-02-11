@@ -207,24 +207,7 @@
 
 </table>
 <br>
-<%
-  int nLastPage=0,nNextPage=0;
-  String strLimit1=request.getParameter("limit1");
-  String strLimit2=request.getParameter("limit2");
-  
-  nNextPage=Integer.parseInt(strLimit2)+Integer.parseInt(strLimit1);
-  nLastPage=Integer.parseInt(strLimit1)-Integer.parseInt(strLimit2);
-  if(nLastPage>=0) {
-%> <a
-	href="securitysearchresults.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nLastPage%>&limit2=<%=strLimit2%>"><bean:message
-	key="admin.securitysearchresults.btnLastPage" /></a> | <%
-  }
-  if(true) { //nItems==Integer.parseInt(strLimit2)) {
-%> <a
-	href="securitysearchresults.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nNextPage%>&limit2=<%=strLimit2%>"><bean:message
-	key="admin.securitysearchresults.btnNextPage" /></a> <%
-}
-%>
+
 <p><bean:message key="admin.securitysearchresults.msgClickForDetail" /></p>
 </center>
 </body>

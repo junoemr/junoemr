@@ -22,10 +22,12 @@
  */
 package org.oscarehr.encounterNote.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
@@ -47,8 +49,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -169,6 +173,116 @@ public class EncounterNoteService
 		return note;
 	}
 
+
+	/**
+	 * Create a new tickler note based on an already existing tickler note.
+	 * If there is no previous note associated with this tickler, a new note will be created,
+	 * If a previous note exists, this will create a new note with the given text appended to the previous notes' text
+	 * @param noteText - the new text for the new note
+	 * @param tickler - the ticker
+	 * @param providerNo - the provider number for the note
+	 * @param demographicNo - the demographic number
+	 * @return - the new note
+	 */
+	public CaseManagementNote saveTicklerNoteFromPrevious(String noteText, Tickler tickler, String providerNo, Integer demographicNo)
+	{
+		CaseManagementNoteLink link = caseManagementNoteLinkDao.findLatestByTableAndTableId(CaseManagementNoteLink.TICKLER, tickler.getId());
+		CaseManagementNote ticklerNote;
+		boolean addNoteHeader = false;
+		if(link != null)
+		{
+			CaseManagementNote previousNote = link.getNote();
+			ticklerNote = new CaseManagementNote(previousNote);// get a copy without an ID
+			ticklerNote.setNote(previousNote.getNote() + "\n\n" + noteText);
+			ticklerNote.setUuid(null); // because this copy should be saved as a new note
+		}
+		else
+		{
+			ticklerNote = new CaseManagementNote();
+			ticklerNote.setNote(noteText);
+			addNoteHeader = true;
+		}
+		return saveTicklerNote(ticklerNote, tickler, providerNo, demographicNo, addNoteHeader);
+	}
+
+	/**
+	 * save a new tickler note. auto-sets all the note requirements needed to make the given note appear as a tickler note
+	 * @param noteText - the note text to be saved
+	 * @param tickler - the tickler to link the note with
+	 * @param providerNo - the provider number for the note
+	 * @param demographicNo - the demographic number
+	 * @return - the new note
+	 */
+	public CaseManagementNote saveTicklerNote(String noteText, Tickler tickler, String providerNo, Integer demographicNo)
+	{
+		CaseManagementNote ticklerNote = new CaseManagementNote();
+		ticklerNote.setNote(noteText);
+		return saveTicklerNote(ticklerNote, tickler, providerNo, demographicNo);
+	}
+
+	/**
+	 * save a new tickler note. auto-sets all the note requirements needed to make the given note appear as a tickler note
+	 * @param note - the note to be saved
+	 * @param tickler - the tickler to link the note with
+	 * @param providerNo - the provider number for the note
+	 * @param demographicNo - the demographic number
+	 * @return - the new note
+	 */
+	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler, String providerNo, Integer demographicNo)
+	{
+		note.setDemographic(demographicDao.find(demographicNo));
+		note.setProvider(providerDataDao.find(providerNo));
+		return saveTicklerNote(note, tickler, true);
+	}
+
+	protected CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler, String providerNo, Integer demographicNo, boolean addNoteHeader)
+	{
+		note.setDemographic(demographicDao.find(demographicNo));
+		note.setProvider(providerDataDao.find(providerNo));
+		return saveTicklerNote(note, tickler, addNoteHeader);
+	}
+
+	/**
+	 * save a new tickler note. auto-sets all the note requirements needed to make the given note appear as a tickler note
+	 * @param note - the note to be saved
+	 * @param tickler - the tickler to link the note with
+	 * @return - the new note
+	 */
+	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler)
+	{
+		return saveTicklerNote(note, tickler, true);
+	}
+	protected CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler, boolean addNoteHeader)
+	{
+		if(note.getSigningProvider() == null)
+		{
+			note.setSigningProvider(note.getProvider());
+		}
+		String headerText = addNoteHeader ? getNoteHeaderText(Tickler.HEADER_NAME) + "\n" : "";
+		note.setNote(headerText + note.getNote() + "\n" + getSignatureText(note.getSigningProvider()));
+		note.setArchived(false);
+		note = saveHistoryNote(note, Issue.SUMMARY_CODE_TICKLER_NOTE);
+
+		CaseManagementNoteLink link = new CaseManagementNoteLink();
+		link.setNote(note);
+		link.setTickler(tickler.getId());
+		caseManagementNoteLinkDao.persist(link);
+
+		return note;
+	}
+
+	public String getNoteHeaderText(String reason)
+	{
+		String dateStr = ConversionUtils.toDateTimeString(LocalDateTime.now(), ConversionUtils.DISPLAY_DATE_PATTERN);
+		return "[" + dateStr + " .: " + reason + "]";
+	}
+
+	public String getSignatureText(ProviderData signingProvider)
+	{
+		String dateStr = ConversionUtils.toDateTimeString(LocalDateTime.now(), ConversionUtils.DISPLAY_DATE_TIME_PATTERN);
+		return "[Signed on " + dateStr + " by " + StringUtils.trimToEmpty(signingProvider.getFirstName() + " " + signingProvider.getLastName()) + "]";
+	}
+
 	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
 	{
 		return saveHistoryNote(note, Issue.SUMMARY_CODE_MEDICAL_HISTORY);
@@ -187,6 +301,11 @@ public class EncounterNoteService
 	public CaseManagementNote saveReminderNote(CaseManagementNote note)
 	{
 		return saveHistoryNote(note, Issue.SUMMARY_CODE_REMINDERS);
+	}
+
+	public CaseManagementNote saveConcernNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_CONCERNS);
 	}
 
 	private CaseManagementNote saveHistoryNote(CaseManagementNote note, String summaryCode)

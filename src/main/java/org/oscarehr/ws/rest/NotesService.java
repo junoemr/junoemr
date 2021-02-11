@@ -94,6 +94,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
+
 
 @Path("/notes")
 @Component("notesService")
@@ -377,6 +379,17 @@ public class NotesService extends AbstractServiceImpl {
 
 			/* Save assigned issues & link with the note */
 			List<CaseManagementIssue> issuelist = toAssignedCaseManagementIssueList(note.getAssignedIssues(), demographicNoStr, providerNo);
+
+			if(note.isTicklerNote())
+			{
+				// tickler notes must always have the tickler issue attached
+				// this should exist unless they are somehow adding a new tickler note through the chart, but not assigning the issue
+				CaseManagementIssue cmi = caseManagementMgr.getIssueByIssueCode(demographicNoStr, SUMMARY_CODE_TICKLER_NOTE);
+				if(cmi != null)
+				{
+					issuelist.add(cmi);
+				}
+			}
 
 			caseMangementNote.setIssues(new HashSet<CaseManagementIssue>(issuelist));
 
@@ -1140,9 +1153,10 @@ public class NotesService extends AbstractServiceImpl {
 			List<CaseManagementIssue> rawCmeIssues = new ArrayList<CaseManagementIssue>(casemgmtNote.getIssues());
 			List<CaseManagementIssue> cmeIssues = new ArrayList<CaseManagementIssue>();
 
-			for (CaseManagementIssue cmei : rawCmeIssues) {
-
-				if (!cmei.getIssue().getType().equalsIgnoreCase("system")) {
+			for(CaseManagementIssue cmei : rawCmeIssues)
+			{
+				if(!cmei.getIssue().getType().equalsIgnoreCase("system"))
+				{
 					cmeIssues.add(cmei);
 				}
 			}
@@ -1331,7 +1345,7 @@ public class NotesService extends AbstractServiceImpl {
 		
 		
 		
-		Issue issue = this.issueDao.findIssueByTypeAndCode("system", "TicklerNote");
+		Issue issue = this.issueDao.findIssueByTypeAndCode("system", SUMMARY_CODE_TICKLER_NOTE);
 		if(issue == null) {
 			logger.warn("missing TicklerNote issue, please run all database updates");
 			return null;

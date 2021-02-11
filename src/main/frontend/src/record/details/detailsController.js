@@ -263,7 +263,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 							controller.page.integratorOffline = results.integratorOffline;
 							controller.page.integratorAllSynced = results.integratorAllSynced;
 
-							controller.page.conformanceFeaturesEnabled = results.conformanceFeaturesEnabled;
 							controller.page.workflowEnhance = results.workflowEnhance;
 							controller.page.billregion = results.billregion;
 							controller.page.defaultView = results.defaultView;
@@ -294,7 +293,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 					controller.formatLastName(); //done on page load
 					controller.formatFirstName(); //done on page load
-					controller.validateHCSave();
 				},
 				function error(errors)
 				{
@@ -1008,44 +1006,26 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//HCValidation on open & save
 		controller.validateHCSave = function validateHCSave(doSave)
 		{
-			if (controller.page.demo.hin == null || controller.page.demo.hin == "")
+			if ((controller.page.demo.hin == null || controller.page.demo.hin === "") && doSave)
 			{
-				if (doSave) controller.save();
+				controller.save();
 			}
 			else
 			{
-				patientDetailStatusService.isUniqueHC(controller.page.demo.hin, controller.page.demo.demographicNo).then(
+				let hin = controller.page.demo.hin;
+				let ver = controller.page.demo.ver;
+				let hcType = controller.page.demo.hcType;
+				let demographicNo = controller.page.demo.demographicNo;
+				patientDetailStatusService.isUniqueHC(hin, ver, hcType, demographicNo).then(
 					function success(results)
 					{
 						if (!results.success)
 						{
 							alert("HIN is already in use!");
 						}
-						else if (controller.page.demo.hcType != "ON")
+						else if (doSave)
 						{
-							if (doSave) controller.save();
-						}
-						else
-						{
-							if (controller.page.demo.ver == null) controller.page.demo.ver = "";
-							patientDetailStatusService.validateHC(controller.page.demo.hin, controller.page.demo.ver).then(
-								function success(results)
-								{
-									if (results.valid == null)
-									{
-										controller.page.HCValidation = "n/a";
-									}
-									else if (!results.valid)
-									{
-										alert("Health Card Validation failed: " + results.responseDescription + " (" + results.responseCode + ")");
-										doSave = false;
-									}
-									if (doSave) controller.save();
-								},
-								function error(errors)
-								{
-									console.log(errors);
-								});
+							controller.save();
 						}
 					},
 					function error(errors)
@@ -1103,6 +1083,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 
+			if (Juno.Common.Util.exists(controller.page.demo.hin))
+            {
+                controller.page.demo.hin = controller.page.demo.hin.replace(/[\W_]/gi, '');
+            }
 
 			//save notes
 			if (controller.page.demo.scrNotes != null)

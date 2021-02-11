@@ -163,3 +163,26 @@ ul.templatelist li {
 li.selectedTemplate {
 	background-color: #ffedf4;
 }
+
+@media print
+{
+	.MainTableTopRow,
+	.MainTableLeftColumn,
+	.noprint,.showhidequery,
+	.sqlBorderDiv,
+	.MainTableBottomRow
+	{
+		display: none;
+	}
+
+	.MainTableRightColumn
+	{
+		border: 0;
+	}
+
+	div.reportBorderDiv
+	{
+		float: none;
+	}
+
+}

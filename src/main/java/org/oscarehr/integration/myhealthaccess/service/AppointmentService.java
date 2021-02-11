@@ -28,24 +28,29 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
+import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
+import org.oscarehr.integration.myhealthaccess.conversion.SessionInfoInboundDtoMHATelehealthSessionInfoConverter;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentAqsLinkTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentSearchTo1;
 import org.oscarehr.integration.myhealthaccess.dto.NotificationTo1;
+import org.oscarehr.integration.myhealthaccess.dto.SessionInfoInboundDto;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.BookingException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
+import org.oscarehr.integration.myhealthaccess.model.MHATelehealthSessionInfo;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
-@Service
+@Service("myHealthAppointmentService")
 public class AppointmentService extends BaseService
 {
 	@Autowired
@@ -54,18 +59,21 @@ public class AppointmentService extends BaseService
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
 
+	@Autowired
+	SessionInfoInboundDtoMHATelehealthSessionInfoConverter sessionInfoConverter;
+
 	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integrationData.getIntegration());
 		String endpoint = "/clinic/%s/appointment/%s/cache";
 
-		String apiKey = integrationData.getClinicApiKey();
 		String clinicId = integrationData.getIntegration().getRemoteId();
 		String appointmentId = appointmentTransfer.getId();
 
 		try
 		{
-			endpoint = formatEndpoint(endpoint, clinicId, appointmentId);
-			Boolean response = put(endpoint, apiKey, appointmentTransfer, Boolean.class);
+			endpoint = restClient.formatEndpoint(endpoint, clinicId, appointmentId);
+			Boolean response = restClient.doPut(endpoint, appointmentTransfer, Boolean.class);
 			if(!response)
 			{
 				throw new RuntimeException("Got bad response status: " + response);
@@ -105,10 +113,14 @@ public class AppointmentService extends BaseService
 			appointmentSite = appointment.getLocation();
 		}
 
+		RestClientBase restClient = RestClientFactory.getRestClient(integrationOrException(integrationService.findMhaIntegration(appointmentSite)));
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
-		String apiKey = getApiKey(appointmentSite);
-		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"),
-				apiKey, new AppointmentBookTo1(appointment, false, sendNotification, remoteId), AppointmentBookResponseTo1.class, loginToken);
+		AppointmentBookResponseTo1 appointmentBookResponseTo1 = restClient.doPostWithToken(
+				restClient.formatEndpoint("/clinic_user/appointment/book"),
+				loginToken,
+				new AppointmentBookTo1(appointment, false, sendNotification, remoteId),
+				AppointmentBookResponseTo1.class);
+
 		if (!appointmentBookResponseTo1.isSuccess())
 		{
 			throw new BookingException(appointmentBookResponseTo1.getMessage());
@@ -131,9 +143,13 @@ public class AppointmentService extends BaseService
 		}
 
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
-		String apiKey = getApiKey(appointmentSite);
-		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"),
-				apiKey, new AppointmentBookTo1(appointment, true, sendNotification, null), AppointmentBookResponseTo1.class, loginToken);
+		RestClientBase restClient = RestClientFactory.getRestClient(integrationOrException(integrationService.findMhaIntegration(appointmentSite)));
+		AppointmentBookResponseTo1 appointmentBookResponseTo1 = restClient.doPostWithToken(
+				restClient.formatEndpoint("/clinic_user/appointment/book"),
+				loginToken,
+				new AppointmentBookTo1(appointment, true, sendNotification, null),
+				AppointmentBookResponseTo1.class);
+
 		if (!appointmentBookResponseTo1.isSuccess())
 		{
 			throw new BookingException(appointmentBookResponseTo1.getMessage());
@@ -148,12 +164,16 @@ public class AppointmentService extends BaseService
 	 */
 	public void sendTelehealthAppointmentNotification(Integration integration, String loginToken, String remoteId)
 	{
-		postWithToken(formatEndpoint("/clinic_user/self/clinic/appointment/%s/send_telehealth_notification", remoteId),
-				integration.getApiKey(), null, Boolean.class, loginToken);
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+		restClient.doPostWithToken(
+				restClient.formatEndpoint("/clinic_user/self/clinic/appointment/%s/send_telehealth_notification", remoteId),
+				loginToken,
+				null,
+				Boolean.class);
 	}
 
 	/**
-	 * send a genearal appointment notification for the specified appointment, to the patient.
+	 * send a general appointment notification for the specified appointment, to the patient.
 	 * @param integration - the integration under which to perform the action
 	 * @param loginToken - the login token of the user performing the action
 	 * @param appointmentNo - the appointment no
@@ -161,12 +181,16 @@ public class AppointmentService extends BaseService
 	public void sendGeneralAppointmentNotification(Integration integration, String loginToken, Integer appointmentNo)
 	{
 		Appointment appointment = oscarAppointmentDao.find(appointmentNo);
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
 		if (appointment != null)
 		{
 			NotificationTo1 notificationTo1 = new NotificationTo1(appointment);
-			postWithToken(formatEndpoint("/clinic_user/self/juno/appointment/%s/send_general_notification", appointmentNo.toString()),
-					integration.getApiKey(), notificationTo1, Boolean.class, loginToken);
+			restClient.doPostWithToken(
+					restClient.formatEndpoint("/clinic_user/self/juno/appointment/%s/send_general_notification", appointmentNo.toString()),
+					loginToken,
+					notificationTo1,
+					Boolean.class);
 		}
 		else
 		{
@@ -182,10 +206,15 @@ public class AppointmentService extends BaseService
 	 */
 	public MHAAppointment getAppointment(Integration integration, Integer appointmentNo)
 	{
-		String url = formatEndpoint("/clinic/%s/appointments?search_by=remote_id&remote_id=%s",
-				integration.getRemoteId(), appointmentNo);
-		AppointmentSearchTo1 result = get(url,
-				integration.getApiKey(), AppointmentSearchTo1.class);
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		String url = restClient.formatEndpoint(
+				"/clinic/%s/appointments?search_by=remote_id&remote_id=%s",
+				integration.getRemoteId(),
+				appointmentNo);
+
+		AppointmentSearchTo1 result = restClient.doGet(url, AppointmentSearchTo1.class);
+
 		if (result.isSuccess())
 		{
 			if (result.getAppointments().size() == 1)
@@ -211,6 +240,33 @@ public class AppointmentService extends BaseService
 	}
 
 	/**
+	 * get information about the MHA telehealth session
+	 * @param integration - integration to use when fetching the information
+	 * @param mhaAppointmentId - the appointment to get session information for.
+	 * @return telehealth session info
+	 */
+	public MHATelehealthSessionInfo getAppointmentSessionInformation(Integration integration, UUID mhaAppointmentId) throws IllegalAccessException, InstantiationException
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		String url = restClient.formatEndpoint("/clinic/%s/appointment/%s/session", integration.getRemoteId(), mhaAppointmentId);
+		return sessionInfoConverter.convert(restClient.doGet(url, SessionInfoInboundDto.class));
+	}
+
+	/**
+	 * get information about the MHA telehealth session
+	 * @param integration - integration to use when fetching the information
+	 * @param appointmentNo - the appointment no to get session information for.
+	 * @return telehealth session info
+	 */
+	public MHATelehealthSessionInfo getAppointmentSessionInformation(Integration integration, Integer appointmentNo) throws InstantiationException, IllegalAccessException
+	{
+		MHAAppointment mhaAppointment = getAppointment(integration, appointmentNo);
+		return getAppointmentSessionInformation(integration, UUID.fromString(mhaAppointment.getId()));
+	}
+
+
+	/**
 	 * link an MHA appointment with an AQS telehealth session
 	 * @param integration - integration on which to perform the link
 	 * @param loggedInInfo - logged in info
@@ -220,10 +276,13 @@ public class AppointmentService extends BaseService
 	 */
 	public void linkAppointmentToAqsTelehealth(Integration integration, LoggedInInfo loggedInInfo, MHAAppointment mhaAppointment, UUID queuedAppointmentId) throws InvalidIntegrationException
 	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 		String loginToken = clinicService.loginOrCreateClinicUser(integration, loggedInInfo.getLoggedInSecurity().getSecurityNo()).getToken();
-		String apiKey = integration.getApiKey();
-		postWithToken(formatEndpoint("/clinic_user/self/appointment/" + mhaAppointment.getId() + "/aqs_link"),
-		              apiKey, new AppointmentAqsLinkTo1(queuedAppointmentId), null, loginToken);
+		restClient.doPostWithToken(
+				restClient.formatEndpoint("/clinic_user/self/appointment/" + mhaAppointment.getId() + "/aqs_link"),
+				loginToken,
+				new AppointmentAqsLinkTo1(queuedAppointmentId),
+				null);
 	}
 
 }

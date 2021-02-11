@@ -628,6 +628,7 @@ private long getAppointmentRowSpan(
 	<script type="text/javascript" src="../share/javascript/Oscar.js" ></script>
 	<script type="text/javascript" src="../share/javascript/prototype.js"></script>
 	<script type="text/javascript" src="../phr/phr.js"></script>
+	<script type="text/javascript" src="../js/myhealthaccess.js"></script>
 
 	<script src="<c:out value="../js/jquery.js"/>"></script>
 
@@ -1898,7 +1899,7 @@ private long getAppointmentRowSpan(
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
 																					 "&appt=${appointmentInfo.appointmentNo}", "telehealth");return false;'
-																	 title="Telehealth">
+																	 onmouseover="onTelehealthIconHover(event, '<%=appointmentInfo.getSiteName()%>', '<%=appointmentInfo.getAppointmentNo()%>')">
 																		<img
 																						style="vertical-align: bottom"
 																						src="../images/icons/telehealth.svg"
@@ -1984,6 +1985,7 @@ private long getAppointmentRowSpan(
 																		<c:otherwise>
 																			&#124; <a
 																				id="billingLink"
+																				rel="opener"
 																				href="${appointmentInfo.billLink}"
 																				target="_blank"
 																				title="<bean:message key="global.billingtag"/>"
@@ -2274,6 +2276,33 @@ private long getAppointmentRowSpan(
 			}
 
 		}
+	}
+
+	// called when appointment telehealth icon is hovered
+	function onTelehealthIconHover(event, site, appointmentNo)
+	{
+		myhealthaccess.getAppointmentSessionInformation('<%=request.getContextPath()%>', site, appointmentNo).then(
+			(result) =>
+			{
+				var sessionInfo = JSON.parse(result).body;
+				if (sessionInfo)
+				{
+					if (sessionInfo.patientInSession)
+					{
+						event.target.setAttribute("title", myhealthaccess.telehealthStatusToDisplayName(sessionInfo.sessionStatus));
+					}
+					else
+					{
+						event.target.setAttribute("title", "Patient not present");
+					}
+				}
+			}
+		).catch(
+			(error) =>
+			{
+				console.error("Failed to get telehealth session info with error: ", error);
+			}
+		)
 	}
 
 </script>

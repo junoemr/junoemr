@@ -595,7 +595,6 @@
         <ViolationValue>/src/main/webapp/oscarMessenger/CreateMessage.jsp:listy = new java.util.ArrayList();</ViolationValue>
         <ViolationValue>/src/main/webapp/oscarMessenger/DisplayDemographicMessages.jsp:&lt;% //java.util.Vector theMessages = new java.util.Vector() ;</ViolationValue>
         <ViolationValue>/src/main/webapp/oscarMessenger/DisplayDemographicMessages.jsp:java.util.Vector theMessages2 = new java.util.Vector() ;</ViolationValue>
-        <ViolationValue>/src/main/webapp/oscarMessenger/DisplayMessages.jsp:java.util.Vector theMessages2 = new java.util.Vector() ;</ViolationValue>
         <ViolationValue>/src/main/webapp/oscarMessenger/Transfer/PostItems.jsp:java.util.ArrayList aList = new java.util.ArrayList();</ViolationValue>
         <ViolationValue>/src/main/webapp/oscarPrevention/PreventionReporting.jsp:&lt;%ArrayList overDueList = new ArrayList();</ViolationValue>
         <ViolationValue>/src/main/webapp/oscarPrevention/PreventionReporting.jsp:ArrayList firstLetter = new ArrayList();</ViolationValue>

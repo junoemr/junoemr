@@ -49,11 +49,11 @@
 		
 		function captureParameters(id) {
 			
-			var keyword = '${ param.keyword }';
+			var keyword = "${ param.keyword }";
 			var keywordLastName = null;
 			var keywordFirstName = null;
-			var firstName = '${ pcontact.firstName }';
-			var lastName = '${ pcontact.lastName }';
+			var firstName = "<spring:message text="pcontact.firstName" javaScriptEscape="true" />";
+			var lastName = "<spring:message text="pcontact.lastName" javaScriptEscape="true" />";
 			
 			if( keyword && keyword.contains(",") ) {
 				keywordLastName = keyword.split(",")[0].trim();
@@ -72,11 +72,11 @@
 
 		function forwardToParent() {
 			
-			var contactId = '${ requestScope.contactId }'; // server returns the id that was saved.
-			var demographicContactId = '${ requestScope.demographicContactId }';
-			var contactRole = '${ requestScope.contactRole }';
-			var contactName = '${ requestScope.contactName }';
-			var contactType = '${ requestScope.contactType }';
+			var contactId = "${ requestScope.contactId }"; // server returns the id that was saved.
+			var demographicContactId = "${ requestScope.demographicContactId }";
+			var contactRole = "${ requestScope.contactRole }";
+            var contactName = "<spring:message text="${requestScope.contactName}" javaScriptEscape="true" />";
+			var contactType = "${ requestScope.contactType }";
 			
 			if( contactId ) {
 				
@@ -212,8 +212,7 @@
 	<tr>
 		<td align="right"><b>Last Name</b></td>
 		<td>
-			<input type="text" name="pcontact.lastName" id="pcontact.lastName" 
-				value="${ pcontact.lastName }" size="30">
+			<input type="text" name="pcontact.lastName" id="pcontact.lastName" value="<c:out value="${pcontact.lastName}"/>" size="30">
 		</td>
 	</tr>
 	<tr>

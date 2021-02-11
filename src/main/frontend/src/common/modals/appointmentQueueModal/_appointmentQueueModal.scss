@@ -16,7 +16,10 @@
 			display: flex;
 			flex-direction: row;
 			justify-content: space-between;
-			padding: 8px 0;
+			padding: 4px 0 8px 0;
+		}
+		.options-common.align-items-flex-end {
+			justify-content: flex-end;
 		}
 		.options-availability {
 			overflow-y: auto;

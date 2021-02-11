@@ -1,0 +1,26 @@
+.juno-patient-select {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+
+	div {
+		flex: 1 0 100%;
+	}
+
+	.add-demo-button {
+		max-width: 32px;
+		height: 32px;
+	}
+
+	.header-row {
+		margin-bottom: 24px;
+	}
+
+	juno-typeahead {
+		flex-grow: 1;
+	}
+
+	label {
+		margin-bottom: 4px;
+	}
+}

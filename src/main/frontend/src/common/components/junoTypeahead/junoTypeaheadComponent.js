@@ -43,6 +43,10 @@ angular.module('Common.Components').component('junoTypeahead',
 		rawOutput: "<?",
 		// if true options are filtered on $viewValue. Set to false if you plan to self filter
 		filterOptions: "<?",
+		// Use with filterOptions: false. This callback is called when the option list needs to be fetched.
+		// Most of the time you will use this to fetch a paged list of options. This callback is provided
+		// the current search parameter as an argument.
+		getOptionsCallback: "&?"
 	},
 	controller: ['$scope', "filterFilter", function ($scope, filterFilter)
 	{
@@ -103,11 +107,15 @@ angular.module('Common.Components').component('junoTypeahead',
 			lastModel = null;
 		}
 
-		ctrl.getOptions = (viewValue) =>
+		ctrl.getOptions = async (viewValue) =>
 		{
 			if (ctrl.filterOptions)
 			{
 				return filterFilter(ctrl.options, viewValue);
+			}
+			else if (ctrl.getOptionsCallback)
+			{
+				return await ctrl.getOptionsCallback({value: viewValue});
 			}
 			return ctrl.options;
 		}

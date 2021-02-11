@@ -72,6 +72,7 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import oscar.OscarProperties;
 import oscar.form.FrmLabReq07Record;
 import oscar.form.FrmLabReq10Record;
+import oscar.oscarEncounter.oscarMeasurements.util.MeasurementDSHelper;
 
 public class RenalAction extends DispatchAction {
 
@@ -147,7 +148,8 @@ public class RenalAction extends DispatchAction {
 
 		return null;
 	}
-	
+
+	// Called as part of health tracker for reasons unknown
 	public ActionForward getNextSteps(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String demographicNo = request.getParameter("demographicNo");
 		
@@ -157,38 +159,45 @@ public class RenalAction extends DispatchAction {
 		
 		String nextSteps = "N/A";
 		if(match)
+		{
 			nextSteps  = "Screen patient for CKD<br/>using eGFR, ACR, and BP";
-		
+		}
+
+		int demographicId = Integer.parseInt(demographicNo);
+
 		//get tests
-		List<Measurement> egfrs = measurementDao.findByType(Integer.parseInt(demographicNo), "EGFR");
-		List<Measurement> acrs = measurementDao.findByType(Integer.parseInt(demographicNo), "ACR");
-		Date latestEgfrDate = null;
-		
-		
+		Measurement currentEgfr = measurementDao.findLatestByDemographicNoAndType(demographicId, "EGFR");
+		Measurement currentAcr = measurementDao.findLatestByDemographicNoAndType(demographicId, "ACR");
+
 		Double latestEgfr = null;
 		Double aYearAgoEgfr = null;
-		if(egfrs.size()>0) {
-			latestEgfr = Double.valueOf(egfrs.get(0).getDataField());
-			latestEgfrDate = egfrs.get(0).getDateObserved();
-		}
-		Double latestAcr = null;
-		if(acrs.size()>0) {
-			latestAcr = Double.valueOf(acrs.get(0).getDataField());
-		}
-		if(latestEgfrDate != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(latestEgfrDate);
-			cal.add(Calendar.MONTH, -12);
-			Date aYearBefore = cal.getTime();
-			
-			//do we have any egfrs from before this date?
-			List<Measurement> tmp = measurementDao.findByTypeBefore(Integer.parseInt(demographicNo), "EGFR",aYearBefore);
-			if(tmp.size()>0) {
-				Measurement m = tmp.get(0);
-				aYearAgoEgfr = Double.valueOf(m.getDataField());
+		if(currentEgfr != null)
+		{
+			latestEgfr = MeasurementDSHelper.getMeasurementValue(currentEgfr);
+
+			Date latestEgfrDate = currentEgfr.getDateObserved();
+			if(latestEgfrDate != null)
+			{
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(latestEgfrDate);
+				cal.add(Calendar.MONTH, -12);
+				Date aYearBefore = cal.getTime();
+
+				//do we have any egfrs from before this date?
+				List<Measurement> previousMeasurements = measurementDao.findByTypeBefore(Integer.parseInt(demographicNo), "EGFR",aYearBefore);
+				if(previousMeasurements.size() > 0)
+				{
+					aYearAgoEgfr = MeasurementDSHelper.getMeasurementValue(previousMeasurements.get(0));
+				}
 			}
 		}
-		
+
+		Double latestAcr = null;
+		if(currentAcr != null)
+		{
+			latestAcr = MeasurementDSHelper.getMeasurementValue(currentAcr);
+		}
+
 		if((latestEgfr != null && latestEgfr < 30) || (latestAcr != null && latestAcr >= 60)) {
 			nextSteps = "<a href=\"javascript:void();\" onclick=\"window.open('"+request.getContextPath()+"/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp?de="+demographicNo+"&teamVar=','Consultation"+demographicNo+"','width=960,height=700');return false;\">Refer to Nephrology</a>";
 		}
@@ -206,7 +215,7 @@ public class RenalAction extends DispatchAction {
 		}
 		
 		if(latestEgfr != null && aYearAgoEgfr != null) {
-			if((aYearAgoEgfr.doubleValue() - latestEgfr.doubleValue()) > 20) {
+			if((aYearAgoEgfr - latestEgfr) > 20) {
 				nextSteps = "Check ACR, and if drop pesistent, <a href=\"javascript:void();\" onclick=\"window.open('"+request.getContextPath()+"/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp?de="+demographicNo+"&teamVar=','Consultation"+demographicNo+"','width=960,height=700');return false;\">Refer to Nephrology</a>";
 			}
 		}
@@ -388,4 +397,5 @@ public class RenalAction extends DispatchAction {
 		return null;
 		
 	}
+
 }

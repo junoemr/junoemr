@@ -23,32 +23,21 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.CustomFilter;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
 import org.oscarehr.ticklers.service.TicklerService;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.TicklerConverter;
 import org.oscarehr.ws.rest.conversion.TicklerTextSuggestConverter;
@@ -59,6 +48,16 @@ import org.oscarehr.ws.rest.to.model.TicklerTextSuggestTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.util.Date;
+import java.util.List;
 
 @Path("/tickler")
 @Component("ticklerWebService")
@@ -77,6 +76,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 	
 	@Autowired
 	private ProgramManager2 programManager;
+
+	@Autowired
+	private EncounterNoteService encounterNoteService;
 
 	@POST
 	@Path("/search")
@@ -209,13 +211,16 @@ public class TicklerWebService extends AbstractServiceImpl {
 		}
 
 		TicklerResponse result = new TicklerResponse();
-		List<Tickler> comparisonSearch = ticklerService.getSearchResponse(ticklerCriteriaSearch, page, count);
 
 		ticklerConverter.setIncludeLinks(includeLinks);
 		ticklerConverter.setIncludeComments(includeComments);
 		ticklerConverter.setIncludeUpdates(includeUpdates);
 		ticklerConverter.setIncludeProgram(includeProgram);
 
+		int ticklerCount = ticklerService.getTicklerCount(ticklerCriteriaSearch);
+		result.setTotal(ticklerCount);
+
+		List<Tickler> comparisonSearch = ticklerService.getSearchResponse(ticklerCriteriaSearch, page, count);
 		result.getContent().addAll(ticklerConverter.getAllAsTransferObjects(getLoggedInInfo(), comparisonSearch));
 		
 		return result;
@@ -231,10 +236,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "u", null)) {
 			throw new RuntimeException("Access Denied");
 		}
-		
-		
-		MiscUtils.getLogger().info(json.toString());
-		
+
 		JSONArray ticklerIds = json.getJSONArray("ticklers");
 		
 		for(Object id : ticklerIds) {
@@ -255,9 +257,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "u", null)) {
 			throw new RuntimeException("Access Denied");
 		}
-		
-		MiscUtils.getLogger().info(json.toString());
-		
+
 		JSONArray ticklerIds = json.getJSONArray("ticklers");
 		
 		for(Object id : ticklerIds) {
@@ -272,15 +272,12 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/update")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse updateTickler(JSONObject json){
-		GenericRESTResponse response = new GenericRESTResponse();
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "u", null)) {
-			throw new RuntimeException("Access Denied");
-		}
-		
-		MiscUtils.getLogger().info(json.toString());
-		
+	public GenericRESTResponse updateTickler(@QueryParam("writeEncounterNote") Boolean writeEncounterNote,
+	                                         JSONObject json)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.UPDATE, json.getInt("id"), SecObjectName._TICKLER);
+
 		Tickler tickler = ticklerManager.getTickler(getLoggedInInfo(), json.getInt("id"));
 		
 		if(tickler == null) {
@@ -301,7 +298,8 @@ public class TicklerWebService extends AbstractServiceImpl {
 		String dt = json.getString("serviceDate");
 		// tickler.setServiceDate(javax.xml.bind.DatatypeConverter.parseDateTime(dt).getTime());
 		tickler.setServiceDate(new Date(Long.parseLong(dt)));
-		
+
+		GenericRESTResponse response = new GenericRESTResponse();
 		response.setSuccess(ticklerManager.updateTickler(getLoggedInInfo(), tickler));
 		
 		if(response.isSuccess()) {
@@ -316,6 +314,11 @@ public class TicklerWebService extends AbstractServiceImpl {
 					}
 				}
 			}
+		}
+
+		if(writeEncounterNote)
+		{
+			encounterNoteService.saveTicklerNoteFromPrevious(tickler.getMessage(), tickler, loggedInProviderNo, tickler.getDemographicNo());
 		}
 		
 
@@ -344,24 +347,29 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse addTickler(Tickler tickler)
+	public GenericRESTResponse addTickler(@QueryParam("writeEncounterNote") Boolean writeEncounterNote,
+	                                      Tickler tickler)
 	{
-		GenericRESTResponse response = new GenericRESTResponse();
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "w", null)) {
-			throw new RuntimeException("Access Denied");
-		}
-			
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, tickler.getDemographicNo(), SecObjectName._TICKLER);
+
 		tickler.setUpdateDate(new Date());
-		tickler.setCreator(getLoggedInInfo().getLoggedInProviderNo());
+		tickler.setCreator(loggedInProviderNo);
+
+		ProgramProvider programProvider = programManager.getCurrentProgramInDomain(getLoggedInInfo(), loggedInProviderNo);
 		
-		ProgramProvider pp = programManager.getCurrentProgramInDomain(getLoggedInInfo(),getLoggedInInfo().getLoggedInProviderNo());
-		
-		if(pp != null) {
-			tickler.setProgramId(pp.getProgramId().intValue());
+		if(programProvider != null)
+		{
+			tickler.setProgramId(programProvider.getProgramId().intValue());
 		}
-		
-		response.setSuccess(ticklerManager.addTickler(getLoggedInInfo(), tickler));
+
+		boolean success = ticklerManager.addTickler(getLoggedInInfo(), tickler);
+		if(writeEncounterNote)
+		{
+			encounterNoteService.saveTicklerNote(tickler.getMessage(), tickler, loggedInProviderNo, tickler.getDemographicNo());
+		}
+		GenericRESTResponse response = new GenericRESTResponse();
+		response.setSuccess(success);
 
 		return response;
 	}

@@ -41,7 +41,6 @@ public class PatientDetailStatusTo1 implements Serializable {
 	private String macPHRVerificationLevel;
 
 	//from oscar.properties
-	private boolean conformanceFeaturesEnabled = false;
 	private boolean workflowEnhance = false;
 	private String billregion;
 	private String defaultView;
@@ -86,12 +85,6 @@ public class PatientDetailStatusTo1 implements Serializable {
 	}
 	public void setMacPHRVerificationLevel(String macPHRVerificationLevel) {
 		this.macPHRVerificationLevel = macPHRVerificationLevel;
-	}
-	public boolean isConformanceFeaturesEnabled() {
-		return conformanceFeaturesEnabled;
-	}
-	public void setConformanceFeaturesEnabled(boolean conformanceFeaturesEnabled) {
-		this.conformanceFeaturesEnabled = conformanceFeaturesEnabled;
 	}
 	public boolean isWorkflowEnhance() {
 		return workflowEnhance;

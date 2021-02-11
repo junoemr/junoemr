@@ -31,7 +31,6 @@
 <%@page import="oscar.oscarRx.data.RxPrescriptionData" %>
 <%@page import="oscar.oscarRx.util.RxUtil" %>
 <%@page import="java.util.List" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>

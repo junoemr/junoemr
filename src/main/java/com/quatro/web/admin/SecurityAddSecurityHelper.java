@@ -31,6 +31,7 @@ import javax.servlet.jsp.PageContext;
 
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -45,7 +46,7 @@ import oscar.log.LogConst;
 public class SecurityAddSecurityHelper {
 
 	private SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
-
+	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	/**
 	 * Adds a security record (i.e. user login information) for the provider.
 	 * <p/>
@@ -70,7 +71,6 @@ public class SecurityAddSecurityHelper {
         	MiscUtils.getLogger().error("Unable to get SHA message digest", e);
         	return "admin.securityaddsecurity.msgAdditionFailure";
         }
-        
 		byte[] btNewPasswd = md.digest(request.getParameter("password").getBytes());
 		for (int i = 0; i < btNewPasswd.length; i++)
 			sbTemp = sbTemp.append(btNewPasswd[i]);
@@ -83,7 +83,10 @@ public class SecurityAddSecurityHelper {
 
 		boolean isUserAlreadyExists = securityDao.findByUserName(request.getParameter("user_name")) != null;
 		if (isUserAlreadyExists) return "admin.securityaddsecurity.msgAdditionFailureDuplicate";
-
+		if (!securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no")))
+		{
+			return "admin.securityaddsecurity.msgProviderNoAuthorization";
+		}
 		Security s = new Security();
 		s.setUserName(request.getParameter("user_name"));
 		s.setPassword(sbTemp.toString());
@@ -93,7 +96,7 @@ public class SecurityAddSecurityHelper {
 		s.setDateExpiredate(MyDateFormat.getSysDate(request.getParameter("date_ExpireDate")));
 		s.setBLocallockset(request.getParameter("b_LocalLockSet") == null ? 0 : Integer.parseInt(request.getParameter("b_LocalLockSet")));
 		s.setBRemotelockset(request.getParameter("b_RemoteLockSet") == null ? 0 : Integer.parseInt(request.getParameter("b_RemoteLockSet")));
-		
+
     	if (request.getParameter("forcePasswordReset") != null && request.getParameter("forcePasswordReset").equals("1")) {
     	    s.setForcePasswordReset(Boolean.TRUE);
     	} else {

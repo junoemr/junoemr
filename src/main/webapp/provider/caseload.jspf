@@ -10,10 +10,9 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="oscar.*, org.oscarehr.util.*"%>
-<%@ page import="java.util.*, java.sql.*, java.net.URLEncoder "%>
+<%@ page import="java.net.URLEncoder "%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao, org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="oscar.OscarProperties" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
@@ -63,16 +62,68 @@
 <c:import url="/infirm.do?action=showProgram"/>
 <%
 Locale locale = request.getLocale();
-String[] clH = new String[] {   LocaleUtils.getMessage(locale, "caseload.msgDemographic"), "", LocaleUtils.getMessage(locale, "caseload.msgAge"), LocaleUtils.getMessage(locale, "caseload.msgSex"), LocaleUtils.getMessage(locale, "caseload.msgLastAppt"), LocaleUtils.getMessage(locale, "caseload.msgNextAppt"), LocaleUtils.getMessage(locale, "caseload.msgApptsLYTD"), LocaleUtils.getMessage(locale, "caseload.msgLab"), LocaleUtils.getMessage(locale, "caseload.msgDoc"), LocaleUtils.getMessage(locale, "caseload.msgTickler"), LocaleUtils.getMessage(locale, "caseload.msgMsg"), LocaleUtils.getMessage(locale, "caseload.msgBMI"), LocaleUtils.getMessage(locale, "caseload.msgBP"), LocaleUtils.getMessage(locale, "caseload.msgWT"), LocaleUtils.getMessage(locale, "caseload.msgSMK"), LocaleUtils.getMessage(locale, "caseload.msgA1C"), LocaleUtils.getMessage(locale, "caseload.msgACR"), LocaleUtils.getMessage(locale, "caseload.msgSCR"), LocaleUtils.getMessage(locale, "caseload.msgLDL"), LocaleUtils.getMessage(locale, "caseload.msgHDL"), LocaleUtils.getMessage(locale, "caseload.msgTCHD"), LocaleUtils.getMessage(locale, "caseload.msgEGFR"), LocaleUtils.getMessage(locale, "caseload.msgEYEE"), LocaleUtils.getMessage(locale, "caseload.msgLastEncounterDate"), LocaleUtils.getMessage(locale, "caseload.msgLastEncounterType"), LocaleUtils.getMessage(locale, "caseload.msgCASHAdmissionDate"), LocaleUtils.getMessage(locale, "caseload.msgACCESS1AdmissionDate")};
+String[] caseloadHeader = new String[] {
+		LocaleUtils.getMessage(locale, "caseload.msgDemographic"),
+		"",
+		LocaleUtils.getMessage(locale, "caseload.msgAge"),
+		LocaleUtils.getMessage(locale, "caseload.msgSex"),
+		LocaleUtils.getMessage(locale, "caseload.msgLastAppt"),
+		LocaleUtils.getMessage(locale, "caseload.msgNextAppt"),
+		LocaleUtils.getMessage(locale, "caseload.msgApptsLYTD"),
+		LocaleUtils.getMessage(locale, "caseload.msgLab"),
+		LocaleUtils.getMessage(locale, "caseload.msgDoc"),
+		LocaleUtils.getMessage(locale, "caseload.msgTickler"),
+		LocaleUtils.getMessage(locale, "caseload.msgMsg"),
+		LocaleUtils.getMessage(locale, "caseload.msgBMI"),
+		LocaleUtils.getMessage(locale, "caseload.msgBP"),
+		LocaleUtils.getMessage(locale, "caseload.msgWT"),
+		LocaleUtils.getMessage(locale, "caseload.msgSMK"),
+		LocaleUtils.getMessage(locale, "caseload.msgA1C"),
+		LocaleUtils.getMessage(locale, "caseload.msgACR"),
+		LocaleUtils.getMessage(locale, "caseload.msgSCR"),
+		LocaleUtils.getMessage(locale, "caseload.msgLDL"),
+		LocaleUtils.getMessage(locale, "caseload.msgHDL"),
+		LocaleUtils.getMessage(locale, "caseload.msgTCHD"),
+		LocaleUtils.getMessage(locale, "caseload.msgEGFR"),
+		LocaleUtils.getMessage(locale, "caseload.msgEYEE"),
+		LocaleUtils.getMessage(locale, "caseload.msgLastEncounterDate"),
+		LocaleUtils.getMessage(locale, "caseload.msgLastEncounterType")
+};
 %>
 <script type="text/javascript">
-clH = ["<bean:message key="caseload.msgDemographic" />", "", "<bean:message key="caseload.msgAge" />", "<bean:message key="caseload.msgSex" />", "<bean:message key="caseload.msgLastAppt" />", "<bean:message key="caseload.msgNextAppt" />", "<bean:message key="caseload.msgApptsLYTD" />", "<bean:message key="caseload.msgLab" />", "<bean:message key="caseload.msgDoc" />", "<bean:message key="caseload.msgTickler" />", "<bean:message key="caseload.msgMsg" />", "<bean:message key="caseload.msgBMI" />", "<bean:message key="caseload.msgBP" />", "<bean:message key="caseload.msgWT" />", "<bean:message key="caseload.msgSMK" />", "<bean:message key="caseload.msgA1C" />", "<bean:message key="caseload.msgACR" />", "<bean:message key="caseload.msgSCR" />", "<bean:message key="caseload.msgLDL" />", "<bean:message key="caseload.msgHDL" />", "<bean:message key="caseload.msgTCHD" />", "<bean:message key="caseload.msgEYEE" />", "<bean:message key="caseload.msgLastEncounterDate" />", "<bean:message key="caseload.msgLastEncounterType" />", "<bean:message key="caseload.msgCASHAdmissionDate" />", "<bean:message key="caseload.msgACCESS1AdmissionDate" />"];
+caseloadHeader = [
+	"<bean:message key="caseload.msgDemographic" />",
+	"",
+	"<bean:message key="caseload.msgAge" />",
+	"<bean:message key="caseload.msgSex" />",
+	"<bean:message key="caseload.msgLastAppt" />",
+	"<bean:message key="caseload.msgNextAppt" />",
+	"<bean:message key="caseload.msgApptsLYTD" />",
+	"<bean:message key="caseload.msgLab" />",
+	"<bean:message key="caseload.msgDoc" />",
+	"<bean:message key="caseload.msgTickler" />",
+	"<bean:message key="caseload.msgMsg" />",
+	"<bean:message key="caseload.msgBMI" />",
+	"<bean:message key="caseload.msgBP" />",
+	"<bean:message key="caseload.msgWT" />",
+	"<bean:message key="caseload.msgSMK" />",
+	"<bean:message key="caseload.msgA1C" />",
+	"<bean:message key="caseload.msgACR" />",
+	"<bean:message key="caseload.msgSCR" />",
+	"<bean:message key="caseload.msgLDL" />",
+	"<bean:message key="caseload.msgHDL" />",
+	"<bean:message key="caseload.msgTCHD" />",
+	"<bean:message key="caseload.msgEGFR" />",
+	"<bean:message key="caseload.msgEYEE" />",
+	"<bean:message key="caseload.msgLastEncounterDate" />",
+	"<bean:message key="caseload.msgLastEncounterType" />"
+];
 </script>
 <table border="1" cellpadding="0" cellspacing="0" width="100%" id="caseloadTable">
-<tr><td colspan='<%=clH.length%>'>
+<tr><td colspan='<%=caseloadHeader.length%>'>
 	<table border='0' cellpadding='0' bgcolor='#fffff0' cellspacing='0' width='100%'>
 		<tr class='caseloadRow'>
-		<td colspan='<%=clH.length%>'>
+		<td colspan='<%=caseloadHeader.length%>'>
 			<div>
 				<div id="leftSearch">
 					<form>
@@ -117,7 +168,7 @@ clH = ["<bean:message key="caseload.msgDemographic" />", "", "<bean:message key=
 			} %>
 					</select>
 					<b>Rostered: </b>
-					<select id='caseloadRoster' onChange='search("search");' style='width: 120'>
+					<select id='caseloadRoster' onChange='search("search");' style='width: 120px'>
 						<option value='' selected></option>
 						<option value='RO'><bean:message key='demographic.demographiceditdemographic.optRostered'/></option>
 						<option value='NR'><bean:message key='demographic.demographiceditdemographic.optNotRostered'/></option>
@@ -143,8 +194,19 @@ clH = ["<bean:message key="caseload.msgDemographic" />", "", "<bean:message key=
 		</td></tr>
 	</table>
 </td></tr>
-<tr id='loadingHeader' class='caseloadRow'><td style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'><img src='../images/DMSLoader.gif' /><bean:message key="caseload.msgLoading" /></td></tr>
-<tr id='totalResults2' class='caseloadRow'><td style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'> <span id="rows2"></span>/<span id="totalRows2"></span>&nbsp;<bean:message key="caseload.msgResults" /></td></tr>
+<tr id='loadingHeader' class='caseloadRow'>
+	<td style='text-align: center;' bgcolor='#fffff0' colspan='<%=caseloadHeader.length%>'>
+		<img src='../images/DMSLoader.gif' />
+		<bean:message key="caseload.msgLoading" />
+	</td>
+</tr>
+<tr id='totalResults2' class='caseloadRow'>
+	<td style='text-align: center;' bgcolor='#fffff0' colspan='<%=caseloadHeader.length%>'>
+		<span id="rows2"></span>/
+		<span id="totalRows2"></span>&nbsp;
+		<bean:message key="caseload.msgResults" />
+	</td>
+</tr>
 <tr class='caseloadRow' id='caseloadHeader'>
 
 <%
@@ -154,25 +216,39 @@ String[] objIds = new String[] {"Demographic", "_caseload.DisplayMode", "_caselo
 		, "_caseload.Tickler", "_caseload.Msg", "_caseload.BMI", "_caseload.BP", "_caseload.WT"
 		, "_caseload.SMK", "_caseload.A1C", "_caseload.ACR", "_caseload.SCR", "_caseload.LDL"
 		, "_caseload.HDL", "_caseload.TCHD", "_caseload.EGFR", "_caseload.EYEE", "_caseload.LastEncounterDate"
-		, "_caseload.LastEncounterType", "_caseload.CashAdmissionDate", "_caseload.Access1AdmissionDate"};
+		, "_caseload.LastEncounterType"};
 %>
 
-<% for (int i=0; i < clH.length; i++) { %>
+<% for (int i=0; i < caseloadHeader.length; i++) { %>
 	<% if (i == 0) { %>
-	<td class='selectedCategory' bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=clH[i]%> &Delta;</b></td>
+	<td class='selectedCategory' bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=caseloadHeader[i]%> &Delta;</b></td>
 	<% } else if (i == 1) { %>
 	<security:oscarSec roleName="<%=caseloadroleName$%>" objectName="<%=objIds[i]%>" rights="r" reverse="<%=false%>" >
-		<td bgcolor='#c0c0c0' <%="style='width:307px'"%>><b><%=clH[i]%></b></td>
+		<td bgcolor='#c0c0c0' <%="style='width:307px'"%>><b><%=caseloadHeader[i]%></b></td>
 	</security:oscarSec>
 	<% } else{ %>
 	<security:oscarSec roleName="<%=caseloadroleName$%>" objectName="<%=objIds[i]%>" rights="r" reverse="<%=false%>" >
-		<td bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=clH[i]%></b></td>
+		<td bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=caseloadHeader[i]%></b></td>
 	</security:oscarSec>
 	<% } %>
 <% } %>
-<tr id='loadingFooter' class='caseloadRow'><td colspan='<%=clH.length%>' style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'><img src='../images/DMSLoader.gif' /><bean:message key="caseload.msgLoading" /></td></tr>
-<tr id='noResults' class='caseloadRow'><td colspan='<%=clH.length%>' style='text-align: center;' bgcolor='#fffff0' ><bean:message key="caseload.msgTryAgain" /></td></tr>
-<tr id='totalResults1' class='caseloadRow'><td colspan='<%=clH.length%>' style='text-align: center;' bgcolor='#fffff0' ><span id="rows1"></span>/<span id="totalRows1"></span>&nbsp;<bean:message key="caseload.msgResults" /></td></tr>
+<tr id='loadingFooter' class='caseloadRow'>
+	<td colspan='<%=caseloadHeader.length%>' style='text-align: center;' bgcolor='#fffff0' colspan='<%=caseloadHeader.length%>'>
+		<img src='../images/DMSLoader.gif' /><bean:message key="caseload.msgLoading" />
+	</td>
+</tr>
+<tr id='noResults' class='caseloadRow'>
+	<td colspan='<%=caseloadHeader.length%>' style='text-align: center;' bgcolor='#fffff0' >
+		<bean:message key="caseload.msgTryAgain" />
+	</td>
+</tr>
+<tr id='totalResults1' class='caseloadRow'>
+	<td colspan='<%=caseloadHeader.length%>' style='text-align: center;' bgcolor='#fffff0' >
+		<span id="rows1"></span>/
+		<span id="totalRows1"></span>&nbsp;
+		<bean:message key="caseload.msgResults" />
+	</td>
+</tr>
 </table>
 <script type="text/javascript">
 
@@ -248,18 +324,19 @@ function generateQuery(method) {
 	}
 	query += "&clPage=" + page;
     query += "&clPSize=" + pageSize;
-    query += "&clCat=" + escape(clH[category]);
+    query += "&clCat=" + escape(caseloadHeader[category]);
     query += "&clSortAsc=" + escape(sortAsc);
     return query;
 }
 
 function getHeadersElement(headers,realIdx){
 	// iteration in headers
-	if (headers == undefined || headers == null || headers.length==0){
+	if (headers === undefined || headers === null || headers.length === 0)
+	{
 		return null;
 	}
-	var heading = clH[realIdx];
-	if (heading == undefined || heading.length == 0){
+	var heading = caseloadHeader[realIdx];
+	if (heading === undefined || heading.length === 0){
 		return null;
 	}
 	var headElement = null;
@@ -288,20 +365,17 @@ function changeCategory(cat) {
 	}
 	if (cat == category) {
 		sortAsc = !sortAsc;
-//		headers.get(category).innerHTML = "<b onclick='changeCategory(\""+category+"\")'>"+clH[category] + " " + getSortDir() + "</b>";
 		oldCat.attr(onclick,"changeCategory(\"" + category+ "\")");
-		oldCat.html("<b>" + clH[category] + " " + getSortDir() + "</b>");
+		oldCat.html("<b>" + caseloadHeader[category] + " " + getSortDir() + "</b>");
 	}
 	else {
-//		var oldCat = jQuery(headers.get(category));
-//		var newCat = jQuery(headers.get(cat));
 		var newCat = jQuery(getHeadersElement(headers,cat));
 		sortAsc = true;
 		oldCat.removeClass("selectedCategory");
 		newCat.addClass("selectedCategory");
 		oldCat.attr(onclick,"changeCategory(\"" + category+ "\")");
-		oldCat.html("<b>"+clH[category]+"</b>");
-		newCat.html("<b>" + clH[cat] + " " + getSortDir() + "</b>");
+		oldCat.html("<b>"+caseloadHeader[category]+"</b>");
+		newCat.html("<b>" + caseloadHeader[cat] + " " + getSortDir() + "</b>");
 		category = cat;
 	}
 	search(searchMethod);

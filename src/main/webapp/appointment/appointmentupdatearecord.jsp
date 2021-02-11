@@ -54,6 +54,7 @@
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="oscar.util.StringUtils" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = SpringUtils.getBean(AppointmentArchiveDao.class);
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
@@ -73,7 +74,7 @@
 	</tr>
 </table>
 	<%
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+ 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String updateuser = loggedInInfo.getLoggedInProviderNo();
 		final String cancelledAppointment = "Cancel Appt";
 
@@ -92,16 +93,16 @@
 		Date endDate = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time"));
 
 		String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), appt.getName());
-		String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), appt.getNotes());
-		String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), appt.getReason());
+		String notes = StringUtils.transformNullInEmptyString(request.getParameter("notes"));
+		String reason = StringUtils.transformNullInEmptyString(request.getParameter("reason"));
 		String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), appt.getLocation());
 		String isVirtual = ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "off");
-		String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), appt.getResources());
-		String type = ConversionUtils.getStringOrDefaultValue(request.getParameter("type"), appt.getType());
+		String resources = StringUtils.transformNullInEmptyString(request.getParameter("resources"));
+		String type = StringUtils.transformNullInEmptyString(request.getParameter("type"));
 		String style = ConversionUtils.getStringOrDefaultValue(request.getParameter("style"), appt.getStyle());
 		String billing = ConversionUtils.getStringOrDefaultValue(request.getParameter("billing"), appt.getBilling());
 		String remarks = ConversionUtils.getStringOrDefaultValue(request.getParameter("remarks"), appt.getRemarks());
-		String urgency = ConversionUtils.getStringOrDefaultValue(request.getParameter("urgency"), appt.getUrgency());
+		String urgency = StringUtils.transformNullInEmptyString(request.getParameter("urgency"));
 
 		Integer reasonCode = appt.getReasonCode();
 		int demographicNo = appt.getDemographicNo();

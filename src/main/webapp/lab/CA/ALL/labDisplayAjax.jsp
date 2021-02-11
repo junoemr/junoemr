@@ -178,35 +178,43 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      		}
      	%>
      	
-         getComment=function(labid, action) {
-            var ret = true;            
-            var text = "V" + <%=version%> + "commentText" + labid + $("providerNo").value;
-            
-            var commentVal = "";
-            
-            if( $(text) != null ) {
-            	commentVal = $(text).innerHTML;
-            	if( commentVal == null ) {
-            		commentVal = "";
-            	}
-            }
-            var commentID = "comment_" + labid;
-            
-            var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
-			
-            if( comment == null )
-                ret = false;
-            else if ( comment != null && comment.length > 0 ){
-                $(commentID).value = comment;
-            }
-            else {
-            	$(commentID).value = commentVal;
-            }
-            if(ret)
-                handleLab('acknowledgeForm_'+labid,labid,action);
+       getComment = function getComment(labId, action)
+         {
+                 jQuery.ajax(
+                     {
+                         url: "../ws/rs/lab/" + labId + "/provider/" + providerNo + "/labRouting",
+                         type: "GET",
+                         success: function(result)
+                         {
+                             var commentVal = "";
 
-            return false;
-        }
+                             if (result.body)
+                             {
+                                 commentVal = result.body.comment;
+                             }
+
+                             var commentID = "comment_" + labId;
+                             var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
+
+                             if (comment == null)
+                             {
+                                 return;
+                             }
+                             //The empty string case is handled in addComment()
+                             if (comment)
+                             {
+                                 $(commentID).value = comment;
+                             }
+
+                             handleLab('acknowledgeForm_' + labId, labId, action);
+                         },
+                         error: function(error)
+                         {
+                            console.log("Error getting lab comment", error);
+                            window.alert("Failed to load comments");
+                         }
+                     });
+         }
 
          printPDF=function(doclabid){
             document.forms['acknowledgeForm_'+doclabid].action="../lab/CA/ALL/PrintPDF.do";
@@ -282,7 +290,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 				$(status).value = "N";
 			}
         	var data=$(formid).serialize(true);
-        	
+
         	var label = "V" + <%=version%> + "commentLabel" + labid + $F("providerNo");
         	var text = "V" + <%=version%> + "commentText" + labid + $("providerNo").value;
 			var commentID = "comment_" + labid;

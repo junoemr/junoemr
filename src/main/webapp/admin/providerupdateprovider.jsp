@@ -82,7 +82,9 @@
     <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/admin/provider/providerProfile.js"></script>
 <script type="text/javascript" src="./provider/providerProfile.js"></script>
+
 <title><bean:message key="admin.providerupdateprovider.title" /></title>
 <link rel="stylesheet" href="../web.css">
 
@@ -114,12 +116,15 @@ jQuery(document).ready( function() {
     }
         
         
+
  );
+
 </script>
 </head>
 
 <%
     String curProvider_no = (String) session.getAttribute("user");
+    ProviderData currentProvider = providerDao.findByProviderNo(curProvider_no);
     List<Integer> siteIDs = new ArrayList<Integer>();
     boolean isSiteAccessPrivacy=false;
 %>
@@ -151,6 +156,7 @@ jQuery(document).ready( function() {
 <form method="post" action="providerupdate.jsp" name="updatearecord">
 
 <%
+
 	String providerNo = request.getParameter("keyword");
 	ProviderData provider = providerService.getProviderEager(providerNo);
 
@@ -176,7 +182,6 @@ jQuery(document).ready( function() {
 		<% String provider_no = provider.getId(); %>
 		<%= provider_no %>
 		<input type="hidden" name="provider_no" value="<%= provider_no %>">
-		
 	</tr>
 	<tr>
 		<td>
@@ -610,7 +615,9 @@ jQuery(document).ready( function() {
 		<td colspan="2">
 		<div align="center"><input type="submit"
 			name="subbutton"
-			value="<bean:message key="admin.providerupdateprovider.btnSubmit"/>">
+			value="<bean:message key="admin.providerupdateprovider.btnSubmit"/>"
+		>
+			<input type="hidden" name="current_user" value="<%=curProvider_no%>">
 		</div>
 		</td>
 	</tr>
