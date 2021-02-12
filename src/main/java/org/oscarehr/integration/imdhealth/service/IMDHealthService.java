@@ -26,7 +26,6 @@ package org.oscarehr.integration.imdhealth.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.encryption.StringEncryptor;
@@ -45,7 +44,6 @@ import org.oscarehr.integration.imdhealth.transfer.outbound.SSORequest;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSOUser;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
-import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -59,8 +57,8 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import static org.oscarehr.util.JsfUtils.getHttpServletRequest;
 
 @Service
 public class IMDHealthService
@@ -123,60 +121,41 @@ public class IMDHealthService
 			imdIntegration.setApiKey(encryptedSecret);
 			integrationDao.persist(imdIntegration);
 
-			//pre-load all site specific organizations
-			initializeAllSites(session, clientId, clientSecret);
-
 			return imdIntegration;
 		}
 	}
 
-	public void initializeAllSites(HttpSession session, String clientId, String clientSecret)
+
+	/**
+	 * Initialize imD Health Organizations for each provider/site combination.
+	 *
+	 * @param integrationId integration id
+	 *
+	 * @return True if credentials for all providers/sites are successfully made
+	 */
+	public Boolean initializeAllUsers(Integer integrationId) throws IntegrationException
 	{
-		String encryptedSecret = StringEncryptor.encrypt(clientSecret);
-		List<Integration> allIntegrations = new ArrayList<>();
-		SiteDao siteDao = (SiteDao) SpringUtils.getBean("siteDao");
+		Integration integration = integrationDao.find(integrationId);
+		BearerToken token = getBearerToken(integration);
+		String junoPracticeId = "CloudPracticeDefault";
 
 		List<Site> sites = siteDao.getAllActiveSites();
+
+		SSOCredentials credentials = null;
 		for (Site site : sites)
-			{
-				Integer siteId = site.getId();
-				Integration imdIntegration = new Integration();
-				imdIntegration.setIntegrationType(Integration.INTEGRATION_TYPE_IMD_HEALTH);
-				imdIntegration.setRemoteId(clientId);
-				imdIntegration.setApiKey(encryptedSecret);
-				imdIntegration.setSite(site);
-				integrationDao.persist(imdIntegration);
-				allIntegrations.add(imdIntegration);
-			}
-				initializeAllUsers(session, allIntegrations);
-	}
-
-
-	public void initializeAllUsers(HttpSession session, List<Integration> allIntegrations )
-	{
-		ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-		List<Provider> allProviders = providerDao.getActiveProviders();
-		SiteDao siteDao = (SiteDao) SpringUtils.getBean("siteDao");
-
-		for (Provider provider : allProviders)
 		{
-			List<Site> sites = siteDao.getActiveSitesByProviderNo(provider.getProviderNo());
-			for (Site site : sites)
+			Set<Provider> providers = site.getProviders();
+
+			for (Provider provider : providers)
 			{
-				try
+				credentials = getSSOCredentials(token, provider, junoPracticeId, site.getId());
+				if (credentials == null)
 				{
-					session.setAttribute("initializingProvider", provider.getProviderNo());
-					String ssoLink = getSSOLink(session, site.getId());
-					session.removeAttribute("initializingProvider");
-				}
-				catch (IntegrationException e)
-				{
-					e.printStackTrace();
+					return false;
 				}
 			}
-
-
 		}
+		return credentials != null;
 	}
 	/**
 	 * Generate the SSO link needed to connect to iMDHealth, logging in if necessary.
@@ -312,6 +291,7 @@ public class IMDHealthService
 		credentials.setBearerToken(token);
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(session);
+		Provider provider = loggedInInfo.getLoggedInProvider();
 		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
 
 		// TODO: Remove after figuring out something better for embedded tomcat
@@ -319,7 +299,7 @@ public class IMDHealthService
 		{
 			junoPracticeId = "CloudPracticeDefault";
 		}
-		SSOCredentials ssoInfo = getSSOCredentials(token, loggedInInfo, junoPracticeId, siteId);
+		SSOCredentials ssoInfo = getSSOCredentials(token, provider, junoPracticeId, siteId);
 		credentials.loadSSOCredentials(ssoInfo);
 
 		credentials.saveToSession(session);
@@ -343,13 +323,13 @@ public class IMDHealthService
 	}
 
 	private SSOCredentials getSSOCredentials(BearerToken token,
-	                                         LoggedInInfo loggedInInfo,
+	                                         Provider provider,
 	                                         String practiceId,
 	                                         @Nullable Integer siteId) throws SSOLoginException
 	{
 		try
 		{
-			SSOUser user = SSOUser.fromLoggedInInfo(loggedInInfo, practiceId);
+			SSOUser user = SSOUser.fromProvider(provider, practiceId);
 			SSOOrganization organization;
 			if (siteId == null)
 			{

@@ -80,6 +80,14 @@ public class iMDHealthWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(ssoLink);
 	}
 
+	@GET
+	@Path("/{integrationId}/Sync")
+	public RestResponse<Boolean> syncIntegrations(@PathParam("integrationId") Integer integrationId) throws IntegrationException
+	{
+		Boolean synced = imdHealthService.initializeAllUsers(integrationId);
+		return RestResponse.successResponse(synced);
+	}
+
 	@PUT
 	@Path("/")
 	public RestResponse<Integer> updateIntegration(IMDHealthCredentialsTo1 credentials)
