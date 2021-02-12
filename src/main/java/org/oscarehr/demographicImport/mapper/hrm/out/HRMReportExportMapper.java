@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import xml.hrm.v4_3.ReportClass;
@@ -34,6 +35,8 @@ import xml.hrm.v4_3.ReportFormat;
 import xml.hrm.v4_3.ReportsReceived;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class HRMReportExportMapper extends AbstractHRMExportMapper<ReportsReceived, HrmDocument>
@@ -77,10 +80,26 @@ public class HRMReportExportMapper extends AbstractHRMExportMapper<ReportsReceiv
 			reportsReceived.setReviewedDateTime(toNullableDateFullOrPartial(reviewer.getReviewDateTime()));
 		}
 
+		reportsReceived.getOBRContent().addAll(toObservationList(exportStructure.getObservations()));
 		reportsReceived.setSendingFacility(exportStructure.getSendingFacilityId());
 		reportsReceived.setSendingFacilityReportNumber(exportStructure.getSendingFacilityReport());
 
 		return reportsReceived;
+	}
+
+	protected List<ReportsReceived.OBRContent> toObservationList(List<HrmObservation> observations)
+	{
+		List<ReportsReceived.OBRContent> contentList = new ArrayList<>(observations.size());
+		for(HrmObservation observation : observations)
+		{
+			ReportsReceived.OBRContent content = objectFactory.createReportsReceivedOBRContent();
+			content.setAccompanyingSubClass(observation.getAccompanyingSubClass());
+			content.setAccompanyingMnemonic(observation.getAccompanyingMnemonic());
+			content.setAccompanyingDescription(observation.getAccompanyingDescription());
+			content.setObservationDateTime(toNullableDateFullOrPartial(observation.getObservationDateTime()));
+			contentList.add(content);
+		}
+		return contentList;
 	}
 
 	protected ReportClass toReportClass(HrmDocument.REPORT_CLASS exportClass)

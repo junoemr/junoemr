@@ -67,7 +67,7 @@ public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper
 		sourceAuthorPhysician.setAuthorName(toPersonNameSimple(exportStructure.getCreatedBy()));
 		reports.setSourceAuthorPhysician(sourceAuthorPhysician);
 
-		reports.getReportReviewed().addAll(getReportReviewedList(exportStructure));
+		reports.getReportReviewed().addAll(getReportReviewedList(exportStructure.getReviewer()));
 		reports.setNotes(exportStructure.getAnnotation());
 
 		// the following can be omitted for non-hrm documents:
@@ -85,22 +85,5 @@ public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper
 		* This does not apply to standard documents the way Juno uses them */
 
 		return reports;
-	}
-
-	protected List<Reports.ReportReviewed> getReportReviewedList(Document exportStructure)
-	{
-		List<Reports.ReportReviewed> reviewedList = new ArrayList<>();
-
-		Reviewer reviewer = exportStructure.getReviewer();
-		if(reviewer != null)
-		{
-			Reports.ReportReviewed reportReviewed = objectFactory.createReportsReportReviewed();
-			reportReviewed.setName(toPersonNameSimple(reviewer));
-			reportReviewed.setDateTimeReportReviewed(toNullableDateFullOrPartial(reviewer.getReviewDateTime()));
-			reportReviewed.setReviewingOHIPPhysicianId(reviewer.getOhipNumber());
-
-			reviewedList.add(reportReviewed);
-		}
-		return reviewedList;
 	}
 }

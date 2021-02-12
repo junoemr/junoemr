@@ -52,10 +52,7 @@ public class CDSReportDocumentExportMapperTest
 	@Test
 	public void testGetReportReviewedList_Null()
 	{
-		Document exportStructure = new Document();
-		exportStructure.setReviewer(null);
-
-		assertTrue(cdsReportDocumentExportMapper.getReportReviewedList(exportStructure).isEmpty());
+		assertTrue(cdsReportDocumentExportMapper.getReportReviewedList(null).isEmpty());
 	}
 
 	@Test
@@ -65,14 +62,12 @@ public class CDSReportDocumentExportMapperTest
 		String expectedLastName = "last";
 		PartialDateTime expectedReviewDateTime = new PartialDateTime(2021, 4, 21);
 
-		Document exportStructure = new Document();
 		Reviewer reviewer = new Reviewer();
 		reviewer.setFirstName(expectedFirstName);
 		reviewer.setLastName(expectedLastName);
 		reviewer.setReviewDateTime(expectedReviewDateTime);
-		exportStructure.setReviewer(reviewer);
 
-		List<Reports.ReportReviewed> results = cdsReportDocumentExportMapper.getReportReviewedList(exportStructure);
+		List<Reports.ReportReviewed> results = cdsReportDocumentExportMapper.getReportReviewedList(reviewer);
 		assertEquals(1, results.size());
 		assertEquals(expectedFirstName, results.get(0).getName().getFirstName());
 		assertEquals(expectedLastName, results.get(0).getName().getLastName());

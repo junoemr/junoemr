@@ -23,10 +23,14 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.Reports;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public abstract class AbstractCDSReportExportMapper<E> extends AbstractCDSExportMapper<Reports, E>
@@ -53,5 +57,26 @@ public abstract class AbstractCDSReportExportMapper<E> extends AbstractCDSExport
 			logger.error("Invalid document class value: " + docClass);
 		}
 		return reportClass;
+	}
+
+	protected List<Reports.ReportReviewed> getReportReviewedList(Reviewer ... reviewers)
+	{
+		List<Reports.ReportReviewed> reviewedList = new ArrayList<>();
+		if(reviewers != null)
+		{
+			for(Reviewer reviewer : reviewers)
+			{
+				if(reviewer != null)
+				{
+					Reports.ReportReviewed reportReviewed = objectFactory.createReportsReportReviewed();
+					reportReviewed.setName(toPersonNameSimple(reviewer));
+					reportReviewed.setDateTimeReportReviewed(toNullableDateFullOrPartial(reviewer.getReviewDateTime()));
+					reportReviewed.setReviewingOHIPPhysicianId(reviewer.getOhipNumber());
+
+					reviewedList.add(reportReviewed);
+				}
+			}
+		}
+		return reviewedList;
 	}
 }
