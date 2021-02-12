@@ -53,7 +53,6 @@ import xml.hrm.v4_3.PostalZipCode;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 
@@ -227,15 +226,14 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 	}
 	protected PersonStatus getExportStatusCode(String patientStatus)
 	{
-		if(patientStatus == null)
-		{
-			patientStatus = STATUS_ACTIVE;
-		}
 		PersonStatus personStatus = PersonStatus.A;
-		switch(patientStatus)
+		if(patientStatus != null)
 		{
-			case STATUS_INACTIVE: personStatus = PersonStatus.I; break;
-			case STATUS_DECEASED: personStatus = PersonStatus.D; break;
+			switch(patientStatus)
+			{
+				case STATUS_INACTIVE: personStatus = PersonStatus.I; break;
+				case STATUS_DECEASED: personStatus = PersonStatus.D; break;
+			}
 		}
 		return personStatus;
 	}

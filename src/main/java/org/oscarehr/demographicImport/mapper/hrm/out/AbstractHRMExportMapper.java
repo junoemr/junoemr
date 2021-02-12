@@ -55,51 +55,59 @@ public abstract class AbstractHRMExportMapper<I, E> extends AbstractExportMapper
 
 	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDate localDate)
 	{
-		if(localDate == null) return null;
-
-		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
-		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(localDate);
-		dateFullOrPartial.setFullDate(calendar);
+		DateFullOrPartial dateFullOrPartial = null;
+		if(localDate != null)
+		{
+			dateFullOrPartial = objectFactory.createDateFullOrPartial();
+			XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(localDate);
+			dateFullOrPartial.setFullDate(calendar);
+		}
 		return dateFullOrPartial;
 	}
 
 	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDateTime localDateTime)
 	{
-		if(localDateTime == null) return null;
-		return toNullableDateFullOrPartial(localDateTime.toLocalDate());
+		DateFullOrPartial dateFullOrPartial = null;
+		if(localDateTime != null)
+		{
+			dateFullOrPartial = toNullableDateFullOrPartial(localDateTime.toLocalDate());
+		}
+		return dateFullOrPartial;
 	}
 
 	protected DateFullOrPartial toNullableDateFullOrPartial(PartialDate partialDate)
 	{
-		if(partialDate == null) return null;
+		DateFullOrPartial dateFullOrPartial = null;
+		if(partialDate != null)
+		{
+			dateFullOrPartial = objectFactory.createDateFullOrPartial();
+			XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(partialDate.toLocalDate());
 
-		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
-		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(partialDate.toLocalDate());
-
-		if(partialDate.isFullDate())
-		{
-			dateFullOrPartial.setFullDate(calendar);
-		}
-		else if(partialDate.isYearMonth())
-		{
-			dateFullOrPartial.setYearMonth(calendar);
-		}
-		else if(partialDate.isYearOnly())
-		{
-			dateFullOrPartial.setYearOnly(calendar);
+			if(partialDate.isFullDate())
+			{
+				dateFullOrPartial.setFullDate(calendar);
+			}
+			else if(partialDate.isYearMonth())
+			{
+				dateFullOrPartial.setYearMonth(calendar);
+			}
+			else if(partialDate.isYearOnly())
+			{
+				dateFullOrPartial.setYearOnly(calendar);
+			}
 		}
 		return dateFullOrPartial;
 	}
 
 	protected PersonNameSimple toPersonNameSimple(Provider provider)
 	{
-		if(provider == null)
+		PersonNameSimple personNameSimple = null;
+		if(provider != null)
 		{
-			return null;
+			personNameSimple = objectFactory.createPersonNameSimple();
+			personNameSimple.setFirstName(provider.getFirstName());
+			personNameSimple.setLastName(provider.getLastName());
 		}
-		PersonNameSimple personNameSimple = objectFactory.createPersonNameSimple();
-		personNameSimple.setFirstName(provider.getFirstName());
-		personNameSimple.setLastName(provider.getLastName());
 		return personNameSimple;
 	}
 }

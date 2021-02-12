@@ -17,6 +17,7 @@ import javax.persistence.Query;
 import java.util.List;
 
 @Repository
+@SuppressWarnings("unchecked")
 public class HRMDocumentToDemographicDao extends AbstractDao<HRMDocumentToDemographic>
 {
 	public HRMDocumentToDemographicDao()
@@ -26,22 +27,18 @@ public class HRMDocumentToDemographicDao extends AbstractDao<HRMDocumentToDemogr
 
 	public List<HRMDocumentToDemographic> findByDemographicNo(Integer demographicNo)
 	{
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1";
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.demographicNo=:demographicNo";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, demographicNo);
-		@SuppressWarnings("unchecked")
-		List<HRMDocumentToDemographic> documentToDemographics = query.getResultList();
-		return documentToDemographics;
+		query.setParameter("demographicNo", demographicNo);
+		return query.getResultList();
 	}
 
 	public List<HRMDocumentToDemographic> findByHrmDocumentId(Integer hrmDocumentId)
 	{
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1";
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.hrmDocumentId=:documentId";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, hrmDocumentId);
-		@SuppressWarnings("unchecked")
-		List<HRMDocumentToDemographic> documentToDemographics = query.getResultList();
-		return documentToDemographics;
+		query.setParameter("documentId", hrmDocumentId);
+		return query.getResultList();
 	}
 
 	public HRMDocumentToDemographic findByHrmDocumentIdAndDemographicNo(Integer hrmDocumentId, Integer demographicId)
