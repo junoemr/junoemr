@@ -140,6 +140,8 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 		$("printStartDate").value = moment().format("DD-MMM-YYYY");
 		$("printEndDate").value = $F("printStartDate");
 		$("printopDates").checked = true;
+
+		this.printNotes();
 	};
 
 	this.printInfo = function printInfo(img, item)
@@ -283,7 +285,11 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 
 		var url = "../ws/rs/recordUX/" + this.pageData.demographicNo + "/print?printOps=" + encodeURIComponent(jsonString);
 
-		window.open(url, '_blank');
+		// Open the link as a download to match the old encounter page
+		var link = document.createElement('a');
+		link.href = url;
+		link.download = "Encounter-" + moment().format("YYYY-MM-DD.HH.mm.ss") + ".pdf";
+		link.dispatchEvent(new MouseEvent('click'));
 
 		return false;
 	};
