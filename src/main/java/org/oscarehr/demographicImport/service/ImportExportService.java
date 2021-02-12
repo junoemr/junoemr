@@ -408,6 +408,19 @@ public class ImportExportService
 		}
 
 		hrmService.uploadAllNewHRMDocuments(patientRecord.getHrmDocumentList(), dbDemographic);
+
+		// clean up temp document files.
+		// since HRM document files are embedded in the xml we write, we don't need the document anymore
+		for(HrmDocument hrmDocument : patientRecord.getHrmDocumentList())
+		{
+			GenericFile docFile = hrmDocument.getDocument().getFile();
+
+			// check that it's for sure in the temp directory still, just in case
+			if(GenericFile.TEMP_DIRECTORY.equals(docFile.getDirectory()))
+			{
+				docFile.deleteFile();
+			}
+		}
 	}
 
 	private void persistPharmacy(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
