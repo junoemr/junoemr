@@ -91,7 +91,8 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 
 				// filter duplicate reports
 				String duplicateKey;
-				if(facilityId == null && facilityReportId == null && deliverToUserId == null) // legacy xml lookup
+				//TODO - figure out version lookup here too
+				if(!"4.3".equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
 				{
 					HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
 					if(hrmReport != null)

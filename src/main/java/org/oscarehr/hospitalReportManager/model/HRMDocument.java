@@ -11,7 +11,6 @@ package org.oscarehr.hospitalReportManager.model;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.document.model.Document;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -22,7 +21,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -61,10 +59,6 @@ public class HRMDocument extends AbstractModel<Integer>
 	@JoinColumn(name = "hrmCategoryId")
 	private HRMCategory hrmCategory;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "documentId")
-	private Document document;
-
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument", cascade = CascadeType.PERSIST)
 	private List<HRMDocumentComment> commentList;
 
@@ -74,7 +68,7 @@ public class HRMDocument extends AbstractModel<Integer>
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument")
 	private List<HRMDocumentToDemographic> documentToDemographicList;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument", cascade = CascadeType.PERSIST)
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument")
 	private List<HRMDocumentToProvider> documentToProviderList;
 
 	@Override

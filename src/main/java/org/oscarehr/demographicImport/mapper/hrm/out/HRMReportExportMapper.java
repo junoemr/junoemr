@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.mapper.hrm.out;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
@@ -49,8 +50,13 @@ public class HRMReportExportMapper extends AbstractHRMExportMapper<ReportsReceiv
 	{
 		ReportsReceived reportsReceived = objectFactory.createReportsReceived();
 
+		Document document = exportStructure.getDocument();
+		if(document == null)
+		{
+			throw new RuntimeException("HRM document model cannot be exported without an attached Document model");
+		}
+		GenericFile documentFile = document.getFile();
 		reportsReceived.setFormat(ReportFormat.BINARY);	// all Juno documents will be treated as binary reports
-		GenericFile documentFile = exportStructure.getDocument().getFile();
 		ReportContent reportContent = objectFactory.createReportContent();
 		reportContent.setMedia(documentFile.toBase64ByteArray());
 		reportsReceived.setContent(reportContent);
