@@ -24,15 +24,12 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.model.document.Document;
-import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ReportContent;
 import xml.cds.v5_0.ReportFormat;
 import xml.cds.v5_0.Reports;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper<Document>

@@ -412,7 +412,7 @@ public class HRMReportParser
 			List<HrmObservation> subClassList = report.getObservations();
 			if(!subClassList.isEmpty())
 			{
-				return ConversionUtils.toLegacyDateTime(subClassList.get(0).getObservationDateTime());
+				return ConversionUtils.toNullableLegacyDateTime(subClassList.get(0).getObservationDateTime());
 			}
 		}
 

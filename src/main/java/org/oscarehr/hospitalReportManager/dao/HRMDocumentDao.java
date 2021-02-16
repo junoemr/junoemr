@@ -30,9 +30,8 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);
-		@SuppressWarnings("unchecked")
-		List<HRMDocument> documents = query.getResultList();
-		return documents;
+
+		return query.getResultList();
 	}
 
 	public List<HRMDocument> findByDemographicId(Integer demographicId)
@@ -44,8 +43,7 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("demographicId", demographicId);
 
-		List<HRMDocument> documents = query.getResultList();
-		return documents;
+		return query.getResultList();
 	}
 	
 	public List<HRMDocument> findAll(int offset, int limit) {
@@ -53,9 +51,8 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		Query query = entityManager.createQuery(sql);
 		query.setFirstResult(offset);
 		query.setMaxResults(limit);
-		
-		List<HRMDocument> documents = query.getResultList();
-		return documents;
+
+		return query.getResultList();
 	}
 	
 	
@@ -71,8 +68,8 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		String sql = "select x from " + this.modelClass.getName() + " x where x.reportLessTransactionInfoHash=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hash);
-		List<HRMDocument> matches = query.getResultList();
-		return matches;
+
+		return query.getResultList();
 	}
 	
 	@SuppressWarnings("unchecked")

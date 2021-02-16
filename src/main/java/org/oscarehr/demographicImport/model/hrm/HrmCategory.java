@@ -28,4 +28,6 @@ import lombok.Data;
 public class HrmCategory
 {
 	private Integer id;
+	private String name;
+	private String subClassNameMnemonic;
 }

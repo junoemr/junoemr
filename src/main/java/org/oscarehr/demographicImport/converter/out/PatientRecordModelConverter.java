@@ -38,6 +38,7 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.out.contact.DemographicContactDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.ConcernNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.EncounterNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.FamilyHistoryNoteDbToModelConverter;
@@ -51,6 +52,8 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.search.CaseManagementNoteCriteriaSearch;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.rx.dao.DrugDao;
@@ -148,6 +151,12 @@ public class PatientRecordModelConverter extends
 	@Autowired
 	private PharmacyDbToModelConverter pharmacyDbToModelConverter;
 
+	@Autowired
+	private HRMDocumentDao hrmDocumentDao;
+
+	@Autowired
+	private HrmDocumentDbToModelConverter hrmDocumentDbToModelConverter;
+
 	@Override
 	public PatientRecord convert(Demographic input)
 	{
@@ -175,6 +184,9 @@ public class PatientRecordModelConverter extends
 
 		List<Document> documents = documentDao.findByDemographicId(String.valueOf(input.getDemographicId()));
 		patientRecord.setDocumentList(documentDbToModelConverter.convert(documents));
+
+		List<HRMDocument> hrmDocuments = hrmDocumentDao.findByDemographicId(input.getDemographicId());
+		patientRecord.setHrmDocumentList(hrmDocumentDbToModelConverter.convert(hrmDocuments));
 
 		List<Allergy> allergies = allergyDao.findActiveAllergies(input.getDemographicId());
 		patientRecord.setAllergyList(allergyDbToModelConverter.convert(allergies));

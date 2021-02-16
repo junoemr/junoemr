@@ -365,12 +365,17 @@ public class HRMReport_4_1 implements HRMReport
 				observation.setAccompanyingMnemonic(obrContent.getAccompanyingMnemonic());
 				observation.setAccompanyingSubClass(obrContent.getAccompanyingSubClass());
 
-				observation.setObservationDateTime(
-						ConversionUtils.fillPartialCalendar(
-								obrContent.getObservationDateTime().getFullDate(),
-								obrContent.getObservationDateTime().getYearMonth(),
-								obrContent.getObservationDateTime().getYearOnly())
-				);
+				DateFullOrPartial obrDate = obrContent.getObservationDateTime();
+
+				if(obrDate != null)
+				{
+					observation.setObservationDateTime(
+							ConversionUtils.fillPartialCalendar(
+									obrDate.getFullDate(),
+									obrDate.getYearMonth(),
+									obrDate.getYearOnly())
+					);
+				}
 				observationList.add(observation);
 			}
 		}

@@ -24,10 +24,13 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.hrm.HrmComment;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
+import org.oscarehr.hospitalReportManager.HRMReport;
+import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.ReportContent;
@@ -51,12 +54,27 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 	{
 		Reports reports = objectFactory.createReports();
 
-		GenericFile documentFile = exportStructure.getDocument().getFile();
 		reports.setFormat(ReportFormat.BINARY);	// all Juno documents will be treated as binary reports
+
+		byte[] media;
+		Document document = exportStructure.getDocument();
+		if(document != null)
+		{
+			GenericFile hrmDocumentFile = document.getFile();
+			media = hrmDocumentFile.toBase64ByteArray();
+			reports.setFileExtensionAndVersion(hrmDocumentFile.getExtension().toLowerCase());
+		}
+		else
+		{
+			//TODO - refactor so it doesn't load the file again
+			HRMReport hrmReport = HRMReportParser.parseReport(exportStructure.getReportFile().getName(), exportStructure.getReportFileSchemaVersion());
+			media = hrmReport.getBinaryContent();
+			reports.setFileExtensionAndVersion(hrmReport.getFileExtension());
+		}
+
 		ReportContent reportContent = objectFactory.createReportContent();
-		reportContent.setMedia(documentFile.toBase64ByteArray());
+		reportContent.setMedia(media);
 		reports.setContent(reportContent);
-		reports.setFileExtensionAndVersion(documentFile.getExtension().toLowerCase());
 
 		reports.setClazz(toReportClass(exportStructure.getReportClass()));
 		reports.setSubClass(exportStructure.getReportSubClass());
