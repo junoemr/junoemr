@@ -57,7 +57,7 @@ public class DatabaseUtil
 		{
 			Demographic demo = new Demographic();
 			PatientTestData patient = PatientTestCollection.patientMap.get(patientLName);
-			LocalDate dob= LocalDate.of(Integer.parseInt(patient.dobYear), Integer.parseInt(patient.dobMonth), Integer.parseInt(patient.dobDate));
+			LocalDate dob = LocalDate.of(Integer.parseInt(patient.dobYear), Integer.parseInt(patient.dobMonth), Integer.parseInt(patient.dobDate));
 			demo.setDateOfBirth(dob);
 			demo.setFirstName(patient.firstName);
 			demo.setLastName(patient.lastName);
