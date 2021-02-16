@@ -57,12 +57,6 @@ public class EditAppointmentsTests extends SeleniumTestBase
 	@BeforeClass
 	public static void setup() throws Exception
 	{
-		SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "caisi_role",  "demographic",
-				"documentDescriptionTemplate", "issue", "log", "log_ws_rest", "LookupList", "LookupListItem",
-				"measurementType", "mygroup", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
-				"provider_billing", "providerArchive", "providerbillcenter", "ProviderPreference", "providersite",
-				"rschedule", "secUserRole", "scheduledate", "scheduletemplate", "scheduletemplatecode", "site",
-				"tickler_text_suggest" );
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
 		DatabaseUtil.createTestProvider();
