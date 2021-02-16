@@ -46,7 +46,6 @@ import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -58,7 +57,6 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 
 @Service
 public class IMDHealthService
@@ -83,6 +81,7 @@ public class IMDHealthService
 
 	protected static final String HOST_URL = OscarProperties.getInstance().getProperty(PROP_KEY_APP);
 	protected static final String DEFAULT_SCHEME= OscarProperties.getInstance().getProperty(PROP_KEY_SCHEME);
+
 
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -114,7 +113,6 @@ public class IMDHealthService
 		}
 		else
 		{
-			//load the organization not attached to a specific site
 			Integration imdIntegration = new Integration();
 			imdIntegration.setIntegrationType(Integration.INTEGRATION_TYPE_IMD_HEALTH);
 			imdIntegration.setRemoteId(clientId);
@@ -124,38 +122,39 @@ public class IMDHealthService
 			return imdIntegration;
 		}
 	}
-
-
 	/**
 	 * Initialize imD Health Organizations for each provider/site combination.
 	 *
 	 * @param integrationId integration id
 	 *
-	 * @return True if credentials for all providers/sites are successfully made
+	 * @return A list of failed initializations
 	 */
-	public Boolean initializeAllUsers(Integer integrationId) throws IntegrationException
+	public List<String> initializeAllUsers(Integer integrationId) throws IntegrationException
 	{
 		Integration integration = integrationDao.find(integrationId);
 		BearerToken token = getBearerToken(integration);
 		String junoPracticeId = "CloudPracticeDefault";
 
 		List<Site> sites = siteDao.getAllActiveSites();
-
-		SSOCredentials credentials = null;
+		List<String> failedToInitialize = new ArrayList<>();
+		SSOCredentials credentials;
 		for (Site site : sites)
 		{
 			Set<Provider> providers = site.getProviders();
 
 			for (Provider provider : providers)
 			{
-				credentials = getSSOCredentials(token, provider, junoPracticeId, site.getId());
-				if (credentials == null)
+				if (provider.getStatus().equals("1"))
 				{
-					return false;
+					credentials = getSSOCredentials(token, provider, junoPracticeId, site.getId());
+					if (credentials == null)
+					{
+						failedToInitialize.add("ProviderNo " + provider.getPractitionerNo() + " ,SiteId " + site.getId());
+					}
 				}
 			}
 		}
-		return credentials != null;
+		return failedToInitialize;
 	}
 	/**
 	 * Generate the SSO link needed to connect to iMDHealth, logging in if necessary.
@@ -339,7 +338,6 @@ public class IMDHealthService
 			}
 			else
 			{
-				// NOT YET IMPLEMENTED, WILL THROW RUNTIME EXCEPTION //
 				Site site = siteDao.find(siteId);
 				String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
 				organization = SSOOrganization.fromSite(site, practiceId, provinceCode);

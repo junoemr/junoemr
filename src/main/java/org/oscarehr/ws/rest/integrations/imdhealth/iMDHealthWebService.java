@@ -81,10 +81,10 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/{integrationId}/Sync")
-	public RestResponse<Boolean> syncIntegrations(@PathParam("integrationId") Integer integrationId) throws IntegrationException
+	@Path("/{integrationId}/sync")
+	public RestResponse<List<String>> syncIntegrations(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
-		Boolean synced = imdHealthService.initializeAllUsers(integrationId);
+		List<String> synced = imdHealthService.initializeAllUsers(integrationId);
 		return RestResponse.successResponse(synced);
 	}
 

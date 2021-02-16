@@ -26,7 +26,6 @@ package org.oscarehr.integration.imdhealth.transfer.outbound;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.util.LoggedInInfo;
 
 import java.io.Serializable;
 

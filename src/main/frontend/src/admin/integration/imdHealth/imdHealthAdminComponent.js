@@ -104,19 +104,24 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
              ctrl.syncIntegrations = (integrationId) =>
              {
                   imdHealthWebService.syncIntegrations(integrationId)
-                      .then( (response ) =>
+                      .then((response ) =>
                       {
-                          const payload = response.data.body;
-                            console.log(payload);
-                          if (payload)
+                          let failedIntegrations = response.data.body;
+
+                          if (failedIntegrations.length < 1)
                           {
                               Juno.Common.Util.successAlert($uibModal,"Success", "Successfully synced");
                           }
+                          else
+                          {
+                              Juno.Common.Util.errorAlert($uibModal, "Failure", "Could not sync integrations");
+                              console.log(failedIntegrations.join(' | '));
+                          }
                       })
-                  .catch((error) =>
-                    {
-                        Juno.Common.Util.errorAlert($uibModal, "Failure", "Could not sync integrations");
-                    })
+                      .catch((error) =>
+                      {
+                        console.log(error);
+                      })
              }
 
             ctrl.testSSO = (integrationId) =>
