@@ -78,6 +78,7 @@ public class IMDHealthService
 
 	private static final String PROP_KEY_APP = "imdhealth_app_domain";
 	private static final String PROP_KEY_SCHEME = "imdhealth_scheme";
+	private static final String JUNO_PRACTICE_ID = "CloudPracticeDefault";
 
 	protected static final String HOST_URL = OscarProperties.getInstance().getProperty(PROP_KEY_APP);
 	protected static final String DEFAULT_SCHEME= OscarProperties.getInstance().getProperty(PROP_KEY_SCHEME);
@@ -133,7 +134,7 @@ public class IMDHealthService
 	{
 		Integration integration = integrationDao.find(integrationId);
 		BearerToken token = getBearerToken(integration);
-		String junoPracticeId = "CloudPracticeDefault";
+		String junoPracticeId = JUNO_PRACTICE_ID;
 
 		List<Site> sites = siteDao.getAllActiveSites();
 		List<String> failedToInitialize = new ArrayList<>();
@@ -296,7 +297,7 @@ public class IMDHealthService
 		// TODO: Remove after figuring out something better for embedded tomcat
 		if (StringUtils.isEmpty(junoPracticeId))
 		{
-			junoPracticeId = "CloudPracticeDefault";
+			junoPracticeId = JUNO_PRACTICE_ID;
 		}
 		SSOCredentials ssoInfo = getSSOCredentials(token, provider, junoPracticeId, siteId);
 		credentials.loadSSOCredentials(ssoInfo);
