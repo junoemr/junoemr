@@ -53,15 +53,15 @@ public class DatabaseUtil
 	public static void createTestDemographic()
 	{
 		DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
-		for (String patient : patientLNames)
+		for (String patientLName : patientLNames)
 		{
 			Demographic demo = new Demographic();
-			PatientTestData p = PatientTestCollection.patientMap.get(patient);
-			LocalDate dob= LocalDate.of(Integer.parseInt(p.dobYear), Integer.parseInt(p.dobMonth), Integer.parseInt(p.dobDate));
+			PatientTestData  patient= PatientTestCollection.patientMap.get(patientLName);
+			LocalDate dob= LocalDate.of(Integer.parseInt(patient.dobYear), Integer.parseInt(patient.dobMonth), Integer.parseInt(patient.dobDate));
 			demo.setDateOfBirth(dob);
-			demo.setFirstName(p.firstName);
-			demo.setLastName(p.lastName);
-			demo.setSex(p.sex);
+			demo.setFirstName(patient.firstName);
+			demo.setLastName(patient.lastName);
+			demo.setSex(patient.sex);
 			demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
 			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
 		}
