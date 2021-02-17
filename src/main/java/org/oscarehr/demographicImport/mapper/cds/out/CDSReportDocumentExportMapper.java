@@ -50,7 +50,7 @@ public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper
 		GenericFile documentFile = exportStructure.getFile();
 
 		ReportContent reportContent = objectFactory.createReportContent();
-		reportContent.setMedia(documentFile.toBase64ByteArray());
+		reportContent.setMedia(documentFile.toByteArray());
 		reports.setContent(reportContent);
 
 		reports.setFileExtensionAndVersion(documentFile.getExtension().toLowerCase());

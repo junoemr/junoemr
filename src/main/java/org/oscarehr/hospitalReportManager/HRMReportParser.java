@@ -85,32 +85,8 @@ public class HRMReportParser
 					logger.warn("unable to find the HRM report. checked " + hrmReportFileLocation + ", and in the document_dir");
 					return null;
 				}
-				String fileData = FileUtils.getStringFromFile(tmpXMLHolder);
 
-				//TODO - this should not need to be hard coded
-				if("4.3".equals(schemaVersion)) // HRM 4.3 schema
-				{
-					xml.hrm.v4_3.OmdCds root = new HRMFileParser().parse(new XMLFile(tmpXMLHolder));
-					return new HRMReport_4_3(root, hrmReportFileLocation, fileData);
-
-				}
-				else // legacy load HRM 4.1 or other
-				{
-					// Load a WXS schema, represented by a Schema instance.
-					// Create a SchemaFactory capable of understanding WXS schemas.
-					SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-					String OMDDirectory = SFTPConnector.OMD_directory;
-					File schemaFile = new File(OMDDirectory, "report_manager_cds.xsd");
-					Schema schema = factory.newSchema(new StreamSource(schemaFile));
-
-					JAXBContext jc = JAXBContext.newInstance("org.oscarehr.hospitalReportManager.xsd");
-					Unmarshaller u = jc.createUnmarshaller();
-					u.setSchema(schema);
-
-					OmdCds root = (OmdCds) u.unmarshal(tmpXMLHolder);
-					return new HRMReport_4_1(root, hrmReportFileLocation, fileData);
-				}
+				return parseReport(tmpXMLHolder, schemaVersion);
 			}
 			catch(SAXException e)
 			{
@@ -122,6 +98,36 @@ public class HRMReportParser
 			}
 		}
 		return null;
+	}
+
+	public static HRMReport parseReport(File hrmFile, String schemaVersion) throws IOException, SAXException, JAXBException
+	{
+		String fileData = FileUtils.getStringFromFile(hrmFile);
+
+		//TODO - this should not need to be hard coded
+		if("4.3".equals(schemaVersion)) // HRM 4.3 schema
+		{
+			xml.hrm.v4_3.OmdCds root = new HRMFileParser().parse(new XMLFile(hrmFile));
+			return new HRMReport_4_3(root, hrmFile.getPath(), fileData);
+
+		}
+		else // legacy load HRM 4.1 or other
+		{
+			// Load a WXS schema, represented by a Schema instance.
+			// Create a SchemaFactory capable of understanding WXS schemas.
+			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+			String OMDDirectory = SFTPConnector.OMD_directory;
+			File schemaFile = new File(OMDDirectory, "report_manager_cds.xsd");
+			Schema schema = factory.newSchema(new StreamSource(schemaFile));
+
+			JAXBContext jc = JAXBContext.newInstance("org.oscarehr.hospitalReportManager.xsd");
+			Unmarshaller u = jc.createUnmarshaller();
+			u.setSchema(schema);
+
+			OmdCds root = (OmdCds) u.unmarshal(hrmFile);
+			return new HRMReport_4_1(root, hrmFile.getPath(), fileData);
+		}
 	}
 
 	/**

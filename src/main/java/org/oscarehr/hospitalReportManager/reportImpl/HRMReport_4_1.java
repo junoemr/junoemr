@@ -266,20 +266,22 @@ public class HRMReport_4_1 implements HRMReport
 		return result;
 	}
 
-	//this is actually BASE64, so using as ASCII ok.
-	public byte[] getBinaryContent()
+	public byte[] getBase64BinaryContent()
 	{
-
 		try
 		{
-			byte[] tmp = hrmReport.getPatientRecord().getReportsReceived().get(0).getContent().getMedia();
-			return tmp;
+			return hrmReport.getPatientRecord().getReportsReceived().get(0).getContent().getMedia();
 		}
 		catch(Exception e)
 		{
 			MiscUtils.getLogger().error("error", e);
 		}
 		return null;
+	}
+
+	public byte[] getBinaryContent()
+	{
+		return Base64.decodeBase64(getBase64BinaryContent());
 	}
 
 	public String getFirstReportClass()

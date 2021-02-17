@@ -37,7 +37,6 @@ import xml.cds.v5_0.ReportContent;
 import xml.cds.v5_0.ReportFormat;
 import xml.cds.v5_0.Reports;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 	}
 
 	@Override
-	public Reports exportFromJuno(HrmDocument exportStructure) throws IOException
+	public Reports exportFromJuno(HrmDocument exportStructure) throws Exception
 	{
 		Reports reports = objectFactory.createReports();
 
@@ -61,13 +60,12 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 		if(document != null)
 		{
 			GenericFile hrmDocumentFile = document.getFile();
-			media = hrmDocumentFile.toBase64ByteArray();
+			media = hrmDocumentFile.toByteArray();
 			reports.setFileExtensionAndVersion(hrmDocumentFile.getExtension().toLowerCase());
 		}
 		else
 		{
-			//TODO - refactor so it doesn't load the file again
-			HRMReport hrmReport = HRMReportParser.parseReport(exportStructure.getReportFile().getName(), exportStructure.getReportFileSchemaVersion());
+			HRMReport hrmReport = HRMReportParser.parseReport(exportStructure.getReportFile().getFileObject(), exportStructure.getReportFileSchemaVersion());
 			media = hrmReport.getBinaryContent();
 			reports.setFileExtensionAndVersion(hrmReport.getFileExtension());
 		}

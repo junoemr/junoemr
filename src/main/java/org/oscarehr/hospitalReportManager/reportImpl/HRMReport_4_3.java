@@ -24,6 +24,7 @@
 package org.oscarehr.hospitalReportManager.reportImpl;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.util.MiscUtils;
@@ -265,7 +266,7 @@ public class HRMReport_4_3 implements HRMReport
 		{
 			if(hrmReport.getPatientRecord().getReportsReceived().get(0).getFormat() == ReportFormat.BINARY)
 			{
-				return new Base64().encodeToString(getBinaryContent());
+				return StringUtils.newStringUtf8(getBase64BinaryContent());
 			}
 
 			try
@@ -280,17 +281,14 @@ public class HRMReport_4_3 implements HRMReport
 		return result;
 	}
 
+	public byte[] getBase64BinaryContent()
+	{
+		return hrmReport.getPatientRecord().getReportsReceived().get(0).getContent().getMedia();
+	}
+
 	public byte[] getBinaryContent()
 	{
-		try
-		{
-			return Base64.decodeBase64(hrmReport.getPatientRecord().getReportsReceived().get(0).getContent().getMedia());
-		}
-		catch(Exception e)
-		{
-			MiscUtils.getLogger().error("error", e);
-		}
-		return null;
+		return Base64.decodeBase64(getBase64BinaryContent());
 	}
 
 	public String getFirstReportClass()

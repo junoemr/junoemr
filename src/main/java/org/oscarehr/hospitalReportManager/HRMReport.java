@@ -70,8 +70,9 @@ public interface HRMReport
 
 	String getFirstReportTextContent();
 
-	//this is actually BASE64, so using as ASCII ok.
 	byte[] getBinaryContent();
+
+	byte[] getBase64BinaryContent();
 
 	String getFirstReportClass();
 

@@ -90,7 +90,7 @@ public class HRMDownloadFileAction extends DownloadAction
     		throw new Exception("no binary document found");
     	}
     	
-    	byte[] data = report.getBinaryContent();
+    	byte[] binaryContent = report.getBinaryContent();
 
     	String fileExtension = report.getFileExtension().toLowerCase();
     	if(!fileExtension.startsWith("."))
@@ -135,7 +135,7 @@ public class HRMDownloadFileAction extends DownloadAction
         File temp = File.createTempFile("HRMDownloadFile", fileExtension);
         temp.deleteOnExit();
         
-        FileUtils.writeByteArrayToFile(temp, data);
+        FileUtils.writeByteArrayToFile(temp, binaryContent);
        
         return new FileStreamInfo(contentType, temp);   
     }   
