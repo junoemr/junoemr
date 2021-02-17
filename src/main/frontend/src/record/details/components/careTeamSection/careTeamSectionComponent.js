@@ -22,6 +22,7 @@
 */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {SystemPreferenceApi} from "../../../../../generated/"
 
 angular.module('Record.Details').component('careTeamSection', {
 	templateUrl: 'src/record/details/components/careTeamSection/careTeamSection.jsp',
@@ -32,18 +33,24 @@ angular.module('Record.Details').component('careTeamSection', {
 	},
 	controller: [ "$scope",
 		"$uibModal",
+        "$http",
+        "$httpParamSerializer",
 		"staticDataService",
 		"providersService",
 		"demographicsService",
 		"referralDoctorsService",
 		function ($scope,
-							$uibModal,
-							staticDataService,
-							providersService,
-							demographicsService,
-							referralDoctorsService)
+                  $uibModal,
+                  $http,
+                  $httpParamSerializer,
+                  staticDataService,
+                  providersService,
+                  demographicsService,
+                  referralDoctorsService)
 	{
 		let ctrl = this;
+        let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+            '../ws/rs');
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
@@ -60,6 +67,7 @@ angular.module('Record.Details').component('careTeamSection', {
 		ctrl.endDateValid = true;
 		ctrl.dateJoinedValid = true;
 		ctrl.terminationDateValid = true;
+        ctrl.familyDoctorEnabled = false;
 
 		ctrl.$onInit = () =>
 		{
@@ -106,6 +114,14 @@ angular.module('Record.Details').component('careTeamSection', {
 						ctrl.patientStatusList = data;
 					}
 			);
+
+			systemPreferenceApi.getPropertyEnabled("demographic_family_doctor").then(
+                (response) =>
+                {
+                    ctrl.familyDoctorEnabled = response.data.body;
+                }
+            )
+
 		}
 
 		ctrl.updateReferralDoctors = (docSearchString, docReferralNo) =>

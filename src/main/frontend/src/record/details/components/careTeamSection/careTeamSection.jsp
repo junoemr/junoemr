@@ -20,7 +20,8 @@
 			</juno-select>
 
             <!-- Family Doctor -->
-            <juno-typeahead model="$ctrl.ngModel.scrFamilyDoc"
+            <juno-typeahead ng-if="$ctrl.familyDoctorEnabled"
+                            model="$ctrl.ngModel.scrFamilyDoc"
                             options="$ctrl.referralDoctors"
                             filter-options="false"
                             name="FamilyDoctor"
@@ -119,7 +120,8 @@
 			</juno-select>
 
             <!-- Family Doctor Number -->
-            <juno-input ng-model="$ctrl.ngModel.scrFamilyDocNo"
+            <juno-input ng-if="$ctrl.familyDoctorEnabled"
+                        ng-model="$ctrl.ngModel.scrFamilyDocNo"
                         label="Family Doctor #"
                         placeholder="Family Doctor #"
                         valid-regex="$ctrl.numberRegex"
