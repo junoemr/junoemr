@@ -88,6 +88,8 @@ import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -196,14 +198,17 @@ public class ImportExportService
 
 		try
 		{
+			Instant instant = Instant.now();
 			for(PatientRecord patientRecord : patientRecords)
 			{
 				logger.info("Export Demographic " + patientRecord.getDemographic().getId());
 				GenericFile file = exporter.exportDemographic(patientRecord);
 				fileList.add(file);
 			}
+			instant = printDuration(instant, "Export Service: Combined export file creation");
 			exportLogger.logSummaryFooter();
 			fileList.addAll(exporter.getAdditionalFiles(preferences));
+			instant = printDuration(instant, "Export Service: additional files creation");
 		}
 		finally
 		{
@@ -219,6 +224,7 @@ public class ImportExportService
 	                                                      List<String> demographicIdList,
 	                                                      ExportPreferences preferences) throws Exception
 	{
+		Instant instant = Instant.now();
 		//TODO batch query get demographics
 		List<PatientRecord> patientRecords = new ArrayList<>(demographicIdList.size());
 		for(String demographicIdStr : demographicIdList)
@@ -229,6 +235,7 @@ public class ImportExportService
 			PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
 			patientRecords.add(patientRecord);
 		}
+		printDuration(instant, "Export Service: demographic model load");
 
 		return exportDemographics(importType, exportLogger, patientRecords, preferences);
 	}
@@ -498,5 +505,12 @@ public class ImportExportService
 				LogConst.CON_DEMOGRAPHIC,
 				LogConst.STATUS_SUCCESS,
 				logMessage);
+	}
+
+	public static Instant printDuration(Instant start, String what)
+	{
+		Instant now = Instant.now();
+		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
+		return now;
 	}
 }
