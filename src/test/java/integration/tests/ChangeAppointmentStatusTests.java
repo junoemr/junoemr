@@ -101,9 +101,10 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
+		Thread.sleep(10000);//wait for clicking to change the status.
 		driver.navigate().refresh();
 		String statusDP = apptStatusHoverOver();
-		Assert.assertEquals("Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
+		Assert.assertEquals("Classic UI: Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
 
 		//Edit from "Edit An Appointment" page
 		Set<String> oldWindowHandles = driver.getWindowHandles();
@@ -113,7 +114,7 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
 		String statusCus2 = apptStatusHoverOver();
-		Assert.assertEquals("Status is NOT updated to Customized 2 Successfully", statusExpectedCusomized2, statusCus2);
+		Assert.assertEquals("Classic UI: Status is NOT updated to Customized 2 Successfully", statusExpectedCusomized2, statusCus2);
 	}
 
 	@Test
@@ -139,10 +140,10 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
-		Thread.sleep(10000);//wait for clicking to change the status.
+		Thread.sleep(3000);//wait for clicking to change the status.
 		String statusDP = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']"))
 				.getAttribute("title");
-		Assert.assertEquals("Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
+		Assert.assertEquals("JUNO UI: Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
 
 		//Edit from "Modify Appointment" page
 		driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
@@ -150,6 +151,6 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
 		String statusCancelled = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-cancel rotate']"))
 				.getAttribute("title");
-		Assert.assertEquals("Status is NOT updated to Customized 2 Successfully", statusExpectedCancelled, statusCancelled);
+		Assert.assertEquals("JUNO UI: Status is NOT updated to Customized 2 Successfully", statusExpectedCancelled, statusCancelled);
 	}
 }
