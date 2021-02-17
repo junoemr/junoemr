@@ -13,6 +13,7 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 		var selected = this.pageData.contextPath + "/oscarEncounter/graphics/printerGreen.png";
 		var unselected = this.pageData.contextPath + "/oscarEncounter/graphics/printer.png";
 		var imgId = "print" + noteId;
+		var imgIdMinimized = "minimizedPrint" + noteId;
 		var idx;
 		var idx2;
 		var tmp = "";
@@ -27,6 +28,10 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 		if (idx >= 0)
 		{
 			$(imgId).src = unselected;
+			if($(imgIdMinimized))
+			{
+				$(imgIdMinimized).src = unselected;
+			}
 
 			//if we're slicing first note off list
 			if (idx === 0)
@@ -56,6 +61,10 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 		else
 		{
 			$(imgId).src = selected;
+			if($(imgIdMinimized))
+			{
+				$(imgIdMinimized).src = selected;
+			}
 			if ($F("notes2print").length > 0)
 				$("notes2print").value += "," + noteId;
 			else
@@ -85,7 +94,7 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 				continue;
 			}
 
-			notesDiv = ncIdx.down('div');
+			notesDiv = ncIdx.down("div[id^='n']");
 			noteId = notesDiv.id.substr(1);  //get note id
 			imgId = "print" + noteId;
 
@@ -108,6 +117,11 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 		if ($F("printRx") === "true")
 		{
 			this.printInfo("imgPrintRx", "printRx");
+		}
+
+		if ($F("printLabs") === "true")
+		{
+			this.printInfo("imgPrintLabs", "printLabs");
 		}
 
 		return false;
@@ -193,10 +207,15 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 	{
 		var unselected = this.pageData.contextPath + "/oscarEncounter/graphics/printer.png";
 		var imgId = "print" + noteId;
+		var imgIdMinimized = "minimizedPrint" + noteId;
 		var tmp = "";
 		var idx2;
 
 		$(imgId).src = unselected; //imgPrintgrey.src;
+		if($(imgIdMinimized))
+		{
+			$(imgIdMinimized).src = unselected;
+		}
 
 		//if we're slicing first note off list
 		if (idx === 0)
