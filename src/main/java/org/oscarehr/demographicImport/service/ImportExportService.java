@@ -189,26 +189,33 @@ public class ImportExportService
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                            ExportLogger exportLogger,
-	                                            List<PatientRecord> patientRecords,
+	                                            List<String> demographicIdList,
 	                                            ExportPreferences preferences) throws Exception
 	{
 		exportLogger.logSummaryHeader();
 		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
-		List<GenericFile> fileList = new ArrayList<>(patientRecords.size() + 2);
+		List<GenericFile> fileList = new ArrayList<>();
 
 		try
 		{
 			Instant instant = Instant.now();
-			for(PatientRecord patientRecord : patientRecords)
+			for(String demographicIdStr : demographicIdList)
 			{
+				logger.info("Load Demographic " + demographicIdStr);
+				Integer demographicId = Integer.parseInt(demographicIdStr);
+				org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+
+				PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
+				instant = printDuration(instant, "Export Service: load patient model");
+
 				logger.info("Export Demographic " + patientRecord.getDemographic().getId());
 				GenericFile file = exporter.exportDemographic(patientRecord);
+				instant = printDuration(instant, "Export Service: export file creation");
 				fileList.add(file);
 			}
-			instant = printDuration(instant, "Export Service: Combined export file creation");
 			exportLogger.logSummaryFooter();
 			fileList.addAll(exporter.getAdditionalFiles(preferences));
-			instant = printDuration(instant, "Export Service: additional files creation");
+			printDuration(instant, "Export Service: additional files creation");
 		}
 		finally
 		{
@@ -217,27 +224,6 @@ public class ImportExportService
 		}
 
 		return fileList;
-	}
-
-	public List<GenericFile> exportDemographicsWithLookup(ImporterExporterFactory.EXPORTER_TYPE importType,
-	                                                      ExportLogger exportLogger,
-	                                                      List<String> demographicIdList,
-	                                                      ExportPreferences preferences) throws Exception
-	{
-		Instant instant = Instant.now();
-		//TODO batch query get demographics
-		List<PatientRecord> patientRecords = new ArrayList<>(demographicIdList.size());
-		for(String demographicIdStr : demographicIdList)
-		{
-			logger.info("Load Demographic " + demographicIdStr);
-			Integer demographicId = Integer.parseInt(demographicIdStr);
-			org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
-			PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
-			patientRecords.add(patientRecord);
-		}
-		printDuration(instant, "Export Service: demographic model load");
-
-		return exportDemographics(importType, exportLogger, patientRecords, preferences);
 	}
 
 	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,

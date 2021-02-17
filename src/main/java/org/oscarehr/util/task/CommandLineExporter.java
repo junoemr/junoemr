@@ -122,7 +122,7 @@ public class CommandLineExporter implements CommandLineTask
 		try
 		{
 			ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
-			List<GenericFile> exportFiles = importExportService.exportDemographicsWithLookup(
+			List<GenericFile> exportFiles = importExportService.exportDemographics(
 					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportLogger, demographicIdList, exportPreferences);
 			ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
 

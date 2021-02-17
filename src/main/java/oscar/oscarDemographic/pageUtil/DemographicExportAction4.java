@@ -281,7 +281,7 @@ public class DemographicExportAction4 extends Action {
 				exportPreferences.setExportRiskFactors(exRiskFactors);
 
 				ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
-				List<GenericFile> exportFiles = importExportService.exportDemographicsWithLookup(
+				List<GenericFile> exportFiles = importExportService.exportDemographics(
 						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportLogger, list, exportPreferences);
 
 				//TODO refactor this. we could zip genericFiles directly
