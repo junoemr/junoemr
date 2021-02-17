@@ -1041,7 +1041,11 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				var issues = [];
 				if (
 					noteToEditResponse[1] === "success" &&
-					noteToEditResponse[0].body
+					noteToEditResponse[0].body &&
+						// Edit new note if tmpSave is for note id 0
+						(
+							!tmpSave || tmpSave.noteId !== 0
+						)
 				)
 				{
 					noteToEdit = noteToEditResponse[0].body.encounterNote;
