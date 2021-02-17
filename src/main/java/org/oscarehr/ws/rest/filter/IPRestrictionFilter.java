@@ -48,12 +48,12 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 {
 	public static final String X_FORWARDED_FOR_HEADER_NAME = "X-FORWARDED-FOR";
 	private static final String IP_SEPARATOR = ",";
-	private static final String LOCAL_IP_PREFIX = "10.";
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final boolean enabled = props.isPropertyActive("web_service_allowed_ips.enabled");
 	private static final boolean hasProxy = props.isPropertyActive("web_service_allowed_ips.has_proxy");
+	private static final String localIpPrefix = props.getProperty("web_service_allowed_ips.local_ip_prefix");
 	private static final String allowedIPs = props.getProperty("web_service_allowed_ips");
 	private static final String systemAllowedIPs = props.getProperty("web_service_allowed_system_ips");
 	private static final String localhost = "127.0.0.1";
@@ -103,6 +103,7 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 		return isIpBlocked(
 				IPRestrictionFilter.enabled,
 				IPRestrictionFilter.hasProxy,
+				IPRestrictionFilter.localIpPrefix,
 				IPRestrictionFilter.whitelistedIPs,
 				requestIp,
 				xForwardedForValueIpCsv
@@ -123,6 +124,7 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 	public static boolean isIpBlocked(
 			boolean enabled,
 			boolean hasProxy,
+			String localIpPrefix,
 			Set<String> whitelistedIPs,
 			String requestIp,
 			String xForwardedForValueIpCsv
@@ -132,15 +134,15 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 		{
 			// If a proxy is used, take the last ip from the list and ensure the request IP is local
 			String mostRecentIp = getMostRecentIpFromCsv(xForwardedForValueIpCsv);
-			return (!isRequestIpLocal(requestIp) || isIpBlocked(enabled, whitelistedIPs, mostRecentIp));
+			return (!isRequestIpLocal(localIpPrefix, requestIp) || isIpBlocked(enabled, whitelistedIPs, mostRecentIp));
 		}
 
 		return isIpBlocked(enabled, whitelistedIPs, requestIp);
 	}
 
-	private static boolean isRequestIpLocal(String requestIp)
+	private static boolean isRequestIpLocal(String localIpPrefix, String requestIp)
 	{
-		return (requestIp != null && requestIp.startsWith(LOCAL_IP_PREFIX));
+		return (requestIp != null && requestIp.startsWith(localIpPrefix));
 	}
 
 	private static String getMostRecentIpFromCsv(String ipCsv)

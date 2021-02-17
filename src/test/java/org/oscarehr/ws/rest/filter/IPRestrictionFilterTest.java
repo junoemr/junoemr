@@ -5,16 +5,16 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * <p>
+ *
  * This software was written for
  * CloudPractice Inc.
  * Victoria, British Columbia
@@ -35,6 +35,7 @@ public class IPRestrictionFilterTest
 {
 	boolean enabled;
 	boolean hasProxy;
+	String localIpPrefix;
 	Set<String> whitelistedIPs;
 
 	@Before
@@ -42,6 +43,7 @@ public class IPRestrictionFilterTest
 	{
 		enabled = true;
 		hasProxy = false;
+		localIpPrefix = "10.";
 		whitelistedIPs = new HashSet<>();
 
 		whitelistedIPs.add("1.1.1.1");
@@ -56,7 +58,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "";
 		String xForwardedForValue = "";
 
-		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -65,15 +67,16 @@ public class IPRestrictionFilterTest
 		String requestIp = "1.1.1.1";
 		String xForwardedForValue = "";
 
-		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
 	public void isIpBlocked_basicRequestNullXFF()
-	{ String requestIp = "1.1.1.1";
+	{
+		String requestIp = "1.1.1.1";
 		String xForwardedForValue = null;
 
-		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -82,7 +85,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "";
 		String xForwardedForValue = "";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -91,7 +94,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "1.1.1.2";
 		String xForwardedForValue = "";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -100,7 +103,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "1.1.1.1.1";
 		String xForwardedForValue = "";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -111,7 +114,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = "1.1.1.1";
 
-		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -122,7 +125,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = " 1.1.1.1 ";
 
-		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -133,7 +136,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "11.0.0.0";
 		String xForwardedForValue = "1.1.1.1";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -144,7 +147,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = "3.3.3.3, 1.1.1.1";
 
-		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -155,7 +158,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = "3.3.3.3,1.1.1.1";
 
-		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertFalse(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -166,7 +169,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = "3.3.3.3, 4.4.4.4";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -177,7 +180,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = "1.1.1.1, 4.4.4.4";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -188,7 +191,7 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = "1.1.1.1,";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 
 	@Test
@@ -199,6 +202,6 @@ public class IPRestrictionFilterTest
 		String requestIp = "10.0.0.0";
 		String xForwardedForValue = "1.1.1.1, ";
 
-		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, whitelistedIPs, requestIp, xForwardedForValue));
+		assertTrue(IPRestrictionFilter.isIpBlocked(enabled, hasProxy, localIpPrefix, whitelistedIPs, requestIp, xForwardedForValue));
 	}
 }
