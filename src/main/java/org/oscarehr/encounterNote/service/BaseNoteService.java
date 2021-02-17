@@ -114,11 +114,10 @@ public abstract class BaseNoteService
 	{
 		CaseManagementNote note = caseManagementNoteDao.find(noteId.longValue());
 
-		if (!note.getDemographic().getId().equals(demographicNo))
+		if(note == null || !note.getDemographic().getId().equals(demographicNo))
 		{
 			return null;
 		}
-
 		return getNoteTo1FromNote(note);
 	}
 

@@ -27,7 +27,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -42,6 +44,9 @@ import java.util.ResourceBundle;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public abstract class AbstractServiceImpl {
+
+	@Autowired
+	SecurityInfoManager securityInfoManager;
 
 	private static final int MAX_PAGE_RESULTS = 100;
 
@@ -164,5 +169,22 @@ public abstract class AbstractServiceImpl {
 			throw new IllegalStateException("Authentication info is not available.");
 		}
 		return info;
+	}
+
+	/**
+	 * Require the logged in user to possess the specified security object, and access level
+	 *
+	 * @param secObjName security object name
+	 * @param privilegeLevel access level
+	 * @throws SecurityException if requirements not met.
+	 */
+	protected void requireSecurityOnEndpoint(String secObjName, SecurityInfoManager.PRIVILEGE_LEVEL privilegeLevel)
+			throws SecurityException
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo,
+		                                        privilegeLevel.asString(),
+		                                        null,
+		                                        secObjName);
 	}
 }

@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.util.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Service
@@ -131,4 +132,23 @@ public class IntegrationService
     {
         userIntegrationAccessDao.remove(userIntegrationAccess);
     }
+
+	/**
+	 * Find an integration by name and (optional) site.  Integrations matching the same key, but at a different site will not be returned
+	 * if the site is specified as null.
+	 *
+	 * @param integrationType unique integration key
+	 * @param siteId optional siteName.  For non-multisite instances, or for integrations not reliant on site, this should be set as null.
+	 * @return Integration if found, or null if no such record exists
+	 * @throws javax.persistence.NonUniqueResultException if more than one record is found
+	 */
+	public Integration findIntegrationByTypeAndSite(String integrationType, @Nullable Integer siteId)
+	{
+		return integrationDao.findByIntegrationTypeAndSiteId(integrationType, siteId);
+	}
+
+	public List<Integration> findIntegrationsByType(String integrationType)
+	{
+		return integrationDao.findByIntegrationType(integrationType);
+	}
 }

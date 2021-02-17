@@ -105,7 +105,7 @@ public class RecordUxService extends AbstractServiceImpl {
 
 	@Autowired
 	private DashboardDao dashboardDao;
-	
+
 	/**
 	$scope.recordtabs2 = [ 
 	 {id : 0,name : 'Master',url : 'partials/master.html'},
@@ -151,9 +151,14 @@ public class RecordUxService extends AbstractServiceImpl {
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.viewTickler", "r", null)) {
 			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Tickler", Arrays.asList("record.tickler")));
 		}
-		
+
 		menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", Arrays.asList("record.tracker")));
-		
+
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
+		{
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Patient Education", Arrays.asList("record.patientEducation")));
+		}
+
 		//PHR
 		if( ProviderMyOscarIdData.idIsSet(loggedInInfo.getLoggedInProviderNo())) {
 			DemographicDao demographicDao=(DemographicDao)SpringUtils.getBean("demographicDao");

@@ -51,6 +51,18 @@ angular.module('Admin.Section').component('integrationModules',
 				enabled: false,
 				propertyName: "aqs_enabled",
 				configUrl: "#!/admin/manageAppointmentQueues",
+			},
+            {
+                name: "iMD Health",
+                enabled: false,
+                propertyName: "integration.imdHealth.enabled",
+                configUrl: "#!/admin/imdHealth"
+            },
+			{
+				name: "Ocean ToolBar",
+				enabled: false,
+				propertyName: "integration.OceanToolBar.enabled",
+				configUrl:""
 			}
 		];
 

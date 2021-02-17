@@ -52,7 +52,7 @@ public class DxMapper extends AbstractMapper
 	{
 		int numDx = getNumDx();
 		List<Dxresearch> dxList = new ArrayList<>(numDx);
-		for(int i=0; i< numDx; i++)
+		for(int i = 0; i < numDx; i++)
 		{
 			Dxresearch dxresearch = getDxResearch(i);
 			if(dxresearch != null)
@@ -83,7 +83,7 @@ public class DxMapper extends AbstractMapper
 	{
 		int numDx = getNumDx();
 		List<CaseManagementNote> dxNoteList = new ArrayList<>(numDx);
-		for(int i=0; i< numDx; i++)
+		for(int i = 0; i < numDx; i++)
 		{
 			CaseManagementNote dxresearchNote = getDxResearchNote(i);
 			if(dxresearchNote != null)

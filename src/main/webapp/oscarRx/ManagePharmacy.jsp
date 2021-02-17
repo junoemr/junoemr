@@ -67,7 +67,8 @@ oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBea
 
 if (request.getParameter("ID") != null && request.getParameter("type")!=null && request.getParameter("type").equals("Delete")){
 	RxPharmacyData rxp = new RxPharmacyData();
-	rxp.deletePharmacy(request.getParameter("ID"));
+	Integer pharmacyId = Integer.parseInt(request.getParameter("ID"));
+	rxp.deletePharmacy(pharmacyId, LoggedInInfo.getLoggedInInfoFromSession(request));
 
 	response.sendRedirect(request.getContextPath() + "/oscarRx/SelectPharmacy2.jsp");
 	return;

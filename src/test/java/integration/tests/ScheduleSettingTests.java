@@ -36,7 +36,6 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
@@ -66,12 +65,15 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 	private DatabaseUtil databaseUtil;
 
 	public static String templateTitleGeneral = "P:General";
-	
+
 	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
+		SchemaUtils.restoreTable("admission", "log", "program_provider",
+				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
+				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
 		loadSpringBeans();
 		databaseUtil.createTestProvider();
 	}
@@ -155,8 +157,9 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
 	{
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
+		//webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());

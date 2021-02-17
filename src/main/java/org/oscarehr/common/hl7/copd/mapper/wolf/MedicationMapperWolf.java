@@ -113,11 +113,15 @@ public class MedicationMapperWolf extends MedicationMapper
 		return endDate;
 	}
 
-	/** Normally this is based on the flag, but Wolf always sends everything as long term and that's never the desired state */
+	/** Normally this is based on the flag, but Wolf always sends everything as long term and that's never the desired state
+	 * instead we are going to set long term if the med does not have an end date, or info to calculate an end date
+	 */
 	@Override
 	public boolean isLongTerm(int rep) throws HL7Exception
 	{
-		return false;
+		return (getAdministrationStopDate(rep) == null
+				&& getCalculatedEndDate(rep, getStartDate(rep)) == null
+				&& getCalculatedEndDateAlternate(rep, getStartDate(rep)) == null);
 	}
 
 }

@@ -35,6 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
-	public void removeExpiryDate(String userName, String providerNo)////
+	public void removeExpiryDate(String userName, String providerNo) throws InterruptedException////
 	{
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		String currWindowHandle1 = driver.getWindowHandle();
@@ -129,8 +130,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addLoginRecordsClassicUITest()
-	{
+	public void addLoginRecordsClassicUITest() throws InterruptedException {
 		String currWindowHandle = driver.getWindowHandle();
 		//Assign Roles
 		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
@@ -168,7 +168,8 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addLoginRecordsJUNOUITest()
+
+	public void addLoginRecordsJUNOUITest() throws InterruptedException
 	{
 		String xpathProvider = "(//td[contains(., '" + drBerry.providerNo + "')])";
 		String xpathDropdown = xpathProvider + xpathOption;
@@ -183,6 +184,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		Set<String> handles = driver.getWindowHandles();
 		PageUtil.switchToWindow(handles.iterator().next(), driver);
 		accessAdministrationSectionJUNOUI(driver, "User Management", "Add a Login Record");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='user_name']")));
 		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameBerry);
 
 		//password validation

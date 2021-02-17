@@ -283,6 +283,25 @@ angular.module('Schedule').component('eventComponent', {
 					});
 				}
 
+				controller.validations = {
+					appointmentDateOnSameDay: Juno.Validations.validationCustom(() =>
+					{
+						let momentStart = Juno.Common.Util.getDateAndTimeMoment(
+							$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+						let momentEnd = controller.calculateEndTime();
+
+						let momentStartDay = momentStart.date();
+						let momentEndDay = momentEnd.date();
+
+						if (momentEndDay != momentStartDay)
+						{
+							return false;
+						}
+
+						return true;
+					}),
+				};
+
 				// resolve data from opener
 				controller.loadedSettings = controller.resolve.loadedSettings;
 				controller.parentScope = controller.resolve.parentScope;
@@ -535,6 +554,18 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
+			controller.getPatientToolTip = () =>
+            {
+                if ($scope.eventData.virtual && controller.inEditMode())
+                {
+                    return "Patients can't be changed once a telehealth appointment is set";
+                }
+                else
+                {
+                    return "Patient";
+                }
+            }
+
 			controller.getSiteChangeToolTip = () =>
             {
                 if ($scope.eventData.virtual && controller.inEditMode())
@@ -767,6 +798,15 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
 				}
 
+				let appointmentSpansToNextDay = !controller.validations.appointmentDateOnSameDay();
+
+				if (appointmentSpansToNextDay)
+				{
+					$scope.displayMessages.add_field_error('startTime', 'Appointment cannot span to the next day');
+					$scope.displayMessages.add_field_error('duration', 'Appointment cannot span to the next day');
+					Juno.Common.Util.errorAlert($uibModal, "Error", "Please correct highlighted fields");
+				}
+
 				return !$scope.displayMessages.has_errors();
 			};
 
@@ -918,8 +958,9 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.calculateEndTime = function calculateEndTime()
 			{
-				var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+				let momentStart = Juno.Common.Util.getDateAndTimeMoment(
 					$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+
 				return momentStart.add($scope.eventData.duration, 'minutes');
 			};
 

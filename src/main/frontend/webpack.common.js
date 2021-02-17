@@ -340,6 +340,8 @@ module.exports = {
 			'./src/admin/section/iceFall/iceFallAdminComponent.js',
 			'./src/admin/section/iceFall/settings/iceFallAdminSettingsComponent.js',
 			'./src/admin/section/iceFall/activity/iceFallAdminActivityComponent.js',
+			'./src/admin/section/imdHealth/imdHealthAdminComponent.js',
+			'./src/admin/section/imdHealth/imdHealthLandingComponent.js',
 			'./src/admin/section/know2act/module.js',
 			'./src/admin/section/know2act/Know2actConfigController.js',
 			'./src/admin/section/know2act/Know2actNotificationController.js',

@@ -4819,6 +4819,16 @@ angular.module("Common.Services").service("staticDataService", [
 				value: 5,
 				name: "Cancelled"
 			});
+			statuses.push(
+			{
+				value: 6,
+				name: "Appointment Booked"
+			});
+			statuses.push(
+			{
+				value: 7,
+				name: "Deleted"
+			});
 			return statuses;
 		};
 

@@ -44,6 +44,7 @@ import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.site.service.SiteService;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,8 +98,12 @@ public class Appointment
 
 	@Autowired
 	private LookupListManager lookupListManager;
+
 	@Autowired
 	private LookupListItemDao lookupListItemDao;
+
+	@Autowired
+	SiteService siteService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -269,9 +274,10 @@ public class Appointment
 	 * update appointment. notifying MHA of update if applicable.
 	 * @param appointment - appointment to update
 	 */
-	public void updateAppointment(org.oscarehr.common.model.Appointment appointment,
-	                              LoggedInInfo loggedInInfo, HttpServletRequest request)
+	public org.oscarehr.common.model.Appointment updateAppointment(org.oscarehr.common.model.Appointment appointment,
+																LoggedInInfo loggedInInfo, HttpServletRequest request)
 	{
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.merge(appointment);
 
 		if (appointment.getIsVirtual())
@@ -286,6 +292,8 @@ public class Appointment
 						LogConst.STATUS_SUCCESS,
 						String.valueOf(appointment.getId()),
 						request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	public List<CalendarEvent> getCalendarEvents(HttpSession session,

@@ -156,7 +156,7 @@
 			}
 		}
     } else {
-    	redirect.append("../close.html");
+    	redirect.append("../close.jsp");
     }
 	response.sendRedirect(redirect.toString());
 %>

@@ -53,6 +53,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 			scope.iconLeft = '=junoIconLeft';
 			scope.iconRight = '=junoIconRight';
 
+			scope.isDisabled = '<junoDisabled';
 			return scope;
 		};
 
@@ -105,7 +106,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.hasButtons = function hasButtons()
 			{
-				return $scope.hasSearchButton() || $scope.hasAddButton();
+				return !$scope.isDisabled && ($scope.hasSearchButton() || $scope.hasAddButton());
 			};
 
 			$scope.hasSearchButton = function hasSearchButton()
