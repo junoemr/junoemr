@@ -307,21 +307,16 @@ public class FlowSheetCustomAction extends DispatchAction {
 		String recommendationColour = request.getParameter("recommendationColour");
 
 		MeasurementFlowSheet measurementFlowSheet = new MeasurementFlowSheet();
+		measurementFlowSheet.setName(displayName);
 		measurementFlowSheet.parseDxTriggers(dxcodeTriggers);
 		measurementFlowSheet.setDisplayName(displayName);
 		measurementFlowSheet.setWarningColour(warningColour);
 		measurementFlowSheet.setRecommendationColour(recommendationColour);
 
-		String name =  flowsheetService.addFlowsheet( measurementFlowSheet );
+		flowsheetService.addFlowsheet(measurementFlowSheet);
 		measurementFlowSheet.loadRuleBase();
 
-		flowsheetService.createUserFlowSheet(name, dxcodeTriggers, displayName, warningColour, recommendationColour);
-
+		flowsheetService.createUserFlowSheet(measurementFlowSheet);
 		return mapping.findForward("newflowsheet");
 	}
-
-
-
-
-
 }

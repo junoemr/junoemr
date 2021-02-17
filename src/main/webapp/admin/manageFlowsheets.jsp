@@ -50,6 +50,8 @@
 <%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.HashSet" %>
+<%@ page import="java.util.Set" %>
 
 <%
 	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
@@ -135,10 +137,10 @@ br {
 					<td><b>Actions</b></td>
 				</tr>
 			<%
-				List<MeasurementFlowSheet> flowsheetTemplates = flowsheetService.getFlowsheetTemplates();
 				List<Flowsheet> systemFlowsheets = flowsheetService.getSystemFlowsheets();
 				List<Flowsheet> databaseFlowsheets = flowsheetService.getDatabaseFlowsheets();
 				List<FlowSheetUserCreated> userCreatedFlowSheets = flowsheetService.getUserCreatedFlowsheets();
+				Set<MeasurementFlowSheet> flowsheetTemplates = new HashSet<MeasurementFlowSheet>(flowsheetService.getFlowsheetTemplates());
 
 				for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
 				{

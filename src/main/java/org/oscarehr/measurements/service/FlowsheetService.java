@@ -107,6 +107,11 @@ public class FlowsheetService
 	public List<FlowSheetUserCreated> getUserCreatedFlowsheets()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		List<FlowSheetUserCreated> userCreatedFlowsheets = config.getUserCreatedFlowsheets();
+		if (userCreatedFlowsheets == null || userCreatedFlowsheets.size() == 0)
+		{
+			loadFlowsheets();
+		}
 		return config.getUserCreatedFlowsheets();
 	}
 
@@ -375,28 +380,24 @@ public class FlowsheetService
 
 	/**
 	 * Create a custom flowsheet given all of the required parameters.
-	 * @param name Internal name for the flowsheet
-	 * @param dxCodeTriggers set of ICD9 codes of which any can trigger visibility for a demographic
-	 * @param displayName user-friendly name for the flowsheet
-	 * @param warningColour custom colour to set for warning
-	 * @param recommendationColour custom colour to set for recommendation
+	 * @param measurementFlowSheet the measurement flow sheet template from which to persist a custom flowsheet
 	 */
-	public void createUserFlowSheet(String name,
-									String dxCodeTriggers,
-									String displayName,
-									String warningColour,
-									String recommendationColour)
+	public void createUserFlowSheet(MeasurementFlowSheet measurementFlowSheet)
 	{
 		FlowSheetUserCreated flowSheetUserCreated = new FlowSheetUserCreated();
-		flowSheetUserCreated.setName(name);
-		flowSheetUserCreated.setDxcodeTriggers(dxCodeTriggers);
-		flowSheetUserCreated.setDisplayName(displayName);
-		flowSheetUserCreated.setWarningColour(warningColour);
-		flowSheetUserCreated.setRecommendationColour(recommendationColour);
+		flowSheetUserCreated.setName(measurementFlowSheet.getName());
+		flowSheetUserCreated.setDxcodeTriggers(measurementFlowSheet.getDxTriggersString());
+		flowSheetUserCreated.setDisplayName(measurementFlowSheet.getDisplayName());
+		flowSheetUserCreated.setWarningColour(measurementFlowSheet.getWarningColour());
+		flowSheetUserCreated.setRecommendationColour(measurementFlowSheet.getRecommendationColour());
 		flowSheetUserCreated.setCreatedDate(new Date());
 		flowSheetUserCreated.setArchived(false);
 
 		flowSheetUserCreatedDao.persist(flowSheetUserCreated);
+		// Add to local cache
+
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		config.cacheUserCreatedFlowsheet(flowSheetUserCreated, measurementFlowSheet);
 	}
 
 	/**

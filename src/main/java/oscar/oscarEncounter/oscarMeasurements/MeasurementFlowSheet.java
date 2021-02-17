@@ -142,18 +142,23 @@ public class MeasurementFlowSheet {
         return programTriggers;
     }
 
-    public String getDxTriggersString(){
-       StringBuilder sb = new StringBuilder();
+    public String getDxTriggersString()
+    {
+       StringBuilder stringBuilder = new StringBuilder();
        boolean firstElement = true;
-       if (dxTriggers != null){
-           for(String s:dxTriggers){
-                if (!firstElement){
-                    sb.append(",");
+       if (dxTriggers != null)
+       {
+           for(String trigger : dxTriggers)
+           {
+                if (!firstElement)
+                {
+                    stringBuilder.append(", ");
                 }
-                sb.append(s);
+                stringBuilder.append(trigger);
+                firstElement = false;
            }
        }
-       return sb.toString();
+       return stringBuilder.toString();
     }
 
     public String getDxTriggersQueryBuilder(String demo, String provider){
@@ -196,19 +201,24 @@ public class MeasurementFlowSheet {
         return query;
      }
     
-    public String getProgramTriggersString(){
-    	StringBuilder sb = new StringBuilder();
-        boolean firstElement = true;
-        if (programTriggers != null){
-            for(String s:programTriggers){
-                 if (!firstElement){
-                     sb.append(",");
-                 }
-                 sb.append(s);
-            }
-        }
-        return sb.toString();
-     }
+	public String getProgramTriggersString()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		boolean firstElement = true;
+		if (programTriggers != null)
+		{
+			for(String trigger : programTriggers)
+			{
+				 if (!firstElement)
+				 {
+					 stringBuilder.append(", ");
+				 }
+				 stringBuilder.append(trigger);
+				 firstElement = false;
+			}
+		}
+		return stringBuilder.toString();
+	 }
 
     /** Creates a new instance of MeasurementFlowSheet */
     public MeasurementFlowSheet() {

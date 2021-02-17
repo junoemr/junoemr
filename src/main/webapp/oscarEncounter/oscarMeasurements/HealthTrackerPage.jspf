@@ -801,7 +801,15 @@ function fsPopup(width,height,url,window) {
 			btnLabel = "DIAB";
 		}
 
-		out.print("<a href='" + request.getRequestURI() + "?demographic_no=" + demographic_no + "&template=" + value.toString() + "' class='btn " + fsSelected + "' title='Diagnosed' id='group-btn-" + value + "'>" + btnLabel + "</a> ");
+		%>
+			<a href="<%=request.getRequestURI()%>?demographic_no=<%=demographic_no%>&template=<%=value%>"
+			   class="'btn <%=fsSelected%>"
+			   title="Diagnosed"
+			   id="group-btn-<%=value%>">
+				<%=btnLabel%>
+			</a>
+		<%
+
 		fsSelected = "";
 	}
 
@@ -1084,7 +1092,7 @@ function fsPopup(width,height,url,window) {
             //graphable="no"
             //value_name="Answer"
             
-          
+
 String name = h2.get("display_name").toString();
 name = name.replaceAll("\\W","");
 iDate++;
