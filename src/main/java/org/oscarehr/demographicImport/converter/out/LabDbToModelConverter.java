@@ -36,7 +36,6 @@ import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
-import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarLab.ca.all.parsers.Factory;
@@ -45,6 +44,7 @@ import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class LabDbToModelConverter extends
@@ -61,14 +61,14 @@ public class LabDbToModelConverter extends
 
 
 	@Override
-	public org.oscarehr.demographicImport.model.lab.Lab convert(Hl7TextInfo hl7TextInfo)
+	public Lab convert(Hl7TextInfo hl7TextInfo)
 	{
 		if(hl7TextInfo == null)
 		{
 			return null;
 		}
 		Hl7TextMessage hl7TextMessage = hl7TextInfo.getHl7TextMessage();
-		MessageHandler labHandler = Factory.getHandler(hl7TextInfo.getLabNumber());
+		MessageHandler labHandler = Factory.getHandler(hl7TextMessage);
 		Lab exportLab = new Lab();
 
 		exportLab.setId(hl7TextMessage.getId());
@@ -78,9 +78,10 @@ public class LabDbToModelConverter extends
 		exportLab.setEmrReceivedDateTime(ConversionUtils.toLocalDateTime(hl7TextMessage.getCreated()));
 		exportLab.setSendingFacility(labHandler.getPatientLocation());
 
+		Map<String, CaseManagementNote> annotationMap = caseManagementNoteLinkDao.getLabNotesByNoteLink(hl7TextMessage.getId());
 		for(int i = 0; i < labHandler.getOBRCount(); i++)
 		{
-			exportLab.addObservation(getObservations(hl7TextMessage, labHandler, i));
+			exportLab.addObservation(getObservations(labHandler, i, annotationMap));
 		}
 
 		exportLab.setReviewers(getReviewers(hl7TextInfo));
@@ -107,7 +108,7 @@ public class LabDbToModelConverter extends
 		return reviewers;
 	}
 
-	private LabObservation getObservations(Hl7TextMessage hl7TextMessage, MessageHandler labHandler, int obrIndex)
+	private LabObservation getObservations(MessageHandler labHandler, int obrIndex, Map<String, CaseManagementNote> annotationMap)
 	{
 		LabObservation observation = new LabObservation();
 		observation.setName(labHandler.getOBRName(obrIndex));
@@ -119,7 +120,7 @@ public class LabDbToModelConverter extends
 
 		for(int i = 0; i < labHandler.getOBXCount(obrIndex); i++)
 		{
-			observation.addResult(getObservationResult(hl7TextMessage, labHandler, obrIndex, i));
+			observation.addResult(getObservationResult(labHandler, obrIndex, i, annotationMap));
 		}
 
 		for(int i = 0; i < labHandler.getOBRCommentCount(obrIndex); i++)
@@ -131,7 +132,11 @@ public class LabDbToModelConverter extends
 	}
 
 
-	private LabObservationResult getObservationResult(Hl7TextMessage hl7TextMessage, MessageHandler labHandler, int obrIndex, int obxIndex)
+	private LabObservationResult getObservationResult(
+			MessageHandler labHandler,
+			int obrIndex,
+			int obxIndex,
+			Map<String, CaseManagementNote> annotationMap)
 	{
 		LabObservationResult result = new LabObservationResult();
 		result.setAbnormal(labHandler.isOBXAbnormal(obrIndex, obxIndex));
@@ -150,27 +155,18 @@ public class LabDbToModelConverter extends
 		{
 			result.addComment(labHandler.getOBXComment(obrIndex, obxIndex, i));
 		}
-		result.setAnnotation(getAnnotationNote(hl7TextMessage.getId(), obrIndex, obxIndex));
+		result.setAnnotation(getAnnotationNote(annotationMap, obrIndex, obxIndex));
 
 		return result;
 	}
 
-	private EncounterNote getAnnotationNote(Integer parentNoteId, int obrIndex, int obxIndex)
+	private EncounterNote getAnnotationNote(Map<String, CaseManagementNote> annotationMap, int obrIndex, int obxIndex)
 	{
-		if(parentNoteId == null)
+		CaseManagementNote note = annotationMap.get(obrIndex + "-" + obxIndex);
+		if(note == null)
 		{
 			return null;
 		}
-
-		CaseManagementNoteLink noteLink = caseManagementNoteLinkDao.getNoteLinkByTableIdAndTableName(
-				parentNoteId, CaseManagementNoteLink.HL7LAB, obrIndex + "-" + obxIndex);
-
-		CaseManagementNote note = null;
-		if(noteLink != null)
-		{
-			note = noteLink.getNote();
-		}
-
 		return encounterNoteDbToModelConverter.convert(note);
 	}
 }

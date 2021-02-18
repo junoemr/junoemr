@@ -55,19 +55,38 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.*;
-import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.AITLHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIORMHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareCardiologyCancelHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareCardiologyHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDiagnosticImagingCancelHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDiagnosticImagingHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDocumentationAddHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDocumentationCancelHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDocumentationEditHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareEndoscopyCancelHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareEndoscopyHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareLabCancelHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.EIHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.GLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 
 public final class Factory {
 
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 
 	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB", "CCENDO", "CCCARDIOLOGY", "CCIMAGING", "CCDOC","CLS","CLSDI", "EI", JunoGenericLabHandler.LAB_TYPE_VALUE);
 
@@ -87,18 +106,22 @@ public final class Factory {
 	 */
 	public static MessageHandler getHandler(Integer segmentID)
 	{
+		Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
+		Hl7TextMessage hl7TextMessage = hl7TextMessageDao.find(segmentID);
+		return getHandler(hl7TextMessage);
+	}
+
+	public static MessageHandler getHandler(Hl7TextMessage hl7TextMessage)
+	{
 		try
 		{
-			Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
-			Hl7TextMessage hl7TextMessage = hl7TextMessageDao.find(segmentID);
-
 			String type = hl7TextMessage.getType();
-			String hl7Body = new String(Base64.decodeBase64(hl7TextMessage.getBase64EncodedeMessage()), MiscUtils.DEFAULT_UTF8_ENCODING);
+			String hl7Body = new String(Base64.decodeBase64(hl7TextMessage.getBase64EncodedeMessage()), StandardCharsets.UTF_8);
 			return getHandler(type, hl7Body);
 		}
 		catch(Exception e)
 		{
-			logger.error("Could not retrieve lab for segmentID(" + segmentID + ")", e);
+			logger.error("Could not retrieve lab for segmentID(" + hl7TextMessage.getId() + ")", e);
 		}
 		return new DefaultGenericHandler();
 	}
@@ -109,7 +132,7 @@ public final class Factory {
 			Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
 			Hl7TextMessage hl7TextMessage = hl7TextMessageDao.find(Integer.parseInt(segmentID));
 
-			ret = new String(Base64.decodeBase64(hl7TextMessage.getBase64EncodedeMessage()), MiscUtils.DEFAULT_UTF8_ENCODING);
+			ret = new String(Base64.decodeBase64(hl7TextMessage.getBase64EncodedeMessage()), StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			logger.error("Could not retrieve lab for segmentID(" + segmentID + ")", e);
 		}

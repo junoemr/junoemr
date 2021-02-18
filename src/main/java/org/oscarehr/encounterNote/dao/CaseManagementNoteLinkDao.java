@@ -29,6 +29,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Transactional
@@ -103,6 +105,32 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 		query.setMaxResults(1);
 
 		return this.getSingleResultOrNull(query);
+	}
+
+	/**
+	 * query very specific to lab notes. this maps associated notes based for a lab based on the otherId column as a key.
+	 * This allows loading all annotations for a lab in a single query
+	 * @param tableId - the hl7TextMessage id
+	 * @return - map of lab notes
+	 */
+	public Map<String, CaseManagementNote> getLabNotesByNoteLink(Integer tableId)
+	{
+		// select model name must match specified @Entity name in model object
+		String jpql = "SELECT x \n" +
+				"FROM model_CaseManagementNoteLink x \n" +
+				"WHERE x.tableId = :tableId \n" +
+				"AND x.tableName = :tableName \n" +
+				"ORDER BY x.note.noteId DESC";
+		return entityManager.createQuery(jpql, CaseManagementNoteLink.class)
+				.setParameter("tableId", tableId)
+				.setParameter("tableName", CaseManagementNoteLink.HL7LAB)
+				.getResultStream()
+				.collect(
+						Collectors.toMap(
+								CaseManagementNoteLink::getOtherId,
+								CaseManagementNoteLink::getNote
+						)
+				);
 	}
 
 	public CaseManagementNoteLink getNoteLinkByNoteIdAndTableName(CaseManagementNote note, Integer tableName)
