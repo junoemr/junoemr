@@ -1013,7 +1013,7 @@
 								</div>
 								<input type="text" id="keyword" name="keyword"
 									   value=""
-									   onkeypress="return grabEnter('searchButton',event)">
+									   onkeypress="return junoEncounter.grabEnter('searchButton',event);">
 								<input type="button" id="searchButton" name="button"
 									   value="<bean:message key="oscarEncounter.Index.btnSearch"/>"
 									   onClick="junoEncounter.channelSearch(); return false;">
