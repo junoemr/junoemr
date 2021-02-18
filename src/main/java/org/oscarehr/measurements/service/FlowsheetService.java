@@ -118,6 +118,11 @@ public class FlowsheetService
 	public List<Flowsheet> getDatabaseFlowsheets()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		List<Flowsheet> databaseFlowsheets = config.getDatabaseFlowsheets();
+		if (databaseFlowsheets == null || databaseFlowsheets.size() == 0)
+		{
+			loadFlowsheets();
+		}
 		return config.getDatabaseFlowsheets();
 	}
 

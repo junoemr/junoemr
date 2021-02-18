@@ -165,6 +165,7 @@ br {
 					{
 						for (Flowsheet customFlowsheet : databaseFlowsheets)
 						{
+							enabled = customFlowsheet.isEnabled();
 							if (flowsheetTemplate.getName().equals(customFlowsheet.getName()))
 							{
 								type = Flowsheet.TYPE_CUSTOM;
