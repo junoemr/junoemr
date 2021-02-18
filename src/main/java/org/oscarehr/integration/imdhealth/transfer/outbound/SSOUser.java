@@ -26,7 +26,6 @@ package org.oscarehr.integration.imdhealth.transfer.outbound;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.common.model.Provider;
-
 import java.io.Serializable;
 
 @Data
@@ -59,7 +58,8 @@ public class SSOUser implements Serializable
 		// externalId must be globally unique across the credential.  This implementation should be safe
 		// regardless of whether we decide to go with issuing the credential to cloudpractice vs individual clinics
 
-		user.externalId = "juno_" + practiceId + "_" + provider.getProviderNo();
+		String uniqueProvider = "juno_" + practiceId + "_" + provider.getProviderNo();
+		user.externalId = "juno_" + practiceId + "_" + uniqueProvider;
 		user.firstName = provider.getFirstName();
 		user.lastName = provider.getLastName();
 

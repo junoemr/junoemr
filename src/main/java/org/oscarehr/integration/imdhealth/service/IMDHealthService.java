@@ -130,11 +130,18 @@ public class IMDHealthService
 	 *
 	 * @return A list of failed initializations
 	 */
-	public List<String> initializeAllUsers(Integer integrationId) throws IntegrationException
+	public List<String> initializeAllUsers(HttpSession session, Integer integrationId) throws IntegrationException
 	{
 		Integration integration = integrationDao.find(integrationId);
 		BearerToken token = getBearerToken(integration);
-		String junoPracticeId = JUNO_PRACTICE_ID;
+
+		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
+
+		// TODO: Remove after figuring out something better for embedded tomcat
+		if (StringUtils.isEmpty(junoPracticeId))
+		{
+			junoPracticeId = JUNO_PRACTICE_ID;
+		}
 
 		List<Site> sites = siteDao.getAllActiveSites();
 		List<String> failedToInitialize = new ArrayList<>();
@@ -145,12 +152,12 @@ public class IMDHealthService
 
 			for (Provider provider : providers)
 			{
-				if (provider.getStatus().equals("1"))
+				if (provider.isActive())
 				{
 					credentials = getSSOCredentials(token, provider, junoPracticeId, site.getId());
 					if (credentials == null)
 					{
-						failedToInitialize.add("ProviderNo " + provider.getPractitionerNo() + " ,SiteId " + site.getId());
+						failedToInitialize.add("ProviderNo " + provider.getProviderNo() + " ,SiteId " + site.getId());
 					}
 				}
 			}
