@@ -1223,4 +1223,21 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		return null;
 	};
+
+	this.closeEnc = function closeEnc(e)
+	{
+		Event.stop(e);
+
+		var noteId = junoJQuery("input#editNoteId").val();
+		var noteData = this.getNoteDataById(noteId);
+
+		if(
+				pageState.currentNoteData.note.trim() === noteData.note.trim() ||
+				confirm(pageData.closeWithoutSaveMsg))
+		{
+			window.close();
+		}
+
+		return false;
+	};
 };
