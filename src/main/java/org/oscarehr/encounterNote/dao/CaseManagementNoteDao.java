@@ -314,32 +314,41 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	{
 		//language=MariaDB
 		String sql = "SELECT cmn_outer.note_id\n" +
-				"FROM casemgmt_note AS cmn_outer\n" +
-				"JOIN " +
-				"(\n" +
-				"SELECT cmn.note_id\n" +
-				"FROM casemgmt_note cmn\n" +
-				"LEFT JOIN casemgmt_note AS cmn_filter \n" +
-				"  ON cmn_filter.uuid = cmn.uuid\n" +
-				"  " +
-				"AND (cmn.update_date < cmn_filter.update_date " +
-				"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
-				"LEFT JOIN casemgmt_issue_notes cmin ON cmin.note_id = cmn.note_id\n" +
-				"LEFT JOIN casemgmt_issue cmi ON cmin.id = cmi.id\n" +
-				"LEFT JOIN issue i\n" +
-				"  ON i.issue_id = cmi.issue_id\n" +
-				"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication')\n" +
-				"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
-				"WHERE " +
-				"cmn_filter.note_id IS NULL\n" +
-				"AND i.issue_id IS NULL\n" +
-				"AND cnl.id IS NULL\n" +
-				"AND cmn.demographic_no = :demographicNo\n" +
-				"AND cmn.provider_no = :providerNo\n" +
-				") AS latest_notes\n" +
-				"ON cmn_outer.note_id = latest_notes.note_id\n" +
-				"WHERE NOT cmn_outer.signed\n" +
-				"ORDER BY cmn_outer.update_date DESC\n";
+			"FROM casemgmt_note AS cmn_outer\n" +
+
+			// Remove CPP notes
+			"JOIN " +
+			"(\n" +
+			"SELECT cmn.note_id\n" +
+			"FROM casemgmt_note cmn\n" +
+			"LEFT JOIN casemgmt_note AS cmn_filter \n" +
+			"  ON cmn_filter.uuid = cmn.uuid\n" +
+			"AND (cmn.update_date < cmn_filter.update_date " +
+			"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
+			"LEFT JOIN casemgmt_issue_notes cmin ON cmin.note_id = cmn.note_id\n" +
+			"LEFT JOIN casemgmt_issue cmi ON cmin.id = cmi.id\n" +
+			"LEFT JOIN issue i\n" +
+			"  ON i.issue_id = cmi.issue_id\n" +
+			"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication')\n" +
+			"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
+			"WHERE " +
+			"cmn_filter.note_id IS NULL\n" +
+			"AND i.issue_id IS NULL\n" +
+			"AND cnl.id IS NULL\n" +
+			"AND cmn.demographic_no = :demographicNo\n" +
+			"AND cmn.provider_no = :providerNo\n" +
+			") AS latest_notes\n" +
+			"ON cmn_outer.note_id = latest_notes.note_id\n" +
+
+			// Include notes that have a tmpsave
+			"LEFT JOIN casemgmt_tmpsave ct\n" +
+			"  ON ct.note_id = cmn_outer.note_id\n" +
+			"  AND ct.provider_no = cmn_outer.provider_no\n" +
+			"  AND ct.program_id = cmn_outer.program_no\n" +
+
+			// Get latest note that either is unsigned or has a tmpSave
+			"WHERE (NOT cmn_outer.signed OR ct.id IS NOT NULL)\n" +
+			"ORDER BY cmn_outer.update_date DESC\n";
 
 		Query query = entityManager.createNativeQuery(sql);
 
