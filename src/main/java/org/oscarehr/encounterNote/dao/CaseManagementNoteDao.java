@@ -686,7 +686,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		if(SORT_PROVIDER.equals(sortType))
 		{
-			sql += "ORDER BY full_query.editors_string DESC\n";
+			sql += "ORDER BY full_query.editors_string DESC, full_query.observation_date DESC\n";
 		}
 		else if(SORT_DATE_DESC.equals(sortType))
 		{
