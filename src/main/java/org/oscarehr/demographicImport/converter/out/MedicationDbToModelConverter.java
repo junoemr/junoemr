@@ -37,6 +37,8 @@ import oscar.oscarDemographic.pageUtil.Util;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
+import java.util.Map;
+
 @Component
 public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, Medication>
 {
@@ -65,28 +67,22 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 				"rxDate", "endDate", "writtenDate", "createDate",
 				"lastRefillDate", "archivedDate", "pickupDateTime", "lastUpdateDate", "freqCode");
 
-		org.oscarehr.common.model.PartialDate dbPartialDate = partialDateDao.getPartialDate(
-				org.oscarehr.common.model.PartialDate.TABLE_DRUGS,
-				input.getId(),
-				org.oscarehr.common.model.PartialDate.DRUGS_WRITTENDATE);
+		Map<Integer, org.oscarehr.common.model.PartialDate> partialDateMap = partialDateDao.getAllForTableEntry(
+				org.oscarehr.common.model.PartialDate.TABLE_DRUGS, input.getId());
+
+
+		org.oscarehr.common.model.PartialDate dbPartialDate = partialDateMap.get(org.oscarehr.common.model.PartialDate.DRUGS_WRITTENDATE);
 		PartialDateTime writtenDate = PartialDateTime.from(ConversionUtils.toNullableLocalDateTime(input.getWrittenDate()), dbPartialDate);
 		medication.setWrittenDate(writtenDate);
 
 		if(!input.getStartDateUnknown())
 		{
-			org.oscarehr.common.model.PartialDate dbPartialStartDate = partialDateDao.getPartialDate(
-					org.oscarehr.common.model.PartialDate.TABLE_DRUGS,
-					input.getId(),
-					org.oscarehr.common.model.PartialDate.DRUGS_STARTDATE);
-
+			org.oscarehr.common.model.PartialDate dbPartialStartDate = partialDateMap.get(org.oscarehr.common.model.PartialDate.DRUGS_STARTDATE);
 			PartialDate startDate = PartialDate.from(ConversionUtils.toNullableLocalDate(input.getRxDate()), dbPartialStartDate);
 			medication.setRxStartDate(startDate);
 		}
 
-		org.oscarehr.common.model.PartialDate dbPartialEndDate = partialDateDao.getPartialDate(
-				org.oscarehr.common.model.PartialDate.TABLE_DRUGS,
-				input.getId(),
-				org.oscarehr.common.model.PartialDate.DRUGS_ENDDATE);
+		org.oscarehr.common.model.PartialDate dbPartialEndDate = partialDateMap.get(org.oscarehr.common.model.PartialDate.DRUGS_ENDDATE);
 		medication.setRxEndDate(PartialDate.from(ConversionUtils.toNullableLocalDate(input.getEndDate()), dbPartialEndDate));
 
 		medication.setPickupDateTime(ConversionUtils.toNullableLocalDateTime(input.getPickUpDateTime()));

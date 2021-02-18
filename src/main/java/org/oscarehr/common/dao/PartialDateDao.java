@@ -34,6 +34,8 @@ import oscar.util.UtilDateUtilities;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.util.Date;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class PartialDateDao extends AbstractDao<PartialDate> {
@@ -60,6 +62,30 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 		}
 
 		return result;
+	}
+
+	/**
+	 * fetch all the partial date entries for a specified table/entity combination. This returns a map keyed on the fieldName
+	 * @param tableName - the table 'name'
+	 * @param tableId - the entity id
+	 * @return -  a map containing all entries for the entity, keyed on the fieldName
+	 */
+	public Map<Integer, PartialDate> getAllForTableEntry(Integer tableName, Integer tableId)
+	{
+		String jpql = "SELECT x \n" +
+				"FROM PartialDate x \n" +
+				"WHERE x.tableName = :tableName \n" +
+				"AND x.tableId = :tableId";
+		return entityManager.createQuery(jpql, PartialDate.class)
+				.setParameter("tableName", tableName)
+				.setParameter("tableId", tableId)
+				.getResultStream()
+				.collect(
+						Collectors.toMap(
+								PartialDate::getFieldName,
+								partialDate -> (partialDate)
+						)
+				);
 	}
 	
 	public String getDatePartial(Date fieldDate, Integer tableName, Integer tableId, Integer fieldName) {

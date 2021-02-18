@@ -97,7 +97,6 @@ public class DocumentDbToModelConverter extends
 		}
 		catch(IOException e)
 		{
-			//TODO handle missing documents?
 			throw new RuntimeException("Missing Document File", e);
 		}
 
