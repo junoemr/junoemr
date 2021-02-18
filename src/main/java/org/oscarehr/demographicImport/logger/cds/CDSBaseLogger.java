@@ -49,7 +49,7 @@ public abstract class CDSBaseLogger implements BaseLogger
 	protected abstract GenericFile initSummaryLogFile() throws IOException, InterruptedException;
 	protected abstract GenericFile initEventLogFile() throws IOException, InterruptedException;
 
-	public void log(GenericFile logFile, String message)
+	public synchronized void log(GenericFile logFile, String message)
 	{
 		String messageLine = message + "\n";
 		try
@@ -75,13 +75,13 @@ public abstract class CDSBaseLogger implements BaseLogger
 	}
 
 	@Override
-	public void logEvent(String message)
+	public synchronized void logEvent(String message)
 	{
 		log(eventLogFile, message);
 	}
 
 	@Override
-	public void logSummaryHeader()
+	public synchronized void logSummaryHeader()
 	{
 		String summaryLine = buildSummaryLine("Patient ID", "Family", "Past Health", "Problem List",
 				"Risk Factor", "Allergy &", "Medication", "Immunization",

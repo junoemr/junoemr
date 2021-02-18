@@ -29,12 +29,13 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.demographicImport.logger.ExportLogger;
-import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.util.JunoCommandLineRunner;
 import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;
+import org.oscarehr.util.task.args.IntegerArg;
 import org.oscarehr.util.task.args.StringArg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -69,6 +70,7 @@ public class CommandLineExporter implements CommandLineTask
 				new StringArg("type", null, true),
 				new StringArg("patient-set", null, true),
 				new StringArg("directory", "/tmp", false),
+				new IntegerArg("thread-count", 1, false),
 				new BooleanArg("include-alerts", true, false),
 				new BooleanArg("include-allergies", true, false),
 				new BooleanArg("include-appointments", true, false),
@@ -117,6 +119,7 @@ public class CommandLineExporter implements CommandLineTask
 		exportPreferences.setExportProblemList((Boolean) args.get("include-problems").getValue());
 		exportPreferences.setExportReportsReceived((Boolean) args.get("include-reports").getValue());
 		exportPreferences.setExportRiskFactors((Boolean) args.get("include-risk-factors").getValue());
+		exportPreferences.setThreadCount((Integer) args.get("thread-count").getValue());
 
 		logger.info("BEGIN EXPORT [ Patient Set: '" + patientSet + "']");
 		try

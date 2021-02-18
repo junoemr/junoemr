@@ -47,9 +47,10 @@ import java.io.OutputStreamWriter;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static oscar.util.ConversionUtils.DATE_PATTERN_DAY;
 import static oscar.util.ConversionUtils.DATE_PATTERN_MONTH;
@@ -60,7 +61,7 @@ public class CDSExporter implements DemographicExporter
 {
 	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
 
-	private final HashMap<String, Integer> providerExportCountHash;
+	private final ConcurrentMap<String, Integer> providerExportCountHash;
 
 	@Autowired
 	private CDSExportMapper cdsExportMapper;
@@ -70,7 +71,7 @@ public class CDSExporter implements DemographicExporter
 
 	public CDSExporter()
 	{
-		providerExportCountHash = new HashMap<>();
+		providerExportCountHash = new ConcurrentHashMap<>();
 	}
 
 	public GenericFile exportDemographic(PatientRecord patientRecord) throws Exception
@@ -121,7 +122,7 @@ public class CDSExporter implements DemographicExporter
 		return filename.replaceAll("[\\s,.]", "-") + ".xml";
 	}
 
-	protected void incrementProviderExportCount(Demographic demographic)
+	protected synchronized void incrementProviderExportCount(Demographic demographic)
 	{
 		Provider provider = demographic.getMrpProvider();
 		String providerKey = "Provider Unassigned";

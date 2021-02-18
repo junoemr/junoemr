@@ -20,27 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.util.task.args;
 
-import lombok.Data;
+import java.util.List;
 
-@Data
-public class ExportPreferences
+public class IntegerArg extends CommandLineArg<Integer>
 {
-	boolean exportAlertsAndSpecialNeeds;
-	boolean exportAllergiesAndAdverseReactions;
-	boolean exportAppointments;
-	boolean exportCareElements;
-	boolean exportClinicalNotes;
-	boolean exportFamilyHistory;
-	boolean exportImmunizations;
-	boolean exportLaboratoryResults;
-	boolean exportMedicationsAndTreatments;
-	boolean exportPastHealth;
-	boolean exportPersonalHistory;
-	boolean exportProblemList;
-	boolean exportReportsReceived;
-	boolean exportRiskFactors;
+	public IntegerArg(String name, Integer defaultValue, boolean required)
+	{
+		super(name, defaultValue, required);
+	}
 
-	int threadCount;
+	@Override
+	protected Integer toValue(List<String> valueList)
+	{
+		if(valueList != null && !valueList.isEmpty())
+		{
+			return Integer.parseInt(valueList.get(0));
+		}
+		return null;
+	}
 }

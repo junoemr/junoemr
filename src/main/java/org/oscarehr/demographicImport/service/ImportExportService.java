@@ -45,7 +45,6 @@ import org.oscarehr.demographicImport.converter.in.PharmacyModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
-import org.oscarehr.demographicImport.converter.out.PatientRecordModelConverter;
 import org.oscarehr.demographicImport.exception.DuplicateDemographicException;
 import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.logger.ImportLogger;
@@ -94,6 +93,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 
@@ -173,9 +173,6 @@ public class ImportExportService
 	private ImporterExporterFactory importerExporterFactory;
 
 	@Autowired
-	private PatientRecordModelConverter patientRecordModelConverter;
-
-	@Autowired
 	private PharmacyInfoDao pharmacyInfoDao;
 
 	@Autowired
@@ -186,6 +183,9 @@ public class ImportExportService
 
 	@Autowired
 	private HRMService hrmService;
+
+	@Autowired
+	private PatientExportService patientExportService;
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                            ExportLogger exportLogger,
@@ -198,24 +198,30 @@ public class ImportExportService
 
 		try
 		{
-			Instant instant = Instant.now();
-			for(String demographicIdStr : demographicIdList)
+			int threadCount = preferences.getThreadCount();
+			if(threadCount < 1)
 			{
-				logger.info("Load Demographic " + demographicIdStr);
-				Integer demographicId = Integer.parseInt(demographicIdStr);
-				org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+				threadCount = 1;
+			}
 
-				PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
-				instant = printDuration(instant, "Export Service: load patient model");
+			// break export tasks into threads (one thread per demographic)
+			for(int i = 0; i < demographicIdList.size(); i += threadCount)
+			{
+				ArrayList<CompletableFuture<GenericFile>> threads = new ArrayList<>(threadCount);
+				for(int j = 0; j < threadCount && i+j < demographicIdList.size(); j++)
+				{
+					Integer demographicId = Integer.parseInt(demographicIdList.get(i + j));
+					threads.add(patientExportService.exportDemographic(exporter, demographicId));
+				}
+				CompletableFuture.allOf(threads.toArray(new CompletableFuture<?>[0])).join();
 
-				logger.info("Export Demographic " + patientRecord.getDemographic().getId());
-				GenericFile file = exporter.exportDemographic(patientRecord);
-				instant = printDuration(instant, "Export Service: export file creation");
-				fileList.add(file);
+				for(CompletableFuture<?> thread : threads)
+				{
+					fileList.add((GenericFile) thread.get());
+				}
 			}
 			exportLogger.logSummaryFooter();
 			fileList.addAll(exporter.getAdditionalFiles(preferences));
-			printDuration(instant, "Export Service: additional files creation");
 		}
 		finally
 		{

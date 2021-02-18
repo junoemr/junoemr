@@ -32,13 +32,14 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Component
 public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverter<I, E>
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final HashMap<String, Provider> providerLookupCache = new HashMap<>();
+	private static final ConcurrentMap<String, Provider> providerLookupCache = new ConcurrentHashMap<>();
 
 	@Autowired
 	private ProviderDataDao providerDao;
@@ -46,13 +47,13 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 	@Autowired
 	private ProviderDbToModelConverter providerConverter;
 
-	public static void clearProviderCache()
+	public synchronized static void clearProviderCache()
 	{
 		logger.info("Clearing model provider cache");
 		providerLookupCache.clear();
 	}
 
-	protected Provider findProvider(String providerId)
+	protected synchronized Provider findProvider(String providerId)
 	{
 		Provider providerRecord = null;
 		providerId = StringUtils.trimToNull(providerId);
@@ -72,7 +73,7 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 		return providerRecord;
 	}
 
-	protected Provider findProvider(ProviderData provider)
+	protected synchronized Provider findProvider(ProviderData provider)
 	{
 		Provider providerRecord = null;
 		if(provider != null)

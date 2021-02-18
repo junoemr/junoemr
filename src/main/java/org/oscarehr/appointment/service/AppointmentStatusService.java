@@ -31,9 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Service
 @Transactional
@@ -56,22 +56,22 @@ public class AppointmentStatusService
 		return appointmentStatusList.getCalendarAppointmentStatusList();
 	}
 
-	public Map<String, AppointmentStatus> getAppointmentStatusCodeModelMap()
+	public ConcurrentMap<String, AppointmentStatus> getAppointmentStatusCodeModelMap()
 	{
 		List<org.oscarehr.common.model.AppointmentStatus> apptStatusList = appointmentManager.getAppointmentStatuses();
 
-		Map<String, AppointmentStatus> statusMap = new HashMap<>(apptStatusList.size());
+		ConcurrentMap<String, AppointmentStatus> statusMap = new ConcurrentHashMap<>(apptStatusList.size());
 		for(org.oscarehr.common.model.AppointmentStatus dbStatus : apptStatusList)
 		{
 			statusMap.put(dbStatus.getStatus(), appointmentStatusConverter.convert(dbStatus));
 		}
 		return statusMap;
 	}
-	public Map<String, AppointmentStatus> getAppointmentStatusNameModelMap()
+	public ConcurrentMap<String, AppointmentStatus> getAppointmentStatusNameModelMap()
 	{
 		List<org.oscarehr.common.model.AppointmentStatus> apptStatusList = appointmentManager.getAppointmentStatuses();
 
-		Map<String, AppointmentStatus> statusMap = new HashMap<>(apptStatusList.size());
+		ConcurrentMap<String, AppointmentStatus> statusMap = new ConcurrentHashMap<>(apptStatusList.size());
 		for(org.oscarehr.common.model.AppointmentStatus dbStatus : apptStatusList)
 		{
 			statusMap.put(dbStatus.getDescription(), appointmentStatusConverter.convert(dbStatus));

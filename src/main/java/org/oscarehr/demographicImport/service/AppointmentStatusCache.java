@@ -27,14 +27,14 @@ import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 //TODO - better way to look up intermediate objects
 @Service
 public class AppointmentStatusCache
 {
-	private static Map<String, AppointmentStatus> appointmentStatusCodeModelMap;
-	private static Map<String, AppointmentStatus> appointmentStatusNameModelMap;
+	private static ConcurrentMap<String, AppointmentStatus> appointmentStatusCodeModelMap;
+	private static ConcurrentMap<String, AppointmentStatus> appointmentStatusNameModelMap;
 
 	@Autowired
 	private AppointmentStatusService appointmentStatusService;
@@ -43,7 +43,7 @@ public class AppointmentStatusCache
 	{
 	}
 
-	public AppointmentStatus findByCode(String code)
+	public synchronized AppointmentStatus findByCode(String code)
 	{
 		if(appointmentStatusCodeModelMap == null)
 		{
@@ -52,7 +52,7 @@ public class AppointmentStatusCache
 		return appointmentStatusCodeModelMap.get(code);
 	}
 
-	public AppointmentStatus findByName(String name)
+	public synchronized AppointmentStatus findByName(String name)
 	{
 		if(appointmentStatusNameModelMap == null)
 		{
@@ -61,7 +61,7 @@ public class AppointmentStatusCache
 		return appointmentStatusNameModelMap.get(name);
 	}
 
-	public void clear()
+	public synchronized void clear()
 	{
 		appointmentStatusCodeModelMap = null;
 		appointmentStatusNameModelMap = null;
