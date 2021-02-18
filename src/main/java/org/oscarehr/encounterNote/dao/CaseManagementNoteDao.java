@@ -442,9 +442,9 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		if(providers != null && providers.size() > 0)
 		{
 			List<String> parameterList = new ArrayList<>();
-			for(String providerNo: providers)
+			for(int i = 0; i < providers.size(); i++)
 			{
-				parameterList.add(":providerNo" + providerNo);
+				parameterList.add(":providerNo" + i);
 			}
 
 			providerFilterCmn = " AND cmn.provider_no IN (" + String.join(",", parameterList) + ") ";
@@ -492,13 +492,11 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    cmn.observation_date AS observation_date,\n" +
 				"    cmn.provider_no AS provider_no,\n" +
 				"    prog.name AS program_name,\n" +
-				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
 				"    cmn.uuid AS uuid,\n" +
 				"    cmn.update_date AS update_date,\n" +
 				"    doc.document_no,\n" +
 				"    doc.docfilename AS document_filename,\n" +
-				"    doc.status as document_status,\n" +
-				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+				"    CAST(doc.status AS VARCHAR(255)) as document_status,\n" +
 				"    cmn.archived,\n" +
 				"    cmn.signed,\n" +
 				"    NOT cmn.signed OR NOT cmn.locked AS editable,\n" +
@@ -519,7 +517,6 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"        END AS status,\n" +
 				"    'local' AS location,\n" +
 				"    role.role_name,\n" +
-				//"    0 AS remote_facility_id,\n" +
 				"    cmn.history LIKE '----------------History Record----------------' AS has_history,\n" +
 				"    cmn.locked,\n" +
 				"    cmn.note,\n" +
@@ -636,13 +633,11 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS observation_date,\n" +
 					"    ed.form_provider AS provider_no,\n" +
 					"    '' AS program_name,\n" +
-					//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
 					"    '' AS uuid,\n" +
 					"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS update_date,\n" +
 					"    0 AS document_no,\n" +
 					"    '' AS document_filename,\n" +
-					"    '' AS document_status,\n" +
-					//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+					"    CAST('' AS VARCHAR(255)) AS document_status,\n" +
 					"    false AS archived,\n" +
 					"    false AS signed,\n" +
 					"    false AS editable,\n" +
@@ -651,7 +646,6 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    '' AS status,\n" +
 					"    '' AS location,\n" +
 					"    '' AS role_name,\n" +
-					//"    0 AS remote_facility_id,\n" +
 					"    false AS has_history,\n" +
 					"    CAST('0' AS CHARACTER) AS locked,\n" +
 					"    CONCAT(ed.form_name, ' : ', ed.subject) AS note,\n" +
@@ -708,9 +702,9 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		if(providers != null && providers.size() > 0)
 		{
-			for(String providerNo: providers)
+			for(int i = 0; i < providers.size(); i++)
 			{
-				query.setParameter("providerNo" + providerNo, providerNo);
+				query.setParameter("providerNo" + i, providers.get(i));
 			}
 		}
 
