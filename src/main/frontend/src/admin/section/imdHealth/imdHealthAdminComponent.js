@@ -24,9 +24,9 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import {IMDHealthApi} from "../../../../generated";
 
-angular.module('Admin.Integration').component('imdHealthAdmin',
+angular.module('Admin.Section').component('imdHealthAdmin',
     {
-        templateUrl: 'src/admin/integration/imdHealth/imdHealthAdmin.jsp',
+        templateUrl: 'src/admin/section/imdHealth/imdHealthAdmin.jsp',
         bindings: {},
         controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
         {

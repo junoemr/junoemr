@@ -23,9 +23,9 @@
 
 import {IMDHealthApi} from "../../../../generated";
 
-angular.module('Admin.Integration').component('imdHealthLanding',
+angular.module('Admin.Section').component('imdHealthLanding',
     {
-        templateUrl: 'src/admin/integration/imdHealth/imdHealthLanding.jsp',
+        templateUrl: 'src/admin/section/imdHealth/imdHealthLanding.jsp',
         bindings: {},
         controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$sce', function ($scope, $http, $httpParamSerializer, $state, $sce) {
 
