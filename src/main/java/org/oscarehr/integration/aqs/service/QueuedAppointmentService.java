@@ -27,7 +27,6 @@ import ca.cloudpractice.aqs.client.model.QueuedAppointmentInput;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Site;
@@ -63,6 +62,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class QueuedAppointmentService extends BaseService
 {
 	@Autowired
@@ -82,9 +82,6 @@ public class QueuedAppointmentService extends BaseService
 
 	@Autowired
 	private org.oscarehr.appointment.service.Appointment appointmentService;
-
-	@Autowired
-	private OscarAppointmentDao oscarAppointmentDao;
 
 	@Autowired
 	private SiteDao siteDao;
@@ -239,7 +236,6 @@ public class QueuedAppointmentService extends BaseService
 	 * @param httpServletRequest - http servlet request
 	 * @return - the newly scheduled appointment
 	 */
-	@Transactional
 	public Appointment scheduleQueuedAppointment(UUID queuedAppointmentId, UUID queueId, String providerNo,
 	                                             Integer siteId, LoggedInInfo loggedInInfo, HttpServletRequest httpServletRequest)
 	{

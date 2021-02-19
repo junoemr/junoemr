@@ -148,7 +148,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable
 
 	@Getter
 	@Setter
-	@OneToOne(mappedBy="appointment", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy="appointment", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	private QueuedAppointmentLink queuedAppointmentLink;
 
 	private String remarks = "";

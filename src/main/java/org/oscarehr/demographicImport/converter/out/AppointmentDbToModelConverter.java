@@ -47,6 +47,7 @@ public class AppointmentDbToModelConverter extends
 		BeanUtils.copyProperties(
 				input,
 				appointment,
+				"queuedAppointmentLink",
 				"appointmentDate",
 				"startTime",
 				"endTime",
