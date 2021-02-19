@@ -8,6 +8,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 	'demographicsService',
 	'providerService',
 	'ticklerService',
+	'securityService',
 
 	function(
 		$scope,
@@ -17,7 +18,8 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		demographicService,
 		demographicsService,
 		providerService,
-		ticklerService)
+		ticklerService,
+		securityService)
 	{
 
 		var controller = this;
@@ -54,7 +56,9 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			},
 			serviceDateDate: new Date(),
 			serviceDateTime: "12:00 AM",
-			suggestedTextId: 0
+			suggestedTextId: 0,
+			taskAssignedTo: securityService.getUser().providerNo,
+			taskAssignedToName: securityService.getUser().firstName + " " + securityService.getUser().lastName,
 		};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
