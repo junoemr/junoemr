@@ -233,8 +233,6 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * in the messagelisttbl
 	 */
 	void getMessageIDs(String providerNo) {
-		//providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
-
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		messagePosition = new Vector<String>();
@@ -433,7 +431,6 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 
 	public int getTotalMessages(int type, HttpServletRequest request)
 	{
-		//String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
 		LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo = info.getLoggedInProviderNo();
 		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
