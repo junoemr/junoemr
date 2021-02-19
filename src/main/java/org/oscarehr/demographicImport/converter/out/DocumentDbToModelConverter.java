@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.converter.out;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.model.Appointment;
@@ -63,9 +64,9 @@ public class DocumentDbToModelConverter extends
 		exportDocument.setId(input.getId());
 		exportDocument.setDocumentType(input.getDoctype());
 		exportDocument.setCreatedAt(ConversionUtils.toLocalDateTime(input.getContentdatetime()));
-		exportDocument.setDocumentClass(input.getDocClass());
-		exportDocument.setDocumentSubClass(input.getDocSubClass());
-		exportDocument.setDescription(input.getDocdesc());
+		exportDocument.setDocumentClass(StringUtils.trimToNull(input.getDocClass()));
+		exportDocument.setDocumentSubClass(StringUtils.trimToNull(input.getDocSubClass()));
+		exportDocument.setDescription(StringUtils.trimToNull(input.getDocdesc()));
 		exportDocument.setPublicDocument(input.isPublic());
 		exportDocument.setStatus(getDocumentStatus(input.getStatus()));
 		exportDocument.setObservationDate(ConversionUtils.toNullableLocalDate(input.getObservationdate()));

@@ -32,6 +32,8 @@ import xml.cds.v5_0.Reports;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE;
+
 @Component
 public abstract class AbstractCDSReportExportMapper<E> extends AbstractCDSExportMapper<Reports, E>
 {
@@ -49,7 +51,15 @@ public abstract class AbstractCDSReportExportMapper<E> extends AbstractCDSExport
 		{
 			if(docClass != null)
 			{
-				reportClass = ReportClass.fromValue(docClass);
+				// handle small discrepancy case
+				if(DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE.equalsIgnoreCase(docClass))
+				{
+					reportClass = ReportClass.MEDICAL_RECORDS_REPORT;
+				}
+				else
+				{
+					reportClass = ReportClass.fromValue(docClass);
+				}
 			}
 		}
 		catch(IllegalArgumentException e)

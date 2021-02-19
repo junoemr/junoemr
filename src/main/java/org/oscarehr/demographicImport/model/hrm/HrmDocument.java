@@ -33,6 +33,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE;
+
 @Data
 public class HrmDocument extends AbstractTransientModel
 {
@@ -96,6 +98,10 @@ public class HrmDocument extends AbstractTransientModel
 				{
 					return status;
 				}
+			}
+			if(DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE.equalsIgnoreCase(value))
+			{
+				return REPORT_CLASS.MEDICAL_RECORDS;
 			}
 			return null;
 		}
