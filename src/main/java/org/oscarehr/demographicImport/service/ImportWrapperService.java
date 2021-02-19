@@ -46,7 +46,7 @@ public class ImportWrapperService
 	private static final Logger logger = Logger.getLogger(ImportWrapperService.class);
 
 	@Autowired
-	private ImportExportService importExportService;
+	private PatientImportService patientImportService;
 
 	@Autowired
 	private ImporterExporterFactory importerExporterFactory;
@@ -74,7 +74,7 @@ public class ImportWrapperService
 			{
 				try
 				{
-					importExportService.importDemographic(importerType,
+					patientImportService.importDemographic(importerType,
 							importSource,
 							importLogger,
 							importFile,

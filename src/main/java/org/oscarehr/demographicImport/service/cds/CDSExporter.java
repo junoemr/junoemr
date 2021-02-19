@@ -31,7 +31,7 @@ import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicExporter;
-import org.oscarehr.demographicImport.service.ImportExportService;
+import org.oscarehr.demographicImport.service.PatientExportService;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.demographicImport.util.ExportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,12 +83,12 @@ public class CDSExporter implements DemographicExporter
 		exportProperties.getExportLogger().logSummaryLine(patientRecord);
 		incrementProviderExportCount(demographic);
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
-		instant = ImportExportService.printDuration(instant, "Exporter: model to CDS structure conversion");
+		instant = PatientExportService.printDuration(instant, "Exporter: model to CDS structure conversion");
 
 		GenericFile exportFile = parser.write(omdCds);
 		exportFile.rename(createExportFilename(demographic));
 
-		instant = ImportExportService.printDuration(instant, "Exporter: file write and rename");
+		instant = PatientExportService.printDuration(instant, "Exporter: file write and rename");
 		return exportFile;
 	}
 

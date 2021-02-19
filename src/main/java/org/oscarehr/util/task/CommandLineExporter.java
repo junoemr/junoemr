@@ -29,8 +29,8 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.demographicImport.logger.ExportLogger;
-import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.oscarehr.demographicImport.service.PatientExportService;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.util.JunoCommandLineRunner;
 import org.oscarehr.util.task.args.BooleanArg;
@@ -55,7 +55,7 @@ public class CommandLineExporter implements CommandLineTask
 	private static final Logger logger = Logger.getLogger(JunoCommandLineRunner.class);
 
 	@Autowired
-	private ImportExportService importExportService;
+	private PatientExportService patientExportService;
 
 	@Autowired
 	private ImporterExporterFactory importerExporterFactory;
@@ -125,7 +125,7 @@ public class CommandLineExporter implements CommandLineTask
 		try
 		{
 			ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
-			List<GenericFile> exportFiles = importExportService.exportDemographics(
+			List<GenericFile> exportFiles = patientExportService.exportDemographics(
 					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportLogger, demographicIdList, exportPreferences);
 			ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
 

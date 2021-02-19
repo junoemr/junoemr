@@ -44,9 +44,7 @@ import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.converter.in.PharmacyModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
-import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.exception.DuplicateDemographicException;
-import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
@@ -56,7 +54,6 @@ import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
-import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
@@ -93,15 +90,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class ImportExportService
+public class PatientImportService
 {
-	private static final Logger logger = Logger.getLogger(ImportExportService.class);
+	private static final Logger logger = Logger.getLogger(PatientImportService.class);
 
 	@Autowired
 	private AllergyService allergyService;
@@ -183,54 +179,6 @@ public class ImportExportService
 
 	@Autowired
 	private HRMService hrmService;
-
-	@Autowired
-	private PatientExportService patientExportService;
-
-	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
-	                                            ExportLogger exportLogger,
-	                                            List<String> demographicIdList,
-	                                            ExportPreferences preferences) throws Exception
-	{
-		exportLogger.logSummaryHeader();
-		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
-		List<GenericFile> fileList = new ArrayList<>();
-
-		try
-		{
-			int threadCount = preferences.getThreadCount();
-			if(threadCount < 1)
-			{
-				threadCount = 1;
-			}
-
-			// break export tasks into threads (one thread per demographic)
-			for(int i = 0; i < demographicIdList.size(); i += threadCount)
-			{
-				ArrayList<CompletableFuture<GenericFile>> threads = new ArrayList<>(threadCount);
-				for(int j = 0; j < threadCount && i+j < demographicIdList.size(); j++)
-				{
-					Integer demographicId = Integer.parseInt(demographicIdList.get(i + j));
-					threads.add(patientExportService.exportDemographic(exporter, demographicId));
-				}
-				CompletableFuture.allOf(threads.toArray(new CompletableFuture<?>[0])).join();
-
-				for(CompletableFuture<?> thread : threads)
-				{
-					fileList.add((GenericFile) thread.get());
-				}
-			}
-			exportLogger.logSummaryFooter();
-			fileList.addAll(exporter.getAdditionalFiles(preferences));
-		}
-		finally
-		{
-			BaseDbToModelConverter.clearProviderCache();
-			appointmentStatusCache.clear();
-		}
-
-		return fileList;
-	}
 
 	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
 	                              ImporterExporterFactory.IMPORT_SOURCE importSource,

@@ -71,9 +71,9 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographicImport.logger.ExportLogger;
-import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.oscarehr.demographicImport.service.PatientExportService;
+import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.e2e.director.E2ECreator;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
@@ -260,7 +260,7 @@ public class DemographicExportAction4 extends Action {
 		switch (template) {
 			case CDS5_0:
 			{
-				ImportExportService importExportService = SpringUtils.getBean(ImportExportService.class);
+				PatientExportService patientExportService = SpringUtils.getBean(PatientExportService.class);
 				ImporterExporterFactory importerExporterFactory = SpringUtils.getBean(ImporterExporterFactory.class);
 
 				ArrayList<File> files = new ArrayList<>();
@@ -281,7 +281,7 @@ public class DemographicExportAction4 extends Action {
 				exportPreferences.setExportRiskFactors(exRiskFactors);
 
 				ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
-				List<GenericFile> exportFiles = importExportService.exportDemographics(
+				List<GenericFile> exportFiles = patientExportService.exportDemographics(
 						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportLogger, list, exportPreferences);
 
 				//TODO refactor this. we could zip genericFiles directly

@@ -23,7 +23,7 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.demographicImport.model.lab.Lab;
-import org.oscarehr.demographicImport.service.ImportExportService;
+import org.oscarehr.demographicImport.service.PatientExportService;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -88,98 +88,98 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, org.oscareh
 
 		patientRecord.setDemographics(
 				cdsDemographicExportMapper.exportFromJuno(exportStructure));
-		instant = ImportExportService.printDuration(instant, "ExportMapper: demographics");
+		instant = PatientExportService.printDuration(instant, "ExportMapper: demographics");
 
 		if(exportPreferences.isExportPersonalHistory())
 		{
 			patientRecord.getPersonalHistory().addAll(
 					cdsPersonalHistoryExportMapper.exportAll(exportStructure.getSocialHistoryNoteList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: personal history");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: personal history");
 		}
 		if(exportPreferences.isExportFamilyHistory())
 		{
 			patientRecord.getFamilyHistory().addAll(
 					cdsFamilyHistoryExportMapper.exportAll(exportStructure.getFamilyHistoryNoteList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: family history");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: family history");
 		}
 		if(exportPreferences.isExportPastHealth())
 		{
 			patientRecord.getPastHealth().addAll(
 					cdsPastHealthExportMapper.exportAll(exportStructure.getMedicalHistoryNoteList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: past health");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: past health");
 		}
 		if(exportPreferences.isExportProblemList())
 		{
 			patientRecord.getProblemList().addAll(
 					cdsProblemExportMapper.exportAll(exportStructure.getConcernNoteList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: problems");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: problems");
 		}
 		if(exportPreferences.isExportRiskFactors())
 		{
 			patientRecord.getRiskFactors().addAll(
 					cdsRiskFactorExportMapper.exportAll(exportStructure.getRiskFactorNoteList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: risk factors");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: risk factors");
 		}
 		if(exportPreferences.isExportAllergiesAndAdverseReactions())
 		{
 			patientRecord.getAllergiesAndAdverseReactions().addAll(
 					cdsAllergyExportMapper.exportAll(exportStructure.getAllergyList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: allergies");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: allergies");
 		}
 		if(exportPreferences.isExportMedicationsAndTreatments())
 		{
 			patientRecord.getMedicationsAndTreatments().addAll(
 					cdsMedicationExportMapper.exportAll(exportStructure.getMedicationList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: medications");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: medications");
 		}
 		if(exportPreferences.isExportImmunizations())
 		{
 			patientRecord.getImmunizations().addAll(
 					cdsImmunizationExportMapper.exportAll(exportStructure.getImmunizationList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: immunizations");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: immunizations");
 		}
 		if(exportPreferences.isExportLaboratoryResults())
 		{
 			patientRecord.getLaboratoryResults().addAll(
 					getLabList(exportStructure.getLabList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: labs");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: labs");
 		}
 		if(exportPreferences.isExportAppointments())
 		{
 			patientRecord.getAppointments().addAll(
 					cdsAppointmentExportMapper.exportAll(exportStructure.getAppointmentList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: appointments");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: appointments");
 		}
 		if(exportPreferences.isExportClinicalNotes())
 		{
 			patientRecord.getClinicalNotes().addAll(
 					cdsEncounterNoteExportMapper.exportAll(exportStructure.getEncounterNoteList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: encounter notes");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: encounter notes");
 		}
 		if(exportPreferences.isExportReportsReceived())
 		{
 			//TODO add more properties for these to export individually
 			patientRecord.getReports().addAll(
 					cdsReportDocumentExportMapper.exportAll(exportStructure.getDocumentList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: documents");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: documents");
 			patientRecord.getReports().addAll(
 					cdsReportHRMExportMapper.exportAll(exportStructure.getHrmDocumentList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: hrm");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: hrm");
 			patientRecord.getReports().addAll(
 					cdsReportEFormExportMapper.exportAll(exportStructure.getEFormListList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: eforms");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: eforms");
 		}
 		if(exportPreferences.isExportCareElements())
 		{
 			patientRecord.getCareElements().addAll(
 					cdsCareElementExportMapper.exportAll(exportStructure.getMeasurementList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: care elements (measurements)");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: care elements (measurements)");
 		}
 		if(exportPreferences.isExportAlertsAndSpecialNeeds())
 		{
 			patientRecord.getAlertsAndSpecialNeeds().addAll(
 					cdsAlertExportMapper.exportAll(exportStructure.getReminderNoteList()));
-			instant = ImportExportService.printDuration(instant, "ExportMapper: alerts");
+			instant = PatientExportService.printDuration(instant, "ExportMapper: alerts");
 		}
 
 		omdCds.setPatientRecord(patientRecord);

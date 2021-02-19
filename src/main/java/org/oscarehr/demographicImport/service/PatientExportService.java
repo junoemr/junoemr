@@ -24,46 +24,75 @@ package org.oscarehr.demographicImport.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographicImport.converter.out.PatientRecordModelConverter;
-import org.oscarehr.demographicImport.model.PatientRecord;
+import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
+import org.oscarehr.demographicImport.logger.ExportLogger;
+import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class PatientExportService
 {
 	private static final Logger logger = Logger.getLogger(PatientExportService.class);
 
 	@Autowired
-	private DemographicDao demographicDao;
+	private AppointmentStatusCache appointmentStatusCache;
 
 	@Autowired
-	private PatientRecordModelConverter patientRecordModelConverter;
+	private ImporterExporterFactory importerExporterFactory;
 
-	@Async
-	public CompletableFuture<GenericFile> exportDemographic(DemographicExporter exporter, Integer demographicId) throws Exception
+	@Autowired
+	private PatientExportAsyncService patientExportService;
+
+	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
+	                                            ExportLogger exportLogger,
+	                                            List<String> demographicIdList,
+	                                            ExportPreferences preferences) throws Exception
 	{
-		Instant instant = Instant.now();
-		logger.info("Load Demographic " + demographicId);
-		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+		exportLogger.logSummaryHeader();
+		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
+		List<GenericFile> fileList = new ArrayList<>();
 
-		PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
-		instant = printDuration(instant, "Export Service: load patient model");
+		try
+		{
+			int threadCount = preferences.getThreadCount();
+			if(threadCount < 1)
+			{
+				threadCount = 1;
+			}
 
-		logger.info("Export Demographic " + patientRecord.getDemographic().getId());
-		GenericFile file = exporter.exportDemographic(patientRecord);
-		instant = printDuration(instant, "Export Service: export file creation");
+			// break export tasks into threads (one thread per demographic)
+			for(int i = 0; i < demographicIdList.size(); i += threadCount)
+			{
+				ArrayList<CompletableFuture<GenericFile>> threads = new ArrayList<>(threadCount);
+				for(int j = 0; j < threadCount && i+j < demographicIdList.size(); j++)
+				{
+					Integer demographicId = Integer.parseInt(demographicIdList.get(i + j));
+					threads.add(patientExportService.exportDemographic(exporter, demographicId));
+				}
+				CompletableFuture.allOf(threads.toArray(new CompletableFuture<?>[0])).join();
 
-		return CompletableFuture.completedFuture(file);
+				for(CompletableFuture<?> thread : threads)
+				{
+					fileList.add((GenericFile) thread.get());
+				}
+			}
+			exportLogger.logSummaryFooter();
+			fileList.addAll(exporter.getAdditionalFiles(preferences));
+		}
+		finally
+		{
+			BaseDbToModelConverter.clearProviderCache();
+			appointmentStatusCache.clear();
+		}
+
+		return fileList;
 	}
 
 	public static Instant printDuration(Instant start, String what)
