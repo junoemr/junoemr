@@ -26,7 +26,6 @@ package org.oscarehr;
 import org.apache.log4j.Logger;
 import org.oscarehr.init.OscarPropertiesInitializer;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -49,7 +48,7 @@ public class JunoApplication extends SpringBootServletInitializer
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application)
 	{
-		logger.info("Starting Juno with the application builder");
+		logger.info("Starting Juno (JunoApplication.configure())");
 
 		return application
 				.sources(JunoApplication.class)
@@ -58,11 +57,12 @@ public class JunoApplication extends SpringBootServletInitializer
 
 	public static void main(String[] args)
 	{
-		logger.info("Starting Juno with a new SpringApplication");
+		logger.info("Starting Juno (JunoApplication.main())");
 
-		SpringApplication application = new SpringApplication(JunoApplication.class);
-		application.addInitializers(new OscarPropertiesInitializer());
-		application.run(args);
+		new SpringApplicationBuilder(JunoApplication.class)
+			.sources(JunoApplication.class)
+			.initializers(new OscarPropertiesInitializer())
+			.run(args);
 	}
 
 
