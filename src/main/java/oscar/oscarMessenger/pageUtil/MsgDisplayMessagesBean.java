@@ -36,17 +36,18 @@ import org.oscarehr.common.dao.forms.FormsDao;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.OscarCommLocations;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarMessenger.data.MsgDisplayMessage;
 import oscar.util.ConversionUtils;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static org.apache.commons.lang.StringUtils.stripToNull;
 
 public class MsgDisplayMessagesBean implements java.io.Serializable {
-
-	private MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -233,13 +234,15 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * in the messagelisttbl
 	 */
 	void getMessageIDs(String providerNo) {
+		providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
 
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		messagePosition = new Vector<String>();
 		int index = 0;
 
-		for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+		MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
+		for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 			messagePosition.add(Integer.toString(index));
 			messageid.add("" + ml.getMessage());
 			status.add(ml.getStatus());
@@ -429,8 +432,12 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		return msg;
 	}
 
-	public int getTotalMessages(int type, String providerNo)
+	public int getTotalMessages(int type, HttpServletRequest request)
 	{
+		//String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
+		LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
+		String providerNo = info.getLoggedInProviderNo();
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		Integer location = Integer.parseInt(getCurrentLocationId());
 		switch(type)
 		{
@@ -522,11 +529,13 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getDeletedMessageIDs(String providerNo) {
+	void getDeletedMessageIDs() {
+		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		try {
-			for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+			MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
+			for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 				messageid.add("" + ml.getMessage());
 				status.add("deleted");
 			}
@@ -539,7 +548,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getSentMessageIDs(String providerNo) {
+	void getSentMessageIDs() {
+		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
 
 		messageid = new Vector<String>();
 		status = new Vector<String>();

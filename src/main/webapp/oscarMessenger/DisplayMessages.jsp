@@ -340,7 +340,7 @@ function checkAll(formId){
 
 		                    if (pageType != PAGE_TYPE_DEMOGRAPHIC)
 		                    {
-                                int totalMsgs = DisplayMessagesBeanId.getTotalMessages(pageType, providerNo);
+                                int totalMsgs = DisplayMessagesBeanId.getTotalMessages(pageType, request);
                                 int totalPages = totalMsgs / recordsToDisplay + (totalMsgs % recordsToDisplay == 0 ? 0 : 1);
                                 if(pageNum > 1)
                                 {
