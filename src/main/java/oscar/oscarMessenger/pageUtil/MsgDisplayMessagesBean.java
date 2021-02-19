@@ -42,7 +42,6 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarMessenger.data.MsgDisplayMessage;
 import oscar.util.ConversionUtils;
-
 import javax.servlet.http.HttpServletRequest;
 
 import static org.apache.commons.lang.StringUtils.stripToNull;
@@ -234,7 +233,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * in the messagelisttbl
 	 */
 	void getMessageIDs(String providerNo) {
-		providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
+		//providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
 
 		messageid = new Vector<String>();
 		status = new Vector<String>();
