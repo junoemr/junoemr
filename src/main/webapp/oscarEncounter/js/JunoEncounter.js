@@ -602,4 +602,16 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			popupPage(700,700,'Templates',selectedValue);
 		}
 	};
+
+	this.grabEnter = function grabEnter(id, event)
+	{
+		var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+		if (keyCode == 13)
+		{
+			$(id).click();
+			return false;
+		}
+
+		return true;
+	}
 };
