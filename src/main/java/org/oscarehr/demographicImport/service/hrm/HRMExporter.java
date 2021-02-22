@@ -30,7 +30,6 @@ import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.demographicImport.parser.hrm.HRMFileParser;
 import org.oscarehr.demographicImport.service.DemographicExporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.ExportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xml.hrm.v4_3.OmdCds;
@@ -43,9 +42,6 @@ public class HRMExporter implements DemographicExporter
 {
 	@Autowired
 	private HRMExportMapper hrmExportMapper;
-
-	@Autowired
-	private ExportProperties exportProperties;
 
 	public HRMExporter()
 	{
@@ -81,6 +77,6 @@ public class HRMExporter implements DemographicExporter
 	@Override
 	public String getSchemaVersion()
 	{
-		return "4.3";
+		return HRMFileParser.SCHEMA_VERSION;
 	}
 }

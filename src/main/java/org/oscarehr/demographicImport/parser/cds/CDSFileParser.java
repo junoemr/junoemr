@@ -32,6 +32,8 @@ import javax.xml.bind.JAXBException;
 
 public class CDSFileParser extends AbstractXMLFileParser<OmdCds>
 {
+	public static final String SCHEMA_VERSION = "5.1";
+
 	@Override
 	protected JAXBContext getNewInstance() throws JAXBException
 	{
@@ -42,5 +44,11 @@ public class CDSFileParser extends AbstractXMLFileParser<OmdCds>
 	protected NamespacePrefixMapper getNamespaceMapper()
 	{
 		return new CDSNamespaceMapper();
+	}
+
+	@Override
+	public String getSchemaVersion()
+	{
+		return SCHEMA_VERSION;
 	}
 }

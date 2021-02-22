@@ -106,7 +106,7 @@ public class CDSExporter implements DemographicExporter
 	@Override
 	public String getSchemaVersion()
 	{
-		return "5.1";
+		return CDSFileParser.SCHEMA_VERSION;
 	}
 
 	/**

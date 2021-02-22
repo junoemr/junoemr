@@ -47,92 +47,102 @@ public class HRMDownloadFileAction extends DownloadAction
 	private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	 
     /** Creates a new instance of DownloadFileAction */
-    public HRMDownloadFileAction() {
+    public HRMDownloadFileAction()
+    {
     }
-    
-    protected StreamInfo getStreamInfo(ActionMapping mapping, 
-                                       ActionForm form,
-                                       HttpServletRequest request, 
-                                       HttpServletResponse response)
-            throws Exception {
 
+	protected StreamInfo getStreamInfo(
+			ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response)
+			throws Exception
+	{
 	    securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
 			    SecurityInfoManager.READ, null, SecObjectName._HRM);
-    	
-    	String hash = request.getParameter("hash");
-    	if(StringUtils.isNullOrEmpty(hash)) {
-    		throw new Exception("no hash parameter passed");
-    	}
+
+	    String hash = request.getParameter("hash");
+	    if(StringUtils.isNullOrEmpty(hash))
+	    {
+		    throw new Exception("no hash parameter passed");
+	    }
     	
     	List<Integer> ids  = hrmDocumentDao.findByHash(hash);
-    	
-    	if(ids == null || ids.size() == 0) {
-    		throw new Exception("no documents found for hash - " + hash);
-    	}
-    	
-    	if(ids.size() > 1) {
-    		throw new Exception("too many documents found for hash - " + hash);
-    	}
+
+		if(ids == null || ids.size() == 0)
+		{
+			throw new Exception("no documents found for hash - " + hash);
+		}
+
+		if(ids.size() > 1)
+		{
+			throw new Exception("too many documents found for hash - " + hash);
+		}
     	
     	HRMDocument hd = hrmDocumentDao.find(ids.get(0));
-    	
-    	if(hd == null) {
-    		throw new Exception("HRMDocument not found - " + ids.get(0));
-    	}
-    	
-    	HRMReport report = HRMReportParser.parseReport(hd.getReportFile(), hd.getReportFileSchemaVersion());
-        
-    	if(report == null) {
-    		throw new Exception("Failed to parse HRMDocument with id " + hd.getId());
-    	}
-    	
-    	if(!report.isBinary()) {
-    		throw new Exception("no binary document found");
-    	}
+		if(hd == null)
+		{
+			throw new Exception("HRMDocument not found - " + ids.get(0));
+		}
+
+		HRMReport report = HRMReportParser.parseReport(hd.getReportFile(), hd.getReportFileSchemaVersion());
+
+		if(report == null)
+		{
+			throw new Exception("Failed to parse HRMDocument with id " + hd.getId());
+		}
+
+		if(!report.isBinary())
+		{
+			throw new Exception("no binary document found");
+		}
     	
     	byte[] binaryContent = report.getBinaryContent();
 
     	String fileExtension = report.getFileExtension().toLowerCase();
-    	if(!fileExtension.startsWith("."))
-	    {
-		    fileExtension = "." + fileExtension;
-	    }
+	    fileExtension = fileExtension.replaceAll("\\.", "");
 
 	    String fileName = GenericFile.getSanitizedFileName(
 			    report.getLegalLastName() + "-" +
 					    report.getLegalFirstName() + "-" +
-					    report.getFirstReportClass() + fileExtension
+					    report.getFirstReportClass() + "." + fileExtension
 	    );
 
     	String contentType = "application/octet-stream";
-    	
-    	if(fileExtension.equals(".pdf")) {
-    		contentType = "application/pdf";
-    	}
-    	if(fileExtension.equals(".tiff")) {
-    		contentType = "image/tiff";
-    	}
-    	if(fileExtension.equals(".rtf")) {
-    		contentType = "text/enriched";
-    	}
-    	if(fileExtension.equals(".jpg")) {
-    		contentType = "image/jpeg";
-    	}
-    	if(fileExtension.equals(".gif")) {
-    		contentType = "image/gif";
-    	}
-    	if(fileExtension.equals(".png")) {
-    		contentType = "image/png";
-    	}
-    	if(fileExtension.equals(".html")) {
-    		contentType = "text/html";
-    	}
-    	
+
+	    if(fileExtension.equals("pdf"))
+	    {
+		    contentType = "application/pdf";
+	    }
+	    if(fileExtension.equals("tiff"))
+	    {
+		    contentType = "image/tiff";
+	    }
+	    if(fileExtension.equals("rtf"))
+	    {
+		    contentType = "text/enriched";
+	    }
+	    if(fileExtension.equals("jpg"))
+	    {
+		    contentType = "image/jpeg";
+	    }
+	    if(fileExtension.equals("gif"))
+	    {
+		    contentType = "image/gif";
+	    }
+	    if(fileExtension.equals("png"))
+	    {
+		    contentType = "image/png";
+	    }
+	    if(fileExtension.equals("html"))
+	    {
+		    contentType = "text/html";
+	    }
          
         response.setHeader("Content-disposition", 
                            "attachment; filename=" + fileName);
         
-        File temp = File.createTempFile("HRMDownloadFile", fileExtension);
+        File temp = File.createTempFile("HRMDownloadFile", "." + fileExtension);
         temp.deleteOnExit();
         
         FileUtils.writeByteArrayToFile(temp, binaryContent);

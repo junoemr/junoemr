@@ -104,10 +104,10 @@ public class HRMReportParser
 	{
 		String fileData = FileUtils.getStringFromFile(hrmFile);
 
-		//TODO - this should not need to be hard coded
-		if("4.3".equals(schemaVersion)) // HRM 4.3 schema
+		HRMFileParser hrmParser = new HRMFileParser();
+		if(hrmParser.getSchemaVersion().equals(schemaVersion))
 		{
-			xml.hrm.v4_3.OmdCds root = new HRMFileParser().parse(new XMLFile(hrmFile));
+			xml.hrm.v4_3.OmdCds root = hrmParser.parse(new XMLFile(hrmFile));
 			return new HRMReport_4_3(root, hrmFile.getPath(), fileData);
 
 		}

@@ -88,6 +88,8 @@ public abstract class AbstractXMLFileParser<T> extends AbstractFileParser<T>
 		return tempFile;
 	}
 
+	public abstract String getSchemaVersion();
+
 	protected abstract JAXBContext getNewInstance() throws JAXBException;
 
 	protected abstract NamespacePrefixMapper getNamespaceMapper();
