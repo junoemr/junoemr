@@ -113,6 +113,7 @@ public class AppointmentService extends AbstractServiceImpl
 
 		return RestResponse.successResponse(responseAppointment);
 	}
+
 	@POST
 	@Path("/repeating/")
 	@Produces("application/json")
@@ -153,17 +154,16 @@ public class AppointmentService extends AbstractServiceImpl
 	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws ScheduleException
 	{
 		AppointmentConverter converter = new AppointmentConverter();
-		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		String siteName = appointment.getLocation();
-		String providerNo = appointment.getProviderNo();
+		String siteName = calendarAppointment.getSite();
+		String providerNo = calendarAppointment.getProviderNo().toString();
 
 		boolean isMultiSite = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 		boolean isValidTargetSite = !isMultiSite || siteService.isProviderAssignedToSite(providerNo, siteName);
 
 		if (isValidTargetSite)
 		{
-			org.oscarehr.common.model.Appointment savedAppointment = appointmentService.updateAppointment(appointment, getLoggedInInfo(), getHttpServletRequest());
+			org.oscarehr.common.model.Appointment savedAppointment = appointmentService.updateAppointment(calendarAppointment, getLoggedInInfo(), getHttpServletRequest());
 			CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
 
 			responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
