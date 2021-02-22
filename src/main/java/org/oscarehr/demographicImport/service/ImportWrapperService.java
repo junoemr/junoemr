@@ -24,17 +24,22 @@ package org.oscarehr.demographicImport.service;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
+import org.oscarehr.demographicImport.converter.out.SiteDbToModelConverter;
 import org.oscarehr.demographicImport.exception.DuplicateDemographicException;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
+import org.oscarehr.demographicImport.util.ImportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,6 +48,7 @@ import java.util.List;
 @Transactional(propagation = Propagation.NEVER)
 public class ImportWrapperService
 {
+	private static final OscarProperties properties = OscarProperties.getInstance();
 	private static final Logger logger = Logger.getLogger(ImportWrapperService.class);
 
 	@Autowired
@@ -51,16 +57,39 @@ public class ImportWrapperService
 	@Autowired
 	private ImporterExporterFactory importerExporterFactory;
 
-	public ImportTransferOutbound importDemographics(ImporterExporterFactory.IMPORTER_TYPE importerType,
-	                                                 ImporterExporterFactory.IMPORT_SOURCE importSource,
-	                                                 DemographicImporter.MERGE_STRATEGY mergeStrategy,
-	                                                 List<GenericFile> importFileList,
-	                                                 String documentLocation,
-	                                                 boolean skipMissingDocs) throws IOException, InterruptedException
+	@Autowired
+	private SiteDao siteDao;
+
+	@Autowired
+	private SiteDbToModelConverter siteDbToModelConverter;
+
+	public ImportTransferOutbound importDemographics(
+			ImporterExporterFactory.IMPORTER_TYPE importerType,
+			ImporterExporterFactory.IMPORT_SOURCE importSource,
+			DemographicImporter.MERGE_STRATEGY mergeStrategy,
+			List<GenericFile> importFileList,
+			String documentLocation,
+			boolean skipMissingDocs,
+			String defaultSiteName) throws IOException, InterruptedException
 	{
 		long importCount = 0;
 		long duplicateCount = 0;
 		long failureCount = 0;
+
+		ImportPreferences importPreferences = new ImportPreferences();
+		importPreferences.setExternalDocumentPath(documentLocation);
+		importPreferences.setImportSource(importSource);
+		importPreferences.setSkipMissingDocs(skipMissingDocs);
+		importPreferences.setThreadCount(1);
+		if(properties.isMultisiteEnabled())
+		{
+			Site site = siteDao.findByName(defaultSiteName);
+			if(site == null)
+			{
+				throw new RuntimeException("No site exists with name '" + defaultSiteName + "'");
+			}
+			importPreferences.setDefaultSite(siteDbToModelConverter.convert(site));
+		}
 
 		ImportLogger importLogger = importerExporterFactory.getImportLogger(importerType);
 		ImportTransferOutbound transferOutbound = new ImportTransferOutbound();
@@ -74,12 +103,11 @@ public class ImportWrapperService
 			{
 				try
 				{
-					patientImportService.importDemographic(importerType,
-							importSource,
+					patientImportService.importDemographic(
+							importerType,
 							importLogger,
 							importFile,
-							documentLocation,
-							skipMissingDocs,
+							importPreferences,
 							mergeStrategy);
 
 					importCount++;
@@ -130,12 +158,14 @@ public class ImportWrapperService
 		return transferOutbound;
 	}
 
-	public ImportTransferOutbound importDemographics(String importerTypeStr,
-	                               String importSourceStr,
-	                               String mergeStrategyStr,
-	                               List<GenericFile> importFileList,
-	                               String documentLocation,
-	                               boolean skipMissingDocs) throws IOException, InterruptedException
+	public ImportTransferOutbound importDemographics(
+			String importerTypeStr,
+			String importSourceStr,
+			String mergeStrategyStr,
+			List<GenericFile> importFileList,
+			String documentLocation,
+			boolean skipMissingDocs,
+			String defaultSiteName) throws IOException, InterruptedException
 	{
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importerTypeStr))
 		{
@@ -163,7 +193,7 @@ public class ImportWrapperService
 			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
-		return importDemographics(importerType, importSource, mergeStrategy, importFileList, documentLocation, skipMissingDocs);
+		return importDemographics(importerType, importSource, mergeStrategy, importFileList, documentLocation, skipMissingDocs, defaultSiteName);
 	}
 
 	protected void onSuccess(GenericFile genericFile)

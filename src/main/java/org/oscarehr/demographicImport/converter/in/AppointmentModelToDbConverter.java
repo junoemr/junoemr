@@ -22,19 +22,14 @@
  */
 package org.oscarehr.demographicImport.converter.in;
 
-import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.Site;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.demographicImport.model.appointment.Site;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
 public class AppointmentModelToDbConverter extends BaseModelToDbConverter<org.oscarehr.demographicImport.model.appointment.Appointment, Appointment>
 {
-	@Autowired
-	private SiteDao siteDao;
-
 	@Override
 	public Appointment convert(org.oscarehr.demographicImport.model.appointment.Appointment input)
 	{
@@ -51,10 +46,16 @@ public class AppointmentModelToDbConverter extends BaseModelToDbConverter<org.os
 
 		if(properties.isMultisiteEnabled())
 		{
-			//TODO how to pick assigned site?
-			//just pick a site for now
-			Site anySite = siteDao.findAll().get(0);
-			appointment.setLocation((anySite != null) ? anySite.getName() : "");
+			Site assignedSite = input.getSite();
+			if(assignedSite == null)
+			{
+				throw new RuntimeException("Missing site assignment");
+			}
+			appointment.setLocation(assignedSite.getName());
+		}
+		else
+		{
+			appointment.setLocation(input.getLocation());
 		}
 
 		return appointment;

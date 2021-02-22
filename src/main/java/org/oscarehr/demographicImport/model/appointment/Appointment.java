@@ -51,7 +51,7 @@ public class Appointment extends AbstractTransientModel
 	private AppointmentStatus status;
 
 	private String location;
-//	private Site site;
+	private Site site;
 
 	public Duration getDuration()
 	{
