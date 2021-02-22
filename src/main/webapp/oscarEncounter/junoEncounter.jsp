@@ -192,6 +192,7 @@
 				assignedIssuesTitle: "<bean:message key="oscarEncounter.assignedIssues.title"/>",
 				referenceResolvedIssuesTitle: "<bean:message key="oscarEncounter.referenceResolvedIssues.title"/>",
 				referenceUnresolvedIssuesTitle: "<bean:message key="oscarEncounter.referenceUnresolvedIssues.title"/>",
+				closeWithoutSaveMsg: "<bean:message key="oscarEncounter.closeWithoutSave.msg"/>",
 			};
 
 
@@ -1148,7 +1149,7 @@
 								</c:if>
 								<input tabindex="23" type='image'
 									   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
-									   onclick='closeEnc(event);return false;'
+									   onclick='encounterNote.closeEnc(event);return false;'
 									   title='<bean:message key="global.btnExit"/>'>&nbsp;
 								<input tabindex="24" type='image'
 									   src="<c:out value="${ctx}/oscarEncounter/graphics/document-print.png"/>"
