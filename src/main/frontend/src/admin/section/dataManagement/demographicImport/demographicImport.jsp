@@ -101,6 +101,25 @@
 				</div>
 			</div>
 
+			<div class="row" ng-if="$ctrl.sitesEnabled">
+				<div class="col-md-12">
+					<%--	multisite selection --%>
+					<juno-select ng-model="$ctrl.selectedSite"
+					             options="$ctrl.siteOptions"
+					             label="Select Site"
+					             label-position="LABEL_POSITION.TOP"
+					             component-style="$ctrl.componentStyle"
+					></juno-select>
+				</div>
+			</div>
+			<div class="row" ng-if="$ctrl.sitesEnabled">
+				<div class="col-md-12">
+					<p class="juno-text">* Import data does not record site information,
+						so all imported data will be assigned to this site when site assignment is needed.
+					</p>
+				</div>
+			</div>
+
 			<div class="row">
 				<div class="col-md-12">
 					<juno-button ng-click="$ctrl.onRunImport()"
