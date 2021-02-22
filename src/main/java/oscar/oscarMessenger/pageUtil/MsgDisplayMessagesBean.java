@@ -429,10 +429,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		return msg;
 	}
 
-	public int getTotalMessages(int type, HttpServletRequest request)
+	public int getTotalMessages(int type, String providerNo)
 	{
-		LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
-		String providerNo = info.getLoggedInProviderNo();
 		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		Integer location = Integer.parseInt(getCurrentLocationId());
 		switch(type)
