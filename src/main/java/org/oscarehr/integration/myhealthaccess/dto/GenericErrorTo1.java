@@ -25,8 +25,12 @@ package org.oscarehr.integration.myhealthaccess.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GenericErrorTo1 implements Serializable
@@ -40,29 +44,39 @@ public class GenericErrorTo1 implements Serializable
 	public static final String ERROR_VALIDATION = "error_field_validation";
 	public static final String ERROR_DUPLICATE_RECORD = "error_duplicate_record";
 
+	@Getter
+	@Setter
 	@JsonProperty("code")
 	private String code;
 
+	@Getter
+	@Setter
 	@JsonProperty("message")
 	private String message;
 
-	public String getCode()
-	{
-		return code;
-	}
+	@Getter
+	@Setter
+	@JsonProperty("error_description")
+	private String errorDescription;
 
-	public void setCode(String code)
-	{
-		this.code = code;
-	}
+	@Getter
+	@Setter
+	@JsonProperty("data")
+	private Map<String, String> data;
 
-	public String getMessage()
+	@Override
+	public String toString()
 	{
-		return message;
-	}
+		String dataString = "";
+		if (this.data != null)
+		{
+			dataString = this.data.entrySet().stream().map((entry) -> entry.getKey() + ": " + entry.getValue())
+					.collect(Collectors.joining("\n"));
+		}
 
-	public void setMessage(String message)
-	{
-		this.message = message;
+		return "Error Code: " + this.code +
+				"\nError Message: " + this.message +
+				"\nError Description: " + this.errorDescription +
+				"\nError Data: " + dataString;
 	}
 }
