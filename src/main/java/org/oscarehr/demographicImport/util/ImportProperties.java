@@ -24,7 +24,6 @@ package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.demographicImport.model.appointment.Site;
 import org.springframework.stereotype.Component;
 
 @Data
