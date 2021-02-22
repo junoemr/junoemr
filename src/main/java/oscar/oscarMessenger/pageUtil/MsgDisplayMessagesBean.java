@@ -36,13 +36,11 @@ import org.oscarehr.common.dao.forms.FormsDao;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.OscarCommLocations;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarMessenger.data.MsgDisplayMessage;
 import oscar.util.ConversionUtils;
-import javax.servlet.http.HttpServletRequest;
 
 import static org.apache.commons.lang.StringUtils.stripToNull;
 
@@ -523,13 +521,12 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getDeletedMessageIDs() {
-		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
+	void getDeletedMessageIDs(String providerNo) {
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		try {
-			MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
-			for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+			for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 				messageid.add("" + ml.getMessage());
 				status.add("deleted");
 			}
@@ -542,8 +539,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getSentMessageIDs() {
-		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
+	void getSentMessageIDs(String providerNo) {
 
 		messageid = new Vector<String>();
 		status = new Vector<String>();
