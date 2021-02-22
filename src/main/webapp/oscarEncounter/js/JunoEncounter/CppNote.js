@@ -290,7 +290,6 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		if (Array.isArray(assignedCMIssues) && assignedCMIssues.length > 0)
 		{
 			var idx;
-			var cppDisplay = "";
 			for(idx = 0; idx < assignedCMIssues.length; idx++)
 			{
 				var assignedIssue = assignedCMIssues[idx];
@@ -305,13 +304,6 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 				}
 
 				noteIssueUl += "<input type='checkbox' id='issueId' name='issue_id' checked value='" + assignedIssue.issue_id + "' \>" + assignedIssue.issue.description;
-
-				/* XXX: don't show CPP issues
-				if (cppDisplay == "")
-				{
-					cppDisplay = getCPP(issueArray[idx + 1]);
-				}
-				*/
 			}
 
 			if (idx % 2 === 0)
@@ -339,7 +331,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		//var obj = {};
 		Element.observe('anno', 'click', this.junoEncounter.openAnnotation.bindAsEventListener(this, noteId, "issue", demoNo));
 
-		this.prepareExtraFields(cppDisplay, extraFields);
+		this.prepareExtraFields(title, extraFields);
 
 
 		// Build position dropdown
