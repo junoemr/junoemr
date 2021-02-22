@@ -238,8 +238,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		messagePosition = new Vector<String>();
 		int index = 0;
 
-		MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
-		for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
+		for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 			messagePosition.add(Integer.toString(index));
 			messageid.add("" + ml.getMessage());
 			status.add(ml.getStatus());
