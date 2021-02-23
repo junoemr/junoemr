@@ -73,39 +73,37 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		// initialization
 		controller.init = function init()
 		{
-			systemPreferenceApi.getPropertyValue("default_tickler_provider").then((response)=>
-			{
-				if (response.data.body != null)
+			systemPreferenceApi.getPropertyValue("default_tickler_provider").then((response) =>
 				{
+					if (response.data.body === null)
+					{
+						return Promise.reject("Response body is empty");
+					}
+
 					controller.defaultTicklerProviderNo = response.data.body;
 
 					if (response.data.body.length && response.data.body.length > 0)
-					{ // Ask provider service for information on the provider number
+					{
 						return providerService.getProvider(parseInt(controller.defaultTicklerProviderNo));
 					}
-				}
-				else
+				})
+				.then(response =>
 				{
-					return Promise.reject("Response body is empty");
-				}
-			})
-			.then(response =>
-			{
-				let firstName = response.firstName || "";
-				let lastName = response.lastName || "";
+					let firstName = response.firstName || "";
+					let lastName = response.lastName || "";
 
-				let name = firstName + " " + lastName;
-				controller.defaultTicklerProviderName = name;
-			})
-			.finally(() =>
-			{
-				controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
-				controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
-			})
-			.catch((error) =>
-			{
-				console.log(error);
-			})
+					let name = firstName + " " + lastName;
+					controller.defaultTicklerProviderName = name;
+				})
+				.finally(() =>
+				{
+					controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
+					controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
+				})
+				.catch((error) =>
+				{
+					console.log(error);
+				})
 
 			if (Juno.Common.Util.exists($stateParams.demographicNo))
 			{
