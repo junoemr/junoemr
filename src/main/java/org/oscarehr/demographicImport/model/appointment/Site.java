@@ -20,16 +20,20 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.demographicImport.model.appointment;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.springframework.stereotype.Component;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.common.Address;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 
 @Data
-@Component
-public class ImportProperties
+public class Site extends AbstractTransientModel
 {
-	private ImportLogger importLogger;
-	private ImportPreferences importPreferences;
+	private Integer id;
+	private String name;
+	private String shortName;
+	private PhoneNumber phoneNumber;
+	private PhoneNumber faxNumber;
+	private Address address;
 }

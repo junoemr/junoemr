@@ -1,5 +1,3 @@
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -22,6 +20,9 @@ import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION
  * Victoria, British Columbia
  * Canada
  */
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {SitesApi} from "../../../../../generated";
+
 angular.module('Admin.Section.DataManagement').component('demographicImport',
 	{
 		templateUrl: 'src/admin/section/dataManagement/demographicImport/demographicImport.jsp',
@@ -30,11 +31,22 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 		},
 		controller: [
 			'$scope',
+			'$http',
+			'$httpParamSerializer',
+			'$q',
 			'$uibModal',
 			'demographicsService',
-			function ($scope, $uibModal, demographicsService)
+			function (
+				$scope,
+				$http,
+				$httpParamSerializer,
+				$q,
+				$uibModal,
+				demographicsService)
 			{
 				let ctrl = this;
+
+				ctrl.sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
 
 				$scope.LABEL_POSITION = LABEL_POSITION;
 				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -43,7 +55,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				ctrl.importTypeOptions = Object.freeze(
 					[
 						{
-							label: 'CDS 5.0',
+							label: 'CDS 5',
 							value: 'CDS_5',
 						},
 					]
@@ -92,19 +104,34 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						},
 					]
 				);
-
+				ctrl.siteOptions = [];
 
 				ctrl.selectedImportSource = ctrl.importSourceOptions[0].value;
 				ctrl.selectedMergeStrategy = ctrl.mergeOptions[0].value;
 				ctrl.selectedImportType = ctrl.importTypeOptions[0].value;
+				ctrl.selectedSite = null;
 				ctrl.selectedFiles = [];
 
 				ctrl.results = null;
 				ctrl.importRunning = false;
+				ctrl.sitesEnabled = false;
 
 				ctrl.$onInit = () =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
+					// set up multisite selection if needed
+					ctrl.loadSitesEnabled().then((enabled) =>
+					{
+						if (enabled)
+						{
+							ctrl.loadSites().then((siteOptions) =>
+							{
+								ctrl.siteOptions = siteOptions;
+								ctrl.selectedSite = siteOptions[0].value;
+							});
+						}
+					});
 				}
 
 				ctrl.onRunImport = async () =>
@@ -121,6 +148,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						ctrl.selectedImportType,
 						ctrl.selectedImportSource,
 						ctrl.selectedMergeStrategy,
+						ctrl.selectedSite,
 						formattedFileList
 					).then((response) =>
 						{
@@ -178,6 +206,57 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						reader.onerror = (error) => reject(error);
 					});
 				}
+
+				ctrl.loadSitesEnabled = () =>
+				{
+					let deferred = $q.defer();
+
+					ctrl.sitesApi.getSitesEnabled().then(
+						function success(rawResults)
+						{
+							let enabled = rawResults.data.body;
+							ctrl.sitesEnabled = enabled;
+							deferred.resolve(enabled);
+						},
+						function failure(results)
+						{
+							deferred.reject(results.data.body);
+						}
+					);
+
+					return deferred.promise;
+				};
+				ctrl.loadSites = () =>
+				{
+					let deferred = $q.defer();
+
+					ctrl.sitesApi.getSiteList().then(
+						function success(rawResults)
+						{
+							let results = rawResults.data.body;
+							let out = [];
+							if (angular.isArray(results))
+							{
+								for (let i = 0; i < results.length; i++)
+								{
+									out.push({
+										uuid: results[i].siteId,
+										value: results[i].name,
+										label: results[i].name,
+										color: results[i].bgColor,
+									});
+								}
+							}
+							deferred.resolve(out);
+						},
+						function failure(results)
+						{
+							deferred.reject(results);
+						}
+					);
+
+					return deferred.promise;
+				};
 
 				ctrl.onFileSelected = (files) =>
 				{

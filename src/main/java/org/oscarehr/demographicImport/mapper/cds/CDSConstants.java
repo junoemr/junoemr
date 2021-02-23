@@ -71,4 +71,7 @@ public class CDSConstants
 
 	public static final String DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE = "EC";
 	public static final String DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE = "SDM";
+
+	// this document-class value shows up in HRM and CDS documentation but does not match the schema
+	public static final String DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE = "Medical Record Report";
 }

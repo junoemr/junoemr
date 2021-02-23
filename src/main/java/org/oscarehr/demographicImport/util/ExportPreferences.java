@@ -27,20 +27,20 @@ import lombok.Data;
 @Data
 public class ExportPreferences
 {
-	boolean exportAlertsAndSpecialNeeds;
-	boolean exportAllergiesAndAdverseReactions;
-	boolean exportAppointments;
-	boolean exportCareElements;
-	boolean exportClinicalNotes;
-	boolean exportFamilyHistory;
-	boolean exportImmunizations;
-	boolean exportLaboratoryResults;
-	boolean exportMedicationsAndTreatments;
-	boolean exportPastHealth;
-	boolean exportPersonalHistory;
-	boolean exportProblemList;
-	boolean exportReportsReceived;
-	boolean exportRiskFactors;
+	private boolean exportAlertsAndSpecialNeeds;
+	private boolean exportAllergiesAndAdverseReactions;
+	private boolean exportAppointments;
+	private boolean exportCareElements;
+	private boolean exportClinicalNotes;
+	private boolean exportFamilyHistory;
+	private boolean exportImmunizations;
+	private boolean exportLaboratoryResults;
+	private boolean exportMedicationsAndTreatments;
+	private boolean exportPastHealth;
+	private boolean exportPersonalHistory;
+	private boolean exportProblemList;
+	private boolean exportReportsReceived;
+	private boolean exportRiskFactors;
 
-	int threadCount;
+	private int threadCount;
 }

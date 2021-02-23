@@ -160,7 +160,7 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
-		service.demographicImport = function demographicImport(type, source, mergeStrategy, files)
+		service.demographicImport = function demographicImport(type, source, mergeStrategy, site, files)
 		{
 			var deferred = $q.defer();
 
@@ -169,6 +169,7 @@ angular.module("Common.Services").service("demographicsService", [
 				type: type,
 				source: source,
 				merge: mergeStrategy,
+				site: site,
 			};
 
 			junoHttp.post(service.apiPath + '/import', files, config).then(

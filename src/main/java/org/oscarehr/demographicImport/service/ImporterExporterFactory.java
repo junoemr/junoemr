@@ -31,6 +31,7 @@ import org.oscarehr.demographicImport.service.cds.CDSImporter;
 import org.oscarehr.demographicImport.service.hrm.HRMExporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.demographicImport.util.ExportProperties;
+import org.oscarehr.demographicImport.util.ImportPreferences;
 import org.oscarehr.demographicImport.util.ImportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -96,16 +97,10 @@ public class ImporterExporterFactory
 		}
 	}
 
-	public DemographicImporter getImporter(IMPORTER_TYPE type,
-	                                       IMPORT_SOURCE importSource,
-	                                       ImportLogger importLogger,
-	                                       String documentLocation,
-	                                       boolean skipMissingDocs)
+	public DemographicImporter getImporter(IMPORTER_TYPE type, ImportLogger importLogger, ImportPreferences importPreferences)
 	{
-		importProperties.setImportSource(importSource);
 		importProperties.setImportLogger(importLogger);
-		importProperties.setExternalDocumentPath(documentLocation);
-		importProperties.setSkipMissingDocs(skipMissingDocs);
+		importProperties.setImportPreferences(importPreferences);
 
 		switch(type)
 		{

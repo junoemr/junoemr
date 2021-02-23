@@ -54,6 +54,7 @@ import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
+import org.oscarehr.demographicImport.util.ImportPreferences;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
@@ -181,14 +182,12 @@ public class PatientImportService
 	private HRMService hrmService;
 
 	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
-	                              ImporterExporterFactory.IMPORT_SOURCE importSource,
 	                              ImportLogger importLogger,
 	                              GenericFile importFile,
-	                              String documentLocation,
-	                              boolean skipMissingDocs,
+	                              ImportPreferences importPreferences,
 	                              DemographicImporter.MERGE_STRATEGY mergeStrategy) throws Exception
 	{
-		DemographicImporter importer = importerExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
+		DemographicImporter importer = importerExporterFactory.getImporter(importType, importLogger, importPreferences);
 		importer.verifyFileFormat(importFile);
 		PatientRecord patientRecord = importer.importDemographic(importFile);
 
@@ -236,7 +235,7 @@ public class PatientImportService
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
 
 		importLogger.logSummaryLine(patientRecord);
-		writeAuditLogImportStatement(dbDemographic, importType, importSource, duplicateDetected);
+		writeAuditLogImportStatement(dbDemographic, importType, importPreferences.getImportSource(), duplicateDetected);
 	}
 
 	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)

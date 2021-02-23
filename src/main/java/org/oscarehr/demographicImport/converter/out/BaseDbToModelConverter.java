@@ -31,6 +31,7 @@ import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.OscarProperties;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -38,6 +39,7 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverter<I, E>
 {
+	protected static final OscarProperties properties = OscarProperties.getInstance();
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final ConcurrentMap<String, Provider> providerLookupCache = new ConcurrentHashMap<>();
 

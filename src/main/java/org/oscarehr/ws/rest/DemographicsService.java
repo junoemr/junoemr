@@ -295,6 +295,7 @@ public class DemographicsService extends AbstractServiceImpl
 			@QueryParam("type") String type,
 			@QueryParam("source") String importSource,
 			@QueryParam("merge") String mergeStrategy,
+			@QueryParam("site") String defaultSiteName,
 			List<FileTransfer> fileListTransfer) throws IOException, InterruptedException
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
@@ -324,7 +325,8 @@ public class DemographicsService extends AbstractServiceImpl
 				mergeStrategy,
 				importFileList,
 				documentLocation,
-				false);
+				false,
+				defaultSiteName);
 
 		// clean up temp files
 		for(GenericFile tempFile : genericFileList)

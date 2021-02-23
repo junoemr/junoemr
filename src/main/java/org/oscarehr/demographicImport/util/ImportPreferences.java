@@ -23,13 +23,16 @@
 package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.springframework.stereotype.Component;
+import org.oscarehr.demographicImport.model.appointment.Site;
+import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 
 @Data
-@Component
-public class ImportProperties
+public class ImportPreferences
 {
-	private ImportLogger importLogger;
-	private ImportPreferences importPreferences;
+	private Site defaultSite;
+	private String externalDocumentPath;
+	private boolean skipMissingDocs;
+	private ImporterExporterFactory.IMPORT_SOURCE importSource;
+
+	int threadCount;
 }

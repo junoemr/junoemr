@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.demographicImport.model.appointment.Site;
 import org.oscarehr.demographicImport.service.AppointmentStatusCache;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +55,27 @@ public class AppointmentDbToModelConverter extends
 				"providerNo",
 				"creator",
 				"demographicNo",
-				"status"
+				"status",
+				"location"
 		);
 
 		appointment.setAppointmentStartDateTime(ConversionUtils.toLocalDateTime(input.getStartTimeAsFullDate()));
 		appointment.setAppointmentEndDateTime(ConversionUtils.toLocalDateTime(input.getEndTimeAsFullDate()));
 		appointment.setProvider(findProvider(input.getProviderNo()));
 		appointment.setStatus(appointmentStatusCache.findByCode(input.getAppointmentStatus()));
+
+		// TODO load this from a cache similar to appointmentStatus
+		// we don't need it for exporting anything right now though
+		if(properties.isMultisiteEnabled())
+		{
+			Site site = new Site();
+			site.setName(input.getLocation());
+			appointment.setSite(site);
+		}
+		else
+		{
+			appointment.setLocation(input.getLocation());
+		}
 
 		return appointment;
 	}

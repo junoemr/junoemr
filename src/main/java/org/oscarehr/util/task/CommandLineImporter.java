@@ -56,8 +56,9 @@ public class CommandLineImporter extends ImportWrapperService implements Command
 				new StringArg("file-directory", null, true),
 				new StringArg("document-directory", null, false),
 				new StringArg("source-type", null, false),
-				new StringArg("mergeStrategy", DemographicImporter.MERGE_STRATEGY.SKIP.name(), false),
-				new BooleanArg("skipMissingDocs", false, false)
+				new StringArg("merge-strategy", DemographicImporter.MERGE_STRATEGY.SKIP.name(), false),
+				new BooleanArg("skip-missing-docs", false, false),
+				new StringArg("site-name", null, false)
 				);
 	}
 
@@ -69,8 +70,9 @@ public class CommandLineImporter extends ImportWrapperService implements Command
 		String importFileLocation = (String) args.get("file-directory").getValue();
 		String importDocumentLocation = (String) args.get("document-directory").getValue();
 		String importSourceStr = (String) args.get("source-type").getValue();
-		Boolean skipMissingDocs = (Boolean) args.get("skipMissingDocs").getValue();
-		String mergeStrategyStr = (String) args.get("mergeStrategy").getValue();
+		Boolean skipMissingDocs = (Boolean) args.get("skip-missing-docs").getValue();
+		String mergeStrategyStr = (String) args.get("merge-strategy").getValue();
+		String defaultSiteName = (String) args.get("site-name").getValue();
 
 		File importFileDirectory = new File(importFileLocation);
 		if(!(importFileDirectory.exists() && importFileDirectory.isDirectory()))
@@ -111,7 +113,8 @@ public class CommandLineImporter extends ImportWrapperService implements Command
 					mergeStrategyStr,
 					genericFileList,
 					importDocumentLocation,
-					skipMissingDocs);
+					skipMissingDocs,
+					defaultSiteName);
 		}
 		catch(Exception e)
 		{
