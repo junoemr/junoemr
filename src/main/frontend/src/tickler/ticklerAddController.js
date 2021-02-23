@@ -1,32 +1,39 @@
+import {SystemPreferenceApi} from "../../generated";
+
 angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 	'$scope',
 	'$uibModalInstance',
 	'$filter',
 	'$stateParams',
+	'$http',
+	'$httpParamSerializer',
 	'demographicService',
 	'demographicsService',
 	'providerService',
 	'ticklerService',
-	'securityService',
 
 	function(
 		$scope,
 		$uibModalInstance,
 		$filter,
 		$stateParams,
+		$http,
+		$httpParamSerializer,
 		demographicService,
 		demographicsService,
 		providerService,
-		ticklerService,
-		securityService)
+		ticklerService)
 	{
-
 		var controller = this;
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
 		// holds the patient typeahead selection
 		controller.demographicSearch = null;
 		controller.isDisabled = false; // Save button enabled by default
+
+		controller.defaultTicklerProviderNo = null;
+		controller.defaultTicklerProviderName = null;
 		//=========================================================================
 		// Watches
 		//=========================================================================
@@ -57,8 +64,8 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			serviceDateDate: new Date(),
 			serviceDateTime: "12:00 AM",
 			suggestedTextId: 0,
-			taskAssignedTo: securityService.getUser().providerNo,
-			taskAssignedToName: securityService.getUser().firstName + " " + securityService.getUser().lastName,
+			taskAssignedTo: null,
+			taskAssignedToName: null,
 		};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
@@ -66,6 +73,33 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		// initialization
 		controller.init = function init()
 		{
+			systemPreferenceApi.getPropertyValue("default_tickler_provider").then((response)=>
+			{
+				controller.defaultTicklerProviderNo = response.data.body;
+
+				if (response.data.body.length && response.data.body.length > 0)
+				{ // Ask provider service for information on the provider number
+					return providerService.getProvider(parseInt(controller.defaultTicklerProviderNo));
+				}
+			})
+			.then(response =>
+			{
+				let firstName = response.firstName || "";
+				let lastName = response.lastName || "";
+
+				let name = firstName + " " + lastName;
+				controller.defaultTicklerProviderName = name;
+			})
+			.finally(() =>
+			{
+				controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
+				controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
+			})
+			.catch((error) =>
+			{
+				console.log(error);
+			})
+
 			if (Juno.Common.Util.exists($stateParams.demographicNo))
 			{
 				console.log('initializing demographicSearch pre-selected', $stateParams.demographicNo);
