@@ -227,6 +227,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				url: '/demographicImport',
 				component: 'demographicImport',
 			})
+		.state('admin.demographicExport',
+			{
+				url: '/demographicExport',
+				component: 'demographicExport',
+			})
 		.state('ticklers',
 		{
 			url: '/ticklers',

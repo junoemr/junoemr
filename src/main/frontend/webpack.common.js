@@ -350,6 +350,7 @@ module.exports = {
 			'./src/admin/section/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.js',
 			'./src/admin/section/dataManagement/module.js',
 			'./src/admin/section/dataManagement/demographicImport/demographicImportComponent.js',
+			'./src/admin/section/dataManagement/demographicExport/demographicExportComponent.js',
 
 			'./src/billing/billingController.js',
 

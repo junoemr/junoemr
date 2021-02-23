@@ -680,7 +680,7 @@ public class AdminNavService
 
 		dataManagementGroup.setName(resourceBundle.getString("admin.admin.DataManagement"));
 
-		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DemoExport"), "frame?frameUrl=" + contextPath + "/demographic/demographicExport.jsp"));
+		dataManagementItems.add(new AdminNavItemTo1("Demographic Export", "demographicExport"));
 		dataManagementItems.add(new AdminNavItemTo1("Demographic Import", "demographicImport"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.mergeRec"), "frame?frameUrl=" + contextPath + "/admin/demographicmergerecord.jsp"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnUpdatePatientProvider"), "frame?frameUrl=" + contextPath + "/admin/updatedemographicprovider.jsp"));

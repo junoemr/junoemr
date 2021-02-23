@@ -21,7 +21,7 @@
 * Canada
 --%>
 <div id="admin-demographic-import">
-	<panel id="cds-import-panel"
+	<panel id="import-panel"
 	       component-style="$ctrl.componentStyle">
 		<panel-header>
 			<h6 class="juno-text">Demographic Import</h6>
