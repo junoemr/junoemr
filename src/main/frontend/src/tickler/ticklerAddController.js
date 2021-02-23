@@ -82,10 +82,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 					controller.defaultTicklerProviderNo = response.data.body;
 
-					if (response.data.body.length && response.data.body.length > 0)
-					{
-						return providerService.getProvider(parseInt(controller.defaultTicklerProviderNo));
-					}
+					return providerService.getProvider(parseInt(controller.defaultTicklerProviderNo));
 				})
 				.then(response =>
 				{
