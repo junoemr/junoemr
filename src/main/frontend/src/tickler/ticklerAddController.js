@@ -77,7 +77,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				{
 					if (response.data.body === null)
 					{
-						return Promise.reject("Response body is empty");
+						return Promise.resolve({firstName: "", lastName: ""});
 					}
 
 					controller.defaultTicklerProviderNo = response.data.body;
@@ -92,6 +92,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 					let firstName = response.firstName || "";
 					let lastName = response.lastName || "";
 
+					if (firstName === "" && lastName === "")
+					{
+						controller.defaultTicklerProviderName = "";
+						return;
+					}
+
 					let name = firstName + " " + lastName;
 					controller.defaultTicklerProviderName = name;
 				})
@@ -99,10 +105,6 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				{
 					controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
 					controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
-				})
-				.catch((error) =>
-				{
-					console.log(error);
 				})
 
 			if (Juno.Common.Util.exists($stateParams.demographicNo))
