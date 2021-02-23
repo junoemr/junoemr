@@ -28,10 +28,15 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HRMReport_4_1 extends AbstractHRMReport implements HRMReport
+public class HRMReport_4_1 implements HRMReport
 {
 	private final OmdCds hrmReport;
 	private final Demographics demographics;
+	private String fileLocation;
+	private String fileData;
+
+	private Integer hrmDocumentId;
+	private Integer hrmParentDocumentId;
 
 	public HRMReport_4_1(OmdCds hrmReport)
 	{
@@ -52,14 +57,33 @@ public class HRMReport_4_1 extends AbstractHRMReport implements HRMReport
 		return hrmReport;
 	}
 
-	@Override
+	public String getFileData()
+	{
+		return fileData;
+	}
+
+	public String getFileLocation()
+	{
+		return fileLocation;
+	}
+
+	public void setFileLocation(String fileLocation)
+	{
+		this.fileLocation = fileLocation;
+	}
+
+	public String getLegalName()
+	{
+		PersonNameStandard name = demographics.getNames();
+		return name.getLegalName().getLastName().getPart() + ", " + name.getLegalName().getFirstName().getPart();
+	}
+
 	public String getLegalLastName()
 	{
 		PersonNameStandard name = demographics.getNames();
 		return name.getLegalName().getLastName().getPart();
 	}
 
-	@Override
 	public String getLegalFirstName()
 	{
 		PersonNameStandard name = demographics.getNames();
@@ -78,10 +102,21 @@ public class HRMReport_4_1 extends AbstractHRMReport implements HRMReport
 		return otherNames;
 	}
 
-	@Override
-	public XMLGregorianCalendar getXMLDateOfBirth()
+	public List<Integer> getDateOfBirth()
 	{
-		return dateFP(demographics.getDateOfBirth());
+		List<Integer> dateOfBirthList = new ArrayList<Integer>();
+		XMLGregorianCalendar fullDate = dateFP(demographics.getDateOfBirth());
+		dateOfBirthList.add(fullDate.getYear());
+		dateOfBirthList.add(fullDate.getMonth());
+		dateOfBirthList.add(fullDate.getDay());
+
+		return dateOfBirthList;
+	}
+
+	public String getDateOfBirthAsString()
+	{
+		List<Integer> dob = getDateOfBirth();
+		return dob.get(0) + "-" + dob.get(1) + "-" + dob.get(2);
 	}
 
 	public String getHCN()
@@ -231,7 +266,6 @@ public class HRMReport_4_1 extends AbstractHRMReport implements HRMReport
 		return result;
 	}
 
-	@Override
 	public byte[] getBase64BinaryContent()
 	{
 		try
@@ -243,6 +277,11 @@ public class HRMReport_4_1 extends AbstractHRMReport implements HRMReport
 			MiscUtils.getLogger().error("error", e);
 		}
 		return null;
+	}
+
+	public byte[] getBinaryContent()
+	{
+		return Base64.decodeBase64(getBase64BinaryContent());
 	}
 
 	public String getFirstReportClass()
@@ -273,10 +312,18 @@ public class HRMReport_4_1 extends AbstractHRMReport implements HRMReport
 		return null;
 	}
 
-	@Override
-	public String getPhysicianHL7String()
+	public List<String> getFirstReportAuthorPhysician()
 	{
-		return hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician().getLastName();
+		List<String> physicianName = new ArrayList<String>();
+		String physicianHL7String = hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician().getLastName();
+		String[] physicianNameArray = physicianHL7String.split("^");
+		physicianName.add(physicianNameArray[0]);
+		physicianName.add(physicianNameArray[1]);
+		physicianName.add(physicianNameArray[2]);
+		physicianName.add(physicianNameArray[3]);
+		physicianName.add(physicianNameArray[6]);
+
+		return physicianName;
 	}
 
 	public String getSendingFacilityId()
@@ -390,6 +437,27 @@ public class HRMReport_4_1 extends AbstractHRMReport implements HRMReport
 			return null;
 		return hrmReport.getPatientRecord().getTransactionInformation().get(0).getProvider().getLastName();
 	}
+
+	public Integer getHrmDocumentId()
+	{
+		return hrmDocumentId;
+	}
+
+	public void setHrmDocumentId(Integer hrmDocumentId)
+	{
+		this.hrmDocumentId = hrmDocumentId;
+	}
+
+	public Integer getHrmParentDocumentId()
+	{
+		return hrmParentDocumentId;
+	}
+
+	public void setHrmParentDocumentId(Integer hrmParentDocumentId)
+	{
+		this.hrmParentDocumentId = hrmParentDocumentId;
+	}
+
 
 	private XMLGregorianCalendar dateFP(DateFullOrPartial dfp)
 	{
