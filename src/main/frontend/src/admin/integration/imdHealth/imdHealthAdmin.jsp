@@ -70,6 +70,13 @@
                             Test
                         </juno-button>
                         <juno-button
+                                ng-click="$ctrl.syncIntegrations(integration.integrationId)"
+                                button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
+                                button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                                component-style="$ctrl.componentStyle">
+                            Sync
+                        </juno-button>
+                        <juno-button
                             ng-click="$ctrl.removeIntegration(integration.integrationId)"
                             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED">

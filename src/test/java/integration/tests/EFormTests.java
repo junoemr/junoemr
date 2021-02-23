@@ -50,7 +50,7 @@ public class EFormTests extends SeleniumTestBase
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic("Test", "Test", "F");
+		DatabaseUtil.createTestDemographic();
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
 	}
 

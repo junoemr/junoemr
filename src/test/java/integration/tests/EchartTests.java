@@ -52,7 +52,7 @@ public class EchartTests extends SeleniumTestBase
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic("Test", "Test", "F");
+		DatabaseUtil.createTestDemographic();
 	}
 
 	@AfterClass

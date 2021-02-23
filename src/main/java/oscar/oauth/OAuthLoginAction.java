@@ -43,6 +43,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.PMmodule.dao.SecUserRoleDao;
+import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.common.dao.SecurityDao;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.Security;
 import org.oscarehr.login.dto.LoginForwardURL;
 import org.oscarehr.login.service.LoginService;
 import org.oscarehr.util.MiscUtils;
@@ -64,6 +70,9 @@ public final class OAuthLoginAction extends DispatchAction
 	protected static final OscarProperties props = oscar.OscarProperties.getInstance();
 
 	private LoginService loginService = SpringUtils.getBean(LoginService.class);
+	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	private SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
+	private SecUserRoleDao secUserRoleDao = SpringUtils.getBean(SecUserRoleDao.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -99,14 +108,31 @@ public final class OAuthLoginAction extends DispatchAction
 
 				if (isProjectMember(email))
 				{
+					String userName = "oscar_host";
+					Security security = securityDao.findByUserName(userName);
+					Provider provider = providerDao.getProvider(security.getProviderNo());
+					List<SecUserRole> roles = secUserRoleDao.getUserRoles(security.getProviderNo());
+					String rolename = null;
+					for (SecUserRole role : roles)
+					{
+						if (rolename == null)
+						{
+							rolename = role.getRoleName();
+						}
+						else
+						{
+							rolename += "," + role.getRoleName();
+						}
+					}
+
 					LoginForwardURL loginForwardURL = loginService.loginSuccess(mapping,
 							request,
-							"oscar_host",
-							"999900",
+							userName,
+							security.getProviderNo(),
 							(String) payload.get("given_name"),
 							(String) payload.get("family_name"),
-							"doctor",
-							"doctor,admin",
+							provider.getProviderType(),
+							rolename,
 							payload.getExpirationTimeSeconds().toString(),
 							"",
 							"",

@@ -28,22 +28,20 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.model.UserIntegrationAccess;
-import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
 import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
-import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidUserIntegrationException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -70,15 +68,8 @@ public class ClinicService extends BaseService
 		ClinicUserCreateResponseTo1 response = null;
 		String clinicId = integrationData.getIntegration().getRemoteId();
 
-		try
-		{
-			endpoint = restClient.formatEndpoint(endpoint, clinicId);
-			response = restClient.doPost(endpoint, newUser, ClinicUserCreateResponseTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
+		endpoint = restClient.formatEndpoint(endpoint, clinicId);
+		response = restClient.doPost(endpoint, newUser, ClinicUserCreateResponseTo1.class);
 
 		return response;
 	}
@@ -106,16 +97,23 @@ public class ClinicService extends BaseService
 	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(Integration integration, Integer securityNo) throws InvalidIntegrationException
 	{
 		Security security = securityDao.find(securityNo);
-		ProviderData provider = providerDataDao.find(security.getProviderNo());
-		if (security != null && provider != null)
+
+		if (security != null)
 		{
-			return loginOrCreateClinicUser(security, provider.getFirstName(), provider.getLastName(),
-					integration.getSite() != null ? integration.getSite().getName() : null);
+			ProviderData provider = providerDataDao.find(security.getProviderNo());
+			if (provider != null)
+			{
+				return loginOrCreateClinicUser(security, provider.getFirstName(), provider.getLastName(),
+						integration.getSite() != null ? integration.getSite().getName() : null);
+			}
+			else
+			{
+				throw new RecordNotFoundException("Provider record [" + security.getProviderNo() + "] was not found");
+			}
 		}
 		else
 		{
-			MiscUtils.getLogger().warn("Failed to create or login to MHA clinic_user. Security lookup failed. Security No:" + securityNo);
-			return null;
+			throw new RecordNotFoundException("Security record [" + securityNo + "] was not found");
 		}
 	}
 
@@ -161,17 +159,11 @@ public class ClinicService extends BaseService
 		String remoteUserId = integrationData.getRemoteUserId();
 
 		ClinicUserLoginTokenTo1 loginToken = null;
-		try
-		{
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("X-API-Key", integrationData.getUserApiKey());
-			endpoint = restClient.formatEndpoint(endpoint, remoteUserId);
-			loginToken = restClient.doPost(endpoint, headers, null, ClinicUserLoginTokenTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("X-API-Key", integrationData.getUserApiKey());
+		endpoint = restClient.formatEndpoint(endpoint, remoteUserId);
+		loginToken = restClient.doPost(endpoint, headers, null, ClinicUserLoginTokenTo1.class);
 
 		return loginToken;
 	}
@@ -185,15 +177,8 @@ public class ClinicService extends BaseService
 
 		ClinicStatusResponseTo1 response = null;
 
-		try
-		{
-			endpoint = restClient.formatEndpoint(endpoint, clinicId);
-			response = restClient.doGet(endpoint, ClinicStatusResponseTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
+		endpoint = restClient.formatEndpoint(endpoint, clinicId);
+		response = restClient.doGet(endpoint, ClinicStatusResponseTo1.class);
 
 		return response;
 	}

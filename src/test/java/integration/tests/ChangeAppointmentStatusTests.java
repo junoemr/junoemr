@@ -39,6 +39,8 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.Set;
 
+import static integration.tests.AddPatientsTests.mom;
+import static integration.tests.AddPatientsTests.momFullNameJUNO;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
@@ -53,7 +55,7 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 	public static void setup() throws Exception
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic("Test", "Test", "F");
+		DatabaseUtil.createTestDemographic();
 		DatabaseUtil.createTestProvider();
 		DatabaseUtil.createProviderSite();
 	}
@@ -88,10 +90,10 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
 		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
-		addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle, mom.firstName);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
-				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
 		WebElement statusButton = driver.findElement(By.className("apptStatus"));
 		String statusTD = apptStatusHoverOver();
@@ -99,9 +101,10 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
+		Thread.sleep(10000);//wait for clicking to change the status.
 		driver.navigate().refresh();
 		String statusDP = apptStatusHoverOver();
-		Assert.assertEquals("Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
+		Assert.assertEquals("Classic UI: Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
 
 		//Edit from "Edit An Appointment" page
 		Set<String> oldWindowHandles = driver.getWindowHandles();
@@ -111,7 +114,7 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
 		String statusCus2 = apptStatusHoverOver();
-		Assert.assertEquals("Status is NOT updated to Customized 2 Successfully", statusExpectedCusomized2, statusCus2);
+		Assert.assertEquals("Classic UI: Status is NOT updated to Customized 2 Successfully", statusExpectedCusomized2, statusCus2);
 	}
 
 	@Test
@@ -120,10 +123,10 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();
 		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
-		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
-				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
 		accessSectionJUNOUI(driver, "Schedule");
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
@@ -137,17 +140,17 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
-		Thread.sleep(1000);//wait for clicking to change the status.
+		Thread.sleep(3000);//wait for clicking to change the status.
 		String statusDP = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']"))
 				.getAttribute("title");
-		Assert.assertEquals("Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
+		Assert.assertEquals("JUNO UI: Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
 
 		//Edit from "Modify Appointment" page
-		driver.findElement(By.xpath("//span[contains(., 'Test, Test')]")).click();
+		driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
 		dropdownSelectByValue(driver, By.id("input-event-appt-status"), "C");//Cancelled
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
 		String statusCancelled = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-cancel rotate']"))
 				.getAttribute("title");
-		Assert.assertEquals("Status is NOT updated to Customized 2 Successfully", statusExpectedCancelled, statusCancelled);
+		Assert.assertEquals("JUNO UI: Status is NOT updated to Customized 2 Successfully", statusExpectedCancelled, statusCancelled);
 	}
 }
