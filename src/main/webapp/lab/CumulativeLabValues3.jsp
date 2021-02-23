@@ -75,6 +75,8 @@ try{
         if (!loinc_code.equalsIgnoreCase("NULL")){
             Map<String, HashMap<String, Serializable>> IdMap = new LinkedHashMap<String, HashMap<String, Serializable>>();
 	        ArrayList<Map<String, Serializable>> labValueList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
+				LabDateComparator compare = new LabDateComparator();
+				Collections.sort(labValueList, compare);
 
             for (Map<String, Serializable> labValue : labValueList){
 
@@ -108,7 +110,7 @@ try{
             String[] nameMapKeys = new String[nameMap.size()];
             nameMap.keySet().toArray(nameMapKeys);
             String lastKey = nameMapKeys[nameMapKeys.length-1];
-            
+
             // Do not allow more than one space or more than one header in a row
             // A space is allowed to be followed by a header
             if ( lastKey.startsWith("NULL") && (labName.equalsIgnoreCase("NULL") || !(nameMap.get(lastKey)).equalsIgnoreCase("NULL"))){
@@ -145,6 +147,7 @@ try{
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%@ page import="java.io.Serializable" %>
 <%@ page import="oscar.oscarLab.ca.all.util.LabValuesByReverseDateComparator" %>
+<%@ page import="oscar.oscarLab.ca.all.util.LabDateComparator" %>
 <html:html locale="true">
 
 <head>
