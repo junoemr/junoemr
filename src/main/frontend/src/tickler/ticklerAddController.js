@@ -75,11 +75,18 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		{
 			systemPreferenceApi.getPropertyValue("default_tickler_provider").then((response)=>
 			{
-				controller.defaultTicklerProviderNo = response.data.body;
+				if (response.data.body != null)
+				{
+					controller.defaultTicklerProviderNo = response.data.body;
 
-				if (response.data.body.length && response.data.body.length > 0)
-				{ // Ask provider service for information on the provider number
-					return providerService.getProvider(parseInt(controller.defaultTicklerProviderNo));
+					if (response.data.body.length && response.data.body.length > 0)
+					{ // Ask provider service for information on the provider number
+						return providerService.getProvider(parseInt(controller.defaultTicklerProviderNo));
+					}
+				}
+				else
+				{
+					return Promise.reject("Response body is empty");
 				}
 			})
 			.then(response =>
