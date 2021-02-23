@@ -51,12 +51,13 @@ public class PatientExportService
 	private PatientExportAsyncService patientExportService;
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
-	                                            ExportLogger exportLogger,
 	                                            List<String> demographicIdList,
 	                                            ExportPreferences preferences) throws Exception
 	{
-		exportLogger.logSummaryHeader();
+		ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
 		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
+
+		exportLogger.logSummaryHeader();
 		List<GenericFile> fileList = new ArrayList<>();
 
 		try

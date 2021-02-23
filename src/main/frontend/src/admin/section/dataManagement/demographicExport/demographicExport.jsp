@@ -38,6 +38,15 @@
 					></juno-select>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<juno-button ng-click="$ctrl.onExport()"
+					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.FILL;>
+						Run Export
+					</juno-button>
+				</div>
+			</div>
 		</panel-body>
 	</panel>
 </div>

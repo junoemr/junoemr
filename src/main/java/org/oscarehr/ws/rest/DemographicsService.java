@@ -39,7 +39,10 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.service.ImportWrapperService;
+import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.oscarehr.demographicImport.service.PatientExportService;
 import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
+import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -53,6 +56,7 @@ import org.oscarehr.ws.rest.to.model.StatusValueTo1;
 import org.oscarehr.ws.rest.transfer.common.FileTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.oscarReport.data.DemographicSetManager;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -93,6 +97,9 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@Autowired
 	private ImportWrapperService importWrapperService;
+
+	@Autowired
+	private PatientExportService patientExportService;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -335,6 +342,56 @@ public class DemographicsService extends AbstractServiceImpl
 		}
 
 		return RestResponse.successResponse(transferOutbound);
+	}
+
+	@GET
+	@Path("/export")
+	@Produces("application/zip")
+	@SkipContentLoggingOutbound
+	public Response demographicExport(
+			@QueryParam("type") String type,
+			@QueryParam("patientSet") String patientSet,
+			@QueryParam("exPersonalHistory") @DefaultValue("false") boolean exPersonalHistory,
+			@QueryParam("exFamilyHistory") @DefaultValue("false") boolean exFamilyHistory,
+			@QueryParam("exPastHealth") @DefaultValue("false") boolean exPastHealth,
+			@QueryParam("exProblemList") @DefaultValue("false") boolean exProblemList,
+			@QueryParam("exRiskFactors") @DefaultValue("false") boolean exRiskFactors,
+			@QueryParam("exAllergiesAndAdverseReactions") @DefaultValue("false") boolean exAllergiesAndAdverseReactions,
+			@QueryParam("exMedicationsAndTreatments") @DefaultValue("false") boolean exMedicationsAndTreatments,
+			@QueryParam("exImmunizations") @DefaultValue("false") boolean exImmunizations,
+			@QueryParam("exLaboratoryResults") @DefaultValue("false") boolean exLaboratoryResults,
+			@QueryParam("exAppointments") @DefaultValue("false") boolean exAppointments,
+			@QueryParam("exClinicalNotes") @DefaultValue("false") boolean exClinicalNotes,
+			@QueryParam("exReportsReceived") @DefaultValue("false") boolean exReportsReceived,
+			@QueryParam("exAlertsAndSpecialNeeds") @DefaultValue("false") boolean exAlertsAndSpecialNeeds,
+			@QueryParam("exCareElements") @DefaultValue("false") boolean exCareElements) throws Exception
+	{
+		ExportPreferences exportPreferences = new ExportPreferences();
+		exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
+		exportPreferences.setExportAllergiesAndAdverseReactions(exAllergiesAndAdverseReactions);
+		exportPreferences.setExportAppointments(exAppointments);
+		exportPreferences.setExportCareElements(exCareElements);
+		exportPreferences.setExportClinicalNotes(exClinicalNotes);
+		exportPreferences.setExportFamilyHistory(exFamilyHistory);
+		exportPreferences.setExportImmunizations(exImmunizations);
+		exportPreferences.setExportLaboratoryResults(exLaboratoryResults);
+		exportPreferences.setExportMedicationsAndTreatments(exMedicationsAndTreatments);
+		exportPreferences.setExportPastHealth(exPastHealth);
+		exportPreferences.setExportPersonalHistory(exPersonalHistory);
+		exportPreferences.setExportProblemList(exProblemList);
+		exportPreferences.setExportReportsReceived(exReportsReceived);
+		exportPreferences.setExportRiskFactors(exRiskFactors);
+
+		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
+		List<GenericFile> exportFiles = patientExportService.exportDemographics(
+				ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
+		ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
+
+		String filename = GenericFile.getSanitizedFileName(patientSet + ".zip");
+		Response.ResponseBuilder response = Response.ok(zipFile.toFileInputStream());
+		response.header("Content-Disposition", "filename="+filename);
+		response.type("application/zip");
+		return response.build();
 	}
 
 	@GET

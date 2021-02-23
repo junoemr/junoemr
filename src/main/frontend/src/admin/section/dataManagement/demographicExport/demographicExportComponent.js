@@ -64,5 +64,12 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				}
+
+				ctrl.onExport = () =>
+				{
+					let url = demographicsService.demographicExport(ctrl.selectedExportType, "set1");
+					let windowName = "export";
+					window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+				}
 			}]
 	});

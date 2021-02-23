@@ -186,6 +186,15 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
+		service.demographicExport = function importLogUrl(type, patientSet)
+		{
+			let formatArray = [
+				"type=" + type,
+				"patientSet=" + patientSet,
+			]
+			return service.apiPath + '/export?' + formatArray.join('&');
+		};
+
 		service.importLogUrl = function importLogUrl(fileNames)
 		{
 			let formatArray = fileNames.map(name => 'logName=' + encodeURIComponent(name));
