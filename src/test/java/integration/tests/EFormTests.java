@@ -65,6 +65,7 @@ public class EFormTests extends SeleniumTestBase
 	{
 		loadSpringBeans();
 
+		databaseUtil.createTestDemographic();
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
 
 		if(!Navigation.isLoggedIn(driver))

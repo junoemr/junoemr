@@ -66,10 +66,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 	public static String templateTitleGeneral = "P:General";
 
-	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-
-	@Before
-	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@BeforeClass
+	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",

@@ -39,6 +39,7 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static integration.tests.AddPatientsTests.mom;
 import static integration.tests.util.data.SiteTestCollection.siteNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
@@ -58,7 +59,7 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 	public void setup() throws Exception
 	{
 		loadSpringBeans();
-		databaseUtil.createTestDemographic(patientFName, patientLName, "F");
+		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
 		databaseUtil.createProviderSite();
 
@@ -144,7 +145,7 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String startTimeExpected = "09:00:00";
 		String apptStatusAt9 = "To Do";
-		addAppointmentWithDemo(startTimeExpected, patientFName, apptStatusAt9, siteNames[0]);
+		addAppointmentWithDemo(startTimeExpected, mom.firstName, apptStatusAt9, siteNames[0]);
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.xpath("//i[@title='" + apptStatusAt9 + "']"), driver));
 
@@ -168,7 +169,7 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		// Add an appointment at 11:00-11:15 next Sunday with demographic selected.
 		String startTimeExpected = "11:00:00";
 		String apptStatusAt11 = "Customized 2";
-		addAppointmentWithDemo(startTimeExpected, patientFName, apptStatusAt11, siteNames[0]);
+		addAppointmentWithDemo(startTimeExpected, mom.firstName, apptStatusAt11, siteNames[0]);
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.xpath("//i[@title='" + apptStatusAt11 + "']"), driver));
 
@@ -202,7 +203,7 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		// Add an appointment at 13:00-13:15 next Sunday with demographic selected.
 		String startTimeExpected = "13:00:00";
 		String apptStatusAt13 = "Customized 4";
-		addAppointmentWithDemo(startTimeExpected, patientFName, apptStatusAt13, siteNames[0]);
+		addAppointmentWithDemo(startTimeExpected, mom.firstName, apptStatusAt13, siteNames[0]);
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.xpath("//i[@title='" + apptStatusAt13 + "']"), driver));
 
@@ -213,6 +214,4 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.xpath("//i[@title='" + apptStatusAt14 + "']"), driver));
 	}
-
-
 }

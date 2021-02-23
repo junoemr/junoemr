@@ -75,6 +75,8 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                     .then((response) =>
                     {
                         ctrl.imdIntegrations = response.data.body;
+                        ctrl.credentials.clientId = "";
+                        ctrl.credentials.clientSecret = "";
                     })
                     .catch((error) =>
                     {
@@ -98,6 +100,29 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                         })
                 }
             };
+
+             ctrl.syncIntegrations = (integrationId) =>
+             {
+                  imdHealthWebService.syncIntegrations(integrationId)
+                      .then((response ) =>
+                      {
+                          let failedIntegrations = response.data.body;
+
+                          if (failedIntegrations.length < 1)
+                          {
+                              Juno.Common.Util.successAlert($uibModal,"Success", "Successfully synced");
+                          }
+                          else
+                          {
+                              Juno.Common.Util.errorAlert($uibModal, "Failure", "Could not sync integrations");
+                              console.log(failedIntegrations.join(' | '));
+                          }
+                      })
+                      .catch((error) =>
+                      {
+                        console.log(error);
+                      })
+             }
 
             ctrl.testSSO = (integrationId) =>
             {

@@ -47,7 +47,6 @@ public class SectionAccessUtil
 	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
 			throws InterruptedException
 	{
-		//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
 		{
 			// open JUNO UI page
