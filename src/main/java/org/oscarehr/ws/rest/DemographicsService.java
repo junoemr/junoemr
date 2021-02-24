@@ -30,6 +30,7 @@ import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore;
+import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
@@ -100,6 +101,9 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@Autowired
 	private PatientExportService patientExportService;
+
+	@Autowired
+	private DemographicSetsDao demographicSetsDao;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -366,6 +370,9 @@ public class DemographicsService extends AbstractServiceImpl
 			@QueryParam("exAlertsAndSpecialNeeds") @DefaultValue("false") boolean exAlertsAndSpecialNeeds,
 			@QueryParam("exCareElements") @DefaultValue("false") boolean exCareElements) throws Exception
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+
 		ExportPreferences exportPreferences = new ExportPreferences();
 		exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
 		exportPreferences.setExportAllergiesAndAdverseReactions(exAllergiesAndAdverseReactions);
@@ -400,6 +407,9 @@ public class DemographicsService extends AbstractServiceImpl
 	@SkipContentLoggingOutbound
 	public Response download(@QueryParam("logName") final List<String> logFileNames) throws IOException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+
 		List<GenericFile> logFiles = new ArrayList<>(logFileNames.size());
 		for(String fileName : logFileNames)
 		{
@@ -413,6 +423,17 @@ public class DemographicsService extends AbstractServiceImpl
 		response.header("Content-Disposition", "filename="+filename);
 		response.type("application/zip");
 		return response.build();
+	}
+
+	@GET
+	@Path("/sets")
+	public RestSearchResponse<String> getDemographicSetNames()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, SecObjectName._DEMOGRAPHIC);
+
+		List<String> demographicSetNames = demographicSetsDao.findSetNames();
+		return RestSearchResponse.successResponseOnePage(demographicSetNames);
 	}
 
 	private DemographicService.SEARCH_MODE getSearchMode(String searchType)

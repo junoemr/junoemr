@@ -57,19 +57,85 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 						},
 					]
 				);
+				ctrl.demographicSetOptions = [];
+				ctrl.exportToggleOptions = {
+					exPersonalHistory: false,
+					exFamilyHistory: false,
+					exPastHealth: false,
+					exProblemList: false,
+					exRiskFactors: false,
+					exAllergiesAndAdverseReactions: false,
+					exMedicationsAndTreatments: false,
+					exImmunizations: false,
+					exLaboratoryResults: false,
+					exAppointments: false,
+					exClinicalNotes: false,
+					exReportsReceived: false,
+					exAlertsAndSpecialNeeds: false,
+					exCareElements: false,
+				}
 
 				ctrl.selectedExportType = ctrl.exportTypeOptions[0].value;
+				ctrl.selectedSet = null;
 
 				ctrl.$onInit = () =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
+					ctrl.loadDemographicSets();
+				}
+
+				ctrl.loadDemographicSets = () =>
+				{
+					let deferred = $q.defer();
+					demographicsService.getDemographicSetNames().then(
+						function success(response)
+						{
+							let names = response.data;
+							ctrl.demographicSetOptions = names.map(setName =>
+							{
+								return {
+									label: setName,
+									value: setName
+								};
+							});
+							ctrl.selectedSet = ctrl.demographicSetOptions[0].value;
+							deferred.resolve(names);
+						},
+						function failure(response)
+						{
+							deferred.reject(response.data);
+						}
+					);
+					return deferred.promise;
+				}
+
+				ctrl.onSelectAll = () =>
+				{
+					let toggleValue = false;
+					// if there are any false values, we want to set all values to 'true'
+					for(const value of Object.values(ctrl.exportToggleOptions))
+					{
+						if(value === false)
+						{
+							toggleValue = true;
+							break;
+						}
+					}
+					for(const key of Object.keys(ctrl.exportToggleOptions))
+					{
+						ctrl.exportToggleOptions[key] = toggleValue;
+					}
 				}
 
 				ctrl.onExport = () =>
 				{
-					let url = demographicsService.demographicExport(ctrl.selectedExportType, "set1");
-					let windowName = "export";
-					window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+					if (ctrl.selectedExportType && ctrl.selectedSet)
+					{
+						let url = demographicsService.demographicExport(ctrl.selectedExportType, ctrl.selectedSet, ctrl.exportToggleOptions);
+						let windowName = "export";
+						window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+					}
 				}
 			}]
 	});

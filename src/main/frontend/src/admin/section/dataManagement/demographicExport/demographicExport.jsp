@@ -40,6 +40,114 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
+					<juno-select ng-model="$ctrl.selectedSet"
+					             options="$ctrl.demographicSetOptions"
+					             label="Patient Set"
+					             label-position="LABEL_POSITION.TOP"
+					             component-style="$ctrl.componentStyle"
+					></juno-select>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-2 pull-right">
+					<juno-button ng-click="$ctrl.onSelectAll()"
+					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern=JUNO_BUTTON_COLOR_PATTERN.DEFAULT;
+					>Select All</juno-button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exPersonalHistory"
+					                label="Export Personal History"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exFamilyHistory"
+					                label="Export Family History"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exPastHealth"
+					                label="Export Past Health"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exProblemList"
+					                label="Export Family History"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exRiskFactors"
+					                label="Export Risk Factors"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exAllergiesAndAdverseReactions"
+					                label="Export Allergies"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exMedicationsAndTreatments"
+					                label="Export Medications"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+				</div>
+				<div class="col-md-6">
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exImmunizations"
+					                label="Export Preventions/Immunizations"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exLaboratoryResults"
+					                label="Export Lab Results"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exAppointments"
+					                label="Export Appointments"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exClinicalNotes"
+					                label="Export Chart Notes"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exReportsReceived"
+					                label="Export Reports"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exAlertsAndSpecialNeeds"
+					                label="Export Alerts and Special Needs"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+					<juno-check-box ng-model="$ctrl.exportToggleOptions.exCareElements"
+					                label="Export Care Elements"
+					                label-position="LABEL_POSITION.LEFT"
+					                component-style="$ctrl.componentStyle"
+					                class="export-label"
+					></juno-check-box>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
 					<juno-button ng-click="$ctrl.onExport()"
 					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.FILL;>

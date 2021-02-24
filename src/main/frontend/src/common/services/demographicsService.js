@@ -186,19 +186,39 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
-		service.demographicExport = function importLogUrl(type, patientSet)
+		service.demographicExport = function importLogUrl(type, patientSet, options)
 		{
 			let formatArray = [
 				"type=" + type,
 				"patientSet=" + patientSet,
 			]
-			return service.apiPath + '/export?' + formatArray.join('&');
+			return service.apiPath + '/export?' + formatArray.join('&') + "&" + new URLSearchParams(options).toString();
 		};
 
 		service.importLogUrl = function importLogUrl(fileNames)
 		{
 			let formatArray = fileNames.map(name => 'logName=' + encodeURIComponent(name));
 			return service.apiPath + '/import/logs/download?' + formatArray.join('&');
+		};
+
+		service.getDemographicSetNames = function getDemographicSetNames()
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+
+			junoHttp.get(service.apiPath + '/sets', config).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("demographicsService::getDemographicSetNames error", errors);
+					deferred.reject("An error occurred while loading demographic sets");
+				});
+
+			return deferred.promise;
 		};
 
 		// add the default roster statuses to the roster status list.
