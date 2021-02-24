@@ -241,6 +241,7 @@ module.exports = {
 			'./src/common/components/junoFileChooser/junoFileChooserComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
 			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
+			'./src/common/components/junoProgressBar/junoProgressBarComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
 			'./src/common/components/junoTab/junoTabComponent.js',
 			'./src/common/components/junoTab/components/module.js',
