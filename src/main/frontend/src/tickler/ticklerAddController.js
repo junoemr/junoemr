@@ -106,12 +106,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			alert(reason);
 		});
 
-		controller.close = function()
+		controller.close = function close()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		controller.validate = function()
+		controller.validate = function validate()
 		{
 			var t = controller.tickler;
 			controller.errors = [];
@@ -135,11 +135,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			return true;
 		};
 
-		controller.saveWithEncounter = function()
+		controller.saveWithEncounter = function saveWithEncounter()
 		{
 			return controller.save(true);
 		}
-		controller.save = function(writeEncounter = false)
+
+		controller.save = function save(writeEncounter = false)
 		{
 			controller.isDisabled = true; // Disable save button
 			controller.showErrors = true;
@@ -232,7 +233,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				});
 		};
 
-		controller.searchProviders = function(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
@@ -253,13 +254,13 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			});
 		};
 
-		controller.updateProviderNo = function(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
 			controller.tickler.taskAssignedTo = model;
 			controller.tickler.taskAssignedToName = label;
 		};
 
-		controller.setSuggestedText = function()
+		controller.setSuggestedText = function setSuggestedText()
 		{
 			var results = $filter('filter')(controller.textSuggestions,
 			{
@@ -277,36 +278,37 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			controller.tickler.serviceDateDate = moment().add(num, 'months').toDate();
 		};
 
-		controller.SetTicklerProvider = async function () {
+		controller.setTicklerProvider = async function setTicklerProvider()
+		{
 			try
 			{
 				let systemPrefApiResponse = await systemPreferenceApi.getPropertyValue("default_tickler_provider");
 				controller.defaultTicklerProviderNo = parseInt(systemPrefApiResponse.data.body);
 
 				let providerServiceResponse = await providerService.getProvider(controller.defaultTicklerProviderNo);
-				SetTicklerProviderAssignee(providerServiceResponse);
+				setTicklerProviderAssignee(providerServiceResponse);
 			}
 			catch (error)
 			{
 				console.log(error);
 			}
+		}
 
-			function SetTicklerProviderAssignee(resp)
+		function setTicklerProviderAssignee(resp)
+		{
+			let firstName = resp.firstName || "";
+			let lastName = resp.lastName || "";
+
+			if (firstName === "" && lastName === "")
 			{
-				let firstName = resp.firstName || "";
-				let lastName = resp.lastName || "";
-
-				if (firstName === "" && lastName === "")
-				{
-					return;
-				}
-
-				let name = firstName + " " + lastName;
-				controller.defaultTicklerProviderName = name;
-
-				controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
-				controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
+				return;
 			}
+
+			let name = firstName + " " + lastName;
+			controller.defaultTicklerProviderName = name;
+
+			controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
+			controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
 		}
 	}
 ]);
