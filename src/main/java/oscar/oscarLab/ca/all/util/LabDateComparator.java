@@ -45,7 +45,7 @@ public class LabDateComparator implements Comparator<Map<String, Serializable>>
         Date dateA = ConversionUtils.fromDateString((String) ((HashMap) o1).get("collDate") , "yyyy-MM-dd HH:mm:ss");
         Date dateB = ConversionUtils.fromDateString((String) ((HashMap) o2).get("collDate") , "yyyy-MM-dd HH:mm:ss");
 
-        return dateA.compareTo(dateB) * -1;
+        return dateA.compareTo(dateB);
     }
 
 }

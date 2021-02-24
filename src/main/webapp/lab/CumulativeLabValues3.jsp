@@ -75,8 +75,9 @@ try{
         if (!loinc_code.equalsIgnoreCase("NULL")){
             Map<String, HashMap<String, Serializable>> IdMap = new LinkedHashMap<String, HashMap<String, Serializable>>();
 	        ArrayList<Map<String, Serializable>> labValueList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
-				LabDateComparator compare = new LabDateComparator();
-				Collections.sort(labValueList, compare);
+	        LabDateComparator compare = new LabDateComparator();
+	        Collections.sort(labValueList, compare);
+	        Collections.reverse(labValueList);
 
             for (Map<String, Serializable> labValue : labValueList){
 
