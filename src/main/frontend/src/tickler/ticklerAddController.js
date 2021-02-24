@@ -73,36 +73,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		// initialization
 		controller.init = function init()
 		{
-			systemPreferenceApi.getPropertyValue("default_tickler_provider").then((response) =>
-				{
-					if (response.data.body === null)
-					{
-						return Promise.resolve({firstName: "", lastName: ""});
-					}
-
-					controller.defaultTicklerProviderNo = response.data.body;
-
-					return providerService.getProvider(parseInt(controller.defaultTicklerProviderNo));
-				})
-				.then(response =>
-				{
-					let firstName = response.firstName || "";
-					let lastName = response.lastName || "";
-
-					if (firstName === "" && lastName === "")
-					{
-						controller.defaultTicklerProviderName = "";
-						return;
-					}
-
-					let name = firstName + " " + lastName;
-					controller.defaultTicklerProviderName = name;
-				})
-				.finally(() =>
-				{
-					controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
-					controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
-				})
+			controller.SetTicklerProvider();
 
 			if (Juno.Common.Util.exists($stateParams.demographicNo))
 			{
@@ -305,5 +276,37 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		{
 			controller.tickler.serviceDateDate = moment().add(num, 'months').toDate();
 		};
+
+		controller.SetTicklerProvider = async function () {
+			try
+			{
+				let systemPrefApiResponse = await systemPreferenceApi.getPropertyValue("default_tickler_provider");
+				controller.defaultTicklerProviderNo = parseInt(systemPrefApiResponse.data.body);
+
+				let providerServiceResponse = await providerService.getProvider(controller.defaultTicklerProviderNo);
+				SetTicklerProviderAssignee(providerServiceResponse);
+			}
+			catch (error)
+			{
+				console.log(error);
+			}
+
+			function SetTicklerProviderAssignee(resp)
+			{
+				let firstName = resp.firstName || "";
+				let lastName = resp.lastName || "";
+
+				if (firstName === "" && lastName === "")
+				{
+					return;
+				}
+
+				let name = firstName + " " + lastName;
+				controller.defaultTicklerProviderName = name;
+
+				controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
+				controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
+			}
+		}
 	}
 ]);
