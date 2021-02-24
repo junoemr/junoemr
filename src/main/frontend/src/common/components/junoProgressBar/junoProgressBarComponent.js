@@ -93,7 +93,7 @@ angular.module('Common.Components').component('junoProgressBar',
 				}
 				ctrl.getProgressLabel = () =>
 				{
-					return ctrl.data.message + " " + Math.round((ctrl.data.processed / ctrl.data.total) * 100) +"%";
+					return Math.round((ctrl.data.processed / ctrl.data.total) * 100) +"%";
 				}
 
 				ctrl.getComponentClasses = () =>

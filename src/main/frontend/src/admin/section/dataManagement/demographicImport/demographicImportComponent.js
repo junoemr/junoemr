@@ -144,6 +144,16 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					ctrl.importRunning = true;
 					let formattedFileList = await ctrl.formatSelectedFiles();
 
+					Juno.Common.Util.showProgressBar($uibModal,
+						"Importing Patient Files",
+						ctrl.componentStyle,
+						ctrl.fetchImportProgress,
+						() =>
+						{
+							console.info("loading bar closed");
+						}
+					);
+
 					demographicsService.demographicImport(
 						ctrl.selectedImportType,
 						ctrl.selectedImportSource,
@@ -163,6 +173,20 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 							ctrl.importRunning = false;
 						}
 					);
+				}
+
+				ctrl.fetchImportProgress = async () =>
+				{
+					let pollingData = {};
+					try
+					{
+						pollingData = (await demographicsService.demographicImportProgress()).data;
+					}
+					catch (e)
+					{
+						console.error("Polling Error", e);
+					}
+					return pollingData;
 				}
 
 				ctrl.onDownloadLogFiles = () =>

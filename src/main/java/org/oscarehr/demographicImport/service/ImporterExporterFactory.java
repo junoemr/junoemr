@@ -81,6 +81,7 @@ public class ImporterExporterFactory
 	public PatientImportContext initializeImportContext(IMPORTER_TYPE type, ImportPreferences importPreferences, int size) throws IOException, InterruptedException
 	{
 		patientImportContext.initialize(size);
+		patientImportContext.setImportType(type);
 		patientImportContext.setImportLogger(getImportLogger(type));
 		patientImportContext.setImportPreferences(importPreferences);
 		patientImportContext.setImporter(getImporter(type));
