@@ -27,6 +27,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographicImport.converter.out.PatientRecordModelConverter;
 import org.oscarehr.demographicImport.model.PatientRecord;
+import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,9 @@ public class PatientExportAsyncService
 	@Autowired
 	private PatientRecordModelConverter patientRecordModelConverter;
 
+	@Autowired
+	private PatientExportContext patientExportContext;
+
 	@Async
 	public CompletableFuture<GenericFile> exportDemographic(DemographicExporter exporter, Integer demographicId) throws Exception
 	{
@@ -61,6 +65,7 @@ public class PatientExportAsyncService
 		logger.info("Export Demographic " + patientRecord.getDemographic().getId());
 		GenericFile file = exporter.exportDemographic(patientRecord);
 		instant = PatientExportService.printDuration(instant, "[" + demographicId + "] Export Service: export file creation");
+		patientExportContext.incrementProcessed();
 
 		return CompletableFuture.completedFuture(file);
 	}

@@ -24,20 +24,27 @@ package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.logger.ExportLogger;
-import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
+import org.oscarehr.demographicImport.service.DemographicExporter;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
-public class PatientExportContext
+public class PatientExportContext extends PollableContext
 {
+	private DemographicExporter exporter;
 	private ExportLogger exportLogger;
 	private ExportPreferences exportPreferences;
 
-	public ProgressBarPollingData getProgress()
+	@Override
+	protected synchronized String getPollingMessage()
 	{
-		ProgressBarPollingData progressData = new ProgressBarPollingData();
-		//TODO fill data
-		return progressData;
+		if(getTotal() > getProcessed())
+		{
+			return "Exporting Patient " + (getProcessed() + 1) + " of " + getTotal();
+		}
+		else
+		{
+			return "Finalizing Export";
+		}
 	}
 }

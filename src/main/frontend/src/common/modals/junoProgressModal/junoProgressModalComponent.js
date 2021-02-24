@@ -39,6 +39,20 @@ angular.module('Common.Components').component('junoProgressModalComponent',
 				ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 			}
 
+			ctrl.onProgressComplete = () =>
+			{
+				// wait a little before closing the modal just for visual reasons.
+				// this lets the user see the progress bar hit the 100% mark before it disappears
+				setTimeout(() =>
+				{
+					if(ctrl.resolve.onComplete)
+					{
+						ctrl.resolve.onComplete();
+					}
+					ctrl.close();
+				}, 1500);
+			}
+
 			ctrl.close = function ()
 			{
 				ctrl.modalInstance.close();

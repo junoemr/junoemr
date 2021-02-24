@@ -54,7 +54,7 @@ import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
-import org.oscarehr.demographicImport.util.ImportPreferences;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
@@ -181,13 +181,12 @@ public class PatientImportService
 	@Autowired
 	private HRMService hrmService;
 
-	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
-	                              ImportLogger importLogger,
-	                              GenericFile importFile,
-	                              ImportPreferences importPreferences,
+	public void importDemographic(GenericFile importFile,
+	                              PatientImportContext context,
 	                              DemographicImporter.MERGE_STRATEGY mergeStrategy) throws Exception
 	{
-		DemographicImporter importer = importerExporterFactory.getImporter(importType, importLogger, importPreferences);
+		DemographicImporter importer = context.getImporter();
+		ImportLogger importLogger = context.getImportLogger();
 		importer.verifyFileFormat(importFile);
 		PatientRecord patientRecord = importer.importDemographic(importFile);
 
@@ -235,7 +234,7 @@ public class PatientImportService
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
 
 		importLogger.logSummaryLine(patientRecord);
-		writeAuditLogImportStatement(dbDemographic, importType, importPreferences.getImportSource(), duplicateDetected);
+		writeAuditLogImportStatement(dbDemographic, context.getImportType(), context.getImportPreferences().getImportSource(), duplicateDetected);
 	}
 
 	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)

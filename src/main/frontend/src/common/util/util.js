@@ -483,7 +483,7 @@ Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, m
 	).result;
 };
 
-Juno.Common.Util.showProgressBar = function showProgressBar(uibModal, title, updateCallback, style)
+Juno.Common.Util.showProgressBar = function showProgressBar(uibModal, title, style, updateCallback, onComplete)
 {
 	return uibModal.open(
 		{
@@ -493,6 +493,7 @@ Juno.Common.Util.showProgressBar = function showProgressBar(uibModal, title, upd
 			resolve: {
 				title: () => title,
 				updateCallback: () => updateCallback,
+				onComplete: () => onComplete,
 				style: () => style,
 			}
 		}

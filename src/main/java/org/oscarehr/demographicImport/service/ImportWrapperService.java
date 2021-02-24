@@ -35,6 +35,7 @@ import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
 import org.oscarehr.demographicImport.util.ImportPreferences;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -91,7 +92,9 @@ public class ImportWrapperService
 			importPreferences.setDefaultSite(siteDbToModelConverter.convert(site));
 		}
 
-		ImportLogger importLogger = importerExporterFactory.getImportLogger(importerType);
+		PatientImportContext context = importerExporterFactory.initializeImportContext(importerType, importPreferences, importFileList.size());
+		ImportLogger importLogger = context.getImportLogger();
+
 		ImportTransferOutbound transferOutbound = new ImportTransferOutbound();
 
 		try
@@ -104,14 +107,11 @@ public class ImportWrapperService
 				try
 				{
 					patientImportService.importDemographic(
-							importerType,
-							importLogger,
 							importFile,
-							importPreferences,
+							context,
 							mergeStrategy);
 
 					importCount++;
-
 					onSuccess(importFile);
 				}
 				catch(InvalidImportFileException e)
@@ -137,6 +137,7 @@ public class ImportWrapperService
 				finally
 				{
 					importLogger.flush();
+					context.incrementProcessed();
 				}
 			}
 			importLogger.logSummaryFooter();
@@ -145,6 +146,7 @@ public class ImportWrapperService
 		{
 			// always clear the provider cache after an import to unload resources
 			BaseModelToDbConverter.clearProviderCache();
+			context.setComplete(true);
 		}
 
 		onImportComplete(importCount, duplicateCount, failureCount);

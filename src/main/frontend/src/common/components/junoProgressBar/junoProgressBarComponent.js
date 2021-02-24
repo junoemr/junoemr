@@ -26,6 +26,7 @@ angular.module('Common.Components').component('junoProgressBar',
 		templateUrl: 'src/common/components/junoProgressBar/junoProgressBar.jsp',
 		bindings: {
 			updateCallback: "&", // must return a specific object
+			onComplete: "&",
 			componentStyle: "<?",
 		},
 		controller: [
@@ -59,18 +60,21 @@ angular.module('Common.Components').component('junoProgressBar',
 				ctrl.startPolling = () =>
 				{
 					ctrl.stopPolling();
-					ctrl.pollingPromise = $interval(() =>
+					if (ctrl.updateCallback)
 					{
-						if(ctrl.updateCallback)
+						ctrl.pollingPromise = $interval(async () =>
 						{
-							ctrl.data = ctrl.updateCallback();
-							if(ctrl.data.complete)
+							ctrl.data = await ctrl.updateCallback();
+							if (ctrl.data.complete)
 							{
 								ctrl.stopPolling();
+								if(ctrl.onComplete)
+								{
+									ctrl.onComplete();
+								}
 							}
-						}
-
-					}, 1000, 0, true);
+						}, 1000, 0, true);
+					}
 				}
 				ctrl.stopPolling = () =>
 				{
@@ -94,7 +98,7 @@ angular.module('Common.Components').component('junoProgressBar',
 
 				ctrl.getComponentClasses = () =>
 				{
-					return [ctrl.resolve.style]
+					return [ctrl.componentStyle]
 				}
 			}]
 	});

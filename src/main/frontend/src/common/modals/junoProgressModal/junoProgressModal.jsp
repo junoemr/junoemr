@@ -29,6 +29,6 @@
 		<div ng-if="$ctrl.resolve.message" class="col-xs-12 no-padding alert-content text-center">
 			<p>{{$ctrl.resolve.message}}</p>
 		</div>
-		<juno-progress-bar update-callback="$ctrl.resolve.updateCallback()"></juno-progress-bar>
+		<juno-progress-bar update-callback="$ctrl.resolve.updateCallback()" on-complete="$ctrl.onProgressComplete()"></juno-progress-bar>
 	</div>
 </div>

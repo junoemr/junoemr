@@ -23,30 +23,39 @@
 package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.demographicImport.service.DemographicImporter;
-import org.oscarehr.demographicImport.service.ImporterExporterFactory;
-import org.springframework.stereotype.Component;
+import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
 
 @Data
-@Component
-public class PatientImportContext extends PollableContext
+public class PollableContext
 {
-	private DemographicImporter importer;
-	private ImportLogger importLogger;
-	private ImportPreferences importPreferences;
-	private ImporterExporterFactory.IMPORTER_TYPE importType;
+	private int total;
+	private int processed;
+	private boolean complete;
 
-	@Override
+	public synchronized void initialize(int total)
+	{
+		setTotal(total);
+		setProcessed(0);
+		setComplete(false);
+	}
+
+	public synchronized ProgressBarPollingData getProgress()
+	{
+		ProgressBarPollingData progressData = new ProgressBarPollingData();
+		progressData.setTotal(getTotal());
+		progressData.setProcessed(getProcessed());
+		progressData.setComplete(isComplete());
+		progressData.setMessage(getPollingMessage());
+		return progressData;
+	}
+
+	public synchronized void incrementProcessed()
+	{
+		this.processed += 1;
+	}
+
 	protected synchronized String getPollingMessage()
 	{
-		if(getTotal() > getProcessed())
-		{
-			return "Importing Patient " + (getProcessed() + 1) + " of " + getTotal();
-		}
-		else
-		{
-			return "Finalizing Import";
-		}
+		return "Processing " + getProcessed() + " of " + getTotal();
 	}
 }

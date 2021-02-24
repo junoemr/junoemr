@@ -27,6 +27,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.util.ExportPreferences;
+import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,8 +55,9 @@ public class PatientExportService
 	                                            List<String> demographicIdList,
 	                                            ExportPreferences preferences) throws Exception
 	{
-		ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
-		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
+		PatientExportContext context = importerExporterFactory.initializeExportContext(importType, preferences, demographicIdList.size());
+		ExportLogger exportLogger = context.getExportLogger();
+		DemographicExporter exporter = context.getExporter();
 
 		exportLogger.logSummaryHeader();
 		List<GenericFile> fileList = new ArrayList<>();
@@ -89,6 +91,7 @@ public class PatientExportService
 		}
 		finally
 		{
+			context.setComplete(true);
 			BaseDbToModelConverter.clearProviderCache();
 			appointmentStatusCache.clear();
 		}

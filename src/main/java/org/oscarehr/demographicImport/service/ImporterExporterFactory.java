@@ -30,8 +30,8 @@ import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
 import org.oscarehr.demographicImport.service.hrm.HRMExporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.oscarehr.demographicImport.util.ImportPreferences;
+import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -78,6 +78,25 @@ public class ImporterExporterFactory
 		UNKNOWN
 	}
 
+	public PatientImportContext initializeImportContext(IMPORTER_TYPE type, ImportPreferences importPreferences, int size) throws IOException, InterruptedException
+	{
+		patientImportContext.initialize(size);
+		patientImportContext.setImportLogger(getImportLogger(type));
+		patientImportContext.setImportPreferences(importPreferences);
+		patientImportContext.setImporter(getImporter(type));
+		return patientImportContext;
+	}
+
+	public DemographicImporter getImporter(IMPORTER_TYPE type)
+	{
+		switch(type)
+		{
+			case CDS_5: return cdsImporter;
+			case ToPD: // TODO
+			default: throw new RuntimeException(type + " importer not implemented");
+		}
+	}
+
 	public ImportLogger getImportLogger(IMPORTER_TYPE type) throws IOException, InterruptedException
 	{
 		switch(type)
@@ -88,33 +107,13 @@ public class ImporterExporterFactory
 		}
 	}
 
-	public ExportLogger getExportLogger(EXPORTER_TYPE type) throws IOException, InterruptedException
+	public PatientExportContext initializeExportContext(EXPORTER_TYPE type, ExportPreferences exportPreferences, int size) throws IOException, InterruptedException
 	{
-		switch(type)
-		{
-			case CDS_5: return new CDSExportLogger();
-			default: throw new RuntimeException(type + " logger not implemented");
-		}
-	}
-
-	public DemographicImporter getImporter(IMPORTER_TYPE type, ImportLogger importLogger, ImportPreferences importPreferences)
-	{
-		patientImportContext.setImportLogger(importLogger);
-		patientImportContext.setImportPreferences(importPreferences);
-
-		switch(type)
-		{
-			case CDS_5: return cdsImporter;
-			case ToPD: // TODO
-			default: throw new RuntimeException(type + " importer not implemented");
-		}
-	}
-
-	public DemographicExporter getExporter(EXPORTER_TYPE type, ExportLogger exportLogger, ExportPreferences exportPreferences)
-	{
-		patientExportContext.setExportLogger(exportLogger);
+		patientExportContext.initialize(size);
 		patientExportContext.setExportPreferences(exportPreferences);
-		return getExporter(type);
+		patientExportContext.setExportLogger(getExportLogger(type));
+		patientExportContext.setExporter(getExporter(type));
+		return patientExportContext;
 	}
 
 	public DemographicExporter getExporter(EXPORTER_TYPE type)
@@ -124,6 +123,15 @@ public class ImporterExporterFactory
 			case CDS_5: return cdsExporter;
 			case HRM_4: return hrmExporter;
 			default: throw new RuntimeException(type + " exporter not implemented");
+		}
+	}
+
+	public ExportLogger getExportLogger(EXPORTER_TYPE type) throws IOException, InterruptedException
+	{
+		switch(type)
+		{
+			case CDS_5: return new CDSExportLogger();
+			default: throw new RuntimeException(type + " logger not implemented");
 		}
 	}
 }

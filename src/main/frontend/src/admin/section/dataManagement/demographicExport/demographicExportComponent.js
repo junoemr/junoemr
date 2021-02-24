@@ -133,9 +133,14 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 					if (ctrl.selectedExportType && ctrl.selectedSet)
 					{
 						Juno.Common.Util.showProgressBar($uibModal,
-							"Exporting Patients",
+							"Exporting Patient Set",
+							ctrl.componentStyle,
 							ctrl.fetchExportProgress,
-							ctrl.componentStyle);
+							() =>
+							{
+								console.info("loading bar closed");
+							}
+						);
 
 						let url = demographicsService.demographicExport(ctrl.selectedExportType, ctrl.selectedSet, ctrl.exportToggleOptions);
 						let windowName = "export";
@@ -148,7 +153,7 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 					let pollingData = {};
 					try
 					{
-						pollingData = await demographicsService.demographicExportProgress();
+						pollingData = (await demographicsService.demographicExportProgress()).data;
 					}
 					catch (e)
 					{
