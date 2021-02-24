@@ -73,7 +73,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		// initialization
 		controller.init = function init()
 		{
-			controller.SetTicklerProvider();
+			controller.setTicklerProvider();
 
 			if (Juno.Common.Util.exists($stateParams.demographicNo))
 			{
