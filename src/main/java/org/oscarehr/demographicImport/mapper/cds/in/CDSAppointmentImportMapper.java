@@ -64,7 +64,7 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 		appointment.setProvider(getImportProvider(importStructure));
 		appointment.setReason(importStructure.getAppointmentPurpose());
 		appointment.setNotes(importStructure.getAppointmentNotes());
-		appointment.setSite(importProperties.getImportPreferences().getDefaultSite());
+		appointment.setSite(patientImportContext.getImportPreferences().getDefaultSite());
 
 		return appointment;
 	}

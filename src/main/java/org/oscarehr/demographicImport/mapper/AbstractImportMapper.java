@@ -22,7 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper;
 
-import org.oscarehr.demographicImport.util.ImportProperties;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ import java.util.List;
 public abstract class AbstractImportMapper<I, E>
 {
 	@Autowired
-	protected ImportProperties importProperties;
+	protected PatientImportContext patientImportContext;
 
 	/**
 	 * build the export structure from the provided import structure.

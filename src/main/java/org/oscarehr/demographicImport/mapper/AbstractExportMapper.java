@@ -23,7 +23,7 @@
 package org.oscarehr.demographicImport.mapper;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.util.ExportProperties;
+import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +36,7 @@ import java.util.List;
 public abstract class AbstractExportMapper<I, E>
 {
 	@Autowired
-	protected ExportProperties exportProperties;
+	protected PatientExportContext patientExportContext;
 
 	public AbstractExportMapper()
 	{

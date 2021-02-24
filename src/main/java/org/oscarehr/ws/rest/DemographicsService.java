@@ -44,8 +44,8 @@ import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.demographicImport.service.PatientExportService;
 import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
 import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.ExportProperties;
-import org.oscarehr.demographicImport.util.ImportProperties;
+import org.oscarehr.demographicImport.util.PatientExportContext;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -109,10 +109,10 @@ public class DemographicsService extends AbstractServiceImpl
 	private DemographicSetsDao demographicSetsDao;
 
 	@Autowired
-	private ImportProperties importProperties;
+	private PatientImportContext patientImportContext;
 
 	@Autowired
-	private ExportProperties exportProperties;
+	private PatientExportContext patientExportContext;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -363,7 +363,7 @@ public class DemographicsService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(importProperties.getProgress());
+		return RestResponse.successResponse(patientImportContext.getProgress());
 	}
 
 	@GET
@@ -450,7 +450,7 @@ public class DemographicsService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(exportProperties.getProgress());
+		return RestResponse.successResponse(patientExportContext.getProgress());
 	}
 
 	@GET

@@ -33,7 +33,7 @@ import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicExporter;
 import org.oscarehr.demographicImport.service.PatientExportService;
 import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.ExportProperties;
+import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
@@ -67,7 +67,7 @@ public class CDSExporter implements DemographicExporter
 	private CDSExportMapper cdsExportMapper;
 
 	@Autowired
-	private ExportProperties exportProperties;
+	private PatientExportContext patientExportContext;
 
 	public CDSExporter()
 	{
@@ -80,7 +80,7 @@ public class CDSExporter implements DemographicExporter
 		Demographic demographic = patientRecord.getDemographic();
 		CDSFileParser parser = new CDSFileParser();
 
-		exportProperties.getExportLogger().logSummaryLine(patientRecord);
+		patientExportContext.getExportLogger().logSummaryLine(patientRecord);
 		incrementProviderExportCount(demographic);
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
 		instant = PatientExportService.printDuration(instant, "Exporter: model to CDS structure conversion");
@@ -147,8 +147,8 @@ public class CDSExporter implements DemographicExporter
 		eventLog.rename("ExportEventLog.txt");
 
 		eventLog.appendContents(
-				exportProperties.getExportLogger().getSummaryLogFile(),
-				exportProperties.getExportLogger().getEventLogFile());
+				patientExportContext.getExportLogger().getSummaryLogFile(),
+				patientExportContext.getExportLogger().getEventLogFile());
 
 		return eventLog;
 	}

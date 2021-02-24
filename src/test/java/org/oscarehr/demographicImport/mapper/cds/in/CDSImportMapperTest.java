@@ -46,7 +46,7 @@ import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
-import org.oscarehr.demographicImport.util.ImportProperties;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.ConversionUtils;
 
@@ -71,7 +71,7 @@ public class CDSImportMapperTest
 	private CDSImportMapper cdsImportMapper;
 
 	@Mock
-	private ImportProperties importProperties;
+	private PatientImportContext patientImportContext;
 
 	@Before
 	public void setUp()
@@ -139,7 +139,7 @@ public class CDSImportMapperTest
 	public void testGetSubregionCode_Invalid()
 	{
 		ImportLogger mockLogger = Mockito.mock(CDSImportLogger.class);
-		Mockito.when(importProperties.getImportLogger()).thenReturn(mockLogger);
+		Mockito.when(patientImportContext.getImportLogger()).thenReturn(mockLogger);
 		assertNull(cdsImportMapper.getSubregionCode("notValid"));
 	}
 

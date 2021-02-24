@@ -30,9 +30,9 @@ import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
 import org.oscarehr.demographicImport.service.hrm.HRMExporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.ExportProperties;
+import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.oscarehr.demographicImport.util.ImportPreferences;
-import org.oscarehr.demographicImport.util.ImportProperties;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,10 +51,10 @@ public class ImporterExporterFactory
 	private HRMExporter hrmExporter;
 
 	@Autowired
-	private ImportProperties importProperties;
+	private PatientImportContext patientImportContext;
 
 	@Autowired
-	private ExportProperties exportProperties;
+	private PatientExportContext patientExportContext;
 
 	public enum IMPORTER_TYPE
 	{
@@ -99,8 +99,8 @@ public class ImporterExporterFactory
 
 	public DemographicImporter getImporter(IMPORTER_TYPE type, ImportLogger importLogger, ImportPreferences importPreferences)
 	{
-		importProperties.setImportLogger(importLogger);
-		importProperties.setImportPreferences(importPreferences);
+		patientImportContext.setImportLogger(importLogger);
+		patientImportContext.setImportPreferences(importPreferences);
 
 		switch(type)
 		{
@@ -112,8 +112,8 @@ public class ImporterExporterFactory
 
 	public DemographicExporter getExporter(EXPORTER_TYPE type, ExportLogger exportLogger, ExportPreferences exportPreferences)
 	{
-		exportProperties.setExportLogger(exportLogger);
-		exportProperties.setExportPreferences(exportPreferences);
+		patientExportContext.setExportLogger(exportLogger);
+		patientExportContext.setExportPreferences(exportPreferences);
 		return getExporter(type);
 	}
 

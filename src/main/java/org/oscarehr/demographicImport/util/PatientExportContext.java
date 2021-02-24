@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-public class ExportProperties
+public class PatientExportContext
 {
 	private ExportLogger exportLogger;
 	private ExportPreferences exportPreferences;

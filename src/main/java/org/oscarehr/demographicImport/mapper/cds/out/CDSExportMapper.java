@@ -84,7 +84,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, org.oscareh
 		Instant instant = Instant.now();
 		OmdCds omdCds = objectFactory.createOmdCds();
 		PatientRecord patientRecord = objectFactory.createPatientRecord();
-		ExportPreferences exportPreferences = exportProperties.getExportPreferences();
+		ExportPreferences exportPreferences = patientExportContext.getExportPreferences();
 
 		patientRecord.setDemographics(
 				cdsDemographicExportMapper.exportFromJuno(exportStructure));
