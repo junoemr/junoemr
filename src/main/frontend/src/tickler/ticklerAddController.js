@@ -285,8 +285,11 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				let systemPrefApiResponse = await systemPreferenceApi.getPropertyValue("default_tickler_provider");
 				controller.defaultTicklerProviderNo = parseInt(systemPrefApiResponse.data.body);
 
-				let providerServiceResponse = await providerService.getProvider(controller.defaultTicklerProviderNo);
-				setTicklerProviderAssignee(providerServiceResponse);
+				if (systemPrefApiResponse.data.body !== null)
+				{
+					let providerServiceResponse = await providerService.getProvider(controller.defaultTicklerProviderNo);
+					setTicklerProviderAssignee(providerServiceResponse);
+				}
 			}
 			catch (error)
 			{
