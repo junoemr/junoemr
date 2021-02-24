@@ -2431,31 +2431,11 @@
 								<artifactId>tomcat-embed-logging-juli</artifactId>
 								<version>${tomcat.version}</version>
 							</dependency>
-
 							<dependency>
 								<groupId>org.apache.tomcat.embed</groupId>
 								<artifactId>tomcat-embed-logging-log4j</artifactId>
 								<version>${tomcat.version}</version>
 							</dependency>
-
-							<dependency>
-								<groupId>de.javakaffee.msm</groupId>
-								<artifactId>memcached-session-manager</artifactId>
-								<version>2.3.2</version>
-							</dependency>
-
-							<dependency>
-								<groupId>redis.clients</groupId>
-								<artifactId>jedis</artifactId>
-								<version>3.0.0</version>
-							</dependency>
-
-							<dependency>
-								<groupId>de.javakaffee.msm</groupId>
-								<artifactId>memcached-session-manager-tc7</artifactId>
-								<version>2.3.2</version>
-							</dependency>
-
 						</dependencies>
 						<configuration>
 							<systemProperties>
