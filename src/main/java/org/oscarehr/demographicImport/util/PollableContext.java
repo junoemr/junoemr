@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
 import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
+import org.springframework.dao.ConcurrencyFailureException;
 
 @Data
 public class PollableContext
@@ -32,8 +33,19 @@ public class PollableContext
 	private int processed;
 	private boolean complete;
 
+	public PollableContext()
+	{
+		total = 0;
+		processed = 0;
+		complete = true;
+	}
+
 	public synchronized void initialize(int total)
 	{
+		if(!complete)
+		{
+			throw new ConcurrencyFailureException("Attempt to initialize Context in use");
+		}
 		setTotal(total);
 		setProcessed(0);
 		setComplete(false);

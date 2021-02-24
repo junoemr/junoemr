@@ -50,6 +50,7 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.DemographicSearchHelper;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
@@ -311,6 +312,8 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@POST
 	@Path("/import")
+	@SkipContentLoggingOutbound
+	@SkipContentLoggingInbound
 	public RestResponse<ImportTransferOutbound> demographicImport(
 			@QueryParam("type") String type,
 			@QueryParam("source") String importSource,
