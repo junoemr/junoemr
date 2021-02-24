@@ -132,10 +132,29 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				{
 					if (ctrl.selectedExportType && ctrl.selectedSet)
 					{
+						Juno.Common.Util.showProgressBar($uibModal,
+							"Exporting Patients",
+							ctrl.fetchExportProgress,
+							ctrl.componentStyle);
+
 						let url = demographicsService.demographicExport(ctrl.selectedExportType, ctrl.selectedSet, ctrl.exportToggleOptions);
 						let windowName = "export";
 						window.open(url, windowName, "scrollbars=1,width=1024,height=768");
 					}
+				}
+
+				ctrl.fetchExportProgress = async () =>
+				{
+					let pollingData = {};
+					try
+					{
+						pollingData = await demographicsService.demographicExportProgress();
+					}
+					catch (e)
+					{
+						console.error("Polling Error", e);
+					}
+					return pollingData;
 				}
 			}]
 	});

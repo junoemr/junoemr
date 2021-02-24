@@ -20,24 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.ws.rest.transfer.common;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
-import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 
 @Data
-@Component
-public class ImportProperties
+public class ProgressBarPollingData implements Serializable
 {
-	private ImportLogger importLogger;
-	private ImportPreferences importPreferences;
-
-	public ProgressBarPollingData getProgress()
-	{
-		ProgressBarPollingData progressData = new ProgressBarPollingData();
-		//TODO fill data
-		return progressData;
-	}
+	private int total;
+	private int processed;
+	private String message;
+	private boolean complete;
 }

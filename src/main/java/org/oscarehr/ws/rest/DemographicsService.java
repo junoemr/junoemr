@@ -44,6 +44,8 @@ import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.demographicImport.service.PatientExportService;
 import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
 import org.oscarehr.demographicImport.util.ExportPreferences;
+import org.oscarehr.demographicImport.util.ExportProperties;
+import org.oscarehr.demographicImport.util.ImportProperties;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -55,6 +57,7 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.oscarehr.ws.rest.to.model.StatusValueTo1;
 import org.oscarehr.ws.rest.transfer.common.FileTransfer;
+import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarReport.data.DemographicSetManager;
@@ -104,6 +107,12 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@Autowired
 	private DemographicSetsDao demographicSetsDao;
+
+	@Autowired
+	private ImportProperties importProperties;
+
+	@Autowired
+	private ExportProperties exportProperties;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -349,6 +358,40 @@ public class DemographicsService extends AbstractServiceImpl
 	}
 
 	@GET
+	@Path("/import/progress")
+	public RestResponse<ProgressBarPollingData> demographicImportProgress()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		return RestResponse.successResponse(importProperties.getProgress());
+	}
+
+	@GET
+	@Path("/import/logs/download")
+	@Produces("application/zip")
+	@SkipContentLoggingOutbound
+	public Response download(@QueryParam("logName") final List<String> logFileNames) throws IOException
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+
+		List<GenericFile> logFiles = new ArrayList<>(logFileNames.size());
+		for(String fileName : logFileNames)
+		{
+			logFiles.add(FileFactory.getImportLogFile(fileName));
+		}
+		ZIPFile zipFile = FileFactory.packageZipFile(logFiles);
+
+		String filename = "import-logs.zip";
+		Response.ResponseBuilder response = Response.ok(zipFile.toFileInputStream());
+
+		response.header("Content-Disposition", "filename="+filename);
+		response.type("application/zip");
+		return response.build();
+	}
+
+
+	@GET
 	@Path("/export")
 	@Produces("application/zip")
 	@SkipContentLoggingOutbound
@@ -402,27 +445,12 @@ public class DemographicsService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/import/logs/download")
-	@Produces("application/zip")
-	@SkipContentLoggingOutbound
-	public Response download(@QueryParam("logName") final List<String> logFileNames) throws IOException
+	@Path("/export/progress")
+	public RestResponse<ProgressBarPollingData> demographicExportProgress()
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-
-		List<GenericFile> logFiles = new ArrayList<>(logFileNames.size());
-		for(String fileName : logFileNames)
-		{
-			logFiles.add(FileFactory.getImportLogFile(fileName));
-		}
-		ZIPFile zipFile = FileFactory.packageZipFile(logFiles);
-
-		String filename = "import-logs.zip";
-		Response.ResponseBuilder response = Response.ok(zipFile.toFileInputStream());
-
-		response.header("Content-Disposition", "filename="+filename);
-		response.type("application/zip");
-		return response.build();
+		return RestResponse.successResponse(exportProperties.getProgress());
 	}
 
 	@GET

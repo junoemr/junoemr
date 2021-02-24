@@ -20,24 +20,33 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
 
-import lombok.Data;
-import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
-import org.springframework.stereotype.Component;
+import {JUNO_STYLE} from "../../components/junoComponentConstants";
 
-@Data
-@Component
-public class ImportProperties
-{
-	private ImportLogger importLogger;
-	private ImportPreferences importPreferences;
-
-	public ProgressBarPollingData getProgress()
+angular.module('Common.Components').component('junoProgressModalComponent',
 	{
-		ProgressBarPollingData progressData = new ProgressBarPollingData();
-		//TODO fill data
-		return progressData;
-	}
-}
+		templateUrl: 'src/common/modals/junoProgressModal/junoProgressModal.jsp',
+		bindings: {
+			modalInstance: "<",
+			resolve: "<",
+		},
+		controller: [function ()
+		{
+			let ctrl = this;
+
+			ctrl.$onInit = () =>
+			{
+				ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+			}
+
+			ctrl.close = function ()
+			{
+				ctrl.modalInstance.close();
+			};
+
+			ctrl.getComponentClasses = () =>
+			{
+				return [ctrl.resolve.style, ctrl.resolve.style + "-background"]
+			}
+		}]
+	});

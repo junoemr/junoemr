@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.logger.ExportLogger;
+import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
 import org.springframework.stereotype.Component;
 
 @Data
@@ -32,4 +33,11 @@ public class ExportProperties
 {
 	private ExportLogger exportLogger;
 	private ExportPreferences exportPreferences;
+
+	public ProgressBarPollingData getProgress()
+	{
+		ProgressBarPollingData progressData = new ProgressBarPollingData();
+		//TODO fill data
+		return progressData;
+	}
 }

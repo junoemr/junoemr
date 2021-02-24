@@ -186,6 +186,24 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
+		service.demographicImportProgress = function demographicImportProgress()
+		{
+			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+
+			junoHttp.get(service.apiPath + '/import/progress', config).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("demographicsService::demographicImportProgress error", errors);
+					deferred.reject("An error occurred while fetching import progress");
+				});
+			return deferred.promise;
+		}
+
 		service.demographicExport = function importLogUrl(type, patientSet, options)
 		{
 			let formatArray = [
@@ -194,6 +212,24 @@ angular.module("Common.Services").service("demographicsService", [
 			]
 			return service.apiPath + '/export?' + formatArray.join('&') + "&" + new URLSearchParams(options).toString();
 		};
+
+		service.demographicExportProgress = function demographicExportProgress()
+		{
+			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+
+			junoHttp.get(service.apiPath + '/export/progress', config).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("demographicsService::demographicExportProgress error", errors);
+					deferred.reject("An error occurred while fetching export progress");
+				});
+			return deferred.promise;
+		}
 
 		service.importLogUrl = function importLogUrl(fileNames)
 		{

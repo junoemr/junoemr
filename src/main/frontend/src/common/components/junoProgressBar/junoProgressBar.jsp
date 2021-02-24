@@ -20,11 +20,16 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div class="juno-progress-bar">
-	<div class="progress">
-		<div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"
-		     ng-style="$ctrl.getProgressStyle()">
-			{{$ctrl.getProgressLabel()}}
+<div class="juno-progress-bar" ng-class="$ctrl.getComponentClasses()">
+	<div class="flex-column width-100">
+		<div ng-if="$ctrl.data.message" class="col-xs-12 no-padding alert-content text-center">
+			<p>{{$ctrl.data.message}}</p>
+		</div>
+		<div class="progress">
+			<div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"
+			     ng-style="$ctrl.getProgressStyle()">
+				{{$ctrl.getProgressLabel()}}
+			</div>
 		</div>
 	</div>
 </div>

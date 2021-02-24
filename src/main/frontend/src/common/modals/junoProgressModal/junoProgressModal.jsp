@@ -1,4 +1,4 @@
-/**
+<%--
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -19,25 +19,16 @@
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
- */
-package org.oscarehr.demographicImport.util;
-
-import lombok.Data;
-import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
-import org.springframework.stereotype.Component;
-
-@Data
-@Component
-public class ImportProperties
-{
-	private ImportLogger importLogger;
-	private ImportPreferences importPreferences;
-
-	public ProgressBarPollingData getProgress()
-	{
-		ProgressBarPollingData progressData = new ProgressBarPollingData();
-		//TODO fill data
-		return progressData;
-	}
-}
+--%>
+<div class="juno-progress-modal height-100" ng-class="$ctrl.getComponentClasses()">
+	<div class="flex-column height-100 width-100 juno-text">
+		<div ng-if="$ctrl.resolve.title">
+			<h6 class="body-bold text-center">{{$ctrl.resolve.title}}</h6>
+			<hr class="md-margin-bottom no-margin-top header-divider">
+		</div>
+		<div ng-if="$ctrl.resolve.message" class="col-xs-12 no-padding alert-content text-center">
+			<p>{{$ctrl.resolve.message}}</p>
+		</div>
+		<juno-progress-bar update-callback="$ctrl.resolve.updateCallback()"></juno-progress-bar>
+	</div>
+</div>

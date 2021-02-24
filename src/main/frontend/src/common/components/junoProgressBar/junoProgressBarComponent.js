@@ -30,17 +30,9 @@ angular.module('Common.Components').component('junoProgressBar',
 		},
 		controller: [
 			'$scope',
-			'$http',
-			'$httpParamSerializer',
-			'$q',
-			'$uibModal',
 			'$interval',
 			function (
 				$scope,
-				$http,
-				$httpParamSerializer,
-				$q,
-				$uibModal,
 				$interval)
 			{
 				let ctrl = this;
@@ -58,6 +50,11 @@ angular.module('Common.Components').component('junoProgressBar',
 				{
 					ctrl.startPolling();
 				}
+
+				ctrl.$onDestroy = () =>
+				{
+					ctrl.stopPolling();
+				};
 
 				ctrl.startPolling = () =>
 				{
@@ -93,6 +90,11 @@ angular.module('Common.Components').component('junoProgressBar',
 				ctrl.getProgressLabel = () =>
 				{
 					return ctrl.data.message + " " + Math.round((ctrl.data.processed / ctrl.data.total) * 100) +"%";
+				}
+
+				ctrl.getComponentClasses = () =>
+				{
+					return [ctrl.resolve.style]
 				}
 			}]
 	});
