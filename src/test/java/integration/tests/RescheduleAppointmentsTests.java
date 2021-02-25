@@ -26,6 +26,7 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
+import javax.xml.crypto.Data;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -51,8 +52,11 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class RescheduleAppointmentsTests extends SeleniumTestBase
 {
-    @BeforeClass
-    public static void setup() throws Exception
+	@Autowired
+    DatabaseUtil databaseUtil;
+
+    @Before
+    public void setup() throws Exception
     {
         loadSpringBeans();
         databaseUtil.createTestDemographic();

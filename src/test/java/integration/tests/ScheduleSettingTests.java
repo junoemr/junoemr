@@ -66,8 +66,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 	public static String templateTitleGeneral = "P:General";
 
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@Before
+	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
