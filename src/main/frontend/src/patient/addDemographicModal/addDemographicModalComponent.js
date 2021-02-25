@@ -41,6 +41,7 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.newDemographicData.hin = "";
 		ctrl.newDemographicData.ver = "";
 		ctrl.newDemographicData.hcType = "BC";
+		ctrl.newDemographicData.dateJoined = new Date();
 
 		// address data
 		ctrl.newDemographicData.address = {
@@ -150,6 +151,7 @@ angular.module('Patient').component('addDemographicModal', {
 
 			if (ctrl.validateDemographic())
 			{
+				console.log("saving demographic");
 				demographicService.saveDemographic(ctrl.newDemographicData)
 					.then((results) =>
 					{
