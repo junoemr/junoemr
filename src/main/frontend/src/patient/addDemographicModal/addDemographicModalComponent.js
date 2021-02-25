@@ -41,6 +41,7 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.newDemographicData.hin = "";
 		ctrl.newDemographicData.ver = "";
 		ctrl.newDemographicData.hcType = "BC";
+		ctrl.newDemographicData.patientStatusDate = new Date();
 
 		// address data
 		ctrl.newDemographicData.address = {
