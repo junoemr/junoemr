@@ -78,6 +78,8 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				ctrl.selectedExportType = ctrl.exportTypeOptions[0].value;
 				ctrl.selectedSet = null;
 
+				ctrl.exportRunning = false;
+
 				ctrl.$onInit = () =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
@@ -99,7 +101,11 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 									value: setName
 								};
 							});
-							ctrl.selectedSet = ctrl.demographicSetOptions[0].value;
+
+							if(ctrl.demographicSetOptions.length > 0)
+							{
+								ctrl.selectedSet = ctrl.demographicSetOptions[0].value;
+							}
 							deferred.resolve(names);
 						},
 						function failure(response)
@@ -132,13 +138,14 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				{
 					if (ctrl.selectedExportType && ctrl.selectedSet)
 					{
+						ctrl.exportRunning = true
 						Juno.Common.Util.showProgressBar($uibModal,
 							"Exporting Patient Set",
 							ctrl.componentStyle,
 							ctrl.fetchExportProgress,
 							() =>
 							{
-								console.info("loading bar closed");
+								ctrl.exportRunning = false;
 							}
 						);
 
@@ -160,6 +167,11 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 						console.error("Polling Error", e);
 					}
 					return pollingData;
+				}
+
+				ctrl.canRunExport = () =>
+				{
+					return (!ctrl.exportRunning && ctrl.selectedSet);
 				}
 			}]
 	});

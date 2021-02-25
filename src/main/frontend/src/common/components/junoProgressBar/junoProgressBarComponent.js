@@ -87,13 +87,13 @@ angular.module('Common.Components').component('junoProgressBar',
 
 				ctrl.getProgressStyle = () =>
 				{
+					// make sure the values are valid / exist etc.
+					let processed = (ctrl.data.processed && ctrl.data.processed >= 0) ? ctrl.data.processed : 0;
+					let total = (ctrl.data.total && ctrl.data.total > 0) ? ctrl.data.total : 1;
+
 					return {
-						width: Math.round((ctrl.data.processed / ctrl.data.total) * 100) +"%",
+						width: Math.round((processed / total) * 100) +"%",
 					}
-				}
-				ctrl.getProgressLabel = () =>
-				{
-					return Math.round((ctrl.data.processed / ctrl.data.total) * 100) +"%";
 				}
 
 				ctrl.getComponentClasses = () =>

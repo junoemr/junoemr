@@ -24,7 +24,6 @@
 	<div class="flex-column height-100 width-100 juno-text">
 		<div ng-if="$ctrl.resolve.title">
 			<h6 class="body-bold text-center">{{$ctrl.resolve.title}}</h6>
-			<hr class="md-margin-bottom no-margin-top header-divider">
 		</div>
 		<div ng-if="$ctrl.resolve.message" class="col-xs-12 no-padding alert-content text-center">
 			<p>{{$ctrl.resolve.message}}</p>
