@@ -73,7 +73,7 @@
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
     String demographic_no = request.getParameter("demographic_no");
     String providerNo = (String) session.getAttribute("user");
-    String temp = request.getParameter("template");
+    String template = request.getParameter("template");
         
     String ornPilot = OscarProperties.getInstance().getProperty("ORN_PILOT", "no");
 
@@ -82,14 +82,14 @@
     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="r" reverse="<%=true%>">
         "You have no right to access this page!"
         <%
-    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
+    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.ACTION_READ, LogConst.CON_FLOWSHEET, template, request.getRemoteAddr(),demographic_no);
             response.sendRedirect("../../noRights.html");
     %>
     </security:oscarSec>
 </oscar:oscarPropertiesCheck>
 
 <%
-	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
+	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET, template, request.getRemoteAddr(),demographic_no);
 	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 
     int numElementsToShow = 6;
@@ -116,11 +116,11 @@
     }
 
     FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
-    List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
+    List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
 
     ////Start
 
-    MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(temp,custList);
+    MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(template,custList);
 
     MeasurementInfo mi = new MeasurementInfo(demographic_no);
     List<String> measurementLs = mFlowsheet.getMeasurementList();
@@ -425,7 +425,7 @@ padding-left:10px;
 }
 </style>
 
-<%//todo: temp hack
+<%//todo: template hack
 String tracker = "";
 if( request.getParameter("tracker")!=null && request.getParameter("tracker").equals("slim") ){ 
 tracker="&tracker=slim";
@@ -529,10 +529,10 @@ div.preventionSection {
         
       
       if (sdate && edate){
-            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>&sdate='+sdate+'&edate='+edate;
+            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>&sdate='+sdate+'&edate='+edate;
             //console.log("two");
         }else{
-            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>';
+            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>';
         }
 
     }
@@ -674,25 +674,11 @@ function fsPopup(width,height,url,window) {
 <%@ include file="/share/templates/patient.jspf"%>
 
 <div class="well DoNotPrint" id="tracker-bar" >
-   		<div class="col-lg-12" style="padding-left:0px;margin-left:0px">
-<%
-	if ("tracker".equals(temp))
-	{
-%>
-		<a href="?demographic_no=<%=demographic_no%>&template=tracker" class="btn btn-default btn-primary active">
+	<div class="col-lg-12" style="padding-left:0px;margin-left:0px">
+		<a href="?demographic_no=<%=demographic_no%>&template=tracker"
+		   class="btn btn-default <%= "tracker".equals(template) ? "btn-primary active" : "" %>">
 			<span class="glyphicon glyphicon-home "></span>
 		</a>
-<%
-	}
-	else
-	{
-%>
-		<a href="?demographic_no=<%=demographic_no%>&template=tracker" class="btn btn-default">
-			<span class="glyphicon glyphicon-home "></span>
-		</a>
-<%
-	}
-	%>
 <%
 	String dxCodeQueryString="";
 
@@ -814,7 +800,7 @@ function fsPopup(width,height,url,window) {
 
 	for (String value : diagnosed)
 	{
-		if (temp.equals(value))
+		if (template.equals(value))
 		{
 			fsSelected = "btn-primary active";
 		}
@@ -852,7 +838,7 @@ function fsPopup(width,height,url,window) {
 		{
 			if (btnLabel.equals("PHV"))
 			{
-				if (temp.equals(value))
+				if (template.equals(value))
 				{
 					fsSelected = "btn-primary active";
 				}
@@ -870,7 +856,7 @@ function fsPopup(width,height,url,window) {
 				btnLabel = "DIAB";
 			}
 
-			if (temp.equals(value) && !temp.equals("phv"))
+			if (template.equals(value) && !template.equals("phv"))
 			{
 				fsSelected = "active";
 				unDxShow = btnLabel;
@@ -928,7 +914,7 @@ function fsPopup(width,height,url,window) {
    	<div class="row-fluid">
    		<div class="col-lg-12">
  
- <%if (!diagnosed.contains(temp) && !temp.equals("phv") && !temp.equals("tracker")){ %>  
+ <%if (!diagnosed.contains(template) && !template.equals("phv") && !template.equals("tracker")){ %>
  
 <script type="text/javascript">
     $(window).load(function(){
@@ -966,9 +952,9 @@ function fsPopup(width,height,url,window) {
 <%if( request.getParameter("tracker")!=null && request.getParameter("tracker").equals("slim") ){ %>
 
 <%}else{%>   
-<%if(!temp.equals("tracker")){%>
+<%if(!template.equals("tracker")){%>
 <h4 style="display:inline;"><%=flowSheet%></h4>
-<%}else if(isMeasurements && temp.equals("tracker")){ 	%>
+<%}else if(isMeasurements && template.equals("tracker")){ 	%>
 <h4 style="display:inline;">Tracker Flowsheet</h4>
 <%}%>
 
@@ -985,7 +971,7 @@ function fsPopup(width,height,url,window) {
 		<%}%>
 		<%
 		 if("yes".equalsIgnoreCase(ornPilot) || "true".equalsIgnoreCase(ornPilot)) {
-		 if(temp.toUpperCase().equals("DIAB2") || temp.toUpperCase().equals("CKD") || temp.toUpperCase().equals("RENAL")){
+		 if(template.toUpperCase().equals("DIAB2") || template.toUpperCase().equals("CKD") || template.toUpperCase().equals("RENAL")){
 		%>
 		
 		<span class="DoNotPrint" style="padding-left:10px;" id="add-renal">
@@ -1047,16 +1033,16 @@ function fsPopup(width,height,url,window) {
 	    <div class="row-fluid">
 		    <div class="col-lg-6 col-md-6" id="left-side">
 
-<%if(!isMeasurements && !temp.equals("tracker")){ out.print("No measurements! ");%>	
+<%if(!isMeasurements && !template.equals("tracker")){ out.print("No measurements! ");%>
 		<security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="w">	
-		To add measurements go to <a href='adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=temp%>&demographic=<%=demographic_no%>&htracker<%=tracker%>' title='Edit Flowsheet'>Edit Flowsheet</a>.	
+		To add measurements go to <a href='adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=template%>&demographic=<%=demographic_no%>&htracker<%=tracker%>' title='Edit Flowsheet'>Edit Flowsheet</a>.
 		</security:oscarSec>	
-<%}else if(!isMeasurements && temp.equals("tracker")){%>            		    
+<%}else if(!isMeasurements && template.equals("tracker")){%>
 
 <div class="well" id="health-tracker-add">
 <p class="lead muted">It looks like you are not tracking any measurements!</p>
 
-<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=temp%>&demographic=<%=demographic_no%>&add&htracker<%=tracker%>" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-plus-sign "></span> Add Measurements</a>
+<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=template%>&demographic=<%=demographic_no%>&add&htracker<%=tracker%>" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-plus-sign "></span> Add Measurements</a>
 
 </div>
 <%}%>           		    
@@ -1075,7 +1061,7 @@ function fsPopup(width,height,url,window) {
 
 <input type="hidden" name="date" id="date" value="<%=date%>" size="10" > 
 <input type="hidden" name="demographic_no" value="<%=demographic_no%>"/>
-<input type="hidden" name="template" value="<%=temp%>"/>
+<input type="hidden" name="template" value="<%=template%>"/>
 <%
 	//set add link array
 	String[] addAllLink = new String[measurements.size()];
@@ -1518,11 +1504,11 @@ function createAddAll(d,t){
 <div class="DoNotPrint save-all">
 	<!-- this will have to be visible to user -->
 			
-		<a href="TemplateFlowSheetPrint.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>&htracker" class="btn btn-default btn-lg" value="<bean:message key="oscarencounter.templateflowsheet.print" />" title="<bean:message key="oscarencounter.templateflowsheet.print" /> Flowsheet"><span class="glyphicon glyphicon-print"></span> Print</a>
+		<a href="TemplateFlowSheetPrint.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>&htracker" class="btn btn-default btn-lg" value="<bean:message key="oscarencounter.templateflowsheet.print" />" title="<bean:message key="oscarencounter.templateflowsheet.print" /> Flowsheet"><span class="glyphicon glyphicon-print"></span> Print</a>
 					
 		<security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="w">
 			<security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="x">
-			<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=temp%>&demographic=<%=demographic_no%>&htracker" class="btn btn-default btn-lg" title="Edit Flowsheet"><span class="glyphicon glyphicon-pencil"></span> Edit</a>   
+			<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=template%>&demographic=<%=demographic_no%>&htracker" class="btn btn-default btn-lg" title="Edit Flowsheet"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
 			</security:oscarSec>
 					
 		    <input class="btn btn-primary btn-lg" type="submit" name="submit" value="Save All" />
@@ -1539,7 +1525,7 @@ function createAddAll(d,t){
  
  <%
  if("yes".equalsIgnoreCase(ornPilot) || "true".equalsIgnoreCase(ornPilot)) {
- if(temp.toUpperCase().equals("DIAB2") || temp.toUpperCase().equals("CKD") || temp.toUpperCase().equals("RENAL")){
+ if(template.toUpperCase().equals("DIAB2") || template.toUpperCase().equals("CKD") || template.toUpperCase().equals("RENAL")){
  %>
  <!-- renal  start-->
    <div class="tabbable DoNotPrint">
@@ -1576,12 +1562,12 @@ function createAddAll(d,t){
     	<li><a href="#templates" data-toggle="tab" title="new forms to be completed"><bean:message key="global.templates" /></a></li>
     	
     	
-    	<%if(temp.toUpperCase().equals("PHV")){ //temp for PHV TODO: make generic so the below links will be user added/managed %>
+    	<%if(template.toUpperCase().equals("PHV")){ //template for PHV TODO: make generic so the below links will be user added/managed %>
     	<li><a href="#resources" data-toggle="tab" title="">Resources</a></li>
 		<%} %>
     </ul>
 <%
-	String groupToView = temp.toLowerCase(); 
+	String groupToView = template.toLowerCase();
 	String user = (String) session.getAttribute("user");
 	String roleName = (String)session.getAttribute("userrole") + "," + user;
 	String orderBy = EFormUtil.DATE;
@@ -1635,7 +1621,7 @@ function createAddAll(d,t){
 		</table>
 		</div><!-- templates -->
 
-		<%if(temp.toUpperCase().equals("PHV")){%>
+		<%if(template.toUpperCase().equals("PHV")){%>
 		<div id="resources" class="tab-pane">
 		<ul>
 		<li><a href="http://www.sexualityandu.ca" target="_blank">www.sexualityandu.ca</a></li>
@@ -1729,7 +1715,7 @@ function createAddAll(d,t){
 <div class="modal-body" style="text-align:center">
 
                <input type="hidden" name="value(numType)" value="<%=demographic_no%>"/>
-               <input type="hidden" name="template"  id="deleteTemplate" value="<%=temp%>"/>
+               <input type="hidden" name="template"  id="deleteTemplate" value="<%=template%>"/>
 
                <input type="hidden" name="id" id="deleteId" value=""/>
                <input type="hidden" name="deleteCheckbox" id="deleteCheck" value=""/>
@@ -1877,13 +1863,13 @@ $(document).ready(function () {
 		var v=$(this).val();
 		
 		  if(v=="All"){
-	          window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>';  
+	          window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>';
 		  }else if (v=="outOfRange"){
-			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>&show='+v;
+			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>&show='+v;
 		  }else if(v=="dateRange"){
 			  $("#date-filter").toggle();
 		  }else{
-			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>&numEle='+v;
+			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>&numEle='+v;
 		  } 
     });    
     
@@ -1900,7 +1886,7 @@ $(document).ready(function () {
             method: 'POST',
             data: deletevalue,
             success: function(returnData){
-            	window.location = "<%=request.getContextPath()%>/oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?ycoord="+ycoord+"&demographic_no=<%=demographic_no%>&template=<%=temp%>";
+            	window.location = "<%=request.getContextPath()%>/oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?ycoord="+ycoord+"&demographic_no=<%=demographic_no%>&template=<%=template%>";
             }
         });
 
@@ -2014,7 +2000,7 @@ $(document).ready(function () {
 	}else{
 		//build
 		var link = "<%=request.getContextPath()%>/oscarEncounter/oscarMeasurements/TrackerUpdate.do";
-		var qs1 = "ycoord="+ycoord+"&date="+date+"&demographic_no=<%=demographic_no%>&template=<%=temp%>";
+		var qs1 = "ycoord="+ycoord+"&date="+date+"&demographic_no=<%=demographic_no%>&template=<%=template%>";
 		var qs2 = typeDate+"="+typeDateVal+"&"+type+"="+value+"&"+typeComments+"="+typeCommentsVal+"&submit=Add";
 
 		$('#'+type).removeClass(' input-error').addClass(' input-success');
@@ -2053,7 +2039,7 @@ $('#deleteModal').on('hidden', function () {
 	$("#deleteComment").html("");
 });
 
-<%if(temp.toUpperCase().equals("PHV")){%>
+<%if(template.toUpperCase().equals("PHV")){%>
 $("#AssessmentFollowupplans-REVIEWED").click(function(){
 	if ($('#AssessmentFollowupplans-REVIEWED').is(':checked')) {
 		$("#AssessmentFollowupplans_note").prop( 'checked', true );
