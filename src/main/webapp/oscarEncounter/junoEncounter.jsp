@@ -145,7 +145,7 @@
 			function getAppointmentNo()
 			{
 				<c:if test="${not empty junoEncounterForm.pageData.appointmentNo}">
-				var appointmentNo = <c:out value="${junoEncounterForm.pageData.appointmentNo}" />;
+				var appointmentNo = parseInt("<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.appointmentNo}</spring:escapeBody>");
 				</c:if>
 				<c:if test="${empty junoEncounterForm.pageData.appointmentNo}">
 				var appointmentNo = null;
@@ -168,21 +168,21 @@
 			var junoJQuery = null;
 
 			var pageData = {
-				contextPath: "<c:out value='${pageContext.request.contextPath}' />",
-				demographicNo: "<c:out value='${junoEncounterForm.pageData.demographicNo}' />",
-				providerNo: "<c:out value='${junoEncounterForm.pageData.providerNo}' />",
+				contextPath: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${pageContext.request.contextPath}</spring:escapeBody>", //**
+				demographicNo: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.demographicNo}</spring:escapeBody>", //**
+				providerNo: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.providerNo}</spring:escapeBody>", //**
 				appointmentNo: getAppointmentNo(),
-				encounterNoteHideBeforeDate: "<c:out value='${encounterNoteHideBeforeDateFormatted}' />",
-				defaultEncounterType: "<c:out value='${junoEncounterForm.encType}' />",
-				reason: "<c:out value='${junoEncounterForm.reason}' />",
-				appointmentDate: "<c:out value='${junoEncounterForm.appointmentDate}' />",
-				cmeJs: "<c:out value='${junoEncounterForm.pageData.cmeJs}' />",
-				billingUrl: "<c:out value='${junoEncounterForm.pageData.billingUrl}' />",
-				encounterWindowCustomSize: ("<c:out value="${junoEncounterForm.pageData.encounterWindowCustomSize}" />" == "true"),
-				encounterWindowHeight: "<c:out value="${junoEncounterForm.pageData.encounterWindowHeight}" />",
-				encounterWindowWidth: "<c:out value="${junoEncounterForm.pageData.encounterWindowWidth}" />",
-				encounterWindowMaximize: ("<c:out value="${junoEncounterForm.pageData.encounterWindowMaximize}" />" == "true"),
-				imagePresentPlaceholderUrl: "<c:out value='${fn:escapeXml(junoEncounterForm.pageData.imagePresentPlaceholderUrl)}' />",
+				encounterNoteHideBeforeDate: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${encounterNoteHideBeforeDateFormatted}</spring:escapeBody>", //**
+				defaultEncounterType: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.encType}</spring:escapeBody>", //**
+				reason: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.reason}</spring:escapeBody>", //**
+				appointmentDate: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.appointmentDate}</spring:escapeBody>", //**
+				cmeJs: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.cmeJs}</spring:escapeBody>",
+				billingUrl: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.billingUrl}</spring:escapeBody>",
+				encounterWindowCustomSize: ("<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.encounterWindowCustomSize}</spring:escapeBody>" == "true"), //**
+				encounterWindowHeight: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.encounterWindowHeight}</spring:escapeBody>", //**
+				encounterWindowWidth: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.encounterWindowWidth}</spring:escapeBody>", //**
+				encounterWindowMaximize: ("<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${junoEncounterForm.pageData.encounterWindowMaximize}</spring:escapeBody>" == "true"), //**
+				imagePresentPlaceholderUrl: "<spring:escapeBody htmlEscape='false' javaScriptEscape='true'>${fn:escapeXml(junoEncounterForm.pageData.imagePresentPlaceholderUrl)}</spring:escapeBody>", //**
 				encounterTypeArray: getEncounterTypeArray(),
 				editUnsignedMsg: "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>",
 				unsavedNoteWarningMsg: "<bean:message key="oscarEncounter.unsavedNoteWarning.msg"/>",
