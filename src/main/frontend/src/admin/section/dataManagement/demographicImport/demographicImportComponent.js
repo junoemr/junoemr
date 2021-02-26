@@ -21,7 +21,8 @@
  * Canada
  */
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {SitesApi} from "../../../../../generated";
+import {DemographicsApi, SitesApi} from "../../../../../generated";
+import FileSaver from "file-saver";
 
 angular.module('Admin.Section.DataManagement').component('demographicImport',
 	{
@@ -35,18 +36,17 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 			'$httpParamSerializer',
 			'$q',
 			'$uibModal',
-			'demographicsService',
 			function (
 				$scope,
 				$http,
 				$httpParamSerializer,
 				$q,
-				$uibModal,
-				demographicsService)
+				$uibModal)
 			{
 				let ctrl = this;
 
 				ctrl.sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
+				ctrl.demographicsApi = new DemographicsApi($http, $httpParamSerializer, '../ws/rs');
 
 				$scope.LABEL_POSITION = LABEL_POSITION;
 				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -154,7 +154,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						}
 					);
 
-					demographicsService.demographicImport(
+					ctrl.demographicsApi.demographicImport(
 						ctrl.selectedImportType,
 						ctrl.selectedImportSource,
 						ctrl.selectedMergeStrategy,
@@ -162,7 +162,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						formattedFileList
 					).then((response) =>
 						{
-							ctrl.results = response.data;
+							ctrl.results = response.data.body;
 						}
 					).catch(() =>
 						{
@@ -180,7 +180,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					let pollingData = {};
 					try
 					{
-						pollingData = (await demographicsService.demographicImportProgress()).data;
+						pollingData = (await ctrl.demographicsApi.demographicImportProgress()).data.body;
 					}
 					catch (e)
 					{
@@ -189,13 +189,12 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					return pollingData;
 				}
 
-				ctrl.onDownloadLogFiles = () =>
+				ctrl.onDownloadLogFiles = async () =>
 				{
 					if(ctrl.results && ctrl.results.logFileNames && ctrl.results.logFileNames.length > 0)
 					{
-						let url = demographicsService.importLogUrl(ctrl.results.logFileNames);
-						let windowName = "importLogs";
-						window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+						const doc = await ctrl.demographicsApi.downloadImportLogs(ctrl.results.logFileNames, {responseType: "blob"})
+						FileSaver.saveAs(new Blob([doc.data], {type: doc.data.type}), "importLogs.zip");
 					}
 				}
 

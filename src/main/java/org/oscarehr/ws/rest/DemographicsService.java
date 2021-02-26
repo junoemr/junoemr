@@ -375,7 +375,7 @@ public class DemographicsService extends AbstractServiceImpl
 	@Path("/import/logs/download")
 	@Produces("application/zip")
 	@SkipContentLoggingOutbound
-	public Response download(@QueryParam("logName") final List<String> logFileNames) throws IOException
+	public Response downloadImportLogs(@QueryParam("logName") final List<String> logFileNames) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);

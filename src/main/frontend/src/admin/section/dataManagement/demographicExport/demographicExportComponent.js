@@ -36,14 +36,12 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 			'$httpParamSerializer',
 			'$q',
 			'$uibModal',
-			'demographicsService',
 			function (
 				$scope,
 				$http,
 				$httpParamSerializer,
 				$q,
-				$uibModal,
-				demographicsService)
+				$uibModal)
 			{
 				let ctrl = this;
 
@@ -94,10 +92,10 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				ctrl.loadDemographicSets = () =>
 				{
 					let deferred = $q.defer();
-					demographicsService.getDemographicSetNames().then(
+					ctrl.demographicsApi.getDemographicSetNames().then(
 						function success(response)
 						{
-							let names = response.data;
+							let names = response.data.body;
 							ctrl.demographicSetOptions = names.map(setName =>
 							{
 								return {
@@ -185,7 +183,7 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 					let pollingData = {};
 					try
 					{
-						pollingData = (await demographicsService.demographicExportProgress()).data;
+						pollingData = (await ctrl.demographicsApi.demographicExportProgress()).data.body;
 					}
 					catch (e)
 					{
