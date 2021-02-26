@@ -29,9 +29,11 @@ import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.dao.SecurityDao;
+import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.dao.ProviderBillingDao;
@@ -63,6 +65,9 @@ public class ProviderService
 
 	@Autowired
 	SecurityDao securityDao;
+
+	@Autowired
+	UserPropertyDAO userPropertyDAO;
 
 	@Autowired
 	private ProviderRoleService providerRoleService;
@@ -276,6 +281,7 @@ public class ProviderService
 
 		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
 
+		setJunoUIAsDefault(provider.getProviderNo());
 		return provider;
 	}
 
@@ -335,6 +341,19 @@ public class ProviderService
 			providerRoleService.removeOtherProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
 			providerRoleService.setDefaultPrimaryRole(providerNo);
 		}
+	}
+
+	/**
+	 * set Juno UI as default for provider
+	 * @param providerNo - the provider to set the default UI for
+	 */
+	public synchronized void setJunoUIAsDefault(Integer providerNo)
+	{
+		UserProperty property = new UserProperty();
+		property.setName(UserProperty.COBALT);
+		property.setProviderNo(Integer.toString(providerNo));
+		property.setValue("yes");
+		userPropertyDAO.saveProp(property);
 	}
 
 	/**
