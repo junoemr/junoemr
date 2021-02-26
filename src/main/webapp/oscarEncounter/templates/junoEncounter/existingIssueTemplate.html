@@ -6,7 +6,7 @@
             {{if i % 2 == 0}}
     </tr><tr>
             {{/if}}
-        <td>
+        <td id="issueListWidgetContainer\${cmIssue.issue.id}">
             <input
                     type='checkbox'
                     id='issueId\${cmIssue.issue.id}'
@@ -19,6 +19,7 @@
             <a href="#" onclick="caseManagementIssue.toggleIssueWidget('\${cmIssue.issue.id}'); return false;">
                 \${cmIssue.issue.description}
             </a>
+            &nbsp;
             <!-- <a href="#" onclick="">Delete</a> -->
             <a href="#" onclick="caseManagementIssue.enableChangeMode('\${cmIssue.issue.id}', \${resolved}); return false;">Change</a>
             <div class="setIssueListWidget" id="setIssueListWidget\${cmIssue.issue.id}"><div>
@@ -26,7 +27,7 @@
                     <div class="setIssueListControl \${cmIssue.class}">
                         <input
                                 type="radio"
-                                name="issueCheckList\${property.fieldName}"
+                                name="issueCheckList\${cmIssue.issue.id}\${property.fieldName}"
                                 id="issueCheckList\${cmIssue.issue.id}.\${property.name}"
                                 onclick="caseManagementIssue.saveIssueProperty({jQuery: jQuery}, '\${cmIssue.issue.id}', '\${property.fieldName}', \${property.fieldValue})"
                         >\${property.label}</input>
