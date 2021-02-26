@@ -25,9 +25,6 @@
 		<div ng-if="$ctrl.resolve.title">
 			<h6 class="body-bold text-center">{{$ctrl.resolve.title}}</h6>
 		</div>
-		<div ng-if="$ctrl.resolve.message" class="col-xs-12 no-padding alert-content text-center">
-			<p>{{$ctrl.resolve.message}}</p>
-		</div>
-		<juno-progress-bar update-callback="$ctrl.resolve.updateCallback()" on-complete="$ctrl.onProgressComplete()"></juno-progress-bar>
+		<juno-progress-bar total="$ctrl.total" processed="$ctrl.processed" message="{{$ctrl.message}}"></juno-progress-bar>
 	</div>
 </div>

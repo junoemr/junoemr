@@ -36,12 +36,14 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 			'$httpParamSerializer',
 			'$q',
 			'$uibModal',
+			'$interval',
 			function (
 				$scope,
 				$http,
 				$httpParamSerializer,
 				$q,
-				$uibModal)
+				$uibModal,
+				$interval)
 			{
 				let ctrl = this;
 
@@ -81,12 +83,20 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				ctrl.selectedSet = null;
 
 				ctrl.exportRunning = false;
+				ctrl.pollingPromise = null;
 
 				ctrl.$onInit = () =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 
 					ctrl.loadDemographicSets();
+				}
+				ctrl.$onDestroy = () =>
+				{
+					if(ctrl.pollingPromise)
+					{
+						$interval.cancel(ctrl.pollingPromise);
+					}
 				}
 
 				ctrl.loadDemographicSets = () =>
@@ -141,41 +151,62 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 					if (ctrl.selectedExportType && ctrl.selectedSet)
 					{
 						ctrl.exportRunning = true
-						Juno.Common.Util.showProgressBar($uibModal,
+
+						let downloadPromiseDefer = $q.defer();
+
+						ctrl.demographicsApi.demographicExport(
+							ctrl.selectedExportType,
+							ctrl.selectedSet,
+							ctrl.exportToggleOptions.exPersonalHistory,
+							ctrl.exportToggleOptions.exFamilyHistory,
+							ctrl.exportToggleOptions.exPastHealth,
+							ctrl.exportToggleOptions.exProblemList,
+							ctrl.exportToggleOptions.exRiskFactors,
+							ctrl.exportToggleOptions.exAllergiesAndAdverseReactions,
+							ctrl.exportToggleOptions.exMedicationsAndTreatments,
+							ctrl.exportToggleOptions.exImmunizations,
+							ctrl.exportToggleOptions.exLaboratoryResults,
+							ctrl.exportToggleOptions.exAppointments,
+							ctrl.exportToggleOptions.exClinicalNotes,
+							ctrl.exportToggleOptions.exReportsReceived,
+							ctrl.exportToggleOptions.exAlertsAndSpecialNeeds,
+							ctrl.exportToggleOptions.exCareElements,
+							{responseType: "blob"}
+						).then((result) =>
+						{
+							downloadPromiseDefer.resolve(result);
+						}).catch((error) =>
+						{
+							downloadPromiseDefer.reject(error);
+						});
+
+						let loadingPromise = Juno.Common.Util.showProgressBar(
+							$uibModal,
+							$q,
+							downloadPromiseDefer,
 							"Exporting Patient Set",
 							ctrl.componentStyle,
-							ctrl.fetchExportProgress,
-							() =>
+						);
+
+						ctrl.pollingPromise = $interval(async () =>
+						{
+							downloadPromiseDefer.notify(await ctrl.fetchExportProgress());
+						}, 500, 0, true);
+
+						loadingPromise.then((result) =>
+						{
+							FileSaver.saveAs(new Blob([result.data], {type: result.data.type}), ctrl.selectedSet + ".zip");
+						}).catch(() =>
 							{
+								Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Export Not Completed");
+							}
+						).finally(() =>
+							{
+								$interval.cancel(ctrl.pollingPromise);
 								ctrl.exportRunning = false;
 							}
 						);
-
-						ctrl.downloadFile();
 					}
-				}
-
-				ctrl.downloadFile = async () =>
-				{
-					const doc = await ctrl.demographicsApi.demographicExport(
-						ctrl.selectedExportType,
-						ctrl.selectedSet,
-						ctrl.exportToggleOptions.exPersonalHistory,
-						ctrl.exportToggleOptions.exFamilyHistory,
-						ctrl.exportToggleOptions.exPastHealth,
-						ctrl.exportToggleOptions.exProblemList,
-						ctrl.exportToggleOptions.exRiskFactors,
-						ctrl.exportToggleOptions.exAllergiesAndAdverseReactions,
-						ctrl.exportToggleOptions.exMedicationsAndTreatments,
-						ctrl.exportToggleOptions.exImmunizations,
-						ctrl.exportToggleOptions.exLaboratoryResults,
-						ctrl.exportToggleOptions.exAppointments,
-						ctrl.exportToggleOptions.exClinicalNotes,
-						ctrl.exportToggleOptions.exReportsReceived,
-						ctrl.exportToggleOptions.exAlertsAndSpecialNeeds,
-						ctrl.exportToggleOptions.exCareElements,
-						{responseType: "blob"});
-					FileSaver.saveAs(new Blob([doc.data], {type: doc.data.type}), ctrl.selectedSet + ".zip");
 				}
 
 				ctrl.fetchExportProgress = async () =>

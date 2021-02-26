@@ -36,12 +36,14 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 			'$httpParamSerializer',
 			'$q',
 			'$uibModal',
+			'$interval',
 			function (
 				$scope,
 				$http,
 				$httpParamSerializer,
 				$q,
-				$uibModal)
+				$uibModal,
+				$interval)
 			{
 				let ctrl = this;
 
@@ -115,6 +117,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				ctrl.results = null;
 				ctrl.importRunning = false;
 				ctrl.sitesEnabled = false;
+				ctrl.pollingPromise = null;
 
 				ctrl.$onInit = () =>
 				{
@@ -133,6 +136,13 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						}
 					});
 				}
+				ctrl.$onDestroy = () =>
+				{
+					if(ctrl.pollingPromise)
+					{
+						$interval.cancel(ctrl.pollingPromise);
+					}
+				}
 
 				ctrl.onRunImport = async () =>
 				{
@@ -144,15 +154,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					ctrl.importRunning = true;
 					let formattedFileList = await ctrl.formatSelectedFiles();
 
-					Juno.Common.Util.showProgressBar($uibModal,
-						"Importing Patient Files",
-						ctrl.componentStyle,
-						ctrl.fetchImportProgress,
-						() =>
-						{
-							console.info("loading bar closed");
-						}
-					);
+					let importPromiseDefer = $q.defer();
 
 					ctrl.demographicsApi.demographicImport(
 						ctrl.selectedImportType,
@@ -160,7 +162,28 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						ctrl.selectedMergeStrategy,
 						ctrl.selectedSite,
 						formattedFileList
-					).then((response) =>
+					).then((result) =>
+					{
+						importPromiseDefer.resolve(result);
+					}).catch((error) =>
+					{
+						importPromiseDefer.reject(error);
+					});
+
+					let loadingPromise = Juno.Common.Util.showProgressBar(
+						$uibModal,
+						$q,
+						importPromiseDefer,
+						"Importing Patient Files",
+						ctrl.componentStyle,
+					);
+
+					ctrl.pollingPromise = $interval(async () =>
+					{
+						importPromiseDefer.notify(await ctrl.fetchImportProgress());
+					}, 500, 0, true);
+
+					loadingPromise.then((response) =>
 						{
 							ctrl.results = response.data.body;
 						}
@@ -170,6 +193,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						}
 					).finally(() =>
 						{
+							$interval.cancel(ctrl.pollingPromise);
 							ctrl.importRunning = false;
 						}
 					);

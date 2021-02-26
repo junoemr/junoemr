@@ -25,71 +25,21 @@ angular.module('Common.Components').component('junoProgressBar',
 	{
 		templateUrl: 'src/common/components/junoProgressBar/junoProgressBar.jsp',
 		bindings: {
-			updateCallback: "&", // must return a specific object
-			onComplete: "&",
 			componentStyle: "<?",
+			total: "<",
+			processed: "<",
+			message: "@?",
 		},
 		controller: [
-			'$scope',
-			'$interval',
-			function (
-				$scope,
-				$interval)
+			function ()
 			{
 				let ctrl = this;
-
-				// the callback method must return an object with these properties
-				ctrl.data = {
-					total: 1,
-					processed: 0,
-					message: "Initializing...",
-					complete: false,
-				};
-				ctrl.pollingPromise = null;
-
-				ctrl.$onInit = () =>
-				{
-					ctrl.startPolling();
-				}
-
-				ctrl.$onDestroy = () =>
-				{
-					ctrl.stopPolling();
-				};
-
-				ctrl.startPolling = () =>
-				{
-					ctrl.stopPolling();
-					if (ctrl.updateCallback)
-					{
-						ctrl.pollingPromise = $interval(async () =>
-						{
-							ctrl.data = await ctrl.updateCallback();
-							if (ctrl.data.complete)
-							{
-								ctrl.stopPolling();
-								if(ctrl.onComplete)
-								{
-									ctrl.onComplete();
-								}
-							}
-						}, 1000, 0, true);
-					}
-				}
-				ctrl.stopPolling = () =>
-				{
-					if(ctrl.pollingPromise)
-					{
-						$interval.cancel(ctrl.pollingPromise);
-						ctrl.pollingPromise = null;
-					}
-				}
 
 				ctrl.getProgressStyle = () =>
 				{
 					// make sure the values are valid / exist etc.
-					let processed = (ctrl.data.processed && ctrl.data.processed >= 0) ? ctrl.data.processed : 0;
-					let total = (ctrl.data.total && ctrl.data.total > 0) ? ctrl.data.total : 1;
+					let processed = (ctrl.processed && ctrl.processed >= 0) ? ctrl.processed : 0;
+					let total = (ctrl.total && ctrl.total > 0) ? ctrl.total : 1;
 
 					return {
 						width: Math.round((processed / total) * 100) +"%",

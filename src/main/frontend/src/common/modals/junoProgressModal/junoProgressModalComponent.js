@@ -34,29 +34,35 @@ angular.module('Common.Components').component('junoProgressModalComponent',
 		{
 			let ctrl = this;
 
+			ctrl.total = 1;
+			ctrl.processed = 0;
+			ctrl.message = "Initializing...";
+
 			ctrl.$onInit = () =>
 			{
 				ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-			}
-
-			ctrl.onProgressComplete = () =>
-			{
-				// wait a little before closing the modal just for visual reasons.
-				// this lets the user see the progress bar hit the 100% mark before it disappears
-				setTimeout(() =>
-				{
-					if(ctrl.resolve.onComplete)
+				ctrl.resolve.deferral.promise.then(
+					function success(response)
 					{
-						ctrl.resolve.onComplete();
-					}
-					ctrl.close();
-				}, 1500);
+						// wait a little before closing the modal just for visual reasons.
+						// this lets the user see the progress bar hit the 100% mark before it disappears
+						setTimeout(() =>
+						{
+							ctrl.modalInstance.close(response);
+						}, 1500);
+					},
+					function failure(error)
+					{
+						ctrl.modalInstance.dismiss(error);
+					},
+					function notify(data)
+					{
+						ctrl.total = data.total;
+						ctrl.processed = data.processed;
+						ctrl.message = data.message;
+					},
+				)
 			}
-
-			ctrl.close = function ()
-			{
-				ctrl.modalInstance.close();
-			};
 
 			ctrl.getComponentClasses = () =>
 			{

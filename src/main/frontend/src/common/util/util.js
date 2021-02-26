@@ -483,21 +483,29 @@ Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, m
 	).result;
 };
 
-Juno.Common.Util.showProgressBar = function showProgressBar(uibModal, title, style, updateCallback, onComplete)
+Juno.Common.Util.showProgressBar = function showProgressBar($uibModal, $q, deferral, title, style)
 {
-	return uibModal.open(
+	let deferred = $q.defer();
+
+	$uibModal.open(
 		{
 			component: 'junoProgressModalComponent',
 			backdrop: 'static',
 			windowClass: "juno-progress-modal",
 			resolve: {
 				title: () => title,
-				updateCallback: () => updateCallback,
-				onComplete: () => onComplete,
+				deferral: () => deferral,
 				style: () => style,
 			}
 		}
-	).result;
+	).result.then((result) =>
+	{
+		deferred.resolve(result);
+	}).catch((reason) =>
+	{
+		deferred.reject(reason);
+	});
+	return deferred.promise;
 };
 
 /**

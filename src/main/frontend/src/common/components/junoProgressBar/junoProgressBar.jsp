@@ -26,8 +26,8 @@
 			<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
 			     ng-style="$ctrl.getProgressStyle()"></div>
 		</div>
-		<div ng-if="$ctrl.data.message" class="progress-label text-center">
-			<p>{{$ctrl.data.message}}</p>
+		<div ng-if="$ctrl.message" class="progress-label text-center">
+			<p>{{$ctrl.message}}</p>
 		</div>
 	</div>
 </div>
