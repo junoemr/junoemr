@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
@@ -84,6 +85,7 @@ import java.util.regex.Pattern;
 @Path("/demographics")
 @Component("demographicsService")
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "demographics")
 public class DemographicsService extends AbstractServiceImpl
 {
 	private static Logger logger = MiscUtils.getLogger();

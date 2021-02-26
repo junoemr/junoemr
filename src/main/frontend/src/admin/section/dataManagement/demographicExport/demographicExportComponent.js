@@ -1,4 +1,6 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {DemographicsApi} from "../../../../../generated";
+import FileSaver from "file-saver";
 
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -48,6 +50,8 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				$scope.LABEL_POSITION = LABEL_POSITION;
 				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 				$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+
+				ctrl.demographicsApi = new DemographicsApi($http, $httpParamSerializer, '../ws/rs');
 
 				ctrl.exportTypeOptions = Object.freeze(
 					[
@@ -149,10 +153,31 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 							}
 						);
 
-						let url = demographicsService.demographicExport(ctrl.selectedExportType, ctrl.selectedSet, ctrl.exportToggleOptions);
-						let windowName = "export";
-						window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+						ctrl.downloadFile();
 					}
+				}
+
+				ctrl.downloadFile = async () =>
+				{
+					const doc = await ctrl.demographicsApi.demographicExport(
+						ctrl.selectedExportType,
+						ctrl.selectedSet,
+						ctrl.exportToggleOptions.exPersonalHistory,
+						ctrl.exportToggleOptions.exFamilyHistory,
+						ctrl.exportToggleOptions.exPastHealth,
+						ctrl.exportToggleOptions.exProblemList,
+						ctrl.exportToggleOptions.exRiskFactors,
+						ctrl.exportToggleOptions.exAllergiesAndAdverseReactions,
+						ctrl.exportToggleOptions.exMedicationsAndTreatments,
+						ctrl.exportToggleOptions.exImmunizations,
+						ctrl.exportToggleOptions.exLaboratoryResults,
+						ctrl.exportToggleOptions.exAppointments,
+						ctrl.exportToggleOptions.exClinicalNotes,
+						ctrl.exportToggleOptions.exReportsReceived,
+						ctrl.exportToggleOptions.exAlertsAndSpecialNeeds,
+						ctrl.exportToggleOptions.exCareElements,
+						{responseType: "blob"});
+					FileSaver.saveAs(new Blob([doc.data], {type: doc.data.type}), ctrl.selectedSet + ".zip");
 				}
 
 				ctrl.fetchExportProgress = async () =>

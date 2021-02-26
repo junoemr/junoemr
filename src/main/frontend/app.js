@@ -27,6 +27,7 @@ require('pym.js');
 require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
 require('angular-drag-and-drop-lists');
+require('file-saver');
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
