@@ -1,0 +1,25 @@
+#admin-system-properties {
+  @include juno-font-default();
+
+  hr {
+    margin-top: 0;
+  }
+
+  .navbar {
+    font-size: 24px;
+    margin: 0;
+
+    .active {
+      border-style: solid;
+      border-width: 0 0 4px 0;
+      border-color: $color-primary-base;
+      a {
+        color: $color-primary-base;
+      }
+    }
+  }
+
+  .content {
+    padding-left: 15px;
+  }
+}
