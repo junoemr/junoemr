@@ -24,6 +24,7 @@ package org.oscarehr.integration.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 
@@ -103,6 +104,10 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 	@Column(name = "json_data")
 	private String jsonData;
 
+	@Getter @Setter
+	@Column(name = "error_message")
+	private String errorMessage;
+
 	// The identifier of the target of the update.
 	// Can be NULL. This identifier, if not NULL
 	// is used to insure in-order delivery of updates
@@ -110,6 +115,26 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 	@Setter
 	@Column(name = "target_id")
 	private String targetId;
+
+	/**
+	 * set this record to an error state
+	 * @param errorMessage - error message describing why the error occurred
+	 */
+	public void recordError(String errorMessage)
+	{
+		this.setStatus(PUSH_STATUS.ERROR);
+		this.setErrorMessage(errorMessage);
+	}
+
+	/**
+	 * set this record to an error state
+	 * @param e - the exception that caused the error status
+	 */
+	public void recordError(Exception e)
+	{
+		this.setStatus(PUSH_STATUS.ERROR);
+		this.setErrorMessage(ExceptionUtils.getStackTrace(e));
+	}
 
 	@Override
 	public Integer getId()
@@ -205,21 +230,6 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 	public void setStatus(PUSH_STATUS status)
 	{
 		this.status = status;
-	}
-
-	public void setStatusQueued()
-	{
-		this.setStatus(PUSH_STATUS.QUEUED);
-	}
-
-	public void setStatusSent()
-	{
-		this.setStatus(PUSH_STATUS.SENT);
-	}
-
-	public void setStatusError()
-	{
-		this.setStatus(PUSH_STATUS.ERROR);
 	}
 
 	public Integer getSendCount()

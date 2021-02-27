@@ -22,6 +22,8 @@
  */
 package integration.tests.util.junoUtil;
 
+import integration.tests.util.data.PatientTestCollection;
+import integration.tests.util.data.PatientTestData;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
 import org.oscarehr.common.dao.ProviderSiteDao;
@@ -39,22 +41,30 @@ import org.oscarehr.util.SpringUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.data.ProviderTestCollection.providerLNames;
-import static integration.tests.util.data.SiteTestCollection.*;
+import static integration.tests.util.data.SiteTestCollection.shortNames;
+import static integration.tests.util.data.SiteTestCollection.siteNames;
+import static integration.tests.util.data.SiteTestCollection.themeColors;
 import static org.oscarehr.common.dao.utils.AuthUtils.TEST_PROVIDER_ID;
 
 public class DatabaseUtil
 {
-	public static Demographic createTestDemographic(String fName, String lName, String sex)
+	public static void createTestDemographic()
 	{
 		DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
-		Demographic demo = new Demographic();
-		demo.setDateOfBirth(LocalDate.now());
-		demo.setFirstName(fName);
-		demo.setLastName(lName);
-		demo.setSex(sex);
-		demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
-		return demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+		for (String patientLName : patientLNames)
+		{
+			Demographic demo = new Demographic();
+			PatientTestData patient = PatientTestCollection.patientMap.get(patientLName);
+			LocalDate dob = LocalDate.of(Integer.parseInt(patient.dobYear), Integer.parseInt(patient.dobMonth), Integer.parseInt(patient.dobDate));
+			demo.setDateOfBirth(dob);
+			demo.setFirstName(patient.firstName);
+			demo.setLastName(patient.lastName);
+			demo.setSex(patient.sex);
+			demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+		}
 	}
 	public static void createTestProvider()
 	{

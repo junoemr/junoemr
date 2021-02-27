@@ -52,7 +52,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 public class ScheduleSettingTests extends SeleniumTestBase
 {
 	public static String templateTitleGeneral = "P:General";
-	//static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{

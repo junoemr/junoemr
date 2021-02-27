@@ -355,6 +355,7 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.bookingSource = data.eventData.bookingSource;
 					$scope.eventData.creatorSecurityId = data.eventData.creatorSecurityId;
 					$scope.eventData.isSelfBooked = data.eventData.tagSelfBooked;
+					$scope.eventData.confirmed = data.eventData.confirmed;
 
 					controller.checkEventConflicts(); // uses the eventData
 
@@ -887,6 +888,7 @@ angular.module('Schedule').component('eventComponent', {
 				{
 					repeatOnDates = controller.repeatBookingDates;
 				}
+
 				controller.parentScope.saveEvent(
 					controller.editMode,
 					{
@@ -910,6 +912,7 @@ angular.module('Schedule').component('eventComponent', {
 						creatorSecurityId: $scope.eventData.creatorSecurityId,
 						tagSelfBooked: $scope.eventData.isSelfBooked,
 						sendNotification: sendNotification,
+						confirmed: $scope.eventData.confirmed
 					},
 					repeatOnDates,
 
