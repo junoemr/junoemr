@@ -45,6 +45,8 @@
 <%@page import="java.util.Date"%>
 <%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.common.dao.QueueDocumentLinkDao" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <!-- end -->
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -184,7 +186,7 @@ if (pharmacyId != null && !"null".equalsIgnoreCase(pharmacyId)) {
     }
 }
 
-String patientDOBStr=RxUtil.DateToString(patient.getDOB(), "MMM d, yyyy") ;
+String patientDOBStr=RxUtil.DateToString(patient.getDOB(), "MMM d, yyyy");
 boolean showPatientDOB=false;
 
 //check if user prefer to show dob in print
@@ -518,7 +520,9 @@ if(custom_logo_name != null ){
 																	imageUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
 																	startimageUrl=request.getContextPath()+"/images/1x1.gif";		
 																	statusUrl = request.getContextPath()+"/PMmodule/ClientManager/check_signature_status.jsp?" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
-                                                                    if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures")){
+
+																	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
+																	if(systemPreferenceService.isPreferenceEnabled("rx_preset_signatures", false)){
 																		if (rx.getProviderNo() != null)
 																		{
 																			imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + rx.getProviderNo() + ".png";

@@ -51,6 +51,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.Vector"%>
 <%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -669,7 +670,9 @@ function toggleView(form) {
 						{
 							rx = sessionBean.getStashItem(sessionBean.getStashSize() - 1);
 						}
-                        if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
+
+						SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
+                        if(systemPreferenceService.isPreferenceEnabled("rx_preset_signatures", false))
                         {
 							String imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_";
                         	if (rx != null && rx.getProviderNo() != null)
