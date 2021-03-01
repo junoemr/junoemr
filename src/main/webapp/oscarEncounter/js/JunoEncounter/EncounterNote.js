@@ -1041,7 +1041,11 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				var issues = [];
 				if (
 					noteToEditResponse[1] === "success" &&
-					noteToEditResponse[0].body
+					noteToEditResponse[0].body &&
+						// Edit new note if tmpSave is for note id 0
+						(
+							!tmpSave || tmpSave.noteId !== 0
+						)
 				)
 				{
 					noteToEdit = noteToEditResponse[0].body.encounterNote;
@@ -1222,5 +1226,22 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		this.junoEncounter.cleanUpWindows();
 
 		return null;
+	};
+
+	this.closeEnc = function closeEnc(e)
+	{
+		Event.stop(e);
+
+		var noteId = junoJQuery("input#editNoteId").val();
+		var noteData = this.getNoteDataById(noteId);
+
+		if(
+				pageState.currentNoteData.note.trim() === noteData.note.trim() ||
+				confirm(pageData.closeWithoutSaveMsg))
+		{
+			window.close();
+		}
+
+		return false;
 	};
 };

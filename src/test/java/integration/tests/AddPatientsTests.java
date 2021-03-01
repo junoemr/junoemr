@@ -53,6 +53,12 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddPatientsTests extends SeleniumTestBase
 {
+	public static final PatientTestData mom = PatientTestCollection.patientMap.get(patientLNames[0]);
+	public static final PatientTestData dad = PatientTestCollection.patientMap.get(patientLNames[1]);
+	public static final PatientTestData son = PatientTestCollection.patientMap.get(patientLNames[2]);
+	public static final String momFullNameJUNO = mom.lastName + ", " + mom.firstName;
+	public static final String dadFullName = dad.lastName + ',' + dad.firstName;
+
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
@@ -91,9 +97,6 @@ public class AddPatientsTests extends SeleniumTestBase
 
 		// Add a demographic record page
 		driver.findElement(By.xpath(".//a[contains(@href,'demographiccontrol')]")).click();
-
-		//Patient p = PatientCollection.patients.get(0);
-		PatientTestData mom = PatientTestCollection.patientMap.get(patientLNames[0]);
 		driver.findElement(By.id("last_name")).sendKeys(mom.lastName);
 		driver.findElement(By.id("first_name")).sendKeys(mom.firstName);
 		dropdownSelectByValue(driver, By.id("official_lang"), mom.language);
@@ -173,7 +176,6 @@ public class AddPatientsTests extends SeleniumTestBase
 
 		// Add a demographic record page
 		driver.findElement(By.xpath(".//a[contains(@href,'demographicaddrecordcustom')]")).click();
-		PatientTestData dad = PatientTestCollection.patientMap.get(patientLNames[1]);
 		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(dad.lastName);
 		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.firstName);
 		driver.findElement(By.xpath("//input[@name='year_of_birth']")).sendKeys(dad.dobYear);
@@ -209,7 +211,6 @@ public class AddPatientsTests extends SeleniumTestBase
 
 		// Add a demographic record page
 		driver.findElement(By.xpath("//button[@title=\"Add a new Patient\"]")).click();
-		PatientTestData son = PatientTestCollection.patientMap.get(patientLNames[2]);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-lastName")));
 		driver.findElement(By.id("input-lastName")).sendKeys(son.lastName);
 		driver.findElement(By.id("input-firstName")).sendKeys(son.firstName);

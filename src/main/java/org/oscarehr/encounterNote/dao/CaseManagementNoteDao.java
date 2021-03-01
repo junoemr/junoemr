@@ -314,32 +314,41 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	{
 		//language=MariaDB
 		String sql = "SELECT cmn_outer.note_id\n" +
-				"FROM casemgmt_note AS cmn_outer\n" +
-				"JOIN " +
-				"(\n" +
-				"SELECT cmn.note_id\n" +
-				"FROM casemgmt_note cmn\n" +
-				"LEFT JOIN casemgmt_note AS cmn_filter \n" +
-				"  ON cmn_filter.uuid = cmn.uuid\n" +
-				"  " +
-				"AND (cmn.update_date < cmn_filter.update_date " +
-				"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
-				"LEFT JOIN casemgmt_issue_notes cmin ON cmin.note_id = cmn.note_id\n" +
-				"LEFT JOIN casemgmt_issue cmi ON cmin.id = cmi.id\n" +
-				"LEFT JOIN issue i\n" +
-				"  ON i.issue_id = cmi.issue_id\n" +
-				"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication')\n" +
-				"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
-				"WHERE " +
-				"cmn_filter.note_id IS NULL\n" +
-				"AND i.issue_id IS NULL\n" +
-				"AND cnl.id IS NULL\n" +
-				"AND cmn.demographic_no = :demographicNo\n" +
-				"AND cmn.provider_no = :providerNo\n" +
-				") AS latest_notes\n" +
-				"ON cmn_outer.note_id = latest_notes.note_id\n" +
-				"WHERE NOT cmn_outer.signed\n" +
-				"ORDER BY cmn_outer.update_date DESC\n";
+			"FROM casemgmt_note AS cmn_outer\n" +
+
+			// Remove CPP notes
+			"JOIN " +
+			"(\n" +
+			"SELECT cmn.note_id\n" +
+			"FROM casemgmt_note cmn\n" +
+			"LEFT JOIN casemgmt_note AS cmn_filter \n" +
+			"  ON cmn_filter.uuid = cmn.uuid\n" +
+			"AND (cmn.update_date < cmn_filter.update_date " +
+			"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
+			"LEFT JOIN casemgmt_issue_notes cmin ON cmin.note_id = cmn.note_id\n" +
+			"LEFT JOIN casemgmt_issue cmi ON cmin.id = cmi.id\n" +
+			"LEFT JOIN issue i\n" +
+			"  ON i.issue_id = cmi.issue_id\n" +
+			"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication')\n" +
+			"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
+			"WHERE " +
+			"cmn_filter.note_id IS NULL\n" +
+			"AND i.issue_id IS NULL\n" +
+			"AND cnl.id IS NULL\n" +
+			"AND cmn.demographic_no = :demographicNo\n" +
+			"AND cmn.provider_no = :providerNo\n" +
+			") AS latest_notes\n" +
+			"ON cmn_outer.note_id = latest_notes.note_id\n" +
+
+			// Include notes that have a tmpsave
+			"LEFT JOIN casemgmt_tmpsave ct\n" +
+			"  ON ct.note_id = cmn_outer.note_id\n" +
+			"  AND ct.provider_no = cmn_outer.provider_no\n" +
+			"  AND ct.program_id = cmn_outer.program_no\n" +
+
+			// Get latest note that either is unsigned or has a tmpSave
+			"WHERE (NOT cmn_outer.signed OR ct.id IS NOT NULL)\n" +
+			"ORDER BY cmn_outer.update_date DESC\n";
 
 		Query query = entityManager.createNativeQuery(sql);
 
@@ -442,9 +451,9 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		if(providers != null && providers.size() > 0)
 		{
 			List<String> parameterList = new ArrayList<>();
-			for(String providerNo: providers)
+			for(int i = 0; i < providers.size(); i++)
 			{
-				parameterList.add(":providerNo" + providerNo);
+				parameterList.add(":providerNo" + i);
 			}
 
 			providerFilterCmn = " AND cmn.provider_no IN (" + String.join(",", parameterList) + ") ";
@@ -492,13 +501,11 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    cmn.observation_date AS observation_date,\n" +
 				"    cmn.provider_no AS provider_no,\n" +
 				"    prog.name AS program_name,\n" +
-				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
 				"    cmn.uuid AS uuid,\n" +
 				"    cmn.update_date AS update_date,\n" +
 				"    doc.document_no,\n" +
 				"    doc.docfilename AS document_filename,\n" +
-				"    doc.status as document_status,\n" +
-				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+				"    CAST(doc.status AS VARCHAR(255)) as document_status,\n" +
 				"    cmn.archived,\n" +
 				"    cmn.signed,\n" +
 				"    NOT cmn.signed OR NOT cmn.locked AS editable,\n" +
@@ -519,7 +526,6 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"        END AS status,\n" +
 				"    'local' AS location,\n" +
 				"    role.role_name,\n" +
-				//"    0 AS remote_facility_id,\n" +
 				"    cmn.history LIKE '----------------History Record----------------' AS has_history,\n" +
 				"    cmn.locked,\n" +
 				"    cmn.note,\n" +
@@ -636,13 +642,11 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS observation_date,\n" +
 					"    ed.form_provider AS provider_no,\n" +
 					"    '' AS program_name,\n" +
-					//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
 					"    '' AS uuid,\n" +
 					"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS update_date,\n" +
 					"    0 AS document_no,\n" +
 					"    '' AS document_filename,\n" +
-					"    '' AS document_status,\n" +
-					//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+					"    CAST('' AS VARCHAR(255)) AS document_status,\n" +
 					"    false AS archived,\n" +
 					"    false AS signed,\n" +
 					"    false AS editable,\n" +
@@ -651,7 +655,6 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    '' AS status,\n" +
 					"    '' AS location,\n" +
 					"    '' AS role_name,\n" +
-					//"    0 AS remote_facility_id,\n" +
 					"    false AS has_history,\n" +
 					"    CAST('0' AS CHARACTER) AS locked,\n" +
 					"    CONCAT(ed.form_name, ' : ', ed.subject) AS note,\n" +
@@ -686,7 +689,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		if(SORT_PROVIDER.equals(sortType))
 		{
-			sql += "ORDER BY full_query.editors_string DESC\n";
+			sql += "ORDER BY full_query.editors_string DESC, full_query.observation_date DESC\n";
 		}
 		else if(SORT_DATE_DESC.equals(sortType))
 		{
@@ -708,9 +711,9 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		if(providers != null && providers.size() > 0)
 		{
-			for(String providerNo: providers)
+			for(int i = 0; i < providers.size(); i++)
 			{
-				query.setParameter("providerNo" + providerNo, providerNo);
+				query.setParameter("providerNo" + i, providers.get(i));
 			}
 		}
 

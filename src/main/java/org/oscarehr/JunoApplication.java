@@ -46,24 +46,21 @@ public class JunoApplication extends SpringBootServletInitializer
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	// TODO: SPRINGUPGRADE: Figure out if this runs for war/jar startup
-	// XXX: Does not seem to run when running from intellij.  Suspect it doesn't run when running as a jar, likely
-	//      for startup when using a war file.
+	// This is used to start the app from a web container (e.g. tomcat)
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application)
 	{
-		logger.info("Starting Juno with the application builder");
+		logger.info("Starting Juno (JunoApplication.configure())");
 
-		return application
-				.sources(JunoApplication.class)
-				.initializers(new OscarPropertiesInitializerWeb());
+		return JunoApplication.initSpring(application);
 	}
 
+	// This is used to start the app from Intellij or when running the war file directly
 	public static void main(String[] args) throws IOException
 	{
 		if(args.length != 0)
 		{
-			logger.info("Starting Juno with a new SpringApplication in headless mode");
+			logger.info("Starting Juno (JunoApplication.main()) in headless mode");
 
 			new OscarPropertiesInitializerHeadless().initialize();
 			new SpringApplicationBuilder(JunoApplication.class)
@@ -73,42 +70,15 @@ public class JunoApplication extends SpringBootServletInitializer
 		}
 		else
 		{
-			logger.info("Starting Juno with a new SpringApplication");
-
-			new SpringApplicationBuilder(JunoApplication.class)
-					.web(WebApplicationType.SERVLET)
-					.sources(JunoApplication.class)
-					.initializers(new OscarPropertiesInitializerWeb())
-					.run(args);
+			logger.info("Starting Juno (JunoApplication.main())");
+			JunoApplication.initSpring(new SpringApplicationBuilder(JunoApplication.class).web(WebApplicationType.SERVLET)).run(args);
 		}
 	}
 
-
-/*
-	@Bean
-	public ConfigurableServletWebServerFactory configurableServletWebServerFactory()
+	private static SpringApplicationBuilder initSpring(SpringApplicationBuilder application)
 	{
-		return new TomcatServletWebServerFactory()
-		{
-			@Override
-			protected void postProcessContext(Context context)
-			{
-				super.postProcessContext();
-			}
-		};
+		return application
+			.sources(JunoApplication.class)
+			.initializers(new OscarPropertiesInitializerWeb());
 	}
-*/
-
-
-	// TODO: SPRINGUPGRADE: This doesn't seem necessary
-	/*
-	@Override
-	public void onStartup(ServletContext servletContext) throws ServletException
-	{
-		super.onStartup(servletContext);
-
-		servletContext.addListener(new Startup());
-		servletContext.addListener(new ContextStartupListener());
-	}
-	 */
 }
