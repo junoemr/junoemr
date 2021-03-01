@@ -52,7 +52,11 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final boolean enabled = props.isPropertyActive("web_service_allowed_ips.enabled");
-	private static final boolean hasProxy = props.isPropertyActive("web_service_allowed_ips.has_proxy");
+
+	// XXX: disabled in spring-boot because spring boot handles x-forwarded-for
+	//private static final boolean hasProxy = props.isPropertyActive("web_service_allowed_ips.has_proxy");
+	private static final boolean hasProxy = false;
+
 	private static final String localIpPrefix = props.getProperty("web_service_allowed_ips.local_ip_prefix");
 	private static final String allowedIPs = props.getProperty("web_service_allowed_ips");
 	private static final String systemAllowedIPs = props.getProperty("web_service_allowed_system_ips");
