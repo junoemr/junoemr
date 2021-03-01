@@ -56,9 +56,15 @@ public class PollableContext
 		ProgressBarPollingData progressData = new ProgressBarPollingData();
 		progressData.setTotal(getTotal());
 		progressData.setProcessed(getProcessed());
-		progressData.setComplete(isComplete());
 		progressData.setMessage(getPollingMessage());
 		return progressData;
+	}
+
+	public synchronized void markAsComplete()
+	{
+		setTotal(0);
+		setProcessed(0);
+		setComplete(true);
 	}
 
 	public synchronized void incrementProcessed()

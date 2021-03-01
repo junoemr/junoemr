@@ -146,7 +146,7 @@ public class ImportWrapperService
 		{
 			// always clear the provider cache after an import to unload resources
 			BaseModelToDbConverter.clearProviderCache();
-			context.setComplete(true);
+			context.markAsComplete();
 		}
 
 		onImportComplete(importCount, duplicateCount, failureCount);

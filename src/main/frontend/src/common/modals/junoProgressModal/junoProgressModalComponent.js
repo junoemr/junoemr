@@ -34,9 +34,10 @@ angular.module('Common.Components').component('junoProgressModalComponent',
 		{
 			let ctrl = this;
 
-			ctrl.total = 1;
+			ctrl.total = 0;
 			ctrl.processed = 0;
 			ctrl.message = "Initializing...";
+			ctrl.completed = false;
 
 			ctrl.$onInit = () =>
 			{
@@ -44,6 +45,9 @@ angular.module('Common.Components').component('junoProgressModalComponent',
 				ctrl.resolve.deferral.promise.then(
 					function success(response)
 					{
+						ctrl.processed = ctrl.total;
+						ctrl.message = "Finalizing...";
+						ctrl.completed = true;
 						// wait a little before closing the modal just for visual reasons.
 						// this lets the user see the progress bar hit the 100% mark before it disappears
 						setTimeout(() =>
@@ -57,9 +61,12 @@ angular.module('Common.Components').component('junoProgressModalComponent',
 					},
 					function notify(data)
 					{
-						ctrl.total = data.total;
-						ctrl.processed = data.processed;
-						ctrl.message = data.message;
+						if(!ctrl.completed)
+						{
+							ctrl.total = data.total;
+							ctrl.processed = data.processed;
+							ctrl.message = data.message;
+						}
 					},
 				)
 			}

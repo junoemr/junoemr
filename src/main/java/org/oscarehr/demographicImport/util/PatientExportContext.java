@@ -38,13 +38,17 @@ public class PatientExportContext extends PollableContext
 	@Override
 	protected synchronized String getPollingMessage()
 	{
-		if(getTotal() > getProcessed())
+		if(getTotal() <= 0)
+		{
+			return "Initializing...";
+		}
+		else if(getTotal() > getProcessed())
 		{
 			return "Exporting Patient " + (getProcessed() + 1) + " of " + getTotal();
 		}
 		else
 		{
-			return "Finalizing Export";
+			return "Packaging Export Files";
 		}
 	}
 }

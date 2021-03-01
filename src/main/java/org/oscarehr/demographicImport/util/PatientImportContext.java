@@ -40,7 +40,11 @@ public class PatientImportContext extends PollableContext
 	@Override
 	protected synchronized String getPollingMessage()
 	{
-		if(getTotal() > getProcessed())
+		if(getTotal() <= 0)
+		{
+			return "Initializing...";
+		}
+		else if(getTotal() > getProcessed())
 		{
 			return "Importing Patient " + (getProcessed() + 1) + " of " + getTotal();
 		}
