@@ -352,7 +352,7 @@ public class ProviderService
 		UserProperty property = new UserProperty();
 		property.setName(UserProperty.COBALT);
 		property.setProviderNo(Integer.toString(providerNo));
-		property.setValue("yes");
+		property.setValue(UserProperty.PROPERTY_ON_YES);
 		userPropertyDAO.saveProp(property);
 	}
 
