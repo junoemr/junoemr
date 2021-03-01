@@ -1,5 +1,6 @@
 #admin-system-properties {
   @include juno-font-default();
+  @include juno-toggle-switch(32px, 4px, .4s);
 
   hr {
     margin-top: 0;
@@ -20,6 +21,23 @@
   }
 
   .content {
-    padding-left: 15px;
+    margin-left: 32px;
+
+    .property {
+      margin-top: 24px;
+
+      .property-toggle {
+        width: 92px;
+      }
+
+      .property-text {
+        .name {
+          @include juno-font-default-size(17px, bold);
+        }
+        .description {
+          @include juno-font-body-smallest();
+        }
+      }
+    }
   }
 }

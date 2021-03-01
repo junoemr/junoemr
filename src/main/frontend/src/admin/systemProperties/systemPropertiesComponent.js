@@ -28,11 +28,9 @@ angular.module('Admin').component('systemProperties',
         controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
         {
             let ctrl = this;
-            ctrl.message = "gaaaa";
+            ctrl.message = "basic message";
 
             ctrl.$onInit = () => {
-                console.log("hello!");
-                console.log($state.current.name);
             };
 
             ctrl.changeTab = function (state)

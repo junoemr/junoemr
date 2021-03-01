@@ -21,7 +21,25 @@
 * Canada
 --%>
 
-<div class="admin-system-properties system-properties-rx">
-    <h1>Hello</h1>
-    <h3>{{ $ctrl.message }}</h3>
+<div class="admin-system-properties-body system-properties-rx">
+    <h3 class="title">Manage Prescription Properties</h3>
+    <div class="content">
+        <div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
+            <div class="property-toggle">
+                <label class="switch">
+                    <input id="{{ property.propertyName }}" type="checkbox"
+                           ng-model="property.value"
+                           ng-change="$ctrl.updateProperty(property)"/>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="property-text flex-column">
+                <div class="name">{{ property.name }}</div>
+                <div class="description">{{ property.description }}</div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+

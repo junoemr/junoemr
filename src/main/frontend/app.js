@@ -233,7 +233,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
         .state('admin.systemProperties.rx',
         {
             url: '/rx',
-            component: 'systemPropertiesRx'
+            component: 'systemPropertiesRx',
         })
 		.state('ticklers',
 		{
