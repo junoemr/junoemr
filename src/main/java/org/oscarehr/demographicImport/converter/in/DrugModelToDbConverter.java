@@ -47,7 +47,7 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		BeanUtils.copyProperties(input, drug,
 				"rxStartDate", "rxEndDate", "writtenDate", "createdDateTime",
 				"lastRefillDate", "archivedDateTime", "pickupDateTime", "lastUpdateDateTime",
-				"gcnSeqNo", "noSubs", "prn", "archived", "startDateUnknown", "repeat");
+				"gcnSeqNo", "noSubs", "prn", "archived", "startDateUnknown", "repeat", "pastMed");
 
 		drug.setEndDate(ConversionUtils.toNullableLegacyDate(input.getRxEndDate()));
 		drug.setRxDate(ConversionUtils.toNullableLegacyDate(input.getRxStartDate()));
@@ -70,6 +70,7 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		drug.setDispenseInternal(BooleanUtils.toBooleanDefaultIfNull(input.getDispenseInternal(), false));
 		drug.setRepeat(toIntDefaultIfNull(input.getRepeat(), 0));
 		drug.setPosition(0);
+		drug.setPastMed(BooleanUtils.toBooleanDefaultIfNull(input.getPastMed(), false));
 
 		if(input instanceof StandardMedication)
 		{

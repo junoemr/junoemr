@@ -332,7 +332,7 @@ public class DemographicsService extends AbstractServiceImpl
 
 		for(FileTransfer file : fileListTransfer)
 		{
-			GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), ".tmp");
+			GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), "_" + file.getName());
 			tempfile.rename(file.getName()); //might be a referenced document. make sure it uses the original name
 			genericFileList.add(tempfile);
 

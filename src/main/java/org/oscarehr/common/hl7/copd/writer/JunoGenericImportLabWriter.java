@@ -24,6 +24,7 @@ package org.oscarehr.common.hl7.copd.writer;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v24.message.ORU_R01;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
@@ -110,13 +111,25 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		}
 		if(homePhone != null)
 		{
-			terser.set("/.PID-13-1", homePhone.getNumberFormattedHL7());
-			terser.set("/.PID-13-8", homePhone.getExtension());
+			if(StringUtils.isNumeric(homePhone.getNumber()))
+			{
+				terser.set("/.PID-13-1", homePhone.getNumberFormattedHL7());
+			}
+			if(StringUtils.isNumeric(homePhone.getExtension()))
+			{
+				terser.set("/.PID-13-8", homePhone.getExtension());
+			}
 		}
 		if(workPhone != null)
 		{
-			terser.set("/.PID-14-1", workPhone.getNumberFormattedHL7());
-			terser.set("/.PID-14-8", workPhone.getExtension());
+			if(StringUtils.isNumeric(workPhone.getNumber()))
+			{
+				terser.set("/.PID-14-1", workPhone.getNumberFormattedHL7());
+			}
+			if(StringUtils.isNumeric(workPhone.getExtension()))
+			{
+				terser.set("/.PID-14-8", workPhone.getExtension());
+			}
 		}
 	}
 
