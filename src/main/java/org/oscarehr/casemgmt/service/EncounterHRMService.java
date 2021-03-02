@@ -72,10 +72,7 @@ public class EncounterHRMService extends EncounterSectionService
 		return WIN_NAME_PREFIX + sectionParams.getDemographicNo();
 	}
 
-	public EncounterNotes getNotes(
-		SectionParameters sectionParams, Integer limit,
-		Integer offset
-	)
+	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
 		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), SecObjectName._HRM,
 			SecurityInfoManager.READ, sectionParams.getDemographicNo())
@@ -107,7 +104,7 @@ public class EncounterHRMService extends EncounterSectionService
 				text = dispFilename;
 			}
 
-			if (reportStatus != null && reportStatus.equalsIgnoreCase("C"))
+			if(reportStatus != null && reportStatus.equalsIgnoreCase("C"))
 			{
 				text = "(Cancelled) " + text;
 			}
@@ -124,7 +121,10 @@ public class EncounterHRMService extends EncounterSectionService
 			{
 				for (Integer duplicateLabIdTemp : duplicateIdList)
 				{
-					if (duplicateLabIdQueryString.length()>0) duplicateLabIdQueryString.append(',');
+					if (duplicateLabIdQueryString.length() > 0)
+					{
+						duplicateLabIdQueryString.append(',');
+					}
 					duplicateLabIdQueryString.append(duplicateLabIdTemp);
 				}
 			}
