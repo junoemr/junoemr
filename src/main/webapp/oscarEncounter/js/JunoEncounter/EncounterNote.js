@@ -447,7 +447,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		{
 			containerDiv.scrollTop(containerDiv.prop("scrollHeight"));
 		}
-		else
+		else if(firstNoteNode !== null)
 		{
 			firstNoteNode[0].scrollIntoView();
 		}
