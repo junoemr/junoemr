@@ -41,7 +41,8 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.newDemographicData.hin = "";
 		ctrl.newDemographicData.ver = "";
 		ctrl.newDemographicData.hcType = "BC";
-		ctrl.newDemographicData.dateJoined = new moment();
+		ctrl.newDemographicData.dateJoined = Juno.Common.Util.getDateMoment(new Date());
+		console.log(ctrl.newDemographicData.dateJoined);
 
 		// address data
 		ctrl.newDemographicData.address = {
