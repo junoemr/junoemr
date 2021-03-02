@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.Vector;
 
 
 
@@ -64,7 +63,6 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 			String menuId = "3"; //div id for popup menu
 			String roleName$ = request.getSession().getAttribute("userrole") + "," + request.getSession().getAttribute("user");
-			String uuid="";
 			String eChartUUID = request.getParameter("eChartUUID");
 
 			//set text for lefthand module title
@@ -79,8 +77,6 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			Dao.setRightHeadingID(menuId);
 			Dao.setMenuHeader(messages.getMessage("oscarEncounter.LeftNavBar.InputGrps"));
 			Dao.setRightURL("return !showMenu('" + menuId + "', event);");
-
-			com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
 
 			List<String> flowsheets = flowsheetService.getUniversalFlowsheetNames();
 
@@ -142,7 +138,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			Integer demo = Integer.valueOf(bean.getDemographicNo());
 			oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo);
 			oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean data;
-			Vector<EctMeasurementsDataBean> measureTypes = (Vector<EctMeasurementsDataBean>) hd.getMeasurementsDataVector();
+			List<EctMeasurementsDataBean> measureTypes = (ArrayList<EctMeasurementsDataBean>) hd.getMeasurementsDataVector();
 			if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
 				EctMeasurementsDataBeanHandler.addRemoteMeasurementsTypes(loggedInInfo,measureTypes,demo);
 			}
@@ -157,7 +153,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				hash = Math.abs(winName.hashCode());
 
 				hd = new EctMeasurementsDataBeanHandler(demo, data.getType());
-				Vector<EctMeasurementsDataBean> measures = (Vector<EctMeasurementsDataBean>) hd.getMeasurementsDataVector();
+				List<EctMeasurementsDataBean> measures = (ArrayList<EctMeasurementsDataBean>) hd.getMeasurementsDataVector();
 				if (loggedInInfo.getCurrentFacility().isIntegratorEnabled())
 				{
 					EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, measures, data.getType(), demo);
