@@ -41,7 +41,6 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,9 +90,6 @@ public class DocumentService
 	@Autowired
 	private EncounterNoteService encounterNoteService;
 
-	@Autowired
-	private ProviderService providerService;
-
 	/**
 	 * Create a new document from the given document model and a file
 	 * This method will move the file to the documents directory and persist the record
@@ -124,13 +120,14 @@ public class DocumentService
 		String annotation = documentModel.getAnnotation();
 		if (annotation != null)
 		{
-			ProviderData providerData = providerService.getProvider(dbDocument.getDoccreator());
+			ProviderData createdBy = dbDocument.getCreatedBy();
 			CaseManagementNote documentNote = new CaseManagementNote();
-			documentNote.setProvider(providerData);
-			documentNote.setSigningProvider(providerData);
+			documentNote.setProvider(createdBy);
+			documentNote.setSigningProvider(createdBy);
 			documentNote.setDemographic(demographic);
 			documentNote.setNote(annotation);
 			documentNote.setObservationDate(dbDocument.getObservationdate());
+			documentNote.setProgramNo(documentModel.getProgramId() != null ? String.valueOf(documentModel.getProgramId()) : null);
 			encounterNoteService.saveDocumentNote(documentNote, dbDocument);
 		}
 
@@ -148,8 +145,15 @@ public class DocumentService
 
 	public void uploadAllNewDemographicDocument(List<org.oscarehr.demographicImport.model.document.Document> documentModels, Demographic demographic) throws IOException
 	{
+		// load program ID outside of loop to prevent excess queries
+		Integer defaultProgramId = programManager.getDefaultProgramId();
+
 		for(org.oscarehr.demographicImport.model.document.Document documentModel : documentModels)
 		{
+			if(documentModel.getProgramId() == null)
+			{
+				documentModel.setProgramId(defaultProgramId);
+			}
 			uploadNewDemographicDocument(documentModel, demographic);
 		}
 	}

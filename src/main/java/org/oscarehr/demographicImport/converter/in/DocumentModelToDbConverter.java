@@ -51,8 +51,9 @@ public class DocumentModelToDbConverter extends BaseModelToDbConverter<org.oscar
 		document.setUpdatedatetime(ConversionUtils.toNullableLegacyDateTime(input.getUpdatedAt()));
 		document.setSource(input.getSource());
 		document.setSourceFacility(input.getSourceFacility());
+		document.setProgramId(input.getProgramId());
 
-		document.setDocCreator(findOrCreateProviderRecord(input.getCreatedBy(), false).getId());
+		document.setCreatedBy(findOrCreateProviderRecord(input.getCreatedBy(), false));
 		document.setResponsible(findOrCreateProviderRecord(input.getResponsible(), false).getId());
 
 		ProviderData reviewer = findOrCreateProviderRecord(input.getReviewer(), true);
