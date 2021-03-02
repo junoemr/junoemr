@@ -425,10 +425,23 @@ public class FlowsheetService
 		flowSheetUserCreatedDao.merge(flowSheetUserCreated);
 	}
 
+	/**
+	 * Attempt to apply customizations to a flowsheet template.
+	 * @param name flowsheet template we want to look for and modify
+	 * @param customizations customizations that we want to tack on to the base flowsheet
+	 * @return modified flowsheet
+	 */
 	public MeasurementFlowSheet getCustomizedFlowsheet(String name, List<FlowSheetCustomization> customizations)
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 		MeasurementFlowSheet baseFlowsheet = getFlowsheetTemplate(name);
+
+		if (baseFlowsheet == null)
+		{
+			loadFlowsheets();
+			baseFlowsheet = getFlowsheetTemplate(name);
+		}
+
 		if (customizations.size() == 0)
 		{
 			return baseFlowsheet;

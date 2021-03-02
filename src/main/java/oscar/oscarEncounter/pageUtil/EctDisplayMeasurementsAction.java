@@ -24,7 +24,6 @@
 
 package oscar.oscarEncounter.pageUtil;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.MeasurementGroupStyleDao;
@@ -34,9 +33,9 @@ import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.util.DateUtils;
@@ -54,7 +53,6 @@ import java.util.Vector;
 public class EctDisplayMeasurementsAction extends EctDisplayAction {
 	private static final String cmd = "measurements";
 	private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
-	Logger logger = MiscUtils.getLogger();
 
 	public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages) {
 
@@ -97,21 +95,6 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				Dao.addItem(item);
 			}
 
-			if(OscarProperties.getInstance().getBooleanProperty("health_tracker", "true")) {
-			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-			//temp while testing
-				String dispname = "Health Tracker";
-	
-				winName = "viewTracker" + bean.demographicNo;
-				hash = Math.abs(winName.hashCode());
-				url = "window.open('" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?demographic_no=" + bean.demographicNo + "&template=tracker'," + hash + ",'height=' + screen.height + ',width=' + screen.width +',resizable=yes,scrollbars=yes, fullscreen=yes');return false;";
-				item.setLinkTitle(dispname);
-				dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-				item.setTitle(dispname);
-				item.setURL(url);
-				Dao.addItem(item);
-			}
-			
 			//next we add dx triggered flowsheets to the module items
 			dxResearchBeanHandler dxRes = new dxResearchBeanHandler(bean.demographicNo);
 			List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
@@ -139,9 +122,8 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			MeasurementGroupStyleDao groupDao = SpringUtils.getBean(MeasurementGroupStyleDao.class);
 			List<MeasurementGroupStyle> groups = groupDao.findAll();
 			//now we grab measurement groups for popup menu
-			for (int j = 0; j < groups.size(); j++) {
-
-				MeasurementGroupStyle group = groups.get(j);
+			for (MeasurementGroupStyle group : groups)
+			{
 				winName = group.getGroupName() + bean.demographicNo;
 				hash = Math.abs(winName.hashCode());
 				url = "popupPage(500,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupMeasurements.do?groupName=" + group.getGroupName() +
@@ -160,51 +142,48 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			Integer demo = Integer.valueOf(bean.getDemographicNo());
 			oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo);
 			oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean data;
-			Vector measureTypes = (Vector) hd.getMeasurementsDataVector();
+			Vector<EctMeasurementsDataBean> measureTypes = (Vector<EctMeasurementsDataBean>) hd.getMeasurementsDataVector();
 			if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
 				EctMeasurementsDataBeanHandler.addRemoteMeasurementsTypes(loggedInInfo,measureTypes,demo);
 			}
-			
-			for (int idx = 0; idx < measureTypes.size(); ++idx) {
-				data = (oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean) measureTypes.get(idx);
+
+			for (EctMeasurementsDataBean measureType : measureTypes)
+			{
+				data = measureType;
 				String title = data.getTypeDisplayName();
 				String type = data.getType();
 
 				winName = type + bean.demographicNo;
 				hash = Math.abs(winName.hashCode());
 
-				hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo, data.getType());
-				Vector measures = (Vector) hd.getMeasurementsDataVector();
-				if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
-					EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo,measures,data.getType(),demo);
+				hd = new EctMeasurementsDataBeanHandler(demo, data.getType());
+				Vector<EctMeasurementsDataBean> measures = (Vector<EctMeasurementsDataBean>) hd.getMeasurementsDataVector();
+				if (loggedInInfo.getCurrentFacility().isIntegratorEnabled())
+				{
+					EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, measures, data.getType(), demo);
 				}
 
-				if (measures.size() > 0) {
+				if (measures.size() > 0)
+				{
 					NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-					data = (oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean) measures.get(0);
+					data = measures.get(0);
 					Date date = data.getDateObservedAsDate();
-					if (date == null) {
+					if (date == null)
+					{
 						date = data.getDateEnteredAsDate();
 					}
-					
-					//Not sure what the standard should be for showing remote data in the left and right hand sides but im not sure this looks right.
-					//if(data.getRemoteFacility() != null){
-					//	item.setBgColour("#ffcccc");
-					//}
-					
+
 					String formattedDate = DateUtils.formatDate(date, request.getLocale());
 					item.setLinkTitle(title + " " + data.getDataField() + " " + formattedDate);
 					title = padd(title, data.getDataField());
 					String tmp = "<span class=\"measureCol1\">" + title + "</span>";
-					//tmp += "<span class=\"measureCol2\">" + data.getDataField() + "&nbsp;</span>";
 					item.setValue(data.getDataField());
-					//tmp += "<span class=\"measureCol3\">" + formattedDate + "</span><br style=\"clear:both\">";
 					item.setTitle(tmp);
 					item.setDate(date);
 					item.setURL("popupPage(300,800,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?type=" + type + "'); return false;");
 					Dao.addItem(item);
-				} 
-			
+				}
+
 			}
 			Dao.sortItems(NavBarDisplayDAO.DATESORT_ASC);
 			return true;
@@ -294,7 +273,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				{
 					displayName = fs.getDisplayName();
 				}
-				else if (userCreated != null)
+				else if (userCreated != null && !userCreated.getArchived())
 				{
 					displayName = userCreated.getDisplayName();
 				}
