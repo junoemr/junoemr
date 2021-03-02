@@ -209,11 +209,12 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 	this.toggleIssueWidget = function toggleIssueWidget(issueId)
 	{
 		var widget = junoJQuery('#setIssueListWidget' + issueId);
+		var widgetContainer = junoJQuery('#issueListWidgetContainer' + issueId);
 
 		if(widget.is(":visible"))
 		{
-			widget.css('background-color', '');
-			widget.css('border', '');
+			widgetContainer.css('background-color', '');
+			widgetContainer.css('border', '');
 			widget.hide();
 		}
 		else
@@ -231,8 +232,8 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 					var issue = response.body;
 
-					widget.css('background-color', '#dde3eb');
-					widget.css('border', '1px solid #464f5a');
+					widgetContainer.css('background-color', '#dde3eb');
+					widgetContainer.css('border', '1px solid #464f5a');
 					widget.show();
 
 
