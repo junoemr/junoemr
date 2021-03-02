@@ -447,7 +447,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		{
 			containerDiv.scrollTop(containerDiv.prop("scrollHeight"));
 		}
-		else
+		else if(firstNoteNode !== null)
 		{
 			firstNoteNode[0].scrollIntoView();
 		}
@@ -868,6 +868,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 						if(redirectToBilling)
 						{
 							window.location.replace(me.pageData.billingUrl);
+							me.maximizeWindow();
 						}
 						else if (exitAfterSaving)
 						{
@@ -892,6 +893,14 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		return deferred.promise();
 	};
+
+	this.maximizeWindow = function maximizeWindow()
+	{
+		window.onunload = function()
+		{
+			window.resizeTo(screen.width,screen.height);
+		};
+	}
 
 	this.setCaretPosition = function setCaretPosition(input, pos)
 	{
