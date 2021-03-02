@@ -32,8 +32,10 @@ import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.log.LogAction;
 import xml.cds.v5_0.OmdCds;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,10 +62,15 @@ public class CDSImporter implements DemographicImporter
 
 	public PatientRecord importDemographic(GenericFile importFile) throws Exception
 	{
+		Instant instant = Instant.now();
 		CDSFileParser parser = new CDSFileParser();
 
 		OmdCds elem = parser.parse(importFile);
-		return cdsImportMapper.importToJuno(elem);
+		instant = LogAction.printDuration(instant, "Importer: file parse to CDS structure");
+
+		PatientRecord patientRecord = cdsImportMapper.importToJuno(elem);
+		instant = LogAction.printDuration(instant, "Importer: CDS structure to model conversion");
+		return patientRecord;
 	}
 
 	@Override

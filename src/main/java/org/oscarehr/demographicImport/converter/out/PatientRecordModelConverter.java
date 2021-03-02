@@ -61,8 +61,8 @@ import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.log.LogAction;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -173,7 +173,7 @@ public class PatientRecordModelConverter extends
 		Instant instant = Instant.now();
 		PatientRecord patientRecord = new PatientRecord();
 		patientRecord.setDemographic(demographicDbToModelConverter.convert(input));
-		instant = printDuration(instant, "Patient Record Model: Load Demographic");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load Demographic");
 
 		List<DemographicContact> demographicContacts = demographicContactDao.findActiveByDemographicNo(input.getDemographicId());
 		patientRecord.setContactList(demographicContactDbToModelConverter.convert(demographicContacts));
@@ -181,37 +181,37 @@ public class PatientRecordModelConverter extends
 		//TODO how to handle lazy loading etc.?
 		List<Appointment> appointments = appointmentDao.getAllByDemographicNo(input.getDemographicId());
 		patientRecord.setAppointmentList(appointmentConverter.convert(appointments));
-		instant = printDuration(instant, "Patient Record Model: Load appointments");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load appointments");
 
 		setNotes(input, patientRecord);
-		instant = printDuration(instant, "Patient Record Model: Load notes");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load notes");
 
 		List<Measurement> measurements = measurementDao.findByDemographicId(input.getDemographicId());
 		patientRecord.setMeasurementList(measurementDbToModelConverter.convert(measurements));
-		instant = printDuration(instant, "Patient Record Model: Load measurements");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load measurements");
 
 		setLabs(input, patientRecord);
-		instant = printDuration(instant, "Patient Record Model: Load labs");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load labs");
 
 		List<Document> documents = documentDao.findByDemographicId(String.valueOf(input.getDemographicId()));
 		patientRecord.setDocumentList(documentDbToModelConverter.convert(documents));
-		instant = printDuration(instant, "Patient Record Model: Load documents");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load documents");
 
 		List<HRMDocument> hrmDocuments = hrmDocumentDao.findByDemographicId(input.getDemographicId());
 		patientRecord.setHrmDocumentList(hrmDocumentDbToModelConverter.convert(hrmDocuments));
-		instant = printDuration(instant, "Patient Record Model: Load hrm");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load hrm");
 
 		List<Allergy> allergies = allergyDao.findActiveAllergies(input.getDemographicId());
 		patientRecord.setAllergyList(allergyDbToModelConverter.convert(allergies));
-		instant = printDuration(instant, "Patient Record Model: Load allergies");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load allergies");
 
 		List<Prevention> preventions = preventionDao.findActiveByDemoId(input.getDemographicId());
 		patientRecord.setImmunizationList(preventionConverter.convert(preventions));
-		instant = printDuration(instant, "Patient Record Model: Load preventions");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load preventions");
 
 		List<Drug> drugs = drugDao.findByDemographicId(input.getDemographicId());
 		patientRecord.setMedicationList(medicationDbToModelConverter.convert(drugs));
-		instant = printDuration(instant, "Patient Record Model: Load drugs");
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load drugs");
 
 		//TODO replace with new prescribeIT system
 		List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findByDemographicId(input.getDemographicId());
@@ -219,7 +219,7 @@ public class PatientRecordModelConverter extends
 		{
 			PharmacyInfo preferredPharmacyInfo = pharmacyInfoDao.find(demographicPharmacies.get(0).getPharmacyId());
 			patientRecord.setPreferredPharmacy(pharmacyDbToModelConverter.convert(preferredPharmacyInfo));
-			instant = printDuration(instant, "Patient Record Model: Load pharmacy");
+			instant = LogAction.printDuration(instant, "Patient Record Model: Load pharmacy");
 		}
 
 		return patientRecord;
@@ -301,11 +301,5 @@ public class PatientRecordModelConverter extends
 			Hl7TextInfo hl7TxtInfo = (Hl7TextInfo) info[0];
 			patientRecord.addLab(labDbToModelConverter.convert(hl7TxtInfo));
 		}
-	}
-	public static Instant printDuration(Instant start, String what)
-	{
-		Instant now = Instant.now();
-		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
-		return now;
 	}
 }

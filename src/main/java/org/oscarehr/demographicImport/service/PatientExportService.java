@@ -31,8 +31,6 @@ import org.oscarehr.demographicImport.util.PatientExportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -97,12 +95,5 @@ public class PatientExportService
 		}
 
 		return fileList;
-	}
-
-	public static Instant printDuration(Instant start, String what)
-	{
-		Instant now = Instant.now();
-		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
-		return now;
 	}
 }

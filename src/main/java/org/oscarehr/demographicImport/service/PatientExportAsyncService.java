@@ -33,6 +33,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.log.LogAction;
 
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
@@ -60,11 +61,11 @@ public class PatientExportAsyncService
 		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
 
 		PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
-		instant = PatientExportService.printDuration(instant, "[" + demographicId + "] Export Service: load patient model");
+		instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: load patient model");
 
 		logger.info("Export Demographic " + patientRecord.getDemographic().getId());
 		GenericFile file = exporter.exportDemographic(patientRecord);
-		instant = PatientExportService.printDuration(instant, "[" + demographicId + "] Export Service: export file creation");
+		instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: export file creation");
 		patientExportContext.incrementProcessed();
 
 		return CompletableFuture.completedFuture(file);
