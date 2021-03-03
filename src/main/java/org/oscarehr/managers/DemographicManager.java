@@ -67,6 +67,7 @@ import oscar.util.ConversionUtils;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -356,6 +357,20 @@ public class DemographicManager {
 		//Archive previous demo
 		Demographic prevDemo = demographicDao.getDemographicById(demographic.getDemographicNo());
 		demographicArchiveDao.archiveRecord(prevDemo);
+
+		String previousStatus = prevDemo.getPatientStatus();
+		Date previousStatusDate = prevDemo.getPatientStatusDate();
+		String currentStatus = demographic.getPatientStatus();
+		Date currentStatusDate = demographic.getPatientStatusDate();
+
+		if (!Objects.equals(previousStatus, currentStatus))
+		{
+			demographic.setPatientStatusDate(new Date());
+		}
+		else if (!Objects.equals(previousStatusDate, currentStatusDate))
+		{
+			demographic.setPatientStatusDate(currentStatusDate);
+		}
 
 		//retain merge info
 		demographic.setSubRecord(prevDemo.getSubRecord());
