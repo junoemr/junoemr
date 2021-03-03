@@ -361,8 +361,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.hcRenewDate = Juno.Common.Util.getDateMoment(controller.page.demo.hcRenewDate);
 			controller.page.demo.rosterDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterDate);
 			controller.page.demo.rosterTerminationDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterTerminationDate);
-			controller.page.demo.patientStatusDate = Juno.Common.Util.getDateMoment(controller.page.demo.patientStatusDate);
 			controller.page.demo.dateJoined = moment(controller.page.demo.dateJoined);
+			controller.page.demo.patientStatusDate = moment(controller.page.demo.patientStatusDate);
 			controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
 			if (controller.page.demo.onWaitingListSinceDate)
 			{
