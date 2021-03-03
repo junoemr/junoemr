@@ -108,7 +108,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return this.id;
     }
-
     public void setId(Integer id)
     {
         this.id = id;
@@ -125,7 +124,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicName;
     }
-
     public void setClinicName(String clinicName)
     {
         this.clinicName = clinicName;
@@ -135,7 +133,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicAddress;
     }
-
     public void setClinicAddress(String clinicAddress)
     {
         this.clinicAddress = clinicAddress;
@@ -145,7 +142,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicCity;
     }
-
     public void setClinicCity(String clinicCity)
     {
         this.clinicCity = clinicCity;
@@ -155,7 +151,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicPostal;
     }
-
     public void setClinicPostal(String clinicPostal)
     {
         this.clinicPostal = clinicPostal;
@@ -165,7 +160,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicPhone;
     }
-
     public void setClinicPhone(String clinicPhone)
     {
         this.clinicPhone = clinicPhone;
@@ -175,7 +169,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicFax;
     }
-
     public void setClinicFax(String clinicFax)
     {
         this.clinicFax = clinicFax;
@@ -185,7 +178,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicLocationCode;
     }
-
     public void setClinicLocationCode(String clinicLocationCode)
     {
         this.clinicLocationCode = clinicLocationCode;
@@ -195,7 +187,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return status;
     }
-
     public void setStatus(String status)
     {
         this.status = status;
@@ -205,7 +196,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicProvince;
     }
-
     public void setClinicProvince(String clinicProvince)
     {
         this.clinicProvince = clinicProvince;
@@ -215,7 +205,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicDelimPhone;
     }
-
     public void setClinicDelimPhone(String clinicDelimPhone)
     {
         this.clinicDelimPhone = clinicDelimPhone;
@@ -225,32 +214,33 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return clinicDelimFax;
     }
+    public void setClinicDelimFax(String clinicDelimFax)
+    {
+        this.clinicDelimFax = clinicDelimFax;
+    }
 
     public String getClinicEmail()
     {
         return clinicEmail;
     }
-
     public void setClinicEmail(String clinicEmail)
     {
         this.clinicEmail = clinicEmail;
-    }
-
-    public void setClinicDelimFax(String clinicDelimFax)
-    {
-        this.clinicDelimFax = clinicDelimFax;
     }
 
     public ClinicBillingAddress getClinicBillingAddress()
     {
         return clinicBillingAddress;
     }
+    public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress)
+    {
+        this.clinicBillingAddress = clinicBillingAddress;
+    }
 
     public String getAlbertaConnectCareLabId()
     {
         return albertaConnectCareLabId;
     }
-
     public void setAlbertaConnectCareLabId(String albertaConnectCareLabId)
     {
         this.albertaConnectCareLabId = albertaConnectCareLabId;
@@ -260,7 +250,6 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     {
         return albertaConnectCareDepartmentId;
     }
-
     public void setAlbertaConnectCareDepartmentId(String albertaConnectCareDepartmentId)
     {
         this.albertaConnectCareDepartmentId = albertaConnectCareDepartmentId;
@@ -270,22 +259,15 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
 	{
 		return bcFacilityNumber;
 	}
-
 	public void setBcFacilityNumber(String bcFacilityNumber)
 	{
 		this.bcFacilityNumber = bcFacilityNumber;
 	}
 
-    public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress)
-    {
-        this.clinicBillingAddress = clinicBillingAddress;
-    }
-
     public String getImdHealthUuid()
     {
         return imdHealthUuid;
     }
-
     public void setImdHealthUuid(String imdHealthUuid)
     {
         this.imdHealthUuid = imdHealthUuid;
