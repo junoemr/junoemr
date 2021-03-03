@@ -67,7 +67,6 @@ import oscar.util.ConversionUtils;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -363,11 +362,11 @@ public class DemographicManager {
 		String currentStatus = demographic.getPatientStatus();
 		Date currentStatusDate = demographic.getPatientStatusDate();
 
-		if (!Objects.equals(previousStatus, currentStatus))
+		if (!(previousStatus.equals(currentStatus)))
 		{
 			demographic.setPatientStatusDate(new Date());
 		}
-		else if (!Objects.equals(previousStatusDate, currentStatusDate))
+		else if (previousStatusDate.compareTo(currentStatusDate) != 0)
 		{
 			demographic.setPatientStatusDate(currentStatusDate);
 		}
