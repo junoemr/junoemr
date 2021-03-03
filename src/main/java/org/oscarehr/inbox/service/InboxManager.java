@@ -39,6 +39,7 @@ import oscar.oscarLab.ca.on.LabResultData;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -160,24 +161,47 @@ public class InboxManager
 		return response;
 	}
 
-	public void addDocumentToProviderInbox(Integer labNo, boolean alwaysFileLabs, String ... providerIds)
+	public void addDocumentToProviderInbox(Integer labNo, String ... providerIds)
 	{
-		addToProviderInbox(labNo, INBOX_TYPE_DOCUMENT, alwaysFileLabs, providerIds);
+		addToProviderInbox(labNo, INBOX_TYPE_DOCUMENT, providerIds);
 	}
 
-	public void addLabToProviderInbox(Integer labNo, boolean alwaysFileLabs, String ... providerIds)
+	public void addDocumentToProviderInbox(Integer labNo, boolean applyForwardingRules, boolean alwaysFileLabs, String ... providerIds)
 	{
-		addToProviderInbox(labNo, INBOX_TYPE_HL7, alwaysFileLabs, providerIds);
+		addToProviderInbox(labNo, INBOX_TYPE_DOCUMENT, applyForwardingRules, alwaysFileLabs, providerIds);
 	}
 
-	public void addToProviderInbox(Integer labNo, String labType, boolean alwaysFileLabs, String... providerIds)
+	public void addLabToProviderInbox(Integer labNo, String ... providerIds)
 	{
-		Map<String, List<IncomingLabRules>> incomingLabRulesByProviderId = incomingLabRulesDao.findActiveAsProviderMap();
+		addToProviderInbox(labNo, INBOX_TYPE_HL7, providerIds);
+	}
 
+	public void addLabToProviderInbox(Integer labNo, boolean applyForwardingRules, boolean alwaysFileLabs, String ... providerIds)
+	{
+		addToProviderInbox(labNo, INBOX_TYPE_HL7, applyForwardingRules, alwaysFileLabs, providerIds);
+	}
+
+	public void addToProviderInbox(Integer labNo, String labType, String... providerIds)
+	{
+		addToProviderInbox(labNo, labType, true, false, providerIds);
+	}
+
+	public void addToProviderInbox(Integer labNo, String labType, boolean applyForwardingRules, boolean alwaysFileLabs, String... providerIds)
+	{
 		HashSet<String> providerSet = new HashSet<>(providerIds.length);
-		for(String providerId : providerIds)
+		String routeStatus = (alwaysFileLabs ? ProviderInboxItem.FILE : ProviderInboxItem.NEW);
+
+		if(applyForwardingRules)
 		{
-			addProviderToHashSet(providerId, providerSet, incomingLabRulesByProviderId);
+			Map<String, List<IncomingLabRules>> incomingLabRulesByProviderId = incomingLabRulesDao.findActiveAsProviderMap();
+			for(String providerId : providerIds)
+			{
+				addProviderToHashSet(providerId, providerSet, incomingLabRulesByProviderId);
+			}
+		}
+		else // no forwarding, only specified providers will get inbox entries
+		{
+			providerSet.addAll(Arrays.asList(providerIds));
 		}
 
 		// get all existing routes for the lab, mapped by provider ID
@@ -194,7 +218,7 @@ public class InboxManager
 				inboxItem.setProviderNo(providerId);
 				inboxItem.setLabNo(labNo);
 				inboxItem.setLabType(labType);
-				inboxItem.setStatus(alwaysFileLabs ? ProviderInboxItem.FILE : ProviderInboxItem.NEW);
+				inboxItem.setStatus(routeStatus);
 				providerInboxRoutingDao.persist(inboxItem);
 			}
 			else
@@ -206,7 +230,7 @@ public class InboxManager
 					try
 					{
 						//TODO this could be refactored to reduce queries
-						CommonLabResultData.updateReportStatus(labNo, providerId, ProviderInboxItem.NEW, null, labType);
+						CommonLabResultData.updateReportStatus(labNo, providerId, routeStatus, null, labType);
 					}
 					catch(SQLException throwable)
 					{

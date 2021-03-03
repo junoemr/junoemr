@@ -32,6 +32,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.document.dao.CtlDocumentDao;
@@ -136,11 +137,11 @@ public class DocumentService
 
 		if(dbDocument.getReviewer() != null)
 		{
-			this.routeToProviderInbox(dbDocument.getDocumentNo(), true, dbDocument.getDoccreator(), dbDocument.getResponsible(), dbDocument.getReviewer());
+			this.routeToProviderInbox(dbDocument.getDocumentNo(), false, true, dbDocument.getDoccreator(), dbDocument.getResponsible(), dbDocument.getReviewer());
 		}
 		else
 		{
-			this.routeToProviderInbox(dbDocument.getDocumentNo(), true, dbDocument.getDoccreator(), dbDocument.getResponsible());
+			this.routeToProviderInbox(dbDocument.getDocumentNo(), false, true, dbDocument.getDoccreator(), dbDocument.getResponsible());
 		}
 
 		return dbDocument;
@@ -403,7 +404,7 @@ public class DocumentService
 	 */
 	public void routeToProviderInbox(Integer documentNo, String...providerNoList)
 	{
-		routeToProviderInbox(documentNo, false, providerNoList);
+		inboxManagerService.addDocumentToProviderInbox(documentNo, providerNoList);
 	}
 	/**
 	 * Add the document to the given provider(s) inbox
@@ -411,16 +412,9 @@ public class DocumentService
 	 * @param alwaysFile - when true, all routes will be set as filed. otherwise default routing rules are applied
 	 * @param providerNoList - list of provider id(s) to route to
 	 */
-	public void routeToProviderInbox(Integer documentNo, boolean alwaysFile, String...providerNoList)
+	public void routeToProviderInbox(Integer documentNo, boolean applyForwardingRules, boolean alwaysFile, String...providerNoList)
 	{
-		inboxManagerService.addDocumentToProviderInbox(documentNo, alwaysFile, providerNoList);
-
-		//TODO handle the routing weirdness
-//		for(String providerNo : providerNoList)
-//		{
-//			providerInboxRoutingDao.addToProviderInbox(providerNo, documentNo, LabResultData.DOCUMENT, alwaysFile);
-//			logger.info("Added route to provider " + providerNo + " for document " + documentNo);
-//		}
+		inboxManagerService.addDocumentToProviderInbox(documentNo, applyForwardingRules, alwaysFile, providerNoList);
 	}
 	/**
 	 * Add the document to the unclaimed/general inbox
@@ -428,7 +422,7 @@ public class DocumentService
 	 */
 	public void routeToGeneralInbox(Integer documentNo)
 	{
-		routeToProviderInbox(documentNo, "0");
+		routeToProviderInbox(documentNo, Provider.UNCLAIMED_PROVIDER_NO);
 	}
 
 	/**
