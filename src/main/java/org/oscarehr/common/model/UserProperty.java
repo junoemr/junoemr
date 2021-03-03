@@ -134,7 +134,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
 
     public static final String AQS_INTEGRATION_API_SECRET_KEY = "aqs_api_secret_key";
     public static final String AQS_INTEGRATION_ENABLED = "aqs_enabled";
-    public static final String AQS_INTEGRATION_ORGANIZATION_NAME = "aqs_organization_name";
+    public static final String AQS_INTEGRATION_ORGANIZATION_ID = "aqs_organization_id";
 
     public static final String INTEGRATION_IMDHEALTH_ENABLED = "integration.imdHealth.enabled";
     

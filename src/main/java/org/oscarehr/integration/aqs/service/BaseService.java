@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 
-import static org.oscarehr.common.model.UserProperty.AQS_INTEGRATION_ORGANIZATION_NAME;
+import static org.oscarehr.common.model.UserProperty.AQS_INTEGRATION_ORGANIZATION_ID;
 
 @Service
 public abstract class BaseService extends org.oscarehr.integration.BaseService
@@ -96,13 +96,13 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	{
 		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey(securityNo.toString());
 
-		if (userPropertyDao.getProp(AQS_INTEGRATION_ORGANIZATION_NAME) != null)
+		if (userPropertyDao.getProp(AQS_INTEGRATION_ORGANIZATION_ID) != null)
 		{
-			((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey(userPropertyDao.getProp(AQS_INTEGRATION_ORGANIZATION_NAME).getValue());
+			((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey(userPropertyDao.getProp(AQS_INTEGRATION_ORGANIZATION_ID).getValue());
 		}
 		else
 		{
-			throw new RuntimeException("The property [" + AQS_INTEGRATION_ORGANIZATION_NAME + "] is not set in the [property] table! AQS integration will not function until corrected");
+			throw new RuntimeException("The property [" + AQS_INTEGRATION_ORGANIZATION_ID + "] is not set in the [property] table! AQS integration will not function until corrected");
 		}
 
 		if (userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY) != null)
