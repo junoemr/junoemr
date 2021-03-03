@@ -47,7 +47,8 @@ angular.module('Admin').component('systemPropertiesRx',
                 }
             ];
 
-            ctrl.$onInit = () => {
+            ctrl.$onInit = () =>
+            {
                 for (let property of ctrl.propertiesList) {
                     switch (property.type)
                     {
@@ -58,6 +59,7 @@ angular.module('Admin').component('systemPropertiesRx',
                         }
                         case property_types.string:
                         {
+                            /** May not actually be needed, still figuring out what to do for string properties in the future **/
                             console.error("Not yet implemented");
                         }
                     }
@@ -69,16 +71,18 @@ angular.module('Admin').component('systemPropertiesRx',
                 systemPreferenceApi.getPreferenceEnabled(property.propertyName)
                     .then((response) =>
                     {
-                        property.value = !!response.data;
+                        property.value = !!response.data.body;
                     })
             };
 
             /**
              * Persist new property value
-             * @param property property
+             * @param property property to update
+             * @param checked toggle switch state
              */
-            ctrl.updateProperty = (property) => {
-                systemPreferenceApi.putPreferenceValue(property.propertyName, property.value)
+            ctrl.updateProperty = (property, checked) =>
+            {
+                systemPreferenceApi.putPreferenceValue(property.propertyName, checked)
             };
 
         }]

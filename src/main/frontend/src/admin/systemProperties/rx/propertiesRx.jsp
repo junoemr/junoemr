@@ -26,12 +26,12 @@
     <div class="content">
         <div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
             <div class="property-toggle">
-                <label class="switch">
-                    <input id="{{ property.propertyName }}" type="checkbox"
-                           ng-model="property.value"
-                           ng-change="$ctrl.updateProperty(property)"/>
-                    <span class="slider"></span>
-                </label>
+            <juno-toggle
+                    id="property.propertyName"
+                    ng-model="property.value"
+                    change="$ctrl.updateProperty(property, checked)"
+                    round="true">
+            </juno-toggle>
             </div>
             <div class="property-text flex-column">
                 <div class="name">{{ property.name }}</div>
