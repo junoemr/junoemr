@@ -56,7 +56,7 @@ import org.oscarehr.common.model.Queue;
 import org.oscarehr.common.model.QueueDocumentLink;
 import org.oscarehr.inbox.InboxManagerResponse;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.InboxManager;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;

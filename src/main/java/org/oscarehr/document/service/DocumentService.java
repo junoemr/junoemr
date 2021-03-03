@@ -40,6 +40,7 @@ import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,6 @@ import oscar.dms.EDocUtil;
 import oscar.dms.data.AddEditDocumentForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
-import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
@@ -89,6 +89,9 @@ public class DocumentService
 
 	@Autowired
 	private EncounterNoteService encounterNoteService;
+
+	@Autowired
+	private InboxManager inboxManagerService;
 
 	/**
 	 * Create a new document from the given document model and a file
@@ -410,12 +413,14 @@ public class DocumentService
 	 */
 	public void routeToProviderInbox(Integer documentNo, boolean alwaysFile, String...providerNoList)
 	{
+		inboxManagerService.addDocumentToProviderInbox(documentNo, alwaysFile, providerNoList);
+
 		//TODO handle the routing weirdness
-		for(String providerNo : providerNoList)
-		{
-			providerInboxRoutingDao.addToProviderInbox(providerNo, documentNo, LabResultData.DOCUMENT, alwaysFile);
-			logger.info("Added route to provider " + providerNo + " for document " + documentNo);
-		}
+//		for(String providerNo : providerNoList)
+//		{
+//			providerInboxRoutingDao.addToProviderInbox(providerNo, documentNo, LabResultData.DOCUMENT, alwaysFile);
+//			logger.info("Added route to provider " + providerNo + " for document " + documentNo);
+//		}
 	}
 	/**
 	 * Add the document to the unclaimed/general inbox

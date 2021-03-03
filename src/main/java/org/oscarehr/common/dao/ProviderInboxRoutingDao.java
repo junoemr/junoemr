@@ -24,19 +24,19 @@
 
 package org.oscarehr.common.dao;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.model.IncomingLabRules;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
-
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
+
+import javax.persistence.Query;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -94,6 +94,30 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 		List<ProviderInboxItem> results = query.getResultList();
 
 		return results.size();
+	}
+
+	/**
+	 * get a list of inbox items for a specific lab/document
+	 * @param tableName - the document type
+	 * @param tableId - the id
+	 * @return - the map, with providerId as the key
+	 */
+	public Map<String, ProviderInboxItem> findAllByTableId(String tableName, Integer tableId)
+	{
+		String jpql = "SELECT x \n" +
+				"FROM ProviderInboxItem x \n" +
+				"WHERE x.labNo = :tableId \n" +
+				"AND x.labType = :tableName";
+		return entityManager.createQuery(jpql, ProviderInboxItem.class)
+				.setParameter("tableName", tableName)
+				.setParameter("tableId", tableId)
+				.getResultStream()
+				.collect(
+						Collectors.toMap(
+								ProviderInboxItem::getProviderNo,
+								inboxItem -> (inboxItem)
+						)
+				);
 	}
 
 	public void addToProviderInbox(String providerNo, Integer labNo, String labType)
