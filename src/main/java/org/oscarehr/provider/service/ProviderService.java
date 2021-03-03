@@ -287,7 +287,7 @@ public class ProviderService
 			ProviderData newProviderData = providerEditFormTo1.getProviderData();
 
 			// transfer super admin flag
-			newProviderData.setSuperAdmin(providerData.getSuperAdmin());
+			newProviderData.setSuperAdmin(providerData.isSuperAdmin());
 
 			// edit provider
 			newProviderData.setProviderNo(providerNo);

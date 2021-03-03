@@ -73,66 +73,95 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	@Id
 	@Column(name = "provider_no")
 	private String id = null;
+
 	@Column(name = "last_name")
 	private String lastName = null;
+
 	@Column(name = "first_name")
 	private String firstName = null;
+
 	@Column(name = "provider_type")
 	private String providerType = null;
+
 	@Column(name = "specialty")
 	private String specialty = null;
+
 	@Column(name = "team")
 	private String team = null;
+
 	@Column(name = "sex")
 	private String sex = null;
+
 	@Column(name = "dob")
 	@Temporal(TemporalType.DATE)
 	private Date dob = null;
+
 	@Column(name = "address")
 	private String address = null;
+
 	@Column(name = "phone")
 	private String phone = null;
+
 	@Column(name = "work_phone")
 	private String workPhone = null;
+
 	@Column(name = "ohip_no")
 	private String ohipNo = null;
+
 	@Column(name = "rma_no")
 	private String rmaNo = null;
+
 	@Column(name = "billing_no")
 	private String billingNo = null;
+
 	@Column(name = "hso_no")
 	private String hsoNo = null;
+
 	@Column(name = "status")
 	private String status = null;
+
 	@Column(name = "comments")
 	private String comments = null;
+
 	@Column(name = "provider_activity")
 	private String providerActivity = null;
+
 	@Column(name = "practitionerNo")
 	private String practitionerNo = null;
+
 	@Column(name = "init")
 	private String init = null;
+
 	@Column(name = "job_title")
 	private String jobTitle = null;
+
 	@Column(name = "email")
 	private String email = null;
+
 	@Column(name = "title")
 	private String title = null;
+
 	@Column(name = "lastUpdateUser")
 	private String lastUpdateUser = null;
+
 	@Column(name = "lastUpdateDate")
 	@Temporal(TemporalType.DATE)
 	private Date lastUpdateDate = null;
+
 	@Column(name = "signed_confidentiality")
 	@Temporal(TemporalType.DATE)
 	private Date signedConfidentiality = null;
-    @Column(name = "supervisor")
-    private String supervisor;
+
+	@Column(name = "supervisor")
+    private String supervisor = null;
+
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
 
-	/* -- Province specific -- */
+    @Column(name = "imd_health_uuid")
+	private String imdHealthUuid = null;
 
+	/* -- Province specific -- */
 	/* AB */
 	@Column(name = "alberta_tak_no")
 	private String albertaTakNo = null;
@@ -179,7 +208,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void setProviderNo(Integer providerNo) {
 		set(String.valueOf(providerNo));
 	}
-
 
 	public String getLastName() {
 		return lastName;
@@ -305,7 +333,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 		return faxNo;
 	}
 
-
 	public String getProviderActivity() {
 		return providerActivity;
 	}
@@ -372,7 +399,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public String getSupervisor() {
 		return supervisor;
 	}
-
 	public void setSupervisor(String supervisor) {
 		this.supervisor = supervisor;
 	}
@@ -381,14 +407,24 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	{
 		return ontarioLifeLabsId;
 	}
-
 	public void setOntarioLifeLabsId(String ontarioLifeLabsId)
 	{
 		this.ontarioLifeLabsId = ontarioLifeLabsId;
 	}
 
-	public boolean equals(Object object) {
-		if (!(object instanceof ProviderData)) {
+	public String getImdHealthUuid()
+	{
+		return imdHealthUuid;
+	}
+	public void setImdHealthUuid(String imdHealthUuid)
+	{
+		this.imdHealthUuid = imdHealthUuid;
+	}
+
+	public boolean equals(Object object)
+	{
+		if (!(object instanceof ProviderData))
+		{
 			return false;
 		}
 
@@ -397,7 +433,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	}
 	
 	/* -- Province specific getters/setters -- */
-	
 	public String getAlbertaTakNo() {
 		return albertaTakNo;
 	}
@@ -407,7 +442,8 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public String getAlbertaEDeliveryIds() {
 		return albertaEDeliveryIds;
 	}
-	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
+	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds)
+	{
 		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
 	}
 	public void setAlbertaEDeliveryIds(List<String> idList) {
@@ -418,28 +454,30 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 		superAdmin = superAdminStatus;
 	}
 
-	public Boolean getSuperAdmin() {
-		return superAdmin;
-	}
-
 	public Boolean isSuperAdmin() {
 		return superAdmin;
 	}
         
 	/* -- Comparators -- */
 	
-	public static final Comparator<ProviderData> LastNameComparator = new Comparator<ProviderData>() {
-        public int compare(ProviderData pd1, ProviderData pd2) {
+	public static final Comparator<ProviderData> LastNameComparator = new Comparator<ProviderData>()
+	{
+        public int compare(ProviderData pd1, ProviderData pd2)
+		{
         	return pd1.getLastName().compareTo(pd2.getLastName());
         }
     }; 
-	public static final Comparator<ProviderData> FirstNameComparator = new Comparator<ProviderData>() {
-        public int compare(ProviderData pd1, ProviderData pd2) {
+	public static final Comparator<ProviderData> FirstNameComparator = new Comparator<ProviderData>()
+	{
+        public int compare(ProviderData pd1, ProviderData pd2)
+		{
         	return pd1.getFirstName().compareTo(pd2.getFirstName());
         }
     }; 
-	public static final Comparator<ProviderData> ProviderNoComparator = new Comparator<ProviderData>() {
-        public int compare(ProviderData pd1, ProviderData pd2) {
+	public static final Comparator<ProviderData> ProviderNoComparator = new Comparator<ProviderData>()
+	{
+        public int compare(ProviderData pd1, ProviderData pd2)
+		{
         	return pd1.getId().compareTo(pd2.getId());
         }
     };
@@ -448,7 +486,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	{
 		return albertaConnectCareId;
 	}
-
 	public void setAlbertaConnectCareId(String albertaConnectCareId)
 	{
 		this.albertaConnectCareId = albertaConnectCareId;
@@ -458,7 +495,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	{
 		return billingOpts;
 	}
-
 	public void setBillingOpts(ProviderBilling billingOpts)
 	{
 		this.billingOpts = billingOpts;

@@ -47,40 +47,57 @@ import javax.persistence.Table;
 @Table(name = "clinic")
 public class Clinic extends AbstractModel<Integer> implements Serializable
 {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "clinic_no")
     private Integer id;
+
     @Column(name = "clinic_name")
     private String clinicName;
+
     @Column(name = "clinic_address")
     private String clinicAddress;
+
     @Column(name = "clinic_city")
     private String clinicCity;
+
     @Column(name = "clinic_postal")
     private String clinicPostal;
+
     @Column(name = "clinic_phone")
     private String clinicPhone;
+
     @Column(name = "clinic_fax")
     private String clinicFax;
+
     @Column(name = "clinic_location_code")
     private String clinicLocationCode;
+
     private String status;
+
     @Column(name = "clinic_province")
     private String clinicProvince;
+
     @Column(name = "clinic_delim_phone")
     private String clinicDelimPhone;
+
     @Column(name = "clinic_delim_fax")
     private String clinicDelimFax;
+
     @Column(name = "email")
     private String clinicEmail;
+
     @Column(name = "alberta_connect_care_lab_id")
     private String albertaConnectCareLabId;
+
     @Column(name = "alberta_connect_care_department_id")
     private String albertaConnectCareDepartmentId;
+
     @Column(name = "bc_facility_number")
     private String bcFacilityNumber;
+
+    @Column(name = "imd_health_uuid")
+    private String imdHealthUuid;
 
     // foreign key
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
@@ -264,6 +281,16 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
         this.clinicBillingAddress = clinicBillingAddress;
     }
 
+    public String getImdHealthUuid()
+    {
+        return imdHealthUuid;
+    }
+
+    public void setImdHealthUuid(String imdHealthUuid)
+    {
+        this.imdHealthUuid = imdHealthUuid;
+    }
+
     @Override
     public String toString()
     {
@@ -279,6 +306,5 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
                 " clinicDelimPhone " + clinicDelimPhone +
                 " clinicDelimFax " + clinicDelimFax +
                 " clinicBillingAddress " + clinicBillingAddress;
-
     }
 }

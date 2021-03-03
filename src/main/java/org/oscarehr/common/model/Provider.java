@@ -86,6 +86,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 	private String lastUpdateUser;
 	private Date lastUpdateDate = new Date();
 	private String supervisor;
+	private String imdHealthUuid;
 	/* -- Province specific (AB) -- */
 	private String albertaTakNo;
 	private String albertaEDeliveryIds;
@@ -454,6 +455,15 @@ public class Provider implements Serializable, Comparable<Provider>{
 		this.ontarioLifeLabsId = ontarioLifeLabsId;
 	}
 
+	public String getImdHealthUuid()
+	{
+		return imdHealthUuid;
+	}
+
+	public void setImdHealthUuid(String imdHealthUuid)
+	{
+		this.imdHealthUuid = imdHealthUuid;
+	}
 	/* -- other methods --*/
 
 	public ComparatorName ComparatorName() {

@@ -48,7 +48,7 @@ public class Provider {
   private String comments= "";
   private String providerActivity= "";
   private String supervisor = "";
-
+  private String imdHealthUuid = "";
 
   /**
    * Class constructor with no arguments.
@@ -252,6 +252,11 @@ public class Provider {
       return (supervisor != null ? supervisor : "");
   }
 
+  public String getImdHealthUuid()
+  {
+    return (imdHealthUuid != null ? imdHealthUuid : "");
+  }
+
   /**
    * Sets the providerNo
    * @param providerNo String
@@ -396,9 +401,13 @@ public class Provider {
     this.providerActivity = providerActivity;
   }
   
-  
   public void setSupervisor(String supervisor ) {
       this.supervisor = supervisor;
+  }
+
+  public void setImdHealthUuid(String imdHealthUuid)
+  {
+    this.imdHealthUuid = imdHealthUuid;
   }
 
   /**
@@ -415,27 +424,33 @@ public class Provider {
    *
    * @return Object
    */
-  public String getInitials() {
+  public String getInitials()
+  {
     String firstInit = "";
     String lastInit = "";
-    if (this.firstName != null && this.firstName.length() > 0) {
-      if (this.firstName.length() > 1) {
+    if (this.firstName != null && this.firstName.length() > 0)
+    {
+      if (this.firstName.length() > 1)
+      {
         firstInit = firstName.substring(0, 1);
       }
-      else {
+      else
+      {
         firstInit = firstName;
       }
     }
-    if (this.lastName != null && this.lastName.length() > 0) {
-      if (this.lastName.length() > 1) {
+    if (this.lastName != null && this.lastName.length() > 0)
+    {
+      if (this.lastName.length() > 1)
+      {
         lastInit = lastName.substring(0, 1);
       }
-      else {
+      else
+      {
         lastInit = lastName;
       }
     }
 
     return firstInit + lastInit;
   }
-
 }

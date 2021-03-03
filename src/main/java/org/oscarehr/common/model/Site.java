@@ -36,10 +36,11 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name="site")
-public class Site extends AbstractModel<Integer> implements java.io.Serializable {
-
+public class Site extends AbstractModel<Integer> implements java.io.Serializable
+{
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((siteId == null) ? 0 : siteId.hashCode());
@@ -47,19 +48,35 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj)
+	{
 		if (this == obj)
+		{
 			return true;
+		}
+
 		if (obj == null)
+		{
 			return false;
+		}
+
 		if (getClass() != obj.getClass())
+		{
 			return false;
+		}
+
 		Site other = (Site) obj;
-		if (siteId == null) {
+		if (siteId == null)
+		{
 			if (other.siteId != null)
+			{
 				return false;
-		} else if (!siteId.equals(other.siteId))
+			}
+		}
+		else if (!siteId.equals(other.siteId))
+		{
 			return false;
+		}
 		return true;
 	}
 
@@ -111,6 +128,9 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 
 	@Column(name="bc_facility_number")
 	private String bcFacilityNumber;
+
+	@Column(name="imd_health_uuid")
+	private String imdHealthUuid;
 
 	public String getSiteUrl() {
 		return siteUrl;
@@ -334,5 +354,15 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public void setBcFacilityNumber(String bcFacilityNumber)
 	{
 		this.bcFacilityNumber = bcFacilityNumber;
+	}
+
+	public String getImdHealthUuid()
+	{
+		return imdHealthUuid;
+	}
+
+	public void setImdHealthUuid(String imdHealthUuid)
+	{
+		this.imdHealthUuid = imdHealthUuid;
 	}
 }
