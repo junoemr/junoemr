@@ -1,24 +1,10 @@
 #admin-system-properties {
   @include juno-font-default();
 
-  hr {
-    margin-top: 0;
+  .tab-container {
+    display: flex;
   }
-
-  .navbar {
-    font-size: 24px;
-    margin: 0;
-
-    .active {
-      border-style: solid;
-      border-width: 0 0 4px 0;
-      border-color: var(--theme-color-primary-base);
-      a {
-        color: var(--theme-color-primary-base);
-      }
-    }
-  }
-
+  
   .content {
     margin-left: 32px;
 

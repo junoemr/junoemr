@@ -21,6 +21,8 @@
  * Canada
  */
 
+import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
+
 angular.module('Admin').component('systemProperties',
     {
         templateUrl: 'src/admin/systemProperties/systemProperties.jsp',
@@ -28,19 +30,20 @@ angular.module('Admin').component('systemProperties',
         controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
         {
             let ctrl = this;
-            ctrl.message = "basic message";
 
-            ctrl.$onInit = () => {
-            };
+            ctrl.tabList = [
+                {
+                    label: "Rx",
+                    value: 'admin.systemProperties.rx',
+                },
+            ];
 
-            ctrl.changeTab = function (state)
+            ctrl.currentTab = "admin.systemProperties.rx";
+            ctrl.componentStyle = JUNO_STYLE.GREY;
+
+            ctrl.tabChange = (activeTab) =>
             {
-                $state.go(state);
-            };
-
-            ctrl.isTabActive = function(tabState)
-            {
-                return tabState === $state.current.name;
-            };
+                $state.go(ctrl.activeTab);
+            }
         }]
     });

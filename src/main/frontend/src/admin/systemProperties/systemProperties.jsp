@@ -21,14 +21,13 @@
 * Canada
 --%>
 <div id="admin-system-properties">
-    <div class="navbar">
-        <ul class="nav navbar-nav">
-            <li ng-class="{'active': $ctrl.isTabActive('admin.systemProperties.rx')}">
-                <a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.systemProperties.rx')">Rx</a>
-            </li>
-        </ul>
+    <div class="tab-container">
+    <juno-tab ng-model="$ctrl.currentTab"
+              tabs="$ctrl.tabList"
+              change="$ctrl.tabChange(activeTab)"
+              component-style="$ctrl.componentStyle">
+    </juno-tab>
     </div>
-    <hr>
     <div class="admin-system-properties content">
         <ui-view></ui-view>
     </div>
