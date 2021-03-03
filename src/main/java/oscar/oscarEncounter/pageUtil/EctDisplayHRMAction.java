@@ -15,17 +15,15 @@ import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.model.SecObjectName;
-import org.oscarehr.demographicImport.model.hrm.HrmDocument;
-import org.oscarehr.hospitalReportManager.HRMReport;
-import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.on.HRMResultsData;
 import oscar.util.DateUtils;
 import oscar.util.StringUtils;
 
@@ -33,10 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +40,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String cmd = "HRM";
 	private final HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
+	private final HRMService hrmService = (HRMService) SpringUtils.getBean("HRMService");
 	private final OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 	
 	public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages) {
@@ -76,126 +72,14 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 			String BGCOLOUR = request.getParameter("hC");
 			Date date;
 
-			List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
+			Map<String, HRMDemographicDocument> demographicDocuments =
+				hrmService.getHrmDocumentsForDemographic(demographicNo);
 
-			List<Integer> doNotShowList = new LinkedList<>();
-			HashMap<String, HRMDocument> docsToDisplay = new HashMap<>();
-			HashMap<String, HRMDocument> labReports = new HashMap<>();
-			HashMap<String, ArrayList<Integer>> duplicateLabIds = new HashMap<>();
-
-			for (HRMDocument doc : allHrmDocsForDemo)
-			{
-				String facilityId = doc.getSendingFacilityId();
-				String facilityReportId = doc.getSendingFacilityReportId();
-				String deliverToUserId = doc.getDeliverToUserId();
-
-				// filter duplicate reports
-				String duplicateKey;
-				//TODO - figure out version lookup here too
-				if(!"4.3".equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
-				{
-					HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
-					if(hrmReport != null)
-					{
-						facilityId = hrmReport.getSendingFacilityId();
-						facilityReportId = hrmReport.getSendingFacilityReportNo();
-						deliverToUserId = hrmReport.getDeliverToUserId();
-					}
-				}
-
-				// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
-				if(facilityId == null && facilityReportId == null)
-				{
-					duplicateKey = String.valueOf(doc.getId());
-				}
-				else
-				{
-					// the key = SendingFacility+':'+ReportNumber+':'+DeliverToUserID as per HRM spec can be used to signify duplicate report
-					duplicateKey = facilityId + ':' + facilityReportId + ':' + deliverToUserId;
-				}
-
-				List<HRMDocument> relationshipDocs = hrmDocumentDao.findAllDocumentsWithRelationship(doc.getId());
-
-				HRMDocument oldestDocForTree = doc;
-				for(HRMDocument relationshipDoc : relationshipDocs)
-				{
-					if(relationshipDoc.getId().intValue() != doc.getId().intValue())
-					{
-						if(relationshipDoc.getReportDate().compareTo(oldestDocForTree.getReportDate()) >= 0
-								|| relationshipDoc.getReportStatus().equalsIgnoreCase(HrmDocument.REPORT_STATUS.CANCELLED.getValue()))
-						{
-							doNotShowList.add(oldestDocForTree.getId());
-							oldestDocForTree = relationshipDoc;
-						}
-					}
-				}
-
-				boolean addToList = true;
-				for(HRMDocument displayDoc : docsToDisplay.values())
-				{
-					if(displayDoc.getId().intValue() == oldestDocForTree.getId().intValue())
-					{
-						addToList = false;
-						break;
-					}
-				}
-
-				for(Integer doNotShowId : doNotShowList)
-				{
-					if(doNotShowId.intValue() == oldestDocForTree.getId().intValue())
-					{
-						addToList = false;
-						break;
-					}
-				}
-
-				if (addToList)
-				{
-					// if no duplicate
-					if (!docsToDisplay.containsKey(duplicateKey))
-					{
-						docsToDisplay.put(duplicateKey,oldestDocForTree);
-						labReports.put(duplicateKey, doc);
-					}
-					else // there exists an entry like this one
-					{
-						HRMDocument previousHrmReport=labReports.get(duplicateKey);
-
-						logger.debug("Duplicate report found : previous=" + previousHrmReport.getId() + ", current=" + doc.getId());
-						
-						Integer duplicateIdToAdd;
-						
-						// if the current entry is newer than the previous one then replace it, other wise just keep the previous entry
-						if (HRMResultsData.isNewer(doc, previousHrmReport))
-						{
-							HRMDocument previousHRMDocument = docsToDisplay.get(duplicateKey);
-							duplicateIdToAdd=previousHRMDocument.getId();
-							
-							docsToDisplay.put(duplicateKey,oldestDocForTree);
-							labReports.put(duplicateKey, doc);
-						}
-						else
-						{
-							duplicateIdToAdd=doc.getId();
-						}
-
-						ArrayList<Integer> duplicateIds=duplicateLabIds.get(duplicateKey);
-						if (duplicateIds==null)
-						{
-							duplicateIds=new ArrayList<Integer>();
-							duplicateLabIds.put(duplicateKey, duplicateIds);
-						}
-						
-						duplicateIds.add(duplicateIdToAdd);						
-					}
-				}
-			}
-
-			for (Map.Entry<String, HRMDocument> entry : docsToDisplay.entrySet()) {
+			for (Map.Entry<String, HRMDemographicDocument> entry : demographicDocuments.entrySet()) {
 				
-				String duplicateKey=entry.getKey();
-				HRMDocument hrmDocument=entry.getValue();
-				
+				HRMDocument hrmDocument = entry.getValue().getHrmDocument();
+				List<Integer> duplicateIdList = entry.getValue().getDuplicateIds();
+
 				String reportStatus = hrmDocument.getReportStatus();
 				String dispFilename = hrmDocument.getReportType();
 				String dispDocNo    = hrmDocument.getId().toString();
@@ -221,12 +105,10 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 					date = null;
 				}
 
-				String user = (String) request.getSession().getAttribute("user");
 				item.setDate(date);
 				hash = Math.abs(winName.hashCode());
 
 				StringBuilder duplicateLabIdQueryString=new StringBuilder();
-				ArrayList<Integer> duplicateIdList=duplicateLabIds.get(duplicateKey);
             	if (duplicateIdList!=null)
             	{
 					for (Integer duplicateLabIdTemp : duplicateIdList)

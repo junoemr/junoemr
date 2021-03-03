@@ -215,6 +215,8 @@
 				minDelta: 0.93,
 				minMain: null,
 				minWin: null,
+				openWindows: {},
+				reloadSectionTimer: null,
 			};
 
 

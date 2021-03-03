@@ -218,66 +218,72 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		}
 	};
 
-	this.popupPage = function popupPage(vheight, vwidth, name, varpage)
+	this.popupPage = function popupPage(vheight, vwidth, windowName, varpage)
 	{
-		var reloadWindows = {};
-		var updateDivTimer = null;
+		return this.popupPageAndReload(vheight, vwidth, windowName, varpage, null);
+	}
+
+	this.popupPageAndReload = function popupPageBase(vheight, vwidth, windowName, varpage, sectionToReload)
+	{
 		if (varpage == null || varpage === -1)
 		{
 			return false;
 		}
+
 		if (varpage.indexOf("..") === 0)
 		{
 			varpage = this.pageData.contextPath + varpage.substr(2);
 		}
+
 		var page = "" + varpage;
-		var windowprops = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=600,screenY=200,top=0,left=0";
-		openWindows[name] = window.open(page, name, windowprops);
+		var windowprops = "height=" + vheight + ",width=" + vwidth
+				+ ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=600,screenY=200,top=0,left=0";
 
-		if (openWindows[name] != null)
+		var windowProxy = window.open(page, windowName, windowprops);
+
+		if (sectionToReload !== null)
 		{
-			if (openWindows[name].opener == null)
-			{
-				openWindows[name].opener = self;
-			}
-			openWindows[name].focus();
-			if (updateDivTimer == null)
-			{
-				var me = this;
-				updateDivTimer = setInterval(
-					function ()
-					{
-						if (me.checkLengthOfObject(openWindows) > 0)
-						{
-							for (var name in openWindows)
-							{
-								if (openWindows[name].closed && reloadWindows[name] !== undefined)
-								{
-									var reloadDivUrl = reloadWindows[name];
-									var reloadDiv = reloadWindows[name + "div"];
-
-									loadDiv(reloadDiv, reloadDivUrl, 0);
-
-									delete reloadWindows[name];
-									var divName = name + "div";
-									delete reloadWindows[divName];
-									delete openWindows[name];
-								}
-
-							}
-
-						}
-
-						if (me.checkLengthOfObject(openWindows) === 0)
-						{
-							clearInterval(updateDivTimer);
-							updateDivTimer = null;
-						}
-
-					}, 1000);
-			}
+			this.reloadSectionOnWindowClose(windowName, windowProxy, sectionToReload)
 		}
-	};
+
+		return false;
+	}
+
+	// Create an interval that watches for windows being closed.  After they are
+	// closed, reload the required section of the page and stop watching that
+	// window.
+	this.reloadSectionOnWindowClose = function reloadSectionOnWindowClose(windowName, windowProxy, sectionToReload)
+	{
+		this.pageState.openWindows[name] = {
+			windowProxy: windowProxy,
+			sectionToReload: sectionToReload,
+		}
+
+		if(this.pageState.reloadSectionTimer === null)
+		{
+			var me = this;
+			this.pageState.reloadSectionTimer = setInterval(function()
+			{
+				if(me.checkLengthOfObject(me.pageState.openWindows) === 0)
+				{
+					clearInterval(me.pageState.reloadSectionTimer);
+					me.pageState.reloadSectionTimer = null;
+					return;
+				}
+
+				for(var name in me.pageState.openWindows)
+				{
+					var windowInfo = me.pageState.openWindows[name];
+
+					if(windowInfo.windowProxy.closed)
+					{
+						me.getSectionRemote(windowInfo.sectionToReload, false, true)
+						delete me.pageState.openWindows[name];
+					}
+				}
+			}, 1000);
+		}
+	}
 
 	this.getAssignedIssueArray = function getAssignedIssueArray(issueIdArray, async)
 	{
