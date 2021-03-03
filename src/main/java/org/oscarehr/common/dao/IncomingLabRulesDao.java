@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import javax.persistence.Query;
 
 import org.oscarehr.common.model.IncomingLabRules;
-import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.springframework.stereotype.Repository;
 

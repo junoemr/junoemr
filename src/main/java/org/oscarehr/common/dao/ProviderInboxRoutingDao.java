@@ -24,16 +24,13 @@
 
 package org.oscarehr.common.dao;
 
-import org.oscarehr.common.model.IncomingLabRules;
 import org.oscarehr.common.model.ProviderInboxItem;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 
 import javax.persistence.Query;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -118,87 +115,5 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 								inboxItem -> (inboxItem)
 						)
 				);
-	}
-
-	public void addToProviderInbox(String providerNo, Integer labNo, String labType)
-	{
-		addToProviderInbox(providerNo, labNo, labType, false);
-	}
-	/**
-	 * Adds lab results to the provider inbox
-	 * 
-	 * @param providerNo
-	 * 		Provider to add lab results to
-	 * @param labNo
-	 * 		Document id to be added to the inbox
-	 * @param labType
-	 * 		Type of the document to be added. Available document types are defined in {@link oscar.oscarLab.ca.on.LabResultData} class.
-	 * @param alwaysFileLabs
-	 *      When true, all routes will be set as filed. Otherwise default routing rules are applied
-	 * 
-	 */
-	// TODO-legacy Replace labType parameter with an enum
-	@SuppressWarnings("unchecked")
-    public void addToProviderInbox(String providerNo, Integer labNo, String labType, boolean alwaysFileLabs)
-	{
-		ArrayList<String> listofAdditionalProviders = new ArrayList<>();
-		boolean fileForMainProvider = false;
-
-		try
-		{
-			if(alwaysFileLabs)
-			{
-				fileForMainProvider = true;
-			}
-			else
-			{
-				Query rulesQuery = entityManager.createQuery("FROM IncomingLabRules r WHERE r.archive = 0 AND r.providerNo = :providerNo");
-				rulesQuery.setParameter("providerNo", providerNo);
-
-				for(IncomingLabRules rules : (List<IncomingLabRules>) rulesQuery.getResultList())
-				{
-					String status = rules.getStatus();
-					String frwdProvider = rules.getFrwdProviderNo();
-
-					listofAdditionalProviders.add(frwdProvider);
-					if(status != null && status.equals(ProviderInboxItem.FILE))
-					{
-						fileForMainProvider = true;
-					}
-				}
-			}
-
-			// prevent duplicates
-			if(!hasProviderBeenLinkedWithDocument(labType, labNo, providerNo))
-			{
-				ProviderInboxItem p = new ProviderInboxItem();
-				p.setProviderNo(providerNo);
-				p.setLabNo(labNo);
-				p.setLabType(labType);
-				p.setStatus(fileForMainProvider ? ProviderInboxItem.FILE : ProviderInboxItem.NEW);
-				persist(p);
-			}
-
-			//See if the provider we're adding is already linked with the document
-			ProviderInboxItem labForProvider = getRoutingForProviderLabNo(labType, labNo, providerNo);
-
-			//If the document is archived for the provider, move the document from the archive back to their inbox as they've been re-linked to the document
-			if(labForProvider.getStatus().equals(ProviderInboxItem.ARCHIVED))
-			{
-				CommonLabResultData.updateReportStatus(labNo, providerNo, ProviderInboxItem.NEW, null, labType);
-			}
-
-			for(String s : listofAdditionalProviders)
-			{
-				if(!hasProviderBeenLinkedWithDocument(labType, labNo, s))
-				{
-					addToProviderInbox(s, labNo, labType);
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			MiscUtils.getLogger().error("Error", e);
-		}
 	}
 }
