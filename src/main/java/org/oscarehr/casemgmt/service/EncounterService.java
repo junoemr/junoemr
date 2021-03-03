@@ -125,6 +125,9 @@ public class EncounterService
 	@Autowired
 	private EncounterFamilyHistoryService encounterFamilyHistoryService;
 
+	@Autowired
+	private EncounterHRMService encounterHRMService;
+
 	public EncounterSectionService getEncounterSectionServiceByName(String serviceName)
 	{
 		switch(serviceName)
@@ -146,6 +149,7 @@ public class EncounterService
 			case EncounterSection.TYPE_EPISODES: return encounterEpisodeService;
 			case EncounterSection.TYPE_PREGNANCIES: return encounterPregnancyService;
 			case EncounterSection.TYPE_HEALTH_CARE_TEAM: return encounterTeamService;
+			case EncounterSection.TYPE_HRM: return encounterHRMService;
 			/*
 			case encounterSocialHistoryService.SECTION_ID: return encounterSocialHistoryService;
 			case encounterMedicalHistoryService.SECTION_ID: return encounterMedicalHistoryService;

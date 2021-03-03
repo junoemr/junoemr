@@ -23,13 +23,19 @@
  */
 package org.oscarehr.hospitalReportManager.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
+import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
@@ -42,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import oscar.oscarLab.ca.on.HRMResultsData;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -126,5 +133,126 @@ public class HRMService
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
 			}
 		}
+	}
+
+	public Map<String, HRMDemographicDocument> getHrmDocumentsForDemographic(Integer demographicNo)
+	{
+		List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
+
+		List<Integer> doNotShowList = new LinkedList<>();
+		HashMap<String, HRMDocument> labReports = new HashMap<>();
+
+		Map<String, HRMDemographicDocument> out = new HashMap<>();
+
+		for (HRMDocument doc : allHrmDocsForDemo)
+		{
+			String facilityId = doc.getSendingFacilityId();
+			String facilityReportId = doc.getSendingFacilityReportId();
+			String deliverToUserId = doc.getDeliverToUserId();
+
+			// filter duplicate reports
+			String duplicateKey;
+			//TODO - figure out version lookup here too
+			if(!"4.3".equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
+			{
+				HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
+				if(hrmReport != null)
+				{
+					facilityId = hrmReport.getSendingFacilityId();
+					facilityReportId = hrmReport.getSendingFacilityReportNo();
+					deliverToUserId = hrmReport.getDeliverToUserId();
+				}
+			}
+
+			// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
+			if(facilityId == null && facilityReportId == null)
+			{
+				duplicateKey = String.valueOf(doc.getId());
+			}
+			else
+			{
+				// the key = SendingFacility+':'+ReportNumber+':'+DeliverToUserID as per HRM spec can be used to signify duplicate report
+				duplicateKey = facilityId + ':' + facilityReportId + ':' + deliverToUserId;
+			}
+
+			List<HRMDocument> relationshipDocs = hrmDocumentDao.findAllDocumentsWithRelationship(doc.getId());
+
+			HRMDocument oldestDocForTree = doc;
+			for(HRMDocument relationshipDoc : relationshipDocs)
+			{
+				if(relationshipDoc.getId().intValue() != doc.getId().intValue())
+				{
+					if(relationshipDoc.getReportDate().compareTo(oldestDocForTree.getReportDate()) >= 0
+						|| relationshipDoc.getReportStatus().equalsIgnoreCase(HrmDocument.REPORT_STATUS.CANCELLED.getValue()))
+					{
+						doNotShowList.add(oldestDocForTree.getId());
+						oldestDocForTree = relationshipDoc;
+					}
+				}
+			}
+
+			boolean addToList = true;
+			for(HRMDemographicDocument demographicDocument: out.values())
+			{
+				HRMDocument displayDoc = demographicDocument.getHrmDocument();
+				if(displayDoc.getId().intValue() == oldestDocForTree.getId().intValue())
+				{
+					addToList = false;
+					break;
+				}
+			}
+
+			for(Integer doNotShowId : doNotShowList)
+			{
+				if(doNotShowId.intValue() == oldestDocForTree.getId().intValue())
+				{
+					addToList = false;
+					break;
+				}
+			}
+
+			if (addToList)
+			{
+				// if no duplicate
+				if (!out.containsKey(duplicateKey))
+				{
+					HRMDemographicDocument demographicDocument = new HRMDemographicDocument();
+					demographicDocument.setHrmDocument(oldestDocForTree);
+
+					out.put(duplicateKey, demographicDocument);
+					labReports.put(duplicateKey, doc);
+				}
+				else // there exists an entry like this one
+				{
+					Integer duplicateIdToAdd;
+
+					HRMDocument previousHrmReport = labReports.get(duplicateKey);
+					HRMDemographicDocument demographicDocument = out.get(duplicateKey);
+
+					// if the current entry is newer than the previous one then replace it, other wise just keep the previous entry
+					if (HRMResultsData.isNewer(doc, previousHrmReport))
+					{
+						HRMDocument previousHRMDocument = demographicDocument.getHrmDocument();
+						duplicateIdToAdd = previousHRMDocument.getId();
+
+						demographicDocument.setHrmDocument(oldestDocForTree);
+						labReports.put(duplicateKey, doc);
+					}
+					else
+					{
+						duplicateIdToAdd = doc.getId();
+					}
+
+					if (demographicDocument.getDuplicateIds() == null)
+					{
+						demographicDocument.setDuplicateIds(new ArrayList<>());
+					}
+
+					demographicDocument.getDuplicateIds().add(duplicateIdToAdd);
+				}
+			}
+		}
+
+		return out;
 	}
 }
