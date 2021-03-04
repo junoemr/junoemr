@@ -26,12 +26,14 @@ import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.log.LogAction;
 import xml.cds.v5_0.CareElements;
 import xml.cds.v5_0.OmdCds;
 import xml.cds.v5_0.PatientRecord;
 import xml.cds.v5_0.Reports;
 
 import java.io.FileNotFoundException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,27 +86,63 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 	@Override
 	public org.oscarehr.demographicImport.model.PatientRecord importToJuno(OmdCds importStructure) throws Exception
 	{
+		Instant instant = Instant.now();
 		org.oscarehr.demographicImport.model.PatientRecord patientModel = new org.oscarehr.demographicImport.model.PatientRecord();
 
 		PatientRecord patientRecord = importStructure.getPatientRecord();
 		patientModel.setDemographic(cdsDemographicImportMapper.importToJuno(patientRecord.getDemographics()));
+		instant = LogAction.printDuration(instant, "ImportMapper: demographics");
+
 		patientModel.setPreferredPharmacy(cdsPharmacyImportMapper.importToJuno(patientRecord.getDemographics().getPreferredPharmacy()));
+		instant = LogAction.printDuration(instant, "ImportMapper: pharmacy");
+
 		patientModel.setContactList(cdsContactImportMapper.importAll(patientRecord.getDemographics().getContact()));
+		instant = LogAction.printDuration(instant, "ImportMapper: contacts");
+
 		patientModel.setSocialHistoryNoteList(cdsPersonalHistoryImportMapper.importAll(patientRecord.getPersonalHistory()));
+		instant = LogAction.printDuration(instant, "ImportMapper: personal history");
+
 		patientModel.setFamilyHistoryNoteList(cdsFamilyHistoryImportMapper.importAll(patientRecord.getFamilyHistory()));
+		instant = LogAction.printDuration(instant, "ImportMapper: family history");
+
 		patientModel.setMedicalHistoryNoteList(cdsPastHealthImportMapper.importAll(patientRecord.getPastHealth()));
+		instant = LogAction.printDuration(instant, "ImportMapper: past health");
+
 		patientModel.setConcernNoteList(cdsProblemImportMapper.importAll(patientRecord.getProblemList()));
+		instant = LogAction.printDuration(instant, "ImportMapper: problems");
+
 		patientModel.setRiskFactorNoteList(cdsRiskFactorImportMapper.importAll(patientRecord.getRiskFactors()));
+		instant = LogAction.printDuration(instant, "ImportMapper: risk factors");
+
 		patientModel.setAllergyList(cdsAllergyImportMapper.importAll(patientRecord.getAllergiesAndAdverseReactions()));
+		instant = LogAction.printDuration(instant, "ImportMapper: allergies");
+
 		patientModel.setMedicationList(cdsMedicationImportMapper.importAll(patientRecord.getMedicationsAndTreatments()));
+		instant = LogAction.printDuration(instant, "ImportMapper: medications");
+
 		patientModel.setImmunizationList(cdsImmunizationImportMapper.importAll(patientRecord.getImmunizations()));
+		instant = LogAction.printDuration(instant, "ImportMapper: immunizations");
+
 		patientModel.setLabList(cdsLabImportMapper.importToJuno(patientRecord.getLaboratoryResults()));
+		instant = LogAction.printDuration(instant, "ImportMapper: labs");
+
 		patientModel.setAppointmentList(cdsAppointmentImportMapper.importAll(patientRecord.getAppointments()));
+		instant = LogAction.printDuration(instant, "ImportMapper: appointments");
+
 		patientModel.setEncounterNoteList(cdsEncounterNoteImportMapper.importAll(patientRecord.getClinicalNotes()));
+		instant = LogAction.printDuration(instant, "ImportMapper: clinical notes");
+
 		patientModel.setDocumentList(getDocuments(patientRecord.getReports()));
+		instant = LogAction.printDuration(instant, "ImportMapper: document reports");
+
 		patientModel.setHrmDocumentList(cdsReportHrmImportMapper.importAll(getHrmReports(patientRecord.getReports())));
+		instant = LogAction.printDuration(instant, "ImportMapper: HRM reports");
+
 		patientModel.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
+		instant = LogAction.printDuration(instant, "ImportMapper: care elements");
+
 		patientModel.setReminderNoteList(cdsAlertImportMapper.importAll(patientRecord.getAlertsAndSpecialNeeds()));
+		instant = LogAction.printDuration(instant, "ImportMapper: alerts");
 
 		return patientModel;
 	}

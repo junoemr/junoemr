@@ -40,9 +40,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.Attributes;
@@ -136,9 +136,9 @@ public class DataUtils {
 				newDoc.setContentType("text/plain");
 				newDoc.setNumberOfPages(1);
 				String doc_no = EDocUtil.addDocumentSQL(newDoc);
-				
-				ProviderInboxRoutingDao providerInboxRoutingDao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
-				providerInboxRoutingDao.addToProviderInbox(demo.getProviderNo(), ConversionUtils.fromIntString(doc_no), "DOC");
+
+				InboxManager inboxManager = SpringUtils.getBean(InboxManager.class);
+				inboxManager.addDocumentToProviderInbox(ConversionUtils.fromIntString(doc_no), demo.getProviderNo());
 				
 				if (logger.isInfoEnabled()) {
 					logger.info("Added doc: " + fileName);

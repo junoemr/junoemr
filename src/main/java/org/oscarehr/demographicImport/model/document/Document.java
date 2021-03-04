@@ -64,4 +64,5 @@ public class Document extends AbstractTransientModel
 	private Reviewer reviewer;
 
 	private String annotation;
+	private Integer programId;
 }

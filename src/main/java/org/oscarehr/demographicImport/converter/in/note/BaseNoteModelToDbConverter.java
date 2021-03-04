@@ -56,6 +56,8 @@ public abstract class BaseNoteModelToDbConverter<N extends BaseNote> extends
 		dbNote.setObservationDate(ConversionUtils.toNullableLegacyDateTime(input.getObservationDate()));
 		dbNote.setProvider(findOrCreateProviderRecord(input.getProvider(), false));
 		dbNote.setSigningProvider(findOrCreateProviderRecord(input.getSigningProvider(), true));
+		dbNote.setProgramNo(input.getProgramId());
+		dbNote.setReporterCaisiRole(input.getRoleId());
 
 		dbNote.setSigned(true); // always sign the inbound chart notes
 		if(dbNote.getSigningProvider() == null)

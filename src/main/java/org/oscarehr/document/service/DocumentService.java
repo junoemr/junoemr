@@ -32,6 +32,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.document.dao.CtlDocumentDao;
@@ -40,8 +41,8 @@ import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,6 @@ import oscar.dms.EDocUtil;
 import oscar.dms.data.AddEditDocumentForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
-import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
@@ -92,7 +92,7 @@ public class DocumentService
 	private EncounterNoteService encounterNoteService;
 
 	@Autowired
-	private ProviderService providerService;
+	private InboxManager inboxManagerService;
 
 	/**
 	 * Create a new document from the given document model and a file
@@ -124,23 +124,24 @@ public class DocumentService
 		String annotation = documentModel.getAnnotation();
 		if (annotation != null)
 		{
-			ProviderData providerData = providerService.getProvider(dbDocument.getDoccreator());
+			ProviderData createdBy = dbDocument.getCreatedBy();
 			CaseManagementNote documentNote = new CaseManagementNote();
-			documentNote.setProvider(providerData);
-			documentNote.setSigningProvider(providerData);
+			documentNote.setProvider(createdBy);
+			documentNote.setSigningProvider(createdBy);
 			documentNote.setDemographic(demographic);
 			documentNote.setNote(annotation);
 			documentNote.setObservationDate(dbDocument.getObservationdate());
+			documentNote.setProgramNo(documentModel.getProgramId() != null ? String.valueOf(documentModel.getProgramId()) : null);
 			encounterNoteService.saveDocumentNote(documentNote, dbDocument);
 		}
 
 		if(dbDocument.getReviewer() != null)
 		{
-			this.routeToProviderInbox(dbDocument.getDocumentNo(), true, dbDocument.getDoccreator(), dbDocument.getResponsible(), dbDocument.getReviewer());
+			this.routeToProviderInbox(dbDocument.getDocumentNo(), false, true, dbDocument.getDoccreator(), dbDocument.getResponsible(), dbDocument.getReviewer());
 		}
 		else
 		{
-			this.routeToProviderInbox(dbDocument.getDocumentNo(), true, dbDocument.getDoccreator(), dbDocument.getResponsible());
+			this.routeToProviderInbox(dbDocument.getDocumentNo(), false, true, dbDocument.getDoccreator(), dbDocument.getResponsible());
 		}
 
 		return dbDocument;
@@ -148,8 +149,15 @@ public class DocumentService
 
 	public void uploadAllNewDemographicDocument(List<org.oscarehr.demographicImport.model.document.Document> documentModels, Demographic demographic) throws IOException
 	{
+		// load program ID outside of loop to prevent excess queries
+		Integer defaultProgramId = programManager.getDefaultProgramId();
+
 		for(org.oscarehr.demographicImport.model.document.Document documentModel : documentModels)
 		{
+			if(documentModel.getProgramId() == null)
+			{
+				documentModel.setProgramId(defaultProgramId);
+			}
 			uploadNewDemographicDocument(documentModel, demographic);
 		}
 	}
@@ -396,7 +404,7 @@ public class DocumentService
 	 */
 	public void routeToProviderInbox(Integer documentNo, String...providerNoList)
 	{
-		routeToProviderInbox(documentNo, false, providerNoList);
+		inboxManagerService.addDocumentToProviderInbox(documentNo, providerNoList);
 	}
 	/**
 	 * Add the document to the given provider(s) inbox
@@ -404,14 +412,9 @@ public class DocumentService
 	 * @param alwaysFile - when true, all routes will be set as filed. otherwise default routing rules are applied
 	 * @param providerNoList - list of provider id(s) to route to
 	 */
-	public void routeToProviderInbox(Integer documentNo, boolean alwaysFile, String...providerNoList)
+	public void routeToProviderInbox(Integer documentNo, boolean applyForwardingRules, boolean alwaysFile, String...providerNoList)
 	{
-		//TODO handle the routing weirdness
-		for(String providerNo : providerNoList)
-		{
-			providerInboxRoutingDao.addToProviderInbox(providerNo, documentNo, LabResultData.DOCUMENT, alwaysFile);
-			logger.info("Added route to provider " + providerNo + " for document " + documentNo);
-		}
+		inboxManagerService.addDocumentToProviderInbox(documentNo, applyForwardingRules, alwaysFile, providerNoList);
 	}
 	/**
 	 * Add the document to the unclaimed/general inbox
@@ -419,7 +422,7 @@ public class DocumentService
 	 */
 	public void routeToGeneralInbox(Integer documentNo)
 	{
-		routeToProviderInbox(documentNo, "0");
+		routeToProviderInbox(documentNo, Provider.UNCLAIMED_PROVIDER_NO);
 	}
 
 	/**

@@ -85,7 +85,6 @@ import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -185,6 +184,7 @@ public class PatientImportService
 	                              PatientImportContext context,
 	                              DemographicImporter.MERGE_STRATEGY mergeStrategy) throws Exception
 	{
+		Instant instant = Instant.now();
 		DemographicImporter importer = context.getImporter();
 		ImportLogger importLogger = context.getImportLogger();
 		importer.verifyFileFormat(importFile);
@@ -212,26 +212,43 @@ public class PatientImportService
 			dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographicModel);
 			logger.info("Persisted new demographic: " + dbDemographic.getId());
 		}
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist/load demographic");
 
 		patientRecord.getDemographic().setId(dbDemographic.getId());
 		demographicContactService.addNewContacts(patientRecord.getContactList(), dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist contacts");
+
 		persistNotes(patientRecord, dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist notes");
+
 		persistLabs(patientRecord, dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist labs");
 
 		appointmentService.saveNewAppointments(patientRecord.getAppointmentList(), dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist appointments");
 		appointmentStatusCache.clear();
 
 		medicationService.saveNewMedications(patientRecord.getMedicationList(), dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist medications");
+
 		persistMeasurements(patientRecord, dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist measurements");
 
 		allergyService.saveNewAllergies(patientRecord.getAllergyList(), dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist allergies");
 
 		persistPreventions(patientRecord, dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist preventions");
+
 		persistPharmacy(patientRecord, dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: match/persist pharmacy");
 
 		// persist documents last to minimize import errors with disk IO
 		persistHrmDocuments(patientRecord, dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist hrm documents");
+
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
+		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist document files");
 
 		importLogger.logSummaryLine(patientRecord);
 		writeAuditLogImportStatement(dbDemographic, context.getImportType(), context.getImportPreferences().getImportSource(), duplicateDetected);
@@ -443,12 +460,5 @@ public class PatientImportService
 				LogConst.CON_DEMOGRAPHIC,
 				LogConst.STATUS_SUCCESS,
 				logMessage);
-	}
-
-	public static Instant printDuration(Instant start, String what)
-	{
-		Instant now = Instant.now();
-		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
-		return now;
 	}
 }

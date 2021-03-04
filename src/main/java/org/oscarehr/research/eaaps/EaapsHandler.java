@@ -42,7 +42,6 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DxresearchDAO;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.dao.UserDSMessagePrefsDao;
@@ -51,6 +50,7 @@ import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.common.model.UserDSMessagePrefs;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.dms.EDoc;
@@ -83,8 +83,8 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 	private QueueDocumentLinkDao queueDocumentLinkDao = SpringUtils.getBean(QueueDocumentLinkDao.class);
 
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-	
-	private ProviderInboxRoutingDao providerInboxRoutingDao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
+
+	private final InboxManager inboxManager = SpringUtils.getBean(InboxManager.class);
 
 	private CaseManagementManager caseManagementManager = SpringUtils.getBean(CaseManagementManager.class);
 
@@ -300,7 +300,7 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 			return;
 		}
 
-		providerInboxRoutingDao.addToProviderInbox(provider, documentId, "DOC");
+		inboxManager.addDocumentToProviderInbox(documentId, provider);
 		queueDocumentLinkDao.addToQueueDocumentLink(1, documentId);
 	}
 

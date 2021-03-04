@@ -38,10 +38,13 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
@@ -52,6 +55,7 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.io.FileUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.provider.model.ProviderData;
 
 /**
  *
@@ -111,6 +115,11 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     @Basic(optional = false)
     @Column(name = "doccreator")
     private String doccreator;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "doccreator", insertable = false, updatable = false)
+	private ProviderData createdBy;
+
     @Basic(optional = false)
     @Column(name = "responsible")
     private String responsible;
@@ -204,6 +213,20 @@ public class Document extends AbstractModel<Integer> implements Serializable {
 
     public void setDocCreator(String doccreator) {
         this.doccreator = doccreator;
+    }
+
+    public void setCreatedBy(ProviderData providerData)
+    {
+    	this.createdBy = providerData;
+    	if(providerData != null)
+	    {
+	    	this.setDocCreator(providerData.getId());
+	    }
+    }
+
+    public ProviderData getCreatedBy()
+    {
+    	return this.createdBy;
     }
     
     public Date getContentdatetime() {

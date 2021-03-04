@@ -25,7 +25,7 @@ package org.oscarehr.ws.rest;
 
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.inbox.InboxManagerResponse;
-import org.oscarehr.managers.InboxManager;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.InboxResponse;
 import org.oscarehr.ws.rest.to.model.InboxTo1;

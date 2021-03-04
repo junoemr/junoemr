@@ -736,7 +736,7 @@ public class CoPDImportService
 				logger.warn("SKIPPING: File: " + document.getDocfilename() + " already exists in document directory! skipping.");
 				continue;
 			}
-			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getId());
+			documentService.routeToProviderInbox(document.getDocumentNo(), false, true, provider.getId());
 		}
 	}
 

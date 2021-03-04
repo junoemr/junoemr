@@ -42,6 +42,9 @@ public abstract class BaseNote extends AbstractTransientModel
 	private Reviewer signingProvider;
 	private List<Provider> editors;
 
+	private String programId;
+	private String roleId;
+
 	public BaseNote()
 	{
 		this.editors = new ArrayList<>();

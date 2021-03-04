@@ -55,6 +55,7 @@ import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.sharingcenter.SharingCenterUtil;
@@ -72,7 +73,6 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.data.EctProgram;
-import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
 
 import javax.imageio.ImageIO;
@@ -112,6 +112,7 @@ public class ManageDocumentAction extends DispatchAction {
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+	private final InboxManager inboxManager = SpringUtils.getBean(InboxManager.class);
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -971,10 +972,7 @@ public class ManageDocumentAction extends DispatchAction {
 	            {
 		            try
 		            {
-			            for(String proNo : flagproviders)
-			            {
-				            providerInboxRoutingDAO.addToProviderInbox(proNo, documentNo, LabResultData.DOCUMENT);
-			            }
+		            	inboxManager.addDocumentToProviderInbox(documentNo, flagproviders);
 		            }
 		            catch(Exception e)
 		            {

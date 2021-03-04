@@ -70,6 +70,7 @@ public class EncounterNoteService extends BaseNoteService
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
 
+		preSetDefaultProgramIdAndCaisiRole(noteModelList);
 		for(EncounterNote encounterNote : noteModelList)
 		{
 			dbNoteList.add(saveChartNote(encounterNote, demographic));

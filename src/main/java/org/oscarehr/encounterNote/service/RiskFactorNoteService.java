@@ -71,6 +71,8 @@ public class RiskFactorNoteService extends HistoryNoteService
 	public List<CaseManagementNote> saveRiskFactorNote(List<RiskFactorNote> noteModelList, Demographic demographic)
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
+
+		preSetDefaultProgramIdAndCaisiRole(noteModelList);
 		for(RiskFactorNote note : noteModelList)
 		{
 			dbNoteList.add(saveRiskFactorNote(note, demographic));
