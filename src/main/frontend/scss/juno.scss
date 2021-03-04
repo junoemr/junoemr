@@ -10,6 +10,8 @@
 @import "mixins/junoTable";
 @import "mixins/junoPageSizing";
 @import "themes/junoThemeBase";
+@import "mixins/junoToggle";
+
 // Custom Bootstrap
 @import "bootstrap/bootstrap_variables";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
