@@ -52,32 +52,6 @@ public class CDSNoteImportMapperTest
 	}
 
 	@Test
-	public void testCoalescePartialDates_Null()
-	{
-		assertNull(cdsProblemImportMapper.coalescePartialDates((PartialDate) null));
-		assertNull(cdsProblemImportMapper.coalescePartialDates(null, null));
-		assertNull(cdsProblemImportMapper.coalescePartialDates(null, null, null));
-	}
-
-	@Test
-	public void testCoalescePartialDates_FirstChoice()
-	{
-		PartialDate expectedPartialDate = new PartialDate(2021, 2, 3);
-		LocalDateTime expectedDateTime = LocalDateTime.of(2021, 2, 3, 0,0,0);
-
-		assertEquals(expectedDateTime, cdsProblemImportMapper.coalescePartialDates(expectedPartialDate));
-	}
-
-	@Test
-	public void testCoalescePartialDates_SecondChoice()
-	{
-		PartialDate expectedPartialDate = new PartialDate(2021, 2, 3);
-		LocalDateTime expectedDateTime = LocalDateTime.of(2021, 2, 3, 0,0,0);
-
-		assertEquals(expectedDateTime, cdsProblemImportMapper.coalescePartialDates(null, expectedPartialDate));
-	}
-
-	@Test
 	public void testGetDiagnosisNoteText_Null()
 	{
 		assertEquals(AbstractCDSNoteImportMapper.DEFAULT_NOTE_TEXT, cdsProblemImportMapper.getDiagnosisNoteText(null, null));

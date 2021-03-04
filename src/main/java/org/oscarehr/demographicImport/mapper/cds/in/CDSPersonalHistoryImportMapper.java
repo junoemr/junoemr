@@ -106,7 +106,7 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSNoteImportMapper<
 		// use another date if no observation date
 		if(note.getObservationDate() == null)
 		{
-			note.setObservationDate(coalescePartialDates(note.getStartDate(), note.getResolutionDate()));
+			note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Personal History Note", note.getStartDate(), note.getResolutionDate()));
 		}
 
 		return note;

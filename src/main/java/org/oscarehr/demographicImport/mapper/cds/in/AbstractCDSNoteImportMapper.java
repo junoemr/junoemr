@@ -39,25 +39,6 @@ public abstract class AbstractCDSNoteImportMapper<I, E extends BaseNote> extends
 		super();
 	}
 
-	/**
-	 * @param partialDates - partial dates list to choose from in order of preference
-	 * @return - the first non-null dateTime in the given list
-	 */
-	protected LocalDateTime coalescePartialDates(PartialDate... partialDates)
-	{
-		LocalDateTime observationDate = null;
-		for(PartialDate partialDate : partialDates)
-		{
-			if(partialDate != null)
-			{
-				observationDate = partialDate.toLocalDate().atStartOfDay();
-				break;
-			}
-		}
-		return observationDate;
-	}
-
-
 	protected String getDiagnosisNoteText(String description, StandardCoding diagnosisCode)
 	{
 		String noteText;

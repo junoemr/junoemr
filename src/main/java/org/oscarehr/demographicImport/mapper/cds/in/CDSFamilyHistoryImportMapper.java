@@ -43,7 +43,7 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<Fa
 	{
 		FamilyHistoryNote note = new FamilyHistoryNote();
 
-		note.setObservationDate(toNullableLocalDateTime(importStructure.getStartDate()));
+		note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Family History Note", toNullablePartialDate(importStructure.getStartDate())));
 		note.setStartDate(toNullablePartialDate(importStructure.getStartDate()));
 		note.setAgeAtOnset(getAgeAtOnset(importStructure.getAgeAtOnset()));
 		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));

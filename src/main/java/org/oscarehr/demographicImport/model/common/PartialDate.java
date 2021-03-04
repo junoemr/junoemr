@@ -149,6 +149,21 @@ public class PartialDate extends AbstractTransientModel
 		return null;
 	}
 
+	@Override
+	public boolean equals(Object object)
+	{
+		if(object == this)
+		{
+			return true;
+		}
+		if(!(object instanceof PartialDate))
+		{
+			return false;
+		}
+		PartialDate partialDate = (PartialDate) object;
+		return this.toLocalDate().equals(partialDate.toLocalDate());
+	}
+
 	public static PartialDate from(LocalDate localDate)
 	{
 		return from(localDate, null);

@@ -26,6 +26,8 @@ import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.RiskFactors;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CDSRiskFactorImportMapper extends AbstractCDSNoteImportMapper<RiskFactors, RiskFactorNote>
 {
@@ -46,7 +48,7 @@ public class CDSRiskFactorImportMapper extends AbstractCDSNoteImportMapper<RiskF
 		note.setResolutionDate(toNullablePartialDate(importStructure.getEndDate()));
 		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));
 		note.setAnnotation(importStructure.getNotes());
-		note.setObservationDate(coalescePartialDates(note.getStartDate(), note.getResolutionDate()));
+		note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Risk Factor Note", note.getStartDate(), note.getResolutionDate()));
 
 		return note;
 	}

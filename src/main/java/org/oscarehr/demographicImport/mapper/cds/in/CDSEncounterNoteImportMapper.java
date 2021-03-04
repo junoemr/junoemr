@@ -46,7 +46,7 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<Cl
 	{
 		EncounterNote note = new EncounterNote();
 		String noteText = "";
-		note.setObservationDate(toNullableLocalDateTime(importStructure.getEventDateTime()));
+		note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Encounter Note", toNullablePartialDateTime(importStructure.getEventDateTime())));
 
 		// TODO how to choose the mrp provider when there are multiple providers or reviewers?
 		if (!importStructure.getParticipatingProviders().isEmpty())

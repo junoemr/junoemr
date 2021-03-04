@@ -30,6 +30,7 @@ import java.util.Map;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.oscarehr.demographicImport.parser.hrm.HRMFileParser;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
@@ -152,8 +153,7 @@ public class HRMService
 
 			// filter duplicate reports
 			String duplicateKey;
-			//TODO - figure out version lookup here too
-			if(!"4.3".equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
+			if(!HRMFileParser.SCHEMA_VERSION.equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
 			{
 				HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
 				if(hrmReport != null)

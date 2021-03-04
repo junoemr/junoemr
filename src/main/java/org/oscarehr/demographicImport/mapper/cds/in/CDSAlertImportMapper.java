@@ -44,7 +44,7 @@ public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndS
 		ReminderNote reminderNote = new ReminderNote();
 		reminderNote.setStartDate(toNullablePartialDate(importStructure.getDateActive()));
 		reminderNote.setResolutionDate(toNullablePartialDate(importStructure.getEndDate()));
-		reminderNote.setObservationDate(coalescePartialDates(reminderNote.getStartDate(), reminderNote.getResolutionDate()));
+		reminderNote.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Alert", reminderNote.getStartDate(), reminderNote.getResolutionDate()));
 
 		String noteText = StringUtils.trimToEmpty(
 				StringUtils.trimToEmpty(importStructure.getAlertDescription()) + "\n" + StringUtils.trimToEmpty(importStructure.getNotes())

@@ -109,6 +109,21 @@ public class PartialDateTime extends PartialDate
 		return datePart;
 	}
 
+	@Override
+	public boolean equals(Object object)
+	{
+		if(object == this)
+		{
+			return true;
+		}
+		if(!(object instanceof PartialDateTime))
+		{
+			return false;
+		}
+		PartialDateTime partialDate = (PartialDateTime) object;
+		return this.toLocalDateTime().equals(partialDate.toLocalDateTime());
+	}
+
 	public static PartialDateTime from(PartialDate partialDate)
 	{
 		if(partialDate != null)

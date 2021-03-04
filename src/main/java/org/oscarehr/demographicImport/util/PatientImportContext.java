@@ -24,9 +24,12 @@ package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.logger.ImportLogger;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 @Data
 @Component
@@ -36,6 +39,15 @@ public class PatientImportContext extends PollableContext
 	private ImportLogger importLogger;
 	private ImportPreferences importPreferences;
 	private ImporterExporterFactory.IMPORTER_TYPE importType;
+
+	/**
+	 * The date to use when you need to assign a date but there is none provided
+	 * @return - the partial date object
+	 */
+	public LocalDate getDefaultDate()
+	{
+		return LocalDate.of(1900, 1, 1);
+	}
 
 	@Override
 	protected synchronized String getPollingMessage()

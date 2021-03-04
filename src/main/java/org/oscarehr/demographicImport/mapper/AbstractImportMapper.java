@@ -22,10 +22,13 @@
  */
 package org.oscarehr.demographicImport.mapper;
 
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,5 +55,46 @@ public abstract class AbstractImportMapper<I, E>
 			list.add(exportStructure);
 		}
 		return list;
+	}
+
+	/**
+	 * @param partialDates - partial dates list to choose from in order of preference
+	 * @return - the first non-null dateTime in the given list
+	 */
+	protected LocalDateTime coalescePartialDatesToDateTime(PartialDate... partialDates)
+	{
+		LocalDateTime observationDate = null;
+		for(PartialDate partialDate : partialDates)
+		{
+			if(partialDate != null)
+			{
+				if(partialDate instanceof PartialDateTime)
+				{
+					observationDate = ((PartialDateTime) partialDate).toLocalDateTime();
+				}
+				else
+				{
+					observationDate = partialDate.toLocalDate().atStartOfDay();
+				}
+				break;
+			}
+		}
+		return observationDate;
+	}
+
+	protected LocalDateTime coalescePartialDatesToDateTimeWithDefault(String what, PartialDate... partialDates)
+	{
+		LocalDateTime localDateTime = coalescePartialDatesToDateTime(partialDates);
+		if(localDateTime == null)
+		{
+			localDateTime = patientImportContext.getDefaultDate().atStartOfDay();
+			logDefaultValueUse(what, localDateTime);
+		}
+		return localDateTime;
+	}
+
+	public void logDefaultValueUse(String what, Object defaultedValue)
+	{
+		patientImportContext.getImportLogger().logEvent(what + " was defaulted to " + defaultedValue);
 	}
 }

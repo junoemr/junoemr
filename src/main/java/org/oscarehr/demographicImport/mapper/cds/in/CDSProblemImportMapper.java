@@ -46,7 +46,7 @@ public class CDSProblemImportMapper extends AbstractCDSNoteImportMapper<ProblemL
 		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));
 		note.setResolutionDate(toNullablePartialDate(importStructure.getResolutionDate()));
 		note.setAnnotation(importStructure.getNotes());
-		note.setObservationDate(coalescePartialDates(note.getStartDate(), note.getResolutionDate()));
+		note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Problem Note", note.getStartDate(), note.getResolutionDate()));
 
 		return note;
 	}
