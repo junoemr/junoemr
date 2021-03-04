@@ -180,6 +180,9 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
 
 	public static final String MCEDT_ACCOUNT_PASSWORD = "mcedt_account_password";
 
+	// various constant values for on/off in table
+	public static final String PROPERTY_ON_YES = "yes";
+	public static final String PROPERTY_ON_NO = "no";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
