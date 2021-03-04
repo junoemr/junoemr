@@ -32,6 +32,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -352,5 +353,25 @@ public abstract class BaseNoteService
 				PartialDate.TABLE.CASEMGMT_NOTE_EXT,
 				Math.toIntExact(extensionId),
 				PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+	}
+
+	/**
+	 * load program ID outside of loop to prevent excess queries
+	 */
+	public void preSetDefaultProgramIdAndCaisiRole(List<? extends BaseNote> noteModelList)
+	{
+		String defaultProgramId = String.valueOf(programManager.getDefaultProgramId());
+		String defaultRoleId = getCaisiRole();
+		for(BaseNote noteModel : noteModelList)
+		{
+			if(noteModel.getProgramId() == null)
+			{
+				noteModel.setProgramId(defaultProgramId);
+			}
+			if(noteModel.getRoleId() == null)
+			{
+				noteModel.setRoleId(defaultRoleId);
+			}
+		}
 	}
 }

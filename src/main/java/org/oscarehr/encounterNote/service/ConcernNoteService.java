@@ -71,6 +71,8 @@ public class ConcernNoteService extends HistoryNoteService
 	public List<CaseManagementNote> saveConcernNote(List<ConcernNote> noteModelList, Demographic demographic)
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
+
+		preSetDefaultProgramIdAndCaisiRole(noteModelList);
 		for(ConcernNote note : noteModelList)
 		{
 			dbNoteList.add(saveConcernNote(note, demographic));

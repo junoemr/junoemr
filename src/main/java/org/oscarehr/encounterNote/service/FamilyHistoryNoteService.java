@@ -73,6 +73,8 @@ public class FamilyHistoryNoteService extends HistoryNoteService
 	public List<CaseManagementNote> saveFamilyHistoryNote(List<FamilyHistoryNote> noteModelList, Demographic demographic)
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
+
+		preSetDefaultProgramIdAndCaisiRole(noteModelList);
 		for(FamilyHistoryNote note : noteModelList)
 		{
 			dbNoteList.add(saveFamilyHistoryNote(note, demographic));

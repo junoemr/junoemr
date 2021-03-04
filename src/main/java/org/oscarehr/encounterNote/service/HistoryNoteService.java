@@ -32,46 +32,58 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public abstract class HistoryNoteService extends BaseNoteService
 {
 	protected CaseManagementNote saveHistoryNote(CaseManagementNote note, String summaryCode)
 	{
-		CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueCode(
-				note.getDemographic().getDemographicId(), summaryCode);
+		return saveHistoryNote(note, findOrCreateCaseManagementIssue(note, summaryCode));
+	}
 
+	protected CaseManagementNote saveHistoryNote(CaseManagementNote note, CaseManagementIssue caseManagementIssue)
+	{
 		// save the base note
 		note.setSigned(true);
 		note.setIncludeIssueInNote(true);
 		note.setPosition(1);
 		note = saveNote(note);
 
-		// create the demographic specific issue if it does not exist
-		if(caseManagementIssue == null)
-		{
-			// grab the master issue for reference/link
-			Issue issue = issueDao.findByCode(summaryCode);
-
-			caseManagementIssue = new CaseManagementIssue();
-			caseManagementIssue.setAcute(false);
-			caseManagementIssue.setCertain(false);
-			caseManagementIssue.setMajor(false);
-			caseManagementIssue.setProgramId(programManager.getDefaultProgramId());
-			caseManagementIssue.setResolved(false);
-			caseManagementIssue.setIssue(issue);
-			caseManagementIssue.setType(issue.getRole());
-			caseManagementIssue.setDemographic(note.getDemographic());
-			caseManagementIssue.setUpdateDate(note.getUpdateDate());
-
-			caseManagementIssueDao.persist(caseManagementIssue);
-		}
-
 		// link the note and the issue
 		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK(caseManagementIssue, note);
 		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote(caseManagementIssueNotePK);
 		caseManagementIssueNoteDao.persist(caseManagementIssueNote);
 		return note;
+	}
+
+	protected CaseManagementIssue findOrCreateCaseManagementIssue(CaseManagementNote note, String summaryCode)
+	{
+		CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueCode(
+				note.getDemographic().getDemographicId(), summaryCode);
+
+		// create the demographic specific issue if it does not exist
+		if(caseManagementIssue == null)
+		{
+			// grab the master issue for reference/link
+			Issue issue = issueDao.findByCode(summaryCode);
+			Integer programId = (note.getProgramNo() != null) ? Integer.parseInt(note.getProgramNo()) : programManager.getDefaultProgramId();
+
+			caseManagementIssue = new CaseManagementIssue();
+			caseManagementIssue.setAcute(false);
+			caseManagementIssue.setCertain(false);
+			caseManagementIssue.setMajor(false);
+			caseManagementIssue.setProgramId(programId);
+			caseManagementIssue.setResolved(false);
+			caseManagementIssue.setIssue(issue);
+			caseManagementIssue.setType(issue.getRole());
+			caseManagementIssue.setDemographic(note.getDemographic());
+			caseManagementIssue.setUpdateDate(note.getUpdateDate() != null ? note.getUpdateDate() : new Date());
+
+			caseManagementIssueDao.persist(caseManagementIssue);
+		}
+		return caseManagementIssue;
 	}
 
 	protected void addAnnotationLink(CaseManagementNote note, String annotationText)
@@ -81,6 +93,8 @@ public abstract class HistoryNoteService extends BaseNoteService
 			CaseManagementNote annotationNote = buildAnnotationNote(note, annotationText);
 			CaseManagementNoteLink annotationLink = new CaseManagementNoteLink(annotationNote);
 			annotationLink.setLinkedCaseManagementNoteId(Math.toIntExact(note.getId()));
+			annotationNote.setProgramNo(note.getProgramNo());
+			annotationNote.setReporterCaisiRole(note.getReporterCaisiRole());
 			saveNote(annotationNote); // will also save the link through cascade
 		}
 	}

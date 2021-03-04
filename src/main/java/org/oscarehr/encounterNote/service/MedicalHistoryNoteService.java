@@ -77,6 +77,8 @@ public class MedicalHistoryNoteService extends HistoryNoteService
 	public List<CaseManagementNote> saveMedicalHistoryNotes(List<MedicalHistoryNote> noteModelList, Demographic demographic)
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
+
+		preSetDefaultProgramIdAndCaisiRole(noteModelList);
 		for(MedicalHistoryNote note : noteModelList)
 		{
 			dbNoteList.add(saveMedicalHistoryNote(note, demographic));

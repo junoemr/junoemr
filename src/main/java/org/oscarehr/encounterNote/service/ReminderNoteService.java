@@ -73,6 +73,8 @@ public class ReminderNoteService extends HistoryNoteService
 	public List<CaseManagementNote> saveReminderNote(List<ReminderNote> noteModelList, Demographic demographic)
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
+
+		preSetDefaultProgramIdAndCaisiRole(noteModelList);
 		for(ReminderNote note : noteModelList)
 		{
 			dbNoteList.add(saveReminderNote(note, demographic));

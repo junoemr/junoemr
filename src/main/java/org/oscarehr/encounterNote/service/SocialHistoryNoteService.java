@@ -72,6 +72,8 @@ public class SocialHistoryNoteService extends HistoryNoteService
 	public List<CaseManagementNote> saveSocialHistoryNote(List<SocialHistoryNote> noteModelList, Demographic demographic)
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
+
+		preSetDefaultProgramIdAndCaisiRole(noteModelList);
 		for(SocialHistoryNote note : noteModelList)
 		{
 			dbNoteList.add(saveSocialHistoryNote(note, demographic));
