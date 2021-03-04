@@ -43,16 +43,12 @@ public class TomcatConfig
 {
 	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
 
-	@Autowired
-	private JunoProperties junoProperties;
+	private final JunoProperties junoProperties;
 
-	/*
-	@Value("${juno.redis.endpoint}")
-	private String redisEndpoint;
-
-	@Value("${juno.redis.password}")
-	private String redisPassword;
-	 */
+	public TomcatConfig(JunoProperties junoProperties)
+	{
+		this.junoProperties = junoProperties;
+	}
 
 	// TODO: SPRINGUPGRADE: Set the context path from the properties files.  This might not be a
 	//                      thing we need to do.
