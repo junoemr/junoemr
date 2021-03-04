@@ -141,6 +141,26 @@ public class InboxManagerTest
 	}
 
 	@Test
+	public void testAddToProviderInbox_forwardingRulesWithLoop_noPreviousRoutes()
+	{
+		String[] baseProviderIds = {"101"};
+		String[] forwardProviderIds0 = {"201"};
+		String[] forwardProviderIds1 = {"101"};
+		Integer docId = 1;
+
+		Map<String, List<IncomingLabRules>> forwardingRules = new HashMap<>();
+		when(incomingLabRulesDao.findActiveAsProviderMap()).thenReturn(forwardingRules);
+		forwardingRules.put("101", createIncomingLabRulesForward(forwardProviderIds0));
+		forwardingRules.put("201", createIncomingLabRulesForward(forwardProviderIds1));
+
+		when(providerInboxRoutingDao.findAllByTableId(InboxManager.INBOX_TYPE_DOCUMENT, docId)).thenReturn(new HashMap<>());
+
+		inboxManager.addToProviderInbox(docId, InboxManager.INBOX_TYPE_DOCUMENT, baseProviderIds);
+
+		verify(providerInboxRoutingDao, times(2)).persist(Mockito.any(ProviderInboxItem.class));
+	}
+
+	@Test
 	public void testAddToProviderInbox_ignoreForwardingRules_noPreviousRoutes()
 	{
 		String[] baseProviderIds = {"101", "102", "103"};
