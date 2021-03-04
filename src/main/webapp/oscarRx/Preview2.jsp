@@ -522,7 +522,7 @@ if(custom_logo_name != null ){
 																	statusUrl = request.getContextPath()+"/PMmodule/ClientManager/check_signature_status.jsp?" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
 
 																	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
-																	if(systemPreferenceService.isPreferenceEnabled("rx_preset_signatures", false)){
+																	if(systemPreferenceService.isPreferenceEnabled(UserProperty.RX_AUTOSTAMP_SIGNATURE, false)){
 																		if (rx.getProviderNo() != null)
 																		{
 																			imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + rx.getProviderNo() + ".png";
