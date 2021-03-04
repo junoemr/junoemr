@@ -73,7 +73,7 @@
 						<hr>
 					</div>
 					<div class="form-group col-sm-12">
-						Enable New UI on login:<br>
+						Enable Juno UI on login:<br>
 						<label class="radio-inline" for="radios-per-0">
 							<input ng-model="settingsCtrl.pref.useCobaltOnLogin" name="radios-per-0" id="radios-per-0" ng-value="true" type="radio">
 							Enable

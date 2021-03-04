@@ -269,7 +269,7 @@ public class LoginService
 
 		//are they using the new UI?
 		UserProperty prop = userPropertyDAO.getProp(provider.getProviderNo(), UserProperty.COBALT);
-		if (prop != null && prop.getValue() != null && prop.getValue().equals("yes"))
+		if (prop != null && prop.getValue() != null && prop.getValue().equals(UserProperty.PROPERTY_ON_YES))
 		{
 			where = "cobalt";
 		}
