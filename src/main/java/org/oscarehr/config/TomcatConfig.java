@@ -27,7 +27,6 @@ import de.javakaffee.web.msm.MemcachedBackupSessionManager;
 import org.apache.catalina.Context;
 import org.apache.catalina.webresources.ExtractingRoot;
 import org.apache.tomcat.util.scan.StandardJarScanner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
