@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.Clinic;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.exception.IntegrationException;
@@ -53,6 +54,9 @@ import oscar.OscarProperties;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class IMDHealthService
@@ -74,9 +78,11 @@ public class IMDHealthService
 
 	private static final String PROP_KEY_APP = "imdhealth_app_domain";
 	private static final String PROP_KEY_SCHEME = "imdhealth_scheme";
+	private static final String JUNO_PRACTICE_ID = "CloudPracticeDefault";
 
 	protected static final String HOST_URL = OscarProperties.getInstance().getProperty(PROP_KEY_APP);
 	protected static final String DEFAULT_SCHEME= OscarProperties.getInstance().getProperty(PROP_KEY_SCHEME);
+
 
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -117,7 +123,47 @@ public class IMDHealthService
 			return imdIntegration;
 		}
 	}
+	/**
+	 * Initialize imD Health Organizations for each provider/site combination.
+	 *
+	 * @param integrationId integration id
+	 *
+	 * @return A list of failed initializations
+	 */
+	public List<String> initializeAllUsers(HttpSession session, Integer integrationId) throws IntegrationException
+	{
+		Integration integration = integrationDao.find(integrationId);
+		BearerToken token = getBearerToken(integration);
 
+		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
+
+		// TODO: Remove after figuring out something better for embedded tomcat
+		if (StringUtils.isEmpty(junoPracticeId))
+		{
+			junoPracticeId = JUNO_PRACTICE_ID;
+		}
+
+		List<Site> sites = siteDao.getAllActiveSites();
+		List<String> failedToInitialize = new ArrayList<>();
+		SSOCredentials credentials;
+		for (Site site : sites)
+		{
+			Set<Provider> providers = site.getProviders();
+
+			for (Provider provider : providers)
+			{
+				if (provider.isActive())
+				{
+					credentials = getSSOCredentials(token, provider, junoPracticeId, site.getId());
+					if (credentials == null)
+					{
+						failedToInitialize.add("ProviderNo " + provider.getProviderNo() + " ,SiteId " + site.getId());
+					}
+				}
+			}
+		}
+		return failedToInitialize;
+	}
 	/**
 	 * Generate the SSO link needed to connect to iMDHealth, logging in if necessary.
 	 *
@@ -252,15 +298,15 @@ public class IMDHealthService
 		credentials.setBearerToken(token);
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(session);
+		Provider provider = loggedInInfo.getLoggedInProvider();
 		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
 
 		// TODO: Remove after figuring out something better for embedded tomcat
 		if (StringUtils.isEmpty(junoPracticeId))
 		{
-			junoPracticeId = "CloudPracticeDefault";
+			junoPracticeId = JUNO_PRACTICE_ID;
 		}
-
-		SSOCredentials ssoInfo = getSSOCredentials(token, loggedInInfo, junoPracticeId, siteId);
+		SSOCredentials ssoInfo = getSSOCredentials(token, provider, junoPracticeId, siteId);
 		credentials.loadSSOCredentials(ssoInfo);
 
 		credentials.saveToSession(session);
@@ -284,25 +330,25 @@ public class IMDHealthService
 	}
 
 	private SSOCredentials getSSOCredentials(BearerToken token,
-	                                         LoggedInInfo loggedInInfo,
+	                                         Provider provider,
 	                                         String practiceId,
 	                                         @Nullable Integer siteId) throws SSOLoginException
 	{
 		try
 		{
-			SSOUser user = SSOUser.fromLoggedInInfo(loggedInInfo, practiceId);
-
+			SSOUser user = SSOUser.fromProvider(provider, practiceId);
 			SSOOrganization organization;
 			if (siteId == null)
 			{
 				Clinic clinic = clinicDao.getClinic();
-				organization = SSOOrganization.fromClinic(clinic, practiceId);
+				String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
+				organization = SSOOrganization.fromClinic(clinic, practiceId, provinceCode);
 			}
 			else
 			{
-				// NOT YET IMPLEMENTED, WILL THROW RUNTIME EXCEPTION //
 				Site site = siteDao.find(siteId);
-				organization = SSOOrganization.fromSite(site, practiceId);
+				String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
+				organization = SSOOrganization.fromSite(site, practiceId, provinceCode);
 			}
 
 			SSORequest ssoRequest = new SSORequest(user, organization);

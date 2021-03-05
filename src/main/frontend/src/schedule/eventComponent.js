@@ -283,6 +283,25 @@ angular.module('Schedule').component('eventComponent', {
 					});
 				}
 
+				controller.validations = {
+					appointmentDateOnSameDay: Juno.Validations.validationCustom(() =>
+					{
+						let momentStart = Juno.Common.Util.getDateAndTimeMoment(
+							$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+						let momentEnd = controller.calculateEndTime();
+
+						let momentStartDay = momentStart.date();
+						let momentEndDay = momentEnd.date();
+
+						if (momentEndDay != momentStartDay)
+						{
+							return false;
+						}
+
+						return true;
+					}),
+				};
+
 				// resolve data from opener
 				controller.loadedSettings = controller.resolve.loadedSettings;
 				controller.parentScope = controller.resolve.parentScope;
@@ -336,6 +355,7 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.bookingSource = data.eventData.bookingSource;
 					$scope.eventData.creatorSecurityId = data.eventData.creatorSecurityId;
 					$scope.eventData.isSelfBooked = data.eventData.tagSelfBooked;
+					$scope.eventData.confirmed = data.eventData.confirmed;
 
 					controller.checkEventConflicts(); // uses the eventData
 
@@ -779,6 +799,15 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
 				}
 
+				let appointmentSpansToNextDay = !controller.validations.appointmentDateOnSameDay();
+
+				if (appointmentSpansToNextDay)
+				{
+					$scope.displayMessages.add_field_error('startTime', 'Appointment cannot span to the next day');
+					$scope.displayMessages.add_field_error('duration', 'Appointment cannot span to the next day');
+					Juno.Common.Util.errorAlert($uibModal, "Error", "Please correct highlighted fields");
+				}
+
 				return !$scope.displayMessages.has_errors();
 			};
 
@@ -859,6 +888,7 @@ angular.module('Schedule').component('eventComponent', {
 				{
 					repeatOnDates = controller.repeatBookingDates;
 				}
+
 				controller.parentScope.saveEvent(
 					controller.editMode,
 					{
@@ -882,6 +912,7 @@ angular.module('Schedule').component('eventComponent', {
 						creatorSecurityId: $scope.eventData.creatorSecurityId,
 						tagSelfBooked: $scope.eventData.isSelfBooked,
 						sendNotification: sendNotification,
+						confirmed: $scope.eventData.confirmed
 					},
 					repeatOnDates,
 
@@ -930,8 +961,9 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.calculateEndTime = function calculateEndTime()
 			{
-				var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+				let momentStart = Juno.Common.Util.getDateAndTimeMoment(
 					$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+
 				return momentStart.add($scope.eventData.duration, 'minutes');
 			};
 

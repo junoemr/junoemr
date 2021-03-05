@@ -54,7 +54,7 @@ public class SSOOrganization implements Serializable
 
     */
 
-	public static SSOOrganization fromClinic(Clinic clinic, String practiceId)
+	public static SSOOrganization fromClinic(Clinic clinic, String practiceId, String provCode)
 	{
 		if (StringUtils.isBlank(practiceId))
 		{
@@ -70,16 +70,23 @@ public class SSOOrganization implements Serializable
 		org.setExternalId("juno_"+ practiceId);
 		org.setMunicipality(clinic.getClinicCity());
 		org.setName(clinic.getClinicName());
-		org.setSubdivisionCode(clinic.getClinicProvince());
 
+		// Use the instance type as the province code, instead of the clinic's province, because the former is enumerated
+		// to ISO-3166 and the latter is a raw string.
+		org.setSubdivisionCode(provCode);
 		return org;
 	}
 
-	public static SSOOrganization fromSite(Site site, String instanceId)
+	public static SSOOrganization fromSite(Site site, String instanceId, String provCode)
 	{
+		SSOOrganization org = new SSOOrganization();
 		// For external_id want to concat instanceID + siteID.  In case the credential is issued to CloudPractice
 		// as a whole, then this combination will be unique across all live instances.  As above, this also allows demo
 		// and live instances to share the same iMDHealth organization.
-		throw new RuntimeException("Not yet implemented");
+		org.setExternalId("juno_" + instanceId + site.getId());
+		org.setMunicipality(site.getCity());
+		org.setName(site.getName());
+		org.setSubdivisionCode(provCode);
+		return org;
 	}
 }

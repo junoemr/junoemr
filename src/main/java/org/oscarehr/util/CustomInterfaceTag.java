@@ -33,64 +33,108 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.integration.model.CmeJs;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.web.CppPreferencesUIBean;
-
-import oscar.OscarProperties;
 
 public class CustomInterfaceTag extends TagSupport {
 
-	Logger logger = MiscUtils.getLogger();
+	private Logger logger = MiscUtils.getLogger();
+	private SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
+
 	private String name;
 	private String section;
-	
+
 	@Override
 	public int doStartTag() throws JspException {
-		OscarProperties props = OscarProperties.getInstance();
-		String customJs = props.getProperty("cme_js");
-		
-		HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		if(name != null && name.length()>0) {
-			customJs = name;
-		}
-		if(customJs == null || customJs.length() == 0) {
-			customJs="default";
-		}
-		
-		if(customJs.equals("default") && getSection().equals("cme")) {
+		String customJs = getCustomJs();
+
+		HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+		if (CmeJs.DEFAULT.label.equals(customJs) && getSection().equals("cme"))
+		{
 			//check preferences
 			CppPreferencesUIBean bean = new CppPreferencesUIBean(loggedInInfo.getLoggedInProviderNo());
 			bean.loadValues();
-			if(bean.getEnable()!=null&&bean.getEnable().equals("on")) {
-				logger.info("Use preference based echart");
-				try {
-					JspWriter out = super.pageContext.getOut();
-					out.println(this.getPreferenceBasedEChart(bean));
-				}catch(IOException e) {
-					logger.error("Error:",e);
-				}
+			if ("on".equals(bean.getEnable()))
+			{
+				writePreferenceUIBean(bean);
 				return SKIP_BODY;
 			}
 		}
-		
-		if(customJs != null && customJs.length()>0) {
-			JspWriter out = super.pageContext.getOut();
-			String contextPath = this.pageContext.getServletContext().getContextPath();
-			try {
-				// out.println("<link rel=\"stylesheet\" href=\""+contextPath+"/js/custom/global.css\" type=\"text/css\">");
-				out.println("<script src=\""+contextPath+"/js/custom/"+customJs+"/global.js\"></script>");
-				if(getSection()!=null && getSection().length()>0) {
-                    int randomNo = new Random().nextInt();
-					out.println("<script src=\""+contextPath+"/js/custom/"+customJs+"/"+getSection()+".js?no-cache="+randomNo+"\"></script>");
-				}
-			}catch(IOException e) {
-				logger.error("Error",e);
-			}
+
+		if (StringUtils.isNotEmpty(customJs))
+		{
+			writeTagWithCustomJs(customJs);
 		}
 		return SKIP_BODY;
 	}
+
+	private String getCustomJs()
+	{
+		String customJs = CmeJs.DEFAULT.label;
+
+		if (StringUtils.isNotEmpty(name))
+		{
+			customJs = name;
+		}
+		else
+		{
+			boolean hasOceanToolBar = systemPreferenceService.isPreferenceEnabled(UserProperty.OCEAN_TOOLBAR_ENABLED, false);
+			if (hasOceanToolBar)
+			{
+				customJs = CmeJs.OCEAN_TOOLBAR.label;
+			}
+		}
+
+		return customJs;
+	}
+
+	/**
+	 * Writes the CppPreferencesUIBean to the page context.
+	 * @param bean
+	 */
+	private void writePreferenceUIBean(CppPreferencesUIBean bean)
+	{
+		logger.info("Use preference based echart");
+		try
+		{
+			JspWriter out = super.pageContext.getOut();
+			out.println(this.getPreferenceBasedEChart(bean));
+		}
+		catch (IOException e)
+		{
+			logger.error("Error:", e);
+		}
+	}
+
+	/**
+	 * This writes a tag if the custom JavaScript value has been set.
+	 * @param customJs
+	 */
+	private void writeTagWithCustomJs(String customJs)
+	{
+		JspWriter out = super.pageContext.getOut();
+		String contextPath = this.pageContext.getServletContext().getContextPath();
+		try
+		{
+			out.println("<script src=\"" + contextPath + "/js/custom/" + customJs + "/global.js\"></script>");
+			if (StringUtils.isNotEmpty(getSection()))
+			{
+				int randomNo = new Random().nextInt();
+				out.println("<script src=\"" + contextPath + "/js/custom/" + customJs + "/" + getSection() + ".js?no-cache=" + randomNo + "\"></script>");
+			}
+		}
+		catch (IOException e)
+		{
+			logger.error("Error", e);
+		}
+	}
+
 	/*
 	@Override
 	public int doEndTag() throws JspException {		        

@@ -2148,7 +2148,7 @@ public ActionForward viewEDocBrowserInDocumentReport(ActionMapping actionmapping
 		}
 
 		boolean checked;
-		if(propValue.equalsIgnoreCase("yes"))
+		if(propValue.equalsIgnoreCase(UserProperty.PROPERTY_ON_YES))
 			checked=true;
 		else
 			checked=false;
@@ -2184,9 +2184,11 @@ public ActionForward viewEDocBrowserInDocumentReport(ActionMapping actionmapping
 			prop.setName(UserProperty.COBALT);
 			prop.setProviderNo(providerNo);
 		}
-		String propValue="no";
+		String propValue = UserProperty.PROPERTY_ON_NO;
 		if(checked)
-			propValue="yes";
+		{
+			propValue = UserProperty.PROPERTY_ON_YES;
+		}
 
 		prop.setValue(propValue);
 		this.userPropertyDAO.saveProp(prop);

@@ -25,6 +25,7 @@
 
 package org.oscarehr.common.model;
 
+import lombok.ToString;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -39,6 +40,7 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name="pharmacyInfo")
+@ToString
 public class PharmacyInfo extends AbstractModel<Integer> implements Comparable<PharmacyInfo> {
 
 	public static final Character ACTIVE = '1';
@@ -72,6 +74,7 @@ public class PharmacyInfo extends AbstractModel<Integer> implements Comparable<P
 	private String notes;
 	
 	@Transient
+	@ToString.Exclude
 	private Integer preferredOrder;
 
 	@Temporal(TemporalType.TIMESTAMP)

@@ -32,7 +32,6 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,7 +50,6 @@ import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
-import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
 import org.oscarehr.casemgmt.util.ExtPrint;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -60,6 +58,7 @@ import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -83,6 +82,7 @@ public class CaseManagementPrint {
 	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
 	private DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
 	private IssueDao issueDao = (IssueDao)SpringUtils.getBean("encounterNote.dao.IssueDao");
+	private EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 
 	/*
 	 *This method was in CaseManagementEntryAction but has been moved out so that both the classic Echart and the flat echart can use the same printing method.
@@ -101,7 +101,6 @@ public class CaseManagementPrint {
 						OutputStream os)
 			throws IOException, DocumentException
 	{
-		
 		String demoNo = String.valueOf(demographicNo);
 		Demographic demographic = demographicDao.find(demographicNo);
 		request.setAttribute("demoName", demographic.getFirstName() + " " + demographic.getLastName());
@@ -117,7 +116,7 @@ public class CaseManagementPrint {
 
 		if (printAllNotes)
 		{
-			notes = newCaseManagementNoteDao.findAllForDemographic(demographicNo);
+			notes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, false);
 		}
 		else
 		{
@@ -126,11 +125,11 @@ public class CaseManagementPrint {
 		}
 
 		HashMap<String, List<CaseManagementNote>> cpp = null;
-
 		if (printCPP)
 		{
-			cpp = getIssueNotesToPrint(demographicNo, startDate, endDate);
+			cpp = encounterNoteService.buildCPPHashMapForDemographic(demographicNo);
 		}
+
 		List<CaseManagementNote> othermeds = null;
 		if (printRx)
 		{
@@ -281,64 +280,6 @@ public class CaseManagementPrint {
 		}
 
 		return notes;
-	}
-
-	/**
-	 * Given a demographic and a range of dates, grab all issue-related notes for printing within that range.
-	 * @param demographicNo demographic to pull CPP notes for
-	 * @param startDate date to begin looking for notes from
-	 * @param endDate date to look for notes until
-	 * @return a map containing issues as keys and any associated notes with each issue
-	 */
-	private HashMap<String, List<CaseManagementNote>> getIssueNotesToPrint(Integer demographicNo, Calendar startDate, Calendar endDate)
-	{
-		HashMap<String, List<CaseManagementNote>> cpp = new HashMap<>();
-		List<String> issueCodes = Arrays.asList(
-			Issue.SUMMARY_CODE_OTHER_MEDS,
-			Issue.SUMMARY_CODE_SOCIAL_HISTORY,
-			Issue.SUMMARY_CODE_MEDICAL_HISTORY,
-			Issue.SUMMARY_CODE_CONCERNS,
-			Issue.SUMMARY_CODE_REMINDERS,
-			Issue.SUMMARY_CODE_FAMILY_HISTORY,
-			Issue.SUMMARY_CODE_RISK_FACTORS
-		);
-
-		List<CaseManagementNote> issueNotes;
-		List<CaseManagementNote> tmpNotes;
-
-		for (String issueCode : issueCodes)
-		{
-			Issue issue = issueDao.findByCode(issueCode);
-			tmpNotes = newCaseManagementNoteDao.findByDemographicAndIssue(demographicNo, issue.getIssueId());
-			issueNotes = new ArrayList<>();
-			for (CaseManagementNote tmpNote: tmpNotes)
-			{
-				if (!tmpNote.getLocked())
-				{
-					List<CaseManagementNoteExt> exts = caseManagementMgr.getExtByNote(tmpNote.getId());
-					boolean exclude = false;
-					for (CaseManagementNoteExt ext : exts)
-					{
-						if (ext.getKeyVal().equals("Hide Cpp"))
-						{
-							if (ext.getValue().equals("1"))
-							{
-								exclude = true;
-								break;
-							}
-						}
-					}
-
-					if (!exclude)
-					{
-						issueNotes.add(tmpNote);
-					}
-				}
-			}
-			cpp.put(issueCode, issueNotes);
-		}
-
-		return cpp;
 	}
 
 	/**

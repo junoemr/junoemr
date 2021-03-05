@@ -1,9 +1,13 @@
+import {SystemPreferenceApi} from "../../generated";
+
 angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 	'$scope',
 	'$uibModalInstance',
 	'$filter',
 	'$stateParams',
+	'$http',
+	'$httpParamSerializer',
 	'demographicService',
 	'demographicsService',
 	'providerService',
@@ -14,17 +18,22 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		$uibModalInstance,
 		$filter,
 		$stateParams,
+		$http,
+		$httpParamSerializer,
 		demographicService,
 		demographicsService,
 		providerService,
 		ticklerService)
 	{
-
 		var controller = this;
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
 		// holds the patient typeahead selection
 		controller.demographicSearch = null;
 		controller.isDisabled = false; // Save button enabled by default
+
+		controller.defaultTicklerProviderNo = null;
+		controller.defaultTicklerProviderName = null;
 		//=========================================================================
 		// Watches
 		//=========================================================================
@@ -54,7 +63,9 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			},
 			serviceDateDate: new Date(),
 			serviceDateTime: "12:00 AM",
-			suggestedTextId: 0
+			suggestedTextId: 0,
+			taskAssignedTo: null,
+			taskAssignedToName: null,
 		};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
@@ -62,6 +73,8 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		// initialization
 		controller.init = function init()
 		{
+			controller.setTicklerProvider();
+
 			if (Juno.Common.Util.exists($stateParams.demographicNo))
 			{
 				console.log('initializing demographicSearch pre-selected', $stateParams.demographicNo);
@@ -93,12 +106,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			alert(reason);
 		});
 
-		controller.close = function()
+		controller.close = function close()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		controller.validate = function()
+		controller.validate = function validate()
 		{
 			var t = controller.tickler;
 			controller.errors = [];
@@ -122,11 +135,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			return true;
 		};
 
-		controller.saveWithEncounter = function()
+		controller.saveWithEncounter = function saveWithEncounter()
 		{
 			return controller.save(true);
 		}
-		controller.save = function(writeEncounter = false)
+
+		controller.save = function save(writeEncounter = false)
 		{
 			controller.isDisabled = true; // Disable save button
 			controller.showErrors = true;
@@ -219,7 +233,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				});
 		};
 
-		controller.searchProviders = function(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
@@ -240,13 +254,13 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			});
 		};
 
-		controller.updateProviderNo = function(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
 			controller.tickler.taskAssignedTo = model;
 			controller.tickler.taskAssignedToName = label;
 		};
 
-		controller.setSuggestedText = function()
+		controller.setSuggestedText = function setSuggestedText()
 		{
 			var results = $filter('filter')(controller.textSuggestions,
 			{
@@ -263,5 +277,41 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		{
 			controller.tickler.serviceDateDate = moment().add(num, 'months').toDate();
 		};
+
+		controller.setTicklerProvider = async function setTicklerProvider()
+		{
+			try
+			{
+				let systemPrefApiResponse = await systemPreferenceApi.getPropertyValue("default_tickler_provider");
+				controller.defaultTicklerProviderNo = parseInt(systemPrefApiResponse.data.body);
+
+				if (systemPrefApiResponse.data.body !== null)
+				{
+					let providerServiceResponse = await providerService.getProvider(controller.defaultTicklerProviderNo);
+					setTicklerProviderAssignee(providerServiceResponse);
+				}
+			}
+			catch (error)
+			{
+				console.log(error);
+			}
+		}
+
+		function setTicklerProviderAssignee(resp)
+		{
+			let firstName = resp.firstName || "";
+			let lastName = resp.lastName || "";
+
+			if (firstName === "" && lastName === "")
+			{
+				return;
+			}
+
+			let name = firstName + " " + lastName;
+			controller.defaultTicklerProviderName = name;
+
+			controller.tickler.taskAssignedTo = controller.defaultTicklerProviderNo;
+			controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
+		}
 	}
 ]);

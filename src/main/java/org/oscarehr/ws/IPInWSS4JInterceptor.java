@@ -61,12 +61,18 @@ public class IPInWSS4JInterceptor extends WSS4JInInterceptor implements Callback
 	public void handleMessage(SoapMessage message)
 	{
 		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
-		if (request==null) return; // it's an outgoing request
-		String ip = request.getRemoteAddr();
-
-		if(IPRestrictionFilter.isIpBlocked(ip))
+		if(request==null)
 		{
-			String errorMessage = "Unauthorized IP Address (" + ip + ")";
+			return; // it's an outgoing request
+		}
+
+		String ip = request.getRemoteAddr();
+		String xForwardedForValue = request.getHeader(IPRestrictionFilter.X_FORWARDED_FOR_HEADER_NAME);
+
+		if(IPRestrictionFilter.isIpBlocked(ip, xForwardedForValue))
+		{
+			String logIp = IPRestrictionFilter.getIpToFilter(ip, xForwardedForValue);
+			String errorMessage = "Unauthorized IP Address (" + logIp + ")";
 			logger.error(errorMessage);
 			OscarLog oscarLog=new OscarLog();
 			oscarLog.setAction("ACCESS_WS");
