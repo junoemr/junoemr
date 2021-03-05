@@ -212,7 +212,8 @@ angular.module('Record.Details').component('careTeamSection', {
 
 		ctrl.updatePatientStatusDate = () =>
 		{
-			ctrl.ngModel.patientStatusDate = moment();
+			let currentDate = Juno.Common.Util.getDateMoment(new Date());
+			ctrl.ngModel.patientStatusDate = currentDate;
 		}
 	}]
 });
