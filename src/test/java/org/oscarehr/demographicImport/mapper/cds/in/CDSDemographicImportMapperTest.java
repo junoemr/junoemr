@@ -30,28 +30,13 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.util.PatientImportContext;
-import xml.cds.v5_0.Appointments;
-import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.Demographics;
 import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.PersonStatus;
-import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
-import org.oscarehr.demographicImport.service.AppointmentStatusCache;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigInteger;
-import java.time.DateTimeException;
-import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.oscarehr.common.model.Appointment.DEFAULT_APPOINTMENT_DURATION_MIN;
-import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_BILLED;
-import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_CANCELLED;
-import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_NEW;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;

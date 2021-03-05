@@ -38,7 +38,6 @@ import xml.cds.v5_0.PhoneNumberType;
 import xml.cds.v5_0.PostalZipCode;
 import xml.cds.v5_0.ResidualInformation;
 import xml.cds.v5_0.YnIndicator;
-import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.Address;
