@@ -1520,12 +1520,8 @@
 		//check if case note has been changed
 		//if so, warn user that changes will be lost if not saved
 
-		if (origCaseNote != $F(id) || origObservationDate != $("observationDate").value)
-		{
-			if (!confirm(unsavedNoteWarning))
-				return false;
-			else
-			{
+
+
 				// Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
 				if ((typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() != "undefined") &&
 					(typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() != "undefined"))
@@ -1545,7 +1541,6 @@
 						return false;
 					}
 				}
-			}
 			saving = true;
 			if (ajaxSaveNote(sig, nId, tmp) == false)
 			{
