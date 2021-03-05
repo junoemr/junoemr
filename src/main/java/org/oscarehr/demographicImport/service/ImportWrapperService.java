@@ -106,6 +106,7 @@ public class ImportWrapperService
 			{
 				try
 				{
+					context.setPatientRecordIdentifier(importFile.getName());
 					patientImportService.importDemographic(
 							importFile,
 							context,

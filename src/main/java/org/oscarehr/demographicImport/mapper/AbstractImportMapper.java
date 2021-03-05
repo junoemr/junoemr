@@ -95,7 +95,7 @@ public abstract class AbstractImportMapper<I, E>
 
 	public void logDefaultValueUse(String what, Object defaultedValue)
 	{
-		patientImportContext.getImportLogger().logEvent(what + " was defaulted to " + defaultedValue);
+		logEvent(what + " was defaulted to " + defaultedValue);
 	}
 
 	/**
@@ -103,6 +103,6 @@ public abstract class AbstractImportMapper<I, E>
 	 */
 	public void logEvent(String message)
 	{
-		patientImportContext.getImportLogger().logEvent(message);
+		patientImportContext.getImportLogger().logEvent("[" + patientImportContext.getPatientRecordIdentifier() + "] " + message);
 	}
 }
