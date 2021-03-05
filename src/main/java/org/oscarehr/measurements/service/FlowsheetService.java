@@ -214,6 +214,36 @@ public class FlowsheetService
 		flowSheetCustomizationDao.persist(customization);
 	}
 
+	/**
+	 * Given a potential flowsheet's contents, attempt to make a Flowsheet entry out of it.
+	 * @param contents XML content for a new flowsheet, uploaded via file upload
+	 * @return Flowsheet entry if this persists correctly
+	 */
+	public Flowsheet saveCustomFlowsheet(String contents)
+	{
+		MeasurementFlowSheet flowsheetTemplate = validateFlowsheetTemplate(contents);
+		Flowsheet flowsheet = flowsheetDao.findByName(flowsheetTemplate.getName());
+		if (flowsheet == null)
+		{
+			//save to db
+			flowsheet = new Flowsheet();
+			flowsheet.setContent(contents);
+			flowsheet.setCreatedDate(new java.util.Date());
+			flowsheet.setEnabled(true);
+			flowsheet.setExternal(false);
+			flowsheet.setName(flowsheetTemplate.getName());
+			flowsheetDao.persist(flowsheet);
+		}
+		else
+		{
+			flowsheet.setContent(contents);
+			flowsheetDao.merge(flowsheet);
+		}
+
+		loadDatabaseFlowsheets();
+		return flowsheet;
+	}
+
 	public String addFlowsheet(MeasurementFlowSheet measurementFlowSheet)
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();

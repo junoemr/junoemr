@@ -180,6 +180,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean
 				return;
 			}
 		}
+		MiscUtils.getLogger().warn("Couldn't find flowsheet to remove based off: " + name);
 	}
 
 	public void updateCache(String name, FlowSheetUserCreated flowSheetUserCreated)
