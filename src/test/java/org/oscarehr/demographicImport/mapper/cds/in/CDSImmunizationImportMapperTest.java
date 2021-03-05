@@ -83,63 +83,18 @@ public class CDSImmunizationImportMapperTest
 	{
 		// set up a real prevention manager because we need the real values
 		PreventionManager actualPreventionManager = new PreventionManager();
-		Mockito.when(preventionManager.getPreventionByNameOrType(Mockito.anyString())).thenAnswer(new Answer()
-		{
-			@Override
-			public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-			{
-				Object[] args = invocationOnMock.getArguments();
-				return actualPreventionManager.getPreventionByNameOrType((String) args[0]);
-			}
+		Mockito.when(preventionManager.getPreventionByNameOrType(Mockito.anyString())).thenAnswer((Answer) invocationOnMock -> {
+			Object[] args = invocationOnMock.getArguments();
+			return actualPreventionManager.getPreventionByNameOrType((String) args[0]);
 		});
 
 		int errors = 0;
 		for(ImmunizationType type : ImmunizationType.values())
 		{
 			String errorMessage = "immunization type " + type + " has no match";
-
-			switch(type)
-			{
-				//TODO all of these should have a non-default matching
-//				case CHOL_ECOL:
-				case MEN:
-				case MEN_B:
-				case PNEU:
-//				case TDAP_IPV:
-//				case TYPH:
-//				case TYPH_HA:
-//				case MMR_VAR:
-//				case ROT:
-//				case ZOS:
-				case B_ATX:
-				case CMV_IG:
-				case D_ATX:
-				case HB_IG:
-				case IG:
-				case RAB_IG:
-				case RSV_AB:
-				case RSV_IG:
-				case T_IG:
-				case VAR_IG:
-				case VIG:
-					errors += checkTypeMatch(errorMessage, DEFAULT_PREVENTION_TYPE, cdsImmunizationImportMapper.getPreventionCode(getImportStructure(type)));
-					break;
-				default:
-					errors += checkNonDefaultTypeMatch(errorMessage, type.value(), cdsImmunizationImportMapper.getPreventionCode(getImportStructure(type)));
-					break;
-			}
+			errors += checkNonDefaultTypeMatch(errorMessage, type.value(), cdsImmunizationImportMapper.getPreventionCode(getImportStructure(type)));
 		}
 		assertEquals("There are " + errors + " invalid CDS 5.0 prevention matches",0, errors);
-	}
-
-	private int checkTypeMatch(String message, String expected, String actual)
-	{
-		boolean isEqual = expected.equals(actual);
-		if(!isEqual)
-		{
-			MiscUtils.getLogger().error(message + " expected: <" + expected + "> but was <" + actual + ">");
-		}
-		return isEqual ? 0 : 1;
 	}
 
 	private int checkNonDefaultTypeMatch(String message, String expected, String actual)

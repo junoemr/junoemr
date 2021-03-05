@@ -130,6 +130,16 @@ Varicella Immunoglobulin	VarIg
 		healthCanadaType="Pneu-P-23"
 		atc="J07AL02" showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc="Pneu=Pneumococcus"
+		name="Pneu"
+		healthCanadaType="Pneu"
+		link=""
+		layout="injection"
+		atc=""
+		showIfMinRecordNum="1"/>
+
 	<item 
 		resultDesc=""
 		desc="Pneu-C=Pneumococcal Multi Valent Conjugate eg Prevenar 13"
@@ -206,6 +216,16 @@ Varicella Immunoglobulin	VarIg
 		layout="injection" atc="J07AH07" minAge="0" maxAge="19"
 		showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc="MenB=Neisseria Meningitidis Serogroup B Protein"
+		name="MenB"
+		healthCanadaType="Men B"
+		link=""
+		layout="injection"
+		atc=""
+		showIfMinRecordNum="1" />
+
      <item
 		resultDesc=""
 		desc="rMenB=Meningocococcal B Recombinant Multicomponent eg Bexsero"
@@ -216,7 +236,17 @@ Varicella Immunoglobulin	VarIg
 		atc="J07AH08" 
 		minAge="1" 
 		maxAge="17"
-		showIfMinRecordNum="1" /> 
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Men=Meningococcus"
+		name="Men"
+		healthCanadaType="Men"
+		link=""
+		layout="injection"
+		atc=""
+		showIfMinRecordNum="1" />
 
 	<item 
 		resultDesc=""
@@ -239,16 +269,6 @@ Varicella Immunoglobulin	VarIg
 		layout="injection" 
         atc="J07BK02"
         minAge="50" 
-		showIfMinRecordNum="1" />
-
-	<item
-		resultDesc=""
-		desc="Zos=Zostavax"
-		name="Zos"
-		healthCanadaType="Zos"
-		link=""
-		layout="injection"
-		atc=""
 		showIfMinRecordNum="1" />
 
 	<item 
@@ -362,8 +382,13 @@ Varicella Immunoglobulin	VarIg
 
 	<item 	
 		resultDesc=""
-		desc="Rabies=Rabies" name="Rabies" link="" layout="injection" healthCanadaType="Rab"
-		atc="J07BG01" showIfMinRecordNum="1" />
+		desc="Rabies=Rabies"
+		name="Rabies"
+		healthCanadaType="Rab"
+		link=""
+		layout="injection"
+		atc="J07BG01"
+		showIfMinRecordNum="1" />
 
 	<item
 		resultDesc=""
@@ -377,11 +402,11 @@ Varicella Immunoglobulin	VarIg
 
 	<item
 		resultDesc=""
-		desc="Typhoid=Typhoid"
-		name="Typhoid"
+		desc="Typh=Typhoid"
+		name="Typh"
 		healthCanadaType="Typh"
 		link=""
-		layout=""
+		layout="injection"
 		atc=""
 		showIfMinRecordNum="1" />
   		
@@ -555,7 +580,8 @@ Varicella Immunoglobulin	VarIg
 	<item
 		resultDesc=""
 		desc="Zostavax"
-		name="Zostavax"		
+		name="Zostavax"
+		healthCanadaType="Zos"
 		link="http://webprod5.hc-sc.gc.ca/dpd-bdpp/item-iteme.do?pm-mp=00015056"
 		layout="injection" atc="J07BK"
 		showIfMinRecordNum="1" />
@@ -622,6 +648,94 @@ Varicella Immunoglobulin	VarIg
 		name="FIT"
 		healthCanadaType="FIT"
 		layout="PAPMAM"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Botulism Antitoxin"
+		name="BAtx"
+		healthCanadaType="BAtx"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Diphtheria Antitoxin"
+		name="DAtx"
+		healthCanadaType="DAtx"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Cytomegalovirus Immune Globulin"
+		name="CMVIg"
+		healthCanadaType="CMVIg"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Immunoglobulin"
+		name="HBIg"
+		healthCanadaType="HBIg"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Immune Globulin"
+		name="Ig"
+		healthCanadaType="Ig"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Rabies=Rabies Immunoglobulin"
+		name="RabIg"
+		healthCanadaType="RabIg"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Respiratory Syncytial Virus Antibody"
+		name="RSVAb"
+		healthCanadaType="RSVAb"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Respiratory Syncytial Virus Immunoglobulin"
+		name="RSVIg"
+		healthCanadaType="RSVIg"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="TIg=Tetanus Immunoglobulin"
+		name="TIg"
+		healthCanadaType="TIg"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="VarIg=Varicella Immunoglobulin"
+		name="VarIg"
+		healthCanadaType="VarIg"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="VIG=Varicella Immune Globulin"
+		name="VIG"
+		healthCanadaType="VIG"
+		layout="injection"
 		showIfMinRecordNum="1" />
 
 	<item
