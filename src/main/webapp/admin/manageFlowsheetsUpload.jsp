@@ -47,7 +47,6 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ page import="org.apache.commons.fileupload.FileUploadException" %>
-<%@ page import="org.oscarehr.measurements.model.Flowsheet" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
