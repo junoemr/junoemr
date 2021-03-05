@@ -210,5 +210,9 @@ angular.module('Record.Details').component('careTeamSection', {
 			ctrl.rosterStatusList.push({"label": newStatus, "value": newStatus});
 		}
 
+		ctrl.updatePatientStatusDate = () =>
+		{
+			ctrl.ngModel.patientStatusDate = moment();
+		}
 	}]
 });
