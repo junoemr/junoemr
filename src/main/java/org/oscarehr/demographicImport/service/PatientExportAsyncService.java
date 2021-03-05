@@ -57,6 +57,7 @@ public class PatientExportAsyncService
 	public CompletableFuture<GenericFile> exportDemographic(DemographicExporter exporter, Integer demographicId) throws Exception
 	{
 		Instant instant = Instant.now();
+		patientExportContext.addProcessIdentifier(String.valueOf(demographicId));
 		logger.info("Load Demographic " + demographicId);
 		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
 

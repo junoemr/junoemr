@@ -26,6 +26,9 @@ import lombok.Data;
 import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
 import org.springframework.dao.ConcurrencyFailureException;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 @Data
 public class PollableContext
 {
@@ -33,11 +36,14 @@ public class PollableContext
 	private int processed;
 	private boolean complete;
 
+	private ConcurrentMap<String, String> localProcessIdentifierMap;
+
 	public PollableContext()
 	{
 		total = 0;
 		processed = 0;
 		complete = true;
+		localProcessIdentifierMap = new ConcurrentHashMap<>();
 	}
 
 	public synchronized void initialize(int total)
@@ -49,6 +55,7 @@ public class PollableContext
 		setTotal(total);
 		setProcessed(0);
 		setComplete(false);
+		localProcessIdentifierMap.clear();
 	}
 
 	public synchronized ProgressBarPollingData getProgress()
@@ -65,6 +72,7 @@ public class PollableContext
 		setTotal(0);
 		setProcessed(0);
 		setComplete(true);
+		localProcessIdentifierMap.clear();
 	}
 
 	public synchronized void incrementProcessed()
@@ -75,5 +83,15 @@ public class PollableContext
 	protected synchronized String getPollingMessage()
 	{
 		return "Processing " + getProcessed() + " of " + getTotal();
+	}
+
+	public synchronized void addProcessIdentifier(String identifier)
+	{
+		localProcessIdentifierMap.put(Thread.currentThread().getName(), identifier);
+	}
+
+	public synchronized String getCurrentProcessIdentifier()
+	{
+		return localProcessIdentifierMap.get(Thread.currentThread().getName());
 	}
 }

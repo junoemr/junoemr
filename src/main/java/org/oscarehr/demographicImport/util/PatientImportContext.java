@@ -38,7 +38,6 @@ public class PatientImportContext extends PollableContext
 	private ImportLogger importLogger;
 	private ImportPreferences importPreferences;
 	private ImporterExporterFactory.IMPORTER_TYPE importType;
-	private String patientRecordIdentifier;
 
 	/**
 	 * The date to use when you need to assign a date but there is none provided

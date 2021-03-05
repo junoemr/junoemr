@@ -65,6 +65,6 @@ public abstract class AbstractExportMapper<I, E>
 	 */
 	public void logEvent(String message)
 	{
-		patientExportContext.getExportLogger().logEvent(message);
+		patientExportContext.getExportLogger().logEvent("[" + patientExportContext.getCurrentProcessIdentifier() + "] " + message);
 	}
 }

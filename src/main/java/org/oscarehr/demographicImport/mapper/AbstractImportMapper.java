@@ -103,6 +103,6 @@ public abstract class AbstractImportMapper<I, E>
 	 */
 	public void logEvent(String message)
 	{
-		patientImportContext.getImportLogger().logEvent("[" + patientImportContext.getPatientRecordIdentifier() + "] " + message);
+		patientImportContext.getImportLogger().logEvent("[" + patientImportContext.getCurrentProcessIdentifier() + "] " + message);
 	}
 }
