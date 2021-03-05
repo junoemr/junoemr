@@ -64,8 +64,11 @@ Varicella Immunoglobulin	VarIg
 	<item
 		resultDesc=""
 		desc="Tdap-IPV=Diphtheria, Tetanus and Acellular Pertussis for children 4 - 6 years of age; IPV=Inactivated Poliovirus; eg Adacel-IPV"
-		name="Tdap-IPV"		
-		layout="injection" atc="J07AJ52" minAge="4" maxAge="6"
+		name="Tdap-IPV"
+		healthCanadaType="TdapIPV"
+		layout="injection"
+		atc="J07AJ52"
+		minAge="4" maxAge="6"
 		showIfMinRecordNum="1" />
 
 	<item
@@ -106,6 +109,7 @@ Varicella Immunoglobulin	VarIg
 		resultDesc=""
  		desc="Rot-1=Rotavirus Vaccine eg Rotarix" 
  		name="Rot"
+		healthCanadaType="ROT"
         link="www.novaccine.com/pdffiles/Rotarix_new_package_insert.pdf"
 		layout="injection" atc="J07BH01" minAge="0" maxAge="2"
 		showIfMinRecordNum="1" />
@@ -164,7 +168,7 @@ Varicella Immunoglobulin	VarIg
 		resultDesc=""
 		desc="MMRV=Measles, Mumps, Rubella, Varicella eg Priorix-Tetra" 
 		name="MMRV" 
-		healthCanadaType="MMRV"
+		healthCanadaType="MMR-Var"
 		link="http://www.phac-aspc.gc.ca/publicat/ccdr-rmtc/10vol36/acs-9/index-eng.php"
 		layout="injection" atc="J07BD54" minAge="0" maxAge="9"
 		showIfMinRecordNum="1" />		
@@ -237,6 +241,16 @@ Varicella Immunoglobulin	VarIg
         minAge="50" 
 		showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc="Zos=Zostavax"
+		name="Zos"
+		healthCanadaType="Zos"
+		link=""
+		layout="injection"
+		atc=""
+		showIfMinRecordNum="1" />
+
 	<item 
 		resultDesc=""
 		desc="Hep B=Hepatitis B" name="HepB" healthCanadaType="HB"
@@ -263,7 +277,8 @@ Varicella Immunoglobulin	VarIg
 	<item
 		resultDesc=""
 		desc="dTap=Diphtheria, Tetanus and Acellular Pertussis adult/adolescent formulation"
-		name="dTap" healthCanadaType="Tdap"
+		name="dTap"
+		healthCanadaType="Tdap"
 		link="http://www.phac-aspc.gc.ca/naci-ccni/is-si/recimmsche-icy_e.html#dTap"
 		layout="injection" atc="J07AJ52" minAge="0" maxAge="6"
 		showIfMinRecordNum="1" />
@@ -286,7 +301,17 @@ Varicella Immunoglobulin	VarIg
 		desc="Hepatitis A and Typhoid - Injection"
 		name="HA-Typh-I"
 		healthCanadaType="HA-Typh-I"
-		layout="injection" atc=""
+		layout="injection"
+		atc=""
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Typh (HA)"
+		name="Typh (HA)"
+		healthCanadaType="Typh (HA)"
+		layout="injection"
+		atc=""
 		showIfMinRecordNum="1" />
 
 	<item
@@ -312,30 +337,61 @@ Varicella Immunoglobulin	VarIg
 		desc="Cholera - E.coli - Oral"
 		name="Chol-Ecol-O"
 		healthCanadaType="Chol-Ecol-O"
-		layout="injection" atc=""
+		layout="injection"
+		atc=""
 		showIfMinRecordNum="1" />
 
-	<item 
+	<item
 		resultDesc=""
-		desc="Dukoral" name="CHOLERA" link="" layout="injection" healthCanadaType="Chol-O"
-		atc="J07AE01" showIfMinRecordNum="1" />
+		desc="Cholera - E.coli"
+		name="CholEcol"
+		healthCanadaType="CholEcol"
+		layout="injection"
+		atc=""
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Dukoral"
+		name="CHOLERA"
+		healthCanadaType="Chol-O"
+		link=""
+		layout="injection"
+		atc="J07AE01"
+		showIfMinRecordNum="1" />
 
 	<item 	
 		resultDesc=""
 		desc="Rabies=Rabies" name="Rabies" link="" layout="injection" healthCanadaType="Rab"
 		atc="J07BG01" showIfMinRecordNum="1" />
 
-	<item 
+	<item
 		resultDesc=""
-		desc="Typhoid=Typhoid" name="Typhoid" link="" layout="injection" healthCanadaType="Typh-I"
-		atc="J07AP01" showIfMinRecordNum="1" />
+		desc="Typhoid=Typhoid"
+		name="Typhoid"
+		healthCanadaType="Typh-I"
+		link=""
+		layout="injection"
+		atc="J07AP01"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Typhoid=Typhoid"
+		name="Typhoid"
+		healthCanadaType="Typh"
+		link=""
+		layout=""
+		atc=""
+		showIfMinRecordNum="1" />
   		
   	<item 
 		resultDesc=""
   		desc="Typhoid - Oral"
   		name="Typh-O"
   		healthCanadaType="Typh-O"
-  		layout="injection" atc="J07AP" 
+  		layout="injection"
+		atc="J07AP"
   		showIfMinRecordNum="1"/>	
 
 	<item 

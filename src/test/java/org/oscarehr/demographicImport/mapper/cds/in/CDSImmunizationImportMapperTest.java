@@ -101,16 +101,16 @@ public class CDSImmunizationImportMapperTest
 			switch(type)
 			{
 				//TODO all of these should have a non-default matching
-				case CHOL_ECOL:
+//				case CHOL_ECOL:
 				case MEN:
 				case MEN_B:
 				case PNEU:
-				case TDAP_IPV:
-				case TYPH:
-				case TYPH_HA:
-				case MMR_VAR:
-				case ROT:
-				case ZOS:
+//				case TDAP_IPV:
+//				case TYPH:
+//				case TYPH_HA:
+//				case MMR_VAR:
+//				case ROT:
+//				case ZOS:
 				case B_ATX:
 				case CMV_IG:
 				case D_ATX:
