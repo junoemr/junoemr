@@ -28,6 +28,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import xml.cds.v5_0.Appointments;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.Demographics;
@@ -45,6 +47,7 @@ import java.time.DateTimeException;
 import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.oscarehr.common.model.Appointment.DEFAULT_APPOINTMENT_DURATION_MIN;
 import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_BILLED;
 import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_CANCELLED;
@@ -59,10 +62,14 @@ public class CDSDemographicImportMapperTest
 	@InjectMocks
 	private CDSDemographicImportMapper cdsDemographicImportMapper;
 
+	@Mock
+	protected PatientImportContext patientImportContext;
+
 	@Before
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
+		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
 	}
 
 	@Test

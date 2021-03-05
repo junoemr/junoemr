@@ -25,7 +25,11 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.StandardCoding;
 import org.oscarehr.demographicImport.model.common.PartialDate;
@@ -38,6 +42,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class CDSNoteImportMapperTest
 {
@@ -45,10 +50,14 @@ public class CDSNoteImportMapperTest
 	@InjectMocks
 	private CDSProblemImportMapper cdsProblemImportMapper;
 
+	@Mock
+	protected PatientImportContext patientImportContext;
+
 	@Before
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
+		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
 	}
 
 	@Test

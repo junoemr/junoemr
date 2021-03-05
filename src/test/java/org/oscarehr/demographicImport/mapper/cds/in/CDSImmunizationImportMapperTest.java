@@ -30,6 +30,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import xml.cds.v5_0.ImmunizationType;
 import xml.cds.v5_0.Immunizations;
 import xml.cds.v5_0.ObjectFactory;
@@ -38,6 +40,7 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.oscarehr.demographicImport.mapper.cds.in.CDSImmunizationImportMapper.DEFAULT_PREVENTION_TYPE;
 
 public class CDSImmunizationImportMapperTest
@@ -47,12 +50,16 @@ public class CDSImmunizationImportMapperTest
 	private CDSImmunizationImportMapper cdsImmunizationImportMapper;
 
 	@Mock
+	protected PatientImportContext patientImportContext;
+
+	@Mock
 	private PreventionManager preventionManager;
 
 	@Before
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
+		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
 	}
 
 	@Test

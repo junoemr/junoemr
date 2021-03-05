@@ -22,9 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.Reports;
@@ -37,8 +35,6 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DOC_CLASS_M
 @Component
 public abstract class AbstractCDSReportExportMapper<E> extends AbstractCDSExportMapper<Reports, E>
 {
-	public static final Logger logger = MiscUtils.getLogger();
-
 	public AbstractCDSReportExportMapper()
 	{
 		super();
@@ -64,7 +60,7 @@ public abstract class AbstractCDSReportExportMapper<E> extends AbstractCDSExport
 		}
 		catch(IllegalArgumentException e)
 		{
-			logger.error("Invalid document class value: " + docClass);
+			logEvent("Invalid document class value: " + docClass);
 		}
 		return reportClass;
 	}

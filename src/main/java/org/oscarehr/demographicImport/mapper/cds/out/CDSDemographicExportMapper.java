@@ -23,7 +23,6 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.common.Address;
@@ -64,8 +63,6 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_
 @Component
 public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemographicInterface, PatientRecord>
 {
-	private static final Logger logger = Logger.getLogger(CDSDemographicExportMapper.class);
-
 	public CDSDemographicExportMapper()
 	{
 		super();
@@ -121,15 +118,14 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		legalName.setFirstName(firstName);
 		legalName.setLastName(lastName);
 
-		names.setNamePrefix(getExportNamePrefix(exportStructure));
+		names.setNamePrefix(getExportNamePrefix(exportStructure.getTitleString()));
 
 		names.setLegalName(legalName);
 		return names;
 	}
 
-	protected PersonNamePrefixCode getExportNamePrefix(Demographic exportStructure)
+	protected PersonNamePrefixCode getExportNamePrefix(String title)
 	{
-		String title = exportStructure.getTitleString();
 		PersonNamePrefixCode prefixCode = null;
 		if(title != null)
 		{
@@ -139,7 +135,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 			}
 			else
 			{
-				logger.error("(#" +exportStructure.getId()+ ") Invalid Name Prefix in Export: '" + title + "'");
+				logEvent("Invalid Demographic Name Prefix in Export: '" + title + "'");
 			}
 		}
 		return prefixCode;

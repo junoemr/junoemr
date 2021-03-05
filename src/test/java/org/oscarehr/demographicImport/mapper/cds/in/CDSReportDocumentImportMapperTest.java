@@ -25,7 +25,11 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
+import org.oscarehr.demographicImport.util.PatientImportContext;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.PersonNameSimple;
@@ -43,6 +47,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DEFAULT_DOCUMENT_DESCRIPTION;
 
 //TODO add this back in when testing framework works for PowerMockito Initialization
@@ -54,10 +59,14 @@ public class CDSReportDocumentImportMapperTest
 	@InjectMocks
 	private CDSReportDocumentImportMapper cdsReportDocumentImportMapper;
 
+	@Mock
+	protected PatientImportContext patientImportContext;
+
 	@Before
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
+		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
 	}
 
 	@Test

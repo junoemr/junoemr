@@ -63,6 +63,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class CDSImportMapperTest
 {
@@ -77,6 +78,7 @@ public class CDSImportMapperTest
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
+		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
 	}
 
 	@Test
@@ -138,8 +140,6 @@ public class CDSImportMapperTest
 	@Test
 	public void testGetSubregionCode_Invalid()
 	{
-		ImportLogger mockLogger = Mockito.mock(CDSImportLogger.class);
-		Mockito.when(patientImportContext.getImportLogger()).thenReturn(mockLogger);
 		assertNull(cdsImportMapper.getSubregionCode("notValid"));
 	}
 
