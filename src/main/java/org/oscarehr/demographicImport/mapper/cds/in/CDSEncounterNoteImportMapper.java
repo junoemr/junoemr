@@ -68,6 +68,11 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<Cl
 			provider.setLastName(participatingProvider.getName().getLastName());
 			provider.setOhipNumber(participatingProvider.getOHIPPhysicianId());
 			note.setProvider(provider);
+
+			if(importStructure.getParticipatingProviders().size() > 1)
+			{
+				logEvent("EncounterNote [" + note.getObservationDate() + "] has multiple editors. One was assigned as the MRP");
+			}
 		}
 
 		if (!importStructure.getNoteReviewer().isEmpty())
@@ -82,16 +87,22 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<Cl
 			reviewer.setOhipNumber(noteReviewer.getOHIPPhysicianId());
 			reviewer.setReviewDateTime(toNullablePartialDateTime(reviewDateTime));
 			note.setSigningProvider(reviewer);
+
+			if(importStructure.getNoteReviewer().size() > 1)
+			{
+				logEvent("EncounterNote [" + note.getObservationDate() + "] has multiple reviewers that could not be set");
+			}
 		}
 
 		noteText += StringUtils.trimToEmpty(importStructure.getNoteType()) + "\n";
 		noteText += StringUtils.trimToEmpty(importStructure.getMyClinicalNotesContent());
 
+		noteText = StringUtils.trimToEmpty(noteText);
 		if(noteText.isEmpty())
 		{
-			logger.warn("EncounterNote has no text value");
+			logEvent("EncounterNote [" + note.getObservationDate() + "] has no text value");
 		}
-		note.setNoteText(StringUtils.trimToEmpty(noteText));
+		note.setNoteText(noteText);
 
 		return note;
 	}

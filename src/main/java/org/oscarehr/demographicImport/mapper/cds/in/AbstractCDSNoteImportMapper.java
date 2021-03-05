@@ -22,12 +22,9 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.StandardCoding;
-
-import java.time.LocalDateTime;
 
 @Component
 public abstract class AbstractCDSNoteImportMapper<I, E extends BaseNote> extends AbstractCDSImportMapper<I, E>

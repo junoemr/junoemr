@@ -23,10 +23,8 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.oscarehr.prevention.service.PreventionManager;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.Code;
@@ -42,8 +40,6 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_IN
 @Component
 public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immunizations, Immunization>
 {
-	private static final Logger logger = MiscUtils.getLogger();
-
 	public static final String DEFAULT_PREVENTION_TYPE = "OtherA";
 
 	@Autowired
@@ -118,7 +114,7 @@ public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immuniz
 			}
 			else
 			{
-				logger.warn("Unknown or invalid prevention type: " + codeValue);
+				logDefaultValueUse("Unknown or invalid prevention type '" + codeValue + "'", DEFAULT_PREVENTION_TYPE);
 				codeValue = DEFAULT_PREVENTION_TYPE;
 			}
 		}

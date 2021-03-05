@@ -22,14 +22,12 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.hrm.HrmComment;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.demographicImport.model.hrm.HrmObservation;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.Reports;
@@ -42,8 +40,6 @@ import java.util.List;
 @Component
 public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmDocument>
 {
-	private static final Logger logger = MiscUtils.getLogger();
-
 	@Autowired
 	protected CDSReportDocumentImportMapper documentImportMapper;
 

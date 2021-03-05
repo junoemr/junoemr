@@ -85,6 +85,7 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 		if(duration == null)
 		{
 			duration = BigInteger.valueOf(DEFAULT_APPOINTMENT_DURATION_MIN);
+			logDefaultValueUse("Missing appointment duration value for '" + appointmentDateTime + "'", duration);
 		}
 		return appointmentDateTime.plusMinutes(duration.longValue());
 	}
@@ -116,6 +117,7 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 		if(appointmentStatus == null)
 		{
 			appointmentStatus = appointmentStatusCache.findByCode(defaultStatusCode);
+			logDefaultValueUse("Unknown appointment status value for '" + appointmentDateTime + "'", defaultStatusCode);
 		}
 		return appointmentStatus;
 	}

@@ -59,4 +59,12 @@ public abstract class AbstractExportMapper<I, E>
 		}
 		return list;
 	}
+
+	/**
+	 * shortcut to the export logger for use in mappers
+	 */
+	public void logEvent(String message)
+	{
+		patientExportContext.getExportLogger().logEvent(message);
+	}
 }

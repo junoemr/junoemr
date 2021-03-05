@@ -23,7 +23,6 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.AlertsAndSpecialNeeds;
@@ -31,8 +30,6 @@ import xml.cds.v5_0.AlertsAndSpecialNeeds;
 @Component
 public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndSpecialNeeds, ReminderNote>
 {
-	private static final Logger logger = Logger.getLogger(CDSAlertImportMapper.class);
-
 	public CDSAlertImportMapper()
 	{
 		super();
@@ -51,11 +48,9 @@ public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndS
 		);
 		reminderNote.setNoteText(noteText);
 
-
-		if(reminderNote.getNoteText() == null || reminderNote.getNoteText().isEmpty())
+		if(noteText.isEmpty())
 		{
-			logger.warn("ReminderNote has no text value");
-			reminderNote.setNoteText("");
+			logEvent("Reminder Note [" + reminderNote.getObservationDate() + "] has no text value");
 		}
 
 		return reminderNote;

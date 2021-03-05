@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.logger.cds;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.logger.BaseLogger;
 import org.oscarehr.demographicImport.model.PatientRecord;
@@ -34,6 +35,7 @@ import java.nio.file.StandardOpenOption;
 
 public abstract class CDSBaseLogger implements BaseLogger
 {
+	private static final Logger applicationLogger = Logger.getLogger(CDSBaseLogger.class);
 	protected static final int SUMMARY_LOG_COLUMN_WIDTH = 14;
 	protected static final int SUMMARY_LOG_ITEM_COUNT = 15;
 
@@ -77,6 +79,7 @@ public abstract class CDSBaseLogger implements BaseLogger
 	@Override
 	public synchronized void logEvent(String message)
 	{
+		applicationLogger.warn("[Event-Log]: " + message);
 		log(eventLogFile, message);
 	}
 

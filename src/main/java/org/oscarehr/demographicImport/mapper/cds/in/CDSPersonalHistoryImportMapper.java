@@ -23,7 +23,6 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
 import org.springframework.stereotype.Component;
@@ -41,8 +40,6 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_IN
 @Component
 public class CDSPersonalHistoryImportMapper extends AbstractCDSNoteImportMapper<PersonalHistory, SocialHistoryNote>
 {
-	private static final Logger logger = Logger.getLogger(CDSPersonalHistoryImportMapper.class);
-
 	public CDSPersonalHistoryImportMapper()
 	{
 		super();
@@ -97,16 +94,16 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSNoteImportMapper<
 			}
 		}
 
-		note.setNoteText(StringUtils.trimToEmpty(noteText));
-		if(note.getNoteText().isEmpty())
-		{
-			logger.warn("SocialHistoryNote has no text value");
-		}
-
 		// use another date if no observation date
 		if(note.getObservationDate() == null)
 		{
 			note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Personal History Note", note.getStartDate(), note.getResolutionDate()));
+		}
+
+		note.setNoteText(StringUtils.trimToEmpty(noteText));
+		if(note.getNoteText().isEmpty())
+		{
+			logEvent("SocialHistoryNote [" + note.getObservationDate() + "] has no text value");
 		}
 
 		return note;

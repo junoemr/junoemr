@@ -166,7 +166,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 			}
 			catch(FileNotFoundException e)
 			{
-				patientImportContext.getImportLogger().logEvent("Missing External Document: " + report.getFilePath());
+				logEvent("Missing External Document: " + report.getFilePath());
 				if(!patientImportContext.getImportPreferences().isSkipMissingDocs())
 				{
 					throw e;

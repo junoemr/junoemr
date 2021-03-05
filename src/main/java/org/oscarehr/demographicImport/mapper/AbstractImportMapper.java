@@ -97,4 +97,12 @@ public abstract class AbstractImportMapper<I, E>
 	{
 		patientImportContext.getImportLogger().logEvent(what + " was defaulted to " + defaultedValue);
 	}
+
+	/**
+	 * shortcut to the import logger for use in mappers
+	 */
+	public void logEvent(String message)
+	{
+		patientImportContext.getImportLogger().logEvent(message);
+	}
 }

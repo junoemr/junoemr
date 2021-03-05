@@ -23,7 +23,6 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.FamilyHistory;
@@ -31,8 +30,6 @@ import xml.cds.v5_0.FamilyHistory;
 @Component
 public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<FamilyHistory, FamilyHistoryNote>
 {
-	private static final Logger logger = Logger.getLogger(CDSFamilyHistoryImportMapper.class);
-
 	public CDSFamilyHistoryImportMapper()
 	{
 		super();
@@ -54,14 +51,12 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<Fa
 				StringUtils.trimToEmpty(importStructure.getProblemDiagnosisProcedureDescription()) + "\n" +
 						StringUtils.trimToEmpty(importStructure.getNotes())
 		);
-		note.setNoteText(noteText);
 
-		if(note.getNoteText() == null || note.getNoteText().isEmpty())
+		if(noteText.isEmpty())
 		{
-			logger.warn("FamilyHistoryNote has no text value");
-			note.setNoteText("");
+			logEvent("FamilyHistoryNote [" + note.getObservationDate() + "] has no text value");
 		}
-
+		note.setNoteText(noteText);
 		return note;
 	}
 }

@@ -22,11 +22,10 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.RiskFactors;
-
-import java.time.LocalDateTime;
 
 @Component
 public class CDSRiskFactorImportMapper extends AbstractCDSNoteImportMapper<RiskFactors, RiskFactorNote>
@@ -41,7 +40,6 @@ public class CDSRiskFactorImportMapper extends AbstractCDSNoteImportMapper<RiskF
 	{
 		RiskFactorNote note = new RiskFactorNote();
 
-		note.setNoteText(getNoteText(importStructure));
 		note.setExposureDetails(importStructure.getExposureDetails());
 		note.setAgeAtOnset(getAgeAtOnset(importStructure.getAgeOfOnset()));
 		note.setStartDate(toNullablePartialDate(importStructure.getStartDate()));
@@ -50,12 +48,13 @@ public class CDSRiskFactorImportMapper extends AbstractCDSNoteImportMapper<RiskF
 		note.setAnnotation(importStructure.getNotes());
 		note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Risk Factor Note", note.getStartDate(), note.getResolutionDate()));
 
-		return note;
-	}
+		String noteText = StringUtils.trimToEmpty(importStructure.getRiskFactor());
+		if(noteText.isEmpty())
+		{
+			logEvent("Risk Factor [" + note.getObservationDate() + "] has no text value");
+		}
+		note.setNoteText(noteText);
 
-	protected String getNoteText(RiskFactors importStructure)
-	{
-		String riskFactorText = importStructure.getRiskFactor();
-		return (riskFactorText != null) ? riskFactorText : "No Risk Factor Text";
+		return note;
 	}
 }

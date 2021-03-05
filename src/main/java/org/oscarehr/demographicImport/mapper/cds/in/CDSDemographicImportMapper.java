@@ -23,7 +23,6 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
@@ -48,8 +47,6 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_
 @Component
 public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, Demographic>
 {
-	private static final Logger logger = Logger.getLogger(CDSDemographicImportMapper.class);
-
 	public CDSDemographicImportMapper()
 	{
 		super();
@@ -77,6 +74,10 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		if(namePrefixCode != null)
 		{
 			demographic.setTitle(Demographic.TITLE.fromStringIgnoreCase(namePrefixCode.value()));
+			if(demographic.getTitle() == null)
+			{
+				logEvent("Invalid Title value: " + namePrefixCode.value());
+			}
 		}
 
 		OfficialSpokenLanguageCode officialLanguage = importStructure.getPreferredOfficialLanguage();
@@ -114,18 +115,27 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		{
 			PhoneNumber phoneNumber = getPhoneNumber(importNumber);
 
-			if(phoneNumber.isTypeHome())
+			if(phoneNumber.isTypeHome() && demographic.getHomePhone() == null)
 			{
 				demographic.setHomePhone(phoneNumber);
 			}
-			else if(phoneNumber.isTypeWork())
+			else if(phoneNumber.isTypeWork() && demographic.getWorkPhone() == null)
 			{
 				demographic.setWorkPhone(phoneNumber);
 			}
-			else if(phoneNumber.isTypeCell())
+			else if(phoneNumber.isTypeCell() && demographic.getCellPhone() == null)
 			{
 				demographic.setCellPhone(phoneNumber);
 			}
+			else
+			{
+				logEvent("Demographic has excess phone number data that could not be used");
+			}
+		}
+
+		if(importStructure.getAddress().size() > 1)
+		{
+			logEvent("Demographic has multiple associated addresses, some data may be missing.");
 		}
 	}
 
@@ -150,6 +160,10 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 				demographic.setRosterTerminationReason(enrolmentHistory.getTerminationReason());
 				demographic.setRosterDate(ConversionUtils.toNullableLocalDate(enrolmentHistory.getEnrollmentDate()));
 				demographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(enrolmentHistory.getEnrollmentDate()));
+			}
+			if(enrollment.getEnrolmentHistory().size() > 1)
+			{
+				logEvent("Demographic enrollment history may be incomplete");
 			}
 		}
 	}
@@ -180,19 +194,19 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 					default:
 					{
 						status = STATUS_ACTIVE;
-						logger.warn("Unknown patient status string: '" + plainTextCode + "'. Patient status set to active");
+						logEvent("Unknown patient status value: '" + plainTextCode + "'. Patient status set to active");
 						break;
 					}
 				}
 			}
 			else
 			{
-				logger.warn("Patient status missing, set as active");
+				logEvent("Patient status missing, set as active");
 			}
 		}
 		else
 		{
-			logger.warn("Patient status missing, set as active");
+			logEvent("Patient status missing, set as active");
 		}
 		return status;
 	}

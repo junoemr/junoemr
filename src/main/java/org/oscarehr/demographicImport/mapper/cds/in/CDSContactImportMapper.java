@@ -56,17 +56,21 @@ public class CDSContactImportMapper extends AbstractCDSImportMapper<Demographics
 		{
 			PhoneNumber phoneNumber = getPhoneNumber(importNumber);
 
-			if(phoneNumber.isTypeHome())
+			if(phoneNumber.isTypeHome() && contact.getHomePhone() == null)
 			{
 				contact.setHomePhone(phoneNumber);
 			}
-			else if(phoneNumber.isTypeWork())
+			else if(phoneNumber.isTypeWork() && contact.getWorkPhone() == null)
 			{
 				contact.setWorkPhone(phoneNumber);
 			}
-			else if(phoneNumber.isTypeCell())
+			else if(phoneNumber.isTypeCell() && contact.getCellPhone() == null)
 			{
 				contact.setCellPhone(phoneNumber);
+			}
+			else
+			{
+				logEvent("Contact has excess phone number data that could not be used");
 			}
 		}
 

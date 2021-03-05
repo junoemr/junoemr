@@ -31,8 +31,6 @@ import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
-import org.oscarehr.demographicImport.util.PatientImportContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.AddressStructured;
@@ -60,9 +58,6 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
 	private static final Logger logger = Logger.getLogger(AbstractCDSImportMapper.class);
-
-	@Autowired
-	protected PatientImportContext patientImportContext;
 
 	public AbstractCDSImportMapper()
 	{
@@ -258,7 +253,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 					&& !subDivisionCode.equals("-70") // asked, unknown
 					&& !subDivisionCode.equals("-90")) // Not applicable
 			{
-				patientImportContext.getImportLogger().logEvent("Unknown CountrySubdivisionCode: " + subDivisionCode);
+				logEvent("Unknown CountrySubdivisionCode: " + subDivisionCode);
 			}
 		}
 
