@@ -26,20 +26,18 @@
 
 <%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
 <%@page import="org.oscarehr.common.model.FlowSheetCustomization"%>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctMeasurementsForm"%>
-<%@page import="oscar.util.UtilDateUtilities"%>
 <%@page import="java.util.Hashtable"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="java.time.LocalDateTime" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -51,22 +49,16 @@
 	}
 	String demographic_no = request.getParameter("demographic_no");
 	String id = request.getParameter("id");
-	String measurement = request.getParameter("measurement");
 	String[] measurements = request.getParameterValues("measurement");
 	String template = request.getParameter("template");
 	String uuid = request.getParameter("uuid");
 
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) SpringUtils.getBean("flowSheetCustomizationDao");
 	MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-
 
 	List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template, (String) session.getAttribute("user"), Integer.parseInt(demographic_no));
 	MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template, custList);
 
-	EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-
-	String provider = (String) session.getValue("user");
 	String prevDate = ConversionUtils.toDateTimeNoSecString(LocalDateTime.now());
 %>
 
@@ -311,13 +303,13 @@
                <% String val = "";
                   String saveAction = "/oscarEncounter/Measurements2?pasteEncounterNote=true";
                   String comment = "";
-                  Hashtable h = null;
+                  Hashtable hashtable = null;
                   if ( id != null ) {
                      saveAction = "/oscarEncounter/oscarMeasurements/DeleteData2";
-                     h = EctMeasurementsDataBeanHandler.getMeasurementDataById(id);
-					 prevDate = (String) h.get("dateObserved");
-                     val = (String) h.get("value");
-                     comment = (String) h.get("comments");
+                     hashtable = EctMeasurementsDataBeanHandler.getMeasurementDataById(id);
+					 prevDate = (String) hashtable.get("dateObserved");
+                     val = (String) hashtable.get("value");
+                     comment = (String) hashtable.get("comments");
                   }
                %>
 
@@ -359,30 +351,46 @@
                <input type="hidden" name="uuid" value="<%=uuid%>"/>
 
                <%
-                int ctr = 0;
-                EctMeasurementsForm ectMeasurementsForm = (EctMeasurementsForm) request.getAttribute("EctMeasurementsForm");
+                   int ctr = 0;
+                   EctMeasurementsForm ectMeasurementsForm = (EctMeasurementsForm) request.getAttribute("EctMeasurementsForm");
 
-                for (int i = 0; i < measurements.length; i++){
-                    measurement = measurements[i];
-                    Map h2 = mFlowsheet.getMeasurementFlowSheetInfo(measurement);
+                   for (String measurement : measurements)
+                   {
+                       Map<String, String> h2 = mFlowsheet.getMeasurementFlowSheetInfo(measurement);
 
-                EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measurement);
-                if(ectMeasurementsForm != null && !ectMeasurementsForm.isEmpty()){
+                       EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measurement);
 
-                   h = new Hashtable(ectMeasurementsForm.values);
+                       boolean isMeasurement = mtypeBean != null;
 
-                   prevDate = (String) h.get("date-"+ctr);
-                   val = (String) h.get("inputValue-" + ctr);
-                   comment = (String) h.get("comments-" + ctr);
-                }
-                %>
+                       String type = "";
+                       String typeDisplayName = measurement;
+                       String validation = "";
+                       String measuringInstruction = "";
+
+                       if (mtypeBean != null)
+                       {
+                           type = mtypeBean.getType();
+                           typeDisplayName = mtypeBean.getTypeDisplayName();
+                           validation = mtypeBean.getValidation();
+                           measuringInstruction = mtypeBean.getMeasuringInstrc();
+                       }
+
+                       if (ectMeasurementsForm != null && !ectMeasurementsForm.isEmpty())
+                       {
+                           hashtable = new Hashtable<String, Object>(ectMeasurementsForm.values);
+
+                           prevDate = (String) hashtable.get("date-" + ctr);
+                           val = (String) hashtable.get("inputValue-" + ctr);
+                           comment = (String) hashtable.get("comments-" + ctr);
+                       }
+               %>
 
 
                <input type="hidden" name="measurement" value="<%=measurement%>"/>
 
-               <input type="hidden" name="<%= "value(inputType-" + ctr + ")" %>" value="<%=mtypeBean.getType()%>"/>
-               <input type="hidden" name="<%= "value(inputTypeDisplayName-" + ctr + ")" %>" value="<%=mtypeBean.getTypeDisplayName()%>"/>
-               <input type="hidden" name="<%= "value(validation-" + ctr + ")" %>" value="<%=mtypeBean.getValidation()%>"/>
+                   <input type="hidden" name="<%= "value(inputType-" + ctr + ")" %>" value="<%=type%>"/>
+                   <input type="hidden" name="<%= "value(inputTypeDisplayName-" + ctr + ")" %>" value="<%=typeDisplayName%>"/>
+                   <input type="hidden" name="<%= "value(validation-" + ctr + ")" %>" value="<%=validation%>"/>
 
                <% if ( id != null ) { %>
                <input type="hidden" name="id" value="<%=id%>"/>
@@ -391,9 +399,9 @@
 
                <div class="prevention">
                    <fieldset>
-                      <legend>Measurement : <%=mtypeBean.getTypeDisplayName()%></legend>
+                      <legend><%=isMeasurement ? "Measurement" : "Prevention"%>> : <%=typeDisplayName%></legend>
                          <div style="float:left;display:none;">
-                           <input type="radio" name="<%= "value(inputMInstrc-" + ctr + ")" %>" value="<%=mtypeBean.getMeasuringInstrc()%>" checked/>
+                           <input type="radio" name="<%= "value(inputMInstrc-" + ctr + ")" %>" value="<%=measuringInstruction%>" checked/>
                          </div>
                          <div style="float:left;margin-left:30px;">
                             <label for="prevDate<%=ctr%>" class="fields" >Obs Date/Time:</label>
@@ -405,18 +413,18 @@
 							<br />
 
   						<label for="<%="value(inputValue-"+ctr+")"%>" class="fields"><%=h2.get("value_name")%>:</label>
-                            <% if ( mtypeBean.getValidationName() != null && (mtypeBean.getValidationName().equals("Yes/No") || mtypeBean.getValidationName().equals("Yes/No/NA") || mtypeBean.getValidationName().equals("Yes/No/Maybe"))){ %>
+                            <% if (mtypeBean != null && mtypeBean.getValidationName() != null && (mtypeBean.getValidationName().equals("Yes/No") || mtypeBean.getValidationName().equals("Yes/No/NA") || mtypeBean.getValidationName().equals("Yes/No/Maybe"))){ %>
                             <select  id="<%= "value(inputValue-" + ctr + ")" %>" name="<%= "value(inputValue-" + ctr + ")" %>" >
                                 <%if (measurements.length > 1){ %>
                                 <option value="" >Not Answered</option>
                                 <%}%>
-                                <option value="Yes"  <%=sel("Yes", val)%>>Yes</option>
-                                <option value="No"   <%=sel("No", val)%>>No</option>
+                                <option value="Yes" <%="Yes".equals(val) ? "selected" : ""%>>Yes</option>
+                                <option value="No"  <%="No".equals(val) ? "selected" : ""%>>No</option>
                                 
                                 <% if(mtypeBean.getValidationName().equals("Yes/No/Maybe")){ %>
-                                <option value="Maybe" <%=sel("Maybe", val)%>>Maybe</option>                                
+                                <option value="Maybe" <%="Maybe".equals(val) ? "selected" : ""%>>Maybe</option>
                                 <%}else{ %>
-                                <option value="NotApplicable" <%=sel("NotApplicable", val)%>>Not Applicable</option>
+                                <option value="NotApplicable" <%="NotApplicable".equals(val) ? "selected" : ""%>>Not Applicable</option>
                                 <%} %>
                                 
                             </select>
@@ -471,64 +479,3 @@
     </script>
 </body>
 </html:html>
-<%!
-	String completed(boolean b)
-	{
-		String ret = "";
-		if(b)
-		{
-			ret = "checked";
-		}
-		return ret;
-	}
-
-	String refused(boolean b)
-	{
-		String ret = "";
-		if(!b)
-		{
-			ret = "checked";
-		}
-		return ret;
-	}
-
-	String str(String first, String second)
-	{
-		String ret = "";
-		if(first != null)
-		{
-			ret = first;
-		}
-		else if(second != null)
-		{
-			ret = second;
-		}
-		return ret;
-	}
-
-	String checked(String first, String second)
-	{
-		String ret = "";
-		if(first != null && second != null)
-		{
-			if(first.equals(second))
-			{
-				ret = "checked";
-			}
-		}
-		return ret;
-	}
-
-	String sel(String first, String second)
-	{
-		String ret = "";
-		if(first != null && second != null)
-		{
-			if(first.equals(second))
-			{
-				ret = "selected";
-			}
-		}
-		return ret;
-	}
-%>

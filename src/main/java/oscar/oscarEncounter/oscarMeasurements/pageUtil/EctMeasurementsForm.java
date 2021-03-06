@@ -35,7 +35,7 @@ public final class EctMeasurementsForm extends ActionForm {
     //Using map-backed method to get the value of each field
     //key: the field property
     //value: the value of the associated key
-    public final Map values = new HashMap();
+    public final Map<String, Object> values = new HashMap<>();
 
     public void setValue(String key, Object value) {
         values.put(key, value);
