@@ -68,10 +68,12 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -382,8 +384,8 @@ public class DemographicsService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/import/progress")
-	public RestResponse<ProgressBarPollingData> demographicImportProgress()
+	@Path("/import/{processId}/progress")
+	public RestResponse<ProgressBarPollingData> demographicImportProgress(@PathParam("processId") String processId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
@@ -415,11 +417,9 @@ public class DemographicsService extends AbstractServiceImpl
 	}
 
 
-	@GET
+	@POST
 	@Path("/export")
-	@Produces("application/zip")
-	@SkipContentLoggingOutbound
-	public Response demographicExport(
+	public RestResponse<String> demographicExport(
 			@QueryParam("type") String type,
 			@QueryParam("patientSet") String patientSet,
 			@QueryParam("exPersonalHistory") @DefaultValue("false") boolean exPersonalHistory,
@@ -457,20 +457,61 @@ public class DemographicsService extends AbstractServiceImpl
 		exportPreferences.setExportRiskFactors(exRiskFactors);
 
 		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
-		List<GenericFile> exportFiles = patientExportService.exportDemographics(
-				ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
-		ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
 
-		String filename = GenericFile.getSanitizedFileName(patientSet + ".zip");
-		Response.ResponseBuilder response = Response.ok(zipFile.toFileInputStream());
-		response.header("Content-Disposition", "filename="+filename);
-		response.type("application/zip");
-		return response.build();
+		// run the main process in a new thread so this one can return a response
+		Thread thread = new Thread(() ->
+		{
+			try
+			{
+				List<GenericFile> exportFiles = patientExportService.exportDemographics(
+						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
+				ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
+				String filename = GenericFile.getSanitizedFileName(patientSet + ".zip");
+				patientExportContext.setExportName(filename);
+				patientExportContext.setResult(zipFile);
+			}
+			catch(Exception e)
+			{
+				logger.error("Export thread error", e);
+			}
+		});
+		thread.start();
+
+		String threadId = String.valueOf(thread.getId());
+		patientExportContext.setThreadId(threadId);
+		return RestResponse.successResponse(threadId);
 	}
 
 	@GET
-	@Path("/export/progress")
-	public RestResponse<ProgressBarPollingData> demographicExportProgress()
+	@Path("/export/{processId}")
+	@Produces("application/zip")
+	@SkipContentLoggingOutbound
+	public Response demographicExportResults(@PathParam("processId") String processId) throws FileNotFoundException
+	{
+		ZIPFile exportZip = patientExportContext.getResult();
+		if(patientExportContext.isComplete())
+		{
+			if(exportZip != null)
+			{
+				Response.ResponseBuilder response = Response.ok(exportZip.toFileInputStream());
+				response.header("Content-Disposition", "filename=" + patientExportContext.getExportName());
+				response.type("application/zip");
+				return response.build();
+			}
+			else
+			{
+				throw new RuntimeException("An Unknown Error occurred"); // should not be possible
+			}
+		}
+		else
+		{
+			throw new RuntimeException("Process not complete");
+		}
+	}
+
+	@GET
+	@Path("/export/{processId}/progress")
+	public RestResponse<ProgressBarPollingData> demographicExportProgress(@PathParam("processId") String processId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);

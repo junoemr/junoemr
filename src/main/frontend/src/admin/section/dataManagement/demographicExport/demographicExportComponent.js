@@ -171,10 +171,30 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 							ctrl.exportToggleOptions.exReportsReceived,
 							ctrl.exportToggleOptions.exAlertsAndSpecialNeeds,
 							ctrl.exportToggleOptions.exCareElements,
-							{responseType: "blob"}
 						).then((result) =>
 						{
-							downloadPromiseDefer.resolve(result);
+							const processId = result.data.body;
+							let complete = false;
+							ctrl.pollingPromise = $interval(async () =>
+							{
+								if(!complete)
+								{
+									let pollingData = await ctrl.fetchExportProgress(processId);
+									downloadPromiseDefer.notify(pollingData);
+
+									complete = pollingData.complete;
+									if (complete)
+									{
+										ctrl.demographicsApi.demographicExportResults(
+											processId,
+											{responseType: "blob"}
+										).then((response) =>
+										{
+											downloadPromiseDefer.resolve(response);
+										});
+									}
+								}
+							}, 500, 0, true);
 						}).catch((error) =>
 						{
 							downloadPromiseDefer.reject(error);
@@ -187,11 +207,6 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 							"Exporting Patient Set",
 							ctrl.componentStyle,
 						);
-
-						ctrl.pollingPromise = $interval(async () =>
-						{
-							downloadPromiseDefer.notify(await ctrl.fetchExportProgress());
-						}, 500, 0, true);
 
 						loadingPromise.then((result) =>
 						{
@@ -209,12 +224,12 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 					}
 				}
 
-				ctrl.fetchExportProgress = async () =>
+				ctrl.fetchExportProgress = async (processId) =>
 				{
 					let pollingData = {};
 					try
 					{
-						pollingData = (await ctrl.demographicsApi.demographicExportProgress()).data.body;
+						pollingData = (await ctrl.demographicsApi.demographicExportProgress(processId)).data.body;
 					}
 					catch (e)
 					{

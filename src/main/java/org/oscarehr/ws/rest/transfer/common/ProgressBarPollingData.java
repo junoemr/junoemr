@@ -32,4 +32,5 @@ public class ProgressBarPollingData implements Serializable
 	private int total;
 	private int processed;
 	private String message;
+	private boolean complete;
 }

@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
+import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
 import org.springframework.dao.ConcurrencyFailureException;
 
@@ -35,6 +36,10 @@ public class PollableContext
 	private int total;
 	private int processed;
 	private boolean complete;
+
+	private String threadId; //TODO this should eventually be split out to allow multiple parallel runs
+	private ZIPFile result; // this too
+	private String exportName; // and this
 
 	private ConcurrentMap<String, String> localProcessIdentifierMap;
 
@@ -64,6 +69,7 @@ public class PollableContext
 		progressData.setTotal(getTotal());
 		progressData.setProcessed(getProcessed());
 		progressData.setMessage(getPollingMessage());
+		progressData.setComplete(isComplete());
 		return progressData;
 	}
 
