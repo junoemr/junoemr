@@ -60,7 +60,7 @@ determine if the client has already been entered into the system.</p>
 			form.elements['form.healthCardNumber'].value == '' &&
 			form.elements['form.healthCardVersion'].value == '') {
 			
-			alert('You must use atleast 1 of the search fields');
+			alert('You must use at least 1 of the search fields');
 			
 			return false;
 		}
