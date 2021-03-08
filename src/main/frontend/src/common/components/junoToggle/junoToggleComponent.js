@@ -21,56 +21,42 @@
 * Canada
 */
 
-import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_TAB_TYPE} from "../junoComponentConstants";
+import {JUNO_STYLE} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoTab', {
-	templateUrl: 'src/common/components/junoTab/junoTab.jsp',
-	bindings: {
-		ngModel: "=",
-		tabs: "<",
-		componentStyle: "<?",
-		type: "<?",
-		change: "&?"
-	},
-	controller: ['$scope', function ($scope) {
-		let ctrl = this;
+angular.module('Common.Components').component('junoToggle', {
+    templateUrl: 'src/common/components/junoToggle/junoToggle.jsp',
+    bindings: {
+        id: "<",
+        ngModel: "=",
+        change: "&?",
+        disabled: "<?",
+        componentStyle: "<?",
+        round: "<?"
+    },
+    controller: [ "$scope", function ($scope) {
+        let ctrl = this;
 
-		$scope.JUNO_TAB_TYPE = JUNO_TAB_TYPE;
-		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+        ctrl.$onInit = () =>
+        {
+            ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+        };
 
-		ctrl.$onInit = () =>
-		{
-			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-			ctrl.type = ctrl.type || JUNO_TAB_TYPE.NORMAL;
-		};
+        ctrl.componentClasses = () =>
+        {
+            return [ctrl.componentStyle];
+        };
 
-		ctrl.onTabSelect = (tab) =>
-		{
-			ctrl.ngModel = tab.value;
-
-			if (ctrl.change)
+        /**
+         * Change event handler.  State of the checkbox is accessible as the checked parameter on your callback function
+         */
+        ctrl.onChange = () =>
+        {
+            if (ctrl.change && !ctrl.disabled)
             {
                 ctrl.change({
-                    activeTab: tab.value
+                    checked: ctrl.ngModel
                 });
             }
-		}
-
-		ctrl.tabClasses = (tab) =>
-		{
-			if (ctrl.ngModel)
-			{
-				if (ctrl.ngModel === tab.value)
-				{
-					return ["active"];
-				}
-			}
-			return [];
-		}
-
-		ctrl.componentClasses = () =>
-		{
-			return [ctrl.componentStyle, ctrl.type];
-		}
-	}]
+        }
+    }]
 });
