@@ -35,9 +35,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class FileFactory
@@ -380,6 +384,64 @@ public class FileFactory
 	}
 
 	/**
+	 * unpacks a zip file to the same directory as the zip file. does not attempt to modify, rename, or reprocess contained files.
+	 * preserves sub directory structure within the zip
+	 * @param zip - the zip file
+	 * @return - the list of files within the zip
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static List<GenericFile> unpackZipFile(ZIPFile zip) throws IOException, InterruptedException
+	{
+		return unpackZipFile(zip, zip.getDirectory());
+	}
+
+	/**
+	 * unpacks a zip file to the specified directory. does not attempt to modify, rename, or reprocess contained files.
+	 * preserves sub directory structure within the zip
+	 * @param zip - the zip file
+	 * @param directory - the output directory
+	 * @return - the list of files within the zip
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static List<GenericFile> unpackZipFile(ZIPFile zip, String directory) throws IOException, InterruptedException
+	{
+		List<GenericFile> unzippedFiles = new ArrayList<>();
+
+		ZipFile zipFile = new ZipFile(zip.getFileObject());
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+		try
+		{
+			while(entries.hasMoreElements())
+			{
+				ZipEntry entry = entries.nextElement();
+
+				String entryName = FilenameUtils.getName(entry.getName());
+				String entryDirectory = FilenameUtils.getFullPath(entry.getName());
+				String fullPath = Paths.get(directory, entryDirectory).toString();
+
+				if(!entry.isDirectory())
+				{
+					unzippedFiles.add(createNewFile(zipFile.getInputStream(entry), entryName, fullPath, false));
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			// clean up files in the event of an error
+			for(GenericFile file : unzippedFiles)
+			{
+				file.deleteFile();
+			}
+			throw e;
+		}
+
+		return unzippedFiles;
+	}
+
+	/**
 	 * creates a new file with the given name an content. NOTE a datatime string is prepended to the file name.
 	 * @param fileInputStream content to be placed in the file
 	 * @param fileName the file name to use for the file
@@ -424,11 +486,7 @@ public class FileFactory
 		}
 
 		File file = new File(directory.getPath(), fileName);
-		if (!reprocess)
-		{
-			return writeInputStream(fileInputStream, file, false, false);
-		}
-		return writeInputStream(fileInputStream, file, false, true);
+		return writeInputStream(fileInputStream, file, false, reprocess);
 	}
 
 	private static GenericFile writeInputStream(InputStream fileInputStream, File file, boolean allowOverwrite, boolean reprocess) throws IOException, InterruptedException
@@ -515,6 +573,10 @@ public class FileFactory
 			else if("application/xml".equals(fileContent))
 			{
 				genFile = new XMLFile(file);
+			}
+			else if("application/zip".equals(fileContent))
+			{
+				genFile = new ZIPFile(file);
 			}
 			else
 			{

@@ -326,37 +326,56 @@ public class DemographicsService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
 
-		List<GenericFile> genericFileList = new ArrayList<>();
+		List<GenericFile> temporaryFileList = new ArrayList<>();
 		List<GenericFile> importFileList = new ArrayList<>();
 		String documentLocation = GenericFile.TEMP_DIRECTORY;
+		ImportTransferOutbound transferOutbound;
 
-		for(FileTransfer file : fileListTransfer)
+		try
 		{
-			GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), "_" + file.getName());
-			tempfile.rename(file.getName()); //might be a referenced document. make sure it uses the original name
-			genericFileList.add(tempfile);
-
-			// only attempt to import from xml files
-			if(tempfile instanceof XMLFile)
+			for(FileTransfer file : fileListTransfer)
 			{
-				importFileList.add(tempfile);
+				GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), "_" + file.getName());
+				temporaryFileList.add(tempfile);
+				tempfile.rename(file.getName()); //might be a referenced document. make sure it uses the original name
+
+				// unpack zip files, and treat their contents similar to any attached files
+				if(tempfile instanceof ZIPFile)
+				{
+					List<GenericFile> zipContents = ((ZIPFile) tempfile).unzip();
+					temporaryFileList.addAll(zipContents);
+
+					for(GenericFile zipContentFile : zipContents)
+					{
+						if(zipContentFile instanceof XMLFile)
+						{
+							importFileList.add(zipContentFile);
+						}
+					}
+				}
+				// only attempt to import from xml files
+				else if(tempfile instanceof XMLFile)
+				{
+					importFileList.add(tempfile);
+				}
 			}
-			//TODO handle zip files?
+
+			transferOutbound = importWrapperService.importDemographics(
+					type,
+					importSource,
+					mergeStrategy,
+					importFileList,
+					documentLocation,
+					false,
+					defaultSiteName);
 		}
-
-		ImportTransferOutbound transferOutbound = importWrapperService.importDemographics(
-				type,
-				importSource,
-				mergeStrategy,
-				importFileList,
-				documentLocation,
-				false,
-				defaultSiteName);
-
-		// clean up temp files
-		for(GenericFile tempFile : genericFileList)
+		finally
 		{
-			tempFile.deleteFile();
+			// clean up temp files
+			for(GenericFile tempFile : temporaryFileList)
+			{
+				tempFile.deleteFile();
+			}
 		}
 
 		return RestResponse.successResponse(transferOutbound);

@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class ZIPFile extends GenericFile
 {
@@ -35,5 +37,15 @@ public class ZIPFile extends GenericFile
 	public ZIPFile(File file)
 	{
 		super(file);
+	}
+
+	public List<GenericFile> unzip() throws IOException, InterruptedException
+	{
+		return FileFactory.unpackZipFile(this);
+	}
+
+	public List<GenericFile> unzip(String directory) throws IOException, InterruptedException
+	{
+		return FileFactory.unpackZipFile(this, directory);
 	}
 }
