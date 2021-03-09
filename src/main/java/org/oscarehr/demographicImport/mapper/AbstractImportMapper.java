@@ -24,7 +24,8 @@ package org.oscarehr.demographicImport.mapper;
 
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
-import org.oscarehr.demographicImport.util.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +38,7 @@ import java.util.List;
 public abstract class AbstractImportMapper<I, E>
 {
 	@Autowired
-	protected PatientImportContext patientImportContext;
+	protected PatientImportContextService patientImportContextService;
 
 	/**
 	 * build the export structure from the provided import structure.
@@ -87,7 +88,7 @@ public abstract class AbstractImportMapper<I, E>
 		LocalDateTime localDateTime = coalescePartialDatesToDateTime(partialDates);
 		if(localDateTime == null)
 		{
-			localDateTime = patientImportContext.getDefaultDate().atStartOfDay();
+			localDateTime = patientImportContextService.getContext().getDefaultDate().atStartOfDay();
 			logDefaultValueUse(what, localDateTime);
 		}
 		return localDateTime;
@@ -103,6 +104,7 @@ public abstract class AbstractImportMapper<I, E>
 	 */
 	public void logEvent(String message)
 	{
-		patientImportContext.getImportLogger().logEvent("[" + patientImportContext.getCurrentProcessIdentifier() + "] " + message);
+		PatientImportContext context = patientImportContextService.getContext();
+		context.getImportLogger().logEvent("[" + context.getCurrentProcessIdentifier() + "] " + message);
 	}
 }

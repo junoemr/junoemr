@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
-import org.oscarehr.demographicImport.util.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.DateTimeFullOrPartial;
 import xml.cds.v5_0.MedicationsAndTreatments;

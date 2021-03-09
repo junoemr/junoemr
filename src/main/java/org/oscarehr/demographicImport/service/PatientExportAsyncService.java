@@ -27,7 +27,8 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographicImport.converter.out.PatientRecordModelConverter;
 import org.oscarehr.demographicImport.model.PatientRecord;
-import org.oscarehr.demographicImport.util.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -51,12 +52,13 @@ public class PatientExportAsyncService
 	private PatientRecordModelConverter patientRecordModelConverter;
 
 	@Autowired
-	private PatientExportContext patientExportContext;
+	private PatientExportContextService patientExportContextService;
 
 	@Async
-	public CompletableFuture<GenericFile> exportDemographic(DemographicExporter exporter, Integer demographicId) throws Exception
+	public CompletableFuture<GenericFile> exportDemographic(DemographicExporter exporter, PatientExportContext patientExportContext, Integer demographicId) throws Exception
 	{
 		Instant instant = Instant.now();
+		patientExportContextService.register(patientExportContext); // need to register this thread with the given context
 		patientExportContext.addProcessIdentifier(String.valueOf(demographicId));
 		logger.info("Load Demographic " + demographicId);
 		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);

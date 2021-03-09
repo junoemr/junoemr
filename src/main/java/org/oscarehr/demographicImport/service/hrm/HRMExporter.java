@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.hrm.HrmDocument;
 import org.oscarehr.demographicImport.parser.hrm.HRMFileParser;
 import org.oscarehr.demographicImport.service.DemographicExporter;
-import org.oscarehr.demographicImport.util.ExportPreferences;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xml.hrm.v4_3.OmdCds;

@@ -20,26 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.service.context;
 
-import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.exception.InvalidImportFileException;
-import org.oscarehr.demographicImport.model.PatientRecord;
-import org.oscarehr.demographicImport.pref.ExportPreferences;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.List;
-
-public interface DemographicImporter
+@Service
+public class PatientImportContextService extends PollableContextServiceBase<PatientImportContext>
 {
-	enum MERGE_STRATEGY {
-		SKIP,
-		MERGE,
+	public PatientImportContextService()
+	{
+		super();
 	}
-
-	void verifyFileFormat(GenericFile importFile) throws InvalidImportFileException;
-
-	PatientRecord importDemographic(GenericFile importFile) throws Exception;
-
-	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
 }

@@ -26,13 +26,15 @@ import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.logger.ImportLogger;
 import org.oscarehr.demographicImport.logger.cds.CDSExportLogger;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
+import org.oscarehr.demographicImport.pref.ImportPreferences;
 import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
+import org.oscarehr.demographicImport.service.context.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContextService;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContextService;
 import org.oscarehr.demographicImport.service.hrm.HRMExporter;
-import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.ImportPreferences;
-import org.oscarehr.demographicImport.util.PatientExportContext;
-import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,10 +53,10 @@ public class ImporterExporterFactory
 	private HRMExporter hrmExporter;
 
 	@Autowired
-	private PatientImportContext patientImportContext;
+	private PatientExportContextService patientExportContextService;
 
 	@Autowired
-	private PatientExportContext patientExportContext;
+	private PatientImportContextService patientImportContextService;
 
 	public enum IMPORTER_TYPE
 	{
@@ -80,11 +82,13 @@ public class ImporterExporterFactory
 
 	public PatientImportContext initializeImportContext(IMPORTER_TYPE type, ImportPreferences importPreferences, int size) throws IOException, InterruptedException
 	{
+		PatientImportContext patientImportContext = new PatientImportContext();
 		patientImportContext.initialize(size);
 		patientImportContext.setImportType(type);
 		patientImportContext.setImportLogger(getImportLogger(type));
 		patientImportContext.setImportPreferences(importPreferences);
 		patientImportContext.setImporter(getImporter(type));
+		patientImportContextService.register(patientImportContext);
 		return patientImportContext;
 	}
 
@@ -110,10 +114,12 @@ public class ImporterExporterFactory
 
 	public PatientExportContext initializeExportContext(EXPORTER_TYPE type, ExportPreferences exportPreferences, int size) throws IOException, InterruptedException
 	{
+		PatientExportContext patientExportContext = new PatientExportContext();
 		patientExportContext.initialize(size);
 		patientExportContext.setExportPreferences(exportPreferences);
 		patientExportContext.setExportLogger(getExportLogger(type));
 		patientExportContext.setExporter(getExporter(type));
+		patientExportContextService.register(patientExportContext);
 		return patientExportContext;
 	}
 

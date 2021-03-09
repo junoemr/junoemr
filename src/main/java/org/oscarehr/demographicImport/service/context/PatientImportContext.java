@@ -20,24 +20,35 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.demographicImport.service.context;
 
 import lombok.Data;
-import org.oscarehr.common.io.ZIPFile;
-import org.oscarehr.demographicImport.logger.ExportLogger;
-import org.oscarehr.demographicImport.service.DemographicExporter;
-import org.springframework.stereotype.Component;
+import org.oscarehr.demographicImport.logger.ImportLogger;
+import org.oscarehr.demographicImport.pref.ImportPreferences;
+import org.oscarehr.demographicImport.service.DemographicImporter;
+import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
+
+import java.time.LocalDate;
 
 @Data
-@Component
-public class PatientExportContext extends PollableContext
+public class PatientImportContext extends PollableContext
 {
-	private DemographicExporter exporter;
-	private ExportLogger exportLogger;
-	private ExportPreferences exportPreferences;
+	private DemographicImporter importer;
+	private ImportLogger importLogger;
+	private ImportPreferences importPreferences;
+	private ImporterExporterFactory.IMPORTER_TYPE importType;
 
-	private ZIPFile result; // this too
-	private String exportName; // and this
+	private ImportTransferOutbound result;
+
+	/**
+	 * The date to use when you need to assign a date but there is none provided
+	 * @return - the partial date object
+	 */
+	public LocalDate getDefaultDate()
+	{
+		return LocalDate.of(1900, 1, 1);
+	}
 
 	@Override
 	protected synchronized String getPollingMessage()
@@ -48,11 +59,11 @@ public class PatientExportContext extends PollableContext
 		}
 		else if(getTotal() > getProcessed())
 		{
-			return "Exporting Patient " + (getProcessed() + 1) + " of " + getTotal();
+			return "Importing Patient " + (getProcessed() + 1) + " of " + getTotal();
 		}
 		else
 		{
-			return "Packaging Export Files";
+			return "Finalizing Import";
 		}
 	}
 }

@@ -20,29 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.demographicImport.pref;
 
 import lombok.Data;
-
-import java.io.Serializable;
+import org.oscarehr.demographicImport.model.appointment.Site;
+import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 
 @Data
-public class ExportPreferences implements Serializable
+public class ImportPreferences
 {
-	private boolean exportAlertsAndSpecialNeeds;
-	private boolean exportAllergiesAndAdverseReactions;
-	private boolean exportAppointments;
-	private boolean exportCareElements;
-	private boolean exportClinicalNotes;
-	private boolean exportFamilyHistory;
-	private boolean exportImmunizations;
-	private boolean exportLaboratoryResults;
-	private boolean exportMedicationsAndTreatments;
-	private boolean exportPastHealth;
-	private boolean exportPersonalHistory;
-	private boolean exportProblemList;
-	private boolean exportReportsReceived;
-	private boolean exportRiskFactors;
+	private Site defaultSite;
+	private String externalDocumentPath;
+	private boolean skipMissingDocs;
+	private ImporterExporterFactory.IMPORT_SOURCE importSource;
 
-	private int threadCount;
+	int threadCount;
 }

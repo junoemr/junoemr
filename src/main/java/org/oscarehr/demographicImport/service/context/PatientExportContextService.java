@@ -20,19 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.demographicImport.service.context;
 
-import lombok.Data;
-import org.oscarehr.demographicImport.model.appointment.Site;
-import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.springframework.stereotype.Service;
 
-@Data
-public class ImportPreferences
+@Service
+public class PatientExportContextService extends PollableContextServiceBase<PatientExportContext>
 {
-	private Site defaultSite;
-	private String externalDocumentPath;
-	private boolean skipMissingDocs;
-	private ImporterExporterFactory.IMPORT_SOURCE importSource;
-
-	int threadCount;
+	public PatientExportContextService()
+	{
+		super();
+	}
 }

@@ -30,9 +30,9 @@ import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.oscarehr.demographicImport.service.DemographicExporter;
-import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
@@ -67,7 +67,7 @@ public class CDSExporter implements DemographicExporter
 	private CDSExportMapper cdsExportMapper;
 
 	@Autowired
-	private PatientExportContext patientExportContext;
+	private PatientExportContextService patientExportContextService;
 
 	public CDSExporter()
 	{
@@ -80,7 +80,7 @@ public class CDSExporter implements DemographicExporter
 		Demographic demographic = patientRecord.getDemographic();
 		CDSFileParser parser = new CDSFileParser();
 
-		patientExportContext.getExportLogger().logSummaryLine(patientRecord);
+		patientExportContextService.getContext().getExportLogger().logSummaryLine(patientRecord);
 		incrementProviderExportCount(demographic);
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
 		instant = LogAction.printDuration(instant, "Exporter: model to CDS structure conversion");
@@ -147,8 +147,8 @@ public class CDSExporter implements DemographicExporter
 		eventLog.rename("ExportEventLog.txt");
 
 		eventLog.appendContents(
-				patientExportContext.getExportLogger().getSummaryLogFile(),
-				patientExportContext.getExportLogger().getEventLogFile());
+				patientExportContextService.getContext().getExportLogger().getSummaryLogFile(),
+				patientExportContextService.getContext().getExportLogger().getEventLogFile());
 
 		return eventLog;
 	}

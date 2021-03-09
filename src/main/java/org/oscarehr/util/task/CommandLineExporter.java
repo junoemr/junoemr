@@ -30,7 +30,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.demographicImport.service.PatientExportService;
-import org.oscarehr.demographicImport.util.ExportPreferences;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.oscarehr.util.JunoCommandLineRunner;
 import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;

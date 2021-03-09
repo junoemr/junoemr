@@ -23,7 +23,8 @@
 package org.oscarehr.demographicImport.mapper;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.util.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,7 @@ import java.util.List;
 public abstract class AbstractExportMapper<I, E>
 {
 	@Autowired
-	protected PatientExportContext patientExportContext;
+	protected PatientExportContextService patientExportContextService;
 
 	public AbstractExportMapper()
 	{
@@ -65,6 +66,7 @@ public abstract class AbstractExportMapper<I, E>
 	 */
 	public void logEvent(String message)
 	{
-		patientExportContext.getExportLogger().logEvent("[" + patientExportContext.getCurrentProcessIdentifier() + "] " + message);
+		PatientExportContext context = patientExportContextService.getContext();
+		context.getExportLogger().logEvent("[" + context.getCurrentProcessIdentifier() + "] " + message);
 	}
 }

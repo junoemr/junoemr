@@ -29,13 +29,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
-import org.oscarehr.demographicImport.util.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
 import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.StandardCoding;
-import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

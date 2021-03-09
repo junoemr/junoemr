@@ -20,11 +20,10 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.util;
+package org.oscarehr.demographicImport.service.context;
 
 import lombok.Data;
 import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
-import org.springframework.dao.ConcurrencyFailureException;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,24 +35,18 @@ public class PollableContext
 	private int processed;
 	private boolean complete;
 
-	private String threadId; //TODO this should eventually be split out to allow multiple parallel runs
-
 	private ConcurrentMap<String, String> localProcessIdentifierMap;
 
 	public PollableContext()
 	{
 		total = 0;
 		processed = 0;
-		complete = true;
+		complete = false;
 		localProcessIdentifierMap = new ConcurrentHashMap<>();
 	}
 
 	public synchronized void initialize(int total)
 	{
-		if(!complete)
-		{
-			throw new ConcurrencyFailureException("Attempt to initialize Context in use");
-		}
 		setTotal(total);
 		setProcessed(0);
 		setComplete(false);

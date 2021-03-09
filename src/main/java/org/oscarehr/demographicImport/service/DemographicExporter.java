@@ -24,7 +24,7 @@ package org.oscarehr.demographicImport.service;
 
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.model.PatientRecord;
-import org.oscarehr.demographicImport.util.ExportPreferences;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
 
 import java.io.IOException;
 import java.util.List;

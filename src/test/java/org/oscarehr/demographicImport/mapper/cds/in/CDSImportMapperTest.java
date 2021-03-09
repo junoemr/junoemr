@@ -45,7 +45,7 @@ import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
-import org.oscarehr.demographicImport.util.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.ConversionUtils;
 

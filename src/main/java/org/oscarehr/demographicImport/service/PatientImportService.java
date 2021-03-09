@@ -54,7 +54,7 @@ import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
-import org.oscarehr.demographicImport.util.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;

@@ -22,12 +22,11 @@
  */
 package org.oscarehr.demographicImport.service;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.logger.ExportLogger;
-import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.PatientExportContext;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
+import org.oscarehr.demographicImport.service.context.PatientExportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +37,6 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class PatientExportService
 {
-	private static final Logger logger = Logger.getLogger(PatientExportService.class);
-
 	@Autowired
 	private AppointmentStatusCache appointmentStatusCache;
 
@@ -75,7 +72,7 @@ public class PatientExportService
 				for(int j = 0; j < threadCount && i+j < demographicIdList.size(); j++)
 				{
 					Integer demographicId = Integer.parseInt(demographicIdList.get(i + j));
-					threads.add(patientExportService.exportDemographic(exporter, demographicId));
+					threads.add(patientExportService.exportDemographic(exporter, context, demographicId));
 				}
 				CompletableFuture.allOf(threads.toArray(new CompletableFuture<?>[0])).join();
 

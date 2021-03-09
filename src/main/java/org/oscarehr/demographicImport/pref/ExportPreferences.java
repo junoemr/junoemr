@@ -20,26 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.pref;
 
-import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.exception.InvalidImportFileException;
-import org.oscarehr.demographicImport.model.PatientRecord;
-import org.oscarehr.demographicImport.pref.ExportPreferences;
+import lombok.Data;
 
-import java.io.IOException;
-import java.util.List;
+import java.io.Serializable;
 
-public interface DemographicImporter
+@Data
+public class ExportPreferences implements Serializable
 {
-	enum MERGE_STRATEGY {
-		SKIP,
-		MERGE,
-	}
+	private boolean exportAlertsAndSpecialNeeds;
+	private boolean exportAllergiesAndAdverseReactions;
+	private boolean exportAppointments;
+	private boolean exportCareElements;
+	private boolean exportClinicalNotes;
+	private boolean exportFamilyHistory;
+	private boolean exportImmunizations;
+	private boolean exportLaboratoryResults;
+	private boolean exportMedicationsAndTreatments;
+	private boolean exportPastHealth;
+	private boolean exportPersonalHistory;
+	private boolean exportProblemList;
+	private boolean exportReportsReceived;
+	private boolean exportRiskFactors;
 
-	void verifyFileFormat(GenericFile importFile) throws InvalidImportFileException;
-
-	PatientRecord importDemographic(GenericFile importFile) throws Exception;
-
-	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
+	private int threadCount;
 }

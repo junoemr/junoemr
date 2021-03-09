@@ -31,7 +31,7 @@ import org.mockito.MockitoAnnotations;
 import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.mapper.cds.in.CDSImportMapper;
 import org.oscarehr.demographicImport.model.common.PartialDate;
-import org.oscarehr.demographicImport.util.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;

@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.mapper.cds.in.CDSImportMapper;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicImporter;
-import org.oscarehr.demographicImport.util.ExportPreferences;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.log.LogAction;

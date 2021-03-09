@@ -40,13 +40,15 @@ import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.oscarehr.demographicImport.service.ImportWrapperService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.demographicImport.service.PatientExportService;
+import org.oscarehr.demographicImport.service.context.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContextService;
+import org.oscarehr.demographicImport.service.context.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContextService;
 import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
-import org.oscarehr.demographicImport.util.ExportPreferences;
-import org.oscarehr.demographicImport.util.PatientExportContext;
-import org.oscarehr.demographicImport.util.PatientImportContext;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -114,10 +116,10 @@ public class DemographicsService extends AbstractServiceImpl
 	private DemographicSetsDao demographicSetsDao;
 
 	@Autowired
-	private PatientImportContext patientImportContext;
+	private PatientImportContextService patientImportContextService;
 
 	@Autowired
-	private PatientExportContext patientExportContext;
+	private PatientExportContextService patientExportContextService;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -371,7 +373,7 @@ public class DemographicsService extends AbstractServiceImpl
 						documentLocation,
 						false,
 						defaultSiteName);
-				patientImportContext.setResult(transferOutbound);
+				patientImportContextService.getContext().setResult(transferOutbound);
 			}
 			catch(Exception e)
 			{
@@ -396,7 +398,6 @@ public class DemographicsService extends AbstractServiceImpl
 		thread.start();
 
 		String threadId = String.valueOf(thread.getId());
-		patientImportContext.setThreadId(threadId);
 		return RestResponse.successResponse(threadId);
 	}
 
@@ -408,9 +409,14 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		if(patientImportContext.isComplete())
+		PatientImportContext importContext = patientImportContextService.unregister(processId);
+		if(importContext == null)
 		{
-			ImportTransferOutbound transferOutbound = patientImportContext.getResult();
+			throw new RuntimeException("Process is not registered");
+		}
+		else if(importContext.isComplete())
+		{
+			ImportTransferOutbound transferOutbound = importContext.getResult();
 			if(transferOutbound != null)
 			{
 				return RestResponse.successResponse(transferOutbound);
@@ -432,7 +438,7 @@ public class DemographicsService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(patientImportContext.getProgress());
+		return RestResponse.successResponse(patientImportContextService.getContext(processId).getProgress());
 	}
 
 	@GET
@@ -481,8 +487,8 @@ public class DemographicsService extends AbstractServiceImpl
 						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
 				ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
 				String filename = GenericFile.getSanitizedFileName(patientSet + ".zip");
-				patientExportContext.setExportName(filename);
-				patientExportContext.setResult(zipFile);
+				patientExportContextService.getContext().setExportName(filename);
+				patientExportContextService.getContext().setResult(zipFile);
 			}
 			catch(Exception e)
 			{
@@ -492,7 +498,6 @@ public class DemographicsService extends AbstractServiceImpl
 		thread.start();
 
 		String threadId = String.valueOf(thread.getId());
-		patientExportContext.setThreadId(threadId);
 		return RestResponse.successResponse(threadId);
 	}
 
@@ -505,13 +510,18 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		if(patientExportContext.isComplete())
+		PatientExportContext exportContext = patientExportContextService.unregister(processId);
+		if(exportContext == null)
 		{
-			ZIPFile exportZip = patientExportContext.getResult();
+			throw new RuntimeException("Process is not registered");
+		}
+		if(exportContext.isComplete())
+		{
+			ZIPFile exportZip = exportContext.getResult();
 			if(exportZip != null)
 			{
 				Response.ResponseBuilder response = Response.ok(exportZip.toFileInputStream());
-				response.header("Content-Disposition", "filename=" + patientExportContext.getExportName());
+				response.header("Content-Disposition", "filename=" + exportContext.getExportName());
 				response.type("application/zip");
 				return response.build();
 			}
@@ -532,7 +542,7 @@ public class DemographicsService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(patientExportContext.getProgress());
+		return RestResponse.successResponse(patientExportContextService.getContext(processId).getProgress());
 	}
 
 	@GET
