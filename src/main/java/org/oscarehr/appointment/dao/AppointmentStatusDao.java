@@ -94,9 +94,9 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
 	
 	/**
 	 * Get a list of all status codes which are currently in use.  Statuses which have been modified
-	 * (ie: Billed B, Signed S) are considered separate from their unmodified version
+	 * (ie: Verified V, Signed S) are considered separate from their unmodified version
 	 *
-	 * eg for a given status x: x, xS, xB, xBS, xSB are all considered distinct statuses.
+	 * eg for a given status x: x, xS, xV, xVS, xSV are all considered distinct statuses.
 	 *
 	 * @return list of appointment statuses in use
 	 */
