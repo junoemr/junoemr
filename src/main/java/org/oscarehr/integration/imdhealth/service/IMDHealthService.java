@@ -44,6 +44,8 @@ import org.oscarehr.integration.imdhealth.transfer.outbound.SSORequest;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSOUser;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,7 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class IMDHealthService
@@ -75,6 +78,9 @@ public class IMDHealthService
 
 	@Autowired
 	SiteDao siteDao;
+
+	@Autowired
+	ProviderDataDao providerDataDao;
 
 	private static final String PROP_KEY_APP = "imdhealth_app_domain";
 	private static final String PROP_KEY_SCHEME = "imdhealth_scheme";
@@ -148,12 +154,27 @@ public class IMDHealthService
 		SSOCredentials credentials;
 		for (Site site : sites)
 		{
+			if (site.getImdHealthUuid() == null)
+			{
+				UUID newUuid = UUID.randomUUID();
+				site.setImdHealthUuid(newUuid.toString());
+				siteDao.save(site);
+			}
+
 			Set<Provider> providers = site.getProviders();
 
 			for (Provider provider : providers)
 			{
 				if (provider.isActive())
 				{
+					if (provider.getImdHealthUuid() == null)
+					{
+						UUID newUuid = UUID.randomUUID();
+						ProviderData providerData = providerDataDao.findByProviderNo(provider.getProviderNo());
+						providerData.setImdHealthUuid(newUuid.toString());
+						providerDataDao.merge(providerData);
+					}
+
 					credentials = getSSOCredentials(token, provider, junoPracticeId, site.getId());
 					if (credentials == null)
 					{

@@ -169,6 +169,7 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	private String albertaEDeliveryIds = null;
 	@Column(name = "alberta_connect_care_id")
 	private String albertaConnectCareId;
+
 	/* ON */
 	@Column(name = "ontario_lifelabs_id")
 	private String ontarioLifeLabsId;
