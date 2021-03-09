@@ -24,8 +24,10 @@ package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class ExportPreferences
+public class ExportPreferences implements Serializable
 {
 	private boolean exportAlertsAndSpecialNeeds;
 	private boolean exportAllergiesAndAdverseReactions;

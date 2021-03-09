@@ -63,20 +63,20 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 				);
 				ctrl.demographicSetOptions = [];
 				ctrl.exportToggleOptions = {
-					exPersonalHistory: false,
-					exFamilyHistory: false,
-					exPastHealth: false,
-					exProblemList: false,
-					exRiskFactors: false,
-					exAllergiesAndAdverseReactions: false,
-					exMedicationsAndTreatments: false,
-					exImmunizations: false,
-					exLaboratoryResults: false,
-					exAppointments: false,
-					exClinicalNotes: false,
-					exReportsReceived: false,
-					exAlertsAndSpecialNeeds: false,
-					exCareElements: false,
+					exportPersonalHistory: false,
+					exportFamilyHistory: false,
+					exportPastHealth: false,
+					exportProblemList: false,
+					exportRiskFactors: false,
+					exportAllergiesAndAdverseReactions: false,
+					exportMedicationsAndTreatments: false,
+					exportImmunizations: false,
+					exportLaboratoryResults: false,
+					exportAppointments: false,
+					exportClinicalNotes: false,
+					exportReportsReceived: false,
+					exportAlertsAndSpecialNeeds: false,
+					exportCareElements: false,
 				}
 
 				ctrl.selectedExportType = ctrl.exportTypeOptions[0].value;
@@ -157,20 +157,7 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 						ctrl.demographicsApi.demographicExport(
 							ctrl.selectedExportType,
 							ctrl.selectedSet,
-							ctrl.exportToggleOptions.exPersonalHistory,
-							ctrl.exportToggleOptions.exFamilyHistory,
-							ctrl.exportToggleOptions.exPastHealth,
-							ctrl.exportToggleOptions.exProblemList,
-							ctrl.exportToggleOptions.exRiskFactors,
-							ctrl.exportToggleOptions.exAllergiesAndAdverseReactions,
-							ctrl.exportToggleOptions.exMedicationsAndTreatments,
-							ctrl.exportToggleOptions.exImmunizations,
-							ctrl.exportToggleOptions.exLaboratoryResults,
-							ctrl.exportToggleOptions.exAppointments,
-							ctrl.exportToggleOptions.exClinicalNotes,
-							ctrl.exportToggleOptions.exReportsReceived,
-							ctrl.exportToggleOptions.exAlertsAndSpecialNeeds,
-							ctrl.exportToggleOptions.exCareElements,
+							ctrl.exportToggleOptions
 						).then((result) =>
 						{
 							const processId = result.data.body;
@@ -191,6 +178,9 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 										).then((response) =>
 										{
 											downloadPromiseDefer.resolve(response);
+										}).catch((error) =>
+										{
+											downloadPromiseDefer.reject(error);
 										});
 									}
 								}

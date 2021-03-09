@@ -422,39 +422,26 @@ public class DemographicsService extends AbstractServiceImpl
 	public RestResponse<String> demographicExport(
 			@QueryParam("type") String type,
 			@QueryParam("patientSet") String patientSet,
-			@QueryParam("exPersonalHistory") @DefaultValue("false") boolean exPersonalHistory,
-			@QueryParam("exFamilyHistory") @DefaultValue("false") boolean exFamilyHistory,
-			@QueryParam("exPastHealth") @DefaultValue("false") boolean exPastHealth,
-			@QueryParam("exProblemList") @DefaultValue("false") boolean exProblemList,
-			@QueryParam("exRiskFactors") @DefaultValue("false") boolean exRiskFactors,
-			@QueryParam("exAllergiesAndAdverseReactions") @DefaultValue("false") boolean exAllergiesAndAdverseReactions,
-			@QueryParam("exMedicationsAndTreatments") @DefaultValue("false") boolean exMedicationsAndTreatments,
-			@QueryParam("exImmunizations") @DefaultValue("false") boolean exImmunizations,
-			@QueryParam("exLaboratoryResults") @DefaultValue("false") boolean exLaboratoryResults,
-			@QueryParam("exAppointments") @DefaultValue("false") boolean exAppointments,
-			@QueryParam("exClinicalNotes") @DefaultValue("false") boolean exClinicalNotes,
-			@QueryParam("exReportsReceived") @DefaultValue("false") boolean exReportsReceived,
-			@QueryParam("exAlertsAndSpecialNeeds") @DefaultValue("false") boolean exAlertsAndSpecialNeeds,
-			@QueryParam("exCareElements") @DefaultValue("false") boolean exCareElements) throws Exception
+			ExportPreferences exportPreferences) throws Exception
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		ExportPreferences exportPreferences = new ExportPreferences();
-		exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
-		exportPreferences.setExportAllergiesAndAdverseReactions(exAllergiesAndAdverseReactions);
-		exportPreferences.setExportAppointments(exAppointments);
-		exportPreferences.setExportCareElements(exCareElements);
-		exportPreferences.setExportClinicalNotes(exClinicalNotes);
-		exportPreferences.setExportFamilyHistory(exFamilyHistory);
-		exportPreferences.setExportImmunizations(exImmunizations);
-		exportPreferences.setExportLaboratoryResults(exLaboratoryResults);
-		exportPreferences.setExportMedicationsAndTreatments(exMedicationsAndTreatments);
-		exportPreferences.setExportPastHealth(exPastHealth);
-		exportPreferences.setExportPersonalHistory(exPersonalHistory);
-		exportPreferences.setExportProblemList(exProblemList);
-		exportPreferences.setExportReportsReceived(exReportsReceived);
-		exportPreferences.setExportRiskFactors(exRiskFactors);
+//		ExportPreferences exportPreferences = new ExportPreferences();
+//		exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
+//		exportPreferences.setExportAllergiesAndAdverseReactions(exAllergiesAndAdverseReactions);
+//		exportPreferences.setExportAppointments(exAppointments);
+//		exportPreferences.setExportCareElements(exCareElements);
+//		exportPreferences.setExportClinicalNotes(exClinicalNotes);
+//		exportPreferences.setExportFamilyHistory(exportFamilyHistory);
+//		exportPreferences.setExportImmunizations(exImmunizations);
+//		exportPreferences.setExportLaboratoryResults(exLaboratoryResults);
+//		exportPreferences.setExportMedicationsAndTreatments(exMedicationsAndTreatments);
+//		exportPreferences.setExportPastHealth(exPastHealth);
+//		exportPreferences.setExportPersonalHistory(exportPersonalHistory);
+//		exportPreferences.setExportProblemList(exProblemList);
+//		exportPreferences.setExportReportsReceived(exReportsReceived);
+//		exportPreferences.setExportRiskFactors(exRiskFactors);
 
 		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
 
@@ -488,6 +475,9 @@ public class DemographicsService extends AbstractServiceImpl
 	@SkipContentLoggingOutbound
 	public Response demographicExportResults(@PathParam("processId") String processId) throws FileNotFoundException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+
 		ZIPFile exportZip = patientExportContext.getResult();
 		if(patientExportContext.isComplete())
 		{
