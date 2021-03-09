@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
+import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.service.DemographicExporter;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,9 @@ public class PatientExportContext extends PollableContext
 	private DemographicExporter exporter;
 	private ExportLogger exportLogger;
 	private ExportPreferences exportPreferences;
+
+	private ZIPFile result; // this too
+	private String exportName; // and this
 
 	@Override
 	protected synchronized String getPollingMessage()

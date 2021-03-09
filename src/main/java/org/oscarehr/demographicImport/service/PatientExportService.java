@@ -89,7 +89,7 @@ public class PatientExportService
 		}
 		finally
 		{
-			context.setComplete(true);
+			context.markAsComplete();
 			BaseDbToModelConverter.clearProviderCache();
 			appointmentStatusCache.clear();
 		}

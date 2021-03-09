@@ -167,9 +167,8 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 								if(!complete)
 								{
 									let pollingData = await ctrl.fetchExportProgress(processId);
-									downloadPromiseDefer.notify(pollingData);
-
 									complete = pollingData.complete;
+
 									if (complete)
 									{
 										ctrl.demographicsApi.demographicExportResults(
@@ -182,6 +181,10 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 										{
 											downloadPromiseDefer.reject(error);
 										});
+									}
+									else
+									{
+										downloadPromiseDefer.notify(pollingData);
 									}
 								}
 							}, 500, 0, true);

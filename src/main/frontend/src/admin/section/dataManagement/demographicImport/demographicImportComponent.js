@@ -164,7 +164,32 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						formattedFileList
 					).then((result) =>
 					{
-						importPromiseDefer.resolve(result);
+						const processId = result.data.body;
+						let complete = false;
+						ctrl.pollingPromise = $interval(async () =>
+						{
+							if(!complete)
+							{
+								let pollingData = await ctrl.fetchImportProgress(processId);
+								complete = pollingData.complete;
+
+								if (complete)
+								{
+									ctrl.demographicsApi.demographicImportResults(processId
+									).then((response) =>
+									{
+										importPromiseDefer.resolve(response);
+									}).catch((error) =>
+									{
+										importPromiseDefer.reject(error);
+									});
+								}
+								else
+								{
+									importPromiseDefer.notify(pollingData);
+								}
+							}
+						}, 500, 0, true);
 					}).catch((error) =>
 					{
 						importPromiseDefer.reject(error);
@@ -177,11 +202,6 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						"Importing Patient Files",
 						ctrl.componentStyle,
 					);
-
-					ctrl.pollingPromise = $interval(async () =>
-					{
-						importPromiseDefer.notify(await ctrl.fetchImportProgress());
-					}, 500, 0, true);
 
 					loadingPromise.then((response) =>
 						{
@@ -199,12 +219,12 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 					);
 				}
 
-				ctrl.fetchImportProgress = async () =>
+				ctrl.fetchImportProgress = async (processId) =>
 				{
 					let pollingData = {};
 					try
 					{
-						pollingData = (await ctrl.demographicsApi.demographicImportProgress()).data.body;
+						pollingData = (await ctrl.demographicsApi.demographicImportProgress(processId)).data.body;
 					}
 					catch (e)
 					{

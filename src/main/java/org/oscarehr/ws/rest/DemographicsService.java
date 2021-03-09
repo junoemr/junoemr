@@ -90,7 +90,7 @@ import java.util.regex.Pattern;
 @Tag(name = "demographics")
 public class DemographicsService extends AbstractServiceImpl
 {
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
 	private DemographicManager demographicManager;
@@ -316,9 +316,8 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@POST
 	@Path("/import")
-	@SkipContentLoggingOutbound
 	@SkipContentLoggingInbound
-	public RestResponse<ImportTransferOutbound> demographicImport(
+	public RestResponse<String> demographicImport(
 			@QueryParam("type") String type,
 			@QueryParam("source") String importSource,
 			@QueryParam("merge") String mergeStrategy,
@@ -328,59 +327,103 @@ public class DemographicsService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
 
-		List<GenericFile> temporaryFileList = new ArrayList<>();
-		List<GenericFile> importFileList = new ArrayList<>();
-		String documentLocation = GenericFile.TEMP_DIRECTORY;
-		ImportTransferOutbound transferOutbound;
-
-		try
+		// run the main process in a new thread so this one can return a response
+		Thread thread = new Thread(() ->
 		{
-			for(FileTransfer file : fileListTransfer)
+			List<GenericFile> temporaryFileList = new ArrayList<>();
+			List<GenericFile> importFileList = new ArrayList<>();
+			String documentLocation = GenericFile.TEMP_DIRECTORY;
+
+			try
 			{
-				GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), "_" + file.getName());
-				temporaryFileList.add(tempfile);
-				tempfile.rename(file.getName()); //might be a referenced document. make sure it uses the original name
-
-				// unpack zip files, and treat their contents similar to any attached files
-				if(tempfile instanceof ZIPFile)
+				for(FileTransfer file : fileListTransfer)
 				{
-					List<GenericFile> zipContents = ((ZIPFile) tempfile).unzip();
-					temporaryFileList.addAll(zipContents);
+					GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), "_" + file.getName());
+					temporaryFileList.add(tempfile);
+					tempfile.rename(file.getName()); //might be a referenced document. make sure it uses the original name
 
-					for(GenericFile zipContentFile : zipContents)
+					// unpack zip files, and treat their contents similar to any attached files
+					if(tempfile instanceof ZIPFile)
 					{
-						if(zipContentFile instanceof XMLFile)
+						List<GenericFile> zipContents = ((ZIPFile) tempfile).unzip();
+						temporaryFileList.addAll(zipContents);
+
+						for(GenericFile zipContentFile : zipContents)
 						{
-							importFileList.add(zipContentFile);
+							if(zipContentFile instanceof XMLFile)
+							{
+								importFileList.add(zipContentFile);
+							}
 						}
 					}
+					// only attempt to import from xml files
+					else if(tempfile instanceof XMLFile)
+					{
+						importFileList.add(tempfile);
+					}
 				}
-				// only attempt to import from xml files
-				else if(tempfile instanceof XMLFile)
-				{
-					importFileList.add(tempfile);
-				}
-			}
 
-			transferOutbound = importWrapperService.importDemographics(
-					type,
-					importSource,
-					mergeStrategy,
-					importFileList,
-					documentLocation,
-					false,
-					defaultSiteName);
-		}
-		finally
-		{
-			// clean up temp files
-			for(GenericFile tempFile : temporaryFileList)
+				ImportTransferOutbound transferOutbound = importWrapperService.importDemographics(
+						type,
+						importSource,
+						mergeStrategy,
+						importFileList,
+						documentLocation,
+						false,
+						defaultSiteName);
+				patientImportContext.setResult(transferOutbound);
+			}
+			catch(Exception e)
 			{
-				tempFile.deleteFile();
+				logger.error("Import thread exception", e);
+			}
+			finally
+			{
+				try
+				{
+					// clean up temp files
+					for(GenericFile tempFile : temporaryFileList)
+					{
+						tempFile.deleteFile();
+					}
+				}
+				catch(IOException e)
+				{
+					logger.error("Error cleaning import temp files", e);
+				}
+			}
+		});
+		thread.start();
+
+		String threadId = String.valueOf(thread.getId());
+		patientImportContext.setThreadId(threadId);
+		return RestResponse.successResponse(threadId);
+	}
+
+	@GET
+	@Path("/import/{processId}")
+	@SkipContentLoggingOutbound
+	public RestResponse<ImportTransferOutbound> demographicImportResults(@PathParam("processId") String processId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+
+		if(patientImportContext.isComplete())
+		{
+			ImportTransferOutbound transferOutbound = patientImportContext.getResult();
+			if(transferOutbound != null)
+			{
+				return RestResponse.successResponse(transferOutbound);
+			}
+			else
+			{
+				throw new RuntimeException("An Unknown Error occurred"); // should not be possible
 			}
 		}
-
-		return RestResponse.successResponse(transferOutbound);
+		else
+		{
+			throw new RuntimeException("Process not complete");
+		}
 	}
 
 	@GET
@@ -427,22 +470,6 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-//		ExportPreferences exportPreferences = new ExportPreferences();
-//		exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
-//		exportPreferences.setExportAllergiesAndAdverseReactions(exAllergiesAndAdverseReactions);
-//		exportPreferences.setExportAppointments(exAppointments);
-//		exportPreferences.setExportCareElements(exCareElements);
-//		exportPreferences.setExportClinicalNotes(exClinicalNotes);
-//		exportPreferences.setExportFamilyHistory(exportFamilyHistory);
-//		exportPreferences.setExportImmunizations(exImmunizations);
-//		exportPreferences.setExportLaboratoryResults(exLaboratoryResults);
-//		exportPreferences.setExportMedicationsAndTreatments(exMedicationsAndTreatments);
-//		exportPreferences.setExportPastHealth(exPastHealth);
-//		exportPreferences.setExportPersonalHistory(exportPersonalHistory);
-//		exportPreferences.setExportProblemList(exProblemList);
-//		exportPreferences.setExportReportsReceived(exReportsReceived);
-//		exportPreferences.setExportRiskFactors(exRiskFactors);
-
 		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
 
 		// run the main process in a new thread so this one can return a response
@@ -478,9 +505,9 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		ZIPFile exportZip = patientExportContext.getResult();
 		if(patientExportContext.isComplete())
 		{
+			ZIPFile exportZip = patientExportContext.getResult();
 			if(exportZip != null)
 			{
 				Response.ResponseBuilder response = Response.ok(exportZip.toFileInputStream());
@@ -528,6 +555,7 @@ public class DemographicsService extends AbstractServiceImpl
 		}
 		return searchMode;
 	}
+
 	private DemographicCriteriaSearch convertFromJSON(JSONObject json) {
 		if(json ==null)return null;
 
