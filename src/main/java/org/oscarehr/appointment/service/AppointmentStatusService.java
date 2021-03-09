@@ -29,14 +29,16 @@ import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.managers.AppointmentManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class AppointmentStatusService
 {
 	@Autowired
@@ -44,6 +46,11 @@ public class AppointmentStatusService
 	
 	@Autowired
 	private AppointmentStatusDao appointmentStatusDao;
+
+	private enum ReorderDirection {
+		UP,
+		DOWN,
+	}
 
 	/**
 	 * Gets a list of appointment statuses for use in the calendar.
@@ -104,5 +111,70 @@ public class AppointmentStatusService
 		}
 		
 		return validCodes.first().toString();
+	}
+
+	private void swapUp(AppointmentStatus status)
+	{
+		List<AppointmentStatus> statuses = appointmentStatusDao.findAll();
+		Integer index = findByIndex(statuses, status);
+
+		if (index != null && index < 2)
+		{
+			Collections.swap(statuses, index, index - 1);
+
+			// just swap their ids around....
+		}
+	}
+
+
+	/**
+	 * Insert the provided appointment status at the specified relative position.  Appointment statuses following
+	 * the inserted status will be pushed to higher relative positions if space is needed.
+	 *
+	 * Position 1 is reserved, and attempts to insert into that position will result in an exception being thrown.
+	 *
+	 * There are a maximum of 26 appointment statuses, so for now we will attempt to do this in the ORM.
+	 * @param status Appointment Status to insert
+	 * @param relativePosition Relative position to insert the appointment status into.  Lower numbers result in the
+	 *                         appointment status appearing closer to the top of the list when cycling.  Must be greater
+	 *                         than or equals to 2
+	 *
+	 * @return An updated, ordered list of appointment statuses, with the provided appointment inserted into the correct relative position.
+	 */
+	private List<AppointmentStatus> swapPosition(AppointmentStatus status, ReorderDirection direction)
+	{
+
+
+		Integer index = null;
+		for (int i = 0; i < statuses.size(); i++)
+		{
+			AppointmentStatus current = statuses.get(i);
+			if (current.getStatus().equals(status.getStatus()))
+			{
+				index = i;
+			}
+		}
+
+		if (index != null)
+		{
+			if (direction.equals(ReorderDirection.UP))
+			{
+				// Position 1 is reserved
+				if (index > 2)
+				{
+
+				}
+			}
+
+			if (direction.equals(ReorderDirection.DOWN))
+			{
+				if (!index.equals(statuses.size() -1 ))
+				{
+					Collections.swap(statuses, index, index + 1);
+				}
+			}
+		}
+
+		return statuses;
 	}
 }
