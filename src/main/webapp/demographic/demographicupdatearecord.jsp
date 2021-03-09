@@ -67,8 +67,9 @@
 <%@page import="java.util.HashSet" %>
 <%@page import="java.util.List" %>
 <%@page import="java.util.Set" %>
-<%@ page import="static oscar.util.StringUtils.filterControlCharacters" %>
-<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
+<%@page import="java.util.Date" %>
+<%@page import="static oscar.util.StringUtils.filterControlCharacters" %>
+<%@page import="org.oscarehr.demographic.service.DemographicService" %>
 <%@page errorPage="errorpage.jsp"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -115,6 +116,7 @@
 	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
 	String ver = request.getParameter("ver");
 	String hcType = request.getParameter("hc_type");
+	String previousPatientStatus = demographic.getPatientStatus();
 
 	demographic.setLastName(request.getParameter("last_name").trim());
 	demographic.setFirstName(request.getParameter("first_name").trim());
@@ -230,17 +232,10 @@
 		demographic.setRosterTerminationDate(null);
 	}
 
-	yearTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_year"));
-	monthTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_month"));
-	dayTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_day"));
-
-	if(yearTmp != null && monthTmp != null && dayTmp != null)
+	/* Set patient status date */
+	if (!(demographic.getPatientStatus().equals(previousPatientStatus)))
 	{
-		demographic.setPatientStatusDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
-	}
-	else
-	{
-		demographic.setPatientStatusDate(null);
+		demographic.setPatientStatusDate(new Date());
 	}
 
 	/* patient consent */
