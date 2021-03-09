@@ -229,7 +229,7 @@ public class ProviderService extends AbstractServiceImpl {
 
 		try
 		{
-			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo);
+			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo, getLoggedInInfo().getLoggedInProviderNo());
 			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
 		}
 		catch(SecurityRecordAlreadyExistsException secRecordExists)

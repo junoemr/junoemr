@@ -285,12 +285,23 @@ public class ProviderService
 		return provider;
 	}
 
-	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	/**
+	 * edit a provider record.
+	 * @param providerEditFormTo1 - the provider edit forum from the front end containing the provider information to edit
+	 * @param providerNo - the providerNo to edit
+	 * @param editingProviderNo - the providerNo doing the edit
+	 * @return - the update provider
+	 */
+	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo, String editingProviderNo)
 	{
 		ProviderData providerData = providerDataDao.find(providerNo.toString());
 		if (providerData != null)
 		{
 			ProviderData newProviderData = providerEditFormTo1.getProviderData();
+
+			// set last update date
+			newProviderData.setLastUpdateUser(editingProviderNo);
+			newProviderData.setLastUpdateDate(new Date());
 
 			// transfer super admin flag
 			newProviderData.setSuperAdmin(providerData.getSuperAdmin());
