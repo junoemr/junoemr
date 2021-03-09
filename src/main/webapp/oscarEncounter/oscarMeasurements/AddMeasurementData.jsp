@@ -316,11 +316,9 @@
 
                        if (ectMeasurementsForm != null && !ectMeasurementsForm.isEmpty())
                        {
-                           hashtable = new Hashtable<String, Object>(ectMeasurementsForm.values);
-
-                           prevDate = (String) hashtable.get("date-" + ctr);
-                           val = (String) hashtable.get("inputValue-" + ctr);
-                           comment = (String) hashtable.get("comments-" + ctr);
+                           prevDate = ectMeasurementsForm.getValue("date-" + ctr);
+                           val = ectMeasurementsForm.getValue("inputValue-" + ctr);
+                           comment = ectMeasurementsForm.getValue("comments-" + ctr);
                        }
                %>
 
