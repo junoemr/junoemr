@@ -18,6 +18,9 @@
 
 --%>
 <%@ page import="java.util.*,org.oscarehr.common.model.*"%>
+<%@ page import="org.springframework.web.util.UriComponentsBuilder" %>
+<%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.util.regex.Matcher" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -43,79 +46,80 @@
 <oscar:customInterface section="apptStatusList"/>
 </head>
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+<link rel="stylesheet" type="text/css" media="all" href="../css/font/junoIcons/stylesheet.css" />
+
+<style>
+
+</style>
 <body>
-<%
-        String reseturl = request.getContextPath();
-        reseturl = reseturl + "/appointment/apptStatusSetting.do?dispatch=reset";
+    <%
+        final String baseUrl = request.getContextPath() + "/appointment/apptStatusSetting.do";
+
+        UriComponentsBuilder addUrl = UriComponentsBuilder.fromPath(baseUrl);
+        addUrl.queryParam("method", "create");
     %>
 <table border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr bgcolor="#486ebd">
 		<th align="CENTER" NOWRAP><font face="Helvetica" color="#FFFFFF"><bean:message
 			key="admin.appt.status.mgr.title" /></font></th>
-		<th align="right" NOWRAP><font face="Helvetica" color="#CCCCCC"><a
-			href=<%=reseturl%>>reset</a></font></th>
+        <th align="right" NOWRAP><font face="Helvetica" color="#CCCCCC">
+            <a href=<%=addUrl.build().toString()%>>Create new status</a>
+        </font></th>
 	</tr>
 </table>
 
-
 <table class="borderAll" width="100%">
 	<tr>
-		<th><bean:message key="admin.appt.status.mgr.label.status" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.desc" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.color" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.junoColor" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.enable" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.active" /></th>
-		<th>&nbsp;</th>
+        <th style="width: 10%; text-align: left;">Order</th>
+		<th style="width: 10%; text-align: left;"><bean:message key="admin.appt.status.mgr.label.status" /></th>
+		<th style="width: 15%; text-align: left;"><bean:message key="admin.appt.status.mgr.label.desc" /></th>
+        <th style="width: 10%; text-align: left;">Classic UI</th>
+        <th style="width: 10%; text-align: left;">Juno UI</th>
+		<th style="width: 10%; text-align: left;">Enabled</th>
+		<th style="width: 10%; text-align: left;">Actions</th>
+		<th></th>
 	</tr>
 	<%
-            List apptsList = (List) request.getAttribute("allStatus");
-            AppointmentStatus apptStatus = null;
-            int iStatusID = 0;
-            String strStatus = "";
-            String strDesc = "";
-            String strColor = "";
-			String strJunoColor = "";
-            int iActive = 0;
-            int iEditable = 0;
-            for (int i = 0; i < apptsList.size(); i++) {
-                apptStatus = (AppointmentStatus) apptsList.get(i);
-                iStatusID = apptStatus.getId();
-                strStatus = apptStatus.getStatus();
-                strDesc = apptStatus.getDescription();
-	            strColor = apptStatus.getColor();
-	            strJunoColor = apptStatus.getJunoColor();
-                iActive = apptStatus.getActive();
-                iEditable = apptStatus.getEditable();
-%>
-	<tr class=<%=(i % 2 == 0) ? "even" : "odd"%>>
-		<td class="nowrap"><%=strStatus%></td>
-		<td class="nowrap"><%=strDesc%></td>
-		<td class="nowrap" bgcolor="<%=strColor%>"><%=strColor%></td>
-		<td class="nowrap" bgcolor="<%=strJunoColor%>"><%=strJunoColor%></td>
-		<td class="nowrap"><%=iActive%></td>
+        List<AppointmentStatus> statuses = (List<AppointmentStatus>) request.getAttribute("appointmentStatuses");
+
+        boolean rowColoring = false;    // alternate background color of rows, this should really be in CSS.
+        Pattern junoClassRegex = Pattern.compile("(.+)\\.gif");
+
+        for (AppointmentStatus status : statuses)
+        {
+        	rowColoring = !rowColoring;
+
+        	boolean isActive =  status.getActive() == 1;
+        	boolean isEditable = status.getEditable() == 1;
+
+            UriComponentsBuilder editUrl = UriComponentsBuilder.fromPath(baseUrl);
+            editUrl.queryParam("method", "modify");
+            editUrl.queryParam("statusID", status.getId());
+
+            String imgUrl = "../images/" + status.getIcon();
+            String junoIconClass = "";
+
+            Matcher matcher = junoClassRegex.matcher(status.getIcon());
+
+            if (matcher.find()) {
+            	junoIconClass = "icon-" + matcher.group(1);
+            }
+    %>
+	<tr class=<%= (rowColoring) ? "even" : "odd" %>>
+        <td><%= status.getId() %></td>
+		<td class="nowrap"><%= status.getStatus() %></td>
+		<td class="nowrap"><%= status.getDescription() %></td>
+        <td bgcolor="<%= status.getColor() %>"><img src="<%=imgUrl%>"></img></td>
+		<td bgcolor="<%= status.getJunoColor() %>"><i class="<%="icon " + junoIconClass %>"></i> </td>
+        <td class="nowrap" <%= isActive ? "" : "style=\"color:  #808080;\"" %>><%= isActive ? "Enabled" : "Disabled" %></td>
 		<td class="nowrap">
-		<%
-    String url = request.getContextPath();
-    url = url + "/appointment/apptStatusSetting.do?dispatch=modify&statusID=";
-    url = url + iStatusID;
-        %> <a href=<%=url%>>Edit</a> &nbsp;&nbsp;&nbsp; <%
-    int iToStatus = (iActive > 0) ? 0 : 1;
-    url = request.getContextPath();
-    url = url + "/appointment/apptStatusSetting.do?dispatch=changestatus&iActive=";
-    url = url + iToStatus;
-    url = url + "&statusID=";
-    url = url + iStatusID;
-    if (iEditable == 1) {
-        %> <a href=<%=url%>><%=(iActive > 0) ? "Disable" : "Enable"%></a>
-		<%
-    }
-        %>
+        <% if (isEditable) { %>
+	        <a href=<%= editUrl.build().toString() %>>Edit</a>
+        <% } %>
+
 		</td>
 	</tr>
-	<%
-            }
-%>
+    <% } %>
 </table>
 <br>
 

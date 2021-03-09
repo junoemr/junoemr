@@ -29,94 +29,106 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.validator.LazyValidatorForm;
+import org.oscarehr.appointment.service.AppointmentStatusService;
 import org.oscarehr.common.model.AppointmentStatus;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import org.oscarehr.util.SpringUtils;
 import oscar.appt.status.service.AppointmentStatusMgr;
 import oscar.appt.status.service.impl.AppointmentStatusMgrImpl;
 
 public class AppointmentStatusAction extends DispatchAction {
-
-    private static final Logger logger = MiscUtils.getLogger();
+	
+    private static final AppointmentStatusService statusService = SpringUtils.getBean(AppointmentStatusService.class);
 
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        logger.warn("view");
-        populateAllStatus(request);
+        loadStatusAttributes(request);
         return mapping.findForward("success");
     }
-
-    public ActionForward reset(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        logger.warn("reset");
-        AppointmentStatusMgr apptStatusMgr = getApptStatusMgr();
-        apptStatusMgr.reset();
-        populateAllStatus(request);
-        return mapping.findForward("success");
+    
+    public ActionForward add(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
+	    LazyValidatorForm lazyForm = (LazyValidatorForm) form;
+	    
+	    AppointmentStatus status = new AppointmentStatus();
+	    // statusService has business logic to take care of setting the status code for us
+	    status.setDescription(lazyForm.get("description").toString());
+	    status.setIcon(lazyForm.get("icon").toString());
+	    status.setColor(lazyForm.get("color").toString());
+	    status.setJunoColor(lazyForm.get("junoColor").toString());
+	    statusService.createAppointmentStatus(status);
+    	
+	    loadStatusAttributes(request);
+	    return mapping.findForward("success");
     }
-
-    public ActionForward changestatus(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        logger.warn("changestatus");
-        AppointmentStatusMgr apptStatusMgr = getApptStatusMgr();
-        int ID = Integer.parseInt(request.getParameter("statusID"));
-        int iActive = Integer.parseInt(request.getParameter("iActive"));
-        apptStatusMgr.changeStatus(ID, iActive);
-        populateAllStatus(request);
-        return mapping.findForward("success");
+	
+	/** Forward to the edit page in create mode */
+	public ActionForward create(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
+    	LazyValidatorForm lazyForm = (LazyValidatorForm) form;
+	
+    	// Initialize some default values for the new status.
+	    lazyForm.set("active", 1);
+	    lazyForm.set("icon", "1.gif");
+	    
+	    request.setAttribute("action", "add");
+    	return mapping.findForward("edit");
     }
-
+    
+    /** Forward to the edit page in update mode */
     public ActionForward modify(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        logger.warn("modify");
-        AppointmentStatusMgr apptStatusMgr = getApptStatusMgr();
-        int ID = Integer.parseInt(request.getParameter("statusID"));
-        AppointmentStatus appt = apptStatusMgr.getStatus(ID);
+        int id = Integer.parseInt(request.getParameter("statusID"));
+        AppointmentStatus appt = statusService.getAppointmentStatusById(id);
+        
         LazyValidatorForm lazyForm = (LazyValidatorForm) form;
-        lazyForm.set("ID", ID);
-        lazyForm.set("apptStatus", appt.getStatus());
-        lazyForm.set("apptDesc", appt.getDescription());
-        lazyForm.set("apptOldColor", appt.getColor());
-        lazyForm.set("apptOldJunoColor", appt.getJunoColor());
-
+        lazyForm.set("id", id);
+        lazyForm.set("active", appt.getStatus());
+        lazyForm.set("icon", appt.getIcon());
+        lazyForm.set("description", appt.getDescription());
+	    
+        request.setAttribute("action", "update");
         return mapping.findForward("edit");
     }
 
     public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        logger.warn("update");
-        AppointmentStatusMgr apptStatusMgr = getApptStatusMgr();
         LazyValidatorForm lazyForm = (LazyValidatorForm) form;
-
-        int ID = Integer.parseInt(lazyForm.get("ID").toString());
-        String strDesc = lazyForm.get("apptDesc").toString();
-        String strColor = lazyForm.get("apptColor").toString();
-	    String strJunoColor = lazyForm.get("apptJunoColor").toString();
-
-	    if (null==strColor || strColor.equals(""))
-            strColor = lazyForm.get("apptOldColor").toString();
-	    if (null==strColor || strColor.equals(""))
-		    strJunoColor = lazyForm.get("apptOldJunoColor").toString();
-
-        apptStatusMgr.modifyStatus(ID, strDesc, strColor, strJunoColor);
-        populateAllStatus(request);
+	
+	    Integer statusId = Integer.parseInt(lazyForm.get("id").toString());
+        
+        AppointmentStatus status = statusService.getAppointmentStatusById(statusId);
+        if (status.getEditable() != 1)
+        {
+        	throw new RuntimeException("Can't edit a readonly status");
+        }
+        
+        status.setDescription(lazyForm.get("description").toString());
+        status.setActive(Integer.parseInt(lazyForm.get("active").toString()));
+        status.setIcon(lazyForm.get("icon").toString());
+        status.setColor(lazyForm.get("color").toString());
+        status.setJunoColor(lazyForm.get("junoColor").toString());
+        statusService.updateAppointmentStatus(status);
+        
+        loadStatusAttributes(request);
         return mapping.findForward("success");
     }
-
-    public WebApplicationContext getApptContext() {
-        return WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-    }
-
-    public AppointmentStatusMgr getApptStatusMgr() {
-        return new AppointmentStatusMgrImpl();
-    }
-
-    private void populateAllStatus(HttpServletRequest request)
+    
+    private void loadStatusAttributes(HttpServletRequest request)
     {
         AppointmentStatusMgr apptStatusMgr = getApptStatusMgr();
-        List allStatus = apptStatusMgr.getAllStatus();
-        request.setAttribute("allStatus", allStatus);
+        List<AppointmentStatus> allStatus = statusService.getAppointmentStatuses();
+        
+        request.setAttribute("appointmentStatuses", allStatus);
+        
         List<String> inactiveUseStatus = apptStatusMgr.checkStatusUsuage(allStatus);
         if (inactiveUseStatus.size() > 0)
         {
             request.setAttribute("useStatus", inactiveUseStatus);
         }
     }
+	
+    // This is a super dangerous class, need to kill it.  Eg:  Check out the reset method.
+	// TODO KILL WITH FIRE
+	private AppointmentStatusMgr getApptStatusMgr()
+	{
+		return new AppointmentStatusMgrImpl();
+	}
 }
