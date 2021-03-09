@@ -150,7 +150,7 @@ public class IceFallRESTService
 		return headers;
 	}
 
-	public String getIceFallUrlBase()
+	private String getIceFallUrlBase()
 	{
 		try
 		{
