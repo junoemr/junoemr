@@ -39,7 +39,7 @@
 
 	<script src="../js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
 <script src="../js/jquery.ui.colorPicker.min.js" type="text/javascript"></script>
-<oscar:customInterface section="apptStatusEdit"/>
+<%--<oscar:customInterface section="apptStatusEdit"/>--%>
 
 	<style>
 		.juno-color-button {
@@ -68,9 +68,8 @@
 <script type="text/javascript">
 	$(document).ready(function ()
 	{
-		// Fallback colors taken from the default custom appointment colors
-        var color = $('#apptColor').val() || "#897DF8"
-        var junoColor = $('#apptJunoColor').val() || "#AC9DF2";
+        var color = $('#apptColor').val();
+        var junoColor = $('#apptJunoColor').val();
 
         var $apptColorPicker = $('#apptColor');
 		$apptColorPicker.colorPicker({
@@ -234,11 +233,11 @@
             </tr>
             <tr>
                 <td>
-                    <input id="apptColor" name="color" value="" size="20" />
+                    <html:text property="color" styleId="apptColor" size="20"></html:text>
                 </td>
                 <td></td>
                 <td>
-                    <input id="apptJunoColor" name="junoColor" value="" size="20" />
+                    <html:text property="junoColor" styleId="apptJunoColor" size="20"></html:text>
                 </td>
                 <td id="junoColorPalette"></td>
             </tr>

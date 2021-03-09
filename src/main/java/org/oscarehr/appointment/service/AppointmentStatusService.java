@@ -31,10 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -87,8 +84,8 @@ public class AppointmentStatusService
 	}
 	
 	/**
-	 * Return the next available status code sorted alphabetically.  The lowercase set of letters has priority
-	 * over the uppercase set.
+	 * Return the next available status code sorted alphabetically.  Priority is alphabetical with lowercase characters
+	 * having priority.
 	 *
 	 * @return String unused appointment status code.
 	 */
@@ -96,7 +93,7 @@ public class AppointmentStatusService
 	{
 		// Method is private to make it unavailable to non-transactional code
 		// No need to be clever here.  Could also be implemented with a regular unordered set.
-		String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 		TreeSet<Character> validCodes = alphabet.chars().mapToObj(e -> (char)e).collect(Collectors.toCollection(TreeSet::new));
 		
 		List<AppointmentStatus> existingStatuses = appointmentStatusDao.findAll();

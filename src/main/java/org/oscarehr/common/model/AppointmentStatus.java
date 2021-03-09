@@ -23,17 +23,9 @@
  */
 package org.oscarehr.common.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
-import javax.persistence.Table;
-
 import org.hibernate.validator.constraints.Length;
-import oscar.appt.status.service.impl.AppointmentStatusMgrImpl;
+
+import javax.persistence.*;
 
 
 @Entity
@@ -155,10 +147,4 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 	public void setShortLetterColour(String shortLetterColour) {
 		this.shortLetterColour = shortLetterColour;
 	}
-
-	@PostPersist
-    @PostUpdate
-    public void on_jpa_update() {
-    	AppointmentStatusMgrImpl.setCacheIsDirty(true);
-    }
 }
