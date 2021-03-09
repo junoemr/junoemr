@@ -48,6 +48,36 @@
 </head>
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 <link rel="stylesheet" type="text/css" media="all" href="../css/font/junoIcons/stylesheet.css" />
+<style>
+    table {
+        width: 100%;
+    }
+
+    .margin-t {
+        margin-top: 32px;
+    }
+
+    .text-l {
+        text-align: left;
+        width: 10%;
+    }
+
+    .text-c {
+        text-align: center;
+    }
+
+    .wider {
+        width: 15%;
+    }
+
+    .active {
+        color: black;
+    }
+
+    .inactive {
+        color:  #808080;
+    }
+</style>
 <body>
     <%
         final String baseUrl = request.getContextPath() + "/appointment/apptStatusSetting.do";
@@ -57,7 +87,7 @@
         UriComponentsBuilder addUrl = UriComponentsBuilder.fromPath(baseUrl);
         addUrl.queryParam("method", "create");
     %>
-<table border=0 cellspacing=0 cellpadding=0 width="100%">
+<table border=0 cellspacing=0 cellpadding=0>
 	<tr bgcolor="#486ebd">
 		<th align="CENTER" NOWRAP><font face="Helvetica" color="#FFFFFF">
 			<bean:message key="admin.appt.status.mgr.title" />
@@ -65,34 +95,39 @@
 	</tr>
 </table>
 
-<table class="borderAll" width="100%">
+<table class="borderAll margin-t">
 	<tr>
-        <th style="width: 10%; text-align: left;">Relative Position</th>
-		<th style="width: 10%; text-align: left;"><bean:message key="admin.appt.status.mgr.label.status" /></th>
-		<th style="width: 15%; text-align: left;"><bean:message key="admin.appt.status.mgr.label.desc" /></th>
-        <th style="width: 10%; text-align: left;">Classic UI</th>
-        <th style="width: 10%; text-align: left;">Juno UI</th>
-		<th style="width: 10%; text-align: left;">Enabled</th>
+        <th class="header text-l">Relative Position</th>
+		<th class="header text-l"><bean:message key="admin.appt.status.mgr.label.status" /></th>
+		<th class="header text-l wider"><bean:message key="admin.appt.status.mgr.label.desc" /></th>
+        <th class="header text-l">Classic UI</th>
+        <th class="header text-l">Juno UI</th>
+		<th class="header text-l">Enabled</th>
 		<% if (isSuperAdmin) { %>
-			<th style="width: 10%; text-align: left;">Actions</th>
+		<th class="header text-l wider" colspan=3>Super Admin Options</th>
 		<% } %>
 	</tr>
 	<%
         List<AppointmentStatus> statuses = (List<AppointmentStatus>) request.getAttribute("appointmentStatuses");
 
-        boolean rowColoring = false;    // alternate background color of rows, this should really be in CSS.
         Pattern junoClassRegex = Pattern.compile("(.+)\\.gif");
 
         for (AppointmentStatus status : statuses)
         {
-        	rowColoring = !rowColoring;
-
         	boolean isActive =  status.getActive() == 1;
         	boolean isEditable = status.getEditable() == 1;
 
             UriComponentsBuilder editUrl = UriComponentsBuilder.fromPath(baseUrl);
             editUrl.queryParam("method", "modify");
             editUrl.queryParam("statusId", status.getId());
+
+            UriComponentsBuilder upUrl = UriComponentsBuilder.fromPath(baseUrl);
+            upUrl.queryParam("method", "moveUp");
+            upUrl.queryParam("statusId", status.getId());
+
+            UriComponentsBuilder downUrl = UriComponentsBuilder.fromPath(baseUrl);
+            downUrl.queryParam("method", "moveDown");
+            downUrl.queryParam("statusId", status.getId());
 
             String imgUrl = "../images/" + status.getIcon();
             String junoIconClass = "";
@@ -104,21 +139,23 @@
             	junoIconClass = "icon-" + matcher.group(1);
             }
     %>
-	<tr class=<%= (rowColoring) ? "even" : "odd" %>>
+	<tr>
         <td><%= status.getId() %></td>
 		<td class="nowrap"><%= status.getStatus() %></td>
 		<td class="nowrap"><%= status.getDescription() %></td>
-        <td bgcolor="<%= status.getColor() %>"><img src="<%=imgUrl%>"></img></td>
-		<td bgcolor="<%= status.getJunoColor() %>"><i class="<%="icon " + junoIconClass %>"></i></td>
-        <td class="nowrap" <%= isActive ? "" : "style=\"color:  #808080;\"" %>><%= isActive ? "Enabled" : "Disabled" %></td>
+        <td style="background-color: <%= status.getColor() %>"><img src="<%=imgUrl%>" alt="Classic icon"/></td>
+		<td style="background-color: <%= status.getJunoColor() %>"><i class="<%="icon " + junoIconClass %>" alt="Juno icon"></i></td>
+        <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %></td>
         <% if (isSuperAdmin && isEditable) { %>
-		<td class="nowrap"><a href=<%= editUrl.build().toString() %>>Edit</a></td>
+		<td class="nowrap text-l"><a href=<%= editUrl.build().toString() %>>Edit</a></td>
+        <td class="nowrap text-l"><a href=<%= upUrl.build().toString() %>>Move Up</a></td>
+        <td class="nowrap text-l"><a href=<%= downUrl.build().toString() %>>Move Down</a></td>
         <% } %>
 	</tr>
     <% } %>
 </table>
 <% if (isSuperAdmin) { %>
-	<div style="margin-top: 32px; text-align: center;">
+	<div class="margin-t text-c">
 		<a href=<%=addUrl.build().toString()%>><b>Create New Appointment Status</b></a>
 	</div>
 <% } %>

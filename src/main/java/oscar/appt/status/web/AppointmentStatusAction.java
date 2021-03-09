@@ -26,8 +26,6 @@ import org.apache.struts.validator.LazyValidatorForm;
 import org.oscarehr.appointment.service.AppointmentStatusService;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.util.SpringUtils;
-import oscar.appt.status.service.AppointmentStatusMgr;
-import oscar.appt.status.service.impl.AppointmentStatusMgrImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -90,7 +88,7 @@ public class AppointmentStatusAction extends DispatchAction {
         request.setAttribute("action", "update");
         return mapping.findForward("edit");
     }
-
+    
     public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         LazyValidatorForm lazyForm = (LazyValidatorForm) form;
 	
@@ -113,24 +111,38 @@ public class AppointmentStatusAction extends DispatchAction {
         return mapping.findForward("success");
     }
     
+    public ActionForward moveUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
+	    int id = Integer.parseInt(request.getParameter("statusId"));
+	    AppointmentStatus apptStatus = statusService.getAppointmentStatusById(id);
+	    
+    	statusService.swapUp(apptStatus);
+	    
+    	loadStatusAttributes(request);
+	    return mapping.findForward("success");
+    }
+	
+	public ActionForward moveDown(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		int id = Integer.parseInt(request.getParameter("statusId"));
+		AppointmentStatus apptStatus = statusService.getAppointmentStatusById(id);
+		
+		statusService.swapDown(apptStatus);
+		
+		loadStatusAttributes(request);
+		return mapping.findForward("success");
+	}
+    
     private void loadStatusAttributes(HttpServletRequest request)
     {
-        AppointmentStatusMgr apptStatusMgr = getApptStatusMgr();
-        List<AppointmentStatus> allStatus = statusService.getAppointmentStatuses();
+        List<AppointmentStatus> allStatuses = statusService.getAppointmentStatuses();
+        request.setAttribute("appointmentStatuses", allStatuses);
         
-        request.setAttribute("appointmentStatuses", allStatus);
-        
-        List<String> inactiveUseStatus = apptStatusMgr.checkStatusUsuage(allStatus);
+        List<String> inactiveUseStatus = statusService.checkStatusUsage(allStatuses);
         if (inactiveUseStatus.size() > 0)
         {
             request.setAttribute("useStatus", inactiveUseStatus);
         }
     }
-	
-    // This is a super dangerous class, need to kill it.  Eg:  Check out the reset method.
-	// TODO KILL WITH FIRE
-	private AppointmentStatusMgr getApptStatusMgr()
-	{
-		return new AppointmentStatusMgrImpl();
-	}
+    
 }

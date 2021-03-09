@@ -27,13 +27,16 @@ import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
 import org.oscarehr.appointment.model.AppointmentStatusList;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.managers.AppointmentManager;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -46,12 +49,7 @@ public class AppointmentStatusService
 	
 	@Autowired
 	private AppointmentStatusDao appointmentStatusDao;
-
-	private enum ReorderDirection {
-		UP,
-		DOWN,
-	}
-
+	
 	/**
 	 * Gets a list of appointment statuses for use in the calendar.
 	 * @return List of appointment statuses.
@@ -99,9 +97,11 @@ public class AppointmentStatusService
 	private String getNextAvailableStatusCode()
 	{
 		// Method is private to make it unavailable to non-transactional code
-		// No need to be clever here.  Could also be implemented with a regular unordered set.
-		String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-		TreeSet<Character> validCodes = alphabet.chars().mapToObj(e -> (char)e).collect(Collectors.toCollection(TreeSet::new));
+		// Ss and Vv are reserved statuses, for signed and verified.
+		String alphabet = "ABCDEFGHIJKLMNOPQRTUWXYZabcdefghijklmnopqrtuwxyz";
+		TreeSet<Character> validCodes = alphabet.chars()
+		                                        .mapToObj(e -> (char)e)
+		                                        .collect(Collectors.toCollection(() -> new TreeSet<Character>()));
 		
 		List<AppointmentStatus> existingStatuses = appointmentStatusDao.findAll();
 		for (AppointmentStatus status : existingStatuses)
@@ -112,69 +112,108 @@ public class AppointmentStatusService
 		
 		return validCodes.first().toString();
 	}
-
-	private void swapUp(AppointmentStatus status)
+	
+	/**
+	 * Move the specified AppointmentStatus up one position in relative ordering
+	 * when sorted by id.  The first position is reserved.  This method will have
+	 * no effect if the status is already first or second in the list.
+	 *
+	 * @param status Appointment status to move up.  This is not modified in place.
+	 */
+	public void swapUp(AppointmentStatus status)
 	{
 		List<AppointmentStatus> statuses = appointmentStatusDao.findAll();
+		statuses.sort(Comparator.comparing(AppointmentStatus::getId));
+		
 		Integer index = findByIndex(statuses, status);
-
-		if (index != null && index < 2)
+		
+		// The 0th index is reserved for the 't' status, therefore index 1 cannot be moved up.
+		// The earliest index that can be moved up is 2
+		if (index != null && index > 2)
 		{
-			Collections.swap(statuses, index, index - 1);
-
-			// just swap their ids around....
+			swapPosition(statuses.get(index), statuses.get(index - 1));
 		}
 	}
-
-
+	
 	/**
-	 * Insert the provided appointment status at the specified relative position.  Appointment statuses following
-	 * the inserted status will be pushed to higher relative positions if space is needed.
+	 * Move the specified AppointmentStatus one step down in relative ordering.
+	 * This method has no effect if the AppointmentStatus is already last
+	 * when sorted by id.
 	 *
-	 * Position 1 is reserved, and attempts to insert into that position will result in an exception being thrown.
-	 *
-	 * There are a maximum of 26 appointment statuses, so for now we will attempt to do this in the ORM.
-	 * @param status Appointment Status to insert
-	 * @param relativePosition Relative position to insert the appointment status into.  Lower numbers result in the
-	 *                         appointment status appearing closer to the top of the list when cycling.  Must be greater
-	 *                         than or equals to 2
-	 *
-	 * @return An updated, ordered list of appointment statuses, with the provided appointment inserted into the correct relative position.
+	 * @param status Appointment status to move down.
 	 */
-	private List<AppointmentStatus> swapPosition(AppointmentStatus status, ReorderDirection direction)
+	public void swapDown(AppointmentStatus status)
 	{
-
-
-		Integer index = null;
-		for (int i = 0; i < statuses.size(); i++)
+		List<AppointmentStatus> statuses = appointmentStatusDao.findAll();
+		statuses.sort(Comparator.comparing(AppointmentStatus::getId));
+		
+		Integer index = findByIndex(statuses, status);
+		
+		// The last item can't be moved down, as it is already on the bottom.
+		if (index != null && index < statuses.size() - 1)
 		{
-			AppointmentStatus current = statuses.get(i);
-			if (current.getStatus().equals(status.getStatus()))
+			swapPosition(statuses.get(index), statuses.get(index + 1));
+		}
+	}
+	
+	private Integer findByIndex(List<AppointmentStatus> allStatuses, AppointmentStatus target)
+	{
+		for (int i = 0; i < allStatuses.size(); i++)
+		{
+			if (allStatuses.get(i).getStatus().equals(target.getStatus()))
 			{
-				index = i;
+				return i;
 			}
 		}
-
-		if (index != null)
+		
+		return null;
+	}
+	
+	/**
+	 * Swaps the relative position (as ordered by id) of two appointment statuses by swapping their
+	 * ids.  The new ids are persisted to the database.  After swapping, the new order of the these
+	 * statuses relative to the rest of the list is guaranteed because no other ids are changed.
+	 *
+	 * ie:  If elements A and B with relative order 3 and 6 respectively are swapped, it is
+	 * guaranteed that A will be 6th in relative order, and B will be 3rd.
+	 *
+	 * @param source appointment status
+	 * @param target appointment status to swap with
+	 */
+	private void swapPosition(AppointmentStatus source, AppointmentStatus target)
+	{
+		AppointmentStatus temp = new AppointmentStatus();
+		
+		// Swap everything between the two statuses, except for the id.
+		BeanUtils.copyProperties(source, temp, "id");
+		BeanUtils.copyProperties(target, source, "id");
+		BeanUtils.copyProperties(temp, target, "id");
+		
+		appointmentStatusDao.merge(source);
+		appointmentStatusDao.merge(target);
+	}
+	
+	/**
+	 * Return which statuses from the given list are in use.
+	 *
+	 * @return List of appointment statuses in use.
+	 */
+	public List<String> checkStatusUsage(List<AppointmentStatus> statuses)
+	{
+		List<String> usedStatuses = appointmentStatusDao.getStatusesInUse();
+		Set<String> allStatusComponents = new HashSet<>();
+		
+		for (String status : usedStatuses)
 		{
-			if (direction.equals(ReorderDirection.UP))
+			for (char component : status.toCharArray())
 			{
-				// Position 1 is reserved
-				if (index > 2)
-				{
-
-				}
-			}
-
-			if (direction.equals(ReorderDirection.DOWN))
-			{
-				if (!index.equals(statuses.size() -1 ))
-				{
-					Collections.swap(statuses, index, index + 1);
-				}
+				allStatusComponents.add(Character.toString(component));
 			}
 		}
-
-		return statuses;
+		
+		return statuses.stream()
+		        .map((AppointmentStatus status) -> status.getStatus())
+		        .filter((String statusCode) -> allStatusComponents.contains(statusCode))
+		        .collect(Collectors.toList());
 	}
 }
