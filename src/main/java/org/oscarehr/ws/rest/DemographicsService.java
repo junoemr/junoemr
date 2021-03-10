@@ -79,6 +79,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -329,6 +330,8 @@ public class DemographicsService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
 
+		String processId = UUID.randomUUID().toString();
+
 		// run the main process in a new thread so this one can return a response
 		Thread thread = new Thread(() ->
 		{
@@ -395,10 +398,10 @@ public class DemographicsService extends AbstractServiceImpl
 				}
 			}
 		});
+		thread.setName(processId);
 		thread.start();
 
-		String threadId = String.valueOf(thread.getId());
-		return RestResponse.successResponse(threadId);
+		return RestResponse.successResponse(processId);
 	}
 
 	@GET
@@ -476,6 +479,7 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
+		String processId = UUID.randomUUID().toString();
 		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
 
 		// run the main process in a new thread so this one can return a response
@@ -495,10 +499,10 @@ public class DemographicsService extends AbstractServiceImpl
 				logger.error("Export thread error", e);
 			}
 		});
+		thread.setName(processId);
 		thread.start();
 
-		String threadId = String.valueOf(thread.getId());
-		return RestResponse.successResponse(threadId);
+		return RestResponse.successResponse(processId);
 	}
 
 	@GET

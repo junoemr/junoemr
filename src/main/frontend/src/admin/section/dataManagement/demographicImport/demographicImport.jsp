@@ -142,7 +142,7 @@
 			<div class="row" ng-if="$ctrl.results">
 				<div class="col-md-12">
 					<h6>Messages:</h6>
-					<div ng-repeat="message in $ctrl.results.messages">
+					<div ng-repeat="message in $ctrl.results.messages track by $index">
 						<span>{{message}}</span>
 					</div>
 				</div>

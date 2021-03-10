@@ -40,9 +40,13 @@ public abstract class PollableContextServiceBase<T extends PollableContext>
 	 */
 	public synchronized void register(T context)
 	{
-		contextMap.put(String.valueOf(Thread.currentThread().getId()), context);
+		contextMap.put(getCurrentThreadKey(), context);
 	}
 
+	public synchronized T unregister()
+	{
+		return unregister(getCurrentThreadKey());
+	}
 	public synchronized T unregister(String identifier)
 	{
 		return contextMap.remove(identifier);
@@ -54,7 +58,7 @@ public abstract class PollableContextServiceBase<T extends PollableContext>
 	 */
 	public synchronized T getContext()
 	{
-		return getContext(String.valueOf(Thread.currentThread().getId()));
+		return getContext(getCurrentThreadKey());
 	}
 
 	/**
@@ -65,5 +69,10 @@ public abstract class PollableContextServiceBase<T extends PollableContext>
 	public synchronized T getContext(String identifier)
 	{
 		return contextMap.get(identifier);
+	}
+
+	private String getCurrentThreadKey()
+	{
+		return Thread.currentThread().getName();
 	}
 }

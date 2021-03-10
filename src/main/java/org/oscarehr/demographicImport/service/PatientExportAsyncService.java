@@ -71,6 +71,7 @@ public class PatientExportAsyncService
 		instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: export file creation");
 		patientExportContext.incrementProcessed();
 
+		patientExportContextService.unregister();
 		return CompletableFuture.completedFuture(file);
 	}
 }
