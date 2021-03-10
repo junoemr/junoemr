@@ -49,6 +49,8 @@ import org.oscarehr.demographicImport.service.context.PatientExportContextServic
 import org.oscarehr.demographicImport.service.context.PatientImportContext;
 import org.oscarehr.demographicImport.service.context.PatientImportContextService;
 import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
+import org.oscarehr.log.model.LogDataMigration;
+import org.oscarehr.log.service.LogDataMigrationService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -64,7 +66,6 @@ import org.oscarehr.ws.rest.transfer.common.FileTransfer;
 import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.oscarReport.data.DemographicSetManager;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -75,7 +76,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +121,9 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@Autowired
 	private PatientExportContextService patientExportContextService;
+
+	@Autowired
+	private LogDataMigrationService logDataMigrationService;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -480,19 +483,16 @@ public class DemographicsService extends AbstractServiceImpl
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
 		String processId = UUID.randomUUID().toString();
-		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
 
 		// run the main process in a new thread so this one can return a response
 		Thread thread = new Thread(() ->
 		{
 			try
 			{
-				List<GenericFile> exportFiles = patientExportService.exportDemographics(
-						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
-				ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
-				String filename = GenericFile.getSanitizedFileName(patientSet + ".zip");
-				patientExportContextService.getContext().setExportName(filename);
-				patientExportContextService.getContext().setResult(zipFile);
+				patientExportService.exportDemographicsToZip(
+						patientSet,
+						ImporterExporterFactory.EXPORTER_TYPE.CDS_5,
+						exportPreferences);
 			}
 			catch(Exception e)
 			{
@@ -509,44 +509,52 @@ public class DemographicsService extends AbstractServiceImpl
 	@Path("/export/{processId}")
 	@Produces("application/zip")
 	@SkipContentLoggingOutbound
-	public Response demographicExportResults(@PathParam("processId") String processId) throws FileNotFoundException
+	public Response demographicExportResults(@PathParam("processId") String processId) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		PatientExportContext exportContext = patientExportContextService.unregister(processId);
-		if(exportContext == null)
-		{
-			throw new RuntimeException("Process is not registered");
-		}
-		if(exportContext.isComplete())
-		{
-			ZIPFile exportZip = exportContext.getResult();
-			if(exportZip != null)
-			{
-				Response.ResponseBuilder response = Response.ok(exportZip.toFileInputStream());
-				response.header("Content-Disposition", "filename=" + exportContext.getExportName());
-				response.type("application/zip");
-				return response.build();
-			}
-			else
-			{
-				throw new RuntimeException("An Unknown Error occurred"); // should not be possible
-			}
-		}
-		else
-		{
-			throw new RuntimeException("Process not complete");
-		}
+		LogDataMigration dataMigration = logDataMigrationService.getExportResult(processId);
+		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
+
+		String patientSet = jsonData.getString(LogDataMigration.DATA_KEY_PATIENT_SET);
+		String filename = jsonData.getString(LogDataMigration.DATA_KEY_FILE);
+		ZIPFile exportZip = (ZIPFile) FileFactory.getExportLogFile(processId, filename);
+
+		Response.ResponseBuilder response = Response.ok(exportZip.toFileInputStream());
+		response.header("Content-Disposition", "filename=" + patientSet + ".zip");
+		response.type("application/zip");
+		return response.build();
 	}
 
 	@GET
 	@Path("/export/{processId}/progress")
-	public RestResponse<ProgressBarPollingData> demographicExportProgress(@PathParam("processId") String processId)
+	public RestResponse<ProgressBarPollingData> demographicExportProgress(@PathParam("processId") String processId) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(patientExportContextService.getContext(processId).getProgress());
+
+		PatientExportContext context = patientExportContextService.getContext(processId);
+		if(context != null)
+		{
+			return RestResponse.successResponse(context.getProgress());
+		}
+		else
+		{
+			LogDataMigration dataMigration = logDataMigrationService.getExportResult(processId);
+
+			if(dataMigration != null)
+			{
+				ProgressBarPollingData pollingData = new ProgressBarPollingData();
+				pollingData.setMessage("Finalizing...");
+				pollingData.setComplete(true);
+				return RestResponse.successResponse(pollingData);
+			}
+			else
+			{
+				throw new RuntimeException("Invalid process id: " + processId);
+			}
+		}
 	}
 
 	@GET

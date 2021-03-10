@@ -121,9 +121,9 @@ public class FileFactory
 	 * @return - the file
 	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
 	 */
-	public static GenericFile createExportLogFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
+	public static GenericFile createExportLogFile(InputStream fileInputStream, String fileName, String identifier) throws IOException, InterruptedException
 	{
-		return createNewFormattedFile(fileInputStream, fileName, GenericFile.LOG_EXPORT_DIR, false);
+		return createNewFormattedFile(fileInputStream, fileName, Paths.get(GenericFile.LOG_EXPORT_DIR, identifier).toString(), false);
 	}
 
 	/**
@@ -295,9 +295,9 @@ public class FileFactory
 	 * @param fileName - name of the file to load
 	 * @return - the file
 	 */
-	public static GenericFile getExportLogFile(String fileName) throws IOException
+	public static GenericFile getExportLogFile(String identifier, String fileName) throws IOException
 	{
-		return getExistingFile(GenericFile.LOG_EXPORT_DIR, fileName);
+		return getExistingFile(Paths.get(GenericFile.LOG_EXPORT_DIR, identifier).toString(), fileName);
 	}
 
 	/**

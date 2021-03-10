@@ -37,10 +37,13 @@ public abstract class PollableContextServiceBase<T extends PollableContext>
 	/**
 	 * register the given context object with the current thread process
 	 * @param context - the context to register
+	 * @return - the context identifier
 	 */
-	public synchronized void register(T context)
+	public synchronized String register(T context)
 	{
-		contextMap.put(getCurrentThreadKey(), context);
+		String key = getCurrentThreadKey();
+		contextMap.put(key, context);
+		return key;
 	}
 
 	public synchronized T unregister()

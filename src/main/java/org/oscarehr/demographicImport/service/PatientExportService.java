@@ -22,14 +22,22 @@
  */
 package org.oscarehr.demographicImport.service;
 
+import org.json.JSONObject;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.oscarehr.demographicImport.service.context.PatientExportContext;
+import org.oscarehr.demographicImport.service.context.PatientExportContextService;
+import org.oscarehr.log.dao.LogDataMigrationDao;
+import org.oscarehr.log.model.LogDataMigration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.oscarReport.data.DemographicSetManager;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -46,11 +54,81 @@ public class PatientExportService
 	@Autowired
 	private PatientExportAsyncService patientExportService;
 
-	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
+	@Autowired
+	private LogDataMigrationDao logDataMigrationDao;
+
+	@Autowired
+	private PatientExportContextService patientExportContextService;
+
+	@Deprecated
+	/**
+	 * @deprecated for legacy UI use only
+	 */
+	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE exportType,
 	                                            List<String> demographicIdList,
 	                                            ExportPreferences preferences) throws Exception
 	{
-		PatientExportContext context = importerExporterFactory.initializeExportContext(importType, preferences, demographicIdList.size());
+		PatientExportContext context = importerExporterFactory.initializeExportContext(exportType, preferences, demographicIdList.size());
+		String contextId = patientExportContextService.register(context);
+		List<GenericFile> exportFiles;
+		try
+		{
+			LogDataMigration dataMigration = new LogDataMigration();
+			dataMigration.setUuid(contextId);
+			dataMigration.setStartDatetime(LocalDateTime.now());
+			dataMigration.setTypeExport();
+			logDataMigrationDao.persist(dataMigration);
+
+			exportFiles = exportDemographics(context, demographicIdList, preferences);
+
+			dataMigration.setEndDatetime(LocalDateTime.now());
+			logDataMigrationDao.merge(dataMigration);
+		}
+		finally
+		{
+			context.markAsComplete();
+			patientExportContextService.unregister(contextId);
+		}
+		return exportFiles;
+	}
+
+	public ZIPFile exportDemographicsToZip(String patientSet,
+	                                       ImporterExporterFactory.EXPORTER_TYPE exportType,
+	                                       ExportPreferences preferences) throws Exception
+	{
+		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
+		PatientExportContext context = importerExporterFactory.initializeExportContext(exportType, preferences, demographicIdList.size());
+		String contextId = patientExportContextService.register(context);
+		ZIPFile zipFile;
+		try
+		{
+			LogDataMigration dataMigration = new LogDataMigration();
+			dataMigration.setUuid(contextId);
+			dataMigration.setStartDatetime(LocalDateTime.now());
+			dataMigration.setTypeExport();
+			dataMigration.setJsonData(new JSONObject().put(LogDataMigration.DATA_KEY_PATIENT_SET, patientSet));
+			logDataMigrationDao.persist(dataMigration);
+
+			List<GenericFile> exportFiles = exportDemographics(context, demographicIdList, preferences);
+			zipFile = FileFactory.packageZipFile(exportFiles, true);
+			zipFile.moveToLogExport(contextId);
+
+			dataMigration.setEndDatetime(LocalDateTime.now());
+			dataMigration.setJsonData(dataMigration.getDataAsJson().put(LogDataMigration.DATA_KEY_FILE, zipFile.getName()));
+			logDataMigrationDao.merge(dataMigration);
+		}
+		finally
+		{
+			context.markAsComplete();
+			patientExportContextService.unregister(contextId);
+		}
+		return zipFile;
+	}
+
+	private List<GenericFile> exportDemographics(PatientExportContext context,
+	                                             List<String> demographicIdList,
+	                                             ExportPreferences preferences) throws Exception
+	{
 		ExportLogger exportLogger = context.getExportLogger();
 		DemographicExporter exporter = context.getExporter();
 
@@ -86,7 +164,6 @@ public class PatientExportService
 		}
 		finally
 		{
-			context.markAsComplete();
 			BaseDbToModelConverter.clearProviderCache();
 			appointmentStatusCache.clear();
 		}

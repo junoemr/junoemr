@@ -58,20 +58,26 @@ public class PatientExportAsyncService
 	public CompletableFuture<GenericFile> exportDemographic(DemographicExporter exporter, PatientExportContext patientExportContext, Integer demographicId) throws Exception
 	{
 		Instant instant = Instant.now();
+		GenericFile file;
 		patientExportContextService.register(patientExportContext); // need to register this thread with the given context
-		patientExportContext.addProcessIdentifier(String.valueOf(demographicId));
-		logger.info("Load Demographic " + demographicId);
-		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+		try
+		{
+			patientExportContext.addProcessIdentifier(String.valueOf(demographicId));
+			logger.info("Load Demographic " + demographicId);
+			org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
 
-		PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
-		instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: load patient model");
+			PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
+			instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: load patient model");
 
-		logger.info("Export Demographic " + patientRecord.getDemographic().getId());
-		GenericFile file = exporter.exportDemographic(patientRecord);
-		instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: export file creation");
-		patientExportContext.incrementProcessed();
-
-		patientExportContextService.unregister();
+			logger.info("Export Demographic " + patientRecord.getDemographic().getId());
+			file = exporter.exportDemographic(patientRecord);
+			instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: export file creation");
+			patientExportContext.incrementProcessed();
+		}
+		finally
+		{
+			patientExportContextService.unregister();
+		}
 		return CompletableFuture.completedFuture(file);
 	}
 }

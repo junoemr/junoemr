@@ -152,9 +152,9 @@ public class GenericFile
 	{
 		return moveFile(LOG_IMPORT_DIR);
 	}
-	public boolean moveToLogExport() throws IOException
+	public boolean moveToLogExport(String identifier) throws IOException
 	{
-		return moveFile(LOG_EXPORT_DIR);
+		return moveFile(Paths.get(LOG_EXPORT_DIR, identifier).toString());
 	}
 	public boolean moveToHRMDocuments() throws IOException
 	{

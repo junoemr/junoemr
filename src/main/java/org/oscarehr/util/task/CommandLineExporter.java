@@ -25,12 +25,10 @@ package org.oscarehr.util.task;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
+import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.demographicImport.service.PatientExportService;
-import org.oscarehr.demographicImport.pref.ExportPreferences;
 import org.oscarehr.util.JunoCommandLineRunner;
 import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;
@@ -38,13 +36,13 @@ import org.oscarehr.util.task.args.IntegerArg;
 import org.oscarehr.util.task.args.StringArg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.oscarReport.data.DemographicSetManager;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static oscar.util.ConversionUtils.DATE_TIME_FILENAME;
 
@@ -98,8 +96,6 @@ public class CommandLineExporter implements CommandLineTask
 					java.util.Arrays.asList(ImporterExporterFactory.EXPORTER_TYPE.values()));
 		}
 
-		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
-
 		ExportPreferences exportPreferences = new ExportPreferences();
 		exportPreferences.setExportAlertsAndSpecialNeeds((Boolean) args.get("include-alerts").getValue());
 		exportPreferences.setExportAllergiesAndAdverseReactions((Boolean) args.get("include-allergies").getValue());
@@ -120,9 +116,11 @@ public class CommandLineExporter implements CommandLineTask
 		logger.info("BEGIN EXPORT [ Patient Set: '" + patientSet + "']");
 		try
 		{
-			List<GenericFile> exportFiles = patientExportService.exportDemographics(
-					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
-			ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
+			String processId = UUID.randomUUID().toString();
+			Thread.currentThread().setName(processId);
+
+			ZIPFile zipFile = patientExportService.exportDemographicsToZip(patientSet,
+					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportPreferences);
 
 			String exportZipName = "export_" + ConversionUtils.toDateTimeString(LocalDateTime.now(), DATE_TIME_FILENAME) + "_" + patientSet + ".zip";
 			zipFile.rename(ZIPFile.getSanitizedFileName(exportZipName));

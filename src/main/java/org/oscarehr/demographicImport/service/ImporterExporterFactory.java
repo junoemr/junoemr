@@ -119,7 +119,6 @@ public class ImporterExporterFactory
 		patientExportContext.setExportPreferences(exportPreferences);
 		patientExportContext.setExportLogger(getExportLogger(type));
 		patientExportContext.setExporter(getExporter(type));
-		patientExportContextService.register(patientExportContext);
 		return patientExportContext;
 	}
 

@@ -53,6 +53,6 @@ public class CDSExportLogger extends CDSBaseLogger implements ExportLogger
 	protected GenericFile initLogFile(String header, String fileName) throws IOException, InterruptedException
 	{
 		InputStream stream = new ByteArrayInputStream(header.getBytes(StandardCharsets.UTF_8));
-		return FileFactory.createExportLogFile(stream, fileName);
+		return FileFactory.createExportLogFile(stream, fileName, Thread.currentThread().getName());
 	}
 }
