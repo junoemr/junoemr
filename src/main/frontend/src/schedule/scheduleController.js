@@ -72,6 +72,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
+		
+		controller.appointmentCount = {};
 
 		//=========================================================================
 		// Local scope variables
@@ -577,7 +579,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// the end time to convert to the correct date.
 			var startDateString = start.format(Juno.Common.Util.settings.date_format);
 			var endDateString = end.subtract(1, 'seconds').format(Juno.Common.Util.settings.date_format);
-
+			
 			$scope.scheduleApi.getCalendarSchedule(
 				selectedSchedule.identifier,
 				selectedSchedule.identifierType,
@@ -591,11 +593,16 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
-					// console.info('================== load events ===================');
+					console.info('================== load events ===================');
 					var hasVisibleSchedules = results.data.body.visibleSchedules;
 					$scope.showNoResources = !hasVisibleSchedules;
 					$scope.uiConfig.calendar.hiddenDays = [];
-
+					
+					console.log(results.data);
+					if (results.data && results.data.body) {
+						controller.testChris(results.data.body.eventList)
+					}
+					
 					if (selectedSchedule.identifierType === controller.scheduleTypeEnum.group)
 					{
 						var providerNos = results.data.body.providerIdList;
@@ -879,6 +886,22 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 			);
 		};
+		
+		controller.testChris = (events) =>
+		{
+			console.log("////// TEST CHRIS //////")
+			controller.appointmentCount = {};
+			events.filter((event) => event.data != null)
+				.forEach((event) =>
+				{
+					const provider = event.resourceId;
+					const status = event.data.eventStatusCode;
+					
+					controller.appointmentCount[provider] = (controller.appointmentCount[provider] +1 ) || 1 ;
+				});
+			
+			console.log(controller.appointmentCount);
+		}
 
 		//=========================================================================
 		// Event Handlers
@@ -1127,7 +1150,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.onResourceRender = function onResourceRender(resourceObj, labelTds, bodyTds)
 		{
 			labelTds.html(require('./view-columnControl.html'));
-
+			
 			labelTds.find(".hdr-label").text(resourceObj.display_name);
 
 			// append data to the root element so it can be accessed by click events
