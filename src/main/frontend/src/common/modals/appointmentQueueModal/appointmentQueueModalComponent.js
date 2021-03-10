@@ -37,11 +37,12 @@ angular.module('Common.Components').component('appointmentQueueModal',
 			'$httpParamSerializer',
 			'$uibModal',
 			'securityService',
-			function ($scope,
-			          $http,
-			          $httpParamSerializer,
-			          $uibModal,
-								securityService)
+			function (
+				$scope,
+				$http,
+				$httpParamSerializer,
+				$uibModal,
+				securityService)
 			{
 				let ctrl = this;
 

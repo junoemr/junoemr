@@ -79,7 +79,7 @@
 				<div class="juno-text flex-row justify-content-between">
 					<span>
 						<h6 class="d-inline-block">Advanced Options</h6>
-						<span>Change only if you know what your doing</span>
+						<span>Change only if you know what you're doing</span>
 					</span>
 					<juno-button component-style="$ctrl.componentStyle" class="flex-grow-0" click="$ctrl.toggleAdvanced()">Show/Hide</juno-button>
 				</div>
