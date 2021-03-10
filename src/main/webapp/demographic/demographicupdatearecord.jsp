@@ -209,9 +209,6 @@
 		demographic.setRosterTerminationDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
 	}
 
-	yearTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_year"));
-	monthTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_month"));
-	dayTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_day"));
 
 	/* Set patient status date */
 	if (!(demographic.getPatientStatus().equals(previousPatientStatus)))
@@ -220,6 +217,10 @@
 	}
 
 	/* TODO: allow user to set the patient status date independently
+	yearTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_year"));
+	monthTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_month"));
+	dayTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_day"));
+
 	else if(yearTmp != null && monthTmp != null && dayTmp != null)
 	{
 
