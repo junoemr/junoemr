@@ -89,8 +89,10 @@ public class AppointmentStatusService
 	}
 	
 	/**
-	 * Return the next available status code sorted alphabetically.  Priority is alphabetical with lowercase characters
-	 * having priority.
+	 * Return the next available status code.
+	 *
+	 * Priority is determined by the ordinal value of the available status' ascii value.
+	 * (Alphabetical, with the entire uppercase set having higher priority than the lowercase set)
 	 *
 	 * @return String unused appointment status code.
 	 */
@@ -170,9 +172,9 @@ public class AppointmentStatusService
 	}
 	
 	/**
-	 * Swaps the relative position (as ordered by id) of two appointment statuses by swapping their
-	 * ids.  The new ids are persisted to the database.  After swapping, the new order of the these
-	 * statuses relative to the rest of the list is guaranteed because no other ids are changed.
+	 * Swaps ids (and therefore the relative position) of two appointment statuses, and persists
+	 * the changes to the database. After swapping, the new order of these statuses relative to
+	 * the rest of the list is guaranteed because no other ids are changed.
 	 *
 	 * ie:  If elements A and B with relative order 3 and 6 respectively are swapped, it is
 	 * guaranteed that A will be 6th in relative order, and B will be 3rd.
@@ -184,7 +186,7 @@ public class AppointmentStatusService
 	{
 		AppointmentStatus temp = new AppointmentStatus();
 		
-		// Swap everything between the two statuses, except for the id.
+		// Abracadabra! Swap everything between the two statuses, except for the id.
 		BeanUtils.copyProperties(source, temp, "id");
 		BeanUtils.copyProperties(target, source, "id");
 		BeanUtils.copyProperties(temp, target, "id");
