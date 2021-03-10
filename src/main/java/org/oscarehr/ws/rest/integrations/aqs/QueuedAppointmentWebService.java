@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.aqs.conversion.QueuedAppointmentBookingTransferQueuedAppointmentConverter;
+import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -51,6 +52,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.validation.ValidationException;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Path("/integrations/aqs/queue/{queueId}/appointment")

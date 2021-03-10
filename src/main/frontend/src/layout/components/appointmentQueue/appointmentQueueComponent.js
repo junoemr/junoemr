@@ -29,6 +29,7 @@ import {
 } from "../../../common/components/junoComponentConstants";
 import {AqsQueuesApi, AqsQueuedAppointmentApi} from "../../../../generated";
 import AppointmentBooking from "../../../common/modals/bookAppointmentModal/appointmentBooking";
+import {ErrorCodes} from "../../../lib/integration/aqs/error/ErrorCodes";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -352,8 +353,18 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				critical: appointmentBooking.critical,
 			}
 
-			await aqsQueuedAppointmentApi.createQueuedAppointment(ctrl.currentQueue.id, queuedAppointmentBookingDto);
-
+			try
+			{
+				await aqsQueuedAppointmentApi.createQueuedAppointment(ctrl.currentQueue.id, queuedAppointmentBookingDto);
+			}
+			catch(errorResponse)
+			{
+				if (errorResponse.data.error.data.errorCode === ErrorCodes.QUEUE_AVAILABILITY_ERROR)
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Failed to book", "The Queue has closed. You can adjust the queue hours in the Admin section.");
+				}
+			}
+			
 			// refresh display
 			this.loadQueues();
 		}

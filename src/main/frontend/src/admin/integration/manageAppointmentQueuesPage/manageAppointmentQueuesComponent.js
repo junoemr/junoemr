@@ -159,6 +159,10 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 					{
 						systemPreferenceService.setPreference(SYSTEM_PROPERTIES.AQS_ORGANIZATION_SECRET, ctrl.organizationSecret);
 					}
+
+					// reload queues.
+					ctrl.queueList = [];
+					ctrl.loadQueuesList();
 				}
 
 				ctrl.loadQueuesList = () =>

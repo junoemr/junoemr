@@ -20,35 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.aqs.exception;
+package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.ApiException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import org.oscarehr.integration.aqs.model.AqsErrorResponse;
-import org.oscarehr.util.MiscUtils;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Data;
+import oscar.util.Jackson.ZonedDateTimeStringDeserializer;
+import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
-public class AqsCommunicationException extends RuntimeException
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+
+@Data
+public class AqsErrorResponse implements Serializable
 {
-	@Getter
-	protected AqsErrorResponse errorResponse;
+	protected static final String ERROR_QUEUE_AVAILABILITY = "queue_availability_exception";
 
-	public AqsCommunicationException(String msg)
-	{
-		super(msg);
-	}
-
-	public AqsCommunicationException(String msg, ApiException cause)
-	{
-		super(msg, cause);
-
-		try
-		{
-			this.errorResponse = (new ObjectMapper()).readValue(cause.getResponseBody(), AqsErrorResponse.class);
-		}
-		catch (Exception e)
-		{
-			MiscUtils.getLogger().error("Failed to deserialize error response from AQS server with error: " + e.toString());
-		}
-	}
+	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
+	@JsonDeserialize(using = ZonedDateTimeStringDeserializer.class)
+	protected ZonedDateTime timestamp;
+	protected Integer statusCode;
+	protected String statusReason;
+	protected String errorCode;
+	protected String message;
+	protected String path;
 }
