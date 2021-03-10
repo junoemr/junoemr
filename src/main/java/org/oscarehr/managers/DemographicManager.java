@@ -357,6 +357,20 @@ public class DemographicManager {
 		Demographic prevDemo = demographicDao.getDemographicById(demographic.getDemographicNo());
 		demographicArchiveDao.archiveRecord(prevDemo);
 
+		String previousStatus = prevDemo.getPatientStatus();
+		Date previousStatusDate = prevDemo.getPatientStatusDate();
+		String currentStatus = demographic.getPatientStatus();
+		Date currentStatusDate = demographic.getPatientStatusDate();
+
+		if (!(previousStatus.equals(currentStatus)))
+		{
+			demographic.setPatientStatusDate(new Date());
+		}
+		else if (previousStatusDate.compareTo(currentStatusDate) != 0)
+		{
+			demographic.setPatientStatusDate(currentStatusDate);
+		}
+
 		//retain merge info
 		demographic.setSubRecord(prevDemo.getSubRecord());
 		
