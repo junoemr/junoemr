@@ -39,7 +39,6 @@ function closeWin()
          let encounterText = '<%=request.getAttribute("textOnEncounter")%>';
          opener.pasteToEncounterNote(encounterText.trim());
       }
-      self.opener.location.reload();
       self.close();
 }
 </script>
