@@ -205,23 +205,18 @@ public class FormUpdateAction extends Action {
 			request.setAttribute("testOutput", testOutput);
 			return mapping.findForward("failure");
 		}
-		
-		session.setAttribute("textOnEncounter", textOnEncounter);
-
-		if (addToNote)
-		{
-			addNote(demographic_no, providerNo, prog_no, note, apptNoInt, request);
-		}
 
 		String submit = request.getParameter("submit");
-		if (submit == null || "Add".equals(submit) || "Save".equals(submit) || "Save All".equals(submit))
+		request.setAttribute("textOnEncounter", textOnEncounter);
+
+		if (submit == null  || "Save".equals(submit) || "Save All".equals(submit))
 		{
 			return mapping.findForward("reload");
 		}
 
 		return mapping.findForward("success");
 	}
-	
+
 	public void addNote(String demographic_no, String providerNo, String prog_no, String note, int apptNoInt, HttpServletRequest request){
 		HttpSession session = request.getSession();
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());
