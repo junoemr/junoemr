@@ -28,6 +28,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.service.context.PatientImportContext;
+import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import xml.cds.v5_0.AddressStructured;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.DateTimeFullOrPartial;
@@ -45,7 +47,6 @@ import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.provider.Provider;
-import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.ConversionUtils;
 
@@ -71,13 +72,17 @@ public class CDSImportMapperTest
 	private CDSImportMapper cdsImportMapper;
 
 	@Mock
-	private PatientImportContext patientImportContext;
+	private PatientImportContextService patientImportContextService;
 
 	@Before
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
-		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
+
+		CDSImportLogger cdsImportLoggerMock = Mockito.mock(CDSImportLogger.class);
+		PatientImportContext patientImportContextMock = Mockito.mock(PatientImportContext.class);
+		when(patientImportContextMock.getImportLogger()).thenReturn(cdsImportLoggerMock);
+		when(patientImportContextService.getContext()).thenReturn(patientImportContextMock);
 	}
 
 	@Test

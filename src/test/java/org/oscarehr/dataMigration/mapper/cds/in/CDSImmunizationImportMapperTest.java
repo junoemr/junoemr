@@ -31,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
+import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import xml.cds.v5_0.ImmunizationType;
 import xml.cds.v5_0.Immunizations;
 import xml.cds.v5_0.ObjectFactory;
@@ -49,7 +50,7 @@ public class CDSImmunizationImportMapperTest
 	private CDSImmunizationImportMapper cdsImmunizationImportMapper;
 
 	@Mock
-	protected PatientImportContext patientImportContext;
+	private PatientImportContextService patientImportContextService;
 
 	@Mock
 	private PreventionManager preventionManager;
@@ -58,7 +59,11 @@ public class CDSImmunizationImportMapperTest
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
-		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
+
+		CDSImportLogger cdsImportLoggerMock = Mockito.mock(CDSImportLogger.class);
+		PatientImportContext patientImportContextMock = Mockito.mock(PatientImportContext.class);
+		when(patientImportContextMock.getImportLogger()).thenReturn(cdsImportLoggerMock);
+		when(patientImportContextService.getContext()).thenReturn(patientImportContextMock);
 	}
 
 	@Test
