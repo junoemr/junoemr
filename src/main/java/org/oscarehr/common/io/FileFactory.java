@@ -287,7 +287,7 @@ public class FileFactory
 	 */
 	public static GenericFile getImportLogFile(String identifier, String fileName) throws IOException
 	{
-		return getExistingFile(GenericFile.LOG_IMPORT_DIR, fileName);
+		return getExistingFile(Paths.get(GenericFile.LOG_IMPORT_DIR, identifier).toString(), fileName);
 	}
 
 	/**

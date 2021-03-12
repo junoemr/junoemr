@@ -31,6 +31,7 @@ import java.util.List;
 @Data
 public class ImportTransferOutbound
 {
+	private String processId;
 	private List<String> messages;
 	private List<String> logFileNames;
 	private long successCount;

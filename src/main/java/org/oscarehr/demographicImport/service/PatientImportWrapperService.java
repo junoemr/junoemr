@@ -36,10 +36,10 @@ import org.oscarehr.demographicImport.converter.out.SiteDbToModelConverter;
 import org.oscarehr.demographicImport.exception.DuplicateDemographicException;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.demographicImport.service.context.PatientImportContextService;
-import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
 import org.oscarehr.demographicImport.pref.ImportPreferences;
 import org.oscarehr.demographicImport.service.context.PatientImportContext;
+import org.oscarehr.demographicImport.service.context.PatientImportContextService;
+import org.oscarehr.demographicImport.transfer.ImportTransferOutbound;
 import org.oscarehr.log.dao.LogDataMigrationDao;
 import org.oscarehr.log.model.LogDataMigration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,6 @@ import oscar.OscarProperties;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -207,6 +206,7 @@ public class PatientImportWrapperService
 		transferOutbound.setFailureCount(failureCount);
 		transferOutbound.setMessages(importLogger.getMessages());
 		transferOutbound.setLogFiles(importLogger.getEventLogFile(), importLogger.getSummaryLogFile());
+		transferOutbound.setProcessId(contextId);
 
 		return transferOutbound;
 	}

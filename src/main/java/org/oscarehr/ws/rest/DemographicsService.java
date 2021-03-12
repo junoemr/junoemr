@@ -419,6 +419,7 @@ public class DemographicsService extends AbstractServiceImpl
 		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
 
 		ImportTransferOutbound transfer = new ImportTransferOutbound();
+		transfer.setProcessId(processId);
 		transfer.setDuplicateCount(jsonData.getLong(LogDataMigration.DATA_KEY_DUPLICATE));
 		transfer.setSuccessCount(jsonData.getLong(LogDataMigration.DATA_KEY_COMPLETE));
 		transfer.setFailureCount(jsonData.getLong(LogDataMigration.DATA_KEY_FAILED));

@@ -235,16 +235,19 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 
 				ctrl.onDownloadLogFiles = async () =>
 				{
-					if(ctrl.results && ctrl.results.logFileNames && ctrl.results.logFileNames.length > 0)
+					if(ctrl.results && ctrl.results.logFileNames && ctrl.results.logFileNames.length > 0 && ctrl.results.processId)
 					{
-						const doc = await ctrl.demographicsApi.downloadImportLogs(ctrl.results.logFileNames, {responseType: "blob"})
+						const doc = await ctrl.demographicsApi.downloadImportLogs(
+							ctrl.results.processId,
+							ctrl.results.logFileNames,
+							{responseType: "blob"});
 						FileSaver.saveAs(new Blob([doc.data], {type: doc.data.type}), "importLogs.zip");
 					}
 				}
 
 				ctrl.formatSelectedFiles = async () =>
 				{
-					const encodedFiles = await Promise.all(Array.from(ctrl.selectedFiles).map( async (file) =>
+					return await Promise.all(Array.from(ctrl.selectedFiles).map( async (file) =>
 					{
 						return {
 							name: file.name,
@@ -253,7 +256,6 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 							data: await this.toBase64(file),
 						};
 					}));
-					return encodedFiles;
 				}
 
 				ctrl.toBase64 = (file) =>
