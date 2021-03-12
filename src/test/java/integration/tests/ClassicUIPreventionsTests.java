@@ -33,7 +33,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.core.annotation.Order;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -71,15 +70,10 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 	}
 
 	@Test
-	@Order(1)
 	public void handleInjectionPreventions() throws InterruptedException
 	{
 		// *** Add prevention ***
 		driver.get(Navigation.OSCAR_URL + PREVENTION_INJECTION_URL);
-		// verify that Completed is pre-selected
-		// verify that Date is filled
-		// verify that Provider is filled
-		// verify that Creator is filled
 
 		String originalName = "A vaccine";
 		String originalLocation = "The clinic";
@@ -115,16 +109,20 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
-		Assert.assertTrue(PageUtil.isExistsBy(
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=1&demographic_no=1')]"), driver));
+		Assert.assertTrue("Can't find anything resembling an added prevention on page",
+				PageUtil.isExistsBy(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), driver));
+
+		Assert.assertTrue("Can't find COVID-19 reference element on page", PageUtil.isExistsBy(
+				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
+						"//preceding::div[@class='headPrevention _nifty']//" +
+						"child::p//" +
+						"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=COVID-19&demographic_no=1')]"), driver));
 
 		// *** Verify prevention ***
 
 		// Attempt to view prevention and verify information is correct
 		PageUtil.switchToNewWindow(driver,
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=1&demographic_no=1')]"), oldWindowHandles);
-
-		Thread.sleep(5 * 1000);
+				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles);
 
 		// Pull out current assigned values and make sure they match
 		String currentName = driver.findElement(By.xpath("//input[@name='name']")).getAttribute("value");
@@ -136,9 +134,8 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 		String currentComments = driver.findElement(By.xpath("//textarea[@name='comments']")).getText();
 		driver.findElement(By.xpath("//a[contains(@onclick, 'showHideNextDate')]")).click();
 		String currentNeverReason = driver.findElement(By.xpath("//input[@name='neverReason']")).getAttribute("value");;
-		String currentNextDate = driver.findElement(By.xpath("//input[@name='nextDate']")).getAttribute("value");
 
-		//Assert.assertEquals("Prevention name not updated successfully", originalName, currentName);
+		Assert.assertEquals("Prevention name not updated successfully", originalName, currentName);
 		Assert.assertEquals("Prevention location not updated successfully", originalLocation, currentLocation);
 		Assert.assertEquals("Prevention route not updated successfully", originalRoute, currentRoute);
 		Assert.assertEquals("Prevention dose not updated successfully", originalDose, currentDose);
@@ -146,11 +143,9 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 		Assert.assertEquals("Prevention manufacture not updated successfully", originalManufacture, currentManufacture);
 		Assert.assertEquals("Prevention comments not updated successfully", originalComments, currentComments);
 		Assert.assertEquals("Prevention never reason field not updated successfully", originalNeverReason, currentNeverReason);
-		// Assert.assertEquals("Prevention next date not updated successfully", nextDate.toString(), currentNextDate);
 	}
 
 	@Test
-	@Order(2)
 	public void addExamPrevention() throws InterruptedException
 	{
 		// *** Add prevention ***
@@ -168,13 +163,14 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
 		// Click on prevention to edit it
-		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=1&demographic_no=1')]"), driver));
+		Assert.assertTrue("Can't find anything resembling an added exam prevention on page", PageUtil.isExistsBy(
+				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
+				"//preceding::div[@class='headPrevention _nifty']//" +
+				"child::p//" +
+				"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]"), driver));
 
-		// This is currently unreliable
-		// Need a better way of identifying the prevention I made
 		PageUtil.switchToNewWindow(driver,
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=2&demographic_no=1')]"), oldWindowHandles);
-
+				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles);
 		String currentComment = driver.findElement(By.xpath("//textarea[@name='comments']")).getAttribute("value");
 		Assert.assertEquals("Exam-style prevention comments not updated successfully", originalComments, currentComment);
 	}
