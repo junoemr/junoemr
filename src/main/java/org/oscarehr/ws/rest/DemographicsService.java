@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
@@ -43,11 +42,11 @@ import org.oscarehr.dataMigration.service.DataMigrationService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.service.PatientExportService;
 import org.oscarehr.dataMigration.service.PatientImportWrapperService;
+import org.oscarehr.dataMigration.transfer.ExportTransferOutbound;
 import org.oscarehr.dataMigration.transfer.ImportTransferOutbound;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
-import org.oscarehr.log.model.LogDataMigration;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -404,23 +403,7 @@ public class DemographicsService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-
-		LogDataMigration dataMigration = dataMigrationService.getMigrationResult(processId);
-		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
-
-		ImportTransferOutbound transfer = new ImportTransferOutbound();
-		transfer.setProcessId(processId);
-		transfer.setDuplicateCount(jsonData.getLong(LogDataMigration.DATA_KEY_DUPLICATE));
-		transfer.setSuccessCount(jsonData.getLong(LogDataMigration.DATA_KEY_COMPLETE));
-		transfer.setFailureCount(jsonData.getLong(LogDataMigration.DATA_KEY_FAILED));
-
-		JSONArray files = jsonData.getJSONArray(LogDataMigration.DATA_KEY_FILES);
-		for(int i=0; i< files.length(); i++)
-		{
-			transfer.addLogFileName(files.getString(i));
-		}
-
-		return RestResponse.successResponse(transfer);
+		return RestResponse.successResponse(dataMigrationService.getImportTransfer(processId));
 	}
 
 	@GET
@@ -499,16 +482,10 @@ public class DemographicsService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		ExportTransferOutbound transfer = dataMigrationService.getExportTransfer(processId);
 
-		LogDataMigration dataMigration = dataMigrationService.getMigrationResult(processId);
-		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
-
-		String patientSet = jsonData.getString(LogDataMigration.DATA_KEY_PATIENT_SET);
-		String filename = jsonData.getString(LogDataMigration.DATA_KEY_FILE);
-		ZIPFile exportZip = (ZIPFile) FileFactory.getExportLogFile(processId, filename);
-
-		Response.ResponseBuilder response = Response.ok(exportZip.toFileInputStream());
-		response.header("Content-Disposition", "filename=" + patientSet + ".zip");
+		Response.ResponseBuilder response = Response.ok(transfer.getExportFile().toFileInputStream());
+		response.header("Content-Disposition", "filename=" + transfer.getPatientSet() + ".zip");
 		response.type("application/zip");
 		return response.build();
 	}

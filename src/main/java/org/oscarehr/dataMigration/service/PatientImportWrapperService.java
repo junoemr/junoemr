@@ -24,13 +24,10 @@ package org.oscarehr.dataMigration.service;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Site;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.converter.out.SiteDbToModelConverter;
 import org.oscarehr.dataMigration.exception.DuplicateDemographicException;
@@ -39,7 +36,7 @@ import org.oscarehr.dataMigration.logger.ImportLogger;
 import org.oscarehr.dataMigration.pref.ImportPreferences;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
-import org.oscarehr.dataMigration.transfer.ImportTransferOutbound;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.log.dao.LogDataMigrationDao;
 import org.oscarehr.log.model.LogDataMigration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +48,7 @@ import oscar.OscarProperties;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -78,7 +76,7 @@ public class PatientImportWrapperService
 	@Autowired
 	private LogDataMigrationDao logDataMigrationDao;
 
-	public ImportTransferOutbound importDemographics(
+	public void importDemographics(
 			ImporterExporterFactory.IMPORTER_TYPE importerType,
 			ImporterExporterFactory.IMPORT_SOURCE importSource,
 			DemographicImporter.MERGE_STRATEGY mergeStrategy,
@@ -110,21 +108,15 @@ public class PatientImportWrapperService
 		String contextId = patientImportContextService.register(context);
 		ImportLogger importLogger = context.getImportLogger();
 
-		ImportTransferOutbound transferOutbound = new ImportTransferOutbound();
-
 		LogDataMigration dataMigration = new LogDataMigration();
 		dataMigration.setUuid(contextId);
 		dataMigration.setStartDatetime(LocalDateTime.now());
 		dataMigration.setTypeImport();
 
-		JSONArray fileList = new JSONArray();
-		fileList.put(importLogger.getSummaryLogFile().getName());
-		fileList.put(importLogger.getEventLogFile().getName());
-
-		JSONObject jsonData = new JSONObject();
-		jsonData.put(LogDataMigration.DATA_KEY_TOTAL, importFileList.size());
-		jsonData.put(LogDataMigration.DATA_KEY_FILES, fileList);
-		dataMigration.setJsonData(jsonData);
+		LogDataMigration.MigrationImportData migrationImportData = new LogDataMigration.MigrationImportData();
+		migrationImportData.setLogFiles(Arrays.asList(importLogger.getSummaryLogFile().getName(), importLogger.getEventLogFile().getName()));
+		migrationImportData.setTotal(importFileList.size());
+		dataMigration.setData(migrationImportData);
 
 		try
 		{
@@ -175,20 +167,13 @@ public class PatientImportWrapperService
 			}
 			importLogger.logSummaryFooter();
 
-			jsonData = dataMigration.getDataAsJson();
-			jsonData.put(LogDataMigration.DATA_KEY_COMPLETE, importCount);
-			jsonData.put(LogDataMigration.DATA_KEY_DUPLICATE, duplicateCount);
-			jsonData.put(LogDataMigration.DATA_KEY_FAILED, failureCount);
-
-			JSONArray demographicIdArray = new JSONArray();
-			for(Integer id : demographicIds)
-			{
-				demographicIdArray.put(id);
-			}
-			jsonData.put(LogDataMigration.DATA_KEY_DEMOGRAPHICS, demographicIdArray);
-
-			dataMigration.setJsonData(jsonData);
+			migrationImportData.setComplete(importCount);
+			migrationImportData.setDuplicates(duplicateCount);
+			migrationImportData.setFailures(failureCount);
+			migrationImportData.setDemographics(demographicIds);
+			dataMigration.setData(migrationImportData);
 			dataMigration.setEndDatetime(LocalDateTime.now());
+
 			logDataMigrationDao.merge(dataMigration);
 		}
 		finally
@@ -199,18 +184,9 @@ public class PatientImportWrapperService
 		}
 
 		onImportComplete(importCount, duplicateCount, failureCount);
-
-		transferOutbound.setSuccessCount(importCount);
-		transferOutbound.setDuplicateCount(duplicateCount);
-		transferOutbound.setFailureCount(failureCount);
-		transferOutbound.setMessages(importLogger.getMessages());
-		transferOutbound.setLogFiles(importLogger.getEventLogFile(), importLogger.getSummaryLogFile());
-		transferOutbound.setProcessId(contextId);
-
-		return transferOutbound;
 	}
 
-	public ImportTransferOutbound importDemographics(
+	public void importDemographics(
 			String importerTypeStr,
 			String importSourceStr,
 			String mergeStrategyStr,
@@ -245,7 +221,7 @@ public class PatientImportWrapperService
 			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
-		return importDemographics(importerType, importSource, mergeStrategy, importFileList, documentLocation, skipMissingDocs, defaultSiteName);
+		importDemographics(importerType, importSource, mergeStrategy, importFileList, documentLocation, skipMissingDocs, defaultSiteName);
 	}
 
 	protected void onSuccess(GenericFile genericFile)

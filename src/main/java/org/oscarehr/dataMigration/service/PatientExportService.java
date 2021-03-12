@@ -22,7 +22,6 @@
  */
 package org.oscarehr.dataMigration.service;
 
-import org.json.JSONObject;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
@@ -39,6 +38,7 @@ import oscar.oscarReport.data.DemographicSetManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -97,6 +97,7 @@ public class PatientExportService
 	{
 		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
 		PatientExportContext context = importerExporterFactory.initializeExportContext(exportType, preferences, demographicIdList.size());
+		ExportLogger exportLogger = context.getExportLogger();
 		String contextId = patientExportContextService.register(context);
 		ZIPFile zipFile;
 		try
@@ -105,7 +106,11 @@ public class PatientExportService
 			dataMigration.setUuid(contextId);
 			dataMigration.setStartDatetime(LocalDateTime.now());
 			dataMigration.setTypeExport();
-			dataMigration.setJsonData(new JSONObject().put(LogDataMigration.DATA_KEY_PATIENT_SET, patientSet));
+
+			LogDataMigration.MigrationExportData migrationExportData = new LogDataMigration.MigrationExportData();
+			migrationExportData.setPatientSet(patientSet);
+			migrationExportData.setLogFiles(Arrays.asList(exportLogger.getSummaryLogFile().getName(), exportLogger.getEventLogFile().getName()));
+			dataMigration.setData(migrationExportData);
 			logDataMigrationDao.persist(dataMigration);
 
 			List<GenericFile> exportFiles = exportDemographics(context, demographicIdList, preferences);
@@ -113,7 +118,8 @@ public class PatientExportService
 			zipFile.moveToLogExport(contextId);
 
 			dataMigration.setEndDatetime(LocalDateTime.now());
-			dataMigration.setJsonData(dataMigration.getDataAsJson().put(LogDataMigration.DATA_KEY_FILE, zipFile.getName()));
+			migrationExportData.setFile(zipFile.getName());
+			dataMigration.setData(migrationExportData);
 			logDataMigrationDao.merge(dataMigration);
 		}
 		finally

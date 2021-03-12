@@ -22,9 +22,13 @@
  */
 package org.oscarehr.dataMigration.service;
 
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.oscarehr.dataMigration.service.context.PollableContext;
+import org.oscarehr.dataMigration.transfer.ExportTransferOutbound;
+import org.oscarehr.dataMigration.transfer.ImportTransferOutbound;
 import org.oscarehr.log.dao.LogDataMigrationDao;
 import org.oscarehr.log.model.LogDataMigration;
 import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
@@ -44,6 +48,40 @@ public class DataMigrationService
 
 	@Autowired
 	private PatientImportContextService patientImportContextService;
+
+	public ImportTransferOutbound getImportTransfer(String processId) throws IOException
+	{
+		LogDataMigration dataMigration = getMigrationResult(processId);
+		LogDataMigration.MigrationImportData importData = dataMigration.getImportData();
+
+		ImportTransferOutbound transfer = new ImportTransferOutbound();
+		transfer.setProcessId(processId);
+		transfer.setStartDateTime(dataMigration.getStartDatetime());
+		transfer.setEndDateTime(dataMigration.getEndDatetime());
+
+		transfer.setSuccessCount(importData.getComplete());
+		transfer.setDuplicateCount(importData.getDuplicates());
+		transfer.setFailureCount(importData.getFailures());
+		transfer.setLogFileNames(importData.getLogFiles());
+		transfer.setMessages(importData.getMessages());
+		return transfer;
+	}
+
+	public ExportTransferOutbound getExportTransfer(String processId) throws IOException
+	{
+		LogDataMigration dataMigration = getMigrationResult(processId);
+		LogDataMigration.MigrationExportData exportData = dataMigration.getExportData();
+
+		ExportTransferOutbound transfer = new ExportTransferOutbound();
+		transfer.setProcessId(processId);
+		transfer.setStartDateTime(dataMigration.getStartDatetime());
+		transfer.setEndDateTime(dataMigration.getEndDatetime());
+
+		transfer.setExportFile((ZIPFile) FileFactory.getExportLogFile(processId, exportData.getFile()));
+		transfer.setPatientSet(exportData.getPatientSet());
+		transfer.setLogFiles(exportData.getLogFiles());
+		return transfer;
+	}
 
 	public ProgressBarPollingData getImportStatus(String processId) throws IOException
 	{

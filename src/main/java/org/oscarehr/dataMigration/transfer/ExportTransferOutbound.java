@@ -23,48 +23,19 @@
 package org.oscarehr.dataMigration.transfer;
 
 import lombok.Data;
-import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.ZIPFile;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ImportTransferOutbound implements Serializable
+public class ExportTransferOutbound implements Serializable
 {
 	private String processId;
-	private List<String> messages;
-	private List<String> logFileNames;
-	private long successCount;
-	private long duplicateCount;
-	private long failureCount;
+	private String patientSet;
+	private List<String> logFiles;
+	private ZIPFile exportFile;
 	private LocalDateTime startDateTime;
 	private LocalDateTime endDateTime;
-
-	public void addMessage(String message)
-	{
-		if(messages == null)
-		{
-			messages = new ArrayList<>();
-		}
-		messages.add(message);
-	}
-
-	public void addLogFileName(String name)
-	{
-		if(logFileNames == null)
-		{
-			logFileNames = new ArrayList<>();
-		}
-		logFileNames.add(name);
-	}
-
-	public void setLogFiles(GenericFile ... files)
-	{
-		for(GenericFile file : files)
-		{
-			addLogFileName(file.getName());
-		}
-	}
 }
