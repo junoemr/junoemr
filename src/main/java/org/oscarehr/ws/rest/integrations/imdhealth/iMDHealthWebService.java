@@ -84,7 +84,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/{integrationId}/sync")
 	public RestResponse<List<String>> syncIntegrations(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
-		List<String> synced = imdHealthService.initializeAllUsers(getHttpServletRequest().getSession(), integrationId);
+		List<String> synced = imdHealthService.initializeAllUsers(integrationId);
 		return RestResponse.successResponse(synced);
 	}
 

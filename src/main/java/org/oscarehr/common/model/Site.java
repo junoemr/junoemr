@@ -38,48 +38,6 @@ import javax.persistence.Transient;
 @Table(name="site")
 public class Site extends AbstractModel<Integer> implements java.io.Serializable
 {
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((siteId == null) ? 0 : siteId.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
-			return true;
-		}
-
-		if (obj == null)
-		{
-			return false;
-		}
-
-		if (getClass() != obj.getClass())
-		{
-			return false;
-		}
-
-		Site other = (Site) obj;
-		if (siteId == null)
-		{
-			if (other.siteId != null)
-			{
-				return false;
-			}
-		}
-		else if (!siteId.equals(other.siteId))
-		{
-			return false;
-		}
-		return true;
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -129,16 +87,8 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	@Column(name="bc_facility_number")
 	private String bcFacilityNumber;
 
-	@Column(name="imd_health_uuid")
-	private String imdHealthUuid;
-
-	public String getSiteUrl() {
-		return siteUrl;
-	}
-
-	public void setSiteUrl(String siteUrl) {
-		this.siteUrl = siteUrl;
-	}
+	@Column(name="uuid")
+	private String uuid;
 
 	@Transient
 	private String siteLogoDesc = null;
@@ -163,10 +113,12 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	@OrderBy(value="LastName, FirstName ASC")
 	private Set<Provider> providers;
 
-	public Site() {
+	public Site()
+	{
 	}
 
-	public Site(String name, String shortName, String bgColor, byte status) {
+	public Site(String name, String shortName, String bgColor, byte status)
+	{
 		this.name = name;
 		this.shortName = shortName;
 		this.bgColor = bgColor;
@@ -175,7 +127,8 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 
 	public Site(String name, String shortName, String phone, String fax,
 			String bgColor, String address, String city, String province,
-			String postal, byte status , int providerIdFrom, int providerIdTo) {
+			String postal, byte status , int providerIdFrom, int providerIdTo)
+	{
 		this.name = name;
 		this.shortName = shortName;
 		this.phone = phone;
@@ -194,10 +147,16 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 		return getSiteId();
 	}
 
+	public String getSiteUrl() {
+		return siteUrl;
+	}
+	public void setSiteUrl(String siteUrl) {
+		this.siteUrl = siteUrl;
+	}
+
 	public Integer getSiteId() {
 		return this.siteId;
 	}
-
 	public void setSiteId(Integer siteId) {
 		this.siteId = siteId;
 	}
@@ -205,7 +164,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getName() {
 		return this.name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -213,7 +171,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getShortName() {
 		return this.shortName;
 	}
-
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
@@ -221,7 +178,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getPhone() {
 		return this.phone;
 	}
-
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
@@ -229,7 +185,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getFax() {
 		return this.fax;
 	}
-
 	public void setFax(String fax) {
 		this.fax = fax;
 	}
@@ -237,8 +192,8 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getBgColor() {
 		return this.bgColor;
 	}
-
-	public void setBgColor(String bgColor) {
+	public void setBgColor(String bgColor)
+	{
 		// Only allow valid characters associated with HTML colors, to prevent code injection
 		// eg:  "dodgerblue", "FFA4G8"
 
@@ -249,7 +204,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getAddress() {
 		return this.address;
 	}
-
 	public void setAddress(String address) {
 		this.address = address;
 	}
@@ -257,7 +211,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getCity() {
 		return this.city;
 	}
-
 	public void setCity(String city) {
 		this.city = city;
 	}
@@ -265,7 +218,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getProvince() {
 		return this.province;
 	}
-
 	public void setProvince(String province) {
 		this.province = province;
 	}
@@ -273,7 +225,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getPostal() {
 		return this.postal;
 	}
-
 	public void setPostal(String postal) {
 		this.postal = postal;
 	}
@@ -281,7 +232,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public byte getStatus() {
 		return this.status;
 	}
-
 	public void setStatus(byte status) {
 		this.status = status;
 	}
@@ -289,7 +239,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public Integer getProviderIdFrom() {
 		return providerIdFrom;
 	}
-
 	public void setProviderIdFrom(Integer providerIdFrom) {
 		this.providerIdFrom = providerIdFrom;
 	}
@@ -297,7 +246,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public Integer getProviderIdTo() {
 		return providerIdTo;
 	}
-
 	public void setProviderIdTo(Integer providerIdTo) {
 		this.providerIdTo = providerIdTo;
 	}
@@ -305,7 +253,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public Set<Provider> getProviders() {
 		return providers;
 	}
-
 	public void setProviders(Set<Provider> providers) {
 		this.providers = providers;
 	}
@@ -313,7 +260,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public Integer getSiteLogoId() {
 		return siteLogoId;
 	}
-
 	public void setSiteLogoId(Integer siteLogoId) {
 		this.siteLogoId = siteLogoId;
 	}
@@ -321,7 +267,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public String getSiteLogoDesc() {
 		return siteLogoDesc;
 	}
-
 	public void setSiteLogoDesc(String siteLogoDesc) {
 		this.siteLogoDesc = siteLogoDesc;
 	}
@@ -330,7 +275,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	{
 		return albertaConnectCareLabId;
 	}
-
 	public void setAlbertaConnectCareLabId(String albertaConnectCareLabId)
 	{
 		this.albertaConnectCareLabId = albertaConnectCareLabId;
@@ -340,7 +284,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	{
 		return albertaConnectCareDepartmentId;
 	}
-
 	public void setAlbertaConnectCareDepartmentId(String albertaConnectCareDepartmentId)
 	{
 		this.albertaConnectCareDepartmentId = albertaConnectCareDepartmentId;
@@ -350,19 +293,59 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	{
 		return bcFacilityNumber;
 	}
-
 	public void setBcFacilityNumber(String bcFacilityNumber)
 	{
 		this.bcFacilityNumber = bcFacilityNumber;
 	}
 
-	public String getImdHealthUuid()
+	public String getUuid()
 	{
-		return imdHealthUuid;
+		return uuid;
+	}
+	public void setUuid(String uuid)
+	{
+		this.uuid = uuid;
 	}
 
-	public void setImdHealthUuid(String imdHealthUuid)
+	@Override
+	public int hashCode()
 	{
-		this.imdHealthUuid = imdHealthUuid;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((siteId == null) ? 0 : siteId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+
+		if (obj == null)
+		{
+			return false;
+		}
+
+		if (getClass() != obj.getClass())
+		{
+			return false;
+		}
+
+		Site other = (Site) obj;
+		if (siteId == null)
+		{
+			if (other.siteId != null)
+			{
+				return false;
+			}
+		}
+		else if (!siteId.equals(other.siteId))
+		{
+			return false;
+		}
+		return true;
 	}
 }

@@ -51,8 +51,8 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "provider")
-public class ProviderData extends AbstractModel<String> implements Serializable {
-
+public class ProviderData extends AbstractModel<String> implements Serializable
+{
 	public static final String SYSTEM_PROVIDER_NO = "-1";
 
 	// tags used to extend the provider record in the comments field.
@@ -158,9 +158,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
 
-    @Column(name = "imd_health_uuid")
-	private String imdHealthUuid = null;
-
 	/* -- Province specific -- */
 	/* AB */
 	@Column(name = "alberta_tak_no")
@@ -183,22 +180,28 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	@Column(name = "booking_notification_numbers")
 	private String bookingNotificationNumbers;
 
+	@Column(name = "imd_health_uuid")
+	private String imdHealthUuid = null;
+
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()
 	{
 		String lastName  = (getLastName()  == null) ? "" : getLastName().trim();
 		String firstName = (getFirstName() == null) ? "" : getFirstName().trim();
-		if(!lastName.isEmpty() && !firstName.isEmpty()) {
+		if(!lastName.isEmpty() && !firstName.isEmpty())
+		{
 			lastName += ", ";
 		}
 		return lastName + firstName;
 	}
 
 	@Override
-	public String getId() {
+	public String getId()
+	{
 		return id;
 	}
-	public void set(String providerNo) {
+	public void set(String providerNo)
+	{
 		id = providerNo;
 	}
 
@@ -206,120 +209,152 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	{
 		return Integer.parseInt(getId());
 	}
-	public void setProviderNo(Integer providerNo) {
+	public void setProviderNo(Integer providerNo)
+	{
 		set(String.valueOf(providerNo));
 	}
 
-	public String getLastName() {
+	public String getLastName()
+	{
 		return lastName;
 	}
-	public void setLastName(String s) {
+	public void setLastName(String s)
+	{
 		lastName = s;
 	}
 
-	public String getFirstName() {
+	public String getFirstName()
+	{
 		return firstName;
 	}
-	public void setFirstName(String s) {
+	public void setFirstName(String s)
+	{
 		firstName = s;
 	}
 
-	public String getProviderType() {
+	public String getProviderType()
+	{
 		return providerType;
 	}
-	public void setProviderType(String s) {
+	public void setProviderType(String s)
+	{
 		providerType = s;
 	}
 
-	public String getSpecialty() {
+	public String getSpecialty()
+	{
 		return specialty;
 	}
-	public void setSpecialty(String s) {
+	public void setSpecialty(String s)
+	{
 		specialty = s;
 	}
 
-	public String getTeam() {
+	public String getTeam()
+	{
 		return team;
 	}
-	public void setTeam(String s) {
+	public void setTeam(String s)
+	{
 		team = s;
 	}
 
-	public String getSex() {
+	public String getSex()
+	{
 		return sex;
 	}
-	public void setSex(String s) {
+	public void setSex(String s)
+	{
 		sex = s;
 	}
 
-	public Date getDob() {
+	public Date getDob()
+	{
 		return dob;
 	}
-	public void setDob(Date d) {
+	public void setDob(Date d)
+	{
 		dob = d;
 	}
 
-	public String getAddress() {
+	public String getAddress()
+	{
 		return address;
 	}
-	public void setAddress(String s) {
+	public void setAddress(String s)
+	{
 		address = s;
 	}
 
-	public String getPhone() {
+	public String getPhone()
+	{
 		return phone;
 	}
-	public void setPhone(String s) {
+	public void setPhone(String s)
+	{
 		phone = s;
 	}
 
-	public String getWorkPhone() {
+	public String getWorkPhone()
+	{
 		return workPhone;
 	}
-	public void setWorkPhone(String s) {
+	public void setWorkPhone(String s)
+	{
 		workPhone = s;
 	}
 
-	public String getOhipNo() {
+	public String getOhipNo()
+	{
 		return ohipNo;
 	}
-	
-	public void setOhipNo(String s) {
+	public void setOhipNo(String s)
+	{
 		ohipNo = s;
 	}
 
-	public String getRmaNo() {
+	public String getRmaNo()
+	{
 		return rmaNo;
 	}
-	public void setRmaNo(String s) {
+	public void setRmaNo(String s)
+	{
 		rmaNo = s;
 	}
 
-	public String getBillingNo() {
+	public String getBillingNo()
+	{
 		return billingNo;
 	}
-	public void setBillingNo(String s) {
+	public void setBillingNo(String s)
+	{
 		billingNo = s;
 	}
 
-	public String getHsoNo() {
+	public String getHsoNo()
+	{
 		return hsoNo;
 	}
-	public void setHsoNo(String s) {
+	public void setHsoNo(String s)
+	{
 		hsoNo = s;
 	}
 
-	public String getStatus() {
+	public String getStatus()
+	{
 		return status;
 	}
-	public void setStatus(String s) {
+	public void setStatus(String s)
+	{
 		status = s;
 	}
 
-	public String getComments() {
+	public String getComments()
+	{
 		return comments;
 	}
-	public void setComments(String s) {
+	public void setComments(String s)
+	{
 		comments = s;
 	}
 
@@ -327,73 +362,90 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	{
 		String comments = getComments();
 		String faxNo = null;
-		if(comments != null && comments.contains("<xml_p_fax>"))
+		if (comments != null && comments.contains("<xml_p_fax>"))
 		{
 			faxNo = StringUtils.substringBetween(getComments(), "<xml_p_fax>", "</xml_p_fax>");
 		}
 		return faxNo;
 	}
 
-	public String getProviderActivity() {
+	public String getProviderActivity()
+	{
 		return providerActivity;
 	}
-	public void setProviderActivity(String s) {
+	public void setProviderActivity(String s)
+	{
 		providerActivity = s;
 	}
 
-	public String getPractitionerNo() {
+	public String getPractitionerNo()
+	{
 		return practitionerNo;
 	}
-	public void setPractitionerNo(String s) {
+	public void setPractitionerNo(String s)
+	{
 		practitionerNo = s;
 	}
 
-	public String getInit() {
+	public String getInit()
+	{
 		return init;
 	}
-	public void setInit(String s) {
+	public void setInit(String s)
+	{
 		init = s;
 	}
 
-	public String getJobTitle() {
+	public String getJobTitle()
+	{
 		return jobTitle;
 	}
-	public void setJobTitle(String s) {
+	public void setJobTitle(String s)
+	{
 		jobTitle = s;
 	}
 
-	public String getEmail() {
+	public String getEmail()
+	{
 		return email;
 	}
-	public void setEmail(String s) {
+	public void setEmail(String s)
+	{
 		email = s;
 	}
 
-	public String getTitle() {
+	public String getTitle()
+	{
 		return title;
 	}
-	public void setTitle(String s) {
+	public void setTitle(String s)
+	{
 		title = s;
 	}
 
-	public String getLastUpdateUser() {
+	public String getLastUpdateUser()
+	{
 		return lastUpdateUser;
 	}
-	public void setLastUpdateUser(String s) {
+	public void setLastUpdateUser(String s)
+	{
 		lastUpdateUser = s;
 	}
 
-	public Date getLastUpdateDate() {
+	public Date getLastUpdateDate()
+	{
 		return lastUpdateDate;
 	}
-	public void setLastUpdateDate(Date d) {
+	public void setLastUpdateDate(Date d)
+	{
 		lastUpdateDate = d;
 	}
 
 	public Date getSignedConfidentiality() {
 		return signedConfidentiality;
 	}
-	public void setSignedConfidentiality(Date d) {
+	public void setSignedConfidentiality(Date d)
+	{
 		signedConfidentiality = d;
 	}
 
@@ -434,33 +486,39 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	}
 	
 	/* -- Province specific getters/setters -- */
-	public String getAlbertaTakNo() {
+	public String getAlbertaTakNo()
+	{
 		return albertaTakNo;
 	}
-	public void setAlbertaTakNo(String takNo) {
+	public void setAlbertaTakNo(String takNo)
+	{
 		albertaTakNo = takNo;
 	}
-	public String getAlbertaEDeliveryIds() {
+
+	public String getAlbertaEDeliveryIds()
+	{
 		return albertaEDeliveryIds;
 	}
 	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds)
 	{
 		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
 	}
-	public void setAlbertaEDeliveryIds(List<String> idList) {
+	public void setAlbertaEDeliveryIds(List<String> idList)
+	{
 		setAlbertaEDeliveryIds(StringUtils.join(idList, ","));
 	}
 
-	public void setSuperAdmin(boolean superAdminStatus) {
+	public void setSuperAdmin(boolean superAdminStatus)
+	{
 		superAdmin = superAdminStatus;
 	}
 
-	public Boolean isSuperAdmin() {
+	public Boolean isSuperAdmin()
+	{
 		return superAdmin;
 	}
         
 	/* -- Comparators -- */
-	
 	public static final Comparator<ProviderData> LastNameComparator = new Comparator<ProviderData>()
 	{
         public int compare(ProviderData pd1, ProviderData pd2)

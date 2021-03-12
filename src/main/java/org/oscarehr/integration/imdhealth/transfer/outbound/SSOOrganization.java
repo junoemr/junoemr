@@ -54,20 +54,11 @@ public class SSOOrganization implements Serializable
 
     */
 
-	public static SSOOrganization fromClinic(Clinic clinic, String practiceId, String provCode)
+	public static SSOOrganization fromClinic(Clinic clinic, String provCode)
 	{
-		if (StringUtils.isBlank(practiceId))
-		{
-			throw new RuntimeException();
-		}
-
 		SSOOrganization org = new SSOOrganization();
 
-		// Set the practice_id as the externalID, as it is unique across all live instances, and will still be compatible
-		// if the iMDHealth credentials are issued to CloudPractice instead of to each individual clinic.
-		// This also allows demo and live instances to connect to the same iMDHealth organization, provided
-		// that the practice id is constant between the two.
-		org.setExternalId("juno_"+ practiceId);
+		org.setExternalId(clinic.getUuid());
 		org.setMunicipality(clinic.getClinicCity());
 		org.setName(clinic.getClinicName());
 
@@ -77,13 +68,16 @@ public class SSOOrganization implements Serializable
 		return org;
 	}
 
-	public static SSOOrganization fromSite(Site site, String instanceId, String provCode)
+	public static SSOOrganization fromSite(Site site, String provCode)
 	{
 		SSOOrganization org = new SSOOrganization();
-		// For external_id want to concat instanceID + siteID.  In case the credential is issued to CloudPractice
-		// as a whole, then this combination will be unique across all live instances.  As above, this also allows demo
-		// and live instances to share the same iMDHealth organization.
-		org.setExternalId("juno_" + instanceId + site.getId());
+
+		if (site.getUuid() == null)
+		{
+			throw new RuntimeException();
+		}
+
+		org.setExternalId(site.getUuid());
 		org.setMunicipality(site.getCity());
 		org.setName(site.getName());
 		org.setSubdivisionCode(provCode);

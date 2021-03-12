@@ -96,8 +96,8 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     @Column(name = "bc_facility_number")
     private String bcFacilityNumber;
 
-    @Column(name = "imd_health_uuid")
-    private String imdHealthUuid;
+    @Column(name = "uuid")
+    private String uuid;
 
     // foreign key
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
@@ -264,13 +264,13 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
 		this.bcFacilityNumber = bcFacilityNumber;
 	}
 
-    public String getImdHealthUuid()
+    public String getUuid()
     {
-        return imdHealthUuid;
+        return uuid;
     }
-    public void setImdHealthUuid(String imdHealthUuid)
+    public void setUuid(String uuid)
     {
-        this.imdHealthUuid = imdHealthUuid;
+        this.uuid = uuid;
     }
 
     @Override
