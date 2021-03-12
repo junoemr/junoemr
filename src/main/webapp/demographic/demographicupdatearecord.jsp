@@ -67,8 +67,9 @@
 <%@page import="java.util.HashSet" %>
 <%@page import="java.util.List" %>
 <%@page import="java.util.Set" %>
-<%@ page import="static oscar.util.StringUtils.filterControlCharacters" %>
-<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
+<%@page import="java.util.Date" %>
+<%@page import="static oscar.util.StringUtils.filterControlCharacters" %>
+<%@page import="org.oscarehr.demographic.service.DemographicService" %>
 <%@page errorPage="errorpage.jsp"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -115,6 +116,7 @@
 	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
 	String ver = request.getParameter("ver");
 	String hcType = request.getParameter("hc_type");
+	String previousPatientStatus = demographic.getPatientStatus();
 
 	demographic.setLastName(request.getParameter("last_name").trim());
 	demographic.setFirstName(request.getParameter("first_name").trim());
@@ -164,10 +166,6 @@
 	{
 		demographic.setDateJoined(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
 	}
-	else
-	{
-		demographic.setDateJoined(null);
-	}
 
 	yearTmp = StringUtils.trimToNull(request.getParameter("end_date_year"));
 	monthTmp = StringUtils.trimToNull(request.getParameter("end_date_month"));
@@ -175,10 +173,6 @@
 	if(yearTmp != null && monthTmp != null && dayTmp != null)
 	{
 		demographic.setEndDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
-	}
-	else
-	{
-		demographic.setEndDate(null);
 	}
 
 	yearTmp = StringUtils.trimToNull(request.getParameter("eff_date_year"));
@@ -188,10 +182,6 @@
 	{
 		demographic.setEffDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
 	}
-	else
-	{
-		demographic.setEffDate(null);
-	}
 
 	yearTmp = StringUtils.trimToNull(request.getParameter("hc_renew_date_year"));
 	monthTmp = StringUtils.trimToNull(request.getParameter("hc_renew_date_month"));
@@ -199,10 +189,6 @@
 	if(yearTmp != null && monthTmp != null && dayTmp != null)
 	{
 		demographic.setHcRenewDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
-	}
-	else
-	{
-		demographic.setHcRenewDate(null);
 	}
 
 	yearTmp = StringUtils.trimToNull(request.getParameter("roster_date_year"));
@@ -213,10 +199,7 @@
 	{
 		demographic.setRosterDate(MyDateFormat.getSysDate(yearTmp+'-'+monthTmp+'-'+dayTmp));
 	}
-	else
-	{
-		demographic.setRosterDate(null);
-	}
+
 	yearTmp=StringUtils.trimToNull(request.getParameter("roster_termination_date_year"));
 	monthTmp=StringUtils.trimToNull(request.getParameter("roster_termination_date_month"));
 	dayTmp=StringUtils.trimToNull(request.getParameter("roster_termination_date_day"));
@@ -225,22 +208,11 @@
 	{
 		demographic.setRosterTerminationDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
 	}
-	else
-	{
-		demographic.setRosterTerminationDate(null);
-	}
 
-	yearTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_year"));
-	monthTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_month"));
-	dayTmp = StringUtils.trimToNull(request.getParameter("patientstatus_date_day"));
-
-	if(yearTmp != null && monthTmp != null && dayTmp != null)
+	/* Set patient status date */
+	if (!(demographic.getPatientStatus().equals(previousPatientStatus)))
 	{
-		demographic.setPatientStatusDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
-	}
-	else
-	{
-		demographic.setPatientStatusDate(null);
+		demographic.setPatientStatusDate(new Date());
 	}
 
 	/* patient consent */
