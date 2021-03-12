@@ -53,6 +53,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				$scope.LABEL_POSITION = LABEL_POSITION;
 				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 				$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.maxFileSize = 512; //MB
 
 				ctrl.importTypeOptions = Object.freeze(
 					[

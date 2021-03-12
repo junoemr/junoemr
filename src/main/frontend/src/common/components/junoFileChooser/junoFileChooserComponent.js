@@ -35,8 +35,11 @@ angular.module('Common.Components').component('junoFileChooser', {
 		accept: "@?",
 		multiple: "<?",
 		change: "&?",
+		maxSize: "<?", // in MB
 	},
-	controller: ['$scope', function ($scope) {
+	controller: ['$scope', '$uibModal',
+		function ($scope, $uibModal)
+		{
 		let ctrl = this;
 
 		ctrl.buttonLabel = "Choose File";
@@ -47,6 +50,7 @@ angular.module('Common.Components').component('junoFileChooser', {
 			{
 				ctrl.buttonLabel = ctrl.placeholder;
 			}
+			ctrl.maxSize = ctrl.maxSize || 25;// default max size in MB
 		}
 
 		ctrl.labelClasses = () =>
@@ -68,6 +72,18 @@ angular.module('Common.Components').component('junoFileChooser', {
 		{
 			if(ctrl.change)
 			{
+				let totalSize = 0;
+				for(let i=0; i< files.length; i++)
+				{
+					totalSize += files[i].size;
+				}
+				const filesize = ((totalSize/1024)/1024).toFixed(4); // MB
+				if(filesize > ctrl.maxSize)
+				{
+					ctrl.getInputRef().val(null);
+					Juno.Common.Util.errorAlert($uibModal, "File Size Limit",
+						"File size limit exceeded. Please limit the total file size to " + ctrl.maxSize + "MB");
+				}
 				ctrl.change({files: files});
 			}
 		}

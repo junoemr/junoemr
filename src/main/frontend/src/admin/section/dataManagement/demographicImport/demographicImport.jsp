@@ -47,6 +47,7 @@
 					                   placeholder="Choose Import Files"
 					                   disabled="$ctrl.importRunning"
 					                   change="$ctrl.onFileSelected(files)"
+					                   max-size="$ctrl.maxFileSize"
 					></juno-file-chooser>
 				</div>
 			</div>
