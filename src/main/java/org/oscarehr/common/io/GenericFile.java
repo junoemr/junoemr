@@ -148,9 +148,9 @@ public class GenericFile
 	{
 		return moveFile(DOCUMENT_ORIGINAL_DIR);
 	}
-	public boolean moveToLogImport() throws IOException
+	public boolean moveToLogImport(String identifier) throws IOException
 	{
-		return moveFile(LOG_IMPORT_DIR);
+		return moveFile(Paths.get(LOG_IMPORT_DIR, identifier).toString());
 	}
 	public boolean moveToLogExport(String identifier) throws IOException
 	{

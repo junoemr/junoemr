@@ -59,7 +59,7 @@ public class PollableContext
 		progressData.setTotal(getTotal());
 		progressData.setProcessed(getProcessed());
 		progressData.setMessage(getPollingMessage());
-		progressData.setComplete(isComplete());
+		progressData.setComplete(false);
 		return progressData;
 	}
 

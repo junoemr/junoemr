@@ -27,7 +27,7 @@ import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.service.DemographicImporter;
-import org.oscarehr.demographicImport.service.ImportWrapperService;
+import org.oscarehr.demographicImport.service.PatientImportWrapperService;
 import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;
 import org.oscarehr.util.task.args.StringArg;
@@ -39,9 +39,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
-public class CommandLineImporter extends ImportWrapperService implements CommandLineTask
+public class CommandLineImporter extends PatientImportWrapperService implements CommandLineTask
 {
 	private static final Logger logger = Logger.getLogger(CommandLineImporter.class);
 
@@ -93,8 +94,10 @@ public class CommandLineImporter extends ImportWrapperService implements Command
 
 		try
 		{
-			List<GenericFile> genericFileList = new ArrayList<>();
+			String processId = UUID.randomUUID().toString();
+			Thread.currentThread().setName(processId);
 
+			List<GenericFile> genericFileList = new ArrayList<>();
 			File[] fileList = importFileDirectory.listFiles();
 			for(File file : fileList)
 			{

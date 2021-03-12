@@ -43,7 +43,14 @@ import java.time.LocalDateTime;
 public class LogDataMigration extends AbstractModel<Integer>
 {
 	public static final String DATA_KEY_FILE = "file";
+	public static final String DATA_KEY_FILES = "files";
 	public static final String DATA_KEY_PATIENT_SET = "patientSet";
+	public static final String DATA_KEY_TOTAL = "total";
+	public static final String DATA_KEY_COMPLETE = "completed";
+	public static final String DATA_KEY_FAILED = "failed";
+	public static final String DATA_KEY_DUPLICATE = "duplicate";
+	public static final String DATA_KEY_DEMOGRAPHICS = "demographics";
+
 
 	public enum TYPE
 	{

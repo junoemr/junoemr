@@ -84,6 +84,6 @@ public class CDSImportLogger extends CDSBaseLogger implements ImportLogger
 	protected GenericFile initLogFile(String header, String fileName) throws IOException, InterruptedException
 	{
 		InputStream stream = new ByteArrayInputStream(header.getBytes(StandardCharsets.UTF_8));
-		return FileFactory.createImportLogFile(stream, fileName);
+		return FileFactory.createImportLogFile(stream, fileName, Thread.currentThread().getName());
 	}
 }

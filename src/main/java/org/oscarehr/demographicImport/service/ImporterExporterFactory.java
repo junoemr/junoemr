@@ -52,12 +52,6 @@ public class ImporterExporterFactory
 	@Autowired
 	private HRMExporter hrmExporter;
 
-	@Autowired
-	private PatientExportContextService patientExportContextService;
-
-	@Autowired
-	private PatientImportContextService patientImportContextService;
-
 	public enum IMPORTER_TYPE
 	{
 		CDS_5,
@@ -88,7 +82,6 @@ public class ImporterExporterFactory
 		patientImportContext.setImportLogger(getImportLogger(type));
 		patientImportContext.setImportPreferences(importPreferences);
 		patientImportContext.setImporter(getImporter(type));
-		patientImportContextService.register(patientImportContext);
 		return patientImportContext;
 	}
 

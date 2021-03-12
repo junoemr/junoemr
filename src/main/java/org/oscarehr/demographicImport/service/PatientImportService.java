@@ -180,7 +180,7 @@ public class PatientImportService
 	@Autowired
 	private HRMService hrmService;
 
-	public void importDemographic(GenericFile importFile,
+	public org.oscarehr.demographic.model.Demographic importDemographic(GenericFile importFile,
 	                              PatientImportContext context,
 	                              DemographicImporter.MERGE_STRATEGY mergeStrategy) throws Exception
 	{
@@ -252,6 +252,7 @@ public class PatientImportService
 
 		importLogger.logSummaryLine(patientRecord);
 		writeAuditLogImportStatement(dbDemographic, context.getImportType(), context.getImportPreferences().getImportSource(), duplicateDetected);
+		return dbDemographic;
 	}
 
 	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)

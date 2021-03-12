@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
@@ -41,9 +42,9 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.pref.ExportPreferences;
-import org.oscarehr.demographicImport.service.ImportWrapperService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.demographicImport.service.PatientExportService;
+import org.oscarehr.demographicImport.service.PatientImportWrapperService;
 import org.oscarehr.demographicImport.service.context.PatientExportContext;
 import org.oscarehr.demographicImport.service.context.PatientExportContextService;
 import org.oscarehr.demographicImport.service.context.PatientImportContext;
@@ -108,7 +109,7 @@ public class DemographicsService extends AbstractServiceImpl
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	private ImportWrapperService importWrapperService;
+	private PatientImportWrapperService patientImportWrapperService;
 
 	@Autowired
 	private PatientExportService patientExportService;
@@ -371,7 +372,7 @@ public class DemographicsService extends AbstractServiceImpl
 					}
 				}
 
-				ImportTransferOutbound transferOutbound = importWrapperService.importDemographics(
+				patientImportWrapperService.importDemographics(
 						type,
 						importSource,
 						mergeStrategy,
@@ -379,7 +380,6 @@ public class DemographicsService extends AbstractServiceImpl
 						documentLocation,
 						false,
 						defaultSiteName);
-				patientImportContextService.getContext().setResult(transferOutbound);
 			}
 			catch(Exception e)
 			{
@@ -410,48 +410,64 @@ public class DemographicsService extends AbstractServiceImpl
 	@GET
 	@Path("/import/{processId}")
 	@SkipContentLoggingOutbound
-	public RestResponse<ImportTransferOutbound> demographicImportResults(@PathParam("processId") String processId)
+	public RestResponse<ImportTransferOutbound> demographicImportResults(@PathParam("processId") String processId) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		PatientImportContext importContext = patientImportContextService.unregister(processId);
-		if(importContext == null)
+		LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
+		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
+
+		ImportTransferOutbound transfer = new ImportTransferOutbound();
+		transfer.setDuplicateCount(jsonData.getLong(LogDataMigration.DATA_KEY_DUPLICATE));
+		transfer.setSuccessCount(jsonData.getLong(LogDataMigration.DATA_KEY_COMPLETE));
+		transfer.setFailureCount(jsonData.getLong(LogDataMigration.DATA_KEY_FAILED));
+
+		JSONArray files = jsonData.getJSONArray(LogDataMigration.DATA_KEY_FILES);
+		for(int i=0; i< files.length(); i++)
 		{
-			throw new RuntimeException("Process is not registered");
+			transfer.addLogFileName(files.getString(i));
 		}
-		else if(importContext.isComplete())
-		{
-			ImportTransferOutbound transferOutbound = importContext.getResult();
-			if(transferOutbound != null)
-			{
-				return RestResponse.successResponse(transferOutbound);
-			}
-			else
-			{
-				throw new RuntimeException("An Unknown Error occurred"); // should not be possible
-			}
-		}
-		else
-		{
-			throw new RuntimeException("Process not complete");
-		}
+
+		return RestResponse.successResponse(transfer);
 	}
 
 	@GET
 	@Path("/import/{processId}/progress")
-	public RestResponse<ProgressBarPollingData> demographicImportProgress(@PathParam("processId") String processId)
+	public RestResponse<ProgressBarPollingData> demographicImportProgress(@PathParam("processId") String processId) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(patientImportContextService.getContext(processId).getProgress());
+
+		PatientImportContext context = patientImportContextService.getContext(processId);
+		if(context != null)
+		{
+			return RestResponse.successResponse(context.getProgress());
+		}
+		else
+		{
+			LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
+
+			if(dataMigration != null)
+			{
+				ProgressBarPollingData pollingData = new ProgressBarPollingData();
+				pollingData.setMessage("Finalizing...");
+				pollingData.setComplete(true);
+				return RestResponse.successResponse(pollingData);
+			}
+			else
+			{
+				throw new RuntimeException("Invalid process id: " + processId);
+			}
+		}
 	}
 
 	@GET
-	@Path("/import/logs/download")
+	@Path("/import/{processId}/logs/download")
 	@Produces("application/zip")
 	@SkipContentLoggingOutbound
-	public Response downloadImportLogs(@QueryParam("logName") final List<String> logFileNames) throws IOException
+	public Response downloadImportLogs(@PathParam("processId") String processId,
+	                                   @QueryParam("logName") final List<String> logFileNames) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
@@ -459,7 +475,7 @@ public class DemographicsService extends AbstractServiceImpl
 		List<GenericFile> logFiles = new ArrayList<>(logFileNames.size());
 		for(String fileName : logFileNames)
 		{
-			logFiles.add(FileFactory.getImportLogFile(fileName));
+			logFiles.add(FileFactory.getImportLogFile(processId, fileName));
 		}
 		ZIPFile zipFile = FileFactory.packageZipFile(logFiles);
 
@@ -491,7 +507,7 @@ public class DemographicsService extends AbstractServiceImpl
 			{
 				patientExportService.exportDemographicsToZip(
 						patientSet,
-						ImporterExporterFactory.EXPORTER_TYPE.CDS_5,
+						ImporterExporterFactory.EXPORTER_TYPE.valueOf(type),
 						exportPreferences);
 			}
 			catch(Exception e)
@@ -514,7 +530,7 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		LogDataMigration dataMigration = logDataMigrationService.getExportResult(processId);
+		LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
 		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
 
 		String patientSet = jsonData.getString(LogDataMigration.DATA_KEY_PATIENT_SET);
@@ -541,7 +557,7 @@ public class DemographicsService extends AbstractServiceImpl
 		}
 		else
 		{
-			LogDataMigration dataMigration = logDataMigrationService.getExportResult(processId);
+			LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
 
 			if(dataMigration != null)
 			{

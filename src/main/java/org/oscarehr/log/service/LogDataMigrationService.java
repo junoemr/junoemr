@@ -35,7 +35,7 @@ public class LogDataMigrationService
 	@Autowired
 	private LogDataMigrationDao logDataMigrationDao;
 
-	public LogDataMigration getExportResult(String uuid) throws IOException
+	public LogDataMigration getMigrationResult(String uuid) throws IOException
 	{
 		LogDataMigration dataMigration = logDataMigrationDao.findByUuid(uuid);
 		if(dataMigration == null)
