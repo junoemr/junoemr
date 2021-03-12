@@ -20,20 +20,40 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.log.service;
+package org.oscarehr.dataMigration.service;
 
+import org.oscarehr.dataMigration.service.context.PatientExportContextService;
+import org.oscarehr.dataMigration.service.context.PatientImportContextService;
+import org.oscarehr.dataMigration.service.context.PollableContext;
 import org.oscarehr.log.dao.LogDataMigrationDao;
 import org.oscarehr.log.model.LogDataMigration;
+import org.oscarehr.ws.rest.transfer.common.ProgressBarPollingData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 @Service
-public class LogDataMigrationService
+public class DataMigrationService
 {
 	@Autowired
 	private LogDataMigrationDao logDataMigrationDao;
+
+	@Autowired
+	private PatientExportContextService patientExportContextService;
+
+	@Autowired
+	private PatientImportContextService patientImportContextService;
+
+	public ProgressBarPollingData getImportStatus(String processId) throws IOException
+	{
+		return getMigrationStatus(processId, patientImportContextService.getContext(processId));
+	}
+
+	public ProgressBarPollingData getExportStatus(String processId) throws IOException
+	{
+		return getMigrationStatus(processId, patientExportContextService.getContext(processId));
+	}
 
 	public LogDataMigration getMigrationResult(String uuid) throws IOException
 	{
@@ -47,5 +67,29 @@ public class LogDataMigrationService
 			throw new RuntimeException("Data Migration Entry (" + uuid + ") is not complete");
 		}
 		return dataMigration;
+	}
+
+	private ProgressBarPollingData getMigrationStatus(String processId, PollableContext context) throws IOException
+	{
+		if(context != null)
+		{
+			return context.getProgress();
+		}
+		else
+		{
+			LogDataMigration dataMigration = getMigrationResult(processId);
+
+			if(dataMigration != null)
+			{
+				ProgressBarPollingData pollingData = new ProgressBarPollingData();
+				pollingData.setMessage("Finalizing...");
+				pollingData.setComplete(true);
+				return pollingData;
+			}
+			else
+			{
+				throw new RuntimeException("Invalid process id: " + processId);
+			}
+		}
 	}
 }

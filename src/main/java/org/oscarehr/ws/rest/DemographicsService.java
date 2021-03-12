@@ -38,20 +38,16 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.common.model.SecObjectName;
-import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
+import org.oscarehr.dataMigration.service.DataMigrationService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.service.PatientExportService;
 import org.oscarehr.dataMigration.service.PatientImportWrapperService;
-import org.oscarehr.dataMigration.service.context.PatientExportContext;
-import org.oscarehr.dataMigration.service.context.PatientExportContextService;
-import org.oscarehr.dataMigration.service.context.PatientImportContext;
-import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.oscarehr.dataMigration.transfer.ImportTransferOutbound;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.log.model.LogDataMigration;
-import org.oscarehr.log.service.LogDataMigrationService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -118,13 +114,7 @@ public class DemographicsService extends AbstractServiceImpl
 	private DemographicSetsDao demographicSetsDao;
 
 	@Autowired
-	private PatientImportContextService patientImportContextService;
-
-	@Autowired
-	private PatientExportContextService patientExportContextService;
-
-	@Autowired
-	private LogDataMigrationService logDataMigrationService;
+	private DataMigrationService dataMigrationService;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -415,7 +405,7 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
+		LogDataMigration dataMigration = dataMigrationService.getMigrationResult(processId);
 		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
 
 		ImportTransferOutbound transfer = new ImportTransferOutbound();
@@ -439,28 +429,7 @@ public class DemographicsService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-
-		PatientImportContext context = patientImportContextService.getContext(processId);
-		if(context != null)
-		{
-			return RestResponse.successResponse(context.getProgress());
-		}
-		else
-		{
-			LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
-
-			if(dataMigration != null)
-			{
-				ProgressBarPollingData pollingData = new ProgressBarPollingData();
-				pollingData.setMessage("Finalizing...");
-				pollingData.setComplete(true);
-				return RestResponse.successResponse(pollingData);
-			}
-			else
-			{
-				throw new RuntimeException("Invalid process id: " + processId);
-			}
-		}
+		return RestResponse.successResponse(dataMigrationService.getImportStatus(processId));
 	}
 
 	@GET
@@ -531,7 +500,7 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
+		LogDataMigration dataMigration = dataMigrationService.getMigrationResult(processId);
 		org.json.JSONObject jsonData = dataMigration.getDataAsJson();
 
 		String patientSet = jsonData.getString(LogDataMigration.DATA_KEY_PATIENT_SET);
@@ -551,27 +520,7 @@ public class DemographicsService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 
-		PatientExportContext context = patientExportContextService.getContext(processId);
-		if(context != null)
-		{
-			return RestResponse.successResponse(context.getProgress());
-		}
-		else
-		{
-			LogDataMigration dataMigration = logDataMigrationService.getMigrationResult(processId);
-
-			if(dataMigration != null)
-			{
-				ProgressBarPollingData pollingData = new ProgressBarPollingData();
-				pollingData.setMessage("Finalizing...");
-				pollingData.setComplete(true);
-				return RestResponse.successResponse(pollingData);
-			}
-			else
-			{
-				throw new RuntimeException("Invalid process id: " + processId);
-			}
-		}
+		return RestResponse.successResponse(dataMigrationService.getExportStatus(processId));
 	}
 
 	@GET

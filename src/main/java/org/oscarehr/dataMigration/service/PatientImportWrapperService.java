@@ -195,7 +195,6 @@ public class PatientImportWrapperService
 		{
 			// always clear the provider cache after an import to unload resources
 			BaseModelToDbConverter.clearProviderCache();
-			context.markAsComplete();
 			patientImportContextService.unregister(contextId);
 		}
 

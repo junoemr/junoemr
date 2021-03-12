@@ -86,7 +86,6 @@ public class PatientExportService
 		}
 		finally
 		{
-			context.markAsComplete();
 			patientExportContextService.unregister(contextId);
 		}
 		return exportFiles;
@@ -119,7 +118,6 @@ public class PatientExportService
 		}
 		finally
 		{
-			context.markAsComplete();
 			patientExportContextService.unregister(contextId);
 		}
 		return zipFile;

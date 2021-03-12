@@ -33,7 +33,6 @@ public class PollableContext
 {
 	private int total;
 	private int processed;
-	private boolean complete;
 
 	private ConcurrentMap<String, String> localProcessIdentifierMap;
 
@@ -41,7 +40,6 @@ public class PollableContext
 	{
 		total = 0;
 		processed = 0;
-		complete = false;
 		localProcessIdentifierMap = new ConcurrentHashMap<>();
 	}
 
@@ -49,7 +47,6 @@ public class PollableContext
 	{
 		setTotal(total);
 		setProcessed(0);
-		setComplete(false);
 		localProcessIdentifierMap.clear();
 	}
 
@@ -61,14 +58,6 @@ public class PollableContext
 		progressData.setMessage(getPollingMessage());
 		progressData.setComplete(false);
 		return progressData;
-	}
-
-	public synchronized void markAsComplete()
-	{
-		setTotal(0);
-		setProcessed(0);
-		setComplete(true);
-		localProcessIdentifierMap.clear();
 	}
 
 	public synchronized void incrementProcessed()
