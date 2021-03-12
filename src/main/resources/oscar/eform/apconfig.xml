@@ -1185,11 +1185,11 @@
 		<ap-name>latest_echart_note</ap-name>
 		<ap-sql>SELECT cmn.note AS note FROM casemgmt_note cmn
 			JOIN (SELECT DISTINCT a.note_id, a.uuid FROM casemgmt_note a
-			WHERE a.demographic_no=9
+			WHERE a.demographic_no=${demographic}
 			AND a.note_id NOT IN(SELECT l.note_id FROM casemgmt_note_link AS l)
 			ORDER BY a.observation_date DESC) AS A
 			ON (cmn.uuid = A.uuid)
-			WHERE cmn.demographic_no=9
+			WHERE cmn.demographic_no=${demographic}
 			ORDER BY update_date
 			DESC LIMIT 1;
 		</ap-sql>
