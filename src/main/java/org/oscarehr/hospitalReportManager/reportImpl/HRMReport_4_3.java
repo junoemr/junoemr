@@ -25,7 +25,7 @@ package org.oscarehr.hospitalReportManager.reportImpl;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
-import org.oscarehr.demographicImport.model.hrm.HrmObservation;
+import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;

@@ -13,7 +13,7 @@ package oscar.oscarLab.ca.on;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographicImport.model.hrm.HrmDocument;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;

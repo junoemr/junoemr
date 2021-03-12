@@ -27,11 +27,11 @@ import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
-import org.oscarehr.demographicImport.model.common.PhoneNumber;
-import org.oscarehr.demographicImport.model.lab.Lab;
-import org.oscarehr.demographicImport.model.lab.LabObservation;
-import org.oscarehr.demographicImport.model.lab.LabObservationResult;
+import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.lab.Lab;
+import org.oscarehr.dataMigration.model.lab.LabObservation;
+import org.oscarehr.dataMigration.model.lab.LabObservationResult;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 

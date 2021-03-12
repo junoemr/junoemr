@@ -26,7 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Tickler;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.provider.model.ProviderData;
 
 import java.util.ArrayList;

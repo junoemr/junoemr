@@ -38,7 +38,7 @@ import org.oscarehr.common.hl7.copd.mapper.MapperFactory;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;

@@ -131,7 +131,7 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 		if (partialDate!=null) persist(partialDate);
 	}
 
-	public void setPartialDate(org.oscarehr.demographicImport.model.common.PartialDate partialDateModel,
+	public void setPartialDate(org.oscarehr.dataMigration.model.common.PartialDate partialDateModel,
 	                           PartialDate.TABLE table, Integer tableId, Integer field)
 	{
 		String format = partialDateModel.getFormatString();
@@ -140,7 +140,7 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 			setPartialDate(table.getValue(), tableId, field, format);
 		}
 	}
-	public void setPartialDateTime(org.oscarehr.demographicImport.model.common.PartialDateTime partialDateModel,
+	public void setPartialDateTime(org.oscarehr.dataMigration.model.common.PartialDateTime partialDateModel,
 	                           PartialDate.TABLE table, Integer tableId, Integer field)
 	{
 		if(partialDateModel.isFullDateTime())

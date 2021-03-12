@@ -28,10 +28,10 @@ import org.apache.log4j.PropertyConfigurator;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
-import org.oscarehr.demographicImport.service.CoPDImportService;
-import org.oscarehr.demographicImport.service.CoPDMessageStream;
-import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
-import org.oscarehr.demographicImport.transfer.CoPDRecordData;
+import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDMessageStream;
+import org.oscarehr.dataMigration.service.CoPDPreProcessorService;
+import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 

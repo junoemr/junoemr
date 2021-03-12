@@ -26,8 +26,8 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
-import org.oscarehr.demographicImport.transfer.CoPDRecordData;
+import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.rx.model.Drug;
 import oscar.util.ConversionUtils;
 

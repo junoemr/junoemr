@@ -27,7 +27,7 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.converter.in.AllergyModelToDbConverter;
+import org.oscarehr.dataMigration.converter.in.AllergyModelToDbConverter;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.provider.model.ProviderData;
@@ -58,7 +58,7 @@ public class AllergyService
 	@Autowired
 	private EncounterNoteService encounterNoteService;
 
-	public void saveNewAllergy(org.oscarehr.demographicImport.model.allergy.Allergy allergy, Demographic dbDemographic)
+	public void saveNewAllergy(org.oscarehr.dataMigration.model.allergy.Allergy allergy, Demographic dbDemographic)
 	{
 		Allergy dbAllergy = allergyModelToDbConverter.convert(allergy);
 		dbAllergy.setDemographicNo(dbDemographic.getId());
@@ -82,9 +82,9 @@ public class AllergyService
 		}
 	}
 
-	public void saveNewAllergies(List<org.oscarehr.demographicImport.model.allergy.Allergy> allergyList, Demographic dbDemographic)
+	public void saveNewAllergies(List<org.oscarehr.dataMigration.model.allergy.Allergy> allergyList, Demographic dbDemographic)
 	{
-		for(org.oscarehr.demographicImport.model.allergy.Allergy allergy : allergyList)
+		for(org.oscarehr.dataMigration.model.allergy.Allergy allergy : allergyList)
 		{
 			saveNewAllergy(allergy, dbDemographic);
 		}

@@ -34,7 +34,7 @@ import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.converter.in.DocumentModelToDbConverter;
+import org.oscarehr.dataMigration.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
@@ -117,7 +117,7 @@ public class DocumentService
 		return uploadNewDemographicDocumentLogic(document, file, demographicNo);
 	}
 
-	public Document uploadNewDemographicDocument(org.oscarehr.demographicImport.model.document.Document documentModel, Demographic demographic) throws IOException
+	public Document uploadNewDemographicDocument(org.oscarehr.dataMigration.model.document.Document documentModel, Demographic demographic) throws IOException
 	{
 		Document dbDocument = uploadNewDemographicDocument(documentModelToDbConverter.convert(documentModel), documentModel.getFile(), demographic.getId());
 
@@ -147,12 +147,12 @@ public class DocumentService
 		return dbDocument;
 	}
 
-	public void uploadAllNewDemographicDocument(List<org.oscarehr.demographicImport.model.document.Document> documentModels, Demographic demographic) throws IOException
+	public void uploadAllNewDemographicDocument(List<org.oscarehr.dataMigration.model.document.Document> documentModels, Demographic demographic) throws IOException
 	{
 		// load program ID outside of loop to prevent excess queries
 		Integer defaultProgramId = programManager.getDefaultProgramId();
 
-		for(org.oscarehr.demographicImport.model.document.Document documentModel : documentModels)
+		for(org.oscarehr.dataMigration.model.document.Document documentModel : documentModels)
 		{
 			if(documentModel.getProgramId() == null)
 			{

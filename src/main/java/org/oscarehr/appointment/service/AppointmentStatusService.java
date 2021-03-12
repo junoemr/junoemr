@@ -24,8 +24,8 @@ package org.oscarehr.appointment.service;
 
 import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
 import org.oscarehr.appointment.model.AppointmentStatusList;
-import org.oscarehr.demographicImport.converter.out.AppointmentStatusDbToModelConverter;
-import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
+import org.oscarehr.dataMigration.converter.out.AppointmentStatusDbToModelConverter;
+import org.oscarehr.dataMigration.model.appointment.AppointmentStatus;
 import org.oscarehr.managers.AppointmentManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

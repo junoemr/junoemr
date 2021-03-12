@@ -26,8 +26,8 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
-import org.oscarehr.demographicImport.transfer.CoPDRecordData;
+import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import oscar.util.ConversionUtils;
 

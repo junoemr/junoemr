@@ -23,8 +23,8 @@
 package org.oscarehr.encounterNote.service;
 
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.converter.in.note.MedicalHistoryNoteModelToDbConverter;
-import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
+import org.oscarehr.dataMigration.converter.in.note.MedicalHistoryNoteModelToDbConverter;
+import org.oscarehr.dataMigration.model.encounterNote.MedicalHistoryNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.encounterNote.model.Issue;

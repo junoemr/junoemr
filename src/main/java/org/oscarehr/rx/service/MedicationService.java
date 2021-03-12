@@ -25,9 +25,9 @@ package org.oscarehr.rx.service;
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.converter.in.DrugModelToDbConverter;
-import org.oscarehr.demographicImport.converter.in.PrescriptionModelToDbConverter;
-import org.oscarehr.demographicImport.model.medication.Medication;
+import org.oscarehr.dataMigration.converter.in.DrugModelToDbConverter;
+import org.oscarehr.dataMigration.converter.in.PrescriptionModelToDbConverter;
+import org.oscarehr.dataMigration.model.medication.Medication;
 import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
 import org.oscarehr.rx.model.Drug;
@@ -71,7 +71,7 @@ public class MedicationService
 		drugDao.persist(drug);
 
 		/* save drug partial dates */
-		org.oscarehr.demographicImport.model.common.PartialDate partialStartDate = medication.getRxStartDate();
+		org.oscarehr.dataMigration.model.common.PartialDate partialStartDate = medication.getRxStartDate();
 		if(partialStartDate != null)
 		{
 			partialDateDao.setPartialDate(partialStartDate,
@@ -79,7 +79,7 @@ public class MedicationService
 					drug.getId(),
 					PartialDate.DRUGS_STARTDATE);
 		}
-		org.oscarehr.demographicImport.model.common.PartialDate partialWrittenDate = medication.getWrittenDate();
+		org.oscarehr.dataMigration.model.common.PartialDate partialWrittenDate = medication.getWrittenDate();
 		if(partialWrittenDate != null)
 		{
 			partialDateDao.setPartialDate(partialWrittenDate,
@@ -87,7 +87,7 @@ public class MedicationService
 					drug.getId(),
 					PartialDate.DRUGS_WRITTENDATE);
 		}
-		org.oscarehr.demographicImport.model.common.PartialDate partialEndDate = medication.getRxEndDate();
+		org.oscarehr.dataMigration.model.common.PartialDate partialEndDate = medication.getRxEndDate();
 		if(partialEndDate != null)
 		{
 			partialDateDao.setPartialDate(partialEndDate,

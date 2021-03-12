@@ -25,8 +25,8 @@ package oscar.util;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.demographicImport.model.common.PartialDate;
-import org.oscarehr.demographicImport.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.common.PartialDate;
+import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.util.MiscUtils;
 
 import javax.xml.datatype.DatatypeConfigurationException;

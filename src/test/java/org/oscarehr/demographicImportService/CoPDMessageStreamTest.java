@@ -26,8 +26,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.oscarehr.demographic.util.HinValidator;
-import org.oscarehr.demographicImport.service.CoPDMessageStream;
+import org.oscarehr.dataMigration.service.CoPDMessageStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

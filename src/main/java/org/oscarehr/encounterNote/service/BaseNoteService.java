@@ -32,7 +32,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
+import org.oscarehr.dataMigration.model.encounterNote.BaseNote;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -347,7 +347,7 @@ public abstract class BaseNoteService
 		return new CaseManagementNote(noteToCopy);
 	}
 
-	public void saveExtPartialDate(org.oscarehr.demographicImport.model.common.PartialDate dateToSave, Long extensionId)
+	public void saveExtPartialDate(org.oscarehr.dataMigration.model.common.PartialDate dateToSave, Long extensionId)
 	{
 		partialDateDao.setPartialDate(dateToSave,
 				PartialDate.TABLE.CASEMGMT_NOTE_EXT,

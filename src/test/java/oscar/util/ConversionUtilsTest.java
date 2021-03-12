@@ -25,7 +25,7 @@ package oscar.util;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.dataMigration.model.common.PartialDate;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;

@@ -30,7 +30,7 @@ import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.converter.in.AppointmentModelToDbConverter;
+import org.oscarehr.dataMigration.converter.in.AppointmentModelToDbConverter;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
@@ -248,7 +248,7 @@ public class Appointment
 		return appointment;
 	}
 
-	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.demographicImport.model.appointment.Appointment appointment, Demographic demographic)
+	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.dataMigration.model.appointment.Appointment appointment, Demographic demographic)
 	{
 		org.oscarehr.common.model.Appointment dbAppointment = appointmentModelToDbConverter.convert(appointment);
 		dbAppointment.setDemographicNo(demographic.getDemographicId());
@@ -263,9 +263,9 @@ public class Appointment
 		return dbAppointment;
 	}
 
-	public void saveNewAppointments(List<org.oscarehr.demographicImport.model.appointment.Appointment> appointmentList, Demographic demographic)
+	public void saveNewAppointments(List<org.oscarehr.dataMigration.model.appointment.Appointment> appointmentList, Demographic demographic)
 	{
-		for(org.oscarehr.demographicImport.model.appointment.Appointment appointment : appointmentList)
+		for(org.oscarehr.dataMigration.model.appointment.Appointment appointment : appointmentList)
 		{
 			saveNewAppointment(appointment, demographic);
 		}

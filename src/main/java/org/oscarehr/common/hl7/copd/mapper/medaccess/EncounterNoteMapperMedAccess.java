@@ -26,7 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.jsoup.Jsoup;
 import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDImportService;
 
 
 // override of EncounterNoteMapper with custom functionality for MedAccess

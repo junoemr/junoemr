@@ -9,7 +9,7 @@
 
 package org.oscarehr.hospitalReportManager;
 
-import org.oscarehr.demographicImport.model.hrm.HrmObservation;
+import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 
 import java.util.Calendar;
 import java.util.List;

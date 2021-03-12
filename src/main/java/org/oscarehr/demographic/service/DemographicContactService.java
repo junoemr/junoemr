@@ -27,12 +27,12 @@ import org.oscarehr.common.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.demographicImport.converter.in.contact.DemographicContactModelToDbConverter;
-import org.oscarehr.demographicImport.converter.in.contact.ExternalContactModelToDbConverter;
-import org.oscarehr.demographicImport.model.contact.DemographicContact;
-import org.oscarehr.demographicImport.model.contact.ExternalContact;
+import org.oscarehr.dataMigration.converter.in.contact.DemographicContactModelToDbConverter;
+import org.oscarehr.dataMigration.converter.in.contact.ExternalContactModelToDbConverter;
+import org.oscarehr.dataMigration.model.contact.DemographicContact;
+import org.oscarehr.dataMigration.model.contact.ExternalContact;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,7 +130,7 @@ public class DemographicContactService
 		return dbContact;
 	}
 
-	private ProfessionalSpecialist persistSpecialistContact(org.oscarehr.demographicImport.model.contact.Contact specialistContactPlaceholder)
+	private ProfessionalSpecialist persistSpecialistContact(org.oscarehr.dataMigration.model.contact.Contact specialistContactPlaceholder)
 	{
 		throw new NotImplementedException("Conversion not implemented");
 	}

@@ -33,7 +33,7 @@ if(!authed) {
 %>
 
 <%@page import="java.util.LinkedList, org.oscarehr.hospitalReportManager.*, org.oscarehr.hospitalReportManager.model.*, java.util.List, org.oscarehr.util.SpringUtils, org.oscarehr.PMmodule.dao.ProviderDao, java.util.Date" %>
-<%@ page import="org.oscarehr.demographicImport.model.hrm.HrmObservation" %>
+<%@ page import="org.oscarehr.dataMigration.model.hrm.HrmObservation" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
