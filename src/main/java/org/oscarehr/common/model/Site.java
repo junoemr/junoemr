@@ -147,49 +147,62 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 		return getSiteId();
 	}
 
-	public String getSiteUrl() {
+	public String getSiteUrl()
+	{
 		return siteUrl;
 	}
-	public void setSiteUrl(String siteUrl) {
+	public void setSiteUrl(String siteUrl)
+	{
 		this.siteUrl = siteUrl;
 	}
 
-	public Integer getSiteId() {
+	public Integer getSiteId()
+	{
 		return this.siteId;
 	}
-	public void setSiteId(Integer siteId) {
+	public void setSiteId(Integer siteId)
+	{
 		this.siteId = siteId;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return this.name;
 	}
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
 
-	public String getShortName() {
+	public String getShortName()
+	{
 		return this.shortName;
 	}
-	public void setShortName(String shortName) {
+	public void setShortName(String shortName)
+	{
 		this.shortName = shortName;
 	}
 
-	public String getPhone() {
+	public String getPhone()
+	{
 		return this.phone;
 	}
-	public void setPhone(String phone) {
+	public void setPhone(String phone)
+	{
 		this.phone = phone;
 	}
 
-	public String getFax() {
+	public String getFax()
+	{
 		return this.fax;
 	}
-	public void setFax(String fax) {
+	public void setFax(String fax)
+	{
 		this.fax = fax;
 	}
 
-	public String getBgColor() {
+	public String getBgColor()
+	{
 		return this.bgColor;
 	}
 	public void setBgColor(String bgColor)
@@ -201,73 +214,93 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 		this.bgColor = cleaned;
 	}
 
-	public String getAddress() {
+	public String getAddress()
+	{
 		return this.address;
 	}
-	public void setAddress(String address) {
+	public void setAddress(String address)
+	{
 		this.address = address;
 	}
 
-	public String getCity() {
+	public String getCity()
+	{
 		return this.city;
 	}
-	public void setCity(String city) {
+	public void setCity(String city)
+	{
 		this.city = city;
 	}
 
-	public String getProvince() {
+	public String getProvince()
+	{
 		return this.province;
 	}
-	public void setProvince(String province) {
+	public void setProvince(String province)
+	{
 		this.province = province;
 	}
 
-	public String getPostal() {
+	public String getPostal()
+	{
 		return this.postal;
 	}
-	public void setPostal(String postal) {
+	public void setPostal(String postal)
+	{
 		this.postal = postal;
 	}
 
-	public byte getStatus() {
+	public byte getStatus()
+	{
 		return this.status;
 	}
-	public void setStatus(byte status) {
+	public void setStatus(byte status)
+	{
 		this.status = status;
 	}
 
-	public Integer getProviderIdFrom() {
+	public Integer getProviderIdFrom()
+	{
 		return providerIdFrom;
 	}
-	public void setProviderIdFrom(Integer providerIdFrom) {
+	public void setProviderIdFrom(Integer providerIdFrom)
+	{
 		this.providerIdFrom = providerIdFrom;
 	}
 
-	public Integer getProviderIdTo() {
+	public Integer getProviderIdTo()
+	{
 		return providerIdTo;
 	}
-	public void setProviderIdTo(Integer providerIdTo) {
+	public void setProviderIdTo(Integer providerIdTo)
+	{
 		this.providerIdTo = providerIdTo;
 	}
 
-	public Set<Provider> getProviders() {
+	public Set<Provider> getProviders()
+	{
 		return providers;
 	}
-	public void setProviders(Set<Provider> providers) {
+	public void setProviders(Set<Provider> providers)
+	{
 		this.providers = providers;
 	}
 
-	public Integer getSiteLogoId() {
+	public Integer getSiteLogoId()
+	{
 		return siteLogoId;
 	}
-	public void setSiteLogoId(Integer siteLogoId) {
+	public void setSiteLogoId(Integer siteLogoId)
+	{
 		this.siteLogoId = siteLogoId;
 	}
 
-	public String getSiteLogoDesc() {
+	public String getSiteLogoDesc()
+	{
 		return siteLogoDesc;
 	}
-	public void setSiteLogoDesc(String siteLogoDesc) {
+	public void setSiteLogoDesc(String siteLogoDesc)
+	{
 		this.siteLogoDesc = siteLogoDesc;
 	}
 

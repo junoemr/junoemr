@@ -72,11 +72,6 @@ public class SSOOrganization implements Serializable
 	{
 		SSOOrganization org = new SSOOrganization();
 
-		if (site.getUuid() == null)
-		{
-			throw new RuntimeException();
-		}
-
 		org.setExternalId(site.getUuid());
 		org.setMunicipality(site.getCity());
 		org.setName(site.getName());
