@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.service;
 
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.logger.ExportLogger;
 import org.oscarehr.dataMigration.logger.ImportLogger;
 import org.oscarehr.dataMigration.logger.cds.CDSExportLogger;
@@ -110,6 +111,7 @@ public class ImporterExporterFactory
 		patientExportContext.setExportPreferences(exportPreferences);
 		patientExportContext.setExportLogger(getExportLogger(type));
 		patientExportContext.setExporter(getExporter(type));
+		patientExportContext.setTempDirectory(FileFactory.createTempDirectory());
 		return patientExportContext;
 	}
 

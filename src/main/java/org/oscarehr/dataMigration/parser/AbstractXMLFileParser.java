@@ -32,6 +32,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public abstract class AbstractXMLFileParser<T> extends AbstractFileParser<T>
 {
@@ -59,8 +60,17 @@ public abstract class AbstractXMLFileParser<T> extends AbstractFileParser<T>
 	@Override
 	public GenericFile write(T formatObject) throws IOException
 	{
-		GenericFile tempFile = FileFactory.createTempFile(".xml");
+		return write(formatObject, (Path) null);
+	}
 
+	@Override
+	public GenericFile write(T formatObject, Path directory) throws IOException
+	{
+		return write(formatObject, FileFactory.createTempFile(directory, ".xml"));
+	}
+
+	private GenericFile write(T formatObject, GenericFile tempFile) throws IOException
+	{
 		try
 		{
 			JAXBContext jaxbContext = getNewInstance();
@@ -84,7 +94,6 @@ public abstract class AbstractXMLFileParser<T> extends AbstractFileParser<T>
 			tempFile.deleteFile(); // clean up failed file write
 			throw new IOException(e);
 		}
-
 		return tempFile;
 	}
 

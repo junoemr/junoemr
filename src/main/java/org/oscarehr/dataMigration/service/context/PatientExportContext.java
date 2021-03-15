@@ -27,6 +27,11 @@ import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.dataMigration.logger.ExportLogger;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DemographicExporter;
+import org.oscarehr.util.MiscUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Data
 public class PatientExportContext extends PollableContext
@@ -37,6 +42,24 @@ public class PatientExportContext extends PollableContext
 
 	private ZIPFile result;
 	private String exportName;
+	private Path tempDirectory;
+
+	@Override
+	public synchronized void clean()
+	{
+		if(tempDirectory != null)
+		{
+			try
+			{
+				MiscUtils.getLogger().info("remove temp directory: " + tempDirectory.toString());
+				Files.deleteIfExists(tempDirectory);
+			}
+			catch(IOException e)
+			{
+				MiscUtils.getLogger().error("Error cleaning export temp files", e);
+			}
+		}
+	}
 
 	@Override
 	protected synchronized String getPollingMessage()

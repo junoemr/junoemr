@@ -25,10 +25,13 @@ package org.oscarehr.dataMigration.parser;
 import org.oscarehr.common.io.GenericFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public abstract class AbstractFileParser<I>
 {
 	public abstract I parse(GenericFile genericFile) throws IOException;
 
 	public abstract GenericFile write(I formatObject) throws IOException;
+
+	public abstract GenericFile write(I formatObject, Path directory) throws IOException;
 }

@@ -79,4 +79,8 @@ public class PollableContext
 	{
 		return localProcessIdentifierMap.get(Thread.currentThread().getName());
 	}
+
+	public synchronized void clean()
+	{
+	}
 }

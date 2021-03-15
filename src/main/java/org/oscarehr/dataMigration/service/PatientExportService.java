@@ -86,6 +86,7 @@ public class PatientExportService
 		}
 		finally
 		{
+			context.clean();
 			patientExportContextService.unregister(contextId);
 		}
 		return exportFiles;
@@ -124,6 +125,7 @@ public class PatientExportService
 		}
 		finally
 		{
+			context.clean();
 			patientExportContextService.unregister(contextId);
 		}
 		return zipFile;

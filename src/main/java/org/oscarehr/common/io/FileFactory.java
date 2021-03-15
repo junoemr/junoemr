@@ -139,6 +139,25 @@ public class FileFactory
 		logger.info("Created tempfile: " + file.getPath());
 		return getExistingFile(file);
 	}
+
+	/**
+	 * Write the input stream to a tempfile
+	 * @param directory - the directory to create the tempFile in
+	 * @param suffix - suffix of filename, usually the desired extension
+	 * @return the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile createTempFile(Path directory, String suffix) throws IOException
+	{
+		if(directory == null)
+		{
+			return createTempFile(suffix);
+		}
+		File file = Files.createTempFile(directory, "juno", suffix).toFile();
+		logger.info("Created tempfile: " + file.getPath());
+		return getExistingFile(file);
+	}
+
 	/**
 	 * Write the input stream to a tempfile
 	 * @param fileInputStream - input stream of the new file
@@ -186,7 +205,7 @@ public class FileFactory
 	 * @return - the directory path
 	 * @throws IOException
 	 */
-	public static Path createTepDirectory() throws IOException
+	public static Path createTempDirectory() throws IOException
 	{
 		Path tempDir = Files.createTempDirectory("juno");
 		logger.info("Created temp directory: " + tempDir.toString());

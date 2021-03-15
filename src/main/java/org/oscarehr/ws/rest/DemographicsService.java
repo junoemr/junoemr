@@ -334,7 +334,7 @@ public class DemographicsService extends AbstractServiceImpl
 			java.nio.file.Path tempDir = null;
 			try
 			{
-				tempDir = FileFactory.createTepDirectory();
+				tempDir = FileFactory.createTempDirectory();
 
 				for(FileTransfer file : fileListTransfer)
 				{

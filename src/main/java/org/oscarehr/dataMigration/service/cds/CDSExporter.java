@@ -32,6 +32,7 @@ import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.parser.cds.CDSFileParser;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DemographicExporter;
+import org.oscarehr.dataMigration.service.context.PatientExportContext;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,12 +81,13 @@ public class CDSExporter implements DemographicExporter
 		Demographic demographic = patientRecord.getDemographic();
 		CDSFileParser parser = new CDSFileParser();
 
-		patientExportContextService.getContext().getExportLogger().logSummaryLine(patientRecord);
+		PatientExportContext context = patientExportContextService.getContext();
+		context.getExportLogger().logSummaryLine(patientRecord);
 		incrementProviderExportCount(demographic);
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
 		instant = LogAction.printDuration(instant, "Exporter: model to CDS structure conversion");
 
-		GenericFile exportFile = parser.write(omdCds);
+		GenericFile exportFile = parser.write(omdCds, context.getTempDirectory());
 		exportFile.rename(createExportFilename(demographic));
 
 		instant = LogAction.printDuration(instant, "Exporter: file write and rename");
@@ -143,19 +145,21 @@ public class CDSExporter implements DemographicExporter
 
 	protected GenericFile createEventLog() throws IOException
 	{
-		GenericFile eventLog = FileFactory.createTempFile(".txt");
+		PatientExportContext context = patientExportContextService.getContext();
+		GenericFile eventLog = FileFactory.createTempFile(context.getTempDirectory(), ".txt");
 		eventLog.rename("ExportEventLog.txt");
 
 		eventLog.appendContents(
-				patientExportContextService.getContext().getExportLogger().getSummaryLogFile(),
-				patientExportContextService.getContext().getExportLogger().getEventLogFile());
+				context.getExportLogger().getSummaryLogFile(),
+				context.getExportLogger().getEventLogFile());
 
 		return eventLog;
 	}
 
 	protected GenericFile createReadme() throws IOException
 	{
-		GenericFile readme = FileFactory.createTempFile(".txt");
+		PatientExportContext context = patientExportContextService.getContext();
+		GenericFile readme = FileFactory.createTempFile(context.getTempDirectory(), ".txt");
 		FileOutputStream fos = new FileOutputStream(readme.getFileObject());
 		OutputStreamWriter streamWriter = new OutputStreamWriter(fos);
 
