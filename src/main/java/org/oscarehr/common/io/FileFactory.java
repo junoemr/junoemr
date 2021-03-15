@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -151,6 +152,21 @@ public class FileFactory
 		logger.info("Created tempfile: " + file.getPath());
 		return writeInputStream(fileInputStream, file, true, true);
 	}
+
+	/**
+	 * Write the input stream to a tempfile
+	 * @param fileInputStream - input stream of the new file
+	 * @param directory - the directory to create the tempFile in
+	 * @param suffix - suffix of filename, usually the desired extension
+	 * @return the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile createTempFile(InputStream fileInputStream, Path directory, String suffix) throws IOException, InterruptedException
+	{
+		File file = Files.createTempFile(directory, "juno", suffix).toFile();
+		logger.info("Created tempfile: " + file.getPath());
+		return writeInputStream(fileInputStream, file, true, true);
+	}
 	/**
 	 * Write the input stream to a tempfile
 	 * @param outputStream - input stream of the new file
@@ -163,6 +179,18 @@ public class FileFactory
 		File file = File.createTempFile("juno", suffix);
 		logger.info("Created tempfile: " + file.getPath());
 		return writeOutputStream(outputStream, file);
+	}
+
+	/**
+	 * create a temp directory
+	 * @return - the directory path
+	 * @throws IOException
+	 */
+	public static Path createTepDirectory() throws IOException
+	{
+		Path tempDir = Files.createTempDirectory("juno");
+		logger.info("Created temp directory: " + tempDir.toString());
+		return tempDir;
 	}
 
 	/**

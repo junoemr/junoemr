@@ -73,12 +73,12 @@ angular.module('Common.Components').component('junoFileChooser', {
 			if(ctrl.change)
 			{
 				let totalSize = 0;
-				for(let i=0; i< files.length; i++)
+				for (let i = 0; i < files.length; i++)
 				{
 					totalSize += files[i].size;
 				}
-				const filesize = ((totalSize/1024)/1024).toFixed(4); // MB
-				if(filesize > ctrl.maxSize)
+				const filesize = ((totalSize / 1024) / 1024).toFixed(4); // MB
+				if (filesize > ctrl.maxSize)
 				{
 					ctrl.getInputRef().val(null);
 					Juno.Common.Util.errorAlert($uibModal, "File Size Limit",

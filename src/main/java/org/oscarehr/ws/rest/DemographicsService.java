@@ -73,6 +73,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -330,13 +331,14 @@ public class DemographicsService extends AbstractServiceImpl
 		{
 			List<GenericFile> temporaryFileList = new ArrayList<>();
 			List<GenericFile> importFileList = new ArrayList<>();
-			String documentLocation = GenericFile.TEMP_DIRECTORY;
-
+			java.nio.file.Path tempDir = null;
 			try
 			{
+				tempDir = FileFactory.createTepDirectory();
+
 				for(FileTransfer file : fileListTransfer)
 				{
-					GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), "_" + file.getName());
+					GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), tempDir, "_" + file.getName());
 					temporaryFileList.add(tempfile);
 					tempfile.rename(file.getName()); //might be a referenced document. make sure it uses the original name
 
@@ -366,7 +368,7 @@ public class DemographicsService extends AbstractServiceImpl
 						importSource,
 						mergeStrategy,
 						importFileList,
-						documentLocation,
+						tempDir.toString(),
 						false,
 						defaultSiteName);
 			}
@@ -382,6 +384,11 @@ public class DemographicsService extends AbstractServiceImpl
 					for(GenericFile tempFile : temporaryFileList)
 					{
 						tempFile.deleteFile();
+					}
+					if(tempDir != null)
+					{
+						logger.info("delete temp directory: " + tempDir.toString());
+						Files.deleteIfExists(tempDir);
 					}
 				}
 				catch(IOException e)

@@ -37,10 +37,6 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.common.model.ProviderInboxItem;
-import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-import org.oscarehr.demographic.service.DemographicContactService;
-import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.dataMigration.converter.in.PharmacyModelToDbConverter;
 import org.oscarehr.dataMigration.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.dataMigration.converter.in.ReviewerModelToDbConverter;
@@ -48,6 +44,7 @@ import org.oscarehr.dataMigration.exception.DuplicateDemographicException;
 import org.oscarehr.dataMigration.logger.ImportLogger;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.lab.Lab;
@@ -55,6 +52,10 @@ import org.oscarehr.dataMigration.model.lab.LabObservation;
 import org.oscarehr.dataMigration.model.lab.LabObservationResult;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.demographic.service.DemographicContactService;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
@@ -195,62 +196,71 @@ public class PatientImportService
 		boolean duplicateDetected = (dbDemographicDuplicate != null);
 
 		org.oscarehr.demographic.model.Demographic dbDemographic;
-		if(duplicateDetected)
+		try
 		{
-			dbDemographic = dbDemographicDuplicate;
-			if(DemographicImporter.MERGE_STRATEGY.MERGE.equals(mergeStrategy))
+			if(duplicateDetected)
 			{
-				logger.warn("Merge with existing demographic: " + dbDemographic.getId());
+				dbDemographic = dbDemographicDuplicate;
+				if(DemographicImporter.MERGE_STRATEGY.MERGE.equals(mergeStrategy))
+				{
+					logger.warn("Merge with existing demographic: " + dbDemographic.getId());
+				}
+				else
+				{
+					throw new DuplicateDemographicException("Duplicate demographic: " + dbDemographic.getId());
+				}
 			}
 			else
 			{
-				throw new DuplicateDemographicException("Duplicate demographic: " + dbDemographic.getId());
+				dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographicModel);
+				logger.info("Persisted new demographic: " + dbDemographic.getId());
 			}
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist/load demographic");
+
+			patientRecord.getDemographic().setId(dbDemographic.getId());
+			demographicContactService.addNewContacts(patientRecord.getContactList(), dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist contacts");
+
+			persistNotes(patientRecord, dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist notes");
+
+			persistLabs(patientRecord, dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist labs");
+
+			appointmentService.saveNewAppointments(patientRecord.getAppointmentList(), dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist appointments");
+			appointmentStatusCache.clear();
+
+			medicationService.saveNewMedications(patientRecord.getMedicationList(), dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist medications");
+
+			persistMeasurements(patientRecord, dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist measurements");
+
+			allergyService.saveNewAllergies(patientRecord.getAllergyList(), dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist allergies");
+
+			persistPreventions(patientRecord, dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist preventions");
+
+			persistPharmacy(patientRecord, dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: match/persist pharmacy");
+
+			// persist documents last to minimize import errors with disk IO
+			persistHrmDocuments(patientRecord, dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist hrm documents");
+
+			documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
+			instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist document files");
+
+			importLogger.logSummaryLine(patientRecord);
 		}
-		else
+		catch(Exception e)
 		{
-			dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographicModel);
-			logger.info("Persisted new demographic: " + dbDemographic.getId());
+			// clean up all document files that will be orphaned by a rollback
+			cleanTempFiles(patientRecord);
+			throw e;
 		}
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist/load demographic");
-
-		patientRecord.getDemographic().setId(dbDemographic.getId());
-		demographicContactService.addNewContacts(patientRecord.getContactList(), dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist contacts");
-
-		persistNotes(patientRecord, dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist notes");
-
-		persistLabs(patientRecord, dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist labs");
-
-		appointmentService.saveNewAppointments(patientRecord.getAppointmentList(), dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist appointments");
-		appointmentStatusCache.clear();
-
-		medicationService.saveNewMedications(patientRecord.getMedicationList(), dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist medications");
-
-		persistMeasurements(patientRecord, dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist measurements");
-
-		allergyService.saveNewAllergies(patientRecord.getAllergyList(), dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist allergies");
-
-		persistPreventions(patientRecord, dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist preventions");
-
-		persistPharmacy(patientRecord, dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: match/persist pharmacy");
-
-		// persist documents last to minimize import errors with disk IO
-		persistHrmDocuments(patientRecord, dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist hrm documents");
-
-		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
-		instant = LogAction.printDuration(instant, "[" + dbDemographic.getId() + "] Import Service: persist document files");
-
-		importLogger.logSummaryLine(patientRecord);
 		writeAuditLogImportStatement(dbDemographic, context.getImportType(), context.getImportPreferences().getImportSource(), duplicateDetected);
 		return dbDemographic;
 	}
@@ -461,5 +471,32 @@ public class PatientImportService
 				LogConst.CON_DEMOGRAPHIC,
 				LogConst.STATUS_SUCCESS,
 				logMessage);
+	}
+
+	private void cleanTempFiles(PatientRecord patientRecord)
+	{
+		for(Document document : patientRecord.getDocumentList())
+		{
+			try
+			{
+				document.getFile().deleteFile();
+			}
+			catch(Exception e)
+			{
+				logger.error("error cleaning temp file", e);
+			}
+		}
+
+		for(HrmDocument document : patientRecord.getHrmDocumentList())
+		{
+			try
+			{
+				document.getDocument().getFile().deleteFile();
+			}
+			catch(Exception e)
+			{
+				logger.error("error cleaning temp file", e);
+			}
+		}
 	}
 }
