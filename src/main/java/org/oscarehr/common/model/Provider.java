@@ -459,7 +459,7 @@ public class Provider implements Serializable, Comparable<Provider>
 	@Override
     public int hashCode()
 	{
-		if (providerNo==null)
+		if (providerNo == null)
 		{
 			return(super.hashCode());
 		}

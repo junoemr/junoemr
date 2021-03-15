@@ -24,6 +24,8 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.clinic.model.ClinicBillingAddress;
 
 import java.io.Serializable;
@@ -49,228 +51,102 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    @Setter
     @Column(name = "clinic_no")
     private Integer id;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_name")
     private String clinicName;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_address")
     private String clinicAddress;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_city")
     private String clinicCity;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_postal")
     private String clinicPostal;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_phone")
     private String clinicPhone;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_fax")
     private String clinicFax;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_location_code")
     private String clinicLocationCode;
 
+    @Getter
+    @Setter
     private String status;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_province")
     private String clinicProvince;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_delim_phone")
     private String clinicDelimPhone;
 
+    @Getter
+    @Setter
     @Column(name = "clinic_delim_fax")
     private String clinicDelimFax;
 
+    @Getter
+    @Setter
     @Column(name = "email")
     private String clinicEmail;
 
+    @Getter
+    @Setter
     @Column(name = "alberta_connect_care_lab_id")
     private String albertaConnectCareLabId;
 
+    @Getter
+    @Setter
     @Column(name = "alberta_connect_care_department_id")
     private String albertaConnectCareDepartmentId;
 
+    @Getter
+    @Setter
     @Column(name = "bc_facility_number")
     private String bcFacilityNumber;
 
+    @Getter
+    @Setter
     @Column(name = "uuid")
     private String uuid;
 
     // foreign key
+    @Getter
+    @Setter
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "clinic_billing_address_id", referencedColumnName = "id")
     private ClinicBillingAddress clinicBillingAddress;
-
-    public Integer getId()
-    {
-        return this.id;
-    }
-    public void setId(Integer id)
-    {
-        this.id = id;
-    }
 
     /**
      * Creates a new instance of UserProperty
      */
     public Clinic()
     {
-    }
-
-    public String getClinicName()
-    {
-        return clinicName;
-    }
-    public void setClinicName(String clinicName)
-    {
-        this.clinicName = clinicName;
-    }
-
-    public String getClinicAddress()
-    {
-        return clinicAddress;
-    }
-    public void setClinicAddress(String clinicAddress)
-    {
-        this.clinicAddress = clinicAddress;
-    }
-
-    public String getClinicCity()
-    {
-        return clinicCity;
-    }
-    public void setClinicCity(String clinicCity)
-    {
-        this.clinicCity = clinicCity;
-    }
-
-    public String getClinicPostal()
-    {
-        return clinicPostal;
-    }
-    public void setClinicPostal(String clinicPostal)
-    {
-        this.clinicPostal = clinicPostal;
-    }
-
-    public String getClinicPhone()
-    {
-        return clinicPhone;
-    }
-    public void setClinicPhone(String clinicPhone)
-    {
-        this.clinicPhone = clinicPhone;
-    }
-
-    public String getClinicFax()
-    {
-        return clinicFax;
-    }
-    public void setClinicFax(String clinicFax)
-    {
-        this.clinicFax = clinicFax;
-    }
-
-    public String getClinicLocationCode()
-    {
-        return clinicLocationCode;
-    }
-    public void setClinicLocationCode(String clinicLocationCode)
-    {
-        this.clinicLocationCode = clinicLocationCode;
-    }
-
-    public String getStatus()
-    {
-        return status;
-    }
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getClinicProvince()
-    {
-        return clinicProvince;
-    }
-    public void setClinicProvince(String clinicProvince)
-    {
-        this.clinicProvince = clinicProvince;
-    }
-
-    public String getClinicDelimPhone()
-    {
-        return clinicDelimPhone;
-    }
-    public void setClinicDelimPhone(String clinicDelimPhone)
-    {
-        this.clinicDelimPhone = clinicDelimPhone;
-    }
-
-    public String getClinicDelimFax()
-    {
-        return clinicDelimFax;
-    }
-    public void setClinicDelimFax(String clinicDelimFax)
-    {
-        this.clinicDelimFax = clinicDelimFax;
-    }
-
-    public String getClinicEmail()
-    {
-        return clinicEmail;
-    }
-    public void setClinicEmail(String clinicEmail)
-    {
-        this.clinicEmail = clinicEmail;
-    }
-
-    public ClinicBillingAddress getClinicBillingAddress()
-    {
-        return clinicBillingAddress;
-    }
-    public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress)
-    {
-        this.clinicBillingAddress = clinicBillingAddress;
-    }
-
-    public String getAlbertaConnectCareLabId()
-    {
-        return albertaConnectCareLabId;
-    }
-    public void setAlbertaConnectCareLabId(String albertaConnectCareLabId)
-    {
-        this.albertaConnectCareLabId = albertaConnectCareLabId;
-    }
-
-    public String getAlbertaConnectCareDepartmentId()
-    {
-        return albertaConnectCareDepartmentId;
-    }
-    public void setAlbertaConnectCareDepartmentId(String albertaConnectCareDepartmentId)
-    {
-        this.albertaConnectCareDepartmentId = albertaConnectCareDepartmentId;
-    }
-
-	public String getBcFacilityNumber()
-	{
-		return bcFacilityNumber;
-	}
-	public void setBcFacilityNumber(String bcFacilityNumber)
-	{
-		this.bcFacilityNumber = bcFacilityNumber;
-	}
-
-    public String getUuid()
-    {
-        return uuid;
-    }
-    public void setUuid(String uuid)
-    {
-        this.uuid = uuid;
     }
 
     @Override
