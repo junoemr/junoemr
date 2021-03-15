@@ -14,7 +14,7 @@ public class ClinicService
     @Autowired
     ClinicDAO clinicDao;
 
-    public void createClinicUuid(Clinic clinic)
+    public void createAndSaveClinicUuid(Clinic clinic)
     {
         UUID newUuid = UUID.randomUUID();
         clinic.setUuid(newUuid.toString());

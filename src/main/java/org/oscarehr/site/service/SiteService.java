@@ -158,7 +158,7 @@ public class SiteService
 		return false;
 	}
 
-	public void createSiteUuid(Site site)
+	public void createAndSaveSiteUuid(Site site)
 	{
 		UUID newUuid = UUID.randomUUID();
 		site.setUuid(newUuid.toString());

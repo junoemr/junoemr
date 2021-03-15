@@ -476,7 +476,7 @@ public class ProviderService
 		existingRecord.setEmail(source.getEmail());
 	}
 
-	public void createProviderImdHealthUuid(ProviderData providerData)
+	public void createAndSaveProviderImdHealthUuid(ProviderData providerData)
 	{
 		UUID newUuid = UUID.randomUUID();
 		providerData.setImdHealthUuid(newUuid.toString());
