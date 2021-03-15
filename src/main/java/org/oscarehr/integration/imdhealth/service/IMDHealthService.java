@@ -161,7 +161,7 @@ public class IMDHealthService
 		// Set clinic uuid
 		if (clinic.getUuid() == null)
 		{
-			clinic.setUuid(clinicService.createClinicUuid(clinic));
+			clinicService.createClinicUuid(clinic);
 		}
 
 		getProviderClinicCredentials(token, providerDataList, clinic, failedToInitialize);
@@ -170,7 +170,7 @@ public class IMDHealthService
 			// Set site uuid
 			if (site.getUuid() == null)
 			{
-				site.setUuid(siteService.createSiteUuid(site));
+				siteService.createSiteUuid(site);
 			}
 
 			Set<Provider> providers = site.getProviders();
@@ -190,7 +190,7 @@ public class IMDHealthService
 			// Set provider uuid
 			if (providerData.getImdHealthUuid() == null)
 			{
-				providerData.setImdHealthUuid(providerService.createProviderImdHealthUuid(providerData));
+				providerService.createProviderImdHealthUuid(providerData);
 			}
 
 			SSOCredentials ssoCredentials = getSSOCredentials(token, providerData, clinic);

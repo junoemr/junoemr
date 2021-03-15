@@ -476,12 +476,10 @@ public class ProviderService
 		existingRecord.setEmail(source.getEmail());
 	}
 
-	public String createProviderImdHealthUuid(ProviderData providerData)
+	public void createProviderImdHealthUuid(ProviderData providerData)
 	{
 		UUID newUuid = UUID.randomUUID();
 		providerData.setImdHealthUuid(newUuid.toString());
 		providerDataDao.merge(providerData);
-
-		return providerData.getImdHealthUuid();
 	}
 }

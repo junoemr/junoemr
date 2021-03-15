@@ -14,12 +14,10 @@ public class ClinicService
     @Autowired
     ClinicDAO clinicDao;
 
-    public String createClinicUuid(Clinic clinic)
+    public void createClinicUuid(Clinic clinic)
     {
         UUID newUuid = UUID.randomUUID();
         clinic.setUuid(newUuid.toString());
         clinicDao.save(clinic);
-
-        return clinic.getUuid();
     }
 }

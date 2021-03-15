@@ -47,97 +47,63 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "clinic")
+@Getter
+@Setter
 public class Clinic extends AbstractModel<Integer> implements Serializable
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    @Setter
     @Column(name = "clinic_no")
     private Integer id;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_name")
     private String clinicName;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_address")
     private String clinicAddress;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_city")
     private String clinicCity;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_postal")
     private String clinicPostal;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_phone")
     private String clinicPhone;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_fax")
     private String clinicFax;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_location_code")
     private String clinicLocationCode;
 
-    @Getter
-    @Setter
     private String status;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_province")
     private String clinicProvince;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_delim_phone")
     private String clinicDelimPhone;
 
-    @Getter
-    @Setter
     @Column(name = "clinic_delim_fax")
     private String clinicDelimFax;
 
-    @Getter
-    @Setter
     @Column(name = "email")
     private String clinicEmail;
 
-    @Getter
-    @Setter
     @Column(name = "alberta_connect_care_lab_id")
     private String albertaConnectCareLabId;
 
-    @Getter
-    @Setter
     @Column(name = "alberta_connect_care_department_id")
     private String albertaConnectCareDepartmentId;
 
-    @Getter
-    @Setter
     @Column(name = "bc_facility_number")
     private String bcFacilityNumber;
 
-    @Getter
-    @Setter
     @Column(name = "uuid")
     private String uuid;
 
     // foreign key
-    @Getter
-    @Setter
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "clinic_billing_address_id", referencedColumnName = "id")
     private ClinicBillingAddress clinicBillingAddress;
