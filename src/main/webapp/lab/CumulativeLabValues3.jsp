@@ -24,13 +24,28 @@
 
 --%>
 
-<%@page
-	import="oscar.oscarDemographic.data.*,java.util.*,java.sql.Connection,oscar.oscarPrevention.*,oscar.oscarLab.ca.on.*,oscar.util.*,oscar.oscarLab.*,oscar.oscarLab.ca.all.util.LabValuesByReverseDateComparator,org.jdom.*,oscar.oscarDB.*,org.jdom.input.*,java.io.InputStream"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@page import="org.oscarehr.util.MiscUtils"%>
+<%@ page import="java.io.Serializable" %>
+<%@ page import="oscar.oscarLab.ca.all.util.LabValuesByReverseDateComparator" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.LinkedHashMap" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="oscar.oscarLab.ca.on.CommonLabTestValues" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="oscar.oscarLab.ca.on.CommonLabResultData" %>
+<%@ page import="oscar.util.StringUtils" %>
+
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	  boolean authed=true;
@@ -52,10 +67,11 @@ String demographic_no = request.getParameter("demographic_no");
 Map<String, String> nameMap = new LinkedHashMap<String, String>();
 List<String> idList = new ArrayList<String>();
 Map<String, Serializable> measIdMap = new HashMap<String, Serializable>();
-List<HashMap<String, String>> dateList = new ArrayList<HashMap<String, String>>();
+List<Map<String, String>> dateList = new ArrayList<Map<String, String>>();
 ArrayList<Hashtable<String, Serializable>> uniqueLabs = CommonLabTestValues.findUniqueLabsForPatient(demographic_no);
 
-try{
+try
+{
 /*  loop through the measurements
 *   nameMap: (loinc_code, name)
 *   measIdMap: (loinc_code, IdMap)
@@ -66,75 +82,49 @@ try{
     */
 
 
-	for (int i = 0; i < uniqueLabs.size(); i++){
-		Hashtable<String, Serializable> ulab =  uniqueLabs.get(i);
-	    String labName = (String) ulab.get("testName");
-	    String labType = (String) ulab.get("labType");
-	    String loinc_code = (String) ulab.get("identCode");
+	for (int i = 0; i < uniqueLabs.size(); i++)
+	{
+		Hashtable<String, Serializable> ulab = uniqueLabs.get(i);
+		String labName = (String) ulab.get("testName");
+		String labType = (String) ulab.get("labType");
+		String loinc_code = (String) ulab.get("identCode");
+		if (!loinc_code.equalsIgnoreCase("NULL"))
+		{
+			Map<String, Map<String, Serializable>> IdMap = new LinkedHashMap<String, Map<String, Serializable>>();
+			List<Map<String, Serializable>> labValueList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
 
-        if (!loinc_code.equalsIgnoreCase("NULL")){
-            Map<String, HashMap<String, Serializable>> IdMap = new LinkedHashMap<String, HashMap<String, Serializable>>();
-	        ArrayList<Map<String, Serializable>> labValueList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
-	        LabDateComparator compare = new LabDateComparator();
-	        Collections.sort(labValueList, compare);
-	        Collections.reverse(labValueList);
+			for (int j = labValueList.size() - 1; j >= 0; j--)
+			{
+				Map<String, Serializable> valuesTable = labValueList.get(j);
+				String date = ((String) valuesTable.get("collDate"));
+				String id = (String) valuesTable.get("lab_no");
+				IdMap.put(id, valuesTable);
+				// check if this lab has already been added
+				if (!idList.contains(id))
+				{
+					idList.add(id);
+					Map<String, String> dateIdHash = new HashMap<String, String>();
+					dateIdHash.put("date", date);
+					dateIdHash.put("id", id);
+					dateList.add(dateIdHash);
+				}
+			}
 
-            for (Map<String, Serializable> labValue : labValueList){
+			// add the test only if there are results for it
+			if (labValueList.size() > 0)
+			{
+				measIdMap.put(loinc_code, (Serializable) IdMap);
+				nameMap.put(loinc_code, labName);
+			}
 
-	            HashMap<String, Serializable> valuesTable = (HashMap) labValue;
-                String date = ((String) valuesTable.get("collDate"));
-                String id = (String) valuesTable.get("lab_no");
-                IdMap.put(id, valuesTable);
-                
-                // check if this lab has already been added
-                if (!idList.contains(id)){
-                    idList.add(id);
-                    Map<String, String> dateIdHash = new HashMap<String, String>();
-                    dateIdHash.put("date", date);
-                    dateIdHash.put("id", id);
-                    dateList.add((HashMap<String, String>) dateIdHash);
-                }
-            }
-            
-            // add the test only if there are results for it
-            if (labValueList.size() > 0){
-                measIdMap.put(loinc_code, (Serializable) IdMap);
-                nameMap.put(loinc_code, labName);
-            }
-            
-        // If the first element to be displayed is a header
-        }else if(nameMap.size() == 0 && !labName.equals("NULL")){
-            nameMap.put("NULL"+i, labName);
-        // Do not allow the first element displayed to be a space
-        }else if(nameMap.size() != 0){
-
-            String[] nameMapKeys = new String[nameMap.size()];
-            nameMap.keySet().toArray(nameMapKeys);
-            String lastKey = nameMapKeys[nameMapKeys.length-1];
-
-            // Do not allow more than one space or more than one header in a row
-            // A space is allowed to be followed by a header
-            if ( lastKey.startsWith("NULL") && (labName.equalsIgnoreCase("NULL") || !(nameMap.get(lastKey)).equalsIgnoreCase("NULL"))){
-                nameMap.remove(lastKey);
-                
-                if (nameMapKeys.length > 1){
-                    lastKey = nameMapKeys[nameMapKeys.length-2];
-                    // if a header has been removed by a space remove the space before the header too
-                    if ((nameMap.get(lastKey)).equalsIgnoreCase("NULL") && labName.equalsIgnoreCase("NULL"))
-                        nameMap.remove(lastKey);
-                }
-            }
-            nameMap.put("NULL"+i, labName);
-        }
-        
-    }
-
-// if the last item in the name list is a space or header remove it
-    String[] nameMapKeys = new String[nameMap.size()];
-    nameMap.keySet().toArray(nameMapKeys);
-    if ( nameMapKeys[nameMapKeys.length-1].startsWith("NULL") )
-        nameMap.remove(nameMapKeys[nameMapKeys.length-1]);
-    
+			// If the first element to be displayed is a header
+		}
+		else if (nameMap.size() == 0 && !labName.equals("NULL"))
+		{
+			nameMap.put("NULL" + i, labName);
+			// Do not allow the first element displayed to be a space
+		}
+	}
 }catch(Exception e){
 	MiscUtils.getLogger().error("Error", e);
 }%>
@@ -145,10 +135,6 @@ try{
 
 
 
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@ page import="java.io.Serializable" %>
-<%@ page import="oscar.oscarLab.ca.all.util.LabValuesByReverseDateComparator" %>
-<%@ page import="oscar.oscarLab.ca.all.util.LabDateComparator" %>
 <html:html locale="true">
 
 <head>
@@ -306,19 +292,19 @@ function reportWindow(page) {
 				<%
                             // use a custom comparator to compare the HashMaps in the array
 					LabValuesByReverseDateComparator comp = new LabValuesByReverseDateComparator();
-                            Collections.sort(dateList, comp);
-                            for (int i=0; i < dateList.size(); i++){
-                                HashMap<String, String> dateIdHash = dateList.get(i);
-                                String dateString = dateIdHash.get("date");
-                                Date labDate= ConversionUtils.fromDateString(dateString, "yyyy-MM-dd HH:mm:ss");
-                                String lab_no = dateIdHash.get("id");
-                                
-                                CommonLabResultData data = new CommonLabResultData();
-                                String multiId = data.getMatchingLabs(lab_no, "HL7");
-                            %>
+                    Collections.sort(dateList, comp);
+                    for (Map<String, String> dateIdHash : dateList)
+                    {
+                        String dateString = dateIdHash.get("date");
+                        Date labDate = ConversionUtils.fromDateString(dateString, ConversionUtils.DEFAULT_DATE_PATTERN);
+                        String lab_no = dateIdHash.get("id");
+
+                        CommonLabResultData data = new CommonLabResultData();
+                        String multiId = data.getMatchingLabs(lab_no, "HL7");
+                %>
 
 				<th><a
-					href="javascript:reportWindow('../lab/CA/ALL/labDisplay.jsp?segmentID=<%=lab_no%>&providerNo=<%= session.getValue("user") %>')"><%=UtilDateUtilities.DateToString( labDate , "dd-MMM yy")%></a>
+					href="javascript:reportWindow('../lab/CA/ALL/labDisplay.jsp?segmentID=<%=lab_no%>&providerNo=<%= session.getValue("user") %>')"><%=ConversionUtils.toDateString(labDate, "dd-MMM yy")%></a>
 				</th>
 				<%}%>
 			</tr>
@@ -344,7 +330,7 @@ function reportWindow(page) {
                                     HashMap<String, Serializable> ht = (HashMap) IdMap.get(IdMap.keySet().iterator().next());
                                     latestVal = (String) ht.get("result");
                                     latestDate = (String) ht.get("collDate");
-                                    abn = (String) ht.get("abn");
+                                    abn = ConversionUtils.toBoolString((Boolean)ht.get("abn"));
                                     // trim the date
                                     latestDate = latestDate.substring(0, 10);
                                 }
@@ -356,14 +342,14 @@ function reportWindow(page) {
 				<%
                             // display all of values from all the labs for the given test
                             for (int i = 0; i < dateList.size(); i++){
-                                    HashMap<String, String> dateIdHash = dateList.get(i);
+                                    Map<String, String> dateIdHash = dateList.get(i);
                                     String labVal = "";
                                     abn = "N";
                                     if (IdMap.size() > 0 ){
                                         HashMap<String, Serializable> ht = (HashMap) IdMap.get(dateIdHash.get("id"));
                                         if (ht != null){
                                             labVal = (String) ht.get("result");
-                                            abn = (String) ht.get("abn");
+                                            abn = ConversionUtils.toBoolString((Boolean)ht.get("abn"));
                                         }
                                     }
                             %>

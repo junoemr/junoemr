@@ -43,6 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarLab.ca.all.util.LabGridDisplay;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -664,6 +666,55 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		query.setParameter("identCode", identCode);
 		query.setParameter("demoNo", demoNo);
 		return query.getResultList();
+	}
+
+	/**
+	 * This entire thing makes me sad, but it is a necessary evil.
+	 * Basically, it's either this or get a bunch of lab IDs, instantiate a terser for each one and
+	 * procedurally loop over them to fetch the same data.
+	 *
+	 * Given a demographic, get all measurements that were populated by labs and any extra associated info.
+	 * @param demographicNo demographic to get measurements for
+	 * @return a set of LabGridDisplay objects that encapsulate precisely the info we want to display
+	 */
+	public List<LabGridDisplay> getLabMeasurements(Integer demographicNo, String loincCode)
+	{
+		String sql = "SELECT \n" +
+				"    m.id AS measurement_id,\n" +
+				"    e3.val AS is_abnormal,\n" +
+				"    m.dataField AS result,\n" +
+				"    \"\" AS \"reference_range\", -- reference range\n" +
+				"    \"\" AS \"units\", -- units\n" +
+				"    m.dateObserved AS \"dateCollected\",\n" +
+				"    e2.val AS \"lab_no\",\n" +
+				"    e1.val AS \"loinc_code\"\n" +
+				"FROM measurements m\n" +
+				"JOIN measurementsExt e1 ON m.id=e1.measurement_id AND e1.keyval = 'identifier' \n" +
+				"JOIN measurementsExt e2 ON m.id=e2.measurement_id AND e2.keyval = 'lab_no' \n" +
+				"JOIN measurementsExt e3 ON m.id=e3.measurement_id AND e3.keyval = 'abnormal'\n" +
+				"WHERE m.dataField != ''\n" +
+				"AND m.demographicNo = :demographicNo\n" +
+				"AND e1.val = :loincCode\n" +
+				"GROUP BY m.id";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("loincCode", loincCode);
+		List<Object[]> labMeasurements = query.getResultList();
+		List<LabGridDisplay> gridDisplayList = new ArrayList<>();
+		for (Object[] measurement : labMeasurements)
+		{
+			LabGridDisplay newDisplay = new LabGridDisplay();
+			newDisplay.setMeasurementId((Integer)measurement[0]);
+			newDisplay.setAbnormal(ConversionUtils.fromBoolString((String)measurement[1]));
+			newDisplay.setResult((String)measurement[2]);
+			newDisplay.setReferenceRange((String)measurement[3]);
+			newDisplay.setUnits((String)measurement[4]);
+			newDisplay.setDateObserved((Date)measurement[5]);
+			newDisplay.setLabId((String)measurement[6]);
+			newDisplay.setLoincCode((String)measurement[7]);
+			gridDisplayList.add(newDisplay);
+		}
+		return gridDisplayList;
 	}
 
 	public Measurement findLastEntered(Integer demo, String type) {

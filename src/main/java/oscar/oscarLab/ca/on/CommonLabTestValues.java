@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -53,6 +54,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.util.LabGridDisplay;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -107,6 +109,22 @@ public class CommonLabTestValues {
 		}
 		return labs;
 	}
+
+	/*
+	public static Map<String, LabGridDisplay> getUniqueLabsForPatients(Integer demographicNo)
+	{
+		// for now, ignoring non-HL7 labs
+		OscarProperties op = OscarProperties.getInstance();
+		String hl7text = op.getProperty("HL7TEXT_LABS");
+		Map<String, LabGridDisplay> labsPerLoincCode = new HashMap<>();
+		if (hl7text != null && hl7text.trim().equals("yes"))
+		{
+			ArrayList<Hashtable<String, Serializable>> hl7Labs = findUniqueLabsForPatientHL7Text(demographic);
+			labs.addAll(hl7Labs);
+		}
+
+	}
+	 */
 
 	//Method returns unique test names for a patient
 	//List is used to compile a cummalitive lab profile
@@ -448,48 +466,24 @@ public class CommonLabTestValues {
 
 		} else if (labType != null && labType.equals("HL7")) {
 			MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-			
-			for(Object lNo : dao.findLabNumbers(demographicNo==null?0:demographicNo, identCode)) {
-					String lab_no = String.valueOf(lNo);
 
-					MessageHandler handler = Factory.getHandler(lab_no);
-					HashMap<String, Serializable> h = new HashMap<String, Serializable>();
-					int i = 0;
-					while (i < handler.getOBRCount() && h.get("testName") == null) {
-						for (int j = 0; j < handler.getOBXCount(i); j++) {
-							if (handler.getOBXIdentifier(i, j).equals(identCode)) {
+			// TODO get this setup so it's query all at once, then split it up into proper map here
+			// requires a bit of a refactor of the layer above
+			List<LabGridDisplay> gridDisplayList = dao.getLabMeasurements(demographicNo, identCode);
+			for (LabGridDisplay gridDisplay : gridDisplayList)
+			{
+				HashMap<String, Serializable> hashMap = new HashMap<>();
+				hashMap.put("testName", testName);
+				hashMap.put("abn", gridDisplay.getAbnormal());
+				hashMap.put("result", gridDisplay.getResult());
+				hashMap.put("units", gridDisplay.getUnits());
+				hashMap.put("lab_no", gridDisplay.getLabId());
+				hashMap.put("collDate", ConversionUtils.toDateString(gridDisplay.getDateObserved()));
+				hashMap.put("collDateDate", gridDisplay.getDateObserved());
 
-								String result = handler.getOBXResult(i, j);
+				labList.add(hashMap);
+			}
 
-								// only add measurements with actual results
-								if (!result.equals("")) {
-									h.put("testName", testName);
-									h.put("abn", handler.getOBXAbnormalFlag(i, j));
-									h.put("result", result);
-									h.put("range", handler.getOBXReferenceRange(i, j));
-									h.put("units", handler.getOBXUnits(i, j));
-									String collDate = handler.getTimeStamp(i, j);
-									h.put("lab_no", lab_no);
-									h.put("collDate", collDate);
-									MiscUtils.getLogger().debug("COLLDATE " + collDate);
-									if (collDate.length() == 10) {
-										h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd"));
-									} else if (collDate.length() == 16) {
-										h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm"));
-									} else {
-										h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm:ss"));
-									}
-									labList.add(h);
-									break;
-								}
-
-							}
-						}
-						i++;
-					}
-				}
-
-			
 		}
 
 		return labList;
