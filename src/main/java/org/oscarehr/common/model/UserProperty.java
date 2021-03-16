@@ -178,6 +178,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
 	public static final String STUDENT_PARTICIPATION_CONSENT = "student_participation_consent";	
 	public static final String PROVIDER_FOR_TICKLER_WARNING = "provider_for_tickler_warning";
 	public static final String OCEAN_TOOLBAR_ENABLED = "integration.OceanToolBar.enabled";
+    public static final String PHONE_PREFIX = "phoneprefix";
 
 	public static final String MCEDT_ACCOUNT_PASSWORD = "mcedt_account_password";
 

@@ -557,6 +557,7 @@ public class AdminNavService
 
 		if (securityInfoManager.isSuperAdmin(providerNo))
 		{
+			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/general"));
 			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/rx"));
 		}
 

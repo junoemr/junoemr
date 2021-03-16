@@ -230,6 +230,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
             url: '/systemProperties',
             component: 'systemProperties'
         })
+		.state('admin.systemProperties.general',
+		{
+			url: '/general',
+			component: 'systemPropertiesGeneral',
+		})
         .state('admin.systemProperties.rx',
         {
             url: '/rx',

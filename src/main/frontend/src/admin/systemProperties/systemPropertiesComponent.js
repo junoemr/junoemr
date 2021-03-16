@@ -33,6 +33,10 @@ angular.module('Admin').component('systemProperties',
 
             ctrl.tabList = [
                 {
+                  label: "General",
+                  value: "admin.systemProperties.general"
+                },
+                {
                     label: "Rx",
                     value: 'admin.systemProperties.rx',
                 },
@@ -43,7 +47,7 @@ angular.module('Admin').component('systemProperties',
 
             ctrl.tabChange = (activeTab) =>
             {
-                $state.go(ctrl.activeTab);
+                $state.go(activeTab);
             }
         }]
     });
