@@ -1183,11 +1183,15 @@
 		<!-- get the latest note uuid by observation_date. Then the latest revision 
 			by update_date -->
 		<ap-name>latest_echart_note</ap-name>
-		<ap-sql>SELECT cmn.note AS note FROM casemgmt_note cmn
-			JOIN (SELECT DISTINCT a.note_id, a.uuid FROM casemgmt_note a
-			WHERE a.demographic_no=${demographic}
-			AND a.note_id NOT IN(SELECT l.note_id FROM casemgmt_note_link AS l)
-			ORDER BY a.observation_date DESC) AS A
+		<ap-sql>
+			SELECT cmn.note AS note FROM casemgmt_note cmn
+			JOIN
+				(SELECT DISTINCT a.note_id, a.uuid
+				FROM casemgmt_note a
+				LEFT JOIN casemgmt_note_link AS link ON (link.note_id = a.note_id)
+				WHERE a.demographic_no=${demographic}
+				AND link.id IS NULL
+				ORDER BY a.observation_date DESC) AS A
 			ON (cmn.uuid = A.uuid)
 			WHERE cmn.demographic_no=${demographic}
 			ORDER BY update_date
