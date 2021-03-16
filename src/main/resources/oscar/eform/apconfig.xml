@@ -1191,7 +1191,7 @@
 				LEFT JOIN casemgmt_note_link AS link ON (link.note_id = a.note_id)
 				WHERE a.demographic_no=${demographic}
 				AND link.id IS NULL
-				ORDER BY a.observation_date DESC) AS A
+				ORDER BY a.observation_date DESC LIMIT 1) AS A
 			ON (cmn.uuid = A.uuid)
 			WHERE cmn.demographic_no=${demographic}
 			ORDER BY update_date
