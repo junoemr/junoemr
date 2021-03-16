@@ -158,16 +158,15 @@ public class IMDHealthService
 
 		List<String> failedToInitialize = new ArrayList<>();
 
-		// Set clinic uuid
 		if (clinic.getUuid() == null)
 		{
 			clinicService.createAndSaveClinicUuid(clinic);
 		}
 
-		getProviderClinicCredentials(token, providerDataList, clinic, failedToInitialize);
+		failedToInitialize.addAll(loginProviderClinic(token, providerDataList, clinic));
+
 		for (Site site : sites)
 		{
-			// Set site uuid
 			if (site.getUuid() == null)
 			{
 				siteService.createAndSaveSiteUuid(site);
@@ -177,17 +176,18 @@ public class IMDHealthService
 
 			if (oscarProperties.isMultisiteEnabled())
 			{
-				getProviderSiteCredentials(token, providers, site, failedToInitialize);
+				failedToInitialize.addAll(loginProviderSite(token, providers, site));
 			}
 		}
 		return failedToInitialize;
 	}
 
-	private void getProviderClinicCredentials(BearerToken token, List<ProviderData> providerDataList, Clinic clinic, List<String> failedToInitialize) throws SSOLoginException
+	private List<String> loginProviderClinic(BearerToken token, List<ProviderData> providerDataList, Clinic clinic) throws SSOLoginException
 	{
+		List<String> failedProviderClinicList = new ArrayList<>();
+
 		for (ProviderData providerData : providerDataList)
 		{
-			// Set provider uuid
 			if (providerData.getImdHealthUuid() == null)
 			{
 				providerService.createAndSaveProviderImdHealthUuid(providerData);
@@ -196,25 +196,28 @@ public class IMDHealthService
 			SSOCredentials ssoCredentials = getSSOCredentials(token, providerData, clinic);
 			if (ssoCredentials == null)
 			{
-				failedToInitialize.add("ProviderNo " + providerData.getProviderNo() + ", Clinic " + clinic.getClinicName());
+				failedProviderClinicList.add("ProviderNo " + providerData.getProviderNo() + ", Clinic " + clinic.getClinicName());
 			}
 		}
+		return failedProviderClinicList;
 	}
 
-	private void getProviderSiteCredentials(BearerToken token, Set<Provider> providers, Site site, List<String> failedToInitialize) throws SSOLoginException
+	private List<String> loginProviderSite(BearerToken token, Set<Provider> providers, Site site) throws SSOLoginException
 	{
+		List<String> failedProviderSiteList = new ArrayList<>();
+
 		for (Provider provider : providers)
 		{
 			if (provider.isActive())
 			{
 				SSOCredentials ssoCredentials = getSSOCredentials(token, provider, site);
-
 				if (ssoCredentials == null)
 				{
-					failedToInitialize.add("ProviderNo " + provider.getProviderNo() + " ,SiteId " + site.getId());
+					failedProviderSiteList.add("ProviderNo " + provider.getProviderNo() + " ,SiteId " + site.getId());
 				}
 			}
 		}
+		return failedProviderSiteList;
 	}
 
 	/**

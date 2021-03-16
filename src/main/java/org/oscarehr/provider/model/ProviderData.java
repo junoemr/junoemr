@@ -51,6 +51,8 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "provider")
+@Getter
+@Setter
 public class ProviderData extends AbstractModel<String> implements Serializable
 {
 	public static final String SYSTEM_PROVIDER_NO = "-1";
@@ -72,183 +74,115 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Getter
-	@Setter
 	@Column(name = "provider_no")
 	private String id = null;
 
-	@Getter
-	@Setter
 	@Column(name = "last_name")
 	private String lastName = null;
 
-	@Getter
-	@Setter
 	@Column(name = "first_name")
 	private String firstName = null;
 
-	@Getter
-	@Setter
 	@Column(name = "provider_type")
 	private String providerType = null;
 
-	@Getter
-	@Setter
 	@Column(name = "specialty")
 	private String specialty = null;
 
-	@Getter
-	@Setter
 	@Column(name = "team")
 	private String team = null;
 
-	@Getter
-	@Setter
 	@Column(name = "sex")
 	private String sex = null;
 
-	@Getter
-	@Setter
 	@Column(name = "dob")
 	@Temporal(TemporalType.DATE)
 	private Date dob = null;
 
-	@Getter
-	@Setter
 	@Column(name = "address")
 	private String address = null;
 
-	@Getter
-	@Setter
 	@Column(name = "phone")
 	private String phone = null;
 
-	@Getter
-	@Setter
 	@Column(name = "work_phone")
 	private String workPhone = null;
 
-	@Getter
-	@Setter
 	@Column(name = "ohip_no")
 	private String ohipNo = null;
 
-	@Getter
-	@Setter
 	@Column(name = "rma_no")
 	private String rmaNo = null;
 
-	@Getter
-	@Setter
 	@Column(name = "billing_no")
 	private String billingNo = null;
 
-	@Getter
-	@Setter
 	@Column(name = "hso_no")
 	private String hsoNo = null;
 
-	@Getter
-	@Setter
 	@Column(name = "status")
 	private String status = null;
 
-	@Getter
-	@Setter
 	@Column(name = "comments")
 	private String comments = null;
 
-	@Getter
-	@Setter
 	@Column(name = "provider_activity")
 	private String providerActivity = null;
 
-	@Getter
-	@Setter
 	@Column(name = "practitionerNo")
 	private String practitionerNo = null;
 
-	@Getter
-	@Setter
 	@Column(name = "init")
 	private String init = null;
 
-	@Getter
-	@Setter
 	@Column(name = "job_title")
 	private String jobTitle = null;
 
-	@Getter
-	@Setter
 	@Column(name = "email")
 	private String email = null;
 
-	@Getter
-	@Setter
 	@Column(name = "title")
 	private String title = null;
 
-	@Getter
-	@Setter
 	@Column(name = "lastUpdateUser")
 	private String lastUpdateUser = null;
 
-	@Getter
-	@Setter
 	@Column(name = "lastUpdateDate")
 	@Temporal(TemporalType.DATE)
 	private Date lastUpdateDate = null;
 
-	@Getter
-	@Setter
 	@Column(name = "signed_confidentiality")
 	@Temporal(TemporalType.DATE)
 	private Date signedConfidentiality = null;
 
-	@Getter
-	@Setter
 	@Column(name = "supervisor")
     private String supervisor = null;
 
-	@Getter
-	@Setter
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
 
 	/* -- Province specific -- */
 	/* AB */
-	@Getter
-	@Setter
 	@Column(name = "alberta_tak_no")
 	private String albertaTakNo = null;
 
 	@Column(name = "alberta_e_delivery_ids")
 	private String albertaEDeliveryIds = null;
 
-	@Getter
-	@Setter
 	@Column(name = "alberta_connect_care_id")
 	private String albertaConnectCareId;
 
 	/* ON */
-	@Getter
-	@Setter
 	@Column(name = "ontario_lifelabs_id")
 	private String ontarioLifeLabsId;
 
-	@Getter
-	@Setter
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name="provider_billing_id")
 	private ProviderBilling billingOpts;
 
-	@Getter
-	@Setter
 	@Column(name = "booking_notification_numbers")
 	private String bookingNotificationNumbers;
 
-	@Getter
-	@Setter
 	@Column(name = "imd_health_uuid")
 	private String imdHealthUuid = null;
 
