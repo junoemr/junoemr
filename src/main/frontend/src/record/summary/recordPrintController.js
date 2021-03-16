@@ -1,15 +1,19 @@
 angular.module('Record.Summary').controller('Record.Summary.RecordPrintController', [
 
+	'$scope',
 	'$uibModal',
 	'$uibModalInstance',
 	'$stateParams',
 	'selectedNoteList',
+	'providerService',
 
 	function(
+		$scope,
 		$uibModal,
 		$uibModalInstance,
 		$stateParams,
-		selectedNoteList)
+		selectedNoteList,
+		providerService)
 	{
 
 		var controller = this;
@@ -27,8 +31,29 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			printType: controller.printTypeEnum.all,
 			dates: {},
 			selectedList: selectedNoteList,
+			selectedSite: 0,
 		};
 
+		controller.siteSelection = providerService.getMe().then(
+			function (user)
+			{
+				providerService.getSitesByProvider(user.providerNo).then(
+					function success(result)
+					{
+						if (result == null)
+						{
+							controller.siteSelection = 0;
+						}
+						else
+						{
+							controller.siteSelection = result;
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch provider sites: " + result);
+					})
+			});
 
 		/*
 		 *If at least one note selected, Default to Note. Other wise default to All
@@ -53,7 +78,9 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 		controller.print = function print()
 		{
-			if (controller.pageOptions.printType ===controller.printTypeEnum.selected
+			var site = $scope.recordPrintCtrl.siteSelection.site;
+
+			if (controller.pageOptions.printType === controller.printTypeEnum.selected
 				&& controller.pageOptions.selectedList.length === 0)
 			{
 				controller.page.selectedWarning = true;
@@ -62,6 +89,15 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			else
 			{
 				controller.page.selectedWarning = false;
+			}
+
+			if (site !== undefined && site !== null)
+			{
+				controller.pageOptions.selectedSite = site;
+			}
+			else
+			{
+				controller.pageOptions.selectedSite = 0;
 			}
 
 			var ops = encodeURIComponent(JSON.stringify(controller.pageOptions));

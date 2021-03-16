@@ -76,7 +76,7 @@
 										<bean:message key="oscarEncounter.Labs.title" />
 									</label>
 								</div>
-							</div>		
+							</div>
 							<div class="form-group col-sm-6" ng-show="recordPrintCtrl.pageOptions.printType === 'dates'">
 								<label for="exampleInputEmail1"><bean:message key="oscarEncounter.startdate.title" /></label>
 								<juno-datepicker-popup  juno-model="recordPrintCtrl.pageOptions.dates.start" 
@@ -92,7 +92,17 @@
 									show-icon="true"
 									type="Input"> 
 								</juno-datepicker-popup>
-							</div>		
+							</div>
+								<div class=" form-group col-sm-6" >
+									<label><bean:message key="oscarEncounter.selectSite.title" /></label>
+									<select ng-model="recordPrintCtrl.siteSelection.site"
+									        class="form-control ng-pristine ng-valid ng-not-empty ng-touched"
+									        id="site"
+									        data-ng-options="a.siteId as a.name for a in recordPrintCtrl.siteSelection"
+									        ng-init="recordPrintCtrl.siteSelection.site=''">
+										<option value="" selected><bean:message key="oscarEncounter.Index.defaultprint" /></option>
+									</select>
+								</div>
 						</form>
 	        		</div>
 	        	</div>

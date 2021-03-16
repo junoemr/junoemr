@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
 import org.oscarehr.encounterNote.model.Issue;
@@ -141,17 +143,27 @@ public class CaseManagementPrintPdf {
         String mrp = propResource.getString("oscarEncounter.pdfPrint.mrp") + " " + (String)request.getAttribute("mrp") + "\n";
         String hin = propResource.getString("oscarEncounter.pdfPrint.hin") + " " + (String)request.getAttribute("hin") + "\n";
         String[] info = null;
+        Integer selectedSite = (Integer) request.getAttribute("site");
+
         if("true".equals(OscarProperties.getInstance().getProperty("print.includeMRP", "true"))) {
         	info = new String[] { title, gender, dob, age, hin, mrp };
         } else {
         	info = new String[] { title, gender, dob, age, hin};
         }
 
-        ClinicData clinicData = new ClinicData();
-        clinicData.refreshClinicData();
-        String[] clinic = new String[] {clinicData.getClinicName(), clinicData.getClinicAddress(),
-        clinicData.getClinicCity() + ", " + clinicData.getClinicProvince(),
-        clinicData.getClinicPostal(), "Phone: " + clinicData.getClinicPhone(), "Fax: " + clinicData.getClinicFax()};
+        String[] clinic;
+        if (selectedSite.equals(null) || selectedSite.equals(0))
+        {
+            ClinicData clinicData = new ClinicData();
+            clinicData.refreshClinicData();
+            clinic = new String[]{clinicData.getClinicName(), clinicData.getClinicAddress(), clinicData.getClinicCity() + ", " + clinicData.getClinicProvince(), clinicData.getClinicPostal(), "Phone: " + clinicData.getClinicPhone(), "Fax: " + clinicData.getClinicFax()};
+        }
+        else
+        {
+            SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
+            Site site = siteDao.getById((Integer) request.getAttribute("site"));
+            clinic = new String[]{site.getName(), site.getAddress(), site.getCity() + ", " + site.getProvince(), site.getPostal(), "Phone: " + site.getPhone(), "Fax: " + site.getFax()};
+        }
 
         if("true".equals(OscarProperties.getInstance().getProperty("print.useCurrentProgramInfoInHeader", "false"))) {
         	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);

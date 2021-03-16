@@ -95,6 +95,7 @@ public class CaseManagementPrint {
 						boolean printCPP,
 						boolean printRx,
 						boolean printLabs,
+						Integer siteSelected,
 						Calendar startDate,
 						Calendar endDate,
 						HttpServletRequest request,
@@ -108,6 +109,7 @@ public class CaseManagementPrint {
 		request.setAttribute("demoAge", getDemoAge(demographic));
 		request.setAttribute("mrp", getMRP(demographic));
 		request.setAttribute("hin", StringUtils.trimToEmpty(demographic.getHin()));
+		request.setAttribute("site", siteSelected);
 		String dob = ConversionUtils.toDateString(demographic.getDateOfBirth());
 		dob = convertDateFmt(dob, request);
 		request.setAttribute("demoDOB", dob);
