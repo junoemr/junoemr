@@ -23,6 +23,7 @@ Juno.Common.Util.settings = {
 Juno.Common.Util.DisplaySettings = {
 	dateFormat: "yyyy-MM-dd",
 	timeFormat: "HH:mm a",
+	dayDateFormat: 'dddd MMM Do',
 };
 
 Juno.Common.Util.exists = function exists(object) {
