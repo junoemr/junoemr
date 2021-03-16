@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,31 +152,45 @@ public class CaseManagementPrintPdf {
         	info = new String[] { title, gender, dob, age, hin};
         }
 
-        String[] clinic;
+        List<String> clinic = new ArrayList<>();
         if (selectedSite.equals(null) || selectedSite.equals(0))
         {
             ClinicData clinicData = new ClinicData();
             clinicData.refreshClinicData();
-            clinic = new String[]{clinicData.getClinicName(), clinicData.getClinicAddress(), clinicData.getClinicCity() + ", " + clinicData.getClinicProvince(), clinicData.getClinicPostal(), "Phone: " + clinicData.getClinicPhone(), "Fax: " + clinicData.getClinicFax()};
+            clinic.add(clinicData.getClinicName());
+            clinic.add(clinicData.getClinicAddress());
+            clinic.add(clinicData.getClinicCity() + ", " + clinicData.getClinicProvince());
+            clinic.add(clinicData.getClinicPostal());
+            clinic.add("Phone: " + clinicData.getClinicPhone());
+            clinic.add("Fax: " + clinicData.getClinicFax());
+          //  clinic = new String[]{clinicData.getClinicName(), clinicData.getClinicAddress(), clinicData.getClinicCity() + ", " + clinicData.getClinicProvince(), clinicData.getClinicPostal(), "Phone: " + clinicData.getClinicPhone(), "Fax: " + clinicData.getClinicFax()};
         }
         else
         {
             SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
             Site site = siteDao.getById((Integer) request.getAttribute("site"));
-            clinic = new String[]{site.getName(), site.getAddress(), site.getCity() + ", " + site.getProvince(), site.getPostal(), "Phone: " + site.getPhone(), "Fax: " + site.getFax()};
+            clinic.add(site.getName());
+            clinic.add(site.getAddress());
+            clinic.add(site.getCity() + ", " + site.getProvince());
+            clinic.add(site.getPostal());
+            clinic.add("Phone: " + site.getPhone());
+            clinic.add("Fax: " + site.getFax());
+            //clinic = new String[]{site.getName(), site.getAddress(), site.getCity() + ", " + site.getProvince(), site.getPostal(), "Phone: " + site.getPhone(), "Fax: " + site.getFax()};
         }
 
         if("true".equals(OscarProperties.getInstance().getProperty("print.useCurrentProgramInfoInHeader", "false"))) {
         	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
         	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-        	ProgramProvider pp = programManager2.getCurrentProgramInDomain(loggedInInfo,loggedInInfo.getLoggedInProviderNo());
-    		if(pp != null) {
-    			Program program = pp.getProgram();
-    			clinic = new String[] {
-    			program.getDescription(),
-    			program.getAddress(),
-    			program.getPhone()
-    			};
+        	ProgramProvider programProvider = programManager2.getCurrentProgramInDomain(loggedInInfo,loggedInInfo.getLoggedInProviderNo());
+    		if(programProvider != null) {
+    			Program program = programProvider.getProgram();
+    			clinic.add(program.getDescription());
+    			clinic.add(program.getAddress());
+    			clinic.add(program.getPhone());
+    			//clinic = new String[] {
+    			//program.getDescription(),
+    			//program.getAddress(),
+    			//program.getPhone()
     		}
         }
         //Header will be printed at top of every page beginning with p2
@@ -201,8 +216,8 @@ public class CaseManagementPrintPdf {
         p.setAlignment(Paragraph.ALIGN_LEFT);
         Phrase phrase = new Phrase();
         Phrase dummy = new Phrase();
-        for( int idx = 0; idx < clinic.length; ++idx ) {
-            phrase.add(clinic[idx] + "\n");
+        for( int idx = 0; idx < clinic.size(); ++idx ) {
+            phrase.add(clinic.get(idx) + "\n");
             dummy.add("\n");
             upperYcoord -= phrase.getLeading();
         }

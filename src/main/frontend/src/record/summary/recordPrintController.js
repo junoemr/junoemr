@@ -78,7 +78,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 		controller.print = function print()
 		{
-			var site = $scope.recordPrintCtrl.siteSelection.site;
+			let site = $scope.recordPrintCtrl.siteSelection.site;
 
 			if (controller.pageOptions.printType === controller.printTypeEnum.selected
 				&& controller.pageOptions.selectedList.length === 0)
@@ -91,7 +91,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 				controller.page.selectedWarning = false;
 			}
 
-			if (site !== undefined && site !== null)
+			if (site != null)
 			{
 				controller.pageOptions.selectedSite = site;
 			}
@@ -100,7 +100,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 				controller.pageOptions.selectedSite = 0;
 			}
 
-			var ops = encodeURIComponent(JSON.stringify(controller.pageOptions));
+			let ops = encodeURIComponent(JSON.stringify(controller.pageOptions));
 			window.open('../ws/rs/recordUX/' + $stateParams.demographicNo + '/print?printOps=' + ops, '_blank');
 		};
 	}
