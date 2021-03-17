@@ -96,14 +96,14 @@ public class EctMeasurementsAction extends Action
 			mFlowsheet = templateConfig.getFlowSheet(template, custList);
 		}
 
-		String numType = (String) frm.getValue("numType");
+		String numType = frm.getValue("numType");
 		int iType = Integer.parseInt(numType);
 
 		String textOnEncounter = ""; //"**"+StringUtils.rightPad(by,80,"*")+"\\n";
 
 		//if parent window content has changed then we need to propagate change so
 		//we do not write to parent
-		String parentChanged = (String) frm.getValue("parentChanged");
+		String parentChanged = frm.getValue("parentChanged");
 		request.setAttribute("parentChanged", parentChanged);
 
 		boolean valid = true;
@@ -134,12 +134,12 @@ public class EctMeasurementsAction extends Action
 			mInstrcName = "inputMInstrc-" + i;
 			commentsName = "comments-" + i;
 			dateName = "date-" + i;
-			inputValue = (String) frm.getValue(inputValueName);
-			inputType = (String) frm.getValue(inputTypeName);
-			inputTypeDisplay = (String) frm.getValue(inputTypeDisplayName);
-			mInstrc = (String) frm.getValue(mInstrcName);
-			comments = (String) frm.getValue(commentsName);
-			dateObserved = (String) frm.getValue(dateName);
+			inputValue = frm.getValue(inputValueName);
+			inputType = frm.getValue(inputTypeName);
+			inputTypeDisplay = frm.getValue(inputTypeDisplayName);
+			mInstrc = frm.getValue(mInstrcName);
+			comments = frm.getValue(commentsName);
+			dateObserved = frm.getValue(dateName);
 
 
 			regExp = null;
@@ -234,13 +234,13 @@ public class EctMeasurementsAction extends Action
 				validationName = "validation-" + i;
 				dateName = "date-" + i;
 
-				inputValue = (String) frm.getValue(inputValueName);
-				inputType = (String) frm.getValue(inputTypeName);
-				mInstrc = (String) frm.getValue(mInstrcName);
-				comments = (String) frm.getValue(commentsName);
+				inputValue = frm.getValue(inputValueName);
+				inputType = frm.getValue(inputTypeName);
+				mInstrc = frm.getValue(mInstrcName);
+				comments = frm.getValue(commentsName);
 				comments = org.apache.commons.lang.StringEscapeUtils.escapeSql(comments);
-				validation = (String) frm.getValue(validationName);
-				dateObserved = (String) frm.getValue(dateName);
+				validation = frm.getValue(validationName);
+				dateObserved = frm.getValue(dateName);
 
 				if(!GenericValidator.isBlankOrNull(inputValue))
 				{
@@ -287,8 +287,8 @@ public class EctMeasurementsAction extends Action
 		}
 		else
 		{
-			String groupName = (String) frm.getValue("groupName");
-			String css = (String) frm.getValue("css");
+			String groupName = frm.getValue("groupName");
+			String css = frm.getValue("css");
 			request.setAttribute("groupName", groupName);
 			request.setAttribute("css", css);
 			request.setAttribute("demographicNo", demographicNo);
