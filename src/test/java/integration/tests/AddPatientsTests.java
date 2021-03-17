@@ -193,7 +193,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")));
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title='Search']")));
+		Thread.sleep(2000);//wait until modal closes
 
 		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,
 				By.xpath("//button[@title='Search']"),
