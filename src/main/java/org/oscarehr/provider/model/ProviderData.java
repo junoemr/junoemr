@@ -240,10 +240,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	}
 
 	/* -- Province specific getters/setters -- */
-	public String getAlbertaEDeliveryIds()
-	{
-		return albertaEDeliveryIds;
-	}
 	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds)
 	{
 		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
