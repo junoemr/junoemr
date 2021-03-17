@@ -21,20 +21,16 @@
 * Canada
 --%>
 
+
 <div class="admin-system-properties-body system-properties-general">
     <h3 class="title">Change Phone Prefix</h3>
     <div class="content">
         <div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
             <div class="property-toggle flex-column" >
-                <juno-input>
-
-                </juno-input>
-                <juno-button ng-click=""
-                             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-                             component-style="$ctrl.componentStyle">
-                    <i class="icon-logout"></i>
-                </juno-button>
+                <juno-input-save
+                        ng-model="$ctrl.phonePrefixValue"
+                        click="$ctrl.updateProperty(property, value)">
+                </juno-input-save>
             </div>
             <div class="property-text flex-column">
                 <div class="name">{{ property.name }}</div>

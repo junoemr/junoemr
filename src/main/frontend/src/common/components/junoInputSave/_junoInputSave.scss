@@ -1,0 +1,24 @@
+.juno-input-save{
+  @include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
+  @include juno-form-inputs-colors-default();
+  .left{
+    width: 70%;
+    display: inline-block;
+    float: left;
+  }
+  .right{
+    width:20%;
+    display: inline-block;
+    float: left;
+  }
+  .juno-input{
+    width: 100%;
+    height: 100%;
+  }
+  .juno-button{
+    width: 100%;
+    height:100%;
+    padding-top: 1px;
+    padding-bottom: 1px;
+  }
+}

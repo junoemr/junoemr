@@ -42,7 +42,7 @@ angular.module('Admin').component('systemProperties',
                 },
             ];
 
-            ctrl.currentTab = "admin.systemProperties.rx";
+            ctrl.currentTab = "admin.systemProperties.general";
             ctrl.componentStyle = JUNO_STYLE.GREY;
 
             ctrl.tabChange = (activeTab) =>

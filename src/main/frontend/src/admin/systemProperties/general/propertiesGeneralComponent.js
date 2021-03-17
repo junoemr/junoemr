@@ -30,20 +30,23 @@ angular.module('Admin').component('systemPropertiesGeneral',
         controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
         {
             let property_types =
-                {
-                    text: "string",
-                }
+            {
+                text: "string",
+            }
 
             let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
             let ctrl = this;
 
-            ctrl.propertiesList = [
+            ctrl.phonePrefixValue = "";
+
+            ctrl.propertiesList =
+            [
                 {
                     name: "Phone Prefix",
                     description: "Change the default phone number prefix",
-                    propertyName: "phoneprefix",
+                    propertyName: "phone_prefix",
                     type: property_types.text,
-                    value: "250"
+                    value: ""
                 }
             ];
 
@@ -55,7 +58,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
                     {
                         case property_types.text:
                         {
-                            ctrl.loadTextType(property)
+                            ctrl.loadTextType(property);
                             break;
                         }
                     }
@@ -68,19 +71,19 @@ angular.module('Admin').component('systemPropertiesGeneral',
                 .then((response) =>
                 {
                     console.log(response);
-                    property.value = response.data.body;
-                    console.log(response.data.body);
-                    console.log(property.value);
+                    ctrl.phonePrefixValue = response.data.body;
                 })
             };
 
             /**
              * Persist new property value
              * @param property property to update
-             * @param value set the phone prefix
+             * @param value set the value in the database
              */
             ctrl.updateProperty = (property, value) =>
             {
+                console.log("controller handler");
+                console.log("Property: " + property + " Value: " + value);
                 systemPreferenceApi.putPreferenceValue(property.propertyName, value)
             };
         }]
