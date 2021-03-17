@@ -32,13 +32,13 @@
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title>close</title>
 <script LANGUAGE="JavaScript">
-function closeWin() {
-      if (opener.refreshEncounter !== undefined && opener.pasteToEncounterNote !== undefined )
+function closeWin()
+{
+      if (opener.refreshEncounter !== undefined || opener.pasteToEncounterNote !== undefined )
       {
          let encounterText = '<%=request.getAttribute("textOnEncounter")%>';
          opener.pasteToEncounterNote(encounterText.trim());
       }
-      self.opener.location.reload();
       self.close();
 }
 </script>
