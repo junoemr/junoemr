@@ -155,7 +155,7 @@ angular.module("Common.Services").service("providerService", [
 
 		service.getSitesByProvider = function getSitesByProvider(provNo)
 		{
-			let deferred = $q.defer();
+			const deferred = $q.defer();
 
 			service.sitesApi.getSitesByProvider(provNo).then(
 

@@ -163,7 +163,6 @@ public class CaseManagementPrintPdf {
             clinic.add(clinicData.getClinicPostal());
             clinic.add("Phone: " + clinicData.getClinicPhone());
             clinic.add("Fax: " + clinicData.getClinicFax());
-          //  clinic = new String[]{clinicData.getClinicName(), clinicData.getClinicAddress(), clinicData.getClinicCity() + ", " + clinicData.getClinicProvince(), clinicData.getClinicPostal(), "Phone: " + clinicData.getClinicPhone(), "Fax: " + clinicData.getClinicFax()};
         }
         else
         {
@@ -175,7 +174,6 @@ public class CaseManagementPrintPdf {
             clinic.add(site.getPostal());
             clinic.add("Phone: " + site.getPhone());
             clinic.add("Fax: " + site.getFax());
-            //clinic = new String[]{site.getName(), site.getAddress(), site.getCity() + ", " + site.getProvince(), site.getPostal(), "Phone: " + site.getPhone(), "Fax: " + site.getFax()};
         }
 
         if("true".equals(OscarProperties.getInstance().getProperty("print.useCurrentProgramInfoInHeader", "false"))) {
@@ -187,10 +185,6 @@ public class CaseManagementPrintPdf {
     			clinic.add(program.getDescription());
     			clinic.add(program.getAddress());
     			clinic.add(program.getPhone());
-    			//clinic = new String[] {
-    			//program.getDescription(),
-    			//program.getAddress(),
-    			//program.getPhone()
     		}
         }
         //Header will be printed at top of every page beginning with p2

@@ -423,7 +423,8 @@ public class RecordUxService extends AbstractServiceImpl {
 		return false;
 	}
 
-	Integer getInt(JSONObject jsonobject, String key){
+	Integer getInt(JSONObject jsonobject, String key)
+	{
     	if(jsonobject.containsKey(key))
 		{
 			return jsonobject.getInt(key);
