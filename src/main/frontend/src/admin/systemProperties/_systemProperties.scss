@@ -5,8 +5,8 @@
     display: flex;
   }
   
-  .content {
-    margin-left: 32px;
+  .admin-system-properties-body {
+    margin-left: 28px;
 
     .property {
       margin-top: 24px;
@@ -16,6 +16,7 @@
       }
 
       .property-text {
+        padding-left: 20px;
         .name {
           @include juno-font-default-size(17px, bold);
         }

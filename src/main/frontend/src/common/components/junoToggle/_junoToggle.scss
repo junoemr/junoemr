@@ -12,6 +12,5 @@ set the html structure up like this:
   display: flex;
   flex-direction: row;
   align-items: center;
-
   @include juno-toggle-switch(32px, 4px, .4s);
 }

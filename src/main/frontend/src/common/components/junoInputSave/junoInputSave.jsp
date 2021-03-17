@@ -3,7 +3,6 @@
     <label ng-if="$ctrl.label" ng-class="$ctrl.labelClasses()">
         {{$ctrl.label}}
     </label>
-
     <div class ="left">
         <juno-input ng-model="$ctrl.ngModel"
                     valid-regex="$ctrl.phoneNumberRegex"
@@ -15,7 +14,7 @@
                      component-style="$ctrl.componentStyle"
                      click="$ctrl.onClick()"
                      title="Save Phone Prefix">
-            <i class="icon-logout"></i>
+            <i class="icon-logout fa-lg"></i>
         </juno-button>
     </div>
 </div>
