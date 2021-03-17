@@ -26,9 +26,7 @@ package org.oscarehr.integration.imdhealth.transfer.outbound;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 

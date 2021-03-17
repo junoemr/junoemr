@@ -25,7 +25,6 @@ package org.oscarehr.integration.imdhealth.transfer.outbound;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Site;
 
