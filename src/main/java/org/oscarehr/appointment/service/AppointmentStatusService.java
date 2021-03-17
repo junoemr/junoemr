@@ -120,7 +120,7 @@ public class AppointmentStatusService
 	 * when sorted by id.  The first position is reserved.  This method will have
 	 * no effect if the status is already first or second in the list.
 	 *
-	 * @param status Appointment status to move up.  This is not modified in place.
+	 * @param status Appointment status to move up.
 	 */
 	public void swapUp(AppointmentStatus status)
 	{
@@ -130,8 +130,8 @@ public class AppointmentStatusService
 		Integer index = findByIndex(statuses, status);
 		
 		// The 0th index is reserved for the 't' status, therefore index 1 cannot be moved up.
-		// The earliest index that can be moved up is 2
-		if (index != null && index > 2)
+		// The earliest index that can be moved up is 1
+		if (index != null && index > 1)
 		{
 			swapPosition(statuses.get(index), statuses.get(index - 1));
 		}
@@ -139,8 +139,9 @@ public class AppointmentStatusService
 	
 	/**
 	 * Move the specified AppointmentStatus one step down in relative ordering.
-	 * This method has no effect if the AppointmentStatus is already last
-	 * when sorted by id.
+	 * The first position is reserved and cannot be moved, and this method will have
+	 * no effect if trying to move the first appointment.  Likewise, this method will
+	 * have no effect if the status is already last in the list.
 	 *
 	 * @param status Appointment status to move down.
 	 */
@@ -152,7 +153,8 @@ public class AppointmentStatusService
 		Integer index = findByIndex(statuses, status);
 		
 		// The last item can't be moved down, as it is already on the bottom.
-		if (index != null && index < statuses.size() - 1)
+		// The 0th index is reserved for the 't' status, therefore it also can't be swapped down
+		if (index != null && index != 0 && index < statuses.size() - 1)
 		{
 			swapPosition(statuses.get(index), statuses.get(index + 1));
 		}
