@@ -33,7 +33,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.CachedMeasurement;
@@ -55,7 +54,7 @@ public class EctMeasurementsDataBeanHandler {
 
 	private static MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
 
-    Vector<EctMeasurementsDataBean> measurementsDataVector = new Vector<EctMeasurementsDataBean>();
+    List<EctMeasurementsDataBean> measurementsDataVector = new ArrayList<EctMeasurementsDataBean>();
 
     public EctMeasurementsDataBeanHandler(Integer demo) {
         init(demo);
