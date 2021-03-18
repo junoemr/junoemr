@@ -33,7 +33,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.*;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.MeasurementMap;
+import org.oscarehr.common.model.MeasurementType;
+import org.oscarehr.common.model.MeasurementsDeleted;
+import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.util.MiscUtils;
 
 import javax.persistence.Query;
@@ -677,41 +681,40 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	 * @param demographicNo demographic to get measurements for
 	 * @return a set of LabGridDisplay objects that encapsulate precisely the info we want to display
 	 */
-	public List<LabGridDisplay> getLabMeasurements(Integer demographicNo, String loincCode)
+	public List<LabGridDisplay> getLabMeasurementsForPatient(Integer demographicNo)
 	{
 		String sql = "SELECT \n" +
 				"    m.id AS measurement_id,\n" +
 				"    e3.val AS is_abnormal,\n" +
 				"    m.dataField AS result,\n" +
-				"    \"\" AS \"reference_range\", -- reference range\n" +
-				"    \"\" AS \"units\", -- units\n" +
-				"    m.dateObserved AS \"dateCollected\",\n" +
-				"    e2.val AS \"lab_no\",\n" +
-				"    e1.val AS \"loinc_code\"\n" +
+				"    m.dateObserved AS dateCollected,\n" +
+				"    e2.val AS lab_no,\n" +
+				"    e1.val AS loinc_code," +
+				"	 e4.val AS test_name\n" +
 				"FROM measurements m\n" +
 				"JOIN measurementsExt e1 ON m.id=e1.measurement_id AND e1.keyval = 'identifier' \n" +
 				"JOIN measurementsExt e2 ON m.id=e2.measurement_id AND e2.keyval = 'lab_no' \n" +
 				"JOIN measurementsExt e3 ON m.id=e3.measurement_id AND e3.keyval = 'abnormal'\n" +
+				"JOIN measurementsExt e4 ON m.id=e4.measurement_id AND e4.keyval = 'name'\n" +
 				"WHERE m.dataField != ''\n" +
 				"AND m.demographicNo = :demographicNo\n" +
-				"AND e1.val = :loincCode\n" +
-				"GROUP BY m.id";
+				"AND m.dataField != \"***FINAL REPORT***\"\n" +
+				"GROUP BY m.id\n" +
+				"ORDER BY m.dateObserved DESC";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("demographicNo", demographicNo);
-		query.setParameter("loincCode", loincCode);
 		List<Object[]> labMeasurements = query.getResultList();
 		List<LabGridDisplay> gridDisplayList = new ArrayList<>();
 		for (Object[] measurement : labMeasurements)
 		{
 			LabGridDisplay newDisplay = new LabGridDisplay();
 			newDisplay.setMeasurementId((Integer)measurement[0]);
-			newDisplay.setAbnormal(ConversionUtils.fromBoolString((String)measurement[1]));
+			newDisplay.setAbnormal((String)measurement[1]);
 			newDisplay.setResult((String)measurement[2]);
-			newDisplay.setReferenceRange((String)measurement[3]);
-			newDisplay.setUnits((String)measurement[4]);
-			newDisplay.setDateObserved((Date)measurement[5]);
-			newDisplay.setLabId((String)measurement[6]);
-			newDisplay.setLoincCode((String)measurement[7]);
+			newDisplay.setDateObserved(ConversionUtils.toDateString((Date)measurement[3], ConversionUtils.DEFAULT_DATE_PATTERN));
+			newDisplay.setLabId((String)measurement[4]);
+			newDisplay.setLoincCode((String)measurement[5]);
+			newDisplay.setTestName((String)measurement[6]);
 			gridDisplayList.add(newDisplay);
 		}
 		return gridDisplayList;

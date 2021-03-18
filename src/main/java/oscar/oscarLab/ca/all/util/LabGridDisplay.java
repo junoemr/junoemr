@@ -25,22 +25,25 @@ package oscar.oscarLab.ca.all.util;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Getter
 @Setter
-/**
+/*
  * Helper class to better encapsulate what we want to display.
  * Values get pulled from measurements/measurementsExt.
  */
 public class LabGridDisplay
 {
 	private Integer measurementId;
-	private Boolean abnormal;
+	private String abnormal;
 	private String result;
-	private String referenceRange;
-	private String units;
-	private Date dateObserved;
+	private String dateObserved;
 	private String labId;
 	private String loincCode;
+	private String testName;
+
+	@Override
+	public String toString()
+	{
+		return "lab measurement: " + dateObserved + " | " + testName + " | " + result;
+	}
 }

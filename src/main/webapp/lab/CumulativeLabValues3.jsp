@@ -29,22 +29,14 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@ page import="java.io.Serializable" %>
 <%@ page import="oscar.oscarLab.ca.all.util.LabValuesByReverseDateComparator" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.LinkedHashMap" %>
-<%@ page import="java.util.Hashtable" %>
 <%@ page import="oscar.oscarLab.ca.on.CommonLabTestValues" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Collections" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="oscar.util.ConversionUtils" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="oscar.oscarLab.ca.on.CommonLabResultData" %>
 <%@ page import="oscar.util.StringUtils" %>
+<%@ page import="oscar.oscarLab.ca.all.util.LabGridDisplay" %>
 
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -55,334 +47,146 @@
 	<%response.sendRedirect("../../securityError.jsp?type=_lab");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed) {
+		return;
+	}
+
+	String demographic_no = request.getParameter("demographic_no");
+	Map<String, List<LabGridDisplay>>  uniqueLabs = CommonLabTestValues.getUniqueLabsForPatients(demographic_no);
+	List<Map<String, String>> dateList = CommonLabTestValues.buildDateList(uniqueLabs);
 %>
 
-<%
-
-String demographic_no = request.getParameter("demographic_no");
-
-Map<String, String> nameMap = new LinkedHashMap<String, String>();
-List<String> idList = new ArrayList<String>();
-Map<String, Serializable> measIdMap = new HashMap<String, Serializable>();
-List<Map<String, String>> dateList = new ArrayList<Map<String, String>>();
-ArrayList<Hashtable<String, Serializable>> uniqueLabs = CommonLabTestValues.findUniqueLabsForPatient(demographic_no);
-
-try
-{
-/*  loop through the measurements
-*   nameMap: (loinc_code, name)
-*   measIdMap: (loinc_code, IdMap)
-*   IdMap: (idHash, h)
-*   valuesTable: (lab_no, result, abn, collDate, type) -- retrieved in order of the date
-*   dateList: (dateIdHash)
-*   dateIdHash: (date, lab_no)
-    */
-
-
-	for (int i = 0; i < uniqueLabs.size(); i++)
-	{
-		Hashtable<String, Serializable> ulab = uniqueLabs.get(i);
-		String labName = (String) ulab.get("testName");
-		String labType = (String) ulab.get("labType");
-		String loinc_code = (String) ulab.get("identCode");
-		if (!loinc_code.equalsIgnoreCase("NULL"))
-		{
-			Map<String, Map<String, Serializable>> IdMap = new LinkedHashMap<String, Map<String, Serializable>>();
-			List<Map<String, Serializable>> labValueList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
-
-			for (int j = labValueList.size() - 1; j >= 0; j--)
-			{
-				Map<String, Serializable> valuesTable = labValueList.get(j);
-				String date = ((String) valuesTable.get("collDate"));
-				String id = (String) valuesTable.get("lab_no");
-				IdMap.put(id, valuesTable);
-				// check if this lab has already been added
-				if (!idList.contains(id))
-				{
-					idList.add(id);
-					Map<String, String> dateIdHash = new HashMap<String, String>();
-					dateIdHash.put("date", date);
-					dateIdHash.put("id", id);
-					dateList.add(dateIdHash);
-				}
-			}
-
-			// add the test only if there are results for it
-			if (labValueList.size() > 0)
-			{
-				measIdMap.put(loinc_code, (Serializable) IdMap);
-				nameMap.put(loinc_code, labName);
-			}
-
-			// If the first element to be displayed is a header
-		}
-		else if (nameMap.size() == 0 && !labName.equals("NULL"))
-		{
-			nameMap.put("NULL" + i, labName);
-			// Do not allow the first element displayed to be a space
-		}
-	}
-}catch(Exception e){
-	MiscUtils.getLogger().error("Error", e);
-}%>
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html:html locale="true">
+	<head>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<title>Cumulative Lab 3</title>
+		<!--I18n-->
+		<link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css" />
+		<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
+		<script type="text/javascript" src="../share/javascript/prototype.js"></script>
+		<script type="text/javascript" src="../share/javascript/boxover.js"></script>
+		<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+		<link rel="stylesheet" type="text/css" href="../share/css/niftyCorners.css" />
+		<link rel="stylesheet" type="text/css" href="../share/css/niftyPrint.css" media="print" />
+		<script type="text/javascript" src="../share/javascript/nifty.js"></script>
+		<script type="text/javascript">
+			window.onload=function()
+			{
+				if(!NiftyCheck())
+				{
+					console.log("This is failing.");
+					return;
+				}
 
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title>Cumulative Lab 3</title>
-<!--I18n-->
-<link rel="stylesheet" type="text/css"
-	href="../share/css/OscarStandardLayout.css" />
-<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
-<script type="text/javascript" src="../share/javascript/prototype.js"></script>
+				Rounded("div.headPrevention","all","#CCF","#efeadc","small border blue");
+				Rounded("div.preventionProcedure","all","transparent","#F0F0E7","small border #999");
 
-<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+				Rounded("div.leftBox","top","transparent","#CCCCFF","small border #ccccff");
+				Rounded("div.leftBox","bottom","transparent","#EEEEFF","small border #ccccff");
+			};
 
-<link rel="stylesheet" type="text/css"
-	href="../share/css/niftyCorners.css" />
-<link rel="stylesheet" type="text/css"
-	href="../share/css/niftyPrint.css" media="print" />
-<script type="text/javascript" src="../share/javascript/nifty.js"></script>
-<script type="text/javascript">
-window.onload=function(){
-if(!NiftyCheck())
-    return;
+			function reportWindow(page)
+			{
+				windowprops="height=660, width=960, location=no, scrollbars=yes, menubars=no, toolbars=no, resizable=yes, top=0, left=0";
+				var popup = window.open(page, "labreport", windowprops);
+				popup.focus();
+			}
+		</script>
+	</head>
 
-//Rounded("div.news","all","transparent","#FFF","small border #999");
-Rounded("div.headPrevention","all","#CCF","#efeadc","small border blue");
-Rounded("div.preventionProcedure","all","transparent","#F0F0E7","small border #999");
-
-Rounded("div.leftBox","top","transparent","#CCCCFF","small border #ccccff");
-Rounded("div.leftBox","bottom","transparent","#EEEEFF","small border #ccccff");
-
-}
-
-        </script>
-
-
-
-
-<script type="text/javascript">
-<!--
-//if (document.all || document.layers)  window.resizeTo(790,580);
-function newWindow(file,window) {
-  msgWindow=open(file,window,'scrollbars=yes,width=760,height=520,screenX=0,screenY=0,top=0,left=10');
-  if (msgWindow.opener == null) msgWindow.opener = self;
-} 
-//-->
-        </script>
-
-
-
-
-<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
-
-<script language="JavaScript">
-
-
-function addLabToProfile(labType,testName){
-
-   alert("calling addLabToProfile");
-   var url = "../lab/DisplayLabValue.jsp";
-   var ran_number=Math.round(Math.random()*1000000);
-   var params = "demographicNo=<%=demographic_no%>&rand="+ran_number+"&labType="+labType+"&testName="+testName;  //hack to get around ie caching the page
-   alert(params);
-   new Ajax.Updater('dd',url, {method:'get',
-                                          parameters:params,
-                                          asynchronous:true,
-                                          onComplete: addLabToList,
-                                          evalScripts:true }); 
-   //alert(origRequest.responseText);
-}
-
-
-function addLabToProfile2(labType,testName){
-
-   ///alert("calling addLabToProfile2");
-    
-   var newNode = document.createElement('div');
-   var img = document.createElement('img');
-   img.setAttribute('src','../images/osx-pinwheel.gif');
-   
-   newNode.appendChild(img)
-   var ran_number=Math.round(Math.random()*1000000);
-   newNode.setAttribute('id','d'+ran_number);
-   //var 
-   //$('cumulativeLab').appendChild(req.responseText);
-   $('cumulativeLab').appendChild(newNode);
-   //alert(req.responseText);
-   
-   var url = "../lab/DisplayLabValue.jsp";
-   var ran_number=Math.round(Math.random()*1000000);
-   var params = "demographicNo=<%=demographic_no%>&rand="+ran_number+"&labType="+labType+"&testName="+testName;  //hack to get around ie caching the page
-   ///alert(params);  //'d'+ran_number
-   new Ajax.Updater(newNode,url, {method:'get',
-                                          parameters:params,
-                                          asynchronous:true,
-                                           //onComplete: reRound
-                                          evalScripts:true}); 
-   ///alert("sdf"+$('d'+ran_number));
-   //alert(origRequest.responseText);
-}
-
-function reRound(){
-   Rounded("div.headPrevention","all","#CCF","#efeadc","small border blue");
-   Rounded("div.preventionProcedure","all","transparent","#F0F0E7","small border #999");
-}
-
-
-function addLabToList(req){
-   var newText = document.createTextNode(req.responseText); 
-   var newNode = document.createElement("div");
-   var ran_number=Math.round(Math.random()*1000000);
-   newNode.setAttribute("id","d"+ran_number);
-   //$('cumulativeLab').appendChild(req.responseText);
-   $('cumulativeLab').appendChild(newText);
-   alert(req.responseText);
-}
-
-function reportWindow(page) {
-    windowprops="height=660, width=960, location=no, scrollbars=yes, menubars=no, toolbars=no, resizable=yes, top=0, left=0";
-    var popup = window.open(page, "labreport", windowprops);
-    popup.focus();
-}
-        </script>
-
-
-</head>
-
-<body class="BodyStyle">
-<!--  -->
-<table class="MainTable" id="scrollNumber1">
-	<tr class="MainTableTopRow">
-		<td class="MainTableTopRowLeftColumn">lab</td>
-		<td class="MainTableTopRowRightColumn">
-		<table class="TopStatusBar">
-			<tr>
-				<td><oscar:nameage demographicNo="<%=demographic_no%>" /></td>
-				<td>&nbsp;</td>
-				<td style="text-align: right"><oscar:help keywords="lab" key="app.top1"/> | <a
-					href="javascript:popupStart(300,400,'About.jsp')"><bean:message
-					key="global.about" /></a> | <a
-					href="javascript:popupStart(300,400,'License.jsp')"><bean:message
-					key="global.license" /></a></td>
-			</tr>
-		</table>
-		</td>
-	</tr>
-	<tr>
-		<td class="MainTableLeftColumn" valign="top"></td>
-		<td valign="top" class="MainTableRightColumn">
-		<table class="cumlatable">
-			<tr>
-				<th>&nbsp;</th>
-				<th>Latest Value</th>
-				<th>Last Done</th>
+	<body class="BodyStyle">
+	<table class="MainTable" id="scrollNumber1">
+		<tr class="MainTableTopRow">
+			<td class="MainTableTopRowLeftColumn">lab</td>
+			<td class="MainTableTopRowRightColumn">
+				<table class="TopStatusBar">
+					<tr>
+						<td><oscar:nameage demographicNo="<%=demographic_no%>" /></td>
+						<td>&nbsp;</td>
+						<td style="text-align: right"><oscar:help keywords="lab" key="app.top1"/>
+							| <a href="javascript:popupStart(300,400,'About.jsp')"><bean:message key="global.about" /></a>
+							| <a href="javascript:popupStart(300,400,'License.jsp')"><bean:message key="global.license" /></a>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="MainTableLeftColumn" valign="top"></td>
+			<td valign="top" class="MainTableRightColumn">
+				<table class="cumlatable">
+					<tr>
+						<th>&nbsp;</th>
+						<th>Latest Value</th>
+						<th>Last Done</th>
 				<!-- Dates start here. Need to have all the dates of the different labs -->
 				<%
-                            // use a custom comparator to compare the HashMaps in the array
+					// use a custom comparator to compare the HashMaps in the array
+					// This has to be here unfortunately, otherwise we can't guarantee order
 					LabValuesByReverseDateComparator comp = new LabValuesByReverseDateComparator();
-                    Collections.sort(dateList, comp);
+                    dateList.sort(comp);
                     for (Map<String, String> dateIdHash : dateList)
                     {
                         String dateString = dateIdHash.get("date");
                         Date labDate = ConversionUtils.fromDateString(dateString, ConversionUtils.DEFAULT_DATE_PATTERN);
                         String lab_no = dateIdHash.get("id");
-
-                        CommonLabResultData data = new CommonLabResultData();
-                        String multiId = data.getMatchingLabs(lab_no, "HL7");
                 %>
-
-				<th><a
-					href="javascript:reportWindow('../lab/CA/ALL/labDisplay.jsp?segmentID=<%=lab_no%>&providerNo=<%= session.getValue("user") %>')"><%=ConversionUtils.toDateString(labDate, "dd-MMM yy")%></a>
-				</th>
-				<%}%>
-			</tr>
-
+						<th>
+							<a href="javascript:reportWindow('../lab/CA/ALL/labDisplay.jsp?segmentID=<%=lab_no%>&providerNo=<%= session.getAttribute("user") %>')">
+						<%=ConversionUtils.toDateString(labDate, "dd-MMM yy")%>
+							</a>
+						</th>
+					<%}%>
+					</tr>
 			<%
-                        Iterator iter = nameMap.keySet().iterator();
-                        while (iter.hasNext()){
-                            // Display the test name
-                            String loinc_code = (String) iter.next();
-                            String testName = nameMap.get(loinc_code);
-                            LinkedHashMap<String, Serializable> IdMap =  (LinkedHashMap) measIdMap.get(loinc_code);
-                            
-                            //preserve spaces in the test names
-                            testName = testName.replaceAll("\\s", "&#160;");
-                            
-                            // display the latest value for the test
-                            if (!loinc_code.startsWith("NULL")){
-                                String latestDate = "";
-                                String latestVal = "";
-                                String abn = "N";
-                                if (IdMap.size() > 0){
-                                    // the latest date will be the first one
-                                    HashMap<String, Serializable> ht = (HashMap) IdMap.get(IdMap.keySet().iterator().next());
-                                    latestVal = (String) ht.get("result");
-                                    latestDate = (String) ht.get("collDate");
-                                    abn = ConversionUtils.toBoolString((Boolean)ht.get("abn"));
-                                    // trim the date
-                                    latestDate = latestDate.substring(0, 10);
-                                }
-                        %>
-			<tr>
-				<td><%=testName%></td>
-				<td class="<%= abn %>"><%=StringUtils.maxLenString(latestVal, 9, 8, "...")%></td>
-				<td><%=latestDate%></td>
-				<%
-                            // display all of values from all the labs for the given test
-                            for (int i = 0; i < dateList.size(); i++){
-                                    Map<String, String> dateIdHash = dateList.get(i);
-                                    String labVal = "";
-                                    abn = "N";
-                                    if (IdMap.size() > 0 ){
-                                        HashMap<String, Serializable> ht = (HashMap) IdMap.get(dateIdHash.get("id"));
-                                        if (ht != null){
-                                            labVal = (String) ht.get("result");
-                                            abn = ConversionUtils.toBoolString((Boolean)ht.get("abn"));
-                                        }
-                                    }
-                            %>
-				<td class="<%= abn %>"><%=StringUtils.maxLenString(labVal, 9, 8, "...")%></td>
-				<%}%>
-			</tr>
-			<%}else{
-                        // if the loinc_code is null display the header name without any results or
-                        // a blank space if the name is null as well
-                        %>
-			<tr>
-				<td colspan="<%= 3+dateList.size() %>">
-				<%
-                                if (testName.equals("NULL")){
-                                %><%="<br />"%>
-				<%
-                                }else{
-                                %><%= testName %>
-				<%
-                                }
-                                %>
-				</td>
-			</tr>
-			<%}
-                        }%>
-		</table>
-		</td>
-	</tr>
-	<tr>
-		<td class="MainTableBottomRowLeftColumn">&nbsp;</td>
-		<td class="MainTableBottomRowRightColumn" valign="top">&nbsp;</td>
-	</tr>
-</table>
-<script type="text/javascript" src="../share/javascript/boxover.js"></script>
-</body>
+				for (String testName : uniqueLabs.keySet())
+				{
+					List<LabGridDisplay> labsToDisplay = uniqueLabs.get(testName);
+					//preserve spaces in the test names
+					testName = testName.replaceAll("\\s", "&#160;");
+
+					LabGridDisplay latestLab = labsToDisplay.get(0);
+					String abnormal = latestLab.getAbnormal();
+			%>
+					<tr>
+						<td><%=testName%></td>
+						<td class="<%=abnormal%>"><%=StringUtils.maxLenString(latestLab.getResult(), 9, 8, "...")%></td>
+						<td><%=latestLab.getDateObserved()%></td>
+					<%
+						// display all of values from all the labs for the given test
+						for (Map<String, String> dateIdHash : dateList)
+						{
+							String dateString = dateIdHash.get("date");
+							String labNo = dateIdHash.get("id");
+							String testAbnormal = "";
+							String testResult = "";
+							// Loop over all results for this test again to find the one that matches up with date & labno
+							for (LabGridDisplay labGridDisplay : labsToDisplay)
+							{
+								if (!dateString.equals(labGridDisplay.getDateObserved()) || !labNo.equals(labGridDisplay.getLabId()))
+								{
+									continue;
+								}
+								testAbnormal = labGridDisplay.getAbnormal();
+								testResult = labGridDisplay.getResult();
+							}
+					%>
+						<td class="<%= testAbnormal %>"><%=StringUtils.maxLenString(testResult, 9, 8, "...")%></td>
+						<%
+
+						}
+				}
+						%>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="MainTableBottomRowLeftColumn">&nbsp;</td>
+			<td class="MainTableBottomRowRightColumn" valign="top">&nbsp;</td>
+		</tr>
+	</table>
+	</body>
 </html:html>

@@ -84,6 +84,16 @@ public class CommonLabTestValues {
 		return retval;
 	}
 
+	/**
+	 * Super slow function. Has to instantiate a terser for each lab it attempts to read.
+	 * Terser also only grabs metadata for lab, you would then have to call "findValuesForTest"
+	 * which re-instantiates terser for each lab.
+	 *
+	 * Use getUniqueLabsForPatient if possible.
+	 * @param demographic demographic to get labs for
+	 * @return list of maps containing metadata about labs for a patient
+	 */
+	@Deprecated
 	public static ArrayList<Hashtable<String, Serializable>> findUniqueLabsForPatient(String demographic) {
 		OscarProperties op = OscarProperties.getInstance();
 		String cml = op.getProperty("CML_LABS");
@@ -110,21 +120,58 @@ public class CommonLabTestValues {
 		return labs;
 	}
 
-	/*
-	public static Map<String, LabGridDisplay> getUniqueLabsForPatients(Integer demographicNo)
+	/**
+	 * Helper function for lab grid display. Given a map of labs per test type, build a map containing dates and lab ids
+	 * This is used to provide a link at the top of the grid display for the provider to click on and get to the lab
+	 * @param uniqueLabs map of labs to create a list of dates from
+	 * @return map containing date, lab_no information
+	 */
+	public static List<Map<String, String>> buildDateList(Map<String, List<LabGridDisplay>> uniqueLabs)
 	{
-		// for now, ignoring non-HL7 labs
-		OscarProperties op = OscarProperties.getInstance();
-		String hl7text = op.getProperty("HL7TEXT_LABS");
-		Map<String, LabGridDisplay> labsPerLoincCode = new HashMap<>();
-		if (hl7text != null && hl7text.trim().equals("yes"))
+		List<String> idList = new ArrayList<>();
+		List<Map<String, String>> dateList = new ArrayList<>();
+
+		for (String key : uniqueLabs.keySet())
 		{
-			ArrayList<Hashtable<String, Serializable>> hl7Labs = findUniqueLabsForPatientHL7Text(demographic);
-			labs.addAll(hl7Labs);
+			List<LabGridDisplay> labs = uniqueLabs.get(key);
+			for (LabGridDisplay lab : labs)
+			{
+				String date = lab.getDateObserved();
+				String id = lab.getLabId();
+				if (!idList.contains(id))
+				{
+					idList.add(id);
+					Map<String, String> dateIdHash = new HashMap<>();
+					dateIdHash.put("date", date);
+					dateIdHash.put("id", id);
+					dateList.add(dateIdHash);
+				}
+			}
 		}
 
+		return dateList;
 	}
-	 */
+
+	public static Map<String, List<LabGridDisplay>>  getUniqueLabsForPatients(String demographic)
+	{
+		Integer demographicNo = Integer.parseInt(demographic);
+		MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
+
+		List<LabGridDisplay> patientLabResults = measurementDao.getLabMeasurementsForPatient(demographicNo);
+		Map<String, List<LabGridDisplay>> resultsPerTest = new HashMap<>();
+
+		for (LabGridDisplay result : patientLabResults)
+		{
+			if (!resultsPerTest.containsKey(result.getTestName()))
+			{
+				resultsPerTest.put(result.getTestName(), new ArrayList<LabGridDisplay>());
+			}
+			resultsPerTest.get(result.getTestName()).add(result);
+		}
+
+		return resultsPerTest;
+
+	}
 
 	//Method returns unique test names for a patient
 	//List is used to compile a cummalitive lab profile
@@ -469,18 +516,15 @@ public class CommonLabTestValues {
 
 			// TODO get this setup so it's query all at once, then split it up into proper map here
 			// requires a bit of a refactor of the layer above
-			List<LabGridDisplay> gridDisplayList = dao.getLabMeasurements(demographicNo, identCode);
+			List<LabGridDisplay> gridDisplayList = dao.getLabMeasurementsForPatient(demographicNo);
 			for (LabGridDisplay gridDisplay : gridDisplayList)
 			{
 				HashMap<String, Serializable> hashMap = new HashMap<>();
 				hashMap.put("testName", testName);
 				hashMap.put("abn", gridDisplay.getAbnormal());
 				hashMap.put("result", gridDisplay.getResult());
-				hashMap.put("units", gridDisplay.getUnits());
 				hashMap.put("lab_no", gridDisplay.getLabId());
-				hashMap.put("collDate", ConversionUtils.toDateString(gridDisplay.getDateObserved()));
-				hashMap.put("collDateDate", gridDisplay.getDateObserved());
-
+				hashMap.put("collDate", gridDisplay.getDateObserved());
 				labList.add(hashMap);
 			}
 
