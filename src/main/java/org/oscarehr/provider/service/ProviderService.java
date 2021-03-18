@@ -52,6 +52,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service("provider.service.ProviderService")
 @Transactional
@@ -293,7 +294,7 @@ public class ProviderService
 			ProviderData newProviderData = providerEditFormTo1.getProviderData();
 
 			// transfer super admin flag
-			newProviderData.setSuperAdmin(providerData.getSuperAdmin());
+			newProviderData.setSuperAdmin(providerData.isSuperAdmin());
 
 			// edit provider
 			newProviderData.setProviderNo(providerNo);
@@ -473,5 +474,12 @@ public class ProviderService
 		}
 		existingRecord.setUserName(source.getUserName());
 		existingRecord.setEmail(source.getEmail());
+	}
+
+	public void createAndSaveProviderImdHealthUuid(ProviderData providerData)
+	{
+		UUID newUuid = UUID.randomUUID();
+		providerData.setImdHealthUuid(newUuid.toString());
+		providerDataDao.merge(providerData);
 	}
 }
