@@ -162,13 +162,4 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures {
 		
 		assertEquals(expectedResult, result);
 	}
-	
-/*	@Test
-	public void testCheckStatusUsuage() {
-		List<AppointmentStatus> statuses = new ArrayList<AppointmentStatus>();
-		AppointmentStatus a = new AppointmentStatus();
-		a.setStatus("test");
-		statuses.add(a);
-		dao.checkStatusUsuage(statuses);
-	}*/
 }

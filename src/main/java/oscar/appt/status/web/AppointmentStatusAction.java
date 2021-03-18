@@ -63,12 +63,13 @@ public class AppointmentStatusAction extends DispatchAction {
     	LazyValidatorForm lazyForm = (LazyValidatorForm) form;
 	
     	// Initialize some default values for the new status.
-	    lazyForm.set("active", 1);
-	    lazyForm.set("icon", "1.gif");
+	lazyForm.set("active", 1);
+	lazyForm.set("icon", "1.gif");
         lazyForm.set("color", "#897DF8");
         lazyForm.set("junoColor", "#AC9DF2");
-	    
-	    request.setAttribute("action", "add");
+        
+        request.setAttribute("canDisable", 1);
+	request.setAttribute("action", "add");
     	return mapping.findForward("edit");
     }
     
@@ -85,6 +86,7 @@ public class AppointmentStatusAction extends DispatchAction {
         lazyForm.set("junoColor", apptStatus.getJunoColor());
         lazyForm.set("description", apptStatus.getDescription());
 	    
+        request.setAttribute("canDisable", apptStatus.getEditable());
         request.setAttribute("action", "update");
         return mapping.findForward("edit");
     }
@@ -146,7 +148,7 @@ public class AppointmentStatusAction extends DispatchAction {
         List<String> inactiveStatusCodesInUse = statusService.checkStatusUsage(inactiveStatuses);
         if (inactiveStatusCodesInUse.size() > 0)
         {
-            request.setAttribute("useStatus", inactiveStatusCodesInUse);
+            request.setAttribute("alertStatuses", inactiveStatusCodesInUse);
         }
     }
 }

@@ -58,6 +58,9 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 	
 	private int active;
 	
+	/**
+	 * Whether this appointment can be enabled/disabled or reordered.
+	 */
 	private int editable;
 	
 	@Column(name="short_letters")

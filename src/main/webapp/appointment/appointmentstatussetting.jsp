@@ -115,7 +115,7 @@
         for (AppointmentStatus status : statuses)
         {
         	boolean isActive =  status.getActive() == 1;
-        	boolean isEditable = status.getEditable() == 1;
+        	boolean isMovable = status.getEditable() == 1;
 
             UriComponentsBuilder editUrl = UriComponentsBuilder.fromPath(baseUrl);
             editUrl.queryParam("method", "modify");
@@ -146,10 +146,12 @@
         <td style="background-color: <%= status.getColor() %>"><img src="<%=imgUrl%>" alt="Classic icon"/></td>
 		<td style="background-color: <%= status.getJunoColor() %>"><i class="<%="icon " + junoIconClass %>" alt="Juno icon"></i></td>
         <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %></td>
-        <% if (isSuperAdmin && isEditable) { %>
+        <% if (isSuperAdmin) { %>
 		<td class="nowrap text-l"><a href=<%= editUrl.build().toString() %>>Edit</a></td>
+            <% if (isMovable) { %>
         <td class="nowrap text-l"><a href=<%= upUrl.build().toString() %>>Move Up</a></td>
         <td class="nowrap text-l"><a href=<%= downUrl.build().toString() %>>Move Down</a></td>
+            <% } %>
         <% } %>
 	</tr>
     <% } %>
@@ -162,14 +164,14 @@
 <br>
 
 <%
-	List inactiveUseStatus = (List) request.getAttribute("useStatus");
-	if (null != inactiveUseStatus && inactiveUseStatus.size() > 0)
+	List<String> alertStatuses = (List<String>)request.getAttribute("alertStatuses");
+	if (alertStatuses != null)
 	{
-		for (int i = 0; i < inactiveUseStatus.size(); i++)
+		for (String code : alertStatuses)
 		{
 %>
-			The code [<%=inactiveUseStatus.get(i)%>] has been used before, please enable that
-			status.<br/>
+			Status code [<%=code%>] has been used before, but is currently disabled.
+			<br/>
 <%
 		}
 	}

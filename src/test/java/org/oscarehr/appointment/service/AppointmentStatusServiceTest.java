@@ -15,6 +15,7 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -263,11 +264,12 @@ public class AppointmentStatusServiceTest
 		Assert.assertEquals(secondBeforeSwap.getId(), secondAfterSwap.getId());
 	}
 
-	@Test
+	
 	/**
 	 * The last status should not be able to be swapped down because it is already last.
 	 * Attempting to swap it should do nothing.
 	 */
+	@Test
 	public void testSwapDownPastBottom()
 	{
 		List<AppointmentStatus> allStatuses = appointmentStatusService.getAllAppointmentStatuses();
@@ -285,6 +287,51 @@ public class AppointmentStatusServiceTest
 
 		Assert.assertEquals(secondLast.getStatus(), newSecondLast.getStatus());
 		Assert.assertEquals(secondLast.getId(), secondLast.getId());
+	}
+	
+	/**
+	 * Test if used statuses are detected properly
+	 */
+	@Test
+	public void testStatusUsage()
+	{
+		// Test without modifiers
+		List<AppointmentStatus> basicCheck = generateAppointmentStatusList("ABCDE".toCharArray());
+		when(mockDao.getStatusesInUse()).thenReturn(Arrays.asList("A", "B", "D", "Z"));
+		
+		List<String> basicStatusesInUse = appointmentStatusServiceMockedDao.checkStatusUsage(basicCheck);
+		
+		Assert.assertEquals(3, basicStatusesInUse.size());
+		Assert.assertTrue(basicStatusesInUse.contains("A"));
+		Assert.assertTrue(basicStatusesInUse.contains("B"));
+		Assert.assertTrue(basicStatusesInUse.contains("D"));
+
+		// Test casing
+		List<AppointmentStatus> caseCheck = generateAppointmentStatusList("Aa".toCharArray());
+		when(mockDao.getStatusesInUse()).thenReturn(Arrays.asList("a"));
+		List<String> casedStatusesInUse = appointmentStatusServiceMockedDao.checkStatusUsage(caseCheck);
+		
+		Assert.assertEquals(1, casedStatusesInUse.size());
+		Assert.assertTrue(casedStatusesInUse.contains("a"));
+		
+		// Test modifiers, such as S, V for signed and verified appointments
+		List<AppointmentStatus> modifierCheck = generateAppointmentStatusList("ABcd".toCharArray());
+		when(mockDao.getStatusesInUse()).thenReturn(Arrays.asList("AV", "BS", "cv", "ds", "Y", "YV", "yv"));
+		List<String> modifierStatusesInUse = appointmentStatusServiceMockedDao.checkStatusUsage(modifierCheck);
+		
+		Assert.assertEquals(4, modifierStatusesInUse.size());
+		Assert.assertTrue(modifierStatusesInUse.contains("A"));
+		Assert.assertTrue(modifierStatusesInUse.contains("B"));
+		Assert.assertTrue(modifierStatusesInUse.contains("c"));
+		Assert.assertTrue(modifierStatusesInUse.contains("d"));
+		
+		// Test asking for nothing, it should also return nothing
+		List<AppointmentStatus> nothingIn = new ArrayList<>();
+		List<String> emptyResult = new ArrayList<>();
+		when(mockDao.getStatusesInUse()).thenReturn(emptyResult);
+		
+		List<String> nothingOut = appointmentStatusServiceMockedDao.checkStatusUsage(nothingIn);
+		Assert.assertTrue(nothingOut.isEmpty());
 	}
 
 	/**
