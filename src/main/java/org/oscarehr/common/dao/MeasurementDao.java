@@ -698,7 +698,6 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 				"JOIN measurementsExt e4 ON m.id=e4.measurement_id AND e4.keyval = 'name'\n" +
 				"WHERE m.dataField != ''\n" +
 				"AND m.demographicNo = :demographicNo\n" +
-				"AND m.dataField != \"***FINAL REPORT***\"\n" +
 				"GROUP BY m.id\n" +
 				"ORDER BY m.dateObserved DESC";
 		Query query = entityManager.createNativeQuery(sql);
