@@ -76,7 +76,6 @@
 			{
 				if(!NiftyCheck())
 				{
-					console.log("This is failing.");
 					return;
 				}
 

@@ -152,7 +152,12 @@ public class CommonLabTestValues {
 		return dateList;
 	}
 
-	public static Map<String, List<LabGridDisplay>>  getUniqueLabsForPatients(String demographic)
+	/**
+	 * Given a patient ID, get all stored lab measurements for them
+	 * @param demographic demographic to get stored lab measurements for
+	 * @return a map of stored lab measurements, categorized by test name
+	 */
+	public static Map<String, List<LabGridDisplay>> getUniqueLabsForPatients(String demographic)
 	{
 		Integer demographicNo = Integer.parseInt(demographic);
 		MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
@@ -164,7 +169,7 @@ public class CommonLabTestValues {
 		{
 			if (!resultsPerTest.containsKey(result.getTestName()))
 			{
-				resultsPerTest.put(result.getTestName(), new ArrayList<LabGridDisplay>());
+				resultsPerTest.put(result.getTestName(), new ArrayList<>());
 			}
 			resultsPerTest.get(result.getTestName()).add(result);
 		}
@@ -519,9 +524,9 @@ public class CommonLabTestValues {
 				String lab_no = String.valueOf(lNo);
 
 				MessageHandler handler = Factory.getHandler(lab_no);
-				HashMap<String, Serializable> h = new HashMap<String, Serializable>();
+				HashMap<String, Serializable> hashMap = new HashMap<String, Serializable>();
 				int i = 0;
-				while (i < handler.getOBRCount() && h.get("testName") == null)
+				while (i < handler.getOBRCount() && hashMap.get("testName") == null)
 				{
 					for (int j = 0; j < handler.getOBXCount(i); j++)
 					{
@@ -533,28 +538,28 @@ public class CommonLabTestValues {
 							// only add measurements with actual results
 							if (!result.equals(""))
 							{
-								h.put("testName", testName);
-								h.put("abn", handler.getOBXAbnormalFlag(i, j));
-								h.put("result", result);
-								h.put("range", handler.getOBXReferenceRange(i, j));
-								h.put("units", handler.getOBXUnits(i, j));
+								hashMap.put("testName", testName);
+								hashMap.put("abn", handler.getOBXAbnormalFlag(i, j));
+								hashMap.put("result", result);
+								hashMap.put("range", handler.getOBXReferenceRange(i, j));
+								hashMap.put("units", handler.getOBXUnits(i, j));
 								String collDate = handler.getTimeStamp(i, j);
-								h.put("lab_no", lab_no);
-								h.put("collDate", collDate);
+								hashMap.put("lab_no", lab_no);
+								hashMap.put("collDate", collDate);
 								MiscUtils.getLogger().debug("COLLDATE " + collDate);
 								if (collDate.length() == 10)
 								{
-									h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd"));
+									hashMap.put("collDateDate", ConversionUtils.fromDateString(collDate, ConversionUtils.DEFAULT_DATE_PATTERN));
 								}
 								else if (collDate.length() == 16)
 								{
-									h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm"));
+									hashMap.put("collDateDate", ConversionUtils.fromDateString(collDate, ConversionUtils.TS_NO_SEC_PATTERN));
 								}
 								else
 								{
-									h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm:ss"));
+									hashMap.put("collDateDate", ConversionUtils.fromDateString(collDate, ConversionUtils.DEFAULT_TS_PATTERN));
 								}
-								labList.add(h);
+								labList.add(hashMap);
 								break;
 							}
 
