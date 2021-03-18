@@ -29,7 +29,8 @@
             <div class="property-toggle flex-column" >
                 <juno-input-save
                         ng-model="$ctrl.phonePrefixValue"
-                        click="$ctrl.updateProperty(property, value)">
+                        click="$ctrl.updateProperty(property, value)"
+                        invalid="!$ctrl.validations.phonePrefixValid()">
                 </juno-input-save>
             </div>
             <div class="property-text flex-column">

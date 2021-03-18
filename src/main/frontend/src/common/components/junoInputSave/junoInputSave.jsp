@@ -5,8 +5,9 @@
     </label>
     <div class ="left">
         <juno-input ng-model="$ctrl.ngModel"
-                    valid-regex="$ctrl.phoneNumberRegex"
-                    component-style="$ctrl.componentStyle"></juno-input>
+                    component-style="$ctrl.componentStyle"
+                    invalid="$ctrl.invalid">
+        </juno-input>
     </div>
     <div class="right">
         <juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"

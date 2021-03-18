@@ -28,8 +28,10 @@ angular.module('Common.Components').component('junoInputSave',
     templateUrl: 'src/common/components/junoInputSave/junoInputSave.jsp',
     bindings: {
         ngModel: "=",
-        click: "&?"
+        click: "&?",
+        invalid: "<?"
     },
+
     controller: [ '$scope', function ($scope)
     {
         let ctrl = this;
@@ -39,35 +41,31 @@ angular.module('Common.Components').component('junoInputSave',
         ctrl.isFocused = false;
         ctrl.value = "";
 
+        ctrl.$onInit = () =>
+        {
+            ctrl.invalid = ctrl.invalid || false;
+        }
+
         $scope.$watch("$ctrl.ngModel", () =>
         {
             ctrl.oldNgModel = ctrl.ngModel;
         });
-
-        ctrl.isNgModelValid = () =>
-        {
-            if (ctrl.validRegex && !ctrl.validRegex.test(ctrl.ngModel))
-            {
-                return false;
-            }
-            else if (ctrl.onlyNumeric && !((/^\d+$/).test(ctrl.ngModel)))
-            {
-                return false;
-            }
-
-            return true;
-        }
 
         ctrl.onClick = () =>
         {
             console.log("component handler");
             if (ctrl.click)
             {
+
                 console.log("invoking callback");
                 console.log(ctrl.click.toString());
-                ctrl.click({
-                    value: ctrl.ngModel
-                })
+
+                if (!ctrl.invalid)
+                {
+                    ctrl.click({
+                        value: ctrl.ngModel
+                    })
+                }
             }
         };
     }]

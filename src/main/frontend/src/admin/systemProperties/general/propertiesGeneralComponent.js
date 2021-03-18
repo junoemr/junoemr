@@ -75,6 +75,22 @@ angular.module('Admin').component('systemPropertiesGeneral',
                 })
             };
 
+            ctrl.validations = {
+                phonePrefixValid: Juno.Validations.validationCustom(() =>
+                {
+                    const prefix = ctrl.phonePrefixValue;
+
+                    console.log("prefix: " + prefix);
+                    const MAX_PREFIX_LENGTH = 3;
+                    let isNumeric = parseInt(prefix, MAX_PREFIX_LENGTH);
+                    console.log("is numeric" + isNumeric.toString());
+                    if (prefix.length <= MAX_PREFIX_LENGTH && typeof isNumeric === 'number')
+                    {
+                        return true;
+                    }
+                    return false;
+                })
+            };
             /**
              * Persist new property value
              * @param property property to update
