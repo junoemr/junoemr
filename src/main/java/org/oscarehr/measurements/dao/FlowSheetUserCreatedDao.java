@@ -23,28 +23,28 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.measurements.dao;
 
 import java.util.List;
 
-import org.oscarehr.common.model.FlowSheetUserCreated;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.measurements.model.FlowSheetUserCreated;
 import org.springframework.stereotype.Repository;
 import javax.persistence.Query;
 
 @Repository
-public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
+public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated>
+{
 
 	public FlowSheetUserCreatedDao() {
 		super(FlowSheetUserCreated.class);
 	}
 	
-	public List<FlowSheetUserCreated> getAllUserCreatedFlowSheets(){
-        Query query = entityManager.createQuery("SELECT f FROM FlowSheetUserCreated f WHERE f.archived=?");
-        query.setParameter(1, false);
-        
-        //@SuppressWarnings("unchecked")
-        return query.getResultList();                
-     }
+	public List<FlowSheetUserCreated> getAllUserCreatedFlowSheets()
+	{
+		Query query = entityManager.createQuery("SELECT f FROM FlowSheetUserCreated f ");
+		return query.getResultList();
+	}
 
 	public FlowSheetUserCreated findByName(String name) {
 		Query query = entityManager.createQuery("select f from FlowSheetUserCreated f where f.name=?");
@@ -52,5 +52,5 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
 
 		return getSingleResultOrNull(query);
 	}
-	
+
 }

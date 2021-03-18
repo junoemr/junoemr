@@ -10,8 +10,6 @@
 --%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page contentType="text/html"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
 <%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
 <%@page import="org.oscarehr.common.model.FlowSheetCustomization"%>
 
@@ -22,7 +20,6 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
@@ -38,6 +35,7 @@
 <%@ page import="oscar.oscarRx.util.RxUtil" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -81,17 +79,15 @@
 
 
 <%
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-
-	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+	FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
 	List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
+	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 
-	MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-	MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+	MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(temp, custList);
 
 	MeasurementInfo mi = new MeasurementInfo(demographic_no);
 	List<String> measurementLs = mFlowsheet.getMeasurementList();
-	ArrayList<String> measurements = new ArrayList(measurementLs);
+	List<String> measurements = new ArrayList(measurementLs);
 
 	mi.getMeasurements(measurements);
 

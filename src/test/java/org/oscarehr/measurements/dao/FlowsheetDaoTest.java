@@ -23,8 +23,9 @@
  */
 package org.oscarehr.common.dao;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -36,50 +37,49 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.FlowSheetUserCreated;
+import org.oscarehr.measurements.model.Flowsheet;
+import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures {
+public class FlowsheetDaoTest extends DaoTestFixtures {
 
-	protected FlowSheetUserCreatedDao dao = SpringUtils.getBean(FlowSheetUserCreatedDao.class);
-
+	protected FlowsheetDao dao = SpringUtils.getBean(FlowsheetDao.class);
 
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("FlowSheetUserCreated");
+		SchemaUtils.restoreTable("Flowsheet");
 	}
 
         @Test
         public void testCreate() throws Exception {
-                FlowSheetUserCreated entity = new FlowSheetUserCreated();
+                Flowsheet entity = new Flowsheet();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
                 dao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
 	@Test
-	public void testGetAllUserCreatedFlowSheets() throws Exception {
+	public void testFindAll() throws Exception {
 		
-		boolean isArchived = true;
+		Flowsheet flowSheet1 = new Flowsheet();
+		EntityDataGenerator.generateTestDataForModelClass(flowSheet1);
+		dao.persist(flowSheet1);
 		
-		FlowSheetUserCreated flowSheetUserCreated1 = new FlowSheetUserCreated();
-		EntityDataGenerator.generateTestDataForModelClass(flowSheetUserCreated1);
-		flowSheetUserCreated1.setArchived(!isArchived);
-		dao.persist(flowSheetUserCreated1);
+		Flowsheet flowSheet2 = new Flowsheet();
+		EntityDataGenerator.generateTestDataForModelClass(flowSheet2);
+		dao.persist(flowSheet2);
 		
-		FlowSheetUserCreated flowSheetUserCreated2 = new FlowSheetUserCreated();
-		EntityDataGenerator.generateTestDataForModelClass(flowSheetUserCreated2);
-		flowSheetUserCreated2.setArchived(isArchived);
-		dao.persist(flowSheetUserCreated2);
+		Flowsheet flowSheet3 = new Flowsheet();
+		EntityDataGenerator.generateTestDataForModelClass(flowSheet3);
+		dao.persist(flowSheet3);
 		
-		FlowSheetUserCreated flowSheetUserCreated3 = new FlowSheetUserCreated();
-		EntityDataGenerator.generateTestDataForModelClass(flowSheetUserCreated3);
-		flowSheetUserCreated3.setArchived(!isArchived);
-		dao.persist(flowSheetUserCreated3);
+		Flowsheet flowSheet4 = new Flowsheet();
+		EntityDataGenerator.generateTestDataForModelClass(flowSheet4);
+		dao.persist(flowSheet4);
 		
-		List<FlowSheetUserCreated> expectedResult = new ArrayList<FlowSheetUserCreated>(Arrays.asList(flowSheetUserCreated1, flowSheetUserCreated3));
-		List<FlowSheetUserCreated> result = dao.getAllUserCreatedFlowSheets();
+		List<Flowsheet> expectedResult = new ArrayList<Flowsheet>(Arrays.asList(flowSheet1, flowSheet2, flowSheet3, flowSheet4));
+		List<Flowsheet> result = dao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -94,5 +94,33 @@ public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures {
 			}
 		}
 		assertTrue(true);
+	}
+	
+	@Test
+	public void testFindByName() throws Exception {
+		
+		String name1 = "alpha";
+		String name2 = "bravo";
+		String name3 = "charlie";
+		
+		Flowsheet flowSheet1 = new Flowsheet();
+		EntityDataGenerator.generateTestDataForModelClass(flowSheet1);
+		flowSheet1.setName(name1);
+		dao.persist(flowSheet1);
+		
+		Flowsheet flowSheet2 = new Flowsheet();
+		EntityDataGenerator.generateTestDataForModelClass(flowSheet2);
+		flowSheet2.setName(name2);
+		dao.persist(flowSheet2);
+		
+		Flowsheet flowSheet3 = new Flowsheet();
+		EntityDataGenerator.generateTestDataForModelClass(flowSheet3);
+		flowSheet3.setName(name3);
+		dao.persist(flowSheet3);
+		
+		Flowsheet expectedResult = flowSheet2;
+		Flowsheet result = dao.findByName(name2);
+		
+		assertEquals(expectedResult, result);
 	}
 }
