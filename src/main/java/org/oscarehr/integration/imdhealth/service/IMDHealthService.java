@@ -44,15 +44,10 @@ import org.oscarehr.integration.imdhealth.transfer.outbound.SSORequest;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSOUser;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.provider.service.ProviderService;
-import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import oscar.OscarProperties;
@@ -64,7 +59,6 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@Transactional
 public class IMDHealthService
 {
 	@Autowired
@@ -78,21 +72,13 @@ public class IMDHealthService
 
 	@Autowired
 	ClinicDAO clinicDao;
-	@Autowired
-	org.oscarehr.clinic.service.ClinicService clinicService;
 
 	@Autowired
 	SiteDao siteDao;
-	@Autowired
-	SiteService siteService;
-
-	@Autowired
-	ProviderDataDao providerDataDao;
-	@Autowired
-	ProviderService providerService;
 
 	private static final String PROP_KEY_APP = "imdhealth_app_domain";
 	private static final String PROP_KEY_SCHEME = "imdhealth_scheme";
+	private static final String JUNO_PRACTICE_ID = "CloudPracticeDefault";
 
 	protected static final String HOST_URL = OscarProperties.getInstance().getProperty(PROP_KEY_APP);
 	protected static final String DEFAULT_SCHEME= OscarProperties.getInstance().getProperty(PROP_KEY_SCHEME);
@@ -144,80 +130,40 @@ public class IMDHealthService
 	 *
 	 * @return A list of failed initializations
 	 */
-	public List<String> initializeAllUsers(Integer integrationId) throws IntegrationException
+	public List<String> initializeAllUsers(HttpSession session, Integer integrationId) throws IntegrationException
 	{
 		Integration integration = integrationDao.find(integrationId);
 		BearerToken token = getBearerToken(integration);
-		OscarProperties oscarProperties = OscarProperties.getInstance();
 
-		Clinic clinic = clinicDao.getClinic();
-		List<ProviderData> providerDataList = providerDataDao.findByActiveStatus(true);
-		List<Site> sites = siteDao.getAllActiveSites();
+		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
 
-		List<String> failedToInitialize = new ArrayList<>();
-
-		if (clinic.getUuid() == null)
+		// TODO: Remove after figuring out something better for embedded tomcat
+		if (StringUtils.isEmpty(junoPracticeId))
 		{
-			clinicService.createAndSaveClinicUuid(clinic);
+			junoPracticeId = JUNO_PRACTICE_ID;
 		}
 
-		failedToInitialize.addAll(loginProviderClinic(token, providerDataList, clinic));
-
+		List<Site> sites = siteDao.getAllActiveSites();
+		List<String> failedToInitialize = new ArrayList<>();
+		SSOCredentials credentials;
 		for (Site site : sites)
 		{
-			if (site.getUuid() == null)
-			{
-				siteService.createAndSaveSiteUuid(site);
-			}
-
 			Set<Provider> providers = site.getProviders();
 
-			if (oscarProperties.isMultisiteEnabled())
+			for (Provider provider : providers)
 			{
-				failedToInitialize.addAll(loginProviderSite(token, providers, site));
+				if (provider.isActive())
+				{
+					credentials = getSSOCredentials(token, provider, junoPracticeId, site.getId());
+					if (credentials == null)
+					{
+						failedToInitialize.add("ProviderNo " + provider.getProviderNo() + " ,SiteId " + site.getId());
+					}
+				}
 			}
 		}
 		return failedToInitialize;
 	}
-
-	private List<String> loginProviderClinic(BearerToken token, List<ProviderData> providerDataList, Clinic clinic) throws SSOLoginException
-	{
-		List<String> failedProviderClinicList = new ArrayList<>();
-
-		for (ProviderData providerData : providerDataList)
-		{
-			if (providerData.getImdHealthUuid() == null)
-			{
-				providerService.createAndSaveProviderImdHealthUuid(providerData);
-			}
-
-			SSOCredentials ssoCredentials = getSSOCredentials(token, providerData, clinic);
-			if (ssoCredentials == null)
-			{
-				failedProviderClinicList.add("ProviderNo " + providerData.getProviderNo() + ", Clinic " + clinic.getClinicName());
-			}
-		}
-		return failedProviderClinicList;
-	}
-
-	private List<String> loginProviderSite(BearerToken token, Set<Provider> providers, Site site) throws SSOLoginException
-	{
-		List<String> failedProviderSiteList = new ArrayList<>();
-
-		for (Provider provider : providers)
-		{
-			if (provider.isActive())
-			{
-				SSOCredentials ssoCredentials = getSSOCredentials(token, provider, site);
-				if (ssoCredentials == null)
-				{
-					failedProviderSiteList.add("ProviderNo " + provider.getProviderNo() + " ,SiteId " + site.getId());
-				}
-			}
-		}
-		return failedProviderSiteList;
-	}
-
 	/**
 	 * Generate the SSO link needed to connect to iMDHealth, logging in if necessary.
 	 *
@@ -353,8 +299,14 @@ public class IMDHealthService
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(session);
 		Provider provider = loggedInInfo.getLoggedInProvider();
+		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
 
-		SSOCredentials ssoInfo = getSSOCredentials(token, provider, siteDao.getById(siteId));
+		// TODO: Remove after figuring out something better for embedded tomcat
+		if (StringUtils.isEmpty(junoPracticeId))
+		{
+			junoPracticeId = JUNO_PRACTICE_ID;
+		}
+		SSOCredentials ssoInfo = getSSOCredentials(token, provider, junoPracticeId, siteId);
 		credentials.loadSSOCredentials(ssoInfo);
 
 		credentials.saveToSession(session);
@@ -374,20 +326,30 @@ public class IMDHealthService
 			logger.error("Error retrieving bearer token", ex);
 			throw new SSOBearerException("IMDHealth Authentication error");
 		}
+
 	}
 
-	// Clinic
 	private SSOCredentials getSSOCredentials(BearerToken token,
-	                                         ProviderData providerData,
-	                                         Clinic clinic) throws SSOLoginException
+	                                         Provider provider,
+	                                         String practiceId,
+	                                         @Nullable Integer siteId) throws SSOLoginException
 	{
 		try
 		{
-			SSOUser user = SSOUser.fromProvider(providerData);
+			SSOUser user = SSOUser.fromProvider(provider, practiceId);
 			SSOOrganization organization;
-
-			String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
-			organization = SSOOrganization.fromClinic(clinic, provinceCode);
+			if (siteId == null)
+			{
+				Clinic clinic = clinicDao.getClinic();
+				String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
+				organization = SSOOrganization.fromClinic(clinic, practiceId, provinceCode);
+			}
+			else
+			{
+				Site site = siteDao.find(siteId);
+				String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
+				organization = SSOOrganization.fromSite(site, practiceId, provinceCode);
+			}
 
 			SSORequest ssoRequest = new SSORequest(user, organization);
 			return communicationService.SSOLogin(token, ssoRequest);
@@ -397,29 +359,7 @@ public class IMDHealthService
 			logger.error("Error during SSO login", ex);
 			throw new SSOLoginException("IMDHealth Login error");
 		}
-	}
 
-	// Site
-	private SSOCredentials getSSOCredentials(BearerToken token,
-											 Provider provider,
-											 Site site) throws SSOLoginException
-	{
-		try
-		{
-			SSOUser user = SSOUser.fromProvider(provider);
-			SSOOrganization organization;
-
-			String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
-			organization = SSOOrganization.fromSite(site, provinceCode);
-
-			SSORequest ssoRequest = new SSORequest(user, organization);
-			return communicationService.SSOLogin(token, ssoRequest);
-		}
-		catch (HttpClientErrorException | HttpServerErrorException ex)
-		{
-			logger.error("Error during SSO login", ex);
-			throw new SSOLoginException("IMDHealth Login error");
-		}
 	}
 
 	private static void checkIntegrationIsIMDType(Integration integration) throws IntegrationException

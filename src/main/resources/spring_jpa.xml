@@ -122,7 +122,6 @@
 
 	<!-- Managed Beans -->
 	<context:component-scan base-package="org.oscarehr.appointment.dao" />
-	<context:component-scan base-package="org.oscarehr.clinic" />
 	<context:component-scan base-package="org.oscarehr.common.dao" />
 	<context:component-scan base-package="org.oscarehr.common.server" />
 	<context:component-scan base-package="org.oscarehr.common.conversion" />
