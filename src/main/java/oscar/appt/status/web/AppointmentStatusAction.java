@@ -30,6 +30,7 @@ import org.oscarehr.util.SpringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AppointmentStatusAction extends DispatchAction {
 	
@@ -50,8 +51,7 @@ public class AppointmentStatusAction extends DispatchAction {
 	    status.setColor(lazyForm.get("color").toString());
 	    status.setJunoColor(lazyForm.get("junoColor").toString());
 	    status.setEditable(1);
-        // statusService will take care of choosing an available status code for us
-	    statusService.createAppointmentStatus(status);
+	    statusService.assignStatusCodeAndSave(status);
     	
 	    loadStatusAttributes(request);
 	    return mapping.findForward("success");
@@ -135,14 +135,18 @@ public class AppointmentStatusAction extends DispatchAction {
     
     private void loadStatusAttributes(HttpServletRequest request)
     {
-        List<AppointmentStatus> allStatuses = statusService.getAppointmentStatuses();
+        List<AppointmentStatus> allStatuses = statusService.getAllAppointmentStatuses();
         request.setAttribute("appointmentStatuses", allStatuses);
         
-        List<String> inactiveUseStatus = statusService.checkStatusUsage(allStatuses);
-        if (inactiveUseStatus.size() > 0)
+        
+        List<AppointmentStatus> inactiveStatuses = allStatuses.stream()
+                                                              .filter(s -> s.getActive() == 0)
+                                                              .collect(Collectors.toList());
+        
+        List<String> inactiveStatusCodesInUse = statusService.checkStatusUsage(inactiveStatuses);
+        if (inactiveStatusCodesInUse.size() > 0)
         {
-            request.setAttribute("useStatus", inactiveUseStatus);
+            request.setAttribute("useStatus", inactiveStatusCodesInUse);
         }
     }
-    
 }

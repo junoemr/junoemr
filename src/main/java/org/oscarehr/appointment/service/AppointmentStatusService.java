@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -61,9 +62,9 @@ public class AppointmentStatusService
 		return appointmentStatusList.getCalendarAppointmentStatusList();
 	}
 	
-	public List<AppointmentStatus> getAppointmentStatuses()
+	public List<AppointmentStatus> getAllAppointmentStatuses()
 	{
-		return appointmentManager.getAppointmentStatuses();
+		return appointmentStatusDao.findAll();
 	}
 	
 	public AppointmentStatus getAppointmentStatusById(Integer id)
@@ -77,15 +78,19 @@ public class AppointmentStatusService
 	}
 	
 	/**
-	 * Create a new appointment status. This method will automatically set a status code based on the next
+	 * Persist the supplied appointment status. This method will automatically set a status code based on the next
 	 * available unused code.  Any existing status code passed into this method will be lost.
 	 *
 	 * @param status AppointmentStatus to persist
 	 */
-	public void createAppointmentStatus(AppointmentStatus status)
+	public AppointmentStatus assignStatusCodeAndSave(AppointmentStatus status)
 	{
-		status.setStatus(getNextAvailableStatusCode());
+		String nextAvailableStatusCode = getNextAvailableStatusCode();
+		
+		status.setStatus(nextAvailableStatusCode);
 		appointmentStatusDao.persist(status);
+		
+		return status;
 	}
 	
 	/**
@@ -94,25 +99,21 @@ public class AppointmentStatusService
 	 * Priority is determined by the ordinal value of the available status' ascii value.
 	 * (Alphabetical, with the entire uppercase set having higher priority than the lowercase set)
 	 *
-	 * @return String unused appointment status code.
+	 * @return String unused appointment status code.  If there are no valid codes left, return null
+	 * @throws NoSuchElementException if there are no available status codes left
 	 */
-	private String getNextAvailableStatusCode()
+	private String getNextAvailableStatusCode() throws NoSuchElementException
 	{
 		// Method is private to make it unavailable to non-transactional code
 		// Ss and Vv are reserved statuses, for signed and verified.
 		String alphabet = "ABCDEFGHIJKLMNOPQRTUWXYZabcdefghijklmnopqrtuwxyz";
-		TreeSet<Character> validCodes = alphabet.chars()
-		                                        .mapToObj(e -> (char)e)
-		                                        .collect(Collectors.toCollection(() -> new TreeSet<Character>()));
+		TreeSet<String> validCodes = alphabet.chars()
+		                                        .mapToObj(e -> Character.toString((char)e))
+		                                        .collect(Collectors.toCollection(() -> new TreeSet<String>()));
 		
-		List<AppointmentStatus> existingStatuses = appointmentStatusDao.findAll();
-		for (AppointmentStatus status : existingStatuses)
-		{
-			Character usedCode = status.getStatus().toCharArray()[0];
-			validCodes.remove(usedCode);
-		}
+		appointmentStatusDao.findAll().forEach(s -> validCodes.remove(s.getStatus()));
 		
-		return validCodes.first().toString();
+		return validCodes.first();
 	}
 	
 	/**
