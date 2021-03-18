@@ -514,20 +514,55 @@ public class CommonLabTestValues {
 		} else if (labType != null && labType.equals("HL7")) {
 			MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
 
-			// TODO get this setup so it's query all at once, then split it up into proper map here
-			// requires a bit of a refactor of the layer above
-			List<LabGridDisplay> gridDisplayList = dao.getLabMeasurementsForPatient(demographicNo);
-			for (LabGridDisplay gridDisplay : gridDisplayList)
+			for (Object lNo : dao.findLabNumbers(demographicNo == null ? 0 : demographicNo, identCode))
 			{
-				HashMap<String, Serializable> hashMap = new HashMap<>();
-				hashMap.put("testName", testName);
-				hashMap.put("abn", gridDisplay.getAbnormal());
-				hashMap.put("result", gridDisplay.getResult());
-				hashMap.put("lab_no", gridDisplay.getLabId());
-				hashMap.put("collDate", gridDisplay.getDateObserved());
-				labList.add(hashMap);
-			}
+				String lab_no = String.valueOf(lNo);
 
+				MessageHandler handler = Factory.getHandler(lab_no);
+				HashMap<String, Serializable> h = new HashMap<String, Serializable>();
+				int i = 0;
+				while (i < handler.getOBRCount() && h.get("testName") == null)
+				{
+					for (int j = 0; j < handler.getOBXCount(i); j++)
+					{
+						if (handler.getOBXIdentifier(i, j).equals(identCode))
+						{
+
+							String result = handler.getOBXResult(i, j);
+
+							// only add measurements with actual results
+							if (!result.equals(""))
+							{
+								h.put("testName", testName);
+								h.put("abn", handler.getOBXAbnormalFlag(i, j));
+								h.put("result", result);
+								h.put("range", handler.getOBXReferenceRange(i, j));
+								h.put("units", handler.getOBXUnits(i, j));
+								String collDate = handler.getTimeStamp(i, j);
+								h.put("lab_no", lab_no);
+								h.put("collDate", collDate);
+								MiscUtils.getLogger().debug("COLLDATE " + collDate);
+								if (collDate.length() == 10)
+								{
+									h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd"));
+								}
+								else if (collDate.length() == 16)
+								{
+									h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm"));
+								}
+								else
+								{
+									h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm:ss"));
+								}
+								labList.add(h);
+								break;
+							}
+
+						}
+					}
+					i++;
+				}
+			}
 		}
 
 		return labList;
