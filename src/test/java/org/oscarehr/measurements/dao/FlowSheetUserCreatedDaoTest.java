@@ -80,7 +80,7 @@ public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures
 		flowSheetUserCreated3.setArchived(!isArchived);
 		dao.persist(flowSheetUserCreated3);
 		
-		List<FlowSheetUserCreated> expectedResult = new ArrayList<FlowSheetUserCreated>(Arrays.asList(flowSheetUserCreated1, flowSheetUserCreated3));
+		List<FlowSheetUserCreated> expectedResult = new ArrayList<FlowSheetUserCreated>(Arrays.asList(flowSheetUserCreated1, flowSheetUserCreated2, flowSheetUserCreated3));
 		List<FlowSheetUserCreated> result = dao.getAllUserCreatedFlowSheets();
 
 		Logger logger = MiscUtils.getLogger();
