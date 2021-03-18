@@ -1,6 +1,10 @@
+import {SitesApi, SystemPreferenceApi} from "../../../generated";
+
 angular.module('Record.Summary').controller('Record.Summary.RecordPrintController', [
 
 	'$scope',
+	'$http',
+	'$httpParamSerializer',
 	'$uibModal',
 	'$uibModalInstance',
 	'$stateParams',
@@ -9,6 +13,8 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 	function(
 		$scope,
+		$http,
+		$httpParamSerializer,
 		$uibModal,
 		$uibModalInstance,
 		$stateParams,
@@ -17,6 +23,13 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 	{
 
 		var controller = this;
+
+		controller.sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
+		controller.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+
+		controller.defaultClinic = {value: 0, label: "Default Clinic"};
+		controller.selectedSite = null;
+		controller.sites = [];
 
 		controller.printTypeEnum = Object.freeze({
 			all: 'all',
@@ -34,26 +47,33 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			selectedSite: 0,
 		};
 
-		controller.siteSelection = providerService.getMe().then(
-			function (user)
+		controller.$onInit = async () =>
+		  {
+		  	controller.isMultisiteEnabled = (await controller.systemPreferenceApi.getPropertyEnabled("multisites")).data.body;
+
+			if(controller.isMultisiteEnabled)
 			{
-				providerService.getSitesByProvider(user.providerNo).then(
-					function success(result)
+				await controller.getSites();
+			}
+		  }
+
+		  controller.getSites = async () =>
+			{
+				const provider = (await providerService.getMe());
+				const sites = (await controller.sitesApi.getSitesByProvider(provider.providerNo)).data.body;
+
+				controller.sites = [];
+				controller.sites.push(controller.defaultClinic);
+
+				sites.forEach((site) =>
+				{
+					controller.sites.push(
 					{
-						if (result == null)
-						{
-							controller.siteSelection = 0;
-						}
-						else
-						{
-							controller.siteSelection = result;
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch provider sites: " + result);
+						label: site.name,
+						value: site.siteId,
 					})
-			});
+				});
+			}
 
 		/*
 		 *If at least one note selected, Default to Note. Other wise default to All
@@ -78,7 +98,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 		controller.print = function print()
 		{
-			let site = $scope.recordPrintCtrl.siteSelection.site;
+			let site = controller.selectedSite;
 
 			if (controller.pageOptions.printType === controller.printTypeEnum.selected
 				&& controller.pageOptions.selectedList.length === 0)
@@ -91,13 +111,13 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 				controller.page.selectedWarning = false;
 			}
 
-			if (site != null)
+			if (site == null)
 			{
-				controller.pageOptions.selectedSite = site;
+				controller.pageOptions.selectedSite = 0;
 			}
 			else
 			{
-				controller.pageOptions.selectedSite = 0;
+				controller.pageOptions.selectedSite = site;
 			}
 
 			let ops = encodeURIComponent(JSON.stringify(controller.pageOptions));

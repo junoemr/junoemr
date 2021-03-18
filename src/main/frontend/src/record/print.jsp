@@ -93,15 +93,14 @@
 									type="Input"> 
 								</juno-datepicker-popup>
 							</div>
+
 								<div class=" form-group col-sm-6" >
-									<label><bean:message key="oscarEncounter.selectSite.title" /></label>
-									<select ng-model="recordPrintCtrl.siteSelection.site"
-									        class="form-control ng-pristine ng-valid ng-not-empty ng-touched"
-									        id="site"
-									        data-ng-options="a.siteId as a.name for a in recordPrintCtrl.siteSelection"
-									        ng-init="recordPrintCtrl.siteSelection.site=''">
-										<option value="" selected><bean:message key="oscarEncounter.Index.defaultprint" /></option>
-									</select>
+									<juno-select ng-model="recordPrintCtrl.siteSelection"
+									             options="recordPrintCtrl.sites"
+									             placeholder="Select Site"
+									             disabled="!recordPrintCtrl.isMultisiteEnabled"
+									>
+									</juno-select>
 								</div>
 						</form>
 	        		</div>
