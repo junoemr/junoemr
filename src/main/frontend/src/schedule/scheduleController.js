@@ -81,11 +81,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			includeCancelled: false,
 		};
 		
-		controller.DEFAULT_APPOINTMENT_STATUSES = {
-			CANCELLED: 'C',
-			NO_SHOW: 'N',
-		}.freeze();
-
+		controller.appointmentStatusEnum = Object.freeze({
+			todo: 't',
+			cancelled: 'C',
+			noShow: 'N',
+			billed: 'B',
+		});
+		
 		//=========================================================================
 		// Local scope variables
 		//=========================================================================/
@@ -660,7 +662,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						{
 							if (controller.appointmentCountOptions.enabled) {
 								const dateText = moment($scope.datepickerSelectedDate)
-									.format(Juno.Common.Util.DisplaySettings.dayDateFormat);
+									.format(Juno.Common.Util.DisplaySettings.calendarDateFormat);
 								
 								const selectedProviderNo = $scope.selectedSchedule.providerNos[0];
 								const apptCount = controller.appointmentCount[selectedProviderNo] || 0;
@@ -937,9 +939,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					const status = event.data.eventStatusCode;
 					const demographicNo = event.data.demographicNo;
 					
-					if ((status === controller.DEFAULT_APPOINTMENT_STATUSES.CANCELLED && !controller.appointmentCountOptions.includeCancelled) ||
-						(status === controller.DEFAULT_APPOINTMENT_STATUSES.NO_SHOW && !controller.appointmentCountOptions.includeNoShow) ||
-						(demographicNo === 0 && !controller.appointmentCountOptions.includeNoDemographic))
+					const noDemographicAssigned = 0;
+					
+					if ((status === controller.appointmentStatusEnum.cancelled && !controller.appointmentCountOptions.includeCancelled) ||
+						(status === controller.appointmentStatusEnum.noShow && !controller.appointmentCountOptions.includeNoShow) ||
+						(demographicNo === noDemographicAssigned && !controller.appointmentCountOptions.includeNoDemographic))
 					{
 						return;
 					}
