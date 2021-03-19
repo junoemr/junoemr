@@ -124,6 +124,13 @@ public class PartialDateTime extends PartialDate
 		return this.toLocalDateTime().equals(partialDate.toLocalDateTime());
 	}
 
+	@Override
+	public int hashCode()
+	{
+		LocalDateTime localDateTime = this.toLocalDateTime();
+		return (localDateTime != null) ? localDateTime.hashCode() : 0;
+	}
+
 	public static PartialDateTime from(PartialDate partialDate)
 	{
 		if(partialDate != null)

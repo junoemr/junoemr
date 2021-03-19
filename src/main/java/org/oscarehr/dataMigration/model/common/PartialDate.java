@@ -164,6 +164,13 @@ public class PartialDate extends AbstractTransientModel
 		return this.toLocalDate().equals(partialDate.toLocalDate());
 	}
 
+	@Override
+	public int hashCode()
+	{
+		LocalDate localDate = this.toLocalDate();
+		return (localDate != null) ? localDate.hashCode() : 0;
+	}
+
 	public static PartialDate from(LocalDate localDate)
 	{
 		return from(localDate, null);
