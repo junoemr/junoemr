@@ -154,12 +154,11 @@ public class CommonLabTestValues {
 
 	/**
 	 * Given a patient ID, get all stored lab measurements for them
-	 * @param demographic demographic to get stored lab measurements for
+	 * @param demographicNo demographic to get stored lab measurements for
 	 * @return a map of stored lab measurements, categorized by test name
 	 */
-	public static Map<String, List<LabGridDisplay>> getUniqueLabsForPatients(String demographic)
+	public static Map<String, List<LabGridDisplay>> getUniqueLabsForPatients(Integer demographicNo)
 	{
-		Integer demographicNo = Integer.parseInt(demographic);
 		MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
 
 		List<LabGridDisplay> patientLabResults = measurementDao.getLabMeasurementsForPatient(demographicNo);
@@ -356,15 +355,15 @@ public class CommonLabTestValues {
 		if (identCode != null) {
 			identCode = identCode.replace("_amp_", "&");
 		}
-		
+
 		if (labType != null && labType.equals("CML")) {
 			// LabTestResultsDao dao = SpringUtils.getBean(LabTestResultsDao.class);
 			PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
 			for(Object[] i : dao.findRoutingsAndTests(demographicNo==null?0:demographicNo, labType, testName)) {
-				PatientLabRouting p = (PatientLabRouting) i[0]; 
+				PatientLabRouting p = (PatientLabRouting) i[0];
 				LabTestResults ltr = (LabTestResults) i[1];
 				LabPatientPhysicianInfo lfp = (LabPatientPhysicianInfo) i[2];
-				
+
 				String testNam = ltr.getTestName();
 					String abn = ltr.getAbn();
 					String result = ltr.getResult();
@@ -396,17 +395,17 @@ public class CommonLabTestValues {
 						}
 					}
 				}
-				
+
 				labList.addAll(labMap.values());
 		} else if (labType != null && labType.equals("MDS")) {
 			PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
 			MdsZMNDao zmDao = SpringUtils.getBean(MdsZMNDao.class);
-			
+
 			for(Object[] i : dao.findMdsRoutings(demographicNo==null?0:demographicNo, testName, "MDS")) {
 					MdsOBX x = (MdsOBX) i[0];
 					MdsMSH m = (MdsMSH) i[1];
 					PatientLabRouting p = (PatientLabRouting) i[2];
-					
+
 					String testNam = parseObservationId(x.getObservationIdentifier());
 
 					String abn = x.getAbnormalFlags(); //abnormalFlags from mdsOBX
@@ -424,7 +423,7 @@ public class CommonLabTestValues {
 					if (status.equals("I") || status.equals("W") || status.equals("X") || status.equals("D")) {
 						continue;
 					}
-					
+
 					// Only retieve the latest measurement for each accessionNum
 					Hashtable<String, Serializable> ht = (Hashtable<String, Serializable>) accessionMap.get(accessionNum);
 					if (ht == null || Integer.parseInt((String) ht.get("mapNum")) < Integer.parseInt(version)) {
@@ -444,14 +443,14 @@ public class CommonLabTestValues {
 							ht.put("date", collDate);
 							ht.put("mapNum", version);
 							accessionMap.put(accessionNum, ht);
-							
+
 							MdsZMN mdsZmn = zmDao.findBySegmentIdAndReportName(ConversionUtils.fromIntString(segId), testNam);
-							
+
 							if (mdsZmn != null) {
 								range = mdsZmn.getReferenceRange();
 								units = mdsZmn.getUnits();
 							}
-							
+
 							Hashtable<String, Serializable> h = new Hashtable<String, Serializable>();
 							h.put("testName", testNam);
 							h.put("abn", abn);
@@ -468,15 +467,15 @@ public class CommonLabTestValues {
 		} else if (labType != null && labType.equals("BCP")) {
 			PatientLabRoutingDao dao = SpringUtils
 					.getBean(PatientLabRoutingDao.class);
-			
+
 			for (Object[] i : dao.findHl7InfoForRoutingsAndTests(demographicNo==null?0:demographicNo, "BCP", testName)) {
 					// PatientLabRouting p = (PatientLabRouting) i[0];
 					// Hl7Msh m = (Hl7Msh) i[1];
 					Hl7Pid pi = (Hl7Pid) i[2];
 					// Hl7Obr r = (Hl7Obr) i[3];
-					Hl7Obx x = (Hl7Obx) i[4]; 
+					Hl7Obx x = (Hl7Obx) i[4];
 					Hl7Orc c = (Hl7Orc) i[5];
-					
+
 					String testNam = parseObservationId(x.getObservationIdentifier());
 
 					String abn = x.getAbnormalFlags();
@@ -485,7 +484,7 @@ public class CommonLabTestValues {
 					String range = x.getReferenceRange();
 					String units = x.getUnits();
 					String collDate = ConversionUtils.toTimestampString(x.getObservationDateTime());
-					String accessionNum = c.getFillerOrderNumber(); 
+					String accessionNum = c.getFillerOrderNumber();
 
 					// get just the accession number
 					String[] ss = accessionNum.split("-");

@@ -685,20 +685,17 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	{
 		String sql = "SELECT \n" +
 				"    m.id AS measurement_id,\n" +
-				"    e3.val AS is_abnormal,\n" +
+				"    MAX(CASE WHEN me.keyval = 'abnormal' THEN me.val END) AS is_abnormal,\n" +
 				"    m.dataField AS result,\n" +
 				"    m.dateObserved AS dateCollected,\n" +
-				"    e2.val AS lab_no,\n" +
-				"    e1.val AS loinc_code," +
-				"	 e4.val AS test_name\n" +
+				"    MAX(CASE WHEN me.keyval = 'lab_no' THEN me.val END) AS lab_no,\n" +
+				"    MAX(CASE WHEN me.keyval = 'name' THEN me.val END) AS test_name\n" +
 				"FROM measurements m\n" +
-				"JOIN measurementsExt e1 ON m.id=e1.measurement_id AND e1.keyval = 'identifier' \n" +
-				"JOIN measurementsExt e2 ON m.id=e2.measurement_id AND e2.keyval = 'lab_no' \n" +
-				"JOIN measurementsExt e3 ON m.id=e3.measurement_id AND e3.keyval = 'abnormal'\n" +
-				"JOIN measurementsExt e4 ON m.id=e4.measurement_id AND e4.keyval = 'name'\n" +
+				"JOIN measurementsExt me ON m.id=me.measurement_id\n" +
 				"WHERE m.dataField != ''\n" +
+				"AND me.keyVal in ('name', 'lab_no', 'abnormal')\n" +
 				"AND m.demographicNo = :demographicNo\n" +
-				"GROUP BY m.id\n" +
+				"GROUP BY m.id, m.dataField, m.dateObserved\n" +
 				"ORDER BY m.dateObserved DESC";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("demographicNo", demographicNo);
@@ -712,8 +709,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 			newDisplay.setResult((String)measurement[2]);
 			newDisplay.setDateObserved(ConversionUtils.toDateString((Date)measurement[3], ConversionUtils.DEFAULT_DATE_PATTERN));
 			newDisplay.setLabId((String)measurement[4]);
-			newDisplay.setLoincCode((String)measurement[5]);
-			newDisplay.setTestName((String)measurement[6]);
+			newDisplay.setTestName((String)measurement[5]);
 			gridDisplayList.add(newDisplay);
 		}
 		return gridDisplayList;

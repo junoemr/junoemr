@@ -38,7 +38,6 @@ public class LabGridDisplay
 	private String result;
 	private String dateObserved;
 	private String labId;
-	private String loincCode;
 	private String testName;
 
 	@Override

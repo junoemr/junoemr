@@ -52,7 +52,8 @@
 	}
 
 	String demographic_no = request.getParameter("demographic_no");
-	Map<String, List<LabGridDisplay>>  uniqueLabs = CommonLabTestValues.getUniqueLabsForPatients(demographic_no);
+	Integer demographicNo = Integer.parseInt(demographic_no);
+	Map<String, List<LabGridDisplay>>  uniqueLabs = CommonLabTestValues.getUniqueLabsForPatients(demographicNo);
 	List<Map<String, String>> dateList = CommonLabTestValues.buildDateList(uniqueLabs);
 %>
 
