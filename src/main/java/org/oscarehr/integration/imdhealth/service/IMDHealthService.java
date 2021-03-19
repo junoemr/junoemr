@@ -453,9 +453,9 @@ public class IMDHealthService
 
 	private boolean isValidSite(Site site)
 	{
-		if (site.getCity() == null || site.getCity().equals("") ||
-			site.getName() == null || site.getName().equals("") ||
-			site.getProvince() == null || site.getProvince().equals(""))
+		if (site.getCity() == null || site.getCity().isEmpty() ||
+			site.getName() == null || site.getName().isEmpty() ||
+			site.getProvince() == null || site.getProvince().isEmpty())
 		{
 			return false;
 		}
@@ -464,9 +464,9 @@ public class IMDHealthService
 
 	private boolean isValidClinic(Clinic clinic)
 	{
-		if (clinic.getClinicCity() == null || clinic.getClinicCity().equals("") ||
-			clinic.getClinicName() == null || clinic.getClinicName().equals("") ||
-			clinic.getClinicProvince() == null || clinic.getClinicProvince().equals(""))
+		if (clinic.getClinicCity() == null || clinic.getClinicCity().isEmpty() ||
+			clinic.getClinicName() == null || clinic.getClinicName().isEmpty() ||
+			clinic.getClinicProvince() == null || clinic.getClinicProvince().isEmpty())
 		{
 			return false;
 		}
