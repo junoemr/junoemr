@@ -41,7 +41,6 @@ import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -60,7 +59,7 @@ public class FlowsheetService
 	@Autowired
 	private FlowSheetCustomizationDao flowSheetCustomizationDao;
 
-	public void loadFlowsheets()
+	public synchronized void loadFlowsheets()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 		config.clearCache();
@@ -99,7 +98,7 @@ public class FlowsheetService
 		List<Flowsheet> systemFlowsheets = config.getSystemFlowsheets();
 		if (systemFlowsheets == null || systemFlowsheets.size() == 0)
 		{
-			loadFlowsheets();
+			loadSystemFlowsheets();
 		}
 		return config.getSystemFlowsheets();
 	}
@@ -110,7 +109,7 @@ public class FlowsheetService
 		List<FlowSheetUserCreated> userCreatedFlowsheets = config.getUserCreatedFlowsheets();
 		if (userCreatedFlowsheets == null || userCreatedFlowsheets.size() == 0)
 		{
-			loadFlowsheets();
+			loadUserCreatedFlowsheets();
 		}
 		return config.getUserCreatedFlowsheets();
 	}
@@ -121,7 +120,7 @@ public class FlowsheetService
 		List<Flowsheet> databaseFlowsheets = config.getDatabaseFlowsheets();
 		if (databaseFlowsheets == null || databaseFlowsheets.size() == 0)
 		{
-			loadFlowsheets();
+			loadDatabaseFlowsheets();
 		}
 		return config.getDatabaseFlowsheets();
 	}
@@ -306,6 +305,9 @@ public class FlowsheetService
 		}
 	}
 
+	/**
+	 * Warning: this is an expensive call. Has to parse 12 XML files that all invoke Drools.
+	 */
 	public void loadSystemFlowsheets()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
@@ -318,6 +320,12 @@ public class FlowsheetService
 			{
 				is = new FileInputStream(flowsheetFile);
 				MeasurementFlowSheet measurementFlowSheet = config.createflowsheet(is);
+				// Happens if the flowsheet is already being read - just move on
+				if (measurementFlowSheet == null)
+				{
+					is.close();
+					continue;
+				}
 				Flowsheet flowsheetEntry = flowsheetDao.findByName(measurementFlowSheet.getName());
 				if (flowsheetEntry == null)
 				{
@@ -326,7 +334,7 @@ public class FlowsheetService
 
 				config.cacheSystemFlowsheet(flowsheetEntry, measurementFlowSheet);
 			}
-			catch (FileNotFoundException e)
+			catch (IOException e)
 			{
 				MiscUtils.getLogger().error("Error loading system flowsheet: ", e);
 			}
@@ -334,10 +342,7 @@ public class FlowsheetService
 			{
 				try
 				{
-					if (is != null)
-					{
-						is.close();
-					}
+					is.close();
 				}
 				catch (IOException e)
 				{
