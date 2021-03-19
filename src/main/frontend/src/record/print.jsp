@@ -95,7 +95,7 @@
 							</div>
 
 								<div class=" form-group col-sm-6" >
-									<juno-select ng-model="recordPrintCtrl.siteSelection"
+									<juno-select ng-model="recordPrintCtrl.selectedSite"
 									             options="recordPrintCtrl.sites"
 									             placeholder="Select Site"
 									             disabled="!recordPrintCtrl.isMultisiteEnabled"

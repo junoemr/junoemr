@@ -427,7 +427,7 @@ public class RecordUxService extends AbstractServiceImpl {
 	{
     	if(jsonobject.containsKey(key))
 		{
-			return jsonobject.getInt(key);
+			return (Integer) jsonobject.get(key);
 		}
 		return null;
 	}
@@ -482,7 +482,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		final boolean printCPP  = getBoolean(jsonobject,"cpp");
 		final boolean printRx   = getBoolean(jsonobject,"rx");
 		final boolean printLabs = getBoolean(jsonobject,"labs");
-		final Integer siteSelected =  getInt(jsonobject,"selectedSite");
+		final Integer siteSelected =  getInt(jsonobject, "selectedSite");
 		
 		final JSONArray keyArray = jsonobject.getJSONArray("selectedList");
 		final String[] noteIds = new String[keyArray.size()];

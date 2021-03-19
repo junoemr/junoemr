@@ -24,10 +24,11 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 		var controller = this;
 
+		const DEFAULT_SITE = 0;
 		controller.sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
 		controller.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
-		controller.defaultClinic = {value: 0, label: "Default Clinic"};
+		controller.defaultClinic = {value: DEFAULT_SITE, label: "Default Clinic"};
 		controller.selectedSite = null;
 		controller.sites = [];
 
@@ -44,7 +45,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			printType: controller.printTypeEnum.all,
 			dates: {},
 			selectedList: selectedNoteList,
-			selectedSite: 0,
+			selectedSite: DEFAULT_SITE,
 		};
 
 		controller.$onInit = async () =>
@@ -113,7 +114,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 			if (site == null)
 			{
-				controller.pageOptions.selectedSite = 0;
+				controller.pageOptions.selectedSite = DEFAULT_SITE;
 			}
 			else
 			{
