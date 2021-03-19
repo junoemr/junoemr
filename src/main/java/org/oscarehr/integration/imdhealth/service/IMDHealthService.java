@@ -177,26 +177,36 @@ public class IMDHealthService
 				failedToInitialize.addAll(loginProviderSite(token, providers, site));
 			}
 		}
+
 		return failedToInitialize;
 	}
 
 	private List<String> loginProviderClinic(BearerToken token, List<ProviderData> providerDataList, Clinic clinic) throws SSOLoginException
 	{
 		List<String> failedProviderClinicList = new ArrayList<>();
+		SSOCredentials ssoCredentials;
 
-		for (ProviderData providerData : providerDataList)
+		if (isValidClinic(clinic))
 		{
-			if (providerData.getImdHealthUuid() == null)
+			for (ProviderData providerData : providerDataList)
 			{
-				providerService.createAndSaveProviderImdHealthUuid(providerData);
-			}
+				if (providerData.getImdHealthUuid() == null)
+				{
+					providerService.createAndSaveProviderImdHealthUuid(providerData);
+				}
 
-			SSOCredentials ssoCredentials = getSSOCredentials(token, providerData, clinic);
-			if (ssoCredentials == null)
-			{
-				failedProviderClinicList.add("ProviderNo " + providerData.getProviderNo() + ", Clinic " + clinic.getClinicName());
+				ssoCredentials = getSSOCredentials(token, providerData, clinic);
+				if (ssoCredentials == null)
+				{
+					failedProviderClinicList.add("Failed to get sso-credentials for ProviderNo: " + providerData.getProviderNo() + ", Clinic: " + clinic.getClinicName());
+				}
 			}
 		}
+		else
+		{
+			failedProviderClinicList.add("Clinic is not valid: " + clinic.getClinicName());
+		}
+
 		return failedProviderClinicList;
 	}
 
@@ -204,17 +214,25 @@ public class IMDHealthService
 	{
 		List<String> failedProviderSiteList = new ArrayList<>();
 
-		for (Provider provider : providers)
+		if (isValidSite(site))
 		{
-			if (provider.isActive())
+			for (Provider provider : providers)
 			{
-				SSOCredentials ssoCredentials = getSSOCredentials(token, provider, site);
-				if (ssoCredentials == null)
+				if (provider.isActive())
 				{
-					failedProviderSiteList.add("ProviderNo " + provider.getProviderNo() + " ,SiteId " + site.getId());
+					SSOCredentials ssoCredentials = getSSOCredentials(token, provider, site);
+					if (ssoCredentials == null)
+					{
+						failedProviderSiteList.add("Failed to get sso-credentials for ProviderNo: " + provider.getProviderNo() + ", SiteId: " + site.getId());
+					}
 				}
 			}
 		}
+		else
+		{
+			failedProviderSiteList.add("Site is not valid: " + site.getName());
+		}
+
 		return failedProviderSiteList;
 	}
 
@@ -431,5 +449,27 @@ public class IMDHealthService
 				throw new IntegrationException("Integration is not a valid iMDHealth integration");
 			}
 		}
+	}
+
+	private boolean isValidSite(Site site)
+	{
+		if (site.getCity() == null || site.getCity().equals("") ||
+			site.getName() == null || site.getName().equals("") ||
+			site.getProvince() == null || site.getProvince().equals(""))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private boolean isValidClinic(Clinic clinic)
+	{
+		if (clinic.getClinicCity() == null || clinic.getClinicCity().equals("") ||
+			clinic.getClinicName() == null || clinic.getClinicName().equals("") ||
+			clinic.getClinicProvince() == null || clinic.getClinicProvince().equals(""))
+		{
+			return false;
+		}
+		return true;
 	}
 }
