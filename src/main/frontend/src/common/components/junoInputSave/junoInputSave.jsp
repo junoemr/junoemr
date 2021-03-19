@@ -6,7 +6,9 @@
     <div class ="left">
         <juno-input ng-model="$ctrl.ngModel"
                     component-style="$ctrl.componentStyle"
-                    invalid="$ctrl.invalid">
+                    invalid="$ctrl.invalid"
+                    character-limit="3"
+                    hide-character-limit="true">
         </juno-input>
     </div>
     <div class="right">

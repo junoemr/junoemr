@@ -29,44 +29,41 @@ angular.module('Common.Components').component('junoInputSave',
     bindings: {
         ngModel: "=",
         click: "&?",
-        invalid: "<?"
+        invalid: "<?",
+        characterLimit: "<",
+        hideCharacterLimit: "<"
     },
+    controller: [
+        '$scope',
+        '$uibModal',
+        function ($scope,$uibModal) {
+            let ctrl = this;
 
-    controller: [ '$scope', function ($scope)
-    {
-        let ctrl = this;
+            $scope.LABEL_POSITION = LABEL_POSITION;
+            ctrl.oldNgModel = null;
+            ctrl.value = "";
 
-        $scope.LABEL_POSITION = LABEL_POSITION;
-        ctrl.oldNgModel = null;
-        ctrl.isFocused = false;
-        ctrl.value = "";
-
-        ctrl.$onInit = () =>
-        {
-            ctrl.invalid = ctrl.invalid || false;
-        }
-
-        $scope.$watch("$ctrl.ngModel", () =>
-        {
-            ctrl.oldNgModel = ctrl.ngModel;
-        });
-
-        ctrl.onClick = () =>
-        {
-            console.log("component handler");
-            if (ctrl.click)
+            ctrl.$onInit = () =>
             {
-
-                console.log("invoking callback");
-                console.log(ctrl.click.toString());
-
-                if (!ctrl.invalid)
-                {
-                    ctrl.click({
-                        value: ctrl.ngModel
-                    })
-                }
+                ctrl.invalid = ctrl.invalid || false;
             }
-        };
-    }]
+
+            ctrl.onClick = () =>
+            {
+                if (ctrl.click)
+                {
+                    if (!ctrl.invalid)
+                    {
+                        ctrl.click({
+                            value: ctrl.ngModel + '-'
+                        })
+                        Juno.Common.Util.successAlert($uibModal, "Success", "Phone Prefix Saved");
+                    }
+                    else
+                    {
+                        Juno.Common.Util.errorAlert($uibModal, "Error", "Phone Prefix must be exactly three digits");
+                    }
+                }
+            };
+        }]
 });

@@ -27,80 +27,81 @@ angular.module('Admin').component('systemPropertiesGeneral',
     {
         templateUrl: 'src/admin/systemProperties/general/propertiesGeneral.jsp',
         bindings: {},
-        controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
-        {
-            let property_types =
-            {
-                text: "string",
-            }
-
-            let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
-            let ctrl = this;
-
-            ctrl.phonePrefixValue = "";
-
-            ctrl.propertiesList =
-            [
+        controller: [
+            '$scope',
+            '$http',
+            '$httpParamSerializer',
+            function ($scope, $http, $httpParamSerializer) {
+                let property_types =
                 {
-                    name: "Phone Prefix",
-                    description: "Change the default phone number prefix",
-                    propertyName: "phone_prefix",
-                    type: property_types.text,
-                    value: ""
+                    text: "string",
                 }
-            ];
 
-           ctrl.$onInit = () =>
-            {
-                for (let property of ctrl.propertiesList)
-                {
-                    switch (property.type)
+                let ctrl = this;
+                let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+
+                ctrl.phonePrefixValue = "";
+
+                ctrl.propertiesList =
+                [
                     {
-                        case property_types.text:
+                        name: "Phone Prefix",
+                        description: "Change the default phone number prefix",
+                        propertyName: "phone_prefix",
+                        type: property_types.text,
+                        value: ""
+                    }
+                ];
+
+               ctrl.$onInit = () =>
+                {
+                    for (let property of ctrl.propertiesList)
+                    {
+                        switch (property.type)
                         {
-                            ctrl.loadTextType(property);
-                            break;
+                            case property_types.text:
+                            {
+                                ctrl.loadTextType(property);
+                                break;
+                            }
                         }
                     }
-                }
-            };
+                };
 
-            ctrl.loadTextType = (property) =>
-            {
-                systemPreferenceApi.getPreferenceValue(property.propertyName)
-                .then((response) =>
+                ctrl.loadTextType = (property) =>
                 {
-                    console.log(response);
-                    ctrl.phonePrefixValue = response.data.body;
-                })
-            };
-
-            ctrl.validations = {
-                phonePrefixValid: Juno.Validations.validationCustom(() =>
-                {
-                    const prefix = ctrl.phonePrefixValue;
-
-                    console.log("prefix: " + prefix);
-                    const MAX_PREFIX_LENGTH = 3;
-                    let isNumeric = parseInt(prefix, MAX_PREFIX_LENGTH);
-                    console.log("is numeric" + isNumeric.toString());
-                    if (prefix.length <= MAX_PREFIX_LENGTH && typeof isNumeric === 'number')
+                    systemPreferenceApi.getPreferenceValue(property.propertyName)
+                    .then((response) =>
                     {
-                        return true;
-                    }
-                    return false;
-                })
-            };
-            /**
-             * Persist new property value
-             * @param property property to update
-             * @param value set the value in the database
-             */
-            ctrl.updateProperty = (property, value) =>
-            {
-                console.log("controller handler");
-                console.log("Property: " + property + " Value: " + value);
-                systemPreferenceApi.putPreferenceValue(property.propertyName, value)
-            };
-        }]
+                        ctrl.phonePrefixValue = response.data.body.slice(0, -1);
+                    })
+                };
+
+                ctrl.validations =
+                {
+                    phonePrefixValid: Juno.Validations.validationCustom(() =>
+                    {
+                        const prefix = ctrl.phonePrefixValue;
+                        const reg = new RegExp('^[0-9]+$');
+                        const MAX_PREFIX_LENGTH = 3;
+
+                        if (prefix.match(reg) != null && prefix.length == MAX_PREFIX_LENGTH )
+                        {
+                            return true;
+                        }
+                        return false;
+                    })
+                };
+
+                /**
+                 * Persist new property value
+                 * @param property property to update
+                 * @param value set the value in the database
+                 */
+                ctrl.updateProperty = (property, value) =>
+                {
+                    systemPreferenceApi.putPreferenceValue(property.propertyName, value)
+                };
+            }
+        ]
     });
