@@ -56,6 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
@@ -453,9 +454,9 @@ public class IMDHealthService
 
 	private boolean isValidSite(Site site)
 	{
-		if (site.getCity() == null || site.getCity().isEmpty() ||
-			site.getName() == null || site.getName().isEmpty() ||
-			site.getProvince() == null || site.getProvince().isEmpty())
+		if (!ConversionUtils.hasContent(site.getCity()) ||
+			!ConversionUtils.hasContent(site.getName()) ||
+			!ConversionUtils.hasContent(site.getProvince()))
 		{
 			return false;
 		}
@@ -464,9 +465,9 @@ public class IMDHealthService
 
 	private boolean isValidClinic(Clinic clinic)
 	{
-		if (clinic.getClinicCity() == null || clinic.getClinicCity().isEmpty() ||
-			clinic.getClinicName() == null || clinic.getClinicName().isEmpty() ||
-			clinic.getClinicProvince() == null || clinic.getClinicProvince().isEmpty())
+		if (!ConversionUtils.hasContent(clinic.getClinicCity()) ||
+			!ConversionUtils.hasContent(clinic.getClinicName()) ||
+			!ConversionUtils.hasContent(clinic.getClinicProvince()))
 		{
 			return false;
 		}
