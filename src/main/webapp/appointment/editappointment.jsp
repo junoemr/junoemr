@@ -99,8 +99,6 @@
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="oscar.appt.ApptData" %>
 <%@ page import="oscar.appt.ApptUtil" %>
-<%@ page import="oscar.appt.status.service.AppointmentStatusMgr" %>
-<%@ page import="oscar.appt.status.service.impl.AppointmentStatusMgrImpl" %>
 <%@ page import="oscar.oscarBilling.ca.on.data.BillingDataHlp" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData" %>
 <%@page import="oscar.oscarEncounter.data.EctFormData" %>
@@ -158,8 +156,8 @@
 
 	boolean appointmentReminderEnabled = pros.isPropertyActive("appointment_reminder_enabled");
 
-	AppointmentStatusMgr apptStatusMgr = new AppointmentStatusMgrImpl();
-	List allStatus = apptStatusMgr.getAllActiveStatus();
+    AppointmentStatusService appointmentStatusService = SpringUtils.getBean(AppointmentStatusService.class);
+    List<AppointmentStatus> allStatus = appointmentStatusService.getActiveAppointmentStatuses();
 
 	Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 
@@ -172,6 +170,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.oscarehr.common.IsPropertiesOn" %>
+<%@ page import="org.oscarehr.appointment.service.AppointmentStatusService" %>
 <html:html locale="true">
 	<head>
 		<% if (isMobileOptimized)

@@ -72,6 +72,11 @@
         width: 15%;
     }
 
+    .preview {
+        max-height: 10px;
+        padding-left: 4px;
+    }
+
     .active {
         color: black;
     }
@@ -145,8 +150,8 @@
         <td><%= status.getId() %></td>
 		<td class="nowrap"><%= status.getStatus() %></td>
 		<td class="nowrap"><%= status.getDescription() %></td>
-        <td style="background-color: <%= status.getColor() %>"><img src="<%=imgUrl%>" alt="Classic icon"/></td>
-		<td style="background-color: <%= status.getJunoColor() %>"><i class="<%="icon " + junoIconClass %>" alt="Juno icon"></i></td>
+        <td style="background-color: <%= status.getColor() %>"><img class=preview src="<%=imgUrl%>" alt="Classic icon"/></td>
+		<td style="background-color: <%= status.getJunoColor() %>"><i class="preview <%="icon " + junoIconClass %>" alt="Juno icon"></i></td>
         <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %></td>
         <% if (isSuperAdmin) { %>
 		<td class="nowrap text-l"><a href=<%= editUrl.build().toString() %>>Edit</a></td>

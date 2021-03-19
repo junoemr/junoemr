@@ -67,6 +67,11 @@ public class AppointmentStatusService
 		return appointmentStatusDao.findAll();
 	}
 	
+	public List<AppointmentStatus> getActiveAppointmentStatuses()
+	{
+		return appointmentStatusDao.findActive();
+	}
+	
 	public AppointmentStatus getAppointmentStatusById(Integer id)
 	{
 		return appointmentStatusDao.find(id);

@@ -47,12 +47,12 @@
             height: 40px;
         }
 
-	.juno-color-button {
-		width: 25px;
-		height: 25px;
-		border: 0;
-		border-radius: 2px;
-	}
+	    .juno-color-button {
+		    width: 25px;
+		    height: 25px;
+		    border: 0;
+		    border-radius: 2px;
+	    }
 
         .submit {
             margin: 0 auto;
@@ -83,6 +83,11 @@
 
         .grey {
             color: #808080;
+        }
+
+        .preview {
+            padding-left: 4px;
+            max-height: 10px;
         }
 
         .w-10 {
@@ -190,7 +195,7 @@
 	    var name = iconRegex.exec(iconFile)[1];
 
 	    var $junoIcon = $('#juno-preview > i');
-	    $junoIcon.attr("class", "icon-" + name);
+	    $junoIcon.attr("class", "preview icon-" + name);
 
 	    var $classicIcon = $('#classic-preview > img');
 	    $classicIcon.attr("src", "../images/" + iconFile);
@@ -249,6 +254,7 @@
                         <html:option value="cancel.gif">Cancel</html:option>
                         <html:option value="billed.gif">Billed</html:option>
                         <html:option value="empty.gif">Empty</html:option>
+                        <html:option value="dot.gif">Dot</html:option>
                         <html:option value="1.gif">Custom 1</html:option>
                         <html:option value="2.gif">Custom 2</html:option>
                         <html:option value="3.gif">Custom 3</html:option>
@@ -263,7 +269,7 @@
                     </html:select>
                 </td>
                 <td class="w-15 right">Classic Preview</td>
-                <td id="classic-preview" class="w-10"><img/></td>
+                <td id="classic-preview" class="w-10"><img class="preview"/></td>
                 <td class="w-15 right">Juno Preview</td>
                 <td id="juno-preview" class="w-10"><i></i></td>
             </tr>

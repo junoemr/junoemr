@@ -34,95 +34,98 @@ import java.util.stream.Collectors;
 
 public class AppointmentStatusAction extends DispatchAction {
 	
-    private static final AppointmentStatusService statusService = SpringUtils.getBean(AppointmentStatusService.class);
+	private static final AppointmentStatusService statusService = SpringUtils.getBean(AppointmentStatusService.class);
 
-    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        loadStatusAttributes(request);
-        return mapping.findForward("success");
-    }
-    
-    public ActionForward add(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-    {
-	    LazyValidatorForm lazyForm = (LazyValidatorForm) form;
-	    
-	    AppointmentStatus status = new AppointmentStatus();
-	    status.setDescription(lazyForm.get("description").toString());
-	    status.setIcon(lazyForm.get("icon").toString());
-	    status.setColor(lazyForm.get("color").toString());
-	    status.setJunoColor(lazyForm.get("junoColor").toString());
-	    status.setEditable(1);
-	    statusService.assignStatusCodeAndSave(status);
-    	
-	    loadStatusAttributes(request);
-	    return mapping.findForward("success");
-    }
+	public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		loadStatusAttributes(request);
+		return mapping.findForward("success");
+	}
+	
+	public ActionForward add(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		LazyValidatorForm lazyForm = (LazyValidatorForm) form;
+		
+		AppointmentStatus status = new AppointmentStatus();
+		
+		status.setDescription(lazyForm.get("description").toString());
+		status.setIcon(lazyForm.get("icon").toString());
+		status.setColor(lazyForm.get("color").toString());
+		status.setJunoColor(lazyForm.get("junoColor").toString());
+		status.setActive(Integer.parseInt(lazyForm.get("active").toString()));
+		status.setEditable(1);
+		
+		statusService.assignStatusCodeAndSave(status);
+		
+		loadStatusAttributes(request);
+		return mapping.findForward("success");
+	}
 	
 	/** Forward to the edit page in create mode */
 	public ActionForward create(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-    {
-    	LazyValidatorForm lazyForm = (LazyValidatorForm) form;
+	{
+		LazyValidatorForm lazyForm = (LazyValidatorForm) form;
 	
-    	// Initialize some default values for the new status.
-	lazyForm.set("active", 1);
-	lazyForm.set("icon", "1.gif");
-        lazyForm.set("color", "#897DF8");
-        lazyForm.set("junoColor", "#AC9DF2");
-        
-        request.setAttribute("canDisable", 1);
+		// Initialize some default values for the new status.
+		lazyForm.set("active", 1);
+		lazyForm.set("icon", "dot.gif");
+		lazyForm.set("color", "#897DF8");
+		lazyForm.set("junoColor", "#AC9DF2");
+		
+		request.setAttribute("canDisable", 1);
 	request.setAttribute("action", "add");
-    	return mapping.findForward("edit");
-    }
-    
-    /** Forward to the edit page in update mode */
-    public ActionForward modify(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        int id = Integer.parseInt(request.getParameter("statusId"));
-        AppointmentStatus apptStatus = statusService.getAppointmentStatusById(id);
-        
-        LazyValidatorForm lazyForm = (LazyValidatorForm) form;
-        lazyForm.set("id", id);
-        lazyForm.set("active", apptStatus.getActive());
-        lazyForm.set("icon", apptStatus.getIcon());
-        lazyForm.set("color", apptStatus.getColor());
-        lazyForm.set("junoColor", apptStatus.getJunoColor());
-        lazyForm.set("description", apptStatus.getDescription());
-	    
-        request.setAttribute("canDisable", apptStatus.getEditable());
-        request.setAttribute("action", "update");
-        return mapping.findForward("edit");
-    }
-    
-    public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        LazyValidatorForm lazyForm = (LazyValidatorForm) form;
+		return mapping.findForward("edit");
+	}
 	
-	    Integer statusId = Integer.parseInt(lazyForm.get("id").toString());
-        
-        AppointmentStatus apptStatus = statusService.getAppointmentStatusById(statusId);
-        if (apptStatus.getEditable() != 1)
-        {
-        	throw new RuntimeException("Can't edit a readonly status");
-        }
-        
-        apptStatus.setDescription(lazyForm.get("description").toString());
-        apptStatus.setActive(Integer.parseInt(lazyForm.get("active").toString()));
-        apptStatus.setIcon(lazyForm.get("icon").toString());
-        apptStatus.setColor(lazyForm.get("color").toString());
-        apptStatus.setJunoColor(lazyForm.get("junoColor").toString());
-        statusService.updateAppointmentStatus(apptStatus);
-        
-        loadStatusAttributes(request);
-        return mapping.findForward("success");
-    }
-    
-    public ActionForward moveUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-    {
-	    int id = Integer.parseInt(request.getParameter("statusId"));
-	    AppointmentStatus apptStatus = statusService.getAppointmentStatusById(id);
-	    
-    	statusService.swapUp(apptStatus);
-	    
-    	loadStatusAttributes(request);
-	    return mapping.findForward("success");
-    }
+	/** Forward to the edit page in update mode */
+	public ActionForward modify(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		int id = Integer.parseInt(request.getParameter("statusId"));
+		AppointmentStatus apptStatus = statusService.getAppointmentStatusById(id);
+		
+		LazyValidatorForm lazyForm = (LazyValidatorForm) form;
+		lazyForm.set("id", id);
+		lazyForm.set("active", apptStatus.getActive());
+		lazyForm.set("icon", apptStatus.getIcon());
+		lazyForm.set("color", apptStatus.getColor());
+		lazyForm.set("junoColor", apptStatus.getJunoColor());
+		lazyForm.set("description", apptStatus.getDescription());
+		
+		request.setAttribute("canDisable", apptStatus.getEditable());
+		request.setAttribute("action", "update");
+		return mapping.findForward("edit");
+	}
+	
+	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		LazyValidatorForm lazyForm = (LazyValidatorForm) form;
+	
+		Integer statusId = Integer.parseInt(lazyForm.get("id").toString());
+		
+		AppointmentStatus apptStatus = statusService.getAppointmentStatusById(statusId);
+		if (apptStatus.getEditable() != 1)
+		{
+			throw new RuntimeException("Can't edit a readonly status");
+		}
+		
+		apptStatus.setDescription(lazyForm.get("description").toString());
+		apptStatus.setActive(Integer.parseInt(lazyForm.get("active").toString()));
+		apptStatus.setIcon(lazyForm.get("icon").toString());
+		apptStatus.setColor(lazyForm.get("color").toString());
+		apptStatus.setJunoColor(lazyForm.get("junoColor").toString());
+		statusService.updateAppointmentStatus(apptStatus);
+		
+		loadStatusAttributes(request);
+		return mapping.findForward("success");
+	}
+	
+	public ActionForward moveUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		int id = Integer.parseInt(request.getParameter("statusId"));
+		AppointmentStatus apptStatus = statusService.getAppointmentStatusById(id);
+		
+		statusService.swapUp(apptStatus);
+		
+		loadStatusAttributes(request);
+		return mapping.findForward("success");
+	}
 	
 	public ActionForward moveDown(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -134,21 +137,21 @@ public class AppointmentStatusAction extends DispatchAction {
 		loadStatusAttributes(request);
 		return mapping.findForward("success");
 	}
-    
-    private void loadStatusAttributes(HttpServletRequest request)
-    {
-        List<AppointmentStatus> allStatuses = statusService.getAllAppointmentStatuses();
-        request.setAttribute("appointmentStatuses", allStatuses);
-        
-        
-        List<AppointmentStatus> inactiveStatuses = allStatuses.stream()
-                                                              .filter(s -> s.getActive() == 0)
-                                                              .collect(Collectors.toList());
-        
-        List<String> inactiveStatusCodesInUse = statusService.checkStatusUsage(inactiveStatuses);
-        if (inactiveStatusCodesInUse.size() > 0)
-        {
-            request.setAttribute("alertStatuses", inactiveStatusCodesInUse);
-        }
-    }
+	
+	private void loadStatusAttributes(HttpServletRequest request)
+	{
+		List<AppointmentStatus> allStatuses = statusService.getAllAppointmentStatuses();
+		request.setAttribute("appointmentStatuses", allStatuses);
+		
+		
+		List<AppointmentStatus> inactiveStatuses = allStatuses.stream()
+															  .filter(s -> s.getActive() == 0)
+															  .collect(Collectors.toList());
+		
+		List<String> inactiveStatusCodesInUse = statusService.checkStatusUsage(inactiveStatuses);
+		if (inactiveStatusCodesInUse.size() > 0)
+		{
+			request.setAttribute("alertStatuses", inactiveStatusCodesInUse);
+		}
+	}
 }
