@@ -79,7 +79,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			includeNoDemographic: false,
 			includeNoShow: false,
 			includeCancelled: false,
-		}
+		};
+		
+		controller.DEFAULT_APPOINTMENT_STATUSES = {
+			CANCELLED: 'C',
+			NO_SHOW: 'N',
+		}.freeze();
 
 		//=========================================================================
 		// Local scope variables
@@ -184,15 +189,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.$onInit = () =>
 		{
 			controller.providerPreferenceApi.getProviderSettings().then((response) =>
-				{
-					const prefs = response.data.content[0];
-					controller.appointmentCountOptions = {
-						enabled: prefs.appointmentCountEnabled,
-						includeNoDemographic: prefs.appointmentCountIncludeNoDemographic,
-						includeNoShow: prefs.appointmentCountIncludeNoShow,
-						includeCancelled: prefs.appointmentCountIncludeCancelled,
-					}
-				})
+			{
+				const prefs = response.data.content[0];
+				controller.appointmentCountOptions = {
+					enabled: prefs.appointmentCountEnabled,
+					includeNoDemographic: prefs.appointmentCountIncludeNoDemographic,
+					includeNoShow: prefs.appointmentCountIncludeNoShow,
+					includeCancelled: prefs.appointmentCountIncludeCancelled,
+				}
+			});
 		}
 
 		$scope.init = function init()
@@ -619,7 +624,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					$scope.uiConfig.calendar.hiddenDays = [];
 					$scope.events = results.data.body.eventList;
 					
-					if (controller.appointmentCountOptions.enabled) {
+					if (controller.appointmentCountOptions.enabled)
+					{
 						controller.countAppointments($scope.events)
 					}
 					
@@ -931,8 +937,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					const status = event.data.eventStatusCode;
 					const demographicNo = event.data.demographicNo;
 					
-					if ((status === 'C' && !controller.appointmentCountOptions.includeCancelled) ||
-						(status === 'N' && !controller.appointmentCountOptions.includeNoShow) ||
+					if ((status === controller.DEFAULT_APPOINTMENT_STATUSES.CANCELLED && !controller.appointmentCountOptions.includeCancelled) ||
+						(status === controller.DEFAULT_APPOINTMENT_STATUSES.NO_SHOW && !controller.appointmentCountOptions.includeNoShow) ||
 						(demographicNo === 0 && !controller.appointmentCountOptions.includeNoDemographic))
 					{
 						return;
@@ -2209,10 +2215,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				columnHeader: true,
 				views: {
 					day: {
-						columnHeaderFormat: Juno.Common.Util.DisplaySettings.dayDateFormat
+						columnHeaderFormat: Juno.Common.Util.DisplaySettings.calendarDateFormat
 					},
 					week: {
-						columnHeaderFormat: Juno.Common.Util.DisplaySettings.dayDateFormat
+						columnHeaderFormat: Juno.Common.Util.DisplaySettings.calendarDateFormat
 					},
 					month: {
 						columnHeaderFormat: 'dddd'
