@@ -92,7 +92,7 @@ public class FlowsheetService
 		return config.getFlowsheetTemplates();
 	}
 
-	public List<Flowsheet> getSystemFlowsheets()
+	public synchronized List<Flowsheet> getSystemFlowsheets()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 		List<Flowsheet> systemFlowsheets = config.getSystemFlowsheets();
