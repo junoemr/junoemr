@@ -86,8 +86,9 @@ angular.module('Admin').component('systemPropertiesGeneral',
                         const MIN_PREFIX_LENGTH = 3;
                         const MAX_PREFIX_LENGTH = 4;
 
-                        if (prefix.match(reg) != null &&
-                            (prefix.length >= MIN_PREFIX_LENGTH && prefix.length <= MAX_PREFIX_LENGTH))
+                        if (prefix == null || prefix == "" ||
+                                (prefix.match(reg) != null &&
+                                (prefix.length >= MIN_PREFIX_LENGTH && prefix.length <= MAX_PREFIX_LENGTH)))
                         {
                             return true;
                         }
