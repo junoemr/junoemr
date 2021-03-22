@@ -32,7 +32,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
             '$http',
             '$httpParamSerializer',
             function ($scope, $http, $httpParamSerializer) {
-                let property_types =
+                let propertyTypes =
                 {
                     text: "string",
                 }
@@ -48,7 +48,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
                         name: "Phone Prefix",
                         description: "Change the default phone number prefix",
                         propertyName: "phone_prefix",
-                        type: property_types.text,
+                        type: propertyTypes.text,
                         value: ""
                     }
                 ];
@@ -59,7 +59,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
                     {
                         switch (property.type)
                         {
-                            case property_types.text:
+                            case propertyTypes.text:
                             {
                                 ctrl.loadTextType(property);
                                 break;
@@ -73,7 +73,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
                     systemPreferenceApi.getPreferenceValue(property.propertyName)
                     .then((response) =>
                     {
-                        ctrl.phonePrefixValue = response.data.body.slice(0, -1);
+                        ctrl.phonePrefixValue = response.data.body;
                     })
                 };
 
@@ -82,10 +82,12 @@ angular.module('Admin').component('systemPropertiesGeneral',
                     phonePrefixValid: Juno.Validations.validationCustom(() =>
                     {
                         const prefix = ctrl.phonePrefixValue;
-                        const reg = new RegExp('^[0-9]+$');
-                        const MAX_PREFIX_LENGTH = 3;
+                        const reg = new RegExp(/^[0-9]{3}-?$/);
+                        const MIN_PREFIX_LENGTH = 3;
+                        const MAX_PREFIX_LENGTH = 4;
 
-                        if (prefix.match(reg) != null && prefix.length == MAX_PREFIX_LENGTH )
+                        if (prefix.match(reg) != null &&
+                            (prefix.length >= MIN_PREFIX_LENGTH && prefix.length <= MAX_PREFIX_LENGTH))
                         {
                             return true;
                         }

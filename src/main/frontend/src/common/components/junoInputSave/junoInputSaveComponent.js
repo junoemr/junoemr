@@ -55,13 +55,13 @@ angular.module('Common.Components').component('junoInputSave',
                     if (!ctrl.invalid)
                     {
                         ctrl.click({
-                            value: ctrl.ngModel + '-'
+                            value: ctrl.ngModel
                         })
-                        Juno.Common.Util.successAlert($uibModal, "Success", "Phone Prefix Saved");
+                        Juno.Common.Util.successAlert($uibModal, "Success", "Phone Prefix saved");
                     }
                     else
                     {
-                        Juno.Common.Util.errorAlert($uibModal, "Error", "Phone Prefix must be exactly three digits");
+                        Juno.Common.Util.errorAlert($uibModal, "Error", "Phone Prefix must be exactly three digits with an optional '-' character");
                     }
                 }
             };

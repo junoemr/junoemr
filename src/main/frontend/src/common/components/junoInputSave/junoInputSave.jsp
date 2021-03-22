@@ -7,7 +7,7 @@
         <juno-input ng-model="$ctrl.ngModel"
                     component-style="$ctrl.componentStyle"
                     invalid="$ctrl.invalid"
-                    character-limit="3"
+                    character-limit="4"
                     hide-character-limit="true">
         </juno-input>
     </div>
