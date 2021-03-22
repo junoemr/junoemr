@@ -28,6 +28,7 @@ import org.oscarehr.init.OscarPropertiesInitializer;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
@@ -38,6 +39,7 @@ import org.springframework.context.annotation.ImportResource;
 @ComponentScan(basePackages = {"oscar", "org.oscarehr", "com.quatro"})
 @ServletComponentScan(basePackages = {"com.junoemr", "org.oscarehr"})
 @ImportResource({"classpath*:applicationContext.xml"})
+@EnableConfigurationProperties
 public class JunoApplication extends SpringBootServletInitializer
 {
 	private static final Logger logger = MiscUtils.getLogger();
