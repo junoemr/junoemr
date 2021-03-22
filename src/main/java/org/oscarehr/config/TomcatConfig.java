@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationPropertiesScan("org.oscarehr.config")
 public class TomcatConfig
 {
-	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
+	private final oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
 
 	private final JunoProperties junoProperties;
 
