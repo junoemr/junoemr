@@ -1,1 +1,0 @@
-ALTER TABLE ProviderPreference ADD IF NOT EXISTS appointmentReasonDisplayLevel ENUM('DEFAULT_ALL', 'REASON_ONLY') DEFAULT 'DEFAULT_ALL';
