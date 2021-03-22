@@ -112,14 +112,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 				controller.page.selectedWarning = false;
 			}
 
-			if (site == null)
-			{
-				controller.pageOptions.selectedSite = DEFAULT_SITE;
-			}
-			else
-			{
-				controller.pageOptions.selectedSite = site;
-			}
+			 controller.pageOptions.selectedSite = site || DEFAULT_SITE;
 
 			let ops = encodeURIComponent(JSON.stringify(controller.pageOptions));
 			window.open('../ws/rs/recordUX/' + $stateParams.demographicNo + '/print?printOps=' + ops, '_blank');
