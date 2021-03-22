@@ -330,7 +330,7 @@ public class SchemaUtils
 			{
 				if(FilenameUtils.getExtension(update.getAbsolutePath()).equals("sql"))
 				{
-					assertEquals(loadFileIntoMySQL(update.getAbsolutePath()),0);
+					assertEquals(loadFileIntoMySQL(update.getAbsolutePath()), 0);
 				}
 			}
 
