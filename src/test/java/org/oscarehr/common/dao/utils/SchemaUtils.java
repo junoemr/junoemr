@@ -324,8 +324,6 @@ public class SchemaUtils
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscarinit_bc.sql"),0);
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscardata_bc.sql"),0);
 
-			//assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscar_15.creation_db.2017.02.23.sql"), 0);
-
 			// Run OscarHost updates
 			File folder = new File(baseDir, "/database/mysql/oscarhost_updates/");
 			File[] updateFiles = folder.listFiles();

@@ -1,1 +1,0 @@
-ALTER TABLE provider ADD COLUMN IF NOT EXISTS ontario_lifelabs_id VARCHAR(128);

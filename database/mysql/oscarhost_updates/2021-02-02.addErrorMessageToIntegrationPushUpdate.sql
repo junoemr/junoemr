@@ -1,1 +1,0 @@
-ALTER TABLE integration_push_update ADD COLUMN IF NOT EXISTS error_message TEXT;
