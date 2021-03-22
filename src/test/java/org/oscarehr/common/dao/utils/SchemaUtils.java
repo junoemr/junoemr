@@ -62,8 +62,6 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.NotImplementedException;
@@ -325,6 +323,17 @@ public class SchemaUtils
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscardata_bc.sql"),0);
 
 			// Run OscarHost updates
+			File regularUpdates = new File(baseDir, "/database/mysql/oscarhost_updates_applied/");
+			File[] updatesToRun = regularUpdates.listFiles();
+			Arrays.sort(updatesToRun);
+			for (File update : updatesToRun)
+			{
+				if(FilenameUtils.getExtension(update.getAbsolutePath()).equals("sql"))
+				{
+					assertEquals(loadFileIntoMySQL(update.getAbsolutePath()),0);
+				}
+			}
+
 			File folder = new File(baseDir, "/database/mysql/oscarhost_updates/");
 			File[] updateFiles = folder.listFiles();
 			Arrays.sort(updateFiles);
@@ -338,7 +347,6 @@ public class SchemaUtils
 
 			// Fix test specific problems with the database
 			assertEquals(loadFileIntoMySQL(baseDir + "/src/test/java/integration/tests/sql/initialize_database.sql"), 0);
-		 
 			createTableStatements.clear();
 			try {
 				ResultSet rs = c.getMetaData().getTables(ConfigUtils.getProperty("db_schema"), null, "%", null);
