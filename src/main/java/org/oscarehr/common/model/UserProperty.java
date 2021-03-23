@@ -94,6 +94,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String ENCOUNTER_FORM_LENGTH = "encounter.form_length";
     public static final String ENCOUNTER_FORM_NAME = "encounter.form_name";
     public static final String EFORM_NAME = "encounter.eform_name";
+	public static final String RX_AUTOSTAMP_SIGNATURE = "rx_preset_signatures";
     public static final String RX_SHOW_QR_CODE = "rx_show_qr_code";
     public static final String ENABLE_RX_WATERMARK = "enable_rx_watermark";
     public static final String IS_BACKGROUND_RX_WATERMARK = "is_background_rx_watermark";
@@ -136,6 +137,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
 
     public static final String AQS_INTEGRATION_API_SECRET_KEY = "aqs_api_secret_key";
     public static final String AQS_INTEGRATION_ENABLED = "aqs_enabled";
+    public static final String AQS_INTEGRATION_ORGANIZATION_ID = "aqs_organization_id";
 
     public static final String INTEGRATION_IMDHEALTH_ENABLED = "integration.imdHealth.enabled";
     
@@ -181,6 +183,9 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
 
 	public static final String MCEDT_ACCOUNT_PASSWORD = "mcedt_account_password";
 
+	// various constant values for on/off in table
+	public static final String PROPERTY_ON_YES = "yes";
+	public static final String PROPERTY_ON_NO = "no";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -75,7 +75,8 @@
 				<juno-select ng-model="$ctrl.ngModel.patientStatus"
 								options="$ctrl.patientStatusList"
 								label="Patient Status"
-								component-style="$ctrl.componentStyle">
+								component-style="$ctrl.componentStyle"
+								on-change="$ctrl.updatePatientStatusDate()">
 				</juno-select>
 
 				<juno-button ng-click="$ctrl.openAddPatientStatusModal()"

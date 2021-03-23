@@ -1,0 +1,17 @@
+/**
+set the html structure up like this:
+<label class="switch">
+    <input type="checkbox"/>
+    <span class="slider [round]"></span>
+</label>
+ */
+
+/* The switch - the box around the slider */
+
+.juno-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  @include juno-toggle-switch(32px, 4px, .4s);
+}

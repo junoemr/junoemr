@@ -21,25 +21,21 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.measurements.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.Flowsheet;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.measurements.model.Flowsheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -83,22 +79,12 @@ public class FlowsheetDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet4);
 		flowsheetDao.persist(flowSheet4);
 		
-		List<Flowsheet> expectedResult = new ArrayList<Flowsheet>(Arrays.asList(flowSheet1, flowSheet2, flowSheet3, flowSheet4));
 		List<Flowsheet> result = flowsheetDao.findAll();
 
-		Logger logger = MiscUtils.getLogger();
-		
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
-		}
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items  do not match.");
-				fail("Items  do not match.");
-			}
-		}
-		assertTrue(true);
+		assertTrue(result.contains(flowSheet1));
+		assertTrue(result.contains(flowSheet2));
+		assertTrue(result.contains(flowSheet3));
+		assertTrue(result.contains(flowSheet4));
 	}
 	
 	@Test

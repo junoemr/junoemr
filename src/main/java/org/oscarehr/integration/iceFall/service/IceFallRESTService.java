@@ -23,6 +23,8 @@
 
 package org.oscarehr.integration.iceFall.service;
 
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.log4j.Logger;
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationResponseTo1;
@@ -33,10 +35,15 @@ import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescripti
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCustomerTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import oscar.OscarProperties;
 import oscar.util.RESTClient;
+
+import java.net.URISyntaxException;
+import java.util.Properties;
 
 @Service
 public class IceFallRESTService
@@ -50,10 +57,15 @@ public class IceFallRESTService
 	public static final String CREATE_CUSTOMER = API_BASE + "/partner/customers/";
 	public static final String ADD_PRESCRIPTION = API_BASE + "/partner/prescriptions/";
 
+	// Property keys
+	private static final String ICEFALL_SCHEME = "icefall_scheme";
+	private static final String ICEFALL_API_DOMAIN = "icefall_api_domain";
+	
 	@Autowired
 	IceFallCredentialsDao iceFallCredentialsDao;
 
 	private RESTClient RESTClient = new RESTClient(new IceFallRESTErrorHandler());
+	private static Properties props = OscarProperties.getInstance();
 
 	/**
 	 * authenticate with the icefall api, updating the api token
@@ -140,6 +152,18 @@ public class IceFallRESTService
 
 	private String getIceFallUrlBase()
 	{
-		return "https://api-qa.canopygrowthweb.com";
+		try
+		{
+			URIBuilder builder = new URIBuilder();
+			builder.setScheme(props.getProperty(ICEFALL_SCHEME));
+			builder.setHost(props.getProperty(ICEFALL_API_DOMAIN));
+			return builder.build().toString();
+		}
+		catch (URISyntaxException e)
+		{
+			Logger logger = MiscUtils.getLogger();
+			logger.error("Invalid icefall url", e);
+			return "";
+		}
 	}
 }

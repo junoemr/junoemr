@@ -49,6 +49,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
 
 <%
 	if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
@@ -119,19 +121,14 @@
 
     boolean dsProblems = false;
 
-
-    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-
-    FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-    FlowSheetDrugDao flowSheetDrugDao = (FlowSheetDrugDao) ctx.getBean("flowSheetDrugDao");
-	FlowSheetDxDao flowSheetDxDao = (FlowSheetDxDao) ctx.getBean("flowSheetDxDao");
+    FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+    FlowSheetDrugDao flowSheetDrugDao = SpringUtils.getBean(FlowSheetDrugDao.class);
+	FlowSheetDxDao flowSheetDxDao = SpringUtils.getBean(FlowSheetDxDao.class);
+    FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
     List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template,providerNo,Integer.parseInt(demographic_no));
 
     ////Start
-    MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-
-
-    MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template,custList);
+    MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(template, custList);
     if(mFlowsheet == null)
     {
         MiscUtils.getLogger().error("Invalid Flowsheet Template: " + template);

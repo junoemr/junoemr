@@ -35,6 +35,7 @@ import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -43,7 +44,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.util.ConversionUtils;
@@ -61,6 +61,7 @@ public class FormUpdateAction extends Action {
 	
 	private static Logger log = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String date = request.getParameter("date");
@@ -97,8 +98,7 @@ public class FormUpdateAction extends Action {
 
 		List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(temp, providerNo, Integer.parseInt(demographic_no));
 
-		MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-		MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp, custList);
+		MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(temp, custList);
 
 		//List<MeasurementTemplateFlowSheetConfig.Node> nodes = mFlowsheet.getItemHeirarchy();
 	    
@@ -205,23 +205,18 @@ public class FormUpdateAction extends Action {
 			request.setAttribute("testOutput", testOutput);
 			return mapping.findForward("failure");
 		}
-		
-		session.setAttribute("textOnEncounter", textOnEncounter);
-
-		if (addToNote)
-		{
-			addNote(demographic_no, providerNo, prog_no, note, apptNoInt, request);
-		}
 
 		String submit = request.getParameter("submit");
-		if (submit == null || "Add".equals(submit) || "Save".equals(submit) || "Save All".equals(submit))
+		request.setAttribute("textOnEncounter", textOnEncounter);
+
+		if (submit == null  || "Save".equals(submit) || "Save All".equals(submit))
 		{
 			return mapping.findForward("reload");
 		}
 
 		return mapping.findForward("success");
 	}
-	
+
 	public void addNote(String demographic_no, String providerNo, String prog_no, String note, int apptNoInt, HttpServletRequest request){
 		HttpSession session = request.getSession();
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());

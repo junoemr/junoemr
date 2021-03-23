@@ -24,13 +24,28 @@
 
 --%>
 <% long startTime = System.currentTimeMillis(); %>
-<%@ page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,java.net.*"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@ page import="org.springframework.web.context.WebApplicationContext"%>
-<%@ page import="org.oscarehr.common.dao.FlowSheetCustomizationDao,org.oscarehr.common.model.FlowSheetCustomization"%>
-<%@ page import="org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.model.FlowSheetDrug"%>
+<%@ page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
+<%@ page import="org.oscarehr.common.model.FlowSheetCustomization"%>
+<%@ page import="org.oscarehr.common.dao.FlowSheetDrugDao"%>
+<%@ page import="org.oscarehr.common.model.FlowSheetDrug"%>
 <%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="java.util.List" %>
+<%@ page import="oscar.oscarPrevention.PreventionData" %>
+<%@ page import="oscar.oscarPrevention.Prevention" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementInfo" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -67,7 +82,7 @@ maybe use jquery/ajax to post this data instead of submitting a form to send ALL
     String date = UtilDateUtilities.getToday("yyyy-MM-dd");
 
     //preset for patient handout
-    ArrayList<String> phandout = new ArrayList<String>();
+    List<String> phandout = new ArrayList<String>();
     if( request.getParameter("patientHandout") != null ) {
         phandout.add("FGLC");
         phandout.add("A1C");
@@ -121,18 +136,15 @@ maybe use jquery/ajax to post this data instead of submitting a form to send ALL
     boolean dsProblems = false;
 
     String temp = request.getParameter("template");
-    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 
-    FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-    FlowSheetDrugDao flowSheetDrugDAO = ctx.getBean(FlowSheetDrugDao.class);
+    FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+    FlowSheetDrugDao flowSheetDrugDAO = SpringUtils.getBean(FlowSheetDrugDao.class);
+    FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 
     List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
 
     ////Start
-    MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-
-
-    MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+    MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(temp, custList);
 
     MeasurementInfo mi = new MeasurementInfo(demographic_no);
     List<String> measurementLs = mFlowsheet.getMeasurementList();

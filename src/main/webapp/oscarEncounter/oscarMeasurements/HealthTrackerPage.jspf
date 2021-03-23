@@ -34,15 +34,13 @@
 <%@ page import="oscar.OscarProperties"%>
 <%@ page import="org.oscarehr.common.model.Validations" %>
 
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
-<%@ page import="org.oscarehr.common.model.Flowsheet" %>
+<%@ page import="org.oscarehr.measurements.model.Flowsheet" %>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementInfo" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
-<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean" %>
@@ -54,9 +52,12 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="oscar.eform.EFormUtil" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation" %>
-<%@ page import="java.util.Vector" %>
 <%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
 <%@ page import="oscar.oscarPrevention.PreventionData" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="org.oscarehr.measurements.model.FlowSheetUserCreated" %>
+<%@ page import="org.springframework.web.util.UriComponentsBuilder" %>
+<%@ page import="java.net.URI" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 
@@ -72,7 +73,7 @@
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
     String demographic_no = request.getParameter("demographic_no");
     String providerNo = (String) session.getAttribute("user");
-    String temp = request.getParameter("template");
+    String template = request.getParameter("template");
         
     String ornPilot = OscarProperties.getInstance().getProperty("ORN_PILOT", "no");
 
@@ -81,15 +82,15 @@
     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="r" reverse="<%=true%>">
         "You have no right to access this page!"
         <%
-    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
+    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.ACTION_READ, LogConst.CON_FLOWSHEET, template, request.getRemoteAddr(),demographic_no);
             response.sendRedirect("../../noRights.html");
     %>
     </security:oscarSec>
 </oscar:oscarPropertiesCheck>
 
 <%
-	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
-
+	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET, template, request.getRemoteAddr(),demographic_no);
+	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 
     int numElementsToShow = 6;
     Date sdate = null;
@@ -114,16 +115,12 @@
         }catch(Exception e){edate = null;}
     }
 
-    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-
-    FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-    List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
-    
+    FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+    List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
 
     ////Start
-    MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
-    MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+    MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(template,custList);
 
     MeasurementInfo mi = new MeasurementInfo(demographic_no);
     List<String> measurementLs = mFlowsheet.getMeasurementList();
@@ -428,7 +425,7 @@ padding-left:10px;
 }
 </style>
 
-<%//todo-legacy: temp hack
+<%//todo-legacy: template hack
 String tracker = "";
 if( request.getParameter("tracker")!=null && request.getParameter("tracker").equals("slim") ){ 
 tracker="&tracker=slim";
@@ -532,10 +529,10 @@ div.preventionSection {
         
       
       if (sdate && edate){
-            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>&sdate='+sdate+'&edate='+edate;
+            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>&sdate='+sdate+'&edate='+edate;
             //console.log("two");
         }else{
-            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>';
+            window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>';
         }
 
     }
@@ -676,10 +673,12 @@ function fsPopup(width,height,url,window) {
 
 <%@ include file="/share/templates/patient.jspf"%>
 
-<div class="well" id="tracker-bar" class="DoNotPrint">
-   		<div class="col-lg-12" style="padding-left:0px;margin-left:0px">
-
-<a href="?demographic_no=<%=demographic_no%>&template=tracker" class="btn btn-default <%if(temp.equals("tracker")){ out.print("btn-primary active");} %>"><span class="glyphicon glyphicon-home "></span></a>
+<div class="well DoNotPrint" id="tracker-bar" >
+	<div class="col-lg-12" style="padding-left:0px;margin-left:0px">
+		<a href="?demographic_no=<%=demographic_no%>&template=tracker"
+		   class="btn btn-default <%= "tracker".equals(template) ? "btn-primary active" : "" %>">
+			<span class="glyphicon glyphicon-home "></span>
+		</a>
 <%
 	String dxCodeQueryString="";
 
@@ -688,37 +687,49 @@ function fsPopup(width,height,url,window) {
 
 	dxResearchBeanHandler dxRes = new dxResearchBeanHandler(demographic_no);
 	List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-	List<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
+	List<String> flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
 
-	Hashtable<String, String> systemFlowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetDisplayNames();
+	List<Flowsheet> systemFlowsheets = flowsheetService.getSystemFlowsheets();
+	// Concatenate flowsheets whose XML is stored in the DB to this list
+	// This is only used to display the flowsheet name at the top to click on
+	systemFlowsheets.addAll(flowsheetService.getDatabaseFlowsheets());
 
-	String displayName= "";
+	List<MeasurementFlowSheet> flowsheetTemplates = flowsheetService.getFlowsheetTemplates();
 
-	for(String name:systemFlowsheets.keySet())
+	String displayName;
+
+	for(Flowsheet flowsheet : systemFlowsheets)
 	{
-		displayName = systemFlowsheets.get(name);
-		MeasurementFlowSheet flowSheetGroups = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(name);
-		Flowsheet fs = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetSettings().get(flowSheetGroups.getName());
+		displayName = flowsheet.getDisplayName();
+		MeasurementFlowSheet flowSheetGroups = null;
 
-		boolean enabled = true;
-		if(fs != null)
+		// go through all flowsheet templates and find the associated one
+		for (MeasurementFlowSheet measurementFlowSheet : flowsheetTemplates)
 		{
-			enabled = fs.isEnabled();
+			if (measurementFlowSheet.getName() != null && measurementFlowSheet.getName().equals(flowsheet.getName()))
+			{
+				flowSheetGroups = measurementFlowSheet;
+				break;
+			}
 		}
 
-		if(enabled)
+		if(flowsheet.isEnabled() && flowSheetGroups != null)
 		{
-			if (flowSheetGroups.isUniversal())
+			if (flowSheetGroups.isUniversal()
+					&& flowsheet.getName().equals(flowSheetGroups.getName())
+					&& !diagnosed.contains(flowSheetGroups.getName()))
 			{
 				diagnosed.add(flowSheetGroups.getName());
 			}
 			else
 			{
+				// These flowsheets have a Dx trigger associated
 				for (String flowsheetName : flowsheets)
 				{
 					if (flowsheetName.equals(flowSheetGroups.getName()))
 					{
 						diagnosed.add(flowSheetGroups.getName());
+						break;
 					}
 				}
 
@@ -726,10 +737,62 @@ function fsPopup(width,height,url,window) {
 
 				if (displayName.equals(flowSheet))
 				{
-					dxCodeQueryString = flowSheetGroups.getDxTriggersQueryBuilder(demographic_no, providerNo);
+					try
+					{
+						dxCodeQueryString = flowSheetGroups.getDxTriggersQueryBuilder(demographic_no, providerNo);
+					}
+					catch (Exception e)
+					{
+						MiscUtils.getLogger().error("Error getting DxTriggers - Health Tracker", e);
+					}
 				}
 			}
+		}// if enabled and universal
+	}
+
+	List<FlowSheetUserCreated> userCreatedFlowsheets = flowsheetService.getUserCreatedFlowsheets();
+
+	for (FlowSheetUserCreated userCreatedFlowsheet : userCreatedFlowsheets)
+	{
+		displayName = userCreatedFlowsheet.getDisplayName();
+		MeasurementFlowSheet flowSheetGroups = null;
+
+		for (MeasurementFlowSheet measurementFlowSheet : flowsheetTemplates)
+		{
+			if (measurementFlowSheet.getName() != null && measurementFlowSheet.getName().equals(userCreatedFlowsheet.getName()))
+			{
+				flowSheetGroups = measurementFlowSheet;
+				break;
+			}
 		}
+
+		if(!userCreatedFlowsheet.getArchived())
+		{
+			for (String flowsheetName : flowsheets)
+			{
+				if(flowsheetName.equals(flowSheetGroups.getName()))
+				{
+					diagnosed.add(flowSheetGroups.getName());
+					break;
+				}
+			}
+
+			flowsheetList.add(flowSheetGroups.getName());
+
+			if(displayName.equals(flowSheet))
+			{
+				try
+				{
+					dxCodeQueryString = flowSheetGroups.getDxTriggersQueryBuilder(demographic_no, providerNo);
+				}
+				catch(Exception e)
+				{
+					MiscUtils.getLogger().error("Error getting DxTriggers - Health Tracker",e);
+				}
+			}
+
+		}// if enabled and universal
+
 	}
 
 	String btnLabel = "";
@@ -737,7 +800,7 @@ function fsPopup(width,height,url,window) {
 
 	for (String value : diagnosed)
 	{
-		if (temp.equals(value))
+		if (template.equals(value))
 		{
 			fsSelected = "btn-primary active";
 		}
@@ -752,11 +815,19 @@ function fsPopup(width,height,url,window) {
 			btnLabel = "DIAB";
 		}
 
-		out.print("<a href='" + request.getRequestURI() + "?demographic_no=" + demographic_no + "&template=" + value.toString() + "' class='btn " + fsSelected + "' title='Diagnosed' id='group-btn-" + value + "'>" + btnLabel + "</a> ");
+		%>
+			<a href="<%=request.getRequestURI()%>?demographic_no=<%=demographic_no%>&template=<%=value%>"
+			   class="btn <%=fsSelected%>"
+			   title="Diagnosed"
+			   id="group-btn-<%=value%>">
+				<%=btnLabel%>
+			</a>
+		<%
+
 		fsSelected = "";
 	}
 
-	String undiagnosed = "";
+	StringBuilder undiagnosed = new StringBuilder();
 	String unDxShow ="";
 
 	for (String value : flowsheetList)
@@ -767,7 +838,7 @@ function fsPopup(width,height,url,window) {
 		{
 			if (btnLabel.equals("PHV"))
 			{
-				if (temp.equals(value))
+				if (template.equals(value))
 				{
 					fsSelected = "btn-primary active";
 				}
@@ -785,7 +856,7 @@ function fsPopup(width,height,url,window) {
 				btnLabel = "DIAB";
 			}
 
-			if (temp.equals(value) && !temp.equals("phv"))
+			if (template.equals(value) && !template.equals("phv"))
 			{
 				fsSelected = "active";
 				unDxShow = btnLabel;
@@ -793,34 +864,49 @@ function fsPopup(width,height,url,window) {
 
 			if (!btnLabel.equals("PHV"))
 			{
-				MeasurementFlowSheet findName = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(value);
-				undiagnosed = undiagnosed + "<li class='" + fsSelected + "'><a href='" + request.getRequestURI() + "?demographic_no=" + demographic_no + "&template=" + value.toString() + "'  title='Undiagnosed' id='group-btn-" + value + "'>" + findName.getDisplayName() + "</a></li>";
+				MeasurementFlowSheet findName = flowsheetService.getFlowsheetTemplate(value);
+				String templateDisplayName = "";
+				if (findName != null)
+				{
+					templateDisplayName = findName.getDisplayName();
+				}
+				UriComponentsBuilder undiagnosedUri = UriComponentsBuilder.fromUriString(request.getRequestURI());
+				undiagnosedUri.queryParam("demographic_no", demographic_no);
+				undiagnosedUri.queryParam("template", value);
+
+				undiagnosed.append("<li class='")
+						.append(fsSelected)
+						.append("'><a href='")
+						.append(undiagnosedUri.build())
+						.append("' title='Undiagnosed' id='group-btn-")
+						.append(value).append("'>")
+						.append(templateDisplayName).append("</a></li>");
 				fsSelected = "";
 			}
 
 		}
 	}
 
+	String primaryMore = "";
+	if (!unDxShow.isEmpty())
+	{
+		primaryMore="btn-primary";
+	}
+
+
 %>
-<span class="btn-divider" title="View undiagnosed flowsheets">| </span>			
-<%
-String primaryMore="";
-if(unDxShow!=""){  
-primaryMore="btn-primary";
-}
-%>			
-			<div class="btn-group">
-			  <button type="button" class="btn btn-default <%=primaryMore%> dropdown-toggle" data-toggle="dropdown" title="View undiagnosed flowsheets">
-			    <%=unDxShow%> <span class="glyphicon glyphicon-chevron-down "></span>
-			  </button>
-			  <ul class="dropdown-menu" role="menu">
-			  	<li class="dropdown-header">Undiagnosed</li>
-				<%=undiagnosed %>
-			  </ul>
-			</div>
+<span class="btn-divider" title="View undiagnosed flowsheets">| </span>
+<div class="btn-group">
+	<button type="button" class="btn btn-default <%=primaryMore%> dropdown-toggle" data-toggle="dropdown" title="View undiagnosed flowsheets">
+		<%=unDxShow%> <span class="glyphicon glyphicon-chevron-down "></span>
+	</button>
+	<ul class="dropdown-menu" role="menu">
+		<li class="dropdown-header">Undiagnosed</li>
+		<%=undiagnosed %>
+	</ul>
+</div>
 		</div>
 </div>
-
 
 <div id="main" class="container">
    <div class="row-fluid">
@@ -828,7 +914,7 @@ primaryMore="btn-primary";
    	<div class="row-fluid">
    		<div class="col-lg-12">
  
- <%if (!diagnosed.contains(temp) && !temp.equals("phv") && !temp.equals("tracker")){ %>  
+ <%if (!diagnosed.contains(template) && !template.equals("phv") && !template.equals("tracker")){ %>
  
 <script type="text/javascript">
     $(window).load(function(){
@@ -866,9 +952,9 @@ primaryMore="btn-primary";
 <%if( request.getParameter("tracker")!=null && request.getParameter("tracker").equals("slim") ){ %>
 
 <%}else{%>   
-<%if(!temp.equals("tracker")){%>
+<%if(!template.equals("tracker")){%>
 <h4 style="display:inline;"><%=flowSheet%></h4>
-<%}else if(isMeasurements && temp.equals("tracker")){ 	%>
+<%}else if(isMeasurements && template.equals("tracker")){ 	%>
 <h4 style="display:inline;">Tracker Flowsheet</h4>
 <%}%>
 
@@ -885,7 +971,7 @@ primaryMore="btn-primary";
 		<%}%>
 		<%
 		 if("yes".equalsIgnoreCase(ornPilot) || "true".equalsIgnoreCase(ornPilot)) {
-		 if(temp.toUpperCase().equals("DIAB2") || temp.toUpperCase().equals("CKD") || temp.toUpperCase().equals("RENAL")){
+		 if(template.toUpperCase().equals("DIAB2") || template.toUpperCase().equals("CKD") || template.toUpperCase().equals("RENAL")){
 		%>
 		
 		<span class="DoNotPrint" style="padding-left:10px;" id="add-renal">
@@ -947,16 +1033,16 @@ primaryMore="btn-primary";
 	    <div class="row-fluid">
 		    <div class="col-lg-6 col-md-6" id="left-side">
 
-<%if(!isMeasurements && !temp.equals("tracker")){ out.print("No measurements! ");%>	
+<%if(!isMeasurements && !template.equals("tracker")){ out.print("No measurements! ");%>
 		<security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="w">	
-		To add measurements go to <a href='adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=temp%>&demographic=<%=demographic_no%>&htracker<%=tracker%>' title='Edit Flowsheet'>Edit Flowsheet</a>.	
+		To add measurements go to <a href='adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=template%>&demographic=<%=demographic_no%>&htracker<%=tracker%>' title='Edit Flowsheet'>Edit Flowsheet</a>.
 		</security:oscarSec>	
-<%}else if(!isMeasurements && temp.equals("tracker")){%>            		    
+<%}else if(!isMeasurements && template.equals("tracker")){%>
 
 <div class="well" id="health-tracker-add">
 <p class="lead muted">It looks like you are not tracking any measurements!</p>
 
-<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=temp%>&demographic=<%=demographic_no%>&add&htracker<%=tracker%>" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-plus-sign "></span> Add Measurements</a>
+<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=template%>&demographic=<%=demographic_no%>&add&htracker<%=tracker%>" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-plus-sign "></span> Add Measurements</a>
 
 </div>
 <%}%>           		    
@@ -975,7 +1061,7 @@ primaryMore="btn-primary";
 
 <input type="hidden" name="date" id="date" value="<%=date%>" size="10" > 
 <input type="hidden" name="demographic_no" value="<%=demographic_no%>"/>
-<input type="hidden" name="template" value="<%=temp%>"/>
+<input type="hidden" name="template" value="<%=template%>"/>
 <%
 	//set add link array
 	String[] addAllLink = new String[measurements.size()];
@@ -1014,13 +1100,6 @@ primaryMore="btn-primary";
                 warningColour = mFlowsheet.getWarningColour();
             }
 
-            //measurement_type="EDGI"
-            //display_name="Autonomic Neuropathy"
-            //guideline="Erectile Dysfunction, hastrointestinal disturbance"
-            //graphable="no"
-            //value_name="Answer"
-            
-          
 String name = h2.get("display_name").toString();
 name = name.replaceAll("\\W","");
 iDate++;
@@ -1107,9 +1186,11 @@ iDate++;
 	<div class="form-group" style="width:160px;text-align:right;display:inline-block !important; margin:0px;padding:0px;">
 	<%
 		String validationName = "";
+		String measuringInstructions = "";
 		if (mtypeBean != null)
 		{
 			validationName = mtypeBean.getValidationName();
+			measuringInstructions = mtypeBean.getMeasuringInstrc();
 		}
 		if ("Yes/No".equals(validationName) || "Yes/No/NA".equals(validationName) || "Yes/No/X".equals(validationName))
 		{
@@ -1124,18 +1205,18 @@ iDate++;
 		NA
 	<%}%>				 		  
 	    </div> <!-- yes-no-options -->                      
-	 <%}else if( mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Review")){ %>
+	 <%}else if( !validationName.isEmpty() && validationName.equals("Review")){ %>
 		<label class="checkbox checkbox-inline">
 		<input type="checkbox" name="<%=name%>" id="<%=name%>-REVIEWED" value="Reviewed" onClick="toggle_visibility('add-box-<%=measure%>')">
 		Reviewed
 		</label>
 	 <%}else{ %>
-	 <input type="text" class="form-control" id="<%=name%>" name="<%=name%>" onClick="toggle_visibility('add-box-<%=measure%>')" title="<% if (name.equals("WarfarinWeeklyDose") || name.equals("Weightkg") || name.equals("Heightcm")){ %> Double click to convert<%}else if (name.equals("BP")) {%>00/00 or 000/00 <%}else{ %> <%=mtypeBean.getValidationName()%> <%}%>"
+	 <input type="text" class="form-control" id="<%=name%>" name="<%=name%>" onClick="toggle_visibility('add-box-<%=measure%>')" title="<% if (name.equals("WarfarinWeeklyDose") || name.equals("Weightkg") || name.equals("Heightcm")){ %> Double click to convert<%}else if (name.equals("BP")) {%>00/00 or 000/00 <%}else{ %> <%=validationName%> <%}%>"
 	                       	<% if ((name.equals("Weightkg") || name.equals("Heightcm")) ){ %> onchange="calcBMI();" onkeyup="calcBMI();"<%}%>
 	                       	<% if (name.equals("Weightkg")){ %> onDblClick="wtEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("Heightcm")){ %> onDblClick="htEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("BMI")){ %> onDblClick="calcBMI();"<%}%>
-	                       	<% if (name.equals("WarfarinWeeklyDose")){ %> onDblClick="calcWeeklyDose(this);"<%}%> placeholder="Enter Data" <%=getPattern(measure, mtypeBean.getMeasuringInstrc())%> autocomplete="off"> 
+							<% if (name.equals("WarfarinWeeklyDose")){ %> onDblClick="calcWeeklyDose(this);"<%}%> placeholder="Enter Data" <%=getPattern(measure, measuringInstructions)%> autocomplete="off">
 	 <%} %>
 	 </div><!-- form group -->
   
@@ -1423,11 +1504,11 @@ function createAddAll(d,t){
 <div class="DoNotPrint save-all">
 	<!-- this will have to be visible to user -->
 			
-		<a href="TemplateFlowSheetPrint.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>&htracker" class="btn btn-default btn-lg" value="<bean:message key="oscarencounter.templateflowsheet.print" />" title="<bean:message key="oscarencounter.templateflowsheet.print" /> Flowsheet"><span class="glyphicon glyphicon-print"></span> Print</a>
+		<a href="TemplateFlowSheetPrint.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>&htracker" class="btn btn-default btn-lg" value="<bean:message key="oscarencounter.templateflowsheet.print" />" title="<bean:message key="oscarencounter.templateflowsheet.print" /> Flowsheet"><span class="glyphicon glyphicon-print"></span> Print</a>
 					
 		<security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="w">
 			<security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="x">
-			<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=temp%>&demographic=<%=demographic_no%>&htracker" class="btn btn-default btn-lg" title="Edit Flowsheet"><span class="glyphicon glyphicon-pencil"></span> Edit</a>   
+			<a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=template%>&demographic=<%=demographic_no%>&htracker" class="btn btn-default btn-lg" title="Edit Flowsheet"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
 			</security:oscarSec>
 					
 		    <input class="btn btn-primary btn-lg" type="submit" name="submit" value="Save All" />
@@ -1444,7 +1525,7 @@ function createAddAll(d,t){
  
  <%
  if("yes".equalsIgnoreCase(ornPilot) || "true".equalsIgnoreCase(ornPilot)) {
- if(temp.toUpperCase().equals("DIAB2") || temp.toUpperCase().equals("CKD") || temp.toUpperCase().equals("RENAL")){
+ if(template.toUpperCase().equals("DIAB2") || template.toUpperCase().equals("CKD") || template.toUpperCase().equals("RENAL")){
  %>
  <!-- renal  start-->
    <div class="tabbable DoNotPrint">
@@ -1481,12 +1562,12 @@ function createAddAll(d,t){
     	<li><a href="#templates" data-toggle="tab" title="new forms to be completed"><bean:message key="global.templates" /></a></li>
     	
     	
-    	<%if(temp.toUpperCase().equals("PHV")){ //temp for PHV TODO-legacy: make generic so the below links will be user added/managed %>
+    	<%if(template.toUpperCase().equals("PHV")){ //template for PHV TODO-legacy: make generic so the below links will be user added/managed %>
     	<li><a href="#resources" data-toggle="tab" title="">Resources</a></li>
 		<%} %>
     </ul>
 <%
-	String groupToView = temp.toLowerCase(); 
+	String groupToView = template.toLowerCase();
 	String user = (String) session.getAttribute("user");
 	String roleName = (String)session.getAttribute("userrole") + "," + user;
 	String orderBy = EFormUtil.DATE;
@@ -1540,7 +1621,7 @@ function createAddAll(d,t){
 		</table>
 		</div><!-- templates -->
 
-		<%if(temp.toUpperCase().equals("PHV")){%>
+		<%if(template.toUpperCase().equals("PHV")){%>
 		<div id="resources" class="tab-pane">
 		<ul>
 		<li><a href="http://www.sexualityandu.ca" target="_blank">www.sexualityandu.ca</a></li>
@@ -1634,7 +1715,7 @@ function createAddAll(d,t){
 <div class="modal-body" style="text-align:center">
 
                <input type="hidden" name="value(numType)" value="<%=demographic_no%>"/>
-               <input type="hidden" name="template"  id="deleteTemplate" value="<%=temp%>"/>
+               <input type="hidden" name="template"  id="deleteTemplate" value="<%=template%>"/>
 
                <input type="hidden" name="id" id="deleteId" value=""/>
                <input type="hidden" name="deleteCheckbox" id="deleteCheck" value=""/>
@@ -1740,14 +1821,7 @@ $(document).ready(function () {
 			margin:"0px",
 			padding:"0px"
         });
-	}else{
-        // Execute on load
-        //checkWidth();
-        
-        // Bind event listener
-        //$(window).resize(checkWidth);
 	}
-
 	//TODO-legacy:these will change generic so this function can be re-used
 	$("input:radio[name=SmokingStatus]").click(function() {
 	    var value = $(this).val().toLowerCase();
@@ -1789,13 +1863,13 @@ $(document).ready(function () {
 		var v=$(this).val();
 		
 		  if(v=="All"){
-	          window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>';  
+	          window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>';
 		  }else if (v=="outOfRange"){
-			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>&show='+v;
+			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>&show='+v;
 		  }else if(v=="dateRange"){
 			  $("#date-filter").toggle();
 		  }else{
-			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=temp%>&numEle='+v;
+			  window.location = 'HealthTrackerPage.jspf?demographic_no=<%=demographic_no%>&template=<%=template%>&numEle='+v;
 		  } 
     });    
     
@@ -1812,7 +1886,7 @@ $(document).ready(function () {
             method: 'POST',
             data: deletevalue,
             success: function(returnData){
-            	window.location = "<%=request.getContextPath()%>/oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?ycoord="+ycoord+"&demographic_no=<%=demographic_no%>&template=<%=temp%>";
+            	window.location = "<%=request.getContextPath()%>/oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?ycoord="+ycoord+"&demographic_no=<%=demographic_no%>&template=<%=template%>";
             }
         });
 
@@ -1874,9 +1948,6 @@ $(document).ready(function () {
     	if(error){
     		$(this).addClass('input-error');
     		$(this).removeClass('input-success');
-
-    		//TODO-legacy: when able to save individual measurments
-    		 //$('#save_'+id).attr('disabled','disabled');
     		return false;
     		
         	}else{
@@ -1884,10 +1955,6 @@ $(document).ready(function () {
            			$(this).removeClass('input-error');
                 	$(this).addClass('input-success');
 
-            	//TODO-legacy: when able to save individual measurments
-            	//$('#save_'+id).removeAttr('disabled');
-
-            	
             	}
 
     }); 
@@ -1929,27 +1996,14 @@ $(document).ready(function () {
 			}else{
 				$("#options-"+type).addClass(' options-error');	
 			}
-	   //alert("input type: "+inputType+" empty" + type + " date:" + typeDate + " comment:" + typeComments + " scrollcords:" + ycoord + " hiddenDate: " + date);
- 
+
 	}else{
 		//build
 		var link = "<%=request.getContextPath()%>/oscarEncounter/oscarMeasurements/TrackerUpdate.do";
-		var qs1 = "ycoord="+ycoord+"&date="+date+"&demographic_no=<%=demographic_no%>&template=<%=temp%>";
+		var qs1 = "ycoord="+ycoord+"&date="+date+"&demographic_no=<%=demographic_no%>&template=<%=template%>";
 		var qs2 = typeDate+"="+typeDateVal+"&"+type+"="+value+"&"+typeComments+"="+typeCommentsVal+"&submit=Add";
 
 		$('#'+type).removeClass(' input-error').addClass(' input-success');
-		
-		//TODO-legacy: post single measurments instead of passing complete form
-	 	//alert("input type: "+inputType+" not empty" + type + link+qs1+qs2);
-		/*
-        $.ajax({
-            url: link,
-            method: 'POST',
-            data: qs1 + qs2,
-            success: function(returnData){
-            	window.location.reload();
-            }//do something on failure
-        });*/ 
 	}
 	 
 	});
@@ -1973,23 +2027,6 @@ $(document).ready(function () {
 	   
         var $window = $(window);
 
-        // Function to handle changes to style classes based on window width
-        /*function checkWidth() {
-            if ($window.width() < 964) {
-                $('#right-side').removeClass('col-lg-6').addClass('col-lg-2 pull-right');
-                };
-                
-            if ($window.width() < 1200) {
-                $('#right-side').removeClass('col-lg-6').addClass('col-lg-2 pull-right');
-                };
-
-            if ($window.width() >= 1200) {
-                $('#right-side').removeClass('col-lg-4 pull-right').addClass('col-lg-6');
-            }
-    
-        }*/
-
-
  });
 
 //clear modal when closing
@@ -2002,7 +2039,7 @@ $('#deleteModal').on('hidden', function () {
 	$("#deleteComment").html("");
 });
 
-<%if(temp.toUpperCase().equals("PHV")){%>
+<%if(template.toUpperCase().equals("PHV")){%>
 $("#AssessmentFollowupplans-REVIEWED").click(function(){
 	if ($('#AssessmentFollowupplans-REVIEWED').is(':checked')) {
 		$("#AssessmentFollowupplans_note").prop( 'checked', true );
@@ -2057,12 +2094,6 @@ $(".graphClick").click(function(){
 	 	});
 
 	}
-	//alert(data.length);
- 	
-	 /*var line1=[['23-May-08', 2], ['20-Jun-08', 7], ['25-Jul-08', 8], ['22-Aug-08', 4],
-    ['26-Sep-08', 2], ['24-Oct-08', 2], ['21-Nov-08', 4], ['26-Dec-08', 4],
-    ['23-Jan-09', 3], ['20-Feb-09', 3], ['20-Mar-09', 4], ['24-Apr-09', 5]];*/
-
     
 var title1= name;
 var line1 = data;
@@ -2137,12 +2168,9 @@ $('.carousel').carousel({
     })
 
 function saveAll(){
-	//$("#trackerForm").submit();
 	alert("tracker save");
 	$("#trackerForm").submit();
-	//$("form[name='trackerForm']").submit();
-	//document.forms["trackerForm"].submit();
-}    
+}
     
 function deleteMeasurement(type,enteredBy,value,date,id){   
 	$("#myModalLabel").html="";
