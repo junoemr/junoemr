@@ -27,9 +27,9 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -37,9 +37,12 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ClassicUIPreventionsTests extends SeleniumTestBase
 {
+	@Autowired
+	DatabaseUtil databaseUtil;
 
 	// Reused URLs to navigate to
 	private static final String PREVENTION_URL = "/oscarPrevention/index.jsp?demographic_no=1";
@@ -47,15 +50,15 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 	private static final String EXAM_PREVENTION_URL = "/oscarPrevention/AddPreventionData.jsp?prevention=Smoking&demographic_no=1&prevResultDesc=";
 
 	//
-	@BeforeClass
-	public static void setup()
+	@Before
+	public void setup()
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
+		databaseUtil.createTestDemographic();
 	}
 
-	@AfterClass
-	public static void cleanup()
+	@After
+	public void cleanup()
 			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		SchemaUtils.restoreTable(

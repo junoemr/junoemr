@@ -26,9 +26,9 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -39,20 +39,24 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class EditEncounterNotesTests extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@Autowired
+	DatabaseUtil databaseUtil;
+
+	@Before
+	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
+		databaseUtil.createTestDemographic();
 	}
 
-	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "casemgmt_note", "demographic",
 				"eChart", "eform_data", "eform_instance", "eform_values", "log", "measurementType", "validations");

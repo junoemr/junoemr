@@ -52,7 +52,6 @@ import org.oscarehr.util.MiscUtils;
 
 import org.springframework.beans.factory.InitializingBean;
 
-import org.springframework.core.io.Resource;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctValidationsBean;
