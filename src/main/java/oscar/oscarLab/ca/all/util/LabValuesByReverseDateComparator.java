@@ -54,8 +54,8 @@ public class LabValuesByReverseDateComparator implements Comparator<Map<String, 
 {
     public int compare(Map<String, String> o1, Map<String, String> o2)
     {
-        Date dateA = ConversionUtils.fromDateString(o1.get("date") , ConversionUtils.DEFAULT_TS_PATTERN);
-        Date dateB = ConversionUtils.fromDateString(o2.get("date") , ConversionUtils.DEFAULT_TS_PATTERN);
+        Date dateA = ConversionUtils.fromDateString(o1.get("date") , ConversionUtils.DEFAULT_DATE_PATTERN);
+        Date dateB = ConversionUtils.fromDateString(o2.get("date") , ConversionUtils.DEFAULT_DATE_PATTERN);
 
         return dateA.compareTo(dateB) * -1;
     }
