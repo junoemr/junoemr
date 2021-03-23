@@ -128,7 +128,7 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
 			boolean printLabs = request.getParameter("printLabs") != null && request.getParameter("printLabs").equalsIgnoreCase("true");		
 		
 			CaseManagementPrint cmp = new CaseManagementPrint();
-			cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs,null,null,request, response.getOutputStream());
+			cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs, null, null,null,request, response.getOutputStream());
         	
         }
         return null;
@@ -227,7 +227,7 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
     			}
     		
     			CaseManagementPrint cmp = new CaseManagementPrint();
-    			cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs,startDate,endDate,request, os);
+    			cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs, null, startDate,endDate,request, os);
             	
             } else if (module != null && module.equals("document")) {
             	documentNo =  request.getParameter("documentNo");
