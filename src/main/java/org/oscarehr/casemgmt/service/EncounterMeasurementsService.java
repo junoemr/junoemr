@@ -41,7 +41,6 @@ import oscar.OscarProperties;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarEncounter.pageUtil.EctDisplayMeasurementsAction;
-import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.util.ConversionUtils;
 
@@ -49,7 +48,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import oscar.util.StringUtils;
 
 public class EncounterMeasurementsService extends EncounterSectionService
 {
