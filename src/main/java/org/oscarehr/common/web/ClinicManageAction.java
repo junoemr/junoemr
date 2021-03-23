@@ -85,28 +85,45 @@ public class ClinicManageAction extends DispatchAction
     public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
         DynaActionForm frm = (DynaActionForm) form;
-        Clinic clinic = (Clinic) frm.get("clinic");
+        Clinic clinicFromForm = (Clinic) frm.get("clinic");
+        Clinic oldClinic = clinicDAO.find(clinicFromForm.getId());
 
         //weird hack, but not sure why struts isn't filling in the id.
-        if (request.getParameter("clinic.id") != null && request.getParameter("clinic.id").length() > 0 && clinic.getId() == null)
+        if (request.getParameter("clinic.id") != null && request.getParameter("clinic.id").length() > 0 && clinicFromForm.getId() == null)
         {
-            clinic.setId(Integer.parseInt(request.getParameter("clinic.id")));
+            clinicFromForm.setId(Integer.parseInt(request.getParameter("clinic.id")));
         }
 
         if (request.getParameter("billingCheck") != null && request.getParameter("billingCheck").equals("on"))
         {
             ClinicBillingAddress clinicBillingAddress = (ClinicBillingAddress) frm.get("clinicBillingAddress");
             clinicBillingAddressDAO.save(clinicBillingAddress);
-            clinic.setClinicBillingAddress(clinicBillingAddress);
+            clinicFromForm.setClinicBillingAddress(clinicBillingAddress);
         }
 
-        Clinic oldClinic = clinicDAO.find(clinic.getId());
         if (oldClinic != null)
         {
-            clinic.setUuid(oldClinic.getUuid());
+            oldClinic.setClinicName(clinicFromForm.getClinicName());
+            oldClinic.setClinicAddress(clinicFromForm.getClinicAddress());
+            oldClinic.setClinicCity(clinicFromForm.getClinicCity());
+            oldClinic.setClinicProvince(clinicFromForm.getClinicProvince());
+            oldClinic.setClinicPostal(clinicFromForm.getClinicPostal());
+            oldClinic.setClinicPhone(clinicFromForm.getClinicPhone());
+            oldClinic.setClinicFax(clinicFromForm.getClinicFax());
+            oldClinic.setClinicLocationCode(clinicFromForm.getClinicLocationCode());
+            oldClinic.setBcFacilityNumber(clinicFromForm.getBcFacilityNumber());
+            oldClinic.setClinicDelimPhone(clinicFromForm.getClinicDelimPhone());
+            oldClinic.setClinicDelimFax(clinicFromForm.getClinicDelimFax());
+            oldClinic.setClinicEmail(clinicFromForm.getClinicEmail());
+
+            // If billing check
+            if (request.getParameter("billingCheck") != null && request.getParameter("billingCheck").equals("on"))
+            {
+                oldClinic.setClinicBillingAddress(clinicFromForm.getClinicBillingAddress());
+            }
         }
 
-        clinicDAO.merge(clinic);
+        clinicDAO.merge(oldClinic);
 
         request.setAttribute("updateSuccess", "Updated Successfully");
 
