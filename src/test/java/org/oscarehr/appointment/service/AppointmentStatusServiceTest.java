@@ -55,7 +55,7 @@ public class AppointmentStatusServiceTest
 	 * Test that the correct appointment status code (the next one alphabetically) is assigned.
 	 */
 	@Test
-	public void createAppointmentStatuses()
+	public synchronized void createAppointmentStatuses()
 	{
 		// General case
 		when(mockDao.findAll()).thenReturn(generateAppointmentStatusList("ABCabc".toCharArray()));

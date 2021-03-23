@@ -69,7 +69,12 @@ public class AppointmentStatusService
 	
 	public List<AppointmentStatus> getActiveAppointmentStatuses()
 	{
-		return appointmentStatusDao.findActive();
+		return appointmentStatusDao.findByActive(true);
+	}
+	
+	public List<AppointmentStatus> getInactiveAppointmentStatuses()
+	{
+		return appointmentStatusDao.findByActive(false);
 	}
 	
 	public AppointmentStatus getAppointmentStatusById(Integer id)
@@ -85,6 +90,10 @@ public class AppointmentStatusService
 	/**
 	 * Persist the supplied appointment status. This method will automatically set a status code based on the next
 	 * available unused code.  Any existing status code passed into this method will be lost.
+	 *
+	 * For safety, this code should be called from a synchronized block, as two simultaneous transactions looking up
+	 * the next available appointment status code will return identical status codes, leading to multiple statuses
+	 * sharing the same code.
 	 *
 	 * @param status AppointmentStatus to persist
 	 */
