@@ -123,6 +123,7 @@ public class ProviderEditFormTo1 implements Serializable
 	private String takNumber;
 	private String lifeLabsClientId;
 	private String eDeliveryIds;
+	private String imdHealthUuid;
 
 	/**
 	 * initialize this object using the provided provider data.
@@ -168,6 +169,11 @@ public class ProviderEditFormTo1 implements Serializable
 		this.setConnectCareProviderId(providerData.getAlbertaConnectCareId());
 		this.setCpsid(providerData.getPractitionerNo());
 		this.setLifeLabsClientId(providerData.getOntarioLifeLabsId());
+
+		if (providerData.getImdHealthUuid() != null)
+		{
+			this.setImdHealthUuid(providerData.getImdHealthUuid());
+		}
 	}
 
 	/**
@@ -226,6 +232,7 @@ public class ProviderEditFormTo1 implements Serializable
 		providerData.setAlbertaConnectCareId(this.getConnectCareProviderId());
 		providerData.setPractitionerNo(this.getCpsid());
 		providerData.setOntarioLifeLabsId(this.getLifeLabsClientId());
+		providerData.setImdHealthUuid(this.getImdHealthUuid());
 
 		return providerData;
 	}
@@ -367,7 +374,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return firstName;
 	}
-
 	public void setFirstName(String firstName)
 	{
 		this.firstName = firstName;
@@ -377,7 +383,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return lastName;
 	}
-
 	public void setLastName(String lastName)
 	{
 		this.lastName = lastName;
@@ -387,7 +392,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return type;
 	}
-
 	public void setType(String type)
 	{
 		this.type = type;
@@ -397,7 +401,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return speciality;
 	}
-
 	public void setSpeciality(String speciality)
 	{
 		this.speciality = speciality;
@@ -407,7 +410,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return team;
 	}
-
 	public void setTeam(String team)
 	{
 		this.team = team;
@@ -417,7 +419,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return sex;
 	}
-
 	public void setSex(String sex)
 	{
 		this.sex = sex;
@@ -427,7 +428,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return dateOfBirth;
 	}
-
 	public void setDateOfBirth(LocalDate dateOfBirth)
 	{
 		this.dateOfBirth = dateOfBirth;
@@ -437,7 +437,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return email;
 	}
-
 	public void setEmail(String email)
 	{
 		this.email = email;
@@ -447,7 +446,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return userName;
 	}
-
 	public void setUserName(String userName)
 	{
 		this.userName = userName;
@@ -457,7 +455,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return password;
 	}
-
 	public void setPassword(String password)
 	{
 		this.password = password;
@@ -467,7 +464,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return secondLevelPasscode;
 	}
-
 	public void setSecondLevelPasscode(String secondLevelPasscode)
 	{
 		this.secondLevelPasscode = secondLevelPasscode;
@@ -477,7 +473,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return address;
 	}
-
 	public void setAddress(String address)
 	{
 		this.address = address;
@@ -487,7 +482,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return homePhone;
 	}
-
 	public void setHomePhone(String homePhone)
 	{
 		this.homePhone = homePhone;
@@ -497,7 +491,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return workPhone;
 	}
-
 	public void setWorkPhone(String workPhone)
 	{
 		this.workPhone = workPhone;
@@ -507,7 +500,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return cellPhone;
 	}
-
 	public void setCellPhone(String cellPhone)
 	{
 		this.cellPhone = cellPhone;
@@ -517,7 +509,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return otherPhone;
 	}
-
 	public void setOtherPhone(String otherPhone)
 	{
 		this.otherPhone = otherPhone;
@@ -527,7 +518,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return fax;
 	}
-
 	public void setFax(String fax)
 	{
 		this.fax = fax;
@@ -537,7 +527,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return contactEmail;
 	}
-
 	public void setContactEmail(String contactEmail)
 	{
 		this.contactEmail = contactEmail;
@@ -547,7 +536,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return pagerNumber;
 	}
-
 	public void setPagerNumber(String pagerNumber)
 	{
 		this.pagerNumber = pagerNumber;
@@ -557,7 +545,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return userRoles;
 	}
-
 	public void setUserRoles(List<Integer> userRoles)
 	{
 		this.userRoles = userRoles;
@@ -567,7 +554,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return siteAssignments;
 	}
-
 	public void setSiteAssignments(List<Integer> siteAssignments)
 	{
 		this.siteAssignments = siteAssignments;
@@ -577,7 +563,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return bcBillingNo;
 	}
-
 	public void setBcBillingNo(String bcBillingNo)
 	{
 		this.bcBillingNo = bcBillingNo;
@@ -587,7 +572,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return bcRuralRetentionCode;
 	}
-
 	public void setBcRuralRetentionCode(JunoTypeaheadTo1 bcRuralRetentionCode)
 	{
 		this.bcRuralRetentionCode = bcRuralRetentionCode;
@@ -597,7 +581,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return bcServiceLocation;
 	}
-
 	public void setBcServiceLocation(String bcServiceLocation)
 	{
 		this.bcServiceLocation = bcServiceLocation;
@@ -607,7 +590,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return onGroupNumber;
 	}
-
 	public void setOnGroupNumber(String onGroupNumber)
 	{
 		this.onGroupNumber = onGroupNumber;
@@ -617,7 +599,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return onSpecialityCode;
 	}
-
 	public void setOnSpecialityCode(String onSpecialityCode)
 	{
 		this.onSpecialityCode = onSpecialityCode;
@@ -627,7 +608,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return onVisitLocation;
 	}
-
 	public void setOnVisitLocation(String onVisitLocation)
 	{
 		this.onVisitLocation = onVisitLocation;
@@ -637,7 +617,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return onServiceLocationIndicator;
 	}
-
 	public void setOnServiceLocationIndicator(String onServiceLocationIndicator)
 	{
 		this.onServiceLocationIndicator = onServiceLocationIndicator;
@@ -647,7 +626,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return abSourceCode;
 	}
-
 	public void setAbSourceCode(String abSourceCode)
 	{
 		this.abSourceCode = abSourceCode;
@@ -657,7 +635,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return abSkillCode;
 	}
-
 	public void setAbSkillCode(String abSkillCode)
 	{
 		this.abSkillCode = abSkillCode;
@@ -667,7 +644,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return abLocationCode;
 	}
-
 	public void setAbLocationCode(String abLocationCode)
 	{
 		this.abLocationCode = abLocationCode;
@@ -677,7 +653,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return abBANumber;
 	}
-
 	public void setAbBANumber(Integer abBANumber)
 	{
 		this.abBANumber = abBANumber;
@@ -687,7 +662,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return abFacilityNumber;
 	}
-
 	public void setAbFacilityNumber(Integer abFacilityNumber)
 	{
 		this.abFacilityNumber = abFacilityNumber;
@@ -697,7 +671,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return abFunctionalCenter;
 	}
-
 	public void setAbFunctionalCenter(String abFunctionalCenter)
 	{
 		this.abFunctionalCenter = abFunctionalCenter;
@@ -707,7 +680,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return abRoleModifier;
 	}
-
 	public void setAbRoleModifier(String abRoleModifier)
 	{
 		this.abRoleModifier = abRoleModifier;
@@ -717,7 +689,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return skMode;
 	}
-
 	public void setSkMode(Integer skMode)
 	{
 		this.skMode = skMode;
@@ -727,7 +698,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return skLocationCode;
 	}
-
 	public void setSkLocationCode(String skLocationCode)
 	{
 		this.skLocationCode = skLocationCode;
@@ -737,7 +707,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return skSubmissionType;
 	}
-
 	public void setSkSubmissionType(String skSubmissionType)
 	{
 		this.skSubmissionType = skSubmissionType;
@@ -747,7 +716,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return skCorporationIndicator;
 	}
-
 	public void setSkCorporationIndicator(String skCorporationIndicator)
 	{
 		this.skCorporationIndicator = skCorporationIndicator;
@@ -757,7 +725,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return ohipNo;
 	}
-
 	public void setOhipNo(String ohipNo)
 	{
 		this.ohipNo = ohipNo;
@@ -767,7 +734,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return thirdPartyBillingNo;
 	}
-
 	public void setThirdPartyBillingNo(String thirdPartyBillingNo)
 	{
 		this.thirdPartyBillingNo = thirdPartyBillingNo;
@@ -777,7 +743,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return alternateBillingNo;
 	}
-
 	public void setAlternateBillingNo(String alternateBillingNo)
 	{
 		this.alternateBillingNo = alternateBillingNo;
@@ -787,7 +752,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return cpsid;
 	}
-
 	public void setCpsid(String cpsid)
 	{
 		this.cpsid = cpsid;
@@ -797,7 +761,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return ihaProviderMnemonic;
 	}
-
 	public void setIhaProviderMnemonic(String ihaProviderMnemonic)
 	{
 		this.ihaProviderMnemonic = ihaProviderMnemonic;
@@ -807,7 +770,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return connectCareProviderId;
 	}
-
 	public void setConnectCareProviderId(String connectCareProviderId)
 	{
 		this.connectCareProviderId = connectCareProviderId;
@@ -817,7 +779,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return takNumber;
 	}
-
 	public void setTakNumber(String takNumber)
 	{
 		this.takNumber = takNumber;
@@ -827,7 +788,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return lifeLabsClientId;
 	}
-
 	public void setLifeLabsClientId(String lifeLabsClientId)
 	{
 		this.lifeLabsClientId = lifeLabsClientId;
@@ -837,7 +797,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return eDeliveryIds;
 	}
-
 	public void seteDeliveryIds(String eDeliveryIds)
 	{
 		this.eDeliveryIds = eDeliveryIds;
@@ -847,7 +806,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return status;
 	}
-
 	public void setStatus(String status)
 	{
 		this.status = status;
@@ -857,7 +815,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return securityRecords;
 	}
-
 	public void setSecurityRecords(List<SecurityRecordTo1> securityRecords)
 	{
 		this.securityRecords = securityRecords;
@@ -867,7 +824,6 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return currentSecurityRecord;
 	}
-
 	public void setCurrentSecurityRecord(Integer currentSecurityRecord)
 	{
 		this.currentSecurityRecord = currentSecurityRecord;
@@ -877,9 +833,17 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		return bcpSites;
 	}
-
 	public void setBcpSites(List<Integer> bcpSites)
 	{
 		this.bcpSites = bcpSites;
+	}
+
+	public String getImdHealthUuid()
+	{
+		return imdHealthUuid;
+	}
+	public void setImdHealthUuid(String imdHealthUuid)
+	{
+		this.imdHealthUuid = imdHealthUuid;
 	}
 }

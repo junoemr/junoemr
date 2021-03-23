@@ -289,4 +289,13 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	{
 		this.bookingNotificationNumbers = bookingNotificationNumbers.stream().reduce("", (String acc, String str) -> acc + "," + str);
 	}
+
+	public String getImdHealthUuid()
+	{
+		return imdHealthUuid;
+	}
+	public void setImdHealthUuid(String imdHealthUuid)
+	{
+		this.imdHealthUuid = imdHealthUuid;
+	}
 }

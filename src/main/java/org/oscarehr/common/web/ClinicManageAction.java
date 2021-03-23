@@ -100,7 +100,13 @@ public class ClinicManageAction extends DispatchAction
             clinic.setClinicBillingAddress(clinicBillingAddress);
         }
 
-        clinicDAO.save(clinic);
+        Clinic oldClinic = clinicDAO.find(clinic.getId());
+        if (oldClinic != null)
+        {
+            clinic.setUuid(oldClinic.getUuid());
+        }
+
+        clinicDAO.merge(clinic);
 
         request.setAttribute("updateSuccess", "Updated Successfully");
 
