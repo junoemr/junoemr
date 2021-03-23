@@ -39,18 +39,21 @@ public class SitesManageAction extends DispatchAction {
     private SiteDao siteDao;
 
     @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
         return view(mapping, form, request, response);
     }
 
-    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
         List<Site> sites = siteDao.getAllSites();
 
         request.setAttribute("sites", sites);
         return mapping.findForward("list");
     }
 
-    public ActionForward add(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward add(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
     	DynaBean lazyForm = (DynaBean) form;
 
     	Site s = new Site();
@@ -62,16 +65,16 @@ public class SitesManageAction extends DispatchAction {
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		DynaBean lazyForm = (DynaBean) form;
-		Site updatedSite = (Site) lazyForm.get("site");
+		Site siteFromForm = (Site) lazyForm.get("site");
 
 		// verify mandatories
-		if (StringUtils.isBlank(updatedSite.getName()) || StringUtils.isBlank(updatedSite.getShortName()))
+		if (StringUtils.isBlank(siteFromForm.getName()) || StringUtils.isBlank(siteFromForm.getShortName()))
 		{
 			ActionMessages errors = this.getErrors(request);
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", "Site name or short name"));
 			this.saveErrors(request, errors);
 		}
-		if (StringUtils.isBlank(updatedSite.getBgColor()))
+		if (StringUtils.isBlank(siteFromForm.getBgColor()))
 		{
 			ActionMessages errors = this.getErrors(request);
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", "Theme color"));
@@ -79,45 +82,53 @@ public class SitesManageAction extends DispatchAction {
 		}
 
 		// check that site with this name does not already exist
-		Site siteByName = siteDao.findByName(updatedSite.getName());
-		if (siteByName != null && !siteByName.getId().equals(updatedSite.getId()))
+		Site siteByName = siteDao.findByName(siteFromForm.getName());
+		if (siteByName != null && !siteByName.getId().equals(siteFromForm.getId()))
 		{
 			ActionMessages errors = this.getErrors(request);
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.exists", "A site with the name: " + updatedSite.getName()));
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.exists", "A site with the name: " + siteFromForm.getName()));
 			this.saveErrors(request, errors);
 		}
 
 		// check that site with this short name does not already exist
-		Site siteByShortName = siteDao.findByShortName(updatedSite.getShortName());
-		if (siteByShortName != null && !siteByShortName.getId().equals(updatedSite.getId()))
+		Site siteByShortName = siteDao.findByShortName(siteFromForm.getShortName());
+		if (siteByShortName != null && !siteByShortName.getId().equals(siteFromForm.getId()))
 		{
 			ActionMessages errors = this.getErrors(request);
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.exists", "A site with the short name: " + updatedSite.getShortName()));
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.exists", "A site with the short name: " + siteFromForm.getShortName()));
 			this.saveErrors(request, errors);
 		}
 
-    	if (this.getErrors(request).size()>0)
-    		return mapping.findForward("details");
-
-		Site oldSite = siteDao.getById(updatedSite.getSiteId());
-
-		// If there was an update, grab the info that hasn't changed
-		if (oldSite != null)
+    	if (this.getErrors(request).size() > 0)
 		{
-			updatedSite.setProviderIdFrom(oldSite.getProviderIdFrom());
-			updatedSite.setProviderIdTo(oldSite.getProviderIdTo());
-			updatedSite.setSiteLogoId(oldSite.getSiteLogoId());
-			updatedSite.setSiteUrl(oldSite.getSiteUrl());
-			updatedSite.setBcFacilityNumber(oldSite.getBcFacilityNumber());
-			updatedSite.setUuid(oldSite.getUuid());
+			return mapping.findForward("details");
 		}
 
-		siteDao.merge(updatedSite);
+		Site oldSite = siteDao.getById(siteFromForm.getSiteId());
+
+		if (oldSite != null)
+		{
+			oldSite.setName(siteFromForm.getName());
+			oldSite.setShortName(siteFromForm.getShortName());
+			oldSite.setBgColor(siteFromForm.getBgColor());
+			oldSite.setStatus(siteFromForm.getStatus());
+			oldSite.setPhone(siteFromForm.getPhone());
+			oldSite.setFax(siteFromForm.getFax());
+			oldSite.setAddress(siteFromForm.getAddress());
+			oldSite.setCity(siteFromForm.getCity());
+			oldSite.setProvince(siteFromForm.getProvince());
+			oldSite.setPostal(siteFromForm.getPostal());
+			oldSite.setAlbertaConnectCareLabId(siteFromForm.getAlbertaConnectCareLabId());
+			oldSite.setAlbertaConnectCareDepartmentId(siteFromForm.getAlbertaConnectCareDepartmentId());
+		}
+
+		siteDao.merge(oldSite);
 
         return view(mapping, form, request, response);
     }
 
-    public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
     	DynaBean lazyForm = (DynaBean) form;
 
     	String siteId = request.getParameter("siteId");
@@ -127,9 +138,8 @@ public class SitesManageAction extends DispatchAction {
         return mapping.findForward("details");
     }
 
-	public void setSiteDao(SiteDao siteDao) {
+	public void setSiteDao(SiteDao siteDao)
+	{
 		this.siteDao = siteDao;
 	}
-
-
 }
