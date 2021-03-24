@@ -149,6 +149,15 @@ public class PatientImportWrapperService
 					duplicateCount++;
 					onDuplicate(importFile);
 				}
+				catch(Error e)
+				{
+					// Error is a subclass of Throwable that indicates serious problems that a reasonable application should not try to catch.
+					// includes things like OutOfMemory errors etc.
+					// in this case we don't want to attempt importing the remaining files, and we don't mark them as failed/complete etc.
+
+					logger.fatal("Importer encountered a critical error while processing file: " + importFile.getName(), e);
+					throw e;
+				}
 				catch(Exception e)
 				{
 					importLogger.logEvent(importFile.getName() + ": Failed to import");

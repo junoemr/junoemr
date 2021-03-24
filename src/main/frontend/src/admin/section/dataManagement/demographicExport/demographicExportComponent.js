@@ -166,25 +166,32 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 							{
 								if(!complete)
 								{
-									let pollingData = await ctrl.fetchExportProgress(processId);
-									complete = pollingData.complete;
+									try
+									{
+										let pollingData = (await ctrl.demographicsApi.demographicExportProgress(processId)).data.body;
+										complete = pollingData.complete;
 
-									if (complete)
-									{
-										ctrl.demographicsApi.demographicExportResults(
-											processId,
-											{responseType: "blob"}
-										).then((response) =>
+										if (complete)
 										{
-											downloadPromiseDefer.resolve(response);
-										}).catch((error) =>
+											ctrl.demographicsApi.demographicExportResults(
+												processId,
+												{responseType: "blob"}
+											).then((response) =>
+											{
+												downloadPromiseDefer.resolve(response);
+											}).catch((error) =>
+											{
+												downloadPromiseDefer.reject(error);
+											});
+										}
+										else
 										{
-											downloadPromiseDefer.reject(error);
-										});
+											downloadPromiseDefer.notify(pollingData);
+										}
 									}
-									else
+									catch (error)
 									{
-										downloadPromiseDefer.notify(pollingData);
+										downloadPromiseDefer.reject(error);
 									}
 								}
 							}, 500, 0, true);
@@ -215,20 +222,6 @@ angular.module('Admin.Section.DataManagement').component('demographicExport',
 							}
 						);
 					}
-				}
-
-				ctrl.fetchExportProgress = async (processId) =>
-				{
-					let pollingData = {};
-					try
-					{
-						pollingData = (await ctrl.demographicsApi.demographicExportProgress(processId)).data.body;
-					}
-					catch (e)
-					{
-						console.error("Polling Error", e);
-					}
-					return pollingData;
 				}
 
 				ctrl.canRunExport = () =>

@@ -171,23 +171,31 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 						{
 							if(!complete)
 							{
-								let pollingData = await ctrl.fetchImportProgress(processId);
-								complete = pollingData.complete;
+								let pollingData;
+								try
+								{
+									pollingData = (await ctrl.demographicsApi.demographicImportProgress(processId)).data.body;
+									complete = pollingData.complete;
 
-								if (complete)
-								{
-									ctrl.demographicsApi.demographicImportResults(processId
-									).then((response) =>
+									if (complete)
 									{
-										importPromiseDefer.resolve(response);
-									}).catch((error) =>
+										ctrl.demographicsApi.demographicImportResults(processId
+										).then((response) =>
+										{
+											importPromiseDefer.resolve(response);
+										}).catch((error) =>
+										{
+											importPromiseDefer.reject(error);
+										});
+									}
+									else
 									{
-										importPromiseDefer.reject(error);
-									});
+										importPromiseDefer.notify(pollingData);
+									}
 								}
-								else
+								catch (error)
 								{
-									importPromiseDefer.notify(pollingData);
+									importPromiseDefer.reject(error);
 								}
 							}
 						}, 500, 0, true);
@@ -218,20 +226,6 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 							ctrl.importRunning = false;
 						}
 					);
-				}
-
-				ctrl.fetchImportProgress = async (processId) =>
-				{
-					let pollingData = {};
-					try
-					{
-						pollingData = (await ctrl.demographicsApi.demographicImportProgress(processId)).data.body;
-					}
-					catch (e)
-					{
-						console.error("Polling Error", e);
-					}
-					return pollingData;
 				}
 
 				ctrl.onDownloadLogFiles = async () =>
