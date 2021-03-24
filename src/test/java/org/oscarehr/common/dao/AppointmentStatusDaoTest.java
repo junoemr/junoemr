@@ -95,49 +95,6 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures {
 	}
 	
 	@Test
-	public void testFindActive() throws Exception {
-		
-		int active1 = 1, active2 = 2;
-		
-		AppointmentStatus apptStatus1 = new AppointmentStatus();
-		EntityDataGenerator.generateTestDataForModelClass(apptStatus1);
-		apptStatus1.setActive(active1);
-		dao.persist(apptStatus1);
-		
-		AppointmentStatus apptStatus2 = new AppointmentStatus();
-		EntityDataGenerator.generateTestDataForModelClass(apptStatus2);
-		apptStatus2.setActive(active2);
-		dao.persist(apptStatus2);
-		
-		AppointmentStatus apptStatus3 = new AppointmentStatus();
-		EntityDataGenerator.generateTestDataForModelClass(apptStatus3);
-		apptStatus3.setActive(active1);
-		dao.persist(apptStatus3);
-		
-		AppointmentStatus apptStatus4 = new AppointmentStatus();
-		EntityDataGenerator.generateTestDataForModelClass(apptStatus4);
-		apptStatus4.setActive(active1);
-		dao.persist(apptStatus4);
-		
-		List<AppointmentStatus> expectedResult = new ArrayList<AppointmentStatus>(Arrays.asList(apptStatus1, apptStatus3, apptStatus4));
-		List<AppointmentStatus> result = dao.findActive();
-
-		Logger logger = MiscUtils.getLogger();
-				
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
-		}
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items  do not match.");
-				fail("Items  do not match.");
-			}
-		}
-		assertTrue(true);
-	}
-
-	@Test
 	public void testFindByStatus() throws Exception {
 		
 		String status1 = "alpha", status2 = "bravo", status3 = "charlie";
@@ -161,14 +118,5 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures {
 		AppointmentStatus result = dao.findByStatus(status2);
 		
 		assertEquals(expectedResult, result);
-	}
-	
-	@Test
-	public void testCheckStatusUsuage() {
-		List<AppointmentStatus> statuses = new ArrayList<AppointmentStatus>();
-		AppointmentStatus a = new AppointmentStatus();
-		a.setStatus("test");
-		statuses.add(a);
-		dao.checkStatusUsuage(statuses);
 	}
 }
