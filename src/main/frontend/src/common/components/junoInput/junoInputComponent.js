@@ -63,7 +63,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.invalid = ctrl.invalid || false;
 			ctrl.noBox = ctrl.noBox || false;
 			ctrl.onlyNumeric = ctrl.onlyNumeric || false;
-			ctrl.hideCharacterLimit = ctrl.hideCharacterLimit || false;
+			ctrl.hideCharacterLimit = ctrl.hideCharacterLimit || true;
 
 			if (ctrl.showInvalidFocus === undefined)
 			{
