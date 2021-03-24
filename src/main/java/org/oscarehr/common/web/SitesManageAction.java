@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.opensaml.xmlsec.signature.P;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
 
@@ -120,9 +121,14 @@ public class SitesManageAction extends DispatchAction {
 			oldSite.setPostal(siteFromForm.getPostal());
 			oldSite.setAlbertaConnectCareLabId(siteFromForm.getAlbertaConnectCareLabId());
 			oldSite.setAlbertaConnectCareDepartmentId(siteFromForm.getAlbertaConnectCareDepartmentId());
+
+			siteDao.merge(oldSite);
+		}
+		else
+		{
+			siteDao.save(siteFromForm);
 		}
 
-		siteDao.merge(oldSite);
 
         return view(mapping, form, request, response);
     }
