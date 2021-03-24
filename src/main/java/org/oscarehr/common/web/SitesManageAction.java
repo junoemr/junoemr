@@ -31,7 +31,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.opensaml.xmlsec.signature.P;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
 
@@ -128,7 +127,6 @@ public class SitesManageAction extends DispatchAction {
 		{
 			siteDao.save(siteFromForm);
 		}
-
 
         return view(mapping, form, request, response);
     }
