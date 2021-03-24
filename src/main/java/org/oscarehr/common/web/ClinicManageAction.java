@@ -121,7 +121,7 @@ public class ClinicManageAction extends DispatchAction
             {
                 oldClinic.setClinicBillingAddress(clinicFromForm.getClinicBillingAddress());
             }
-            clinicDAO.merge(oldClinic);
+            clinicDAO.save(oldClinic);
         }
         else
         {

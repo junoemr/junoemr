@@ -121,7 +121,7 @@ public class SitesManageAction extends DispatchAction {
 			oldSite.setAlbertaConnectCareLabId(siteFromForm.getAlbertaConnectCareLabId());
 			oldSite.setAlbertaConnectCareDepartmentId(siteFromForm.getAlbertaConnectCareDepartmentId());
 
-			siteDao.merge(oldSite);
+			siteDao.save(oldSite);
 		}
 		else
 		{
