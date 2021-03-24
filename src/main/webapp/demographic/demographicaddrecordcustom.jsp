@@ -52,7 +52,7 @@
 <%
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
-	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class)
+	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	String [][] dbQueries=new String[][] {
 			{"search_provider", "select * from provider where provider_type='doctor' and status='1' order by last_name"},
