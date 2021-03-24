@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.allergy.Allergy;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.AdverseReactionSeverity;
@@ -45,7 +46,7 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 	{
 		Allergy allergy = new Allergy();
 
-		allergy.setDescription(importStructure.getOffendingAgentDescription());
+		allergy.setDescription(getDescriptionOrDefault(importStructure.getOffendingAgentDescription()));
 		allergy.setTypeCode(getTypeCode(importStructure));
 		allergy.setDrugIdentificationNumber(getDin(importStructure));
 		//TODO reaction type?
@@ -61,6 +62,17 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		allergy.setOnsetOfReaction(Allergy.REACTION_ONSET.fromDescription(onsetOfReaction));
 
 		return allergy;
+	}
+
+	protected String getDescriptionOrDefault(String dataDescription)
+	{
+		String description = StringUtils.trimToNull(dataDescription);
+		if(description == null)
+		{
+			description = "No description";
+			logEvent("Allergy record had no description, it was set to '" + description + "'");
+		}
+		return description;
 	}
 
 	protected Integer getTypeCode(AllergiesAndAdverseReactions importStructure)
