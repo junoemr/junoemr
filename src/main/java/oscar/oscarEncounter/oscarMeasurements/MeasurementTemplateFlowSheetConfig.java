@@ -27,7 +27,6 @@ package oscar.oscarEncounter.oscarMeasurements;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -67,12 +66,11 @@ import oscar.oscarEncounter.oscarMeasurements.util.TargetColour;
  */
 public class MeasurementTemplateFlowSheetConfig implements InitializingBean
 {
-
 	private static Logger log = MiscUtils.getLogger();
 
 	private SAXBuilder saxBuilder = new SAXBuilder();
 
-	private List<File> systemFlowsheetFiles;
+	private List<InputStream> systemFlowsheetFiles;
 
 	private List<String> dxTriggers = new ArrayList<>();
 	private List<String> programTriggers = new ArrayList<>();
@@ -250,12 +248,12 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean
 		return programTrigHash.get(code);
 	}
 
-	public List<File> getSystemFlowsheetFiles()
+	public List<InputStream> getSystemFlowsheetFiles()
 	{
 		return systemFlowsheetFiles;
 	}
 
-	public void setSystemFlowsheetFiles(List<File> systemFlowsheetFiles)
+	public void setSystemFlowsheetFiles(List<InputStream> systemFlowsheetFiles)
 	{
 		this.systemFlowsheetFiles = systemFlowsheetFiles;
 	}

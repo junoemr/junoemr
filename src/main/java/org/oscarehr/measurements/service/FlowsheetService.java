@@ -39,8 +39,6 @@ import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -311,44 +309,25 @@ public class FlowsheetService
 	public void loadSystemFlowsheets()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
-		List<File> systemFlowsheetFiles = config.getSystemFlowsheetFiles();
+		List<InputStream> systemFlowsheetFiles = config.getSystemFlowsheetFiles();
 
-		for (File flowsheetFile : systemFlowsheetFiles)
+		for (InputStream is : systemFlowsheetFiles)
 		{
-			InputStream is = null;
-			try
-			{
-				is = new FileInputStream(flowsheetFile);
-				MeasurementFlowSheet measurementFlowSheet = config.createflowsheet(is);
-				// Happens if the flowsheet is already being read - just move on
-				if (measurementFlowSheet == null)
-				{
-					is.close();
-					continue;
-				}
-				Flowsheet flowsheetEntry = flowsheetDao.findByName(measurementFlowSheet.getName());
-				if (flowsheetEntry == null)
-				{
-					flowsheetEntry = addSystemFlowsheet(measurementFlowSheet.getName());
-				}
+			MeasurementFlowSheet measurementFlowSheet = config.createflowsheet(is);
 
-				config.cacheSystemFlowsheet(flowsheetEntry, measurementFlowSheet);
-			}
-			catch (IOException e)
+			// Happens if the flowsheet is already being read - just move on
+			if (measurementFlowSheet == null)
 			{
-				MiscUtils.getLogger().error("Error loading system flowsheet: ", e);
+				continue;
 			}
-			finally
+
+			Flowsheet flowsheetEntry = flowsheetDao.findByName(measurementFlowSheet.getName());
+			if (flowsheetEntry == null)
 			{
-				try
-				{
-					is.close();
-				}
-				catch (IOException e)
-				{
-					MiscUtils.getLogger().error("Error cleaning up InputStream when loading system flowsheets: ", e);
-				}
+				flowsheetEntry = addSystemFlowsheet(measurementFlowSheet.getName());
 			}
+
+			config.cacheSystemFlowsheet(flowsheetEntry, measurementFlowSheet);
 		}
 	}
 
