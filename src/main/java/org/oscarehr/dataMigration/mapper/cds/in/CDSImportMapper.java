@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ import xml.cds.v5_0.OmdCds;
 import xml.cds.v5_0.PatientRecord;
 import xml.cds.v5_0.Reports;
 
-import java.io.FileNotFoundException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,11 +164,18 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 			{
 				documentList.add(cdsReportDocumentImportMapper.importToJuno(report));
 			}
-			catch(FileNotFoundException e)
+			catch(InvalidDocumentException e)
 			{
-				logEvent("Missing External Document: " + report.getFilePath());
-				if(!patientImportContextService.getContext().getImportPreferences().isSkipMissingDocs())
+				boolean skipMissingDocs = patientImportContextService.getContext().getImportPreferences().isSkipMissingDocs();
+				String message = e.getMessage() == null ? "Invalid Document" : e.getMessage();
+
+				if(skipMissingDocs)
 				{
+					logEvent(message  +" [SKIPPED]");
+				}
+				else
+				{
+					logEvent(message);
 					throw e;
 				}
 			}

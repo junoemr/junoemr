@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.Reports;
@@ -39,7 +40,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 	}
 
 	@Override
-	public Document importToJuno(Reports importStructure) throws IOException, InterruptedException
+	public Document importToJuno(Reports importStructure) throws InvalidDocumentException, IOException, InterruptedException
 	{
 		Document document = new Document();
 

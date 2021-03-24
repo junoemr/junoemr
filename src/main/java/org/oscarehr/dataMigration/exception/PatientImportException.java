@@ -22,10 +22,22 @@
  */
 package org.oscarehr.dataMigration.exception;
 
-public class InvalidImportFileException extends PatientImportException
+public class PatientImportException extends Exception
 {
-	public InvalidImportFileException()
+	public PatientImportException()
 	{
 		super();
+	}
+	public PatientImportException(String message)
+	{
+		super(message);
+	}
+	public PatientImportException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+	public PatientImportException(Throwable cause)
+	{
+		super(cause);
 	}
 }

@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -49,7 +50,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 	}
 
 	@Override
-	public HrmDocument importToJuno(Reports importStructure) throws IOException, InterruptedException
+	public HrmDocument importToJuno(Reports importStructure) throws IOException, InterruptedException, InvalidDocumentException
 	{
 		HrmDocument document = new HrmDocument();
 

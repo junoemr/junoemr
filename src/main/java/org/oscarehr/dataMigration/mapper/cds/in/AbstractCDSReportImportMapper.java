@@ -24,16 +24,19 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.PersonNameSimple;
 import xml.cds.v5_0.ReportClass;
+import xml.cds.v5_0.ReportContent;
 import xml.cds.v5_0.ReportFormat;
 import xml.cds.v5_0.Reports;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -55,30 +58,38 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 		return null;
 	}
 
-	protected GenericFile getDocumentFile(Reports importStructure) throws IOException, InterruptedException
+	protected GenericFile getDocumentFile(Reports importStructure) throws IOException, InterruptedException, InvalidDocumentException
 	{
 		GenericFile tempFile;
 
-		ReportFormat format = importStructure.getFormat();
-		if(format.equals(ReportFormat.BINARY)) //Document file
+		try
 		{
-			String filePath = importStructure.getFilePath();
-			if(filePath != null) // external document
+			ReportFormat format = importStructure.getFormat();
+			if(format.equals(ReportFormat.BINARY)) //Document file
 			{
-				GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences().getExternalDocumentPath(), filePath);
-				tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(), "." + externalFile.getExtension().toLowerCase());
+				String filePath = importStructure.getFilePath();
+				if(filePath != null) // external document
+				{
+					GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences().getExternalDocumentPath(), filePath);
+					tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(), "." + externalFile.getExtension().toLowerCase());
+				}
+				else
+				{
+					String fileExtension = importStructure.getFileExtensionAndVersion();
+					byte[] base64Media = getReportContent(importStructure).getMedia();
+					tempFile = FileFactory.createTempFile(new ByteArrayInputStream(base64Media), "." + fileExtension.toLowerCase());
+				}
 			}
-			else
+			else //text report
 			{
-				String fileExtension = importStructure.getFileExtensionAndVersion();
-				byte[] base64Media = importStructure.getContent().getMedia();
-				tempFile = FileFactory.createTempFile(new ByteArrayInputStream(base64Media), "." + fileExtension.toLowerCase());
+				String textContent = getReportContent(importStructure).getTextContent();
+				tempFile = FileFactory.createTempFile(new ByteArrayInputStream(textContent.getBytes(StandardCharsets.UTF_8)), ".txt");
 			}
 		}
-		else //text report
+		catch(FileNotFoundException e)
 		{
-			String textContent = importStructure.getContent().getTextContent();
-			tempFile = FileFactory.createTempFile(new ByteArrayInputStream(textContent.getBytes(StandardCharsets.UTF_8)), ".txt");
+			String message = "Missing External Document: " + importStructure.getFilePath();
+			throw new InvalidDocumentException(message, e);
 		}
 		return tempFile;
 	}
@@ -112,5 +123,16 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 			reviewer.setOhipNumber(reviewed.getReviewingOHIPPhysicianId());
 		}
 		return reviewer;
+	}
+
+	private ReportContent getReportContent(Reports importStructure) throws InvalidDocumentException
+	{
+		ReportContent content = importStructure.getContent();
+
+		if(content == null)
+		{
+			throw new InvalidDocumentException("Missing ReportContent");
+		}
+		return content;
 	}
 }
