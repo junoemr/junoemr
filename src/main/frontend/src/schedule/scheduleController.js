@@ -944,6 +944,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					{
 						controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
 					}
+					// Accounts for appointments which are both cancelled and have no demographic.  The former has precedence.
 					else if ((status === controller.appointmentStatusEnum.cancelled && controller.appointmentCountOptions.includeCancelled) ||
 						(status === controller.appointmentStatusEnum.noShow && controller.appointmentCountOptions.includeNoShow) ||
 						(demographicNo === noDemographicAssigned && controller.appointmentCountOptions.includeNoDemographic))
