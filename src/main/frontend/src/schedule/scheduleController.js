@@ -938,17 +938,24 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					const provider = event.resourceId;
 					const status = event.data.eventStatusCode;
 					const demographicNo = event.data.demographicNo;
-					
 					const noDemographicAssigned = 0;
-					
-					if ((status === controller.appointmentStatusEnum.cancelled && !controller.appointmentCountOptions.includeCancelled) ||
-						(status === controller.appointmentStatusEnum.noShow && !controller.appointmentCountOptions.includeNoShow) ||
-						(demographicNo === noDemographicAssigned && !controller.appointmentCountOptions.includeNoDemographic))
+
+					if (!status)  // some legacy appointments may not have an appointment status (mainly imports)
 					{
-						return;
+						controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
 					}
-					
-					controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
+					else if ((status === controller.appointmentStatusEnum.cancelled && controller.appointmentCountOptions.includeCancelled) ||
+						(status === controller.appointmentStatusEnum.noShow && controller.appointmentCountOptions.includeNoShow) ||
+						(demographicNo === noDemographicAssigned && controller.appointmentCountOptions.includeNoDemographic))
+					{
+						controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
+					}
+					else if (status !== controller.appointmentStatusEnum.cancelled &&
+						status !== controller.appointmentStatusEnum.noShow &&
+						demographicNo !== noDemographicAssigned)
+					{
+						controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
+					}
 				});
 		};
 
