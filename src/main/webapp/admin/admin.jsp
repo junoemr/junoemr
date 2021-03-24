@@ -678,7 +678,7 @@ div.logoutBox {
 			<oscar:oscarPropertiesCheck property="ENABLE_EDIT_APPT_STATUS"
 				value="yes">
 				<li><a href="#"
-					onclick="popupPage(500,600,'../appointment/appointmentstatuscontrol.jsp');return false;"
+					onclick="popupPage(500,600,'../appointment/apptStatusSetting.do?method=view');return false;"
 					title="<bean:message key="admin.admin.scheduleSettingTitle"/>"><bean:message
 					key="admin.admin.appointmentStatusSetting" /></a></li>
 			</oscar:oscarPropertiesCheck>

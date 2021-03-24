@@ -1,1 +1,0 @@
-ALTER TABLE document ADD COLUMN IF NOT EXISTS encoding_error tinyint(1) NOT NULL DEFAULT 0;
