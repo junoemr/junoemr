@@ -370,6 +370,7 @@ public class DemographicsService extends AbstractServiceImpl
 						importFileList,
 						tempDir.toString(),
 						false,
+						false,
 						defaultSiteName);
 			}
 			catch(Exception e)

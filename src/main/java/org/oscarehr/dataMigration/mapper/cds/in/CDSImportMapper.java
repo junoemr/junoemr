@@ -22,12 +22,15 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.oscarehr.dataMigration.exception.InvalidImportDataException;
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
+import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
+import xml.cds.v5_0.Appointments;
 import xml.cds.v5_0.CareElements;
 import xml.cds.v5_0.OmdCds;
 import xml.cds.v5_0.PatientRecord;
@@ -126,7 +129,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 		patientModel.setLabList(cdsLabImportMapper.importToJuno(patientRecord.getLaboratoryResults()));
 		instant = LogAction.printDuration(instant, "ImportMapper: labs");
 
-		patientModel.setAppointmentList(cdsAppointmentImportMapper.importAll(patientRecord.getAppointments()));
+		patientModel.setAppointmentList(getAppointments(patientRecord.getAppointments()));
 		instant = LogAction.printDuration(instant, "ImportMapper: appointments");
 
 		patientModel.setEncounterNoteList(cdsEncounterNoteImportMapper.importAll(patientRecord.getClinicalNotes()));
@@ -154,8 +157,36 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 		return measurementLists.stream().flatMap(List::stream).collect(Collectors.toList());
 	}
 
+	private List<Appointment> getAppointments(List<Appointments> appointments) throws Exception
+	{
+		boolean forceSkipInvalidData = patientImportContextService.getContext().getImportPreferences().isForceSkipInvalidData();
+		List<Appointment> appointmentList = new ArrayList<>(appointments.size());
+		for(Appointments appointment : appointments)
+		{
+			try
+			{
+				appointmentList.add(cdsAppointmentImportMapper.importToJuno(appointment));
+			}
+			catch(InvalidImportDataException e)
+			{
+				String message = e.getMessage() == null ? "Invalid Appointment" : e.getMessage();
+				if(forceSkipInvalidData)
+				{
+					logEvent(message + " [SKIPPED]");
+				}
+				else
+				{
+					logEvent(message);
+					throw e;
+				}
+			}
+		}
+		return appointmentList;
+	}
+
 	private List<Document> getDocuments(List<Reports> reports) throws Exception
 	{
+		boolean skipMissingDocs = patientImportContextService.getContext().getImportPreferences().isSkipMissingDocs();
 		List<Reports> documentReports = getDocumentReports(reports);
 		List<Document> documentList = new ArrayList<>(documentReports.size());
 		for(Reports report : documentReports)
@@ -166,9 +197,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 			}
 			catch(InvalidDocumentException e)
 			{
-				boolean skipMissingDocs = patientImportContextService.getContext().getImportPreferences().isSkipMissingDocs();
 				String message = e.getMessage() == null ? "Invalid Document" : e.getMessage();
-
 				if(skipMissingDocs)
 				{
 					logEvent(message  +" [SKIPPED]");

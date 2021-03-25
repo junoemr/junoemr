@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.oscarehr.dataMigration.exception.InvalidImportDataException;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.appointment.AppointmentStatus;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -32,7 +33,6 @@ import oscar.util.ConversionUtils;
 import xml.cds.v5_0.Appointments;
 
 import java.math.BigInteger;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -53,7 +53,7 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 	}
 
 	@Override
-	public Appointment importToJuno(Appointments importStructure)
+	public Appointment importToJuno(Appointments importStructure) throws InvalidImportDataException
 	{
 		Appointment appointment = new Appointment();
 
@@ -69,13 +69,13 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 		return appointment;
 	}
 
-	protected LocalDateTime getAppointmentStartDateTime(Appointments importStructure)
+	protected LocalDateTime getAppointmentStartDateTime(Appointments importStructure) throws InvalidImportDataException
 	{
 		LocalDate appointmentDate = toNullableLocalDate(importStructure.getAppointmentDate());
 		LocalTime appointmentTime = ConversionUtils.toNullableLocalTime(importStructure.getAppointmentTime());
 		if(appointmentDate == null || appointmentTime == null)
 		{
-			throw new DateTimeException("Appointment must have a valid date and time");
+			throw new InvalidImportDataException("Appointment must have a valid date and time");
 		}
 		return LocalDateTime.of(appointmentDate, appointmentTime);
 	}

@@ -28,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.exception.InvalidImportDataException;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
@@ -42,7 +43,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
@@ -104,8 +104,8 @@ public class CDSAppointmentImportMapperTest
 		when(patientImportContextService.getContext()).thenReturn(patientImportContextMock);
 	}
 
-	@Test(expected = DateTimeException.class)
-	public void testGetAppointmentStartDateTime_Null()
+	@Test(expected = InvalidImportDataException.class)
+	public void testGetAppointmentStartDateTime_Null() throws InvalidImportDataException
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
 		Appointments appointments = objectFactory.createAppointments();
@@ -115,7 +115,7 @@ public class CDSAppointmentImportMapperTest
 	}
 
 	@Test
-	public void testGetAppointmentStartDateTime_FullDate() throws DatatypeConfigurationException
+	public void testGetAppointmentStartDateTime_FullDate() throws DatatypeConfigurationException, InvalidImportDataException
 	{
 		LocalDateTime appointmentDateTime = LocalDateTime.of(2021, 1, 12, 11, 30, 0);
 

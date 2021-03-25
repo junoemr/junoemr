@@ -59,6 +59,7 @@ public class CommandLineImporter extends PatientImportWrapperService implements 
 				new StringArg("source-type", null, false),
 				new StringArg("merge-strategy", DemographicImporter.MERGE_STRATEGY.SKIP.name(), false),
 				new BooleanArg("skip-missing-docs", false, false),
+				new BooleanArg("force-skip-invalid-data", false, false),
 				new StringArg("site-name", null, false)
 				);
 	}
@@ -72,6 +73,7 @@ public class CommandLineImporter extends PatientImportWrapperService implements 
 		String importDocumentLocation = (String) args.get("document-directory").getValue();
 		String importSourceStr = (String) args.get("source-type").getValue();
 		Boolean skipMissingDocs = (Boolean) args.get("skip-missing-docs").getValue();
+		Boolean skipInvalidData = (Boolean) args.get("force-skip-invalid-data").getValue();
 		String mergeStrategyStr = (String) args.get("merge-strategy").getValue();
 		String defaultSiteName = (String) args.get("site-name").getValue();
 
@@ -117,6 +119,7 @@ public class CommandLineImporter extends PatientImportWrapperService implements 
 					genericFileList,
 					importDocumentLocation,
 					skipMissingDocs,
+					skipInvalidData,
 					defaultSiteName);
 		}
 		catch(Exception e)

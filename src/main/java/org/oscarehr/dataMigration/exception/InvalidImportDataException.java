@@ -20,20 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.pref;
+package org.oscarehr.dataMigration.exception;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.appointment.Site;
-import org.oscarehr.dataMigration.service.ImporterExporterFactory;
-
-@Data
-public class ImportPreferences
+public class InvalidImportDataException extends PatientImportException
 {
-	private Site defaultSite;
-	private String externalDocumentPath;
-	private boolean skipMissingDocs;
-	private boolean forceSkipInvalidData;
-	private ImporterExporterFactory.IMPORT_SOURCE importSource;
+	public InvalidImportDataException()
+	{
+		super();
+	}
 
-	int threadCount;
+	public InvalidImportDataException(String message)
+	{
+		super(message);
+	}
+
+	public InvalidImportDataException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+
+	public InvalidImportDataException(Throwable t)
+	{
+		super(t);
+	}
 }

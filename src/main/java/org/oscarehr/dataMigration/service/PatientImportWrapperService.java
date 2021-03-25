@@ -83,6 +83,7 @@ public class PatientImportWrapperService
 			List<GenericFile> importFileList,
 			String documentLocation,
 			boolean skipMissingDocs,
+			boolean skipInvalidData,
 			String defaultSiteName) throws IOException, InterruptedException
 	{
 		long importCount = 0;
@@ -93,6 +94,7 @@ public class PatientImportWrapperService
 		importPreferences.setExternalDocumentPath(documentLocation);
 		importPreferences.setImportSource(importSource);
 		importPreferences.setSkipMissingDocs(skipMissingDocs);
+		importPreferences.setForceSkipInvalidData(skipInvalidData);
 		importPreferences.setThreadCount(1);
 		if(properties.isMultisiteEnabled())
 		{
@@ -203,6 +205,7 @@ public class PatientImportWrapperService
 			List<GenericFile> importFileList,
 			String documentLocation,
 			boolean skipMissingDocs,
+			boolean skipInvalidData,
 			String defaultSiteName) throws IOException, InterruptedException
 	{
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importerTypeStr))
@@ -231,7 +234,7 @@ public class PatientImportWrapperService
 			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
-		importDemographics(importerType, importSource, mergeStrategy, importFileList, documentLocation, skipMissingDocs, defaultSiteName);
+		importDemographics(importerType, importSource, mergeStrategy, importFileList, documentLocation, skipMissingDocs, skipInvalidData, defaultSiteName);
 	}
 
 	protected void onSuccess(GenericFile genericFile)
