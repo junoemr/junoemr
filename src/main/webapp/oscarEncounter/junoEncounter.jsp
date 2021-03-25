@@ -1179,7 +1179,7 @@
 									   type="button"
 									   id="changeIssues"
 									   style="display: none;"
-									   onclick="caseManagementIssue.changeIssue({jQuery: junoJQuery}); return false;"
+									   onclick="caseManagementIssue.changeIssue({junoJQuery: junoJQuery}); return false;"
 									   value="<bean:message key="oscarEncounter.change.title"/>">
 								<span id="busy" style="display: none">
 									<img style="position: absolute;"

@@ -12,7 +12,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 	var issueIdToChange = null;
 	var changeModeResolved = null;
 
-		this.displayResolvedIssues = function displayResolvedIssues(clickContext)
+	this.displayResolvedIssues = function displayResolvedIssues(clickContext)
 	{
 		this.showIssues(
 			clickContext,
