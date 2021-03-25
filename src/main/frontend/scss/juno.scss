@@ -40,11 +40,14 @@
 @import "../src/common/components/junoButton/junoButton";
 @import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
+@import "../src/common/components/junoFileChooser/junoFileChooser";
 @import "../src/common/components/junoInput/junoInput";
 @import "../src/common/components/junoPatientSelect/junoPatientSelect";
+@import "../src/common/components/junoProgressBar/junoProgressBar";
 @import "../src/common/components/junoSelect/junoSelect";
 @import "../src/common/components/junoTab/junoTab";
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
+@import "../src/common/components/junoToggle/junoToggle";
 @import "../src/common/components/junoDateSelect/junoDateSelect";
 @import "../src/common/components/junoTimeSelect/junoTimeSelect";
 @import "../src/common/components/junoDivider/junoDivider";
@@ -55,6 +58,7 @@
 @import "../src/common/components/panel/_panel.scss";
 @import "../src/common/modals/junoAlert/junoAlert";
 @import "../src/common/modals/junoInputModal/junoInputModal";
+@import "../src/common/modals/junoProgressModal/junoProgressModal";
 @import "../src/common/modals/junoSimpleModal/junoSimpleModal";
 @import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
 @import "../src/common/modals/appointmentQueueModal/appointmentQueueModal";
