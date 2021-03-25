@@ -112,6 +112,7 @@ public class CommandLineExporter implements CommandLineTask
 		exportPreferences.setExportReportsReceived((Boolean) args.get("include-reports").getValue());
 		exportPreferences.setExportRiskFactors((Boolean) args.get("include-risk-factors").getValue());
 		exportPreferences.setThreadCount((Integer) args.get("thread-count").getValue());
+		exportPreferences.setExportDirectory(exportDirectory);
 
 		logger.info("BEGIN EXPORT [ Patient Set: '" + patientSet + "']");
 		try
@@ -124,7 +125,6 @@ public class CommandLineExporter implements CommandLineTask
 
 			String exportZipName = "export_" + ConversionUtils.toDateTimeString(LocalDateTime.now(), DATE_TIME_FILENAME) + "_" + patientSet + ".zip";
 			zipFile.rename(ZIPFile.getSanitizedFileName(exportZipName));
-			zipFile.moveFile(exportDirectory);
 
 			logger.info("Created zip file: " + zipFile.getPath());
 		}

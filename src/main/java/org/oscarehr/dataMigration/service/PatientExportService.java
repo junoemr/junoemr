@@ -103,8 +103,21 @@ public class PatientExportService
 			private List<GenericFile> exportFiles = null;
 
 			@Override
-			public void handleExportResults(List<GenericFile> exportFiles, String contextId)
+			public void handleExportResults(List<GenericFile> exportFiles, String contextId) throws IOException
 			{
+				// need to move the files out of the temp directory before context cleanup
+				String exportDirectory = patientExportContextService.getContext().getExportPreferences().getExportDirectory();
+				for(GenericFile exportFile : exportFiles)
+				{
+					if(exportDirectory != null)
+					{
+						exportFile.moveFile(exportDirectory);
+					}
+					else
+					{
+						exportFile.moveToLogExport(contextId);
+					}
+				}
 				this.exportFiles = exportFiles;
 			}
 
@@ -138,7 +151,16 @@ public class PatientExportService
 			public void handleExportResults(List<GenericFile> exportFiles, String contextId) throws IOException
 			{
 				zipFile = FileFactory.packageZipFile(exportFiles, true);
-				zipFile.moveToLogExport(contextId);
+				String exportDirectory = patientExportContextService.getContext().getExportPreferences().getExportDirectory();
+
+				if(exportDirectory != null)
+				{
+					zipFile.moveFile(exportDirectory);
+				}
+				else
+				{
+					zipFile.moveToLogExport(contextId);
+				}
 			}
 
 			@Override

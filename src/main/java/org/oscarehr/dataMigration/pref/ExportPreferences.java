@@ -45,4 +45,5 @@ public class ExportPreferences implements Serializable
 	private boolean exportRiskFactors;
 
 	private int threadCount;
+	private String exportDirectory;
 }
