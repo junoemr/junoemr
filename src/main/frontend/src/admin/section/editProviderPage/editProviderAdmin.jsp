@@ -359,7 +359,7 @@
 								>
 								</ca-field-password>
 								<div class="body-smallest error-message" ng-if="!securityRecord.validations.password() && $ctrl.hasSubmitted">
-									Password must be atleast 8 characters long and include atleast one special character.
+									Password must be a minimum of 8 characters long and include at least one special character.
 								</div>
 							</div>
 							<!-- Confirm Password -->

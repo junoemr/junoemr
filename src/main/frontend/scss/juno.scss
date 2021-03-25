@@ -9,7 +9,9 @@
 @import "mixins/junoTab";
 @import "mixins/junoTable";
 @import "mixins/junoPageSizing";
+@import "mixins/junoToggle";
 @import "themes/junoThemeBase";
+
 // Custom Bootstrap
 @import "bootstrap/bootstrap_variables";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
@@ -38,10 +40,8 @@
 @import "../src/common/components/junoButton/junoButton";
 @import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
-@import "../src/common/components/junoFileChooser/junoFileChooser";
 @import "../src/common/components/junoInput/junoInput";
 @import "../src/common/components/junoPatientSelect/junoPatientSelect";
-@import "../src/common/components/junoProgressBar/junoProgressBar";
 @import "../src/common/components/junoSelect/junoSelect";
 @import "../src/common/components/junoTab/junoTab";
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
@@ -55,7 +55,6 @@
 @import "../src/common/components/panel/_panel.scss";
 @import "../src/common/modals/junoAlert/junoAlert";
 @import "../src/common/modals/junoInputModal/junoInputModal";
-@import "../src/common/modals/junoProgressModal/junoProgressModal";
 @import "../src/common/modals/junoSimpleModal/junoSimpleModal";
 @import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
 @import "../src/common/modals/appointmentQueueModal/appointmentQueueModal";
@@ -94,6 +93,7 @@
 @import "../src/settings/settings";
 @import "../src/tickler/tickler";
 @import "../src/consults/consults";
+@import "../src/admin/systemProperties/systemProperties";
 @import "../src/admin/section/know2act/Know2act";
 @import "../src/admin/section/fax/fax";
 @import "../src/admin/section/landingPage/landingPage";

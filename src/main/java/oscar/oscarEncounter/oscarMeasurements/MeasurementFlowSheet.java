@@ -102,7 +102,7 @@ public class MeasurementFlowSheet {
            RuleBase rb = loadMeasurementRuleBase(dsRules);
            item.setRuleBase(rb);
         }else if(item.getTargetColour() != null && item.getTargetColour().size() > 0){
-           RuleBase rb = loadMeasuremntRuleBase(item.getTargetColour());
+           RuleBase rb = loadMeasurementRuleBase(item.getTargetColour());
            item.setRuleBase(rb);
         }
         itemList.put(item.getItemName(), item);
@@ -142,18 +142,23 @@ public class MeasurementFlowSheet {
         return programTriggers;
     }
 
-    public String getDxTriggersString(){
-       StringBuilder sb = new StringBuilder();
+    public String getDxTriggersString()
+    {
+       StringBuilder stringBuilder = new StringBuilder();
        boolean firstElement = true;
-       if (dxTriggers != null){
-           for(String s:dxTriggers){
-                if (!firstElement){
-                    sb.append(",");
+       if (dxTriggers != null)
+       {
+           for(String trigger : dxTriggers)
+           {
+                if (!firstElement)
+                {
+                    stringBuilder.append(", ");
                 }
-                sb.append(s);
+                stringBuilder.append(trigger);
+                firstElement = false;
            }
        }
-       return sb.toString();
+       return stringBuilder.toString();
     }
 
     public String getDxTriggersQueryBuilder(String demo, String provider){
@@ -196,19 +201,24 @@ public class MeasurementFlowSheet {
         return query;
      }
     
-    public String getProgramTriggersString(){
-    	StringBuilder sb = new StringBuilder();
-        boolean firstElement = true;
-        if (programTriggers != null){
-            for(String s:programTriggers){
-                 if (!firstElement){
-                     sb.append(",");
-                 }
-                 sb.append(s);
-            }
-        }
-        return sb.toString();
-     }
+	public String getProgramTriggersString()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		boolean firstElement = true;
+		if (programTriggers != null)
+		{
+			for(String trigger : programTriggers)
+			{
+				 if (!firstElement)
+				 {
+					 stringBuilder.append(", ");
+				 }
+				 stringBuilder.append(trigger);
+				 firstElement = false;
+			}
+		}
+		return stringBuilder.toString();
+	 }
 
     /** Creates a new instance of MeasurementFlowSheet */
     public MeasurementFlowSheet() {
@@ -438,7 +448,7 @@ public class MeasurementFlowSheet {
         }
     }
 
-    public RuleBase loadMeasuremntRuleBase(List<TargetColour> targetColours){
+    public RuleBase loadMeasurementRuleBase(List<TargetColour> targetColours){
         RuleBase measurementRuleBase = null;
         List<Element> dsElements = new ArrayList<Element>();
          RuleBaseCreator rcb = new RuleBaseCreator();
@@ -463,6 +473,16 @@ public class MeasurementFlowSheet {
 
     }
 
+    public FlowSheetItem setMeasurementRuleBase(FlowSheetItem item)
+    {
+        List<TargetColour> targetColours = item.getTargetColour();
+        if (targetColours != null && targetColours.size() > 0)
+        {
+            RuleBase measurementRuleBase = loadMeasurementRuleBase(targetColours);
+            item.setRuleBase(measurementRuleBase);
+        }
+        return item;
+    }
 
 
     public RuleBase loadMeasurementRuleBase(String string) {
@@ -510,7 +530,6 @@ public class MeasurementFlowSheet {
                 workingMemory.fireAllRules();
             } catch (Exception e) {
                 MiscUtils.getLogger().error("Error", e);
-            //throw new Exception("ERROR: Drools ",e);
             }
         }
     }

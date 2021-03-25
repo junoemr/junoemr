@@ -23,6 +23,7 @@
 
 package org.oscarehr.config;
 
+import de.javakaffee.web.msm.MemcachedBackupSessionManager;
 import org.apache.catalina.Context;
 import org.apache.catalina.webresources.ExtractingRoot;
 import org.apache.tomcat.util.scan.StandardJarScanner;
@@ -39,7 +40,14 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationPropertiesScan("org.oscarehr.config")
 public class TomcatConfig
 {
-	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
+	private final oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
+
+	private final JunoProperties junoProperties;
+
+	public TomcatConfig(JunoProperties junoProperties)
+	{
+		this.junoProperties = junoProperties;
+	}
 
 	// TODO: SPRINGUPGRADE: Set the context path from the properties files.  This might not be a
 	//                      thing we need to do.
@@ -71,6 +79,27 @@ public class TomcatConfig
 				context.addServletMappingDecoded("*.json", "jsp");
 
 				context.setResources(new ExtractingRoot());
+
+				// Set up redis session management
+				if(junoProperties.getRedisSessionStore().isEnabled())
+				{
+					String redisConnectionString = "redis://";
+					if (junoProperties.getRedisSessionStore().getPassword() != null)
+					{
+						redisConnectionString +=
+							"default:" + junoProperties.getRedisSessionStore().getPassword() + "@";
+					}
+					redisConnectionString += junoProperties.getRedisSessionStore().getEndpoint();
+
+					MemcachedBackupSessionManager manager = new MemcachedBackupSessionManager();
+					manager.setMemcachedNodes(redisConnectionString);
+					manager.setSticky(true);
+					manager.setSessionBackupAsync(true);
+					manager.setLockingMode("none");
+					manager.setStorageKeyPrefix("");
+
+					context.setManager(manager);
+				}
 			}
 		};
 	}

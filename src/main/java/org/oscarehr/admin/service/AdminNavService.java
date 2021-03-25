@@ -555,6 +555,11 @@ public class AdminNavService
 			}
 		}
 
+		if (securityInfoManager.isSuperAdmin(providerNo))
+		{
+			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/rx"));
+		}
+
 		systemManagementGroup.setItems(systemManagementItems);
 		return systemManagementGroup;
 	}

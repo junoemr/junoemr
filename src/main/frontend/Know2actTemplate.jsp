@@ -44,11 +44,11 @@
 
 <html lang="en" ng-app="oscarProviderViewModule">
 <head></head>
-<body ng-controller="Admin.Integration.Know2act.k2aTemplateController as k2aTemplateCtrl">
+<body ng-controller="Admin.Section.Know2act.k2aTemplateController as k2aTemplateCtrl">
 
 <!--
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
-<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
+<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/section/know2act/Know2actHideNavBars.css">
 -->
 
 <div class="k2a-report-template">

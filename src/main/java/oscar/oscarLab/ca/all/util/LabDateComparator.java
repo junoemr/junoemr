@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,36 +22,30 @@
  * Ontario, Canada
  */
 
+package oscar.oscarLab.ca.all.util;
 
-package org.oscarehr.common.dao;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import oscar.util.ConversionUtils;
 
-import java.util.List;
+/**
+ *  A custom comparator used to order the HashMaps within an array by latest
+ *  date first.
+ *
+ *  Used by /oscar/lab/CumulativeLabValues3.jsp
+ *
+ */
+public class LabDateComparator implements Comparator<Map<String, Serializable>>
+{
+    public int compare(Map<String, Serializable> o1, Map<String, Serializable> o2)
+    {
+        Date dateA = ConversionUtils.fromDateString((String) ((HashMap) o1).get("collDate") , "yyyy-MM-dd HH:mm:ss");
+        Date dateB = ConversionUtils.fromDateString((String) ((HashMap) o2).get("collDate") , "yyyy-MM-dd HH:mm:ss");
 
-import javax.persistence.Query;
+        return dateA.compareTo(dateB);
+    }
 
-import org.oscarehr.common.model.Flowsheet;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public class FlowsheetDao extends AbstractDao<Flowsheet>{
-
-	public FlowsheetDao() {
-		super(Flowsheet.class);
-	}
-	
-	public List<Flowsheet> findAll() {
-		Query query = entityManager.createQuery("select f from Flowsheet f");
-		
-		@SuppressWarnings("unchecked")
-		List<Flowsheet> results = query.getResultList();
-		
-		return results;
-	}
-	
-	public Flowsheet findByName(String name) {
-		Query query = entityManager.createQuery("select f from Flowsheet f where f.name=?1");
-		query.setParameter(1, name);
-		
-		return getSingleResultOrNull(query);
-	}
 }

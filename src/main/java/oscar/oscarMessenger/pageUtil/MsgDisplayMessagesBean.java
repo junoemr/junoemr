@@ -46,8 +46,6 @@ import static org.apache.commons.lang.StringUtils.stripToNull;
 
 public class MsgDisplayMessagesBean implements java.io.Serializable {
 
-	private MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
-
 	private static final long serialVersionUID = 1L;
 
 	private static final int TYPE_SENT = 1;
@@ -233,12 +231,12 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * in the messagelisttbl
 	 */
 	void getMessageIDs(String providerNo) {
-
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		messagePosition = new Vector<String>();
 		int index = 0;
 
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 			messagePosition.add(Integer.toString(index));
 			messageid.add("" + ml.getMessage());
@@ -371,7 +369,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 					"ON map.messageID = msgTbl.messageid " +
 					"LEFT JOIN demographic demo " +
 					"ON map.demographic_no = demo.demographic_no " +
-					"WHERE msgList.status != 'del' AND remoteLocation = '" + getCurrentLocationId() + "' " +
+					"WHERE remoteLocation = '" + getCurrentLocationId() + "' " +
 					"AND map.demographic_no = '" + demographic_no + "' " +
 					getSQLSearchFilter(searchCols) + " ORDER BY " + getOrderBy(orderby);
 			FormsDao dao = SpringUtils.getBean(FormsDao.class);
@@ -431,6 +429,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 
 	public int getTotalMessages(int type, String providerNo)
 	{
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		Integer location = Integer.parseInt(getCurrentLocationId());
 		switch(type)
 		{
@@ -523,6 +522,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * in the messagelisttbl
 	 */
 	void getDeletedMessageIDs(String providerNo) {
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		try {

@@ -29,7 +29,8 @@ angular.module('Common.Components').component('junoTab', {
 		ngModel: "=",
 		tabs: "<",
 		componentStyle: "<?",
-		type: "<?"
+		type: "<?",
+		change: "&?"
 	},
 	controller: ['$scope', function ($scope) {
 		let ctrl = this;
@@ -46,6 +47,13 @@ angular.module('Common.Components').component('junoTab', {
 		ctrl.onTabSelect = (tab) =>
 		{
 			ctrl.ngModel = tab.value;
+
+			if (ctrl.change)
+            {
+                ctrl.change({
+                    activeTab: tab.value
+                });
+            }
 		}
 
 		ctrl.tabClasses = (tab) =>

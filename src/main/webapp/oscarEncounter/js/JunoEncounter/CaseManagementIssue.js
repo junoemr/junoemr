@@ -78,11 +78,6 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 		junoJQuery("#noteIssueIdList input:checkbox[name=issue_id]").each(function ()
 		{
 			var issueId = parseInt(junoJQuery(this).val());
-			console.log('"' + issueId + '"');
-			console.log(issueIdArray);
-			console.log(junoJQuery.inArray(issueId, issueIdArray));
-			console.log(junoJQuery.inArray(6279, issueIdArray));
-			console.log(junoJQuery.inArray("6279", issueIdArray));
 
 			if(junoJQuery.inArray(issueId, issueIdArray) >= 0)
 			{
@@ -201,7 +196,6 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 					me.displayResolvedIssues(clickContext);
 					me.displayUnresolvedIssues(clickContext);
 				}
-				console.log(response);
 			}
 		});
 	};

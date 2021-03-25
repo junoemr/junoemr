@@ -210,5 +210,10 @@ angular.module('Record.Details').component('careTeamSection', {
 			ctrl.rosterStatusList.push({"label": newStatus, "value": newStatus});
 		}
 
+		ctrl.updatePatientStatusDate = () =>
+		{
+			let currentDate = Juno.Common.Util.getDateMoment(new Date());
+			ctrl.ngModel.patientStatusDate = currentDate;
+		}
 	}]
 });

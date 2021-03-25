@@ -23,14 +23,16 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.measurements.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.io.Serializable;
 
 import java.util.Date;
 
 
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
@@ -40,90 +42,122 @@ import javax.persistence.GenerationType;
 
 @Entity
 public class FlowSheetUserCreated extends AbstractModel<Integer> implements Serializable {
-/*
-	create table FlowSheetUserCreated(
-	id int(10) auto_increment primary key,
-	name varchar(4),
-	dxcodeTriggers varchar(255),	
-	displayName varchar(255),
-	warningColour varchar(20),
-	recommendationColour varchar(20),
-	topHTML text,
-	archived tinyint(1),
-	createdDate date
-	);
 
-	
-	
-	<indicator key="HIGH 1" colour="#E00000" />
-	  <indicator key="HIGH" colour="orange" />
-	  <indicator key="LOW" colour="#9999FF" />
-	*/
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer id;
-	String name ;
-	String dxcodeTriggers ;
-	String displayName ;
-	String warningColour ;
-	String recommendationColour ;
-	String topHTML ;
-	Boolean archived;
+	private Integer id;
+
+	@Column(name="name")
+	private String name;
+
+	@Column(name="dxcodeTriggers")
+	private String dxcodeTriggers;
+
+	@Column(name="displayName")
+	private String displayName;
+
+	@Column(name="warningColour")
+	private String warningColour;
+
+	@Column(name="recommendationColour")
+	private String recommendationColour;
+
+	@Column(name="topHTML")
+	private String topHTML;
+
+	@Column(name="archived")
+	private Boolean archived;
+
 	@Temporal(TemporalType.DATE)
 	private Date createdDate;
-	public String getName() {
+
+	public Integer getId()
+	{
+		return id;
+	}
+
+	public void setId(Integer id)
+	{
+		this.id = id;
+	}
+
+	public String getName()
+	{
     	return name;
     }
-	public void setName(String name) {
+
+	public void setName(String name)
+	{
     	this.name = name;
     }
-	public String getDxcodeTriggers() {
+
+	public String getDxcodeTriggers()
+	{
     	return dxcodeTriggers;
     }
-	public void setDxcodeTriggers(String dxcodeTriggers) {
+
+	public void setDxcodeTriggers(String dxcodeTriggers)
+	{
     	this.dxcodeTriggers = dxcodeTriggers;
     }
-	public String getDisplayName() {
+
+	public String getDisplayName()
+	{
     	return displayName;
     }
-	public void setDisplayName(String displayName) {
+
+	public void setDisplayName(String displayName)
+	{
     	this.displayName = displayName;
     }
-	public String getWarningColour() {
+
+	public String getWarningColour()
+	{
     	return warningColour;
     }
-	public void setWarningColour(String warningColour) {
+
+	public void setWarningColour(String warningColour)
+	{
     	this.warningColour = warningColour;
     }
-	public String getRecommendationColour() {
+
+	public String getRecommendationColour()
+	{
     	return recommendationColour;
     }
-	public void setRecommendationColour(String recommendationColour) {
+
+	public void setRecommendationColour(String recommendationColour)
+	{
     	this.recommendationColour = recommendationColour;
     }
-	public String getTopHTML() {
+
+	public String getTopHTML()
+	{
     	return topHTML;
     }
-	public void setTopHTML(String topHTML) {
+
+	public void setTopHTML(String topHTML)
+	{
     	this.topHTML = topHTML;
     }
-	public Boolean getArchived() {
+
+	public Boolean getArchived()
+	{
     	return archived;
     }
-	public void setArchived(Boolean archived) {
+
+	public void setArchived(Boolean archived)
+	{
     	this.archived = archived;
     }
-	public Date getCreatedDate() {
+
+	public Date getCreatedDate()
+	{
     	return createdDate;
     }
-	public void setCreatedDate(Date createdDate) {
+
+	public void setCreatedDate(Date createdDate)
+	{
     	this.createdDate = createdDate;
     }
-	public Integer getId() {
-    	return id;
-    }
-	
-	
-
-	
 }

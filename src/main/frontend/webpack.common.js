@@ -249,6 +249,7 @@ module.exports = {
 			'./src/common/components/junoDateSelect/junoDateSelectComponent.js',
 			'./src/common/components/junoTimeSelect/junoTimeSelectComponent.js',
 			'./src/common/components/junoDivider/junoDividerComponent.js',
+			'./src/common/components/junoToggle/junoToggleComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',
@@ -353,7 +354,8 @@ module.exports = {
 			'./src/admin/section/dataManagement/module.js',
 			'./src/admin/section/dataManagement/demographicImport/demographicImportComponent.js',
 			'./src/admin/section/dataManagement/demographicExport/demographicExportComponent.js',
-
+			'./src/admin/systemProperties/systemPropertiesComponent.js',
+			'./src/admin/systemProperties/rx/propertiesRxComponent.js',
 			'./src/billing/billingController.js',
 
 			'./src/consults/module.js',

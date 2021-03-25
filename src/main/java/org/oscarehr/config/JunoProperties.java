@@ -23,38 +23,32 @@
 
 package org.oscarehr.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
-// TODO: SPRINGUPGRADE: Remove this?  Current plan is to put Juno-specific settings in the old-style properties file.
-@Configuration
+// These properties can be used in the application.properties files and any other method of setting
+// properties according to this: https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config
+// It should be possible to autocomplete these settings in application.properties with intellij,
+// but if you add a new one you might need to "Rebuild Project" for them to show up (it has to
+// generate a metadata file to let intellij know they exist)
 @ConfigurationProperties(prefix = "juno")
+@Data
 public class JunoProperties
 {
 	private JunoPropertiesConfig properties;
+	private RedisSessionStore redisSessionStore;
 
-	public JunoPropertiesConfig getProperties()
-	{
-		return properties;
-	}
-
-	public void setProperties(JunoPropertiesConfig properties)
-	{
-		this.properties = properties;
-	}
-
+	@Data
 	public static class JunoPropertiesConfig
 	{
 		private String filename;
+	}
 
-		public String getFilename()
-		{
-			return filename;
-		}
-
-		public void setFilename(String filename)
-		{
-			this.filename = filename;
-		}
+	@Data
+	public static class RedisSessionStore
+	{
+		private boolean enabled;
+		private String endpoint;
+		private String password;
 	}
 }
