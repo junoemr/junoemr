@@ -1124,7 +1124,7 @@ public class DemographicManager {
 	 * Update the electronic messaging consent timestamps of the provided demographic
 	 * if the messaging consent status has changed
 	 * @param demographic - the demographic to update the timestamps on.
-	 * @param existingDemographic - the previously saved demographic record
+	 * @param existingDemographic - the previously saved demographic record (can be null)
 	 * @param loggedInInfo - the user performing this action
 	 */
 	private void updateElectronicMessagingConsentTimestamps(Demographic demographic, Demographic existingDemographic, LoggedInInfo loggedInInfo)
