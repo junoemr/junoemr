@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.oscarReport.data.DemographicSetManager;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,36 +61,19 @@ public class PatientExportService
 	@Autowired
 	private PatientExportContextService patientExportContextService;
 
-	@Deprecated
-	/**
-	 * @deprecated for legacy UI use only
-	 */
-	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE exportType,
-	                                            List<String> demographicIdList,
-	                                            ExportPreferences preferences) throws Exception
+	public List<GenericFile> exportDemographicsToList(String patientSet,
+	                                                  ImporterExporterFactory.EXPORTER_TYPE exportType,
+	                                                  ExportPreferences preferences) throws Exception
 	{
-		PatientExportContext context = importerExporterFactory.initializeExportContext(exportType, preferences, demographicIdList.size());
-		String contextId = patientExportContextService.register(context);
-		List<GenericFile> exportFiles;
-		try
-		{
-			LogDataMigration dataMigration = new LogDataMigration();
-			dataMigration.setUuid(contextId);
-			dataMigration.setStartDatetime(LocalDateTime.now());
-			dataMigration.setTypeExport();
-			logDataMigrationDao.persist(dataMigration);
+		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
+		return exportDemographicsToList(patientSet, exportType, demographicIdList, preferences);
+	}
 
-			exportFiles = exportDemographics(context, demographicIdList, preferences);
-
-			dataMigration.setEndDatetime(LocalDateTime.now());
-			logDataMigrationDao.merge(dataMigration);
-		}
-		finally
-		{
-			context.clean();
-			patientExportContextService.unregister(contextId);
-		}
-		return exportFiles;
+	public List<GenericFile> exportDemographicsToList(List<String> demographicIdList,
+	                                                  ImporterExporterFactory.EXPORTER_TYPE exportType,
+	                                                  ExportPreferences preferences) throws Exception
+	{
+		return exportDemographicsToList(null, exportType, demographicIdList, preferences);
 	}
 
 	public ZIPFile exportDemographicsToZip(String patientSet,
@@ -97,10 +81,92 @@ public class PatientExportService
 	                                       ExportPreferences preferences) throws Exception
 	{
 		List<String> demographicIdList = new DemographicSetManager().getDemographicSet(patientSet);
+		return exportDemographicsToZip(patientSet, demographicIdList, exportType, preferences);
+	}
+
+	public ZIPFile exportDemographicsToZip(List<String> demographicIdList,
+	                                       ImporterExporterFactory.EXPORTER_TYPE exportType,
+	                                       ExportPreferences preferences) throws Exception
+	{
+		return exportDemographicsToZip(null, demographicIdList, exportType, preferences);
+	}
+
+
+
+	private List<GenericFile> exportDemographicsToList(String patientSet,
+	                                                  ImporterExporterFactory.EXPORTER_TYPE exportType,
+	                                                  List<String> demographicIdList,
+	                                                  ExportPreferences preferences) throws Exception
+	{
+		ExportResultHandler<List<GenericFile>> resultHandler = new ExportResultHandler<List<GenericFile>>()
+		{
+			private List<GenericFile> exportFiles = null;
+
+			@Override
+			public void handleExportResults(List<GenericFile> exportFiles, String contextId)
+			{
+				this.exportFiles = exportFiles;
+			}
+
+			@Override
+			public String getFilename()
+			{
+				return null;
+			}
+
+			@Override
+			public List<GenericFile> getResults()
+			{
+				return exportFiles;
+			}
+		};
+
+		exportDemographics(patientSet, demographicIdList, resultHandler, exportType, preferences);
+		return resultHandler.getResults();
+	}
+
+	private ZIPFile exportDemographicsToZip(String patientSet,
+	                                        List<String> demographicIdList,
+	                                        ImporterExporterFactory.EXPORTER_TYPE exportType,
+	                                        ExportPreferences preferences) throws Exception
+	{
+		ExportResultHandler<ZIPFile> resultHandler = new ExportResultHandler<ZIPFile>()
+		{
+			private ZIPFile zipFile = null;
+
+			@Override
+			public void handleExportResults(List<GenericFile> exportFiles, String contextId) throws IOException
+			{
+				zipFile = FileFactory.packageZipFile(exportFiles, true);
+				zipFile.moveToLogExport(contextId);
+			}
+
+			@Override
+			public String getFilename()
+			{
+				return zipFile.getName();
+			}
+
+			@Override
+			public ZIPFile getResults()
+			{
+				return zipFile;
+			}
+		};
+
+		exportDemographics(patientSet, demographicIdList, resultHandler, exportType, preferences);
+		return resultHandler.getResults();
+	}
+
+	private void exportDemographics(String patientSet,
+	                                List<String> demographicIdList,
+	                                ExportResultHandler<?> resultHandler,
+	                                ImporterExporterFactory.EXPORTER_TYPE exportType,
+	                                ExportPreferences preferences) throws Exception
+	{
 		PatientExportContext context = importerExporterFactory.initializeExportContext(exportType, preferences, demographicIdList.size());
 		ExportLogger exportLogger = context.getExportLogger();
 		String contextId = patientExportContextService.register(context);
-		ZIPFile zipFile;
 		try
 		{
 			LogDataMigration dataMigration = new LogDataMigration();
@@ -114,12 +180,10 @@ public class PatientExportService
 			dataMigration.setData(migrationExportData);
 			logDataMigrationDao.persist(dataMigration);
 
-			List<GenericFile> exportFiles = exportDemographics(context, demographicIdList, preferences);
-			zipFile = FileFactory.packageZipFile(exportFiles, true);
-			zipFile.moveToLogExport(contextId);
+			resultHandler.handleExportResults(exportDemographics(context, demographicIdList, preferences), contextId);
 
 			dataMigration.setEndDatetime(LocalDateTime.now());
-			migrationExportData.setFile(zipFile.getName());
+			migrationExportData.setFile(resultHandler.getFilename());
 			dataMigration.setData(migrationExportData);
 			logDataMigrationDao.merge(dataMigration);
 		}
@@ -128,7 +192,6 @@ public class PatientExportService
 			context.clean();
 			patientExportContextService.unregister(contextId);
 		}
-		return zipFile;
 	}
 
 	private List<GenericFile> exportDemographics(PatientExportContext context,
@@ -175,5 +238,12 @@ public class PatientExportService
 		}
 
 		return fileList;
+	}
+
+	private interface ExportResultHandler<T>
+	{
+		void handleExportResults(List<GenericFile> exportFiles, String contextId) throws IOException;
+		String getFilename();
+		T getResults();
 	}
 }

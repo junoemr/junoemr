@@ -278,8 +278,8 @@ public class DemographicExportAction4 extends Action {
 				exportPreferences.setExportReportsReceived(exReportsReceived);
 				exportPreferences.setExportRiskFactors(exRiskFactors);
 
-				List<GenericFile> exportFiles = patientExportService.exportDemographics(
-						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, list, exportPreferences);
+				List<GenericFile> exportFiles = patientExportService.exportDemographicsToList(
+						list, ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportPreferences);
 
 				//TODO refactor this. we could zip genericFiles directly
 				for(GenericFile genericFile : exportFiles)
