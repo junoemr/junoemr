@@ -25,6 +25,7 @@ package org.oscarehr.util.task;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
@@ -65,6 +66,7 @@ public class CommandLineExporter implements CommandLineTask
 				new StringArg("patient-set", null, true),
 				new StringArg("directory", "/tmp", false),
 				new IntegerArg("thread-count", 1, false),
+				new BooleanArg("zip-results", false, false),
 				new BooleanArg("include-alerts", true, false),
 				new BooleanArg("include-allergies", true, false),
 				new BooleanArg("include-appointments", true, false),
@@ -89,12 +91,14 @@ public class CommandLineExporter implements CommandLineTask
 		String type = (String) args.get("type").getValue();
 		String patientSet = (String) args.get("patient-set").getValue();
 		String exportDirectory = (String) args.get("directory").getValue();
+		Boolean zipResults = (Boolean) args.get("zip-results").getValue();
 
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.EXPORTER_TYPE.class, type))
 		{
 			throw new InvalidCommandLineArgumentsException(type + " is not a valid EXPORT_TYPE enum. must be one of " +
 					java.util.Arrays.asList(ImporterExporterFactory.EXPORTER_TYPE.values()));
 		}
+		ImporterExporterFactory.EXPORTER_TYPE exportType = ImporterExporterFactory.EXPORTER_TYPE.valueOf(type);
 
 		ExportPreferences exportPreferences = new ExportPreferences();
 		exportPreferences.setExportAlertsAndSpecialNeeds((Boolean) args.get("include-alerts").getValue());
@@ -120,13 +124,22 @@ public class CommandLineExporter implements CommandLineTask
 			String processId = UUID.randomUUID().toString();
 			Thread.currentThread().setName(processId);
 
-			ZIPFile zipFile = patientExportService.exportDemographicsToZip(patientSet,
-					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportPreferences);
+			if(zipResults)
+			{
+				ZIPFile zipFile = patientExportService.exportDemographicsToZip(patientSet,
+						exportType, exportPreferences);
 
-			String exportZipName = "export_" + ConversionUtils.toDateTimeString(LocalDateTime.now(), DATE_TIME_FILENAME) + "_" + patientSet + ".zip";
-			zipFile.rename(ZIPFile.getSanitizedFileName(exportZipName));
+				String exportZipName = "export_" + ConversionUtils.toDateTimeString(LocalDateTime.now(), DATE_TIME_FILENAME) + "_" + patientSet + ".zip";
+				zipFile.rename(ZIPFile.getSanitizedFileName(exportZipName));
+				logger.info("Created zip file: " + zipFile.getPath());
+			}
+			else
+			{
+				List<GenericFile> exportFiles = patientExportService.exportDemographicsToList(patientSet,
+						exportType, exportPreferences);
+				logger.info("Exported files to " + exportFiles.get(0).getDirectory());
+			}
 
-			logger.info("Created zip file: " + zipFile.getPath());
 		}
 		catch(Exception e)
 		{
