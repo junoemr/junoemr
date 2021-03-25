@@ -23,7 +23,6 @@
 
 
 package org.oscarehr.common.model;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +34,6 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
-import oscar.util.Jackson.LocalDateSerializer;
 
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -43,8 +41,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;

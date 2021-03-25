@@ -24,22 +24,16 @@
 package org.oscarehr.ws.rest.to.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.demographic.model.Demographic;
 import oscar.util.Jackson.DateDeserializer;
-import oscar.util.Jackson.LocalDateSerializer;
-import oscar.util.Jackson.ZonedDateTimeStringDeserializer;
-import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

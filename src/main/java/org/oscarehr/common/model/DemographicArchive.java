@@ -33,7 +33,6 @@ import org.oscarehr.util.MiscUtils;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -161,11 +160,13 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	@Getter
 	@Setter
 	@Column(name = "electronic_messaging_consent_given_at")
-	private LocalDateTime electronicMessagingConsentGivenAt;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentGivenAt;
 	@Getter
 	@Setter
 	@Column(name = "electronic_messaging_consent_rejected_at")
-	private LocalDateTime electronicMessagingConsentRejectedAt;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentRejectedAt;
 
 	public DemographicArchive()
 	{
@@ -223,6 +224,8 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.title = demographic.getTitle();
 		this.ver = demographic.getVer();
 		this.yearOfBirth = demographic.getYearOfBirth();
+		this.setElectronicMessagingConsentGivenAt(demographic.getElectronicMessagingConsentGivenAt());
+		this.setElectronicMessagingConsentRejectedAt(demographic.getElectronicMessagingConsentRejectedAt());
 	}
 
 	public DemographicArchive(org.oscarehr.demographic.model.Demographic demographic)
