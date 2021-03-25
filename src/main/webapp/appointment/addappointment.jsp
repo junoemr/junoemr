@@ -93,8 +93,6 @@
 %>
 <%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*, oscar.appt.*"
 		 errorPage="errorpage.jsp" %>
-<%@ page import="oscar.appt.status.service.AppointmentStatusMgr" %>
-<%@ page import="oscar.appt.status.service.impl.AppointmentStatusMgrImpl" %>
 <%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="oscar.oscarEncounter.data.EctFormData" %>
@@ -155,8 +153,8 @@
 	String strEditable = pros.getProperty("ENABLE_EDIT_APPT_STATUS");
 	Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 
-	AppointmentStatusMgr apptStatusMgr = new AppointmentStatusMgrImpl();
-	List<AppointmentStatus> allStatus = apptStatusMgr.getAllActiveStatus();
+	AppointmentStatusService appointmentStatusService = SpringUtils.getBean(AppointmentStatusService.class);
+	List<AppointmentStatus> allStatus = appointmentStatusService.getActiveAppointmentStatuses();
 
 	String useProgramLocation = OscarProperties.getInstance().getProperty("useProgramLocation");
 	String moduleNames = OscarProperties.getInstance().getProperty("ModuleNames");
@@ -168,6 +166,7 @@
 <%@page import="org.oscarehr.common.dao.SiteDao" %>
 <%@page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.IsPropertiesOn" %>
+<%@ page import="org.oscarehr.appointment.service.AppointmentStatusService" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="../js/jquery-1.7.1.min.js"></script>

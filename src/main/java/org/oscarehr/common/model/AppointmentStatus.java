@@ -23,18 +23,14 @@
  */
 package org.oscarehr.common.model;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
 import javax.persistence.Table;
-
-import org.hibernate.validator.constraints.Length;
-import oscar.appt.status.service.impl.AppointmentStatusMgrImpl;
-
 
 @Entity
 @Table(name="appointment_status")
@@ -66,6 +62,9 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 	
 	private int active;
 	
+	/**
+	 * Whether this appointment can be enabled/disabled or reordered.
+	 */
 	private int editable;
 	
 	@Column(name="short_letters")
@@ -155,10 +154,4 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 	public void setShortLetterColour(String shortLetterColour) {
 		this.shortLetterColour = shortLetterColour;
 	}
-
-	@PostPersist
-    @PostUpdate
-    public void on_jpa_update() {
-    	AppointmentStatusMgrImpl.setCacheIsDirty(true);
-    }
 }

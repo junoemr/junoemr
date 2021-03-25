@@ -68,7 +68,7 @@ public class ImportMeasurementTypes {
            
            boolean measurementReInitNeeded = false;
            //MAKE SURE ALL MEASUREMENTS HAVE BEEN INITIALIZED
-           List meas = root.getChildren("measurement");
+           List<Element> meas = root.getChildren("measurement");
            
            log.debug("measurement size "+meas.size());
            for (int i = 0; i < meas.size(); i++){

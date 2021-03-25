@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2006-. OSCARservice, OpenSoft System. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,29 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package oscar.appt.status.service;
-
-import java.util.List;
-
-import org.oscarehr.common.model.AppointmentStatus;
-
-/**
  *
- * @author toby
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
-public interface AppointmentStatusMgr {
-	public List<AppointmentStatus> getAllStatus();
-    public List<AppointmentStatus> getAllActiveStatus();
-    public AppointmentStatus getStatus(int ID);
-    public void changeStatus(int ID, int iActive);
-	public void modifyStatus(int ID, String strDesc, String strColor, String strJunoColor);
-    public List<String> checkStatusUsuage(List<AppointmentStatus> allStatus);
-    public void reset();
+package oscar.oscarLab.ca.all.util;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+/*
+ * Helper class to better encapsulate what we want to display.
+ * Values get pulled from measurements/measurementsExt.
+ */
+public class LabGridDisplay
+{
+	private Integer measurementId;
+	private String abnormal;
+	private String result;
+	private String dateObserved;
+	private String labId;
+	private String testName;
+
+	@Override
+	public String toString()
+	{
+		return "lab measurement: " + dateObserved + " | " + testName + " | " + result;
+	}
 }

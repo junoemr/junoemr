@@ -153,6 +153,24 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		service.getSitesByProvider = function getSitesByProvider(provNo)
+		{
+			const deferred = $q.defer();
+
+			service.sitesApi.getSitesByProvider(provNo).then(
+
+				function success(results)
+				{
+					deferred.resolve(results.data.body);
+				},
+				function error(errors)
+				{
+					console.log("providerService::getProviderSites error", errors);
+					deferred.reject("An error occurred fetching the providers sites");
+				});
+			return deferred.promise;
+		};
+
 		//TODO move to its own service
 		service.saveSettings = function saveSettings(providerNo, settings)
 		{

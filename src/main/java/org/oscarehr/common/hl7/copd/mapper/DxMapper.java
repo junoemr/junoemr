@@ -174,8 +174,8 @@ public class DxMapper extends AbstractMapper
 		switch(status)
 		{
 			case "I":
-			case "D": return "D"; // deleted
 			case "C": return "C"; // resolved
+			case "D": return "D"; // deleted
 			default: return "A"; // active
 		}
 	}
