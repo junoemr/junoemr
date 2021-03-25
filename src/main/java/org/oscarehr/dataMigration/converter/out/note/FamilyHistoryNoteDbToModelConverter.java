@@ -59,7 +59,7 @@ public class FamilyHistoryNoteDbToModelConverter extends
 			}
 			if(ext.getKey().equals(AGEATONSET))
 			{
-				exportNote.setAgeAtOnset(Long.parseLong(ext.getValue()));
+				exportNote.setAgeAtOnset(convertAgeAtOnset(ext.getValue()));
 			}
 			if(ext.getKey().equals(LIFESTAGE))
 			{
