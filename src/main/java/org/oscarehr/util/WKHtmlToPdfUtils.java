@@ -71,8 +71,11 @@ public class WKHtmlToPdfUtils
 
 
 	/**
-	 * This method is a copy of Apache Tomcat's ApplicationHttpRequest getRequestURL method with the exception that the uri is removed and replaced with our eform viewing uri. Note that this requires that the remote url is valid for local access. i.e. the
-	 * host name from outside needs to resolve inside as well. The result needs to look something like this : https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms
+	 * This method is a copy of Apache Tomcat's ApplicationHttpRequest getRequestURL method with the
+	 * exception that the uri is removed and replaced with our eform viewing uri. Note that this
+	 * requires that the remote url is valid for local access. i.e. the host name from outside needs
+	 * to resolve inside as well. The result needs to look something like this:
+	 * https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms
 	 */
 	public static String getEformRequestUrl(String providerId, String formId, String httpScheme, String contextPath)
 	{
@@ -84,16 +87,24 @@ public class WKHtmlToPdfUtils
 			scheme = prop_scheme;
 		}
 
-		Integer port;
-		try
+		Integer port = PortListener.getPort();
+
+		if(port == null)
 		{
-			port = new Integer(props.getProperty("oscar_port"));
+			try
+			{
+				port = new Integer(props.getProperty("oscar_port"));
+			}
+			catch (Exception e)
+			{
+				port = 8443;
+			}
 		}
-		catch (Exception e)
+
+		if (port < 0)
 		{
-			port = 8443;
+			port = 80; // Work around java.net.URL bug
 		}
-		if (port < 0) port = 80; // Work around java.net.URL bug
 
 		url.append(scheme);
 		url.append("://");
