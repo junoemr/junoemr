@@ -72,6 +72,8 @@ angular.module('Record.Details').component('contactSection', {
 
 		ctrl.onConsentStatusChange = (value) =>
 		{
+			// Update consent timestamps for immediate UI feedback.
+			// Exact value will be calculated by the backend on save.
 			switch (value)
 			{
 				case ElectronicMessagingConsentStatus.NONE:

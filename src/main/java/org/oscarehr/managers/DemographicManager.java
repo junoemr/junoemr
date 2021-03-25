@@ -1151,7 +1151,7 @@ public class DemographicManager {
 			LogAction.addLogEntry(
 					loggedInInfo.getLoggedInProviderNo(),
 					demographic.getDemographicNo(),
-					LogConst.ACTION_ELECTRONIC_MESSAGING_CONSENT_UPDATED,
+					LogConst.ACTION_UPDATE,
 					LogConst.CON_ELECTRONIC_MESSAGING_CONSENT_STATUS,
 					LogConst.STATUS_SUCCESS,
 					demographic.getElectronicMessagingConsentStatus().name());
