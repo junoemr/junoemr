@@ -58,6 +58,7 @@ public class LogConst {
 	public static final String ACTION_UNLINK = "unlink";
 	public static final String ACTION_SENT = "sent";
 	public static final String ACTION_DOWNLOAD = "download";
+	public static final String ACTION_ELECTRONIC_MESSAGING_CONSENT_UPDATED = "ELECTRONIC_MESSAGING_CONSENT_UPDATED";
 
 	/* Content/Module constants
 	 * These should describe what module the action applies to.
@@ -104,6 +105,7 @@ public class LogConst {
 	public static final String CON_FAX = "fax";
 	public static final String CON_PHARMACY = "pharmacy";
 	public static final String CON_SYSTEM = "system";
+	public static final String CON_ELECTRONIC_MESSAGING_CONSENT_STATUS = "ELECTRONIC_MESSAGING_CONSENT_STATUS";
 
 	/* Status constants
 	 * These should describe the outcome of the action */

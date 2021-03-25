@@ -22,6 +22,8 @@
  */
 package org.oscarehr.demographic.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
@@ -46,6 +48,8 @@ import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -177,6 +181,16 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String nameOfMother;
 	@Column(name = "name_of_father")
 	private String nameOfFather;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_given_at")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentGivenAt;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_rejected_at", columnDefinition = "TIMESTAMP")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentRejectedAt;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id")
 	private List<DemographicCust> demographicCust;
@@ -214,6 +228,13 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		SK,
 		YT,
 		PP
+	}
+
+	public enum ELECTRONIC_MESSAGING_CONSENT_STATUS
+	{
+		NONE,
+		CONSENTED,
+		REVOKED,
 	}
 
 	/**
@@ -899,5 +920,25 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isActive()
 	{
 		return !getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
+
+	/**
+	 * get the patients electronic messaging consent status
+	 * @return - the patients consent status
+	 */
+	public ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
+	{
+		if (this.electronicMessagingConsentRejectedAt != null)
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.REVOKED;
+		}
+		else if (this.electronicMessagingConsentGivenAt != null)
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.CONSENTED;
+		}
+		else
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+		}
 	}
 }

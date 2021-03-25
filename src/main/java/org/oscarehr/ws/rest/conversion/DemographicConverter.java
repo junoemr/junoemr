@@ -115,6 +115,8 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setNewsletter(transfer.getNewsletter());
 		demographic.setNameOfMother(transfer.getNameOfMother());
 		demographic.setNameOfFather(transfer.getNameOfFather());
+		demographic.setElectronicMessagingConsentGivenAt(transfer.getElectronicMessagingConsentGivenAt());
+		demographic.setElectronicMessagingConsentRejectedAt(transfer.getElectronicMessagingConsentRejectedAt());
 
 		DemographicExt[] exts = new DemographicExt[transfer.getExtras().size()];
 		for (int i = 0; i < transfer.getExtras().size(); i++) {
@@ -203,6 +205,9 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setNewsletter(demographic.getNewsletter());
 		transfer.setNameOfMother(demographic.getNameOfMother());
 		transfer.setNameOfFather(demographic.getNameOfFather());
+		transfer.setElectronicMessagingConsentGivenAt(demographic.getElectronicMessagingConsentGivenAt());
+		transfer.setElectronicMessagingConsentRejectedAt(demographic.getElectronicMessagingConsentRejectedAt());
+		transfer.setElectronicMessagingConsentStatus(demographic.getElectronicMessagingConsentStatus());
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {

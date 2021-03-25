@@ -55,6 +55,7 @@ import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -370,6 +371,9 @@ public class DemographicManager {
 		{
 			demographic.setPatientStatusDate(currentStatusDate);
 		}
+
+		// update messaging consent timestamps
+		updateElectronicMessagingConsentTimestamps(demographic, prevDemo, loggedInInfo);
 
 		//retain merge info
 		demographic.setSubRecord(prevDemo.getSubRecord());
@@ -1114,6 +1118,45 @@ public class DemographicManager {
 	public Demographic getDemographicByHealthNumber(String healthNumber)
 	{
 		return this.demographicDao.getDemographicByHealthNumber(healthNumber);
+	}
+
+
+	/**
+	 * Update the electronic messaging consent timestamps of the provided demographic
+	 * if the messaging consent status has changed
+	 * @param demographic - the demographic to update the timestamps on.
+	 * @param existingDemographic - the previously saved demographic record
+	 * @param loggedInInfo - the user performing this action
+	 */
+	private void updateElectronicMessagingConsentTimestamps(Demographic demographic, Demographic existingDemographic, LoggedInInfo loggedInInfo)
+	{
+		if (existingDemographic == null || demographic.getElectronicMessagingConsentStatus() != existingDemographic.getElectronicMessagingConsentStatus())
+		{
+			// status has changed. update!
+			switch(demographic.getElectronicMessagingConsentStatus())
+			{
+				case NONE:
+					demographic.setElectronicMessagingConsentGivenAt(null);
+					demographic.setElectronicMessagingConsentRejectedAt(null);
+					break;
+				case REVOKED:
+					demographic.setElectronicMessagingConsentRejectedAt(new Date());
+					break;
+				case CONSENTED:
+					demographic.setElectronicMessagingConsentGivenAt(new Date());
+					demographic.setElectronicMessagingConsentRejectedAt(null);
+					break;
+			}
+
+			// record the consent change.
+			LogAction.addLogEntry(
+					loggedInInfo.getLoggedInProviderNo(),
+					demographic.getDemographicNo(),
+					LogConst.ACTION_ELECTRONIC_MESSAGING_CONSENT_UPDATED,
+					LogConst.CON_ELECTRONIC_MESSAGING_CONSENT_STATUS,
+					LogConst.STATUS_SUCCESS,
+					demographic.getElectronicMessagingConsentStatus().name());
+		}
 	}
 
 }

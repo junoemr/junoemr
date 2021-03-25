@@ -25,12 +25,15 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -155,6 +158,14 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	private Date lastUpdateDate = null;
 	@Column(name = "veteran_no")
 	private String veteranNo = null;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_given_at")
+	private LocalDateTime electronicMessagingConsentGivenAt;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_rejected_at")
+	private LocalDateTime electronicMessagingConsentRejectedAt;
 
 	public DemographicArchive()
 	{

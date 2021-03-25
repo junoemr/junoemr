@@ -23,7 +23,10 @@
 
 
 package org.oscarehr.common.model;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sun.istack.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
@@ -32,6 +35,7 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
+import oscar.util.Jackson.LocalDateSerializer;
 
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -39,6 +43,8 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -140,6 +146,12 @@ public class Demographic implements Serializable
 	private String veteranNo;
 	private String nameOfMother;
 	private String nameOfFather;
+	@Getter
+	@Setter
+	private Date electronicMessagingConsentGivenAt;
+	@Getter
+	@Setter
+	private Date electronicMessagingConsentRejectedAt;
 
 	public String getTitle()
 	{
@@ -1591,5 +1603,25 @@ public class Demographic implements Serializable
 	public boolean isPatientActive()
 	{
 		return !org.oscarehr.demographic.model.Demographic.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
+
+	/**
+	 * get the patients electornic messaging consent status
+	 * @return - the patients consent status
+	 */
+	public org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
+	{
+		if (this.electronicMessagingConsentRejectedAt != null)
+		{
+			return org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.REVOKED;
+		}
+		else if (this.electronicMessagingConsentGivenAt != null)
+		{
+			return org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.CONSENTED;
+		}
+		else
+		{
+			return org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+		}
 	}
 }
