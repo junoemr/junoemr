@@ -74,20 +74,8 @@ angular.module('Record.Details').component('contactSection', {
 		{
 			// Update consent timestamps for immediate UI feedback.
 			// Exact value will be calculated by the backend on save.
-			switch (value)
-			{
-				case ElectronicMessagingConsentStatus.NONE:
-					ctrl.ngModel.electronicMessagingConsentGivenAt = null;
-					ctrl.ngModel.electronicMessagingConsentRejectedAt = null;
-					break;
-				case ElectronicMessagingConsentStatus.REVOKED:
-					ctrl.ngModel.electronicMessagingConsentRejectedAt = moment();
-					break;
-				case ElectronicMessagingConsentStatus.CONSENTED:
-					ctrl.ngModel.electronicMessagingConsentGivenAt = moment();
-					ctrl.ngModel.electronicMessagingConsentRejectedAt = null;
-					break;
-			}
+			ctrl.ngModel.electronicMessagingConsentGivenAt = moment();
+			ctrl.ngModel.electronicMessagingConsentRejectedAt = moment();
 		}
 
 		/**

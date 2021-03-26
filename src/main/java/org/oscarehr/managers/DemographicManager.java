@@ -371,9 +371,6 @@ public class DemographicManager {
 			demographic.setPatientStatusDate(currentStatusDate);
 		}
 
-		// update messaging consent timestamps
-		updateElectronicMessagingConsentTimestamps(demographic, prevDemo, loggedInInfo);
-
 		//retain merge info
 		demographic.setSubRecord(prevDemo.getSubRecord());
 		
@@ -398,6 +395,19 @@ public class DemographicManager {
 
 				updateExtension(loggedInInfo, ext);
 			}
+		}
+
+		// log consent status change.
+		if (prevDemo.getElectronicMessagingConsentStatus() != demographic.getElectronicMessagingConsentStatus())
+		{
+			// record the consent change.
+			LogAction.addLogEntry(
+					loggedInInfo.getLoggedInProviderNo(),
+					demographic.getDemographicNo(),
+					LogConst.ACTION_UPDATE,
+					LogConst.CON_ELECTRONIC_MESSAGING_CONSENT_STATUS,
+					LogConst.STATUS_SUCCESS,
+					demographic.getElectronicMessagingConsentStatus().name());
 		}
 	}
 	
@@ -1118,44 +1128,4 @@ public class DemographicManager {
 	{
 		return this.demographicDao.getDemographicByHealthNumber(healthNumber);
 	}
-
-
-	/**
-	 * Update the electronic messaging consent timestamps of the provided demographic
-	 * if the messaging consent status has changed
-	 * @param demographic - the demographic to update the timestamps on.
-	 * @param existingDemographic - the previously saved demographic record (can be null)
-	 * @param loggedInInfo - the user performing this action
-	 */
-	private void updateElectronicMessagingConsentTimestamps(Demographic demographic, Demographic existingDemographic, LoggedInInfo loggedInInfo)
-	{
-		if (existingDemographic == null || demographic.getElectronicMessagingConsentStatus() != existingDemographic.getElectronicMessagingConsentStatus())
-		{
-			// status has changed. update!
-			switch(demographic.getElectronicMessagingConsentStatus())
-			{
-				case NONE:
-					demographic.setElectronicMessagingConsentGivenAt(null);
-					demographic.setElectronicMessagingConsentRejectedAt(null);
-					break;
-				case REVOKED:
-					demographic.setElectronicMessagingConsentRejectedAt(new Date());
-					break;
-				case CONSENTED:
-					demographic.setElectronicMessagingConsentGivenAt(new Date());
-					demographic.setElectronicMessagingConsentRejectedAt(null);
-					break;
-			}
-
-			// record the consent change.
-			LogAction.addLogEntry(
-					loggedInInfo.getLoggedInProviderNo(),
-					demographic.getDemographicNo(),
-					LogConst.ACTION_UPDATE,
-					LogConst.CON_ELECTRONIC_MESSAGING_CONSENT_STATUS,
-					LogConst.STATUS_SUCCESS,
-					demographic.getElectronicMessagingConsentStatus().name());
-		}
-	}
-
 }
