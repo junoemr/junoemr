@@ -42,6 +42,8 @@ import org.oscarehr.dataMigration.service.DataMigrationService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.service.PatientExportService;
 import org.oscarehr.dataMigration.service.PatientImportWrapperService;
+import org.oscarehr.dataMigration.service.context.PatientExportContextService;
+import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.oscarehr.dataMigration.transfer.ExportTransferOutbound;
 import org.oscarehr.dataMigration.transfer.ImportTransferOutbound;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -77,6 +79,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,6 +118,12 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@Autowired
 	private DataMigrationService dataMigrationService;
+
+	@Autowired
+	private PatientImportContextService patientImportContextService;
+
+	@Autowired
+	private PatientExportContextService patientExportContextService;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -319,7 +328,7 @@ public class DemographicsService extends AbstractServiceImpl
 			@QueryParam("source") String importSource,
 			@QueryParam("merge") String mergeStrategy,
 			@QueryParam("site") String defaultSiteName,
-			List<FileTransfer> fileListTransfer) throws IOException, InterruptedException
+			List<FileTransfer> fileListTransfer) throws IOException, InterruptedException, TimeoutException
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
@@ -401,6 +410,8 @@ public class DemographicsService extends AbstractServiceImpl
 		thread.setName(processId);
 		thread.start();
 
+		// wait for the context to exist before returning, with an emergency timeout just in case
+		patientImportContextService.waitForContext(processId, 60000);
 		return RestResponse.successResponse(processId);
 	}
 
@@ -479,6 +490,8 @@ public class DemographicsService extends AbstractServiceImpl
 		thread.setName(processId);
 		thread.start();
 
+		// wait for the context to exist before returning, with an emergency timeout just in case
+		patientExportContextService.waitForContext(processId, 60000);
 		return RestResponse.successResponse(processId);
 	}
 

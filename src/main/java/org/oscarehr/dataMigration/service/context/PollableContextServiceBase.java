@@ -24,6 +24,7 @@ package org.oscarehr.dataMigration.service.context;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeoutException;
 
 public abstract class PollableContextServiceBase<T extends PollableContext>
 {
@@ -43,6 +44,7 @@ public abstract class PollableContextServiceBase<T extends PollableContext>
 	{
 		String key = getCurrentThreadKey();
 		contextMap.put(key, context);
+		this.notifyAll(); // wake any threads waiting for context to exist
 		return key;
 	}
 
@@ -72,6 +74,22 @@ public abstract class PollableContextServiceBase<T extends PollableContext>
 	public synchronized T getContext(String identifier)
 	{
 		return contextMap.get(identifier);
+	}
+
+	public synchronized T waitForContext(String identifier, long timout) throws InterruptedException, TimeoutException
+	{
+		T context = getContext(identifier);
+		if(context == null)
+		{
+			this.wait(timout);
+			context = getContext(identifier);
+
+			if(context == null)
+			{
+				throw new TimeoutException("thread wait for context timed out (max wait time " + timout + ")");
+			}
+		}
+		return context;
 	}
 
 	private String getCurrentThreadKey()
