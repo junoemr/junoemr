@@ -18,9 +18,10 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <%
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -32,23 +33,70 @@
 
 <html>
 <head>
-<%--<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>--%>
 <title><bean:message key="admin.appt.status.mgr.title" /></title>
 <link href="../css/jquery.ui.colorPicker.css" rel="stylesheet" type="text/css" />
-<%--<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>--%>
-	<script src="../js/jquery-3.1.0.min.js" type="text/javascript"></script>
-
-	<script src="../js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+<link rel="stylesheet" type="text/css" media="all" href="../css/font/junoIcons/stylesheet.css" />
+<script src="../js/jquery-3.1.0.min.js" type="text/javascript"></script>
+<script src="../js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
 <script src="../js/jquery.ui.colorPicker.min.js" type="text/javascript"></script>
-<oscar:customInterface section="apptStatusEdit"/>
+<%--<oscar:customInterface section="apptStatusEdit"/>--%>
 
 	<style>
-		.juno-color-button {
-			width: 25px;
-			height: 25px;
-			border: 0;
-			border-radius: 2px;
-		}
+        tr {
+            height: 40px;
+        }
+
+	    .juno-color-button {
+		    width: 25px;
+		    height: 25px;
+		    border: 0;
+		    border-radius: 2px;
+	    }
+
+        .submit {
+            margin: 0 auto;
+            display: block;
+        }
+
+        .margin-t {
+            margin-top: 32px;
+        }
+
+        .margin-b {
+            margin-bottom: 32px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .header {
+            width: 20%;
+            font-weight: bold;
+        }
+
+        .right {
+            text-align: right;
+            padding-right: 8px;
+        }
+
+        .grey {
+            color: #808080;
+        }
+
+        .preview {
+            padding-left: 4px;
+            max-height: 10px;
+        }
+
+        .w-10 {
+            width: 10%;
+        }
+
+        .w-15 {
+            width: 15%;
+        }
 	</style>
 </head>
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
@@ -56,23 +104,36 @@
 <script type="text/javascript">
 	$(document).ready(function ()
 	{
-		// init colour pickers
-		$('#apptColor').colorPicker({
+        var color = $('#apptColor').val();
+        var junoColor = $('#apptJunoColor').val();
+
+        var $apptColorPicker = $('#apptColor');
+        var $classicPreview = $('#classic-preview');
+		$apptColorPicker.colorPicker({
 			format: 'hex',
 			colorChange: function (e, ui)
 			{
-				$('#apptColor').val(ui.color);
+				$apptColorPicker.val(ui.color);
+				$apptColorPicker.css("background-color", ui.color);
+				$classicPreview.css('background-color', ui.color);
 			}
-		}).colorPicker('setColor', $('#old_color').val());
+		}).colorPicker('setColor', color);
+		$apptColorPicker.css("background-color", color);
+		$classicPreview.css('background-color', color);
 
 		var $junoColorPicker = $('#apptJunoColor');
+		var $junoPreview = $('#juno-preview');
 		$junoColorPicker.colorPicker({
 			format: 'hex',
 			colorChange: function (e, ui)
 			{
-				$('#apptJunoColor').val(ui.color);
+				$junoColorPicker.val(ui.color);
+				$junoColorPicker.css("background-color", ui.color);
+				$junoPreview.css('background-color', ui.color);
 			}
-		}).colorPicker('setColor', $('#old_juno_color').val());
+		}).colorPicker('setColor', junoColor);
+		$junoColorPicker.css("background-color", junoColor);
+		$junoPreview.css('background-color', junoColor);
 
 		var colorCodeArray = [
 			//darkest, darker,  dark,   base,    light,   lighter,  lightest
@@ -116,69 +177,151 @@
 			$junoColorPicker.colorPicker('setColor', colorCode);
 			event.preventDefault();
 		})
+
+        $("#icon-picker").on("change", updateIconPreview);
+		updateIconPreview();
+
+        $("#form-submit").on("click", function(event)
+        {
+        	processForm(event);
+        });
 	});
+
+	function updateIconPreview()
+    {
+    	var iconRegex = /(.+)\.gif/g;
+    	var iconFile = $('#icon-picker').val();
+
+	    var name = iconRegex.exec(iconFile)[1];
+
+	    var $junoIcon = $('#juno-preview > i');
+	    $junoIcon.attr("class", "preview icon-" + name);
+
+	    var $classicIcon = $('#classic-preview > img');
+	    $classicIcon.attr("src", "../images/" + iconFile);
+    }
+
+	function processForm(event)
+    {
+    	event.preventDefault();
+
+    	var description = $('#appt-description').val();
+    	if (!description || !description.trim())
+        {
+        	alert("Appointment Status must have a valid description");
+        	return false;
+        }
+    	else
+    	{
+    		var endpoint = $('#statusForm').attr('action');
+            var method = $('#action').val();
+
+		    $('#statusForm').attr('action', endpoint + "?method=" + method);
+    	    document.forms[0].submit();
+        }
+    }
 </script>
 
 <table border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr bgcolor="#486ebd">
-		<th align="CENTER" NOWRAP><font face="Helvetica" color="#FFFFFF"><bean:message
-			key="admin.appt.status.mgr.title" /></font></th>
+		<th align="CENTER" NOWRAP><font face="Helvetica" color="#FFFFFF">
+            <c:if test = "${ action eq 'update'}">
+                Update an Appointment Status
+            </c:if>
+            <c:if test = "${ action eq 'add'}">
+                Create a New Appointment Status
+            </c:if>
+        </font></th>
 	</tr>
 </table>
+<input type="hidden" id="action" value="<c:out value="${action}"/>">
+<html:form action="/appointment/apptStatusSetting" styleId="statusForm">
+    <div>
+        <table class="margin-t">
+            <tr>
+                <td class="header"><bean:message key="admin.appt.status.mgr.label.desc" /></td>
+                <td><html:text property="description" styleId="appt-description" size="40"></html:text></td>
+            </tr>
+            <tr>
+                <td class="header">Icon</td>
+                <td>
+                    <html:select property="icon" styleId="icon-picker">
+                        <html:option value="starbill.gif">StarBill</html:option>
+                        <html:option value="todo.gif">Todo</html:option>
+                        <html:option value="here.gif">Here</html:option>
+                        <html:option value="picked.gif">Picked</html:option>
+                        <html:option value="noshow.gif">No Show</html:option>
+                        <html:option value="cancel.gif">Cancel</html:option>
+                        <html:option value="billed.gif">Billed</html:option>
+                        <html:option value="empty.gif">Empty</html:option>
+                        <html:option value="dot.gif">Dot</html:option>
+                        <html:option value="1.gif">Custom 1</html:option>
+                        <html:option value="2.gif">Custom 2</html:option>
+                        <html:option value="3.gif">Custom 3</html:option>
+                        <html:option value="4.gif">Custom 4</html:option>
+                        <html:option value="5.gif">Custom 5</html:option>
+                        <html:option value="6.gif">Custom 6</html:option>
+                        <html:option value="7.gif">Custom 7</html:option>
+                        <html:option value="8.gif">Custom 8</html:option>
+                        <html:option value="9.gif">Custom 9</html:option>
+                        <html:option value="10.gif">Custom 10</html:option>
+                        <html:option value="11.gif">Custom 11</html:option>
+                    </html:select>
+                </td>
+                <td class="w-15 right">Classic Preview</td>
+                <td id="classic-preview" class="w-10"><img class="preview"/></td>
+                <td class="w-15 right">Juno Preview</td>
+                <td id="juno-preview" class="w-10"><i></i></td>
+            </tr>
 
+            <tr>
+                <td class="header">Toggle</td>
+                <c:if test = "${ canDisable eq 1}">
+                <td>
+                    <html:select property="active">
+                        <html:option value="1">Enabled</html:option>
+                        <html:option value="0">Disabled</html:option>
+                    </html:select>
+                </td>
+                </c:if>
+                <c:if test = "${ canDisable eq 0}">
+                <td class="grey">Cannot be disabled</td>
+                </c:if>
+            </tr>
+        </table>
+        <hr class="margin-t margin-b">
+        <table>
+            <tr>
+                <td class="header text-center">
+                    Classic UI Color
+                </td>
+                <td style="width: 96px"></td>
+                <td colspan="2" class="header text-center">
+                    Juno UI Color
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <html:text property="color" styleId="apptColor" size="20"></html:text>
+                </td>
+                <td></td>
+                <td>
+                    <html:text property="junoColor" styleId="apptJunoColor" size="20"></html:text>
 
-<html:form action="/appointment/apptStatusSetting">
-	<table>
-		<tr>
-			<td class="tdLabel"><bean:message
-				key="admin.appt.status.mgr.label.status" />:</td>
-			<td colspan="3"><html:text readonly="true" property="apptStatus" size="40" /></td>
-		</tr>
-		<tr>
-			<td class="tdLabel"><bean:message
-				key="admin.appt.status.mgr.label.desc" />:</td>
-			<td colspan="3"><html:text property="apptDesc" size="40" /></td>
-		</tr>
-
-		<tr>
-			<td class="tdLabel"><bean:message
-					key="admin.appt.status.mgr.label.oldcolor" />:</td>
-			<td><html:text readonly="true" styleId="old_color" property="apptOldColor" size="20" />
-			</td>
-		</tr>
-		<tr>
-			<td class="tdLabel"><bean:message
-					key="admin.appt.status.mgr.label.newcolor" />:</td>
-			<td>
-				<input id="apptColor" name="apptColor" value="" size="20" />
-			</td>
-		</tr>
-		<tr>
-			<td class="tdLabel"><bean:message
-					key="admin.appt.status.mgr.label.oldJunoColor" />:</td>
-			<td><html:text readonly="false" styleId="old_juno_color" property="apptOldJunoColor" size="20" />
-			</td>
-		</tr>
-		<tr>
-			<td class="tdLabel"><bean:message
-					key="admin.appt.status.mgr.label.newJunoColor" />:</td>
-			<td>
-				<input id="apptJunoColor" name="apptJunoColor" value="#000000" size="20" />
-			</td>
-
-			<td id="junoColorPalette">
-			</td>
-		</tr>
-
-		<div id="list_entries"></div>
-		<tr>
-			<td colspan="2"><html:hidden property="ID" /> <input
-				type="hidden" name="dispatch" value="update" /> <br />
-			<input type="submit"
-				value="<bean:message key="oscar.appt.status.mgr.label.submit"/>" />
-			</td>
-		</tr>
-	</table>
+                </td>
+                <td><div id="junoColorPalette"></div></td>
+                <td></td>
+            </tr>
+        </table>
+        <hr class="margin-t margin-b">
+        <div>
+            <html:hidden property="id"/>
+            <html:submit styleId="form-submit" styleClass="submit">
+                <c:if test="${ action eq 'add'}">Create Status</c:if>
+                <c:if test="${ action eq 'update'}">Update Status</c:if>
+            </html:submit>
+        </div>
+    </div>
 </html:form>
 </body>
 </html>

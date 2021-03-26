@@ -2723,7 +2723,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		boolean printLabs = request.getParameter("printLabs") != null && request.getParameter("printLabs").equalsIgnoreCase("true");
 
 		CaseManagementPrint cmp = new CaseManagementPrint();
-		cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs,cStartDate,cEndDate,request, response.getOutputStream());
+		cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs, null, cStartDate,cEndDate,request, response.getOutputStream());
 
 		return null;
 	}

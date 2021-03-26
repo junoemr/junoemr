@@ -276,7 +276,7 @@ public class Appointment
 	 * @param calendarAppointment - the transfer object that represents the appointment.
 	 * @param loggedInInfo - logged in info
 	 * @param request - http request
-	 * @return
+	 * @return updated appointment
 	 */
 	public org.oscarehr.common.model.Appointment updateAppointment(CalendarAppointment calendarAppointment,
 			LoggedInInfo loggedInInfo, HttpServletRequest request)

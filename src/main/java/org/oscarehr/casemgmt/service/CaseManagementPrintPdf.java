@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
 import org.oscarehr.encounterNote.model.Issue;
@@ -118,7 +121,8 @@ public class CaseManagementPrintPdf {
     	return bf;
     }
 
-    public void printDocHeaderFooter() throws IOException, DocumentException {
+    public void printDocHeaderFooter() throws IOException, DocumentException
+    {
         //Create the document we are going to write to
         document = new Document();
         PdfWriter writer = PdfWriterFactory.newInstance(document, os, FontSettings.HELVETICA_12PT);
@@ -140,30 +144,54 @@ public class CaseManagementPrintPdf {
         String age = propResource.getString("oscarEncounter.pdfPrint.age") + " " + (String)request.getAttribute("demoAge") + "\n";
         String mrp = propResource.getString("oscarEncounter.pdfPrint.mrp") + " " + (String)request.getAttribute("mrp") + "\n";
         String hin = propResource.getString("oscarEncounter.pdfPrint.hin") + " " + (String)request.getAttribute("hin") + "\n";
-        String[] info = null;
-        if("true".equals(OscarProperties.getInstance().getProperty("print.includeMRP", "true"))) {
-        	info = new String[] { title, gender, dob, age, hin, mrp };
-        } else {
-        	info = new String[] { title, gender, dob, age, hin};
+        Integer selectedSite = (Integer) request.getAttribute("site");
+
+        List<String> info = new ArrayList<>();
+        info.add(title);
+        info.add(gender);
+        info.add(dob);
+        info.add(age);
+        info.add(hin);
+        if("true".equals(OscarProperties.getInstance().getProperty("print.includeMRP", "true")))
+        {
+            info.add(mrp);
         }
 
-        ClinicData clinicData = new ClinicData();
-        clinicData.refreshClinicData();
-        String[] clinic = new String[] {clinicData.getClinicName(), clinicData.getClinicAddress(),
-        clinicData.getClinicCity() + ", " + clinicData.getClinicProvince(),
-        clinicData.getClinicPostal(), "Phone: " + clinicData.getClinicPhone(), "Fax: " + clinicData.getClinicFax()};
+        List<String> clinic = new ArrayList<>();
+        if (selectedSite == null || selectedSite == 0)
+        {
+            ClinicData clinicData = new ClinicData();
+            clinicData.refreshClinicData();
+            clinic.add(clinicData.getClinicName());
+            clinic.add(clinicData.getClinicAddress());
+            clinic.add(clinicData.getClinicCity() + ", " + clinicData.getClinicProvince());
+            clinic.add(clinicData.getClinicPostal());
+            clinic.add("Phone: " + clinicData.getClinicPhone());
+            clinic.add("Fax: " + clinicData.getClinicFax());
+        }
+        else
+        {
+            SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
+            Site site = siteDao.getById((Integer) request.getAttribute("site"));
+            clinic.add(site.getName());
+            clinic.add(site.getAddress());
+            clinic.add(site.getCity() + ", " + site.getProvince());
+            clinic.add(site.getPostal());
+            clinic.add("Phone: " + site.getPhone());
+            clinic.add("Fax: " + site.getFax());
+        }
 
-        if("true".equals(OscarProperties.getInstance().getProperty("print.useCurrentProgramInfoInHeader", "false"))) {
+        if("true".equals(OscarProperties.getInstance().getProperty("print.useCurrentProgramInfoInHeader", "false")))
+        {
         	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
         	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-        	ProgramProvider pp = programManager2.getCurrentProgramInDomain(loggedInInfo,loggedInInfo.getLoggedInProviderNo());
-    		if(pp != null) {
-    			Program program = pp.getProgram();
-    			clinic = new String[] {
-    			program.getDescription(),
-    			program.getAddress(),
-    			program.getPhone()
-    			};
+        	ProgramProvider programProvider = programManager2.getCurrentProgramInDomain(loggedInInfo,loggedInInfo.getLoggedInProviderNo());
+    		if(programProvider != null)
+    		{
+    			Program program = programProvider.getProgram();
+    			clinic.add(program.getDescription());
+    			clinic.add(program.getAddress());
+    			clinic.add(program.getPhone());
     		}
         }
         //Header will be printed at top of every page beginning with p2
@@ -189,8 +217,9 @@ public class CaseManagementPrintPdf {
         p.setAlignment(Paragraph.ALIGN_LEFT);
         Phrase phrase = new Phrase();
         Phrase dummy = new Phrase();
-        for( int idx = 0; idx < clinic.length; ++idx ) {
-            phrase.add(clinic[idx] + "\n");
+        for(String idx: clinic)
+        {
+            phrase.add(idx + "\n");
             dummy.add("\n");
             upperYcoord -= phrase.getLeading();
         }
@@ -207,8 +236,10 @@ public class CaseManagementPrintPdf {
         phrase = new Phrase();
         p = new Paragraph();
         p.setAlignment(Paragraph.ALIGN_RIGHT);
-        for( int idx = 0; idx < info.length; ++idx ) {
-            phrase.add(info[idx]);
+
+        for(String idx: info)
+        {
+            phrase.add(idx);
         }
 
         ct.setSimpleColumn(document.right()/2f, upperYcoord, document.right(), document.top());

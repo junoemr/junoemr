@@ -2606,7 +2606,7 @@
 		<action input="/oscarEncounter/oscarMeasurements/HistoryIndex.jsp" name="FrmForm" path="/oscarEncounter/oscarMeasurements/SendToPhr" parameter="method" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
 			<forward name="finished" path="/phr/response.jsp"></forward>
 		</action>
-		<action path="/appointment/apptStatusSetting" name="apptStatusEditForm" type="org.springframework.web.struts.DelegatingActionProxy" scope="request" parameter="dispatch">
+		<action path="/appointment/apptStatusSetting" name="apptStatusEditForm" type="org.springframework.web.struts.DelegatingActionProxy" scope="request" parameter="method">
 			<forward name="success" path="/appointment/appointmentstatussetting.jsp" />
 			<forward name="edit" path="/appointment/appointmentstatusedit.jsp" />
 		</action>

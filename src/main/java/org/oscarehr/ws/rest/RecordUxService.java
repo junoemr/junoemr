@@ -422,10 +422,19 @@ public class RecordUxService extends AbstractServiceImpl {
 		}
 		return false;
 	}
+
+	Integer getInt(JSONObject jsonobject, String key)
+	{
+    	if(jsonobject.containsKey(key))
+		{
+			return (Integer) jsonobject.get(key);
+		}
+		return null;
+	}
 	
 	String getString(JSONObject jsonobject,String key){
 		if(jsonobject.containsKey(key)){
-			return jsonobject.getString(key); 
+			return jsonobject.getString(key);
 		}
 		return null;
 	}
@@ -472,6 +481,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		final boolean printCPP  = getBoolean(jsonobject,"cpp");
 		final boolean printRx   = getBoolean(jsonobject,"rx");
 		final boolean printLabs = getBoolean(jsonobject,"labs");
+		final Integer siteSelected =  getInt(jsonobject, "selectedSite");
 		
 		final JSONArray keyArray = jsonobject.getJSONArray("selectedList");
 		final String[] noteIds = new String[keyArray.size()];
@@ -485,7 +495,7 @@ public class RecordUxService extends AbstractServiceImpl {
 					throws IOException, WebApplicationException {
 				try{
 					CaseManagementPrint cmp = new CaseManagementPrint();
-					cmp.doPrint(loggedInInfo,demographicNof, printAllNotes,noteIds,printCPP,printRx,printLabs,startCalf,endCalf, request, os);
+					cmp.doPrint(loggedInInfo,demographicNof, printAllNotes,noteIds,printCPP,printRx,printLabs,siteSelected,startCalf,endCalf, request,  os);
 		        }catch(Exception e){
 		        		logger.error("error streaming",e);
 		        }finally{

@@ -46,15 +46,15 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
 		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " x ORDER BY x.id");
 		return query.getResultList();
 	}
-    
-    public List<AppointmentStatus> findActive() {
-    	Query q = entityManager.createQuery("select a from AppointmentStatus a where a.active=?1");
-    	q.setParameter(1, 1);
-    	
-    	@SuppressWarnings("unchecked")
-    	List<AppointmentStatus> results = q.getResultList();
-    	
-    	return results;
+
+	@SuppressWarnings("unchecked")
+    public List<AppointmentStatus> findByActive(boolean isActive)
+    {
+    	int active = isActive? 1 : 0;
+	    Query query = entityManager.createQuery("SELECT a FROM AppointmentStatus a WHERE a.active = :active");
+	    query.setParameter("active", active);
+
+	    return query.getResultList();
     }
     
     public AppointmentStatus findByStatus(String status) {
@@ -93,6 +93,22 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
     		appts.setActive(iActive);
     	}
     }
+
+	/**
+	 * Get a list of all status codes which are currently in use.  Statuses which have been modified
+	 * (ie: Verified V, Signed S) are considered separate from their unmodified version
+	 *
+	 * eg for a given status x: x, xS, xV, xVS, xSV are all considered distinct statuses.
+	 *
+	 * @return list of appointment statuses in use
+	 */
+	public List<String> getStatusesInUse()
+	{
+		String sql = "SELECT DISTINCT status FROM appointment ORDER BY status";
+		Query query = entityManager.createNativeQuery(sql);
+
+		return query.getResultList();
+	}
 
 	/**
 	 * Find all inactive statuses that are currently used in any appointment. Return a list of these statuses.

@@ -1,1 +1,0 @@
-CREATE OR REPLACE INDEX fdidIndex ON eform_values (fdid);
