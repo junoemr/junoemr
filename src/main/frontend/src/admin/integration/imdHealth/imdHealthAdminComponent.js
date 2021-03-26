@@ -65,9 +65,7 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                         Juno.Common.Util.errorAlert($uibModal, "Error", "Could not update integration");
                         console.log(error);
                     });
-
             };
-
 
             ctrl.fetchIntegrations = () =>
             {
@@ -114,7 +112,8 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                           }
                           else
                           {
-                              Juno.Common.Util.errorAlert($uibModal, "Failure", "Could not sync integrations");
+                              Juno.Common.Util.errorAlert($uibModal, "Failure", "Could not sync the following integrations:" + '\n' + failedIntegrations);
+
                               console.log(failedIntegrations.join(' | '));
                           }
                       })
