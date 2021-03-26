@@ -31,8 +31,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import oscar.OscarProperties;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
@@ -239,8 +237,15 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 	{
 		if (existingDemographic == null || demographicTransfer.getElectronicMessagingConsentStatus() != existingDemographic.getElectronicMessagingConsentStatus())
 		{
+			// switch statements dont like null. convert to NONE if null.
+			org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS status = demographicTransfer.getElectronicMessagingConsentStatus();
+			if (status == null)
+			{
+				status = org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+			}
+
 			// status has changed. update!
-			switch(demographicTransfer.getElectronicMessagingConsentStatus())
+			switch(status)
 			{
 				case NONE:
 					demographic.setElectronicMessagingConsentGivenAt(null);
