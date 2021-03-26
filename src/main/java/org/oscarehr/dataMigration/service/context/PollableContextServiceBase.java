@@ -76,17 +76,25 @@ public abstract class PollableContextServiceBase<T extends PollableContext>
 		return contextMap.get(identifier);
 	}
 
-	public synchronized T waitForContext(String identifier, long timout) throws InterruptedException, TimeoutException
+	/**
+	 * wait for another thread to register the context with the specified identifier before returning
+	 * @param identifier - the thread identifier
+	 * @param timeout - the maximum length to wait.
+	 * @return - the context
+	 * @throws InterruptedException - if another thread has interrupted the current thread
+	 * @throws TimeoutException - if the timeout duration is exceeded
+	 */
+	public synchronized T waitForContext(String identifier, long timeout) throws InterruptedException, TimeoutException
 	{
 		T context = getContext(identifier);
 		if(context == null)
 		{
-			this.wait(timout);
+			this.wait(timeout);
 			context = getContext(identifier);
 
 			if(context == null)
 			{
-				throw new TimeoutException("thread wait for context timed out (max wait time " + timout + ")");
+				throw new TimeoutException("thread wait for context timed out (max wait time " + timeout + ")");
 			}
 		}
 		return context;
