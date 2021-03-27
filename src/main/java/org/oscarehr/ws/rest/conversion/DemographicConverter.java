@@ -24,22 +24,18 @@
 package org.oscarehr.ws.rest.conversion;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class DemographicConverter extends AbstractConverter<Demographic, DemographicTo1> {
 	
 	private static Logger logger = Logger.getLogger(DemographicConverter.class);
-	private static final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 
 	private DemographicExtConverter demoExtConverter = new DemographicExtConverter();
 	private ProviderConverter providerConverter = new ProviderConverter();
@@ -50,7 +46,6 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 	@Override
 	public Demographic getAsDomainObject(LoggedInInfo loggedInInfo,DemographicTo1 transfer) throws ConversionException {
 		Demographic demographic = new Demographic();
-		Demographic previousDemographic = demographicDao.getDemographicById(transfer.getDemographicNo());
 
 		demographic.setDemographicNo(transfer.getDemographicNo());
 		demographic.setPhone(transfer.getPhone());
@@ -120,7 +115,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setNewsletter(transfer.getNewsletter());
 		demographic.setNameOfMother(transfer.getNameOfMother());
 		demographic.setNameOfFather(transfer.getNameOfFather());
-		this.updateElectronicMessagingConsentTimestamps(demographic, transfer, previousDemographic);
+		demographic.updateElectronicMessagingConsentStatus(transfer.getElectronicMessagingConsentStatus());
 
 		DemographicExt[] exts = new DemographicExt[transfer.getExtras().size()];
 		for (int i = 0; i < transfer.getExtras().size(); i++) {
@@ -225,46 +220,4 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 
 		return transfer;
 	}
-
-	/**
-	 * Update the electronic messaging consent timestamps of the provided demographic
-	 * if the messaging consent status has changed
-	 * @param demographic - the demographic to update the timestamps on.
-	 * @param demographicTransfer - the transfer object for the demographic.
-	 * @param existingDemographic - the previously saved demographic record (can be null)
-	 */
-	private void updateElectronicMessagingConsentTimestamps(Demographic demographic, DemographicTo1 demographicTransfer, Demographic existingDemographic)
-	{
-		if (existingDemographic == null || demographicTransfer.getElectronicMessagingConsentStatus() != existingDemographic.getElectronicMessagingConsentStatus())
-		{
-			// switch statements dont like null. convert to NONE if null.
-			org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS status = demographicTransfer.getElectronicMessagingConsentStatus();
-			if (status == null)
-			{
-				status = org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
-			}
-
-			// status has changed. update!
-			switch(status)
-			{
-				case NONE:
-					demographic.setElectronicMessagingConsentGivenAt(null);
-					demographic.setElectronicMessagingConsentRejectedAt(null);
-					break;
-				case REVOKED:
-					demographic.setElectronicMessagingConsentRejectedAt(new Date());
-					break;
-				case CONSENTED:
-					demographic.setElectronicMessagingConsentGivenAt(new Date());
-					demographic.setElectronicMessagingConsentRejectedAt(null);
-					break;
-			}
-		}
-		else
-		{
-			demographic.setElectronicMessagingConsentGivenAt(existingDemographic.getElectronicMessagingConsentGivenAt());
-			demographic.setElectronicMessagingConsentRejectedAt(existingDemographic.getElectronicMessagingConsentRejectedAt());
-		}
-	}
-	
 }

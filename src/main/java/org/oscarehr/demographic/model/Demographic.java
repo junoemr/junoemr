@@ -939,4 +939,30 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 			return ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
 		}
 	}
+
+	/**
+	 * Update the patients electronic messaging consent status.
+	 * @param status - the new consent status to use.
+	 */
+	public void updateElectronicMessagingConsentStatus(ELECTRONIC_MESSAGING_CONSENT_STATUS status)
+	{
+		if (this.getElectronicMessagingConsentStatus() != status && status != null)
+		{
+			// status has changed. update!
+			switch(status)
+			{
+				case NONE:
+					this.setElectronicMessagingConsentGivenAt(null);
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+				case REVOKED:
+					this.setElectronicMessagingConsentRejectedAt(new Date());
+					break;
+				case CONSENTED:
+					this.setElectronicMessagingConsentGivenAt(new Date());
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+			}
+		}
+	}
 }

@@ -1602,7 +1602,7 @@ public class Demographic implements Serializable
 	}
 
 	/**
-	 * get the patients electornic messaging consent status
+	 * get the patients electronic messaging consent status
 	 * @return - the patients consent status
 	 */
 	public org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
@@ -1618,6 +1618,32 @@ public class Demographic implements Serializable
 		else
 		{
 			return org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+		}
+	}
+
+	/**
+	 * Update the patients electronic messaging consent status.
+	 * @param status - the new consent status to use.
+	 */
+	public void updateElectronicMessagingConsentStatus(org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS status)
+	{
+		if (this.getElectronicMessagingConsentStatus() != status && status != null)
+		{
+			// status has changed. update!
+			switch(status)
+			{
+				case NONE:
+					this.setElectronicMessagingConsentGivenAt(null);
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+				case REVOKED:
+					this.setElectronicMessagingConsentRejectedAt(new Date());
+					break;
+				case CONSENTED:
+					this.setElectronicMessagingConsentGivenAt(new Date());
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+			}
 		}
 	}
 }

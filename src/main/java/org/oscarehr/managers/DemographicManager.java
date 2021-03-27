@@ -373,6 +373,13 @@ public class DemographicManager {
 
 		//retain merge info
 		demographic.setSubRecord(prevDemo.getSubRecord());
+
+		// retain old consent timestamps if unchanged
+		if (demographic.getElectronicMessagingConsentStatus() == prevDemo.getElectronicMessagingConsentStatus())
+		{
+			demographic.setElectronicMessagingConsentGivenAt(prevDemo.getElectronicMessagingConsentGivenAt());
+			demographic.setElectronicMessagingConsentRejectedAt(prevDemo.getElectronicMessagingConsentRejectedAt());
+		}
 		
 		//save current demo
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
