@@ -39,6 +39,7 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -46,6 +47,7 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -150,7 +152,11 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 		Returns all demographics.
 	 */
 	@GET
-	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		OscarSearchResponse<DemographicTo1> result = new OscarSearchResponse<DemographicTo1>();
 		
 		if (offset == null) {
@@ -182,7 +188,11 @@ public class DemographicService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException {
+	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				id, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		try
 		{
 			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
@@ -252,6 +262,9 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("dataId") Integer demographicNo,
 	                                                                           @QueryParam("category") String category)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		try
 		{
 			// return error if invalid category
@@ -325,6 +338,9 @@ public class DemographicService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
 		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
 		demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
@@ -349,7 +365,10 @@ public class DemographicService extends AbstractServiceImpl {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data) {
+	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				data.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		try
 		{
@@ -405,7 +424,10 @@ public class DemographicService extends AbstractServiceImpl {
 	@DELETE
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id) {
+	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE,
+				id, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		try
 		{
 			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
@@ -439,6 +461,9 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("issueId") Long issueId
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.getIssueById(demographicNo, issueId);
 
 		return RestResponse.successResponse(issue);
@@ -454,6 +479,9 @@ public class DemographicService extends AbstractServiceImpl {
 			PropertyData propertyData
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateProperty(
 				demographicNo,
 				issueId,
@@ -474,6 +502,9 @@ public class DemographicService extends AbstractServiceImpl {
 			IssueData issueData
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateIssue(
 				demographicNo,
 				issueId,
@@ -491,6 +522,9 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_ALL);
 		return RestResponse.successResponse(issues);
@@ -504,6 +538,9 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED);
 		return RestResponse.successResponse(issues);
@@ -517,6 +554,9 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
 
