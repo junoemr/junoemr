@@ -44,7 +44,7 @@ public class TomcatConfig
 {
 	private final oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
 
-	private final String QUERY_STRING_CHARACTERS_TO_ALLOW = "[]";
+	private static final String QUERY_STRING_CHARACTERS_TO_ALLOW = "[]";
 
 	private final JunoProperties junoProperties;
 
