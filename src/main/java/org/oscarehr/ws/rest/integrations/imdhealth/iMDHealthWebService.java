@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest.integrations.imdhealth;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.exception.IntegrationException;
 import org.oscarehr.integration.imdhealth.service.IMDHealthService;
 import org.oscarehr.integration.model.Integration;
@@ -63,6 +64,8 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<List<IMDHealthIntegrationTo1>> getIMDHealthIntegrations()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN);
+
 		List<Integration> integrations = integrationService.findIntegrationsByType(Integration.INTEGRATION_TYPE_IMD_HEALTH);
 
 		List<IMDHealthIntegrationTo1> response = new ArrayList<>();
@@ -75,7 +78,8 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/SSOLink")
 	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IntegrationException
 	{
-		// TODO security permissions
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN);
+
 		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), siteId);
 		return RestResponse.successResponse(ssoLink);
 	}
@@ -84,6 +88,8 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/{integrationId}/sync")
 	public RestResponse<List<String>> syncIntegrations(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+
 		List<String> synced = imdHealthService.initializeAllUsers(getHttpServletRequest().getSession(), integrationId);
 		return RestResponse.successResponse(synced);
 	}
@@ -92,7 +98,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<Integer> updateIntegration(IMDHealthCredentialsTo1 credentials)
 	{
-		requireSecurityOnEndpoint("_admin", SecurityInfoManager.PRIVILEGE_LEVEL.WRITE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		Integration integration = imdHealthService.updateSSOCredentials(getHttpServletRequest().getSession(),
 		                                      credentials.getClientId(),
@@ -106,6 +112,8 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/{integrationId}/Test")
 	public RestResponse<Boolean> testIntegration(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN);
+
 		boolean credentialsValid = imdHealthService.testIntegration(integrationId);
 		return RestResponse.successResponse(credentialsValid);
 	}
@@ -114,7 +122,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/{integrationId}")
 	public RestResponse<Integer> deleteIntegration(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
-		requireSecurityOnEndpoint("_admin", SecurityInfoManager.PRIVILEGE_LEVEL.WRITE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		Integer returnValue = null;
 		Integration integration = imdHealthService.removeIntegration(getHttpServletRequest().getSession(), integrationId);

@@ -46,7 +46,7 @@ import java.util.ResourceBundle;
 public abstract class AbstractServiceImpl {
 
 	@Autowired
-	SecurityInfoManager securityInfoManager;
+	protected SecurityInfoManager securityInfoManager;
 
 	private static final int MAX_PAGE_RESULTS = 100;
 
@@ -172,19 +172,10 @@ public abstract class AbstractServiceImpl {
 	}
 
 	/**
-	 * Require the logged in user to possess the specified security object, and access level
-	 *
-	 * @param secObjName security object name
-	 * @param privilegeLevel access level
-	 * @throws SecurityException if requirements not met.
+	 * @return the current logged in provider id based on the loggedInInfo
 	 */
-	protected void requireSecurityOnEndpoint(String secObjName, SecurityInfoManager.PRIVILEGE_LEVEL privilegeLevel)
-			throws SecurityException
+	protected String getLoggedInProviderId()
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo,
-		                                        privilegeLevel.asString(),
-		                                        null,
-		                                        secObjName);
+		return getLoggedInInfo().getLoggedInProviderNo();
 	}
 }
