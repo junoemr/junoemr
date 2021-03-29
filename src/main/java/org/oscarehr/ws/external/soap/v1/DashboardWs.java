@@ -23,11 +23,13 @@
 package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.dashboard.dao.BillingMasterClinicaidDao;
 import org.oscarehr.dashboard.model.BillingMasterClinicaid;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.external.soap.v1.transfer.BillingTransfer;
@@ -57,6 +59,8 @@ public class DashboardWs extends AbstractWs
 	@SkipContentLoggingInbound
 	public String addBillingRecord(BillingTransfer billingTransfer)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.BILLING);
+
 		return saveBillingTransfer(billingTransfer);
 	}
 
@@ -64,6 +68,8 @@ public class DashboardWs extends AbstractWs
 	@SkipContentLoggingInbound
 	public String[] addBillingRecords(BillingTransfer[] billingTransfers)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.BILLING);
+
 		ArrayList<String> result_list = new ArrayList<>();
 		for(BillingTransfer billingTransfer: billingTransfers)
 		{
@@ -75,6 +81,8 @@ public class DashboardWs extends AbstractWs
 
 	private String saveBillingTransfer(BillingTransfer billingTransfer)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.BILLING);
+
 		try
 		{
 			//check for existing record

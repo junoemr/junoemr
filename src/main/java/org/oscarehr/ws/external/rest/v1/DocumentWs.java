@@ -24,6 +24,7 @@ package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -71,7 +72,8 @@ public class DocumentWs extends AbstractExternalRestWs
 	public RestResponse<Integer> postDocument(@Valid DocumentTransferInbound transfer) throws IOException, InterruptedException
 	{
 		String providerNoStr = getOAuthProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.EDOC);
 
 		if(transfer.getDocumentNo() != null)
 		{
@@ -108,7 +110,7 @@ public class DocumentWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
 
 		documentService.routeToGeneralInbox(documentId);
 		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
@@ -125,7 +127,7 @@ public class DocumentWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
 
 		documentService.routeToProviderInbox(documentId, providerId);
 		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,

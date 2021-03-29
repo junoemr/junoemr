@@ -37,23 +37,27 @@ import java.util.List;
 @WebService
 @Component
 @GZIP(threshold = AbstractWs.GZIP_THRESHOLD)
-public class FacilityWs extends AbstractWs {
+public class FacilityWs extends AbstractWs
+{
 	@Autowired
 	private FacilityManager facilityManager;
 
 	/**
-	 * @deprecated 2013-03-19 grammatical mistaken in name, this only returns 1 default facility, use getDefaultFacility() instead. 
+	 * @deprecated 2013-03-19 grammatical mistaken in name, this only returns 1 default facility, use getDefaultFacility() instead.
 	 */
-	public FacilityTransfer getDefaultFacilities() {
+	public FacilityTransfer getDefaultFacilities()
+	{
 		return (FacilityTransfer.toTransfer(facilityManager.getDefaultFacility(getLoggedInInfo())));
 	}
 
-	public FacilityTransfer getDefaultFacility() {
+	public FacilityTransfer getDefaultFacility()
+	{
 		return (FacilityTransfer.toTransfer(facilityManager.getDefaultFacility(getLoggedInInfo())));
 	}
 
-	public FacilityTransfer[] getAllFacilities(Boolean active) {
-		List<Facility> results = facilityManager.getAllFacilities(getLoggedInInfo(),active);
+	public FacilityTransfer[] getAllFacilities(Boolean active)
+	{
+		List<Facility> results = facilityManager.getAllFacilities(getLoggedInInfo(), active);
 		return (FacilityTransfer.toTransfers(results));
 	}
 }

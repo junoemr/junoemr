@@ -25,6 +25,7 @@ package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
@@ -90,7 +91,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, demographicNo, "_demographic");
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(demographicNo);
 
 		LogAction.addLogEntry(providerNoStr, demographicTransfer.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
@@ -106,8 +107,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	public RestResponse<DemographicTransferOutbound> putDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo,
 	                                                                @Valid DemographicTransferInbound demographicTo)
 	{
-		String providerNoStr = getOAuthProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, demographicNo, "_demographic");
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		return RestResponse.errorResponse("Not Implemented");
 	}
@@ -121,7 +121,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
 
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_demographic");
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		hinValidationService.validateNoDuplication(demographicTo.getHin(), demographicTo.getHcVersion(), demographicTo.getHcType());
 		Demographic demographic = demographicService.addNewDemographicRecord(providerNoStr, demographicTo);
 
@@ -140,7 +140,8 @@ public class DemographicWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, demographicId, "_demographic", "_edoc");
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicId,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.EDOC);
 
 		documentService.assignDocumentToDemographic(documentId, demographicId);
 		LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
@@ -159,7 +160,8 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, demographicId, "_demographic", "_eform");
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicId,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.EFORM);
 
 		EFormData eForm = eFormService.saveNewEFormWithDatabaseTags(transfer.getTemplateId(), demographicId, providerNo,
 				transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);

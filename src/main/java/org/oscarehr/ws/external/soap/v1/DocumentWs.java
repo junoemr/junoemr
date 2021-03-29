@@ -28,10 +28,12 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DocumentManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
@@ -62,34 +64,46 @@ public class DocumentWs extends AbstractWs {
 	@Autowired
 	private DocumentService documentService;
 
-	public DocumentTransfer getDocument(Integer documentId) {
-		try {
-			LoggedInInfo loggedInInfo = getLoggedInInfo();
+	public DocumentTransfer getDocument(Integer documentId)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC);
+		try
+		{
 			Document document = documentManager.getDocument(loggedInInfo, documentId);
 			CtlDocument ctlDocument = documentManager.getCtlDocumentByDocumentId(loggedInInfo, documentId);
 			return (DocumentTransfer.toTransfer(document, ctlDocument));
-		} catch (IOException e) {
+		}
+		catch(IOException e)
+		{
 			logger.error("Unexpected error", e);
 			throw (new WebServiceException(e));
 		}
 	}
 
-	public DocumentTransfer[] getDocumentsUpdateAfterDate(Date updatedAfterThisDateExclusive, int itemsToReturn) {
+	public DocumentTransfer[] getDocumentsUpdateAfterDate(Date updatedAfterThisDateExclusive, int itemsToReturn)
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC);
+
 		List<Document> documents = documentManager.getDocumentsUpdateAfterDate(loggedInInfo, updatedAfterThisDateExclusive, itemsToReturn);
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
 	}
 
-	public DocumentTransfer[] getDocumentsByProgramProviderDemographicDate(Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn) {
+	public DocumentTransfer[] getDocumentsByProgramProviderDemographicDate(Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn)
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC);
+
 		List<Document> documents = documentManager.getDocumentsByProgramProviderDemographicDate(loggedInInfo, programId, providerNo, demographicId, updatedAfterThisDateExclusive, itemsToReturn);
-		logger.debug("programId="+programId+", providerNo="+providerNo+", demographicId="+demographicId+", updatedAfterThisDateExclusive="+DateFormatUtils.ISO_DATETIME_FORMAT.format(updatedAfterThisDateExclusive)+", itemsToReturn="+itemsToReturn+", results="+documents.size());
+		logger.debug("programId=" + programId + ", providerNo=" + providerNo + ", demographicId=" + demographicId + ", updatedAfterThisDateExclusive=" + DateFormatUtils.ISO_DATETIME_FORMAT.format(updatedAfterThisDateExclusive) + ", itemsToReturn=" + itemsToReturn + ", results=" + documents.size());
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
 	}
 
 	@SkipContentLoggingInbound
 	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException, InterruptedException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
 		// Decode document
 		Base64 base64 = new Base64();
 		byte[] docContents = base64.decode(docContentsBase64);

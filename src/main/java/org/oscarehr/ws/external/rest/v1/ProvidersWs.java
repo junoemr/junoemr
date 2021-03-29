@@ -28,6 +28,8 @@ import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -58,7 +60,10 @@ public class ProvidersWs extends AbstractExternalRestWs
 	@GET
 	@Path("/providers_json")
 	@Hidden
-	public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON() {
+	public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON()
+	{
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
+
 		JsonConfig config = new JsonConfig();
 		config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
 

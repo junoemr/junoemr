@@ -26,6 +26,7 @@ package org.oscarehr.ws.external.rest.v1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
@@ -99,8 +100,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 			@QueryParam("providerNo") String searchProviderNo
 	)
 	{
-		String providerNoStr = getOAuthProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, null, "_demographic");
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		if(parametersAllNull(firstName, lastName, hin, sex, dateOfBirthStr, address, chartNo, phone, searchProviderNo))
 		{

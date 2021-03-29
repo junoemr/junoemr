@@ -26,6 +26,8 @@ package org.oscarehr.ws.external.rest.v1;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
@@ -56,6 +58,8 @@ public class ProviderWs extends AbstractExternalRestWs
 	@Operation(summary = "Retrieve an existing provider record by provider id.")
 	public RestResponse<ProviderTransfer> getProvider(@ProviderNoConstraint @PathParam("id") String id)
 	{
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
+
 		ProviderTransfer providerTransfer = ProviderTransfer.toTransfer(providerDao.getProvider(id));
 		return RestResponse.successResponse(providerTransfer);
 	}
