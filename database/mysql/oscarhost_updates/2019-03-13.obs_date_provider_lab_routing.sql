@@ -1,3 +1,4 @@
+-- Keep this file in oscarhost_updates and don't move to applied, as it will be needed when moving instances
 ALTER TABLE providerLabRouting add COLUMN IF NOT EXISTS obr_date DATETIME;
 
 -- These statements can be run repeatedly without affecting the integrity of the data.

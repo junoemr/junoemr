@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -53,6 +54,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.util.LabGridDisplay;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -82,6 +84,16 @@ public class CommonLabTestValues {
 		return retval;
 	}
 
+	/**
+	 * Super slow function. Has to instantiate a terser for each lab it attempts to read.
+	 * Terser also only grabs metadata for lab, you would then have to call "findValuesForTest"
+	 * which re-instantiates terser for each lab.
+	 *
+	 * Use getUniqueLabsForPatient if possible.
+	 * @param demographic demographic to get labs for
+	 * @return list of maps containing metadata about labs for a patient
+	 */
+	@Deprecated
 	public static ArrayList<Hashtable<String, Serializable>> findUniqueLabsForPatient(String demographic) {
 		OscarProperties op = OscarProperties.getInstance();
 		String cml = op.getProperty("CML_LABS");
@@ -106,6 +118,63 @@ public class CommonLabTestValues {
 			labs.addAll(hl7Labs);
 		}
 		return labs;
+	}
+
+	/**
+	 * Helper function for lab grid display. Given a map of labs per test type, build a map containing dates and lab ids
+	 * This is used to provide a link at the top of the grid display for the provider to click on and get to the lab
+	 * @param uniqueLabs map of labs to create a list of dates from
+	 * @return map containing date, lab_no information
+	 */
+	public static List<Map<String, String>> buildDateList(Map<String, List<LabGridDisplay>> uniqueLabs)
+	{
+		List<String> idList = new ArrayList<>();
+		List<Map<String, String>> dateList = new ArrayList<>();
+
+		for (String key : uniqueLabs.keySet())
+		{
+			List<LabGridDisplay> labs = uniqueLabs.get(key);
+			for (LabGridDisplay lab : labs)
+			{
+				String date = lab.getDateObserved();
+				String id = lab.getLabId();
+				if (!idList.contains(id))
+				{
+					idList.add(id);
+					Map<String, String> dateIdHash = new HashMap<>();
+					dateIdHash.put("date", date);
+					dateIdHash.put("id", id);
+					dateList.add(dateIdHash);
+				}
+			}
+		}
+
+		return dateList;
+	}
+
+	/**
+	 * Given a patient ID, get all stored lab measurements for them
+	 * @param demographicNo demographic to get stored lab measurements for
+	 * @return a map of stored lab measurements, categorized by test name
+	 */
+	public static Map<String, List<LabGridDisplay>> getUniqueLabsForPatients(Integer demographicNo)
+	{
+		MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
+
+		List<LabGridDisplay> patientLabResults = measurementDao.getLabMeasurementsForPatient(demographicNo);
+		Map<String, List<LabGridDisplay>> resultsPerTest = new HashMap<>();
+
+		for (LabGridDisplay result : patientLabResults)
+		{
+			if (!resultsPerTest.containsKey(result.getTestName()))
+			{
+				resultsPerTest.put(result.getTestName(), new ArrayList<>());
+			}
+			resultsPerTest.get(result.getTestName()).add(result);
+		}
+
+		return resultsPerTest;
+
 	}
 
 	//Method returns unique test names for a patient
@@ -286,15 +355,15 @@ public class CommonLabTestValues {
 		if (identCode != null) {
 			identCode = identCode.replace("_amp_", "&");
 		}
-		
+
 		if (labType != null && labType.equals("CML")) {
 			// LabTestResultsDao dao = SpringUtils.getBean(LabTestResultsDao.class);
 			PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
 			for(Object[] i : dao.findRoutingsAndTests(demographicNo==null?0:demographicNo, labType, testName)) {
-				PatientLabRouting p = (PatientLabRouting) i[0]; 
+				PatientLabRouting p = (PatientLabRouting) i[0];
 				LabTestResults ltr = (LabTestResults) i[1];
 				LabPatientPhysicianInfo lfp = (LabPatientPhysicianInfo) i[2];
-				
+
 				String testNam = ltr.getTestName();
 					String abn = ltr.getAbn();
 					String result = ltr.getResult();
@@ -326,17 +395,17 @@ public class CommonLabTestValues {
 						}
 					}
 				}
-				
+
 				labList.addAll(labMap.values());
 		} else if (labType != null && labType.equals("MDS")) {
 			PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
 			MdsZMNDao zmDao = SpringUtils.getBean(MdsZMNDao.class);
-			
+
 			for(Object[] i : dao.findMdsRoutings(demographicNo==null?0:demographicNo, testName, "MDS")) {
 					MdsOBX x = (MdsOBX) i[0];
 					MdsMSH m = (MdsMSH) i[1];
 					PatientLabRouting p = (PatientLabRouting) i[2];
-					
+
 					String testNam = parseObservationId(x.getObservationIdentifier());
 
 					String abn = x.getAbnormalFlags(); //abnormalFlags from mdsOBX
@@ -354,7 +423,7 @@ public class CommonLabTestValues {
 					if (status.equals("I") || status.equals("W") || status.equals("X") || status.equals("D")) {
 						continue;
 					}
-					
+
 					// Only retieve the latest measurement for each accessionNum
 					Hashtable<String, Serializable> ht = (Hashtable<String, Serializable>) accessionMap.get(accessionNum);
 					if (ht == null || Integer.parseInt((String) ht.get("mapNum")) < Integer.parseInt(version)) {
@@ -374,14 +443,14 @@ public class CommonLabTestValues {
 							ht.put("date", collDate);
 							ht.put("mapNum", version);
 							accessionMap.put(accessionNum, ht);
-							
+
 							MdsZMN mdsZmn = zmDao.findBySegmentIdAndReportName(ConversionUtils.fromIntString(segId), testNam);
-							
+
 							if (mdsZmn != null) {
 								range = mdsZmn.getReferenceRange();
 								units = mdsZmn.getUnits();
 							}
-							
+
 							Hashtable<String, Serializable> h = new Hashtable<String, Serializable>();
 							h.put("testName", testNam);
 							h.put("abn", abn);
@@ -398,15 +467,15 @@ public class CommonLabTestValues {
 		} else if (labType != null && labType.equals("BCP")) {
 			PatientLabRoutingDao dao = SpringUtils
 					.getBean(PatientLabRoutingDao.class);
-			
+
 			for (Object[] i : dao.findHl7InfoForRoutingsAndTests(demographicNo==null?0:demographicNo, "BCP", testName)) {
 					// PatientLabRouting p = (PatientLabRouting) i[0];
 					// Hl7Msh m = (Hl7Msh) i[1];
 					Hl7Pid pi = (Hl7Pid) i[2];
 					// Hl7Obr r = (Hl7Obr) i[3];
-					Hl7Obx x = (Hl7Obx) i[4]; 
+					Hl7Obx x = (Hl7Obx) i[4];
 					Hl7Orc c = (Hl7Orc) i[5];
-					
+
 					String testNam = parseObservationId(x.getObservationIdentifier());
 
 					String abn = x.getAbnormalFlags();
@@ -415,7 +484,7 @@ public class CommonLabTestValues {
 					String range = x.getReferenceRange();
 					String units = x.getUnits();
 					String collDate = ConversionUtils.toTimestampString(x.getObservationDateTime());
-					String accessionNum = c.getFillerOrderNumber(); 
+					String accessionNum = c.getFillerOrderNumber();
 
 					// get just the accession number
 					String[] ss = accessionNum.split("-");
@@ -448,48 +517,56 @@ public class CommonLabTestValues {
 
 		} else if (labType != null && labType.equals("HL7")) {
 			MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-			
-			for(Object lNo : dao.findLabNumbers(demographicNo==null?0:demographicNo, identCode)) {
-					String lab_no = String.valueOf(lNo);
 
-					MessageHandler handler = Factory.getHandler(lab_no);
-					HashMap<String, Serializable> h = new HashMap<String, Serializable>();
-					int i = 0;
-					while (i < handler.getOBRCount() && h.get("testName") == null) {
-						for (int j = 0; j < handler.getOBXCount(i); j++) {
-							if (handler.getOBXIdentifier(i, j).equals(identCode)) {
+			for (Object lNo : dao.findLabNumbers(demographicNo == null ? 0 : demographicNo, identCode))
+			{
+				String lab_no = String.valueOf(lNo);
 
-								String result = handler.getOBXResult(i, j);
+				MessageHandler handler = Factory.getHandler(lab_no);
+				HashMap<String, Serializable> hashMap = new HashMap<String, Serializable>();
+				int i = 0;
+				while (i < handler.getOBRCount() && hashMap.get("testName") == null)
+				{
+					for (int j = 0; j < handler.getOBXCount(i); j++)
+					{
+						if (handler.getOBXIdentifier(i, j).equals(identCode))
+						{
 
-								// only add measurements with actual results
-								if (!result.equals("")) {
-									h.put("testName", testName);
-									h.put("abn", handler.getOBXAbnormalFlag(i, j));
-									h.put("result", result);
-									h.put("range", handler.getOBXReferenceRange(i, j));
-									h.put("units", handler.getOBXUnits(i, j));
-									String collDate = handler.getTimeStamp(i, j);
-									h.put("lab_no", lab_no);
-									h.put("collDate", collDate);
-									MiscUtils.getLogger().debug("COLLDATE " + collDate);
-									if (collDate.length() == 10) {
-										h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd"));
-									} else if (collDate.length() == 16) {
-										h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm"));
-									} else {
-										h.put("collDateDate", UtilDateUtilities.getDateFromString(collDate, "yyyy-MM-dd HH:mm:ss"));
-									}
-									labList.add(h);
-									break;
+							String result = handler.getOBXResult(i, j);
+
+							// only add measurements with actual results
+							if (!result.equals(""))
+							{
+								hashMap.put("testName", testName);
+								hashMap.put("abn", handler.getOBXAbnormalFlag(i, j));
+								hashMap.put("result", result);
+								hashMap.put("range", handler.getOBXReferenceRange(i, j));
+								hashMap.put("units", handler.getOBXUnits(i, j));
+								String collDate = handler.getTimeStamp(i, j);
+								hashMap.put("lab_no", lab_no);
+								hashMap.put("collDate", collDate);
+								MiscUtils.getLogger().debug("COLLDATE " + collDate);
+								if (collDate.length() == 10)
+								{
+									hashMap.put("collDateDate", ConversionUtils.fromDateString(collDate, ConversionUtils.DEFAULT_DATE_PATTERN));
 								}
-
+								else if (collDate.length() == 16)
+								{
+									hashMap.put("collDateDate", ConversionUtils.fromDateString(collDate, ConversionUtils.TS_NO_SEC_PATTERN));
+								}
+								else
+								{
+									hashMap.put("collDateDate", ConversionUtils.fromDateString(collDate, ConversionUtils.DEFAULT_TS_PATTERN));
+								}
+								labList.add(hashMap);
+								break;
 							}
-						}
-						i++;
-					}
-				}
 
-			
+						}
+					}
+					i++;
+				}
+			}
 		}
 
 		return labList;

@@ -220,7 +220,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			connectCareProviderId: null,
 			takNumber: null,
 			lifeLabsClientIds: null,
-			eDeliveryIds: null
+			eDeliveryIds: null,
+			imdHealthUuid: null
 		};
 
 		ctrl.setupFormValidations = function()

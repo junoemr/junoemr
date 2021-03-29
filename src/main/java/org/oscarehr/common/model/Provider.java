@@ -21,7 +21,6 @@
  * Toronto, Ontario, Canada
  */
 
-
 package org.oscarehr.common.model;
 
 import java.io.Serializable;
@@ -38,8 +37,8 @@ import org.oscarehr.util.SpringUtils;
  * @deprecated - use the JPA version instead
  */
 @Deprecated
-public class Provider implements Serializable, Comparable<Provider>{
-
+public class Provider implements Serializable, Comparable<Provider>
+{
 	/**
 	 * default serial version id for serializable
 	 */
@@ -68,7 +67,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	 * "1"=active "0"=inactive
 	 */
 	private String status;
-
 	private String lastName;
 	private String providerType;
 	private String sex;
@@ -86,25 +84,21 @@ public class Provider implements Serializable, Comparable<Provider>{
 	private String lastUpdateUser;
 	private Date lastUpdateDate = new Date();
 	private String supervisor;
+
 	/* -- Province specific (AB) -- */
 	private String albertaTakNo;
 	private String albertaEDeliveryIds;
 	private String albertaConnectCareId;
+
 	/* -- Province specific (ON) -- */
 	private String ontarioLifeLabsId;
 
 	private Boolean superAdmin = false;
-
-	public String getPractitionerNo() {
-		return practitionerNo;
-	}
-
-	public void setPractitionerNo(String practitionerNo) {
-		this.practitionerNo = practitionerNo;
-	}
+	private String imdHealthUuid;
 
 	// constructors
-	public Provider() {
+	public Provider()
+	{
 	}
 
 	/**
@@ -117,8 +111,8 @@ public class Provider implements Serializable, Comparable<Provider>{
 	/**
 	 * Constructor for required fields
 	 */
-	public Provider(String providerNo, String lastName, String providerType, String sex, String specialty, String firstName) {
-
+	public Provider(String providerNo, String lastName, String providerType, String sex, String specialty, String firstName)
+	{
 		this.setProviderNo(providerNo);
 		this.setLastName(lastName);
 		this.setProviderType(providerType);
@@ -127,7 +121,8 @@ public class Provider implements Serializable, Comparable<Provider>{
 		this.setFirstName(firstName);
 	}
 	
-	public Provider(Provider provider) {
+	public Provider(Provider provider)
+	{
 		providerNo = provider.providerNo;
 		comments = provider.comments;
 		phone = provider.phone;
@@ -161,11 +156,14 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getFormattedName() {
 		return getDisplayName();
 	}
+
 	/** returns a formatted name String in the form of 'first_name, last_name' */
-	public String getDisplayName() {
+	public String getDisplayName()
+	{
 		String lastName  = (getLastName()  == null) ? "" : getLastName().trim();
 		String firstName = (getFirstName() == null) ? "" : getFirstName().trim();
-		if(!lastName.isEmpty() && !firstName.isEmpty()) {
+		if(!lastName.isEmpty() && !firstName.isEmpty())
+		{
 			lastName += ", ";
 		}
 		return lastName + firstName;
@@ -175,8 +173,18 @@ public class Provider implements Serializable, Comparable<Provider>{
 		return getFirstName() + " " + getLastName();
 	}
 
+	public String getPractitionerNo() {
+		return practitionerNo;
+	}
+	public void setPractitionerNo(String practitionerNo) {
+		this.practitionerNo = practitionerNo;
+	}
+
 	public String getProviderNo() {
 		return providerNo;
+	}
+	public void setProviderNo(String providerNo) {
+		this.providerNo = providerNo;
 	}
 
 	public ProviderData convertToProviderData()
@@ -185,14 +193,10 @@ public class Provider implements Serializable, Comparable<Provider>{
 		return providerDataDao.findByProviderNo(this.providerNo);
 	}
 
-	public void setProviderNo(String providerNo) {
-		this.providerNo = providerNo;
-	}
 
 	public String getComments() {
 		return comments;
 	}
-
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
@@ -200,7 +204,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getPhone() {
 		return phone;
 	}
-
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
@@ -208,7 +211,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getBillingNo() {
 		return billingNo;
 	}
-
 	public void setBillingNo(String billingNo) {
 		this.billingNo = billingNo;
 	}
@@ -216,7 +218,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getWorkPhone() {
 		return workPhone;
 	}
-
 	public void setWorkPhone(String workPhone) {
 		this.workPhone = workPhone;
 	}
@@ -224,7 +225,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getAddress() {
 		return address;
 	}
-
 	public void setAddress(String address) {
 		this.address = address;
 	}
@@ -232,7 +232,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getTeam() {
 		return team;
 	}
-
 	public void setTeam(String team) {
 		this.team = team;
 	}
@@ -240,7 +239,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getStatus() {
 		return status;
 	}
-
 	public void setStatus(String status) {
 		this.status = status;
 	}
@@ -252,7 +250,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getLastName() {
 		return lastName;
 	}
-
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
@@ -263,7 +260,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getProviderType() {
 		return providerType;
 	}
-
 	public void setProviderType(String providerType) {
 		this.providerType = providerType;
 	}
@@ -272,27 +268,22 @@ public class Provider implements Serializable, Comparable<Provider>{
 	{
 		return this.providerType.equals(PROVIDER_TYPE_DOCTOR);
 	}
-
 	public boolean isProviderTypeReceptionist()
 	{
 		return this.providerType.equals(PROVIDER_TYPE_RECEPTIONIST);
 	}
-
 	public boolean isProviderTypeNurse()
 	{
 		return this.providerType.equals(PROVIDER_TYPE_NURSE);
 	}
-
 	public boolean isProviderTypeResident()
 	{
 		return this.providerType.equals(PROVIDER_TYPE_RESIDENT);
 	}
-
 	public boolean isProviderTypeMidwife()
 	{
 		return this.providerType.equals(PROVIDER_TYPE_MIDWIFE);
 	}
-
 	public boolean isProviderTypeAdmin()
 	{
 		return this.providerType.equals(PROVIDER_TYPE_ADMIN);
@@ -301,7 +292,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getSex() {
 		return sex;
 	}
-
 	public void setSex(String sex) {
 		this.sex = sex;
 	}
@@ -309,7 +299,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getOhipNo() {
 		return ohipNo;
 	}
-
 	public void setOhipNo(String ohipNo) {
 		this.ohipNo = ohipNo;
 	}
@@ -317,7 +306,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getSpecialty() {
 		return specialty;
 	}
-
 	public void setSpecialty(String specialty) {
 		this.specialty = specialty;
 	}
@@ -325,7 +313,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public java.util.Date getDob() {
 		return dob;
 	}
-
 	public void setDob(java.util.Date dob) {
 		this.dob = dob;
 	}
@@ -333,7 +320,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getHsoNo() {
 		return hsoNo;
 	}
-
 	public void setHsoNo(String hsoNo) {
 		this.hsoNo = hsoNo;
 	}
@@ -341,7 +327,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getProviderActivity() {
 		return providerActivity;
 	}
-
 	public void setProviderActivity(String providerActivity) {
 		this.providerActivity = providerActivity;
 	}
@@ -349,7 +334,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getFirstName() {
 		return firstName;
 	}
-
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
@@ -357,7 +341,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getRmaNo() {
 		return rmaNo;
 	}
-
 	public void setRmaNo(String rmaNo) {
 		this.rmaNo = rmaNo;
 	}
@@ -365,7 +348,6 @@ public class Provider implements Serializable, Comparable<Provider>{
     public String getEmail() {
     	return email;
     }
-
 	public void setEmail(String email) {
     	this.email = email;
     }
@@ -373,24 +355,21 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public Date getSignedConfidentiality() {
         return this.SignedConfidentiality;
     }
-
-    public void setSignedConfidentiality( Date SignedConfidentiality ) {
+    public void setSignedConfidentiality( Date SignedConfidentiality )
+	{
         this.SignedConfidentiality = SignedConfidentiality;
     }
 
 	public String getTitle() {
     	return title;
     }
-
 	public void setTitle(String title) {
     	this.title = title;
     }
 
-
 	public String getLastUpdateUser() {
     	return lastUpdateUser;
     }
-
 	public void setLastUpdateUser(String lastUpdateUser) {
     	this.lastUpdateUser = lastUpdateUser;
     }
@@ -412,7 +391,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public void setSuperAdmin(boolean superAdminStatus) {
 		superAdmin = superAdminStatus;
 	}
-
 	public Boolean getSuperAdmin() {
 		return superAdmin;
 	}
@@ -429,8 +407,8 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public String getAlbertaEDeliveryIds() {
 		return albertaEDeliveryIds;
 	}
-
-	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
+	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds)
+	{
 		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
 	}
 
@@ -438,7 +416,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	{
 		return albertaConnectCareId;
 	}
-
 	public void setAlbertaConnectCareId(String albertaConnectCareId)
 	{
 		this.albertaConnectCareId = albertaConnectCareId;
@@ -448,40 +425,59 @@ public class Provider implements Serializable, Comparable<Provider>{
 	{
 		return ontarioLifeLabsId;
 	}
-
 	public void setOntarioLifeLabsId(String ontarioLifeLabsId)
 	{
 		this.ontarioLifeLabsId = ontarioLifeLabsId;
 	}
 
-	/* -- other methods --*/
+	public String getImdHealthUuid()
+	{
+		return imdHealthUuid;
+	}
+	public void setImdHealthUuid(String imdHealthUuid)
+	{
+		this.imdHealthUuid = imdHealthUuid;
+	}
 
+	/* -- other methods --*/
 	public ComparatorName ComparatorName() {
 		return new ComparatorName();
 	}
 
-	public boolean equals(Provider provider) {
-		try {
+	public boolean equals(Provider provider)
+	{
+		try
+		{
 			return (providerNo.equals(provider.providerNo));
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			return (false);
 		}
 	}
 
 	@Override
-    public int hashCode() {
-		if (providerNo==null) return(super.hashCode());
-		else return(providerNo.hashCode());
+    public int hashCode()
+	{
+		if (providerNo == null)
+		{
+			return(super.hashCode());
+		}
+		else
+		{
+			return(providerNo.hashCode());
+		}
 	}
 
-	public class ComparatorName implements Comparator<Provider>, Serializable {
-
+	public class ComparatorName implements Comparator<Provider>, Serializable
+	{
 		/**
 		 * default serial version id for serializable
 		 */
 		private static final long serialVersionUID = 1L;
 
-		public int compare(Provider o1, Provider o2) {
+		public int compare(Provider o1, Provider o2)
+		{
 			Provider bp1 = o1;
 			Provider bp2 = o2;
 			String lhs = bp1.getLastName() + bp1.getFirstName();
@@ -491,9 +487,12 @@ public class Provider implements Serializable, Comparable<Provider>{
 		}
 	}
 
-	public int compareTo(Provider o) {
-		if (providerNo==null) return(0);
-	    return(providerNo.compareTo(o.providerNo));
+	public int compareTo(Provider o)
+	{
+		if (providerNo == null)
+		{
+			return(0);
+		}
+	    return (providerNo.compareTo(o.providerNo));
     }
-
 }

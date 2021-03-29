@@ -80,9 +80,9 @@ angular.module('Patient').component('addDemographicModal', {
 			}
 		);
 
-		// Pull phone prefix from Oscar Properties file
-		ctrl.systemPreferenceApi.getPropertyValue("phoneprefix", "").then(
-			function success(results)
+			// Pull phone prefix from Oscar Properties file
+			ctrl.systemPreferenceApi.getPreferenceValue("phone_prefix", "").then(
+				function success(results)
 			{
 				ctrl.newDemographicData.phone = results.data.body;
 			},

@@ -1,2 +1,0 @@
-ALTER TABLE integration
-MODIFY COLUMN remote_id VARCHAR(255);

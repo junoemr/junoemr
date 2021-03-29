@@ -59,7 +59,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.sitesApi = new SitesApi($http, $httpParamSerializer,
 			'../ws/rs');
 
-		$scope.providerPreferenceApi = new ProviderPreferenceApi($http, $httpParamSerializer,
+		controller.providerPreferenceApi = new ProviderPreferenceApi($http, $httpParamSerializer,
 			'../ws/rs');
 
 		controller.systemPreferencesApi = new SystemPreferenceApi($http, $httpParamSerializer,
@@ -72,7 +72,22 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
-
+		
+		controller.appointmentCount = {};
+		controller.appointmentCountOptions = {
+			enabled: false,
+			includeNoDemographic: false,
+			includeNoShow: false,
+			includeCancelled: false,
+		};
+		
+		controller.appointmentStatusEnum = Object.freeze({
+			todo: 't',
+			cancelled: 'C',
+			noShow: 'N',
+			billed: 'B',
+		});
+		
 		//=========================================================================
 		// Local scope variables
 		//=========================================================================/
@@ -172,6 +187,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			eFormNameMap: {},
 			quickLinkMap: {},
 		};
+		
+		controller.$onInit = () =>
+		{
+			controller.providerPreferenceApi.getProviderSettings().then((response) =>
+			{
+				const prefs = response.data.content[0];
+				controller.appointmentCountOptions = {
+					enabled: prefs.appointmentCountEnabled,
+					includeNoDemographic: prefs.appointmentCountIncludeNoDemographic,
+					includeNoShow: prefs.appointmentCountIncludeNoShow,
+					includeCancelled: prefs.appointmentCountIncludeCancelled,
+				}
+			});
+		}
 
 		$scope.init = function init()
 		{
@@ -343,7 +372,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if (controller.selectedScheduleView !== view)
 			{
-				$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.view", view)
+				controller.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.view", view)
 					.then(
 						function success()
 						{
@@ -577,7 +606,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// the end time to convert to the correct date.
 			var startDateString = start.format(Juno.Common.Util.settings.date_format);
 			var endDateString = end.subtract(1, 'seconds').format(Juno.Common.Util.settings.date_format);
-
+			
 			$scope.scheduleApi.getCalendarSchedule(
 				selectedSchedule.identifier,
 				selectedSchedule.identifierType,
@@ -591,11 +620,17 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
-					// console.info('================== load events ===================');
 					var hasVisibleSchedules = results.data.body.visibleSchedules;
+					
 					$scope.showNoResources = !hasVisibleSchedules;
 					$scope.uiConfig.calendar.hiddenDays = [];
-
+					$scope.events = results.data.body.eventList;
+					
+					if (controller.appointmentCountOptions.enabled)
+					{
+						controller.countAppointments($scope.events)
+					}
+					
 					if (selectedSchedule.identifierType === controller.scheduleTypeEnum.group)
 					{
 						var providerNos = results.data.body.providerIdList;
@@ -614,7 +649,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
-
+						
 						var hiddenDays = results.data.body.hiddenDaysList;
 						// only hide days in week/month views. limiting day view causes re-fetch errors when changing to week view
 						// hiding all days causes an error in fullCalendar, rely on the no schedules screen to hide it
@@ -622,10 +657,23 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						{
 							$scope.uiConfig.calendar.hiddenDays = hiddenDays; // hide days without schedules
 						}
+						
+						if ($scope.calendarViewName === controller.calendarViewEnum.agendaDay)
+						{
+							if (controller.appointmentCountOptions.enabled) {
+								const dateText = moment($scope.datepickerSelectedDate)
+									.format(Juno.Common.Util.DisplaySettings.calendarDateFormat);
+								
+								const selectedProviderNo = $scope.selectedSchedule.providerNos[0];
+								const apptCount = controller.appointmentCount[selectedProviderNo] || 0;
+								
+								let header = $('.fc-day-header > span');
+								header.text(`(${apptCount}) ${dateText}`);
+							}
+						}
 					}
+					
 					$scope.applyUiConfig($scope.uiConfig);
-					$scope.events = results.data.body.eventList;
-
 					$scope.setCustomLoading(false);
 					deferred.resolve(results.data.body);
 				},
@@ -879,6 +927,38 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 			);
 		};
+		
+		controller.countAppointments = (events) =>
+		{
+			controller.appointmentCount = {};
+			
+			events.filter((event) => event.data != null)
+				.forEach((event) =>
+				{
+					const provider = event.resourceId;
+					const status = event.data.eventStatusCode;
+					const demographicNo = event.data.demographicNo;
+					const noDemographicAssigned = 0;
+
+					if (!status)  // some legacy appointments may not have an appointment status (mainly imports)
+					{
+						controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
+					}
+					// Accounts for appointments which are both cancelled and have no demographic.  The former has precedence.
+					else if ((status === controller.appointmentStatusEnum.cancelled && controller.appointmentCountOptions.includeCancelled) ||
+						(status === controller.appointmentStatusEnum.noShow && controller.appointmentCountOptions.includeNoShow) ||
+						(demographicNo === noDemographicAssigned && controller.appointmentCountOptions.includeNoDemographic))
+					{
+						controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
+					}
+					else if (status !== controller.appointmentStatusEnum.cancelled &&
+						status !== controller.appointmentStatusEnum.noShow &&
+						demographicNo !== noDemographicAssigned)
+					{
+						controller.appointmentCount[provider] = (controller.appointmentCount[provider] + 1) || 1 ;
+					}
+				});
+		};
 
 		//=========================================================================
 		// Event Handlers
@@ -1127,9 +1207,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.onResourceRender = function onResourceRender(resourceObj, labelTds, bodyTds)
 		{
 			labelTds.html(require('./view-columnControl.html'));
-
-			labelTds.find(".hdr-label").text(resourceObj.display_name);
-
+			
+			const label = labelTds.find(".hdr-label");
+			if (controller.appointmentCountOptions.enabled)
+			{
+				const apptCount = controller.appointmentCount[resourceObj.id] || 0;
+				label.text(`(${apptCount}) ${resourceObj.display_name}`);
+			}
+			else
+			{
+				label.text(resourceObj.display_name);
+			}
+			
 			// append data to the root element so it can be accessed by click events
 			labelTds.find(".column-ctl-root").attr("data-resourceId", resourceObj.id);
 			labelTds.on('click', $scope.onHeaderClick);
@@ -1647,7 +1736,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				$scope.selectedSiteName = null;
 			}
 
-			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.site", $scope.selectedSiteName)
+			controller.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.site", $scope.selectedSiteName)
 				.then(
 					function success()
 					{
@@ -1670,7 +1759,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				return;
 			}
 
-			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "myGroupNo", selectedSchedule.identifier)
+			controller.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "myGroupNo", selectedSchedule.identifier)
 				.then(
 					function success()
 					{
@@ -1702,7 +1791,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.scheduleTimeInterval = $scope.selectedTimeInterval;
 			var intervalInMin = $scope.scheduleTimeInterval.split(':')[1];
 
-			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "everyMin", intervalInMin)
+			controller.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "everyMin", intervalInMin)
 				.then(
 					function success()
 					{
@@ -2138,10 +2227,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				columnHeader: true,
 				views: {
 					day: {
-						columnHeaderFormat: 'dddd MMMM Do'
+						columnHeaderFormat: Juno.Common.Util.DisplaySettings.calendarDateFormat
 					},
 					week: {
-						columnHeaderFormat: 'dddd MMM Do'
+						columnHeaderFormat: Juno.Common.Util.DisplaySettings.calendarDateFormat
 					},
 					month: {
 						columnHeaderFormat: 'dddd'

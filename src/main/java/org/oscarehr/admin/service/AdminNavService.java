@@ -414,7 +414,7 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.scheduleSetting"), "frame?frameUrl=" + contextPath + "/schedule/scheduletemplatesetting.jsp"));
 		if (oscarProperties.isPropertyActive("ENABLE_EDIT_APPT_STATUS"))
 		{
-			scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentStatusSetting"), "frame?frameUrl=" + contextPath + "/appointment/appointmentstatuscontrol.jsp"));
+			scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentStatusSetting"), "frame?frameUrl=" + contextPath + "/appointment/apptStatusSetting.do?method=view"));
 		}
 
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentTypeList"), "frame?frameUrl=" + contextPath + "/appointment/appointmentTypeAction.do"));
@@ -557,7 +557,7 @@ public class AdminNavService
 
 		if (securityInfoManager.isSuperAdmin(providerNo))
 		{
-			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/rx"));
+			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/general"));
 		}
 
 		systemManagementGroup.setItems(systemManagementItems);

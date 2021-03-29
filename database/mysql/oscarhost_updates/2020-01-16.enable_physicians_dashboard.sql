@@ -1,1 +1,0 @@
-INSERT IGNORE INTO secObjPrivilege VALUES ('admin', '_admin.panelManagement', 'x', 0, 999998);
