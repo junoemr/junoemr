@@ -25,8 +25,10 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.managers.FormsManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
@@ -63,6 +65,8 @@ public class EFormsService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<EFormTo1>> getEFormList()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EFORM);
+
 		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),
 				formsManager.findByStatus(getLoggedInInfo(), true, EFormDao.EFormSortOrder.NAME));
 		return RestResponse.successResponse(allEforms);
@@ -77,6 +81,8 @@ public class EFormsService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<String>> getEFormImageList()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EFORM);
+
 		String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
 		File directory = new File(imageHomeDir);
 
@@ -94,6 +100,8 @@ public class EFormsService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<String>> getEFormDatabaseTagList()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EFORM);
+
 		List<String> dbTagList;
 		try
 		{

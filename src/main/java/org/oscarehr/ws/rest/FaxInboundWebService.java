@@ -22,6 +22,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.fax.schedulingTasks.InboundFaxSchedulingTask;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -49,8 +50,8 @@ public class FaxInboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<LocalDateTime> getNextPullTime()
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_FAX);
 
 		return RestResponse.successResponse(inboundFaxSchedulingTask.getNextRunTime());
 	}

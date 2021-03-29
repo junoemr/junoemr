@@ -36,6 +36,8 @@ import org.oscarehr.casemgmt.service.EncounterService;
 import org.oscarehr.casemgmt.service.MultiSearchResult;
 import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.EncounterTemplate;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +107,9 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	)
 			throws EncounterSectionException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.ECHART);
+
 		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
 
 		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
@@ -126,6 +131,9 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	)
 			throws EncounterSectionException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.ECHART);
+
 		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
 
 		// This might need to be faster.

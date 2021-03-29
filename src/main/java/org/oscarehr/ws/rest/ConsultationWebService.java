@@ -320,6 +320,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
 				SecObjectName.OBJECT_NAME.CONSULTATION,
 				SecObjectName.OBJECT_NAME.EDOC,
+				SecObjectName.OBJECT_NAME.EFORM,
 				SecObjectName.OBJECT_NAME.LAB);
 
 		List<EDoc> edocs;

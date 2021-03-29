@@ -26,8 +26,10 @@ package org.oscarehr.ws.rest;
 
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.model.EForm;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
@@ -60,7 +62,9 @@ public class EFormService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1> loadEForm(@PathParam("dataId") Integer id) {
+	public RestResponse<EFormTo1> loadEForm(@PathParam("dataId") Integer id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EFORM);
 
 		EForm eform = eFormDao.findById(id);
 
@@ -79,7 +83,9 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1> saveEForm(EFormTo1 eformTo1) {
+	public RestResponse<EFormTo1> saveEForm(EFormTo1 eformTo1)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EFORM);
 
 		EForm eForm = new EFormConverter(false).getAsDomainObject(getLoggedInInfo(), eformTo1);
 
@@ -110,7 +116,9 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/json")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1> saveEForm(String jsonString) {
+	public RestResponse<EFormTo1> saveEForm(String jsonString)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EFORM);
 
 		JSONObject jsonObject = JSONObject.fromObject(jsonString);
 
@@ -162,7 +170,9 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/{dataId}")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1> updateEForm(EFormTo1 eformTo1) {
+	public RestResponse<EFormTo1> updateEForm(EFormTo1 eformTo1)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EFORM);
 
 		EForm eForm = new EFormConverter(false).getAsDomainObject(getLoggedInInfo(), eformTo1);
 
@@ -186,7 +196,9 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/{dataId}/json")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1> updateEFormJson(String jsonString) {
+	public RestResponse<EFormTo1> updateEFormJson(String jsonString)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EFORM);
 
 		JSONObject jsonObject = JSONObject.fromObject(jsonString);
 

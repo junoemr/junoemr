@@ -30,6 +30,8 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.QuickListDao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.QuickListView;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.DiagnosisTo1;
 import org.oscarehr.ws.rest.to.model.DxQuickList;
@@ -76,7 +78,10 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/quickLists")
 	@Produces("application/json")
-	public RestResponse<List<DxQuickList>> getQuickLists() {
+	public RestResponse<List<DxQuickList>> getQuickLists()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
 
 		List<DxQuickList> resultList;
 		try {
@@ -97,7 +102,10 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/issueQuickLists")
 	@Produces("application/json")
-	public RestResponse<List<DxQuickList>> getIssueQuickLists() {
+	public RestResponse<List<DxQuickList>> getIssueQuickLists()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
 
 		List<DxQuickList> resultList;
 		try {
@@ -113,7 +121,11 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/findDxIssue")
 	@Produces("application/json")
-	public RestResponse<IssueTo1> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code) {
+	public RestResponse<IssueTo1> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		Issue issue = issueDao.findIssueByTypeAndCode(codingSystem, code);
 		if(issue != null) {
 			IssueTo1 returnIssue = new IssueTo1();
@@ -134,7 +146,11 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response addToDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo,IssueTo1 issue){		
+	public Response addToDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo, IssueTo1 issue)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+
 		boolean activeEntryExists = dxresearchDao.activeEntryExists(demographicNo, issue.getType(), issue.getCode());
 		
 		if(!activeEntryExists){

@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.fax.schedulingTasks.OutboundFaxSchedulingTask;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -65,8 +66,8 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxOutboxTransferOutbound> resend(@PathParam("id") Long id) throws IOException
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin.fax");
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_FAX);
 
 		return RestResponse.successResponse(outgoingFaxService.resendFax(id));
 	}
@@ -77,8 +78,8 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxOutboxTransferOutbound> setNotificationStatus(@PathParam("id") Long id, String status)
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin.fax");
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_FAX);
 
 		return RestResponse.successResponse(outgoingFaxService.setNotificationStatus(id, status));
 	}
@@ -89,8 +90,8 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxOutboxTransferOutbound> archive(@PathParam("id") Long id)
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin.fax");
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_FAX);
 
 		return RestResponse.successResponse(outgoingFaxService.setArchived(id, true));
 	}
@@ -100,8 +101,8 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<LocalDateTime> getNextPushTime()
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_FAX);
 
 		return RestResponse.successResponse(outboundFaxSchedulingTask.getNextRunTime());
 	}
@@ -113,8 +114,8 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@SkipContentLoggingOutbound
 	public Response download(@PathParam("id") Long id)
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin.fax");
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_FAX);
 
 		FileInputStream stream = null;
 		String filename = "faxed-document-" + id + ".pdf";

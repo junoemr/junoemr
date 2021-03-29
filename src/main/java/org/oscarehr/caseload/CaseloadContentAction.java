@@ -87,7 +87,7 @@ public class CaseloadContentAction extends DispatchAction {
 	{
 
 		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, SecObjectName._DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		String caseloadProv     = request.getParameter("clProv");
 		String caseloadQuery    = request.getParameter("clQ");
