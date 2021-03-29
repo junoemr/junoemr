@@ -78,7 +78,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/SSOLink")
 	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IntegrationException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), siteId);
 		return RestResponse.successResponse(ssoLink);

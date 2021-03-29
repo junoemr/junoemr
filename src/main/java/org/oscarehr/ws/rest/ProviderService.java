@@ -33,6 +33,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
@@ -43,15 +44,15 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
-import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
+import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -201,7 +202,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
 		try
 		{
 			ProviderData providerData = providerService.createProvider(providerEditFormTo1, getLoggedInInfo());
@@ -225,7 +226,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		try
 		{
@@ -251,6 +252,8 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
+
 		ProviderBilling billing = providerService.getProviderBilling(providerNo);
 		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
 		return RestResponse.successResponse(transfer);
@@ -275,7 +278,10 @@ public class ProviderService extends AbstractServiceImpl {
 	@Path("/providers/search")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public AbstractSearchResponse<ProviderTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn ) {
+	public AbstractSearchResponse<ProviderTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn )
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
+
 		AbstractSearchResponse<ProviderTo1> response = new AbstractSearchResponse<ProviderTo1>();
 		
 		int startIndexVal = startIndex==null?0:startIndex.intValue();
@@ -314,6 +320,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<PatientListItemTransfer> getRecentDemographicsViewed()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		int providerNo = Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo());
 		int offset = 0;
@@ -348,7 +355,8 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/getActiveTeams")
 	@Produces("application/json")
-	public AbstractSearchResponse<String> getActiveTeams() {	
+	public AbstractSearchResponse<String> getActiveTeams()
+	{
 		List<String> teams = providerManager.getActiveTeams(getLoggedInInfo());
 		
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();

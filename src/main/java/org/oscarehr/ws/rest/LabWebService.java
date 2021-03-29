@@ -26,6 +26,8 @@ package org.oscarehr.ws.rest;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.ProviderLabRoutingConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -55,6 +57,8 @@ public class LabWebService extends AbstractServiceImpl
     @Path("/{labID}/provider/{providerID}/labRouting")
     public RestResponse<ProviderLabRoutingTransfer> getProviderLabRouting(@PathParam("labID") Integer labID, @PathParam("providerID") String providerID)
     {
+        securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.LAB);
+
         List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labID, ProviderLabRoutingModel.LAB_TYPE_LABS, providerID);
 
         ProviderLabRoutingTransfer transfer = null;

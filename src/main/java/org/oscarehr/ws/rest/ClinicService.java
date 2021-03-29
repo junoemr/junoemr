@@ -26,8 +26,6 @@ package org.oscarehr.ws.rest;
 import org.oscarehr.clinic.transfer.ClinicTransfer;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
-import org.oscarehr.common.model.SecObjectName;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,12 +44,6 @@ public class ClinicService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<ClinicTransfer> getClinic()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN,
-				SecObjectName.OBJECT_NAME.DEMOGRAPHIC,
-				SecObjectName.OBJECT_NAME.APPOINTMENT,
-				SecObjectName.OBJECT_NAME.ECHART);
-
 		Clinic clinic = clinicDao.getClinic();
 		return RestResponse.successResponse(ClinicTransfer.toTransferObj(clinic));
 	}

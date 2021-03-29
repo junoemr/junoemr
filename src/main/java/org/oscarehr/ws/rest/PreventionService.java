@@ -30,6 +30,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.ws.rest.conversion.PreventionConverter;
@@ -49,7 +51,10 @@ public class PreventionService extends AbstractServiceImpl {
 	@GET
 	@Path("/active")
 	@Produces("application/json")
-	public PreventionResponse getCurrentPreventions(@QueryParam("demographicNo") Integer demographicNo) {
+	public PreventionResponse getCurrentPreventions(@QueryParam("demographicNo") Integer demographicNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.PREVENTION);
+
 		List<Prevention> preventions = preventionManager.getPreventionsByDemographicNo(getLoggedInInfo(), demographicNo);
 		
 		List<PreventionTo1> preventionsT = new PreventionConverter().getAllAsTransferObjects(getLoggedInInfo(), preventions);
@@ -59,5 +64,4 @@ public class PreventionService extends AbstractServiceImpl {
 		
 		return response;
 	}
-
 }

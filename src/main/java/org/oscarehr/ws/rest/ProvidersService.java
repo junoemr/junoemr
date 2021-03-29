@@ -28,7 +28,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -66,10 +68,11 @@ public class ProvidersService extends AbstractServiceImpl
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ProviderTo1> search(@QueryParam("searchText") String searchText,
-	                                                @QueryParam("searchMode") @DefaultValue("NAME") String searchMode,
-	                                                @QueryParam("page") @DefaultValue("1") Integer page,
-	                                                @QueryParam("perPage") @DefaultValue("10") Integer perPage)
+	                                        @QueryParam("searchMode") @DefaultValue("NAME") String searchMode,
+	                                        @QueryParam("page") @DefaultValue("1") Integer page,
+	                                        @QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
 		try
 		{
 			//TODO - standardized provider search
@@ -87,6 +90,7 @@ public class ProvidersService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<ProviderTo1>> getBySecurityRole(@QueryParam("role") String role)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
 		try
 		{
 			List<Provider> providers = providerDao.getActiveProvidersByRole(role);
@@ -105,6 +109,7 @@ public class ProvidersService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<ProviderTo1>> getByType(@QueryParam("type") String type)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
 		try
 		{
 			List<Provider> providers = providerDao.getActiveProvidersByType(type);
@@ -123,6 +128,8 @@ public class ProvidersService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<ProviderTo1> getAll()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
+
 		List<Provider> providers = providerDao.getProviders();
 		List<ProviderTo1> providersTo1 = providerConverter.getAllAsTransferObjects(getLoggedInInfo(), providers);
 		return RestSearchResponse.successResponseOnePage(providersTo1);

@@ -286,6 +286,10 @@ public class SecurityInfoManager {
 	 */
 	public void requireAllPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... requiredObjList)
 	{
+		if(requiredObjList == null)
+		{
+			return;
+		}
 		for(SecObjectName.OBJECT_NAME objectName : requiredObjList)
 		{
 			if(!hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), (demographicNo != null ? String.valueOf(demographicNo) : null)))
@@ -330,6 +334,10 @@ public class SecurityInfoManager {
 	 */
 	public void requireOnePrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... requiredObjList)
 	{
+		if(requiredObjList == null)
+		{
+			return;
+		}
 		for(SecObjectName.OBJECT_NAME objectName : requiredObjList)
 		{
 			if(hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), (demographicNo != null ? String.valueOf(demographicNo) : null)))

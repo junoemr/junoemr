@@ -32,11 +32,13 @@ import javax.ws.rs.core.MediaType;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.mchcv.HCValidationFactory;
 import org.oscarehr.integration.mchcv.HCValidationResult;
 import org.oscarehr.integration.mchcv.HCValidator;
 import org.oscarehr.integration.mchcv.OnlineHCValidator;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
@@ -60,7 +62,11 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/getStatus")
-	public PatientDetailStatusTo1 getStatus(@QueryParam("demographicNo") Integer demographicNo) {
+	public PatientDetailStatusTo1 getStatus(@QueryParam("demographicNo") Integer demographicNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		PatientDetailStatusTo1 status = new PatientDetailStatusTo1();
 		
 		//Integrator status
@@ -120,7 +126,10 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/validateHC")
-	public HCValidationResult validateHC(@QueryParam("hin") String healthCardNo, @QueryParam("ver") String versionCode) {
+	public HCValidationResult validateHC(@QueryParam("hin") String healthCardNo, @QueryParam("ver") String versionCode)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		HCValidator validator = HCValidationFactory.getHCValidator();
 		HCValidationResult result = null;
 		
@@ -154,6 +163,8 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 										  @QueryParam("province") String hcType,
 										  @QueryParam("demographicNo") Integer demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		GenericRESTResponse response = new GenericRESTResponse();
 		if (healthCardNo != null && !healthCardNo.trim().isEmpty() && demographicNo != null)
 		{

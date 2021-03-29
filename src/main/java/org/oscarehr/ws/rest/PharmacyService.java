@@ -23,6 +23,16 @@
  */
 package org.oscarehr.ws.rest;
 
+import org.oscarehr.common.dao.PharmacyInfoDao;
+import org.oscarehr.common.model.PharmacyInfo;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.ws.rest.conversion.PharmacyInfoConverter;
+import org.oscarehr.ws.rest.to.OscarSearchResponse;
+import org.oscarehr.ws.rest.to.model.PharmacyInfoTo1;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -31,14 +41,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
-import org.oscarehr.common.dao.PharmacyInfoDao;
-import org.oscarehr.common.model.PharmacyInfo;
-import org.oscarehr.ws.rest.conversion.PharmacyInfoConverter;
-import org.oscarehr.ws.rest.to.OscarSearchResponse;
-import org.oscarehr.ws.rest.to.model.PharmacyInfoTo1;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 /**
  * Defines service contract for create/read/update/delete operations on pharmacies.
  * 
@@ -46,8 +48,8 @@ import org.springframework.stereotype.Component;
  */
 @Path("/pharmacies/")
 @Component("pharmacyService")
-public class PharmacyService extends AbstractServiceImpl {
-
+public class PharmacyService extends AbstractServiceImpl
+{
 	@Autowired
 	private PharmacyInfoDao pharmacyInfoDao;
 
@@ -67,9 +69,12 @@ public class PharmacyService extends AbstractServiceImpl {
 	 */
 	@GET
 	@Path("/")
-	public OscarSearchResponse<PharmacyInfoTo1> getPharmacies(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+	public OscarSearchResponse<PharmacyInfoTo1> getPharmacies(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.RX);
+
 		OscarSearchResponse<PharmacyInfoTo1> result = new OscarSearchResponse<PharmacyInfoTo1>();
-		result.getContent().addAll(converter.getAllAsTransferObjects(getLoggedInInfo(),pharmacyInfoDao.findAll(offset, limit))); 
+		result.getContent().addAll(converter.getAllAsTransferObjects(getLoggedInInfo(), pharmacyInfoDao.findAll(offset, limit)));
 		return result;
 	}
 
@@ -83,8 +88,10 @@ public class PharmacyService extends AbstractServiceImpl {
 	 */
 	@GET
 	@Path("/{pharmacyId}")
-	public PharmacyInfoTo1 getPharmacy(@PathParam("pharmacyId") Integer id) {
-		return converter.getAsTransferObject(getLoggedInInfo(),pharmacyInfoDao.find(id));
+	public PharmacyInfoTo1 getPharmacy(@PathParam("pharmacyId") Integer id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.RX);
+		return converter.getAsTransferObject(getLoggedInInfo(), pharmacyInfoDao.find(id));
 	}
 
 	/**
@@ -97,8 +104,10 @@ public class PharmacyService extends AbstractServiceImpl {
 	 */
 	@POST
 	@Path("/")
-	public PharmacyInfoTo1 addPharmacy(PharmacyInfoTo1 pharmacyInfo) {
-		return converter.getAsTransferObject(getLoggedInInfo(),pharmacyInfoDao.saveEntity(converter.getAsDomainObject(getLoggedInInfo(),pharmacyInfo)));
+	public PharmacyInfoTo1 addPharmacy(PharmacyInfoTo1 pharmacyInfo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.RX);
+		return converter.getAsTransferObject(getLoggedInInfo(), pharmacyInfoDao.saveEntity(converter.getAsDomainObject(getLoggedInInfo(), pharmacyInfo)));
 	}
 
 	/**
@@ -111,8 +120,10 @@ public class PharmacyService extends AbstractServiceImpl {
 	 */
 	@PUT
 	@Path("/")
-	public PharmacyInfoTo1 updatePharmacy(PharmacyInfoTo1 pharmacyInfo) {
-		return converter.getAsTransferObject(getLoggedInInfo(),pharmacyInfoDao.saveEntity(converter.getAsDomainObject(getLoggedInInfo(),pharmacyInfo)));
+	public PharmacyInfoTo1 updatePharmacy(PharmacyInfoTo1 pharmacyInfo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.RX);
+		return converter.getAsTransferObject(getLoggedInInfo(), pharmacyInfoDao.saveEntity(converter.getAsDomainObject(getLoggedInInfo(), pharmacyInfo)));
 	}
 
 	/**
@@ -125,11 +136,11 @@ public class PharmacyService extends AbstractServiceImpl {
 	 */
 	@DELETE
 	@Path("/{pharmacyId}")
-	public PharmacyInfoTo1 removePharmacy(@PathParam("pharmacyId") Integer id) {
+	public PharmacyInfoTo1 removePharmacy(@PathParam("pharmacyId") Integer id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.RX);
 		PharmacyInfo pharmacyInfo = pharmacyInfoDao.find(id);
 		pharmacyInfo.setStatus(PharmacyInfo.DELETED);
-		return converter.getAsTransferObject(getLoggedInInfo(),pharmacyInfoDao.saveEntity(pharmacyInfo));
-
+		return converter.getAsTransferObject(getLoggedInInfo(), pharmacyInfoDao.saveEntity(pharmacyInfo));
 	}
-
 }
