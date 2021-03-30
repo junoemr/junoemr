@@ -28,6 +28,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.ProviderRoleService;
 import org.oscarehr.util.MiscUtils;
@@ -54,7 +55,8 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("ADD ROLE");
-			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_admin.userAdmin");
+			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+					SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, String.valueOf(providerId));
 
 			if(!providerRoleService.validRoleName(roleNew))
@@ -103,7 +105,8 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("UPDATE ROLE");
-			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.UPDATE, null, "_admin", "_admin.userAdmin");
+			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
+					SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
 			if(!providerRoleService.validRoleName(roleNew))
@@ -144,7 +147,8 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("DELETE ROLE");
-			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.DELETE, null, "_admin", "_admin.userAdmin");
+			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE,
+					SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
 			if(!providerRoleService.validRoleName(roleNew))

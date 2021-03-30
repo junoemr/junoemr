@@ -387,19 +387,19 @@ public class AdminNavService
 		reportItems.add(new AdminNavItemTo1("Pre-Implementation Report", "frame?frameUrl=" + contextPath + "/renal/preImplementationSubmit.jsp"));
 		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.renal.managePatientLetter"), "frame?frameUrl=" + contextPath + "/renal/patientLetterManager.jsp"));
 
-		if (securityInfoManager.hasPrivilege(providerNo, "_admin.fieldnote", SecurityInfoManager.READ, null))
+		if(securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_FIELD_NOTE))
 		{
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.fieldNoteReport"), "frame?frameUrl=" + contextPath + "/eform/fieldNoteReport/fieldnotereport.jsp"));
 		}
 
-		if (securityInfoManager.hasPrivilege(providerNo, "_admin.eformreporttool", SecurityInfoManager.READ, null))
+		if(securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_EFORM_REPORT_TOOL))
 		{
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.eformReportTool"), "frame?frameUrl=" + contextPath + "/admin/eformReportTool/eformReportTool.jsp"));
 		}
 
 		// /panelManagement
-		if (securityInfoManager.hasPrivilege(providerNo, "_admin.panelManagement", SecurityInfoManager.READ, null) &&
-				oscarProperties.isBritishColumbiaInstanceType())
+		if(securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_PANEL_MANAGEMENT)
+				&& oscarProperties.isBritishColumbiaInstanceType())
 		{
 			reportItems.add(new AdminNavItemTo1("Panel Management", "panelManagement"));
 		}

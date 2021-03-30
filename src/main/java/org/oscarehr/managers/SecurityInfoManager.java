@@ -45,13 +45,15 @@ import java.util.Properties;
 import java.util.Vector;
 
 @Service
-public class SecurityInfoManager {
+public class SecurityInfoManager
+{
+	// avoid use of these, use enum instead
 	public static final String READ = "r";
 	public static final String WRITE = "w";
 	public static final String UPDATE = "u";
 	public static final String DELETE = "d";
-	public static final String NORIGHTS = "o";
-	
+	public static final String NO_RIGHTS = "o";
+
 	public enum PRIVILEGE_LEVEL
 	{
 		READ ("r"),
@@ -134,7 +136,7 @@ public class SecurityInfoManager {
 	 * @param demographicNo
 	 * @return boolean
 	 */
-	@Deprecated
+	@Deprecated // use enum version instead
 	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, String demographicNo)
 	{
 		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, demographicNo);
@@ -195,7 +197,7 @@ public class SecurityInfoManager {
 		return hasOnePrivileges(providerNo, privilege, null, hasObjList);
 	}
 
-	public boolean hasPrivilege(String providerNo, String objectName, String privilege, String demographicNo)
+	private boolean hasPrivilege(String providerNo, String objectName, String privilege, String demographicNo)
 	{
 		try
 		{
@@ -222,7 +224,8 @@ public class SecurityInfoManager {
 			}
 			if (noMatchingRoleToSpecificPatient) v = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
 			
-			if (!noMatchingRoleToSpecificPatient && OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), NORIGHTS)) {
+			if (!noMatchingRoleToSpecificPatient && OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), NO_RIGHTS))
+			{
 					throw new PatientDirectiveException("Patient has requested user not access record");
 			} else  if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "x")) {
 				return true;
@@ -275,7 +278,7 @@ public class SecurityInfoManager {
 		return true;
 	}
 
-	@Deprecated
+	@Deprecated // use enum version instead
 	public void requireAllPrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
 	{
 		for(String objectName:requiredObjList)
@@ -322,7 +325,7 @@ public class SecurityInfoManager {
 		requireAllPrivilege(providerNo, privilege, null, requiredObjList);
 	}
 
-	@Deprecated
+	@Deprecated // use enum version instead
 	public void requireOnePrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
 	{
 		for(String objectName:requiredObjList)
