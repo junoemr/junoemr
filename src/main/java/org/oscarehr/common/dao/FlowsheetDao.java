@@ -23,19 +23,17 @@
  */
 
 
-package org.oscarehr.measurements.dao;
+package org.oscarehr.common.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.measurements.model.Flowsheet;
+import org.oscarehr.common.model.Flowsheet;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class FlowsheetDao extends AbstractDao<Flowsheet>
-{
+public class FlowsheetDao extends AbstractDao<Flowsheet>{
 
 	public FlowsheetDao() {
 		super(Flowsheet.class);
@@ -55,48 +53,5 @@ public class FlowsheetDao extends AbstractDao<Flowsheet>
 		query.setParameter(1, name);
 		
 		return getSingleResultOrNull(query);
-	}
-
-	/**
-	 * Method to specifically pull flowsheet entries from the DB that are system-level ones.
-	 * These entries get inserted whenever someone hits enable or disable flowsheet.
-	 */
-	public Flowsheet findExternalByName(String name)
-	{
-		Query query = entityManager.createQuery("SELECT f " +
-				"FROM Flowsheet f " +
-				"WHERE f.name=:name " +
-				"AND f.external=true");
-		query.setParameter("name", name);
-
-		return getSingleResultOrNull(query);
-	}
-
-	/**
-	 * Given the name of a flowsheet, find the corresponding DB entry and set it as disabled.
-	 * @param name name of the flowsheet to disable
-	 */
-	public void disableFlowsheet(String name)
-	{
-		Flowsheet flowsheet = findByName(name);
-		if (flowsheet != null)
-		{
-			flowsheet.setEnabled(false);
-			merge(flowsheet);
-		}
-	}
-
-	/**
-	 * Given the name of a flowsheet, find the corresponding DB entry and enable it.
-	 * @param name name of the flowsheet to disable
-	 */
-	public void enableFlowsheet(String name)
-	{
-		Flowsheet flowsheet = findByName(name);
-		if (flowsheet != null)
-		{
-			flowsheet.setEnabled(true);
-			merge(flowsheet);
-		}
 	}
 }

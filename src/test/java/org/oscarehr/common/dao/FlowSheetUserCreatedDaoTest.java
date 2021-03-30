@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.measurements.dao;
+package org.oscarehr.common.dao;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
@@ -34,15 +34,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.measurements.model.FlowSheetUserCreated;
+import org.oscarehr.common.model.FlowSheetUserCreated;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures
-{
+public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures {
 
 	protected FlowSheetUserCreatedDao dao = SpringUtils.getBean(FlowSheetUserCreatedDao.class);
 
@@ -80,7 +78,7 @@ public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures
 		flowSheetUserCreated3.setArchived(!isArchived);
 		dao.persist(flowSheetUserCreated3);
 		
-		List<FlowSheetUserCreated> expectedResult = new ArrayList<FlowSheetUserCreated>(Arrays.asList(flowSheetUserCreated1, flowSheetUserCreated2, flowSheetUserCreated3));
+		List<FlowSheetUserCreated> expectedResult = new ArrayList<FlowSheetUserCreated>(Arrays.asList(flowSheetUserCreated1, flowSheetUserCreated3));
 		List<FlowSheetUserCreated> result = dao.getAllUserCreatedFlowSheets();
 
 		Logger logger = MiscUtils.getLogger();

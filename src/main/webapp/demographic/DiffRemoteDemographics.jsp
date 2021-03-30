@@ -85,7 +85,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ page import="oscar.oscarReport.reportByTemplate.*"%>
+<%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -97,8 +97,9 @@
 	import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig"%>
 <%@ page
 	import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet"%>
-<%@ page import="org.oscarehr.measurements.model.Flowsheet"%>
-<%@ page import="org.oscarehr.measurements.dao.FlowsheetDao"%>
+<%@ page import="org.oscarehr.common.model.Flowsheet"%>
+<%@ page import="org.oscarehr.common.dao.FlowsheetDao"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
 
 <html:html locale="true">
 <head>

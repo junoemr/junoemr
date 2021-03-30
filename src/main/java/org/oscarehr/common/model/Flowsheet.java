@@ -23,21 +23,17 @@
  */
 
 
-package org.oscarehr.measurements.model;
-
-import org.oscarehr.common.model.AbstractModel;
+package org.oscarehr.common.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 @Entity
 public class Flowsheet extends AbstractModel<Integer> implements Serializable {
@@ -45,29 +41,13 @@ public class Flowsheet extends AbstractModel<Integer> implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-
-	@Column(name="name")
 	private String name;
-
-	@Column(name="enabled")
 	private boolean enabled;
-
-	@Column(name="content")
 	private String content;
-
-	@Column(name="external")
 	private boolean external;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdDate;
-
-	@Transient
-	private String displayName;
-
-	public static final String TYPE_UNKNOWN = "Unknown";
-	public static final String TYPE_SYSTEM = "System";
-	public static final String TYPE_CUSTOM = "Custom";
-	public static final String TYPE_USER_ADDED = "User Added";
 	
 	public Flowsheet() {
 		
@@ -117,13 +97,5 @@ public class Flowsheet extends AbstractModel<Integer> implements Serializable {
 		this.createdDate = createdDate;
 	}
 	
-	public String getDisplayName()
-	{
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName)
-	{
-		this.displayName = displayName;
-	}
+	
 }

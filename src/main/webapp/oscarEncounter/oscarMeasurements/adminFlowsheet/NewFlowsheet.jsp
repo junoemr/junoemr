@@ -25,10 +25,9 @@
 --%>
 
 <%@page contentType="text/html"%>
-<%@page import="org.oscarehr.measurements.dao.FlowSheetUserCreatedDao"%>
-<%@page import="org.oscarehr.measurements.model.FlowSheetUserCreated"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="java.util.List" %>
+<%@page  import="java.util.*,oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,java.net.*"%>
+<%@page import="org.jdom.Element,oscar.oscarEncounter.oscarMeasurements.data.*,org.jdom.output.Format,org.jdom.output.XMLOutputter,oscar.oscarEncounter.oscarMeasurements.util.*" %>
+<%@page import="org.oscarehr.common.dao.FlowSheetUserCreatedDao,org.oscarehr.common.model.FlowSheetUserCreated,org.oscarehr.util.SpringUtils" %>
 <%
 FlowSheetUserCreatedDao flowSheetUserCreatedDao = (FlowSheetUserCreatedDao) SpringUtils.getBean("flowSheetUserCreatedDao");
 List<FlowSheetUserCreated> flowsheets = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
@@ -75,22 +74,11 @@ List<FlowSheetUserCreated> flowsheets = flowSheetUserCreatedDao.getAllUserCreate
         <form action="FlowSheetCustomAction.do" onsubmit="return checkForm()">
             <input type="hidden" name="method" value="createNewFlowSheet"/>
         <table border="0">
-            <tr>
-                <td><label for="displayName">Name: </label></td>
-                <td><input type="text" name="displayName" id="displayName"/></td>
-            </tr>
-            <tr>
-                <td><label for="dxcodeTriggers">Trigger: </label></td>
-                <td><input type="text" name="dxcodeTriggers" id="dxcodeTriggers"/> (eg icd9:250)</td>
-            </tr>
-            <tr>
-                <td><label for="warningColour">Warning Colour: </label></td>
-                <td><input type="text" name="warningColour" id="warningColour"/> (eg red or #E00000)</td>
-            </tr>
-            <tr>
-                <td><label for="recommendationColour">Recommendation Colour: </label></td>
-                <td><input type="text" name="recommendationColour" id="recommendationColour"/> (eg yellow)</td>
-            </tr>
+        <tr><td>Name: </td><td><input type="text" name="displayName" id="displayName"/></td></tr>
+        <tr><td>Trigger: </td><td><input type="text" name="dxcodeTriggers" id="dxcodeTriggers"/> (eg icd9:250)</td></tr>
+        <tr><td>Warning Colour: </td><td><input type="text" name="warningColour" id="warningColour"/> (eg red or #E00000)</td></tr>
+        <tr><td>Recommendation Colour: </td><td><input type="text" name="recommendationColour" id="recommendationColour"/> (eg yellow)</td></tr>
+        
         </table>
         <input type="submit" name="Submit" value="Create"/>
         </form>

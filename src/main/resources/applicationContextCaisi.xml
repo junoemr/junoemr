@@ -14,7 +14,7 @@
 
 	<!-- configure the available measurement flow sheets -->
 	<bean id="measurementTemplateFlowSheet" class="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig">
-		<property name="systemFlowsheetFiles">
+		<property name="flowSheets">
 			<list>
 				<value>classpath:oscar/oscarEncounter/oscarMeasurements/flowsheets/omdDiabetesFlowsheet.xml</value>
 				<value>classpath:oscar/oscarEncounter/oscarMeasurements/flowsheets/hypertensionFlowsheet.xml</value>

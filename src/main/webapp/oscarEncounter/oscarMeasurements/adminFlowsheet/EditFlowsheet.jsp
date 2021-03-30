@@ -24,22 +24,16 @@
 
 --%>
 <% long startTime = System.currentTimeMillis(); %>
-<%@ page import="org.jdom.Element"%>
-<%@ page import="org.jdom.output.Format"%>
-<%@ page import="org.jdom.output.XMLOutputter" %>
-<%@ page import="org.oscarehr.common.model.FlowSheetCustomization"%>
+<%@ page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,java.net.*"%>
+<%@ page import="org.jdom.Element,oscar.oscarEncounter.oscarMeasurements.data.*,org.jdom.output.Format,org.jdom.output.XMLOutputter,oscar.oscarEncounter.oscarMeasurements.util.*,java.io.*" %>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="org.oscarehr.common.dao.*,org.oscarehr.common.model.FlowSheetCustomization"%>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig"%>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem"%>
 
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
-<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Vector" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBeanHandler" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean" %>
-<%@ page import="org.oscarehr.common.dao.FlowSheetCustomizationDao" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -62,8 +56,7 @@ if(!authed2) {
 
 <%
     long startTimeToGetP = System.currentTimeMillis();
-    FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
-
+    
     String module="";
     String htQueryString = "";
     if(request.getParameter("htracker")!=null){
@@ -85,14 +78,18 @@ if(!authed2) {
 
     String flowsheet = temp;
     String demographic = request.getParameter("demographic");
+    MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+    Hashtable<String, String> flowsheetNames = templateConfig.getFlowsheetDisplayNames();
 
-    FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+    FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
     List<FlowSheetCustomization> custList = null;
     if(demographic == null || demographic.isEmpty()) {
     	custList = flowSheetCustomizationDao.getFlowSheetCustomizations( flowsheet,(String) session.getAttribute("user"));
     } else {
     	custList = flowSheetCustomizationDao.getFlowSheetCustomizations( flowsheet,(String) session.getAttribute("user"),Integer.parseInt(demographic));
     }
+    Enumeration en = flowsheetNames.keys();
 
     EctMeasurementTypesBeanHandler hd = new EctMeasurementTypesBeanHandler();
     Vector<EctMeasurementTypesBean> vec = hd.getMeasurementTypeVector();
@@ -299,8 +296,9 @@ Flowsheet: <span style="font-weight:normal"><%=flowsheet.toUpperCase()%></span>
 		
 		<tbody>
 		            <%
-		            MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(temp, custList);
-
+		            MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+		            Element va = templateConfig.getExportFlowsheet(mFlowsheet);
+		
 		            List<String> measurements = mFlowsheet.getMeasurementList();
 				
 			    int counter = 1;
@@ -358,8 +356,11 @@ Flowsheet: <span style="font-weight:normal"><%=flowsheet.toUpperCase()%></span>
 		    String mtype="";
 		     
 		    for (FlowSheetCustomization cust :custList){
-
-				FlowSheetItem item = flowsheetService.getFlowsheetItemFromString(cust.getPayload());
+		    	
+		    	
+		    	MeasurementTemplateFlowSheetConfig mfc = MeasurementTemplateFlowSheetConfig.getInstance() ;
+		    	
+		    	FlowSheetItem item = mfc.getItemFromString(cust.getPayload());
 
 		    	try{
 		    	if(item.getMeasurementType()!=null){
@@ -511,6 +512,12 @@ Flowsheet: <span style="font-weight:normal"><%=flowsheet.toUpperCase()%></span>
 
 
 <div id="scrollToTop"><a href="#editFlowsheetBody"><i class="icon-arrow-up"></i>Top</a></div>
+
+<!-- flowsheet xml output -->
+        <textarea style="display:none;" cols="200" rows="200">
+            <%=outp.outputString(va)%>
+        </textarea><!-- flowsheet xml output END-->
+
 <script src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script> 
 <script src="<%=request.getContextPath() %>/js/bootstrap.min.js"></script>	
 <script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery.dataTables.js"></script>
