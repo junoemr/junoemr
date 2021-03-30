@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.validator.EmailValidator;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.dao.IntegrationDao;
@@ -35,6 +36,7 @@ import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueExceptio
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,8 @@ public class DemographicWebService extends AbstractServiceImpl
 	public RestResponse<PatientTo1> getMHAPatient(@PathParam("integrationId") Integer integrationId,
 	                                              @PathParam("demographic_no") String demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		Integration integration = integrationDao.find(integrationId);
 		Demographic demographic = demographicDao.find(Integer.parseInt(demographicNo));
 		try
@@ -92,6 +96,7 @@ public class DemographicWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> isPatientConfirmed(@PathParam("integrationId") Integer integrationId,
 	                                                @PathParam("demographic_no") String demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		Integration integration = integrationDao.find(integrationId);
 		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), integration));
 	}
@@ -102,6 +107,7 @@ public class DemographicWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> rejectPatientConnection(@PathParam("integrationId") Integer integrationId,
 	                                                     @PathParam("demographic_no") String demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		updatePatientConnection(integrationId, demographicNo, true);
 		return RestResponse.successResponse(true);
 	}
@@ -112,6 +118,7 @@ public class DemographicWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> cancelRejectPatientConnection(@PathParam("integrationId") Integer integrationId,
 	                                                           @PathParam("demographic_no") String demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		updatePatientConnection(integrationId, demographicNo, false);
 		return RestResponse.successResponse(true);
 	}
@@ -123,6 +130,7 @@ public class DemographicWebService extends AbstractServiceImpl
 	                                           @PathParam("demographicId") Integer demographicId,
 	                                           @QueryParam("email") String patientEmail)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		Integration integration = integrationDao.find(integrationId);
 		Demographic demographic = demographicDao.find(demographicId);
 

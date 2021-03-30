@@ -81,7 +81,7 @@ public class SystemPreferenceWebService extends AbstractServiceImpl
 	public RestResponse<Integer> putPreferenceValue(@PathParam("key") String key,
 	                                                String value)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		Property property = systemPreferenceService.setPreferenceValue(key, value);
 		return RestResponse.successResponse(property.getId());

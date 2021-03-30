@@ -224,7 +224,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse completeTicklers(JSONObject json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.TICKLER);
 		GenericRESTResponse response = new GenericRESTResponse();
 
 		JSONArray ticklerIds = json.getJSONArray("ticklers");
@@ -264,7 +264,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	                                         JSONObject json)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
 				json.getInt("id"), SecObjectName.OBJECT_NAME.TICKLER);
 
 		Tickler tickler = ticklerManager.getTickler(getLoggedInInfo(), json.getInt("id"));

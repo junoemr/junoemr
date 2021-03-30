@@ -154,7 +154,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestResponse<FaxAccountTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
 																		  FaxAccountTransferInbound accountSettingsTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
 		if (faxAccount == null)

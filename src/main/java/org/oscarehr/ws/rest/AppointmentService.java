@@ -161,7 +161,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws ScheduleException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		AppointmentConverter converter = new AppointmentConverter();
 
@@ -217,7 +217,7 @@ public class AppointmentService extends AbstractServiceImpl
 	public RestResponse<String> setStatus(@PathParam("appointmentNo") Integer appointmentNo,
 	                                      String statusCode)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		Appointment appointment = appointmentManager.updateAppointmentStatus(getLoggedInInfo(), appointmentNo, statusCode);
 
@@ -230,7 +230,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<String> setNextStatus(@PathParam("appointmentNo") Integer appointmentNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		String newStatus = appointmentManager.rotateStatus(getLoggedInInfo(), appointmentNo);
 
 		return RestResponse.successResponse(newStatus);

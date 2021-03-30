@@ -333,7 +333,7 @@ public class FormsService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public RestResponse<Boolean> restoreForm(@PathParam("id") Integer id, @QueryParam("type") String type)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
 				SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.EFORM);
 
 		FORM_TYPE fType = FORM_TYPE.valueOf(type.toUpperCase());

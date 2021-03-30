@@ -176,7 +176,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse markLatestEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		

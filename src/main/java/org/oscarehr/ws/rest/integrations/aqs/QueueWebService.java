@@ -85,7 +85,8 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<AppointmentQueueTo1>> getAppointmentQueues()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		return RestResponse.successResponse(modelConverter.convert(
 				appointmentQueueService.getAppointmentQueues(getLoggedInInfo().getLoggedInSecurity().getSecurityNo())
 		));
@@ -97,7 +98,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<AppointmentQueueTo1> createAppointmentQueue(AppointmentQueueTo1 queueTransfer)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
 		return RestResponse.successResponse(modelConverter.convert(
 				appointmentQueueService.createAppointmentQueue(transferConverter.convert(queueTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo())
 		));
@@ -108,7 +109,8 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<AppointmentQueueTo1> getAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		return RestResponse.successResponse(modelConverter.convert(
 				appointmentQueueService.getAppointmentQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())
 		));
@@ -121,7 +123,7 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<AppointmentQueueTo1> updateAppointmentQueue(@PathParam("queueId") UUID queueId,
 	                                                                AppointmentQueueTo1 queueTransfer)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN);
 		return RestResponse.successResponse(modelConverter.convert(
 				appointmentQueueService.updateAppointmentQueue(queueId, transferConverter.convert(queueTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
@@ -131,7 +133,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> deleteAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN);
 		appointmentQueueService.deleteAppointmentQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(true);
 	}
@@ -141,7 +143,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<AppointmentQueueTo1> getNewAppointmentQueue()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN);
 		return RestResponse.successResponse(modelConverter.convert(new AppointmentQueue()));
 	}
 
@@ -150,7 +152,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<ContactTransfer>> getQueueContacts(@PathParam("queueId") UUID queueId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN);
 		return RestResponse.successResponse(contactContactTransferConverter.convert(appointmentQueueService.getAppointmentQueueContacts(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 
@@ -160,7 +162,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<ContactTransfer> addQueueContact(@PathParam("queueId") UUID queueId, @RequestBody ContactTransfer contactTransfer)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		Contact newContact = contactService.createNewContact(contactTransferContactConverter.convert(contactTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		appointmentQueueService.addAppointmentQueueContact(queueId, newContact.getRemoteId(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
@@ -173,7 +175,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void removeQueueContact(@PathParam("queueId") UUID queueId, @PathParam("contactId") UUID contactId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN);
 		appointmentQueueService.removeAppointmentQueueContact(queueId, contactId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 	}
 

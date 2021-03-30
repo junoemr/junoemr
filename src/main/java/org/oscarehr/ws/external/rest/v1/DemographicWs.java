@@ -107,7 +107,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	public RestResponse<DemographicTransferOutbound> putDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo,
 	                                                                @Valid DemographicTransferInbound demographicTo)
 	{
-		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		return RestResponse.errorResponse("Not Implemented");
 	}

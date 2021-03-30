@@ -324,7 +324,7 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<String> markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
 				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 
 		String retval = "";

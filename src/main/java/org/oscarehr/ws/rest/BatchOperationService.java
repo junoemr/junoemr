@@ -67,7 +67,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Boolean> deactivateDemographics(DemographicBatchOperationTo1 demoTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN);
 		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.IN.name());
 	}
 
@@ -87,7 +87,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Boolean> setDemographicDxCode(DemographicBatchDxUpdateTo1 demoTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		MiscUtils.getLogger().info("Performing batch demographic dx code assignment: " + demoTo1.toString());
 		try

@@ -89,7 +89,7 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Operation(summary = "Update the specified tickler")
 	public RestResponse<TicklerTransferOutbound> updateTickler(@PathParam("id") Integer id, @Valid TicklerTransferInbound ticklerIn)
 	{
-		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.TICKLER);
 
 		if (ticklerIn == null)
 		{
