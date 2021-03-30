@@ -23,10 +23,27 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.ResourceBundle;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.log4j.Logger;
+import org.oscarehr.app.OAuth1Utils;
+import org.oscarehr.common.dao.AppDefinitionDao;
+import org.oscarehr.common.dao.AppUserDao;
+import org.oscarehr.common.dao.ResourceStorageDao;
+import org.oscarehr.common.model.AppDefinition;
+import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.ResourceStorage;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.AppManager;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.to.model.NotificationTo1;
+import org.springframework.beans.factory.annotation.Autowired;
+import oscar.OscarProperties;
+import oscar.log.LogAction;
+import oscar.oscarPrevention.PreventionDS;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -36,30 +53,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-
-import org.apache.log4j.Logger;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import org.oscarehr.app.OAuth1Utils;
-import org.oscarehr.common.dao.AppDefinitionDao;
-import org.oscarehr.common.dao.AppUserDao;
-import org.oscarehr.common.dao.ResourceStorageDao;
-import org.oscarehr.common.model.AppDefinition;
-import org.oscarehr.common.model.AppUser;
-import org.oscarehr.common.model.ResourceStorage;
-import org.oscarehr.managers.AppManager;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.model.NotificationTo1;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import oscar.OscarProperties;
-import oscar.log.LogAction;
-import oscar.oscarPrevention.PreventionDS;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.ResourceBundle;
 
 
 @Path("/resources")
@@ -88,11 +85,10 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public RestResponse<Boolean> isK2AActive(@Context HttpServletRequest request) {
-		String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
-    	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
-		    return RestResponse.errorResponse("Insufficient Privileges");
-    	}
+	public RestResponse<Boolean> isK2AActive(@Context HttpServletRequest request)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
 
@@ -110,13 +106,15 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/preventionRulesList")
 	@Produces("application/json")
-	public RestResponse<JSONArray> getPreventionRulesListFromK2A(@Context HttpServletRequest request) {
-		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null)) {
-			return RestResponse.errorResponse("Access Denied");
-		}
+	public RestResponse<JSONArray> getPreventionRulesListFromK2A(@Context HttpServletRequest request)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+
 		JSONArray retArray = new JSONArray();
-		try {
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		try
+		{
 			String resource = getK2aResource(loggedInInfo,
 					"/ws/api/oscar/get/PREVENTION_RULES/list",
 					"/ws/api/oscar/get/PREVENTION_RULES/list");
@@ -151,10 +149,11 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/currentPreventionRulesVersion")
 	@Produces("application/json")
-	public RestResponse<String> getCurrentPreventionRulesVersion() {
-		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
-			return RestResponse.errorResponse("Access Denied");
-		}
+	public RestResponse<String> getCurrentPreventionRulesVersion()
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+
 		try {
 			ResourceBundle bundle = getResourceBundle();
 
@@ -181,14 +180,14 @@ public class ResourceService extends AbstractServiceImpl {
 	@Path("/loadPreventionRulesById/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
-		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
-			return RestResponse.errorResponse("Access Denied");
-		}
+	public RestResponse<String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
     	
 		try {
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			
+
 			//Log agreement
 			if(jSONObject.containsKey("agreement")){
 				String action = "oauth1_AGREEMENT";
@@ -236,10 +235,14 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/notifications")
 	@Produces("application/json")
-	public RestResponse<List<NotificationTo1>> getNotifications(@Context HttpServletRequest request) {
+	public RestResponse<List<NotificationTo1>> getNotifications(@Context HttpServletRequest request)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+
 		List<NotificationTo1> list = new ArrayList<NotificationTo1>();
 		try {
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
 			if(notificationStr == null) {
 				return RestResponse.errorResponse("Failed to load Resource");
@@ -263,9 +266,13 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/notifications/number")
 	@Produces("application/json")
-	public RestResponse<String> getNotificationsNumber(@Context HttpServletRequest request) {
-		try {
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+	public RestResponse<String> getNotificationsNumber(@Context HttpServletRequest request)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		try
+		{
 			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
 			if(notificationStr != null) {
 				JSONObject notifyObject = JSONObject.fromObject(notificationStr);
@@ -284,10 +291,15 @@ public class ResourceService extends AbstractServiceImpl {
 	@Path("/notifications/readmore")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String> getMoreInfoNotificationURL(@Context HttpServletRequest request, JSONObject jSONObject) {
+	public RestResponse<String> getMoreInfoNotificationURL(@Context HttpServletRequest request, JSONObject jSONObject)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+
 		String retval = "";
-		try {
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		try
+		{
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
 			if (k2aApp != null) {
 				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), loggedInInfo.getLoggedInProvider().getProviderNo());
@@ -309,10 +321,15 @@ public class ResourceService extends AbstractServiceImpl {
 	@Path("/notifications/{id}/ack/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String> markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject) {
+	public RestResponse<String> markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+
 		String retval = "";
-		try {
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		try
+		{
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
 			if (k2aApp != null) {
 				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), loggedInInfo.getLoggedInProvider().getProviderNo());

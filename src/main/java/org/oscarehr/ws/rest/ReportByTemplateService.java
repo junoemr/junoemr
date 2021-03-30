@@ -33,6 +33,7 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
@@ -75,17 +76,20 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public GenericRESTResponse isK2AActive(){
-		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "r", null)) {
-			throw new RuntimeException("Access Denied");
-		}
-		
+	public GenericRESTResponse isK2AActive()
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
+
 		GenericRESTResponse response = null;
 		AppDefinition appDef = appDefinitionDao.findByName("K2A");
-		if(appDef == null){
-			response = new GenericRESTResponse(false,"K2A active");
-		}else{
-			response = new GenericRESTResponse(true,"K2A not active");
+		if(appDef == null)
+		{
+			response = new GenericRESTResponse(false, "K2A active");
+		}
+		else
+		{
+			response = new GenericRESTResponse(true, "K2A not active");
 		}
 		return response;
 	}
@@ -93,10 +97,10 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AUrl/")
 	@Produces("application/json")
-	public RestResponse<String> getK2AUrl() {
-		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "r", null)) {
-			return RestResponse.errorResponse("Access Denied");
-		}
+	public RestResponse<String> getK2AUrl()
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
 
 		AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
 		if (k2aApp != null) {
@@ -115,11 +119,12 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@GET
 	@Path("/allReports")
 	@Produces("application/json")
-	public RestResponse<String> getReportByTemplatesFromK2A() {
+	public RestResponse<String> getReportByTemplatesFromK2A()
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "r", null)) {
-			return RestResponse.errorResponse("Access Denied");
-		}
+
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
 
 		try {
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
@@ -141,11 +146,11 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@POST
 	@Path("/getReportById/{id}")
 	@Produces("application/json")
-	public String addK2AReport(@PathParam("id") String id) {
+	public String addK2AReport(@PathParam("id") String id)
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
-			throw new RuntimeException("Access Denied");
-		}
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
 
 		try
 		{

@@ -139,7 +139,7 @@ public class SecObjectName extends AbstractModel<String>
 		NEW_CASEMGMT_MEASUREMENT("_newCasemgmt.measurements"),
 		NEW_CASEMGMT_MEDICAL_HISTORY("_newCasemgmt.medicalHistory"),
 		NEW_CASEMGMT_OSCAR_MESSAGE("_newCasemgmt.oscarMsg"),
-		NEW_CASEMGMT_OTEHR_MEDS("_newCasemgmt.otherMeds"),
+		NEW_CASEMGMT_OTHER_MEDS("_newCasemgmt.otherMeds"),
 		NEW_CASEMGMT_PHOTO("_newCasemgmt.photo"),
 		NEW_CASEMGMT_PREGNANCY("_newCasemgmt.pregnancy"),
 		NEW_CASEMGMT_PRESCRIPTIONS("_newCasemgmt.prescriptions"),

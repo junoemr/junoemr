@@ -46,6 +46,8 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -69,7 +71,15 @@ public class RSSFeedService extends AbstractServiceImpl {
 	@GET
 	@Path("/rss")
 	@Produces("application/json")
-	public RestResponse<RSSResponse> getRSS(@QueryParam("key") String key, @QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
+	public RestResponse<RSSResponse> getRSS(
+			@QueryParam("key") String key,
+			@QueryParam("startPoint") String startPoint,
+			@QueryParam("numberOfRows") String numberOfRows,
+			@Context HttpServletRequest request)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {

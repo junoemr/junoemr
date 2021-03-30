@@ -27,9 +27,11 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.EFormReportToolDao;
 import org.oscarehr.common.model.DemographicSets;
 import org.oscarehr.common.model.EFormReportTool;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.DemographicSetsManager;
 import org.oscarehr.managers.EFormReportToolManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.EFormReportToolConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -62,7 +64,10 @@ public class ReportingService extends AbstractServiceImpl {
 	@GET
 	@Path("/demographicSets/list")
 	@Produces("application/json")
-	public RestResponse<AbstractSearchResponse<String>> listDemographicSets(){
+	public RestResponse<AbstractSearchResponse<String>> listDemographicSets()
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 		
 		response.setContent(demographicSetsManager.getNames(getLoggedInInfo()));
@@ -74,7 +79,10 @@ public class ReportingService extends AbstractServiceImpl {
 	@GET
 	@Path("/demographicSets/demographicSet/{name}")
 	@Produces("application/json")
-	public AbstractSearchResponse<DemographicSets> getDemographicSetByName(@PathParam("name") String name){
+	public AbstractSearchResponse<DemographicSets> getDemographicSetByName(@PathParam("name") String name)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+
 		AbstractSearchResponse<DemographicSets> response = new AbstractSearchResponse<DemographicSets>();
 		
 		response.setContent(demographicSetsManager.getByName(getLoggedInInfo(), name));
@@ -91,7 +99,9 @@ public class ReportingService extends AbstractServiceImpl {
 	@GET
 	@Path("/eformReportTool/list")
 	@Produces("application/json")
-	public AbstractSearchResponse<EFormReportToolTo1> eformReportToolList(){
+	public AbstractSearchResponse<EFormReportToolTo1> eformReportToolList()
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
 		
 		List<EFormReportTool> results = eformReportToolManager.findAll(getLoggedInInfo(), 0, EFormReportToolDao.MAX_LIST_RETURN_SIZE);
 		
@@ -110,8 +120,10 @@ public class ReportingService extends AbstractServiceImpl {
 	@Path("/eformReportTool/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse addEFormReportTool(EFormReportToolTo1 json){
-		
+	public GenericRESTResponse addEFormReportTool(EFormReportToolTo1 json)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
+
 		GenericRESTResponse response = new GenericRESTResponse();
 		
 		if(StringUtils.isEmpty(json.getName()) || json.getEformId() == 0) {
@@ -131,7 +143,9 @@ public class ReportingService extends AbstractServiceImpl {
 	@Path("/eformReportTool/populate")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse populateEFormReportTool(EFormReportToolTo1 json){
+	public GenericRESTResponse populateEFormReportTool(EFormReportToolTo1 json)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -145,7 +159,9 @@ public class ReportingService extends AbstractServiceImpl {
 	@Path("/eformReportTool/remove")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse removeEFormReportTool(EFormReportToolTo1 json){
+	public GenericRESTResponse removeEFormReportTool(EFormReportToolTo1 json)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -158,7 +174,9 @@ public class ReportingService extends AbstractServiceImpl {
 	@Path("/eformReportTool/markLatest")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse markLatestEFormReportTool(EFormReportToolTo1 json){
+	public GenericRESTResponse markLatestEFormReportTool(EFormReportToolTo1 json)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -166,6 +184,4 @@ public class ReportingService extends AbstractServiceImpl {
 		
 		return (response);
 	}
-	
-	
 }
