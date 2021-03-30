@@ -70,7 +70,7 @@
 </logic:present>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
-	RxSessionBean rxBean = (RxSessionBean)pageContext.findAttribute("RxSessionBean");
+	RxSessionBean rxBean = (RxSessionBean)pageContext.findAttribute("rxBean");
 
 	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 	RxPharmacyData pharmacyData = new RxPharmacyData();
