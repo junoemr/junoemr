@@ -22,6 +22,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		var demographicNo = this.pageData.demographicNo;
 
+		this.pageState.notesOffset = 0;
+
 		// Load a few extra notes initially, hopefully fill up the page
 		var me = this;
 		this.notesLoader(
