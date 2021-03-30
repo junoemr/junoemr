@@ -84,11 +84,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/search")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public TicklerResponse search(JSONObject json, @QueryParam("startIndex") int startIndex, @QueryParam("limit") int limit) {
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "r", null)) {
-			throw new RuntimeException("Access Denied");
-		}
+	public TicklerResponse search(JSONObject json, @QueryParam("startIndex") int startIndex, @QueryParam("limit") int limit)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
 		
 		CustomFilter cf = new CustomFilter(true);
 		
@@ -124,8 +122,6 @@ public class TicklerWebService extends AbstractServiceImpl {
 			
 		}
 		
-		
-		
 		List<Tickler> ticklers = ticklerManager.getTicklers(getLoggedInInfo(),cf,startIndex,limit);
 
 		TicklerResponse result = new TicklerResponse();
@@ -145,11 +141,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/mine")
 	@Produces("application/json")
-	public TicklerResponse getMyTicklers(@QueryParam("limit") int limit) {
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "r", null)) {
-			throw new RuntimeException("Access Denied");
-		}
+	public TicklerResponse getMyTicklers(@QueryParam("limit") int limit)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
 		
 		CustomFilter cf = new CustomFilter(true);
 		cf.setAssignee(getLoggedInInfo().getLoggedInProviderNo());
@@ -160,8 +154,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 		TicklerResponse result = new TicklerResponse();
 		result.setTotal(ticklers.size());
 		result.getContent().addAll(ticklerConverter.getAllAsTransferObjects(getLoggedInInfo(),ticklers)); 
-		
-		
+
 		return result;
 	}
 	
@@ -185,8 +178,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 										  @QueryParam("includeProgram") boolean includeProgram,
 										  @QueryParam("includeUpdates") boolean includeUpdates)
 	{
-		String providerNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(providerNo, "r", null, "_tickler");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
 
 		AbstractCriteriaSearch.SORTDIR sortDir = AbstractCriteriaSearch.SORTDIR.valueOf(sortDirection);
 		TicklerCriteriaSearch.SORT_MODE sortMode = TicklerCriteriaSearch.SORT_MODE.valueOf(sortColumn);
@@ -230,12 +222,10 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/complete")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse completeTicklers(JSONObject json){
+	public GenericRESTResponse completeTicklers(JSONObject json)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TICKLER);
 		GenericRESTResponse response = new GenericRESTResponse();
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "u", null)) {
-			throw new RuntimeException("Access Denied");
-		}
 
 		JSONArray ticklerIds = json.getJSONArray("ticklers");
 		
@@ -251,13 +241,11 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/delete")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse deleteTicklers(JSONObject json){
-		GenericRESTResponse response = new GenericRESTResponse();
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "u", null)) {
-			throw new RuntimeException("Access Denied");
-		}
+	public GenericRESTResponse deleteTicklers(JSONObject json)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.TICKLER);
 
+		GenericRESTResponse response = new GenericRESTResponse();
 		JSONArray ticklerIds = json.getJSONArray("ticklers");
 		
 		for(Object id : ticklerIds) {
@@ -276,7 +264,8 @@ public class TicklerWebService extends AbstractServiceImpl {
 	                                         JSONObject json)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.UPDATE, json.getInt("id"), SecObjectName._TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				json.getInt("id"), SecObjectName.OBJECT_NAME.TICKLER);
 
 		Tickler tickler = ticklerManager.getTickler(getLoggedInInfo(), json.getInt("id"));
 		
@@ -328,13 +317,11 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/textSuggestions")
 	@Produces("application/json")
-	public AbstractSearchResponse<TicklerTextSuggestTo1> getTextSuggestions() {
+	public AbstractSearchResponse<TicklerTextSuggestTo1> getTextSuggestions()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
 		
 		AbstractSearchResponse<TicklerTextSuggestTo1> response = new AbstractSearchResponse<TicklerTextSuggestTo1>();
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "r", null)) {
-			throw new RuntimeException("Access Denied");
-		}
 		List<TicklerTextSuggest> suggestions = ticklerManager.getActiveTextSuggestions(getLoggedInInfo());
 		
 		response.setContent(new TicklerTextSuggestConverter().getAllAsTransferObjects(getLoggedInInfo(),suggestions));
@@ -350,8 +337,8 @@ public class TicklerWebService extends AbstractServiceImpl {
 	public GenericRESTResponse addTickler(@QueryParam("writeEncounterNote") Boolean writeEncounterNote,
 	                                      Tickler tickler)
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, tickler.getDemographicNo(), SecObjectName._TICKLER);
+		String loggedInProviderNo = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TICKLER);
 
 		tickler.setUpdateDate(new Date());
 		tickler.setCreator(loggedInProviderNo);

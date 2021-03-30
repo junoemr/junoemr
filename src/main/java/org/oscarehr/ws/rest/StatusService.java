@@ -40,9 +40,10 @@ public class StatusService extends AbstractServiceImpl {
 	@GET
 	@Path("/checkIfAuthed")
 	@Produces("application/json")
-	public GenericRESTResponse checkIfAuthed() {
-		
-		return new GenericRESTResponse(true,getLoggedInInfo().getLoggedInProviderNo());
+	public GenericRESTResponse checkIfAuthed()
+	{
+		//TODO is this used? It doesn't appear to do anything
+		return new GenericRESTResponse(true, getLoggedInInfo().getLoggedInProviderNo());
 	}
 	
 }

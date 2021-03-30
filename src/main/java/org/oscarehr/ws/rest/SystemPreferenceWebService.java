@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Property;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -80,8 +81,7 @@ public class SystemPreferenceWebService extends AbstractServiceImpl
 	public RestResponse<Integer> putPreferenceValue(@PathParam("key") String key,
 	                                                String value)
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null,"_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		Property property = systemPreferenceService.setPreferenceValue(key, value);
 		return RestResponse.successResponse(property.getId());

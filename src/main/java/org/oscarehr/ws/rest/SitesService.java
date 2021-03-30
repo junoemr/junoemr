@@ -27,7 +27,9 @@ import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.site.service.SiteService;
 import org.oscarehr.site.transfer.ProviderSiteBillingTransfer;
 import org.oscarehr.ws.rest.conversion.SiteConverter;
@@ -106,6 +108,8 @@ public class SitesService extends AbstractServiceImpl
 	@Path("/{siteId}/provider/{providerNo}/billing")
 	public RestResponse<ProviderSiteBillingTransfer> getProviderBillingForSite(@PathParam("providerNo") String providerNo, @PathParam("siteId") Integer siteId)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
+
 		ProviderSitePK key = new ProviderSitePK(providerNo, siteId);
 		ProviderSite providerSite = providerSiteDao.find(key);
 
@@ -118,6 +122,8 @@ public class SitesService extends AbstractServiceImpl
 	@Path("/provider/{providerNo}/{sdate}")
 	public RestResponse<SiteTransfer> getProviderSiteBySchedule(@PathParam("providerNo") String providerNo, @PathParam("sdate") String sdate)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		LocalDate sdateLocalDate = ConversionUtils.toLocalDate(sdate);
 		Site site = siteDao.getProviderSiteByScheduleDate(providerNo, sdateLocalDate);
 

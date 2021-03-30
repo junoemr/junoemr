@@ -40,6 +40,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.AppointmentType;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ScheduleManager;
@@ -123,6 +124,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	                                                                @DefaultValue("8") @QueryParam("resultCount") Integer resultCount
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		List<ScheduleSearchResult> resultList = new ArrayList<>();
 		ProviderConverter providerConverter = new ProviderConverter();
 
@@ -164,6 +167,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<PatientListItemTransfer> getAppointmentsForDay(@PathParam("date") String dateStr) throws ParseException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		String providerNo = this.getCurrentProvider().getProviderNo();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		if("".equals(providerNo))
@@ -231,6 +236,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public SchedulingResponse getAppointmentHistory(@PathParam("demographicNo") Integer demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		SchedulingResponse response = new SchedulingResponse();
 		List<Appointment> appts = appointmentManager.getAppointmentHistoryWithoutDeleted(getLoggedInInfo(), demographicNo, 0, OscarAppointmentDao.MAX_LIST_RETURN_SIZE);
 		if(appts.size() == OscarAppointmentDao.MAX_LIST_RETURN_SIZE)
@@ -285,7 +292,10 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/statuses")
 	@Produces("application/json")
-	public AbstractSearchResponse<AppointmentStatusTo1> getAppointmentStatuses() {
+	public AbstractSearchResponse<AppointmentStatusTo1> getAppointmentStatuses()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		AbstractSearchResponse<AppointmentStatusTo1> response = new AbstractSearchResponse<>();
 
 		List<AppointmentStatus> results = scheduleManager.getAppointmentStatuses(getLoggedInInfo());
@@ -300,7 +310,9 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/types")
 	@Produces("application/json")
-	public RestSearchResponse<AppointmentTypeTo1> getAppointmentTypes() {
+	public RestSearchResponse<AppointmentTypeTo1> getAppointmentTypes()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		List<AppointmentType> types = scheduleManager.getAppointmentTypes();
 
@@ -315,6 +327,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<LookupListItemTo1> getAppointmentReasons()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		List<LookupListItem> items = appointmentManager.getReasons();
 
 		LookupListItemConverter converter = new LookupListItemConverter();
@@ -329,6 +343,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<ScheduleGroup> getScheduleGroups()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups();
 
 		// TODO-legacy: paginate?
@@ -340,6 +356,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<ScheduleTemplateCode> getScheduleTemplateCodes()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		List<ScheduleTemplateCode> scheduleTemplateCodes =
 			scheduleTemplateService.getScheduleTemplateCodes();
 
@@ -351,6 +369,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<CalendarAppointmentStatus> getCalendarAppointmentStatuses()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		List<CalendarAppointmentStatus> appointmentStatusList =
 			appointmentStatusService.getCalendarAppointmentStatusList();
 
@@ -372,6 +392,8 @@ public class ScheduleService extends AbstractServiceImpl {
 			@QueryParam("slotDuration") Integer slotDurationInMin
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+
 		Message message = PhaseInterceptorChain.getCurrentMessage();
 		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
 		HttpSession session = request.getSession(true);

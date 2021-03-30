@@ -23,15 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import org.oscarehr.common.model.MessageList;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.MessagingManager;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -39,6 +31,12 @@ import org.oscarehr.ws.rest.conversion.MessagingConverter;
 import org.oscarehr.ws.rest.to.MessagingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.util.List;
 
 @Path("/messaging")
 @Component("messagingService")
