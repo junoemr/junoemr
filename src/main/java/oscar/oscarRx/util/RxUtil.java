@@ -1445,7 +1445,46 @@ public class RxUtil {
 		}
 		return unique;
 	}
-
+	
+	/**
+	 * Fetch special instructions from past entries associated with the supplied regionalIds.
+	 * Custom drugs have regionalIds of null, which is a valid member of the regionalIds set.
+	 *
+	 * @param regionalIds
+	 * @return String of custom instructions, each instruction is delimited by *
+	 */
+	public static String getSpecialInstructionsOptimized(Set<String> regionalIds)
+	{
+		Set<String> specialInstructions = new HashSet<>();
+		
+		String[] instructions = new RxCodesData().getSpecialInstructions();
+		Arrays.stream(instructions).forEach(inst -> specialInstructions.add(inst));
+		
+		DrugDao drugDao = SpringUtils.getBean(DrugDao.class);
+		List<String> pastInstructionsFromRx = drugDao.findSpecialInstructionsByRegionalId(regionalIds);
+		specialInstructions.addAll(pastInstructionsFromRx);
+		
+		int instructionSize = specialInstructions.size();
+		int index = 1;
+		
+		StringBuilder toReturn = new StringBuilder();
+		for(String instruction : specialInstructions)
+		{
+			toReturn.append(instruction);
+			
+			if (index < instructionSize)
+			{
+				toReturn.append("*");
+			}
+			
+			index++;
+		}
+		
+		return toReturn.toString();
+	}
+	
+	@Deprecated()
+	// Use getSpecialInstructionsOptimized instead
 	public static String getSpecialInstructions() {
 		StringBuilder retStr = new StringBuilder();
 		RxCodesData codesData = new RxCodesData();
