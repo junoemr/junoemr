@@ -24,6 +24,7 @@
 package org.oscarehr.admin.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
@@ -61,38 +62,48 @@ public class AdminNavService
 	{
 		List<AdminNavGroupTo1> adminNavList = new ArrayList<>();
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.userAdmin" , "_admin.provider" ))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN,
+				SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN,
+				SecObjectName.OBJECT_NAME.ADMIN_PROVIDER))
 		{
 			adminNavList.add(getAdminNavUserManagementGroup(contextPath, resourceBundle));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin.invoices", "_admin", "_admin.billing"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN,
+				SecObjectName.OBJECT_NAME.ADMIN_INVOICES,
+				SecObjectName.OBJECT_NAME.ADMIN_BILLING))
 		{
 			adminNavList.add(getAdminNavBilling(contextPath, resourceBundle));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			adminNavList.add(getAdminNavLab(contextPath, resourceBundle));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.eform"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_EFORM))
 		{
 			adminNavList.add(getAdminNavForms(contextPath, resourceBundle));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.reporting"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_REPORTING))
 		{
 			adminNavList.add(getAdminNavReports(contextPath, resourceBundle, providerNo));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.encounter"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_ENCOUNTER))
 		{
 			adminNavList.add(getAdminNavEchart(contextPath, resourceBundle));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, securityInfoManager.READ, null, "_admin", "_admin.schedule"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_SCHEDULE))
 		{
 			adminNavList.add(getAdminNavSchedule(contextPath, resourceBundle, providerNo));
 		}
 		if (oscarProperties.isPropertyActive("caisi"))
 		{// CAISI module loaded
-			if (securityInfoManager.hasPrivilege(providerNo, "_admin.caisi", SecurityInfoManager.READ, null))
+			if (securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_CAISI))
 			{
 				adminNavList.add(getAdminNavCaisiHasPermission(contextPath, resourceBundle));
 			}
@@ -101,39 +112,45 @@ public class AdminNavService
 				adminNavList.add(getAdminNavCaisiNoPermission(contextPath, resourceBundle, providerNo));
 			}
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.measurements", "_admin.document", "_admin.consult"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN,
+				SecObjectName.OBJECT_NAME.ADMIN_MEASUREMENTS,
+				SecObjectName.OBJECT_NAME.ADMIN_DOCUMENT,
+				SecObjectName.OBJECT_NAME.ADMIN_CONSULT))
 		{
 			adminNavList.add(getAdminNavSystemManagement(contextPath, resourceBundle, providerNo));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin.fax"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_FAX))
 		{
 			adminNavList.add(getAdminNavFaxManagement(providerNo));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			adminNavList.add(getAdminNavSystemReports(contextPath, resourceBundle, providerNo));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			adminNavList.add(getAdminNavIntegration(contextPath, resourceBundle, session, providerNo));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.backup"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_BACKUP))
 		{
 			adminNavList.add(getAdminNavDataManagement(contextPath, resourceBundle));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin") &&
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN) &&
 			oscarProperties.isPropertyActive("admin.hph"))
 		{
 			adminNavList.add(getAdminNavHamiltonHealth(contextPath, resourceBundle));
 		}
 		if (oscarProperties.isPropertyActive("sharingcenter.enabled") &&
-						securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null,"_admin", "_admin.sharingcenter"))
+				securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+						SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_SHARING_CENTER))
 		{
 			adminNavList.add(getAdminNavSharingCenter(contextPath, resourceBundle));
 		}
-		if (oscarProperties.isPropertyActive("OSCAR_LEARNING") &&
-						securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if(oscarProperties.isPropertyActive("OSCAR_LEARNING") &&
+				securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			adminNavList.add(getAdminNavOscarLearning(contextPath, resourceBundle));
 		}
@@ -315,7 +332,7 @@ public class AdminNavService
 		reportGroup.setName(resourceBundle.getString("admin.admin.oscarReport"));
 
 		if (oscarProperties.isPropertyActive("enable_dashboards") && oscarProperties.isBritishColumbiaInstanceType() &&
-			securityInfoManager.hasPrivilege(providerNo, "_dashboardManager", SecurityInfoManager.WRITE, null))
+			securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DASHBOARD_MANAGER))
 		{
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("dashboard.dashboardmanager.title"), "frame?frameUrl=" + contextPath + "/web/dashboard/admin/DashboardManager.do"));
 		}
@@ -458,23 +475,23 @@ public class AdminNavService
 
 		caisiGroup.setName(resourcebundle.getString("admin.admin.caisi"));
 
-		if (securityInfoManager.hasPrivilege(providerNo, "_admin.systemMessage", SecurityInfoManager.READ, null))
+		if (securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SYSTEM_MESSAGE))
 		{
 			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.systemMessage"), "frame?frameUrl=" + contextPath + "/SystemMessage.do"));
 		}
-		if (securityInfoManager.hasPrivilege(providerNo, "_admin.facilityMessage", SecurityInfoManager.READ, null))
+		if (securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_FACILITY_MESSAGE))
 		{
 			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.FacilitiesMsgs"), "frame?frameUrl=" + contextPath + "/FacilityMessage.do"));
 		}
-		if (securityInfoManager.hasPrivilege(providerNo, "_admin.lookupFieldEditor", SecurityInfoManager.READ, null))
+		if (securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_LOOKUP_FIELD_EDITOR))
 		{
 			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.LookupFieldEditor"), "frame?frameUrl=" + contextPath + "/Lookup/LookupTableList.do"));
 		}
-		if (securityInfoManager.hasPrivilege(providerNo, "_admin.issueEditor", SecurityInfoManager.READ, null))
+		if (securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_ISSUE_EDITOR))
 		{
 			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.issueEditor"), "frame?frameUrl=" + contextPath + "/issueAdmin.do"));
 		}
-		if(securityInfoManager.hasPrivilege(providerNo, "_admin.userCreatedForms", SecurityInfoManager.READ, null))
+		if(securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_USER_CREATED_FORMS))
 		{
 			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.surveyManager"), "frame?frameUrl=" + contextPath + "/SurveyManager.do"));
 		}
@@ -490,13 +507,14 @@ public class AdminNavService
 
 		systemManagementGroup.setName(resourcebundle.getString("admin.admin.SystemManagement"));
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.document"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_DOCUMENT))
 		{
 			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.DocumentCategories"), "frame?frameUrl=" + contextPath + "/admin/displayDocumentCategories.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.DocumentDescriptionTemplate"), "frame?frameUrl=" + contextPath + "/admin/displayDocumentDescriptionTemplate.jsp"));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.clinicAdmin"), "frame?frameUrl=" + contextPath + "/admin/ManageClinic.do"));
 			if (oscarProperties.isMultisiteEnabled())
@@ -507,28 +525,29 @@ public class AdminNavService
 					"frame?frameUrl=" + contextPath + "/oscarResearch/oscarDxResearch/dxResearchCustomization.jsp"));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.consult"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_CONSULT))
 		{
 			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.consultationSettings"), "frame?frameUrl=" + contextPath + "/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp"));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.measurements"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_MEASUREMENTS))
 		{
 			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("oscarEncounter.Index.btnCustomize") + " " + resourcebundle.getString("admin.admin.oscarMeasurements"),
 					"frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/Customization.jsp"));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("oscarprevention.preventionlistmanager.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionListManager.jsp"));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.messenger"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_MESSENGER))
 		{
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.btnMessengerAdmin"), "frame?frameUrl=" + contextPath + "/oscarMessenger/config/MessengerAdmin.jsp"));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.keyPairGen"), "frame?frameUrl=" + contextPath + "/admin/keygen/keyManager.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.manageFacilities"), "frame?frameUrl=" + contextPath + "/FacilityManager.do"));
@@ -542,7 +561,7 @@ public class AdminNavService
 
 		if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())
 		{
-			if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin.cookieRevolver"))
+			if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_COOKIE_REVOLVER))
 			{
 				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.ipFilter"), "frame?frameUrl=" + contextPath + "/gatekeeper/ip/show"));
 				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.setCert"), "frame?frameUrl=" + contextPath + "/gatekeeper/cert/"));
@@ -571,7 +590,7 @@ public class AdminNavService
 
 		faxManagementGroup.setName("Faxes");
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			faxManagementItems.add( new AdminNavItemTo1("Fax Configuration", "faxConfig"));
 		}
@@ -588,7 +607,8 @@ public class AdminNavService
 
 		systemReportGroup.setName(resourceBundle.getString("admin.admin.SystemReports"));
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.securityLogReport"))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_SECURITY_LOG_REPORT))
 		{
 			systemReportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.securityLogReport"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/admin/logReport.jsp?keyword=admin")));
 

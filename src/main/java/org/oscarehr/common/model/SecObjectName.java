@@ -34,33 +34,36 @@ import javax.persistence.Table;
 @Table(name="secObjectName")
 public class SecObjectName extends AbstractModel<String>
 {
-	public static final String _ADMIN = "_admin";
-	public static final String _APPOINTMENT = "_appointment";
-	public static final String _TICKLER = "_tickler";
-	public static final String _HRM = "_hrm";
-
 	public enum OBJECT_NAME
 	{
 		ADMIN("_admin"), // indicates access to all admin sub-permissions below
+		ADMIN_BACKUP("_admin.backup"),
 		ADMIN_BILLING("_admin.billing"),
 		ADMIN_CAISI("_admin.caisi"),
 		ADMIN_CAISI_ROLES("_admin.caisiRoles"),
 		ADMIN_CONSULT("_admin.consult"),
 		ADMIN_COOKIE_REVOLVER("_admin.cookieRevolver"),
 		ADMIN_DOCUMENT("_admin.document"),
+		ADMIN_EFORM("_admin.eform"),
+		ADMIN_ENCOUNTER("_admin.encounter"),
 		ADMIN_FACILITY_MESSAGE("_admin.facilityMessage"),
 		ADMIN_FAX("_admin.fax"),
+		ADMIN_INVOICES("_admin.invoices"),
 		ADMIN_ISSUE_EDITOR("_admin.issueEditor"),
 		ADMIN_LOOKUP_FIELD_EDITOR("_admin.lookupFieldEditor"),
 		ADMIN_MEASUREMENTS("_admin.measurements"),
+		ADMIN_MESSENGER("_admin.messenger"),
 		ADMIN_PANEL_MANAGEMENT("_admin.panelManagement"),
 		ADMIN_PROVIDER("_admin.provider"),
 		ADMIN_REPORTING("_admin.reporting"),
+		ADMIN_SCHEDULE("_admin.schedule"),
 		ADMIN_SECURITY("_admin.security"),
 		ADMIN_SECURITY_LOG_REPORT("_admin.securityLogReport"),
+		ADMIN_SHARING_CENTER("_admin.sharingcenter"),
 		ADMIN_SYSTEM_MESSAGE("_admin.systemMessage"),
 		ADMIN_TRACEABILITY("_admin.traceability"),
 		ADMIN_UNLOCK_ACCOUNT("_admin.unlockAccount"),
+		ADMIN_USER_ADMIN( "_admin.userAdmin"),
 		ADMIN_USER_CREATED_FORMS("_admin.userCreatedForms"),
 
 		ALLERGY("_allergy"),

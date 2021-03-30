@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.ConsentDao;
 import org.oscarehr.common.dao.ConsentTypeDao;
 import org.oscarehr.common.model.Consent;
 import org.oscarehr.common.model.ConsentType;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -110,11 +111,10 @@ public class PatientConsentManager {
 	 * EXPLICIT CONSENT: patient gave direct consent. explicit = true; 
 	 * IMPLIED CONSENT: patient consent was implied or assumed. explicit = false 
 	 */
-	public void addConsent( LoggedInInfo loggedinInfo, int demographic_no, int consentTypeId, boolean explicit ) {
-		
-		if ( ! securityInfoManager.hasPrivilege(loggedinInfo, "_demographic", SecurityInfoManager.WRITE, demographic_no) ) {
-			throw new RuntimeException("Unauthorised Access. Object[_demographic]");
-		}
+	public void addConsent(LoggedInInfo loggedinInfo, int demographic_no, int consentTypeId, boolean explicit)
+	{
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		LogAction.addLogSynchronous(loggedinInfo, "PatientConsentManager.addConsent", " Demographic: " + demographic_no);
 		
@@ -185,11 +185,10 @@ public class PatientConsentManager {
 	/**
 	 * Used for removing consent from a patient that previously consented. For a Consent object.
 	 */
-	public void optoutConsent( LoggedInInfo loggedinInfo, int consentId ) {
-		
-		if ( ! securityInfoManager.hasPrivilege(loggedinInfo, "_demographic", SecurityInfoManager.WRITE, null) ) {
-			throw new RuntimeException("Unauthorised Access. Object[_demographic]");
-		}
+	public void optoutConsent(LoggedInInfo loggedinInfo, int consentId)
+	{
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		LogAction.addLogSynchronous(loggedinInfo, "PatientConsentManager.optoutConsent[consentID]", " ConsentId: " + consentId);
 		
@@ -240,10 +239,10 @@ public class PatientConsentManager {
 	 * Returns a list of patient consents given by a specified patient for a specific ConsentType program.
 	 * Find the ConsentType object first with getConsentType( String type )
 	 */
-	public Consent getConsentByDemographicAndConsentType( LoggedInInfo loggedinInfo, int demographic_no, ConsentType consentType ) {
-		if ( ! securityInfoManager.hasPrivilege(loggedinInfo, "_demographic", SecurityInfoManager.READ, demographic_no) ) {
-			throw new RuntimeException("Unauthorised Access. Object[_demographic]");
-		}
+	public Consent getConsentByDemographicAndConsentType(LoggedInInfo loggedinInfo, int demographic_no, ConsentType consentType)
+	{
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		if( consentType == null ) {
 			return null;
@@ -258,12 +257,11 @@ public class PatientConsentManager {
 	/**
 	 * Returns a list of all the consentTypes/programs this patient has consented.
 	 */
-	public List<Consent> getAllConsentsByDemographic( LoggedInInfo loggedinInfo, int demographic_no ) {
-		
-		if ( ! securityInfoManager.hasPrivilege(loggedinInfo, "_demographic", SecurityInfoManager.READ, demographic_no) ) {
-			throw new RuntimeException("Unauthorised Access. Object[_demographic]");
-		}
-		
+	public List<Consent> getAllConsentsByDemographic(LoggedInInfo loggedinInfo, int demographic_no)
+	{
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+
 		List<Consent> consent = consentDao.findByDemographic(demographic_no);
 		
 		LogAction.addLogSynchronous( loggedinInfo, "PatientConsentManager.getAllConsentsByDemographic",

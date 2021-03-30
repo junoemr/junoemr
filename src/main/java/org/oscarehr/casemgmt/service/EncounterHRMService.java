@@ -97,9 +97,9 @@ public class EncounterHRMService extends EncounterSectionService
 
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
-		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), SecObjectName._HRM,
-			SecurityInfoManager.READ, sectionParams.getDemographicNo())
-			|| !OscarProperties.getInstance().hasHRMDocuments())
+		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.READ, Integer.parseInt(sectionParams.getDemographicNo()), SecObjectName.OBJECT_NAME.HRM)
+				|| !OscarProperties.getInstance().hasHRMDocuments())
 		{
 			return EncounterNotes.noNotes();
 		}

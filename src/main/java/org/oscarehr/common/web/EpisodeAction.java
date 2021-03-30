@@ -36,6 +36,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.EpisodeDao;
 import org.oscarehr.common.model.Episode;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -55,10 +56,9 @@ public class EpisodeAction extends DispatchAction {
 
 	public ActionForward list(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
 		Integer demographicNo = Integer.parseInt(request.getParameter("demographicNo"));
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "r", demographicNo)) {
-        	throw new SecurityException("missing required security object (_demographic)");
-        }
+
+		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		List<Episode> episodes = episodeDao.findAll(demographicNo);
 		request.setAttribute("episodes",episodes);
@@ -82,7 +82,9 @@ public class EpisodeAction extends DispatchAction {
 
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		
+
+
+
 		DynaActionForm dform = (DynaActionForm)form;
 		Episode episode = (Episode)dform.get("episode");
 		Integer id = null;
@@ -97,10 +99,9 @@ public class EpisodeAction extends DispatchAction {
 		}
 		BeanUtils.copyProperties(episode, e, new String[]{"id","lastUpdateTime","lastUpdateUser"});
 		e.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "w", e.getDemographicNo())) {
-        	throw new SecurityException("missing required security object (_demographic)");
-        }
+
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, e.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		if(id != null && id.intValue()>0) {
 			episodeDao.merge(e);

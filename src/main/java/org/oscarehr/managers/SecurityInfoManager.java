@@ -140,12 +140,6 @@ public class SecurityInfoManager {
 		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, demographicNo);
 	}
 
-	@Deprecated
-	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, int demographicNo)
-	{
-		return hasPrivilege(loggedInInfo, objectName, privilege, String.valueOf(demographicNo));
-	}
-
 	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME objectName)
 	{
 		return hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), (demographicNo != null ? String.valueOf(demographicNo) : null));
@@ -184,19 +178,6 @@ public class SecurityInfoManager {
 	 * @param hasObjList - a list of security objects to check
 	 * @return - true or false indicating pass or fail of the privilege check.
 	 */
-	@Deprecated
-	public boolean hasOnePrivileges(String providerNo, String privilege, Integer demographicNo, String... hasObjList)
-	{
-		for(String objectName:hasObjList)
-		{
-			if(hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public boolean hasOnePrivileges(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... hasObjList)
 	{
 		for(SecObjectName.OBJECT_NAME objectName : hasObjList)
@@ -207,6 +188,11 @@ public class SecurityInfoManager {
 			}
 		}
 		return false;
+	}
+
+	public boolean hasOnePrivileges(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME... hasObjList)
+	{
+		return hasOnePrivileges(providerNo, privilege, null, hasObjList);
 	}
 
 	public boolean hasPrivilege(String providerNo, String objectName, String privilege, String demographicNo)

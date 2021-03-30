@@ -58,8 +58,8 @@ public class HRMDownloadFileAction extends DownloadAction
 			HttpServletResponse response)
 			throws Exception
 	{
-	    securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
-			    SecurityInfoManager.READ, null, SecObjectName._HRM);
+		securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.HRM);
 
 	    String hash = request.getParameter("hash");
 	    if(StringUtils.isNullOrEmpty(hash))

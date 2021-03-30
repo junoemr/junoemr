@@ -48,7 +48,8 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 
 		Integer demographicNo = Integer.parseInt(bean.demographicNo);
 
-		if(!securityInfoManager.hasPrivilege(loggedInInfo, SecObjectName._HRM, SecurityInfoManager.READ, demographicNo)
+		if(!securityInfoManager.hasPrivilege(loggedInInfo.getLoggedInProviderNo(),
+				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.HRM)
 				|| !OscarProperties.getInstance().hasHRMDocuments())
 		{
 			return true; // HRM section does not show up at all
