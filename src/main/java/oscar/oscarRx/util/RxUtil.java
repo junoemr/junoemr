@@ -1463,13 +1463,16 @@ public class RxUtil {
 		String[] instructions = new RxCodesData().getSpecialInstructions();
 		Arrays.stream(instructions).forEach(inst -> specialInstructions.add(inst));
 		
-		regionalIds.remove(null);
-		
-		if (regionalIds != null && !regionalIds.isEmpty())
+		if (regionalIds != null)
 		{
-			DrugDao drugDao = SpringUtils.getBean(DrugDao.class);
-			List<String> pastInstructionsFromRx = drugDao.findSpecialInstructionsByRegionalId(regionalIds);
-			specialInstructions.addAll(pastInstructionsFromRx);
+			regionalIds.remove(null);
+			
+			if (!regionalIds.isEmpty())
+			{
+				DrugDao drugDao = SpringUtils.getBean(DrugDao.class);
+				List<String> pastInstructionsFromRx = drugDao.findSpecialInstructionsByRegionalId(regionalIds);
+				specialInstructions.addAll(pastInstructionsFromRx);
+			}
 		}
 		
 		String toReturn = String.join("*", specialInstructions);
