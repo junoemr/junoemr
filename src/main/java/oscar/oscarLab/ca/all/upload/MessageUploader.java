@@ -93,6 +93,7 @@ import static org.oscarehr.common.io.FileFactory.createEmbeddedLabFile;
 public final class MessageUploader {
 
 	private static final Logger logger = MiscUtils.getLogger();
+	private static final String DEFAULT_BLANK_PROVIDER_NO = "0";
 	private static PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
 	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 	private static Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
@@ -364,19 +365,16 @@ public final class MessageUploader {
 				}
 			}
 
-			String demProviderNo = "0";
 			boolean custom_route_enabled=false;
 
-			try
-			{
-				demProviderNo = patientRouteReport(loggedInProviderNo, insertID, lastName, firstName, sex, dob, hin);
-			}
-			catch (Exception ignored)
-			{
+			String demProviderNo = patientRouteReport(loggedInProviderNo, insertID, lastName, firstName, sex, dob, hin);
 
+			if(demProviderNo == null)
+			{
+				demProviderNo = DEFAULT_BLANK_PROVIDER_NO;
 			}
 
-			if (type.equals("OLIS_HL7") && demProviderNo.equals("0"))
+			if (type.equals("OLIS_HL7") && demProviderNo.equals(DEFAULT_BLANK_PROVIDER_NO))
 			{
 				OLISSystemPreferencesDao olisPrefDao = SpringUtils.getBean(OLISSystemPreferencesDao.class);
 				OLISSystemPreferences olisPreferences = olisPrefDao.getPreferences();
@@ -491,7 +489,7 @@ public final class MessageUploader {
 				List<Provider> provList = providerDao.getProviderLikeFirstLastName("%"+firstLastName[0]+"%", firstLastName[firstLastName.length-1]);
 				if (provList != null) {
 					int provIndex = findProviderWithShortestFirstName(provList);
-					if (provIndex != -1 && provList.size() >= 1 && !provList.get(provIndex).getProviderNo().equals("0")) {
+					if (provIndex != -1 && provList.size() >= 1 && !provList.get(provIndex).getProviderNo().equals(DEFAULT_BLANK_PROVIDER_NO)) {
 						docNums.add( provList.get(provIndex).getProviderNo() );
 						//logger.debug("ADDED1: " + provList.get(provIndex).getProviderNo());
 					} else {
@@ -499,7 +497,7 @@ public final class MessageUploader {
 						provList = providerDao.getProviderLikeFirstLastName("dr " + firstLastName[0], firstLastName[1]);
 						if (provList != null) {
 							provIndex = findProviderWithShortestFirstName(provList);
-							if (provIndex != -1 && provList.size() == 1 && !provList.get(provIndex).getProviderNo().equals("0")) {
+							if (provIndex != -1 && provList.size() == 1 && !provList.get(provIndex).getProviderNo().equals(DEFAULT_BLANK_PROVIDER_NO)) {
 								//logger.debug("ADDED2: " + provList.get(provIndex).getProviderNo());
 								docNums.add( provList.get(provIndex).getProviderNo() );
 							}
@@ -601,7 +599,7 @@ public final class MessageUploader {
 			}
 		}
 		else {
-			routing.route(labId, "0", conn, "HL7");
+			routing.route(labId, DEFAULT_BLANK_PROVIDER_NO, conn, "HL7");
 			routing.route(labId, altProviderNo, conn, "HL7");
 		}
 	}
@@ -614,20 +612,24 @@ public final class MessageUploader {
 	}
 
 	/**
-	 * Attempt to match the patient from the lab to a demographic, return the patients provider which is to be used then no other provider can be found to match the patient to.
+	 * Attempt to match the patient from the lab to a demographic, return the patients provider
+	 * which is to be used then no other provider can be found to match the patient to.
 	 */
 	private static String patientRouteReport(String loggedInProviderNo, int labId,
 											 String lastName, String firstName,
-											 String sex, String dob, String hin) throws Exception {
-
-		PatientLabRoutingResult patientLabRoutingResult = null;
-		Integer demographicNumber = 0;
-		String providerNumber = "0";
+											 String sex, String dob, String hin) throws Exception
+	{
 		Demographic demographic = getDemographicFromLabInfo(lastName, firstName, sex, dob, hin);
 
-		patientLabRoutingResult = new PatientLabRoutingResult();
-		demographicNumber = demographic.getDemographicNo();
-		providerNumber = demographic.getProviderNo();
+		if(demographic == null)
+		{
+			return null;
+		}
+
+		PatientLabRoutingResult patientLabRoutingResult = new PatientLabRoutingResult();
+		Integer demographicNumber = demographic.getDemographicNo();
+		String providerNumber = demographic.getProviderNo();
+
 		patientLabRoutingResult.setDemographicNo(demographicNumber);
 		patientLabRoutingResult.setProviderNo(providerNumber);
 		
