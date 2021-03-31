@@ -30,17 +30,31 @@ import java.io.Serializable;
 public class RestResponseError implements Serializable
 {
 	private final String message;
+	private Serializable data = null;
+
 	public RestResponseError()
 	{
 		this(null);
 	}
+
 	public RestResponseError(String message)
 	{
 		this.message = message;
 	}
 
+	public RestResponseError(String message, Serializable data)
+	{
+		this(message);
+		this.data = data;
+	}
+
 	public String getMessage()
 	{
 		return message;
+	}
+
+	public Serializable getData()
+	{
+		return this.data;
 	}
 }

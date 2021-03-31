@@ -20,35 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.aqs.exception;
+package org.oscarehr.ws.rest.integrations.aqs.exceptionMapping;
 
-import ca.cloudpractice.aqs.client.ApiException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import org.oscarehr.integration.aqs.model.AqsErrorResponse;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
+import org.oscarehr.ws.rest.response.RestResponse;
 
-public class AqsCommunicationException extends RuntimeException
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+@Provider
+public class AqsCommunicationExceptionMapper implements ExceptionMapper<AqsCommunicationException>
 {
-	@Getter
-	protected AqsErrorResponse errorResponse;
-
-	public AqsCommunicationException(String msg)
+	public AqsCommunicationExceptionMapper()
 	{
-		super(msg);
 	}
 
-	public AqsCommunicationException(String msg, ApiException cause)
+	@Override
+	public Response toResponse(AqsCommunicationException exception)
 	{
-		super(msg, cause);
+		RestResponse<Object> response = RestResponse.errorResponse("Aqs Integration Error", exception.getErrorResponse());
 
-		try
-		{
-			this.errorResponse = (new ObjectMapper()).readValue(cause.getResponseBody(), AqsErrorResponse.class);
-		}
-		catch (Exception e)
-		{
-			MiscUtils.getLogger().error("Failed to deserialize error response from AQS server with error: " + e.toString());
-		}
+		return Response.status(Response.Status.BAD_REQUEST).entity(response)
+				.type(MediaType.APPLICATION_JSON).build();
 	}
 }

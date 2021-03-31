@@ -36,10 +36,13 @@ angular.module('Common.Components').component('appointmentQueueModal',
 			'$http',
 			'$httpParamSerializer',
 			'$uibModal',
-			function ($scope,
-			          $http,
-			          $httpParamSerializer,
-			          $uibModal)
+			'securityService',
+			function (
+				$scope,
+				$http,
+				$httpParamSerializer,
+				$uibModal,
+				securityService)
 			{
 				let ctrl = this;
 
@@ -53,7 +56,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.editMode = false;
 				ctrl.queueModel = {};
 				ctrl.isLoading = true;
-				ctrl.showOnDemandSettings = true; // TODO - when should this be false?
+				ctrl.showOnDemandSettings = securityService.getUser().superAdmin;
 				ctrl.notifyPhoneNumbers = "";
 				ctrl.queueContacts = [];
 
