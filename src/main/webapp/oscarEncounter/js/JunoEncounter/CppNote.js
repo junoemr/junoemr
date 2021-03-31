@@ -344,7 +344,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		}
 
 		// Add options for this list
-		var numNotes = junoJQuery("#" + summaryCode + "list li").length;
+		var numNotes = junoJQuery("#" + summaryCode + "list li.encounterNote").length;
 		for(var j = 1; j <= numNotes + 1; j++)
 		{
 			var optId = "popt" + j;
