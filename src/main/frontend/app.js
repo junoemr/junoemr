@@ -786,17 +786,6 @@ angular.module('oscarProviderViewModule').factory('Navigation', [
 	}
 ]);
 
-/**
- * Run on startup
- */
-oscarApp.run([
-	'securityRolesStore',
-	function (securityRolesStore)
-	{
-		securityRolesStore.loadUserRoles();
-	}
-]);
-
 /*
 
 angular.module('oscarProviderViewModule').directive('oscarSecurityShow', function ($animate, securityService) {

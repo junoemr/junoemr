@@ -61,7 +61,7 @@
       ng-init="bodyCtrl.init()"
       id="main-body">
 
-	<div ng-if="bodyCtrl.userLoaded">
+	<div ng-if="bodyCtrl.isInitialized()">
 		<!-- main navigation bar -->
 		<primary-navigation></primary-navigation>
 
