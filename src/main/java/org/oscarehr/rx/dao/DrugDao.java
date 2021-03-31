@@ -498,7 +498,10 @@ public class DrugDao extends AbstractDao<Drug>
     
     public List<String> findSpecialInstructionsByRegionalId(Set<String> regionalIds)
     {
-    	String sql = "SELECT DISTINCT d.special_instruction FROM Drug d WHERE d.regionalIdentifier IN (:ids) AND d.special_instruction IS NOT NULL ORDER BY d.regionalIdentifier, d.rxDate";
+    	String sql = "SELECT DISTINCT d.special_instruction FROM Drug d " +
+			         "WHERE d.regionalIdentifier IN (:ids) " +
+			         "AND d.special_instruction IS NOT NULL " +
+			         "ORDER BY d.regionalIdentifier, d.rxDate";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter("ids", regionalIds);
     	return query.getResultList();

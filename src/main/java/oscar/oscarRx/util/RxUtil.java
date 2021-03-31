@@ -1450,7 +1450,10 @@ public class RxUtil {
 	 * Fetch special instructions from past entries associated with the supplied regionalIds.
 	 * This does not fetch special instructions for null regionalIds (ie: Custom drugs)
 	 *
-	 * @param regionalIds
+	 * Regional ids appear to be as unique as GCNo, and they also happen to be indexed
+	 * in the database.
+	 *
+	 * @param regionalIds a list of regionalIds.
 	 * @return String of custom instructions, each instruction is delimited by *
 	 */
 	public static String getSpecialInstructionsOptimized(Set<String> regionalIds)
@@ -1468,23 +1471,8 @@ public class RxUtil {
 			specialInstructions.addAll(pastInstructionsFromRx);
 		}
 		
-		int instructionSize = specialInstructions.size();
-		int index = 1;
-		
-		StringBuilder toReturn = new StringBuilder();
-		for(String instruction : specialInstructions)
-		{
-			toReturn.append(instruction);
-			
-			if (index < instructionSize)
-			{
-				toReturn.append("*");
-			}
-			
-			index++;
-		}
-		
-		return toReturn.toString();
+		String toReturn = String.join("*", specialInstructions);
+		return toReturn;
 	}
 	
 	@Deprecated()
