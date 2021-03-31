@@ -25,6 +25,10 @@
 
 package org.oscarehr.common.model;
 
+import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.dataMigration.model.common.Person;
+import org.oscarehr.dataMigration.model.demographic.Demographic;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -201,6 +205,27 @@ public class SecObjectName extends AbstractModel<String>
 		public String getValue()
 		{
 			return this.value;
+		}
+
+		public static OBJECT_NAME fromStringIgnoreCase(String enumString)
+		{
+			if(EnumUtils.isValidEnumIgnoreCase(OBJECT_NAME.class, enumString))
+			{
+				return OBJECT_NAME.valueOf(enumString.toUpperCase());
+			}
+			return null;
+		}
+
+		public static OBJECT_NAME fromValueString(String value)
+		{
+			for(OBJECT_NAME name : OBJECT_NAME.values())
+			{
+				if(name.getValue().equalsIgnoreCase(value))
+				{
+					return name;
+				}
+			}
+			return null;
 		}
 	}
 

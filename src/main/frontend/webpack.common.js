@@ -266,6 +266,9 @@ module.exports = {
 			'./src/common/modals/bookAppointmentModal/bookAppointmentModalComponent.js',
 			'./src/common/modals/appointmentQueueModal/components/availabilitySettings/availabilitySettingsComponent.js',
 
+			'./src/common/store/module.js',
+			'./src/common/store/securityRoles.store.ts',
+
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
 			'./src/layout/primaryNavComponent.js',

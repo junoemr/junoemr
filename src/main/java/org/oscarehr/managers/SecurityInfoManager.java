@@ -28,12 +28,14 @@ import com.quatro.dao.security.SecuserroleDao;
 import com.quatro.model.security.Secobjprivilege;
 import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.OscarRoleObjectPrivilege;
@@ -53,6 +55,7 @@ public class SecurityInfoManager
 	public static final String UPDATE = "u";
 	public static final String DELETE = "d";
 	public static final String NO_RIGHTS = "o";
+	public static final String ALL = "x";
 
 	public enum PRIVILEGE_LEVEL
 	{
@@ -72,6 +75,27 @@ public class SecurityInfoManager
 		public String asString()
 		{
 			return this.level;
+		}
+
+		public static PRIVILEGE_LEVEL fromStringIgnoreCase(String enumString)
+		{
+			if(EnumUtils.isValidEnumIgnoreCase(PRIVILEGE_LEVEL.class, enumString))
+			{
+				return PRIVILEGE_LEVEL.valueOf(enumString.toUpperCase());
+			}
+			return null;
+		}
+
+		public static PRIVILEGE_LEVEL fromValueString(String value)
+		{
+			for(PRIVILEGE_LEVEL level : PRIVILEGE_LEVEL.values())
+			{
+				if(level.asString().equalsIgnoreCase(value))
+				{
+					return level;
+				}
+			}
+			return null;
 		}
 	}
 
@@ -108,6 +132,43 @@ public class SecurityInfoManager
 		List<Secobjprivilege> results = secobjprivilegeDao.getByRoles(roleNames);
 
 		return results;
+	}
+
+	public UserSecurityRolesTransfer getUserSecurityRolesTransfer(String providerNo)
+	{
+		UserSecurityRolesTransfer transfer = new UserSecurityRolesTransfer();
+		List<String> roleNames = new ArrayList<>();
+		for(Secuserrole role : getRoles(providerNo))
+		{
+			roleNames.add(role.getRoleName());
+		}
+		//TODO refactor dao use to jpa dao
+		List<Secobjprivilege> privilegeObjects = secobjprivilegeDao.getByRoles(roleNames);
+
+		for(Secobjprivilege secobjprivilege : privilegeObjects)
+		{
+			transfer.addPrivilege(
+					SecObjectName.OBJECT_NAME.fromValueString(secobjprivilege.getObjectname_code()),
+					getPrivilegeLevels(secobjprivilege)
+			);
+		}
+
+		transfer.setRoles(roleNames);
+		return transfer;
+	}
+
+	private List<PRIVILEGE_LEVEL> getPrivilegeLevels(Secobjprivilege secobjprivilege)
+	{
+		List<PRIVILEGE_LEVEL> privilegeList = new ArrayList<>(4);
+		switch(secobjprivilege.getPrivilege_code())
+		{
+			case ALL: privilegeList.add(PRIVILEGE_LEVEL.DELETE);
+			case WRITE: privilegeList.add(PRIVILEGE_LEVEL.WRITE);
+			case UPDATE: privilegeList.add(PRIVILEGE_LEVEL.UPDATE);
+			case READ: privilegeList.add(PRIVILEGE_LEVEL.READ); break;
+			case DELETE: privilegeList.add(PRIVILEGE_LEVEL.DELETE); break;
+		}
+		return privilegeList;
 	}
 	
 	/**

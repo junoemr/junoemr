@@ -406,6 +406,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ResourceService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RSSFeedService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ScheduleService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.SecurityRolesWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SitesService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SpecialistsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.StatusService"/>
