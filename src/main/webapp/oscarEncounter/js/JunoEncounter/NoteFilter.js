@@ -103,6 +103,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 		this.pageState.filteredProviders = [];
 		this.pageState.filteredRoles = [];
 		this.pageState.filteredIssues = [];
+		this.pageState.notesOffset = 0;
 
 		var me = this;
 		junoJQuery("input[name=filter_providers]:checked").each(function(index, object)
