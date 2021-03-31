@@ -1028,18 +1028,18 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"OR (cm_filter.update_date = cm.update_date AND cm_filter.note_id > cm.note_id)\n" +
 				")\n" +
 			"LEFT JOIN (\n" +
-				"SELECT note.note_id,\n" +
-					"SUM(i.code IN\n" +
-					"('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors', 'OcularMedication', 'TicklerNote')\n" +
-				") > 0 AS is_cpp_note\n" +
+				"SELECT note.note_id\n" +
 				"FROM casemgmt_note note\n" +
 				"JOIN casemgmt_issue_notes cinotes on note.note_id = cinotes.note_id\n" +
 				"JOIN casemgmt_issue ci on cinotes.id = ci.id\n" +
 				"JOIN issue i ON ci.issue_id = i.issue_id\n" +
 				"WHERE note.demographic_no = :demographicNo\n" +
 				"GROUP BY note.note_id\n" +
-			")\n" +
-			"AS cpp_note ON cpp_note.note_id = cm.note_id\n" +
+				"HAVING SUM(COALESCE(i.code IN\n" +
+				"('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors', 'OcularMedication', 'TicklerNote')\n" +
+				", 0)) > 0\n" +
+				")\n" +
+			"AS is_cpp_note ON is_cpp_note.note_id = cm.note_id\n" +
 			"LEFT JOIN casemgmt_note_ext cme " +
 				"ON cm.note_id = cme.note_id " +
 				"AND cme.key_val = 'Hide Cpp' " +
@@ -1050,12 +1050,12 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		if (isCPPNote)
 		{
 			queryString +=
-				"AND cpp_note.is_cpp_note IS NOT NULL\n";
+				"AND is_cpp_note.note_id IS NOT NULL\n";
 		}
 		else
 		{
 			queryString +=
-				"AND cpp_note.is_cpp_note IS NULL\n";
+				"AND is_cpp_note.note_id IS NULL\n";
 		}
 
 		queryString +=
