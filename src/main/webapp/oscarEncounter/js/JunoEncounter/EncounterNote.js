@@ -59,7 +59,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			let endTime = new Date();
 			let timeStr = timer.val();
 
-			if (timeStr.split(":").length < 3) {
+			if (timeStr.split(":").length < 3)
+			{
 				timeStr = "00:" + timeStr;
 			}
 
