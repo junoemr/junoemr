@@ -53,6 +53,30 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	};
 
+	this.putEncounterTimeInNote = function putEncounterTimeInNote()
+	{
+		var timer = jQuery("#encounter_timer");
+		if (timer.length)
+		{
+			let endTime = new Date();
+			let timeStr = timer.val();
+
+			if (timeStr.split(":").length < 3)
+			{
+				timeStr = "00:" + timeStr;
+			}
+
+			var noteTxt = "Start time: " + encounterTimer.startTime.getHours()
+				+ ":" + ("0" + encounterTimer.startTime.getMinutes()).slice(-2)
+				+ "\n" +
+				"End time: " + endTime.getHours() + ":" + ("0"
+					+ endTime.getMinutes()).slice(-2) + "\n" +
+				"Duration: " + timeStr + "\n";
+
+			this.pasteToEncounterNote(noteTxt);
+		}
+	};
+
 	this.updateNoteInPageState = function updateNoteInPageState(noteData, assignedIssueArray)
 	{
 		pageState.currentNoteData = junoJQuery.extend(true, {}, noteData);
