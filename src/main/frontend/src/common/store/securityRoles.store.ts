@@ -25,7 +25,9 @@
 
  */
 
-import {SecurityRolesApi} from "../../../generated";
+import {SecurityObjectsTransfer, SecurityRolesApi, UserSecurityRolesTransfer} from "../../../generated";
+import PrivilegesEnum = UserSecurityRolesTransfer.PrivilegesEnum;
+import AccessObjectsEnum = SecurityObjectsTransfer.AccessObjectsEnum;
 
 angular.module("Common.Services").service("securityRolesStore", [
 	'$http',
@@ -41,7 +43,7 @@ angular.module("Common.Services").service("securityRolesStore", [
 		const service = this;
 		service.securtyRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
-		service.rolesData = null;
+		service.rolesData = <UserSecurityRolesTransfer> null;
 
 		service.loadUserRoles = (): void =>
 		{
@@ -59,7 +61,7 @@ angular.module("Common.Services").service("securityRolesStore", [
 		 * @param access - the access required
 		 * @param requiredPrivileges - the privilege levels required
 		 */
-		service.hasSecurityPrivileges = (access: string, ...requiredPrivileges: string[]): boolean =>
+		service.hasSecurityPrivileges = (access: AccessObjectsEnum, ...requiredPrivileges: PrivilegesEnum[]): boolean =>
 		{
 			if (service.rolesData)
 			{
@@ -84,7 +86,7 @@ angular.module("Common.Services").service("securityRolesStore", [
 		 * @param access - the access required
 		 * @param requiredPrivileges - the privilege levels required
 		 */
-		$rootScope.hasSecurityPrivileges = (access: string, ...requiredPrivileges: string[]): boolean =>
+		$rootScope.hasSecurityPrivileges = (access: AccessObjectsEnum, ...requiredPrivileges: PrivilegesEnum[]): boolean =>
 		{
 			return service.hasSecurityPrivileges(access, ...requiredPrivileges);
 		}

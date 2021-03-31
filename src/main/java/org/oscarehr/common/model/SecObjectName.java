@@ -26,8 +26,6 @@
 package org.oscarehr.common.model;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
