@@ -1463,10 +1463,11 @@ public class RxUtil {
 		String[] instructions = new RxCodesData().getSpecialInstructions();
 		Arrays.stream(instructions).forEach(inst -> specialInstructions.add(inst));
 		
+		regionalIds.remove(null);
+		
 		if (regionalIds != null && !regionalIds.isEmpty())
 		{
 			DrugDao drugDao = SpringUtils.getBean(DrugDao.class);
-			regionalIds.remove(null);
 			List<String> pastInstructionsFromRx = drugDao.findSpecialInstructionsByRegionalId(regionalIds);
 			specialInstructions.addAll(pastInstructionsFromRx);
 		}
