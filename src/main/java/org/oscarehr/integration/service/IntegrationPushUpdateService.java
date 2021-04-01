@@ -91,7 +91,7 @@ public class IntegrationPushUpdateService
 		pushUpdate.setIntegrationType(INTEGRATION_TYPE_MHA);
 		pushUpdate.setIntegrationId(integration.getId());
 		pushUpdate.setUpdateType(IntegrationPushUpdate.UPDATE_TYPE.APPOINTMENT_CACHE);
-		pushUpdate.setStatusQueued();
+		pushUpdate.setStatus(IntegrationPushUpdate.PUSH_STATUS.QUEUED);
 		pushUpdate.setJsonData(jsonData);
 		pushUpdate.setTargetId(appointment.getId());
 
@@ -112,7 +112,7 @@ public class IntegrationPushUpdateService
 		pushUpdate.setIntegrationType(INTEGRATION_TYPE_MHA);
 		pushUpdate.setSecurityNo(securityNo);
 		pushUpdate.setUpdateType(IntegrationPushUpdate.UPDATE_TYPE.PATIENT_CONNECTION);
-		pushUpdate.setStatusQueued();
+		pushUpdate.setStatus(IntegrationPushUpdate.PUSH_STATUS.QUEUED);
 		pushUpdate.setJsonData(mapper.writeValueAsString(patientConnectionTo1));
 		pushUpdate.setTargetId(demographicId.toString());
 
@@ -154,7 +154,7 @@ public class IntegrationPushUpdateService
 				{
 					sendQueuedUpdate(mapper, update);
 
-					update.setStatusSent();
+					update.setStatus(IntegrationPushUpdate.PUSH_STATUS.SENT);
 					update.setSentAt(new Date());
 				}
 				catch(Exception e)
@@ -168,7 +168,7 @@ public class IntegrationPushUpdateService
 					// +1 to account for increment that is not added yet
 					if(update.getSendCount() + 1 >= MAX_SEND_ATTEMPTS)
 					{
-						update.setStatusError();
+						update.recordError(e);
 					}
 				}
 				finally

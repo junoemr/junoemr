@@ -99,8 +99,6 @@
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="oscar.appt.ApptData" %>
 <%@ page import="oscar.appt.ApptUtil" %>
-<%@ page import="oscar.appt.status.service.AppointmentStatusMgr" %>
-<%@ page import="oscar.appt.status.service.impl.AppointmentStatusMgrImpl" %>
 <%@ page import="oscar.oscarBilling.ca.on.data.BillingDataHlp" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData" %>
 <%@page import="oscar.oscarEncounter.data.EctFormData" %>
@@ -158,8 +156,8 @@
 
 	boolean appointmentReminderEnabled = pros.isPropertyActive("appointment_reminder_enabled");
 
-	AppointmentStatusMgr apptStatusMgr = new AppointmentStatusMgrImpl();
-	List allStatus = apptStatusMgr.getAllActiveStatus();
+    AppointmentStatusService appointmentStatusService = SpringUtils.getBean(AppointmentStatusService.class);
+    List<AppointmentStatus> allStatus = appointmentStatusService.getActiveAppointmentStatuses();
 
 	Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 
@@ -168,10 +166,11 @@
 	boolean caisiEnabled = moduleNames != null && org.apache.commons.lang.StringUtils.containsIgnoreCase(moduleNames, "Caisi");
 	boolean locationEnabled = caisiEnabled && (useProgramLocation != null && useProgramLocation.equals("true"));
 %>
-<%@page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.oscarehr.common.IsPropertiesOn" %>
+<%@ page import="org.oscarehr.appointment.service.AppointmentStatusService" %>
 <html:html locale="true">
 	<head>
 		<% if (isMobileOptimized)
@@ -781,7 +780,10 @@
 							<INPUT TYPE="TEXT" NAME="keyword"
 								   tabindex="1"
 								   VALUE="<%=bFirstDisp?nameSb.toString():request.getParameter("name")%>"
-								   width="25">
+								   width="25"
+                                   <%= appt.getIsVirtual() ? "disabled='disabled'" : "" %>
+                                   <%= appt.getIsVirtual() ? "title=\"Demographics can't be changed for virtual appointments\"" : "" %>
+                            >
 						</div>
 						<div class="space">&nbsp;</div>
 						<div class="label">
@@ -802,7 +804,10 @@
 							<!--input type="hidden" name="displaymode" value="Search " -->
 							<input type="submit" style="width:auto;"
 								   onclick="document.forms['EDITAPPT'].displaymode.value='Search '"
-								   value="<bean:message key="appointment.editappointment.btnSearch"/>">
+								   value="<bean:message key="appointment.editappointment.btnSearch"/>"
+                                   <%= appt.getIsVirtual() ? "disabled='disabled'" : ""%>
+                                   <%= appt.getIsVirtual() ? "title=\"Demographics can't be changed for virtual appointments\"" : "" %>
+                            >
 						</div>
 						<div class="input">
 							<input type="TEXT"

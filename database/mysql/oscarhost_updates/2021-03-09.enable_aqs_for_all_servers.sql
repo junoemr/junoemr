@@ -1,0 +1,1 @@
+INSERT IGNORE INTO property (name, value, provider_no) VALUES ('aqs_enabled', 'true', -1);

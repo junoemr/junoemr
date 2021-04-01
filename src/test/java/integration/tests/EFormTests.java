@@ -50,17 +50,14 @@ public class EFormTests extends SeleniumTestBase
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic("Test", "Test", "F");
+		DatabaseUtil.createTestDemographic();
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
 	}
 
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
-		SchemaUtils.restoreTable("admission", "demographic",
-				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
-				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
-				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform", "eform_values");
+		SchemaUtils.restoreTable("casemgmt_note", "eChart", "eform", "eform_data", "eform_instance", "eform_values", "measurementType", "validations");
 	}
 
 	@Test

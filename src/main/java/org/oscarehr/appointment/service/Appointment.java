@@ -42,8 +42,10 @@ import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.site.service.SiteService;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,8 +94,12 @@ public class Appointment
 
 	@Autowired
 	private LookupListManager lookupListManager;
+
 	@Autowired
 	private LookupListItemDao lookupListItemDao;
+
+	@Autowired
+	SiteService siteService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -238,12 +244,44 @@ public class Appointment
 	}
 
 	/**
+	 * just like updateAppointment but takes a transfer object instead.
+	 * @param calendarAppointment - the transfer object that represents the appointment.
+	 * @param loggedInInfo - logged in info
+	 * @param request - http request
+	 * @return updated appointment
+	 */
+	public org.oscarehr.common.model.Appointment updateAppointment(CalendarAppointment calendarAppointment,
+			LoggedInInfo loggedInInfo, HttpServletRequest request)
+	{
+		AppointmentConverter converter = new AppointmentConverter();
+		org.oscarehr.common.model.Appointment appointment = converter.getAsDomainObject(calendarAppointment);
+
+		// if appointment is confirmed make sure not to overwrite confirmation values.
+		if (calendarAppointment.getAppointmentNo() != null && calendarAppointment.isConfirmed())
+		{
+			org.oscarehr.common.model.Appointment existingAppointment = oscarAppointmentDao.find(calendarAppointment.getAppointmentNo());
+
+			// only preserve the confirmation values if the start / end time of the appointment has not changed.
+			if (existingAppointment.getStartTimeAsFullDate().equals(appointment.getStartTimeAsFullDate()) &&
+					existingAppointment.getEndTimeAsFullDate().equals(appointment.getEndTimeAsFullDate()))
+			{
+				existingAppointment.getConfirmedAt().ifPresent(appointment::setConfirmedAt);
+				existingAppointment.getConfirmedBy().ifPresent(appointment::setConfirmedBy);
+				existingAppointment.getConfirmedByType().ifPresent(appointment::setConfirmedByType);
+			}
+		}
+
+		return updateAppointment(appointment, loggedInInfo, request);
+	}
+
+	/**
 	 * update appointment. notifying MHA of update if applicable.
 	 * @param appointment - appointment to update
 	 */
-	public void updateAppointment(org.oscarehr.common.model.Appointment appointment,
+	public org.oscarehr.common.model.Appointment updateAppointment(org.oscarehr.common.model.Appointment appointment,
 																LoggedInInfo loggedInInfo, HttpServletRequest request)
 	{
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.merge(appointment);
 
 		if (appointment.getIsVirtual())
@@ -258,6 +296,8 @@ public class Appointment
 						LogConst.STATUS_SUCCESS,
 						String.valueOf(appointment.getId()),
 						request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	public List<CalendarEvent> getCalendarEvents(HttpSession session,

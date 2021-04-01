@@ -48,7 +48,9 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String providerNo;
+	private static final int TYPE_SENT = 1;
+	private static final int TYPE_DELETED = 2;
+
 	private Vector<String> messageid;
 	private Vector<String> messagePosition;
 	private Vector<String> status;
@@ -134,22 +136,10 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * @return Vector, Contains the messageids for use on the DisplayMessage.jsp
 	 */
 	public Vector<String> getMessageid() {
-		getMessageIDs();
+		// this looks like it's not used
+		getMessageIDs(null);
 		getInfo();
 
-		return this.messageid;
-	}
-
-	public Vector<String> getDelMessageid() {
-		getDeletedMessageIDs();
-		getInfo();
-		estDeletedInbox();
-		return this.messageid;
-	}
-
-	public Vector<String> getSentMessageid() {
-		getSentMessageIDs();
-		estSentItemsInbox();
 		return this.messageid;
 	}
 
@@ -168,7 +158,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getStatus() {
 		if (status == null) {
-			getMessageIDs();
+			// this looks like it's not used
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.status;
@@ -185,7 +176,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getDate() {
 		if (date == null) {
-			getMessageIDs();
+			// this looks like it's not used
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.date;
@@ -206,7 +198,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getSentby() {
 		if (sentby == null) {
-			getMessageIDs();
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.sentby;
@@ -227,43 +219,25 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 */
 	public Vector<String> getSubject() {
 		if (subject == null) {
-			getMessageIDs();
+			// this looks like it's not used
+			getMessageIDs(null);
 			getInfo();
 		}
 		return this.subject;
 	}
 
 	/**
-	 * Used to set the providerNo that will determine what this bean will fill itself with
-	 * @param providerNo String, provider No
-	 */
-	public void setProviderNo(String providerNo) {
-
-		this.providerNo = providerNo;
-	}
-
-	/**
-	 * gets the current provider No
-	 * @return the provider no
-	 */
-	public String getProviderNo() {
-		return this.providerNo;
-	}
-
-	/**
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getMessageIDs() {
-		String providerNo = this.getProviderNo();
-
+	void getMessageIDs(String providerNo) {
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		messagePosition = new Vector<String>();
 		int index = 0;
 
-		MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
-		for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
+		for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 			messagePosition.add(Integer.toString(index));
 			messageid.add("" + ml.getMessage());
 			status.add(ml.getStatus());
@@ -300,8 +274,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		return orderBy;
 	}
 
-	public Vector<MsgDisplayMessage> estInbox(String orderby, int page) {
-		String providerNo = this.getProviderNo();
+	public Vector<MsgDisplayMessage> estInbox(String orderby, int page, String providerNo) {
 		Vector<MsgDisplayMessage> msg = new Vector<MsgDisplayMessage>();
 
 		String[] searchCols = { "msgTbl.thesubject", "msgTbl.themessage", "msgTbl.sentby", "msgTbl.sentto" };
@@ -375,9 +348,6 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		return msg;
 	}
 
-	public Vector<MsgDisplayMessage> estDemographicInbox() {
-		return estDemographicInbox(null, null);
-	}
 
 	//INBOX
 	public Vector<MsgDisplayMessage> estDemographicInbox(String orderby, String demographic_no) {
@@ -399,10 +369,9 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 					"ON map.messageID = msgTbl.messageid " +
 					"LEFT JOIN demographic demo " +
 					"ON map.demographic_no = demo.demographic_no " +
-					"WHERE msgList.status != 'del' AND remoteLocation = '" + getCurrentLocationId() + "' " +
+					"WHERE remoteLocation = '" + getCurrentLocationId() + "' " +
 					"AND map.demographic_no = '" + demographic_no + "' " +
 					getSQLSearchFilter(searchCols) + " ORDER BY " + getOrderBy(orderby);
-
 			FormsDao dao = SpringUtils.getBean(FormsDao.class);
 			List<Object[]> os = dao.runNativeQuery(sql);
 			for (Object[] o : os) {
@@ -458,22 +427,23 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		return msg;
 	}
 
-	public Vector<MsgDisplayMessage> estDeletedInbox() {
-		return estDeletedInbox(null, 1);
-	}
-
-	public int getTotalMessages(int type){
-		String providerNo = this.getProviderNo();
+	public int getTotalMessages(int type, String providerNo)
+	{
 		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
-
-		int total = messageListDao.messagesTotal(type, providerNo, Integer.parseInt(getCurrentLocationId()), filter);
-
-		return total;
+		Integer location = Integer.parseInt(getCurrentLocationId());
+		switch(type)
+		{
+			case TYPE_SENT:
+				return messageListDao.getTotalMessagesSent(providerNo, location, filter);
+			case TYPE_DELETED:
+				return messageListDao.getTotalMessagesDeleted(providerNo, location, filter);
+			default:
+				return messageListDao.getTotalMessages(providerNo, location, filter);
+		}
 	}
 
-	public Vector<MsgDisplayMessage> estDeletedInbox(String orderby, int page) {
+	public Vector<MsgDisplayMessage> estDeletedInbox(String orderby, int page, String providerNo) {
 
-		String providerNo = this.getProviderNo();
 		Vector<MsgDisplayMessage> msg = new Vector<MsgDisplayMessage>();
 		String[] searchCols = { "msgTbl.thesubject", "msgTbl.themessage", "msgTbl.sentby", "msgTbl.sentto" };
 
@@ -551,13 +521,12 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getDeletedMessageIDs() {
-		String providerNo = this.getProviderNo();
+	void getDeletedMessageIDs(String providerNo) {
+		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
 		messageid = new Vector<String>();
 		status = new Vector<String>();
 		try {
-			MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
-			for (MessageList ml : dao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
+			for (MessageList ml : messageListDao.findByProviderNoAndLocationNo(providerNo, ConversionUtils.fromIntString(getCurrentLocationId()))) {
 				messageid.add("" + ml.getMessage());
 				status.add("deleted");
 			}
@@ -570,8 +539,7 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 	 * This method uses the ProviderNo and searches for messages for this providerNo
 	 * in the messagelisttbl
 	 */
-	void getSentMessageIDs() {
-		String providerNo = this.getProviderNo();
+	void getSentMessageIDs(String providerNo) {
 
 		messageid = new Vector<String>();
 		status = new Vector<String>();
@@ -592,13 +560,8 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		}
 	}
 
-	public Vector<MsgDisplayMessage> estSentItemsInbox() {
-		return estSentItemsInbox(null, 1);
-	}
+	public Vector<MsgDisplayMessage> estSentItemsInbox(String orderby, int page, String providerNo) {
 
-	public Vector<MsgDisplayMessage> estSentItemsInbox(String orderby, int page) {
-
-		String providerNo = this.getProviderNo();
 		Vector<MsgDisplayMessage> msg = new Vector<MsgDisplayMessage>();
 		String[] searchCols = { "msgTbl.thesubject", "msgTbl.themessage", "msgTbl.sentby", "msgTbl.sentto" };
 
@@ -624,8 +587,6 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 					"ON map.demographic_no = demo.demographic_no " +
 					"WHERE sentbyNo = '" + providerNo + "' AND sentByLocation = '" + getCurrentLocationId() + "'" +
 					getSQLSearchFilter(searchCols) + " ORDER BY " + getOrderBy(orderby) + limitSql;
-
-			MiscUtils.getLogger().error("QUERY STRING (SENT): " + sql);
 
 			FormsDao dao = SpringUtils.getBean(FormsDao.class);
 			for (Object[] o : dao.runNativeQuery(sql)) {

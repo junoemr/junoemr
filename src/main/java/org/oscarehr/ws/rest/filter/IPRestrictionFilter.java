@@ -22,6 +22,7 @@
  */
 package org.oscarehr.ws.rest.filter;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -45,9 +46,14 @@ import java.util.Set;
 @Priority(Priorities.AUTHENTICATION)
 public class IPRestrictionFilter implements ContainerRequestFilter
 {
+	public static final String X_FORWARDED_FOR_HEADER_NAME = "X-FORWARDED-FOR";
+	private static final String IP_SEPARATOR = ",";
+
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final boolean enabled = props.isPropertyActive("web_service_allowed_ips.enabled");
+	private static final boolean hasProxy = props.isPropertyActive("web_service_allowed_ips.has_proxy");
+	private static final String localIpPrefix = props.getProperty("web_service_allowed_ips.local_ip_prefix");
 	private static final String allowedIPs = props.getProperty("web_service_allowed_ips");
 	private static final String systemAllowedIPs = props.getProperty("web_service_allowed_system_ips");
 	private static final String localhost = "127.0.0.1";
@@ -73,21 +79,89 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 	public void filter(ContainerRequestContext request)
 	{
 		String requestIp = httpRequest.getRemoteAddr();
-		if(isIpBlocked(requestIp))
+		String xForwardedForValue = httpRequest.getHeader(IPRestrictionFilter.X_FORWARDED_FOR_HEADER_NAME);
+
+		if(isIpBlocked(requestIp, xForwardedForValue))
 		{
 			//don't log the request. This filter may execute before the rate limiting filter
 			request.setProperty(LoggingFilter.PROP_SKIP_LOGGING, true);
-			logger.warn("Request from unauthorized IP blocked: " + requestIp);
-			throw new SecurityException("Unauthorized IP Address (" + requestIp + ")");
+
+			String logIp = getIpToFilter(requestIp, xForwardedForValue);
+			logger.warn("Request from unauthorized IP blocked: " + logIp);
+			throw new SecurityException("Unauthorized IP Address (" + logIp + ")");
 		}
 	}
 
-	public static boolean isIpBlocked(String requestIp)
+	public static boolean isIpBlocked(String requestIp, String xForwardedForValueIpCsv)
 	{
-		logger.debug("WHITELIST ENABLED: " + enabled);
+		logger.debug("WHITELIST ENABLED: " + IPRestrictionFilter.enabled);
+		logger.debug("USE PROXY: " + IPRestrictionFilter.hasProxy);
 		logger.debug("CHECK IP: " + requestIp);
-		logger.debug("IP WHITELIST SET: " + String.join(",", whitelistedIPs));
+		logger.debug("XFF IPs: " + xForwardedForValueIpCsv);
+		logger.debug("IP WHITELIST SET: " + String.join(",", IPRestrictionFilter.whitelistedIPs));
 
+		return isIpBlocked(
+				IPRestrictionFilter.enabled,
+				IPRestrictionFilter.hasProxy,
+				IPRestrictionFilter.localIpPrefix,
+				IPRestrictionFilter.whitelistedIPs,
+				requestIp,
+				xForwardedForValueIpCsv
+		);
+	}
+
+	public static String getIpToFilter(String requestIp, String xForwardedForValueIpCsv)
+	{
+		if(hasProxy)
+		{
+			// If a proxy is used, take the last ip from the list and ensure the request IP is local
+			return getMostRecentIpFromCsv(xForwardedForValueIpCsv);
+		}
+
+		return requestIp;
+	}
+
+	public static boolean isIpBlocked(
+			boolean enabled,
+			boolean hasProxy,
+			String localIpPrefix,
+			Set<String> whitelistedIPs,
+			String requestIp,
+			String xForwardedForValueIpCsv
+	)
+	{
+		if(hasProxy)
+		{
+			// If a proxy is used, take the last ip from the list and ensure the request IP is local
+			String mostRecentIp = getMostRecentIpFromCsv(xForwardedForValueIpCsv);
+			return (!isRequestIpLocal(localIpPrefix, requestIp) || isIpBlocked(enabled, whitelistedIPs, mostRecentIp));
+		}
+
+		return isIpBlocked(enabled, whitelistedIPs, requestIp);
+	}
+
+	private static boolean isRequestIpLocal(String localIpPrefix, String requestIp)
+	{
+		return (requestIp != null && requestIp.startsWith(localIpPrefix));
+	}
+
+	private static String getMostRecentIpFromCsv(String ipCsv)
+	{
+		if(ipCsv == null)
+		{
+			return null;
+		}
+
+		if(ipCsv.lastIndexOf(IP_SEPARATOR) == -1)
+		{
+			return ipCsv.trim();
+		}
+
+		return StringUtils.substringAfterLast(ipCsv, IP_SEPARATOR).trim();
+	}
+
+	private static boolean isIpBlocked(boolean enabled, Set<String> whitelistedIPs, String requestIp)
+	{
 		return (enabled && !localhost.equals(requestIp) && !whitelistedIPs.contains(requestIp));
 	}
 }

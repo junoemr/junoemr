@@ -37,6 +37,7 @@
 	var defaultDiv;
 	var changeIssueFunc;
 	var addIssueFunc;
+	var maxNcId;
 
 	var X = 10;
 	var small = 60;
@@ -58,6 +59,8 @@
 	var reloadDivUrl;
 	var reloadDiv;
 	var eChartUUID = "<%=UUID.randomUUID().toString()%>";
+
+	var oldNoteIds = "";
 
 	// load echart uuid if possible from local storage. If not found
 	// save new uuid to storage.
@@ -1514,41 +1517,30 @@
 
 		var sig = 'sig' + nId;
 
-		//check if case note has been changed
-		//if so, warn user that changes will be lost if not saved
+        // Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
+        if ((typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() != "undefined") &&
+            (typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() != "undefined"))
+        {
+            if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val().trim().length == 0 ||
+                jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val().trim().length == 0)
+            {
+                // For weird cases where the role id or program number is missing.
+                _missingRoleProgramIdError();
+                return false;
+            } else if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() == "-2" ||
+                jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() == "-2")
+            {
+                // For the case where you're trying to save a note with no available programs or roles
+                _noVisibleProgramsError();
+                return false;
+            }
+        }
 
-		if (origCaseNote != $F(id) || origObservationDate != $("observationDate").value)
-		{
-			if (!confirm(unsavedNoteWarning))
-				return false;
-			else
-			{
-				// Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
-				if ((typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() != "undefined") &&
-					(typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() != "undefined"))
-				{
-					if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val().trim().length == 0 ||
-						jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val().trim().length == 0)
-					{
-						// For weird cases where the role id or program number is missing.
-						_missingRoleProgramIdError();
-						return false;
-					}
-					else if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() == "-2" ||
-						jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() == "-2")
-					{
-						// For the case where you're trying to save a note with no available programs or roles
-						_noVisibleProgramsError();
-						return false;
-					}
-				}
-			}
-			saving = true;
-			if (ajaxSaveNote(sig, nId, tmp) == false)
-			{
-				return false;
-			}
-		}
+        saving = true;
+        if (ajaxSaveNote(sig, nId, tmp) == false)
+        {
+            return false;
+        }
 
 		//cancel updating of issues
 		//IE destroys innerHTML of sig div when calling ajax update
@@ -3671,13 +3663,20 @@
 
 	}
 
+	function dateRangeFilled()
+	{
+		var sdate = $F("printStartDate");
+		var edate = $F("printEndDate");
+		return !(sdate.length === 0 || edate.length === 0 );
+	}
+
 	var printDateMsg;
 	var printDateOrderMsg;
 	function printDateRange()
 	{
 		var sdate = $F("printStartDate");
 		var edate = $F("printEndDate");
-		if (sdate.length == 0 || edate.length == 0)
+		if (sdate.length === 0 || edate.length === 0)
 		{
 			alert(printDateMsg);
 			return false;
@@ -3705,6 +3704,15 @@
 		var msnote;
 		var pos;
 		var imgId;
+
+		if (!$("maxId"))
+		{
+		    maxNcId = 0;
+		}
+		else
+		{
+            maxNcId = parseInt($("maxId").value);
+		}
 
 		for (idx = 1; idx <= maxNcId; ++idx)
 		{
@@ -3766,7 +3774,17 @@
 	var nothing2PrintMsg;
 	function printNotes()
 	{
-		if ($("printopDates").checked && !printDateRange())
+		if ($("printopSelected").checked)
+		{
+			// check if date range is filled
+			// ask if they're ok with this
+			if (dateRangeFilled())
+			{
+				alert("Clear date range before attempting printing.");
+				return false;
+			}
+		}
+		else if ($("printopDates").checked && !printDateRange())
 		{
 			return false;
 		}
@@ -3781,7 +3799,6 @@
 			return false;
 		}
 
-		var url = ctx + "/CaseManagementEntry.do";
 		var frm = document.forms["caseManagementEntryForm"];
 
 		frm.method.value = "print";
@@ -3789,6 +3806,11 @@
 		frm.pStartDate.value = $F("printStartDate");
 		frm.pEndDate.value = $F("printEndDate");
 		frm.submit();
+
+		if ($("printopAll").checked)
+		{
+			unsetPrintAll();
+		}
 
 		return false;
 	}
@@ -3854,6 +3876,14 @@
 		var notesDiv;
 		var pos;
 		var imgId;
+        if (!$("maxId"))
+        {
+            maxNcId = 0;
+        }
+        else
+        {
+            maxNcId = parseInt($("maxId").value);
+        }
 
 		Event.stop(e);
 
@@ -3886,31 +3916,22 @@
 
 	}
 
+	// Take out magic string and replace it with whatever we had recorded before for printing
+	// This is entirely for handling the case where we want to reprint from the page
+	function unsetPrintAll()
+	{
+		if ($("notes2print").value === "ALL_NOTES")
+		{
+			$("notes2print").value = oldNoteIds;
+		}
+	}
+
+	// Take whatever we had recorded before for printing and replace it with magic string
+	// Keep reference to value for whenever user shifts away from printing all notes
 	function printAll()
 	{
-		var idx;
-		var noteId;
-		var notesDiv;
-		var pos;
-
+		oldNoteIds = $("notes2print").value;
 		$("notes2print").value = "ALL_NOTES";
-
-		/*
-		//cycle through container divs for each note
-		for( idx = 1; idx <= maxNcId; ++idx ) {
-
-			if( $("nc" + idx) == null ) continue;
-
-			notesDiv = $("nc" + idx).down('div');
-			noteId = notesDiv.id.substr(1);  //get note id
-		  //if print img present, add note to print queue if not already there
-			if( $("print"+noteId) != null ) {
-				pos = noteIsQeued(noteId);
-				if( pos == -1 )
-					addPrintQueue(noteId);
-			}
-		}
-		*/
 	}
 
 	var editUnsignedMsg;

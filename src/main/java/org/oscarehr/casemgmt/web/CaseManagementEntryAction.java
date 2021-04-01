@@ -248,19 +248,8 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		logger.debug("NoteId " + nId);
 
-		String maxTmpSave = oscar.OscarProperties.getInstance().getProperty("maxTmpSave", "");
-		logger.debug("maxTmpSave " + maxTmpSave);
-		// set date 2 weeks in past so we retrieve more recent saved notes
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DAY_OF_MONTH, -14);
-		Date twoWeeksAgo = cal.getTime();
-		logger.debug("Get tmp note");
-		CaseManagementTmpSave tmpsavenote;
-		if (maxTmpSave.equalsIgnoreCase("off")) {
-			tmpsavenote = this.caseManagementMgr.restoreTmpSave(providerNo, demono, programIdString);
-		} else {
-			tmpsavenote = this.caseManagementMgr.restoreTmpSave(providerNo, demono, programIdString, twoWeeksAgo);
-		}
+		CaseManagementTmpSave tmpsavenote = this.caseManagementMgr.restoreTmpSave(providerNo, demono, programIdString);
+
 		current = System.currentTimeMillis();
 		logger.debug("Get tmp note " + String.valueOf(current - start));
 		start = current;
@@ -2733,9 +2722,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 	}
 
 	public ActionForward print(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.hh.mm.ss");
-		Date now = new Date();
-		String headerDate = headerFormat.format(now);
+		String headerDate = ConversionUtils.toDateString(new Date(), ConversionUtils.DATE_TIME_FILENAME);
 
 		response.setContentType("application/pdf"); // octet-stream
 		response.setHeader("Content-Disposition", "attachment; filename=\"Encounter-" + headerDate + ".pdf\"");
@@ -2793,7 +2780,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		boolean printLabs = request.getParameter("printLabs") != null && request.getParameter("printLabs").equalsIgnoreCase("true");
 
 		CaseManagementPrint cmp = new CaseManagementPrint();
-		cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs,cStartDate,cEndDate,request, response.getOutputStream());
+		cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs, null, cStartDate,cEndDate,request, response.getOutputStream());
 
 		return null;
 	}

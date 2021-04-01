@@ -129,6 +129,7 @@ boolean authed=true;
 	contentTypeMap.put(LogConst.CON_HL7_LAB, "Lab");
 	contentTypeMap.put(LogConst.CON_LOGIN, "Login");
 	contentTypeMap.put(LogConst.CON_MEDICATION, "Medication");
+	contentTypeMap.put(LogConst.CON_PHARMACY, "Pharmacy");
 	contentTypeMap.put(LogConst.CON_PRESCRIPTION, "Prescription");
 	contentTypeMap.put(LogConst.CON_SYSTEM, "System");
 

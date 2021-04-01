@@ -177,6 +177,15 @@
 <td align=right>
 	<span class="HelpAboutLogout">
 		<%
+            if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
+            {
+        %>
+                <script src="../integration/imdHealth/imdHealthUtils.js"></script>
+                <a style="font-size:10px;font-style:normal;"  href="javascript:void(0)" onclick="Juno.Integration.iMDHealth.openIMDHealth()">
+                    <b>Patient Education</b>
+                </a> |
+		<%
+            }
 			if (systemPreferenceService.isPreferenceEnabled(UserProperty.CARE_CONNECT_ENABLED, false))
 			{
 		%>

@@ -68,7 +68,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 					if ($state.current.name === 'ticklers')
 					{// only default to current day for serviceEndDate on the global tickler page.
-						controller.search.serviceEndDate = moment().startOf('day').toDate();
+						controller.search.serviceEndDate = moment().endOf('day').toDate();
 					}
 
 					providerService.getSettings().then(
@@ -148,7 +148,8 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 						count: 10,// initial count per page
 						sorting: {
 							ServiceDate: "desc"
-						}
+						},
+                        paginationMinBlocks: 2
 					},
 					{
 						// total: 0, // length of data

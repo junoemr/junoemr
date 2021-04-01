@@ -17,7 +17,13 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 --%>
-<%@ page import="java.util.*,org.oscarehr.common.model.*"%>
+<%@ page import="org.springframework.web.util.UriComponentsBuilder" %>
+<%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.util.regex.Matcher" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -43,91 +49,136 @@
 <oscar:customInterface section="apptStatusList"/>
 </head>
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
-<body>
-<%
-        String reseturl = request.getContextPath();
-        reseturl = reseturl + "/appointment/apptStatusSetting.do?dispatch=reset";
-    %>
-<table border=0 cellspacing=0 cellpadding=0 width="100%">
-	<tr bgcolor="#486ebd">
-		<th align="CENTER" NOWRAP><font face="Helvetica" color="#FFFFFF"><bean:message
-			key="admin.appt.status.mgr.title" /></font></th>
-		<th align="right" NOWRAP><font face="Helvetica" color="#CCCCCC"><a
-			href=<%=reseturl%>>reset</a></font></th>
-	</tr>
-</table>
-
-
-<table class="borderAll" width="100%">
-	<tr>
-		<th><bean:message key="admin.appt.status.mgr.label.status" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.desc" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.color" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.junoColor" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.enable" /></th>
-		<th><bean:message key="admin.appt.status.mgr.label.active" /></th>
-		<th>&nbsp;</th>
-	</tr>
-	<%
-            List apptsList = (List) request.getAttribute("allStatus");
-            AppointmentStatus apptStatus = null;
-            int iStatusID = 0;
-            String strStatus = "";
-            String strDesc = "";
-            String strColor = "";
-			String strJunoColor = "";
-            int iActive = 0;
-            int iEditable = 0;
-            for (int i = 0; i < apptsList.size(); i++) {
-                apptStatus = (AppointmentStatus) apptsList.get(i);
-                iStatusID = apptStatus.getId();
-                strStatus = apptStatus.getStatus();
-                strDesc = apptStatus.getDescription();
-	            strColor = apptStatus.getColor();
-	            strJunoColor = apptStatus.getJunoColor();
-                iActive = apptStatus.getActive();
-                iEditable = apptStatus.getEditable();
-%>
-	<tr class=<%=(i % 2 == 0) ? "even" : "odd"%>>
-		<td class="nowrap"><%=strStatus%></td>
-		<td class="nowrap"><%=strDesc%></td>
-		<td class="nowrap" bgcolor="<%=strColor%>"><%=strColor%></td>
-		<td class="nowrap" bgcolor="<%=strJunoColor%>"><%=strJunoColor%></td>
-		<td class="nowrap"><%=iActive%></td>
-		<td class="nowrap">
-		<%
-    String url = request.getContextPath();
-    url = url + "/appointment/apptStatusSetting.do?dispatch=modify&statusID=";
-    url = url + iStatusID;
-        %> <a href=<%=url%>>Edit</a> &nbsp;&nbsp;&nbsp; <%
-    int iToStatus = (iActive > 0) ? 0 : 1;
-    url = request.getContextPath();
-    url = url + "/appointment/apptStatusSetting.do?dispatch=changestatus&iActive=";
-    url = url + iToStatus;
-    url = url + "&statusID=";
-    url = url + iStatusID;
-    if (iEditable == 1) {
-        %> <a href=<%=url%>><%=(iActive > 0) ? "Disable" : "Enable"%></a>
-		<%
+<link rel="stylesheet" type="text/css" media="all" href="../css/font/junoIcons/stylesheet.css" />
+<style>
+    table {
+        width: 100%;
     }
-        %>
-		</td>
+
+    .margin-t {
+        margin-top: 32px;
+    }
+
+    .text-l {
+        text-align: left;
+        width: 10%;
+    }
+
+    .text-c {
+        text-align: center;
+    }
+
+    .wider {
+        width: 15%;
+    }
+
+    .preview {
+        max-height: 10px;
+        padding-left: 4px;
+    }
+
+    .active {
+        color: black;
+    }
+
+    .inactive {
+        color:  #808080;
+    }
+</style>
+<body>
+    <%
+        final String baseUrl = request.getContextPath() + "/appointment/apptStatusSetting.do";
+		final Provider provider = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider();
+		final boolean isSuperAdmin = provider.convertToProviderData().isSuperAdmin();
+
+        UriComponentsBuilder addUrl = UriComponentsBuilder.fromPath(baseUrl);
+        addUrl.queryParam("method", "create");
+    %>
+<table border=0 cellspacing=0 cellpadding=0>
+	<tr bgcolor="#486ebd">
+		<th align="CENTER" NOWRAP><font face="Helvetica" color="#FFFFFF">
+			<bean:message key="admin.appt.status.mgr.title" />
+		</font></th>
+	</tr>
+</table>
+
+<table class="borderAll margin-t">
+	<tr>
+        <th class="header text-l">Relative Position</th>
+		<th class="header text-l"><bean:message key="admin.appt.status.mgr.label.status" /></th>
+		<th class="header text-l wider"><bean:message key="admin.appt.status.mgr.label.desc" /></th>
+        <th class="header text-l">Classic UI</th>
+        <th class="header text-l">Juno UI</th>
+		<th class="header text-l">Enabled</th>
+		<% if (isSuperAdmin) { %>
+		<th class="header text-l wider" colspan=3>Super Admin Options</th>
+		<% } %>
 	</tr>
 	<%
+        List<AppointmentStatus> statuses = (List<AppointmentStatus>) request.getAttribute("appointmentStatuses");
+
+        Pattern junoClassRegex = Pattern.compile("(.+)\\.gif");
+
+        for (AppointmentStatus status : statuses)
+        {
+        	boolean isActive =  status.getActive() == 1;
+        	boolean isMovable = status.getEditable() == 1;
+
+            UriComponentsBuilder editUrl = UriComponentsBuilder.fromPath(baseUrl);
+            editUrl.queryParam("method", "modify");
+            editUrl.queryParam("statusId", status.getId());
+
+            UriComponentsBuilder upUrl = UriComponentsBuilder.fromPath(baseUrl);
+            upUrl.queryParam("method", "moveUp");
+            upUrl.queryParam("statusId", status.getId());
+
+            UriComponentsBuilder downUrl = UriComponentsBuilder.fromPath(baseUrl);
+            downUrl.queryParam("method", "moveDown");
+            downUrl.queryParam("statusId", status.getId());
+
+            String imgUrl = "../images/" + status.getIcon();
+            String junoIconClass = "";
+
+            Matcher matcher = junoClassRegex.matcher(status.getIcon());
+
+            if (matcher.find())
+            {
+            	junoIconClass = "icon-" + matcher.group(1);
             }
-%>
+    %>
+	<tr>
+        <td><%= status.getId() %></td>
+		<td class="nowrap"><%= status.getStatus() %></td>
+		<td class="nowrap"><%= status.getDescription() %></td>
+        <td style="background-color: <%= status.getColor() %>"><img class=preview src="<%=imgUrl%>" alt="Classic icon"/></td>
+		<td style="background-color: <%= status.getJunoColor() %>"><i class="preview <%="icon " + junoIconClass %>" alt="Juno icon"></i></td>
+        <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %></td>
+        <% if (isSuperAdmin) { %>
+		<td class="nowrap text-l"><a href=<%= editUrl.build().toString() %>>Edit</a></td>
+            <% if (isMovable) { %>
+        <td class="nowrap text-l"><a href=<%= upUrl.build().toString() %>>Move Up</a></td>
+        <td class="nowrap text-l"><a href=<%= downUrl.build().toString() %>>Move Down</a></td>
+            <% } %>
+        <% } %>
+	</tr>
+    <% } %>
 </table>
+<% if (isSuperAdmin) { %>
+	<div class="margin-t text-c">
+		<a href=<%=addUrl.build().toString()%>><b>Create New Appointment Status</b></a>
+	</div>
+<% } %>
 <br>
 
 <%
-	List inactiveUseStatus = (List) request.getAttribute("useStatus");
-	if (null != inactiveUseStatus && inactiveUseStatus.size() > 0)
+	List<String> alertStatuses = (List<String>)request.getAttribute("alertStatuses");
+	if (alertStatuses != null)
 	{
-		for (int i = 0; i < inactiveUseStatus.size(); i++)
+		for (String code : alertStatuses)
 		{
 %>
-			The code [<%=inactiveUseStatus.get(i)%>] has been used before, please enable that
-			status.<br/>
+			Status code [<%=code%>] has been used before, but is currently disabled.
+			<br/>
 <%
 		}
 	}

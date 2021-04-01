@@ -26,22 +26,17 @@ package org.oscarehr.common.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Flowsheet;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-public class FlowsheetDaoTest extends DaoTestFixtures {
+public class FlowsheetDaoTest extends DaoTestFixtures
+{
 
 	protected FlowsheetDao dao = SpringUtils.getBean(FlowsheetDao.class);
 
@@ -77,22 +72,12 @@ public class FlowsheetDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet4);
 		dao.persist(flowSheet4);
 		
-		List<Flowsheet> expectedResult = new ArrayList<Flowsheet>(Arrays.asList(flowSheet1, flowSheet2, flowSheet3, flowSheet4));
 		List<Flowsheet> result = dao.findAll();
 
-		Logger logger = MiscUtils.getLogger();
-		
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
-		}
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items  do not match.");
-				fail("Items  do not match.");
-			}
-		}
-		assertTrue(true);
+		assertTrue(result.contains(flowSheet1));
+		assertTrue(result.contains(flowSheet2));
+		assertTrue(result.contains(flowSheet3));
+		assertTrue(result.contains(flowSheet4));
 	}
 	
 	@Test

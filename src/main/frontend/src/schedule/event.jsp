@@ -110,6 +110,8 @@
 												juno-model="eventController.patientTypeahead"
 												juno-add-button-title="New Demographic"
 												juno-on-add-fn="newDemographic"
+                                                juno-disabled="eventData.virtual && eventController.editMode"
+                                                title="{{ eventController.getPatientToolTip() }}"
 										>
 										</juno-patient-search-typeahead>
 									</div>

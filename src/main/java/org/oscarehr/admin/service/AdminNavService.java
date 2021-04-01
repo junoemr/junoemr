@@ -414,7 +414,7 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.scheduleSetting"), "frame?frameUrl=" + contextPath + "/schedule/scheduletemplatesetting.jsp"));
 		if (oscarProperties.isPropertyActive("ENABLE_EDIT_APPT_STATUS"))
 		{
-			scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentStatusSetting"), "frame?frameUrl=" + contextPath + "/appointment/appointmentstatuscontrol.jsp"));
+			scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentStatusSetting"), "frame?frameUrl=" + contextPath + "/appointment/apptStatusSetting.do?method=view"));
 		}
 
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentTypeList"), "frame?frameUrl=" + contextPath + "/appointment/appointmentTypeAction.do"));
@@ -424,8 +424,7 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupPreference"), "frame?frameUrl=" + contextPath + "/admin/groupPreferences.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.preventionNotification.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionManager.jsp"));
 
-		// TODO remove super admin requirement when ready for general use
-		if(securityInfoManager.isSuperAdmin(providerNo) && systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
+		if(systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
 		{
 			scheduleItems.add(new AdminNavItemTo1("Manage Appointment Queues", "manageAppointmentQueues"));
 		}
@@ -555,6 +554,11 @@ public class AdminNavService
 			}
 		}
 
+		if (securityInfoManager.isSuperAdmin(providerNo))
+		{
+			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/general"));
+		}
+
 		systemManagementGroup.setItems(systemManagementItems);
 		return systemManagementGroup;
 	}
@@ -603,6 +607,11 @@ public class AdminNavService
 		List<AdminNavItemTo1> integrationItems = new ArrayList<>();
 
 		integrationGroup.setName(resourceBundle.getString("admin.admin.Integration"));
+
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
+		{
+			integrationItems.add(new AdminNavItemTo1("iMD Health", "imdHealth"));
+		}
 
 		integrationItems.add(new AdminNavItemTo1("REST Clients", "frame?frameUrl=" + contextPath + "/admin/api/clients.jsp"));
 		integrationItems.add(new AdminNavItemTo1("REST API", "frame?frameUrl=" + contextPath + "/admin/api/api.jsp"));

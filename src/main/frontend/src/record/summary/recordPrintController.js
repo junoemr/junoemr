@@ -1,18 +1,36 @@
+import {SitesApi, SystemPreferenceApi} from "../../../generated";
+
 angular.module('Record.Summary').controller('Record.Summary.RecordPrintController', [
 
+	'$scope',
+	'$http',
+	'$httpParamSerializer',
 	'$uibModal',
 	'$uibModalInstance',
 	'$stateParams',
 	'selectedNoteList',
+	'providerService',
 
 	function(
+		$scope,
+		$http,
+		$httpParamSerializer,
 		$uibModal,
 		$uibModalInstance,
 		$stateParams,
-		selectedNoteList)
+		selectedNoteList,
+		providerService)
 	{
 
 		var controller = this;
+
+		const DEFAULT_SITE = 0;
+		controller.sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
+		controller.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+
+		controller.defaultClinic = {value: DEFAULT_SITE, label: "Default Clinic"};
+		controller.selectedSite = null;
+		controller.sites = [];
 
 		controller.printTypeEnum = Object.freeze({
 			all: 'all',
@@ -27,8 +45,36 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			printType: controller.printTypeEnum.all,
 			dates: {},
 			selectedList: selectedNoteList,
+			selectedSite: DEFAULT_SITE,
 		};
 
+		controller.$onInit = async () =>
+		  {
+		  	controller.isMultisiteEnabled = (await controller.systemPreferenceApi.getPropertyEnabled("multisites")).data.body;
+
+			if(controller.isMultisiteEnabled)
+			{
+				await controller.getSites();
+			}
+		  }
+
+		  controller.getSites = async () =>
+			{
+				const provider = (await providerService.getMe());
+				const sites = (await controller.sitesApi.getSitesByProvider(provider.providerNo)).data.body;
+
+				controller.sites = [];
+				controller.sites.push(controller.defaultClinic);
+
+				sites.forEach((site) =>
+				{
+					controller.sites.push(
+					{
+						label: site.name,
+						value: site.siteId,
+					})
+				});
+			}
 
 		/*
 		 *If at least one note selected, Default to Note. Other wise default to All
@@ -53,7 +99,9 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 		controller.print = function print()
 		{
-			if (controller.pageOptions.printType ===controller.printTypeEnum.selected
+			let site = controller.selectedSite;
+
+			if (controller.pageOptions.printType === controller.printTypeEnum.selected
 				&& controller.pageOptions.selectedList.length === 0)
 			{
 				controller.page.selectedWarning = true;
@@ -64,7 +112,9 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 				controller.page.selectedWarning = false;
 			}
 
-			var ops = encodeURIComponent(JSON.stringify(controller.pageOptions));
+			 controller.pageOptions.selectedSite = site || DEFAULT_SITE;
+
+			let ops = encodeURIComponent(JSON.stringify(controller.pageOptions));
 			window.open('../ws/rs/recordUX/' + $stateParams.demographicNo + '/print?printOps=' + ops, '_blank');
 		};
 	}

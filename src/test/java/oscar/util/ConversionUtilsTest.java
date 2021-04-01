@@ -1275,4 +1275,37 @@ public class ConversionUtilsTest
 			}
 		}
 	}
+
+	@Test
+	public void epochDateSeconds_ExpectZero()
+	{
+		final Date zeroDate = new Date(0);
+		Assert.assertEquals(zeroDate, ConversionUtils.fromEpochStringSeconds(null));
+		Assert.assertEquals(zeroDate, ConversionUtils.fromEpochStringSeconds(""));
+		Assert.assertEquals(zeroDate, ConversionUtils.fromEpochStringSeconds(" "));
+		Assert.assertEquals(zeroDate, ConversionUtils.fromEpochStringSeconds("0"));
+		Assert.assertEquals(zeroDate, ConversionUtils.fromEpochStringSeconds(" 11 "));
+		Assert.assertEquals(zeroDate, ConversionUtils.fromEpochStringSeconds("00000"));
+		Assert.assertEquals(zeroDate, ConversionUtils.fromEpochStringSeconds("bubbles"));
+	}
+
+	@Test
+	public void epochDateSeconds_ParseDate()
+	{
+		Assert.assertEquals(new Date(1111111000), (ConversionUtils.fromEpochStringSeconds("1111111")));
+		Assert.assertEquals(new Date(-1111111000), (ConversionUtils.fromEpochStringSeconds("-1111111")));
+
+		Calendar cal = Calendar.getInstance();
+		cal.clear();    // clear any residual milliseconds
+		cal.set(2020, Calendar.DECEMBER, 17, 11, 43, 51);
+		cal.setTimeZone(TimeZone.getDefault());
+		Date date = ConversionUtils.fromEpochStringSeconds("1608234231");
+		Assert.assertEquals(date, cal.getTime());
+
+		cal.clear();
+		cal.set(1983, Calendar.JUNE, 29, 8, 41, 0);
+		cal.setTimeZone(TimeZone.getDefault());
+		Date date2 = ConversionUtils.fromEpochStringSeconds("425749260");
+		Assert.assertEquals(date2, cal.getTime());
+	}
 }

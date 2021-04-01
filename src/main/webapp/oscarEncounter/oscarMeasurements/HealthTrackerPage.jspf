@@ -1201,8 +1201,8 @@ iDate++;
 	           String indText = "";
 	           if ( mdb.getIndicationColour() != null ){
 	               indColour = "style=\"background-color:"+mFlowsheet.getIndicatorColour(mdb.getIndicationColour())+"\"";
-	               if( mFlowsheet.getIndicatorColour(mdb.getIndicationColour()).equals("#9999FF")){ indText="LOW";}
-	               if( mFlowsheet.getIndicatorColour(mdb.getIndicationColour()).equals("orange")){ indText="HIGH";}
+	               if( "#9999FF".equals(mFlowsheet.getIndicatorColour(mdb.getIndicationColour()))){ indText="LOW";}
+	               if( "orange".equals(mFlowsheet.getIndicatorColour(mdb.getIndicationColour()))){ indText="HIGH";}
 	               indText="<font color='"+mFlowsheet.getIndicatorColour(mdb.getIndicationColour())+"' size='3'>"+indText+"</font>";
 	           }
 	  

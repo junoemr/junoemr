@@ -155,17 +155,18 @@ var faxControl = {
                 return;
             }
 
+
             alternateSite.append($(faxControl._elements.faxControlFaxButton));
             alternateSite.append($(faxControl._elements.faxControlFaxSaveButton));
             alternateSite.append($(faxControl._elements.faxControlMemoryInput));
-
-            var faxEnabled = ($("#faxControl_faxEnabled").val() === "true");
-            if (!faxEnabled)
-            {
-                faxContainer.find(":input").prop('disabled', true);
-                faxContainer.find(":button").prop('disabled', true);
-            }
         }
+
+        var faxEnabled = ($("#faxControl_faxEnabled").val() === "true");
+        if (!faxEnabled)
+        {
+            $(faxContainer.find(":input")).prop('disabled', true);
+        }
+
     },
 
     _announceDone: function announceDone()

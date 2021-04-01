@@ -231,7 +231,7 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
 				"AND p.labNo = ltr.labPatientPhysicianInfoId " +
 				"AND ltr.testName = :testName " +
 		        "AND ltr.labPatientPhysicianInfoId = lpp.id " +
-		        "ORDER BY lpp.collectionDate";
+		        "ORDER BY lpp.collectionDate DESC";
 	    Query query = entityManager.createQuery(sql);
 	    query.setParameter("labType", labType);
 	    query.setParameter("demoNo", demoNo);

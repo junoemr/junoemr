@@ -156,18 +156,18 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
 					}
 
-					//show referral doctor
+					// format referral doctor
 					if (controller.page.demo.familyDoctor != null)
 					{
-						var referralDoc = controller.formatDocOutput(controller.page.demo.familyDoctor);
+						const referralDoc = controller.formatReferralDocXMLToJSON(controller.page.demo.familyDoctor);
 						controller.page.demo.scrReferralDocNo = referralDoc.number;
 						controller.page.demo.scrReferralDoc = referralDoc.name;
 					}
 
-					//show family doctor
+					// format family doctor
 					if (controller.page.demo.familyDoctor2 != null)
 					{
-						var familyDoc = controller.formatDocOutput(controller.page.demo.familyDoctor2);
+						const familyDoc = controller.formatFamilyDocXMLToJSON(controller.page.demo.familyDoctor2, 'fd', 'fdname');
 						controller.page.demo.scrFamilyDocNo = familyDoc.number;
 						controller.page.demo.scrFamilyDoc = familyDoc.name;
 					}
@@ -361,8 +361,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.hcRenewDate = Juno.Common.Util.getDateMoment(controller.page.demo.hcRenewDate);
 			controller.page.demo.rosterDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterDate);
 			controller.page.demo.rosterTerminationDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterTerminationDate);
-			controller.page.demo.patientStatusDate = Juno.Common.Util.getDateMoment(controller.page.demo.patientStatusDate);
-			controller.page.demo.dateJoined = Juno.Common.Util.getDateMoment(controller.page.demo.dateJoined);
+			controller.page.demo.dateJoined = moment(controller.page.demo.dateJoined);
+			controller.page.demo.patientStatusDate = moment(controller.page.demo.patientStatusDate);
 			controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
 			if (controller.page.demo.onWaitingListSinceDate)
 			{
@@ -943,19 +943,53 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			window.open(url, "DemographicExport", "width=960, height=700");
 		};
 
-		controller.formatDocOutput = function formatDocOutput(value)
+ 		controller.formatFamilyDocXMLToJSON = (familyDocXML) =>
 		{
-			var number, name;
-			var begin = value.indexOf("<rdohip>") + "<rdohip>".length;
-			var end = value.indexOf("</rdohip>");
-			if (end > begin && end >= 0 && begin >= 0) number = value.substring(begin, end);
+		    let number = "";
+		    let name = "";
 
-			begin = value.indexOf("<rd>") + "<rd>".length;
-			end = value.indexOf("</rd>");
-			if (end > begin && end >= 0 && begin >= 0) name = value.substring(begin, end);
+		    let begin = familyDocXML.indexOf("<fd>") + "<fd>".length;
+		    let end = familyDocXML.indexOf("</fd>");
 
-			return {"number": number, "name": name};
-		};
+		    if (end > begin && end >= 0 && begin >= 0)
+		    {
+                number = familyDocXML.substring(begin, end);
+            }
+
+		    begin = familyDocXML.indexOf("<fdname>") + "<fdname>".length;
+		    end = familyDocXML.indexOf("</fdname>");
+
+		    if (end > begin && end >= 0 && begin >= 0)
+            {
+                name = familyDocXML.substring(begin, end)
+            }
+
+            return {number: number, name: name};
+        };
+
+        controller.formatReferralDocXMLToJSON = (referralDocXML) =>
+        {
+            let number = "";
+            let name = "";
+
+            let begin = referralDocXML.indexOf("<rdohip>") + "<rdohip>".length;
+            let end = referralDocXML.indexOf("</rdohip>");
+
+            if (end > begin && end >= 0 && begin >= 0)
+            {
+                number = referralDocXML.substring(begin, end);
+            }
+
+            begin = referralDocXML.indexOf("<rd>") + "<rd>".length;
+            end = referralDocXML.indexOf("</rd>");
+
+            if (end > begin && end >= 0 && begin >= 0)
+            {
+                name = referralDocXML.substring(begin, end)
+            }
+
+            return {number: number, name: name};
+        };
 
 		/**
 		 * Wrap the familyDoctor field in required HTML tags.

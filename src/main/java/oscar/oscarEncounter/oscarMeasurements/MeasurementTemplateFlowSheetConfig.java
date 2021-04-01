@@ -261,7 +261,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             try
             {
                 is = new FileInputStream(flowSheet);
-                MeasurementFlowSheet measurementFlowsheet = createflowsheet(mType, is);
+                MeasurementFlowSheet measurementFlowsheet = createflowsheet(is);
 
                 //If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
                 if (flowsheetDao.findByName(measurementFlowsheet.getName()) == null && flowSheetUserCreatedDao.findByName(measurementFlowsheet.getName()) == null)
@@ -330,7 +330,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
                 MiscUtils.getLogger().error("error",e);
                 continue;
             }
-        	MeasurementFlowSheet d = createflowsheet(mType, is);
+        	MeasurementFlowSheet d = createflowsheet(is);
         	flowsheets.put(d.getName(), d);
             if (d.isUniversal())
             {
@@ -401,17 +401,6 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
                 }
             }
         }
-    }
-
-
-    public MeasurementFlowSheet createflowsheet(InputStream is ){
-         EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-         MeasurementFlowSheet d = createflowsheet(mType,is);
-
-
-            flowsheets.put(d.getName(), d);
-            flowsheetDisplayNames.put(d.getName(), d.getDisplayName());
-            return d;
     }
 
     private void processItems(List<Element> elements, List<Node> aLevels, Node parent, MeasurementFlowSheet mFlowSheet ) {
@@ -571,8 +560,9 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         }
     }
 
-    private MeasurementFlowSheet createflowsheet(final EctMeasurementTypeBeanHandler mType, InputStream is) {
-        MeasurementFlowSheet d = new MeasurementFlowSheet();
+    public MeasurementFlowSheet createflowsheet(InputStream is)
+	{
+        MeasurementFlowSheet flowSheet = new MeasurementFlowSheet();
 
         try {
             SAXBuilder parser = new SAXBuilder();
@@ -590,61 +580,62 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
             List<Element> measurements = root.getChildren("measurement");
 
-            processMeasurementTypes(measurements, null, d);
+            processMeasurementTypes(measurements, null, flowSheet);
 
             List indi = root.getChildren("indicator"); // key="LOW" colour="blue">
             for (int i = 0; i < indi.size(); i++) {
                 Element e = (Element) indi.get(i);
-                d.AddIndicator(e.getAttributeValue("key"), e.getAttributeValue("colour"));
+                flowSheet.AddIndicator(e.getAttributeValue("key"), e.getAttributeValue("colour"));
             }
             List<Element> elements = root.getChildren();
             List<Element> items = root.getChildren("item");
             List<Node> aItems = new ArrayList<Node>();
 
-            processItems(elements, aItems, null, d);
-            d.setItemHeirarchy(aItems);
+            processItems(elements, aItems, null, flowSheet);
+            flowSheet.setItemHeirarchy(aItems);
 
             if (root.getAttribute("name") != null) {
-                d.setName(root.getAttribute("name").getValue());
+                flowSheet.setName(root.getAttribute("name").getValue());
             }
             if (root.getAttribute("display_name") != null) {
-                d.setDisplayName(root.getAttribute("display_name").getValue());
+                flowSheet.setDisplayName(root.getAttribute("display_name").getValue());
             }
 
             if (root.getAttribute("top_HTML") != null) {
-                d.setTopHTMLFileName(root.getAttribute("top_HTML").getValue());
+                flowSheet.setTopHTMLFileName(root.getAttribute("top_HTML").getValue());
             }
 
             if (root.getAttribute("ds_rules") != null && root.getAttribute("ds_rules").getValue().length()>0 ) {
-                d.loadRuleBase(root.getAttribute("ds_rules").getValue());
+                flowSheet.loadRuleBase(root.getAttribute("ds_rules").getValue());
             }
             if (root.getAttribute("dxcode_triggers") != null) {
-                d.parseDxTriggers(root.getAttribute("dxcode_triggers").getValue());
+                flowSheet.parseDxTriggers(root.getAttribute("dxcode_triggers").getValue());
             }
 
             if (root.getAttribute("program_triggers") != null) {
-                d.parseProgramTriggers(root.getAttribute("program_triggers").getValue());
+                flowSheet.parseProgramTriggers(root.getAttribute("program_triggers").getValue());
             }
 
             if (root.getAttribute("warning_colour") != null) {
-                d.setWarningColour(root.getAttribute("warning_colour").getValue());
+                flowSheet.setWarningColour(root.getAttribute("warning_colour").getValue());
             }
             if (root.getAttribute("recommendation_colour") != null) {
-                d.setRecommendationColour(root.getAttribute("recommendation_colour").getValue());
+                flowSheet.setRecommendationColour(root.getAttribute("recommendation_colour").getValue());
             }
             if (root.getAttribute("is_universal") != null) {
-                d.setUniversal("true".equals(root.getAttribute("is_universal").getValue()));
+                flowSheet.setUniversal("true".equals(root.getAttribute("is_universal").getValue()));
             }
             if (root.getAttribute("is_medical") != null) {
-                d.setMedical("true".equals(root.getAttribute("is_medical").getValue()));
+                flowSheet.setMedical("true".equals(root.getAttribute("is_medical").getValue()));
             }
+			flowSheet.loadRuleBase();
+			return flowSheet;
 
         } catch (Exception e) {
             MiscUtils.getLogger().error("Error", e);
         }
 
-        d.loadRuleBase();
-        return d;
+        return null;
     }
 
     public MeasurementFlowSheet validateFlowsheet(String data) {
@@ -924,7 +915,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             InputStream is = new ByteArrayInputStream(byteArrayout.toByteArray());
 
             EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-            MeasurementFlowSheet d = createflowsheet(mType,is);
+            MeasurementFlowSheet d = createflowsheet(is);
 
             return d;
 

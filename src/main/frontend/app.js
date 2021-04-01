@@ -168,6 +168,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/panelManagement',
 			component: 'panelManagementAdmin'
 		})
+        .state('admin.iMDHealth',
+        {
+            url: '/imdHealth',
+            component: 'imdHealthAdmin',
+        })
 		.state('admin.iceFall',
 		{
 			url: '/iceFall',
@@ -216,10 +221,25 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			component: 'manageUsersAdmin',
 		})
 		.state('admin.manageAppointmentQueues',
-			{
-				url: '/manageAppointmentQueues',
-				component: 'manageAppointmentQueuesAdmin',
-			})
+        {
+            url: '/manageAppointmentQueues',
+            component: 'manageAppointmentQueuesAdmin',
+		})
+        .state('admin.systemProperties',
+        {
+            url: '/systemProperties',
+            component: 'systemProperties'
+        })
+		.state('admin.systemProperties.general',
+		{
+			url: '/general',
+			component: 'systemPropertiesGeneral',
+		})
+        .state('admin.systemProperties.rx',
+        {
+            url: '/rx',
+            component: 'systemPropertiesRx',
+        })
 		.state('ticklers',
 		{
 			url: '/ticklers',
@@ -584,6 +604,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			templateUrl: 'src/record/tracker/tracker.jsp',
 			controller: 'Record.Tracker.TrackerController as trackerCtrl'
 		})
+        .state('record.patientEducation',
+        {
+            url: '/patientEducation',
+            component: 'imdHealthLanding'
+        })
 		.state('record.phr',
 		{
 			url: '/phr',

@@ -359,7 +359,7 @@
 								>
 								</ca-field-password>
 								<div class="body-smallest error-message" ng-if="!securityRecord.validations.password() && $ctrl.hasSubmitted">
-									Password must be atleast 8 characters long and include atleast one special character.
+									Password must be a minimum of 8 characters long and include at least one special character.
 								</div>
 							</div>
 							<!-- Confirm Password -->
@@ -797,7 +797,7 @@
 					<!-- 3rd Party Billing No -->
 					<ca-field-text
 									ca-name="thirdPartyBillingNo"
-									ca-title="3'rd Party Billing #"
+									ca-title="3rd Party Billing #"
 									ca-model="$ctrl.provider.thirdPartyBillingNo"
 									ca-rows="1"
 									ca-text-placeholder=""

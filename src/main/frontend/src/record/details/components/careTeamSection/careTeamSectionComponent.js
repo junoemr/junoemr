@@ -22,6 +22,7 @@
 */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {SystemPreferenceApi} from "../../../../../generated/"
 
 angular.module('Record.Details').component('careTeamSection', {
 	templateUrl: 'src/record/details/components/careTeamSection/careTeamSection.jsp',
@@ -32,18 +33,24 @@ angular.module('Record.Details').component('careTeamSection', {
 	},
 	controller: [ "$scope",
 		"$uibModal",
+        "$http",
+        "$httpParamSerializer",
 		"staticDataService",
 		"providersService",
 		"demographicsService",
 		"referralDoctorsService",
 		function ($scope,
-							$uibModal,
-							staticDataService,
-							providersService,
-							demographicsService,
-							referralDoctorsService)
+                  $uibModal,
+                  $http,
+                  $httpParamSerializer,
+                  staticDataService,
+                  providersService,
+                  demographicsService,
+                  referralDoctorsService)
 	{
 		let ctrl = this;
+        let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+            '../ws/rs');
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
@@ -60,6 +67,7 @@ angular.module('Record.Details').component('careTeamSection', {
 		ctrl.endDateValid = true;
 		ctrl.dateJoinedValid = true;
 		ctrl.terminationDateValid = true;
+        ctrl.familyDoctorEnabled = false;
 
 		ctrl.$onInit = () =>
 		{
@@ -106,16 +114,25 @@ angular.module('Record.Details').component('careTeamSection', {
 						ctrl.patientStatusList = data;
 					}
 			);
+
+			systemPreferenceApi.getPropertyEnabled("demographic_family_doctor").then(
+                (response) =>
+                {
+                    ctrl.familyDoctorEnabled = response.data.body;
+                }
+            )
+
 		}
 
 		ctrl.updateReferralDoctors = (docSearchString, docReferralNo) =>
 		{
 			referralDoctorsService.searchReferralDoctors(docSearchString, docReferralNo, 1, 10).then(
 				function success(results) {
-					var referralDoctors = new Array(results.length);
-					for (var i = 0; i < results.length; i++)
+					let referralDoctors = new Array(results.length);
+
+					for (let i = 0; i < results.length; i++)
 					{
-						var displayName = results[i].lastName + ', ' + results[i].firstName;
+						let displayName = results[i].lastName + ', ' + results[i].firstName;
 						referralDoctors[i] = {
 							label: displayName,
 							value: displayName,
@@ -123,7 +140,7 @@ angular.module('Record.Details').component('careTeamSection', {
 						};
 						if (results[i].specialtyType != null && results[i].specialtyType != "")
 						{
-							referralDoctors[i].label += " [" + results[i].specialtyType + "]";
+							referralDoctors[i].label += " [" + results[i].referralNo + "]";
 						}
 					}
 
@@ -139,6 +156,11 @@ angular.module('Record.Details').component('careTeamSection', {
 		{
 			ctrl.ngModel.scrReferralDocNo = value.referralNo;
 		}
+
+		ctrl.updateFamilyDocNo = (value) =>
+        {
+            ctrl.ngModel.scrFamilyDocNo = value.referralNo;
+        }
 
 		ctrl.openAddPatientStatusModal = async () =>
 		{
@@ -188,5 +210,10 @@ angular.module('Record.Details').component('careTeamSection', {
 			ctrl.rosterStatusList.push({"label": newStatus, "value": newStatus});
 		}
 
+		ctrl.updatePatientStatusDate = () =>
+		{
+			let currentDate = Juno.Common.Util.getDateMoment(new Date());
+			ctrl.ngModel.patientStatusDate = currentDate;
+		}
 	}]
 });

@@ -125,12 +125,26 @@ public class PageUtil
 		targetLocator.window(windowHandle);
 	}
 
-	public static void switchToLastWindow(WebDriver driver)
+	public static void switchToLastWindow1(WebDriver driver)
 	{
 		Set<String> allHandles = driver.getWindowHandles();
 		allHandles.remove(allHandles.iterator().next());
 		String lastHandle = allHandles.iterator().next();
 		driver.switchTo().window(lastHandle);
+		driver.manage().window().maximize();
+	}
+
+	public static void switchToLastWindow(WebDriver driver)
+	{
+		Set<String> allHandles = driver.getWindowHandles();
+		Integer allHandlesSize = allHandles.size();
+		for (int i = 0; i < allHandlesSize - 1; i++)
+		{
+			allHandles.remove(allHandles.iterator().next());
+		}
+		String lastHandle = allHandles.iterator().next();
+		driver.switchTo().window(lastHandle);
+		driver.manage().window().maximize();
 	}
 
 	public static void switchToNewWindow(WebDriver driver, By textlink, Set<String> oldWindowHandles) throws InterruptedException {

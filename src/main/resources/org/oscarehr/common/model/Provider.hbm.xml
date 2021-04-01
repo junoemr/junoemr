@@ -39,6 +39,7 @@
 		<property name="lastUpdateDate" type="timestamp" />
         <property name="supervisor" type="string" />
         <property column="super_admin" name="superAdmin" type="java.lang.Boolean" not-null="true" />
+		<property column="imd_health_uuid" length="36" name="imdHealthUuid" not-null="false" type="string" />
         <property column="alberta_tak_no" name="AlbertaTakNo" not-null="false" type="string" />
         <property column="alberta_e_delivery_ids" name="AlbertaEDeliveryIds" not-null="false" type="string" />
 		<property column="alberta_connect_care_id" name="albertaConnectCareId" not-null="false" type="string" />

@@ -556,6 +556,13 @@ public class CoPDImportService
 				this.dxresearchDAO.save(dx);
 			}
 		}
+		for(CaseManagementNote dxNote : dxMapper.getDxResearchNoteList())
+		{
+			dxNote.setProvider(provider);
+			dxNote.setSigningProvider(provider);
+			dxNote.setDemographic(demographic);
+			encounterNoteService.saveConcernNote(dxNote);
+		}
 	}
 
 	private void importPediatricsData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)

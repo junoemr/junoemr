@@ -29,9 +29,11 @@ import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.dao.SecurityDao;
+import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.dao.ProviderBillingDao;
@@ -50,6 +52,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service("provider.service.ProviderService")
 @Transactional
@@ -63,6 +66,9 @@ public class ProviderService
 
 	@Autowired
 	SecurityDao securityDao;
+
+	@Autowired
+	UserPropertyDAO userPropertyDAO;
 
 	@Autowired
 	private ProviderRoleService providerRoleService;
@@ -276,18 +282,30 @@ public class ProviderService
 
 		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
 
+		setJunoUIAsDefault(provider.getProviderNo());
 		return provider;
 	}
 
-	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	/**
+	 * edit a provider record.
+	 * @param providerEditFormTo1 - the provider edit forum from the front end containing the provider information to edit
+	 * @param providerNo - the providerNo to edit
+	 * @param editingProviderNo - the providerNo doing the edit
+	 * @return - the update provider
+	 */
+	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo, String editingProviderNo)
 	{
 		ProviderData providerData = providerDataDao.find(providerNo.toString());
 		if (providerData != null)
 		{
 			ProviderData newProviderData = providerEditFormTo1.getProviderData();
 
+			// set last update date
+			newProviderData.setLastUpdateUser(editingProviderNo);
+			newProviderData.setLastUpdateDate(new Date());
+
 			// transfer super admin flag
-			newProviderData.setSuperAdmin(providerData.getSuperAdmin());
+			newProviderData.setSuperAdmin(providerData.isSuperAdmin());
 
 			// edit provider
 			newProviderData.setProviderNo(providerNo);
@@ -335,6 +353,19 @@ public class ProviderService
 			providerRoleService.removeOtherProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
 			providerRoleService.setDefaultPrimaryRole(providerNo);
 		}
+	}
+
+	/**
+	 * set Juno UI as default for provider
+	 * @param providerNo - the provider to set the default UI for
+	 */
+	public synchronized void setJunoUIAsDefault(Integer providerNo)
+	{
+		UserProperty property = new UserProperty();
+		property.setName(UserProperty.COBALT);
+		property.setProviderNo(Integer.toString(providerNo));
+		property.setValue(UserProperty.PROPERTY_ON_YES);
+		userPropertyDAO.saveProp(property);
 	}
 
 	/**
@@ -454,5 +485,12 @@ public class ProviderService
 		}
 		existingRecord.setUserName(source.getUserName());
 		existingRecord.setEmail(source.getEmail());
+	}
+
+	public void createAndSaveProviderImdHealthUuid(ProviderData providerData)
+	{
+		UUID newUuid = UUID.randomUUID();
+		providerData.setImdHealthUuid(newUuid.toString());
+		providerDataDao.merge(providerData);
 	}
 }

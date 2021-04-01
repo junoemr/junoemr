@@ -29,6 +29,8 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarAppointmentRepeating;
+import org.oscarehr.schedule.exception.ScheduleException;
+import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -63,6 +65,9 @@ public class AppointmentService extends AbstractServiceImpl
 
 	@Autowired
 	private org.oscarehr.appointment.service.Appointment appointmentService;
+
+	@Autowired
+	private SiteService siteService;
 
 	@GET
 	@Path("/{appointmentNo}")
@@ -108,6 +113,7 @@ public class AppointmentService extends AbstractServiceImpl
 
 		return RestResponse.successResponse(responseAppointment);
 	}
+
 	@POST
 	@Path("/repeating/")
 	@Produces("application/json")
@@ -145,27 +151,35 @@ public class AppointmentService extends AbstractServiceImpl
 	@Path("/")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws Throwable
+	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws ScheduleException
 	{
 		AppointmentConverter converter = new AppointmentConverter();
-		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		Appointment savedAppointment = appointmentManager.updateAppointment(getLoggedInInfo(), appointment);
+		String siteName = calendarAppointment.getSite();
+		String providerNo = calendarAppointment.getProviderNo().toString();
 
-		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), savedAppointment.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
-				LogConst.STATUS_SUCCESS, String.valueOf(savedAppointment.getId()), loggedInInfo.getIp());
+		boolean isMultiSite = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
+		boolean isValidTargetSite = !isMultiSite || siteService.isProviderAssignedToSite(providerNo, siteName);
 
-		CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
+		if (isValidTargetSite)
+		{
+			org.oscarehr.common.model.Appointment savedAppointment = appointmentService.updateAppointment(calendarAppointment, getLoggedInInfo(), getHttpServletRequest());
+			CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
 
-		responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
-		responseAppointment.setBillingForm(calendarAppointment.getBillingForm());
-		responseAppointment.setBillingRdohip(calendarAppointment.getBillingRdohip());
-		responseAppointment.setUserProviderNo(calendarAppointment.getUserProviderNo());
-		responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
-		responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
+			responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
+			responseAppointment.setBillingForm(calendarAppointment.getBillingForm());
+			responseAppointment.setBillingRdohip(calendarAppointment.getBillingRdohip());
+			responseAppointment.setUserProviderNo(calendarAppointment.getUserProviderNo());
+			responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
+			responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
 
-		return RestResponse.successResponse(responseAppointment);
+			return RestResponse.successResponse(responseAppointment);
+		}
+		else
+		{
+			String errorMessage = String.format("Provider is not assigned to site %s", siteName);
+			throw new ScheduleException(errorMessage);
+		}
 	}
 
 	@DELETE

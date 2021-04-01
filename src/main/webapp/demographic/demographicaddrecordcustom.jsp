@@ -46,12 +46,13 @@
 <%@ page import="oscar.dms.EDocUtil" %>
 <jsp:useBean id="providerBean" class="java.util.Properties"
              scope="session" />
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <jsp:useBean id="addDemoBean" class="oscar.AppointmentMainBean"/>
 <%@ include file="../admin/dbconnection.jsp"%>
 <%
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
-
+	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	String [][] dbQueries=new String[][] {
 			{"search_provider", "select * from provider where provider_type='doctor' and status='1' order by last_name"},
@@ -693,7 +694,7 @@
 		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></label>
-			<input type="text" name="phone" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone)" value="<%=props.getProperty("phoneprefix", "905-")%>">
+			<input type="text" name="phone" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone)" value="<%=systemPreferenceService.getPreferenceValue("phone_prefix", "")%>">
 			<bean:message key="demographic.demographicaddrecordhtm.Ext" />:
 			<input type="text" name="hPhoneExt" value="" size="4" />
 		</div>
@@ -1434,7 +1435,7 @@
 		<%
 		}else if(hidden_demographic_fields.get(i).equals("phone")){
 		%>
-		<input type="hidden" name="phone" value="<%=props.getProperty("phoneprefix", "905-")%>" />
+		<input type="hidden" name="phone" value="<%=systemPreferenceService.getPreferenceValue("phone_prefix", "")%>" />
 		<input type="hidden" name="hPhoneExt" value="" />
 		<%
 		}else if(hidden_demographic_fields.get(i).equals("phone2")){

@@ -33,7 +33,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.*;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.MeasurementMap;
+import org.oscarehr.common.model.MeasurementType;
+import org.oscarehr.common.model.MeasurementsDeleted;
+import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.util.MiscUtils;
 
 import javax.persistence.Query;
@@ -43,6 +47,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarLab.ca.all.util.LabGridDisplay;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -664,6 +670,49 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		query.setParameter("identCode", identCode);
 		query.setParameter("demoNo", demoNo);
 		return query.getResultList();
+	}
+
+	/**
+	 * This entire thing makes me sad, but it is a necessary evil.
+	 * Basically, it's either this or get a bunch of lab IDs, instantiate a terser for each one and
+	 * procedurally loop over them to fetch the same data.
+	 *
+	 * Given a demographic, get all measurements that were populated by labs and any extra associated info.
+	 * @param demographicNo demographic to get measurements for
+	 * @return a set of LabGridDisplay objects that encapsulate precisely the info we want to display
+	 */
+	public List<LabGridDisplay> getLabMeasurementsForPatient(Integer demographicNo)
+	{
+		String sql = "SELECT \n" +
+				"    m.id AS measurement_id,\n" +
+				"    MAX(CASE WHEN me.keyval = 'abnormal' THEN me.val END) AS is_abnormal,\n" +
+				"    m.dataField AS result,\n" +
+				"    m.dateObserved AS dateCollected,\n" +
+				"    MAX(CASE WHEN me.keyval = 'lab_no' THEN me.val END) AS lab_no,\n" +
+				"    MAX(CASE WHEN me.keyval = 'name' THEN me.val END) AS test_name\n" +
+				"FROM measurements m\n" +
+				"JOIN measurementsExt me ON m.id=me.measurement_id\n" +
+				"WHERE m.dataField != ''\n" +
+				"AND me.keyVal in ('name', 'lab_no', 'abnormal')\n" +
+				"AND m.demographicNo = :demographicNo\n" +
+				"GROUP BY m.id, m.dataField, m.dateObserved\n" +
+				"ORDER BY m.dateObserved DESC";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+		List<Object[]> labMeasurements = query.getResultList();
+		List<LabGridDisplay> gridDisplayList = new ArrayList<>();
+		for (Object[] measurement : labMeasurements)
+		{
+			LabGridDisplay newDisplay = new LabGridDisplay();
+			newDisplay.setMeasurementId((Integer)measurement[0]);
+			newDisplay.setAbnormal((String)measurement[1]);
+			newDisplay.setResult((String)measurement[2]);
+			newDisplay.setDateObserved(ConversionUtils.toDateString((Date)measurement[3], ConversionUtils.DEFAULT_DATE_PATTERN));
+			newDisplay.setLabId((String)measurement[4]);
+			newDisplay.setTestName((String)measurement[5]);
+			gridDisplayList.add(newDisplay);
+		}
+		return gridDisplayList;
 	}
 
 	public Measurement findLastEntered(Integer demo, String type) {

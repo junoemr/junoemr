@@ -73,5 +73,50 @@
 				</table>
 			</panel-body>
 		</panel>
+
+		<panel ng-if="$ctrl.userIsSuperAdmin" component-style="$ctrl.componentStyle">
+			<panel-header>
+				<div class="juno-text flex-row justify-content-between">
+					<span>
+						<h6 class="d-inline-block">Advanced Options</h6>
+						<span>Change only if you know what you're doing</span>
+					</span>
+					<juno-button component-style="$ctrl.componentStyle" class="flex-grow-0" click="$ctrl.toggleAdvanced()">Show/Hide</juno-button>
+				</div>
+			</panel-header>
+			<panel-body>
+				<div ng-if="$ctrl.showAdvancedOptions" class="advanced-options juno-text">
+					<h6>AQS Credentials</h6>
+
+					<div class="credential-inputs">
+						<!-- Org Name -->
+						<juno-input
+										ng-model="$ctrl.organizationName"
+										label="Organization Name"
+										component-style="$ctrl.componentStyle">
+						</juno-input>
+
+						<!-- Org Secret -->
+						<juno-input
+										ng-model="$ctrl.organizationSecret"
+										label="Organization Secret Key"
+										component-style="$ctrl.componentStyle">
+						</juno-input>
+					</div>
+
+					<!-- Save -->
+					<div class="lg-margin-top">
+						<juno-button
+										component-style="$ctrl.componentStyle"
+										button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+										button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+										click="$ctrl.updateAqsCredentials()">
+							Update
+						</juno-button>
+					</div>
+				</div>
+			</panel-body>
+		</panel>
+
 	</div>
 </div>
