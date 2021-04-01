@@ -42,6 +42,7 @@ import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
@@ -85,7 +86,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
 
 		FormFile docFile = fm.getFiledata();
 		String fileName = docFile.getFileName();
@@ -146,7 +147,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
 
 		FormFile docFile = fm.getDocFile();
 		String fileName = docFile.getFileName();
@@ -194,7 +195,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
 		
 		if (fm.getMode().equals("") && fm.getFunction().equals("") && fm.getFunctionId().equals("")) {
 			// file size exceeds the upload limit
@@ -392,9 +393,8 @@ public class AddEditDocumentAction extends DispatchAction {
 
 	private ActionForward editDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request)
 	{
-
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.EDOC);
 
 		HashMap<String, String> errors = new HashMap<>();
 		boolean documentValid = true;

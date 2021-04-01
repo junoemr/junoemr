@@ -277,18 +277,6 @@ public class SecurityInfoManager
 		return true;
 	}
 
-	@Deprecated // use enum version instead
-	public void requireAllPrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
-	{
-		for(String objectName:requiredObjList)
-		{
-			if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
-			{
-				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName + ")");
-			}
-		}
-	}
-
 	/**
 	 * Check that the given provider has all of the required security access rights
 	 * @param providerNo - the provider ID

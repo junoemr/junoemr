@@ -21,6 +21,7 @@ import org.apache.struts.upload.FormFile;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
@@ -59,7 +60,7 @@ public class DocumentUploadAction extends DispatchAction
 		DocumentUploadForm fm = (DocumentUploadForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
 		logger.info("BEGIN DOCUMENT UPLOAD");
 
 		HashMap<String, Object> responseMap = new HashMap<>();
