@@ -119,6 +119,10 @@ public class CaseManagementPrint {
 		if (printAllNotes)
 		{
 			notes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, false);
+			if (startDate != null && endDate != null)
+			{
+				notes = filterNotesByDate(notes, startDate, endDate);
+			}
 		}
 		else
 		{
