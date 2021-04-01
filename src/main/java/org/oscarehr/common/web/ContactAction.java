@@ -350,8 +350,7 @@ public class ContactAction extends DispatchAction {
 	public ActionForward removeContact(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest request, HttpServletResponse response) {
 
-		ArrayList<String> arrayListIds = null;
-		String[] ids = null;
+		List<String> arrayListIds = new ArrayList<>();
 		String[] proContactIds = request.getParameterValues("procontact.delete");
 		String[] contactIds = request.getParameterValues("contact.delete");
 		String postMethod = request.getParameter("postMethod");
@@ -367,12 +366,11 @@ public class ContactAction extends DispatchAction {
     	}
     	
     	if(removeSingleId != null) {
-    		ids = new String[]{removeSingleId};
-    	}
+			arrayListIds.add(removeSingleId);
+		}
     	
 		if( proContactIds != null || contactIds != null ) {
-			arrayListIds = new ArrayList<String>(); 
-			
+
 			if(proContactIds != null) {
 				arrayListIds.addAll(Arrays.asList( proContactIds ) );
 			}
@@ -381,18 +379,16 @@ public class ContactAction extends DispatchAction {
 				arrayListIds.addAll(Arrays.asList( contactIds ) );
 			}
 			
-			ids = (String[]) arrayListIds.toArray();
 		}
 		
-    	if( ids != null ) {
-    		int contactId;
-    		for( String id : ids ) {
-    			contactId = Integer.parseInt(id);
-    			DemographicContact dc = demographicContactDao.find( contactId );
-    			dc.setDeleted(true);
-    			demographicContactDao.merge(dc);
-    		}
-    	}
+		int contactId;
+		for( String id : arrayListIds ) {
+			contactId = Integer.parseInt(id);
+			DemographicContact dc = demographicContactDao.find( contactId );
+			dc.setDeleted(true);
+			demographicContactDao.merge(dc);
+		}
+
     	
     	return actionForward; 
 
@@ -531,7 +527,7 @@ public class ContactAction extends DispatchAction {
 			contactDao.persist(contact);
 		}
 
-	   return mapping.findForward("cForm");
+	   return mapping.findForward("windowClose");
 	}
 
 	public ActionForward saveProContact(ActionMapping mapping, ActionForm form, 

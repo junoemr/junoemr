@@ -75,7 +75,6 @@
             if (isValid)
             {
                 document.forms[0].submit();
-                window.close();
             }
 	    }
 
