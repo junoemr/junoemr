@@ -30,7 +30,6 @@ import lombok.Setter;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.model.ProviderBilling;
-import org.oscarehr.util.SpringUtils;
 import oscar.SxmlMisc;
 import oscar.util.ConversionUtils;
 
