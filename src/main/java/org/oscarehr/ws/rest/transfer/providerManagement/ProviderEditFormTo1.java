@@ -24,10 +24,10 @@ package org.oscarehr.ws.rest.transfer.providerManagement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.common.model.Security;
-import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.util.SpringUtils;
@@ -42,13 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Getter
-@Setter
+@Data
 public class ProviderEditFormTo1 implements Serializable
 {
-
-	private ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
-
 	// user info
 	private String firstName;
 	private String lastName;
