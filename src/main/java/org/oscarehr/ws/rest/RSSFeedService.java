@@ -77,8 +77,8 @@ public class RSSFeedService extends AbstractServiceImpl {
 			@QueryParam("numberOfRows") String numberOfRows,
 			@Context HttpServletRequest request)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());

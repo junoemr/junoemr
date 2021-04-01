@@ -73,7 +73,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<QueuedAppointmentTo1> createQueuedAppointment(@PathParam("queueId") UUID queueId, QueuedAppointmentBookingTransfer queuedAppointmentBookingTransfer)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
 		QueuedAppointment newQueuedAppointment = queuedAppointmentConverter.convert(queuedAppointmentBookingTransfer);
 		newQueuedAppointment = queuedAppointmentService.bookQueuedAppointment(queueId, newQueuedAppointment, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(new QueuedAppointmentTo1(newQueuedAppointment));
@@ -85,7 +85,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, String reason)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
 		queuedAppointmentService.deleteQueuedAppointment(appointmentId, queueId, reason, getLoggedInInfo());
 		return RestResponse.successResponse(true);
 	}
@@ -96,7 +96,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<QueuedAppointmentTo1> moveAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, QueuedAppointmentMoveTransfer queuedAppointmentMoveTransfer)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
 
 		QueuedAppointment queuedAppointment = queuedAppointmentService.moveQueuedAppointment(appointmentId, queuedAppointmentMoveTransfer.getQueuePosition(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(new QueuedAppointmentTo1(queuedAppointment));
@@ -111,7 +111,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	                                                          @PathParam("appointmentId") UUID appointmentId,
 	                                                          BookQueuedAppointmentTransfer bookQueuedAppointmentTransfer) throws ValidationException
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
 
 		// schedule the queued appointment
 		Appointment newAppointment = queuedAppointmentService.scheduleQueuedAppointment(appointmentId, queueId, bookQueuedAppointmentTransfer.getProviderNo(),

@@ -66,7 +66,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<AbstractSearchResponse<String>> listDemographicSets()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
 
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 		
@@ -81,7 +81,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<DemographicSets> getDemographicSetByName(@PathParam("name") String name)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
 
 		AbstractSearchResponse<DemographicSets> response = new AbstractSearchResponse<DemographicSets>();
 		
@@ -101,7 +101,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<EFormReportToolTo1> eformReportToolList()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
 		
 		List<EFormReportTool> results = eformReportToolManager.findAll(getLoggedInInfo(), 0, EFormReportToolDao.MAX_LIST_RETURN_SIZE);
 		
@@ -122,7 +122,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse addEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
 
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -145,7 +145,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse populateEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -161,7 +161,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse removeEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -176,7 +176,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse markLatestEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		

@@ -68,7 +68,7 @@ public class AppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<AppointmentTo1> searchAppointments(@PathParam("integrationId") Integer integrationId, @QueryParam("appointmentNo") Integer appointmentNo)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		try
 		{
 			Integration integration = integrationDao.find(integrationId);
@@ -91,7 +91,7 @@ public class AppointmentWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> sendGeneralAppointmentNotification(@PathParam("integrationId") Integer integrationId,
 																	@PathParam("appointmentNo") Integer appointmentNo)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		Integration integration = integrationDao.find(integrationId);
 		ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
@@ -106,7 +106,7 @@ public class AppointmentWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> sendTelehealthAppointmentNotification(@PathParam("integrationId") Integer integrationId,
 														   @PathParam("appointmentId") String appointmentId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		Integration integration = integrationDao.find(integrationId);
 		ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
@@ -123,7 +123,7 @@ public class AppointmentWebService extends AbstractServiceImpl
 			@PathParam("integrationId") Integer integrationId,
 			@PathParam("appointmentNo") String appointmentNo) throws IllegalAccessException, InstantiationException
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		Integration integration = integrationDao.find(integrationId);
 		GenericConverter<MHATelehealthSessionInfo, TelehealthSessionInfoDto> genericConverter = new GenericConverter<>(TelehealthSessionInfoDto.class);

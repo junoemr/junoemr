@@ -50,8 +50,7 @@ public class FaxInboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<LocalDateTime> getNextPullTime()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_FAX);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
 
 		return RestResponse.successResponse(inboundFaxSchedulingTask.getNextRunTime());
 	}

@@ -62,7 +62,7 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	private AppDefinitionDao appDefinitionDao;
 	
 	@Autowired
-	AppManager appManager;
+	private AppManager appManager;
 	
 	@Autowired
 	private AppUserDao appUserDao;
@@ -78,8 +78,8 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public GenericRESTResponse isK2AActive()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.REPORT, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		GenericRESTResponse response = null;
 		AppDefinition appDef = appDefinitionDao.findByName("K2A");
@@ -99,8 +99,8 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<String> getK2AUrl()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.REPORT, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
 		if (k2aApp != null) {
@@ -123,8 +123,8 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.REPORT, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		try {
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
@@ -149,8 +149,8 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	public String addK2AReport(@PathParam("id") String id)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.REPORT, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		try
 		{

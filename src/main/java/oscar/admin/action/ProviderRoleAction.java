@@ -55,8 +55,7 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("ADD ROLE");
-			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-					SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
+			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, String.valueOf(providerId));
 
 			if(!providerRoleService.validRoleName(roleNew))
@@ -105,8 +104,7 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("UPDATE ROLE");
-			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
-					SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
+			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
 			if(!providerRoleService.validRoleName(roleNew))
@@ -147,8 +145,7 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("DELETE ROLE");
-			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE,
-					SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
+			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
 			if(!providerRoleService.validRoleName(roleNew))
