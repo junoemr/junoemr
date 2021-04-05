@@ -26,7 +26,7 @@
 
 <%@ page import="org.oscarehr.common.web.ContactAction"%>
 <%@ page import="org.oscarehr.common.model.Contact"%>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="org.apache.commons.text.StringEscapeUtils"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Properties" %>
 <%@ page import="java.net.URLEncoder" %>
@@ -76,7 +76,6 @@
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 <script type="text/javascript" >
 
-<!--
 		function setfocus() {
 		  this.focus();
 		  document.forms[0].keyword.focus();
@@ -87,7 +86,6 @@
 		  return true;
 		}
 		function selectResult(data1,data2) {
-			
 			try {
 				serializePopupData(data1, data2);
 			} catch(error) {
@@ -106,7 +104,6 @@
 			self.close();
 		}
 		                
--->
 
 </script>
 </head>
@@ -136,9 +133,9 @@
 		<td align="left">Results based on keyword(s): <%=keyword==null?"":keyword%></td>
 	</tr>
 </table>
-<input type='hidden' name='form' value="<%=StringEscapeUtils.escapeHtml(form)%>"/>
-<input type='hidden' name='elementName' value="<%=StringEscapeUtils.escapeHtml(elementName)%>"/>
-<input type='hidden' name='elementId' value="<%=StringEscapeUtils.escapeHtml(elementId)%>"/>
+<input type='hidden' name='form' value="<%=StringEscapeUtils.escapeHtml4(form)%>"/>
+<input type='hidden' name='elementName' value="<%=StringEscapeUtils.escapeHtml4(elementName)%>"/>
+<input type='hidden' name='elementId' value="<%=StringEscapeUtils.escapeHtml4(elementId)%>"/>
 </form>
 
 <table bgcolor="#C0C0C0" width="100%">
@@ -156,13 +153,16 @@
 			javax.servlet.jsp.jstl.core.LoopTagStatus i = (javax.servlet.jsp.jstl.core.LoopTagStatus) pageContext.getAttribute("i");
 			String bgColor = i.getIndex()%2==0?"#EEEEFF":"ivory";	
 			
-			String strOnClick; 
-            strOnClick = "selectResult('" + contact.getId() + "','"+StringEscapeUtils.escapeJavaScript(contact.getLastName()+ "," + contact.getFirstName()) + "')";
-                        
+			String contactFullName = contact.getLastName() + "," + contact.getFirstName();
+			// This seems to just be for display purposes
+			// The actual thing being used to eventually link the entry is the ID being passed along
+			contactFullName = contactFullName.replaceAll("\"", "");
+
 		%>
 		<tr bgcolor="<%=bgColor%>"
-		onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';"
-		onMouseout="this.style.backgroundColor='<%=bgColor%>';" onClick="<%=strOnClick%>">
+			onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';"
+			onMouseout="this.style.backgroundColor='<%=bgColor%>';"
+			onClick="selectResult('<%=contact.getId()%>', '<%=StringEscapeUtils.escapeEcmaScript(contactFullName)%>');">
 			<td><c:out value="${contact.lastName}"/></td>
 			<td><c:out value="${contact.firstName}"/></td>
 			<td><c:out value="${contact.residencePhone}" default=""/></td>
