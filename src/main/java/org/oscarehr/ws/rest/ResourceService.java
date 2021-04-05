@@ -87,8 +87,8 @@ public class ResourceService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<Boolean> isK2AActive(@Context HttpServletRequest request)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
 
@@ -109,8 +109,8 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<JSONArray> getPreventionRulesListFromK2A(@Context HttpServletRequest request)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 
 		JSONArray retArray = new JSONArray();
 		try
@@ -151,8 +151,8 @@ public class ResourceService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<String> getCurrentPreventionRulesVersion()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 
 		try {
 			ResourceBundle bundle = getResourceBundle();
@@ -183,8 +183,8 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
     	
 		try {
 
@@ -238,8 +238,8 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<List<NotificationTo1>> getNotifications(@Context HttpServletRequest request)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 
 		List<NotificationTo1> list = new ArrayList<NotificationTo1>();
 		try {
@@ -269,8 +269,8 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<String> getNotificationsNumber(@Context HttpServletRequest request)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 		try
 		{
 			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
@@ -294,8 +294,8 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<String> getMoreInfoNotificationURL(@Context HttpServletRequest request, JSONObject jSONObject)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 
 		String retval = "";
 		try
@@ -324,8 +324,8 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<String> markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
+				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
 
 		String retval = "";
 		try

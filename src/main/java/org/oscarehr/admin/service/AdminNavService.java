@@ -120,7 +120,7 @@ public class AdminNavService
 		{
 			adminNavList.add(getAdminNavSystemManagement(contextPath, resourceBundle, providerNo));
 		}
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_FAX))
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_CONFIG))
 		{
 			adminNavList.add(getAdminNavFaxManagement(providerNo));
 		}

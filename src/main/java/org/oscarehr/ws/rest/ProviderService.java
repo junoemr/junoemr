@@ -280,8 +280,6 @@ public class ProviderService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public AbstractSearchResponse<ProviderTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn )
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.SEARCH);
-
 		AbstractSearchResponse<ProviderTo1> response = new AbstractSearchResponse<ProviderTo1>();
 		
 		int startIndexVal = startIndex==null?0:startIndex.intValue();

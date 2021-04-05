@@ -175,7 +175,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		{
 			providerNo = loggedInInfo.getLoggedInProviderNo();
 		}
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.READ, null, "_appointment");
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm aa");
 

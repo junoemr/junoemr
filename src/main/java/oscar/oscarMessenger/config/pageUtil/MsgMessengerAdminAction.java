@@ -32,6 +32,7 @@ import org.oscarehr.common.dao.GroupMembersDao;
 import org.oscarehr.common.dao.GroupsDao;
 import org.oscarehr.common.model.GroupMembers;
 import org.oscarehr.common.model.Groups;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -52,7 +53,7 @@ public class MsgMessengerAdminAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
 	{
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		String[] providers = ((MsgMessengerAdminForm) form).getProviders();
 		String groupNoStr = ((MsgMessengerAdminForm) form).getGrpNo();

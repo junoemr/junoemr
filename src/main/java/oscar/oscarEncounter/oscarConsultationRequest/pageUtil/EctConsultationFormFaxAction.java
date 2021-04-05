@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tika.io.IOUtils;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
 import org.oscarehr.eform.model.EFormData;
@@ -65,7 +66,7 @@ public class EctConsultationFormFaxAction extends Action
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_con");
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
 
 		String reqId = request.getParameter("reqId");
 		String demoNo = request.getParameter("demographicNo");

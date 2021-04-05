@@ -69,8 +69,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobTypeResponse getCurrentlyAvailableJobTypes()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TASKS);
 
 		List<OscarJobType> results = oscarJobManager.getCurrentlyAvaliableJobTypes();
 
@@ -89,8 +88,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobTypeResponse getAllJobTypes()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TASKS);
 
 		List<OscarJobType> results = oscarJobManager.getAllJobTypes();
 		
@@ -110,8 +108,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobResponse getAllJobs()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TASKS);
 
 		List<OscarJob> results = oscarJobManager.getAllJobs(getLoggedInInfo());
 		
@@ -141,8 +138,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobResponse getJob(@PathParam("jobId") Integer jobId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJob result = oscarJobManager.getJob(getLoggedInInfo(), jobId);
 		
@@ -164,8 +160,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Consumes("application/x-www-form-urlencoded")
 	public OscarJobResponse saveJob(MultivaluedMap<String, String> params)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJob job = new OscarJob();
 		job.setId(Integer.parseInt(params.getFirst("job.id")));
@@ -211,8 +206,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobResponse cancelJob(@QueryParam(value = "jobId") Integer jobId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.TASKS);
 		
 		ScheduledFuture<Object> future = OscarJobExecutingManager.getFutures().get(jobId);
 		if(future != null) {
@@ -241,8 +235,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Consumes("application/x-www-form-urlencoded")
 	public OscarJobResponse saveCrontabExpression(MultivaluedMap<String, String> params)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TASKS);
 
 		Integer jobId = null;
 		try {jobId = Integer.parseInt(params.getFirst("scheduleJobId"));}catch(NumberFormatException e){
@@ -311,8 +304,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobTypeResponse getJobType(@PathParam("jobTypeId") Integer jobTypeId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJobType result = oscarJobManager.getJobType(getLoggedInInfo(), jobTypeId);
 		
@@ -331,8 +323,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Consumes("application/x-www-form-urlencoded")
 	public OscarJobTypeResponse saveJobType(MultivaluedMap<String, String> params)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJobType job = new OscarJobType();
 		job.setId(Integer.parseInt(params.getFirst("jobType.id")));
@@ -368,8 +359,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobResponse enableJob(@QueryParam(value = "jobId") Integer jobId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJob job = oscarJobManager.getJob(getLoggedInInfo(), jobId);
 		if(job != null) {
@@ -389,8 +379,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public OscarJobResponse disableJob(@QueryParam(value = "jobId") Integer jobId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJob job = oscarJobManager.getJob(getLoggedInInfo(), jobId);
 		if(job != null)

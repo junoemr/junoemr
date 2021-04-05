@@ -41,7 +41,6 @@ import org.springframework.stereotype.Service;
 import oscar.util.OscarRoleObjectPrivilege;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -339,18 +338,6 @@ public class SecurityInfoManager
 		return true;
 	}
 
-	@Deprecated // use enum version instead
-	public void requireAllPrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
-	{
-		for(String objectName:requiredObjList)
-		{
-			if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
-			{
-				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName + ")");
-			}
-		}
-	}
-
 	/**
 	 * Check that the given provider has all of the required security access rights
 	 * @param providerNo - the provider ID
@@ -386,6 +373,15 @@ public class SecurityInfoManager
 		requireAllPrivilege(providerNo, privilege, null, requiredObjList);
 	}
 
+	/**
+	 * Check that the given provider has at least one of the required security access rights
+	 * @param providerNo - the provider ID
+	 * @param privilege - the privilege level required
+	 * @param demographicNo - an optional demographic number ( for blocking individual patient records where appropriate)
+	 * @param requiredObjList - the required security objects for access to the emr module
+	 * @throws SecurityException - if the requirements are not me by the provider record
+	 * @deprecated - use enum version of requireAllPrivilege. no access should use an OR on securityObjects
+	 */
 	@Deprecated // use enum version instead
 	public void requireOnePrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
 	{
@@ -397,43 +393,6 @@ public class SecurityInfoManager
 			}
 		}
 		throw new SecurityException("missing one or more required privileges: " + privilege + " for security objects (" + String.join(",", requiredObjList) + ")");
-	}
-
-	/**
-	 * Check that the given provider has at least one of the required security access rights
-	 * @param providerNo - the provider ID
-	 * @param privilege - the privilege level required
-	 * @param demographicNo - an optional demographic number ( for blocking individual patient records where appropriate)
-	 * @param requiredObjList - the required security objects for access to the emr module
-	 * @throws SecurityException - if the requirements are not me by the provider record
-	 */
-	public void requireOnePrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... requiredObjList)
-	{
-		if(requiredObjList == null)
-		{
-			return;
-		}
-		for(SecObjectName.OBJECT_NAME objectName : requiredObjList)
-		{
-			if(hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), (demographicNo != null ? String.valueOf(demographicNo) : null)))
-			{
-				return;
-			}
-		}
-		throw new SecurityException("missing one or more required privileges: " + privilege + " for security objects (" +
-				String.join(",", Arrays.stream(requiredObjList).map(SecObjectName.OBJECT_NAME::getValue).toArray(String[]::new)) + ")");
-	}
-
-	/**
-	 * Check that the given provider has at least one of the required security access rights
-	 * @param providerNo - the provider ID
-	 * @param privilege - the privilege level required
-	 * @param requiredObjList - the required security objects for access to the emr module
-	 * @throws SecurityException - if the requirements are not me by the provider record
-	 */
-	public void requireOnePrivilege(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME... requiredObjList)
-	{
-		requireOnePrivilege(providerNo, privilege, null, requiredObjList);
 	}
 
 	public void requireSuperAdminFlag(String providerNo)

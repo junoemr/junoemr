@@ -97,16 +97,15 @@ public class EncounterHRMService extends EncounterSectionService
 
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
+		Integer demographicNo = Integer.parseInt(sectionParams.getDemographicNo());
 		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.READ, Integer.parseInt(sectionParams.getDemographicNo()), SecObjectName.OBJECT_NAME.HRM)
+				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.HRM)
 				|| !OscarProperties.getInstance().hasHRMDocuments())
 		{
 			return EncounterNotes.noNotes();
 		}
 
-		Map<String, HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(
-			Integer.parseInt(sectionParams.getDemographicNo())
-		);
+		Map<String, HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(demographicNo);
 
 		List<EncounterSectionNote> out = new ArrayList<>();
 		for (Entry<String, HRMDemographicDocument> entry: demographicDocuments.entrySet())

@@ -313,7 +313,7 @@ public class DemographicsService extends AbstractServiceImpl
 			@QueryParam("site") String defaultSiteName,
 			List<FileTransfer> fileListTransfer) throws IOException, InterruptedException, TimeoutException
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC_IMPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC_IMPORT);
 
 		String processId = UUID.randomUUID().toString();
 

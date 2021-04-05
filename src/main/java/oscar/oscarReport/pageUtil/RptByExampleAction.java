@@ -35,6 +35,7 @@ import org.oscarehr.common.dao.ReportByExamplesDao;
 import org.oscarehr.common.dao.ReportByExamplesExplainDao;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.model.ReportByExamples;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.report.SQLReportHelper;
 import org.oscarehr.util.MiscUtils;
@@ -76,7 +77,8 @@ public class RptByExampleAction extends Action
 			RptByExampleForm frm = (RptByExampleForm) form;
 
 			String providerNo = (String) request.getSession().getAttribute("user");
-			securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.READ, null, "_admin", "_report");
+			securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+					SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.REPORT);
 
 			RptByExampleQueryBeanHandler hd = new RptByExampleQueryBeanHandler();
 			Collection favorites = hd.getFavoriteCollection(providerNo);

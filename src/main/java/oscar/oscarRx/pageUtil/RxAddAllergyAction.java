@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.model.PartialDate;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -54,7 +55,7 @@ public final class RxAddAllergyAction extends Action
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNo, "w", null, "_allergy");
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ALLERGY);
 
 		int id = Integer.parseInt(request.getParameter("ID"));
 

@@ -49,6 +49,7 @@ import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
@@ -131,7 +132,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String[] flagProviders = request.getParameterValues("flagproviders");
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, demographicNo, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicNo, SecObjectName.OBJECT_NAME.EDOC);
 
 		try
 		{
@@ -914,7 +915,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 		Integer demographicNo = demographicNoStr != null ? Integer.parseInt(demographicNoStr) : null;
 
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, demographicNo, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicNo, SecObjectName.OBJECT_NAME.EDOC);
 
 		String pdfDir = request.getParameter("pdfDir");
 		String fileName = request.getParameter("pdfName");
