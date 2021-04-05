@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.security.SecurityObjectsTransfer;
-import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -48,12 +47,5 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 		SecurityObjectsTransfer transfer = new SecurityObjectsTransfer();
 		transfer.setAccessObjects(Arrays.asList(SecObjectName.OBJECT_NAME.values()));
 		return RestResponse.successResponse(transfer);
-	}
-
-	@GET
-	@Path("/self")
-	public RestResponse<UserSecurityRolesTransfer> getCurrentUserSecurityRoles()
-	{
-		return RestResponse.successResponse(securityInfoManager.getUserSecurityRolesTransfer(getLoggedInProviderId()));
 	}
 }

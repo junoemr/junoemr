@@ -37,12 +37,13 @@ public class UserSecurityRolesTransfer implements Serializable
 	private List<String> roles;
 	private Map<SecObjectName.OBJECT_NAME, List<SecurityInfoManager.PRIVILEGE_LEVEL>> privileges;
 
+	public UserSecurityRolesTransfer()
+	{
+		privileges = new HashMap<>();
+	}
+
 	public void addPrivilege(SecObjectName.OBJECT_NAME roleName, List<SecurityInfoManager.PRIVILEGE_LEVEL> privilegeLevels)
 	{
-		if(privileges == null)
-		{
-			privileges = new HashMap<>();
-		}
 		privileges.put(roleName, privilegeLevels);
 	}
 }

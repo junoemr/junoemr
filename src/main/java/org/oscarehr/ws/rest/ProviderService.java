@@ -23,6 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONObject;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -54,6 +56,7 @@ import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
+import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -76,6 +79,7 @@ import java.util.List;
 
 @Component("ProviderService")
 @Path("/providerService/")
+@Tag(name = "provider")
 @Transactional
 public class ProviderService extends AbstractServiceImpl {
 
@@ -119,6 +123,7 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/providers")
+	@Produces(MediaType.APPLICATION_JSON)
     @Deprecated
     public org.oscarehr.ws.rest.to.OscarSearchResponse<ProviderTransfer> getProviders() {
     	org.oscarehr.ws.rest.to.OscarSearchResponse<ProviderTransfer> lst = new 
@@ -133,7 +138,7 @@ public class ProviderService extends AbstractServiceImpl {
  
     @GET
     @Path("/providers_json")
-    @Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
     public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON()
     {
     	List<ProviderTo1> providers = new ProviderConverter().getAllAsTransferObjects(getLoggedInInfo(), providerDao.getActiveProviders());
@@ -146,7 +151,7 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/provider/me")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public ProviderTo1 getLoggedInProvider()
     {
     	Provider provider = getLoggedInInfo().getLoggedInProvider();
@@ -260,6 +265,7 @@ public class ProviderService extends AbstractServiceImpl {
 	}
     @GET
     @Path("/providerjson/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
     public ProviderTo1 getProviderAsJSON(@PathParam("id") String id)
     {
 	    Provider provider = providerDao.getProvider(id);
@@ -270,14 +276,16 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/providers/bad")
+	@Produces(MediaType.APPLICATION_JSON)
     public Response getBadRequest() {
         return Response.status(Status.BAD_REQUEST).build();
     }
 	
 	@POST
 	@Path("/providers/search")
-	@Produces("application/json")
-	@Consumes("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Hidden
 	public AbstractSearchResponse<ProviderTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn )
 	{
 		AbstractSearchResponse<ProviderTo1> response = new AbstractSearchResponse<ProviderTo1>();
@@ -315,7 +323,7 @@ public class ProviderService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/getRecentDemographicsViewed")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<PatientListItemTransfer> getRecentDemographicsViewed()
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
@@ -352,7 +360,7 @@ public class ProviderService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/getActiveTeams")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public AbstractSearchResponse<String> getActiveTeams()
 	{
 		List<String> teams = providerManager.getActiveTeams(getLoggedInInfo());
@@ -362,6 +370,13 @@ public class ProviderService extends AbstractServiceImpl {
 		response.setContent(teams);
 		response.setTotal(response.getContent().size());
 		return response;
+	}
+
+	@GET
+	@Path("/self/security/roles")
+	public RestResponse<UserSecurityRolesTransfer> getCurrentUserSecurityRoles()
+	{
+		return RestResponse.successResponse(securityInfoManager.getUserSecurityRolesTransfer(getLoggedInProviderId()));
 	}
 	
 //	@GET

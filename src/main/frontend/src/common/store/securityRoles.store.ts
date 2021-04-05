@@ -25,7 +25,7 @@
 
  */
 
-import {SecurityObjectsTransfer, SecurityRolesApi, UserSecurityRolesTransfer} from "../../../generated";
+import {ProviderApi, SecurityObjectsTransfer, UserSecurityRolesTransfer} from "../../../generated";
 import PrivilegesEnum = UserSecurityRolesTransfer.PrivilegesEnum;
 import AccessObjectsEnum = SecurityObjectsTransfer.AccessObjectsEnum;
 
@@ -37,13 +37,13 @@ angular.module("Common.Store").service("securityRolesStore", [
 		$httpParamSerializer)
 	{
 		const service = this;
-		service.securtyRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
+		service.providerApi = new ProviderApi($http, $httpParamSerializer, '../ws/rs');
 
 		service.rolesData = null as UserSecurityRolesTransfer;
 
 		service.loadUserRoles = async (): Promise<void> =>
 		{
-			service.rolesData = (await service.securtyRolesApi.getCurrentUserSecurityRoles()).data.body;
+			service.rolesData = (await service.providerApi.getCurrentUserSecurityRoles()).data.body;
 		}
 
 		/**

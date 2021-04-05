@@ -2005,6 +2005,7 @@
 								org.oscarehr.ws.rest.SitesService
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
+								org.oscarehr.ws.rest.ProviderService
 								org.oscarehr.ws.rest.DemographicsService
 								org.oscarehr.ws.rest.SecurityRolesWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
