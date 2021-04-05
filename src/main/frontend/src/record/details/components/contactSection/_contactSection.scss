@@ -13,6 +13,20 @@
 				}
 			}
 
+			.e-messaging-consent {
+				display: flex;
+				align-items: center;
+
+				.juno-select {
+					width: 256px;
+				}
+
+				.consent-date {
+					margin-left: 8px;
+					margin-top: 8px;
+				}
+			}
+
 			.phone-with-ext {
 				display: flex;
 				align-items: center;
