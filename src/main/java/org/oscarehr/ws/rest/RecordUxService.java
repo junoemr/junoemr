@@ -468,10 +468,6 @@ public class RecordUxService extends AbstractServiceImpl {
 					endCal = javax.xml.bind.DatatypeConverter.parseDateTime(datesJson.getString("end"));
 				}
 			}
-			if(startCal != null && endCal != null){
-				printAllNotesType = true;
-			}
-			
 		}
 		final Calendar startCalf = startCal;
 		final Calendar endCalf = endCal;
