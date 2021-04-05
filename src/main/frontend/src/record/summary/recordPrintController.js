@@ -114,7 +114,10 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 		{
 			let site = controller.selectedSite;
 			let validDates = controller.checkDates();
-			if (!validDates) return;
+			if (!validDates)
+			{
+				return;
+			}
 
 			if (controller.pageOptions.printType === controller.printTypeEnum.selected
 				&& controller.pageOptions.selectedList.length === 0)
