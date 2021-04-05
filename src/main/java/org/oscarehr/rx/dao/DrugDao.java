@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Query;
 
@@ -493,6 +494,17 @@ public class DrugDao extends AbstractDao<Drug>
 				"LIMIT 100 ";
 		Query query = entityManager.createNativeQuery(sql);
 	    return query.getResultList();
+    }
+    
+    public List<String> findSpecialInstructionsByRegionalId(Set<String> regionalIds)
+    {
+    	String sql = "SELECT DISTINCT d.special_instruction FROM Drug d " +
+			         "WHERE d.regionalIdentifier IN (:ids) " +
+			         "AND d.special_instruction IS NOT NULL " +
+			         "ORDER BY d.regionalIdentifier, d.rxDate";
+    	Query query = entityManager.createQuery(sql);
+    	query.setParameter("ids", regionalIds);
+    	return query.getResultList();
     }
 	
 	public List<Integer> findDemographicIdsUpdatedAfterDate(Date updatedAfterThisDate) {

@@ -1445,7 +1445,42 @@ public class RxUtil {
 		}
 		return unique;
 	}
-
+	
+	/**
+	 * Fetch special instructions from past entries associated with the supplied regionalIds.
+	 * This does not fetch special instructions for null regionalIds (ie: Custom drugs)
+	 *
+	 * Regional ids appear to be as unique as GCNo, and they also happen to be indexed
+	 * in the database.
+	 *
+	 * @param regionalIds a list of regionalIds.
+	 * @return String of custom instructions, each instruction is delimited by *
+	 */
+	public static String getSpecialInstructionsOptimized(Set<String> regionalIds)
+	{
+		Set<String> specialInstructions = new HashSet<>();
+		
+		String[] instructions = new RxCodesData().getSpecialInstructions();
+		Arrays.stream(instructions).forEach(inst -> specialInstructions.add(inst));
+		
+		if (regionalIds != null)
+		{
+			regionalIds.remove(null);
+			
+			if (!regionalIds.isEmpty())
+			{
+				DrugDao drugDao = SpringUtils.getBean(DrugDao.class);
+				List<String> pastInstructionsFromRx = drugDao.findSpecialInstructionsByRegionalId(regionalIds);
+				specialInstructions.addAll(pastInstructionsFromRx);
+			}
+		}
+		
+		String toReturn = String.join("*", specialInstructions);
+		return toReturn;
+	}
+	
+	@Deprecated()
+	// Use getSpecialInstructionsOptimized instead
 	public static String getSpecialInstructions() {
 		StringBuilder retStr = new StringBuilder();
 		RxCodesData codesData = new RxCodesData();
