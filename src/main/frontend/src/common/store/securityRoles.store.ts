@@ -29,21 +29,17 @@ import {SecurityObjectsTransfer, SecurityRolesApi, UserSecurityRolesTransfer} fr
 import PrivilegesEnum = UserSecurityRolesTransfer.PrivilegesEnum;
 import AccessObjectsEnum = SecurityObjectsTransfer.AccessObjectsEnum;
 
-angular.module("Common.Services").service("securityRolesStore", [
+angular.module("Common.Store").service("securityRolesStore", [
 	'$http',
 	'$httpParamSerializer',
-	'$q',
-	'$rootScope',
 	function(
 		$http,
-		$httpParamSerializer,
-		$q,
-		$rootScope)
+		$httpParamSerializer)
 	{
 		const service = this;
 		service.securtyRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
-		service.rolesData = <UserSecurityRolesTransfer> null;
+		service.rolesData = null as UserSecurityRolesTransfer;
 
 		service.loadUserRoles = async (): Promise<void> =>
 		{
@@ -73,16 +69,6 @@ angular.module("Common.Services").service("securityRolesStore", [
 				}
 			}
 			return false;
-		}
-
-		/**
-		 * make the security check available to all pages
-		 * @param access - the access required
-		 * @param requiredPrivileges - the privilege levels required
-		 */
-		$rootScope.hasSecurityPrivileges = (access: AccessObjectsEnum, ...requiredPrivileges: PrivilegesEnum[]): boolean =>
-		{
-			return service.hasSecurityPrivileges(access, ...requiredPrivileges);
 		}
 	}
 ]);
