@@ -21,20 +21,56 @@
  * Canada
  */
 
+import {SecurityRolesApi} from "../../../../generated";
+
+const {UserSecurityRolesTransfer} = require("../../../../generated");
+const {SecurityObjectsTransfer} = require("../../../../generated");
+
 angular.module('Admin.Section').component('securityRoleConfig',
-    {
-        templateUrl: 'src/admin/section/securityRole/securityRoleConfig.jsp',
-        bindings: {},
-        controller: [
-            '$scope',
-            'securityRolesStore',
-            function ($scope, securityRolesStore)
+{
+    templateUrl: 'src/admin/section/securityRole/securityRoleConfig.jsp',
+    bindings: {},
+    controller: [
+        '$scope',
+        '$http',
+        '$httpParamSerializer',
+        '$uibModal',
+        'securityRolesStore',
+        function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
+        {
+            let ctrl = this;
+            ctrl.access = SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY;
+            ctrl.permissions = UserSecurityRolesTransfer.PrivilegesEnum.READ;
+
+            ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
+
+            ctrl.rolesList = [];
+
+            ctrl.$onInit = async () =>
             {
-                let ctrl = this;
+                ctrl.rolesList = (await ctrl.securityRolesApi.getRoles()).data.body;
+            }
 
-                ctrl.$onInit = () =>
+            ctrl.onRoleDetails = (role) =>
+            {
+                $uibModal.open(
+                    {
+                        component: 'securityRoleConfigModal',
+                        backdrop: 'static',
+                        windowClass: "juno-modal lg",
+                        resolve: {
+                            role: role,
+                        }
+                    }
+                ).result.then((data) =>
                 {
-                }
+                    // force the cached access/permissions values to reload
+                    securityRolesStore.loadUserRoles();
+                }).catch((reason) =>
+                {
+                    // do nothing on cancel
+                });
 
-            }]
-    });
+            }
+        }]
+});

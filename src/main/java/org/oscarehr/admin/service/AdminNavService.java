@@ -67,7 +67,7 @@ public class AdminNavService
 				SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN,
 				SecObjectName.OBJECT_NAME.ADMIN_PROVIDER))
 		{
-			adminNavList.add(getAdminNavUserManagementGroup(contextPath, resourceBundle));
+			adminNavList.add(getAdminNavUserManagementGroup(contextPath, providerNo, resourceBundle));
 		}
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
 				SecObjectName.OBJECT_NAME.ADMIN,
@@ -164,7 +164,7 @@ public class AdminNavService
 	 * @param resourceBundle - a resource bundle from which to pull message strings
 	 * @return - the adminNavGroup for the user management list.
 	 */
-	private AdminNavGroupTo1 getAdminNavUserManagementGroup(String contextPath, ResourceBundle resourceBundle)
+	private AdminNavGroupTo1 getAdminNavUserManagementGroup(String contextPath, String providerNo, ResourceBundle resourceBundle)
 	{
 		AdminNavGroupTo1 userManagement = new AdminNavGroupTo1();
 		List<AdminNavItemTo1> userManagementItems = new ArrayList<>();
@@ -172,6 +172,11 @@ public class AdminNavService
 		userManagement.setName(resourceBundle.getString("admin.admin.UserManagement"));
 
 		userManagementItems.add(new AdminNavItemTo1("Manage Users", "manageUsers"));
+
+		if (securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY))
+		{
+			userManagementItems.add(new AdminNavItemTo1("Manage Roles", "manageRoles"));
+		}
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddLogin"), "frame?frameUrl=" + contextPath + "/admin/securityaddarecord.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchLogin"), "frame?frameUrl=" + contextPath + "/admin/securitysearchrecordshtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.assignRole"), "frame?frameUrl=" + contextPath + "/admin/providerRole.jsp"));

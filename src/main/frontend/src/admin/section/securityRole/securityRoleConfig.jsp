@@ -21,4 +21,16 @@
 * Canada
 --%>
 <div class="security-role-config">
+    <juno-security-check access="$ctrl.access" permissions="$ctrl.permissions">
+        <h1>Manage Security Access Roles</h1>
+        <ul class="list-group">
+            <li ng-repeat="role in $ctrl.rolesList" class="list-group-item">
+                <span>{{role.name}}</span>
+                <span>{{role.description}}</span>
+                <juno-button click="$ctrl.onRoleDetails(role)">
+                    Details
+                </juno-button>
+            </li>
+        </ul>
+    </juno-security-check>
 </div>

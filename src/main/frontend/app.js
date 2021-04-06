@@ -219,6 +219,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/manageUsers',
 			component: 'manageUsersAdmin',
 		})
+		.state('admin.manageRoles',
+			{
+				url: '/manageRoles',
+				component: 'securityRoleConfig',
+			})
 		.state('admin.manageAppointmentQueues',
 			{
 				url: '/manageAppointmentQueues',

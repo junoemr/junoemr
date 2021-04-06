@@ -343,6 +343,8 @@ module.exports = {
 			'./src/admin/section/panelManagement/panelManagementAdminComponent.js',
 			'./src/admin/section/editProviderPage/editProviderAdminComponent.js',
 			'./src/admin/section/manageUserPage/manageUserAdminComponent.js',
+			'./src/admin/section/securityRole/securityRoleConfigComponent.js',
+			'./src/admin/section/securityRole/securityRoleConfigModalComponent.js',
 			'./src/admin/section/integrationModules/integrationModulesComponent.js',
 			'./src/admin/section/iceFall/iceFallAdminComponent.js',
 			'./src/admin/section/iceFall/settings/iceFallAdminSettingsComponent.js',

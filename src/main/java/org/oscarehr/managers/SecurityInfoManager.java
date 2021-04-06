@@ -39,18 +39,21 @@ import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.transfer.security.SecurityObjectsTransfer;
+import org.oscarehr.ws.rest.transfer.security.SecurityRoleTransfer;
 import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import oscar.util.OscarRoleObjectPrivilege;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
 @Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class SecurityInfoManager
 {
 	// avoid use of these, use enum instead
@@ -123,6 +126,31 @@ public class SecurityInfoManager
 		return results;
 	}
 
+	public List<SecurityRoleTransfer> getAllRoles()
+	{
+		List<SecRole> allRoles = secRoleDao.findAll();
+		List<SecurityRoleTransfer> roleTransfers = new ArrayList<>(allRoles.size());
+
+		for(SecRole secRole : allRoles)
+		{
+			SecurityRoleTransfer transfer = new SecurityRoleTransfer();
+			transfer.setId(secRole.getId());
+			transfer.setName(secRole.getName());
+			transfer.setDescription(secRole.getDescription());
+
+			for(SecObjPrivilege privilege : secRole.getSecObjPrivilege())
+			{
+				transfer.addPrivilege(
+						SecObjectName.OBJECT_NAME.fromValueString(privilege.getId().getObjectName()),
+						getPrivilegeLevels(privilege.getPrivilege())
+				);
+			}
+
+			roleTransfers.add(transfer);
+		}
+		return roleTransfers;
+	}
+
 	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo)
 	{
 		return getSecurityObjects(loggedInInfo.getLoggedInProviderNo());
@@ -156,7 +184,7 @@ public class SecurityInfoManager
 		{
 			transfer.addPrivilege(
 					SecObjectName.OBJECT_NAME.fromValueString(secobjprivilege.getObjectname_code()),
-					getPrivilegeLevels(secobjprivilege)
+					getPrivilegeLevels(secobjprivilege.getPrivilege_code())
 			);
 		}
 
@@ -174,18 +202,16 @@ public class SecurityInfoManager
 		{
 			objectNames.add(SecObjectName.OBJECT_NAME.fromValueString(secObjPrivilege.getId().getObjectName()));
 		}
-
 		SecurityObjectsTransfer transfer = new SecurityObjectsTransfer();
 		transfer.setAccessObjects(objectNames);
-		transfer.setAccessObjects(Arrays.asList(SecObjectName.OBJECT_NAME.values()));
 
 		return transfer;
 	}
 
-	private List<PRIVILEGE_LEVEL> getPrivilegeLevels(Secobjprivilege secobjprivilege)
+	private List<PRIVILEGE_LEVEL> getPrivilegeLevels(String privilege)
 	{
 		List<PRIVILEGE_LEVEL> privilegeList = new ArrayList<>(4);
-		switch(secobjprivilege.getPrivilege_code())
+		switch(privilege)
 		{
 			case ALL: privilegeList.add(PRIVILEGE_LEVEL.DELETE);
 			case WRITE: privilegeList.add(PRIVILEGE_LEVEL.WRITE);

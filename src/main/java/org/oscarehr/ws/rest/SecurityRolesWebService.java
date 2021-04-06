@@ -24,8 +24,11 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.security.SecurityObjectsTransfer;
+import org.oscarehr.ws.rest.transfer.security.SecurityRoleTransfer;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -35,25 +38,35 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Arrays;
 
-@Path("/security/roles")
+@Path("/security")
 @Component("SecurityRolesWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "securityRoles")
 public class SecurityRolesWebService extends AbstractServiceImpl
 {
 	@GET
-	@Path("/")
+	@Path("/accesses")
 	public RestResponse<SecurityObjectsTransfer> getAccessObjects()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
 		SecurityObjectsTransfer transfer = new SecurityObjectsTransfer();
 		transfer.setAccessObjects(Arrays.asList(SecObjectName.OBJECT_NAME.values()));
 		return RestResponse.successResponse(transfer);
 	}
 
 	@GET
-	@Path("/{roleId}")
+	@Path("/accesses/role/{roleId}")
 	public RestResponse<SecurityObjectsTransfer> getAccessObjectsByRole(@PathParam("roleId") Integer roleId)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
 		return RestResponse.successResponse(securityInfoManager.getSecurityObjectsTransfer(roleId));
+	}
+
+	@GET
+	@Path("roles")
+	public RestSearchResponse<SecurityRoleTransfer> getRoles()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		return RestSearchResponse.successResponseOnePage(securityInfoManager.getAllRoles());
 	}
 }

@@ -33,6 +33,9 @@
 
 .juno-modal {
 	@include modal-size($modal-width, $modal-height);
+	&.lg {
+		@include modal-size($modal-width-lg, $modal-height-lg);
+	}
 	&.sml {
 		@include modal-size($modal-width-sml, $modal-height-sml, 48px, 48px);
 	}
