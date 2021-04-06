@@ -120,10 +120,14 @@ public class CaseManagementPrint {
 		{
 			notes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, false);
 		}
+		else if (startDate != null && endDate != null)
+		{
+			notes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, false);
+			notes = filterNotesByDate(notes, startDate, endDate);
+		}
 		else
 		{
 			notes = getNotesToPrint(noteIds, loggedInInfo, demoNo);
-			notes = filterNotesByDate(notes, startDate, endDate);
 		}
 
 		HashMap<String, List<CaseManagementNote>> cpp = null;
