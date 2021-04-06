@@ -25,13 +25,18 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Data;
 import org.apache.commons.lang3.EnumUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
+@Data
 @Entity
 @Table(name="secObjectName")
 public class SecObjectName extends AbstractModel<String>
@@ -233,28 +238,18 @@ public class SecObjectName extends AbstractModel<String>
 	@Id
 	@Column(name="objectName")
 	private String id;
+
 	private String description;
+
 	@Column(name="orgapplicable")
 	private Boolean orgApplicable;
 
-	public String getId() {
-    	return id;
-    }
-	public void setId(String id) {
-    	this.id = id;
-    }
-	public String getDescription() {
-    	return description;
-    }
-	public void setDescription(String description) {
-    	this.description = description;
-    }
-	public Boolean isOrgApplicable() {
-    	return orgApplicable;
-    }
-	public void setOrgApplicable(Boolean orgApplicable) {
-    	this.orgApplicable = orgApplicable;
-    }
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "secObjectName")
+	private List<SecObjPrivilege> secObjPrivileges;
 
-
+	@Override
+	public String getId()
+	{
+		return id;
+	}
 }

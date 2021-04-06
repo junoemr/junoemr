@@ -25,13 +25,12 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.Collection;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.model.SecObjPrivilege;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.Collection;
+import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")

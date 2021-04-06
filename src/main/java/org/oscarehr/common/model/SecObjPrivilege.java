@@ -25,57 +25,45 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 
+@Data
 @Entity
-@Table(name="secObjPrivilege")
-public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey> {
-
+@Table(name = "secObjPrivilege")
+public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
+{
 	@EmbeddedId
 	private SecObjPrivilegePrimaryKey id;
 
 	private String privilege = "|0|";
+
 	private int priority = 0;
-	@Column(name="provider_no")
+
+	@Column(name = "provider_no")
 	private String providerNo = null;
 
-	public SecObjPrivilegePrimaryKey getId() {
+	@MapsId("roleUserGroup")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "roleUserGroup", referencedColumnName = "role_name", insertable = false, updatable = false)
+	private SecRole secRole;
+
+	@MapsId("objectName")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "objectName", referencedColumnName = "objectName", insertable = false, updatable = false)
+	private SecObjectName secObjectName;
+
+	@Override
+	public SecObjPrivilegePrimaryKey getId()
+	{
 		return id;
 	}
-
-
-	public void setId(SecObjPrivilegePrimaryKey id) {
-    	this.id = id;
-    }
-
-
-	public String getPrivilege() {
-		return privilege;
-	}
-
-	public void setPrivilege(String privilege) {
-		this.privilege = privilege;
-	}
-
-	public int getPriority() {
-		return priority;
-	}
-
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
-
-	public String getProviderNo() {
-		return providerNo;
-	}
-
-	public void setProviderNo(String providerNo) {
-		this.providerNo = providerNo;
-	}
-
-
-
 }

@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Arrays;
@@ -47,5 +48,12 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 		SecurityObjectsTransfer transfer = new SecurityObjectsTransfer();
 		transfer.setAccessObjects(Arrays.asList(SecObjectName.OBJECT_NAME.values()));
 		return RestResponse.successResponse(transfer);
+	}
+
+	@GET
+	@Path("/{roleId}")
+	public RestResponse<SecurityObjectsTransfer> getAccessObjectsByRole(@PathParam("roleId") Integer roleId)
+	{
+		return RestResponse.successResponse(securityInfoManager.getSecurityObjectsTransfer(roleId));
 	}
 }

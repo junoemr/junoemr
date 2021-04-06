@@ -30,9 +30,10 @@ import java.io.Serializable;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class SecObjPrivilegePrimaryKey implements Serializable {
-	private String roleUserGroup = null;
-	private String objectName = null;
+public class SecObjPrivilegePrimaryKey implements Serializable
+{
+	protected String roleUserGroup = null;
+	protected String objectName = null;
 
 	public SecObjPrivilegePrimaryKey()
 	{

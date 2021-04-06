@@ -29,18 +29,23 @@ import com.quatro.model.security.Secobjprivilege;
 import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
+import org.oscarehr.common.model.SecObjPrivilege;
 import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.common.model.SecRole;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.transfer.security.SecurityObjectsTransfer;
 import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.OscarRoleObjectPrivilege;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -108,6 +113,9 @@ public class SecurityInfoManager
 	@Autowired
 	private ProviderDataDao providerDataDao;
 
+	@Autowired
+	private SecRoleDao secRoleDao;
+
 	public List<Secuserrole> getRoles(String providerNo)
 	{
 		@SuppressWarnings("unchecked")
@@ -153,6 +161,24 @@ public class SecurityInfoManager
 		}
 
 		transfer.setRoles(roleNames);
+		return transfer;
+	}
+
+	public SecurityObjectsTransfer getSecurityObjectsTransfer(Integer roleId)
+	{
+		SecRole secRole = secRoleDao.find(roleId);
+		List<SecObjPrivilege> privilegeObjects = secRole.getSecObjPrivilege();
+
+		List<SecObjectName.OBJECT_NAME> objectNames = new ArrayList<>(privilegeObjects.size());
+		for (SecObjPrivilege secObjPrivilege : privilegeObjects)
+		{
+			objectNames.add(SecObjectName.OBJECT_NAME.fromValueString(secObjPrivilege.getId().getObjectName()));
+		}
+
+		SecurityObjectsTransfer transfer = new SecurityObjectsTransfer();
+		transfer.setAccessObjects(objectNames);
+		transfer.setAccessObjects(Arrays.asList(SecObjectName.OBJECT_NAME.values()));
+
 		return transfer;
 	}
 
