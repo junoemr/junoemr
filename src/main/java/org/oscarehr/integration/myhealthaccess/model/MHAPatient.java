@@ -89,6 +89,13 @@ public class MHAPatient
 		@JsonCreator
 		public static LINK_STATUS fromString(String str)
 		{
+			// Old MHA server will send status 'active' instead of 'confirmed' or 'verified'
+			// Convert the value. TODO Can be removed once MHA master branch includes MHA-2069.
+			if (str.equals("active"))
+			{
+				str = "confirmed";
+			}
+
 			return LINK_STATUS.valueOf(str.toUpperCase());
 		}
 	}
