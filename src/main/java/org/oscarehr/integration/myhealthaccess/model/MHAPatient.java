@@ -23,6 +23,7 @@
 
 package org.oscarehr.integration.myhealthaccess.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
 import org.springframework.beans.BeanUtils;
 import oscar.util.ConversionUtils;
@@ -82,7 +83,14 @@ public class MHAPatient
 		CLINIC_REJECTED,
 		PENDING_CLINIC_CONFIRM,
 		PENDING_PATIENT_CONFIRM,
-		ACTIVE
+		CONFIRMED,
+		VERIFIED;
+
+		@JsonCreator
+		public static LINK_STATUS fromString(String str)
+		{
+			return LINK_STATUS.valueOf(str.toUpperCase());
+		}
 	}
 
 	public static boolean isValidProvinceCode(String provinceCode)
@@ -117,7 +125,7 @@ public class MHAPatient
 		BeanUtils.copyProperties(patientTo1, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
 		this.healthCareProvinceCode = stringToProvinceCode(patientTo1.getHealthCareProvinceCode());
 		this.addressProvinceCode = stringToProvinceCode(patientTo1.getAddressProvinceCode());
-		this.linkStatus = LINK_STATUS.valueOf(patientTo1.getLinkStatus().toUpperCase());
+		this.linkStatus = patientTo1.getLinkStatus();
 	}
 
 	public String getId()
