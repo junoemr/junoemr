@@ -63,6 +63,7 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
 
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 public class ContactAction extends DispatchAction {
 
@@ -349,8 +350,7 @@ public class ContactAction extends DispatchAction {
 	public ActionForward removeContact(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest request, HttpServletResponse response) {
 
-		ArrayList<String> arrayListIds = null;
-		String[] ids = null;
+		List<String> arrayListIds = new ArrayList<>();
 		String[] proContactIds = request.getParameterValues("procontact.delete");
 		String[] contactIds = request.getParameterValues("contact.delete");
 		String postMethod = request.getParameter("postMethod");
@@ -366,12 +366,11 @@ public class ContactAction extends DispatchAction {
     	}
     	
     	if(removeSingleId != null) {
-    		ids = new String[]{removeSingleId};
-    	}
+			arrayListIds.add(removeSingleId);
+		}
     	
 		if( proContactIds != null || contactIds != null ) {
-			arrayListIds = new ArrayList<String>(); 
-			
+
 			if(proContactIds != null) {
 				arrayListIds.addAll(Arrays.asList( proContactIds ) );
 			}
@@ -380,18 +379,16 @@ public class ContactAction extends DispatchAction {
 				arrayListIds.addAll(Arrays.asList( contactIds ) );
 			}
 			
-			ids = (String[]) arrayListIds.toArray();
 		}
 		
-    	if( ids != null ) {
-    		int contactId;
-    		for( String id : ids ) {
-    			contactId = Integer.parseInt(id);
-    			DemographicContact dc = demographicContactDao.find( contactId );
-    			dc.setDeleted(true);
-    			demographicContactDao.merge(dc);
-    		}
-    	}
+		int contactId;
+		for( String id : arrayListIds ) {
+			contactId = Integer.parseInt(id);
+			DemographicContact dc = demographicContactDao.find( contactId );
+			dc.setDeleted(true);
+			demographicContactDao.merge(dc);
+		}
+
     	
     	return actionForward; 
 
@@ -510,18 +507,27 @@ public class ContactAction extends DispatchAction {
 		
 		DynaValidatorForm dform = (DynaValidatorForm)form;
 		Contact contact = (Contact)dform.get("contact");
-		String id = request.getParameter("contact.id");
-		if(id != null && id.length()>0) {
+		String id = StringUtils.trimToNull(request.getParameter("contact.id"));
+		if(ConversionUtils.hasContent(id))
+		{
 			Contact savedContact = contactDao.find(Integer.parseInt(id));
-			if(savedContact != null) {
-				BeanUtils.copyProperties(contact, savedContact, new String[]{"id"});
+			if (savedContact != null)
+			{
+				String[] ignoreProps = {"id"};
+				BeanUtils.copyProperties(contact, savedContact, ignoreProps);
 				contactDao.merge(savedContact);
 			}
 		}
-		else {
+		else
+		{
+			// The ID on the request parameter is null or empty string, which
+			// gets converted to 0 by the DynaValidator parser for Integer types.
+			// To persist a new record, it needs to be null.
+			contact.setId(null);
 			contactDao.persist(contact);
 		}
-	   return mapping.findForward("cForm");
+
+	   return mapping.findForward("windowClose");
 	}
 
 	public ActionForward saveProContact(ActionMapping mapping, ActionForm form, 
