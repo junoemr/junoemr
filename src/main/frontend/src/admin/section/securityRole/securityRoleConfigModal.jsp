@@ -22,30 +22,79 @@
 --%>
 <juno-modal class="security-role-config-modal" component-style="$ctrl.resolve.style">
 
-    <modal-ctl-buttons>
-        <i class="icon icon-modal-ctl icon-close" ng-click="$ctrl.onCancel()"></i>
-    </modal-ctl-buttons>
+	<modal-ctl-buttons>
+		<i class="icon icon-modal-ctl icon-close" ng-click="$ctrl.onCancel()"></i>
+	</modal-ctl-buttons>
 
-    <modal-title>
-        <h3>Manage {{$ctrl.role.name}} role</h3>
-    </modal-title>
+	<modal-title>
+		<h3>Manage {{$ctrl.role.name}} role</h3>
+	</modal-title>
 
-    <modal-body>
-        <div class="overflow-auto height-100">
-            <ul class="list-group">
-                <li ng-repeat="access in $ctrl.accessList" class="list-group-item">
-                    <div class="flex-row">
-                        <juno-select
-                                label="{{access.name}}"
-                                ng-model="access.permissionLevel"
-                                options="$ctrl.permissionLevelOptions"
-                                class="role-selection"
-                                disabled="!$ctrl.canEdit()">
-                        </juno-select>
-                        <span>{{access.description}}</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </modal-body>
+	<modal-body>
+		<div class="overflow-auto height-100">
+			<div class="role-details">
+				<h3>Role Details</h3>
+
+				<juno-input ng-model="$ctrl.role.name"
+				            label="Role Name"
+				            disabled="!$ctrl.canEdit()">
+				</juno-input>
+				<juno-input ng-model="$ctrl.role.description"
+				            label="Role Description"
+				            disabled="!$ctrl.canEdit()">
+				</juno-input>
+			</div>
+			<div class="role-access">
+				<h3>Role Permissions</h3>
+
+				<ul class="list-group">
+					<li ng-repeat="access in $ctrl.accessList" class="list-group-item">
+						<div class="flex-row">
+							<juno-select
+									label="{{access.name}}"
+									ng-model="access.permissionLevel"
+									options="$ctrl.permissionLevelOptions"
+									class="access-selection"
+									disabled="!$ctrl.canEdit()">
+							</juno-select>
+							<span>{{access.description}}</span>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</modal-body>
+	<modal-footer>
+		<div class="row footer-wrapper">
+			<div class="col-md-6">
+				<juno-button component-style="$ctrl.resolve.style"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+				             ng-click="$ctrl.onCancel()"
+				             class="cancel-connection-btn">
+					<div class="cancel-btn-text">
+						Cancel
+					</div>
+				</juno-button>
+			</div>
+			<div class="col-md-6">
+				<juno-button ng-if="$ctrl.newRole"
+				             component-style="$ctrl.resolve.style"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+				             ng-click="$ctrl.onCreate()"
+				             disabled="!$ctrl.canSave()">
+					Add Role
+				</juno-button>
+				<juno-button ng-if="!$ctrl.newRole"
+				             component-style="$ctrl.resolve.style"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+				             ng-click="$ctrl.onUpdate()"
+				             disabled="!$ctrl.canSave()">
+					Save Role
+				</juno-button>
+			</div>
+		</div>
+	</modal-footer>
 </juno-modal>

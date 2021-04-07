@@ -3,10 +3,33 @@
 }
 
 .security-role-config-modal {
-  .role-selection {
+  .role-details,
+  .role-access {
+    h3 {
+      color: var(--color-neutral-darkest);
+      text-align: center;
+    }
+
     label {
       min-width: 312px;
     }
   }
 
+  .role-details {
+    padding: 16px;
+    .juno-input {
+      margin-bottom: 4px;
+    }
+  }
+
+  .role-access {
+    padding: 0 16px;
+  }
+
+  .footer-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
 }

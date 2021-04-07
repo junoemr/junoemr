@@ -23,15 +23,19 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.security.SecurityObjectsTransfer;
 import org.oscarehr.ws.rest.transfer.security.SecurityRoleTransfer;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -40,12 +44,12 @@ import java.util.Arrays;
 
 @Path("/security")
 @Component("SecurityRolesWebService")
-@Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "securityRoles")
 public class SecurityRolesWebService extends AbstractServiceImpl
 {
 	@GET
 	@Path("/accesses")
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<SecurityObjectsTransfer> getAccessObjects()
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
@@ -55,18 +59,50 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/accesses/role/{roleId}")
-	public RestResponse<SecurityObjectsTransfer> getAccessObjectsByRole(@PathParam("roleId") Integer roleId)
-	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
-		return RestResponse.successResponse(securityInfoManager.getSecurityObjectsTransfer(roleId));
-	}
-
-	@GET
 	@Path("roles")
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<SecurityRoleTransfer> getRoles()
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
 		return RestSearchResponse.successResponseOnePage(securityInfoManager.getAllRoles());
+	}
+
+	@POST
+	@Path("/role")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<SecurityRoleTransfer> addRole(SecurityRoleTransfer transfer)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		return RestResponse.successResponse(null); //TODO
+	}
+
+	@GET
+	@Path("/role/{roleId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<SecurityRoleTransfer> getRole(@PathParam("roleId") Integer roleId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		return RestResponse.successResponse(securityInfoManager.getRoleTransfer(roleId));
+	}
+
+	@PUT
+	@Path("/role/{roleId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<SecurityRoleTransfer> updateRole(@PathParam("roleId") Integer roleId, SecurityRoleTransfer transfer)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		//TODO
+		return RestResponse.successResponse(securityInfoManager.getRoleTransfer(roleId));
+	}
+
+	@DELETE
+	@Path("/role/{roleId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> deleteRole(@PathParam("roleId") Integer roleId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		return RestResponse.successResponse(false); //TODO
 	}
 }

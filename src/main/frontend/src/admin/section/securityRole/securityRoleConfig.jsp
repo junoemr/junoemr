@@ -16,21 +16,31 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 *
 * This software was written for
-	* CloudPractice Inc.
+* CloudPractice Inc.
 * Victoria, British Columbia
 * Canada
 --%>
 <div class="security-role-config">
-    <juno-security-check access="$ctrl.access" permissions="$ctrl.permissions">
-        <h1>Manage Security Access Roles</h1>
-        <ul class="list-group">
-            <li ng-repeat="role in $ctrl.rolesList" class="list-group-item">
-                <span>{{role.name}}</span>
-                <span>{{role.description}}</span>
-                <juno-button click="$ctrl.onRoleDetails(role)">
-                    Details
-                </juno-button>
-            </li>
-        </ul>
-    </juno-security-check>
+	<juno-security-check access="$ctrl.access" permissions="$ctrl.permissions">
+		<h1>Manage Security Access Roles</h1>
+		<ul class="list-group">
+			<li ng-repeat="role in $ctrl.rolesList" class="list-group-item">
+				<span>{{role.name}}</span>
+				<span>{{role.description}}</span>
+				<juno-button click="$ctrl.onRoleDetails(role)">
+					Details
+				</juno-button>
+			</li>
+		</ul>
+		<juno-button>
+			<juno-button ng-if="!$ctrl.newRole"
+			             component-style="$ctrl.componentStyle"
+			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+			             ng-click="$ctrl.onAddRole()"
+			             disabled="!$ctrl.canAddRole()">
+				Create New Role
+			</juno-button>
+		</juno-button>
+	</juno-security-check>
 </div>

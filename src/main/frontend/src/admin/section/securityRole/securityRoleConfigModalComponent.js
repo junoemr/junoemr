@@ -21,115 +21,158 @@
  * Canada
  */
 import {SecurityObjectsTransfer, SecurityRolesApi, UserSecurityRolesTransfer} from "../../../../generated";
-import {JUNO_STYLE} from "../../../common/components/junoComponentConstants";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE,
+	LABEL_POSITION
+} from "../../../common/components/junoComponentConstants";
 
 angular.module('Admin.Section').component('securityRoleConfigModal',
-{
-    templateUrl: 'src/admin/section/securityRole/securityRoleConfigModal.jsp',
-    bindings: {
-        modalInstance: "<",
-        resolve: "<",
-    },
-    controller: [
-        '$scope',
-        '$http',
-        '$httpParamSerializer',
-        '$uibModal',
-        'securityRolesStore',
-        function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
-        {
-            let ctrl = this;
-            ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
+	{
+		templateUrl: 'src/admin/section/securityRole/securityRoleConfigModal.jsp',
+		bindings: {
+			modalInstance: "<",
+			resolve: "<",
+		},
+		controller: [
+			'$scope',
+			'$http',
+			'$httpParamSerializer',
+			'$uibModal',
+			'securityRolesStore',
+			function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
+			{
+				let ctrl = this;
+				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
-            ctrl.permissionLevelOptions = Object.freeze([
-                {
-                    label: "None",
-                    value: null,
-                },
-                {
-                    label: "Read",
-                    value: UserSecurityRolesTransfer.PrivilegesEnum.READ,
-                },
-                {
-                    label: "Read/Update",
-                    value: UserSecurityRolesTransfer.PrivilegesEnum.UPDATE,
-                },
-                {
-                    label: "Read/Update/Create",
-                    value: UserSecurityRolesTransfer.PrivilegesEnum.WRITE,
-                },
-                {
-                    label: "Read/Update/Create/Delete",
-                    value: "ALL",
-                },
-            ]);
+				ctrl.permissionLevelOptions = Object.freeze([
+					{
+						label: "None",
+						value: null,
+					},
+					{
+						label: "Read",
+						value: UserSecurityRolesTransfer.PrivilegesEnum.READ,
+					},
+					{
+						label: "Read/Update",
+						value: UserSecurityRolesTransfer.PrivilegesEnum.UPDATE,
+					},
+					{
+						label: "Read/Update/Create",
+						value: UserSecurityRolesTransfer.PrivilegesEnum.WRITE,
+					},
+					{
+						label: "Read/Update/Create/Delete",
+						value: "ALL",
+					},
+				]);
 
-            ctrl.role = null;
-            ctrl.accessList = [];
+				ctrl.LABEL_POSITION = LABEL_POSITION;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
+				ctrl.role = null;
+				ctrl.newRole = true;
+				ctrl.accessList = [];
+				ctrl.isLoading = false;
 
 
-            ctrl.$onInit = async () =>
-            {
-                ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+				ctrl.$onInit = async () =>
+				{
+					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 
-                ctrl.role = ctrl.resolve.role;
-                ctrl.allSecurityObjects = (await ctrl.securityRolesApi.getAccessObjects()).data.body.accessObjects;
-                ctrl.computeAccessList();
-            }
+					ctrl.newRole = ctrl.resolve.newRole;
+					ctrl.role = ctrl.resolve.role || {
+						id: null,
+						name: "",
+						description: "",
+						privileges: {},
+					};
+					ctrl.allSecurityObjects = (await ctrl.securityRolesApi.getAccessObjects()).data.body.accessObjects;
+					ctrl.computeAccessList();
+				}
 
-            ctrl.computeAccessList = () =>
-            {
-                ctrl.accessList = [];
-                for (let i = 0; i < ctrl.allSecurityObjects.length; i++)
-                {
-                    const element = ctrl.allSecurityObjects[i];
-                    const access = {
-                        id: i,
-                        name: element,
-                        description: null,
-                        permissionLevel: ctrl.getPermissionLevel(element, ctrl.role),
-                    };
-                    ctrl.accessList.push(access);
-                }
-            }
+				ctrl.computeAccessList = () =>
+				{
+					ctrl.accessList = [];
+					for (let i = 0; i < ctrl.allSecurityObjects.length; i++)
+					{
+						const element = ctrl.allSecurityObjects[i];
+						const access = {
+							id: i,
+							name: element,
+							description: null,
+							permissionLevel: ctrl.getPermissionLevel(element, ctrl.role),
+						};
+						ctrl.accessList.push(access);
+					}
+				}
 
-            ctrl.getPermissionLevel = (access, role) =>
-            {
-                if(role.privileges[access])
-                {
-                    if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.DELETE)
-                        && role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.WRITE)
-                        && role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.UPDATE)
-                        && role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.DELETE))
-                    {
-                        return "ALL";
-                    }
-                    else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.WRITE))
-                    {
-                        return UserSecurityRolesTransfer.PrivilegesEnum.WRITE;
-                    }
-                    else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.UPDATE))
-                    {
-                        return UserSecurityRolesTransfer.PrivilegesEnum.UPDATE;
-                    }
-                    else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.READ))
-                    {
-                        return UserSecurityRolesTransfer.PrivilegesEnum.READ;
-                    }
-                }
-                return null;
-            }
+				ctrl.getPermissionLevel = (access, role) =>
+				{
+					if(role.privileges[access])
+					{
+						if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.DELETE)
+							&& role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.WRITE)
+							&& role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.UPDATE)
+							&& role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.DELETE))
+						{
+							return "ALL";
+						}
+						else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.WRITE))
+						{
+							return UserSecurityRolesTransfer.PrivilegesEnum.WRITE;
+						}
+						else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.UPDATE))
+						{
+							return UserSecurityRolesTransfer.PrivilegesEnum.UPDATE;
+						}
+						else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.READ))
+						{
+							return UserSecurityRolesTransfer.PrivilegesEnum.READ;
+						}
+					}
+					return null;
+				}
 
-            ctrl.canEdit = () =>
-            {
-                return securityRolesStore.hasSecurityPrivileges(
-                    SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY,
-                    UserSecurityRolesTransfer.PrivilegesEnum.WRITE);
-            }
+				ctrl.canEdit = () =>
+				{
+					return securityRolesStore.hasSecurityPrivileges(
+						SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY,
+						UserSecurityRolesTransfer.PrivilegesEnum.UPDATE);
+				}
+				ctrl.canSave = () =>
+				{
+					return !ctrl.isLoading && ctrl.canEdit() && ctrl.role.name.length > 2
+				}
 
-            ctrl.onCancel = () =>
-            {
-                ctrl.modalInstance.dismiss("modal cancelled");
-            }
-        }]
-});
+				ctrl.onCancel = () =>
+				{
+					ctrl.modalInstance.dismiss("cancelled");
+				}
+
+				ctrl.errorFunction = (error) =>
+				{
+					console.error(error);
+					Juno.Common.Util.errorAlert($uibModal, "Error", "Failed to save role");
+				}
+
+				ctrl.onUpdate = () =>
+				{
+					ctrl.securityRolesApi.updateRole(ctrl.role.id, ctrl.role).then((response) =>
+					{
+						ctrl.modalInstance.close(response.data.body);
+					}).catch(ctrl.errorFunction)
+				}
+
+				ctrl.onCreate = () =>
+				{
+					ctrl.securityRolesApi.addRole(ctrl.role).then((response) =>
+					{
+						ctrl.modalInstance.close(response.data.body);
+					}).catch(ctrl.errorFunction)
+				}
+			}]
+	});

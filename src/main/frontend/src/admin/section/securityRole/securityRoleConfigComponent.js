@@ -22,55 +22,90 @@
  */
 
 import {SecurityRolesApi} from "../../../../generated";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE,
+	LABEL_POSITION
+} from "../../../common/components/junoComponentConstants";
 
 const {UserSecurityRolesTransfer} = require("../../../../generated");
 const {SecurityObjectsTransfer} = require("../../../../generated");
 
 angular.module('Admin.Section').component('securityRoleConfig',
-{
-    templateUrl: 'src/admin/section/securityRole/securityRoleConfig.jsp',
-    bindings: {},
-    controller: [
-        '$scope',
-        '$http',
-        '$httpParamSerializer',
-        '$uibModal',
-        'securityRolesStore',
-        function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
-        {
-            let ctrl = this;
-            ctrl.access = SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY;
-            ctrl.permissions = UserSecurityRolesTransfer.PrivilegesEnum.READ;
+	{
+		templateUrl: 'src/admin/section/securityRole/securityRoleConfig.jsp',
+		bindings: {},
+		controller: [
+			'$scope',
+			'$http',
+			'$httpParamSerializer',
+			'$uibModal',
+			'securityRolesStore',
+			function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
+			{
+				let ctrl = this;
+				ctrl.access = SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY;
+				ctrl.permissions = UserSecurityRolesTransfer.PrivilegesEnum.READ;
+				ctrl.LABEL_POSITION = LABEL_POSITION;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-            ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
+				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
-            ctrl.rolesList = [];
+				ctrl.rolesList = [];
 
-            ctrl.$onInit = async () =>
-            {
-                ctrl.rolesList = (await ctrl.securityRolesApi.getRoles()).data.body;
-            }
+				ctrl.$onInit = async () =>
+				{
+					ctrl.componentStyle = JUNO_STYLE.DEFAULT;
+					ctrl.rolesList = (await ctrl.securityRolesApi.getRoles()).data.body;
+				}
 
-            ctrl.onRoleDetails = (role) =>
-            {
-                $uibModal.open(
-                    {
-                        component: 'securityRoleConfigModal',
-                        backdrop: 'static',
-                        windowClass: "juno-modal lg",
-                        resolve: {
-                            role: role,
-                        }
-                    }
-                ).result.then((data) =>
-                {
-                    // force the cached access/permissions values to reload
-                    securityRolesStore.loadUserRoles();
-                }).catch((reason) =>
-                {
-                    // do nothing on cancel
-                });
+				ctrl.onRoleDetails = (role) =>
+				{
+					ctrl.openDetailsModal(role, false);
+				}
 
-            }
-        }]
-});
+				ctrl.onAddRole = () =>
+				{
+					ctrl.openDetailsModal(null, true);
+				}
+
+				ctrl.canAddRole = () =>
+				{
+					return securityRolesStore.hasSecurityPrivileges(
+						SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY,
+						UserSecurityRolesTransfer.PrivilegesEnum.WRITE);
+				}
+
+				ctrl.openDetailsModal = (role, newRole) =>
+				{
+					$uibModal.open(
+						{
+							component: 'securityRoleConfigModal',
+							backdrop: 'static',
+							windowClass: "juno-modal lg",
+							resolve: {
+								newRole: newRole,
+								role: role,
+							}
+						}
+					).result.then((updatedRole) =>
+					{
+						if (newRole)
+						{
+							ctrl.rolesList.push(updatedRole);
+						}
+						else // update existing
+						{
+							const index = ctrl.rolesList.indexOf(role);
+							ctrl.rolesList[index] = updatedRole;
+						}
+						// force the cached access/permissions values to reload
+						securityRolesStore.loadUserRoles();
+					}).catch((reason) =>
+					{
+						// do nothing on cancel
+					});
+				}
+			}]
+	});
