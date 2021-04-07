@@ -32,7 +32,7 @@ import java.util.Map;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SSOCredentials implements Serializable
+public class SSOSessionCredentials implements Serializable
 {
 	@JsonProperty("access_token")
 	private String accessToken;
