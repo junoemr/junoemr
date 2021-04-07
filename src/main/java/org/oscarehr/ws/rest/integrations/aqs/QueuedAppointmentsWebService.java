@@ -24,7 +24,7 @@
 package org.oscarehr.ws.rest.integrations.aqs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;

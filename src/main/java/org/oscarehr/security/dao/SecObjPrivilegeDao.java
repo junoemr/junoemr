@@ -23,9 +23,10 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.security.dao;
 
-import org.oscarehr.common.model.SecObjPrivilege;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.security.model.SecObjPrivilege;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
@@ -34,7 +35,8 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege> {
+public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
+{
 
 	public SecObjPrivilegeDao() {
 		super(SecObjPrivilege.class);

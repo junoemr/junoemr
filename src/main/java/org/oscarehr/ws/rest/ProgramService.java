@@ -28,7 +28,7 @@ import org.apache.tools.ant.util.DateUtils;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.AdmissionConverter;

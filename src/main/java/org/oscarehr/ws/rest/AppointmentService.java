@@ -26,7 +26,7 @@ package org.oscarehr.ws.rest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.appointment.dto.AppointmentEditRecord;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.schedule.dto.CalendarAppointment;

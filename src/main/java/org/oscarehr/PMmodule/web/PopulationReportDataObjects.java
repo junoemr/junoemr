@@ -27,7 +27,7 @@ import java.util.TreeMap;
 
 import org.oscarehr.common.model.IssueGroup;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.util.AccumulatorMap;
 import org.oscarehr.util.EncounterUtil;
 

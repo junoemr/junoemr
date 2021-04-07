@@ -38,7 +38,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.caisi.service.IssueAdminManager;
 import org.oscarehr.casemgmt.model.Issue;
-import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

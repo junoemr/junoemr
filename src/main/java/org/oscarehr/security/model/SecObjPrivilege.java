@@ -23,43 +23,48 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.security.model;
 
+import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 
+@Data
 @Entity
-@Table(name="secPrivilege")
-public class SecPrivilege extends AbstractModel<Integer>{
+@Table(name = "secObjPrivilege")
+public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
+{
+	@EmbeddedId
+	private SecObjPrivilegePrimaryKey id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	private String privilege;
-	private String description;
+	private String privilege = "|0|";
 
-	public Integer getId() {
-    	return id;
-    }
-	public void setId(Integer id) {
-    	this.id = id;
-    }
-	public String getPrivilege() {
-    	return privilege;
-    }
-	public void setPrivilege(String privilege) {
-    	this.privilege = privilege;
-    }
-	public String getDescription() {
-    	return description;
-    }
-	public void setDescription(String description) {
-    	this.description = description;
-    }
+	private int priority = 0;
 
+	@Column(name = "provider_no")
+	private String providerNo = null;
 
+	@MapsId("roleUserGroup")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "roleUserGroup", referencedColumnName = "role_name", insertable = false, updatable = false)
+	private SecRole secRole;
 
+	@MapsId("objectName")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "objectName", referencedColumnName = "objectName", insertable = false, updatable = false)
+	private SecObjectName secObjectName;
+
+	@Override
+	public SecObjPrivilegePrimaryKey getId()
+	{
+		return id;
+	}
 }

@@ -25,7 +25,7 @@ package org.oscarehr.ws.rest.integrations.iceFall;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;

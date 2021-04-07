@@ -30,6 +30,7 @@
 <%@page import="org.oscarehr.util.*"%>
 <%@page import="java.text.*"%>
 <%@page import="org.oscarehr.common.model.FunctionalCentre"%>
+<%@ page import="org.oscarehr.security.model.SecRole" %>
 
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);

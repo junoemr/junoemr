@@ -22,7 +22,7 @@
  */
 package org.oscarehr.ws.rest;
 
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.fax.schedulingTasks.InboundFaxSchedulingTask;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;

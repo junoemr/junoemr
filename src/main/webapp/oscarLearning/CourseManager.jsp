@@ -34,7 +34,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 
-<%@ page import="java.util.*,org.oscarehr.learning.web.CourseManagerAction,org.oscarehr.common.model.SecRole"%>
+<%@ page import="java.util.*,org.oscarehr.learning.web.CourseManagerAction,org.oscarehr.security.model.SecRole"%>
 
 
 <%

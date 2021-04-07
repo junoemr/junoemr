@@ -23,17 +23,19 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.security.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.SecPrivilege;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.security.model.SecPrivilege;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class SecPrivilegeDao extends AbstractDao<SecPrivilege>{
+public class SecPrivilegeDao extends AbstractDao<SecPrivilege>
+{
 
 	public SecPrivilegeDao() {
 		super(SecPrivilege.class);

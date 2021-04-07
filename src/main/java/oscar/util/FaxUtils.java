@@ -30,9 +30,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

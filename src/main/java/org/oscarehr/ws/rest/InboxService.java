@@ -24,7 +24,7 @@
 package org.oscarehr.ws.rest;
 
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.inbox.InboxManagerResponse;
 import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.managers.SecurityInfoManager;

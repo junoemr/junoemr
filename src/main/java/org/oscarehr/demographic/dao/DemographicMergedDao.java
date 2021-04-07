@@ -30,9 +30,9 @@ import java.util.NoSuchElementException;
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.common.dao.SecObjPrivilegeDao;
-import org.oscarehr.common.model.SecObjPrivilege;
-import org.oscarehr.common.model.SecObjPrivilegePrimaryKey;
+import org.oscarehr.security.dao.SecObjPrivilegeDao;
+import org.oscarehr.security.model.SecObjPrivilege;
+import org.oscarehr.security.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.security.model;
 
 import java.io.Serializable;
 

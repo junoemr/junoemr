@@ -24,7 +24,7 @@
 package org.oscarehr.ws.rest;
 
 import org.oscarehr.common.model.MessageList;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.MessagingManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.MessagingConverter;

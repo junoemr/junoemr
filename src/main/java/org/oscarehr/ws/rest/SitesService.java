@@ -27,7 +27,7 @@ import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.site.service.SiteService;

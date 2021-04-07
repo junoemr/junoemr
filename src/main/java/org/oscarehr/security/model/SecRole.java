@@ -21,10 +21,11 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.model;
+package org.oscarehr.security.model;
 
 import lombok.Data;
 import org.hibernate.annotations.NaturalId;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

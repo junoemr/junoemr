@@ -21,7 +21,7 @@ import org.apache.struts.upload.FormFile;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;

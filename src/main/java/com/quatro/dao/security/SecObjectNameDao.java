@@ -32,7 +32,9 @@ import com.quatro.model.security.Secobjectname;
 /**
  *
  * @author jackson
+ * @deprecated use jpa version instead
  */
+@Deprecated
 public class SecObjectNameDao extends HibernateDaoSupport{
     	public void saveOrUpdate(Secobjectname t) {
 

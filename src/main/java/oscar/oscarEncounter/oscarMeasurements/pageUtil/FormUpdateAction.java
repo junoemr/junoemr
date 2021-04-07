@@ -48,8 +48,8 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.util.ConversionUtils;
 
-import org.oscarehr.common.dao.SecRoleDao;
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.model.SecRole;
 
 import oscar.oscarEncounter.data.EctProgram;
 

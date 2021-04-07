@@ -473,7 +473,7 @@ public boolean isBirthday(String schedDate,String demBday){
 <%@page import="org.oscarehr.eform.model.EForm"%>
 <%@ page import="org.oscarehr.common.model.ProviderSite" %>
 <%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
-<%@ page import="org.oscarehr.common.model.SecObjectName" %>
+<%@ page import="org.oscarehr.security.model.SecObjectName" %>
 <html:html locale="true">
 	<head>
 		<script>

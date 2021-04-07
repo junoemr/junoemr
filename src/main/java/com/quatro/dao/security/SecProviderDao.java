@@ -36,9 +36,9 @@ import com.quatro.model.security.SecProvider;
 /**
  * 
  * @author JZhang
- *
+ * @deprecated use jpa version instead
  */
-
+@Deprecated
 public class SecProviderDao extends HibernateDaoSupport {
 	private static final Logger logger = MiscUtils.getLogger();
 	// property constants

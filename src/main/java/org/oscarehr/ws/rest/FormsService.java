@@ -37,7 +37,7 @@ import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.EncounterForm;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.model.EFormData;

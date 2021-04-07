@@ -26,7 +26,7 @@ package org.oscarehr.ws.rest;
 
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.managers.SecurityInfoManager;

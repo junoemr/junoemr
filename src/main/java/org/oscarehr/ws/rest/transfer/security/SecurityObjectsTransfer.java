@@ -23,7 +23,7 @@
 package org.oscarehr.ws.rest.transfer.security;
 
 import lombok.Data;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 
 import java.io.Serializable;
 import java.util.List;

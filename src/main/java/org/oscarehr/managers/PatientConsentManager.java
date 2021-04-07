@@ -30,7 +30,7 @@ import org.oscarehr.common.dao.ConsentDao;
 import org.oscarehr.common.dao.ConsentTypeDao;
 import org.oscarehr.common.model.Consent;
 import org.oscarehr.common.model.ConsentType;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

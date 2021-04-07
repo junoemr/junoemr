@@ -35,7 +35,7 @@ import org.oscarehr.common.dao.ReportByExamplesDao;
 import org.oscarehr.common.dao.ReportByExamplesExplainDao;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.model.ReportByExamples;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.report.SQLReportHelper;
 import org.oscarehr.util.MiscUtils;

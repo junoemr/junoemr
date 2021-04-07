@@ -23,7 +23,7 @@
 package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.dashboard.dao.BillingMasterClinicaidDao;
 import org.oscarehr.dashboard.model.BillingMasterClinicaid;
 import org.oscarehr.demographic.dao.DemographicDao;

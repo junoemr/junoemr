@@ -20,19 +20,21 @@
  * Centre for Research on Inner City Health, St. Michael's Hospital,
  * Toronto, Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.security.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.security.model.SecRole;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class SecRoleDao extends AbstractDao<SecRole> {
+public class SecRoleDao extends AbstractDao<SecRole>
+{
 
 	public SecRoleDao() {
 		super(SecRole.class);

@@ -35,6 +35,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.quatro.model.security.Secobjprivilege;
 
+/**
+ * @deprecated use jpa version instead
+ */
+@Deprecated
 public class SecobjprivilegeDao extends HibernateDaoSupport {
 
     private Logger logger = MiscUtils.getLogger();

@@ -29,7 +29,7 @@ import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
 import org.oscarehr.billing.CA.ON.dao.OntarioMasterNumberDao;
 import org.oscarehr.common.dao.BillingBCDao;
 import org.oscarehr.common.dao.BillingServiceDao;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.BillingManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.ServiceTypeConverter;

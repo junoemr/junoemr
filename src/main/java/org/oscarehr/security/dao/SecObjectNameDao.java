@@ -23,17 +23,19 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.security.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.security.model.SecObjectName;
 import org.springframework.stereotype.Repository;
 
 @Repository(value="secObjectNameDaoJpa")
-public class SecObjectNameDao extends AbstractDao<SecObjectName>{
+public class SecObjectNameDao extends AbstractDao<SecObjectName>
+{
 
 	public SecObjectNameDao() {
 		super(SecObjectName.class);

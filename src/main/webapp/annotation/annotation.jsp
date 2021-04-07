@@ -46,8 +46,8 @@
 		org.oscarehr.casemgmt.model.CaseManagementNote,
 		org.oscarehr.casemgmt.model.CaseManagementNoteLink,
 		org.oscarehr.casemgmt.service.CaseManagementManager,
-		org.oscarehr.common.dao.SecRoleDao,
-		org.oscarehr.common.model.SecRole,
+		org.oscarehr.security.dao.SecRoleDao,
+		org.oscarehr.security.model.SecRole,
 		org.oscarehr.util.SpringUtils,
 		oscar.oscarEncounter.data.EctProgram,
 		java.util.Date, java.util.List"%>

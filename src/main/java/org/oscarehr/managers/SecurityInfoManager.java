@@ -29,11 +29,11 @@ import com.quatro.model.security.Secobjprivilege;
 import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
-import org.oscarehr.common.model.SecObjPrivilege;
-import org.oscarehr.common.model.SecObjectName;
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.security.model.SecObjPrivilege;
+import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
@@ -133,22 +133,30 @@ public class SecurityInfoManager
 
 		for(SecRole secRole : allRoles)
 		{
-			SecurityRoleTransfer transfer = new SecurityRoleTransfer();
-			transfer.setId(secRole.getId());
-			transfer.setName(secRole.getName());
-			transfer.setDescription(secRole.getDescription());
-
-			for(SecObjPrivilege privilege : secRole.getSecObjPrivilege())
-			{
-				transfer.addPrivilege(
-						SecObjectName.OBJECT_NAME.fromValueString(privilege.getId().getObjectName()),
-						getPrivilegeLevels(privilege.getPrivilege())
-				);
-			}
-
-			roleTransfers.add(transfer);
+			roleTransfers.add(getRoleTransfer(secRole));
 		}
 		return roleTransfers;
+	}
+
+	public SecurityRoleTransfer getRoleTransfer(Integer roleId)
+	{
+		return getRoleTransfer(secRoleDao.find(roleId));
+	}
+	public SecurityRoleTransfer getRoleTransfer(SecRole secRole)
+	{
+		SecurityRoleTransfer transfer = new SecurityRoleTransfer();
+		transfer.setId(secRole.getId());
+		transfer.setName(secRole.getName());
+		transfer.setDescription(secRole.getDescription());
+
+		for(SecObjPrivilege privilege : secRole.getSecObjPrivilege())
+		{
+			transfer.addPrivilege(
+					SecObjectName.OBJECT_NAME.fromValueString(privilege.getId().getObjectName()),
+					getPrivilegeLevels(privilege.getPrivilege())
+			);
+		}
+		return transfer;
 	}
 
 	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo)

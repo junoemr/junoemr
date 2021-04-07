@@ -30,7 +30,7 @@ import org.oscarehr.common.dao.BillingreferralDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.Billingreferral;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.ReferralDoctorConverterBC;
 import org.oscarehr.ws.rest.conversion.ReferralDoctorConverterON;

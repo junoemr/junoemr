@@ -26,7 +26,7 @@ package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.AllergyManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.external.soap.v1.transfer.AllergyTransfer;

@@ -23,10 +23,11 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.security.model;
 
 import lombok.Data;
 import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

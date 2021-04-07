@@ -40,8 +40,8 @@
 <%@page import="java.util.*"%>
 <%@page import="org.caisi.dao.*"%>
 <%@page import="org.caisi.model.*"%>
-<%@page import="org.oscarehr.common.dao.SecRoleDao"%>
-<%@page import="org.oscarehr.common.model.SecRole"%>
+<%@page import="org.oscarehr.security.dao.SecRoleDao"%>
+<%@page import="org.oscarehr.security.model.SecRole"%>
 <%@page import="org.oscarehr.PMmodule.model.*"%>
 <%@page import="org.oscarehr.PMmodule.dao.*"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>

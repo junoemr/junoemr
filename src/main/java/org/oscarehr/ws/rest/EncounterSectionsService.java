@@ -36,7 +36,7 @@ import org.oscarehr.casemgmt.service.EncounterService;
 import org.oscarehr.casemgmt.service.MultiSearchResult;
 import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.EncounterTemplate;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.response.RestResponse;

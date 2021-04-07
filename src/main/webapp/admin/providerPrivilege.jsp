@@ -49,17 +49,17 @@
 <%@ page import="org.springframework.dao.DataIntegrityViolationException"%>
 <%@ page import="java.sql.BatchUpdateException"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@ page import="org.oscarehr.common.model.SecRole"%>
-<%@ page import="org.oscarehr.common.dao.SecRoleDao"%>
-<%@ page import="org.oscarehr.common.model.SecPrivilege"%>
-<%@ page import="org.oscarehr.common.dao.SecPrivilegeDao"%>
-<%@ page import="org.oscarehr.common.model.SecObjectName"%>
-<%@ page import="org.oscarehr.common.dao.SecObjectNameDao"%>
+<%@ page import="org.oscarehr.security.model.SecRole"%>
+<%@ page import="org.oscarehr.security.dao.SecRoleDao"%>
+<%@ page import="org.oscarehr.security.model.SecPrivilege"%>
+<%@ page import="org.oscarehr.security.dao.SecPrivilegeDao"%>
+<%@ page import="org.oscarehr.security.model.SecObjectName"%>
+<%@ page import="org.oscarehr.security.dao.SecObjectNameDao"%>
 <%@ page import="org.oscarehr.provider.model.ProviderData"%>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
-<%@ page import="org.oscarehr.common.model.SecObjPrivilege"%>
-<%@ page import="org.oscarehr.common.model.SecObjPrivilegePrimaryKey"%>
-<%@ page import="org.oscarehr.common.dao.SecObjPrivilegeDao"%>
+<%@ page import="org.oscarehr.security.model.SecObjPrivilege"%>
+<%@ page import="org.oscarehr.security.model.SecObjPrivilegePrimaryKey"%>
+<%@ page import="org.oscarehr.security.dao.SecObjPrivilegeDao"%>
 <%@ page import="org.oscarehr.common.model.RecycleBin"%>
 <%@ page import="org.oscarehr.common.dao.RecycleBinDao"%>
 <%

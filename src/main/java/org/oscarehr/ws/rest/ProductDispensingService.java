@@ -38,7 +38,7 @@ import org.apache.http.impl.cookie.DateUtils;
 import org.oscarehr.common.model.DrugProduct;
 import org.oscarehr.common.model.DrugProductTemplate;
 import org.oscarehr.common.model.ProductLocation;
-import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.DrugDispensingManager;
 import org.oscarehr.managers.DrugProductManager;
 import org.oscarehr.managers.SecurityInfoManager;
