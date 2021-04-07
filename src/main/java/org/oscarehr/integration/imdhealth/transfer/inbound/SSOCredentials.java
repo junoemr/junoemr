@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,9 +37,27 @@ public class SSOCredentials implements Serializable
 	@JsonProperty("access_token")
 	private String accessToken;
 
+	/**
+	 * The full SSO link, containing the components below.
+	 * It's recommended in the documentation that this field be used to connect, rather than assembling it ourselves.
+	 */
+	@JsonProperty("imd_url")
+	private String imdUrl;
+
 	@JsonProperty("membership_id")
 	private String membershipId;
 
 	@JsonProperty("organization_id")
 	private String organizationId;
+
+	@JsonProperty("patient_session_id")
+	private String patientSessionId;
+
+	// Implementation TBD below this line
+
+	@JsonProperty("resources")
+	private Map<String, String> resources;
+
+	@JsonProperty("topic_id")
+	private String topicId;
 }

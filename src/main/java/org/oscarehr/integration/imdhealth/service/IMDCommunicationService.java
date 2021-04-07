@@ -23,19 +23,18 @@
 
 package org.oscarehr.integration.imdhealth.service;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.oscarehr.integration.imdhealth.transfer.inbound.BearerToken;
 import org.oscarehr.integration.imdhealth.transfer.inbound.SSOCredentials;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSORequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-
 import oscar.OscarProperties;
 import oscar.util.RESTClient;
+
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 class IMDCommunicationService extends RESTClient
@@ -47,6 +46,7 @@ class IMDCommunicationService extends RESTClient
 
 	/**
 	 * Connect to iMD oauth endpoint and retrieve a bearer token
+	 *
 	 * @param client_id iMDHealth client_id issued to organization
 	 * @param client_secret iMDHealth client_secret issued to organization
 	 *
@@ -90,7 +90,6 @@ class IMDCommunicationService extends RESTClient
 		headers.add(HEADER_AUTHORIZATION, "Bearer " + token.getAccessToken());
 
 		SSOCredentials response = doPost(url, headers, ssoRequest, SSOCredentials.class);
-
 		return response;
 	}
 }

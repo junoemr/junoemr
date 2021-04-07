@@ -24,14 +24,16 @@
 package org.oscarehr.integration.imdhealth.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
+import org.oscarehr.clinic.service.ClinicService;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.exception.IntegrationException;
 import org.oscarehr.integration.imdhealth.exception.IMDHealthException;
@@ -40,6 +42,7 @@ import org.oscarehr.integration.imdhealth.exception.SSOLoginException;
 import org.oscarehr.integration.imdhealth.transfer.inbound.BearerToken;
 import org.oscarehr.integration.imdhealth.transfer.inbound.SSOCredentials;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSOOrganization;
+import org.oscarehr.integration.imdhealth.transfer.outbound.SSOPatient;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSORequest;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSOUser;
 import org.oscarehr.integration.model.Integration;
@@ -61,6 +64,7 @@ import oscar.util.ConversionUtils;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -70,36 +74,31 @@ public class IMDHealthService
 {
 	@Autowired
 	IntegrationService integrationService;
-
 	@Autowired
 	IMDCommunicationService communicationService;
-
 	@Autowired
 	IntegrationDao integrationDao;
-
 	@Autowired
 	ClinicDAO clinicDao;
 	@Autowired
-	org.oscarehr.clinic.service.ClinicService clinicService;
-
+	ClinicService clinicService;
 	@Autowired
 	SiteDao siteDao;
 	@Autowired
 	SiteService siteService;
-
 	@Autowired
 	ProviderDataDao providerDataDao;
 	@Autowired
 	ProviderService providerService;
+	@Autowired
+	DemographicDao demographicDao;
 
 	private static final String PROP_KEY_APP = "imdhealth_app_domain";
 	private static final String PROP_KEY_SCHEME = "imdhealth_scheme";
+	private static final Logger logger = MiscUtils.getLogger();
 
 	protected static final String HOST_URL = OscarProperties.getInstance().getProperty(PROP_KEY_APP);
 	protected static final String DEFAULT_SCHEME= OscarProperties.getInstance().getProperty(PROP_KEY_SCHEME);
-
-
-	private static final Logger logger = MiscUtils.getLogger();
 
 	/**
 	 * Create an iMD Health integration or update an existing iMD Health integration to the database.
@@ -171,21 +170,18 @@ public class IMDHealthService
 				siteService.createAndSaveSiteUuid(site);
 			}
 
-			Set<Provider> providers = site.getProviders();
-
 			if (oscarProperties.isMultisiteEnabled())
 			{
-				failedToInitialize.addAll(loginProviderSite(token, providers, site));
+				failedToInitialize.addAll(loginProviderSite(token, site));
 			}
 		}
 
 		return failedToInitialize;
 	}
 
-	private List<String> loginProviderClinic(BearerToken token, List<ProviderData> providerDataList, Clinic clinic) throws SSOLoginException
+	private List<String> loginProviderClinic(BearerToken token, List<ProviderData> providerDataList, Clinic clinic) throws IMDHealthException
 	{
 		List<String> failedProviderClinicList = new ArrayList<>();
-		SSOCredentials ssoCredentials;
 
 		if (isValidClinic(clinic))
 		{
@@ -196,8 +192,9 @@ public class IMDHealthService
 					providerService.createAndSaveProviderImdHealthUuid(providerData);
 				}
 
-				ssoCredentials = getSSOCredentials(token, providerData, clinic);
-				if (ssoCredentials == null)
+				boolean success = postProviderAtClinic(token, providerData);
+
+				if (!success)
 				{
 					failedProviderClinicList.add("Failed to get sso-credentials for ProviderNo: " + providerData.getProviderNo() + ", Clinic: " + clinic.getClinicName());
 				}
@@ -211,18 +208,20 @@ public class IMDHealthService
 		return failedProviderClinicList;
 	}
 
-	private List<String> loginProviderSite(BearerToken token, Set<Provider> providers, Site site) throws SSOLoginException
+	private List<String> loginProviderSite(BearerToken token, Site site) throws IMDHealthException
 	{
 		List<String> failedProviderSiteList = new ArrayList<>();
 
 		if (isValidSite(site))
 		{
-			for (Provider provider : providers)
+			for (Provider provider : site.getProviders())
 			{
 				if (provider.isActive())
 				{
-					SSOCredentials ssoCredentials = getSSOCredentials(token, provider, site);
-					if (ssoCredentials == null)
+					ProviderData providerData = provider.convertToProviderData();
+					boolean success = postProviderAtSite(token, providerData, site);
+
+					if (!success)
 					{
 						failedProviderSiteList.add("Failed to get sso-credentials for ProviderNo: " + provider.getProviderNo() + ", SiteId: " + site.getId());
 					}
@@ -237,36 +236,31 @@ public class IMDHealthService
 		return failedProviderSiteList;
 	}
 
-	/**
-	 * Generate the SSO link needed to connect to iMDHealth, logging in if necessary.
-	 *
-	 * A login will be performed if:
-	 * 1)  The user is not logged in to iMDHealth
-	 * 2)  The SSO credentials have expired
-	 *
-	 * @param session User session
-	 * @param siteId {Optional} siteId to use to login.  If not needed, use null
-	 *
-	 * @return URL formatted link to iMDHealth with SSO login credentials applied
-	 */
-	public String getSSOLink(HttpSession session, @Nullable Integer siteId) throws IntegrationException
+	public String getSSOLink(HttpSession session, @Nullable Integer demographicNo, @Nullable Integer siteId) throws IntegrationException
 	{
-		IMDHealthCredentials credentials = fetchCredentials(session, siteId);
-		String returnString = "";
+		IMDHealthCredentials bearerToken = fetchCredentials(session, null);
 
-		if (credentials != null)
+		String ssoLink = "";
+
+		if (bearerToken != null)
 		{
-			URIBuilder builder = new URIBuilder()
-					.setScheme(DEFAULT_SCHEME)
-					.setHost(HOST_URL)
-					.setParameter("access_token", credentials.getAccessToken())
-					.setParameter("membership_id", StringUtils.trimToEmpty(credentials.getMembershipId()))
-					.setParameter("organization_id", StringUtils.trimToEmpty(credentials.getOrganizationId()));
+			Site site = null;
+			if (siteId != null)
+			{
+				site = siteDao.getById(siteId);
+			}
 
-			returnString = builder.toString();
+			Demographic demographic = null;
+			if (demographicNo != null)
+			{
+				demographic = demographicDao.find(demographicNo);
+			}
+
+			SSOCredentials ssoCredentials = getSSOCredentialsForPatientSession(session, demographic, site);
+			ssoLink = ssoCredentials.getImdUrl();
 		}
 
-		return returnString;
+		return ssoLink;
 	}
 
 	/**
@@ -341,6 +335,7 @@ public class IMDHealthService
 
 			if (imdIntegration != null)
 			{
+				// TODO refactor, it should only get the bearer token now.  All of the other stuff can't be cached anymore
 				credentials = login(imdIntegration, session, siteId);
 			}
 		}
@@ -357,6 +352,8 @@ public class IMDHealthService
 	 * if needed, differentiated by siteId.  This makes the iMDCredentials compatible if regardless
 	 * if issued organizationally (ie: to all of CloudPractice), or on a per-clinic basis.
 	 *
+	 * TODO rewrite java doc
+	 *
 	 * @param imdHealthIntegration iMDHealth integration to use to login
 	 * @param session User session
 	 * @param siteId {optional} Juno site Id
@@ -369,12 +366,6 @@ public class IMDHealthService
 
 		BearerToken token = getBearerToken(imdHealthIntegration);
 		credentials.setBearerToken(token);
-
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(session);
-		Provider provider = loggedInInfo.getLoggedInProvider();
-
-		SSOCredentials ssoInfo = getSSOCredentials(token, provider, siteDao.getById(siteId));
-		credentials.loadSSOCredentials(ssoInfo);
 
 		credentials.saveToSession(session);
 		return credentials;
@@ -395,50 +386,136 @@ public class IMDHealthService
 		}
 	}
 
-	// Clinic
-	private SSOCredentials getSSOCredentials(BearerToken token,
-	                                         ProviderData providerData,
-	                                         Clinic clinic) throws SSOLoginException
+	/**
+	 * Upload information that the given provider exists at the juno clinic to IMD Health
+	 * @param token valid bearer token
+	 * @param provider provider to post
+	 * @return true if post was successful
+	 * @throws IMDHealthException on post error
+	 */
+	private boolean postProviderAtClinic(BearerToken token, ProviderData provider) throws IMDHealthException
+	{
+		return getSSOCredentials(token, provider, null, null) != null;
+	}
+
+
+	/**
+	 * Post that the specified provider exists at the specified site to IMDHealth
+	 * @param token Valid bearer token
+	 * @param provider provider to post
+	 * @param site site to post
+	 * @return true if post was successful
+	 * @throws IMDHealthException on post error
+	 */
+	private boolean postProviderAtSite(BearerToken token, ProviderData provider, Site site) throws IMDHealthException
+	{
+		return getSSOCredentials(token, provider, null, site) != null;
+	}
+
+	/**
+	 * Generate the SSO credentials needed for a patient associated session
+	 * @param session
+	 * @param demographic
+	 * @param site
+	 * @return
+	 * @throws IMDHealthException
+	 */
+	private SSOCredentials getSSOCredentialsForPatientSession(HttpSession session, @Nullable Demographic demographic, @Nullable Site site) throws IMDHealthException
+	{
+		IMDHealthCredentials token = fetchCredentials(session, null);
+
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(session);
+		ProviderData provider = loggedInInfo.getLoggedInProvider().convertToProviderData();
+
+		return getSSOCredentials(token.getBearerToken(), provider, demographic, site);
+	}
+
+	/**
+	 * Given a bearer token, establish an SSO session on the IMDHealth app and return it's information
+	 * // TODO Java doc
+	 * @param token
+	 * @param provider
+	 * @param demographic
+	 * @param site
+	 * @return
+	 * @throws SSOLoginException
+	 */
+	private SSOCredentials getSSOCredentials(BearerToken token, ProviderData provider, @Nullable Demographic demographic, @Nullable Site site) throws SSOLoginException
 	{
 		try
 		{
-			SSOUser user = SSOUser.fromProvider(providerData);
-			SSOOrganization organization;
+			// TODO TEST REMOVE ME
+			demographic = demographicDao.find(8);
 
-			String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
-			organization = SSOOrganization.fromClinic(clinic, provinceCode);
 
-			SSORequest ssoRequest = new SSORequest(user, organization);
+			SSOUser user = createSSOUser(provider);
+			SSOOrganization organization = createSSOOrganization(site);
+			SSOPatient patient = createSSOPatient(demographic);
+
+			// Stub value.  Implementation TBD.
+			Set<String> issues = new HashSet<>();
+
+			SSORequest ssoRequest = new SSORequest(user, organization, patient, issues);
+
 			return communicationService.SSOLogin(token, ssoRequest);
 		}
-		catch (HttpClientErrorException | HttpServerErrorException ex)
+		catch (HttpClientErrorException | HttpServerErrorException | IMDHealthException ex)
 		{
 			logger.error("Error during SSO login", ex);
 			throw new SSOLoginException("IMDHealth Login error");
 		}
 	}
 
-	// Site
-	private SSOCredentials getSSOCredentials(BearerToken token,
-											 Provider provider,
-											 Site site) throws SSOLoginException
+	private SSOUser createSSOUser(ProviderData provider)
 	{
-		try
-		{
-			SSOUser user = SSOUser.fromProvider(provider);
-			SSOOrganization organization;
+		// TODO preload the UUID here
+		return SSOUser.fromProvider(provider);
+	}
 
-			String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
-			organization = SSOOrganization.fromSite(site, provinceCode);
+	/**
+	 * Return an SSOOrganization.  If a site is given, the SSOOrganization will be derived from its attributes,
+	 * otherwise the SSOOrganization will be based on the clinic.  In either case the province code will be initialized
+	 * using the instance type, as both clinic and site allow raw strings for province and we must adhere to ISO-3166
+	 * conventions for this field.
+	 *
+	 * @param site {optional} site to create the SSOOrganization from, otherwise the clinic will be used.
+	 * @return
+	 */
+	private SSOOrganization createSSOOrganization(@Nullable Site site)
+	{
+		// TODO:  preload the UUID here
+		String provinceCode = OscarProperties.getInstance().getInstanceTypeUpperCase();
 
-			SSORequest ssoRequest = new SSORequest(user, organization);
-			return communicationService.SSOLogin(token, ssoRequest);
-		}
-		catch (HttpClientErrorException | HttpServerErrorException ex)
+		if (site != null)
 		{
-			logger.error("Error during SSO login", ex);
-			throw new SSOLoginException("IMDHealth Login error");
+			return SSOOrganization.fromSite(site, provinceCode);
 		}
+		else
+		{
+			Clinic clinic = clinicDao.getClinic();
+			return SSOOrganization.fromClinic(clinic, provinceCode);
+		}
+
+	}
+
+	/**
+	 * Attempt to create an SSO patient object given a demographic.  Returns null if the demographic is null,
+	 * or if the demographic does not have a vaild email.
+	 *
+	 * @param demographic demographic object to create SSOPatient from
+	 * @return SSOPatient if demographic is not null and has a valid email, otherwise null
+	 * @throws SSOLoginException if demographic cannot be mapped due to invalid data
+	 */
+	private SSOPatient createSSOPatient(@Nullable Demographic demographic) throws SSOLoginException
+	{
+		SSOPatient patient = null;
+
+		if (SSOPatient.canConvert(demographic))
+		{
+			patient = SSOPatient.fromDemographic(demographic);
+		}
+
+		return patient;
 	}
 
 	private static void checkIntegrationIsIMDType(Integration integration) throws IntegrationException
@@ -452,25 +529,19 @@ public class IMDHealthService
 		}
 	}
 
+	// TODO Move out into SSOOrganization?
 	private boolean isValidSite(Site site)
 	{
-		if (!ConversionUtils.hasContent(site.getCity()) ||
-			!ConversionUtils.hasContent(site.getName()) ||
-			!ConversionUtils.hasContent(site.getProvince()))
-		{
-			return false;
-		}
-		return true;
+		return ConversionUtils.hasContent(site.getCity()) &&
+				ConversionUtils.hasContent(site.getName()) &&
+				ConversionUtils.hasContent(site.getProvince());
 	}
 
+	// TODO Move out into SSOOrganization?
 	private boolean isValidClinic(Clinic clinic)
 	{
-		if (!ConversionUtils.hasContent(clinic.getClinicCity()) ||
-			!ConversionUtils.hasContent(clinic.getClinicName()) ||
-			!ConversionUtils.hasContent(clinic.getClinicProvince()))
-		{
-			return false;
-		}
-		return true;
+		return ConversionUtils.hasContent(clinic.getClinicCity()) &&
+				ConversionUtils.hasContent(clinic.getClinicName()) &&
+				ConversionUtils.hasContent(clinic.getClinicProvince());
 	}
 }

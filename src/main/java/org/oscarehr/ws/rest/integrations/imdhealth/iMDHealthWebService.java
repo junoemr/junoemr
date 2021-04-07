@@ -75,8 +75,8 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/SSOLink")
 	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IntegrationException
 	{
-		// TODO security permissions
-		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), siteId);
+		// TODO demographicNo
+		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), null, siteId);
 		return RestResponse.successResponse(ssoLink);
 	}
 

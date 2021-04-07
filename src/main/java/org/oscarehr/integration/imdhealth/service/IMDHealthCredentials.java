@@ -40,6 +40,7 @@ public class IMDHealthCredentials implements Serializable
 
 	private BearerToken bearerToken;
 
+
 	private String accessToken;
 	private String membershipId;
 	private String organizationId;
