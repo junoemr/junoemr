@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-import {SecurityObjectsTransfer, SecurityRolesApi, UserSecurityRolesTransfer} from "../../../../generated";
+import {SecurityObjectTransfer, SecurityRolesApi} from "../../../../generated";
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
@@ -46,6 +46,15 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				let ctrl = this;
 				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
+				ctrl.AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
+				ctrl.PrivilegesEnum = SecurityObjectTransfer.PrivilegesEnum;
+
+				ctrl.permissionLevelValues = Object.freeze({
+					read: "r",
+					readUpdate: "ru",
+					readUpdateWrite: "ruw",
+					readUpdateWriteDelete: "ruwd",
+				});
 				ctrl.permissionLevelOptions = Object.freeze([
 					{
 						label: "None",
@@ -53,19 +62,19 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					},
 					{
 						label: "Read",
-						value: UserSecurityRolesTransfer.PrivilegesEnum.READ,
+						value: ctrl.permissionLevelValues.read,
 					},
 					{
 						label: "Read/Update",
-						value: UserSecurityRolesTransfer.PrivilegesEnum.UPDATE,
+						value: ctrl.permissionLevelValues.readUpdate,
 					},
 					{
 						label: "Read/Update/Create",
-						value: UserSecurityRolesTransfer.PrivilegesEnum.WRITE,
+						value: ctrl.permissionLevelValues.readUpdateWrite,
 					},
 					{
 						label: "Read/Update/Create/Delete",
-						value: "ALL",
+						value: ctrl.permissionLevelValues.readUpdateWriteDelete,
 					},
 				]);
 
@@ -76,7 +85,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				ctrl.role = null;
 				ctrl.newRole = true;
 				ctrl.accessList = [];
-				ctrl.isLoading = false;
+				ctrl.isLoading = true;
 
 
 				ctrl.$onInit = async () =>
@@ -84,65 +93,121 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 
 					ctrl.newRole = ctrl.resolve.newRole;
-					ctrl.role = ctrl.resolve.role || {
-						id: null,
-						name: "",
-						description: "",
-						privileges: {},
-					};
-					ctrl.allSecurityObjects = (await ctrl.securityRolesApi.getAccessObjects()).data.body.accessObjects;
+					if(ctrl.newRole)
+					{
+						ctrl.role = {
+							id: null,
+							name: "",
+							description: "",
+							accessObjects: {},
+						};
+					}
+					else
+					{
+						ctrl.role = (await ctrl.securityRolesApi.getRole(ctrl.resolve.roleId)).data.body;
+					}
+
+					ctrl.allSecurityObjects = (await ctrl.securityRolesApi.getAccessObjects()).data.body;
 					ctrl.computeAccessList();
+					ctrl.isLoading = false;
 				}
 
+				// rebuild the access list
 				ctrl.computeAccessList = () =>
 				{
 					ctrl.accessList = [];
 					for (let i = 0; i < ctrl.allSecurityObjects.length; i++)
 					{
-						const element = ctrl.allSecurityObjects[i];
+						const secObject = ctrl.allSecurityObjects[i];
 						const access = {
 							id: i,
-							name: element,
-							description: null,
-							permissionLevel: ctrl.getPermissionLevel(element, ctrl.role),
+							name: secObject.name,
+							description: secObject.description,
+							permissionLevel: ctrl.getPermissionLevelForOptions(ctrl.role.accessObjects[secObject.name]),
 						};
 						ctrl.accessList.push(access);
 					}
 				}
 
-				ctrl.getPermissionLevel = (access, role) =>
+				// translate model to frontend selection permissionLevelOptions
+				ctrl.getPermissionLevelForOptions = (accessObject) =>
 				{
-					if(role.privileges[access])
+					// this will change once the backend system removes the 'levels' of permission
+					if(accessObject && accessObject.privileges)
 					{
-						if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.DELETE)
-							&& role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.WRITE)
-							&& role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.UPDATE)
-							&& role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.DELETE))
+						if (accessObject.privileges.includes(ctrl.PrivilegesEnum.DELETE)
+							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.WRITE)
+							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.UPDATE)
+							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.DELETE))
 						{
-							return "ALL";
+							return ctrl.permissionLevelValues.readUpdateWriteDelete;
 						}
-						else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.WRITE))
+						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.WRITE))
 						{
-							return UserSecurityRolesTransfer.PrivilegesEnum.WRITE;
+							return ctrl.permissionLevelValues.readUpdateWrite;
 						}
-						else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.UPDATE))
+						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.UPDATE))
 						{
-							return UserSecurityRolesTransfer.PrivilegesEnum.UPDATE;
+							return ctrl.permissionLevelValues.readUpdate;
 						}
-						else if (role.privileges[access].includes(UserSecurityRolesTransfer.PrivilegesEnum.READ))
+						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.READ))
 						{
-							return UserSecurityRolesTransfer.PrivilegesEnum.READ;
+							return ctrl.permissionLevelValues.read;
 						}
 					}
 					return null;
 				}
 
+				// translate ui object back to the model
+				ctrl.translateAccessListToModel = () =>
+				{
+					for (let i = 0; i < ctrl.accessList.length; i++)
+					{
+						const accessObj = ctrl.accessList[i];
+						ctrl.role.accessObjects[accessObj.name] = {
+							name: accessObj.name,
+							description: accessObj.description,
+							privileges: ctrl.getPermissionsForModel(accessObj.permissionLevel),
+						}
+					}
+				}
+
+				// change permissions selection to model permissions
+				ctrl.getPermissionsForModel = (permissionLevel) =>
+				{
+					let permissions = [];
+					if(permissionLevel === ctrl.permissionLevelValues.read)
+					{
+						permissions.push(ctrl.PrivilegesEnum.READ);
+					}
+					else if(permissionLevel === ctrl.permissionLevelValues.readUpdate)
+					{
+						permissions.push(ctrl.PrivilegesEnum.READ);
+						permissions.push(ctrl.PrivilegesEnum.UPDATE);
+					}
+					else if(permissionLevel === ctrl.permissionLevelValues.readUpdateWrite)
+					{
+						permissions.push(ctrl.PrivilegesEnum.READ);
+						permissions.push(ctrl.PrivilegesEnum.UPDATE);
+						permissions.push(ctrl.PrivilegesEnum.WRITE);
+					}
+					else if(permissionLevel === ctrl.permissionLevelValues.readUpdateWriteDelete)
+					{
+						permissions.push(ctrl.PrivilegesEnum.READ);
+						permissions.push(ctrl.PrivilegesEnum.UPDATE);
+						permissions.push(ctrl.PrivilegesEnum.WRITE);
+						permissions.push(ctrl.PrivilegesEnum.DELETE);
+					}
+					return permissions;
+				}
+
 				ctrl.canEdit = () =>
 				{
 					return securityRolesStore.hasSecurityPrivileges(
-						SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY,
-						UserSecurityRolesTransfer.PrivilegesEnum.UPDATE);
+						ctrl.AccessObjectsEnum.ADMINSECURITY,
+						ctrl.PrivilegesEnum.UPDATE);
 				}
+
 				ctrl.canSave = () =>
 				{
 					return !ctrl.isLoading && ctrl.canEdit() && ctrl.role.name.length > 2
@@ -161,18 +226,30 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.onUpdate = () =>
 				{
+					ctrl.isLoading = true;
+					ctrl.translateAccessListToModel();
 					ctrl.securityRolesApi.updateRole(ctrl.role.id, ctrl.role).then((response) =>
 					{
 						ctrl.modalInstance.close(response.data.body);
-					}).catch(ctrl.errorFunction)
+					}).catch(ctrl.errorFunction
+					).finally(() =>
+					{
+						ctrl.isLoading = false;
+					})
 				}
 
 				ctrl.onCreate = () =>
 				{
+					ctrl.isLoading = true;
+					ctrl.translateAccessListToModel();
 					ctrl.securityRolesApi.addRole(ctrl.role).then((response) =>
 					{
 						ctrl.modalInstance.close(response.data.body);
-					}).catch(ctrl.errorFunction)
+					}).catch(ctrl.errorFunction
+					).finally(() =>
+					{
+						ctrl.isLoading = false;
+					})
 				}
 			}]
 	});

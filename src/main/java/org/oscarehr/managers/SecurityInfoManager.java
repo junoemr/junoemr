@@ -29,18 +29,12 @@ import com.quatro.model.security.Secobjprivilege;
 import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
-import org.oscarehr.security.model.SecObjPrivilege;
-import org.oscarehr.security.model.SecObjectName;
-import org.oscarehr.security.model.SecRole;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.transfer.security.SecurityObjectsTransfer;
-import org.oscarehr.ws.rest.transfer.security.SecurityRoleTransfer;
-import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -116,47 +110,11 @@ public class SecurityInfoManager
 	@Autowired
 	private ProviderDataDao providerDataDao;
 
-	@Autowired
-	private SecRoleDao secRoleDao;
-
 	public List<Secuserrole> getRoles(String providerNo)
 	{
 		@SuppressWarnings("unchecked")
 		List<Secuserrole> results = secUserRoleDao.findByProviderNo(providerNo);
 		return results;
-	}
-
-	public List<SecurityRoleTransfer> getAllRoles()
-	{
-		List<SecRole> allRoles = secRoleDao.findAll();
-		List<SecurityRoleTransfer> roleTransfers = new ArrayList<>(allRoles.size());
-
-		for(SecRole secRole : allRoles)
-		{
-			roleTransfers.add(getRoleTransfer(secRole));
-		}
-		return roleTransfers;
-	}
-
-	public SecurityRoleTransfer getRoleTransfer(Integer roleId)
-	{
-		return getRoleTransfer(secRoleDao.find(roleId));
-	}
-	public SecurityRoleTransfer getRoleTransfer(SecRole secRole)
-	{
-		SecurityRoleTransfer transfer = new SecurityRoleTransfer();
-		transfer.setId(secRole.getId());
-		transfer.setName(secRole.getName());
-		transfer.setDescription(secRole.getDescription());
-
-		for(SecObjPrivilege privilege : secRole.getSecObjPrivilege())
-		{
-			transfer.addPrivilege(
-					SecObjectName.OBJECT_NAME.fromValueString(privilege.getId().getObjectName()),
-					getPrivilegeLevels(privilege.getPrivilege())
-			);
-		}
-		return transfer;
 	}
 
 	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo)
@@ -177,59 +135,6 @@ public class SecurityInfoManager
 		return results;
 	}
 
-	public UserSecurityRolesTransfer getUserSecurityRolesTransfer(String providerNo)
-	{
-		UserSecurityRolesTransfer transfer = new UserSecurityRolesTransfer();
-		List<String> roleNames = new ArrayList<>();
-		for(Secuserrole role : getRoles(providerNo))
-		{
-			roleNames.add(role.getRoleName());
-		}
-		//TODO refactor dao use to jpa dao
-		List<Secobjprivilege> privilegeObjects = secobjprivilegeDao.getByRoles(roleNames);
-
-		for(Secobjprivilege secobjprivilege : privilegeObjects)
-		{
-			transfer.addPrivilege(
-					SecObjectName.OBJECT_NAME.fromValueString(secobjprivilege.getObjectname_code()),
-					getPrivilegeLevels(secobjprivilege.getPrivilege_code())
-			);
-		}
-
-		transfer.setRoles(roleNames);
-		return transfer;
-	}
-
-	public SecurityObjectsTransfer getSecurityObjectsTransfer(Integer roleId)
-	{
-		SecRole secRole = secRoleDao.find(roleId);
-		List<SecObjPrivilege> privilegeObjects = secRole.getSecObjPrivilege();
-
-		List<SecObjectName.OBJECT_NAME> objectNames = new ArrayList<>(privilegeObjects.size());
-		for (SecObjPrivilege secObjPrivilege : privilegeObjects)
-		{
-			objectNames.add(SecObjectName.OBJECT_NAME.fromValueString(secObjPrivilege.getId().getObjectName()));
-		}
-		SecurityObjectsTransfer transfer = new SecurityObjectsTransfer();
-		transfer.setAccessObjects(objectNames);
-
-		return transfer;
-	}
-
-	private List<PRIVILEGE_LEVEL> getPrivilegeLevels(String privilege)
-	{
-		List<PRIVILEGE_LEVEL> privilegeList = new ArrayList<>(4);
-		switch(privilege)
-		{
-			case ALL: privilegeList.add(PRIVILEGE_LEVEL.DELETE);
-			case WRITE: privilegeList.add(PRIVILEGE_LEVEL.WRITE);
-			case UPDATE: privilegeList.add(PRIVILEGE_LEVEL.UPDATE);
-			case READ: privilegeList.add(PRIVILEGE_LEVEL.READ); break;
-			case DELETE: privilegeList.add(PRIVILEGE_LEVEL.DELETE); break;
-		}
-		return privilegeList;
-	}
-	
 	/**
 	 * Checks to see if this provider has the privilege to the security object being requested.
 	 * 

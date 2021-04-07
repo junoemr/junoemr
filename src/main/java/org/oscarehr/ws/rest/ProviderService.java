@@ -45,6 +45,7 @@ import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
+import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -83,28 +84,31 @@ import java.util.List;
 @Transactional
 public class ProviderService extends AbstractServiceImpl {
 
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	ProviderDao providerDao;
+	private ProviderDao providerDao;
 
 	@Autowired
-	org.oscarehr.provider.service.ProviderService providerService;
+	private org.oscarehr.provider.service.ProviderService providerService;
 
 	@Autowired
-	ProviderManager2 providerManager;
+	private ProviderManager2 providerManager;
 	
 	@Autowired
-	DemographicManager demographicManager;
+	private DemographicManager demographicManager;
 
 	@Autowired
-	RecentDemographicAccessService recentDemographicAccessService;
+	private RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
 	private PreferenceManager preferenceManager;
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	private SecurityRolesService securityRolesService;
 
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
@@ -376,7 +380,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Path("/self/security/roles")
 	public RestResponse<UserSecurityRolesTransfer> getCurrentUserSecurityRoles()
 	{
-		return RestResponse.successResponse(securityInfoManager.getUserSecurityRolesTransfer(getLoggedInProviderId()));
+		return RestResponse.successResponse(securityRolesService.getUserSecurityRolesTransfer(getLoggedInProviderId()));
 	}
 	
 //	@GET

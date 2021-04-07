@@ -23,13 +23,16 @@
 package org.oscarehr.ws.rest.transfer.security;
 
 import lombok.Data;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.SecObjectName;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class SecurityObjectsTransfer implements Serializable
+public class SecurityObjectTransfer implements Serializable
 {
-	private List<SecObjectName.OBJECT_NAME> accessObjects;
+	private SecObjectName.OBJECT_NAME name;
+	private String description;
+	private List<SecurityInfoManager.PRIVILEGE_LEVEL> privileges;
 }

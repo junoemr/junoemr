@@ -21,15 +21,13 @@
  * Canada
  */
 
-import {SecurityRolesApi} from "../../../../generated";
+import {SecurityObjectTransfer, SecurityRolesApi} from "../../../../generated";
 import {
 	JUNO_BUTTON_COLOR,
-	JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
-
-const {UserSecurityRolesTransfer} = require("../../../../generated");
-const {SecurityObjectsTransfer} = require("../../../../generated");
 
 angular.module('Admin.Section').component('securityRoleConfig',
 	{
@@ -44,11 +42,15 @@ angular.module('Admin.Section').component('securityRoleConfig',
 			function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
 			{
 				let ctrl = this;
-				ctrl.access = SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY;
-				ctrl.permissions = UserSecurityRolesTransfer.PrivilegesEnum.READ;
+				ctrl.AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
+				ctrl.PrivilegesEnum = SecurityObjectTransfer.PrivilegesEnum;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
+				ctrl.access = ctrl.AccessObjectsEnum.ADMINSECURITY;
+				ctrl.permissions = ctrl.PrivilegesEnum.READ;
+
 
 				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
@@ -73,8 +75,8 @@ angular.module('Admin.Section').component('securityRoleConfig',
 				ctrl.canAddRole = () =>
 				{
 					return securityRolesStore.hasSecurityPrivileges(
-						SecurityObjectsTransfer.AccessObjectsEnum.ADMINSECURITY,
-						UserSecurityRolesTransfer.PrivilegesEnum.WRITE);
+						ctrl.AccessObjectsEnum.ADMINSECURITY,
+						ctrl.PrivilegesEnum.WRITE);
 				}
 
 				ctrl.openDetailsModal = (role, newRole) =>
@@ -86,7 +88,7 @@ angular.module('Admin.Section').component('securityRoleConfig',
 							windowClass: "juno-modal lg",
 							resolve: {
 								newRole: newRole,
-								role: role,
+								roleId: (role) ? role.id : null,
 							}
 						}
 					).result.then((updatedRole) =>
