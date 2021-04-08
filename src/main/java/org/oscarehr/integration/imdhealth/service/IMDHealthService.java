@@ -310,7 +310,7 @@ public class IMDHealthService
 
 		for (ProviderData providerData : providers)
 		{
-			boolean success = SSOUser.canConvertProvider(providerData) && postProviderAtClinic(token, providerData);
+			boolean success = SSOUser.canConvertProvider(providerData) && registerProviderAtClinic(token, providerData);
 			if (!success)
 			{
 				failedProviderClinicList.add("Provider is missing required data: " + providerData.getDisplayName());
@@ -424,20 +424,20 @@ public class IMDHealthService
 	}
 
 	/**
-	 * Register the given provider with the clinic to iMD Health
+	 * Register the given provider with this instance's clinic to iMD Health
 	 *
 	 * @param token valid bearer token
 	 * @param provider provider to post
 	 * @return true if post returned a response
 	 * @throws IMDHealthException on post error
 	 */
-	private boolean postProviderAtClinic(BearerToken token, ProviderData provider) throws IMDHealthException
+	private boolean registerProviderAtClinic(BearerToken token, ProviderData provider) throws IMDHealthException
 	{
 		return createSSOSession(token, provider, null, null) != null;
 	}
 
 	/**
-	 * Register the given provider with a site to iMD Health
+	 * Register the given provider with the given site to iMD Health
 	 * @param provider provider to post
 	 * @param site site to post
 	 * @return true if post returned a response
@@ -449,7 +449,7 @@ public class IMDHealthService
 	}
 
 	/**
-	 * Create an iMDHealth SSO session for the logged in provider, with optional patient and site contexts.
+	 * Create an iMDHealth SSO session for the currently logged in provider, with optional patient and site contexts.
 	 *
 	 * @param session HttpSession
 	 * @param demographic {optional} demographic to associate with the patient context of the session
@@ -483,7 +483,7 @@ public class IMDHealthService
 	{
 		try
 		{
-			// TODO ///////////////// TEST REMOVE ME and replace with actual demographic lookup ///////////////////
+			// TODO ///////////////// TEST REMOVE ME AND CONNECT ACTUAL DEMOGRAPHIC LOOKUP ///////////////////
 			demographic = demographicDao.find(8);
 
 
