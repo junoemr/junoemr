@@ -105,11 +105,13 @@ public class SSOPatient implements Serializable {
     }
 
     /**
-     * Precheck if the demographic can be converted into a valid SSODemographic object
+     * Check if the demographic can be converted into a valid SSODemographic object.
+     * A demographic is valid if it has an email address with a valid format.
+     *
      * @param demographic demographic to check
      * @return true if demographic can be converted
      */
-    public static boolean canConvert(Demographic demographic)
+    public static boolean canMapDemographic(Demographic demographic)
     {
         return demographic != null && EmailValidator.getInstance().isValid(demographic.getEmail());
     }

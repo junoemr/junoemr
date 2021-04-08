@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.provider.model.ProviderData;
+import oscar.util.ConversionUtils;
 
 import java.io.Serializable;
 
@@ -73,5 +74,18 @@ public class SSOUser implements Serializable
 		user.lastName = provider.getLastName();
 
 		return user;
+	}
+
+	/**
+	 * Check if a provider can be converted to an valid SSOUser.
+	 * A valid provider has a non-empty unique identifier.
+	 *
+	 * @param provider provider to check
+	 * @return true if able to convert
+	 */
+	public static boolean canConvertProvider(ProviderData provider)
+	{
+		return provider != null &&
+				ConversionUtils.hasContent(provider.getImdHealthUuid());
 	}
 }
