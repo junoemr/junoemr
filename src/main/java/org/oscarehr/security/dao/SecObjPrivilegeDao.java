@@ -41,19 +41,6 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 	public SecObjPrivilegeDao() {
 		super(SecObjPrivilege.class);
 	}
-
-	public List<SecObjPrivilege> findByRoleUserGroupAndObjectName(String roleUserGroup, String objectName) {
-		String sql = "select s FROM SecObjPrivilege s WHERE s.id.roleUserGroup = :rug AND  s.id.objectName = :obj";
-
-		Query query = entityManager.createQuery(sql);
-		query.setParameter("obj",  objectName);
-		query.setParameter("rug", roleUserGroup);
-
-		
-		List<SecObjPrivilege> result =  query.getResultList();
-
-		return result;
-	}
 	
 	public List<SecObjPrivilege> findByObjectNames(Collection<String> objectNames) {
 		String sql = "select s FROM SecObjPrivilege s WHERE s.id.objectName IN (:obj) order by s.priority desc";
@@ -67,19 +54,19 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 		return result;
 	}
 
-	public List<SecObjPrivilege> findByRoleUserGroup(String roleUserGroup) {
-		String sql = "select s FROM SecObjPrivilege s WHERE s.id.roleUserGroup like ?1 order by s.id.roleUserGroup, s.id.objectName";
+	public List<SecObjPrivilege> findByRoleId(Integer roleId) {
+		String sql = "select s FROM SecObjPrivilege s WHERE s.id.roleId = :roleId order by s.id.roleId, s.id.objectName";
 
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, roleUserGroup);
-		
+		query.setParameter("roleId", roleId);
+
 		List<SecObjPrivilege> result =  query.getResultList();
 
 		return result;
 	}
 
 	public List<SecObjPrivilege> findByObjectName(String objectName) {
-		String sql = "select s FROM SecObjPrivilege s WHERE s.id.objectName like ?1 order by s.id.objectName, s.id.roleUserGroup";
+		String sql = "select s FROM SecObjPrivilege s WHERE s.id.objectName like ?1 order by s.id.objectName, s.id.roleId";
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, objectName);
@@ -102,7 +89,7 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 
 	public List<Object[]> findByFormNamePrivilegeAndProviderNo(String formName, String privilege, String providerNo) {
 	    String sql = "FROM SecObjPrivilege p, SecUserRole r " +
-        		"WHERE p.id.roleUserGroup = r.RoleName " +
+        		"WHERE p.roleUserGroup = r.RoleName " +
         		"AND p.id.objectName = :formName " +
         		"AND p.privilege = :privilege " +
 				"AND r.ProviderNo = :providerNo";
@@ -111,6 +98,6 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 		query.setParameter("privilege", privilege);
 		query.setParameter("providerNo", providerNo);
 		return query.getResultList();
-	    
+
     }
 }

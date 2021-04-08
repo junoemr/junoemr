@@ -32,43 +32,49 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class SecObjPrivilegePrimaryKey implements Serializable
 {
-	protected String roleUserGroup = null;
+	protected Integer roleId = null;
 	protected String objectName = null;
 
 	public SecObjPrivilegePrimaryKey()
 	{
 		// do nothing, required by jpa
 	}
-	
-	public SecObjPrivilegePrimaryKey(String roleUserGroup, String objectName)
+
+	public SecObjPrivilegePrimaryKey(Integer roleId, String objectName)
 	{
-		this.roleUserGroup=roleUserGroup;
-		this.objectName=objectName;
+		this.roleId = roleId;
+		this.objectName = objectName;
 	}
 
-	public String getRoleUserGroup() {
-		return roleUserGroup;
+	public Integer getRoleId()
+	{
+		return roleId;
 	}
 
-	public void setRoleUserGroup(String roleUserGroup) {
-		this.roleUserGroup = roleUserGroup;
+	public void setRoleId(Integer roleId)
+	{
+		this.roleId = roleId;
 	}
 
-	public String getObjectName() {
+	public String getObjectName()
+	{
 		return objectName;
 	}
 
-	public void setObjectName(String objectName) {
+	public void setObjectName(String objectName)
+	{
 		this.objectName = objectName;
 	}
 
 	@Override
-	public String toString() {
-		return ("roleUserGroup=" + roleUserGroup + ", objectName=" + objectName);
+	public String toString()
+	{
+		return ("roleId=" + roleId + ", objectName=" + objectName);
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		return (toString().hashCode());
 	}
 
@@ -76,7 +82,7 @@ public class SecObjPrivilegePrimaryKey implements Serializable
 	public boolean equals(Object o) {
 		try {
 			SecObjPrivilegePrimaryKey o1 = (SecObjPrivilegePrimaryKey) o;
-			return ((roleUserGroup.equals(o1.roleUserGroup)) && (roleUserGroup.equals(o1.roleUserGroup)));
+			return ((roleId.equals(o1.roleId)) && (roleId.equals(o1.roleId)));
 		} catch (RuntimeException e) {
 			return (false);
 		}

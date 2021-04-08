@@ -66,14 +66,14 @@ public class SecurityRolesService
 
 		for(SecRole secRole : allRoles)
 		{
-			roleTransfers.add(getRoleTransfer(secRole, false));
+			roleTransfers.add(getRoleTransfer(secRole, false, false));
 		}
 		return roleTransfers;
 	}
 
 	public SecurityRoleTransfer getRoleTransfer(Integer roleId)
 	{
-		return getRoleTransfer(secRoleDao.find(roleId), true);
+		return getRoleTransfer(secRoleDao.find(roleId), true, false);
 	}
 
 	public UserSecurityRolesTransfer getUserSecurityRolesTransfer(String providerNo)
@@ -84,13 +84,13 @@ public class SecurityRolesService
 		for(Secuserrole role : securityInfoManager.getRoles(providerNo))
 		{
 			roleNames.add(role.getRoleName());
-			privilegeObjects.addAll(secObjPrivilegeDao.findByRoleUserGroup(role.getRoleName()));
+			privilegeObjects.addAll(secObjPrivilegeDao.findByRoleId(role.getId()));
 			// queries here could be reduced, but are expected to be 1-3 in most cases
 		}
 
 		for(SecObjPrivilege secObjPrivilege : privilegeObjects)
 		{
-			SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(secObjPrivilege);
+			SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(secObjPrivilege, false);
 			transfer.addAccess(securityObjectTransfer.getName(), securityObjectTransfer);
 		}
 
@@ -100,11 +100,11 @@ public class SecurityRolesService
 
 	public List<SecurityObjectTransfer> getAllSecurityObjectsTransfer()
 	{
-		//TODO this results in a lot of database hits. 1 per enum value
+		//this results in a lot of database hits. 1 per enum value - could be improved
 		List<SecurityObjectTransfer> objectTransfers = new ArrayList<>();
 		for (SecObjectName.OBJECT_NAME secObjPrivilege : SecObjectName.OBJECT_NAME.values())
 		{
-			objectTransfers.add(getSecurityObjectTransfer(secObjPrivilege));
+			objectTransfers.add(getSecurityObjectTransfer(secObjPrivilege, true));
 		}
 		return objectTransfers;
 	}
@@ -113,7 +113,10 @@ public class SecurityRolesService
 	 * ======================================= private methods =======================================
 	 */
 
-	private SecurityRoleTransfer getRoleTransfer(SecRole secRole, boolean includePrivileges)
+	private SecurityRoleTransfer getRoleTransfer(
+			SecRole secRole,
+			boolean includePrivileges,
+			boolean includePrivilegeDescription)
 	{
 		SecurityRoleTransfer transfer = new SecurityRoleTransfer();
 		transfer.setId(secRole.getId());
@@ -125,29 +128,39 @@ public class SecurityRolesService
 		{
 			for (SecObjPrivilege privilege : secRole.getSecObjPrivilege())
 			{
-				SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(privilege);
+				SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(
+						privilege, includePrivilegeDescription);
 				transfer.addAccess(securityObjectTransfer.getName(), securityObjectTransfer);
 			}
 		}
 		return transfer;
 	}
 
-	private SecurityObjectTransfer getSecurityObjectTransfer(SecObjPrivilege secObjPrivilege)
+	private SecurityObjectTransfer getSecurityObjectTransfer(
+			SecObjPrivilege secObjPrivilege,
+			boolean includePrivilegeDescription)
 	{
 		String objectName = secObjPrivilege.getId().getObjectName();
-		SecurityObjectTransfer transfer = getSecurityObjectTransfer(SecObjectName.OBJECT_NAME.fromValueString(objectName));
+		SecurityObjectTransfer transfer = getSecurityObjectTransfer(
+				SecObjectName.OBJECT_NAME.fromValueString(objectName), includePrivilegeDescription);
 		transfer.setPrivileges(getPrivilegeLevels(secObjPrivilege.getPrivilege()));
 		return transfer;
 	}
 
-	private SecurityObjectTransfer getSecurityObjectTransfer(SecObjectName.OBJECT_NAME objectName)
+	private SecurityObjectTransfer getSecurityObjectTransfer(
+			SecObjectName.OBJECT_NAME objectName,
+			boolean includePrivilegeDescription)
 	{
 		SecurityObjectTransfer transfer = new SecurityObjectTransfer();
 		transfer.setName(objectName);
 		transfer.setPrivileges(new ArrayList<>());
 
-		Optional<SecObjectName> SecObjectNameOptional = secObjectNameDao.findOptional(objectName.getValue());
-		SecObjectNameOptional.ifPresent(secObjectName -> transfer.setDescription(secObjectName.getDescription()));
+		// descriptions can add a lot of database hits. only load them if we need them
+		if(includePrivilegeDescription)
+		{
+			Optional<SecObjectName> SecObjectNameOptional = secObjectNameDao.findOptional(objectName.getValue());
+			SecObjectNameOptional.ifPresent(secObjectName -> transfer.setDescription(secObjectName.getDescription()));
+		}
 		return transfer;
 	}
 

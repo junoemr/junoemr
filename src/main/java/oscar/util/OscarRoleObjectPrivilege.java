@@ -51,8 +51,8 @@ public class OscarRoleObjectPrivilege {
 		String[] objectNames = getVecObjectName(objName);
 		SecObjPrivilegeDao dao = SpringUtils.getBean(SecObjPrivilegeDao.class);
 		for (SecObjPrivilege s : dao.findByObjectNames(Arrays.asList(objectNames))) {
-			prop.setProperty(s.getId().getRoleUserGroup(), s.getPrivilege());
-			roleInObj.add(s.getId().getRoleUserGroup());
+			prop.setProperty(String.valueOf(s.getId().getRoleId()), s.getPrivilege());
+			roleInObj.add(String.valueOf(s.getId().getRoleId()));
 			priority.add("" + s.getPriority());
 		}
 
@@ -79,8 +79,8 @@ public class OscarRoleObjectPrivilege {
 
 		ArrayList<String> roleInObj = new ArrayList<String>();
 		for (SecObjPrivilege sop : privileges) {
-			prop.setProperty(sop.getId().getRoleUserGroup(), sop.getPrivilege());
-			roleInObj.add(sop.getId().getRoleUserGroup());
+			prop.setProperty(String.valueOf(sop.getId().getRoleId()), sop.getPrivilege());
+			roleInObj.add(String.valueOf(sop.getId().getRoleId()));
 		}
 		ret.add(prop);
 		ret.add(roleInObj);

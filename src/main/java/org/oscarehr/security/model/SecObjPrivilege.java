@@ -52,9 +52,12 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 	@Column(name = "provider_no")
 	private String providerNo = null;
 
-	@MapsId("roleUserGroup")
+	@Deprecated // property/column to be removed once all references use roleId
+	private String roleUserGroup;
+
+	@MapsId("roleId")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "roleUserGroup", referencedColumnName = "role_name", insertable = false, updatable = false)
+	@JoinColumn(name = "roleId", referencedColumnName = "role_no", insertable = false, updatable = false)
 	private SecRole secRole;
 
 	@MapsId("objectName")
