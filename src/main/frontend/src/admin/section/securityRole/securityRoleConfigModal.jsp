@@ -57,7 +57,9 @@
 									class="access-selection"
 									disabled="!$ctrl.canEdit()">
 							</juno-select>
-							<span>{{access.description}}</span>
+							<div class="access-description flex-column flex-grow justify-content-center">
+								<span>{{access.description}}</span>
+							</div>
 						</div>
 					</li>
 				</ul>
@@ -65,19 +67,16 @@
 		</div>
 	</modal-body>
 	<modal-footer>
-		<div class="row footer-wrapper">
-			<div class="col-md-6">
+		<div class="footer-wrapper">
+			<div class="button-wrapper">
 				<juno-button component-style="$ctrl.resolve.style"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-				             ng-click="$ctrl.onCancel()"
-				             class="cancel-connection-btn">
-					<div class="cancel-btn-text">
-						Cancel
-					</div>
+				             ng-click="$ctrl.onCancel()">
+					Cancel
 				</juno-button>
 			</div>
-			<div class="col-md-6">
+			<div class="button-wrapper">
 				<juno-button ng-if="$ctrl.newRole"
 				             component-style="$ctrl.resolve.style"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"

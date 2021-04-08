@@ -38,8 +38,9 @@ angular.module('Admin.Section').component('securityRoleConfig',
 			'$http',
 			'$httpParamSerializer',
 			'$uibModal',
+			'NgTableParams',
 			'securityRolesStore',
-			function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
+			function ($scope, $http, $httpParamSerializer, $uibModal, NgTableParams, securityRolesStore)
 			{
 				let ctrl = this;
 				ctrl.AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
@@ -53,6 +54,17 @@ angular.module('Admin.Section').component('securityRoleConfig',
 
 
 				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
+
+				// ctrl.sortMode = "name";
+				ctrl.tableParams = new NgTableParams(
+					{
+						page: 1, // show first page
+						count: -1, // unlimited
+						sorting:
+						{
+							name: 'asc',
+						}
+					});
 
 				ctrl.rolesList = [];
 
