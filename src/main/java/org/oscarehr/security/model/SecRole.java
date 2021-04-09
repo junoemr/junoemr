@@ -24,6 +24,7 @@
 package org.oscarehr.security.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
@@ -35,11 +36,13 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "secRole")
+@Where(clause="deleted_at IS NULL")
 public class SecRole extends AbstractModel<Integer> implements Serializable, Comparable<SecRole>
 {
 	@Id
@@ -51,6 +54,12 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 	private String name;
 
 	private String description;
+
+	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime deletedAt;
+
+	@Column(name = "deleted_by")
+	private String deletedBy;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "secRole")
 	private List<SecObjPrivilege> secObjPrivilege;

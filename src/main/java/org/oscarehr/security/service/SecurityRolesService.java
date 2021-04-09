@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -156,6 +157,15 @@ public class SecurityRolesService
 		LogAction.addLogEntry(providerId, null, LogConst.ACTION_UPDATE, LogConst.CON_SECURITY, LogConst.STATUS_SUCCESS,
 				String.valueOf(secRole.getId()), null, "Role: " + secRole.getName());
 		return getRoleTransfer(secRole, false);
+	}
+
+	public boolean deleteRole(String providerId, Integer roleId)
+	{
+		SecRole role = secRoleDao.find(roleId);
+		role.setDeletedBy(providerId);
+		role.setDeletedAt(LocalDateTime.now());
+		secRoleDao.merge(role);
+		return true;
 	}
 
 	/*

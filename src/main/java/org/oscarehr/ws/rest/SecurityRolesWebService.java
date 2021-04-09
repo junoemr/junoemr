@@ -105,7 +105,8 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> deleteRole(@PathParam("roleId") Integer roleId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
-		return RestResponse.successResponse(false); //TODO
+		String providerNo = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		return RestResponse.successResponse(securityRolesService.deleteRole(providerNo, roleId));
 	}
 }
