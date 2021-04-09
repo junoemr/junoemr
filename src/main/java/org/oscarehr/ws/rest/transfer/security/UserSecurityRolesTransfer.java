@@ -33,7 +33,7 @@ import java.util.Map;
 @Data
 public class UserSecurityRolesTransfer implements Serializable
 {
-	private List<String> roles;
+	private List<SecurityRoleTransfer> roles;
 	private Map<SecObjectName.OBJECT_NAME, SecurityObjectTransfer> accessObjects;
 
 	public UserSecurityRolesTransfer()

@@ -67,32 +67,49 @@
 		</div>
 	</modal-body>
 	<modal-footer>
-		<div class="footer-wrapper">
-			<div class="button-wrapper">
-				<juno-button component-style="$ctrl.resolve.style"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-				             ng-click="$ctrl.onCancel()">
-					Cancel
-				</juno-button>
+		<div class="row footer-wrapper">
+			<div class="col-md-6">
+				<div class="button-group-wrapper pull-left">
+					<div class="button-wrapper">
+						<juno-button component-style="$ctrl.resolve.style"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+						             ng-click="$ctrl.onDelete()"
+						             disabled="$ctrl.newRole || !$ctrl.canDelete()">
+							Delete
+						</juno-button>
+					</div>
+				</div>
 			</div>
-			<div class="button-wrapper">
-				<juno-button ng-if="$ctrl.newRole"
-				             component-style="$ctrl.resolve.style"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-				             ng-click="$ctrl.onCreate()"
-				             disabled="!$ctrl.canSave()">
-					Add Role
-				</juno-button>
-				<juno-button ng-if="!$ctrl.newRole"
-				             component-style="$ctrl.resolve.style"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-				             ng-click="$ctrl.onUpdate()"
-				             disabled="!$ctrl.canSave()">
-					Save Role
-				</juno-button>
+			<div class="col-md-6">
+				<div class="button-group-wrapper">
+					<div class="button-wrapper">
+						<juno-button component-style="$ctrl.resolve.style"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+						             ng-click="$ctrl.onCancel()">
+							Cancel
+						</juno-button>
+					</div>
+					<div class="button-wrapper">
+						<juno-button ng-if="$ctrl.newRole"
+						             component-style="$ctrl.resolve.style"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+						             ng-click="$ctrl.onCreate()"
+						             disabled="!$ctrl.canSave()">
+							Add Role
+						</juno-button>
+						<juno-button ng-if="!$ctrl.newRole"
+						             component-style="$ctrl.resolve.style"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+						             ng-click="$ctrl.onUpdate()"
+						             disabled="!$ctrl.canSave()">
+							Save Role
+						</juno-button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</modal-footer>

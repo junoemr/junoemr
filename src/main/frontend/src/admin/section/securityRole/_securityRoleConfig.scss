@@ -41,11 +41,17 @@
     justify-content: flex-end;
     align-items: center;
     padding: 0 16px;
-    margin: 0 -4px;
 
-    .button-wrapper {
-      margin: 0 4px;
-      width: 128px;
+    .button-group-wrapper {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: flex-end;
+      margin: 0 -4px;
+      .button-wrapper {
+        margin: 0 4px;
+        width: 128px;
+      }
     }
   }
 }

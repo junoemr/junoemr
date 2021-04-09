@@ -52,6 +52,12 @@ angular.module('Admin.Section').component('securityRoleConfig',
 				ctrl.access = ctrl.AccessObjectsEnum.ADMINSECURITY;
 				ctrl.permissions = ctrl.PrivilegesEnum.READ;
 
+				ctrl.operationEnum = Object.freeze({
+					ADD: "add",
+					UPDATE: "update",
+					DELETE: "delete",
+				});
+
 
 				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
@@ -101,18 +107,29 @@ angular.module('Admin.Section').component('securityRoleConfig',
 							resolve: {
 								newRole: newRole,
 								roleId: (role) ? role.id : null,
+								operationEnum: ctrl.operationEnum,
 							}
 						}
-					).result.then((updatedRole) =>
+					).result.then((response) =>
 					{
-						if (newRole)
+						const operation = response.operation;
+						const updatedRole = response.data;
+
+						if(operation === ctrl.operationEnum.ADD)
 						{
 							ctrl.rolesList.push(updatedRole);
 						}
-						else // update existing
+						else
 						{
 							const index = ctrl.rolesList.indexOf(role);
-							ctrl.rolesList[index] = updatedRole;
+							if (operation === ctrl.operationEnum.UPDATE)
+							{
+								ctrl.rolesList[index] = updatedRole;
+							}
+							else if (operation === ctrl.operationEnum.DELETE)
+							{
+								ctrl.rolesList.splice(index, 1);
+							}
 						}
 						// force the cached access/permissions values to reload
 						securityRolesStore.loadUserRoles();

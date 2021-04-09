@@ -90,14 +90,14 @@ public class SecurityRolesService
 	public UserSecurityRolesTransfer getUserSecurityRolesTransfer(String providerNo)
 	{
 		UserSecurityRolesTransfer transfer = new UserSecurityRolesTransfer();
-		List<String> roleNames = new ArrayList<>();
+		List<SecurityRoleTransfer> roleTransfers = new ArrayList<>();
 		Set<SecObjPrivilege> privilegeObjects = new HashSet<>(); // remove duplicates during insert
 		for(Secuserrole userRole : securityInfoManager.getRoles(providerNo))
 		{
+			// queries here could be reduced, but in most cases 1-3 roles is expected
 			SecRole role = secRoleDao.findByName(userRole.getRoleName());
-			roleNames.add(role.getName());
+			roleTransfers.add(getRoleTransfer(role, false));
 			privilegeObjects.addAll(secObjPrivilegeDao.findByRoleId(role.getId()));
-			// queries here could be reduced, but are expected to be 1-3 in most cases
 		}
 
 		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
@@ -108,13 +108,12 @@ public class SecurityRolesService
 			transfer.addAccess(securityObjectTransfer.getName(), securityObjectTransfer);
 		}
 
-		transfer.setRoles(roleNames);
+		transfer.setRoles(roleTransfers);
 		return transfer;
 	}
 
 	public List<SecurityObjectTransfer> getAllSecurityObjectsTransfer()
 	{
-		//this results in a lot of database hits. 1 per enum value - could be improved
 		List<SecurityObjectTransfer> objectTransfers = new ArrayList<>();
 		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
 

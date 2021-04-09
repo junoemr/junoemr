@@ -213,6 +213,13 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					return !ctrl.isLoading && ctrl.canEdit() && ctrl.role.name.length > 2
 				}
 
+				ctrl.canDelete = () =>
+				{
+					return !ctrl.isLoading && securityRolesStore.hasSecurityPrivileges(
+						ctrl.AccessObjectsEnum.ADMINSECURITY,
+						ctrl.PrivilegesEnum.DELETE);
+				}
+
 				ctrl.onCancel = () =>
 				{
 					ctrl.modalInstance.dismiss("cancelled");
@@ -221,21 +228,32 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				ctrl.errorFunction = (error) =>
 				{
 					console.error(error);
-					Juno.Common.Util.errorAlert($uibModal, "Error", "Failed to save role");
+					Juno.Common.Util.errorAlert($uibModal, "Error", "Failed to modify role");
 				}
 
-				ctrl.onUpdate = () =>
+				ctrl.onUpdate = async () =>
 				{
-					ctrl.isLoading = true;
-					ctrl.translateAccessListToModel();
-					ctrl.securityRolesApi.updateRole(ctrl.role.id, ctrl.role).then((response) =>
+					const userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Warning",
+						"You are about to modify a user role. " +
+						"This may change what content you and other system users have access to, including this page.\n" +
+						"Are you sure you want to modify this user role?");
+
+					if(userOk)
 					{
-						ctrl.modalInstance.close(response.data.body);
-					}).catch(ctrl.errorFunction
-					).finally(() =>
-					{
-						ctrl.isLoading = false;
-					})
+						ctrl.isLoading = true;
+						ctrl.translateAccessListToModel();
+						ctrl.securityRolesApi.updateRole(ctrl.role.id, ctrl.role).then((response) =>
+						{
+							ctrl.modalInstance.close({
+								operation: ctrl.resolve.operationEnum.UPDATE,
+								data: response.data.body
+							});
+						}).catch(ctrl.errorFunction
+						).finally(() =>
+						{
+							ctrl.isLoading = false;
+						});
+					}
 				}
 
 				ctrl.onCreate = () =>
@@ -244,12 +262,39 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					ctrl.translateAccessListToModel();
 					ctrl.securityRolesApi.addRole(ctrl.role).then((response) =>
 					{
-						ctrl.modalInstance.close(response.data.body);
+						ctrl.modalInstance.close({
+							operation: ctrl.resolve.operationEnum.ADD,
+							data: response.data.body
+						});
 					}).catch(ctrl.errorFunction
 					).finally(() =>
 					{
 						ctrl.isLoading = false;
-					})
+					});
+				}
+
+				ctrl.onDelete = async () =>
+				{
+					const userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Warning",
+						"You are about to delete a user role. " +
+						"This may change what content you and other system users have access to, including this page.\n" +
+						"Are you sure you want to delete this user role?");
+
+					if(userOk)
+					{
+						ctrl.isLoading = true;
+						ctrl.securityRolesApi.deleteRole(ctrl.role.id).then((response) =>
+						{
+							ctrl.modalInstance.close({
+								operation: ctrl.resolve.operationEnum.DELETE,
+								data: null
+							});
+						}).catch(ctrl.errorFunction
+						).finally(() =>
+						{
+							ctrl.isLoading = false;
+						});
+					}
 				}
 			}]
 	});
