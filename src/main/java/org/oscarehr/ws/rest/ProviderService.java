@@ -178,14 +178,19 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> enableProvider(@PathParam("id") Integer id, Boolean enable)
 	{
+		String currentProvider = getLoggedInInfo().getLoggedInProviderNo();
 		try
 		{
-			providerService.enableProvider(id, enable);
+			providerService.enableProvider(id, enable, currentProvider);
 			return RestResponse.successResponse(true);
 		}
 		catch (NoSuchRecordException nsre)
 		{
 			return RestResponse.errorResponse("Cannot find provider, with id: " + id);
+		}
+		catch (SecurityException se)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_INSUFFICIENT_PRIVILEGE);
 		}
 	}
 
@@ -232,9 +237,13 @@ public class ProviderService extends AbstractServiceImpl {
 			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo, getLoggedInInfo().getLoggedInProviderNo());
 			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
 		}
-		catch(SecurityRecordAlreadyExistsException secRecordExists)
+		catch (SecurityRecordAlreadyExistsException secRecordExists)
 		{
 			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
+		}
+		catch (SecurityException securityException)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_INSUFFICIENT_PRIVILEGE);
 		}
 	}
 

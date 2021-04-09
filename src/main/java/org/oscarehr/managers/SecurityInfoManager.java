@@ -307,13 +307,13 @@ public class SecurityInfoManager {
 	}
 
 	/**
-	 *  Action that requires logined provider/user has superadmin provilege
+	 * Action that requires logged in provider has super admin privileges
 	 * @param currentProviderNo logged in provider
 	 * @param providerNoToModify provider that will be changed
 	 */
 	public void requireSuperAdminPrivilege(String currentProviderNo, String providerNoToModify) throws SecurityException
 	{
-		if (!superAdminModificationCheck(currentProviderNo,providerNoToModify))
+		if (!superAdminModificationCheck(currentProviderNo, providerNoToModify))
 		{
 			throw new SecurityException("Super Admin privileges are required");
 		}
@@ -323,7 +323,7 @@ public class SecurityInfoManager {
 	 * check if it's a non super-admin provider attempts to modify a super-admin provider
 	 * @param currentProviderNo - the providerId of the current user
 	 * @param providerNoToModify - the providerId of the user they are attempting to modify
-	 * @return  true if current user has priviledge to set a provider
+	 * @return  true if current user is able to edit the other provider's record
 	 */
 	public boolean superAdminModificationCheck(String currentProviderNo, String providerNoToModify)
 	{

@@ -791,6 +791,10 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 				{
 					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "User name or email already in use");
 				}
+				else if (result.error.message === "INSUFFICIENT_PRIVILEGE")
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Sorry, you are not authorized to make changes to this user.");
+				}
 				else
 				{
 					Juno.Common.Util.errorAlert($uibModal, "Error", "Unknown error: " + result.error.message);

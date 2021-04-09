@@ -34,6 +34,7 @@ import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.dao.ProviderBillingDao;
@@ -87,6 +88,9 @@ public class ProviderService
 
 	@Autowired
 	private ProviderBillingDao providerBillingDao;
+
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
 
 	public ProviderData getProvider(String providerNo)
 	{
@@ -190,8 +194,9 @@ public class ProviderService
 	 * @param providerNo - the provider to enable / disable
 	 * @param enable - if true enable. if false disable.
 	 */
-	public void enableProvider(Integer providerNo, Boolean enable)
+	public void enableProvider(Integer providerNo, Boolean enable, String currentProvider)
 	{
+		securityInfoManager.requireSuperAdminPrivilege(currentProvider, providerNo.toString());
 		ProviderData provider = providerDataDao.find(providerNo.toString());
 		if (provider != null)
 		{
@@ -295,6 +300,7 @@ public class ProviderService
 	 */
 	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo, String editingProviderNo)
 	{
+		securityInfoManager.requireSuperAdminPrivilege(editingProviderNo, providerNo.toString());
 		ProviderData providerData = providerDataDao.find(providerNo.toString());
 		if (providerData != null)
 		{
