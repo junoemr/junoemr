@@ -70,4 +70,10 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 	{
 		return id;
 	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.id.hashCode();
+	}
 }

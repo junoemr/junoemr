@@ -54,13 +54,14 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 		return result;
 	}
 
-	public List<SecObjPrivilege> findByRoleId(Integer roleId) {
+	public List<SecObjPrivilege> findByRoleId(Integer roleId)
+	{
 		String sql = "select s FROM SecObjPrivilege s WHERE s.id.roleId = :roleId order by s.id.roleId, s.id.objectName";
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("roleId", roleId);
 
-		List<SecObjPrivilege> result =  query.getResultList();
+		List<SecObjPrivilege> result = query.getResultList();
 
 		return result;
 	}
@@ -100,4 +101,13 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 		return query.getResultList();
 
     }
+
+	public int deleteByRole(Integer roleId)
+	{
+		String hql = "DELETE FROM SecObjPrivilege p WHERE p.id.roleId = :roleId";
+
+		Query query = entityManager.createQuery(hql);
+		query.setParameter("roleId", roleId);
+		return query.executeUpdate();
+	}
 }

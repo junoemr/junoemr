@@ -25,13 +25,14 @@
 
 package org.oscarehr.security.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.security.model.SecObjectName;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository(value="secObjectNameDaoJpa")
 public class SecObjectNameDao extends AbstractDao<SecObjectName>
@@ -61,5 +62,24 @@ public class SecObjectNameDao extends AbstractDao<SecObjectName>
 		List<String> result =  query.getResultList();
 
 		return result;
+	}
+
+	/**
+	 * fetch all the SecObjectName entries as a map keyed on the id.
+	 * @return -  a map containing all entries for the entity, keyed on the id
+	 */
+	public Map<String, SecObjectName> getAllNamesByMappedById()
+	{
+		String jpql = "SELECT x \n" +
+				"FROM SecObjectName x \n" +
+				"ORDER BY x.id asc";
+		return entityManager.createQuery(jpql, SecObjectName.class)
+				.getResultStream()
+				.collect(
+						Collectors.toMap(
+								SecObjectName::getId,
+								objectName -> (objectName)
+						)
+				);
 	}
 }

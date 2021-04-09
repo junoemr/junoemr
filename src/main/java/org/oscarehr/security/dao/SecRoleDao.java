@@ -22,14 +22,13 @@
  */
 package org.oscarehr.security.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.security.model.SecRole;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 @Transactional
@@ -78,6 +77,13 @@ public class SecRoleDao extends AbstractDao<SecRole>
     	q.setParameter("name", name);
     	
     	return this.getSingleResultOrNull(q);
+    }
+
+    public boolean roleExistsWithName(String name)
+    {
+	    Query query = entityManager.createQuery("SELECT count(x) FROM SecRole x WHERE x.name=:name");
+	    query.setParameter("name", name);
+	    return ((Long) query.getSingleResult() > 0);
     }
 
     public List<SecRole> findAllOrderByRole()

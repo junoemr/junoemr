@@ -24,7 +24,6 @@
 package org.oscarehr.security.model;
 
 import lombok.Data;
-import org.hibernate.annotations.NaturalId;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
@@ -49,7 +48,6 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 	private Integer id;
 
 	@Column(name = "role_name")
-	@NaturalId
 	private String name;
 
 	private String description;

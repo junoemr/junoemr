@@ -23,11 +23,14 @@
 package org.oscarehr.security.service;
 
 import com.quatro.model.security.Secuserrole;
+import org.apache.commons.lang.StringUtils;
+import org.openqa.selenium.InvalidArgumentException;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.dao.SecObjPrivilegeDao;
 import org.oscarehr.security.dao.SecObjectNameDao;
 import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.security.model.SecObjPrivilege;
+import org.oscarehr.security.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.security.model.SecRole;
 import org.oscarehr.ws.rest.transfer.security.SecurityObjectTransfer;
@@ -37,11 +40,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.oscarehr.managers.SecurityInfoManager.ALL;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -66,31 +77,34 @@ public class SecurityRolesService
 
 		for(SecRole secRole : allRoles)
 		{
-			roleTransfers.add(getRoleTransfer(secRole, false, false));
+			roleTransfers.add(getRoleTransfer(secRole, false));
 		}
 		return roleTransfers;
 	}
 
 	public SecurityRoleTransfer getRoleTransfer(Integer roleId)
 	{
-		return getRoleTransfer(secRoleDao.find(roleId), true, false);
+		return getRoleTransfer(secRoleDao.find(roleId), true);
 	}
 
 	public UserSecurityRolesTransfer getUserSecurityRolesTransfer(String providerNo)
 	{
 		UserSecurityRolesTransfer transfer = new UserSecurityRolesTransfer();
 		List<String> roleNames = new ArrayList<>();
-		List<SecObjPrivilege> privilegeObjects = new LinkedList<>();
-		for(Secuserrole role : securityInfoManager.getRoles(providerNo))
+		Set<SecObjPrivilege> privilegeObjects = new HashSet<>(); // remove duplicates during insert
+		for(Secuserrole userRole : securityInfoManager.getRoles(providerNo))
 		{
-			roleNames.add(role.getRoleName());
+			SecRole role = secRoleDao.findByName(userRole.getRoleName());
+			roleNames.add(role.getName());
 			privilegeObjects.addAll(secObjPrivilegeDao.findByRoleId(role.getId()));
 			// queries here could be reduced, but are expected to be 1-3 in most cases
 		}
 
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
 		for(SecObjPrivilege secObjPrivilege : privilegeObjects)
 		{
-			SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(secObjPrivilege, false);
+			SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(
+					secObjPrivilege, nameEntityMap.get(secObjPrivilege.getId().getObjectName()));
 			transfer.addAccess(securityObjectTransfer.getName(), securityObjectTransfer);
 		}
 
@@ -102,21 +116,103 @@ public class SecurityRolesService
 	{
 		//this results in a lot of database hits. 1 per enum value - could be improved
 		List<SecurityObjectTransfer> objectTransfers = new ArrayList<>();
-		for (SecObjectName.OBJECT_NAME secObjPrivilege : SecObjectName.OBJECT_NAME.values())
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
+
+		for (SecObjectName.OBJECT_NAME objectName : SecObjectName.OBJECT_NAME.values())
 		{
-			objectTransfers.add(getSecurityObjectTransfer(secObjPrivilege, true));
+			objectTransfers.add(getSecurityObjectTransfer(objectName, nameEntityMap.get(objectName.getValue())));
 		}
 		return objectTransfers;
+	}
+
+	public SecurityRoleTransfer addRole(String providerId, SecurityRoleTransfer newRoleTransfer)
+	{
+		if(newRoleTransfer.getId() != null)
+		{
+			throw new InvalidArgumentException("Id of new role must be null");
+		}
+		if(StringUtils.isBlank(newRoleTransfer.getName()) || secRoleDao.roleExistsWithName(newRoleTransfer.getName()))
+		{
+			throw new InvalidArgumentException("Role Name must be unique and non-empty");
+		}
+		SecRole secRole = convertSecRole(new SecRole(), newRoleTransfer);
+		secRoleDao.persist(secRole);
+		saveSecurityObjectsForRole(providerId, secRole, convertPrivileges(secRole, newRoleTransfer.getAccessObjects().values()));
+
+		LogAction.addLogEntry(providerId, null, LogConst.ACTION_ADD, LogConst.CON_SECURITY, LogConst.STATUS_SUCCESS,
+				String.valueOf(secRole.getId()), null, "Role: " + secRole.getName());
+		return getRoleTransfer(secRole, false);
+	}
+
+	public SecurityRoleTransfer updateRole(String providerId, Integer roleId, SecurityRoleTransfer updatedRoleTransfer)
+	{
+		if(roleId == null || !roleId.equals(updatedRoleTransfer.getId()))
+		{
+			throw new InvalidArgumentException("Id to update cannot be null and must match transfer ID");
+		}
+		SecRole secRole = convertSecRole(secRoleDao.find(roleId), updatedRoleTransfer);
+		secRoleDao.merge(secRole);
+		saveSecurityObjectsForRole(providerId, secRole, convertPrivileges(secRole, updatedRoleTransfer.getAccessObjects().values()));
+
+		LogAction.addLogEntry(providerId, null, LogConst.ACTION_UPDATE, LogConst.CON_SECURITY, LogConst.STATUS_SUCCESS,
+				String.valueOf(secRole.getId()), null, "Role: " + secRole.getName());
+		return getRoleTransfer(secRole, false);
 	}
 
 	/*
 	 * ======================================= private methods =======================================
 	 */
 
+	public SecRole convertSecRole(SecRole secRole, SecurityRoleTransfer input)
+	{
+		secRole.setId(input.getId());
+		secRole.setName(input.getName());
+		secRole.setDescription(input.getDescription());
+		return secRole;
+	}
+
+	private List<SecObjPrivilege> convertPrivileges(SecRole secRole, Collection<SecurityObjectTransfer> privilegeTransfers)
+	{
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
+		return privilegeTransfers.stream()
+				.map((secObjTransfer) -> convertPrivilege(secRole, secObjTransfer, nameEntityMap))
+				.filter(Objects::nonNull).collect(Collectors.toList());
+	}
+
+	private SecObjPrivilege convertPrivilege(SecRole secRole, SecurityObjectTransfer privilegeTransfer, Map<String, SecObjectName> nameEntityMap)
+	{
+		SecObjPrivilege secObjPrivilege = null;
+		String privilegeLevel = getPrivilegeForModel(privilegeTransfer.getPrivileges());
+
+		if(privilegeLevel != null)
+		{
+			secObjPrivilege = new SecObjPrivilege();
+			secObjPrivilege.setId(new SecObjPrivilegePrimaryKey(secRole.getId(), privilegeTransfer.getName().getValue()));
+			secObjPrivilege.setSecRole(secRole);
+			secObjPrivilege.setRoleUserGroup(secRole.getName());
+			secObjPrivilege.setPriority(0);
+			secObjPrivilege.setPrivilege(privilegeLevel);
+			secObjPrivilege.setSecObjectName(nameEntityMap.get(secObjPrivilege.getId().getObjectName()));
+		}
+
+		return secObjPrivilege;
+	}
+
+	private void saveSecurityObjectsForRole(String providerId, SecRole secRole, List<SecObjPrivilege> secObjPrivileges)
+	{
+		// delete all existing objects and re-add them
+		// otherwise we need to do a diff on the objects added/removed/changed
+		secObjPrivilegeDao.deleteByRole(secRole.getId());
+		for (SecObjPrivilege secObjPrivilege : secObjPrivileges)
+		{
+			secObjPrivilege.setProviderNo(providerId);
+			secObjPrivilegeDao.persist(secObjPrivilege);
+		}
+	}
+
 	private SecurityRoleTransfer getRoleTransfer(
 			SecRole secRole,
-			boolean includePrivileges,
-			boolean includePrivilegeDescription)
+			boolean includePrivileges)
 	{
 		SecurityRoleTransfer transfer = new SecurityRoleTransfer();
 		transfer.setId(secRole.getId());
@@ -126,10 +222,11 @@ public class SecurityRolesService
 		// privileges are not always needed and may have additional database hits as they are lazy loaded
 		if(includePrivileges)
 		{
+			Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
 			for (SecObjPrivilege privilege : secRole.getSecObjPrivilege())
 			{
 				SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(
-						privilege, includePrivilegeDescription);
+						privilege, nameEntityMap.get(privilege.getId().getObjectName()));
 				transfer.addAccess(securityObjectTransfer.getName(), securityObjectTransfer);
 			}
 		}
@@ -138,28 +235,26 @@ public class SecurityRolesService
 
 	private SecurityObjectTransfer getSecurityObjectTransfer(
 			SecObjPrivilege secObjPrivilege,
-			boolean includePrivilegeDescription)
+			SecObjectName secObjectName)
 	{
 		String objectName = secObjPrivilege.getId().getObjectName();
 		SecurityObjectTransfer transfer = getSecurityObjectTransfer(
-				SecObjectName.OBJECT_NAME.fromValueString(objectName), includePrivilegeDescription);
+				SecObjectName.OBJECT_NAME.fromValueString(objectName), secObjectName);
 		transfer.setPrivileges(getPrivilegeLevels(secObjPrivilege.getPrivilege()));
 		return transfer;
 	}
 
 	private SecurityObjectTransfer getSecurityObjectTransfer(
 			SecObjectName.OBJECT_NAME objectName,
-			boolean includePrivilegeDescription)
+			SecObjectName secObjectName)
 	{
 		SecurityObjectTransfer transfer = new SecurityObjectTransfer();
 		transfer.setName(objectName);
 		transfer.setPrivileges(new ArrayList<>());
 
-		// descriptions can add a lot of database hits. only load them if we need them
-		if(includePrivilegeDescription)
+		if (secObjectName != null)
 		{
-			Optional<SecObjectName> SecObjectNameOptional = secObjectNameDao.findOptional(objectName.getValue());
-			SecObjectNameOptional.ifPresent(secObjectName -> transfer.setDescription(secObjectName.getDescription()));
+			transfer.setDescription(secObjectName.getDescription());
 		}
 		return transfer;
 	}
@@ -176,6 +271,29 @@ public class SecurityRolesService
 			case SecurityInfoManager.DELETE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE); break;
 		}
 		return privilegeList;
+	}
+
+	private String getPrivilegeForModel(List<SecurityInfoManager.PRIVILEGE_LEVEL> privileges)
+	{
+		String privilegeLevel = null;
+		if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE)
+				&& privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.WRITE))
+		{
+			privilegeLevel = ALL;
+		}
+		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.WRITE))
+		{
+			privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.WRITE.asString();
+		}
+		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE))
+		{
+			privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE.asString();
+		}
+		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.READ))
+		{
+			privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.READ.asString();
+		}
+		return privilegeLevel;
 	}
 
 }

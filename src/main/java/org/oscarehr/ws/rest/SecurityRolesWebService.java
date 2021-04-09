@@ -75,8 +75,9 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<SecurityRoleTransfer> addRole(SecurityRoleTransfer transfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
-		return RestResponse.successResponse(null); //TODO
+		String providerNo = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		return RestResponse.successResponse(securityRolesService.addRole(providerNo, transfer));
 	}
 
 	@GET
@@ -94,9 +95,9 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<SecurityRoleTransfer> updateRole(@PathParam("roleId") Integer roleId, SecurityRoleTransfer transfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
-		//TODO
-		return RestResponse.successResponse(securityRolesService.getRoleTransfer(roleId));
+		String providerNo = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		return RestResponse.successResponse(securityRolesService.updateRole(providerNo, roleId, transfer));
 	}
 
 	@DELETE

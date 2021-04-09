@@ -82,7 +82,7 @@ public class SecObjPrivilegePrimaryKey implements Serializable
 	public boolean equals(Object o) {
 		try {
 			SecObjPrivilegePrimaryKey o1 = (SecObjPrivilegePrimaryKey) o;
-			return ((roleId.equals(o1.roleId)) && (roleId.equals(o1.roleId)));
+			return ((roleId.equals(o1.roleId)) && (objectName.equals(o1.objectName)));
 		} catch (RuntimeException e) {
 			return (false);
 		}
