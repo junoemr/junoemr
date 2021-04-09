@@ -56,7 +56,7 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 
 	public List<SecObjPrivilege> findByRoleId(Integer roleId)
 	{
-		String sql = "select s FROM SecObjPrivilege s WHERE s.id.roleId = :roleId order by s.id.roleId, s.id.objectName";
+		String sql = "select s FROM SecObjPrivilege s WHERE s.id.secRoleId = :roleId order by s.id.secRoleId, s.id.objectName";
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("roleId", roleId);
@@ -67,7 +67,7 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 	}
 
 	public List<SecObjPrivilege> findByObjectName(String objectName) {
-		String sql = "select s FROM SecObjPrivilege s WHERE s.id.objectName like ?1 order by s.id.objectName, s.id.roleId";
+		String sql = "select s FROM SecObjPrivilege s WHERE s.id.objectName like ?1 order by s.id.objectName, s.id.secRoleId";
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, objectName);
@@ -104,7 +104,7 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 
 	public int deleteByRole(Integer roleId)
 	{
-		String hql = "DELETE FROM SecObjPrivilege p WHERE p.id.roleId = :roleId";
+		String hql = "DELETE FROM SecObjPrivilege p WHERE p.id.secRoleId = :roleId";
 
 		Query query = entityManager.createQuery(hql);
 		query.setParameter("roleId", roleId);

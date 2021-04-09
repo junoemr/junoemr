@@ -55,9 +55,9 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 	@Deprecated // property/column to be removed once all references use roleId
 	private String roleUserGroup;
 
-	@MapsId("roleId")
+	@MapsId("secRoleId")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "roleId", referencedColumnName = "role_no", insertable = false, updatable = false)
+	@JoinColumn(name = "secRoleId", referencedColumnName = "role_no", insertable = false, updatable = false)
 	private SecRole secRole;
 
 	@MapsId("objectName")

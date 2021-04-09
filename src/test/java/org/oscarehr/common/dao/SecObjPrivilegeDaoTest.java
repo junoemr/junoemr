@@ -75,7 +75,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege1);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey1 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey1.setObjectName(objectName1);
-		secObjPrivilegePrimaryKey1.setRoleId(roleId1);
+		secObjPrivilegePrimaryKey1.setSecRoleId(roleId1);
 		secObjPrivilege1.setId(secObjPrivilegePrimaryKey1);
 		secObjPrivilegeDao.persist(secObjPrivilege1);
 
@@ -83,7 +83,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege2);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey2 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey2.setObjectName(objectName2);
-		secObjPrivilegePrimaryKey2.setRoleId(roleId1);
+		secObjPrivilegePrimaryKey2.setSecRoleId(roleId1);
 		secObjPrivilege2.setId(secObjPrivilegePrimaryKey2);
 		secObjPrivilegeDao.persist(secObjPrivilege2);
 
@@ -91,7 +91,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege3);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey3 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey3.setObjectName(objectName3);
-		secObjPrivilegePrimaryKey3.setRoleId(roleId2);
+		secObjPrivilegePrimaryKey3.setSecRoleId(roleId2);
 		secObjPrivilege3.setId(secObjPrivilegePrimaryKey3);
 		secObjPrivilegeDao.persist(secObjPrivilege3);
 
@@ -127,7 +127,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege1);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey1 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey1.setObjectName(objectName1);
-		secObjPrivilegePrimaryKey1.setRoleId(roleId1);
+		secObjPrivilegePrimaryKey1.setSecRoleId(roleId1);
 		secObjPrivilege1.setId(secObjPrivilegePrimaryKey1);
 		secObjPrivilegeDao.persist(secObjPrivilege1);
 
@@ -135,7 +135,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege2);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey2 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey2.setObjectName(objectName2);
-		secObjPrivilegePrimaryKey2.setRoleId(roleId2);
+		secObjPrivilegePrimaryKey2.setSecRoleId(roleId2);
 		secObjPrivilege2.setId(secObjPrivilegePrimaryKey2);
 		secObjPrivilegeDao.persist(secObjPrivilege2);
 
@@ -143,7 +143,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege3);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey3 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey3.setObjectName(objectName1);
-		secObjPrivilegePrimaryKey3.setRoleId(roleId2);
+		secObjPrivilegePrimaryKey3.setSecRoleId(roleId2);
 		secObjPrivilege3.setId(secObjPrivilegePrimaryKey3);
 		secObjPrivilegeDao.persist(secObjPrivilege3);
 
@@ -151,7 +151,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege4);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey4 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey4.setObjectName(objectName2);
-		secObjPrivilegePrimaryKey4.setRoleId(roleId1);
+		secObjPrivilegePrimaryKey4.setSecRoleId(roleId1);
 		secObjPrivilege4.setId(secObjPrivilegePrimaryKey4);
 		secObjPrivilegeDao.persist(secObjPrivilege4);
 
@@ -185,7 +185,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege1);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey1 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey1.setObjectName(objectName1);
-		secObjPrivilegePrimaryKey1.setRoleId(roleId1);
+		secObjPrivilegePrimaryKey1.setSecRoleId(roleId1);
 		secObjPrivilege1.setId(secObjPrivilegePrimaryKey1);
 		secObjPrivilegeDao.persist(secObjPrivilege1);
 
@@ -193,7 +193,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege2);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey2 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey2.setObjectName(objectName2);
-		secObjPrivilegePrimaryKey2.setRoleId(roleId1);
+		secObjPrivilegePrimaryKey2.setSecRoleId(roleId1);
 		secObjPrivilege2.setId(secObjPrivilegePrimaryKey2);
 		secObjPrivilegeDao.persist(secObjPrivilege2);
 
@@ -201,7 +201,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege3);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey3 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey3.setObjectName(objectName1);
-		secObjPrivilegePrimaryKey3.setRoleId(roleId2);
+		secObjPrivilegePrimaryKey3.setSecRoleId(roleId2);
 		secObjPrivilege3.setId(secObjPrivilegePrimaryKey3);
 		secObjPrivilegeDao.persist(secObjPrivilege3);
 
@@ -209,7 +209,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege4);
 		SecObjPrivilegePrimaryKey secObjPrivilegePrimaryKey4 = new SecObjPrivilegePrimaryKey();
 		secObjPrivilegePrimaryKey4.setObjectName(objectName2);
-		secObjPrivilegePrimaryKey4.setRoleId(roleId2);
+		secObjPrivilegePrimaryKey4.setSecRoleId(roleId2);
 		secObjPrivilege4.setId(secObjPrivilegePrimaryKey4);
 		secObjPrivilegeDao.persist(secObjPrivilege4);
 

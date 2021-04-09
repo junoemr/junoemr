@@ -32,7 +32,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class SecObjPrivilegePrimaryKey implements Serializable
 {
-	protected Integer roleId = null;
+	protected Integer secRoleId = null;
 	protected String objectName = null;
 
 	public SecObjPrivilegePrimaryKey()
@@ -40,20 +40,20 @@ public class SecObjPrivilegePrimaryKey implements Serializable
 		// do nothing, required by jpa
 	}
 
-	public SecObjPrivilegePrimaryKey(Integer roleId, String objectName)
+	public SecObjPrivilegePrimaryKey(Integer secRoleId, String objectName)
 	{
-		this.roleId = roleId;
+		this.secRoleId = secRoleId;
 		this.objectName = objectName;
 	}
 
-	public Integer getRoleId()
+	public Integer getSecRoleId()
 	{
-		return roleId;
+		return secRoleId;
 	}
 
-	public void setRoleId(Integer roleId)
+	public void setSecRoleId(Integer roleId)
 	{
-		this.roleId = roleId;
+		this.secRoleId = roleId;
 	}
 
 	public String getObjectName()
@@ -69,7 +69,7 @@ public class SecObjPrivilegePrimaryKey implements Serializable
 	@Override
 	public String toString()
 	{
-		return ("roleId=" + roleId + ", objectName=" + objectName);
+		return ("secRoleId=" + secRoleId + ", objectName=" + objectName);
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class SecObjPrivilegePrimaryKey implements Serializable
 	public boolean equals(Object o) {
 		try {
 			SecObjPrivilegePrimaryKey o1 = (SecObjPrivilegePrimaryKey) o;
-			return ((roleId.equals(o1.roleId)) && (objectName.equals(o1.objectName)));
+			return ((secRoleId.equals(o1.secRoleId)) && (objectName.equals(o1.objectName)));
 		} catch (RuntimeException e) {
 			return (false);
 		}
