@@ -117,7 +117,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getFormsForHeading(@PathParam("demographicNo") Integer demographicNo, @QueryParam("heading") String heading)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.FORM);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.EFORM);
 
 		FormListTo1 formListTo1 = new FormListTo1();
 		if(heading.equals("Completed"))
@@ -168,7 +169,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllCompletedForms(@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.FORM);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.EFORM);
 
 		FormListTo1 formListTo1 = new FormListTo1();
 
@@ -193,7 +195,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllFormRevisions(@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.FORM);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.EFORM);
 
 		FormListTo1 formListTo1 = new FormListTo1();
 
@@ -218,7 +221,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllDeletedForms(@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.FORM);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.EFORM);
 
 		FormListTo1 formListTo1 = new FormListTo1();
 
@@ -237,7 +241,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllNewForms()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FORM);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
+				SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.EFORM);
 
 		FormListTo1 formListTo1 = new FormListTo1();
 
@@ -355,7 +360,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<List<FormTo1>> getCompletedFormNames(@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.FORM);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.FORM);
 
 		List<FormTo1> formList = new ArrayList<FormTo1>();
 
@@ -466,7 +472,7 @@ public class FormsService extends AbstractServiceImpl {
 	public AbstractSearchResponse<String> getK2AEForm(String id)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+				SecObjectName.OBJECT_NAME.EFORM, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 		MiscUtils.getLogger().info("EForm id is: " + id);
@@ -496,7 +502,7 @@ public class FormsService extends AbstractServiceImpl {
 	public AbstractSearchResponse<String> getAllK2AEForms(String jsonString)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.FORM, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+				SecObjectName.OBJECT_NAME.EFORM, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 		try
 		{
 			AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
@@ -533,7 +539,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public MenuTo1 getFormOptions(@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.FORM);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.FORM);
 
 		ResourceBundle bundle = getResourceBundle();
 		MenuTo1 formMenu = new MenuTo1();
