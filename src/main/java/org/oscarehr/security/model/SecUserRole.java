@@ -28,9 +28,12 @@ import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
@@ -54,6 +57,7 @@ public class SecUserRole extends AbstractModel<Integer> implements Serializable
     @Transient
     private int hashCode = Integer.MIN_VALUE;// primary key
 
+    @Deprecated
     @Column(name = "role_name")
     private String roleName;
 
@@ -69,6 +73,9 @@ public class SecUserRole extends AbstractModel<Integer> implements Serializable
     @Column(name = "lastUpdateDate")
     private Date lastUpdateDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sec_role_id")
+    private SecRole secRole;
 
 
     // constructors

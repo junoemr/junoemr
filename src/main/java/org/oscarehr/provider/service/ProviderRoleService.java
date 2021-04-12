@@ -139,8 +139,10 @@ public class ProviderRoleService
 		Secuserrole secUserRole = new Secuserrole();
 		int defaultActiveyn = 1;
 
+		SecRole role = secRoleDao.findByName(roleName);
 		secUserRole.setProviderNo(String.valueOf(roleProviderId));
 		secUserRole.setRoleName(roleName);
+		secUserRole.setRoleId(role.getId());
 		secUserRole.setActiveyn(defaultActiveyn);
 		secUserRoleDao.save(secUserRole);
 		return secUserRole;

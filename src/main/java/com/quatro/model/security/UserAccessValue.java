@@ -21,6 +21,7 @@
 package com.quatro.model.security;
 import java.io.Serializable;
 
+@Deprecated
 public class UserAccessValue implements Serializable {
 		
 		String providerNo;

@@ -29,7 +29,7 @@ import java.util.Date;
  * @author JZhang
  */
 
-
+@Deprecated
 public class SecProvider implements java.io.Serializable {
 
 	// Fields

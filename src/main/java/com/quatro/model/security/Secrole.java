@@ -23,7 +23,7 @@ package com.quatro.model.security;
 
 import java.util.Calendar;
 
-
+@Deprecated
 public class Secrole implements java.io.Serializable {
 
 	// Fields

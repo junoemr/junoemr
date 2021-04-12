@@ -23,7 +23,7 @@ package com.quatro.model.security;
 
 import java.util.Date;
 
-
+@Deprecated
 public class Secuserrole implements java.io.Serializable {
 
 	// Fields
@@ -31,6 +31,7 @@ public class Secuserrole implements java.io.Serializable {
 	private Integer id;
 	private String providerNo;
 	private String roleName;
+	private Integer roleId;
 	private String orgcd;
 	private Integer activeyn;
 	// added extra 
@@ -96,6 +97,16 @@ public class Secuserrole implements java.io.Serializable {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+
+	public Integer getRoleId()
+	{
+		return roleId;
+	}
+
+	public void setRoleId(Integer roleId)
+	{
+		this.roleId = roleId;
 	}
 
 	public String getOrgcd() {

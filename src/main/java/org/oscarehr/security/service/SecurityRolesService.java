@@ -29,10 +29,12 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.dao.SecObjPrivilegeDao;
 import org.oscarehr.security.dao.SecObjectNameDao;
 import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.security.model.SecObjPrivilege;
 import org.oscarehr.security.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.security.model.SecRole;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.ws.rest.transfer.security.SecurityObjectTransfer;
 import org.oscarehr.ws.rest.transfer.security.SecurityRoleTransfer;
 import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
@@ -64,6 +66,9 @@ public class SecurityRolesService
 
 	@Autowired
 	private SecRoleDao secRoleDao;
+
+	@Autowired
+	private SecUserRoleDao secUserRoleDao;
 
 	@Autowired
 	private SecObjPrivilegeDao secObjPrivilegeDao;
@@ -162,6 +167,13 @@ public class SecurityRolesService
 	public boolean deleteRole(String providerId, Integer roleId)
 	{
 		SecRole role = secRoleDao.find(roleId);
+
+		// remove existing provider connections to this role
+		for(SecUserRole secUserRole : role.getSecUserRoles())
+		{
+			secUserRoleDao.remove(secUserRole);
+		}
+
 		role.setDeletedBy(providerId);
 		role.setDeletedAt(LocalDateTime.now());
 		secRoleDao.merge(role);
@@ -172,7 +184,7 @@ public class SecurityRolesService
 	 * ======================================= private methods =======================================
 	 */
 
-	public SecRole convertSecRole(SecRole secRole, SecurityRoleTransfer input)
+	private SecRole convertSecRole(SecRole secRole, SecurityRoleTransfer input)
 	{
 		secRole.setId(input.getId());
 		secRole.setName(input.getName());

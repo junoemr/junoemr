@@ -64,6 +64,9 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "secRole")
 	private List<SecObjPrivilege> secObjPrivilege;
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "secRole")
+	private List<SecUserRole> secUserRoles;
+
 	@Override
 	public Integer getId()
 	{
