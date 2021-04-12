@@ -181,7 +181,8 @@ public class ProviderService extends AbstractServiceImpl {
 		String currentProvider = getLoggedInInfo().getLoggedInProviderNo();
 		try
 		{
-			providerService.enableProvider(id, enable, currentProvider);
+			securityInfoManager.requireUserCanModify(currentProvider, id.toString());
+			providerService.enableProvider(id, enable);
 			return RestResponse.successResponse(true);
 		}
 		catch (NoSuchRecordException nsre)
@@ -230,11 +231,12 @@ public class ProviderService extends AbstractServiceImpl {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
-
+		String currentProvider = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(currentProvider, SecurityInfoManager.WRITE, null, "_admin");
+		securityInfoManager.requireUserCanModify(currentProvider, providerNo.toString());
 		try
 		{
-			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo, getLoggedInInfo().getLoggedInProviderNo());
+			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo, currentProvider);
 			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
 		}
 		catch (SecurityRecordAlreadyExistsException secRecordExists)
