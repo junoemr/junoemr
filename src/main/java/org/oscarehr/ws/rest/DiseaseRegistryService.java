@@ -80,9 +80,6 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<List<DxQuickList>> getQuickLists()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
-
 		List<DxQuickList> resultList;
 		try {
 			resultList = createQuickList(quickListDao.getQuickLists());
@@ -104,9 +101,6 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<List<DxQuickList>> getIssueQuickLists()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
-
 		List<DxQuickList> resultList;
 		try {
 			resultList = createQuickList(quickListDao.getIssueQuickLists());
@@ -149,7 +143,7 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	public Response addToDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo, IssueTo1 issue)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
-				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.DXRESEARCH);
 
 		boolean activeEntryExists = dxresearchDao.activeEntryExists(demographicNo, issue.getType(), issue.getCode());
 		
