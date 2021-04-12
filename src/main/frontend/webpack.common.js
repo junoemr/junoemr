@@ -331,6 +331,7 @@ module.exports = {
             './src/admin/systemProperties/systemPropertiesComponent.js',
             './src/admin/systemProperties/rx/propertiesRxComponent.js',
 			'./src/admin/systemProperties/general/propertiesGeneralComponent.js',
+			'./src/admin/systemProperties/billing/propertiesBillingComponent.js',
 			'./src/admin/integration/module.js',
 			'./src/admin/integration/fax/module.js',
 			'./src/admin/integration/fax/faxConfigurationController.js',
