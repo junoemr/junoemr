@@ -483,10 +483,6 @@ public class IMDHealthService
 	{
 		try
 		{
-			// TODO ///////////////// TEST REMOVE ME AND CONNECT ACTUAL DEMOGRAPHIC LOOKUP ///////////////////
-			demographic = demographicDao.find(8);
-
-
 			SSOUser user = createSSOUser(provider);
 			SSOOrganization organization = createSSOOrganization(site);
 			SSOPatient patient = createSSOPatient(demographic);

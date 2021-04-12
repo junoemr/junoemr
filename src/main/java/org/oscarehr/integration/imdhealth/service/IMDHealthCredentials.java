@@ -30,11 +30,12 @@ import lombok.Setter;
 import org.oscarehr.integration.imdhealth.transfer.inbound.BearerToken;
 
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 @Getter(AccessLevel.PACKAGE)
 @Setter(AccessLevel.PACKAGE)
 @NoArgsConstructor
-public class IMDHealthCredentials
+public class IMDHealthCredentials implements Serializable
 {
 	private static final String IMD_CREDENTIALS_KEY = "INTEGRATION.IMDHEALTH";
 	private BearerToken bearerToken;

@@ -41,7 +41,9 @@ public class BearerToken implements Serializable
 	@JsonProperty("token_type")
 	private String tokenType;
 	@JsonProperty("created_at")
-	private Date createdAt;
+	private String createdAt2;
+
+	private Date createdAt = new Date();
 
 	private static final int EXPIRY_TIME_HOURS = 24;
 	

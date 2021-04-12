@@ -45,13 +45,18 @@ public class SSOUser implements Serializable
 	@JsonProperty("last_name")
 	private String lastName;
 
+	@JsonProperty ("practitioner_type")
+	private String practitionerType = "Other";
+
+	@JsonProperty ("other_type")
+	private String otherType = "Juno Practitioner";
+
+
 	/* OPTIONAL FIELDS (Implementation TBD)
 
 	private String gender;
-	private String practitionerType;
 	private String preferredLocale;
 	private String prefix;
-
 	*/
 
 	public static SSOUser fromProvider(Provider provider)
