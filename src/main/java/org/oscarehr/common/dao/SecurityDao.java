@@ -90,14 +90,14 @@ public class SecurityDao  extends AbstractDao<Security> {
 	 * @return - security record.
 	 */
 	public Security findByEmail(String email) {
-		Query query = entityManager.createQuery("select x from Security x where x.email=?");
-		query.setParameter(1, email);
+		Query query = entityManager.createQuery("select x from Security x where x.email=:email");
+		query.setParameter("email", email);
 		return getSingleResultOrNull(query);
 	}
 	
     public List<Security> findByLikeUserName(String userName) {
-    	Query query = entityManager.createQuery("select x from Security x where x.userName like ?1");
-    	query.setParameter(1, userName);
+    	Query query = entityManager.createQuery("select x from Security x where x.userName like :userName");
+    	query.setParameter("userName", userName);
     	
     	@SuppressWarnings("unchecked")
         List<Security> secList = query.getResultList();
