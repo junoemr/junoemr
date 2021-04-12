@@ -21,8 +21,18 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.PMmodule.model;
+package org.oscarehr.security.model;
 
+import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -31,40 +41,50 @@ import java.util.List;
  * This is the object class that relates to the secUserRole table.
  * Any customizations belong here.
  */
-public class SecUserRole implements Serializable {
+@Data
+@Entity
+@Table(name = "secUserRole")
+public class SecUserRole extends AbstractModel<Integer> implements Serializable
+{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
+    @Transient
     private int hashCode = Integer.MIN_VALUE;// primary key
-    private String _roleName;
-    private String _providerNo;
+
+    @Column(name = "role_name")
+    private String roleName;
+
+    @Column(name = "provider_no")
+    private String providerNo;
+
+    @Column(name = "activeyn")
     private boolean _active;
+
+    @Column(name = "orgcd")
     private String orgCd;
+
+    @Column(name = "lastUpdateDate")
     private Date lastUpdateDate;
 
 
 
     // constructors
-    public SecUserRole () {
-        initialize();
+    public SecUserRole()
+    {
     }
 
-    /**
-     * Constructor for primary key
-     */
-    public SecUserRole (
-            String _roleName,
-            String _providerNo) {
-
-        this.setRoleName(_roleName);
-        this.setProviderNo(_providerNo);
-        initialize();
+    @Override
+    public Integer getId()
+    {
+        return id;
     }
 
-    protected void initialize () {
-    	//empty
-    }
-
-    public String getRoleName () {
-        return this._roleName;
+    public String getRoleName()
+    {
+        return this.roleName;
     }
 
     /**
@@ -72,7 +92,7 @@ public class SecUserRole implements Serializable {
      * @param _roleName the role_name value
      */
     public void setRoleName (String _roleName) {
-        this._roleName = _roleName;
+        this.roleName = _roleName;
         this.hashCode = Integer.MIN_VALUE;
     }
 
@@ -90,7 +110,7 @@ public class SecUserRole implements Serializable {
     }
 
     public String getProviderNo () {
-        return this._providerNo;
+        return this.providerNo;
     }
 
     /**
@@ -98,7 +118,7 @@ public class SecUserRole implements Serializable {
      * @param _providerNo the provider_no value
      */
     public void setProviderNo (String _providerNo) {
-        this._providerNo = _providerNo;
+        this.providerNo = _providerNo;
         this.hashCode = Integer.MIN_VALUE;
     }
 

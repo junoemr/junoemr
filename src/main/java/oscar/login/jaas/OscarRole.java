@@ -26,7 +26,7 @@ package oscar.login.jaas;
 import java.io.Serializable;
 import java.security.Principal;
 
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.model.SecUserRole;
 
 public class OscarRole extends SecUserRole implements Principal, Serializable {
 

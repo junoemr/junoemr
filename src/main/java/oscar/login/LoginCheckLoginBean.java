@@ -31,8 +31,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;

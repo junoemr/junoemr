@@ -30,7 +30,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProviderManager;
 import org.oscarehr.PMmodule.web.utils.UserRoleUtils;

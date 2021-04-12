@@ -34,9 +34,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
+import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.Program;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.PMmodule.web.PopulationReportDataObjects.EncounterTypeDataGrid;
 import org.oscarehr.PMmodule.web.PopulationReportDataObjects.EncounterTypeDataRow;
 import org.oscarehr.PMmodule.web.PopulationReportDataObjects.ProviderDataGrid;

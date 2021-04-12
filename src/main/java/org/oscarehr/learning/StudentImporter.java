@@ -32,10 +32,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
+import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.dao.SecurityDao;
@@ -131,14 +131,14 @@ public class StudentImporter {
 				userRole.setProviderNo(providerNo);
 				userRole.setRoleName(studentRole.getName());	
 				userRole.setActive(true);
-				secUserRoleDao.save(userRole);
+				secUserRoleDao.persist(userRole);
 				
 				//assign student role			
 				SecUserRole drRole = new SecUserRole();
 				drRole.setProviderNo(providerNo);
 				drRole.setRoleName(doctorRole.getName());	
 				drRole.setActive(true);
-				secUserRoleDao.save(drRole);
+				secUserRoleDao.persist(drRole);
 				
 				
 				//create student's "personal" program

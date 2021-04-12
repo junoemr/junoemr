@@ -90,10 +90,10 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 
 	public List<Object[]> findByFormNamePrivilegeAndProviderNo(String formName, String privilege, String providerNo) {
 	    String sql = "FROM SecObjPrivilege p, SecUserRole r " +
-        		"WHERE p.roleUserGroup = r.RoleName " +
+        		"WHERE p.roleUserGroup = r.roleName " +
         		"AND p.id.objectName = :formName " +
         		"AND p.privilege = :privilege " +
-				"AND r.ProviderNo = :providerNo";
+				"AND r.providerNo = :providerNo";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("formName", formName);
 		query.setParameter("privilege", privilege);
