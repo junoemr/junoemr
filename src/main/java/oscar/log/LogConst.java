@@ -104,6 +104,7 @@ public class LogConst {
 	public static final String CON_FAX = "fax";
 	public static final String CON_PHARMACY = "pharmacy";
 	public static final String CON_SYSTEM = "system";
+	public static final String CON_ELECTRONIC_MESSAGING_CONSENT_STATUS = "ELECTRONIC_MESSAGING_CONSENT_STATUS";
 
 	/* Status constants
 	 * These should describe the outcome of the action */
