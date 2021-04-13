@@ -132,6 +132,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -278,15 +279,17 @@ public class DemographicExportAction4 extends Action {
 				exportPreferences.setExportReportsReceived(exReportsReceived);
 				exportPreferences.setExportRiskFactors(exRiskFactors);
 
+				// need to rename the process for the exporter context
+				String originalThreadName = Thread.currentThread().getName();
+				Thread.currentThread().setName(UUID.randomUUID().toString());
 				List<GenericFile> exportFiles = patientExportService.exportDemographicsToList(
 						list, ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportPreferences);
+				Thread.currentThread().setName(originalThreadName);
 
-				//TODO refactor this. we could zip genericFiles directly
 				for(GenericFile genericFile : exportFiles)
 				{
 					files.add(genericFile.getFileObject());
 				}
-
 				exportPatientFilesZip(files);
 				ffwd = "success";
 				break;
