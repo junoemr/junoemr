@@ -103,10 +103,6 @@ public class AppointmentStatusService
 		
 		status.setStatus(nextAvailableStatusCode);
 		appointmentStatusDao.persist(status);
-		// Status gets added at the end of statuses
-		// Move it to a spot where it can be manipulated by users without fear of messing up the rest of the system
-		fixNewStatusOrdering(status);
-
 		return status;
 	}
 	
@@ -215,34 +211,6 @@ public class AppointmentStatusService
 		appointmentStatusDao.merge(target);
 	}
 
-	/**
-	 * Shuffles a new status to its correct location.
-	 * Statuses currently get added at the end like so:
-	 *
-	 * N | C | B | {new_status}
-	 *
-	 * By default, N / C / B are uneditable.
-	 * We need them at the top of this mini set of statuses, so it reads as follows:
-	 *
-	 * {new_status} | N | C | B
-	 */
-	private void fixNewStatusOrdering(AppointmentStatus status)
-	{
-		String originalStatusCode = status.getStatus();
-		AppointmentStatus noShowDefault = appointmentStatusDao.findByStatus(AppointmentStatus.APPOINTMENT_STATUS_NO_SHOW);
-		AppointmentStatus cancelledDefault = appointmentStatusDao.findByStatus(AppointmentStatus.APPOINTMENT_STATUS_CANCELLED);
-		AppointmentStatus billedDefault = appointmentStatusDao.findByStatus(AppointmentStatus.APPOINTMENT_STATUS_BILLED);
-
-		// Current order: N, C, B, <new status>
-		swapPosition(status, billedDefault);
-		// Since the statuses have swapped, we need to get a new reference to the new status
-		status = appointmentStatusDao.findByStatus(originalStatusCode);
-		swapPosition(status, cancelledDefault);
-		// Current order: N, <new status>, C, B
-		status = appointmentStatusDao.findByStatus(originalStatusCode);
-		swapPosition(status, noShowDefault);
-		// Now we have correct order of <new>, N, C, B
-	}
 
 	/**
 	 * Return which statuses from the given list are in use.

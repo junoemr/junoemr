@@ -110,8 +110,7 @@ public class AppointmentStatusAction extends DispatchAction {
 		}
 
 		// For "non-editable statuses", the two things we want to prevent are changing name or disabling
-		if (apptStatus.getEditable() != 1
-				&& (isActive != 1 || !description.equals(apptStatus.getDescription())))
+		if (!apptStatus.isEditable() && (isActive != 1 || !description.equals(apptStatus.getDescription())))
 		{
 			throw new RuntimeException("Can't disable a readonly status or change its description");
 		}

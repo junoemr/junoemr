@@ -117,22 +117,9 @@
 
         Pattern junoClassRegex = Pattern.compile("(.+)\\.gif");
 
-		for (int i = 0; i < statuses.size(); i++)
-		{
-			boolean previousStatusEditable = false;
-			boolean nextStatusEditable = false;
-			if (i - 1 >= 0)
-			{
-				previousStatusEditable = statuses.get(i - 1).getEditable() == 1;
-			}
-			if (i + 1 < statuses.size())
-			{
-				nextStatusEditable = statuses.get(i + 1 ).getEditable() == 1;
-			}
-
-			AppointmentStatus status = statuses.get(i);
-			boolean isActive =  status.getActive() == 1;
-			boolean isEditable = status.getEditable() == 1;
+        for (AppointmentStatus status : statuses)
+        {
+            boolean isActive = status.isActive();
 
             UriComponentsBuilder editUrl = UriComponentsBuilder.fromPath(baseUrl);
             editUrl.queryParam("method", "modify");
@@ -153,33 +140,34 @@
 
             if (matcher.find())
             {
-            	junoIconClass = "icon-" + matcher.group(1);
+                junoIconClass = "icon-" + matcher.group(1);
             }
     %>
-	<tr>
-        <td><%= status.getId() %></td>
-		<td class="nowrap"><%= status.getStatus() %></td>
-		<td class="nowrap"><%= status.getDescription() %></td>
-        <td style="background-color: <%= status.getColor() %>"><img class=preview src="<%=imgUrl%>" alt="Classic icon"/></td>
-		<td style="background-color: <%= status.getJunoColor() %>"><i class="preview <%="icon " + junoIconClass %>" alt="Juno icon"></i></td>
-        <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %></td>
+    <tr>
+        <td><%= status.getId() %>
+        </td>
+        <td class="nowrap"><%= status.getStatus() %>
+        </td>
+        <td class="nowrap"><%= status.getDescription() %>
+        </td>
+        <td style="background-color: <%= status.getColor() %>"><img class=preview src="<%=imgUrl%>" alt="Classic icon"/>
+        </td>
+        <td style="background-color: <%= status.getJunoColor() %>"><i class="preview <%="icon " + junoIconClass %>"
+                                                                      alt="Juno icon"></i></td>
+        <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %>
+        </td>
         <td class="nowrap text-l"><a href=<%= editUrl.build().toString() %>>Edit</a></td>
         <%
-            if (isSuperAdmin) { %>
+            if (isSuperAdmin)
+            { %>
         <td class="nowrap text-l">
-            <% // Check intentionally made redundant so that when we are ready, we can just remove the super admin flag
-                if (isSuperAdmin || previousStatusEditable) { %>
             <a href=<%= upUrl.build().toString() %>>Move Up</a>
-            <% } %>
         </td>
         <td class="nowrap text-l">
-            <% // Check intentionally made redundant so that when we are ready, we can just remove the super admin flag
-                if (isSuperAdmin || nextStatusEditable) { %>
             <a href=<%= downUrl.build().toString() %>>Move Down</a>
-            <% } %>
         </td>
         <% } %>
-	</tr>
+    </tr>
     <% } %>
 </table>
 <% if (isSuperAdmin) { %>
