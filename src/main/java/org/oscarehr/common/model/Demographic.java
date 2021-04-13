@@ -24,6 +24,8 @@
 
 package org.oscarehr.common.model;
 import com.sun.istack.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
@@ -140,6 +142,12 @@ public class Demographic implements Serializable
 	private String veteranNo;
 	private String nameOfMother;
 	private String nameOfFather;
+	@Getter
+	@Setter
+	private Date electronicMessagingConsentGivenAt;
+	@Getter
+	@Setter
+	private Date electronicMessagingConsentRejectedAt;
 
 	public String getTitle()
 	{
@@ -1591,5 +1599,51 @@ public class Demographic implements Serializable
 	public boolean isPatientActive()
 	{
 		return !org.oscarehr.demographic.model.Demographic.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
+
+	/**
+	 * get the patients electronic messaging consent status
+	 * @return - the patients consent status
+	 */
+	public org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
+	{
+		if (this.electronicMessagingConsentRejectedAt != null)
+		{
+			return org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.REVOKED;
+		}
+		else if (this.electronicMessagingConsentGivenAt != null)
+		{
+			return org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.CONSENTED;
+		}
+		else
+		{
+			return org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+		}
+	}
+
+	/**
+	 * Update the patients electronic messaging consent status.
+	 * @param status - the new consent status to use.
+	 */
+	public void updateElectronicMessagingConsentStatus(org.oscarehr.demographic.model.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS status)
+	{
+		if (this.getElectronicMessagingConsentStatus() != status && status != null)
+		{
+			// status has changed. update!
+			switch(status)
+			{
+				case NONE:
+					this.setElectronicMessagingConsentGivenAt(null);
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+				case REVOKED:
+					this.setElectronicMessagingConsentRejectedAt(new Date());
+					break;
+				case CONSENTED:
+					this.setElectronicMessagingConsentGivenAt(new Date());
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+			}
+		}
 	}
 }
