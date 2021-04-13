@@ -53,6 +53,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	public List<Lab> importToJuno(List<LaboratoryResults> importLabResultList)
 	{
 		List<Lab> labList = new ArrayList<>();
+		int nonce = 0;
 
 		// Group all the results based on labName and accession number
 		// results with matching accession number coming from the same lab will be treated as a single lab in Juno
@@ -61,6 +62,13 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		{
 			String labName = laboratoryResults.getLaboratoryName();
 			String accessionNumber = laboratoryResults.getAccessionNumber();
+			if(StringUtils.trimToNull(accessionNumber) == null)
+			{
+				// use the nonce to ensure unique keys if there is no accession number.
+				// null accession labs should not be grouped together.
+				accessionNumber = String.valueOf(nonce);
+				nonce++;
+			}
 			String hashKey = labName + accessionNumber;
 
 			if(groupedLabHash.containsKey(hashKey))
@@ -88,7 +96,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	{
 		Lab lab = new Lab();
 
-		lab.setAccessionNumber(importLabGroup.get(0).getAccessionNumber());
+		lab.setAccessionNumber(StringUtils.trimToNull(importLabGroup.get(0).getAccessionNumber()));
 		lab.setSendingFacility(importLabGroup.get(0).getLaboratoryName());
 		lab.setEmrReceivedDateTime(LocalDateTime.now());
 		lab.setMessageDateTime(toNullableLocalDateTime(importLabGroup.get(0).getCollectionDateTime()));
