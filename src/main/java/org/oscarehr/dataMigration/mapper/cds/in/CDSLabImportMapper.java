@@ -62,14 +62,20 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		{
 			String labName = laboratoryResults.getLaboratoryName();
 			String accessionNumber = laboratoryResults.getAccessionNumber();
+
+			String hashKey;
 			if(StringUtils.trimToNull(accessionNumber) == null)
 			{
 				// use the nonce to ensure unique keys if there is no accession number.
 				// null accession labs should not be grouped together.
-				accessionNumber = String.valueOf(nonce);
+				hashKey = labName + nonce;
 				nonce++;
+				logEvent(labName + " lab is missing accession number. A generated accession number will be assigned");
 			}
-			String hashKey = labName + accessionNumber;
+			else
+			{
+				hashKey = labName + accessionNumber;
+			}
 
 			if(groupedLabHash.containsKey(hashKey))
 			{
