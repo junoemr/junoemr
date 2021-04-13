@@ -22,7 +22,6 @@
  */
 package org.oscarehr.security.service;
 
-import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.InvalidArgumentException;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -48,6 +47,7 @@ import oscar.log.LogConst;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,9 +62,6 @@ import static org.oscarehr.managers.SecurityInfoManager.ALL;
 public class SecurityRolesService
 {
 	@Autowired
-	private SecurityInfoManager securityInfoManager;
-
-	@Autowired
 	private SecRoleDao secRoleDao;
 
 	@Autowired
@@ -75,6 +72,35 @@ public class SecurityRolesService
 
 	@Autowired
 	private SecObjectNameDao secObjectNameDao;
+
+	public UserSecurityRolesTransfer getUserSecurityRolesTransfer(String providerId)
+	{
+		UserSecurityRolesTransfer transfer = new UserSecurityRolesTransfer();
+		List<SecurityRoleTransfer> roleTransfers = new ArrayList<>();
+		Set<SecObjPrivilege> privilegeObjects = new HashSet<>(); // remove duplicates during insert
+		for (SecUserRole secUserRole : secUserRoleDao.getUserRoles(providerId))
+		{
+			// queries here could be reduced, but in most cases 1-3 roles is expected
+			SecRole role = secUserRole.getSecRole();
+			roleTransfers.add(getRoleTransfer(role, false));
+			privilegeObjects.addAll(role.getSecObjPrivilege());
+		}
+		transfer.setAccessObjects(getSecurityObjectsTransferAccessMap(new ArrayList<>(privilegeObjects)));
+		transfer.setRoles(roleTransfers);
+		return transfer;
+	}
+
+	public List<SecurityObjectTransfer> getAllSecurityObjectsTransfer()
+	{
+		List<SecurityObjectTransfer> objectTransfers = new ArrayList<>();
+
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
+		for (SecObjectName.OBJECT_NAME objectName : SecObjectName.OBJECT_NAME.values())
+		{
+			objectTransfers.add(getSecurityObjectTransfer(objectName, nameEntityMap.get(objectName.getValue())));
+		}
+		return objectTransfers;
+	}
 
 	public List<SecurityRoleTransfer> getAllRoles()
 	{
@@ -88,46 +114,9 @@ public class SecurityRolesService
 		return roleTransfers;
 	}
 
-	public SecurityRoleTransfer getRoleTransfer(Integer roleId)
+	public SecurityRoleTransfer getRole(Integer roleId)
 	{
 		return getRoleTransfer(secRoleDao.find(roleId), true);
-	}
-
-	public UserSecurityRolesTransfer getUserSecurityRolesTransfer(String providerNo)
-	{
-		UserSecurityRolesTransfer transfer = new UserSecurityRolesTransfer();
-		List<SecurityRoleTransfer> roleTransfers = new ArrayList<>();
-		Set<SecObjPrivilege> privilegeObjects = new HashSet<>(); // remove duplicates during insert
-		for(Secuserrole userRole : securityInfoManager.getRoles(providerNo))
-		{
-			// queries here could be reduced, but in most cases 1-3 roles is expected
-			SecRole role = secRoleDao.findByName(userRole.getRoleName());
-			roleTransfers.add(getRoleTransfer(role, false));
-			privilegeObjects.addAll(secObjPrivilegeDao.findByRoleId(role.getId()));
-		}
-
-		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
-		for(SecObjPrivilege secObjPrivilege : privilegeObjects)
-		{
-			SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(
-					secObjPrivilege, nameEntityMap.get(secObjPrivilege.getId().getObjectName()));
-			transfer.addAccess(securityObjectTransfer.getName(), securityObjectTransfer);
-		}
-
-		transfer.setRoles(roleTransfers);
-		return transfer;
-	}
-
-	public List<SecurityObjectTransfer> getAllSecurityObjectsTransfer()
-	{
-		List<SecurityObjectTransfer> objectTransfers = new ArrayList<>();
-		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
-
-		for (SecObjectName.OBJECT_NAME objectName : SecObjectName.OBJECT_NAME.values())
-		{
-			objectTransfers.add(getSecurityObjectTransfer(objectName, nameEntityMap.get(objectName.getValue())));
-		}
-		return objectTransfers;
 	}
 
 	public SecurityRoleTransfer addRole(String providerId, SecurityRoleTransfer newRoleTransfer)
@@ -177,6 +166,12 @@ public class SecurityRolesService
 		role.setDeletedBy(providerId);
 		role.setDeletedAt(LocalDateTime.now());
 		secRoleDao.merge(role);
+
+		for(SecObjPrivilege privilege : role.getSecObjPrivilege())
+		{
+			privilege.setDeletedAt(LocalDateTime.now());
+			secObjPrivilegeDao.merge(privilege);
+		}
 		return true;
 	}
 
@@ -194,7 +189,7 @@ public class SecurityRolesService
 
 	private List<SecObjPrivilege> convertPrivileges(SecRole secRole, Collection<SecurityObjectTransfer> privilegeTransfers)
 	{
-		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
 		return privilegeTransfers.stream()
 				.map((secObjTransfer) -> convertPrivilege(secRole, secObjTransfer, nameEntityMap))
 				.filter(Objects::nonNull).collect(Collectors.toList());
@@ -243,15 +238,22 @@ public class SecurityRolesService
 		// privileges are not always needed and may have additional database hits as they are lazy loaded
 		if(includePrivileges)
 		{
-			Map<String, SecObjectName> nameEntityMap = secObjectNameDao.getAllNamesByMappedById();
-			for (SecObjPrivilege privilege : secRole.getSecObjPrivilege())
-			{
-				SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(
-						privilege, nameEntityMap.get(privilege.getId().getObjectName()));
-				transfer.addAccess(securityObjectTransfer.getName(), securityObjectTransfer);
-			}
+			transfer.setAccessObjects(getSecurityObjectsTransferAccessMap(secRole.getSecObjPrivilege()));
 		}
 		return transfer;
+	}
+
+	private Map<SecObjectName.OBJECT_NAME, SecurityObjectTransfer> getSecurityObjectsTransferAccessMap(List<SecObjPrivilege> privileges)
+	{
+		Map<SecObjectName.OBJECT_NAME, SecurityObjectTransfer> accessObjects  = new HashMap<>();
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
+		for (SecObjPrivilege privilege : privileges)
+		{
+			SecurityObjectTransfer securityObjectTransfer = getSecurityObjectTransfer(
+					privilege, nameEntityMap.get(privilege.getId().getObjectName()));
+			accessObjects.put(securityObjectTransfer.getName(), securityObjectTransfer);
+		}
+		return accessObjects;
 	}
 
 	private SecurityObjectTransfer getSecurityObjectTransfer(

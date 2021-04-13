@@ -26,6 +26,7 @@
 package org.oscarehr.security.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
@@ -36,10 +37,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "secObjPrivilege")
+@Where(clause="deleted_at IS NULL")
 public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 {
 	@EmbeddedId
@@ -54,6 +57,9 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 
 	@Deprecated // property/column to be removed once all references use roleId
 	private String roleUserGroup;
+
+	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime deletedAt;
 
 	@MapsId("secRoleId")
 	@ManyToOne(fetch = FetchType.LAZY)

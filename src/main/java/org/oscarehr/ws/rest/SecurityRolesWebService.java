@@ -86,7 +86,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	public RestResponse<SecurityRoleTransfer> getRole(@PathParam("roleId") Integer roleId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
-		return RestResponse.successResponse(securityRolesService.getRoleTransfer(roleId));
+		return RestResponse.successResponse(securityRolesService.getRole(roleId));
 	}
 
 	@PUT

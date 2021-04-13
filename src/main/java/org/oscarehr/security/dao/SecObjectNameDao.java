@@ -68,7 +68,7 @@ public class SecObjectNameDao extends AbstractDao<SecObjectName>
 	 * fetch all the SecObjectName entries as a map keyed on the id.
 	 * @return -  a map containing all entries for the entity, keyed on the id
 	 */
-	public Map<String, SecObjectName> getAllNamesByMappedById()
+	public Map<String, SecObjectName> findAllMappedById()
 	{
 		String jpql = "SELECT x \n" +
 				"FROM SecObjectName x \n" +
@@ -77,8 +77,8 @@ public class SecObjectNameDao extends AbstractDao<SecObjectName>
 				.getResultStream()
 				.collect(
 						Collectors.toMap(
-								SecObjectName::getId,
-								objectName -> (objectName)
+								SecObjectName::getId, // map key is the entity Id
+								entity -> (entity)    // value is the entity
 						)
 				);
 	}

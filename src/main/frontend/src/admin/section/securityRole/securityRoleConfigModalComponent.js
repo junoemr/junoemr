@@ -135,7 +135,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					// this will change once the backend system removes the 'levels' of permission
 					if(accessObject && accessObject.privileges)
 					{
-						if (accessObject.privileges.includes(ctrl.PrivilegesEnum.DELETE)
+						if (accessObject.privileges.includes(ctrl.PrivilegesEnum.READ)
 							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.WRITE)
 							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.UPDATE)
 							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.DELETE))
