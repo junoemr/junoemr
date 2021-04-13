@@ -36,7 +36,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
@@ -46,21 +45,23 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
 	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	public static void setup()
 	{
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
 	}
 
 	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	public static void cleanup()
+			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
 				"casemgmt_note_ext", "eChart", "hash_audit", "log");
 	}
 
 	@Test
-	public void editSocialHistoryTest() throws InterruptedException
+	public void editSocialHistoryTest()
+			throws InterruptedException
 	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String socialHistoryInCPP = "Social History Note in CPP";
@@ -70,7 +71,6 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		String startDate = "2020-01-01";
 		String resolutionDate = "2021-01-01";
 		PageUtil.switchToLastWindow(driver);
-		//webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='divR1I1']//descendant:git checkout :a[@title='Add Item']")));
 		Thread.sleep(2000);
 
 		//Add Social History Notes
@@ -86,10 +86,10 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		Thread.sleep(1000);
 		driver.findElement(By.id("saveImg")).click();
 		Thread.sleep(1000);//wait until note is saved.
-		Boolean isNoteAdded = PageUtil.isExistsBy(By.xpath("//div[contains(., '"+ socialHistoryInEncounter +"')]"), driver);
 		Assert.assertTrue("Social History Note is NOT Added in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(socialHistoryInCPP), driver));
- 		Assert.assertTrue("Social History Note is NOT Copied in Encounter note successfully",isNoteAdded);
+ 		Assert.assertTrue("Social History Note is NOT Copied in Encounter note successfully",
+				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + socialHistoryInEncounter + "')]"), driver));
 
 		//Edit Social History Note
 		driver.findElement(By.id("listNote1")).click();
@@ -107,10 +107,12 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		driver.findElement(By.linkText("Social History")).click();
 		PageUtil.switchToLastWindow(driver);
 		Assert.assertTrue("Social History Note is NOT Archived successfully",
-				PageUtil.isExistsBy(By.xpath("//div[contains(., '"+ archivedSocialHistory +"')]"), driver));
+				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedSocialHistory + "')]"), driver));
 	}
 	@Test
-	public void editMedicalHistoryTest() throws InterruptedException {
+	public void editMedicalHistoryTest()
+			throws InterruptedException
+	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String medicalHistoryInCPP = "Medical History Note in CPP";
 		String medicalHistoryInEncounter = "Medical History Note in Encounter";
@@ -164,7 +166,9 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void editOngoingConcernsTest() throws InterruptedException {
+	public void editOngoingConcernsTest()
+			throws InterruptedException
+	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String ongoingConcernsInCPP = "Ongoing Concerns Note in CPP";
 		String ongoingConcernsInEncounter = "Ongoing Concerns Note in Encounter";
@@ -218,7 +222,9 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void editRemindersTest() throws InterruptedException {
+	public void editRemindersTest()
+			throws InterruptedException
+	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String remindersInCPP = "Reminders Note in CPP";
 		String remindersInEncounter = "Reminders Note in Encounter";
