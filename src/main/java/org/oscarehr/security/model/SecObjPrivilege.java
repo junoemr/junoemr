@@ -63,12 +63,12 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 
 	@MapsId("secRoleId")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "secRoleId", referencedColumnName = "role_no", insertable = false, updatable = false)
+	@JoinColumn(name = "secRoleId", referencedColumnName = "role_no", nullable = false, insertable = false, updatable = false)
 	private SecRole secRole;
 
 	@MapsId("objectName")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "objectName", referencedColumnName = "objectName", insertable = false, updatable = false)
+	@JoinColumn(name = "objectName", referencedColumnName = "objectName", nullable = false, insertable = false, updatable = false)
 	private SecObjectName secObjectName;
 
 	@Override
