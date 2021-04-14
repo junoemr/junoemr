@@ -41,7 +41,7 @@ public class PatientTestData
 	public String city = "Victoria";
 	public String province = "BC";
 	public String postal = "V8W 1J1";
-	public String homePhone = "686-8560";
+	public String homePhone = "250-686-8560";
 	public String homePhoneExt = "101";
 	public String workPhone = "250-250-2500";
 	public String workPhoneExt = "102";
