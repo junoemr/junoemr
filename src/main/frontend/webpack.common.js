@@ -270,6 +270,9 @@ module.exports = {
 			'./src/common/store/module.js',
 			'./src/common/store/securityRoles.store.ts',
 
+			'./src/interceptor/module.js',
+			'./src/interceptor/errorInterceptor.js',
+
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
 			'./src/layout/primaryNavComponent.js',

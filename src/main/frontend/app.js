@@ -63,6 +63,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Patient',
 	'Patient.Search',
 	'Inbox',
+	'Interceptor',
 	'Help',
 	'Document',
 	'Dashboard',
@@ -70,7 +71,13 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin',
 ]);
 
-oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
+oscarApp.config([
+	'$stateProvider',
+	'$urlRouterProvider',
+	'$httpProvider',
+	function($stateProvider,
+	         $urlRouterProvider,
+	         $httpProvider)
 {
 	//
 	// For any unmatched url, redirect to /state1
@@ -657,19 +664,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
 				controller: 'Admin.Section.Fax.FaxSendReceiveController as faxSendReceiveController'
 			});
-
-	// redirect to login page on 401 error.
-	$httpProvider.interceptors.push(['$q', function($q) {
-		return {
-			'responseError': function(rejection) {
-				if (rejection.status === 401 && rejection.data === "<error>Not authorized</error>")
-				{ // reload will cause server to redirect
-					location.reload();
-				}
-				return $q.reject(rejection);
-			}
-		};
-	}]);
+	$httpProvider.interceptors.push('errorInterceptor');
 }]);
 
 
