@@ -139,7 +139,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(medicalHistoryInCPP);
-		driver.findElement(By.xpath("//form[@id='frmIssue Notes']//descendant::input[@title='Sign & Save']")).click();
+		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
 		Thread.sleep(1000);
 		driver.findElement(By.id("saveImg")).click();
 		Assert.assertTrue("Medical History Note is NOT Added in CPP successfully",
