@@ -116,6 +116,10 @@ public class DemographicManager {
 
 	@Autowired
 	private DemographicDao demographicDao;
+
+	@Autowired
+	private org.oscarehr.demographic.dao.DemographicDao newDemographicDao;
+
 	@Autowired
 	private DemographicExtDao demographicExtDao;
 	@Autowired
@@ -1131,8 +1135,8 @@ public class DemographicManager {
 		return true;
 	}
 
-	public Demographic getDemographicByHealthNumber(String healthNumber)
+	public org.oscarehr.demographic.model.Demographic getDemographicByHealthNumber(String healthNumber)
 	{
-		return this.demographicDao.getDemographicByHealthNumber(healthNumber);
+		return newDemographicDao.getDemographicByHin(healthNumber);
 	}
 }

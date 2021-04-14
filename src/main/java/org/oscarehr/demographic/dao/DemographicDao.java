@@ -25,6 +25,8 @@ package org.oscarehr.demographic.dao;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.springframework.stereotype.Repository;
+import oscar.OscarProperties;
+import javax.persistence.Query;
 
 @SuppressWarnings("unchecked")
 @Repository("demographic.dao.DemographicDao")
@@ -38,5 +40,21 @@ public class DemographicDao extends AbstractDao<Demographic>
 	public boolean demographicExists(Integer demographicNo)
 	{
 		return (this.find(demographicNo) != null);
+	}
+
+	public Demographic getDemographicByHin(String hin)
+	{
+		String sql = "SELECT d " +
+				"FROM model.Demographic d " +
+				"WHERE d.hin = :hin ";
+		if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
+		{
+			sql += "AND (d.ver IS NULL OR d.ver != '66')";
+		}
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("hin", hin);
+
+		return getSingleResultOrNull(query);
 	}
 }
