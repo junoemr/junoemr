@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
@@ -125,6 +126,7 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles);
 
 		// Pull out current assigned values and make sure they match
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
 		String currentName = driver.findElement(By.xpath("//input[@name='name']")).getAttribute("value");
 		String currentLocation = driver.findElement(By.xpath("//input[@name='location']")).getAttribute("value");
 		String currentRoute = driver.findElement(By.xpath("//input[@name='route']")).getAttribute("value");

@@ -90,6 +90,7 @@ public class EditEncounterNotesTests extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditor2")));
 		driver.findElement(By.id("noteEditor2")).sendKeys(newNote);
 		driver.findElement(By.id("theSave")).click();
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")));
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")).click();
 		driver.findElement(By.id("noteEditor2")).clear();
 		driver.findElement(By.id("noteEditor2")).sendKeys(editedNote);
