@@ -32,106 +32,71 @@ angular.module('Admin').component('systemPropertiesBilling',
             '$http',
             '$httpParamSerializer',
             '$state',
+            '$uibModal',
             'billingService',
-            function ($scope, $http, $httpParamSerializer, $state, billingService) {
-
-                let propertyTypes =
-                    {
-                        text: "string",
-                    }
+            function ($scope, $http, $httpParamSerializer, $state, $uibModal, billingService) {
 
                 let ctrl = this;
                 let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+                const PLACEHOLDER = 'Set the default Service Location Code'
 
                 ctrl.selectedValue = null;
-                ctrl.serviceCodeValues = [];
+                ctrl.codes = [];
 
                 ctrl.propertiesList =
                     [
                         {
                             name: "Service Location Code",
                             description: "Change the default service location code",
-                            propertyName: "Service Location Code",
-                            type: propertyTypes.text,
-                            value: "",
+                            propertyName: "service_location_code",
+                            value: ctrl.selectedValue,
                         }
                     ];
 
                 ctrl.$onInit = async () =>
                 {
-                        await ctrl.getServiceLocationCodes();
-                        ctrl.serviceCodeValues.forEach((code) =>
-				    {
-				        console.log(code);
-				    });
-
-
-
-                    for (let property of ctrl.propertiesList)
-                    {
-                        switch (property.type)
-                        {
-                            case propertyTypes.text:
-                            {
-                                ctrl.loadTextType(property);
-                                break;
-                            }
-                        }
-                    }
+                     ctrl.load("service_location_code");
+                     await ctrl.getServiceLocationCodes();
                 };
 
                 ctrl.getServiceLocationCodes = async () =>
                 {
                     const codes = (await billingService.getBCBillingVisitCodes()).data.body;
-                    ctrl.serviceCodeValues = [];
 
                     codes.forEach((code) =>
 				    {
-				        ctrl.serviceCodeValues.push(
+				        ctrl.codes.push(
                             {
                                 label: code.visitType + " | " + code.visitDescription,
-                                value: code.visitType + " | " + code.visitDescription,
+                                value: code.visitType,
                             })
 				    });
                 }
 
-                ctrl.loadTextType = (property) =>
+                ctrl.load = (property) =>
                 {
-                    systemPreferenceApi.getPreferenceValue(property.propertyName)
+                    systemPreferenceApi.getPreferenceValue(property)
                         .then((response) =>
                         {
-                            ctrl.serviceCodeValues = response.data.body;
+                            ctrl.selectedValue = response.data.body || PLACEHOLDER;
                         })
                 };
-
-                ctrl.validations =
-                    {
-                        phonePrefixValid: Juno.Validations.validationCustom(() =>
-                        {
-                            const prefix = ctrl.phonePrefixValue;
-                            const reg = new RegExp(/^[0-9]{3}-?$/);
-                            const MIN_PREFIX_LENGTH = 3;
-                            const MAX_PREFIX_LENGTH = 4;
-
-                            if (prefix == null || prefix == "" ||
-                                (prefix.match(reg) != null &&
-                                    (prefix.length >= MIN_PREFIX_LENGTH && prefix.length <= MAX_PREFIX_LENGTH)))
-                            {
-                                return true;
-                            }
-                            return false;
-                        })
-                    };
-
 
                 /**
                  * Persist new property value
                  * @param property property to update
                  * @param value set the value in the database
                  */
-                ctrl.updateProperty = (property, value) =>
+                ctrl.updateProperty = (property) =>
                 {
-                    systemPreferenceApi.putPreferenceValue(property.propertyName, value)
+                    if (systemPreferenceApi.putPreferenceValue(property.propertyName, ctrl.selectedValue ))
+                    {
+                        Juno.Common.Util.successAlert($uibModal, "Success", "Service Location Code updated");
+                    }
+                    else {
+                        Juno.Common.Util.errorAlert($uibModal, "Error", "Service Location Code was not successfully updated.");
+
+                    }
                 };
             }
         ]

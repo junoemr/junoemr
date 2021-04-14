@@ -25,18 +25,33 @@
 <div class="admin-system-properties-body system-properties-billing">
 	<h3 class="title">Manage Billing Properties</h3>
 	<div class="content">
+
 		<div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
-			<div class="property-toggle flex-column" >
-				<juno-select
-			                ng-model="$ctrl.selectedValue"
-		                    options="$ctrl.serviceCodeValues"
-							placeholder="Service Location Codes"
-				>
-				</juno-select>
-			</div>
 			<div class="property-text flex-column">
 				<div class="name">{{ property.name }}</div>
 				<div class="description">{{ property.description }}</div>
+			</div>
+		</div>
+
+		<div class="property flex-row">
+			<juno-select
+					ng-model="$ctrl.selectedValue"
+					options="$ctrl.codes"
+					placeholder="Set the default Service Location Code"
+			>
+			</juno-select>
+		</div>
+
+		<div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
+			<div class="right">
+				<juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+				             component-style="$ctrl.componentStyle"
+				             click="$ctrl.updateProperty(property)"
+				             title="Save"
+				>
+					<i class="icon-logout btn-lg"></i>
+				</juno-button>
 			</div>
 		</div>
 	</div>

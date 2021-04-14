@@ -65,6 +65,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.managers.AppointmentManager" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -150,6 +151,7 @@ if(!authed) {
 %>
 <%
     OscarProperties oscarProperties = OscarProperties.getInstance();
+	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	GregorianCalendar now = new GregorianCalendar();
 	String sxml_location = "", sxml_provider = "", sxml_visittype = "";
@@ -911,7 +913,7 @@ if(wcbneeds != null){%>
 		if(sxml_location.compareTo("") == 0)
 		{
 			sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
-			sxml_visittype = OscarProperties.getInstance().getProperty("visittype");
+			sxml_visittype = systemPreferenceService.getPreferenceValue("service_location_code", "");
 			sxml_provider = bean.getBillingProvider();
 			thisForm.setXml_location(sxml_location);
 			thisForm.setXml_provider(sxml_provider);
@@ -1131,9 +1133,18 @@ if(wcbneeds != null){%>
                 <%
                   for (int i = 0; i < billvisit.length; i++) {
                     String visitTypeDescription = billvisit[i].getVisitType() + "|" + billvisit[i].getDescription();
+                    String option = "";
+                    if ( billvisit[i].getVisitType().equals(sxml_visittype))
+	                  {
+	                      option = "<option value='" + visitTypeDescription + "' selected>" + visitTypeDescription + "</option>";
+	                  }
+	                  else
+	                  {
+		                  option = "<option value='" + visitTypeDescription + "'>" + visitTypeDescription + "</option>";
+	                  }
                 %>
-                  <html:option value="<%=visitTypeDescription%>"><%=visitTypeDescription%>                  </html:option>
-                <%}                %>
+                  print(<%=option%>);
+                <%}%>
                 </html:select>
             </td>
           </tr>
