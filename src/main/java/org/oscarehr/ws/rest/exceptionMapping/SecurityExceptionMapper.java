@@ -41,7 +41,7 @@ public class SecurityExceptionMapper implements ExceptionMapper<SecurityExceptio
 	@Override
 	public Response toResponse(SecurityException exception)
 	{
-		RestResponseError responseError = new RestResponseError(exception.getMessage());
+		RestResponseError responseError = new RestResponseError(exception.getMessage(), RestResponseError.ERROR_TYPE.SECURITY);
 		RestResponse<String> response = RestResponse.errorResponse(responseError);
 
 		return Response.status(Response.Status.FORBIDDEN).entity(response)

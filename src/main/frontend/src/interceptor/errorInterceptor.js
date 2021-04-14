@@ -21,6 +21,8 @@
  * Canada
  */
 
+import {RestResponseError} from "../../generated";
+
 angular.module('Interceptor').service('errorInterceptor', [
 	'$q',
 	'$injector',
@@ -31,21 +33,22 @@ angular.module('Interceptor').service('errorInterceptor', [
 			{
 				// use injector to avoid circular dependency
 				const $uibModal = $injector.get('$uibModal');
+				const errorType = (rejection.data && rejection.data.error) ? rejection.data.error.type : null;
 
 				// redirect to login page on 401 error.
 				if (rejection.status === 401 && rejection.data === "<error>Not authorized</error>")
 				{ // reload will cause server to redirect
 					location.reload();
 				}
-				else if (rejection.status === 403)
+				else if (rejection.status === 403 || errorType === RestResponseError.TypeEnum.SECURITY)
 				{
 					const defaultMessage = "You do not have the required permissions to access this data";
 					const errorMessage = (rejection.data && rejection.data.error) ? rejection.data.error.message : null;
 
+					console.error(rejection);
 					Juno.Common.Util.errorAlert($uibModal, "Security Error", (errorMessage) ? errorMessage : defaultMessage);
 				}
 
-				console.error(rejection);
 				return $q.reject(rejection);
 			},
 		};
