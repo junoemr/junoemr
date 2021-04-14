@@ -1513,7 +1513,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		OscarProperties oscarProperties = OscarProperties.getInstance();
 		if (oscarProperties.isBritishColumbiaInstanceType())
 		{
-				hql += " and d.Ver != '66'";
+				hql += " AND (d.Ver IS NULL OR d.Ver != '66')";
 		}
 
 		Session session = this.getSession();
