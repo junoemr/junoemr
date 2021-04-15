@@ -573,3 +573,22 @@ table.setIssueList div.setIssueListWidget div.setIssueListControlRight {
 table.setIssueList div.setIssueListWidget div.setIssueListRole {
 	text-align: center;
 }
+
+ul.ui-menu {
+	width: 350px;
+	background: #fff;
+	font-size: 9px;
+	text-align: left;
+	border: 1px solid #888;
+	margin: 0;
+	padding: 0;
+}
+
+ul.ui-menu li.ui-menu-item {
+	margin: 0;
+}
+
+ul.ui-menu a.ui-state-focus {
+	background: #ffb;
+	text-decoration: underline;
+}
