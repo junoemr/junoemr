@@ -92,7 +92,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + socialHistoryInEncounter + "')]"), driver));
 
 		//Edit Social History Note
-		driver.findElement(By.id("listNote1")).click();
+		driver.findElement(By.linkText(socialHistoryInCPP)).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(editedSocialHistoryNoteInCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
@@ -197,7 +197,9 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(ongoingConcernsInCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
+		Thread.sleep(1000);
 		driver.findElement(By.id("saveImg")).click();
+		Thread.sleep(1000);
 		Assert.assertTrue("Ongoing Concerns Note is NOT Added in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(ongoingConcernsInCPP), driver));
 		Assert.assertTrue("Ongoing Concerns Note is NOT Copied in Encounter note successfully",
