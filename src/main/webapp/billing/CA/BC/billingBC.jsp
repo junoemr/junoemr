@@ -1129,23 +1129,16 @@ if(wcbneeds != null){%>
                 <b>Service Location</b>
             </td>
             <td width="29%">
-                <html:select property="xml_visittype">
+	            <select name="xml_visittype" id="xml_visittype">
                 <%
                   for (int i = 0; i < billvisit.length; i++) {
-                    String visitTypeDescription = billvisit[i].getVisitType() + "|" + billvisit[i].getDescription();
-                    String option = "";
-                    if ( billvisit[i].getVisitType().equals(sxml_visittype))
-	                  {
-	                      option = "<option value='" + visitTypeDescription + "' selected>" + visitTypeDescription + "</option>";
-	                  }
-	                  else
-	                  {
-		                  option = "<option value='" + visitTypeDescription + "'>" + visitTypeDescription + "</option>";
-	                  }
+                      boolean isDefault = sxml_visittype.equals(billvisit[i].getVisitType());
+                      String visitTypeDescription = billvisit[i].getVisitType() + "|" + billvisit[i].getDescription();
                 %>
-                  print(<%=option%>);
+		            <option value="<%= visitTypeDescription%>" <%=isDefault ? " selected" : ""%> ><%=visitTypeDescription%></option>
+
                 <%}%>
-                </html:select>
+                </select>
             </td>
           </tr>
         </table>

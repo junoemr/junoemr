@@ -1,4 +1,4 @@
-<%--
+/*
 * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
 * This software is published under the GPL GNU General Public License.
 * This program is free software; you can redistribute it and/or
@@ -19,26 +19,37 @@
 * CloudPractice Inc.
 * Victoria, British Columbia
 * Canada
---%>
+*/
 
+import {LABEL_POSITION} from "../junoComponentConstants";
 
-<div class="admin-system-properties-body system-properties-billing">
-	<h3 class="title">Manage Billing Properties</h3>
-	<div class="content">
+angular.module('Common.Components').component('junoSelectSave',
+    {
+        templateUrl: 'src/common/components/junoSelectSave/junoSelectSave.jsp',
+        bindings: {
+            ngModel: "=",
+            options: "<",
+            click: "&?",
+            placeholder: "@?",
+        },
+        controller: [
+            '$scope',
+            '$uibModal',
+            function ($scope, $uibModal) {
+                let ctrl = this;
 
-		<div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
-			<div class="property-text flex-column">
-				<div class="name">{{ property.name }}</div>
-				<div class="description">{{ property.description }}</div>
-			</div>
-		</div>
+                $scope.LABEL_POSITION = LABEL_POSITION;
+                ctrl.oldNgModel = null;
+                ctrl.value = "";
 
-		<div class="property flex-row">
-			<juno-select-save
-					ng-model="$ctrl.selectedValue"
-					options="$ctrl.codes"
-					click="$ctrl.updateProperty()">
-			</juno-select-save>
-		</div>
-	</div>
-</div>
+                ctrl.onClick = () =>
+                {
+                    if (ctrl.click)
+                    {
+                        ctrl.click({
+                            value: ctrl.ngModel
+                        })
+                    }
+                };
+            }]
+    });

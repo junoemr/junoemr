@@ -39,24 +39,22 @@ angular.module('Admin').component('systemPropertiesBilling',
                 let ctrl = this;
                 let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
                 const PLACEHOLDER = 'Set the default Service Location Code'
+                const PROPERTY_NAME = 'service_location_code';
 
                 ctrl.selectedValue = null;
                 ctrl.codes = [];
 
-                ctrl.propertiesList =
-                    [
-                        {
-                            name: "Service Location Code",
-                            description: "Change the default service location code",
-                            propertyName: "service_location_code",
-                            value: ctrl.selectedValue,
-                        }
-                    ];
+                ctrl.propertiesList = [{
+                        name: "Service Location Code",
+                        description: "Change the default service location code",
+                        propertyName: "service_location_code",
+                        value: ctrl.selectedValue,
+                    }];
 
-                ctrl.$onInit = async () =>
+                ctrl.$onInit = () =>
                 {
-                     ctrl.load("service_location_code");
-                     await ctrl.getServiceLocationCodes();
+                     ctrl.load(PROPERTY_NAME);
+                     ctrl.getServiceLocationCodes();
                 };
 
                 ctrl.getServiceLocationCodes = async () =>
@@ -87,15 +85,15 @@ angular.module('Admin').component('systemPropertiesBilling',
                  * @param property property to update
                  * @param value set the value in the database
                  */
-                ctrl.updateProperty = (property) =>
+                ctrl.updateProperty = () =>
                 {
-                    if (systemPreferenceApi.putPreferenceValue(property.propertyName, ctrl.selectedValue ))
+                    if (systemPreferenceApi.putPreferenceValue(PROPERTY_NAME, ctrl.selectedValue))
                     {
                         Juno.Common.Util.successAlert($uibModal, "Success", "Service Location Code updated");
                     }
-                    else {
+                    else
+                    {
                         Juno.Common.Util.errorAlert($uibModal, "Error", "Service Location Code was not successfully updated.");
-
                     }
                 };
             }
