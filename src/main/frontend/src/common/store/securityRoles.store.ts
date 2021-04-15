@@ -40,7 +40,6 @@ angular.module("Common.Store").service("securityRolesStore", [
 	{
 		const service = this;
 		service.providerApi = new ProviderApi($http, $httpParamSerializer, '../ws/rs');
-
 		service.rolesData = null as UserSecurityRolesTransfer;
 
 		service.loadUserRoles = async (): Promise<void> =>
@@ -55,7 +54,7 @@ angular.module("Common.Store").service("securityRolesStore", [
 		 */
 		service.hasSecurityPrivileges = (access: AccessObjectsEnum, ...requiredPrivileges: PrivilegesEnum[]): boolean =>
 		{
-			if (service.rolesData)
+			if (service.rolesData && service.rolesData.accessObjects[access])
 			{
 				const userPrivileges = service.rolesData.accessObjects[access].privileges;
 				if (userPrivileges)

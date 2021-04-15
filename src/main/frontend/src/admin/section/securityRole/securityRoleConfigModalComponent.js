@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-import {SecurityObjectTransfer, SecurityRolesApi} from "../../../../generated";
+import {SecurityRolesApi} from "../../../../generated";
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
@@ -41,13 +41,14 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 			'$httpParamSerializer',
 			'$uibModal',
 			'securityRolesStore',
-			function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore)
+			'SecurityRoleEnum',
+			function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore, SecurityRoleEnum)
 			{
 				let ctrl = this;
 				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
-				ctrl.AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
-				ctrl.PrivilegesEnum = SecurityObjectTransfer.PrivilegesEnum;
+				ctrl.AccessObjectsEnum = SecurityRoleEnum.access;
+				ctrl.PrivilegesEnum = SecurityRoleEnum.privilege;
 
 				ctrl.permissionLevelValues = Object.freeze({
 					read: "r",

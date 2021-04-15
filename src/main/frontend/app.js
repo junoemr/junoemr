@@ -31,6 +31,7 @@ require('file-saver');
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
+import {SecurityObjectTransfer} from "./generated";
 
 var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router',
@@ -667,6 +668,16 @@ oscarApp.config([
 	$httpProvider.interceptors.push('errorInterceptor');
 }]);
 
+oscarApp.constant('SecurityRoleEnum', {
+	access: SecurityObjectTransfer.NameEnum,
+	privilege: SecurityObjectTransfer.PrivilegesEnum,
+});
+
+// oscarApp.run(function ($rootScope, $location)
+// {
+// 	$rootScope.AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
+// 	$rootScope.PrivilegesEnum = SecurityObjectTransfer.PrivilegesEnum;
+// });
 
 // For debugging purposes
 /*

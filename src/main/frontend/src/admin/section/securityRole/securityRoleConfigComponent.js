@@ -21,7 +21,7 @@
  * Canada
  */
 
-import {SecurityObjectTransfer, SecurityRolesApi} from "../../../../generated";
+import {SecurityRolesApi} from "../../../../generated";
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
@@ -40,17 +40,14 @@ angular.module('Admin.Section').component('securityRoleConfig',
 			'$uibModal',
 			'NgTableParams',
 			'securityRolesStore',
-			function ($scope, $http, $httpParamSerializer, $uibModal, NgTableParams, securityRolesStore)
+			'SecurityRoleEnum',
+			function ($scope, $http, $httpParamSerializer, $uibModal, NgTableParams, securityRolesStore, SecurityRoleEnum)
 			{
 				let ctrl = this;
-				ctrl.AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
-				ctrl.PrivilegesEnum = SecurityObjectTransfer.PrivilegesEnum;
+				ctrl.SecurityRoleEnum = SecurityRoleEnum;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
-
-				ctrl.access = ctrl.AccessObjectsEnum.ADMINSECURITY;
-				ctrl.permissions = ctrl.PrivilegesEnum.READ;
 
 				ctrl.operationEnum = Object.freeze({
 					ADD: "add",
@@ -93,8 +90,8 @@ angular.module('Admin.Section').component('securityRoleConfig',
 				ctrl.canAddRole = () =>
 				{
 					return securityRolesStore.hasSecurityPrivileges(
-						ctrl.AccessObjectsEnum.ADMINSECURITY,
-						ctrl.PrivilegesEnum.WRITE);
+						ctrl.SecurityRoleEnum.access.ADMINSECURITY,
+						ctrl.SecurityRoleEnum.privilege.WRITE);
 				}
 
 				ctrl.openDetailsModal = (role, newRole) =>

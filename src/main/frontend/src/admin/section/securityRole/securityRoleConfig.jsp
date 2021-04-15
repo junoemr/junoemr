@@ -21,7 +21,7 @@
 * Canada
 --%>
 <div class="security-role-config">
-	<juno-security-check access="$ctrl.access" permissions="$ctrl.permissions">
+	<juno-security-check access="$ctrl.SecurityRoleEnum.access.ADMINSECURITY" permissions="$ctrl.SecurityRoleEnum.privilege.READ">
 		<div class="flex-row justify-content-between align-items-center">
 			<h1>Manage Security Access Roles</h1>
 
