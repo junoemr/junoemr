@@ -70,7 +70,8 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void handleInjectionPreventions() throws InterruptedException
+	public void handleInjectionPreventions()
+			throws InterruptedException
 	{
 		// *** Add prevention ***
 		driver.get(Navigation.OSCAR_URL + PREVENTION_INJECTION_URL);
@@ -121,11 +122,11 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 		// *** Verify prevention ***
 
 		// Attempt to view prevention and verify information is correct
-		PageUtil.switchToNewWindow(driver,
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles);
+		driver.findElement(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]")).click();
+		PageUtil.switchToLastWindow(driver);
+		Thread.sleep(2000);
 
 		// Pull out current assigned values and make sure they match
-		Thread.sleep(2000);
 		String currentName = driver.findElement(By.xpath("//input[@name='name']")).getAttribute("value");
 		String currentLocation = driver.findElement(By.xpath("//input[@name='location']")).getAttribute("value");
 		String currentRoute = driver.findElement(By.xpath("//input[@name='route']")).getAttribute("value");
@@ -147,7 +148,8 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addExamPrevention() throws InterruptedException
+	public void addExamPrevention()
+			throws InterruptedException
 	{
 		// *** Add prevention ***
 		driver.get(Navigation.OSCAR_URL + EXAM_PREVENTION_URL);
