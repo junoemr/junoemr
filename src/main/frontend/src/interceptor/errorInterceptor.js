@@ -45,8 +45,7 @@ angular.module('Interceptor').service('errorInterceptor', [
 					const defaultMessage = "You do not have the required permissions to access this data";
 					const errorMessage = (rejection.data && rejection.data.error) ? rejection.data.error.message : null;
 
-					console.error(rejection);
-					Juno.Common.Util.errorAlert($uibModal, "Security Error", (errorMessage) ? errorMessage : defaultMessage);
+					console.error((errorMessage) ? errorMessage : defaultMessage, rejection);
 				}
 
 				return $q.reject(rejection);
