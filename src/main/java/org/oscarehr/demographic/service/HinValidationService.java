@@ -36,7 +36,7 @@ import javax.validation.ValidationException;
 @Transactional
 public class HinValidationService
 {
-	private static final String BC_NEWBORN_CODE = "66";
+	public static final String BC_NEWBORN_CODE = "66";
 
 	@Autowired
 	private DemographicDao demographicDao;

@@ -98,7 +98,6 @@ public final class DemographicTransfer {
 	private String nameOfMother;
 	private String nameOfFather;
 
-	
 	public Integer getDemographicNo() {
     	return (demographicNo);
     }
@@ -618,6 +617,15 @@ public final class DemographicTransfer {
 		DemographicTransfer demographicTransfer = new DemographicTransfer();
 		BeanUtils.copyProperties(demographic, demographicTransfer);
 
+		// Manually assign stuff that couldn't be bean copied
+		demographicTransfer.setActiveCount(demographic.isActive() ? 1 : 0);
+		demographicTransfer.setDemographicNo(demographic.getDemographicId());
+		demographicTransfer.setFamilyDoctor(demographic.getReferralDoctor());
+		demographicTransfer.setFamilyDoctor2(demographic.getFamilyDoctor());
+		demographicTransfer.setEffDate(demographic.getHcEffectiveDate());
+		demographicTransfer.setYearOfBirth(demographic.getYearOfBirth());
+		demographicTransfer.setMonthOfBirth(demographic.getMonthOfBirth());
+		demographicTransfer.setDateOfBirth(demographic.getDayOfBirth());
 		// Attempt to set extra demographic fields
 		try
 		{

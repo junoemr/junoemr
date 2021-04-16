@@ -22,6 +22,8 @@
  */
 package org.oscarehr.demographic.search;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
@@ -71,6 +73,9 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 
 	private Integer DemographicNo;
 	private String hin;
+	@Getter
+	@Setter
+	private String ver;
 	private String firstName;
 	private String lastName;
 	private String phone;
@@ -80,6 +85,10 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String sex;
 	private String providerNo;
 	private String email;
+
+	@Getter
+	@Setter
+	private boolean invertVersionCheck = false;
 
 	private SORT_MODE sortMode = SORT_MODE.DemographicNo;
 	private List<STATUS_MODE> statusModes = new ArrayList<>();
@@ -132,6 +141,20 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		if(getHin() != null)
 		{
 			junction.add(getRestrictionCriterion("hin", getHin()));
+			if (getVer() != null)
+			{
+				// If we get a version code to verify, we want one of two things: exactly that version code, or anything but
+				if (isInvertVersionCheck())
+				{
+					junction.add(Restrictions.or(
+							Restrictions.isNull("ver"),
+							Restrictions.ne("ver", getVer())));
+				}
+				else
+				{
+					junction.add(getRestrictionCriterion("ver", getVer()));
+				}
+			}
 		}
 
 		// birthdate searches are always exact due to how the values are stored

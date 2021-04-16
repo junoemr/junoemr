@@ -49,6 +49,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
@@ -60,6 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
@@ -1137,6 +1139,24 @@ public class DemographicManager {
 
 	public org.oscarehr.demographic.model.Demographic getDemographicByHealthNumber(String healthNumber)
 	{
-		return newDemographicDao.getDemographicByHin(healthNumber);
+		DemographicCriteriaSearch search = new DemographicCriteriaSearch();
+		search.setHin(healthNumber);
+		search.setStatusMode(DemographicCriteriaSearch.STATUS_MODE.all);
+
+		// Exclude demographics that would otherwise be guaranteed duplicates
+		if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
+		{
+			search.setVer(HinValidationService.BC_NEWBORN_CODE);
+			search.setInvertVersionCheck(true);
+		}
+
+		List<org.oscarehr.demographic.model.Demographic> demographics = newDemographicDao.criteriaSearch(search);
+		if (demographics.size() == 1)
+		{
+			return demographics.get(0);
+		}
+
+		MiscUtils.getLogger().warn("Looked up HIN=" + healthNumber + " and got " + demographics.size() + " result(s), expected 1");
+		return null;
 	}
 }
