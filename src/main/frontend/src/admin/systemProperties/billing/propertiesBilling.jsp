@@ -25,20 +25,20 @@
 <div class="admin-system-properties-body system-properties-billing">
 	<h3 class="title">Manage Billing Properties</h3>
 	<div class="content">
-
 		<div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
 			<div class="property-text flex-column">
 				<div class="name">{{ property.name }}</div>
 				<div class="description">{{ property.description }}</div>
 			</div>
 		</div>
-
 		<div class="property flex-row">
-			<juno-select-save
-					ng-model="$ctrl.selectedValue"
-					options="$ctrl.codes"
-					click="$ctrl.updateProperty()">
-			</juno-select-save>
+			<div class="property-toggle flex-column">
+				<juno-select-save
+						ng-model="$ctrl.selectedValue"
+						options="$ctrl.codes"
+						click="$ctrl.updateProperty()">
+				</juno-select-save>
+			</div>
 		</div>
 	</div>
 </div>
