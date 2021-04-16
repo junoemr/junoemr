@@ -75,7 +75,11 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String hin;
 	@Getter
 	@Setter
-	private String ver;
+	private String healthCardVersion;
+	@Getter
+	@Setter
+	private String notHealthCardVersion;
+
 	private String firstName;
 	private String lastName;
 	private String phone;
@@ -85,10 +89,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String sex;
 	private String providerNo;
 	private String email;
-
-	@Getter
-	@Setter
-	private boolean invertVersionCheck = false;
 
 	private SORT_MODE sortMode = SORT_MODE.DemographicNo;
 	private List<STATUS_MODE> statusModes = new ArrayList<>();
@@ -137,23 +137,19 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 				junction.add(getRestrictionCriterion("lastName", getLastName()));
 			}
 		}
-
 		if(getHin() != null)
 		{
 			junction.add(getRestrictionCriterion("hin", getHin()));
-			if (getVer() != null)
+			// If we get a version code to verify, we want one of two things: exactly that version code, or anything but
+			if (getHealthCardVersion() != null)
 			{
-				// If we get a version code to verify, we want one of two things: exactly that version code, or anything but
-				if (isInvertVersionCheck())
-				{
-					junction.add(Restrictions.or(
-							Restrictions.isNull("ver"),
-							Restrictions.ne("ver", getVer())));
-				}
-				else
-				{
-					junction.add(getRestrictionCriterion("ver", getVer()));
-				}
+				junction.add(getRestrictionCriterion("ver", getHealthCardVersion()));
+			}
+			else if (getNotHealthCardVersion() != null)
+			{
+				junction.add(Restrictions.or(
+						Restrictions.isNull("ver"),
+						Restrictions.ne("ver", getNotHealthCardVersion())));
 			}
 		}
 

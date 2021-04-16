@@ -1146,8 +1146,7 @@ public class DemographicManager {
 		// Exclude demographics that would otherwise be guaranteed duplicates
 		if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
 		{
-			search.setVer(HinValidationService.BC_NEWBORN_CODE);
-			search.setInvertVersionCheck(true);
+			search.setNotHealthCardVersion(HinValidationService.BC_NEWBORN_CODE);
 		}
 
 		List<org.oscarehr.demographic.model.Demographic> demographics = newDemographicDao.criteriaSearch(search);
@@ -1156,7 +1155,10 @@ public class DemographicManager {
 			return demographics.get(0);
 		}
 
-		MiscUtils.getLogger().warn("Looked up HIN=" + healthNumber + " and got " + demographics.size() + " result(s), expected 1");
+		if (demographics.size() > 1)
+		{
+			MiscUtils.getLogger().warn("Looked up HIN=" + healthNumber + " and got " + demographics.size() + " result(s), expected 1");
+		}
 		return null;
 	}
 }
