@@ -24,5 +24,28 @@
     Canada
 
  */
+import {ProviderApi, SecurityRolesApi} from "../../../generated";
 
-angular.module('Common.Store', ['Common.Util']);
+angular.module("Common.Security").service("securityApiService", [
+    '$http',
+    '$httpParamSerializer',
+    function(
+        $http,
+        $httpParamSerializer)
+    {
+        const service = this;
+        service.providerApi = new ProviderApi($http, $httpParamSerializer, '../ws/rs');
+        service.securityRoleApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
+
+        service.getProviderApi = () : ProviderApi =>
+        {
+            return service.providerApi;
+        }
+
+        service.getSecurityRoleApi = () : SecurityRolesApi =>
+        {
+            return service.securityRoleApi;
+        }
+
+    }
+]);

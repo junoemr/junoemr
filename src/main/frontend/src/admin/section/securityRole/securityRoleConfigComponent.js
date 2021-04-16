@@ -21,30 +21,27 @@
  * Canada
  */
 
-import {SecurityRolesApi} from "../../../../generated";
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
+import {SecurityRole} from "../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('securityRoleConfig',
 	{
 		templateUrl: 'src/admin/section/securityRole/securityRoleConfig.jsp',
 		bindings: {},
 		controller: [
-			'$scope',
-			'$http',
-			'$httpParamSerializer',
 			'$uibModal',
 			'NgTableParams',
-			'securityRolesStore',
-			'SecurityRoleEnum',
-			function ($scope, $http, $httpParamSerializer, $uibModal, NgTableParams, securityRolesStore, SecurityRoleEnum)
+			'securityApiService',
+			'securityRolesService',
+			function ($uibModal, NgTableParams, securityApiService, securityRolesService)
 			{
 				let ctrl = this;
-				ctrl.SecurityRoleEnum = SecurityRoleEnum;
+				ctrl.SecurityRole = SecurityRole;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -54,9 +51,6 @@ angular.module('Admin.Section').component('securityRoleConfig',
 					UPDATE: "update",
 					DELETE: "delete",
 				});
-
-
-				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
 				// ctrl.sortMode = "name";
 				ctrl.tableParams = new NgTableParams(
@@ -74,7 +68,7 @@ angular.module('Admin.Section').component('securityRoleConfig',
 				ctrl.$onInit = async () =>
 				{
 					ctrl.componentStyle = JUNO_STYLE.DEFAULT;
-					ctrl.rolesList = (await ctrl.securityRolesApi.getRoles()).data.body;
+					ctrl.rolesList = (await securityApiService.getSecurityRoleApi().getRoles()).data.body;
 				}
 
 				ctrl.onRoleDetails = (role) =>
@@ -89,9 +83,9 @@ angular.module('Admin.Section').component('securityRoleConfig',
 
 				ctrl.canAddRole = () =>
 				{
-					return securityRolesStore.hasSecurityPrivileges(
-						ctrl.SecurityRoleEnum.access.ADMINSECURITY,
-						ctrl.SecurityRoleEnum.privilege.WRITE);
+					return securityRolesService.hasSecurityPrivileges(
+						SecurityRole.ACCESS.ADMINSECURITY,
+						SecurityRole.PRIVILEGE.WRITE);
 				}
 
 				ctrl.openDetailsModal = (role, newRole) =>
@@ -129,7 +123,7 @@ angular.module('Admin.Section').component('securityRoleConfig',
 							}
 						}
 						// force the cached access/permissions values to reload
-						securityRolesStore.loadUserRoles();
+						securityRolesService.loadUserRoles();
 					}).catch((reason) =>
 					{
 						// do nothing on cancel

@@ -25,26 +25,18 @@
 
  */
 
-import {ProviderApi, SecurityObjectTransfer, UserSecurityRolesTransfer} from "../../../generated";
-import PrivilegesEnum = SecurityObjectTransfer.PrivilegesEnum;
-import AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
+import {SecurityObjectTransfer, UserSecurityRolesTransfer} from "../../../generated";
 
-angular.module("Common.Store").service("securityRolesStore", [
-	'$http',
-	'$httpParamSerializer',
-	'$log',
-	function(
-		$http,
-		$httpParamSerializer,
-		$log)
+angular.module("Common.Security").service("securityRolesService", [
+	'securityApiService',
+	function(securityApiService)
 	{
 		const service = this;
-		service.providerApi = new ProviderApi($http, $httpParamSerializer, '../ws/rs');
 		service.rolesData = null as UserSecurityRolesTransfer;
 
 		service.loadUserRoles = async (): Promise<void> =>
 		{
-			service.rolesData = (await service.providerApi.getCurrentUserSecurityRoles()).data.body;
+			service.rolesData = (await  securityApiService.getProviderApi().getCurrentUserSecurityRoles()).data.body;
 		}
 
 		/**
@@ -52,7 +44,7 @@ angular.module("Common.Store").service("securityRolesStore", [
 		 * @param access - the access required
 		 * @param requiredPrivileges - the privilege levels required
 		 */
-		service.hasSecurityPrivileges = (access: AccessObjectsEnum, ...requiredPrivileges: PrivilegesEnum[]): boolean =>
+		service.hasSecurityPrivileges = (access: SecurityObjectTransfer.NameEnum, ...requiredPrivileges: SecurityObjectTransfer.PrivilegesEnum[]): boolean =>
 		{
 			if (service.rolesData && service.rolesData.accessObjects[access])
 			{

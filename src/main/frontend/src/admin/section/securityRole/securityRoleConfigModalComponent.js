@@ -20,13 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-import {SecurityRolesApi} from "../../../../generated";
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
+import {SecurityRole} from "../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('securityRoleConfigModal',
 	{
@@ -36,19 +36,14 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 			resolve: "<",
 		},
 		controller: [
-			'$scope',
-			'$http',
-			'$httpParamSerializer',
 			'$uibModal',
-			'securityRolesStore',
-			'SecurityRoleEnum',
-			function ($scope, $http, $httpParamSerializer, $uibModal, securityRolesStore, SecurityRoleEnum)
+			'securityApiService',
+			'securityRolesService',
+			function ($uibModal, securityApiService, securityRolesService)
 			{
 				let ctrl = this;
-				ctrl.securityRolesApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
-
-				ctrl.AccessObjectsEnum = SecurityRoleEnum.access;
-				ctrl.PrivilegesEnum = SecurityRoleEnum.privilege;
+				ctrl.securityRolesApi = securityApiService.getSecurityRoleApi();
+				ctrl.PrivilegesEnum = SecurityRole.PRIVILEGE;
 
 				ctrl.permissionLevelValues = Object.freeze({
 					read: "r",
@@ -204,8 +199,8 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.canEdit = () =>
 				{
-					return securityRolesStore.hasSecurityPrivileges(
-						ctrl.AccessObjectsEnum.ADMINSECURITY,
+					return securityRolesService.hasSecurityPrivileges(
+						SecurityRole.ACCESS.ADMINSECURITY,
 						ctrl.PrivilegesEnum.UPDATE);
 				}
 
@@ -216,8 +211,8 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.canDelete = () =>
 				{
-					return !ctrl.isLoading && securityRolesStore.hasSecurityPrivileges(
-						ctrl.AccessObjectsEnum.ADMINSECURITY,
+					return !ctrl.isLoading && securityRolesService.hasSecurityPrivileges(
+						SecurityRole.ACCESS.ADMINSECURITY,
 						ctrl.PrivilegesEnum.DELETE);
 				}
 

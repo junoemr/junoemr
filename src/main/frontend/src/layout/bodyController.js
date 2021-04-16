@@ -3,8 +3,8 @@ angular.module('Layout').controller('Layout.BodyController', [
 	'$scope',
 	'providerService',
 	'securityService',
-	'securityRolesStore',
-	function($rootScope, $scope, providerService, securityService, securityRolesStore)
+	'securityRolesService',
+	function($rootScope, $scope, providerService, securityService, securityRolesService)
 	{
 		var controller = this;
 
@@ -24,7 +24,7 @@ angular.module('Layout').controller('Layout.BodyController', [
 				{
 					console.log(errors);
 				});
-			securityRolesStore.loadUserRoles().then(() =>
+			securityRolesService.loadUserRoles().then(() =>
 			{
 				controller.userRolesLoaded = true;
 			});

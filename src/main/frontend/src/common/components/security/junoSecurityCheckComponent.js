@@ -31,8 +31,8 @@ angular.module('Common.Components').component('junoSecurityCheck',
     transclude: true,
     controller: [
         '$scope',
-        'securityRolesStore',
-        function ($scope, securityRolesStore)
+        'securityRolesService',
+        function ($scope, securityRolesService)
     {
         let ctrl = this;
 
@@ -50,7 +50,7 @@ angular.module('Common.Components').component('junoSecurityCheck',
 
         ctrl.hasPermissions = () =>
         {
-            return securityRolesStore.hasSecurityPrivileges(ctrl.access, ...ctrl.permissions);
+            return securityRolesService.hasSecurityPrivileges(ctrl.access, ...ctrl.permissions);
         }
 
     }]

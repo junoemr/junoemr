@@ -44,12 +44,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngTable',
 	'ngStorage',
 	'Common',
-	'Common.Services',
-	'Common.Store',
-	'Common.Filters',
-	'Common.Directives',
-	'Common.Components',
-	'Common.Util',
 	'Layout',
 	'Tickler',
 	'Record',
@@ -667,17 +661,6 @@ oscarApp.config([
 			});
 	$httpProvider.interceptors.push('errorInterceptor');
 }]);
-
-oscarApp.constant('SecurityRoleEnum', {
-	access: SecurityObjectTransfer.NameEnum,
-	privilege: SecurityObjectTransfer.PrivilegesEnum,
-});
-
-// oscarApp.run(function ($rootScope, $location)
-// {
-// 	$rootScope.AccessObjectsEnum = SecurityObjectTransfer.NameEnum;
-// 	$rootScope.PrivilegesEnum = SecurityObjectTransfer.PrivilegesEnum;
-// });
 
 // For debugging purposes
 /*

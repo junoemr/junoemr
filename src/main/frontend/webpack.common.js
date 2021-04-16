@@ -172,7 +172,6 @@ module.exports = {
 			'./src/common/services/providersService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
-			'./src/common/services/securityService.js',
 			'./src/common/services/staticDataService.js',
 			'./src/common/services/summaryService.js',
 			'./src/common/services/systemPreferenceService.js',
@@ -267,8 +266,10 @@ module.exports = {
 			'./src/common/modals/bookAppointmentModal/bookAppointmentModalComponent.js',
 			'./src/common/modals/appointmentQueueModal/components/availabilitySettings/availabilitySettingsComponent.js',
 
-			'./src/common/store/module.js',
-			'./src/common/store/securityRoles.store.ts',
+			'./src/common/security/module.js',
+			'./src/common/security/securityApi.service.ts',
+			'./src/common/security/securityRoles.service.ts',
+			'./src/common/security/securityService.js',
 
 			'./src/interceptor/module.js',
 			'./src/interceptor/errorInterceptor.js',

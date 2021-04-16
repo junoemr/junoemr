@@ -26,4 +26,11 @@
 
  */
 
-angular.module('Common', []);
+angular.module('Common', [
+	'Common.Security',
+	'Common.Services',
+	'Common.Filters',
+	'Common.Directives',
+	'Common.Components',
+	'Common.Util',
+]);
