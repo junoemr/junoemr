@@ -250,9 +250,13 @@ public class IMDHealthService
 					.map(p -> p.convertToProviderData())
 					.collect(Collectors.toSet());
 
-			if (siteProviders.isEmpty())
+			if ((!SSOOrganization.canMapSite(activeSite)))
 			{
-				siteErrors.add("Site has no active providers: " + activeSite.getName());
+				siteErrors.add(activeSite.getName() + ": is missing required information.");
+			}
+			else if (siteProviders.isEmpty())
+			{
+				siteErrors.add(activeSite.getName() + ": has no active providers.");
 			}
 			else
 			{
@@ -279,7 +283,7 @@ public class IMDHealthService
 
 		if (activeProviders.isEmpty() || !SSOOrganization.canMapClinic(clinic))
 		{
-			errors.add("Clinic is missing required data or has no providers: " + clinic.getClinicName());
+			errors.add(clinic.getClinicName() + ": is missing required information or has no providers.");
 		}
 		else
 		{
@@ -313,7 +317,7 @@ public class IMDHealthService
 			boolean success = SSOUser.canConvertProvider(providerData) && registerProviderAtClinic(token, providerData);
 			if (!success)
 			{
-				failedProviderClinicList.add("Provider is missing required data: " + providerData.getDisplayName());
+				failedProviderClinicList.add(providerData.getDisplayName() + ": is missing required information.");
 			}
 		}
 
@@ -431,7 +435,7 @@ public class IMDHealthService
 	 * @return true if post returned a response
 	 * @throws IMDHealthException on post error
 	 */
-	private boolean registerProviderAtClinic(BearerToken token, ProviderData provider) throws IMDHealthException
+	public boolean registerProviderAtClinic(BearerToken token, ProviderData provider) throws IMDHealthException
 	{
 		return createSSOSession(token, provider, null, null) != null;
 	}
@@ -443,7 +447,7 @@ public class IMDHealthService
 	 * @return true if post returned a response
 	 * @throws IMDHealthException on post error
 	 */
-	private boolean registerProviderAtSite(BearerToken token, ProviderData provider, Site site) throws IMDHealthException
+	public boolean registerProviderAtSite(BearerToken token, ProviderData provider, Site site) throws IMDHealthException
 	{
 		return createSSOSession(token, provider, null, site) != null;
 	}
@@ -458,7 +462,7 @@ public class IMDHealthService
 	 * @return credentials containing an SSO link to login to the iMDHealth webapp
 	 * @throws IMDHealthException
 	 */
-	private SSOSessionCredentials createSSOSessionForLoggedInProvider(HttpSession session, @Nullable Demographic demographic, @Nullable Site site) throws IMDHealthException
+	public SSOSessionCredentials createSSOSessionForLoggedInProvider(HttpSession session, @Nullable Demographic demographic, @Nullable Site site) throws IMDHealthException
 	{
 		IMDHealthCredentials token = getCredentials(session);
 

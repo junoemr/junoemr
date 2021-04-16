@@ -79,7 +79,7 @@ public class SSOOrganization implements Serializable
 
 	/**
 	 * Determine if a site can be mapped to an SSOOrganization which can be accepted by the iMDHealth API.
-	 * To be valid a site must have a non-empty city, name, and unique identifier.
+	 * To be valid a site must have a non-empty city and name.
 	 *
 	 * @param site site
 	 * @return true if mappable
@@ -90,14 +90,13 @@ public class SSOOrganization implements Serializable
 		// It must be a known known ISO-3166 code and Juno allows this to be a raw String input.
 
 		return site != null &&
-				ConversionUtils.hasContent(site.getUuid()) &&
 				ConversionUtils.hasContent(site.getCity()) &&
 				ConversionUtils.hasContent(site.getName());
 	}
 
 	/**
 	 * Determine if a clinic can be mapped to an SSOOrganization which can be accepted by the iMDHealth API.
-	 * To be valid a clinic must have a non-empty city, name, and unique identifier.
+	 * To be valid a clinic must have a non-empty city and name.
 	 *
 	 * @param clinic clinic
 	 * @return true if mappable
@@ -108,7 +107,6 @@ public class SSOOrganization implements Serializable
 		// It must be a known known ISO-3166 code and Juno allows this to be a raw String input.
 
 		return clinic != null &&
-				ConversionUtils.hasContent(clinic.getUuid()) &&
 				ConversionUtils.hasContent(clinic.getClinicCity()) &&
 				ConversionUtils.hasContent(clinic.getClinicName());
 	}
