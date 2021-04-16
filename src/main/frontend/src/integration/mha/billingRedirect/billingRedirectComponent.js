@@ -44,7 +44,7 @@ angular.module('Integration.Mha').component('billingRedirect', {
             scheduleService,
             securityService)
     {
-        const ctrl = this
+        const ctrl = this;
         const systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
         const appointmentApi = new AppointmentApi($http, $httpParamSerializer, '../ws/rs');
 
@@ -60,7 +60,7 @@ angular.module('Integration.Mha').component('billingRedirect', {
         {
             try
             {
-                const billingRegion = (await systemPreferenceApi.getPropertyValue("billing_type", BILLING_REGION.BC)).data.body
+                const billingRegion = (await systemPreferenceApi.getPropertyValue("billing_type", BILLING_REGION.BC)).data.body;
                 const appointment = (await appointmentApi.getAppointment($stateParams.appointmentNo)).data.body;
                 const appointmentStartTime = Juno.Common.Util.getDatetimeNoTimezoneMoment(`${appointment.appointmentDate}T${appointment.startTime}`);
 
@@ -84,7 +84,7 @@ angular.module('Integration.Mha').component('billingRedirect', {
             }
             catch(error)
             {
-                console.error("Failed to redirect to booking.")
+                console.error("Failed to redirect to billing.");
                 console.error(error.toString());
                 $location.url("/dashboard");
             }
