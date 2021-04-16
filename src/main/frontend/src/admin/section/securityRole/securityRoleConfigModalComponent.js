@@ -42,7 +42,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 			function ($uibModal, securityApiService, securityRolesService)
 			{
 				let ctrl = this;
-				ctrl.PrivilegesEnum = SecurityRole.PRIVILEGE;
+				ctrl.PrivilegesEnum = SecurityRole.PRIVILEGE_LEVEL;
 
 				ctrl.permissionLevelValues = Object.freeze({
 					read: "r",

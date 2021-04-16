@@ -39,12 +39,69 @@ import javax.persistence.MapsId;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
+import static org.oscarehr.managers.SecurityInfoManager.PRIVILEGE_LEVEL;
+import static org.oscarehr.security.model.SecObjectName.OBJECT_NAME;
+
 @Data
 @Entity
 @Table(name = "secObjPrivilege")
 @Where(clause="deleted_at IS NULL")
 public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 {
+	public enum PERMISSION
+	{
+		CONFIGURE_BILLING_READ(OBJECT_NAME.ADMIN_BILLING, PRIVILEGE_LEVEL.READ),
+		CONFIGURE_BILLING_CREATE(OBJECT_NAME.ADMIN_BILLING, PRIVILEGE_LEVEL.CREATE),
+		CONFIGURE_BILLING_UPDATE(OBJECT_NAME.ADMIN_BILLING, PRIVILEGE_LEVEL.UPDATE),
+		CONFIGURE_BILLING_DELETE(OBJECT_NAME.ADMIN_BILLING, PRIVILEGE_LEVEL.DELETE),
+
+		CONFIGURE_CONSULT_READ(OBJECT_NAME.ADMIN_CONSULT, PRIVILEGE_LEVEL.READ),
+		CONFIGURE_CONSULT_CREATE(OBJECT_NAME.ADMIN_CONSULT, PRIVILEGE_LEVEL.CREATE),
+		CONFIGURE_CONSULT_UPDATE(OBJECT_NAME.ADMIN_CONSULT, PRIVILEGE_LEVEL.UPDATE),
+		CONFIGURE_CONSULT_DELETE(OBJECT_NAME.ADMIN_CONSULT, PRIVILEGE_LEVEL.DELETE),
+
+		CONFIGURE_SECURITY_ROLES_READ(OBJECT_NAME.ADMIN_SECURITY, PRIVILEGE_LEVEL.READ),
+		CONFIGURE_SECURITY_ROLES_CREATE(OBJECT_NAME.ADMIN_SECURITY, PRIVILEGE_LEVEL.CREATE),
+		CONFIGURE_SECURITY_ROLES_UPDATE(OBJECT_NAME.ADMIN_SECURITY, PRIVILEGE_LEVEL.UPDATE),
+		CONFIGURE_SECURITY_ROLES_DELETE(OBJECT_NAME.ADMIN_SECURITY, PRIVILEGE_LEVEL.DELETE),
+
+		TICKLER_READ(OBJECT_NAME.TICKLER, PRIVILEGE_LEVEL.READ),
+		TICKLER_CREATE(OBJECT_NAME.TICKLER, PRIVILEGE_LEVEL.CREATE),
+		TICKLER_UPDATE(OBJECT_NAME.TICKLER, PRIVILEGE_LEVEL.UPDATE),
+		TICKLER_DELETE(OBJECT_NAME.TICKLER, PRIVILEGE_LEVEL.DELETE);
+
+		private final OBJECT_NAME objectName;
+		private final PRIVILEGE_LEVEL privilegeLevel;
+
+		PERMISSION(OBJECT_NAME objectName, PRIVILEGE_LEVEL privilegeLevel)
+		{
+			this.objectName = objectName;
+			this.privilegeLevel = privilegeLevel;
+		}
+
+		public OBJECT_NAME getObjectName()
+		{
+			return this.objectName;
+		}
+
+		public PRIVILEGE_LEVEL getPrivilegeLevel()
+		{
+			return this.privilegeLevel;
+		}
+
+		public static PERMISSION from(OBJECT_NAME objectName, PRIVILEGE_LEVEL privilegeLevel)
+		{
+			for (PERMISSION permission : PERMISSION.values())
+			{
+				if (permission.getObjectName().equals(objectName) && permission.getPrivilegeLevel().equals(privilegeLevel))
+				{
+					return permission;
+				}
+			}
+			return null;
+		}
+	}
+
 	@EmbeddedId
 	private SecObjPrivilegePrimaryKey id;
 

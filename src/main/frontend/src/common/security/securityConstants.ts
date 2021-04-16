@@ -21,9 +21,10 @@
 * Canada
 */
 
-import {SecurityObjectTransfer} from "../../../generated";
+import {SecurityObjectTransfer, SecurityPermissionTransfer} from "../../../generated";
 
 export const SecurityRole = {
     ACCESS: SecurityObjectTransfer.NameEnum,
-    PRIVILEGE: SecurityObjectTransfer.PrivilegesEnum,
+    PRIVILEGE_LEVEL: SecurityObjectTransfer.PrivilegesEnum,
+    PERMISSIONS: SecurityPermissionTransfer.PermissionEnum,
 }

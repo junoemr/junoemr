@@ -235,7 +235,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		try
 		{

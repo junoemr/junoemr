@@ -27,6 +27,7 @@ import org.oscarehr.security.model.SecObjectName;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,10 +35,12 @@ import java.util.Map;
 public class UserSecurityRolesTransfer implements Serializable
 {
 	private List<SecurityRoleTransfer> roles;
+	private List<SecurityPermissionTransfer> securityPermissions;
 	private Map<SecObjectName.OBJECT_NAME, SecurityObjectTransfer> accessObjects;
 
 	public UserSecurityRolesTransfer()
 	{
+		securityPermissions = new LinkedList<>();
 		accessObjects = new HashMap<>();
 	}
 

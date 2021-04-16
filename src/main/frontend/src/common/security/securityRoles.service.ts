@@ -25,7 +25,7 @@
 
  */
 
-import {SecurityObjectTransfer, UserSecurityRolesTransfer} from "../../../generated";
+import {SecurityObjectTransfer, SecurityPermissionTransfer, UserSecurityRolesTransfer} from "../../../generated";
 
 angular.module("Common.Security").service("securityRolesService", [
 	'securityApiService',
@@ -60,6 +60,26 @@ angular.module("Common.Security").service("securityRolesService", [
 					}
 					return true;
 				}
+			}
+			return false;
+		}
+
+		/**
+		 * check the current users privileges, return true if all requirements are met
+		 * @param requiredPrivileges - the privileges required
+		 */
+		service.hasSecurityPrivileges = (...requiredPrivileges: SecurityPermissionTransfer.PermissionEnum[]): boolean =>
+		{
+			if (service.rolesData && service.rolesData.accessObjects)
+			{
+				for (let i = 0; i < requiredPrivileges.length; i++)
+				{
+					if(!service.rolesData.securityPermissions.includes(requiredPrivileges[i]))
+					{
+						return false;
+					}
+				}
+				return true;
 			}
 			return false;
 		}

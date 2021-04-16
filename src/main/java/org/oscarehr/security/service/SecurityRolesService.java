@@ -35,6 +35,7 @@ import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.security.model.SecRole;
 import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.ws.rest.transfer.security.SecurityObjectTransfer;
+import org.oscarehr.ws.rest.transfer.security.SecurityPermissionTransfer;
 import org.oscarehr.ws.rest.transfer.security.SecurityRoleTransfer;
 import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,6 +88,7 @@ public class SecurityRolesService
 			privilegeObjects.addAll(role.getSecObjPrivilege());
 		}
 		transfer.setAccessObjects(getSecurityObjectsTransferAccessMap(new ArrayList<>(privilegeObjects)));
+		transfer.setSecurityPermissions(getSecurityPermissions(new ArrayList<>(privilegeObjects)));
 		transfer.setRoles(roleTransfers);
 		return transfer;
 	}
@@ -239,6 +242,7 @@ public class SecurityRolesService
 		if(includePrivileges)
 		{
 			transfer.setAccessObjects(getSecurityObjectsTransferAccessMap(secRole.getSecObjPrivilege()));
+			transfer.setSecurityPermissions(getSecurityPermissions(secRole.getSecObjPrivilege()));
 		}
 		return transfer;
 	}
@@ -280,6 +284,31 @@ public class SecurityRolesService
 			transfer.setDescription(secObjectName.getDescription());
 		}
 		return transfer;
+	}
+
+	private List<SecurityPermissionTransfer> getSecurityPermissions(List<SecObjPrivilege> secObjPrivileges)
+	{
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
+
+		List<SecurityPermissionTransfer> transfers = new LinkedList<>();
+		for (SecObjPrivilege secObjPrivilege : secObjPrivileges)
+		{
+			for(SecurityInfoManager.PRIVILEGE_LEVEL level : getPrivilegeLevels(secObjPrivilege.getPrivilege()))
+			{
+				String objectName = secObjPrivilege.getId().getObjectName();
+				SecObjPrivilege.PERMISSION permission = SecObjPrivilege.PERMISSION.from(
+						SecObjectName.OBJECT_NAME.fromValueString(objectName), level);
+
+				if(permission != null)
+				{
+					SecurityPermissionTransfer transfer = new SecurityPermissionTransfer();
+					transfer.setDescription(level.name() + " " + StringUtils.lowerCase(nameEntityMap.get(objectName).getDescription()));
+					transfer.setPermission(permission);
+					transfers.add(transfer);
+				}
+			}
+		}
+		return transfers;
 	}
 
 	private List<SecurityInfoManager.PRIVILEGE_LEVEL> getPrivilegeLevels(String privilege)
