@@ -2144,7 +2144,8 @@
 			var elemId=element.id;
 			var ar=elemId.split("_");
 			var rand=ar[1];
-			var instruction="instruction="+element.value+"&action=parseInstructions&randomId="+rand;
+			var rawInstructions = encodeURIComponent(element.value);
+			var instruction="instruction="+rawInstructions+"&action=parseInstructions&randomId="+rand;
 			var url= "<c:out value="${ctx}"/>" + "/oscarRx/UpdateScript.do?parameterValue=updateDrug";
 			var quantity="quantity_"+rand;
 			var str;

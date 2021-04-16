@@ -37,7 +37,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.awt.AWTException;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +48,8 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 public class RescheduleAppointmentsTests extends SeleniumTestBase
 {
     @BeforeClass
-    public static void setup() throws Exception
+    public static void setup()
+            throws Exception
     {
         loadSpringBeans();
         DatabaseUtil.createTestDemographic();
@@ -58,7 +58,8 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
     }
 
     @AfterClass
-    public static void cleanup() throws Exception
+    public static void cleanup()
+            throws Exception
     {
         SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
                 "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",
@@ -68,7 +69,8 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
     }
 
     @Test
-    public void rescheduleAppointmentTestsClassicUI() throws InterruptedException
+    public void rescheduleAppointmentTestsClassicUI()
+            throws InterruptedException
     {
         // Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
         String currWindowHandle = driver.getWindowHandle();
@@ -106,14 +108,16 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         driver.findElement(By.id("pasteButton")).click();
         driver.findElement(By.id("addButton")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
-        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("10:45")));
+        Thread.sleep(2000);
         String apptCopyXpath = "//a[@title='10:45 AM - 11:00 AM']/../../td/a[contains(., '" + mom.lastName +"')]";
         Assert.assertTrue("Appointment is NOT Copied/Pasted to 10:45am successfully",
                 PageUtil.isExistsBy(By.xpath(apptCopyXpath), driver));
     }
 
     @Test
-    public void rescheduleAppointmentTestsJUNOUI() throws AWTException, InterruptedException {
+    public void rescheduleAppointmentTestsJUNOUI()
+            throws InterruptedException
+    {
         // Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
         driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
         String currWindowHandle = driver.getWindowHandle();
