@@ -36,13 +36,16 @@ angular.module('Admin').component('systemPropertiesBilling',
             'billingService',
             function ($scope, $http, $httpParamSerializer, $state, $uibModal, billingService) {
 
-                let ctrl = this;
-                let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
                 const PLACEHOLDER = 'Set the default Service Location Code'
                 const PROPERTY_NAME = 'service_location_code';
+                const TITLE = "Save Service Code";
+
+                let ctrl = this;
+                let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
                 ctrl.selectedValue = null;
-                ctrl.codes = [];
+                ctrl.codes = [{label:PLACEHOLDER, value:PLACEHOLDER,}];
+                ctrl.title = TITLE;
 
                 ctrl.propertiesList = [{
                         name: "Service Location Code",

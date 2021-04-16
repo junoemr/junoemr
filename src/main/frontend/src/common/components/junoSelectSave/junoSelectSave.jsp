@@ -7,15 +7,14 @@
 		<div class="left">
 			<juno-select ng-model="$ctrl.ngModel"
 			             component-style="$ctrl.componentStyle"
-			             options="$ctrl.options"
+			             options="$ctrl.options">
 			</juno-select>
 		</div>
-		<div class="right">
+		<div class="right" title="{{$ctrl.title}}">
 			<juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 			             component-style="$ctrl.componentStyle"
-			             click="$ctrl.onClick()"
-			             title="Save Service Code">
+			             click="$ctrl.onClick()">
 				<i class="icon-logout fa-lg"></i>
 			</juno-button>
 		</div>

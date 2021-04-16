@@ -31,11 +31,12 @@ angular.module('Common.Components').component('junoSelectSave',
             options: "<",
             click: "&?",
             placeholder: "@?",
+            title: "@?",
         },
         controller: [
             '$scope',
             '$uibModal',
-            function ($scope, $uibModal) {
+            function ($scope) {
                 let ctrl = this;
 
                 $scope.LABEL_POSITION = LABEL_POSITION;

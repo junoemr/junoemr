@@ -32,11 +32,12 @@
 			</div>
 		</div>
 		<div class="property flex-row">
-			<div class="property-toggle flex-column">
+			<div class="property-toggle flex-column" >
 				<juno-select-save
 						ng-model="$ctrl.selectedValue"
 						options="$ctrl.codes"
-						click="$ctrl.updateProperty()">
+						click="$ctrl.updateProperty()"
+						title="{{$ctrl.title}}">
 				</juno-select-save>
 			</div>
 		</div>
