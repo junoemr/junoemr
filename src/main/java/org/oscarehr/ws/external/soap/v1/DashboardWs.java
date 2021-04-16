@@ -59,7 +59,7 @@ public class DashboardWs extends AbstractWs
 	@SkipContentLoggingInbound
 	public String addBillingRecord(BillingTransfer billingTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.BILLING);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.BILLING);
 
 		return saveBillingTransfer(billingTransfer);
 	}
@@ -68,7 +68,7 @@ public class DashboardWs extends AbstractWs
 	@SkipContentLoggingInbound
 	public String[] addBillingRecords(BillingTransfer[] billingTransfers)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.BILLING);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.BILLING);
 
 		ArrayList<String> result_list = new ArrayList<>();
 		for(BillingTransfer billingTransfer: billingTransfers)
@@ -81,7 +81,7 @@ public class DashboardWs extends AbstractWs
 
 	private String saveBillingTransfer(BillingTransfer billingTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.BILLING);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.BILLING);
 
 		try
 		{

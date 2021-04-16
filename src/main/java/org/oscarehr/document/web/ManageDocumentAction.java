@@ -132,7 +132,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String[] flagProviders = request.getParameterValues("flagproviders");
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicNo, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicNo, SecObjectName.OBJECT_NAME.EDOC);
 
 		try
 		{
@@ -214,7 +214,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 		String logStatus = LogConst.STATUS_FAILURE;
 
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.CREATE, null, "_edoc");
 
 		try
 		{
@@ -251,7 +251,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String queueId = request.getParameter("queueId");
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.CREATE, null, "_edoc");
 
 		try
 		{
@@ -915,7 +915,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 		Integer demographicNo = demographicNoStr != null ? Integer.parseInt(demographicNoStr) : null;
 
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicNo, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicNo, SecObjectName.OBJECT_NAME.EDOC);
 
 		String pdfDir = request.getParameter("pdfDir");
 		String fileName = request.getParameter("pdfName");

@@ -354,7 +354,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationRequestTo1> saveRequest(ConsultationRequestTo1 data)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				SecObjectName.OBJECT_NAME.CONSULTATION,
 				SecObjectName.OBJECT_NAME.EDOC,
 				SecObjectName.OBJECT_NAME.EFORM,
@@ -537,7 +537,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationResponseTo1> saveRequest(ConsultationResponseTo1 data)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				SecObjectName.OBJECT_NAME.CONSULTATION,
 				SecObjectName.OBJECT_NAME.EDOC,
 				SecObjectName.OBJECT_NAME.EFORM,

@@ -97,7 +97,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<AppointmentQueueTo1> createAppointmentQueue(AppointmentQueueTo1 queueTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUE_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.AQS_QUEUE_CONFIG);
 		return RestResponse.successResponse(modelConverter.convert(
 				appointmentQueueService.createAppointmentQueue(transferConverter.convert(queueTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo())
 		));
@@ -160,7 +160,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<ContactTransfer> addQueueContact(@PathParam("queueId") UUID queueId, @RequestBody ContactTransfer contactTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUE_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.AQS_QUEUE_CONFIG);
 
 		Contact newContact = contactService.createNewContact(contactTransferContactConverter.convert(contactTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		appointmentQueueService.addAppointmentQueueContact(queueId, newContact.getRemoteId(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());

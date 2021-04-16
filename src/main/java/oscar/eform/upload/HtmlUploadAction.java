@@ -57,7 +57,7 @@ public class HtmlUploadAction extends Action
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 		String ipAddress = LoggedInInfo.getLoggedInInfoFromSession(request).getIp();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EFORM);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.EFORM);
 
 		HtmlUploadForm fm = (HtmlUploadForm) form;
 		FormFile formHtml = fm.getFormHtml();

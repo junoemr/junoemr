@@ -101,7 +101,7 @@ public class EpisodeAction extends DispatchAction {
 		e.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 
 		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, e.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+				SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, e.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		if(id != null && id.intValue()>0) {
 			episodeDao.merge(e);

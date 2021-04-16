@@ -60,7 +60,7 @@ public class DocumentUploadAction extends DispatchAction
 		DocumentUploadForm fm = (DocumentUploadForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.EDOC);
 		logger.info("BEGIN DOCUMENT UPLOAD");
 
 		HashMap<String, Object> responseMap = new HashMap<>();

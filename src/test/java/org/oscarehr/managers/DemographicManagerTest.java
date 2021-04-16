@@ -65,7 +65,7 @@ public class DemographicManagerTest
 		loggedInInfo = new LoggedInInfo();
 		loggedInInfo.setLoggedInProvider(provider);
 
-		Mockito.doNothing().when(securityInfoManager).requireOnePrivilege(provider.getProviderNo(), SecurityInfoManager.WRITE, null, "_demographic");
+		Mockito.doNothing().when(securityInfoManager).requireOnePrivilege(provider.getProviderNo(), SecurityInfoManager.CREATE, null, "_demographic");
 		Mockito.doNothing().when(demographicDao).save(demographic);
 
 		demographic = new Demographic();

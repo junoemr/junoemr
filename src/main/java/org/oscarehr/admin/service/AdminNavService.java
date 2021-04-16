@@ -337,7 +337,7 @@ public class AdminNavService
 		reportGroup.setName(resourceBundle.getString("admin.admin.oscarReport"));
 
 		if (oscarProperties.isPropertyActive("enable_dashboards") && oscarProperties.isBritishColumbiaInstanceType() &&
-			securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DASHBOARD_MANAGER))
+			securityInfoManager.hasPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DASHBOARD_MANAGER))
 		{
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("dashboard.dashboardmanager.title"), "frame?frameUrl=" + contextPath + "/web/dashboard/admin/DashboardManager.do"));
 		}

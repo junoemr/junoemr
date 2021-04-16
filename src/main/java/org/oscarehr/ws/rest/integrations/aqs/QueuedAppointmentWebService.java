@@ -73,7 +73,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<QueuedAppointmentTo1> createQueuedAppointment(@PathParam("queueId") UUID queueId, QueuedAppointmentBookingTransfer queuedAppointmentBookingTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
 		QueuedAppointment newQueuedAppointment = queuedAppointmentConverter.convert(queuedAppointmentBookingTransfer);
 		newQueuedAppointment = queuedAppointmentService.bookQueuedAppointment(queueId, newQueuedAppointment, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(new QueuedAppointmentTo1(newQueuedAppointment));
@@ -96,7 +96,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<QueuedAppointmentTo1> moveAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, QueuedAppointmentMoveTransfer queuedAppointmentMoveTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
 
 		QueuedAppointment queuedAppointment = queuedAppointmentService.moveQueuedAppointment(appointmentId, queuedAppointmentMoveTransfer.getQueuePosition(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(new QueuedAppointmentTo1(queuedAppointment));
@@ -111,7 +111,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	                                                          @PathParam("appointmentId") UUID appointmentId,
 	                                                          BookQueuedAppointmentTransfer bookQueuedAppointmentTransfer) throws ValidationException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.AQS_QUEUED_APPOINTMENTS);
 
 		// schedule the queued appointment
 		Appointment newAppointment = queuedAppointmentService.scheduleQueuedAppointment(appointmentId, queueId, bookQueuedAppointmentTransfer.getProviderNo(),

@@ -212,7 +212,7 @@ public class ConsultationManager {
 	
 	public void saveConsultationRequest(LoggedInInfo loggedInInfo, ConsultationRequest request) {
 		if (request.getId()==null) { //new consultation request
-			checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+			checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 			
 			ProfessionalSpecialist specialist = request.getProfessionalSpecialist();
 			request.setProfessionalSpecialist(null);
@@ -230,7 +230,7 @@ public class ConsultationManager {
 	
 	public void saveConsultationResponse(LoggedInInfo loggedInInfo, ConsultationResponse response) {
 		if (response.getId()==null) { //new consultation response
-			checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+			checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 			
 			consultationResponseDao.persist(response);
 		} else {

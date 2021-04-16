@@ -338,7 +338,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	                                      Tickler tickler)
 	{
 		String loggedInProviderNo = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TICKLER);
 
 		tickler.setUpdateDate(new Date());
 		tickler.setCreator(loggedInProviderNo);

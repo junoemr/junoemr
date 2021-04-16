@@ -114,7 +114,7 @@ public class PatientConsentManager {
 	public void addConsent(LoggedInInfo loggedinInfo, int demographic_no, int consentTypeId, boolean explicit)
 	{
 		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+				SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		LogAction.addLogSynchronous(loggedinInfo, "PatientConsentManager.addConsent", " Demographic: " + demographic_no);
 		
@@ -188,7 +188,7 @@ public class PatientConsentManager {
 	public void optoutConsent(LoggedInInfo loggedinInfo, int consentId)
 	{
 		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+				SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		
 		LogAction.addLogSynchronous(loggedinInfo, "PatientConsentManager.optoutConsent[consentID]", " ConsentId: " + consentId);
 		

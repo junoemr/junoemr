@@ -121,7 +121,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
 
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		hinValidationService.validateNoDuplication(demographicTo.getHin(), demographicTo.getHcVersion(), demographicTo.getHcType());
 		Demographic demographic = demographicService.addNewDemographicRecord(providerNoStr, demographicTo);
 
@@ -140,7 +140,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicId,
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicId,
 				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.EDOC);
 
 		documentService.assignDocumentToDemographic(documentId, demographicId);
@@ -160,7 +160,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicId,
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicId,
 				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.EFORM);
 
 		EFormData eForm = eFormService.saveNewEFormWithDatabaseTags(transfer.getTemplateId(), demographicId, providerNo,

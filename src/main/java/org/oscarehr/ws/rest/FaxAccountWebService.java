@@ -135,7 +135,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> addAccountSettings(FaxAccountTransferInbound accountSettingsTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.FAX_CONFIG);
 
 		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists

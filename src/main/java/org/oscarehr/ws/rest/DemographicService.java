@@ -338,7 +338,7 @@ public class DemographicService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
@@ -479,7 +479,7 @@ public class DemographicService extends AbstractServiceImpl {
 			PropertyData propertyData
 	)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
 
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateProperty(
@@ -502,7 +502,7 @@ public class DemographicService extends AbstractServiceImpl {
 			IssueData issueData
 	)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
 
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateIssue(

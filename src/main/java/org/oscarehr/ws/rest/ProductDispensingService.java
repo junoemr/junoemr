@@ -76,7 +76,7 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@Consumes("application/x-www-form-urlencoded")
 	public DrugProductResponse saveDrugProduct(MultivaluedMap<String, String> params) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.RX);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.RX);
 		
 		DrugProduct drugProduct = new DrugProduct();
 		drugProduct.setId(Integer.parseInt(params.getFirst("product.id")));

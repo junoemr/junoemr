@@ -64,7 +64,7 @@ public class InsideLabUploadAction extends Action {
 		logger.debug("Uploading lab file");
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.WRITE, null, "_lab");
+		securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.CREATE, null, "_lab");
 
 		LabUploadForm frm = (LabUploadForm) form;
 		FormFile importFile = frm.getImportFile();

@@ -265,7 +265,7 @@ public class DemographicWs extends AbstractWs
 	public Integer addDemographic(DemographicTransfer demographicTransfer,
 	                              @Nullable DemographicIntegrationTransfer integrationTransfer) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		MessageContext mc = wsContext.getMessageContext();
 		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
@@ -297,7 +297,7 @@ public class DemographicWs extends AbstractWs
 
 	public void updateDemographic(DemographicTransfer demographicTransfer) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				demographicTransfer.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();

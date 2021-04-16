@@ -102,7 +102,7 @@ public class AppService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public RestResponse<String> initK2A(JSONObject k2aClinicTo1, @Context HttpServletRequest request)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		if (appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null) {
 			return RestResponse.errorResponse("K2A Already Initialized");
@@ -177,7 +177,7 @@ public class AppService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<RssItem> postK2AComment(RssItem comment)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		int total = 0;
 

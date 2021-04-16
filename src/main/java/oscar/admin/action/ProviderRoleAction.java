@@ -55,7 +55,7 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("ADD ROLE");
-			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
+			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, String.valueOf(providerId));
 
 			if(!providerRoleService.validRoleName(roleNew))

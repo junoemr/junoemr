@@ -242,7 +242,7 @@ public class NotesService extends AbstractServiceImpl
 		LoggedInInfo loggedInInfo = getLoggedInInfo();//  LoggedInInfo.loggedInInfo.get();
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				demographicNo, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
 
 		logger.debug("autosave "+note);
@@ -291,7 +291,7 @@ public class NotesService extends AbstractServiceImpl
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				demographicNo, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
 
 		logger.debug("saveNote "+note);
@@ -460,7 +460,7 @@ public class NotesService extends AbstractServiceImpl
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				demographicNo, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
 
 		try {
@@ -1380,7 +1380,7 @@ public class NotesService extends AbstractServiceImpl
 	@Consumes("application/json")
 	public GenericRESTResponse ticklerSaveNote(JSONObject json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				SecObjectName.OBJECT_NAME.ECHART, SecObjectName.OBJECT_NAME.TICKLER);
 
 		logger.info("The config "+json.toString());
@@ -1549,7 +1549,7 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	public GenericRESTResponse setEditingNoteFlag(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
 
 		GenericRESTResponse resp = new GenericRESTResponse(false, "Parameter error");
 		if (noteUUID==null || noteUUID.trim().isEmpty() || providerNo==null || providerNo.trim().isEmpty()) return resp;
@@ -1598,7 +1598,7 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	public GenericRESTResponse checkEditNoteNew(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
 
 		GenericRESTResponse resp = new GenericRESTResponse(true, null);
 		if (noteUUID==null || noteUUID.trim().isEmpty() || providerNo==null || providerNo.trim().isEmpty()) return resp;
@@ -1624,7 +1624,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/removeEditingNoteFlag")
 	public void removeEditingNoteFlag(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.CASEMGMT_NOTES);
 
 		if (noteUUID==null || noteUUID.trim().isEmpty() || providerNo==null || providerNo.trim().isEmpty()) return;
 		

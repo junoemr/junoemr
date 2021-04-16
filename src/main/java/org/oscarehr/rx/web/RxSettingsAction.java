@@ -52,7 +52,7 @@ public class RxSettingsAction extends DispatchAction
 	public ActionForward setSettings(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.CREATE, null,  "_admin");
 
 		String promoText = StringUtils.trimToEmpty(request.getParameter("rx_promo_text"));
 		UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);

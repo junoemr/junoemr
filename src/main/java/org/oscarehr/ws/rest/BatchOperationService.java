@@ -77,7 +77,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Boolean> activateDemographics(DemographicBatchOperationTo1 demoTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN);
 		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.AC.name());
 	}
 

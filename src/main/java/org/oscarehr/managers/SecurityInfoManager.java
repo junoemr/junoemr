@@ -52,7 +52,7 @@ public class SecurityInfoManager
 {
 	// avoid use of these, use enum instead
 	public static final String READ = "r";
-	public static final String WRITE = "w";
+	public static final String CREATE = "w";
 	public static final String UPDATE = "u";
 	public static final String DELETE = "d";
 	public static final String NO_RIGHTS = "o";
@@ -60,11 +60,10 @@ public class SecurityInfoManager
 
 	public enum PRIVILEGE_LEVEL
 	{
-		READ ("r"),
-		WRITE ("w"),
-		UPDATE ("u"),
-		DELETE ("d"),
-		NO_RIGHTS ("o");
+		READ("r"),
+		UPDATE("u"),
+		CREATE("w"),
+		DELETE("d");
 
 		String level;
 
@@ -255,8 +254,8 @@ public class SecurityInfoManager
 			} else  if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "x")) {
 				return true;
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), WRITE)) {
-				return ((READ+UPDATE+WRITE).contains(privilege));
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), CREATE)) {
+				return ((READ+UPDATE+ CREATE).contains(privilege));
 			}
 			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), UPDATE)) {
 				return ((READ+UPDATE).contains(privilege));

@@ -255,7 +255,7 @@ public class DemographicManager {
 
 	public void createUpdateDemographicCust(String providerNo, DemographicCust demoCust)
 	{
-		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
+		checkPrivilege(providerNo, SecurityInfoManager.CREATE);
 		if(demoCust != null)
 		{
 			//Archive previous demoCust
@@ -306,7 +306,7 @@ public class DemographicManager {
 		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, admissionProgramId);
 	}
 	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
-		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
+		checkPrivilege(providerNo, SecurityInfoManager.CREATE);
 		try {
 			demographic.getBirthDay();
 		} catch (Exception e) {
@@ -401,7 +401,7 @@ public class DemographicManager {
 	}
 	
 	public void addDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 		try {
 			demographic.getBirthDay();
 		} catch (Exception e) {
@@ -421,7 +421,7 @@ public class DemographicManager {
 	
 
 	public void createExtension(String providerNo, DemographicExt ext) {
-		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
+		checkPrivilege(providerNo, SecurityInfoManager.CREATE);
 		demographicExtDao.saveEntity(ext);
 	}
 
@@ -461,13 +461,13 @@ public class DemographicManager {
 	}
 
 	public void createUpdateDemographicContact(LoggedInInfo loggedInInfo, DemographicContact demoContact) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 		
 		demographicContactDao.merge(demoContact);
 	}
 
 	public void deleteDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 		
 		demographicArchiveDao.archiveRecord(demographic);
 		demographic.setPatientStatus(Demographic.PatientStatus.DE.name());
@@ -480,13 +480,13 @@ public class DemographicManager {
 	}
 
 	public void deleteExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 		archiveExtension(ext);
 		demographicExtDao.removeDemographicExt(ext.getId());
 	}
 
 	public void mergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 		for (Integer child : children) {
 			DemographicMerged dm = new DemographicMerged();
 			dm.setDemographicNo(child);
@@ -498,7 +498,7 @@ public class DemographicManager {
 
 	public void unmergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children)
 	{
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 		for (Integer childId : children)
 		{
 			List<DemographicMerged> demographicsMerged = demographicMergedDao.findByParentAndChildIds(parentId, childId);
@@ -808,7 +808,7 @@ public class DemographicManager {
 
 	public void addDemographicWithValidation(LoggedInInfo loggedInInfo, Demographic demographic) throws Exception
 	{
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 
         if (demographic.getDateJoined() == null)
         {
@@ -826,7 +826,7 @@ public class DemographicManager {
 	public void addDemographicExts(LoggedInInfo loggedInInfo, Demographic demographic,
 									  DemographicTransfer demographicTransfer)
 	{
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 
 		if (demographicTransfer.getCellPhone() != null)
 		{
@@ -838,7 +838,7 @@ public class DemographicManager {
 
 	public void updateDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic, DemographicTransfer demographicTransfer)
 	{
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 
 		DemographicCust demoCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
 		demoCust.setParsedNotes(demographicTransfer.getNotes());
@@ -849,7 +849,7 @@ public class DemographicManager {
 	// method adds those entries.
 	public void addDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic, DemographicTransfer demographicTransfer)
 	{
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
 
 		// demographiccust
 		DemographicCust demoCust = new DemographicCust();

@@ -142,7 +142,7 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public Response addToDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo, IssueTo1 issue)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.DXRESEARCH);
 
 		boolean activeEntryExists = dxresearchDao.activeEntryExists(demographicNo, issue.getType(), issue.getCode());

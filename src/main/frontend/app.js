@@ -31,7 +31,6 @@ require('file-saver');
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
-import {SecurityObjectTransfer} from "./generated";
 
 var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router',

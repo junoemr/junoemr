@@ -89,7 +89,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Consumes("application/json")
 	public RestResponse<CalendarAppointment> addAppointment(CalendarAppointment calendarAppointment)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
@@ -126,7 +126,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Consumes("application/json")
 	public RestResponse<CalendarAppointment> addRepeatingAppointment(CalendarAppointmentRepeating calendarAppointmentContainer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.APPOINTMENT);
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		AppointmentConverter converter = new AppointmentConverter();

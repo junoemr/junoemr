@@ -178,7 +178,7 @@ public class IceFallWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> sendFormToIceFall(IceFallSendFormTo1 iceFallSendFormTo1)
 	{
 		Provider provider = getCurrentProvider();
-		securityInfoManager.requireAllPrivilege(provider.getProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(provider.getProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				SecObjectName.OBJECT_NAME.RX, SecObjectName.OBJECT_NAME.EFORM);
 
 		Demographic demo = demographicDao.find(iceFallSendFormTo1.getDemographicNo());

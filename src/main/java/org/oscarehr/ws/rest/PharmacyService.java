@@ -106,7 +106,7 @@ public class PharmacyService extends AbstractServiceImpl
 	@Path("/")
 	public PharmacyInfoTo1 addPharmacy(PharmacyInfoTo1 pharmacyInfo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.RX);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.RX);
 		return converter.getAsTransferObject(getLoggedInInfo(), pharmacyInfoDao.saveEntity(converter.getAsDomainObject(getLoggedInInfo(), pharmacyInfo)));
 	}
 

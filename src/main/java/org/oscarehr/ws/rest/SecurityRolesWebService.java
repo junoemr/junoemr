@@ -76,7 +76,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	public RestResponse<SecurityRoleTransfer> addRole(SecurityRoleTransfer transfer)
 	{
 		String providerNo = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
 		return RestResponse.successResponse(securityRolesService.addRole(providerNo, transfer));
 	}
 

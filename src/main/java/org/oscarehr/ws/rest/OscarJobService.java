@@ -160,7 +160,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Consumes("application/x-www-form-urlencoded")
 	public OscarJobResponse saveJob(MultivaluedMap<String, String> params)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJob job = new OscarJob();
 		job.setId(Integer.parseInt(params.getFirst("job.id")));
@@ -235,7 +235,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Consumes("application/x-www-form-urlencoded")
 	public OscarJobResponse saveCrontabExpression(MultivaluedMap<String, String> params)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TASKS);
 
 		Integer jobId = null;
 		try {jobId = Integer.parseInt(params.getFirst("scheduleJobId"));}catch(NumberFormatException e){
@@ -323,7 +323,7 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Consumes("application/x-www-form-urlencoded")
 	public OscarJobTypeResponse saveJobType(MultivaluedMap<String, String> params)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TASKS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TASKS);
 
 		OscarJobType job = new OscarJobType();
 		job.setId(Integer.parseInt(params.getFirst("jobType.id")));

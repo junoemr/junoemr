@@ -117,7 +117,7 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Operation(summary="Create a new tickler")
 	public RestResponse<TicklerTransferOutbound> createTickler( @Valid TicklerTransferInbound ticklerIn)
 	{
-		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TICKLER);
 
 		if (ticklerIn == null)
 		{

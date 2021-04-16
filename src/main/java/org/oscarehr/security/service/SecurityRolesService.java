@@ -288,7 +288,7 @@ public class SecurityRolesService
 		switch(privilege)
 		{
 			case SecurityInfoManager.ALL: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE);
-			case SecurityInfoManager.WRITE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.WRITE);
+			case SecurityInfoManager.CREATE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.CREATE);
 			case SecurityInfoManager.UPDATE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE);
 			case SecurityInfoManager.READ: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.READ); break;
 			case SecurityInfoManager.DELETE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE); break;
@@ -300,13 +300,13 @@ public class SecurityRolesService
 	{
 		String privilegeLevel = null;
 		if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE)
-				&& privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.WRITE))
+				&& privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.CREATE))
 		{
 			privilegeLevel = ALL;
 		}
-		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.WRITE))
+		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.CREATE))
 		{
-			privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.WRITE.asString();
+			privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.CREATE.asString();
 		}
 		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE))
 		{

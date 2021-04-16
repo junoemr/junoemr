@@ -86,7 +86,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.EDOC);
 
 		FormFile docFile = fm.getFiledata();
 		String fileName = docFile.getFileName();
@@ -147,7 +147,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.EDOC);
 
 		FormFile docFile = fm.getDocFile();
 		String fileName = docFile.getFileName();
@@ -195,7 +195,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.EDOC);
 		
 		if (fm.getMode().equals("") && fm.getFunction().equals("") && fm.getFunctionId().equals("")) {
 			// file size exceeds the upload limit

@@ -87,7 +87,7 @@ public class DemographicMergeService extends AbstractServiceImpl
 	@Path("/")
 	public void mergeDemographic(@QueryParam("parentId") Integer parentId, @QueryParam("childId") Integer childId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		List<Integer> children = new ArrayList<Integer>();
 		children.add(childId);

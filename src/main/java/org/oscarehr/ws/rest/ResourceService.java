@@ -183,7 +183,7 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.PREVENTION);
     	
 		try {

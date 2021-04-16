@@ -149,7 +149,7 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	public String addK2AReport(@PathParam("id") String id)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE,
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
 				SecObjectName.OBJECT_NAME.REPORT, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 
 		try

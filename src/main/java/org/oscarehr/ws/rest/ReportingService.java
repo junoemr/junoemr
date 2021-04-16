@@ -122,7 +122,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse addEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.REPORT);
 
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -145,7 +145,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse populateEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.REPORT);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		

@@ -42,7 +42,7 @@ public class RxWatermarkAction  extends DispatchAction
 	public ActionForward enableWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.CREATE, null,  "_admin");
 
 		boolean enableWatermark = Boolean.parseBoolean(request.getParameter("enable"));
 		RxWatermarkService.enableWatermark(enableWatermark);
@@ -54,7 +54,7 @@ public class RxWatermarkAction  extends DispatchAction
 	public ActionForward setWatermarkBackground(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.CREATE, null,  "_admin");
 
 		boolean isBackground = Boolean.parseBoolean(request.getParameter("isBackground"));
 		RxWatermarkService.setWatermarkBackground(isBackground);

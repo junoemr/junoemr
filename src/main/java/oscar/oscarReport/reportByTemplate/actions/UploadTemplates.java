@@ -71,7 +71,7 @@ public class UploadTemplates extends Action {
         String templateIdStr = request.getParameter("templateid");
         String templateIdStrReturn = templateIdStr;
 
-        securityInfoManager.requireOnePrivilege(sessionProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_admin.reporting", "_report");
+        securityInfoManager.requireOnePrivilege(sessionProviderNo, SecurityInfoManager.CREATE, null, "_admin", "_admin.reporting", "_report");
 
         String message;
         try

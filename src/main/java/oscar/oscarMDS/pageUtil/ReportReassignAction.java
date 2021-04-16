@@ -69,7 +69,7 @@ public class ReportReassignAction extends Action
 
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_lab");
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.CREATE, null, "_lab");
 
 		String providerNo = request.getParameter("providerNo");
 		String searchProviderNo = request.getParameter("searchProviderNo");

@@ -70,7 +70,7 @@ public class ManageTemplatesAction extends Action
 		boolean adminVerifiedChecked = Boolean.parseBoolean(request.getParameter("admin_verified"));
 		String sessionProviderNo = (String) request.getSession().getAttribute("user");
 
-		securityInfoManager.requireOnePrivilege(sessionProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_admin.reporting", "_report");
+		securityInfoManager.requireOnePrivilege(sessionProviderNo, SecurityInfoManager.CREATE, null, "_admin", "_admin.reporting", "_report");
 
 		String message;
 		try

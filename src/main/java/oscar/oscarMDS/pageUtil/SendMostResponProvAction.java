@@ -69,7 +69,7 @@ public class SendMostResponProvAction extends Action
 		String docLabId = request.getParameter("docLabId");
 		String docLabType = request.getParameter("docLabType");
 
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, demographicId, SecObjectName.OBJECT_NAME.LAB);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicId, SecObjectName.OBJECT_NAME.LAB);
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicId, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 
 		Demographic demographic = demographicDao.find(demographicId);

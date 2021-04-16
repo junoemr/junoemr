@@ -88,7 +88,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/{integrationId}/sync")
 	public RestResponse<List<String>> syncIntegrations(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		List<String> synced = imdHealthService.initializeAllUsers(getHttpServletRequest().getSession(), integrationId);
 		return RestResponse.successResponse(synced);
@@ -98,7 +98,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<Integer> updateIntegration(IMDHealthCredentialsTo1 credentials)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN);
 
 		Integration integration = imdHealthService.updateSSOCredentials(getHttpServletRequest().getSession(),
 		                                      credentials.getClientId(),

@@ -55,7 +55,7 @@ public final class RxAddAllergyAction extends Action
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.ALLERGY);
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ALLERGY);
 
 		int id = Integer.parseInt(request.getParameter("ID"));
 

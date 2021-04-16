@@ -103,7 +103,7 @@ public class DocumentWs extends AbstractWs {
 	@SkipContentLoggingInbound
 	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException, InterruptedException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.WRITE, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.EDOC);
 		// Decode document
 		Base64 base64 = new Base64();
 		byte[] docContents = base64.decode(docContentsBase64);
