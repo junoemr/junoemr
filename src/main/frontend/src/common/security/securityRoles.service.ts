@@ -36,7 +36,7 @@ angular.module("Common.Security").service("securityRolesService", [
 
 		service.loadUserRoles = async (): Promise<void> =>
 		{
-			service.rolesData = (await  securityApiService.getProviderApi().getCurrentUserSecurityRoles()).data.body;
+			service.rolesData = await securityApiService.getCurrentUserSecurityRoles();
 		}
 
 		/**

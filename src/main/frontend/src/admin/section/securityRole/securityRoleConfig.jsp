@@ -21,38 +21,36 @@
 * Canada
 --%>
 <div class="security-role-config">
-	<juno-security-check access="$ctrl.SecurityRole.ACCESS.ADMINSECURITY" permissions="$ctrl.SecurityRole.PRIVILEGE.READ">
-		<div class="flex-row justify-content-between align-items-center">
-			<h1>Manage Security Access Roles</h1>
+	<div class="flex-row justify-content-between align-items-center">
+		<h1>Manage Security Access Roles</h1>
 
-			<div class="button-wrapper">
-				<juno-button ng-if="!$ctrl.newRole"
-				             component-style="$ctrl.componentStyle"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-				             ng-click="$ctrl.onAddRole()"
-				             disabled="!$ctrl.canAddRole()">
-					Create New Role
-				</juno-button>
-			</div>
+		<div class="button-wrapper">
+			<juno-button ng-if="!$ctrl.newRole"
+			             component-style="$ctrl.componentStyle"
+			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+			             ng-click="$ctrl.onAddRole()"
+			             disabled="!$ctrl.canAddRole()">
+				Create New Role
+			</juno-button>
 		</div>
+	</div>
 
-		<table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
-			<tbody>
-			<tr ng-repeat="role in $ctrl.rolesList">
-				<td data-title="'Role'">
-					{{role.name}}
-				</td>
-				<td data-title="'Description'">
-					{{role.description}}
-				</td>
-				<td>
-					<juno-button click="$ctrl.onRoleDetails(role)">
-						Details
-					</juno-button>
-				</td>
-			</tr>
-			</tbody>
-		</table>
-	</juno-security-check>
+	<table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
+		<tbody>
+		<tr ng-repeat="role in $ctrl.rolesList">
+			<td data-title="'Role'">
+				{{role.name}}
+			</td>
+			<td data-title="'Description'">
+				{{role.description}}
+			</td>
+			<td>
+				<juno-button click="$ctrl.onRoleDetails(role)">
+					Details
+				</juno-button>
+			</td>
+		</tr>
+		</tbody>
+	</table>
 </div>

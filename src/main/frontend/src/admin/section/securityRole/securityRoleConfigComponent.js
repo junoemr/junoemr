@@ -41,7 +41,6 @@ angular.module('Admin.Section').component('securityRoleConfig',
 			function ($uibModal, NgTableParams, securityApiService, securityRolesService)
 			{
 				let ctrl = this;
-				ctrl.SecurityRole = SecurityRole;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -68,7 +67,7 @@ angular.module('Admin.Section').component('securityRoleConfig',
 				ctrl.$onInit = async () =>
 				{
 					ctrl.componentStyle = JUNO_STYLE.DEFAULT;
-					ctrl.rolesList = (await securityApiService.getSecurityRoleApi().getRoles()).data.body;
+					ctrl.rolesList = await securityApiService.getRoles();
 				}
 
 				ctrl.onRoleDetails = (role) =>

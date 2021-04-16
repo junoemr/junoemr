@@ -37,15 +37,39 @@ angular.module("Common.Security").service("securityApiService", [
         service.providerApi = new ProviderApi($http, $httpParamSerializer, '../ws/rs');
         service.securityRoleApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
-        service.getProviderApi = () : ProviderApi =>
+        service.getCurrentUserSecurityRoles = async (): Promise<any> =>
         {
-            return service.providerApi;
+            return (await service.providerApi.getCurrentUserSecurityRoles()).data.body;
         }
 
-        service.getSecurityRoleApi = () : SecurityRolesApi =>
+        service.getRoles = async (): Promise<any> =>
         {
-            return service.securityRoleApi;
+            return (await service.securityRoleApi.getRoles()).data.body;
         }
 
+        service.getRole = async (roleId): Promise<any> =>
+        {
+            return (await service.securityRoleApi.getRole(roleId)).data.body;
+        }
+
+        service.addRole = async (transfer): Promise<any> =>
+        {
+            return (await service.securityRoleApi.addRole(transfer)).data.body;
+        }
+
+        service.updateRole = async (roleId, transfer): Promise<any> =>
+        {
+            return (await service.securityRoleApi.updateRole(roleId, transfer)).data.body;
+        }
+
+        service.deleteRole = async (roleId): Promise<any> =>
+        {
+            return (await service.securityRoleApi.deleteRole(roleId)).data.body;
+        }
+
+        service.getAccessObjects = async (): Promise<any> =>
+        {
+            return (await service.securityRoleApi.getAccessObjects()).data.body;
+        }
     }
 ]);

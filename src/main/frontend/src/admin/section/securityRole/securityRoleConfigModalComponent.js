@@ -42,7 +42,6 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 			function ($uibModal, securityApiService, securityRolesService)
 			{
 				let ctrl = this;
-				ctrl.securityRolesApi = securityApiService.getSecurityRoleApi();
 				ctrl.PrivilegesEnum = SecurityRole.PRIVILEGE;
 
 				ctrl.permissionLevelValues = Object.freeze({
@@ -100,10 +99,10 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					}
 					else
 					{
-						ctrl.role = (await ctrl.securityRolesApi.getRole(ctrl.resolve.roleId)).data.body;
+						ctrl.role = await securityApiService.getRole(ctrl.resolve.roleId);
 					}
 
-					ctrl.allSecurityObjects = (await ctrl.securityRolesApi.getAccessObjects()).data.body;
+					ctrl.allSecurityObjects = await securityApiService.getAccessObjects();
 					ctrl.computeAccessList();
 					ctrl.isLoading = false;
 				}
@@ -132,13 +131,13 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					if(accessObject && accessObject.privileges)
 					{
 						if (accessObject.privileges.includes(ctrl.PrivilegesEnum.READ)
-							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.WRITE)
+							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.CREATE)
 							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.UPDATE)
 							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.DELETE))
 						{
 							return ctrl.permissionLevelValues.readUpdateWriteDelete;
 						}
-						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.WRITE))
+						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.CREATE))
 						{
 							return ctrl.permissionLevelValues.readUpdateWrite;
 						}
@@ -185,13 +184,13 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					{
 						permissions.push(ctrl.PrivilegesEnum.READ);
 						permissions.push(ctrl.PrivilegesEnum.UPDATE);
-						permissions.push(ctrl.PrivilegesEnum.WRITE);
+						permissions.push(ctrl.PrivilegesEnum.CREATE);
 					}
 					else if(permissionLevel === ctrl.permissionLevelValues.readUpdateWriteDelete)
 					{
 						permissions.push(ctrl.PrivilegesEnum.READ);
 						permissions.push(ctrl.PrivilegesEnum.UPDATE);
-						permissions.push(ctrl.PrivilegesEnum.WRITE);
+						permissions.push(ctrl.PrivilegesEnum.CREATE);
 						permissions.push(ctrl.PrivilegesEnum.DELETE);
 					}
 					return permissions;
@@ -238,11 +237,11 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					{
 						ctrl.isLoading = true;
 						ctrl.translateAccessListToModel();
-						ctrl.securityRolesApi.updateRole(ctrl.role.id, ctrl.role).then((response) =>
+						securityApiService.updateRole(ctrl.role.id, ctrl.role).then((response) =>
 						{
 							ctrl.modalInstance.close({
 								operation: ctrl.resolve.operationEnum.UPDATE,
-								data: response.data.body
+								data: response,
 							});
 						}).catch(ctrl.errorFunction
 						).finally(() =>
@@ -256,11 +255,11 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				{
 					ctrl.isLoading = true;
 					ctrl.translateAccessListToModel();
-					ctrl.securityRolesApi.addRole(ctrl.role).then((response) =>
+					securityApiService.addRole(ctrl.role).then((response) =>
 					{
 						ctrl.modalInstance.close({
 							operation: ctrl.resolve.operationEnum.ADD,
-							data: response.data.body
+							data: response,
 						});
 					}).catch(ctrl.errorFunction
 					).finally(() =>
@@ -279,7 +278,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					if(userOk)
 					{
 						ctrl.isLoading = true;
-						ctrl.securityRolesApi.deleteRole(ctrl.role.id).then((response) =>
+						securityApiService.deleteRole(ctrl.role.id).then((response) =>
 						{
 							ctrl.modalInstance.close({
 								operation: ctrl.resolve.operationEnum.DELETE,
