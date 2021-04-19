@@ -83,14 +83,12 @@ public class SSOUser implements Serializable
 
 	/**
 	 * Check if a provider can be converted to an valid SSOUser.
-	 * A valid provider has a non-empty unique identifier.
 	 *
 	 * @param provider provider to check
 	 * @return true if able to convert
 	 */
 	public static boolean canConvertProvider(ProviderData provider)
 	{
-		return provider != null &&
-				ConversionUtils.hasContent(provider.getImdHealthUuid());
+		return provider != null;
 	}
 }
