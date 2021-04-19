@@ -292,7 +292,7 @@ public class IMDHealthService
 
 		return errors;
 	}
-
+	
 	/**
 	 * Generate an SSO session for each of the given providers, using the clinic as the organization.  This generates
 	 * a linkage between the organization (clinic) and user (provider) on the iMDHealth app.
@@ -311,19 +311,25 @@ public class IMDHealthService
 	private List<String> loginProviderClinic(BearerToken token, List<ProviderData> providers) throws IMDHealthException
 	{
 		List<String> failedProviderClinicList = new ArrayList<>();
-
+		
 		for (ProviderData providerData : providers)
 		{
-			boolean success = SSOUser.canConvertProvider(providerData) && registerProviderAtClinic(token, providerData);
-			if (!success)
+			if (SSOUser.canConvertProvider(providerData))
+			{
+				if (!registerProviderAtClinic(token, providerData))
+				{
+					failedProviderClinicList.add(providerData.getDisplayName() + ": was unable to be registered with the clinic");
+				}
+			}
+			else
 			{
 				failedProviderClinicList.add(providerData.getDisplayName() + ": is missing required information.");
 			}
 		}
-
+		
 		return failedProviderClinicList;
 	}
-
+	
 	/**
 	 * Generate an SSO session for each of the given providers, using the site as the organization.  This generates
 	 * a linkage between the organization (site) and user (provider) on the iMDHealth app.
@@ -343,20 +349,22 @@ public class IMDHealthService
 	private List<String> loginProviderSite(BearerToken token, Site site, Set<ProviderData> providers) throws IMDHealthException
 	{
 		List<String> failedProviderSiteList = new ArrayList<>();
-
+		
 		for (ProviderData provider : providers)
 		{
 			if (SSOUser.canConvertProvider(provider))
 			{
-				boolean success = SSOUser.canConvertProvider(provider) && registerProviderAtSite(token, provider, site);
-
+				boolean success = registerProviderAtSite(token, provider, site);
+				
 				if (!success)
 				{
-					failedProviderSiteList.add("Provider is missing required data: " + provider.getDisplayName());
+					failedProviderSiteList.add(provider.getDisplayName() + ": was unable to be registered with " + site.getName());
 				}
 			}
+			// We already know if the provider can't be converted to an SSOUser when we previously tried to register them with the clinic
+			// so ignore the error the second time around.
 		}
-
+		
 		return failedProviderSiteList;
 	}
 

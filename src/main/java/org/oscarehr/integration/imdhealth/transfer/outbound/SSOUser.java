@@ -27,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.provider.model.ProviderData;
-import oscar.util.ConversionUtils;
 
 import java.io.Serializable;
 
