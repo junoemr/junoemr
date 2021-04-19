@@ -46,7 +46,8 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.conversion.ConsultationRequestConverter;
+import org.oscarehr.ws.rest.conversion.ConsultationRequestDomainConverter;
+import org.oscarehr.ws.rest.conversion.ConsultationRequestTransferConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationResponseConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationServiceConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
@@ -112,8 +113,13 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 	@Autowired
 	private ConsultationAttachmentService consultationAttachmentService;
-	
-	private ConsultationRequestConverter requestConverter = new ConsultationRequestConverter();
+
+	@Autowired
+	private ConsultationRequestTransferConverter consultationRequestTransferConverter;
+
+	@Autowired
+	private ConsultationRequestDomainConverter consultationRequestDomainConverter;
+
 	private ConsultationResponseConverter responseConverter = new ConsultationResponseConverter();
 	private ConsultationServiceConverter serviceConverter = new ConsultationServiceConverter();
 	private ProfessionalSpecialistConverter specialistConverter = new ProfessionalSpecialistConverter();
@@ -240,7 +246,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			{
 				return RestResponse.errorResponse("No Consult found with id " + requestId);
 			}
-			request = requestConverter.getAsTransferObject(getLoggedInInfo(), consult);
+			request = consultationRequestTransferConverter.convert(consult);
 			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
 
 			request.setFaxList(getFaxList());
@@ -335,15 +341,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationRequestTo1> saveRequest(ConsultationRequestTo1 data)
 	{
-		ConsultationRequest request;
-		if(data.getId() == null)
-		{ //new consultation request
-			request = requestConverter.getAsDomainObject(getLoggedInInfo(), data);
-		}
-		else
-		{
-			request = requestConverter.getAsDomainObject(data, consultationManager.getRequest(getLoggedInInfo(), data.getId()));
-		}
+		ConsultationRequest request = consultationRequestDomainConverter.convert(data);
 		request.setProfessionalSpecialist(consultationManager.getProfessionalSpecialist(data.getProfessionalSpecialist().getId()));
 		consultationManager.saveConsultationRequest(getLoggedInInfo(), request);
 		if(data.getId() == null) data.setId(request.getId());
