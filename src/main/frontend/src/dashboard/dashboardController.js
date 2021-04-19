@@ -23,6 +23,8 @@
     Ontario, Canada
 
 */
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
     '$scope',
@@ -36,6 +38,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
     'k2aService',
     'noteService',
     'securityService',
+    'securityRolesService',
     'personaService',
 
     function($scope,
@@ -49,10 +52,12 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
              k2aService,
              noteService,
              securityService,
+             securityRolesService,
              personaService)
     {
 
         var controller = this;
+	    controller.SecurityPermissions = SecurityPermissions;
 
         // Intervals for periodic updates
         controller.dashboardInterval = undefined;
@@ -83,31 +88,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 console.log(errors);
             });
 
-        securityService.hasRights(
-            {
-                items: [
-                    {
-                        objectName: '_tickler',
-                        privilege: 'w'
-                    },
-                    {
-                        objectName: '_tickler',
-                        privilege: 'r'
-                    }]
-            }).then(
-            function success(results)
-            {
-                if (results.content != null && results.content.length == 2)
-                {
-                    controller.ticklerWriteAccess = results.content[0];
-                    controller.ticklerReadAccess = results.content[1];
-                }
-            },
-            function error(errors)
-            {
-                console.log(errors);
-            });
-
         controller.inboxTableParams = new NgTableParams(
             {
                 page: 1, // show first page
@@ -117,40 +97,45 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 // total: 0, // length of data
                 getData: function(params)
                 {
-
-
-                    return inboxService.getDashboardItems(params.count()).then(
-                        function success(results)
-                        {
-                            console.log('INBOX DATA: ', results);
-                            params.total(results.total); // recal. page nav controls
-                            return results.content;
-                        },
-                        function error(errors)
-                        {
-                            console.log(errors);
-                        });
+                	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DOCUMENT_READ, SecurityPermissions.LAB_READ, SecurityPermissions.HRM_READ))
+	                {
+		                return inboxService.getDashboardItems(params.count()).then(
+			                function success(results)
+			                {
+				                console.log('INBOX DATA: ', results);
+				                params.total(results.total); // recal. page nav controls
+				                return results.content;
+			                },
+			                function error(errors)
+			                {
+				                console.log(errors);
+			                });
+	                }
+                	return null;
                 }
             });
 
         controller.openInbox = function openInbox()
         {
-            newwindow = window.open('../dms/inboxManage.do?method=prepareForIndexPage', 'inbox', 'height=700,width=1000');
+            const newWindow = window.open('../dms/inboxManage.do?method=prepareForIndexPage', 'inbox', 'height=700,width=1000');
             if (window.focus)
             {
-                newwindow.focus();
+                newWindow.focus();
             }
         };
 
 
 	    controller.updateK2aActive = function ()
 	    {
-		    k2aService.isK2AInit().then(
-			    function success(data)
-			    {
-				    controller.k2aActive = data;
-			    }
-		    );
+	    	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2A_READ))
+		    {
+			    k2aService.isK2AInit().then(
+				    function success(data)
+				    {
+					    controller.k2aActive = data;
+				    }
+			    );
+		    }
 	    };
 	    controller.loadMoreK2aFeed = function ()
 	    {
@@ -258,100 +243,108 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         controller.updateTicklers = function updateTicklers()
         {
-            //consider the option to have overdue only or not
-            ticklerService.search(
-                {
-                    status: 'A',
-                    assignee: controller.me.providerNo,
-                    overdueOnly: 'property'
-                }, 0, 6).then(
-                function success(results)
-                {
-                    controller.totalTicklers = results.total;
-                    if (results.content == null)
-                    {
-                        return;
-                    }
+        	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_READ))
+	        {
+		        //consider the option to have overdue only or not
+		        ticklerService.search(
+			        {
+				        status: 'A',
+				        assignee: controller.me.providerNo,
+				        overdueOnly: 'property'
+			        }, 0, 6).then(
+			        function success(results)
+			        {
+				        controller.totalTicklers = results.total;
+				        if (results.content == null)
+				        {
+					        return;
+				        }
 
-                    if (results.content instanceof Array)
-                    {
-                        controller.ticklers = results.content;
-                    }
-                    else
-                    {
-                        var arr = new Array();
-                        arr[0] = results.content;
-                        controller.ticklers = arr;
-                    }
-                },
-                function error(errors)
-                {
-                    console.log(errors);
-                });
+				        if (results.content instanceof Array)
+				        {
+					        controller.ticklers = results.content;
+				        }
+				        else
+				        {
+					        var arr = new Array();
+					        arr[0] = results.content;
+					        controller.ticklers = arr;
+				        }
+			        },
+			        function error(errors)
+			        {
+				        console.log(errors);
+			        });
+	        }
         };
 
         controller.updateMessages = function updateMessages()
         {
-            messageService.getUnread(6).then(
-                function success(results)
-                {
-                    controller.totalMessages = results.total;
+        	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MESSAGE_READ))
+	        {
+		        messageService.getUnread(6).then(
+			        function success(results)
+			        {
+				        controller.totalMessages = results.total;
 
-                    if (results.content == null)
-                    {
-                        return;
-                    }
+				        if (results.content == null)
+				        {
+					        return;
+				        }
 
-                    if (results.content instanceof Array)
-                    {
-                        controller.messages = results.content;
-                    }
-                    else
-                    {
-                        var arr = new Array();
-                        arr[0] = results.content;
-                        controller.messages = arr;
-                    }
-                },
-                function error(errors)
-                {
-                    console.log(errors);
-                });
-
+				        if (results.content instanceof Array)
+				        {
+					        controller.messages = results.content;
+				        }
+				        else
+				        {
+					        var arr = new Array();
+					        arr[0] = results.content;
+					        controller.messages = arr;
+				        }
+			        },
+			        function error(errors)
+			        {
+				        console.log(errors);
+			        });
+	        }
         };
 
         controller.updateReports = function updateReports()
         {
-            //TODO-legacy: changed to return 5 since that is all we are using at the moment
-            inboxService.getDashboardItems(5).then(
-                function success(results)
-                {
-                    if (results.content == null)
-                    {
-                        return;
-                    }
+	        if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DOCUMENT_READ, SecurityPermissions.LAB_READ, SecurityPermissions.HRM_READ))
+	        {
+		        //TODO-legacy: changed to return 5 since that is all we are using at the moment
+		        inboxService.getDashboardItems(5).then(
+			        function success(results)
+			        {
+				        if (results.content == null)
+				        {
+					        return;
+				        }
 
-                    if (results.content instanceof Array)
-                    {
-                        controller.inbox = results.content;
-                    }
-                    else
-                    {
-                        var arr = new Array();
-                        arr[0] = results.content;
-                        controller.inbox = arr;
-                    }
-                    controller.totalInbox = results.total;
-                },
-                function error(errors)
-                {
-                    console.log(errors);
-                });
+				        if (results.content instanceof Array)
+				        {
+					        controller.inbox = results.content;
+				        }
+				        else
+				        {
+					        var arr = new Array();
+					        arr[0] = results.content;
+					        controller.inbox = arr;
+				        }
+				        controller.totalInbox = results.total;
+			        },
+			        function error(errors)
+			        {
+				        console.log(errors);
+			        });
+	        }
         };
 
         controller.updateFeed = function updateFeed(startPoint, numberOfRows)
         {
-            if (controller.busyLoadingData) return;
+            if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2A_READ) || controller.busyLoadingData) return;
             controller.busyLoadingData = true;
             k2aService.getK2aFeed(startPoint, numberOfRows).then(
                 function(response)

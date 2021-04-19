@@ -77,13 +77,13 @@ public class RSSFeedService extends AbstractServiceImpl {
 			@QueryParam("numberOfRows") String numberOfRows,
 			@Context HttpServletRequest request)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.APP_DEFINITION, SecObjectName.OBJECT_NAME.REPORT);
-
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {
 			if(key.equals("k2a")) {
+				securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+						SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+
 				AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	    		AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
 	    		

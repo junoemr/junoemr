@@ -1,3 +1,4 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Layout').component("primaryNavigation", {
 	bindings: {},
@@ -12,6 +13,7 @@ angular.module('Layout').component("primaryNavigation", {
 		"$uibModal",
 		"$interval",
 		"securityService",
+		"securityRolesService",
 		"personaService",
 		"billingService",
 		"consultService",
@@ -28,6 +30,7 @@ angular.module('Layout').component("primaryNavigation", {
 		          $uibModal,
 		          $interval,
 		          securityService,
+		          securityRolesService,
 		          personaService,
 		          billingService,
 		          consultService,
@@ -67,36 +70,6 @@ angular.module('Layout').component("primaryNavigation", {
 				function success(results)
 				{
 					ctrl.billRegion = results.message;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-
-			securityService.hasRights(
-				{
-					items: [
-						{
-							objectName: '_search',
-							privilege: 'r'
-						},
-						{
-							objectName: '_demographic',
-							privilege: 'w'
-						},
-						{
-							objectName: '_msg',
-							privilege: 'r'
-						}]
-				}).then(
-				function success(results)
-				{
-					if (results.content !== null)
-					{
-						ctrl.searchRights = results.content[0];
-						ctrl.newDemographicRights = results.content[1];
-						ctrl.messageRights = results.content[2];
-					}
 				},
 				function error(errors)
 				{
@@ -287,85 +260,98 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
-			inboxService.getUnAckLabDocCount().then(
-				function success(results)
-				{
-					ctrl.unAckLabDocTotal = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LAB_READ, SecurityPermissions.HRM_READ))
+			{
+				inboxService.getUnAckLabDocCount().then(
+					function success(results)
+					{
+						ctrl.unAckLabDocTotal = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
+			}
 		};
 		ctrl.getUnclaimedInboxCount = function()
 		{
-
-			inboxService.getInboxCountByStatus(0,"N").then(
-				function success(results)
-				{
-					ctrl.unclaimedCount = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				}
-			);
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LAB_READ, SecurityPermissions.DOCUMENT_READ, SecurityPermissions.HRM_READ))
+			{
+				inboxService.getInboxCountByStatus(0, "N").then(
+					function success(results)
+					{
+						ctrl.unclaimedCount = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+			}
 		};
 
 		ctrl.getUnreadMessageCount = function getUnreadMessageCount()
 		{
-			messageService.getUnreadCount().then(
-				function success(results)
-				{
-					ctrl.unreadMessageTotal = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MESSAGE_READ))
+			{
+				messageService.getUnreadCount().then(
+					function success(results)
+					{
+						ctrl.unreadMessageTotal = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
+			}
 		};
 
 		ctrl.getOverdueTicklerCount = function getOverdueTicklerCount()
 		{
-			ticklerService.search(
-				{
-					status: 'A',
-					assignee: ctrl.me.providerNo,
-					overdueOnly: 'property'
-				}, 0, 6).then(
-				function success(results)
-				{
-					ctrl.ticklerTotal = results.total;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				}
-			);
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_READ))
+			{
+				ticklerService.search(
+					{
+						status: 'A',
+						assignee: ctrl.me.providerNo,
+						overdueOnly: 'property'
+					}, 0, 6).then(
+					function success(results)
+					{
+						ctrl.ticklerTotal = results.total;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+			}
 		};
 
 		ctrl.getActiveConsultationCount = function getActiveConsultationCount()
 		{
-			// Any consultations that should have ended after this point but haven't need to be alerted for
-			var endDate = moment().subtract(ctrl.consultationLookbackPeriod, "months").toISOString();
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_READ))
+			{
+				// Any consultations that should have ended after this point but haven't need to be alerted for
+				var endDate = moment().subtract(ctrl.consultationLookbackPeriod, "months").toISOString();
 
-			consultService.getTotalRequests(
-				{
-					invertStatus: true,
-					referralEndDate: endDate,
-					status: '4',
-					team: ctrl.consultationTeamWarning
-				}).then(
-				function success(results)
-				{
-					ctrl.activeConsultationTotal = results.data;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				}
-			);
+				consultService.getTotalRequests(
+					{
+						invertStatus: true,
+						referralEndDate: endDate,
+						status: '4',
+						team: ctrl.consultationTeamWarning
+					}).then(
+					function success(results)
+					{
+						ctrl.activeConsultationTotal = results.data;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+			}
 		};
 
 		ctrl.getNavBar = function getNavBar()
