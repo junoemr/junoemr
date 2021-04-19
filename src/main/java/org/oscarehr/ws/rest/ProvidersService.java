@@ -142,4 +142,14 @@ public class ProvidersService extends AbstractServiceImpl
 
 		return RestResponse.successResponse(userRoles);
 	}
+
+	@GET
+	@Path("/active")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<ProviderTo1>> getActive()
+	{
+		List<Provider> providers = providerDao.getActiveProviders();
+		List<ProviderTo1> providersTo1 = providerConverter.getAllAsTransferObjects(getLoggedInInfo(), providers);
+		return RestResponse.successResponse(providersTo1);
+	}
 }

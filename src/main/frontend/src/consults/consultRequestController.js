@@ -1,3 +1,5 @@
+import {LABEL_POSITION} from "../common/components/junoComponentConstants";
+
 angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 	'$scope',
@@ -12,6 +14,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	'summaryService',
 	'staticDataService',
 	'consult',
+	'providersService',
 	'user',
 
 	function(
@@ -27,6 +30,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		summaryService,
 		staticDataService,
 		consult,
+		providersService,
 		user)
 	{
 
@@ -34,7 +38,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.consult = consult;
 
-		console.log(consult);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
 		consult.serviceList = Juno.Common.Util.toArray(consult.serviceList);
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
@@ -60,6 +63,8 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.initialize = function()
 		{
+			controller.labelPosition = controller.labelPosition || LABEL_POSITION.TOP;
+
 			//get access rights
 			securityService.hasRight("_con", "r").then(
 				function success(results)
@@ -157,8 +162,32 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			//set attachments
 			consult.attachments = Juno.Common.Util.toArray(consult.attachments);
 			Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
+
+			providersService.getActiveProviders().then(
+				function success(result)
+				{
+					controller.providers = [];
+					for (let provider of result)
+					{
+						controller.providers.push({
+							label: provider.name,
+							value: provider.providerNo
+						})
+					}
+				},
+				function error(result)
+				{
+					console.error("Failed to get provider list with error: " + result);
+				}
+			)
 		};
 		controller.initialize();
+
+		// providerNo is what is used as the referral provider for saving
+		controller.onReferralPractitionerSelected = (provider) =>
+		{
+			controller.consult.providerNo = provider;
+		};
 
 		controller.changeLetterhead = function changeLetterhead(letterhead)
 		{
@@ -356,7 +385,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		{
 			if (consult.appointmentHour != null && consult.appointmentMinute != null && !consult.patientWillBook)
 			{
-				apptTime = moment(Date.now());
+				let apptTime = moment(Date.now());
 				apptTime.set('hours', consult.appointmentHour);
 				apptTime.set('minute', consult.appointmentMinute);
 				consult.appointmentTime = apptTime;
@@ -437,10 +466,10 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				controller.consultSaving = true; //show saving banner
 				controller.setAppointmentTime();
 
-				consultService.saveRequest(consult).then(
+				consultService.saveRequest(controller.consult).then(
 					function success(results)
 					{
-						if (consult.id == null)
+						if (controller.consult.id == null)
 						{
 							$location.path("/record/" + consult.demographicId + "/consult/" + results.id);
 						}

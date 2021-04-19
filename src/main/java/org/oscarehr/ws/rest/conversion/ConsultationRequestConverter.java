@@ -31,37 +31,38 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConsultationRequestConverter extends AbstractConverter<ConsultationRequest, ConsultationRequestTo1> {
 	
-	public ConsultationRequest getAsDomainObject(LoggedInInfo loggedInInfo, ConsultationRequestTo1 t, ConsultationRequest d) throws ConversionException {
-		d.setAllergies(t.getAllergies());
-		d.setAppointmentDate(t.getAppointmentDate());
-		d.setAppointmentTime(t.getAppointmentTime());
-		d.setClinicalInfo(t.getClinicalInfo());
-		d.setConcurrentProblems(t.getConcurrentProblems());
-		d.setCurrentMeds(t.getCurrentMeds());
-		d.setDemographicId(t.getDemographicId());
-		d.setFollowUpDate(t.getFollowUpDate());
-		d.setLetterheadAddress(t.getLetterheadAddress());
-		d.setLetterheadFax(t.getLetterheadFax());
-		d.setLetterheadName(t.getLetterheadName());
-		d.setLetterheadPhone(t.getLetterheadPhone());
-		d.setPatientWillBook(t.isPatientWillBook());
-		d.setProviderNo(t.getProviderNo());
-		d.setReasonForReferral(t.getReasonForReferral());
-		d.setReferralDate(t.getReferralDate());
-		d.setSendTo(t.getSendTo());
-		d.setServiceId(t.getServiceId());
-		d.setSignatureImg(t.getSignatureImg());
-		d.setSiteName(t.getSiteName());
-		d.setStatus(t.getStatus());
-		d.setStatusText(t.getStatusText());
-		d.setUrgency(t.getUrgency());
+	public ConsultationRequest getAsDomainObject(ConsultationRequestTo1 transfer, ConsultationRequest domain) throws ConversionException
+	{
+		domain.setAllergies(transfer.getAllergies());
+		domain.setAppointmentDate(transfer.getAppointmentDate());
+		domain.setAppointmentTime(transfer.getAppointmentTime());
+		domain.setClinicalInfo(transfer.getClinicalInfo());
+		domain.setConcurrentProblems(transfer.getConcurrentProblems());
+		domain.setCurrentMeds(transfer.getCurrentMeds());
+		domain.setDemographicId(transfer.getDemographicId());
+		domain.setFollowUpDate(transfer.getFollowUpDate());
+		domain.setLetterheadAddress(transfer.getLetterheadAddress());
+		domain.setLetterheadFax(transfer.getLetterheadFax());
+		domain.setLetterheadName(transfer.getLetterheadName());
+		domain.setLetterheadPhone(transfer.getLetterheadPhone());
+		domain.setPatientWillBook(transfer.isPatientWillBook());
+		domain.setProviderNo(transfer.getProviderNo());
+		domain.setReasonForReferral(transfer.getReasonForReferral());
+		domain.setReferralDate(transfer.getReferralDate());
+		domain.setSendTo(transfer.getSendTo());
+		domain.setServiceId(transfer.getServiceId());
+		domain.setSignatureImg(transfer.getSignatureImg());
+		domain.setSiteName(transfer.getSiteName());
+		domain.setStatus(transfer.getStatus());
+		domain.setStatusText(transfer.getStatusText());
+		domain.setUrgency(transfer.getUrgency());
 		
-		return d;
+		return domain;
 	}
 	
 	@Override
 	public ConsultationRequest getAsDomainObject(LoggedInInfo loggedInInfo, ConsultationRequestTo1 t) throws ConversionException {
-		return getAsDomainObject(loggedInInfo, t, new ConsultationRequest());
+		return getAsDomainObject(t, new ConsultationRequest());
 	}
 
 	@Override

@@ -246,7 +246,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request.setFaxList(getFaxList());
 			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
 			request.setSendToList(providerDao.getActiveTeams());
-			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
 		}
 		catch(Exception e)
 		{
@@ -343,7 +342,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		}
 		else
 		{
-			request = requestConverter.getAsDomainObject(getLoggedInInfo(), data, consultationManager.getRequest(getLoggedInInfo(), data.getId()));
+			request = requestConverter.getAsDomainObject(data, consultationManager.getRequest(getLoggedInInfo(), data.getId()));
 		}
 		request.setProfessionalSpecialist(consultationManager.getProfessionalSpecialist(data.getProfessionalSpecialist().getId()));
 		consultationManager.saveConsultationRequest(getLoggedInInfo(), request);
