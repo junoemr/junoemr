@@ -26,7 +26,7 @@ import {
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
-import {SecurityRole} from "../../../common/security/securityConstants";
+import {SecurityPermissions, SecurityRole} from "../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('securityRoleConfigModal',
 	{
@@ -198,9 +198,16 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.canEdit = () =>
 				{
-					return securityRolesService.hasSecurityPrivileges(
-						SecurityRole.ACCESS.ADMINSECURITY,
-						ctrl.PrivilegesEnum.UPDATE);
+					if(ctrl.newRole)
+					{
+						return securityRolesService.hasSecurityPrivileges(
+							SecurityPermissions.CONFIGURE_SECURITY_ROLES_CREATE);
+					}
+					else
+					{
+						return securityRolesService.hasSecurityPrivileges(
+							SecurityPermissions.CONFIGURE_SECURITY_ROLES_UPDATE);
+					}
 				}
 
 				ctrl.canSave = () =>
@@ -211,8 +218,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				ctrl.canDelete = () =>
 				{
 					return !ctrl.isLoading && securityRolesService.hasSecurityPrivileges(
-						SecurityRole.ACCESS.ADMINSECURITY,
-						ctrl.PrivilegesEnum.DELETE);
+						SecurityPermissions.CONFIGURE_SECURITY_ROLES_DELETE);
 				}
 
 				ctrl.onCancel = () =>

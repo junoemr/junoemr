@@ -27,7 +27,7 @@ import {
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
-import {SecurityRole} from "../../../common/security/securityConstants";
+import {SecurityPermissions} from "../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('securityRoleConfig',
 	{
@@ -82,7 +82,7 @@ angular.module('Admin.Section').component('securityRoleConfig',
 
 				ctrl.canAddRole = () =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityRole.PERMISSIONS.CONFIGURESECURITYROLESCREATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONFIGURE_SECURITY_ROLES_CREATE);
 				}
 
 				ctrl.openDetailsModal = (role, newRole) =>

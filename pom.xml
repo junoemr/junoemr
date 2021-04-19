@@ -2032,7 +2032,7 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>5.1.0</version>
 				<executions>
 					<execution>
 						<id>generate-typescript-api</id>
@@ -2042,8 +2042,12 @@
 						</goals>
 						<configuration>
 							<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
-							<generatorName>typescript-angularjs</generatorName>
+							<generatorName>typescript-angularjs-deprecated</generatorName>
 							<output>src/main/frontend/generated/</output>
+							<skipValidateSpec>true</skipValidateSpec>
+							<additionalProperties>
+								<additionalProperty>enumPropertyNaming=original</additionalProperty>
+							</additionalProperties>
 						</configuration>
 					</execution>
 				</executions>
@@ -2090,11 +2094,6 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-						<configuration>
-							<target>
-								<exec resolveexecutable="true" executable="fix_openapi_generate_hack.sh"></exec>
-							</target>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

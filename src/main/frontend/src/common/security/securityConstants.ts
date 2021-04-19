@@ -26,5 +26,6 @@ import {SecurityObjectTransfer, SecurityPermissionTransfer} from "../../../gener
 export const SecurityRole = {
     ACCESS: SecurityObjectTransfer.NameEnum,
     PRIVILEGE_LEVEL: SecurityObjectTransfer.PrivilegesEnum,
-    PERMISSIONS: SecurityPermissionTransfer.PermissionEnum,
 }
+
+export const SecurityPermissions = SecurityPermissionTransfer.PermissionEnum;
