@@ -25,7 +25,7 @@
 
  */
 
-import {SecurityObjectTransfer, SecurityPermissionTransfer, UserSecurityRolesTransfer} from "../../../generated";
+import {SecurityPermissionTransfer, UserSecurityRolesTransfer} from "../../../generated";
 
 angular.module("Common.Security").service("securityRolesService", [
 	'securityApiService',
@@ -40,41 +40,17 @@ angular.module("Common.Security").service("securityRolesService", [
 		}
 
 		/**
-		 * make the security check available to all pages
-		 * @param access - the access required
-		 * @param requiredPrivileges - the privilege levels required
-		 */
-		service.hasSecurityPrivileges = (access: SecurityObjectTransfer.NameEnum, ...requiredPrivileges: SecurityObjectTransfer.PrivilegesEnum[]): boolean =>
-		{
-			if (service.rolesData && service.rolesData.accessObjects[access])
-			{
-				const userPrivileges = service.rolesData.accessObjects[access].privileges;
-				if (userPrivileges)
-				{
-					for (let i = 0; i < requiredPrivileges.length; i++)
-					{
-						if (!userPrivileges.includes(requiredPrivileges[i]))
-						{
-							return false;
-						}
-					}
-					return true;
-				}
-			}
-			return false;
-		}
-
-		/**
 		 * check the current users privileges, return true if all requirements are met
 		 * @param requiredPrivileges - the privileges required
 		 */
 		service.hasSecurityPrivileges = (...requiredPrivileges: SecurityPermissionTransfer.PermissionEnum[]): boolean =>
 		{
-			if (service.rolesData && service.rolesData.accessObjects)
+			if (service.rolesData && service.rolesData.securityPermissions)
 			{
+				const permissions = service.rolesData.securityPermissions.map((value) => value.permission);
 				for (let i = 0; i < requiredPrivileges.length; i++)
 				{
-					if(!service.rolesData.securityPermissions.includes(requiredPrivileges[i]))
+					if(!permissions.includes(requiredPrivileges[i]))
 					{
 						return false;
 					}

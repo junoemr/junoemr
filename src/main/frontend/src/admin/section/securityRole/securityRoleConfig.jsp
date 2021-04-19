@@ -29,7 +29,7 @@
 			             component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-			             ng-click="$ctrl.onAddRole()"
+			             click="$ctrl.onAddRole()"
 			             disabled="!$ctrl.canAddRole()">
 				Create New Role
 			</juno-button>

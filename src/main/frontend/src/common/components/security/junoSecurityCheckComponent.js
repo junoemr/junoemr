@@ -25,7 +25,6 @@ angular.module('Common.Components').component('junoSecurityCheck',
 {
     templateUrl: 'src/common/components/security/junoSecurityCheck.jsp',
     bindings: {
-        access: '<',
         permissions: '<',
     },
     transclude: true,
@@ -50,7 +49,7 @@ angular.module('Common.Components').component('junoSecurityCheck',
 
         ctrl.hasPermissions = () =>
         {
-            return securityRolesService.hasSecurityPrivileges(ctrl.access, ...ctrl.permissions);
+            return securityRolesService.hasSecurityPrivileges(...ctrl.permissions);
         }
 
     }]

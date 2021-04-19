@@ -74,7 +74,7 @@
 						<juno-button component-style="$ctrl.resolve.style"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             ng-click="$ctrl.onDelete()"
+						             click="$ctrl.onDelete()"
 						             disabled="$ctrl.newRole || !$ctrl.canDelete()">
 							Delete
 						</juno-button>
@@ -87,7 +87,7 @@
 						<juno-button component-style="$ctrl.resolve.style"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-						             ng-click="$ctrl.onCancel()">
+						             click="$ctrl.onCancel()">
 							Cancel
 						</juno-button>
 					</div>
@@ -96,7 +96,7 @@
 						             component-style="$ctrl.resolve.style"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             ng-click="$ctrl.onCreate()"
+						             click="$ctrl.onCreate()"
 						             disabled="!$ctrl.canSave()">
 							Add Role
 						</juno-button>
@@ -104,7 +104,7 @@
 						             component-style="$ctrl.resolve.style"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             ng-click="$ctrl.onUpdate()"
+						             click="$ctrl.onUpdate()"
 						             disabled="!$ctrl.canSave()">
 							Save Role
 						</juno-button>
