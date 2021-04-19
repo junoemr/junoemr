@@ -40,8 +40,6 @@ angular.module('Common.Components').component('junoSelectSave',
                 let ctrl = this;
 
                 $scope.LABEL_POSITION = LABEL_POSITION;
-                ctrl.oldNgModel = null;
-                ctrl.value = "";
 
                 ctrl.onClick = () =>
                 {
