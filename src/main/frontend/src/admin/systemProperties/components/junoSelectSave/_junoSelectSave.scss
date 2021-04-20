@@ -1,0 +1,17 @@
+.juno-select-save {
+  .container {
+    display: flex;
+    flex-flow: row;
+    align-content: flex-start;
+  }
+  .left {
+    width: 80%;
+    overflow: hidden;
+  }
+  .right {
+    width: 5%;
+    flex: none;
+    margin-right:30%;
+    overflow: hidden;
+  }
+}
