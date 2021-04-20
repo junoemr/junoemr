@@ -372,6 +372,11 @@ angular.module('Layout').component("primaryNavigation", {
 				});
 		};
 
+		ctrl.patientSearchEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
+		}
+
 		// when patient typeahead search button is clicked
 		ctrl.onPatientSearch = function onPatientSearch(search)
 		{
@@ -563,6 +568,11 @@ angular.module('Layout').component("primaryNavigation", {
 				'scratch', 'height=700,width=1024,scrollbars=1');
 			win.focus();
 		};
+
+		ctrl.patientCreationEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_CREATE);
+		}
 
 		ctrl.newDemographic = function newDemographic(size)
 		{

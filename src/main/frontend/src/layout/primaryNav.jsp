@@ -18,6 +18,7 @@
 					<form class="vertical-align patient-search-form" role="search">
 						<div class="form-group breakpoint-sm-visible" ng-cloak>
 							<juno-patient-search-typeahead
+									juno-disabled="!$ctrl.patientSearchEnabled()"
 									juno-model="$ctrl.demographicSearch"
 									juno-icon-left="true"
 									juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
@@ -26,6 +27,7 @@
 						</div>
 						<div class="form-group">
 							<button class="btn btn-icon btn-visible"
+							        ng-disabled="!$ctrl.patientSearchEnabled()"
 							        title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
 							ng-click="$ctrl.onPatientSearch($ctrl.demographicSearch)">
 							<i class="icon icon-user-search"></i>
@@ -33,6 +35,7 @@
 						</div>
 						<div class="form-group">
 							<button class="btn btn-icon btn-visible"
+							        ng-disabled="!$ctrl.patientCreationEnabled()"
 							        title="<bean:message key="navbar.newPatient" bundle="ui"/>"
 							ng-click="$ctrl.newDemographic()">
 							<i class="icon icon-user-add"></i>

@@ -256,6 +256,7 @@ module.exports = {
 			'./src/common/components/iconCard/iconCardComponent.js',
 			'./src/common/components/panel/panelComponent.js',
 			'./src/common/components/security/junoSecurityCheckComponent.js',
+			'./src/common/components/security/junoMissingSecurityComponent.js',
 
 			'./src/common/modals/junoAlert/junoAlertComponent.js',
 			'./src/common/modals/junoInputModal/junoInputModalComponent.js',
