@@ -28,12 +28,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.util.MiscUtils;
 
 public class Navigation
 {
 	public static final String OSCAR_URL="http://localhost:9090";
-
+	public static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID
+			+ "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
 	private static Logger logger= MiscUtils.getLogger();
 

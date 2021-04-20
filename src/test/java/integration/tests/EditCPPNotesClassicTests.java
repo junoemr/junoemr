@@ -33,17 +33,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
 public class EditCPPNotesClassicTests extends SeleniumTestBase
 {
-	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
-
 	@BeforeClass
 	public static void setup()
 	{
