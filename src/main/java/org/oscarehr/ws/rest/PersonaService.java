@@ -43,6 +43,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.client.ws_manager.MessageManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.phr.util.MyOscarUtils;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ProgramProviderConverter;
@@ -173,13 +174,13 @@ public class PersonaService extends AbstractServiceImpl {
 	@Path("/navbar")
 	@Produces("application/json")
 	public NavbarResponse getMyNavbar() {
-		Provider provider = getCurrentProvider();
+		String currentUserId = getLoggedInProviderId();
 		ResourceBundle bundle = getResourceBundle();
 		
 		NavbarResponse result = new NavbarResponse();
 		
 		/* program domain, current program */
-		List<ProgramProvider> ppList = programManager2.getProgramDomain(getLoggedInInfo(),provider.getProviderNo());
+		List<ProgramProvider> ppList = programManager2.getProgramDomain(getLoggedInInfo(),currentUserId);
 		ProgramProviderConverter ppConverter = new ProgramProviderConverter();
 		List<ProgramProviderTo1> programDomain = new ArrayList<ProgramProviderTo1>();
 		
@@ -188,7 +189,7 @@ public class PersonaService extends AbstractServiceImpl {
 		}
 		result.setProgramDomain(programDomain);
 		
-		ProgramProvider pp = programManager2.getCurrentProgramInDomain(getLoggedInInfo(),provider.getProviderNo());
+		ProgramProvider pp = programManager2.getCurrentProgramInDomain(getLoggedInInfo(),currentUserId);
 		if(pp != null) {
 			ProgramProviderTo1 ppTo = ppConverter.getAsTransferObject(getLoggedInInfo(),pp);
 			result.setCurrentProgram(ppTo);
@@ -201,14 +202,17 @@ public class PersonaService extends AbstractServiceImpl {
 		/* counts */
 		// Remove demographic message count. Leaving comments for future debugging to address the previously mentioned JSON error.
 		// int messageCount = messagingManager.getMyInboxMessageCount(getLoggedInInfo(),provider.getProviderNo(), false);
-		int ptMessageCount = messagingManager.getMyInboxMessageCount(getLoggedInInfo(),provider.getProviderNo(),true);
 		MenuTo1 messengerMenu = new MenuTo1();
 		int menuItemCounter = 0;
-		// messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newOscarDemoMessages"), ""+messageCount, "classic");
-		messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newOscarMessages"), ""+ptMessageCount, "classic");
+
+		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.MESSAGE))
+		{
+			int ptMessageCount = messagingManager.getMyInboxMessageCount(getLoggedInInfo(), currentUserId, true);
+			messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newOscarMessages"), "" + ptMessageCount, "classic");
+		}
 		
 		
-		if(MyOscarUtils.isMyOscarEnabled(provider.getProviderNo())){
+		if(MyOscarUtils.isMyOscarEnabled(currentUserId)){
 			String phrMessageCount = "-";
 			MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(getLoggedInInfo().getSession());
 
@@ -223,8 +227,10 @@ public class PersonaService extends AbstractServiceImpl {
 			}
 			messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newMyOscarMessages"), phrMessageCount, "phr");
 		}
-		
-		if(appManager.isK2AEnabled()){
+
+		if (securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APP_DEFINITION)
+				&& appManager.isK2AEnabled())
+		{
 			String k2aMessageCount = appManager.getK2ANotificationNumber(getLoggedInInfo());
 			messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newK2ANotifications"), k2aMessageCount, "k2a");
 		}
@@ -236,8 +242,8 @@ public class PersonaService extends AbstractServiceImpl {
 		NavBarMenuTo1 navBarMenu = new NavBarMenuTo1();
 		navBarMenu.setMessengerMenu(messengerMenu);
 
-		MenuTo1 patientSearchMenu = new MenuTo1().add(0,bundle.getString("navbar.menu.newPatient"),null,"#/newpatient")
-				.add(1,bundle.getString("navbar.menu.advancedSearch"),null,"#/search");
+		MenuTo1 patientSearchMenu = new MenuTo1().add(0, bundle.getString("navbar.menu.newPatient"), null, "#/newpatient")
+				.add(1, bundle.getString("navbar.menu.advancedSearch"), null, "#/search");
 		navBarMenu.setPatientSearchMenu(patientSearchMenu);
 		
 		int idCounter = 0;
@@ -245,40 +251,60 @@ public class PersonaService extends AbstractServiceImpl {
 		MenuTo1 menu = new MenuTo1()
 				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard");
 
-		if(OscarProperties.getInstance().isScheduleEnabled() || getLoggedInInfo().getLoggedInProvider().getSuperAdmin())
+		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT))
 		{
-			menu.addWithState(idCounter++, bundle.getString("navbar.menu.schedule"), null, "schedule");
+			if (OscarProperties.getInstance().isScheduleEnabled() || getLoggedInInfo().getLoggedInProvider().getSuperAdmin())
+			{
+				menu.addWithState(idCounter++, bundle.getString("navbar.menu.schedule"), null, "schedule");
+			}
+			else
+			{
+				menu.add(idCounter++, bundle.getString("navbar.menu.schedule"), null, "../provider/providercontrol.jsp");
+			}
 		}
-		else
+
+		if(securityInfoManager.hasPrivileges(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, null,
+				SecObjectName.OBJECT_NAME.EDOC, SecObjectName.OBJECT_NAME.LAB, SecObjectName.OBJECT_NAME.HRM))
 		{
-			menu.add(idCounter++, bundle.getString("navbar.menu.schedule"),null,"../provider/providercontrol.jsp");
+			menu.addWithState(idCounter++, bundle.getString("navbar.menu.inbox"), null, "inbox");
 		}
 
-		menu.addWithState(idCounter++,bundle.getString("navbar.menu.inbox"),null,"inbox");
+		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION))
+		{
+			if (!consultationManager.isConsultResponseEnabled())
+			{
+				menu.addWithState(idCounter++, bundle.getString("navbar.menu.consults"), null, "consultRequests");
+			}
+			else if (!consultationManager.isConsultRequestEnabled())
+			{
+				menu.addWithState(idCounter++, bundle.getString("navbar.menu.consults"), null, "consultResponses");
+			}
 
-		if (!consultationManager.isConsultResponseEnabled()) {
-			menu.addWithState(idCounter++,bundle.getString("navbar.menu.consults"),null,"consultRequests");
-		}
-		else if (!consultationManager.isConsultRequestEnabled()) {
-			menu.addWithState(idCounter++,bundle.getString("navbar.menu.consults"),null,"consultResponses");
-		}
-
-		//consult menu
-		if (consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
-			MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), null);
-			consultMenu.setDropdown(true);
-			MenuTo1 consultMenuList = new MenuTo1()
-					.addWithState(idCounter++,bundle.getString("navbar.menu.consultRequests"),null,"consultRequests")
-					.addWithState(idCounter++,bundle.getString("navbar.menu.consultResponses"),null,"consultResponses");
-			consultMenu.setDropdownItems(consultMenuList.getItems());
-			menu.getItems().add(consultMenu);
+			//consult menu
+			if (consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled())
+			{
+				MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), null);
+				consultMenu.setDropdown(true);
+				MenuTo1 consultMenuList = new MenuTo1()
+						.addWithState(idCounter++, bundle.getString("navbar.menu.consultRequests"), null, "consultRequests")
+						.addWithState(idCounter++, bundle.getString("navbar.menu.consultResponses"), null, "consultResponses");
+				consultMenu.setDropdownItems(consultMenuList.getItems());
+				menu.getItems().add(consultMenu);
+			}
 		}
 
 		//TODO add "star" states, Ex: admin.* to indicate any state starting with admin
-		menu.addWithState(idCounter++,bundle.getString("navbar.menu.tickler"),null,"ticklers")
+		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER))
+		{
+			menu.addWithState(idCounter++, bundle.getString("navbar.menu.tickler"), null, "ticklers");
+		}
 			//.add(0,"K2A",null,"#/k2a")
-			.addWithState(idCounter++,bundle.getString("navbar.menu.billing"),null,"billing")
-			.addWithStates(idCounter++,bundle.getString("navbar.menu.admin"),null,
+		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING))
+		{
+			menu.addWithState(idCounter++, bundle.getString("navbar.menu.billing"), null, "billing");
+		}
+
+		menu.addWithStates(idCounter++,bundle.getString("navbar.menu.admin"),null,
 							Arrays.asList("admin.landingPage",
 											"admin.frame",
 											"admin.faxConfig",
@@ -292,9 +318,15 @@ public class PersonaService extends AbstractServiceImpl {
 											"admin.editUser",
 											"admin.viewUser",
 											"admin.manageUsers",
-											"admin.manageAppointmentQueues"))
-			.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
-			.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
+											"admin.manageAppointmentQueues"));
+		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT))
+		{
+			menu.addWithState(idCounter++, bundle.getString("navbar.menu.reports"), null, "reports");
+		}
+		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC))
+		{
+			menu.addWithState(idCounter++, bundle.getString("navbar.menu.documents"), null, "documents");
+		}
 
 		if (IsPropertiesOn.isTelehealthEnabled())
 		{

@@ -66,16 +66,6 @@ angular.module('Layout').component("primaryNavigation", {
 			// measured in months
 			ctrl.consultationLookbackPeriod = 1;
 
-			billingService.getBillingRegion().then(
-				function success(results)
-				{
-					ctrl.billRegion = results.message;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-
 			personaService.getDashboardMenu().then(
 				function success(results)
 				{
@@ -260,7 +250,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LAB_READ, SecurityPermissions.HRM_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LAB_READ, SecurityPermissions.DOCUMENT_READ, SecurityPermissions.HRM_READ))
 			{
 				inboxService.getUnAckLabDocCount().then(
 					function success(results)
