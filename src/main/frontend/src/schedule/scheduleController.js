@@ -416,6 +416,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.isAgendaView = function isAgendaView()
 		{
+			console.log($scope.uiConfigApplied.calendar.resources === null);
+			console.log($scope.uiConfigApplied.calendar.resources === false);
 			return ($scope.uiConfigApplied.calendar.resources === null || $scope.uiConfigApplied.calendar.resources === false)
 		};
 		$scope.isResourceView = function isResourceView()
@@ -1291,6 +1293,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else if ($target.is(".onclick-open-eform"))
 			{
+				console.log(formService.openEFormInstancePopup(calEvent.data.demographicNo, $target.attr('data-id')));
+				console.log(calEvent.data.demographicNo);
+				console.log($target.attr('data-id'));
 				formService.openEFormInstancePopup(calEvent.data.demographicNo, $target.attr('data-id'));
 			}
 			else if ($target.is(".onclick-open-quicklink"))

@@ -21,17 +21,20 @@
 * Canada
 */
 
-import {LABEL_POSITION} from "../junoComponentConstants";
+import {LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Common.Components').component('junoSelectSave',
     {
-        templateUrl: 'src/common/components/junoSelectSave/junoSelectSave.jsp',
+        templateUrl: 'src/admin/systemProperties/components/junoSelectSave/junoSelectSave.jsp',
         bindings: {
             ngModel: "=",
             options: "<",
             click: "&?",
-            placeholder: "@?",
             title: "@?",
+            buttonColor: "<?",
+            componentStyle: "<?",
+            buttonColorPattern: "<?",
+            icon: "<?",
         },
         controller: [
             '$scope',

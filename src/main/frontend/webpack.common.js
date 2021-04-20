@@ -240,7 +240,7 @@ module.exports = {
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
 			'./src/common/components/junoInputSave/junoInputSaveComponent.js',
-			'./src/common/components/junoSelectSave/junoSelectSaveComponent.js',
+			'./src/admin/systemProperties/components/junoSelectSave/junoSelectSaveComponent.js',
 			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
 			'./src/common/components/junoTab/junoTabComponent.js',

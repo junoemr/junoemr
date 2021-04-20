@@ -37,7 +37,11 @@
 						ng-model="$ctrl.selectedValue"
 						options="$ctrl.codes"
 						click="$ctrl.updateProperty()"
-						title="{{$ctrl.title}}">
+						title="{{$ctrl.title}}"
+						button-color="$ctrl.buttonColor"
+						button-color-pattern="$ctrl.buttonColorPattern"
+						component-style="$ctrl.componentStyle"
+						icon="$ctrl.icon">
 				</juno-select-save>
 			</div>
 		</div>

@@ -20,8 +20,8 @@
  * Victoria, British Columbia
  * Canada
  */
-
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
+import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../../common/components/junoComponentConstants";
 
 angular.module('Admin').component('systemPropertiesBilling',
     {
@@ -36,16 +36,22 @@ angular.module('Admin').component('systemPropertiesBilling',
             'billingService',
             function ($scope, $http, $httpParamSerializer, $state, $uibModal, billingService) {
 
-                const PLACEHOLDER = 'Set the default Service Location Code'
                 const PROPERTY_NAME = 'service_location_code';
                 const TITLE = "Save Service Code";
+                const DEFAULT_VALUE = "A";
+                const DEFAULT_LABEL = "A | Practitioner's Office - In Community";
+                const ICON = "icon-logout fa-lg";
 
                 let ctrl = this;
                 let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
                 ctrl.selectedValue = null;
-                ctrl.codes = [{label:PLACEHOLDER, value:PLACEHOLDER,}];
+                ctrl.codes = [{label:DEFAULT_LABEL, value:DEFAULT_VALUE,}];
                 ctrl.title = TITLE;
+                ctrl.buttonColor = JUNO_BUTTON_COLOR.PRIMARY;
+                ctrl.componentStyle = JUNO_STYLE.DEFAULT;
+                ctrl.buttonColorPattern = JUNO_BUTTON_COLOR_PATTERN.DEFAULT;
+                ctrl.icon = ICON;
 
                 ctrl.propertiesList = [{
                         name: "Service Location Code",
@@ -65,12 +71,15 @@ angular.module('Admin').component('systemPropertiesBilling',
                     const codes = (await billingService.getBCBillingVisitCodes()).data.body;
 
                     codes.forEach((code) =>
-				    {
-				        ctrl.codes.push(
-                            {
-                                label: code.visitType + " | " + code.visitDescription,
-                                value: code.visitType,
-                            })
+                    {
+                        if (code.visitType !== "A")
+                        {
+                            ctrl.codes.push(
+                                {
+                                    label: code.visitType + " | " + code.visitDescription,
+                                    value: code.visitType,
+                                })
+                        }
 				    });
                 }
 
@@ -79,7 +88,7 @@ angular.module('Admin').component('systemPropertiesBilling',
                     systemPreferenceApi.getPreferenceValue(property)
                         .then((response) =>
                         {
-                            ctrl.selectedValue = response.data.body || PLACEHOLDER;
+                            ctrl.selectedValue = response.data.body || DEFAULT_VALUE;
                         })
                 };
 

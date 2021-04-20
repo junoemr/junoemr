@@ -11,11 +11,11 @@
 			</juno-select>
 		</div>
 		<div class="right" title="{{$ctrl.title}}">
-			<juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+			<juno-button button-color="$ctrl.buttonColor"
+			             button-color-pattern="$ctrl.buttonColorPattern";
 			             component-style="$ctrl.componentStyle"
 			             click="$ctrl.onClick()">
-				<i class="icon-logout fa-lg"></i>
+				<i ng-class="$ctrl.icon"></i>
 			</juno-button>
 		</div>
 	</div>
