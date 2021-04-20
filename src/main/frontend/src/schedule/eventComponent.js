@@ -9,6 +9,7 @@ import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
 import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -29,6 +30,7 @@ angular.module('Schedule').component('eventComponent', {
 		'demographicService',
 		'providerService',
 		'securityService',
+		'securityRolesService',
 		'scheduleService',
 
 		function (
@@ -43,6 +45,7 @@ angular.module('Schedule').component('eventComponent', {
 			demographicService,
 			providerService,
 			securityService,
+			securityRolesService,
 			scheduleService,
 		)
 		{
@@ -175,6 +178,7 @@ angular.module('Schedule').component('eventComponent', {
 				NO_CONNECTION: "noConnection",
 			};
 			$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
+			controller.readOnlyMode = true;
 
 			controller.patientTypeahead = {};
 			$scope.autocompleteValues = {};
@@ -275,13 +279,16 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.$onInit = function init()
 			{
-				if (!securityService.hasPermission('scheduling_create'))
+				if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ, SecurityPermissions.APPOINTMENT_READ))
 				{
 					$timeout(function ()
 					{
 						$scope.cancel();
 					});
 				}
+				controller.readOnlyMode = controller.inEditMode() ?
+					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_UPDATE) :
+					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_CREATE);
 
 				controller.validations = {
 					appointmentDateOnSameDay: Juno.Validations.validationCustom(() =>
@@ -1080,6 +1087,10 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				return controller.editMode;
 			};
+			controller.inReadOnlyMode = function inReadOnlyMode()
+			{
+				return controller.readOnlyMode;
+			};
 			controller.isRepeatBookingEnabled = function isRepeatBookingEnabled()
 			{
 				return (!controller.inEditMode() && controller.repeatBookingData.enabled === controller.repeatBooking.toggleEnum.on);
@@ -1092,6 +1103,22 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				return controller.repeatBookingData.endType === controller.repeatBooking.endTypeEnum.after;
 			};
+			controller.isEncounterLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
+			}
+			controller.isBillingLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BILLING_READ);
+			}
+			controller.isRxLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.RX_READ);
+			}
+			controller.deleteButtonEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_DELETE);
+			}
 
 			$scope.hasSites = function hasSites()
 			{

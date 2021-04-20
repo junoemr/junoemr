@@ -606,8 +606,6 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public JSONObject getDisplayProperties()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ECHART);
-
 		JSONObject response = new JSONObject();
 		OscarProperties oscarProperties = OscarProperties.getInstance();
 

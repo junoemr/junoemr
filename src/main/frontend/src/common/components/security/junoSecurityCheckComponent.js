@@ -26,6 +26,7 @@ angular.module('Common.Components').component('junoSecurityCheck',
     templateUrl: 'src/common/components/security/junoSecurityCheck.jsp',
     bindings: {
         permissions: '<',
+        showPlaceholder: '<?'
     },
     transclude: true,
     controller: [

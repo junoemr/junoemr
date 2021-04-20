@@ -15,6 +15,7 @@
 		<div class="directive-appt-status-select">
 			<div class="icon-wrapper">
 				<button class="btn btn-icon"
+			        ng-disabled="disabled"
 					ng-click="button_change_fn()">
 					<i class="icon icon-status"></i>
 				</button>

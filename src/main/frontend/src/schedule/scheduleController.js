@@ -4,6 +4,7 @@ import {SitesApi} from '../../generated/api/SitesApi';
 import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
 import {MhaAppointmentApi, MhaIntegrationApi} from "../../generated";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -20,6 +21,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'formService',
 	'focusService',
 	'securityService',
+	'securityRolesService',
 	'scheduleService',
 	'uiCalendarConfig',
 	'errorsService',
@@ -40,6 +42,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		formService,
 		focusService,
 		securityService,
+		securityRolesService,
 		scheduleService,
 		uiCalendarConfig,
 		messagesFactory,
@@ -72,6 +75,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		//=========================================================================
 		// Local scope variables
@@ -173,55 +177,70 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			quickLinkMap: {},
 		};
 
+		controller.encounterEnabled = false;
+		controller.billingEnabled = false;
+		controller.rxEnabled = false;
+
 		$scope.init = function init()
 		{
-			$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
-
-			$scope.loadAvailabilityTypes().then(function ()
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ, SecurityPermissions.APPOINTMENT_READ))
 			{
-				scheduleService.loadEventStatuses().then(function ()
+				controller.encounterEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
+				controller.billingEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.BILLING_READ);
+				controller.rxEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RX_READ);
+
+				$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
+
+				$scope.loadAvailabilityTypes().then(function ()
 				{
-					$scope.loadScheduleOptions().then(function ()
+					scheduleService.loadEventStatuses().then(function ()
 					{
-						controller.loadResourceHash().then(function ()
+						$scope.loadScheduleOptions().then(function ()
 						{
-							$scope.loadSiteOptions().then(function ()
+							controller.loadResourceHash().then(function ()
 							{
-								controller.loadExtraLinkData().then(function ()
+								$scope.loadSiteOptions().then(function ()
 								{
-									controller.loadTelehealthEnabled().then(function()
+									controller.loadExtraLinkData().then(function ()
 									{
-										$scope.loadDefaultSelections();
-										$scope.setEventSources();
+										controller.loadTelehealthEnabled().then(function ()
+										{
+											$scope.loadDefaultSelections();
+											$scope.setEventSources();
 
-										controller.initEventsAutoRefresh();
+											controller.initEventsAutoRefresh();
 
-										$scope.applyUiConfig($scope.uiConfig);
+											$scope.applyUiConfig($scope.uiConfig);
 
-										controller.loadWatches();
-										$scope.initialized = true;
+											controller.loadWatches();
+											$scope.initialized = true;
+										});
 									});
 								});
 							});
 						});
 					});
 				});
-			});
-		};
+			}
+		}
 
 
 		//=========================================================================
 		// Public Methods
 		//=========================================================================/
 
+		controller.userCanEditAppointments = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_UPDATE);
+		}
+		controller.userCanCreateAppointments = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_CREATE);
+		}
+
 		$scope.calendar = function calendar()
 		{
 			return uiCalendarConfig.calendars[$scope.calendarName];
-		};
-
-		$scope.isSchedulingEnabled = function isSchedulingEnabled()
-		{
-			return true;
 		};
 
 		$scope.isInitialized = function isInitialized()
@@ -916,10 +935,27 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let detailElem = eventElement.find('.event-details');
 				let bookingStatusElem = eventElement.find('.book-status-container');
 				let bookingStatusBox = bookingStatusElem.children(".booking-status-box");
+				let encounterElem = eventElement.find(".event-encounter");
+				let billingElem = eventElement.find(".event-invoice");
+				let rxElem = eventElement.find(".event-rx");
 				let telehealthElem = eventElement.find('.event-telehealth');
 				// By default this element is hidden
 				telehealthElem.hide();
 				// var eventSite = $scope.sites[event.data.site];
+
+				/* disable buttons if modules are disabled */
+				if(!controller.encounterEnabled)
+				{
+					encounterElem.addClass("disabled");
+				}
+				if(!controller.billingEnabled)
+				{
+					billingElem.addClass("disabled");
+				}
+				if(!controller.rxEnabled)
+				{
+					rxElem.addClass("disabled");
+				}
 
 				/* set up status icon + color/hover etc. */
 				let eventStatus = scheduleService.eventStatuses[event.data.eventStatusCode];
@@ -1414,7 +1450,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.openCreateEventDialog = function openCreateEventDialog(start, end, jsEvent, view, resource)
 		{
-			if (!securityService.hasPermission('scheduling_create'))
+			if(!controller.userCanCreateAppointments())
 			{
 				return;
 			}
@@ -1451,10 +1487,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.openEditEventDialog = function openEditEventDialog(calEvent)
 		{
-			if (!securityService.hasPermission('scheduling_edit'))
-			{
-				return;
-			}
 			controller.openAppointmentDialog(true, calEvent.resourceId, calEvent.start, calEvent.end, calEvent.data);
 		};
 
@@ -1530,7 +1562,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.openScheduleSearchDialog = function openScheduleSearchDialog(resourceId)
 		{
-			if (!securityService.hasPermission('scheduling_create'))
+			if(!controller.userCanCreateAppointments())
 			{
 				return;
 			}
@@ -1576,7 +1608,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.onEventDrop = function onEventDrop(
 			calEvent, delta, revertFunc, jsEvent, ui, view)
 		{
-			if (!securityService.hasPermission('scheduling_create'))
+			if(!controller.userCanEditAppointments())
 			{
 				revertFunc();
 				return;
@@ -1608,7 +1640,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onEventResize = function onEventResize(calEvent, delta, revertFunc, jsEvent, ui, view)
 		{
-			if (!securityService.hasPermission('scheduling_create'))
+			if(!controller.userCanEditAppointments())
 			{
 				revertFunc();
 				return;

@@ -23,3 +23,6 @@
 <div ng-if="$ctrl.hasPermissions()">
     <ng-transclude></ng-transclude>
 </div>
+<div ng-if="!$ctrl.hasPermissions() && $ctrl.showPlaceholder">
+    <juno-missing-security></juno-missing-security>
+</div>
