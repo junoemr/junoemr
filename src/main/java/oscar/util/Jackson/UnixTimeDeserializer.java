@@ -35,8 +35,8 @@ import java.util.Date;
 /**
  * Deserialize dates formatted as seconds since the Unix epoch.
  */
-public class UnixTimeDeserializer extends StdDeserializer<Date> {
-
+public class UnixTimeDeserializer extends StdDeserializer<Date>
+{
     protected UnixTimeDeserializer(Class<?> vc)
     {
         super(vc);
@@ -48,7 +48,8 @@ public class UnixTimeDeserializer extends StdDeserializer<Date> {
     }
 
     @Override
-    public Date deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public Date deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException, JsonProcessingException
+    {
         String jsonDate = parser.getText();
 
         return Date.from(Instant.ofEpochSecond(Long.parseLong(jsonDate)));
