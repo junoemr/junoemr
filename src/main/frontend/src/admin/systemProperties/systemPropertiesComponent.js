@@ -40,10 +40,6 @@ angular.module('Admin').component('systemProperties',
                     label: "Rx",
                     value: 'admin.systemProperties.rx',
                 },
-                {
-                    label: "Billing",
-                    value: 'admin.systemProperties.billing'
-                },
             ];
 
             ctrl.currentTab = "admin.systemProperties.general";
