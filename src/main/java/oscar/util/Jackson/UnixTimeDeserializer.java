@@ -21,36 +21,37 @@
  * Canada
  */
 
-package org.oscarehr.integration.imdhealth.transfer.outbound;
+package oscar.util.Jackson;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import java.io.Serializable;
-import java.util.Set;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Date;
 
-@Data
-@NoArgsConstructor
-public class SSORequest implements Serializable
+/**
+ * Deserialize dates formatted as seconds since the Unix epoch.
+ */
+public class UnixTimeDeserializer extends StdDeserializer<Date>
 {
-	@JsonProperty("user")
-	private SSOUser userInfo;
+    protected UnixTimeDeserializer(Class<?> vc)
+    {
+        super(vc);
+    }
 
-	@JsonProperty("organization")
-	private SSOOrganization organizationInfo;
+    public UnixTimeDeserializer()
+    {
+        this(Date.class);
+    }
 
-	@JsonProperty("patient")
-	private SSOPatient patientInfo;
+    @Override
+    public Date deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException, JsonProcessingException
+    {
+        String jsonDate = parser.getText();
 
-	@JsonProperty("issues")
-	private Set<String> issues;
-
-	public SSORequest(SSOUser user, SSOOrganization organization, SSOPatient patient, Set<String> issues)
-	{
-		this.userInfo = user;
-		this.organizationInfo = organization;
-		this.patientInfo = patient;
-		this.issues = issues;		// Empty set for now, implementation TBD
-	}
+        return Date.from(Instant.ofEpochSecond(Long.parseLong(jsonDate)));
+    }
 }

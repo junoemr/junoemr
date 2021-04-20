@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Site;
+import oscar.util.ConversionUtils;
 
 import java.io.Serializable;
 
@@ -60,9 +61,6 @@ public class SSOOrganization implements Serializable
 		org.setExternalId(clinic.getUuid());
 		org.setMunicipality(clinic.getClinicCity());
 		org.setName(clinic.getClinicName());
-
-		// Use the instance type as the province code, instead of the clinic's province, because the former is enumerated
-		// to ISO-3166 and the latter is a raw string.
 		org.setSubdivisionCode(provCode);
 		return org;
 	}
@@ -76,5 +74,40 @@ public class SSOOrganization implements Serializable
 		org.setName(site.getName());
 		org.setSubdivisionCode(provCode);
 		return org;
+	}
+
+
+	/**
+	 * Determine if a site can be mapped to an SSOOrganization which can be accepted by the iMDHealth API.
+	 * To be valid a site must have a non-empty city and name.
+	 *
+	 * @param site site
+	 * @return true if mappable
+	 */
+	public static boolean canMapSite(Site site)
+	{
+		// Province is also required but is determined using the instance type.
+		// It must be a known known ISO-3166 code and Juno allows this to be a raw String input.
+
+		return site != null &&
+				ConversionUtils.hasContent(site.getCity()) &&
+				ConversionUtils.hasContent(site.getName());
+	}
+
+	/**
+	 * Determine if a clinic can be mapped to an SSOOrganization which can be accepted by the iMDHealth API.
+	 * To be valid a clinic must have a non-empty city and name.
+	 *
+	 * @param clinic clinic
+	 * @return true if mappable
+	 */
+	public static boolean canMapClinic(Clinic clinic)
+	{
+		// Province is also required but is determined using the instance type.
+		// It must be a known known ISO-3166 code and Juno allows this to be a raw String input.
+
+		return clinic != null &&
+				ConversionUtils.hasContent(clinic.getClinicCity()) &&
+				ConversionUtils.hasContent(clinic.getClinicName());
 	}
 }
