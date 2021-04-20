@@ -40,12 +40,10 @@ import java.util.Set;
 
 public class ClassicUIPreventionsTests extends SeleniumTestBase
 {
-
 	// Reused URLs to navigate to
 	private static final String PREVENTION_URL = "/oscarPrevention/index.jsp?demographic_no=1";
 	private static final String PREVENTION_INJECTION_URL = "/oscarPrevention/AddPreventionData.jsp?prevention=COVID-19&demographic_no=1&prevResultDesc=";
 	private static final String EXAM_PREVENTION_URL = "/oscarPrevention/AddPreventionData.jsp?prevention=Smoking&demographic_no=1&prevResultDesc=";
-
 	//
 	@BeforeClass
 	public static void setup()

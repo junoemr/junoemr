@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import static integration.tests.EchartTests.ECHART_URL;
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 public class EditEncounterNotesTests extends SeleniumTestBase
 {

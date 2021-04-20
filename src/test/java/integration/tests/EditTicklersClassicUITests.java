@@ -37,9 +37,9 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 
-import static integration.tests.AddProvidersTests.drBerry;
 import static integration.tests.AddPatientsTests.mom;
-import static integration.tests.EchartTests.ECHART_URL;
+import static integration.tests.AddProvidersTests.drBerry;
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
 public class EditTicklersClassicUITests extends SeleniumTestBase
