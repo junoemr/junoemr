@@ -25,7 +25,7 @@
 */
 
 import {INSTANCE_TYPE, SYSTEM_PROPERTIES, BILLING_TYPE} from "../../common/services/systemPreferenceServiceConstants";
-import {SystemPreferenceApi} from "../../../generated";
+import {ProvidersServiceApi, SystemPreferenceApi} from "../../../generated";
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
@@ -42,7 +42,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'demographicService',
 	'demographicsService',
 	'errorsService',
-	'providersService',
 	'patientDetailStatusService',
 	'securityService',
 	'staticDataService',
@@ -62,7 +61,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		demographicService,
 		demographicsService,
 		messagesFactory,
-		providersService,
 		patientDetailStatusService,
 		securityService,
 		staticDataService,
@@ -99,7 +97,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
-
+		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
 		controller.properties = $scope.$parent.recordCtrl.properties;
@@ -120,19 +118,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 					// retrieve provider types for dropdown selection
 					//TODO - are roles determined by security role or provider type?
-					providersService.getBySecurityRole("doctor").then(
+					providersServiceApi.getBySecurityRole("doctor").then(
 						function success(data) {
-							controller.page.doctors = data;
+							controller.page.doctors = data.data.body;
 						}
 					);
-					providersService.getBySecurityRole("nurse").then(
+					providersServiceApi.getBySecurityRole("nurse").then(
 						function success(data) {
-							controller.page.nurses = data;
+							controller.page.nurses = data.data.body;
 						}
 					);
-					providersService.getBySecurityRole("midwife").then(
+					providersServiceApi.getBySecurityRole("midwife").then(
 						function success(data) {
-							controller.page.midwives = data;
+							controller.page.midwives = data.data.body;
 						}
 					);
 

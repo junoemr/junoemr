@@ -169,7 +169,6 @@ module.exports = {
 			'./src/common/services/personaService.js',
 			'./src/common/services/programService.js',
 			'./src/common/services/providerService.js',
-			'./src/common/services/providersService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
 			'./src/common/services/securityService.js',
