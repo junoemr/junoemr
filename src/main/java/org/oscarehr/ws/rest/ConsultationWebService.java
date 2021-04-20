@@ -46,8 +46,8 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.conversion.ConsultationRequestDomainConverter;
-import org.oscarehr.ws.rest.conversion.ConsultationRequestTransferConverter;
+import org.oscarehr.ws.rest.conversion.ConsultationRequestToDomainConverter;
+import org.oscarehr.ws.rest.conversion.ConsultationRequestToTransferConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationResponseConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationServiceConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
@@ -115,10 +115,10 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	private ConsultationAttachmentService consultationAttachmentService;
 
 	@Autowired
-	private ConsultationRequestTransferConverter consultationRequestTransferConverter;
+	private ConsultationRequestToTransferConverter consultationRequestToTransferConverter;
 
 	@Autowired
-	private ConsultationRequestDomainConverter consultationRequestDomainConverter;
+	private ConsultationRequestToDomainConverter consultationRequestToDomainConverter;
 
 	private ConsultationResponseConverter responseConverter = new ConsultationResponseConverter();
 	private ConsultationServiceConverter serviceConverter = new ConsultationServiceConverter();
@@ -246,7 +246,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			{
 				return RestResponse.errorResponse("No Consult found with id " + requestId);
 			}
-			request = consultationRequestTransferConverter.convert(consult);
+			request = consultationRequestToTransferConverter.convert(consult);
 			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
 
 			request.setFaxList(getFaxList());
@@ -341,7 +341,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationRequestTo1> saveRequest(ConsultationRequestTo1 data)
 	{
-		ConsultationRequest request = consultationRequestDomainConverter.convert(data);
+		ConsultationRequest request = consultationRequestToDomainConverter.convert(data);
 		request.setProfessionalSpecialist(consultationManager.getProfessionalSpecialist(data.getProfessionalSpecialist().getId()));
 		consultationManager.saveConsultationRequest(getLoggedInInfo(), request);
 		if(data.getId() == null) data.setId(request.getId());

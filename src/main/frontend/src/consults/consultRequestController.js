@@ -1,9 +1,11 @@
 import {LABEL_POSITION} from "../common/components/junoComponentConstants";
+import {ProvidersServiceApi} from "../../generated";
 
 angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 	'$scope',
 	'$http',
+	"$httpParamSerializer",
 	'$q',
 	'$resource',
 	'$location',
@@ -14,12 +16,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	'summaryService',
 	'staticDataService',
 	'consult',
-	'providersService',
 	'user',
 
 	function(
 		$scope,
 		$http,
+		$httpParamSerializer,
 		$q,
 		$resource,
 		$location,
@@ -30,11 +32,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		summaryService,
 		staticDataService,
 		consult,
-		providersService,
 		user)
 	{
 
 		var controller = this;
+
+		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
 		controller.consult = consult;
 
@@ -63,7 +66,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.initialize = function()
 		{
-			controller.labelPosition = controller.labelPosition || LABEL_POSITION.TOP;
+			controller.labelPosition = LABEL_POSITION;
 
 			//get access rights
 			securityService.hasRight("_con", "r").then(
@@ -163,11 +166,11 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.attachments = Juno.Common.Util.toArray(consult.attachments);
 			Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
 
-			providersService.getActiveProviders().then(
-				function success(result)
+			providersServiceApi.getActive().then(
+				function success(results)
 				{
 					controller.providers = [];
-					for (let provider of result)
+					for (let provider of results.data.body)
 					{
 						controller.providers.push({
 							label: provider.name,
@@ -175,9 +178,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 						})
 					}
 				},
-				function error(result)
+				function error(results)
 				{
-					console.error("Failed to get provider list with error: " + result);
+					console.error("Failed to get provider list with error: " + results);
 				}
 			)
 		};

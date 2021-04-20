@@ -30,24 +30,23 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ConsultationRequestDomainConverter extends AbstractModelConverter<ConsultationRequestTo1, ConsultationRequest>
+public class ConsultationRequestToTransferConverter extends AbstractModelConverter<ConsultationRequest, ConsultationRequestTo1>
 {
 
 	private ProfessionalSpecialistConverter specialistConverter = new ProfessionalSpecialistConverter();
 
 	@Override
-	public ConsultationRequest convert(ConsultationRequestTo1 transfer)
+	public ConsultationRequestTo1 convert(ConsultationRequest request)
 	{
-		ConsultationRequest request = new ConsultationRequest();
-		if (transfer == null)
+		ConsultationRequestTo1 transfer = new ConsultationRequestTo1();
+		if (request == null)
 		{
 			return null;
 		}
 
-		BeanUtils.copyProperties(transfer, request);
-
-		// Specialist is a many-to-one and is handled slightly differently
-		request.setProfessionalSpecialist(specialistConverter.getAsDomainObject(null, transfer.getProfessionalSpecialist()));
-		return request;
+		BeanUtils.copyProperties(request, transfer);
+		transfer.setProfessionalSpecialist(specialistConverter.getAsTransferObject(null, request.getProfessionalSpecialist()));
+		return transfer;
 	}
+
 }

@@ -23,9 +23,12 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.io.Serializable;
 import java.util.Date;
 
+@Tag(name = "ProviderTo1")
 public class ProviderTo1 implements Serializable {
 
     private static final long serialVersionUID = 1L;

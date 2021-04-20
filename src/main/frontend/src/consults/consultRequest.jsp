@@ -154,7 +154,7 @@
 							placeholder="Referral Practitioner"
 							options="consultRequestCtrl.providers"
 							label="Referral Practitioner"
-							label-position="consultRequestCtrl.labelPosition"
+							label-position="consultRequestCtrl.labelPosition.TOP"
 							on-change="consultRequestCtrl.onReferralPractitionerSelected(value)"
 							component-style="consultRequestCtrl.resolve.style">
 						</juno-select>
