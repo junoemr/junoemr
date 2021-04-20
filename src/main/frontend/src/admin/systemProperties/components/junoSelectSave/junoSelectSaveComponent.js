@@ -21,7 +21,11 @@
 * Canada
 */
 
-import {LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {
+    JUNO_BUTTON_COLOR,
+    JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE,
+    LABEL_POSITION
+} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Common.Components').component('junoSelectSave',
     {
@@ -44,6 +48,13 @@ angular.module('Common.Components').component('junoSelectSave',
 
                 $scope.LABEL_POSITION = LABEL_POSITION;
 
+                ctrl.$onInit = () =>
+                {
+                    ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+                    ctrl.buttonColor = ctrl.buttonColor || JUNO_BUTTON_COLOR.PRIMARY;
+                    ctrl.buttonColorPattern = ctrl.buttonColorPattern || JUNO_BUTTON_COLOR_PATTERN.DEFAULT
+                    ctrl.icon = ctrl.icon || "icon-logout fa-lg";
+                }
                 ctrl.onClick = () =>
                 {
                     if (ctrl.click)
