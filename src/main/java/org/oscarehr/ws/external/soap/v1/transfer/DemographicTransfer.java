@@ -602,46 +602,6 @@ public final class DemographicTransfer {
 		return (demographicTransfer);
 	}
 
-	/**
-	 * Effectively a carbon copy of the old toTransfer function, except using the JPA model for demographic.
-	 * @param demographic demographic to shift into a transfer object
-	 * @return DemographicTransfer object with given demo's properties
-	 */
-	public static DemographicTransfer toTransfer(org.oscarehr.demographic.model.Demographic demographic)
-	{
-		if (demographic == null)
-		{
-			return null;
-		}
-
-		DemographicTransfer demographicTransfer = new DemographicTransfer();
-		BeanUtils.copyProperties(demographic, demographicTransfer);
-
-		// Manually assign stuff that couldn't be bean copied
-		demographicTransfer.setActiveCount(demographic.isActive() ? 1 : 0);
-		demographicTransfer.setDemographicNo(demographic.getDemographicId());
-		demographicTransfer.setFamilyDoctor(demographic.getReferralDoctor());
-		demographicTransfer.setFamilyDoctor2(demographic.getFamilyDoctor());
-		demographicTransfer.setEffDate(demographic.getHcEffectiveDate());
-		demographicTransfer.setYearOfBirth(demographic.getYearOfBirth());
-		demographicTransfer.setMonthOfBirth(demographic.getMonthOfBirth());
-		demographicTransfer.setDateOfBirth(demographic.getDayOfBirth());
-		// Attempt to set extra demographic fields
-		try
-		{
-			DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
-			Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographic.getDemographicId());
-			demographicTransfer.setCellPhone(demoExt.get("demo_cell"));
-		}
-		catch (Exception e)
-		{
-			Logger logger = Logger.getLogger(DemographicTransfer.class);
-			logger.error("Failed to get extended demographic data into DemographicTransform.", e);
-		}
-
-		return demographicTransfer;
-	}
-
 	public static DemographicTransfer[] toTransfers(List<Demographic> demographics) {
 		ArrayList<DemographicTransfer> results = new ArrayList<DemographicTransfer>();
 

@@ -33,6 +33,7 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
+import org.oscarehr.demographic.conversion.DemographicModelToTransferConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.service.DemographicService;
@@ -82,6 +83,9 @@ public class DemographicWs extends AbstractWs {
 
 	@Autowired
 	private HinValidationService hinValidationService;
+
+	@Autowired
+	private DemographicModelToTransferConverter demographicModelToTransferConverter;
 
 	/**
 	 * get demographic by ID if available
@@ -234,7 +238,7 @@ public class DemographicWs extends AbstractWs {
 
 		if (demographic != null)
 		{
-			return DemographicTransfer.toTransfer(demographic);
+			return demographicModelToTransferConverter.convert(demographic);
 		}
 
 		return null;
