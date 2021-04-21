@@ -1107,6 +1107,10 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
 			}
+			controller.isMasterFileLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
+			}
 			controller.isBillingLinkEnabled = () =>
 			{
 				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BILLING_READ);

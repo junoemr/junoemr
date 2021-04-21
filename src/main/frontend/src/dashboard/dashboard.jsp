@@ -212,7 +212,7 @@
 
 				<juno-security-check permissions="dashboardCtrl.SecurityPermissions.TICKLER_READ">
 					<div class="row dashboard-row">
-						<div class="col-lg-12">`
+						<div class="col-lg-12">
 							<!-- this is a bit of a problem for il18n -->
 							<p>
 								<a href="../web/#!/ticklers"> <%-- Not a permanent solution, figure out better way to link to ticklers --%>

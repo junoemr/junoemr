@@ -177,14 +177,16 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			quickLinkMap: {},
 		};
 
+		controller.masterFileEnabled = false;
 		controller.encounterEnabled = false;
 		controller.billingEnabled = false;
 		controller.rxEnabled = false;
 
 		$scope.init = function init()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ, SecurityPermissions.APPOINTMENT_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_READ))
 			{
+				controller.masterFileEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
 				controller.encounterEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
 				controller.billingEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.BILLING_READ);
 				controller.rxEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RX_READ);
@@ -930,11 +932,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				eventElement.html(require('./view-event.html'));
 
 				let scheduleElem = eventElement.find(".schedule-event");
-				let statusElem = eventElement.find('.icon-status');
+				let statusIconElem = eventElement.find('.icon-status');
 				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
 				let bookingStatusElem = eventElement.find('.book-status-container');
 				let bookingStatusBox = bookingStatusElem.children(".booking-status-box");
+				let statusElem = eventElement.find('.event-status');
+				let demoMasterElem = eventElement.find(".event-demographic");
 				let encounterElem = eventElement.find(".event-encounter");
 				let billingElem = eventElement.find(".event-invoice");
 				let rxElem = eventElement.find(".event-rx");
@@ -944,6 +948,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				// var eventSite = $scope.sites[event.data.site];
 
 				/* disable buttons if modules are disabled */
+				if(controller.inReadOnlyMode())
+				{
+					statusElem.addClass("disabled");
+				}
+				if(!controller.masterFileEnabled)
+				{
+					demoMasterElem.addClass("disabled");
+				}
 				if(!controller.encounterEnabled)
 				{
 					encounterElem.addClass("disabled");
@@ -961,26 +973,26 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventStatus = scheduleService.eventStatuses[event.data.eventStatusCode];
 				if (Juno.Common.Util.exists(eventStatus))
 				{
-					statusElem.attr("title", eventStatus.name);
+					statusIconElem.attr("title", eventStatus.name);
 
 					if (Juno.Common.Util.exists(eventStatus.icon))
 					{
 						// class matches the icon name without the extension
-						statusElem.addClass("icon-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
+						statusIconElem.addClass("icon-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
 					}
 					else
 					{
-						statusElem.text(eventStatus.displayLetter);
+						statusIconElem.text(eventStatus.displayLetter);
 					}
 
 					if (Juno.Common.Util.exists(eventStatus.sortOrder))
 					{
-						statusElem.addClass("rotate");
+						statusIconElem.addClass("rotate");
 					}
 				}
 				else
 				{
-					statusElem.attr("title", "Unknown").text("?");
+					statusIconElem.attr("title", "Unknown").text("?");
 				}
 
 				/* set up event display text (name, reason, notes, etc.)*/
@@ -1091,9 +1103,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					let formContainerElem = eventElement.find('.inline-flex');
 					/* generate form links */
-					controller.buildEventLink(formContainerElem, controller.formLinks.formNameMap, "onclick-open-form");
+					if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_READ))
+					{
+						controller.buildEventLink(formContainerElem, controller.formLinks.formNameMap, "onclick-open-form");
+					}
 					/* generate eForm links */
-					controller.buildEventLink(formContainerElem, controller.formLinks.eFormNameMap, "onclick-open-eform");
+					if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_READ))
+					{
+						controller.buildEventLink(formContainerElem, controller.formLinks.eFormNameMap, "onclick-open-eform");
+					}
 					/* generate quick links */
 					controller.buildEventLink(formContainerElem, controller.formLinks.quickLinkMap, "onclick-open-quicklink");
 				}
