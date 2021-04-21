@@ -33,16 +33,16 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+
 public class EditEncounterNotesTests extends SeleniumTestBase
 {
-	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 	private static final String JUNO_URL = "/web/#!/record/2/summary";
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
@@ -87,9 +87,10 @@ public class EditEncounterNotesTests extends SeleniumTestBase
 
 		String newNote = "Testing Note JUNO";
 		String editedNote = "Edited Testing Note JUNO";
-
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditor2")));
 		driver.findElement(By.id("noteEditor2")).sendKeys(newNote);
 		driver.findElement(By.id("theSave")).click();
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")));
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")).click();
 		driver.findElement(By.id("noteEditor2")).clear();
 		driver.findElement(By.id("noteEditor2")).sendKeys(editedNote);

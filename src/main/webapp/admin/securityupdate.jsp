@@ -97,7 +97,7 @@
 	Security overlappingEntry = securityDao.findByUserName(username);
 	Security security = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
 
-	if (securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_no")))
+	if (securityInfoManager.userCanModify((String)session.getAttribute("user"), request.getParameter("provider_no")))
 	{
 		if(security != null && (overlappingEntry == null || security.equals(overlappingEntry)))
 		{

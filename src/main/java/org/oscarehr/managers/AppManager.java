@@ -103,7 +103,7 @@ public class AppManager {
 	
 	public AppDefinition getAppDefinition(LoggedInInfo loggedInInfo,  String appName){
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appDefinition", "r", null)) {
-			throw new RuntimeException("Access Denied");
+			return null;
 		}
 		AppDefinition appDef = appDefinitionDao.findByName(appName);
 		

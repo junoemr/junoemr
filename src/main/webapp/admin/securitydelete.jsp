@@ -66,7 +66,7 @@ if(!authed) {
 	</tr>
 </table>
 <%
-if (securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_number")))
+if (securityInfoManager.userCanModify((String)session.getAttribute("user"), request.getParameter("provider_number")))
 {
 	int rowsAffected=0;
 	Security s = securityDao.find(Integer.parseInt(request.getParameter("security_no")));

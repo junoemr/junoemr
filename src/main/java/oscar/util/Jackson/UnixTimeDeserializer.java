@@ -21,33 +21,37 @@
  * Canada
  */
 
-import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
+package oscar.util.Jackson;
 
-angular.module('Admin').component('systemProperties',
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Date;
+
+/**
+ * Deserialize dates formatted as seconds since the Unix epoch.
+ */
+public class UnixTimeDeserializer extends StdDeserializer<Date>
+{
+    protected UnixTimeDeserializer(Class<?> vc)
     {
-        templateUrl: 'src/admin/systemProperties/systemProperties.jsp',
-        bindings: {},
-        controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
-        {
-            let ctrl = this;
+        super(vc);
+    }
 
-            ctrl.tabList = [
-                {
-                  label: "General",
-                  value: "admin.systemProperties.general"
-                },
-                {
-                    label: "Rx",
-                    value: 'admin.systemProperties.rx',
-                },
-            ];
+    public UnixTimeDeserializer()
+    {
+        this(Date.class);
+    }
 
-            ctrl.currentTab = "admin.systemProperties.general";
-            ctrl.componentStyle = JUNO_STYLE.GREY;
+    @Override
+    public Date deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException, JsonProcessingException
+    {
+        String jsonDate = parser.getText();
 
-            ctrl.tabChange = (activeTab) =>
-            {
-                $state.go(activeTab);
-            }
-        }]
-    });
+        return Date.from(Instant.ofEpochSecond(Long.parseLong(jsonDate)));
+    }
+}
