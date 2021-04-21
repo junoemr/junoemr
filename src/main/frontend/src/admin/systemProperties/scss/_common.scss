@@ -1,0 +1,29 @@
+#admin-system-properties {
+  @include juno-font-default();
+
+  .tab-container {
+    display: flex;
+  }
+
+    .admin-system-properties-body {
+      margin-left: 28px;
+
+      .property {
+        margin-top: 24px;
+
+        .property-toggle {
+          width: 92px;
+        }
+
+        .property-text {
+          padding-left: 20px;
+          .name {
+            @include juno-font-default-size(17px, bold);
+          }
+          .description {
+            @include juno-font-body-smallest();
+          }
+        }
+      }
+    }
+  }
