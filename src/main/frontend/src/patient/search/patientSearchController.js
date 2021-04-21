@@ -25,6 +25,8 @@
  Ontario, Canada
 
  */
+import {SecurityPermissions} from "../../common/security/securityConstants";
+
 angular.module('Patient.Search').controller('Patient.Search.PatientSearchController', [
 
 	'$q',
@@ -32,7 +34,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 	'$stateParams',
 	'$uibModal',
 	'NgTableParams',
-	'securityService',
+	'securityRolesService',
 	'demographicsService',
 
 	function(
@@ -41,7 +43,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		$stateParams,
 		$uibModal,
 		NgTableParams,
-		securityService,
+		securityRolesService,
 		demographicsService)
 	{
 		var controller = {};
@@ -55,6 +57,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		controller.STATUS_MODE = demographicsService.STATUS_MODE;
 		controller.SEARCH_MODE = demographicsService.SEARCH_MODE;
 		controller.defaultStatus = demographicsService.STATUS_MODE.ACTIVE;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.init = function init()
 		{
@@ -70,36 +73,11 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			}
 			controller.search.status = controller.defaultStatus;
 
-			securityService.hasRights(
+			if (securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ))
 			{
-				items: [
-				{
-					objectName: '_demographic',
-					privilege: 'r'
-				}]
-			}).then(
-				function success(results)
-				{
-					if (Juno.Common.Util.exists(results.content) && results.content.length === 1)
-					{
-						controller.demographicReadAccess = results.content[0];
-						if (controller.demographicReadAccess)
-						{
-							controller.initTable();
-						}
-					}
-					else
-					{
-						console.log('failed to load rights', results);
-						controller.demographicReadAccess = false;
-					}
-				},
-				function error(errors)
-				{
-					console.log(errors);
-					controller.demographicReadAccess = false;
-				});
-		};
+				controller.initTable();
+			}
+		}
 
 		//=========================================================================
 		// Methods
