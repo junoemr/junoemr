@@ -23,7 +23,6 @@
 
 --%>
 <div id="center-panel" class="schedule-center-panel">
-
 	<juno-security-check show-placeholder="true" permissions="scheduleController.SecurityPermissions.APPOINTMENT_READ">
 		<div class="flex-column flex-grow schedule-page-header">
 			<div class="schedule-options flex-row flex-grow align-items-center">
@@ -53,7 +52,7 @@
 									ca-template="bare"
 									ca-date-picker-id="schedule-view-select-date"
 									ca-name="Date"
-									ca-model="datepickerSelectedDate"
+									ca-model="scheduleController.datepickerSelectedDate"
 									ca-orientation="auto"
 							></ca-field-date>
 						</div>
@@ -65,7 +64,7 @@
 								ca-title="Site"
 								ca-template="label"
 								ca-no-label="true"
-								ca-model="selectedSiteName"
+								ca-model="scheduleController.selectedSiteName"
 								ca-options="getSiteOptions()"
 						>
 						</ca-field-select>
@@ -74,7 +73,7 @@
 							<select id="schedule-select"
 							        class="form-control"
 							        ng-change="onScheduleChanged()"
-							        ng-model="selectedSchedule"
+							        ng-model="scheduleController.selectedSchedule"
 							        ng-options="option as option.label for option in getScheduleOptions()">
 							</select>
 						</div>
@@ -84,7 +83,7 @@
 									ca-name="interval-select"
 									ca-no-label="true"
 									ca-template="label"
-									ca-model="selectedTimeInterval"
+									ca-model="scheduleController.selectedTimeInterval"
 									ca-options="getTimeIntervalOptions()"
 							>
 							</ca-field-select>

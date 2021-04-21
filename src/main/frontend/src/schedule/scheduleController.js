@@ -124,7 +124,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				value: '00:30:00'
 			}];
 		$scope.defaultTimeInterval = $scope.timeIntervalOptions[2].value;
-		$scope.selectedTimeInterval = $scope.defaultTimeInterval;
+		controller.selectedTimeInterval = $scope.defaultTimeInterval;
 		$scope.scheduleTimeInterval = null;
 
 		$scope.selectedSlotLabelInterval = {hours: 1};
@@ -134,7 +134,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.sites = {};
 		$scope.siteOptions = [];
 		$scope.sitesEnabled = false;
-		$scope.selectedSiteName = null;
+		controller.selectedSiteName = null;
 		$scope.telehealthEnabled = false;
 
 		$scope.openingDialog = false;
@@ -158,7 +158,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			group: 'GROUP',
 			provider: 'PROVIDER',
 		});
-		$scope.selectedSchedule = null;
+		controller.selectedSchedule = null;
 
 		controller.refreshSettings = {
 			timerVariable: null,
@@ -167,7 +167,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		};
 
 		$scope.defaultDate = globalStateService.global_settings.schedule.date_selected;
-		$scope.datepickerSelectedDate = null;
+		controller.datepickerSelectedDate = null;
 
 		controller.formLinks = {
 			enabled: true,
@@ -289,7 +289,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.calendarEvents = function calendarEvents(start, end, timezone, callback)
 		{
-			$scope.loadScheduleEvents($scope.selectedSchedule, $scope.selectedSiteName, start, end).then(
+			$scope.loadScheduleEvents(controller.selectedSchedule, controller.selectedSiteName, start, end).then(
 				function success()
 				{
 					try
@@ -311,14 +311,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.changeToSchedule = function (resourceId, view)
 		{
-			$scope.selectedSchedule = null;
+			controller.selectedSchedule = null;
 			var scheduleOptions = $scope.getScheduleOptions();
 
 			for (var i = 0; i < scheduleOptions.length; i++)
 			{
 				if (scheduleOptions[i].uuid === resourceId)
 				{
-					$scope.selectedSchedule = scheduleOptions[i];
+					controller.selectedSchedule = scheduleOptions[i];
 					break;
 				}
 			}
@@ -326,7 +326,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// set the selected schedule to an object not in the options list.
 			// this will show as an empty option when selected, but will be removed once de-selected.
 			// this allows selection of inactive providers schedules
-			if($scope.selectedSchedule === null)
+			if(controller.selectedSchedule === null)
 			{
 				var scheduleData = $scope.resourceOptionHash[resourceId];
 
@@ -337,7 +337,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				scheduleData.identifierType = controller.scheduleTypeEnum.provider;
 				scheduleData.providerNos = [resourceId];
 
-				$scope.selectedSchedule = scheduleData;
+				controller.selectedSchedule = scheduleData;
 			}
 
 			$scope.calendarViewName = view;
@@ -440,9 +440,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			// priority: last used from global state, then preference setting,
 			// then default (first in the list)
-			if ($scope.selectedSchedule !== null)
+			if (controller.selectedSchedule !== null)
 			{
-				return $scope.selectedSchedule;
+				return controller.selectedSchedule;
 			}
 
 			var selectedUuid = controller.providerSettings.groupNo;
@@ -514,7 +514,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.timeIntervalMinutes = function timeIntervalMinutes()
 		{
-			return parseInt($scope.selectedTimeInterval.split(":")[1]);
+			return parseInt(controller.selectedTimeInterval.split(":")[1]);
 		};
 
 		$scope.getSelectedTimeInterval = function getSelectedTimeInterval(
@@ -1170,7 +1170,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if ($scope.isInitialized())
 			{
-				$scope.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment($scope.calendar().fullCalendar('getDate')));
+				controller.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment($scope.calendar().fullCalendar('getDate')));
 			}
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
@@ -1376,7 +1376,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.openDaysheet = function openDaysheet(resourceId)
 		{
-			var formattedDate = $scope.datepickerSelectedDate;
+			var formattedDate = controller.datepickerSelectedDate;
 			var win = window.open('../report/reportdaysheet.jsp' +
 				'?dsmode=all' +
 				'&provider_no=' + encodeURIComponent(resourceId) +
@@ -1478,9 +1478,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				scheduleUuid = resource.id;
 			}
-			else if ($scope.selectedSchedule !== null)
+			else if (controller.selectedSchedule !== null)
 			{
-				scheduleUuid = $scope.selectedSchedule.uuid;
+				scheduleUuid = controller.selectedSchedule.uuid;
 			}
 
 			var activeTemplateList = $scope.getActiveTemplateEvents(start, $scope.events, Number(scheduleUuid));
@@ -1691,17 +1691,17 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onSiteChanged = function onSiteChanged()
 		{
-			var selectedSiteName = $scope.selectedSiteName;
+			var selectedSiteName = controller.selectedSiteName;
 			if (!Juno.Common.Util.exists(selectedSiteName))
 			{
-				$scope.selectedSiteName = null;
+				controller.selectedSiteName = null;
 			}
 
-			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.site", $scope.selectedSiteName)
+			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.site", controller.selectedSiteName)
 				.then(
 					function success()
 					{
-						controller.providerSettings.siteSelected = $scope.selectedSiteName;
+						controller.providerSettings.siteSelected = controller.selectedSiteName;
 						$scope.refetchEvents();
 					},
 					function failure()
@@ -1713,7 +1713,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onScheduleChanged = function onScheduleChanged()
 		{
-			var selectedSchedule = $scope.selectedSchedule;
+			var selectedSchedule = controller.selectedSchedule;
 
 			if (!Juno.Common.Util.exists(selectedSchedule))
 			{
@@ -1749,7 +1749,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onTimeIntervalChanged = function onTimeIntervalChanged()
 		{
-			$scope.scheduleTimeInterval = $scope.selectedTimeInterval;
+			$scope.scheduleTimeInterval = controller.selectedTimeInterval;
 			var intervalInMin = $scope.scheduleTimeInterval.split(':')[1];
 
 			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "everyMin", intervalInMin)
@@ -1759,7 +1759,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						controller.providerSettings.period = Number(intervalInMin);
 
 						// updating the config will automatically trigger an events refresh
-						$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
+						$scope.uiConfig.calendar.slotDuration = controller.selectedTimeInterval;
 						$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
 
 						// ensure the selected date doesn't change on events refresh
@@ -2081,13 +2081,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.loadDefaultSelections = function loadDefaultSelections()
 		{
-			$scope.selectedSchedule = $scope.getSelectedSchedule($scope.scheduleOptions);
-			$scope.selectedSiteName = controller.getSelectedSite();
+			controller.selectedSchedule = $scope.getSelectedSchedule($scope.scheduleOptions);
+			controller.selectedSiteName = controller.getSelectedSite();
 			controller.selectedScheduleView = controller.getSelectedScheduleView();
 
-			$scope.selectedTimeInterval = $scope.getSelectedTimeInterval(
+			controller.selectedTimeInterval = $scope.getSelectedTimeInterval(
 				$scope.timeIntervalOptions, $scope.defaultTimeInterval);
-			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
+			$scope.uiConfig.calendar.slotDuration = controller.selectedTimeInterval;
 			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
 
 			$scope.uiConfig.calendar.minTime = $scope.getScheduleMinTime();
@@ -2103,7 +2103,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.loadWatches = function loadWatches()
 		{
-			$scope.$watch('datepickerSelectedDate', function (newValue, oldValue)
+			$scope.$watch('scheduleController.datepickerSelectedDate', function (newValue, oldValue)
 			{
 				if (newValue !== oldValue)
 				{
@@ -2112,14 +2112,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 			});
 
-			$scope.$watch('selectedSiteName', function (newValue, oldValue)
+			$scope.$watch('scheduleController.selectedSiteName', function (newValue, oldValue)
 			{
 				if (newValue !== oldValue)
 				{
 					$scope.onSiteChanged();
 				}
 			});
-			$scope.$watch('selectedTimeInterval', function (newValue, oldValue)
+			$scope.$watch('scheduleController.selectedTimeInterval', function (newValue, oldValue)
 			{
 				if (newValue !== oldValue)
 				{
@@ -2204,7 +2204,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				defaultView: null,
 				defaultDate: $scope.defaultDate,
-				slotDuration: $scope.selectedTimeInterval,
+				slotDuration: controller.selectedTimeInterval,
 				snapDuration: '00:05:00',
 				slotLabelInterval: $scope.selectedSlotLabelInterval,
 				slotLabelFormat: 'h A',
