@@ -22,7 +22,7 @@
  */
 
 import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
-import {MhaDemographicApi, MhaIntegrationApi} from "../../../../generated";
+import {MhaDemographicApi, MhaIntegrationApi, PatientTo1} from "../../../../generated";
 
 angular.module('Common.Components').component('mhaPatientDetailsModal',
 {
@@ -89,7 +89,8 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.demographic.demographicNo)).data.body;
 					if (patient)
 					{
-						if(patient.link_status === "ACTIVE")
+						if(patient.link_status === PatientTo1.LinkStatusEnum.CONFIRMED ||
+							patient.link_status === PatientTo1.LinkStatusEnum.VERIFIED)
 						{
 							// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
 							let province = patient.address_province_code !== "UNKNOWN" ? patient.address_province_code : "";
@@ -145,11 +146,12 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 		ctrl.getConnectionStatusHuman = (patientConnectionStatus) =>
 		{
-			if (patientConnectionStatus === "ACTIVE")
+			if (patientConnectionStatus === PatientTo1.LinkStatusEnum.CONFIRMED ||
+				patientConnectionStatus === PatientTo1.LinkStatusEnum.VERIFIED)
 			{
 				return "Patient is a CONFIRMED user";
 			}
-			else if (patientConnectionStatus === "CLINIC_REJECTED")
+			else if (patientConnectionStatus === PatientTo1.LinkStatusEnum.CLINICREJECTED)
 			{
 				return "Patient has been REJECTED by clinic";
 			}
@@ -235,7 +237,8 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		{
 			if(ctrl.currentProfile)
 			{
-				return ctrl.currentProfile.link_status === 'ACTIVE';
+				return ctrl.currentProfile.link_status === PatientTo1.LinkStatusEnum.CONFIRMED ||
+					ctrl.currentProfile.link_status === PatientTo1.LinkStatusEnum.VERIFIED;
 			}
 			return false;
 		}
