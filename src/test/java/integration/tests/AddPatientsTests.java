@@ -136,7 +136,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("cust3")).sendKeys("Alert Note");
 		driver.findElement(By.id("content")).sendKeys("Notes");
 		driver.findElement(By.id("btnAddRecord")).click();
-
+		Thread.sleep(2000);
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h2[contains(.,'Successful Addition of a Demographic Record.')]")));
 		Assert.assertTrue(isPatientAdded(mom.lastName, mom.firstName,
 				By.xpath("//a[contains(.,'Back to Demographic Search Page')]"),
