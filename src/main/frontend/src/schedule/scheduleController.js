@@ -948,7 +948,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				// var eventSite = $scope.sites[event.data.site];
 
 				/* disable buttons if modules are disabled */
-				if(controller.inReadOnlyMode())
+				if(!controller.userCanEditAppointments())
 				{
 					statusElem.addClass("disabled");
 				}

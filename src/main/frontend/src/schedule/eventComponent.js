@@ -279,11 +279,11 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.$onInit = function init()
 			{
-				if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ, SecurityPermissions.APPOINTMENT_READ))
+				if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_READ))
 				{
 					$timeout(function ()
 					{
-						$scope.cancel();
+						controller.cancel();
 					});
 				}
 				controller.readOnlyMode = controller.inEditMode() ?

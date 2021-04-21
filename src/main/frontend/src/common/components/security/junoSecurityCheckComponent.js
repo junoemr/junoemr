@@ -35,6 +35,7 @@ angular.module('Common.Components').component('junoSecurityCheck',
         function ($scope, securityRolesService)
     {
         let ctrl = this;
+        ctrl.hasAccess = false;
 
         ctrl.$onInit = () =>
         {
@@ -46,11 +47,13 @@ angular.module('Common.Components').component('junoSecurityCheck',
             {
                 ctrl.permissions = [ctrl.permissions];
             }
+
+            ctrl.hasAccess = securityRolesService.hasSecurityPrivileges(...ctrl.permissions);
         }
 
         ctrl.hasPermissions = () =>
         {
-            return securityRolesService.hasSecurityPrivileges(...ctrl.permissions);
+            return ctrl.hasAccess;
         }
 
     }]
