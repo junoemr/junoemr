@@ -373,13 +373,6 @@ public class DemographicManager {
 
 		//retain merge info
 		demographic.setSubRecord(prevDemo.getSubRecord());
-
-		// retain old consent timestamps if unchanged
-		if (demographic.getElectronicMessagingConsentStatus() == prevDemo.getElectronicMessagingConsentStatus())
-		{
-			demographic.setElectronicMessagingConsentGivenAt(prevDemo.getElectronicMessagingConsentGivenAt());
-			demographic.setElectronicMessagingConsentRejectedAt(prevDemo.getElectronicMessagingConsentRejectedAt());
-		}
 		
 		//save current demo
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
@@ -402,19 +395,6 @@ public class DemographicManager {
 
 				updateExtension(loggedInInfo, ext);
 			}
-		}
-
-		// log consent status change.
-		if (prevDemo.getElectronicMessagingConsentStatus() != demographic.getElectronicMessagingConsentStatus())
-		{
-			// record the consent change.
-			LogAction.addLogEntry(
-					loggedInInfo.getLoggedInProviderNo(),
-					demographic.getDemographicNo(),
-					LogConst.ACTION_UPDATE,
-					LogConst.CON_ELECTRONIC_MESSAGING_CONSENT_STATUS,
-					LogConst.STATUS_SUCCESS,
-					demographic.getElectronicMessagingConsentStatus().name());
 		}
 	}
 	
@@ -1135,4 +1115,5 @@ public class DemographicManager {
 	{
 		return this.demographicDao.getDemographicByHealthNumber(healthNumber);
 	}
+
 }

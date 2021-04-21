@@ -100,23 +100,15 @@ public class AppointmentStatusAction extends DispatchAction {
 		LazyValidatorForm lazyForm = (LazyValidatorForm) form;
 	
 		Integer statusId = Integer.parseInt(lazyForm.get("id").toString());
+		
 		AppointmentStatus apptStatus = statusService.getAppointmentStatusById(statusId);
-		String description = lazyForm.get("description").toString();
-
-		int isActive = 1;
-		if (lazyForm.get("active") != null)
+		if (apptStatus.getEditable() != 1)
 		{
-			isActive = Integer.parseInt(lazyForm.get("active").toString());
-		}
-
-		// For "non-editable statuses", the two things we want to prevent are changing name or disabling
-		if (!apptStatus.isEditable() && (isActive != 1 || !description.equals(apptStatus.getDescription())))
-		{
-			throw new RuntimeException("Can't disable a readonly status or change its description");
+			throw new RuntimeException("Can't edit a readonly status");
 		}
 		
-		apptStatus.setDescription(description);
-		apptStatus.setActive(isActive);
+		apptStatus.setDescription(lazyForm.get("description").toString());
+		apptStatus.setActive(Integer.parseInt(lazyForm.get("active").toString()));
 		apptStatus.setIcon(lazyForm.get("icon").toString());
 		apptStatus.setColor(lazyForm.get("color").toString());
 		apptStatus.setJunoColor(lazyForm.get("junoColor").toString());

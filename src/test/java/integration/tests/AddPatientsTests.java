@@ -51,16 +51,14 @@ public class AddPatientsTests extends SeleniumTestBase
 	public static final String dadFullName = dad.lastName + ',' + dad.firstName;
 
 	@AfterClass
-	public static void cleanup()
-			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "demographicExt", "demographicExtArchive", "log", "log_ws_rest",
 				"program", "provider_recent_demographic_access");
 	}
 
-	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow)
-			throws InterruptedException
+	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
 	{
 		driver.findElement(searchPage).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchTerm));
@@ -72,8 +70,7 @@ public class AddPatientsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addPatientsClassicUITest()
-			throws Exception
+	public void addPatientsClassicUITest() throws Exception
 	{
 		// open patient search page
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
@@ -136,7 +133,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("cust3")).sendKeys("Alert Note");
 		driver.findElement(By.id("content")).sendKeys("Notes");
 		driver.findElement(By.id("btnAddRecord")).click();
-		Thread.sleep(2000);
+
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h2[contains(.,'Successful Addition of a Demographic Record.')]")));
 		Assert.assertTrue(isPatientAdded(mom.lastName, mom.firstName,
 				By.xpath("//a[contains(.,'Back to Demographic Search Page')]"),
@@ -145,8 +142,7 @@ public class AddPatientsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addPatientsClassicUIQuickFormTest()
-			throws Exception
+	public void addPatientsClassicUIQuickFormTest() throws Exception
 	{
 		// open patient search page
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
@@ -173,8 +169,7 @@ public class AddPatientsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addPatientsJUNOUITest()
-			throws Exception
+	public void addPatientsJUNOUITest() throws Exception
 	{
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
@@ -198,7 +193,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")));
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.clickHandler()']")).click();
-		Thread.sleep(2000);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Search']")));
 
 		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,
 				By.xpath("//button[@title='Search']"),

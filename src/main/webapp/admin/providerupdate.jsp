@@ -159,7 +159,7 @@
   }
 
 
-if (securityInfoManager.userCanModify(request.getParameter("current_user"),request.getParameter("provider_no")))
+if (securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no")))
 {
 	if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize)
 	{

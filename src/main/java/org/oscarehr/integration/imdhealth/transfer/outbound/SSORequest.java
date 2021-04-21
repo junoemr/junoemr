@@ -28,7 +28,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -40,17 +39,9 @@ public class SSORequest implements Serializable
 	@JsonProperty("organization")
 	private SSOOrganization organizationInfo;
 
-	@JsonProperty("patient")
-	private SSOPatient patientInfo;
-
-	@JsonProperty("issues")
-	private Set<String> issues;
-
-	public SSORequest(SSOUser user, SSOOrganization organization, SSOPatient patient, Set<String> issues)
+	public SSORequest(SSOUser user, SSOOrganization organization)
 	{
 		this.userInfo = user;
 		this.organizationInfo = organization;
-		this.patientInfo = patient;
-		this.issues = issues;		// Empty set for now, implementation TBD
 	}
 }

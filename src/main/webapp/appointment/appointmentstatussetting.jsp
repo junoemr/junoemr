@@ -110,7 +110,9 @@
         <th class="header text-l">Classic UI</th>
         <th class="header text-l">Juno UI</th>
 		<th class="header text-l">Enabled</th>
-		<th class="header text-l wider" colspan=3>Editing Options</th>
+		<% if (isSuperAdmin) { %>
+		<th class="header text-l wider" colspan=3>Super Admin Options</th>
+		<% } %>
 	</tr>
 	<%
         List<AppointmentStatus> statuses = (List<AppointmentStatus>) request.getAttribute("appointmentStatuses");
@@ -119,7 +121,8 @@
 
         for (AppointmentStatus status : statuses)
         {
-            boolean isActive = status.isActive();
+        	boolean isActive =  status.getActive() == 1;
+        	boolean isMovable = status.getEditable() == 1;
 
             UriComponentsBuilder editUrl = UriComponentsBuilder.fromPath(baseUrl);
             editUrl.queryParam("method", "modify");
@@ -140,34 +143,24 @@
 
             if (matcher.find())
             {
-                junoIconClass = "icon-" + matcher.group(1);
+            	junoIconClass = "icon-" + matcher.group(1);
             }
     %>
-    <tr>
-        <td><%= status.getId() %>
-        </td>
-        <td class="nowrap"><%= status.getStatus() %>
-        </td>
-        <td class="nowrap"><%= status.getDescription() %>
-        </td>
-        <td style="background-color: <%= status.getColor() %>"><img class=preview src="<%=imgUrl%>" alt="Classic icon"/>
-        </td>
-        <td style="background-color: <%= status.getJunoColor() %>"><i class="preview <%="icon " + junoIconClass %>"
-                                                                      alt="Juno icon"></i></td>
-        <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %>
-        </td>
-        <td class="nowrap text-l"><a href=<%= editUrl.build().toString() %>>Edit</a></td>
-        <%
-            if (isSuperAdmin)
-            { %>
-        <td class="nowrap text-l">
-            <a href=<%= upUrl.build().toString() %>>Move Up</a>
-        </td>
-        <td class="nowrap text-l">
-            <a href=<%= downUrl.build().toString() %>>Move Down</a>
-        </td>
+	<tr>
+        <td><%= status.getId() %></td>
+		<td class="nowrap"><%= status.getStatus() %></td>
+		<td class="nowrap"><%= status.getDescription() %></td>
+        <td style="background-color: <%= status.getColor() %>"><img class=preview src="<%=imgUrl%>" alt="Classic icon"/></td>
+		<td style="background-color: <%= status.getJunoColor() %>"><i class="preview <%="icon " + junoIconClass %>" alt="Juno icon"></i></td>
+        <td class="nowrap <%= isActive ? "active" : "inactive" %>"><%= isActive ? "Enabled" : "Disabled" %></td>
+        <% if (isSuperAdmin) { %>
+		<td class="nowrap text-l"><a href=<%= editUrl.build().toString() %>>Edit</a></td>
+            <% if (isMovable) { %>
+        <td class="nowrap text-l"><a href=<%= upUrl.build().toString() %>>Move Up</a></td>
+        <td class="nowrap text-l"><a href=<%= downUrl.build().toString() %>>Move Down</a></td>
+            <% } %>
         <% } %>
-    </tr>
+	</tr>
     <% } %>
 </table>
 <% if (isSuperAdmin) { %>

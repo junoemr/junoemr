@@ -1,4 +1,4 @@
-/*
+<%--
 * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
 * This software is published under the GPL GNU General Public License.
 * This program is free software; you can redistribute it and/or
@@ -19,34 +19,31 @@
 * CloudPractice Inc.
 * Victoria, British Columbia
 * Canada
-*/
+--%>
 
-import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 
-angular.module('Record.Details').component('contactSection', {
-	templateUrl: 'src/record/details/components/contactSection/contactSection.jsp',
-	bindings: {
-		ngModel: "=",
-		validations: "=",
-		componentStyle: "<?"
-	},
-	controller: [ "staticDataService", "$scope", function (staticDataService, $scope)
-	{
-		let ctrl = this;
-
-		$scope.LABEL_POSITION = LABEL_POSITION;
-
-		ctrl.provinces = staticDataService.getProvinces();
-		ctrl.phoneNumberRegex = /^[\d-\s()]*$/;
-
-		ctrl.$onInit = () =>
-		{
-			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
-
-			ctrl.validations = Object.assign(ctrl.validations, {
-				email: Juno.Validations.validationEmail(ctrl, "ngModel.email"),
-			});
-		}
-
-	}]
-});
+<div class="admin-system-properties-body system-properties-billing">
+	<h3 class="title">Manage Billing Properties</h3>
+	<div class="content">
+		<div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
+			<div class="property-text flex-column">
+				<div class="name">{{ property.name }}</div>
+				<div class="description">{{ property.description }}</div>
+			</div>
+		</div>
+		<div class="property flex-row">
+			<div class="property-toggle flex-column" >
+				<juno-select-save
+						ng-model="$ctrl.selectedValue"
+						options="$ctrl.codes"
+						click="$ctrl.updateProperty()"
+						title="{{$ctrl.title}}"
+						button-color="$ctrl.buttonColor"
+						button-color-pattern="$ctrl.buttonColorPattern"
+						component-style="$ctrl.componentStyle"
+						icon="$ctrl.icon">
+				</juno-select-save>
+			</div>
+		</div>
+	</div>
+</div>

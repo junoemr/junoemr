@@ -240,6 +240,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.systemProperties.billing',
+		{
+			url: '/billing',
+			component: 'systemPropertiesBilling',
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',

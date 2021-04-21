@@ -103,6 +103,7 @@ public class AppointmentStatusService
 		
 		status.setStatus(nextAvailableStatusCode);
 		appointmentStatusDao.persist(status);
+		
 		return status;
 	}
 	
@@ -210,8 +211,7 @@ public class AppointmentStatusService
 		appointmentStatusDao.merge(source);
 		appointmentStatusDao.merge(target);
 	}
-
-
+	
 	/**
 	 * Return which statuses from the given list are in use.
 	 *

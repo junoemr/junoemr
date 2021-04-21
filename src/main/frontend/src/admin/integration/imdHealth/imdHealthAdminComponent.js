@@ -40,7 +40,6 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                 clientSecret: ""
             };
 
-            ctrl.isBusy = false;
             ctrl.imdIntegrations = [];
 
             ctrl.LABEL_POSITION = LABEL_POSITION;
@@ -102,34 +101,26 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
 
              ctrl.syncIntegrations = (integrationId) =>
              {
-                 ctrl.isBusy = true;
-
                   imdHealthWebService.syncIntegrations(integrationId)
                       .then((response ) =>
                       {
-                          let failureMessages = response.data.body;
+                          let failedIntegrations = response.data.body;
 
-                          if (failureMessages.length < 1)
+                          if (failedIntegrations.length < 1)
                           {
-                              Juno.Common.Util.successAlert($uibModal,"Success", "Successfully synchronized all sites");
+                              Juno.Common.Util.successAlert($uibModal,"Success", "Successfully synced");
                           }
                           else
                           {
-                              Juno.Common.Util.errorAlert($uibModal,
-                                  "Attention",
-                                  "Could not synchronize the following:" + '\n' + failureMessages.join('\n'));
+                              Juno.Common.Util.errorAlert($uibModal, "Failure", "Could not sync the following integrations:" + '\n' + failedIntegrations);
 
-                              console.log(failureMessages.join('\n'));
+                              console.log(failedIntegrations.join(' | '));
                           }
                       })
                       .catch((error) =>
                       {
-                        Juno.Common.Util.errorAlert($uibModal, "There was a problem synchronizing your integration");
                         console.log(error);
                       })
-                      .finally(() => {
-                          ctrl.isBusy = false;
-                      });
              }
 
             ctrl.testSSO = (integrationId) =>

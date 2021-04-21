@@ -27,7 +27,7 @@ angular.module('Admin.Integration').component('imdHealthLanding',
     {
         templateUrl: 'src/admin/integration/imdHealth/imdHealthLanding.jsp',
         bindings: {},
-        controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$stateParams', '$sce', function ($scope, $http, $httpParamSerializer, $state, $stateParams, $sce) {
+        controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$sce', function ($scope, $http, $httpParamSerializer, $state, $sce) {
 
             let ctrl = this;
             let imdHealthWebService = new IMDHealthApi ($http, $httpParamSerializer, '../ws/rs');
@@ -37,9 +37,8 @@ angular.module('Admin.Integration').component('imdHealthLanding',
 
             ctrl.onPageLoad = () =>
             {
-                const demographicNo = $stateParams.demographicNo || null;
-
-                imdHealthWebService.getSSOLink(demographicNo)
+                console.log("onPageLoad");
+                imdHealthWebService.getSSOLink(null)
                     .then((response) =>
                     {
                         const ssoLink = response.data.body;

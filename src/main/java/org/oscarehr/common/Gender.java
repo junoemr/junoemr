@@ -24,49 +24,20 @@
 package org.oscarehr.common;
 
 public enum Gender {
-	M("Male", "M"),
-	F("Female", "F"),
-	T("Transgender", "T"),
-	O("Other", "O"),
-	U("Undefined", "U");
+	M("Male"),
+	F("Female"),
+	T("Transgender"),
+	O("Other"),
+	U("Undefined");
 	
 	private final String text;
-	private final String letterCode;
 		
-	Gender(String text, String letterCode)
-	{
+	Gender(String text) {
 		this.text = text;
-		this.letterCode = letterCode;
 	}
 	
-	public String getText()
-	{
+	public String getText() {
 		return text;
 	}
-
-	public String getLetterCode()
-	{
-		return letterCode;
-	}
-
-	/**
-	 * Given a gender letter code (ex: M, m, F, f, T, t, U, u, O, o)
-	 * return the corresponding Gender enum.
-	 *
-	 * @param code Gender letter code
-	 * @return Gender corresponding to the letter code, or Gender.U if not found
-	 */
-	public static Gender fromLetterCode(String code)
-	{
-		String upperCased = code.toUpperCase();
-		for (Gender gender : Gender.values())
-		{
-			if (gender.letterCode.equals(upperCased))
-			{
-				return gender;
-			}
-		}
-
-		return Gender.U;
-	}
+		
 }

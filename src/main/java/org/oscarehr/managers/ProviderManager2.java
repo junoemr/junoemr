@@ -1056,7 +1056,6 @@ public class ProviderManager2
 		if (preference == null)
 		{
 			preference = new ProviderPreference();
-			preference.setProviderNo(providerNo);
 		}
 
 		switch (key)

@@ -31,7 +31,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
@@ -77,7 +76,6 @@ public class AssignRolesTests extends SeleniumTestBase
     @Test
     public void assignRolesClassicUITest() throws InterruptedException {
         accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='keyword']")));
         driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);
         driver.findElement(By.xpath("//input[@name='search']")).click();
 

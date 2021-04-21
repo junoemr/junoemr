@@ -25,8 +25,6 @@
 
 package org.oscarehr.common.model;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.util.MiscUtils;
 
@@ -157,16 +155,6 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	private Date lastUpdateDate = null;
 	@Column(name = "veteran_no")
 	private String veteranNo = null;
-	@Getter
-	@Setter
-	@Column(name = "electronic_messaging_consent_given_at")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date electronicMessagingConsentGivenAt;
-	@Getter
-	@Setter
-	@Column(name = "electronic_messaging_consent_rejected_at")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date electronicMessagingConsentRejectedAt;
 
 	public DemographicArchive()
 	{
@@ -224,8 +212,6 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.title = demographic.getTitle();
 		this.ver = demographic.getVer();
 		this.yearOfBirth = demographic.getYearOfBirth();
-		this.setElectronicMessagingConsentGivenAt(demographic.getElectronicMessagingConsentGivenAt());
-		this.setElectronicMessagingConsentRejectedAt(demographic.getElectronicMessagingConsentRejectedAt());
 	}
 
 	public DemographicArchive(org.oscarehr.demographic.model.Demographic demographic)
