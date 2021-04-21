@@ -25,6 +25,7 @@ package org.oscarehr.ws.rest;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.CustomFilter;
@@ -188,9 +189,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 		ticklerCriteriaSearch.setSortMode(sortMode);
 		ticklerCriteriaSearch.setStartDate(ConversionUtils.fromDateString(serviceStartDate));
 		ticklerCriteriaSearch.setEndDate(ConversionUtils.fromDateString(serviceEndDate));
-		ticklerCriteriaSearch.setTaskAssignedTo(taskAssignedTo);
-		ticklerCriteriaSearch.setCreator(creator);
-		ticklerCriteriaSearch.setMrp(mrp);
+		ticklerCriteriaSearch.setTaskAssignedTo(StringUtils.trimToNull(taskAssignedTo));
+		ticklerCriteriaSearch.setCreator(StringUtils.trimToNull(creator));
+		ticklerCriteriaSearch.setMrp(StringUtils.trimToNull(mrp));
 		ticklerCriteriaSearch.setDemographicNo(demographicNo);
 
 		Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);

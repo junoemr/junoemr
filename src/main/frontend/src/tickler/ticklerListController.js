@@ -1,3 +1,5 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 	'$scope',
@@ -10,6 +12,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 	'$filter',
 	'NgTableParams',
 	'securityService',
+	'securityRolesService',
 	'ticklerService',
 	'noteService',
 	'providerService',
@@ -27,6 +30,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		$filter,
 		NgTableParams,
 		securityService,
+		securityRolesService,
 		ticklerService,
 		noteService,
 		providerService,
@@ -39,67 +43,44 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.lastResponse = ""; // Can be removed?
 		controller.providers = providers;
+		controller.SecurityPermissions = SecurityPermissions;
+		controller.tableParams = null;
 
-		securityService.hasRights(
+		controller.$onInit = () =>
 		{
-			items: [
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_READ))
 			{
-				objectName: '_tickler',
-				privilege: 'w'
-			},
-			{
-				objectName: '_tickler',
-				privilege: 'r'
-			}]
-		}).then(function(result)
-		{
-			if (result.content != null && result.content.length == 2)
-			{
-				controller.ticklerWriteAccess = result.content[0];
-				controller.ticklerReadAccess = result.content[1];
+				//object which represents all the filters, initialize status.
+				controller.search = {
+					status: 'A',
+				};
 
-				if (controller.ticklerReadAccess)
-				{
-
-					//object which represents all the filters, initialize status.
-					controller.search = {
-						status: 'A',
-					};
-
-					if ($state.current.name === 'ticklers')
-					{// only default to current day for serviceEndDate on the global tickler page.
-						controller.search.serviceEndDate = moment().endOf('day').toDate();
-					}
-
-					providerService.getSettings().then(
-						function(settings)
-						{
-							if (settings.ticklerViewOnlyMine)
-							{
-								providerService.getMe().then(
-										function(user)
-										{
-											controller.search.taskAssignedTo = user.providerNo;
-											controller.loadTable();
-										}
-								)
-							}
-							else
-							{
-								controller.loadTable();
-							}
-						}
-					);
+				if ($state.current.name === 'ticklers')
+				{// only default to current day for serviceEndDate on the global tickler page.
+					controller.search.serviceEndDate = moment().endOf('day').toDate();
 				}
+
+				providerService.getSettings().then(
+					function(settings)
+					{
+						if (settings.ticklerViewOnlyMine)
+						{
+							providerService.getMe().then(
+								function(user)
+								{
+									controller.search.taskAssignedTo = user.providerNo;
+									controller.loadTable();
+								}
+							)
+						}
+						else
+						{
+							controller.loadTable();
+						}
+					}
+				);
 			}
-			else
-			{
-				alert('failed to load rights');
-			}
-		}, function(reason)
-		{
-			alert(reason);
-		});
+		}
 
 		controller.doSearch = function()
 		{
@@ -122,15 +103,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				tickler.checked = true;
 			});
 		};
-
-		// controller.checkAll = function()
-		// {
-
-		// 	angular.forEach(controller.lastResponse, function(item)
-		// 	{
-		// 		item.checked = true;
-		// 	});
-		// };
 
 		controller.checkNone = function checkNone(data)
 		{
@@ -285,7 +257,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					},
 					ticklerWriteAccess: function()
 					{
-						return controller.ticklerWriteAccess;
+						return controller.canCreate();
 					},
 					me: function()
 					{
@@ -404,6 +376,23 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		controller.inDemographicView = function()
 		{
 			return ($state.params.demographicNo != null);
+		}
+
+		controller.canEdit = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_UPDATE);
+		}
+		controller.canCreate = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_CREATE);
+		}
+		controller.canDelete = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_DELETE);
+		}
+		controller.canAccessEChart = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
 		}
 	}
 ]);
