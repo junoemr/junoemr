@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.conversion;
+package org.oscarehr.ws.external.soap.v1.converter;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class DemographicModelToTransferConverter extends AbstractModelConverter<Demographic, DemographicTransfer>
+public class DemographicModelToSoapTransferConverter extends AbstractModelConverter<Demographic, DemographicTransfer>
 {
 	@Override
 	public DemographicTransfer convert(Demographic demographic)
@@ -45,7 +45,18 @@ public class DemographicModelToTransferConverter extends AbstractModelConverter<
 		}
 
 		DemographicTransfer demographicTransfer = new DemographicTransfer();
-		BeanUtils.copyProperties(demographic, demographicTransfer);
+		String[] ignoreProperties = {
+				"activeCount",
+				"cellPhone",
+				"demographicNo",
+				"familyDoctor",
+				"familyDoctor2",
+				"effDate",
+				"yearOfBirth",
+				"monthOfBirth",
+				"dateOfBirth"
+		};
+		BeanUtils.copyProperties(demographic, demographicTransfer, ignoreProperties);
 
 		// Manually assign stuff that couldn't be bean copied
 		demographicTransfer.setActiveCount(demographic.isActive() ? 1 : 0);
