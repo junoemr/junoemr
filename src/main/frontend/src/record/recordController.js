@@ -24,6 +24,7 @@
 
 */
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -40,12 +41,12 @@ angular.module('Record').controller('Record.RecordController', [
 	'$interval',
 	'$uibModal',
 	'demographicService',
-	'demo',
 	'user',
 	'properties',
 	'noteService',
 	'uxService',
 	'securityService',
+	'securityRolesService',
 	'billingService',
 
 	function(
@@ -62,12 +63,12 @@ angular.module('Record').controller('Record.RecordController', [
 		$interval,
 		$uibModal,
 		demographicService,
-		demo,
 		user,
 		properties,
 		noteService,
 		uxService,
 		securityService,
+		securityRolesService,
 		billingService)
 	{
 
@@ -77,10 +78,11 @@ angular.module('Record').controller('Record.RecordController', [
 			'../ws/rs');
 
 		controller.demographicNo = $stateParams.demographicNo;
-		controller.demographic = demo;
+		controller.demographic = null;
 		controller.properties = properties;
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
+		controller.SecurityPermissions = SecurityPermissions;
 
 		/*
 		 * handle concurrent note edit - EditingNoteFlag
@@ -93,22 +95,77 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
 		controller.working = false;
+		controller.page.cannotChange = true;
 
-		controller.init = function init()
+		controller.$onInit = () =>
 		{
-			controller.fillMenu();
-		};
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ))
+			{
+				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_CREATE);
+				demographicService.getDemographic(controller.demographicNo).then((response) =>
+				{
+					controller.demographic = response;
+					controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 
-		//get access rights
-		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
-			function success(results)
+					controller.fillMenu();
+				});
+			}
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_CREATE))
 			{
-				controller.page.cannotChange = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
+				//////AutoSave
+				var saveIntervalSeconds = 2;
+
+				var timeout = null;
+				var saveUpdates = function saveUpdates()
+				{
+					if (controller.page.encounterNote.note == controller.page.initNote) return; //user did not input anything, don't save
+
+					console.log("save", controller.page.encounterNote);
+					noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote);
+				};
+				controller.skipTmpSave = false;
+				controller.noteDirty = false;
+
+				controller.getCurrentNote(true);
+
+
+				var delayTmpSave = function delayTmpSave(newVal, oldVal)
+				{
+					if (!controller.skipTmpSave)
+					{
+						if (newVal != oldVal)
+						{
+							controller.noteDirty = true;
+							if (timeout)
+							{
+								$timeout.cancel(timeout);
+							}
+							timeout = $timeout(saveUpdates, saveIntervalSeconds * 1000);
+						}
+						else
+						{
+							controller.noteDirty = false;
+						}
+					}
+					controller.skipTmpSave = false; // only skip once
+				};
+				$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
+
+				//////
+
+				//////Timer
+				controller.currentDate = new Date(); //the start
+
+				controller.totalSeconds = 0;
+				controller.intervalVal = setInterval(setTime, 1000);
+
+				$scope.$on('$destroy', function()
+				{
+					clearInterval(controller.intervalVal);
+				});
+
+			}
+		};
 
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
@@ -216,53 +273,9 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		});
 
-		//////AutoSave
-		var saveIntervalSeconds = 2;
-
-		var timeout = null;
-		var saveUpdates = function saveUpdates()
-		{
-			if (controller.page.encounterNote.note == controller.page.initNote) return; //user did not input anything, don't save
-
-			console.log("save", controller.page.encounterNote);
-			noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote);
-		};
-		var skipTmpSave = false;
-		var noteDirty = false;
-
-		var delayTmpSave = function delayTmpSave(newVal, oldVal)
-		{
-			if (!skipTmpSave)
-			{
-				if (newVal != oldVal)
-				{
-					noteDirty = true;
-					if (timeout)
-					{
-						$timeout.cancel(timeout);
-					}
-					timeout = $timeout(saveUpdates, saveIntervalSeconds * 1000);
-				}
-				else
-				{
-					noteDirty = false;
-				}
-			}
-			skipTmpSave = false; // only skip once
-		};
-		$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
-
-		//////
-
-		//////Timer
-		var d = new Date(); //the start
-
-		var totalSeconds = 0;
-		var myVar = setInterval(setTime, 1000);
-
 		controller.getCurrentTimerToggle = function getCurrentTimerToggle()
 		{
-			if (angular.isDefined(myVar))
+			if (angular.isDefined(controller.intervalVal))
 			{
 				return "fa-pause";
 			}
@@ -275,31 +288,31 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				$("#aToggle").removeClass("fa-pause");
 				$("#aToggle").addClass("fa-play");
-				clearInterval(myVar);
+				clearInterval(controller.intervalVal);
 			}
 			else
 			{
 				$("#aToggle").removeClass("fa-play");
 				$("#aToggle").addClass("fa-pause");
-				myVar = setInterval(setTime, 1000);
+				controller.intervalVal = setInterval(setTime, 1000);
 			}
 		};
 
 		controller.pasteTimer = function pasteTimer()
 		{
 			var ed = new Date();
-			controller.page.encounterNote.note += "\n" + document.getElementById("startTag").value + ": " + d.getHours() + ":" + pad(d.getMinutes()) + "\n" + document.getElementById("endTag").value + ": " + ed.getHours() + ":" + pad(ed.getMinutes()) + "\n" + pad(parseInt(totalSeconds / 3600)) + ":" + pad(parseInt((totalSeconds / 60) % 60)) + ":" + pad(totalSeconds % 60);
+			controller.page.encounterNote.note += "\n" + document.getElementById("startTag").value + ": " + controller.currentDate.getHours() + ":" + pad(controller.currentDate.getMinutes()) + "\n" + document.getElementById("endTag").value + ": " + ed.getHours() + ":" + pad(ed.getMinutes()) + "\n" + pad(parseInt(controller.totalSeconds / 3600)) + ":" + pad(parseInt((controller.totalSeconds / 60) % 60)) + ":" + pad(controller.totalSeconds % 60);
 		};
 
 		function setTime()
 		{
-			++totalSeconds;
-			document.getElementById("aTimer").innerHTML = pad(parseInt(totalSeconds / 60)) + ":" + pad(totalSeconds % 60);
-			if (totalSeconds == 1200)
+			++(controller.totalSeconds);
+			document.getElementById("aTimer").innerHTML = pad(parseInt(controller.totalSeconds / 60)) + ":" + pad(controller.totalSeconds % 60);
+			if (controller.totalSeconds === 1200)
 			{
 				$("#aTimer").css("background-color", "#DFF0D8");
 			} //1200 sec = 20 min light green
-			if (totalSeconds == 3000)
+			if (controller.totalSeconds === 3000)
 			{
 				$("#aTimer").css("background-color", "#FDFEC7");
 			} //3600 sec = 50 min light yellow
@@ -317,11 +330,6 @@ angular.module('Record').controller('Record.RecordController', [
 				return valString;
 			}
 		}
-		$scope.$on('$destroy', function()
-		{
-			clearInterval(myVar);
-		});
-		//////		
 
 		controller.isWorking = function isWorking()
 		{
@@ -347,7 +355,7 @@ angular.module('Record').controller('Record.RecordController', [
 			console.log('CANCELLING EDIT');
 			controller.page.encounterNote = null;
 			$scope.$broadcast('stopEditingNote');
-			skipTmpSave = true;
+			controller.skipTmpSave = true;
 			controller.getCurrentNote(false);
 			controller.removeEditingNoteFlag();
 			controller.$storage.hideNote = true;
@@ -392,7 +400,7 @@ angular.module('Record').controller('Record.RecordController', [
 				{
 					controller.page.isNoteSaved = true;
 					$scope.$broadcast('noteSaved', results);
-					skipTmpSave = true;
+					controller.skipTmpSave = true;
 					controller.page.encounterNote = results;
 					controller.$storage.hideNote = true;
 					controller.getCurrentNote(false);
@@ -536,8 +544,6 @@ angular.module('Record').controller('Record.RecordController', [
 					console.log(errors);
 				});
 		};
-
-		controller.getCurrentNote(true);
 
 		controller.editNote = function editNote(note)
 		{
@@ -828,9 +834,6 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
-
-		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
-		controller.init();
 	}
 ]);
 

@@ -102,8 +102,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces("application/json")
 	public GenericRESTResponse billingRegion()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
-
 		boolean billRegionSet = true;
 		String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
 		if(billRegion.isEmpty())
@@ -118,8 +116,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces("application/json")
 	public GenericRESTResponse defaultView()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
-
 		boolean defaultViewSet = true;
 		String defaultView = oscarProperties.getProperty("default_view", "").trim();
 		if(defaultView.isEmpty())
@@ -134,7 +130,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<AlbertaSkillCodeTo1>> getAlbertaSkillCodes()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
 		return RestResponse.successResponse(AlbertaSkillCodeTo1.fromList(albertaSkillCodeDao.getAllSkillCodes()));
 	}
 
@@ -143,7 +138,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<AlbertaFacilityTo1>> getAlbertaActiveFacilities()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
 		return RestResponse.successResponse(AlbertaFacilityTo1.fromList(albertaFacilityDao.getAllActiveFacilities()));
 	}
 
@@ -152,7 +146,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<AlbertaFunctionalCenterTo1>> getAlbertaFunctionalCenters()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
 		return RestResponse.successResponse(AlbertaFunctionalCenterTo1.fromList(albertaFunctionalCenterDao.getAllFunctionalCenters()));
 	}
 
@@ -161,7 +154,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<BCBillingVisitCodeTo1>> getBCBillingVisitCodes()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
 		return RestResponse.successResponse(BCBillingVisitCodeTo1.fromList(billingBCDao.findBillingVisits(BillingServiceDao.BC)));
 	}
 
@@ -170,7 +162,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<BCBillingLocationTo1>> getBCBillingLocations()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
 		return RestResponse.successResponse(BCBillingLocationTo1.fromList(billingBCDao.findBillingLocations(BillingServiceDao.BC)));
 	}
 
@@ -179,7 +170,6 @@ public class BillingService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<OntarioMasterNumberTo1>> getOntarioMasterNumbers()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
 		return RestResponse.successResponse(OntarioMasterNumberTo1.fromList(ontarioMasterNumberDao.findAll()));
 	}
 

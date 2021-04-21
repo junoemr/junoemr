@@ -473,10 +473,6 @@ oscarApp.config([
 			controller: 'Record.RecordController as recordCtrl',
 			resolve:
 			{
-				demo: ['$stateParams', 'demographicService', function($stateParams, demographicService)
-				{
-					return demographicService.getDemographic($stateParams.demographicNo);
-				}],
 				user: ['providerService', function(providerService)
 				{
 					return providerService.getMe();
