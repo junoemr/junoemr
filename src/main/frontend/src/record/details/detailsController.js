@@ -119,18 +119,18 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					// retrieve provider types for dropdown selection
 					//TODO - are roles determined by security role or provider type?
 					providersServiceApi.getBySecurityRole("doctor").then(
-						function success(data) {
-							controller.page.doctors = data.data.body;
+						function success(results) {
+							controller.page.doctors = results.data.body;
 						}
 					);
 					providersServiceApi.getBySecurityRole("nurse").then(
-						function success(data) {
-							controller.page.nurses = data.data.body;
+						function success(results) {
+							controller.page.nurses = results.data.body;
 						}
 					);
 					providersServiceApi.getBySecurityRole("midwife").then(
-						function success(data) {
-							controller.page.midwives = data.data.body;
+						function success(results) {
+							controller.page.midwives = results.data.body;
 						}
 					);
 
