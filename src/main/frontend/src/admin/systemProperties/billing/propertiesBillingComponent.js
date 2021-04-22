@@ -38,7 +38,7 @@ angular.module('Admin').component('systemPropertiesBilling',
 
                 const PROPERTY_NAME = 'service_location_code';
                 const TITLE = "Save Service Code";
-                const DEFAULT_VALUE = "A";
+                const DEFAULT_VALUE = "A|Practitioner's Office - In Community";
                 const DEFAULT_LABEL = "A | Practitioner's Office - In Community";
                 const ICON = "icon-logout fa-lg";
 
@@ -62,8 +62,10 @@ angular.module('Admin').component('systemPropertiesBilling',
 
                 ctrl.$onInit = () =>
                 {
-                     ctrl.load(PROPERTY_NAME);
-                     ctrl.getServiceLocationCodes();
+                    ctrl.getServiceLocationCodes().then( () =>
+                    {
+                        ctrl.load(PROPERTY_NAME);
+                    });
                 };
 
                 ctrl.getServiceLocationCodes = async () =>
@@ -77,7 +79,7 @@ angular.module('Admin').component('systemPropertiesBilling',
                             ctrl.codes.push(
                                 {
                                     label: code.visitType + " | " + code.visitDescription,
-                                    value: code.visitType,
+                                    value: code.visitType + "|"+ code.visitDescription,
                                 })
                         }
 				    });
