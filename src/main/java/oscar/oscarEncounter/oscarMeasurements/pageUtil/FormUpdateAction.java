@@ -209,6 +209,11 @@ public class FormUpdateAction extends Action {
 		String submit = request.getParameter("submit");
 		request.setAttribute("textOnEncounter", textOnEncounter);
 
+		if (addToNote)
+		{
+			addNote(demographic_no, providerNo, prog_no, note, apptNoInt, request);
+		}
+
 		if (submit == null  || "Save".equals(submit) || "Save All".equals(submit))
 		{
 			return mapping.findForward("reload");
