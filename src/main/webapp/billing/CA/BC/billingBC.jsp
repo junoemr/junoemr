@@ -1132,7 +1132,7 @@ if(wcbneeds != null){%>
 	            <select name="xml_visittype" id="xml_visittype">
                 <%
                   for (int i = 0; i < billvisit.length; i++) {
-                      boolean isDefault = sxml_visittype.equals(billvisit[i].getVisitType());
+                      boolean isDefault = sxml_visittype.equals(billvisit[i].getVisitType() + "|" + billvisit[i].getDescription());
                       String visitTypeDescription = billvisit[i].getVisitType() + "|" + billvisit[i].getDescription();
                 %>
 		            <option value="<%= visitTypeDescription%>" <%=isDefault ? " selected" : ""%> ><%=visitTypeDescription%></option>
