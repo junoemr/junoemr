@@ -243,7 +243,7 @@
 								<span>
 									<juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link">
 									</juno-datepicker-popup>
-								<span>
+								</span>
 							</p>
 						</div>
 						<div class="col-xs-4 dropup">

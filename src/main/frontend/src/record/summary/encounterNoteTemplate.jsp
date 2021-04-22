@@ -34,6 +34,7 @@
 					View
 				</button>
 				<button class="btn btn-primary btn-xs"
+				        ng-disabled="!$ctrl.editButtonEnabled()"
 				        ng-click="$ctrl.editButtonClick()"
 				        ng-show="$ctrl.showNoteEditButton()">
 					Edit

@@ -23,6 +23,8 @@
 
  */
 
+import {SecurityPermissions} from "../../common/security/securityConstants";
+
 angular.module('Record.Summary').component('encounterNote', {
 	templateUrl: "src/record/summary/encounterNoteTemplate.jsp",
 	bindings: {
@@ -39,10 +41,12 @@ angular.module('Record.Summary').component('encounterNote', {
 		'$state',
 		'$stateParams',
 		'formService',
+		'securityRolesService',
 		function ($scope,
 		          $state,
 		          $stateParams,
-				  formService)
+				  formService,
+				  securityRolesService)
 	{
 		var ctrl = this;
 
@@ -108,6 +112,12 @@ angular.module('Record.Summary').component('encounterNote', {
 			return ctrl.note.editable && ((ctrl.isRegularNote()) || (ctrl.note.cpp && !ctrl.note.archived));
 		};
 
+		ctrl.editButtonEnabled = () =>
+		{
+			return (ctrl.isRegularNote() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_NOTE_UPDATE)
+				|| ctrl.note.cpp && securityRolesService.hasSecurityPrivileges(SecurityPermissions.CPP_NOTE_UPDATE));
+		}
+
 		ctrl.editButtonClick = function editButtonClick()
 		{
 			if(ctrl.isRegularNote())
@@ -121,7 +131,7 @@ angular.module('Record.Summary').component('encounterNote', {
 						successCallback: function successCallback(updatedNote)
 						{
 							ctrl.inOpenEdit = false;
-							console.info('callback success', updatedNote);
+							console.debug('callback success', updatedNote);
 							// clear the existing properties and replace with the updated ones
 							angular.copy(updatedNote, ctrl.note);
 							ctrl.note.revision = Number(ctrl.note.revision) + 1;
@@ -144,7 +154,7 @@ angular.module('Record.Summary').component('encounterNote', {
 						successCallback: function successCallback(updatedNote)
 						{
 							ctrl.inOpenEdit = false;
-							console.info('callback success', updatedNote);
+							console.debug('callback success', updatedNote);
 							// clear the existing properties and replace with the updated ones
 							angular.copy(updatedNote, ctrl.note);
 							ctrl.note.revision = Number(ctrl.note.revision) + 1;

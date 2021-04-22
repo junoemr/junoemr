@@ -36,7 +36,8 @@ angular.module('Record.Summary').component('summaryModule', {
 		clickableTitle: '<', //true means title is clickable
 
 		enableFilter: '<',
-		enableAddButton: '<',
+		addButton: '<',
+		addButtonEnabled: '<',
 	},
 	controller: [function ()
 	{
@@ -53,7 +54,7 @@ angular.module('Record.Summary').component('summaryModule', {
 			// set default binding values
 			ctrl.itemDisplayCount = ctrl.itemDisplayCount || 5;
 			ctrl.enableFilter = ctrl.enableFilter || false;
-			ctrl.enableAddButton = ctrl.enableAddButton || false;
+			ctrl.addButton = ctrl.addButton || false;
 			ctrl.clickableTitle = ctrl.clickableTitle || false;
 			ctrl.maxItemNameLength = ctrl.maxItemNameLength || 34;
 			ctrl.onclickItem = ctrl.onclickItem || null;
@@ -73,9 +74,9 @@ angular.module('Record.Summary').component('summaryModule', {
 			{
 				ctrl.module = bindingHash.module.currentValue;
 			}
-			if(Juno.Common.Util.exists(bindingHash.enableAddButton))
+			if(Juno.Common.Util.exists(bindingHash.addButton))
 			{
-				ctrl.enableAddButton = bindingHash.enableAddButton.currentValue;
+				ctrl.addButton = bindingHash.addButton.currentValue;
 			}
 			if(Juno.Common.Util.exists(bindingHash.enableFilter))
 			{

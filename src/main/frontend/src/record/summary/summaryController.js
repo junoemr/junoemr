@@ -109,24 +109,24 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.openRx = function openRx(demoNo)
 		{
-			win = "Rx" + demoNo;
-			var url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
-			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+			let win = "Rx" + demoNo;
+			let url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
 		};
 
 		controller.openAllergies = function openAllergies(demoNo)
 		{
-			win = "Allergy" + demoNo;
-			var url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
-			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+			let win = "Allergy" + demoNo;
+			let url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
 			return false;
 		};
 
 		controller.openPreventions = function openPreventions(demoNo)
 		{
-			win = "prevention" + demoNo;
-			var url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
-			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+			let win = "prevention" + demoNo;
+			let url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
 			return false;
 		};
 
@@ -358,7 +358,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
 			{
-
+				let win;
 				if (item.type == 'rx')
 				{
 					win = "Rx" + $stateParams.demographicNo;
@@ -378,7 +378,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					win = "win_item.type_";
 				}
 
-				window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600", "");
+				window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600");
 				return false;
 			}
 			else if (item.type === 'eform')
@@ -497,6 +497,38 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		};
 
+		controller.summaryModAddEnabled = (module) =>
+		{
+			let enabled = false;
+			if (module.summaryCode === 'othermeds' ||
+				module.summaryCode === 'ongoingconcerns' ||
+				module.summaryCode === 'medhx' ||
+				module.summaryCode === 'sochx' ||
+				module.summaryCode === 'famhx' ||
+				module.summaryCode === 'reminders' ||
+				module.summaryCode === 'riskfactors')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.CPP_NOTE_CREATE);
+			}
+			else if (module.summaryCode === 'meds')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RX_CREATE);
+			}
+			else if (module.summaryCode === 'allergies')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.ALLERGY_CREATE);
+			}
+			else if (module.summaryCode === 'forms')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_CREATE)
+					|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_CREATE);
+			}
+			else if (module.summaryCode === 'preventions')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.PREVENTION_CREATE);
+			}
+			return enabled;
+		}
 		controller.onSummaryModAdd = function onSummaryModAdd(module, successCallback, dismissCallback)
 		{
 			if (module.summaryCode === 'othermeds' ||
