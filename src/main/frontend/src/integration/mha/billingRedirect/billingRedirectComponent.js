@@ -23,6 +23,7 @@
 
 import {BILLING_REGION} from "../../../billing/billingConstants";
 import {AppointmentApi, SystemPreferenceApi} from "../../../../generated";
+import SystemPreferenceService from "../../../lib/system/service/SystemPreferenceService";
 
 angular.module('Integration.Mha').component('billingRedirect', {
     bindings: {
@@ -45,7 +46,7 @@ angular.module('Integration.Mha').component('billingRedirect', {
             securityService)
     {
         const ctrl = this;
-        const systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+        const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
         const appointmentApi = new AppointmentApi($http, $httpParamSerializer, '../ws/rs');
 
         ctrl.$onInit = async () =>
@@ -60,7 +61,7 @@ angular.module('Integration.Mha').component('billingRedirect', {
         {
             try
             {
-                const billingRegion = (await systemPreferenceApi.getPropertyValue("billing_type", BILLING_REGION.BC)).data.body;
+                const billingRegion = (await systemPreferenceService.getProperty("billing_type"));
                 const appointment = (await appointmentApi.getAppointment($stateParams.appointmentNo)).data.body;
                 const appointmentStartTime = Juno.Common.Util.getDatetimeNoTimezoneMoment(`${appointment.appointmentDate}T${appointment.startTime}`);
 
