@@ -328,7 +328,9 @@ public class PersonaService extends AbstractServiceImpl {
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.documents"), null, "documents");
 		}
 
-		if (IsPropertiesOn.isTelehealthEnabled())
+		if (securityInfoManager.hasPrivileges(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, null,
+				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.APPOINTMENT)
+				&& IsPropertiesOn.isTelehealthEnabled())
 		{
 			menu.addNewTab(idCounter++, "MyHealthAccess", null,
 					"../integrations/myhealthaccess.do?method=connectOrList");

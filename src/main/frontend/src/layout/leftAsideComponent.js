@@ -126,7 +126,7 @@ angular.module('Layout').component('leftAside', {
 				{
 					ctrl.changeTab(ctrl.tabEnum.appointmentQueue);
 				}
-				else if (ctrl.isAppointmentPatientViewEnabled())
+				else if (ctrl.isRecentPatientViewEnabled())
 				{
 					ctrl.changeTab(ctrl.tabEnum.recent);
 				}
@@ -263,12 +263,13 @@ angular.module('Layout').component('leftAside', {
 
 		ctrl.isRecentPatientViewEnabled = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
+			return securityRolesService.hasSecurityPrivileges(
+				SecurityPermissions.DEMOGRAPHIC_READ, SecurityPermissions.ECHART_READ);
 		}
 		ctrl.isAppointmentPatientViewEnabled = () =>
 		{
 			return securityRolesService.hasSecurityPrivileges(
-				SecurityPermissions.DEMOGRAPHIC_READ, SecurityPermissions.APPOINTMENT_READ);
+				SecurityPermissions.APPOINTMENT_READ, SecurityPermissions.ECHART_READ);
 		}
 		ctrl.isAppointmentQueueViewEnabled = () =>
 		{
