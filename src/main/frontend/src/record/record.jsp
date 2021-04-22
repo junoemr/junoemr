@@ -210,7 +210,7 @@
 	        <div class="include-record-peice" ui-view></div>
 	    </div>
 
-		<juno-security-check permissions="recordCtrl.SecurityPermissions.ECHART_CREATE">
+		<juno-security-check permissions="recordCtrl.SecurityPermissions.ENCOUNTER_NOTE_CREATE">
 			<div class="row" id="note-editor-container">
 				<div id="note-editor-minimized"
 					class="col-sm-3 col-xs-12 text-center hand-hover"

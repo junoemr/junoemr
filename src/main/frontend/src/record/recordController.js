@@ -101,7 +101,7 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ))
 			{
-				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_CREATE);
+				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_NOTE_CREATE);
 				demographicService.getDemographic(controller.demographicNo).then((response) =>
 				{
 					controller.demographic = response;
@@ -110,7 +110,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.fillMenu();
 				});
 			}
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_CREATE))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_NOTE_CREATE))
 			{
 				//////AutoSave
 				var saveIntervalSeconds = 2;
