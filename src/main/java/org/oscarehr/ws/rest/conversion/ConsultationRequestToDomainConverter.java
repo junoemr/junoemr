@@ -27,13 +27,14 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.ws.rest.to.model.ConsultationRequestTo1;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ConsultationRequestToDomainConverter extends AbstractModelConverter<ConsultationRequestTo1, ConsultationRequest>
 {
-
-	private ProfessionalSpecialistConverter specialistConverter = new ProfessionalSpecialistConverter();
+	@Autowired
+	private ProfessionalSpecialistToDomainConverter specialistToDomainConverter;
 
 	@Override
 	public ConsultationRequest convert(ConsultationRequestTo1 transfer)
@@ -44,10 +45,10 @@ public class ConsultationRequestToDomainConverter extends AbstractModelConverter
 			return null;
 		}
 
-		BeanUtils.copyProperties(transfer, request);
+		BeanUtils.copyProperties(transfer, request, "professionalSpecialist");
 
 		// Specialist is a many-to-one and is handled slightly differently
-		request.setProfessionalSpecialist(specialistConverter.getAsDomainObject(null, transfer.getProfessionalSpecialist()));
+		request.setProfessionalSpecialist(specialistToDomainConverter.convert(transfer.getProfessionalSpecialist()));
 		return request;
 	}
 }

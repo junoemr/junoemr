@@ -371,9 +371,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				alert("Please select a Letterhead");
 				return true;
 			}
-			if (!controller.consult.professionalSpecialist)
+			if (!controller.consult.serviceId)
 			{
-				alert("Please select a Specialist");
+				alert("Please select a Service");
 				return true;
 			}
 			if (controller.consult.demographic == null || controller.consult.demographic == "")

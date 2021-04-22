@@ -20,34 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-
 package org.oscarehr.ws.rest.conversion;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.model.ConsultationRequest;
-import org.oscarehr.ws.rest.to.model.ConsultationRequestTo1;
+import org.oscarehr.common.model.ProfessionalSpecialist;
+import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ConsultationRequestToTransferConverter extends AbstractModelConverter<ConsultationRequest, ConsultationRequestTo1>
+public class ProfessionalSpecialistToDomainConverter extends AbstractModelConverter<ProfessionalSpecialistTo1, ProfessionalSpecialist>
 {
-	@Autowired
-	private ProfessionalSpecialistToTransferConverter specialistToTransferConverter;
-
 	@Override
-	public ConsultationRequestTo1 convert(ConsultationRequest request)
+	public ProfessionalSpecialist convert(ProfessionalSpecialistTo1 transfer)
 	{
-		ConsultationRequestTo1 transfer = new ConsultationRequestTo1();
-		if (request == null)
+		if (transfer == null)
 		{
 			return null;
 		}
-
-		BeanUtils.copyProperties(request, transfer, "professionalSpecialist");
-		transfer.setProfessionalSpecialist(specialistToTransferConverter.convert(request.getProfessionalSpecialist()));
-		return transfer;
+		ProfessionalSpecialist domainSpecialist = new ProfessionalSpecialist();
+		BeanUtils.copyProperties(transfer, domainSpecialist, "name");
+		return domainSpecialist;
 	}
 
 }

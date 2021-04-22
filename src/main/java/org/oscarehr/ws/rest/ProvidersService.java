@@ -148,10 +148,10 @@ public class ProvidersService extends AbstractServiceImpl
 	@GET
 	@Path("/active")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ProviderTo1>> getActive()
+	public RestSearchResponse<ProviderTo1> getActive()
 	{
 		List<Provider> providers = providerDao.getActiveProviders();
 		List<ProviderTo1> providersTo1 = providerConverter.getAllAsTransferObjects(getLoggedInInfo(), providers);
-		return RestResponse.successResponse(providersTo1);
+		return RestSearchResponse.successResponseOnePage(providersTo1);
 	}
 }
