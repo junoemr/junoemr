@@ -23,6 +23,8 @@
     Ontario, Canada
 
 */
+import {SecurityPermissions} from "../../common/security/securityConstants";
+
 angular.module('Record.Summary').controller('Record.Summary.SummaryController', [
 
 	'$rootScope',
@@ -35,9 +37,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 	'$uibModal',
 	'$interval',
 	'user',
-	'noteService',
 	'summaryService',
-	'securityService',
+	'securityRolesService',
 	'formService',
 
 	function(
@@ -51,13 +52,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		$uibModal,
 		$interval,
 		user,
-		noteService,
 		summaryService,
-		securityService,
+		securityRolesService,
 		formService)
 	{
 
 		var controller = this;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.page = {};
 		controller.page.columnOne = {};
@@ -66,6 +67,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.page.columnThree = {};
 		controller.page.columnThree.modules = {};
 		controller.page.selectedNoteHash = {};
+
+		controller.summaryLists = {};
 
 		controller.index = 0;
 		controller.busy = false;
@@ -76,44 +79,33 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// store the child component refresh function so that this controller can trigger it.
 		controller.noteListComponentRefreshFunction = null;
 
-		//get access rights
-		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
-			function success(results)
+		controller.$onInit = () =>
+		{
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ))
 			{
-				controller.page.canRead = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotChange = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_eChart", "w", $stateParams.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotAdd = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
+				controller.getLeftItems();
+				controller.getRightItems();
+			}
+		}
 
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
 		{
-			if (controller.page.cannotChange)
+			if (!controller.canEdit())
 			{
 				event.preventDefault();
 				event.stopPropagation();
 			}
 		};
+
+		controller.canEdit = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_UPDATE);
+		}
+		controller.canCreate = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_CREATE);
+		}
 
 		controller.openRx = function openRx(demoNo)
 		{
@@ -184,13 +176,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			controller.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
 		};
 
-		function getLeftItems()
+		controller.getLeftItems = () =>
 		{
 			summaryService.getSummaryHeaders($stateParams.demographicNo, 'left').then(
 				function success(results)
 				{
 					controller.page.columnOne.modules = results;
-					fillItems(controller.page.columnOne.modules);
+					controller.fillItems(controller.page.columnOne.modules);
 				},
 				function error(errors)
 				{
@@ -199,16 +191,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		}
 
-		getLeftItems();
-
-
-		function getRightItems()
+		controller.getRightItems = () =>
 		{
 			summaryService.getSummaryHeaders($stateParams.demographicNo, 'right').then(
 				function success(results)
 				{
 					controller.page.columnThree.modules = results;
-					fillItems(controller.page.columnThree.modules);
+					controller.fillItems(controller.page.columnThree.modules);
 				},
 				function error(errors)
 				{
@@ -217,16 +206,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		}
 
-		getRightItems();
-
-		var summaryLists = {};
-
-		function fillItems(itemsToFill)
+		controller.fillItems = (itemsToFill) =>
 		{
-
 			for (var i = 0; i < itemsToFill.length; i++)
 			{
-				summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
+				controller.summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
 
 				summaryService.getFullSummary($stateParams.demographicNo, itemsToFill[i].summaryCode).then(
 					function success(results)
@@ -235,11 +219,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 						{
 							if (results.summaryItem instanceof Array)
 							{
-								summaryLists[results.summaryCode].summaryItem = results.summaryItem;
+								controller.summaryLists[results.summaryCode].summaryItem = results.summaryItem;
 							}
 							else
 							{
-								summaryLists[results.summaryCode].summaryItem = [results.summaryItem];
+								controller.summaryLists[results.summaryCode].summaryItem = [results.summaryItem];
 							}
 						}
 					},
@@ -346,8 +330,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				controller.noteListComponentRefreshFunction();
 			}
-			getLeftItems();
-			getRightItems();
+			controller.getLeftItems();
+			controller.getRightItems();
 		};
 
 		$scope.$on('summary_page_refresh', function (refresh)
@@ -448,7 +432,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.viewDocument = function viewDocument(documentId)
 		{
 			// get only document summary items
-			let itemArray = summaryLists['incoming'].summaryItem;
+			let itemArray = controller.summaryLists['incoming'].summaryItem;
 			let item = null;
 
 			// find the summary item that matches the document id

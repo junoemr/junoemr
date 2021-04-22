@@ -390,9 +390,5 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		{
 			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_DELETE);
 		}
-		controller.canAccessEChart = () =>
-		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
-		}
 	}
 ]);

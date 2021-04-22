@@ -175,7 +175,7 @@
 						</span>
 					</td>
 					<td data-title="'<bean:message key="tickler.list.header.note" bundle="ui"/>'">
-						<a ng-show="ticklerListCtrl.canEdit() && ticklerListCtrl.canAccessEChart()"
+						<a ng-show="ticklerListCtrl.canEdit()"
 						   ng-click="ticklerListCtrl.editNote2(tickler)"
 						   class="hand-hover noprint">
 							<span class="glyphicon glyphicon-edit" ></span>

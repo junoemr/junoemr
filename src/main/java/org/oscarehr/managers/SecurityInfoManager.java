@@ -32,6 +32,7 @@ import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.model.SecObjPrivilege;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -196,6 +197,18 @@ public class SecurityInfoManager
 		return true;
 	}
 
+	public boolean hasPrivileges(String providerNo, SecObjPrivilege.PERMISSION... permissions)
+	{
+		for (SecObjPrivilege.PERMISSION permission : permissions)
+		{
+			if (!hasPrivilege(providerNo, permission.getPrivilegeLevel(), null, permission.getObjectName()))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * check if the user has any one of the requested privileges
 	 * @param providerNo - provider to check
@@ -322,6 +335,18 @@ public class SecurityInfoManager
 			{
 				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName.getValue() + ")");
 			}
+		}
+	}
+
+	public void requireAllPrivilege(String providerNo, SecObjPrivilege.PERMISSION ... permissions)
+	{
+		if(permissions == null)
+		{
+			return;
+		}
+		if(!hasPrivileges(providerNo, permissions))
+		{
+			throw new SecurityException("missing required permissions: " + permissions);
 		}
 	}
 

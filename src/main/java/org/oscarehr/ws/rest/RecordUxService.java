@@ -35,6 +35,7 @@ import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.EncounterTemplate;
+import org.oscarehr.security.model.SecObjPrivilege;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.ConsultationManager;
@@ -155,7 +156,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		}
 		
 		if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_VIEW_TICKLER))
+				demographicNo, SecObjectName.OBJECT_NAME.TICKLER))
 		{
 			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Tickler", Arrays.asList("record.tickler")));
 		}
@@ -182,7 +183,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		}
 
 		if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_CONSULTATIONS))
+				demographicNo, SecObjectName.OBJECT_NAME.CONSULTATION))
 		{
 			//add notification if patient has outstanding consultation requests (incomplete requests > 1 month)
 			String outstanding = consultationManager.hasOutstandingConsultations(loggedInInfo, demographicNo)? "outstanding" : null;
@@ -207,27 +208,30 @@ public class RecordUxService extends AbstractServiceImpl {
 		}
 
 		if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_PRESCRIPTIONS))
+				demographicNo, SecObjectName.OBJECT_NAME.RX))
 		{
 			menulist.add(new MenuItemTo1(idCounter++, "Rx", "../oscarRx/choosePatient.do?demographicNo="+demographicNo));
 		}
 
 		//END PHR
 		if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_DX_REGISTRY))
+				demographicNo, SecObjectName.OBJECT_NAME.DXRESEARCH))
 		{
 			menulist.add(new MenuItemTo1(idCounter++, "Disease Registry", "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo="+demographicNo));
 		}
 
 		if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_OSCAR_MESSAGE))
+				demographicNo, SecObjectName.OBJECT_NAME.MESSAGE))
 		{
 			menulist.add(new MenuItemTo1(idCounter++, "Messenger", "../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no=" + demographicNo));
-			menulist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no=" + demographicNo));
+			if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicNo, SecObjectName.OBJECT_NAME.MESSAGE))
+			{
+				menulist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no=" + demographicNo));
+			}
 		}
 
 		if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_DOCUMENTS))
+				demographicNo, SecObjectName.OBJECT_NAME.EDOC))
 		{
 			menulist.add(new MenuItemTo1(idCounter++, "Documents", "../dms/documentReport.jsp?function=demographic&doctype=lab&functionid="+demographicNo));
 		}
@@ -255,7 +259,10 @@ public class RecordUxService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/summary/{summaryName}") //@Path("/leftsideSummary")
 	@Produces("application/json")
-	public List<SummaryTo1> getSummary(@PathParam("demographicNo") Integer demographicNo,@PathParam("summaryName") String summaryName){
+	public List<SummaryTo1> getSummary(
+			@PathParam("demographicNo") Integer demographicNo,
+			@PathParam("summaryName") String summaryName)
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String loggedInProviderId = getLoggedInProviderId();
 
@@ -267,8 +274,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		{
 			summaryList = new ArrayList<>();
 
-			if(securityInfoManager.hasOnePrivileges(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
-					SecObjectName.OBJECT_NAME.NEW_CASEMGMT_DOCUMENTS, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_LAB_RESULT)
+			if (securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.DOCUMENT_READ, SecObjPrivilege.PERMISSION.LAB_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.INCOMING_POS))
 			{
 				summaryList.add(new SummaryTo1("Incoming", count++, SummaryTo1.INCOMING_CODE));
@@ -284,62 +290,66 @@ public class RecordUxService extends AbstractServiceImpl {
 		else if("left".equals(summaryName))
 		{
 			summaryList = new ArrayList<>();
-			if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.PREVENTION)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.PREVENTION_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.PREVENTION_POS))
 			{
 				summaryList.add(new SummaryTo1("Preventions", count++, SummaryTo1.PREVENTIONS));
 			}
 
-			if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_PRESCRIPTIONS)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.RX_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.MEDS_POS))
 			{
 				summaryList.add(new SummaryTo1("Medications", count++, SummaryTo1.MEDICATIONS_CODE));
 			}
 
-			if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_OTHER_MEDS)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.CPP_NOTE_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.OTHER_MEDS_POS))
 			{
 				summaryList.add(new SummaryTo1("Other Meds",count++,SummaryTo1.OTHERMEDS_CODE));
 			}
 
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ONGOING_POS))
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ONGOING_POS))
 			{
 				summaryList.add(new SummaryTo1("Ongoing Concerns", count++, SummaryTo1.ONGOINGCONCERNS_CODE));
 			}
 
-			if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_MEDICAL_HISTORY)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.CPP_NOTE_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.MED_HX_POS))
 			{
 				summaryList.add(new SummaryTo1("Medical History", count++, SummaryTo1.MEDICALHISTORY_CODE));
 			}
 
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.SOC_HX_POS))
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.CPP_NOTE_READ))
 			{
 				summaryList.add(new SummaryTo1("Social History", count++, SummaryTo1.SOCIALHISTORY_CODE));
 			}
 
-			if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_FAMILY_HISTORY)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.CPP_NOTE_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.FAM_HX_POS))
 			{
 				summaryList.add(new SummaryTo1("Family History", count++, SummaryTo1.FAMILYHISTORY_CODE));
 			}
 
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.REMINDERS_POS))
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.REMINDERS_POS))
 			{
 				summaryList.add(new SummaryTo1("Reminders", count++, SummaryTo1.REMINDERS_CODE));
 			}
 
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.RISK_FACTORS_POS))
+			if (securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.RISK_FACTORS_POS))
 			{
 				summaryList.add(new SummaryTo1("Risk Factors", count++, SummaryTo1.RISK_FACTORS));
 			}
 
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ALLERGIES_POS))
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.ALLERGY_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ALLERGIES_POS))
 			{
 				summaryList.add(new SummaryTo1("Allergies", count++, SummaryTo1.ALLERGIES));
 			}
 
-			if(securityInfoManager.hasOnePrivileges(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_FORMS, SecObjectName.OBJECT_NAME.NEW_CASEMGMT_EFORMS)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, SecObjPrivilege.PERMISSION.FORM_READ, SecObjPrivilege.PERMISSION.EFORM_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS))
 			{
 				summaryList.add(new SummaryTo1("Forms", count++, SummaryTo1.FORMS_CODE));

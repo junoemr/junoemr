@@ -1350,8 +1350,7 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	public TicklerNoteResponse ticklerGetNote(@PathParam("ticklerNo") Integer ticklerNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.ECHART, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
 		
 		TicklerNoteResponse response = new TicklerNoteResponse();
 		CaseManagementNoteLink link = caseManagementMgr.getLatestLinkByTableId(CaseManagementNoteLink.TICKLER, Long.valueOf(ticklerNo));
@@ -1380,8 +1379,7 @@ public class NotesService extends AbstractServiceImpl
 	@Consumes("application/json")
 	public GenericRESTResponse ticklerSaveNote(JSONObject json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
-				SecObjectName.OBJECT_NAME.ECHART, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TICKLER);
 
 		logger.info("The config "+json.toString());
 		
