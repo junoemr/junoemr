@@ -48,7 +48,7 @@ export default class SystemPreferenceService
 	{
 		const value: any = (await this.systemPreferenceApi.getPropertyValue(propertyName, null)).data.body;
 
-		if (value)
+		if (value === null || value === undefined)
 		{
 			return value;
 		}
