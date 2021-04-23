@@ -65,7 +65,8 @@ public class EchartTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void testWritingNote() throws InterruptedException
+	public void testWritingNote()
+			throws InterruptedException
 	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 
