@@ -131,6 +131,7 @@ boolean authed=true;
 	contentTypeMap.put(LogConst.CON_MEDICATION, "Medication");
 	contentTypeMap.put(LogConst.CON_PHARMACY, "Pharmacy");
 	contentTypeMap.put(LogConst.CON_PRESCRIPTION, "Prescription");
+	contentTypeMap.put(LogConst.CON_SECURITY, "Security");
 	contentTypeMap.put(LogConst.CON_SYSTEM, "System");
 
 	/* Map the log action constants to visible labels */

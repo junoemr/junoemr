@@ -21,6 +21,7 @@
 * Canada
 */
 import {FORM_CONTROLLER_STATES, FORM_CONTROLLER_SORT_MODES, FORM_CONTROLLER_FORM_TYPES} from "../../formsConstants";
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
 
 angular.module('Record.Forms').component('formViewComponent', {
     templateUrl: 'src/record/forms/components/formView/formView.jsp',
@@ -35,12 +36,24 @@ angular.module('Record.Forms').component('formViewComponent', {
         reloadForms: '&'
 
     },
-    controller:[ 'formService', '$scope', '$stateParams', 'NgTableParams', function (formService, $scope, $stateParams, NgTableParams)
+    controller:[
+        'formService',
+        '$scope',
+        '$stateParams',
+        'NgTableParams',
+        'securityRolesService',
+        function (
+            formService,
+            $scope,
+            $stateParams,
+            NgTableParams,
+            securityRolesService)
     {
         let ctrl = this;
 
         $scope.FORM_CONTROLLER_FORM_TYPES = FORM_CONTROLLER_FORM_TYPES;
         ctrl.sortMode = FORM_CONTROLLER_SORT_MODES.FORM_NAME;
+        ctrl.SecurityPermissions = SecurityPermissions;
 
         ctrl.openEForm = function (form)
         {
@@ -79,6 +92,19 @@ angular.module('Record.Forms').component('formViewComponent', {
             return ctrl.filterForms({form:form, index:index, array:array});
         };
 
+        ctrl.canDeleteForm = (type) =>
+        {
+            if(type === FORM_CONTROLLER_FORM_TYPES.EFORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_DELETE);
+            }
+            else if(type === FORM_CONTROLLER_FORM_TYPES.FORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_DELETE);
+            }
+            return false;
+        }
+
         ctrl.deleteForm = function (id, type)
         {
             let ok = confirm("Are you sure you want to delete this eform?");
@@ -97,6 +123,19 @@ angular.module('Record.Forms').component('formViewComponent', {
                 )
             }
         };
+
+        ctrl.canRestoreForm = (type) =>
+        {
+            if(type === FORM_CONTROLLER_FORM_TYPES.EFORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_UPDATE);
+            }
+            else if(type === FORM_CONTROLLER_FORM_TYPES.FORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_UPDATE);
+            }
+            return false;
+        }
 
         ctrl.restoreForm = function (id, type)
         {

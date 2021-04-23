@@ -39,11 +39,17 @@
                     <div ng-if="col.field === 'createDate'">
                         {{form.createDate | date:'yyyy-MM-dd'}}
                     </div>
-                    <div ng-if="col.field === 'delete'">
-                        <a class="delete-link" href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.deleteForm(form.id, form.type)"><u>delete</u></a>
+                    <div ng-if="col.field === 'delete' && $ctrl.canDeleteForm(form.type)">
+                        <a class="delete-link" href="javascript:"
+                           ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM"
+                           ng-click="$ctrl.deleteForm(form.id, form.type)">
+                            <u>delete</u>
+                        </a>
                     </div>
-                    <div ng-if="col.field === 'restore'">
-                        <a class="restore-link" href="javascript:" ng-click="$ctrl.restoreForm(form.id, form.type)"><u>Restore</u></a>
+                    <div ng-if="col.field === 'restore' && $ctrl.canRestoreForm(form.type)">
+                        <a class="restore-link" href="javascript:" ng-click="$ctrl.restoreForm(form.id, form.type)">
+                            <u>Restore</u>
+                        </a>
                     </div>
                 </td>
             </tr>

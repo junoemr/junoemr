@@ -231,7 +231,7 @@ angular.module('Record').controller('Record.RecordController', [
 					var rnd = Math.round(Math.random() * 1000);
 					win = "win" + rnd;
 				}
-				window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600", "");
+				window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600");
 			}
 		};
 
@@ -511,7 +511,7 @@ angular.module('Record').controller('Record.RecordController', [
 			url += "&appointment_date=" + apptDate + "&start_time=" + apptStartTime;
 			url += "&hotclick=&status=t&bNewForm=1" + dxCode;
 
-			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height, "");
+			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height);
 		};
 
 		controller.page.currentNoteConfig = {};
