@@ -88,14 +88,16 @@
 						</div>
 
 						<div class="tab-pane" id="tracker">
-							<iframe
-									id="trackerSlim"
-									scrolling="No"
-									frameborder="0"
-									ng-src="{{ summaryCtrl.trackerUrl }}"
-									width="100%"
-									style="min-height:820px"
-							></iframe>
+							<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.MEASUREMENT_READ">
+								<iframe
+										id="trackerSlim"
+										scrolling="No"
+										frameborder="0"
+										ng-src="{{ summaryCtrl.trackerUrl }}"
+										width="100%"
+										style="min-height:820px"
+								></iframe>
+							</juno-security-check>
 						</div>
 					</div><!-- tab content -->
 				</div>

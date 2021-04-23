@@ -30,7 +30,7 @@
 </div>
 -->
 
-<div >
+<juno-security-check show-placeholder="true" permissions="trackerCtrl.SecurityPermissions.MEASUREMENT_READ">
     <iframe
         id="trackerSlim"
         name="trackerSlim"
@@ -41,7 +41,7 @@
         <%--onload="trackerCtrl.resizeIframe(this)"--%>
         style="min-height:820px">
     </iframe>
-</div>
+</juno-security-check>
 
 <%-- TODO-legacy replace with angular
 

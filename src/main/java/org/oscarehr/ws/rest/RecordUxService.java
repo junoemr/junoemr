@@ -158,8 +158,10 @@ public class RecordUxService extends AbstractServiceImpl {
 		{
 			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Tickler", Arrays.asList("record.tickler")));
 		}
-
-		menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", Arrays.asList("record.tracker")));
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.MEASUREMENT_READ))
+		{
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", Arrays.asList("record.tracker")));
+		}
 
 		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
 		{

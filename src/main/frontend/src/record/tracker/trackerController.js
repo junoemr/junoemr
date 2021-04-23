@@ -24,6 +24,8 @@
 
 */
 
+import {SecurityPermissions} from "../../common/security/securityConstants";
+
 angular.module('Record.Tracker').controller('Record.Tracker.TrackerController', [
 
 	'$rootScope',
@@ -31,31 +33,22 @@ angular.module('Record.Tracker').controller('Record.Tracker.TrackerController', 
 	'$http',
 	'$location',
 	'$stateParams',
-	'$state',
-	'$timeout',
-	'demographicService',
-	'noteService',
-	'uxService',
 
 	function(
 		$rootScope,
 		$scope,
 		$http,
 		$location,
-		$stateParams,
-		$state,
-		$timeout,
-		demographicService,
-		noteService,
-		uxService)
+		$stateParams)
 	{
 
-		var controller = this;
+		const controller = this;
+		controller.SecurityPermissions = SecurityPermissions;
+
 		controller.getTrackerUrl = function getTrackerUrl()
 		{
 
-			url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + $stateParams.demographicNo;
-
+			const url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + $stateParams.demographicNo;
 			return url;
 
 		};
