@@ -23,13 +23,13 @@
 package org.oscarehr.ws.rest.transfer.security;
 
 import lombok.Data;
-import org.oscarehr.security.model.SecObjPrivilege;
+import org.oscarehr.security.model.Permission;
 
 import java.io.Serializable;
 
 @Data
 public class SecurityPermissionTransfer implements Serializable
 {
-	private SecObjPrivilege.PERMISSION permission;
+	private Permission permission;
 	private String description;
 }

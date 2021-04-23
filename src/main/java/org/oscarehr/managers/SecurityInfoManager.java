@@ -32,7 +32,7 @@ import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.security.model.SecObjPrivilege;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -197,11 +197,15 @@ public class SecurityInfoManager
 		return true;
 	}
 
-	public boolean hasPrivileges(String providerNo, SecObjPrivilege.PERMISSION... permissions)
+	public boolean hasPrivileges(String providerNo, Permission... permissions)
 	{
-		for (SecObjPrivilege.PERMISSION permission : permissions)
+		return hasPrivileges(providerNo, null, permissions);
+	}
+	public boolean hasPrivileges(String providerNo, Integer demographicId, Permission... permissions)
+	{
+		for (Permission permission : permissions)
 		{
-			if (!hasPrivilege(providerNo, permission.getPrivilegeLevel(), null, permission.getObjectName()))
+			if (!hasPrivilege(providerNo, permission.getPrivilegeLevel(), demographicId, permission.getObjectName()))
 			{
 				return false;
 			}
@@ -338,13 +342,17 @@ public class SecurityInfoManager
 		}
 	}
 
-	public void requireAllPrivilege(String providerNo, SecObjPrivilege.PERMISSION ... permissions)
+	public void requireAllPrivilege(String providerNo, Permission... permissions)
+	{
+		requireAllPrivilege(providerNo, null, permissions);
+	}
+	public void requireAllPrivilege(String providerNo, Integer demographicId, Permission... permissions)
 	{
 		if(permissions == null)
 		{
 			return;
 		}
-		if(!hasPrivileges(providerNo, permissions))
+		if(!hasPrivileges(providerNo, demographicId, permissions))
 		{
 			throw new SecurityException("missing required permissions: " + permissions);
 		}

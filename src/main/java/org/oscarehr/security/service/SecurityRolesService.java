@@ -29,6 +29,7 @@ import org.oscarehr.security.dao.SecObjPrivilegeDao;
 import org.oscarehr.security.dao.SecObjectNameDao;
 import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjPrivilege;
 import org.oscarehr.security.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.security.model.SecObjectName;
@@ -296,7 +297,7 @@ public class SecurityRolesService
 			for(SecurityInfoManager.PRIVILEGE_LEVEL level : getPrivilegeLevels(secObjPrivilege.getPrivilege()))
 			{
 				String objectName = secObjPrivilege.getId().getObjectName();
-				SecObjPrivilege.PERMISSION permission = SecObjPrivilege.PERMISSION.from(
+				Permission permission = Permission.from(
 						SecObjectName.OBJECT_NAME.fromValueString(objectName), level);
 
 				if(permission != null)
