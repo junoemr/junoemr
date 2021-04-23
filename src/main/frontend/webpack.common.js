@@ -1,3 +1,5 @@
+const glob = require("glob")
+
 const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -282,6 +284,8 @@ module.exports = {
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
 			'./src/dashboard/ticklerConfigureController.js',
+
+			...(glob.sync("./src/integration/**/*.js", {nosort: true})),
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
