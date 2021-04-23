@@ -49,7 +49,6 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
 {
     @BeforeClass
     public static void setup()
-            throws Exception
     {
         loadSpringBeans();
         DatabaseUtil.createTestDemographic();

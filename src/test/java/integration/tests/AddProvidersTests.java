@@ -54,7 +54,8 @@ public class AddProvidersTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addProvidersClassicUITest() throws Exception
+	public void addProvidersClassicUITest()
+			throws Exception
 	{
 		// open administration panel
 		driver.findElement(By.id("admin-panel")).click();

@@ -67,7 +67,8 @@ public class EditTicklersClassicUITests extends SeleniumTestBase
 	}
 
 	@Test
-	public void editTicklerTest() throws InterruptedException
+	public void editTicklerTest()
+			throws InterruptedException
 	{
 		String priority = "High";
 		String clinic = "Test Clinic";
@@ -80,6 +81,7 @@ public class EditTicklersClassicUITests extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("menuTitletickler")));
 		driver.findElement(By.id("menuTitletickler")).click();
 		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='priority']")));
 		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='priority']"), priority);
 		dropdownSelectByVisibleText(driver, By.id("site"), clinic);
 		driver.findElement(By.xpath("//textarea[@name='textarea']")).sendKeys(reminderMessage);

@@ -48,14 +48,15 @@ public class AssignRolesTests extends SeleniumTestBase
     public static String xpathDropdown = xpathProvider + xpathOption;
 
     @BeforeClass
-    public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+    public static void setup()
     {
         loadSpringBeans();
         DatabaseUtil.createTestProvider();
     }
 
     @AfterClass
-    public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+    public static void cleanup()
+            throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
     {
         SchemaUtils.restoreTable("admission", "log", "property", "program_provider", "provider", "providerbillcenter", "secUserRole");
     }
@@ -75,7 +76,9 @@ public class AssignRolesTests extends SeleniumTestBase
     }
 
     @Test
-    public void assignRolesClassicUITest() throws InterruptedException {
+    public void assignRolesClassicUITest()
+            throws InterruptedException
+    {
         accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='keyword']")));
         driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);

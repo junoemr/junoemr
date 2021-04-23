@@ -52,7 +52,8 @@ public class EditEncounterNotesTests extends SeleniumTestBase
 	}
 
 	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	public static void cleanup()
+			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "casemgmt_note", "demographic",
 				"eChart", "eform_data", "eform_instance", "eform_values", "log", "log_ws_rest", "measurementType",
@@ -60,7 +61,7 @@ public class EditEncounterNotesTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void editEncounterNotesClassicUITest() throws InterruptedException
+	public void editEncounterNotesClassicUITest()
 	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 
