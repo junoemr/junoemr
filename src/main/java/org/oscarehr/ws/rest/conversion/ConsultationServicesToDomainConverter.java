@@ -22,14 +22,12 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.ws.rest.to.model.ConsultationServiceTo1;
-import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,10 +47,8 @@ public class ConsultationServicesToDomainConverter extends AbstractModelConverte
 		}
 		ConsultationServices consultationServices = new ConsultationServices();
 		BeanUtils.copyProperties(transfer, consultationServices);
-		List<ProfessionalSpecialist> specialists = new ArrayList<>();
-		for (ProfessionalSpecialistTo1 specialist : transfer.getSpecialists()) {
-			specialists.add(specialistToDomainConverter.convert(specialist));
-		}
+
+		List<ProfessionalSpecialist> specialists = specialistToDomainConverter.convert(transfer.getSpecialists());
 		consultationServices.setSpecialists(specialists);
 
 		return consultationServices;
