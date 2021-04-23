@@ -253,12 +253,15 @@
 							class="form-control">
 						</div>
 						<div class="col-xs-4 dropup">
-							<input type="text" class="form-control" placeholder="Assign Issue"
-								uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)"
-								typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);recordCtrl.selectedIssue='';"
-								ng-model="recordCtrl.selectedIssue"
-								typeahead-loading="loadingIssues"
-								typeahead-min-length="3" />
+							<juno-security-check permissions="recordCtrl.SecurityPermissions.ENCOUNTER_ISSUE_READ">
+								<input type="text" class="form-control" placeholder="Assign Issue"
+								       ng-disabled="!recordCtrl.canSaveIssues()"
+								       uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)"
+								       typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);recordCtrl.selectedIssue='';"
+								       ng-model="recordCtrl.selectedIssue"
+								       typeahead-loading="loadingIssues"
+								       typeahead-min-length="3"/>
+							</juno-security-check>
 						</div>
 					</div>
 					<div class="row">

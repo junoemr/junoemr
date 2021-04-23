@@ -272,7 +272,6 @@ public class NotesService extends AbstractServiceImpl
 		return note;
 	}
 
-	//TODO-legacy -- POST shouldn't return a transfer object
 	/**
 	 * Save a new note
 	 * @param demographicNo
@@ -450,8 +449,6 @@ public class NotesService extends AbstractServiceImpl
 		return RestResponse.successResponse(note);
 	}
 
-
-	//TODO-legacy -- POST shouldn't return a transfer object
 	@POST
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")

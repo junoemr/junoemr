@@ -167,6 +167,12 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
+		controller.canSaveIssues = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_ISSUE_UPDATE)
+				|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_ISSUE_CREATE);
+		}
+
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
 		{

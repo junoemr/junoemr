@@ -27,9 +27,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		securityService,
 		diseaseRegistryService)
 	{
-
-		var controller = this;
-
+		const controller = this;
 
 		controller.page = {};
 		controller.page.title = mod.displayName;
@@ -50,30 +48,32 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 
 		//set hidden which can can move out of hidden to $scope values
-		var now = new Date();
-		controller.groupNotesForm.annotation_attrib = "anno" + now.getTime();
+		controller.groupNotesForm.annotation_attrib = "anno" + new Date().getTime();
 
+		controller.$onInit = () =>
+		{
+			diseaseRegistryService.getIssueQuickLists().then(
+				function success(results)
+				{
+					controller.page.quickLists = results;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 
-		//get access rights
-		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotChange = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
+			controller.displayIssueId(controller.page.code);
 
-		diseaseRegistryService.getIssueQuickLists().then(
-			function success(results)
+			//action is NULL when new , action is some id when not
+			if (action != null)
 			{
-				controller.page.quickLists = results;
-			},
-			function error(errors)
+				controller.displayGroupNote(controller.page.items, action);
+			}
+			else
 			{
-				console.log(errors);
-			});
+				//new entry
+			}
+		}
 
 		controller.addDxItem = function addDxItem(item)
 		{
@@ -107,22 +107,12 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		};
 
-		//disable click and keypress if user only has read-access
-		controller.checkAction = function checkAction(event)
-		{
-			if (controller.page.cannotChange)
-			{
-				event.preventDefault();
-				event.stopPropagation();
-			}
-		};
-
 		controller.isWorking = function isWorking()
 		{
 			return controller.working;
 		};
 
-		displayIssueId = function displayIssueId(issueCode)
+		controller.displayIssueId = function displayIssueId(issueCode)
 		{
 			noteService.getIssueId(issueCode).then(
 				function success(results)
@@ -135,9 +125,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 		};
 
-		displayIssueId(controller.page.code);
-
-		displayGroupNote = function displayGroupNote(item, itemId)
+		controller.displayGroupNote = function displayGroupNote(item, itemId)
 		{
 			if (controller.page.items[itemId].noteId != null)
 			{
@@ -215,15 +203,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			}
 		};
 
-		//action is NULL when new , action is some id when not
-		if (action != null)
-		{
-			displayGroupNote(controller.page.items, action);
-		}
-		else
-		{
-			//new entry
-		}
 
 		controller.setAvailablePositions = function setAvailablePositions()
 		{

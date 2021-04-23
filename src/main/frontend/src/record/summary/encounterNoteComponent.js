@@ -114,8 +114,9 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.editButtonEnabled = () =>
 		{
-			return (ctrl.isRegularNote() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_NOTE_UPDATE)
-				|| ctrl.note.cpp && securityRolesService.hasSecurityPrivileges(SecurityPermissions.CPP_NOTE_UPDATE));
+			// require create permissions for now, since the backend has no PUT operations for notes
+			return (ctrl.isRegularNote() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_NOTE_CREATE)
+				|| (ctrl.note.cpp && securityRolesService.hasSecurityPrivileges(SecurityPermissions.CPP_NOTE_CREATE)));
 		}
 
 		ctrl.editButtonClick = function editButtonClick()

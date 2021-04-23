@@ -32,7 +32,7 @@
 
 <!-- make div layout more fluid see medical history as an example -->
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="modal-content" ng-click="groupNotesCtrl.checkAction($event)" ng-keypress="groupNotesCtrl.checkAction($event)">
+<div class="modal-content">
 
 	<div class="modal-header"> <!-- ng-style="setColor(note.cpp)" -->
 		<button type="button" class="close" data-dismiss="modal" aria-label="<bean:message key="global.close"/>" ng-click="groupNotesCtrl.cancel()">

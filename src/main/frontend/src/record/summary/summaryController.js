@@ -508,7 +508,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				module.summaryCode === 'reminders' ||
 				module.summaryCode === 'riskfactors')
 			{
-				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.CPP_NOTE_CREATE);
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.CPP_NOTE_CREATE)
+					&& securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_ISSUE_CREATE);
 			}
 			else if (module.summaryCode === 'meds')
 			{
