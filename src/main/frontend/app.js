@@ -69,6 +69,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin.Integration',
 	'Admin.Integration.Know2act',
 	'Admin.Integration.Fax',
+	'Integration',
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
@@ -283,6 +284,19 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/documents',
 			templateUrl: 'src/document/documents_classic.jsp',
 			controller: 'Document.DocumentsController'
+		})
+		.state("integration",
+		{
+			url: "/integration",
+		})
+		.state("integration.mha",
+		{
+			url: "/mha"
+		})
+		.state("integration.mha.billingRedirect",
+		{
+			url: "/billingRedirect?appointmentNo&demographicNo&providerNo",
+			component: 'billingRedirect'
 		})
 		.state('settings',
 		{
