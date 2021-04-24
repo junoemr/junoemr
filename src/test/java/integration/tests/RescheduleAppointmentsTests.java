@@ -49,7 +49,6 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
 {
     @BeforeClass
     public static void setup()
-            throws Exception
     {
         loadSpringBeans();
         DatabaseUtil.createTestDemographic();
@@ -86,7 +85,7 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         //Cut & Paste from 9:00 to 9:45
         driver.findElement(By.xpath("//input[@value='Cut']")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
-        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("09:45")));
+        Thread.sleep(2000);
         driver.findElement(By.linkText("09:45")).click();
         PageUtil.switchToLastWindow(driver);
         driver.findElement(By.id("pasteButton")).click();
@@ -102,7 +101,7 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
         driver.findElement(By.xpath("//input[@value='Copy']")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
-        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("10:45")));
+        Thread.sleep(2000);
         driver.findElement(By.linkText("10:45")).click();
         PageUtil.switchToLastWindow(driver);
         driver.findElement(By.id("pasteButton")).click();

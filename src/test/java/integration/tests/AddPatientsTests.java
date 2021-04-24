@@ -29,6 +29,7 @@ import integration.tests.util.data.PatientTestData;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -49,6 +50,15 @@ public class AddPatientsTests extends SeleniumTestBase
 	public static final PatientTestData son = PatientTestCollection.patientMap.get(patientLNames[2]);
 	public static final String momFullNameJUNO = mom.lastName + ", " + mom.firstName;
 	public static final String dadFullName = dad.lastName + ',' + dad.firstName;
+
+	@BeforeClass
+	public static void setup()
+			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	{
+		SchemaUtils.restoreTable("admission", "demographic",
+				"demographicArchive", "demographiccust", "demographicExt", "demographicExtArchive", "log", "log_ws_rest",
+				"program", "provider_recent_demographic_access");
+	}
 
 	@AfterClass
 	public static void cleanup()
@@ -136,7 +146,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("cust3")).sendKeys("Alert Note");
 		driver.findElement(By.id("content")).sendKeys("Notes");
 		driver.findElement(By.id("btnAddRecord")).click();
-
+		Thread.sleep(2000);
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h2[contains(.,'Successful Addition of a Demographic Record.')]")));
 		Assert.assertTrue(isPatientAdded(mom.lastName, mom.firstName,
 				By.xpath("//a[contains(.,'Back to Demographic Search Page')]"),

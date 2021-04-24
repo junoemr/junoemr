@@ -25,7 +25,9 @@ package org.oscarehr.integration.imdhealth.transfer.inbound;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
+import oscar.util.Jackson.UnixTimeDeserializer;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -41,6 +43,7 @@ public class BearerToken implements Serializable
 	@JsonProperty("token_type")
 	private String tokenType;
 	@JsonProperty("created_at")
+	@JsonDeserialize(using = UnixTimeDeserializer.class)
 	private Date createdAt;
 
 	private static final int EXPIRY_TIME_HOURS = 24;

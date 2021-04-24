@@ -31,7 +31,8 @@ import org.junit.Test;
 public class BasicOscarTests extends SeleniumTestBase
 {
 	@Test
-	public void isOscarReachable() throws Exception {
+	public void isOscarReachable()
+	{
 		driver.get(Navigation.OSCAR_URL + "/index.jsp");
 		Assert.assertTrue("Cannot reach login page",!driver.getTitle().isEmpty());
 	}
