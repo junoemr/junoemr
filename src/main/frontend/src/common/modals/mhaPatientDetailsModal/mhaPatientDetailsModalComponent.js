@@ -101,8 +101,8 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 					}
 					catch(error)
 					{
-						console.error(`Could not fetch MHA patient profile for site [${integration.siteName}]`)
-						console.error(error)
+						console.error(`Could not fetch MHA patient profile for site [${integration.siteName}]`);
+						console.error(error);
 					}
 
 					integration.inviteSent = false;
@@ -156,7 +156,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				case PatientTo1.LinkStatusEnum.CLINICREJECTED:
 					return "Patient has been REJECTED by clinic";
 				case PatientTo1.LinkStatusEnum.PENDINGCLINICCONFIRM:
-					return "Patient is a UNCONFIRMED user";
+					return "Patient is an UNCONFIRMED user";
 				case PatientTo1.LinkStatusEnum.VERIFIED:
 					return "Patient is a VERIFIED user";
 				case PatientTo1.LinkStatusEnum.CONFIRMED:
