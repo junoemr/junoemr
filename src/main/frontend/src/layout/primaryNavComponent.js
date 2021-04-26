@@ -65,6 +65,7 @@ angular.module('Layout').component("primaryNavigation", {
 			ctrl.consultationTeamWarning = "";
 			// measured in months
 			ctrl.consultationLookbackPeriod = 1;
+			ctrl.SecurityPermissions = SecurityPermissions;
 
 			personaService.getDashboardMenu().then(
 				function success(results)

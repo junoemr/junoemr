@@ -878,28 +878,31 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.rotateEventStatus = function rotateEventStatus(calEvent)
 		{
-			$scope.setCalendarLoading(true);
+			if(ctrl.userCanEditAppointments())
+			{
+				$scope.setCalendarLoading(true);
 
-			var appointmentNo = calEvent.data.appointmentNo;
+				var appointmentNo = calEvent.data.appointmentNo;
 
-			$scope.appointmentApi.setNextStatus(appointmentNo).then(
-				function success(response)
-				{
-					var newStatus = response.data.body;
+				$scope.appointmentApi.setNextStatus(appointmentNo).then(
+					function success(response)
+					{
+						var newStatus = response.data.body;
 
-					calEvent.color = scheduleService.getStatusByCode(newStatus).color;
-					calEvent.data.eventStatusCode = newStatus;
+						calEvent.color = scheduleService.getStatusByCode(newStatus).color;
+						calEvent.data.eventStatusCode = newStatus;
 
-					$scope.updateEvent(calEvent);
+						$scope.updateEvent(calEvent);
 
-					$scope.setCalendarLoading(false);
-				},
-				function failure()
-				{
-					$scope.displayMessages.add_standard_error("Failed to update status");
-				}
-			);
-		};
+						$scope.setCalendarLoading(false);
+					},
+					function failure()
+					{
+						$scope.displayMessages.add_standard_error("Failed to update status");
+					}
+				);
+			}
+		}
 
 		//=========================================================================
 		// Event Handlers
@@ -951,6 +954,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				if(!controller.userCanEditAppointments())
 				{
 					statusElem.addClass("disabled");
+					statusIconElem.addClass("disabled");
 				}
 				if(!controller.masterFileEnabled)
 				{

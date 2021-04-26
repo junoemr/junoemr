@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.util.OscarRoleObjectPrivilege;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -352,9 +353,12 @@ public class SecurityInfoManager
 		{
 			return;
 		}
-		if(!hasPrivileges(providerNo, demographicId, permissions))
+		for (Permission permission : permissions)
 		{
-			throw new SecurityException("missing required permissions: " + permissions);
+			if (!hasPrivilege(providerNo, permission.getPrivilegeLevel(), demographicId, permission.getObjectName()))
+			{
+				throw new SecurityException("missing required permissions: " + permission.name());
+			}
 		}
 	}
 

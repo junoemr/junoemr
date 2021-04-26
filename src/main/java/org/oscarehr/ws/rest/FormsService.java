@@ -273,8 +273,6 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<EFormTo1> getAllEFormNames()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EFORM);
-
 		AbstractSearchResponse<EFormTo1> response = new AbstractSearchResponse<EFormTo1>();
 		response.setContent(new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),formsManager.findByStatus(getLoggedInInfo(), true, EFormSortOrder.NAME)));
 		response.setTotal(response.getContent().size());
@@ -287,8 +285,6 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<EncounterFormTo1> getAllFormNames()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FORM);
-
 		AbstractSearchResponse<EncounterFormTo1> response = new AbstractSearchResponse<EncounterFormTo1>();
 		response.setContent(new EncounterFormConverter().getAllAsTransferObjects(getLoggedInInfo(),formsManager.getAllEncounterForms()));
 		response.setTotal(response.getContent().size());
@@ -406,8 +402,6 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<String> getGroupNames()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FORM);
-
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 
 		response.setContent(formsManager.getGroupNames());

@@ -25,6 +25,7 @@ package org.oscarehr.ws.rest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.managers.model.ProviderSettings;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
@@ -48,7 +49,7 @@ import java.util.List;
 public class ProviderPreferenceWebService extends AbstractServiceImpl
 {
 	@Autowired
-	ProviderManager2 providerManager;
+	private ProviderManager2 providerManager;
 
 	@GET
 	@Path("/get")
@@ -70,6 +71,7 @@ public class ProviderPreferenceWebService extends AbstractServiceImpl
 	public GenericRESTResponse saveProviderSettings(@PathParam("providerNo") String providerNo,
 	                                                ProviderSettings providerSettings)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.PREFERENCE_UPDATE);
 		GenericRESTResponse response = new GenericRESTResponse();
 
 		providerManager.updateProviderSettings(getLoggedInInfo(), providerNo, providerSettings);
@@ -83,6 +85,7 @@ public class ProviderPreferenceWebService extends AbstractServiceImpl
 	                                                  @PathParam("key") String key,
 	                                                  String value)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.PREFERENCE_UPDATE);
 		providerManager.updateSingleSetting(providerNo, key, value);
 		return RestResponse.successResponse("Success");
 	}

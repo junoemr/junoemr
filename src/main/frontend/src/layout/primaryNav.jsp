@@ -224,14 +224,17 @@
 							</a>
 						</li>
 						<li>
-							<a class="flex-row justify-content-center align-items-center"
-							   title="<bean:message key="navbar.messenger" bundle="ui"/>"
-							ng-click="$ctrl.openMessenger()">
-							<i class="icon icon-chat"></i>
-							<span ng-show="$ctrl.unreadMessageTotal > 0"
-							      class="badge badge-danger">{{$ctrl.unreadMessageTotal}}
-							</span>
-							</a>
+							<juno-security-check permissions="$ctrl.SecurityPermissions.MESSAGE_READ">
+								<a class="flex-row justify-content-center align-items-center"
+								   title="<bean:message key="navbar.messenger" bundle="ui"/>"
+								   ng-click="$ctrl.openMessenger()">
+									<i class="icon icon-chat"></i>
+									<span ng-show="$ctrl.unreadMessageTotal > 0"
+									      class="badge badge-danger">
+										{{$ctrl.unreadMessageTotal}}
+									</span>
+								</a>
+							</juno-security-check>
 						</li>
 						<li>
 							<a class="dropdown-toggle flex-row justify-content-center align-items-center"

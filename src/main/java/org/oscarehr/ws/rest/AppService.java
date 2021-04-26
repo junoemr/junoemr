@@ -83,7 +83,6 @@ public class AppService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public List<AppDefinitionTo1> getApps()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APP_DEFINITION);
 		return appManager.getAppDefinitions(getLoggedInInfo());
 	}
 

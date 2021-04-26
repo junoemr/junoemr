@@ -1,5 +1,6 @@
 import {SitesApi} from "../../generated/api/SitesApi";
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Settings').controller('Settings.SettingsController', [
 
@@ -20,6 +21,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 	'groupNames',
 	'loadedApps',
 	'appService',
+	'securityRolesService',
 
 	function(
 		$scope,
@@ -38,7 +40,8 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		teams,
 		groupNames,
 		loadedApps,
-		appService)
+		appService,
+		securityRolesService)
 	{
 
 		var controller = this;
@@ -60,6 +63,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		controller.siteOptions = [];
 		controller.scheduleOptions = [];
+		controller.SecurityPermissions = SecurityPermissions;
 
 		if (controller.pref.recentPatients == null)
 		{
@@ -511,6 +515,10 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			$state.go('settings.' + tab.path);
 		};
 
+		controller.saveEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.PREFERENCE_UPDATE);
+		}
 		controller.save = function()
 		{
 			var newList = [];
