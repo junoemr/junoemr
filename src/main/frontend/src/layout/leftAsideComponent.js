@@ -282,6 +282,11 @@ angular.module('Layout').component('leftAside', {
 			return ctrl.isRecentPatientViewEnabled() || ctrl.isAppointmentPatientViewEnabled() || ctrl.isAppointmentQueueViewEnabled();
 		}
 
+		ctrl.isAppointmentStatusSelectEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_UPDATE);
+		}
+
 		ctrl.refreshRecentPatientList = function ()
 		{
 			var deferred = $q.defer();

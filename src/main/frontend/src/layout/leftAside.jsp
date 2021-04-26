@@ -143,11 +143,12 @@
 								</div>
 								<div class="col-md-6">
 									<juno-appointment-status-select
-									ca-name="aside-appt-status-{{patient.appointmentNo}}"
-									ca-no-label="true"
-									ca-model="patient.status"
-									ca-options="$ctrl.eventStatusOptions"
-									ca-change="$ctrl.updateAppointmentStatus(patient)"
+											ca-disabled="!$ctrl.isAppointmentStatusSelectEnabled()"
+											ca-name="aside-appt-status-{{patient.appointmentNo}}"
+											ca-no-label="true"
+											ca-model="patient.status"
+											ca-options="$ctrl.eventStatusOptions"
+											ca-change="$ctrl.updateAppointmentStatus(patient)"
 									>
 									</juno-appointment-status-select>
 								</div>
