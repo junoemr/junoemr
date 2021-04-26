@@ -44,13 +44,18 @@ public class SSOUser implements Serializable
 	@JsonProperty("last_name")
 	private String lastName;
 
+	@JsonProperty ("practitioner_type")
+	private String practitionerType = "Other";
+
+	@JsonProperty ("other_type")
+	private String otherType = "Juno Practitioner";
+
+
 	/* OPTIONAL FIELDS (Implementation TBD)
 
 	private String gender;
-	private String practitionerType;
 	private String preferredLocale;
 	private String prefix;
-
 	*/
 
 	public static SSOUser fromProvider(Provider provider)
@@ -73,5 +78,16 @@ public class SSOUser implements Serializable
 		user.lastName = provider.getLastName();
 
 		return user;
+	}
+
+	/**
+	 * Check if a provider can be converted to an valid SSOUser.
+	 *
+	 * @param provider provider to check
+	 * @return true if able to convert
+	 */
+	public static boolean canConvertProvider(ProviderData provider)
+	{
+		return provider != null;
 	}
 }

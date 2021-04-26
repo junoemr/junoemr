@@ -37,7 +37,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,7 +53,8 @@ public class ScheduleSettingTests extends SeleniumTestBase
 	public static String templateTitleGeneral = "P:General";
 
 	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	public static void setup()
+			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
@@ -65,7 +65,8 @@ public class ScheduleSettingTests extends SeleniumTestBase
 	}
 
 	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	public static void cleanup()
+			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
@@ -124,7 +125,9 @@ public class ScheduleSettingTests extends SeleniumTestBase
 		driver.findElement(addingButton).click();
 	}
 
-	public static void setupTemplate(String currWindowHandle, Set<String> oldWindowHandles) throws InterruptedException {
+	public static void setupTemplate(String currWindowHandle, Set<String> oldWindowHandles)
+			throws InterruptedException
+	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
@@ -167,7 +170,8 @@ public class ScheduleSettingTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void setScheduleTest() throws Exception
+	public void setScheduleTest()
+			throws Exception
 	{
 		String holidayName = "Happy Monday";
 

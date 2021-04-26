@@ -37,17 +37,17 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+
 public class EchartTests extends SeleniumTestBase
 {
-	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
-
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
@@ -65,7 +65,8 @@ public class EchartTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void testWritingNote() throws InterruptedException
+	public void testWritingNote()
+			throws InterruptedException
 	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 

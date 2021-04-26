@@ -1,3 +1,5 @@
+const glob = require("glob")
+
 const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -239,6 +241,7 @@ module.exports = {
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
 			'./src/common/components/junoInputSave/junoInputSaveComponent.js',
+			'./src/admin/systemProperties/components/junoSelectSave/junoSelectSaveComponent.js',
 			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
 			'./src/common/components/junoTab/junoTabComponent.js',
@@ -280,6 +283,8 @@ module.exports = {
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
 			'./src/dashboard/ticklerConfigureController.js',
+
+			...(glob.sync("./src/integration/**/*.js", {nosort: true})),
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
@@ -330,6 +335,7 @@ module.exports = {
             './src/admin/systemProperties/systemPropertiesComponent.js',
             './src/admin/systemProperties/rx/propertiesRxComponent.js',
 			'./src/admin/systemProperties/general/propertiesGeneralComponent.js',
+			'./src/admin/systemProperties/billing/propertiesBillingComponent.js',
 			'./src/admin/integration/module.js',
 			'./src/admin/integration/fax/module.js',
 			'./src/admin/integration/fax/faxConfigurationController.js',

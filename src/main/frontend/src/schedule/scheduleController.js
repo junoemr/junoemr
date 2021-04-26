@@ -1290,7 +1290,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else if ($target.is(".onclick-open-eform"))
 			{
-				formService.openEFormInstancePopup(calEvent.data.demographicNo, $target.attr('data-id'));
+				formService.openEFormPopup(calEvent.data.demographicNo, $target.attr('data-id'));
 			}
 			else if ($target.is(".onclick-open-quicklink"))
 			{
