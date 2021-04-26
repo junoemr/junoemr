@@ -43,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.util.OscarRoleObjectPrivilege;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
