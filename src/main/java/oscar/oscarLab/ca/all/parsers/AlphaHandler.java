@@ -168,7 +168,7 @@ public class AlphaHandler extends DefaultGenericHandler {
         	}else {
 				// Very similar to how MessageHandler does it, but looking in a different spot for the OBR headers
 				HashSet<String> uniqueHeaders = new HashSet<>();
-				for (i=0; i < msg23.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
+				for (i = 0; i < msg23.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
 				{
 					uniqueHeaders.add(getObservationHeader(i, 0));
 				}
