@@ -59,7 +59,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 public class AddAppointmentsTests extends SeleniumTestBase
 {
 	@BeforeClass
-	public static void setup() throws Exception
+	public static void setup()
 	{
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();

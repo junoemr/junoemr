@@ -47,7 +47,8 @@ public class EFormTests extends SeleniumTestBase
 	private static String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 
 	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException
+	public static void setup()
+			throws IOException
 	{
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
@@ -55,13 +56,16 @@ public class EFormTests extends SeleniumTestBase
 	}
 
 	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	public static void cleanup()
+			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
-		SchemaUtils.restoreTable("casemgmt_note", "eChart", "eform", "eform_data", "eform_instance", "eform_values", "measurementType", "validations");
+		SchemaUtils.restoreTable("casemgmt_note", "eChart", "eform", "eform_data", "eform_instance",
+				"eform_values", "measurementType", "validations");
 	}
 
 	@Test
-	public void canAddTravel_Form_v4EForm() throws InterruptedException
+	public void canAddTravel_Form_v4EForm()
+			throws InterruptedException
 	{
 		//navigate to eform addition page
 		String oldUrl = driver.getCurrentUrl();

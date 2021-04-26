@@ -124,7 +124,9 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addLoginRecordsClassicUITest() throws InterruptedException {
+	public void addLoginRecordsClassicUITest()
+			throws InterruptedException
+	{
 		String currWindowHandle = driver.getWindowHandle();
 		//Assign Roles
 		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
@@ -163,7 +165,8 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 
 	@Test
 
-	public void addLoginRecordsJUNOUITest() throws InterruptedException
+	public void addLoginRecordsJUNOUITest()
+			throws InterruptedException
 	{
 		String xpathProvider = "(//td[contains(., '" + drBerry.providerNo + "')])";
 		String xpathDropdown = xpathProvider + xpathOption;
