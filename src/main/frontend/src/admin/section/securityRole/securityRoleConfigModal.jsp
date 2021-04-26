@@ -35,6 +35,11 @@
 			<div class="role-details">
 				<h3>Role Details</h3>
 
+				<div class="flex-row justify-content-center system-managed" ng-if="$ctrl.isSystemManaged()">
+					<i class="icon icon-exclamation"></i>
+					<p>This role is managed by the system and cannot be modified</p>
+				</div>
+
 				<juno-input ng-model="$ctrl.role.name"
 				            label="Role Name"
 				            disabled="!$ctrl.canEdit()">

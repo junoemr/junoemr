@@ -37,6 +37,7 @@ public class SecurityRoleTransfer implements Serializable
 	private Integer id;
 	private String name;
 	private String description;
+	private boolean systemManaged;
 	private List<SecurityPermissionTransfer> securityPermissions;
 	private Map<SecObjectName.OBJECT_NAME, SecurityObjectTransfer> accessObjects;
 

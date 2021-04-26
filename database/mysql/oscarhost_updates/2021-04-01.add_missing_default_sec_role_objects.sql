@@ -59,6 +59,8 @@ UPDATE secObjectName SET description = 'Access to invoice configuration' WHERE o
 INSERT IGNORE INTO secObjectName (objectName, description, orgapplicable) VALUES ('_admin.issueEditor', NULL, 0);
 UPDATE secObjectName SET description = 'Access to issue configuration' WHERE objectName='_admin.issueEditor' AND description IS NULL;
 
+INSERT IGNORE INTO secObjectName (objectName, description, orgapplicable) VALUES ('_admin.lookupFieldEditor', NULL, 0);
+
 INSERT IGNORE INTO secObjectName (objectName, description, orgapplicable) VALUES ('_admin.panelManagement', NULL, 0);
 UPDATE secObjectName SET description = 'Access to BC doctors panel management' WHERE objectName='_admin.panelManagement' AND description IS NULL;
 

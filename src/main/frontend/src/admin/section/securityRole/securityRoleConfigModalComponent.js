@@ -205,7 +205,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					}
 					else
 					{
-						return securityRolesService.hasSecurityPrivileges(
+						return !ctrl.isSystemManaged() && securityRolesService.hasSecurityPrivileges(
 							SecurityPermissions.CONFIGURE_SECURITY_ROLES_UPDATE);
 					}
 				}
@@ -217,8 +217,13 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.canDelete = () =>
 				{
-					return !ctrl.isLoading && securityRolesService.hasSecurityPrivileges(
+					return !ctrl.isLoading && !ctrl.isSystemManaged() && securityRolesService.hasSecurityPrivileges(
 						SecurityPermissions.CONFIGURE_SECURITY_ROLES_DELETE);
+				}
+
+				ctrl.isSystemManaged = () =>
+				{
+					return ctrl.role && ctrl.role.systemManaged;
 				}
 
 				ctrl.onCancel = () =>

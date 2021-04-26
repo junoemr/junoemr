@@ -34,6 +34,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -55,6 +56,9 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 
 	private String description;
 
+	@Column(name = "system_managed")
+	private boolean systemManaged;
+
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime deletedAt;
 
@@ -71,6 +75,15 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 	public Integer getId()
 	{
 		return id;
+	}
+
+	@PreUpdate
+	public void checkSystemManaged()
+	{
+		if(this.isSystemManaged())
+		{
+			throw new RuntimeException("System managed roles cannot be modified");
+		}
 	}
 
 	public int compareTo(SecRole o)

@@ -12,6 +12,13 @@
       color: var(--color-neutral-darkest);
       text-align: center;
     }
+    .system-managed {
+      color: var(--color-red-base);
+      text-align: center;
+      i {
+        font-size: 18px;
+      }
+    }
 
     label {
       min-width: 312px;

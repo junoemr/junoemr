@@ -133,7 +133,8 @@ public class SecurityRolesService
 		{
 			throw new InvalidArgumentException("Role Name must be unique and non-empty");
 		}
-		SecRole secRole = convertSecRole(new SecRole(), newRoleTransfer);
+		SecRole secRole = copyToSecRole(new SecRole(), newRoleTransfer);
+		secRole.setSystemManaged(false); // can never add new system managed roles
 		secRoleDao.persist(secRole);
 		saveSecurityObjectsForRole(providerId, secRole, convertPrivileges(secRole, newRoleTransfer.getAccessObjects().values()));
 
@@ -148,7 +149,12 @@ public class SecurityRolesService
 		{
 			throw new InvalidArgumentException("Id to update cannot be null and must match transfer ID");
 		}
-		SecRole secRole = convertSecRole(secRoleDao.find(roleId), updatedRoleTransfer);
+		SecRole secRole = secRoleDao.find(roleId);
+		if(secRole.isSystemManaged())
+		{
+			throw new RuntimeException("System managed roles cannot be modified");
+		}
+		secRole = copyToSecRole(secRoleDao.find(roleId), updatedRoleTransfer);
 		secRoleDao.merge(secRole);
 		saveSecurityObjectsForRole(providerId, secRole, convertPrivileges(secRole, updatedRoleTransfer.getAccessObjects().values()));
 
@@ -160,6 +166,10 @@ public class SecurityRolesService
 	public boolean deleteRole(String providerId, Integer roleId)
 	{
 		SecRole role = secRoleDao.find(roleId);
+		if(role.isSystemManaged())
+		{
+			throw new RuntimeException("System managed roles cannot be deleted");
+		}
 
 		// remove existing provider connections to this role
 		for(SecUserRole secUserRole : role.getSecUserRoles())
@@ -176,6 +186,9 @@ public class SecurityRolesService
 			privilege.setDeletedAt(LocalDateTime.now());
 			secObjPrivilegeDao.merge(privilege);
 		}
+
+		LogAction.addLogEntry(providerId, null, LogConst.ACTION_DELETE, LogConst.CON_SECURITY, LogConst.STATUS_SUCCESS,
+				String.valueOf(role.getId()), null, "Role: " + role.getName());
 		return true;
 	}
 
@@ -183,11 +196,12 @@ public class SecurityRolesService
 	 * ======================================= private methods =======================================
 	 */
 
-	private SecRole convertSecRole(SecRole secRole, SecurityRoleTransfer input)
+	private SecRole copyToSecRole(SecRole secRole, SecurityRoleTransfer input)
 	{
 		secRole.setId(input.getId());
 		secRole.setName(input.getName());
 		secRole.setDescription(input.getDescription());
+		secRole.setSystemManaged(input.isSystemManaged());
 		return secRole;
 	}
 
@@ -238,6 +252,7 @@ public class SecurityRolesService
 		transfer.setId(secRole.getId());
 		transfer.setName(secRole.getName());
 		transfer.setDescription(secRole.getDescription());
+		transfer.setSystemManaged(secRole.isSystemManaged());
 
 		// privileges are not always needed and may have additional database hits as they are lazy loaded
 		if(includePrivileges)
