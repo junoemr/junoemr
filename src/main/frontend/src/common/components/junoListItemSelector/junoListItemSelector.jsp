@@ -11,10 +11,10 @@
 		</div>
 	</div>
 	<div class="flex-column selection-controls">
-		<juno-button click="$ctrl.setSelected($ctrl.activeOption, true)">
+		<juno-button click="$ctrl.addToSelected($ctrl.activeOption)">
 			<i class="icon icon-arrow-left"></i>
 		</juno-button>
-		<juno-button click="$ctrl.setSelected($ctrl.activeSelection, false)">
+		<juno-button click="$ctrl.removeFromSelected($ctrl.activeSelection)">
 			<i class="icon icon-arrow-right"></i>
 		</juno-button>
 	</div>

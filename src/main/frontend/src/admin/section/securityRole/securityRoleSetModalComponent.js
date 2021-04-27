@@ -94,6 +94,10 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 					});
 				}
 
+				ctrl.onBlacklistChange = (item, model) =>
+				{
+				}
+
 				ctrl.onCancel = () =>
 				{
 					ctrl.modalInstance.dismiss("cancelled");

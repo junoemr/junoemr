@@ -30,8 +30,10 @@ angular.module('Common.Components').component('junoListItemSelector', {
 		componentStyle: "<?",
 		labelSelected: "@?",
 		labelOptions: "@?",
+		onChange: "&?"
 	},
-	controller: [function ()
+	controller: ['$scope',
+		function ($scope)
 	{
 		const ctrl = this;
 
@@ -46,6 +48,30 @@ angular.module('Common.Components').component('junoListItemSelector', {
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.reComputeLists();
 		}
+
+		$scope.$watch("$ctrl.ngModel", (oldVal, newVal) =>
+		{
+			if(oldVal !== newVal)
+			{
+				ctrl.setActiveOption(null);
+				ctrl.setActiveSelection(null);
+				ctrl.reComputeLists();
+			}
+		})
+
+		ctrl.emitChangeEvent = (item) =>
+		{
+			if (ctrl.onChange)
+			{
+				ctrl.onChange(
+					{
+						item: item,
+						model: ctrl.ngModel,
+					}
+				);
+			}
+		}
+
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
@@ -67,13 +93,44 @@ angular.module('Common.Components').component('junoListItemSelector', {
 			ctrl.activeSelection = item;
 		}
 
-		ctrl.setSelected = (item, isSelected) =>
+		ctrl.addToSelected = (item) =>
 		{
 			if(item)
 			{
-				item.selected = isSelected;
+				item.selected = true;
+				ctrl.setActiveOption(ctrl.findNextItem(item, ctrl.options));
 				ctrl.reComputeLists();
+				ctrl.setActiveSelection(item);
+				ctrl.emitChangeEvent(item);
 			}
+		}
+		ctrl.removeFromSelected = (item) =>
+		{
+			if(item)
+			{
+				item.selected = false;
+				ctrl.setActiveSelection(ctrl.findNextItem(item, ctrl.selected));
+				ctrl.reComputeLists();
+				ctrl.setActiveOption(item);
+				ctrl.emitChangeEvent(item);
+			}
+		}
+
+		ctrl.findNextItem = (item, list) =>
+		{
+			const index = list.indexOf(item);
+
+			// get the next item in the list if possible
+			if (index >= 0 && index < list.length - 1)
+			{
+				return list[index + 1];
+			}
+			// otherwise try for the previous item if possible
+			else if(index > 0 && index < list.length)
+			{
+				return list[index - 1];
+			}
+			return null;
 		}
 	}],
 });

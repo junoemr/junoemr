@@ -42,8 +42,10 @@
 				<juno-list-item-selector ng-if="$ctrl.selectedProvider"
 				                         label-options="Demographic Sets"
 				                         label-selected="Black Listed"
-				                         ng-model="$ctrl.selectedSetsList">
+				                         ng-model="$ctrl.selectedSetsList"
+				                         on-change="$ctrl.onBlacklistChange(item, model)">
 				</juno-list-item-selector>
+				<p ng-if="!$ctrl.selectedProvider">Please select a provider</p>
 			</div>
 		</div>
 	</modal-body>
