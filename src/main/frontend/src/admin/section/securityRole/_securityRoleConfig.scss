@@ -5,17 +5,18 @@
   }
 }
 
-.security-role-config-modal,
-.security-role-set-modal {
+.security-role-config-modal {
   .role-details,
   .role-access {
     h3 {
       color: var(--color-neutral-darkest);
       text-align: center;
     }
+
     .system-managed {
       color: var(--color-red-base);
       text-align: center;
+
       i {
         font-size: 18px;
       }
@@ -28,6 +29,7 @@
 
   .role-details {
     padding: 16px;
+
     .juno-input {
       margin-bottom: 4px;
     }
@@ -40,7 +42,19 @@
       margin-left: 16px;
     }
   }
+}
 
+.security-role-set-modal {
+  .provider-selection-container {
+    padding: 16px;
+  }
+  .set-selection-container {
+    padding: 16px;
+  }
+}
+
+.security-role-config-modal,
+.security-role-set-modal {
   .footer-wrapper {
     height: 100%;
     display: flex;

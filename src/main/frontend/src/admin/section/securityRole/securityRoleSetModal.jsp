@@ -31,7 +31,21 @@
 	</modal-title>
 
 	<modal-body>
-
+		<div class="overflow-auto height-100 flex-column">
+			<div class="provider-selection-container">
+				<juno-select ng-model="$ctrl.selectedProvider"
+				             options="$ctrl.providerOptions"
+				             on-change="$ctrl.onProviderSelected()">
+				</juno-select>
+			</div>
+			<div class="set-selection-container flex-grow">
+				<juno-list-item-selector ng-if="$ctrl.selectedProvider"
+				                         label-options="Demographic Sets"
+				                         label-selected="Black Listed"
+				                         ng-model="$ctrl.selectedSetsList">
+				</juno-list-item-selector>
+			</div>
+		</div>
 	</modal-body>
 	<modal-footer>
 		<div class="row footer-wrapper">

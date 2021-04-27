@@ -26,7 +26,7 @@ import {
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
-import {SecurityPermissions, SecurityRole} from "../../../common/security/securityConstants";
+import {SecurityPermissions} from "../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('securityRoleSetModal',
 	{
@@ -39,7 +39,13 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 			'$uibModal',
 			'securityApiService',
 			'securityRolesService',
-			function ($uibModal, securityApiService, securityRolesService)
+			'providersService',
+			'reportingService',
+			function ($uibModal,
+			          securityApiService,
+			          securityRolesService,
+			          providersService,
+			          reportingService)
 			{
 				const ctrl = this;
 				ctrl.SecurityPermissions = SecurityPermissions;
@@ -47,9 +53,45 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
+				ctrl.providerOptions = [];
+				ctrl.selectedProvider = null;
+
+				ctrl.availableSetsList = [];
+				ctrl.selectedSetsList = [];
+
 				ctrl.$onInit = async () =>
 				{
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+
+					providersService.getAll().then((results) =>
+					{
+						ctrl.providerOptions = results.map((provider) =>
+						{
+							return {
+								label: provider.name,
+								value: provider.providerNo,
+							}
+						});
+					});
+					reportingService.getDemographicSetList().then((results) =>
+					{
+						ctrl.availableSetsList = results.content;
+					});
+				}
+
+				ctrl.onProviderSelected = () =>
+				{
+					ctrl.reloadSelectedSetsList();
+				}
+				ctrl.reloadSelectedSetsList = () =>
+				{
+					ctrl.selectedSetsList = ctrl.availableSetsList.map((set) =>
+					{
+						return {
+							label: set,
+							selected: false,
+						};
+					});
 				}
 
 				ctrl.onCancel = () =>
