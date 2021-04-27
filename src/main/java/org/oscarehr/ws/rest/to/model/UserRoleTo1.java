@@ -23,11 +23,14 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="userRole")
+@Tag(name = "UserRoleTo1")
 public class UserRoleTo1 implements Serializable {
 
 	private static final long serialVersionUID = 1L;

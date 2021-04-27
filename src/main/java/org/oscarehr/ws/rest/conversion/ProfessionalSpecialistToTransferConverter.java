@@ -20,24 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.dao;
+package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.springframework.stereotype.Repository;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.model.ProfessionalSpecialist;
+import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
-@SuppressWarnings("unchecked")
-@Repository("demographic.dao.DemographicDao")
-public class DemographicDao extends AbstractDao<Demographic>
+@Component
+public class ProfessionalSpecialistToTransferConverter extends AbstractModelConverter<ProfessionalSpecialist, ProfessionalSpecialistTo1>
 {
-	public DemographicDao()
+	@Override
+	public ProfessionalSpecialistTo1 convert(ProfessionalSpecialist domain)
 	{
-		super(Demographic.class);
-	}
-
-	public boolean demographicExists(Integer demographicNo)
-	{
-		return (this.find(demographicNo) != null);
+		if (domain == null)
+		{
+			return null;
+		}
+		ProfessionalSpecialistTo1 specialistTransfer = new ProfessionalSpecialistTo1();
+		BeanUtils.copyProperties(domain, specialistTransfer, "name");
+		specialistTransfer.setName(domain.getLastName() + ", " + domain.getFirstName());
+		return specialistTransfer;
 	}
 
 }

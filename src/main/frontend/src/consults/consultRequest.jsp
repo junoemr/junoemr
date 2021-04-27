@@ -150,6 +150,16 @@
 			<div class="col-md-12"><!-- Referral -->
 				<form class="consult-request-form">
 					<div class="form-group col-md-6">
+						<juno-select ng-model="consultRequestCtrl.consult.providerNo"
+							placeholder="Referral Practitioner"
+							options="consultRequestCtrl.providers"
+							label="Referral Practitioner"
+							label-position="consultRequestCtrl.labelPosition.TOP"
+							on-change="consultRequestCtrl.onReferralPractitionerSelected(value)"
+							component-style="consultRequestCtrl.resolve.style">
+						</juno-select>
+					</div>
+					<div class="form-group col-md-6">
 						<label class="control-label">Referral Date</label>
 						<juno-datepicker-popup juno-model="consultRequestCtrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>

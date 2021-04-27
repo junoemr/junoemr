@@ -55,7 +55,7 @@ public class EditAppointmentsTests extends SeleniumTestBase
 	String resourcesUpdated = "Appointment Resources Updated";
 
 	@BeforeClass
-	public static void setup() throws Exception
+	public static void setup()
 	{
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
@@ -64,7 +64,8 @@ public class EditAppointmentsTests extends SeleniumTestBase
 	}
 
 	@AfterClass
-	public static void cleanup() throws Exception
+	public static void cleanup()
+			throws Exception
 	{
 		SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "caisi_role",  "demographic",
 				"documentDescriptionTemplate", "issue", "log", "log_ws_rest", "LookupList", "LookupListItem",
@@ -82,7 +83,8 @@ public class EditAppointmentsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void editAppointmentTestsClassicUI() throws InterruptedException
+	public void editAppointmentTestsClassicUI()
+			throws InterruptedException
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();

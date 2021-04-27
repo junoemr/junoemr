@@ -3,7 +3,7 @@ import {ScheduleApi} from '../../generated/api/ScheduleApi';
 import {SitesApi} from '../../generated/api/SitesApi';
 import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
-import {MhaAppointmentApi, MhaIntegrationApi} from "../../generated";
+import {MhaAppointmentApi, MhaIntegrationApi, ProvidersServiceApi} from "../../generated";
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -16,7 +16,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'$state',
 	'loadedSettings',
 	'providerService',
-	'providersService',
 	'formService',
 	'focusService',
 	'securityService',
@@ -36,7 +35,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$state,
 		loadedSettings,
 		providerService,
-		providersService,
 		formService,
 		focusService,
 		securityService,
@@ -69,6 +67,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		                                                     '../ws/rs');
 		controller.mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
 		                                                     '../ws/rs');
+		controller.providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
@@ -1291,7 +1290,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else if ($target.is(".onclick-open-eform"))
 			{
-				formService.openEFormInstancePopup(calEvent.data.demographicNo, $target.attr('data-id'));
+				formService.openEFormPopup(calEvent.data.demographicNo, $target.attr('data-id'));
 			}
 			else if ($target.is(".onclick-open-quicklink"))
 			{
@@ -1855,16 +1854,17 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
-			providersService.getAll().then(
+			controller.providersServiceApi.getAll().then(
 				function success(results)
 				{
-					for (var i = 0; i < results.length; i++)
+					let data = results.data.body;
+					for (var i = 0; i < data.length; i++)
 					{
-						var providerNo = Number(results[i].providerNo);
+						var providerNo = Number(data[i].providerNo);
 						$scope.resourceOptionHash[providerNo] = {
 							'id': providerNo,
-							'title': results[i].name,
-							'display_name': results[i].name
+							'title': data[i].name,
+							'display_name': data[i].name
 						};
 					}
 					deferred.resolve($scope.resourceOptionHash);

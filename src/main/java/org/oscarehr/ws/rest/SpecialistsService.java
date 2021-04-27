@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistConverter;
+import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistToTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,8 @@ public class SpecialistsService extends AbstractServiceImpl
 	@Autowired
 	private ProfessionalSpecialistDao specialistDao;
 
-	private ProfessionalSpecialistConverter specialistConverter = new ProfessionalSpecialistConverter();
+	@Autowired
+	private ProfessionalSpecialistToTransferConverter specialistToTransferConverter;
 
 	@GET
 	@Path("/")
@@ -71,7 +72,7 @@ public class SpecialistsService extends AbstractServiceImpl
 		try
 		{
 			List<ProfessionalSpecialist> specialists = getSpecialistSearchResults(specialistDao, searchName, searchRefNo, offset, perPage);
-			List<ProfessionalSpecialistTo1> specialistTo1s = specialistConverter.getAllAsTransferObjects(getLoggedInInfo(), specialists);
+			List<ProfessionalSpecialistTo1> specialistTo1s = specialistToTransferConverter.convert(specialists);
 			return RestResponse.successResponse(specialistTo1s);
 		}
 		catch (NumberFormatException e)

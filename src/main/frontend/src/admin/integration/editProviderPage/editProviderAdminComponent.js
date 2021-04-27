@@ -22,6 +22,7 @@
  */
 import {EDIT_PROVIDER_MODE} from "./editProviderAdminConstants";
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
+import {ProvidersServiceApi} from "../../../../generated";
 import {SitesApi} from "../../../../generated";
 import {BILLING_REGION} from "../../../billing/billingConstants";
 
@@ -38,7 +39,6 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		'$location',
 		'$uibModal',
 		'staticDataService',
-		'providersService',
 		'providerService',
 		'billingService',
 		function (
@@ -49,13 +49,13 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			$location,
 			$uibModal,
 			staticDataService,
-			providersService,
 			providerService,
 			billingService)
 	{
 		let ctrl = this;
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		let sitesApi =  new SitesApi($http, $httpParamSerializer, '../ws/rs');
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
@@ -295,11 +295,11 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.$onInit = async function()
 		{
-			providersService.getAllProviderRoles().then(
+			providersServiceApi.getProviderRoles().then(
 					function success(result)
 					{
 						ctrl.roleOptions = [];
-						for (let role of result)
+						for (let role of result.data.body)
 						{
 							ctrl.roleOptions.push({
 								label: role.roleName,

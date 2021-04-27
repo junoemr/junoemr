@@ -1,3 +1,5 @@
+const glob = require("glob")
+
 const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -169,7 +171,6 @@ module.exports = {
 			'./src/common/services/personaService.js',
 			'./src/common/services/programService.js',
 			'./src/common/services/providerService.js',
-			'./src/common/services/providersService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
 			'./src/common/services/securityService.js',
@@ -282,6 +283,8 @@ module.exports = {
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
 			'./src/dashboard/ticklerConfigureController.js',
+
+			...(glob.sync("./src/integration/**/*.js", {nosort: true})),
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',

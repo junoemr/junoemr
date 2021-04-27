@@ -46,11 +46,12 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.conversion.ConsultationRequestConverter;
+import org.oscarehr.ws.rest.conversion.ConsultationRequestToDomainConverter;
+import org.oscarehr.ws.rest.conversion.ConsultationRequestToTransferConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationResponseConverter;
-import org.oscarehr.ws.rest.conversion.ConsultationServiceConverter;
+import org.oscarehr.ws.rest.conversion.ConsultationServicesToTransferConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
-import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistConverter;
+import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistToTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.ReferralResponse;
@@ -59,6 +60,7 @@ import org.oscarehr.ws.rest.to.model.ConsultationRequestSearchResult;
 import org.oscarehr.ws.rest.to.model.ConsultationRequestTo1;
 import org.oscarehr.ws.rest.to.model.ConsultationResponseSearchResult;
 import org.oscarehr.ws.rest.to.model.ConsultationResponseTo1;
+import org.oscarehr.ws.rest.to.model.ConsultationServiceTo1;
 import org.oscarehr.ws.rest.to.model.FaxConfigTo1;
 import org.oscarehr.ws.rest.to.model.LetterheadTo1;
 import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
@@ -112,11 +114,22 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 	@Autowired
 	private ConsultationAttachmentService consultationAttachmentService;
-	
-	private ConsultationRequestConverter requestConverter = new ConsultationRequestConverter();
+
+	@Autowired
+	private ConsultationRequestToTransferConverter consultationRequestToTransferConverter;
+
+	@Autowired
+	private ConsultationRequestToDomainConverter consultationRequestToDomainConverter;
+
+
+	@Autowired
+	private ProfessionalSpecialistToTransferConverter specialistToTransferConverter;
+
 	private ConsultationResponseConverter responseConverter = new ConsultationResponseConverter();
-	private ConsultationServiceConverter serviceConverter = new ConsultationServiceConverter();
-	private ProfessionalSpecialistConverter specialistConverter = new ProfessionalSpecialistConverter();
+
+	@Autowired
+	private ConsultationServicesToTransferConverter servicesToTransferConverter;
+
 	private DemographicConverter demographicConverter = new DemographicConverter();
 	
 	
@@ -240,13 +253,18 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			{
 				return RestResponse.errorResponse("No Consult found with id " + requestId);
 			}
-			request = requestConverter.getAsTransferObject(getLoggedInInfo(), consult);
+			request = consultationRequestToTransferConverter.convert(consult);
 			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
 
 			request.setFaxList(getFaxList());
-			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
+			List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
+			List<ConsultationServiceTo1> serviceTransfers = new ArrayList<>();
+			for (ConsultationServices consultationService : consultationServices)
+			{
+				serviceTransfers.add(servicesToTransferConverter.convert(consultationService));
+			}
+			request.setServiceList(serviceTransfers);
 			request.setSendToList(providerDao.getActiveTeams());
-			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
 		}
 		catch(Exception e)
 		{
@@ -280,7 +298,9 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			if(StringUtils.isNotBlank(info)) request.setCurrentMeds(info);
 
 			request.setFaxList(getFaxList());
-			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
+			List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
+			List<ConsultationServiceTo1> serviceTransfers = servicesToTransferConverter.convert(consultationServices);
+			request.setServiceList(serviceTransfers);
 			request.setSendToList(providerDao.getActiveTeams());
 			request.setProviderNo(loggedInProviderNo);
 			request.setPatientWillBook(true);
@@ -336,18 +356,12 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationRequestTo1> saveRequest(ConsultationRequestTo1 data)
 	{
-		ConsultationRequest request;
-		if(data.getId() == null)
-		{ //new consultation request
-			request = requestConverter.getAsDomainObject(getLoggedInInfo(), data);
-		}
-		else
-		{
-			request = requestConverter.getAsDomainObject(getLoggedInInfo(), data, consultationManager.getRequest(getLoggedInInfo(), data.getId()));
-		}
-		request.setProfessionalSpecialist(consultationManager.getProfessionalSpecialist(data.getProfessionalSpecialist().getId()));
+		ConsultationRequest request = consultationRequestToDomainConverter.convert(data);
 		consultationManager.saveConsultationRequest(getLoggedInInfo(), request);
-		if(data.getId() == null) data.setId(request.getId());
+		if(data.getId() == null)
+		{
+			data.setId(request.getId());
+		}
 
 		//save attachments
 		saveRequestAttachments(data);
@@ -440,7 +454,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			demographicNo = responseD.getDemographicNo();
 			
 			ProfessionalSpecialist referringDoctorD = consultationManager.getProfessionalSpecialist(responseD.getReferringDocId());
-			response.setReferringDoctor(specialistConverter.getAsTransferObject(getLoggedInInfo(), referringDoctorD));
+			response.setReferringDoctor(specialistToTransferConverter.convert(referringDoctorD));
 			
 			response.setAttachments(getResponseAttachments(responseId, demographicNo, ConsultationAttachmentTo1.ATTACHED));
 		} else {
@@ -529,21 +543,21 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			specs = consultationManager.findByService(getLoggedInInfo(), serviceName);
 			ConsultationServices cs = consultationServiceDao.findByDescription(serviceName);
 			if(cs != null) {
-				response.getServices().add(serviceConverter.getAsTransferObject(getLoggedInInfo(), cs));
+				response.getServices().add(servicesToTransferConverter.convert(cs));
 			}
 		} else {
 			for(BORNPathwayMapping mapping:mappings) {
 				specs.addAll(consultationManager.findByServiceId(getLoggedInInfo(), mapping.getServiceId()));
 				ConsultationServices cs = consultationServiceDao.find(mapping.getServiceId());
 				if(cs != null) {
-					response.getServices().add(serviceConverter.getAsTransferObject(getLoggedInInfo(), cs));
+					response.getServices().add(servicesToTransferConverter.convert(cs));
 				}
 			}
 		}
-		
-		ProfessionalSpecialistConverter converter = new ProfessionalSpecialistConverter();
-		response.setSpecialists(converter.getAllAsTransferObjects(getLoggedInInfo(), specs));
-		
+
+		List<ProfessionalSpecialistTo1> specialistTo1s = specialistToTransferConverter.convert(specs);
+		response.setSpecialists(specialistTo1s);
+
 		return response;
 	}
 
@@ -552,13 +566,8 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public ProfessionalSpecialistTo1 getProfessionalSpecialist(@QueryParam("specId") Integer specId)
 	{
-		ProfessionalSpecialist ps = consultationManager.getProfessionalSpecialist(specId);
-		if(ps != null)
-		{
-			ProfessionalSpecialistConverter converter = new ProfessionalSpecialistConverter();
-			return converter.getAsTransferObject(getLoggedInInfo(), ps);
-		}
-		return null;
+		ProfessionalSpecialist specialist = consultationManager.getProfessionalSpecialist(specId);
+		return specialistToTransferConverter.convert(specialist);
 	}
 
 	@GET
@@ -587,16 +596,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		return faxList;
 	}
 	
-	private List<ProfessionalSpecialistTo1> getReferringDoctorList() {
-		List<ProfessionalSpecialistTo1> refDocList = new ArrayList<ProfessionalSpecialistTo1>();
-		
+	private List<ProfessionalSpecialistTo1> getReferringDoctorList()
+	{
 		List<ProfessionalSpecialist> list = consultationManager.getReferringDoctorList();
-		if (list!=null) {
-			for (ProfessionalSpecialist specialist : list) {
-				refDocList.add(specialistConverter.getAsTransferObject(getLoggedInInfo(), specialist));
-			}
-		}
-		return refDocList;
+
+		return specialistToTransferConverter.convert(list);
 	}
 
 	private void getDocuments(List<EDoc> edocs, boolean attached, List<ConsultationAttachmentTo1> attachments)

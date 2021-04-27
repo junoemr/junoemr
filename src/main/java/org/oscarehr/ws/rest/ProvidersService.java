@@ -24,6 +24,7 @@
 
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.SecRoleDao;
@@ -50,6 +51,7 @@ import java.util.List;
 
 @Path("/providers")
 @Component("providersService")
+@Tag(name = "providersService")
 public class ProvidersService extends AbstractServiceImpl
 {
 	private static Logger logger = MiscUtils.getLogger();
@@ -141,5 +143,15 @@ public class ProvidersService extends AbstractServiceImpl
 		}
 
 		return RestResponse.successResponse(userRoles);
+	}
+
+	@GET
+	@Path("/active")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<ProviderTo1> getActive()
+	{
+		List<Provider> providers = providerDao.getActiveProviders();
+		List<ProviderTo1> providersTo1 = providerConverter.getAllAsTransferObjects(getLoggedInInfo(), providers);
+		return RestSearchResponse.successResponseOnePage(providersTo1);
 	}
 }
