@@ -126,5 +126,24 @@ angular.module('Admin.Section').component('securityRoleConfig',
 						// do nothing on cancel
 					});
 				}
+
+				ctrl.openSecuritySetsModal = () =>
+				{
+					$uibModal.open(
+						{
+							component: 'securityRoleSetModal',
+							backdrop: 'static',
+							windowClass: "juno-modal",
+							resolve: {
+							}
+						}
+					).result.then((response) =>
+					{
+
+					}).catch((reason) =>
+					{
+						// do nothing on cancel
+					});
+				}
 			}]
 	});

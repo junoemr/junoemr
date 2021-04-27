@@ -53,4 +53,15 @@
 		</tr>
 		</tbody>
 	</table>
+
+	<div class="bottom-wrapper">
+		<div class="button-wrapper">
+			<juno-button component-style="$ctrl.componentStyle"
+			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+			             click="$ctrl.openSecuritySetsModal()">
+				Manage Set Access
+			</juno-button>
+		</div>
+	</div>
 </div>
