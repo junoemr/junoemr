@@ -78,6 +78,7 @@ public class SecuritySetsService
 				demographicSet = new SecDemographicSet();
 				demographicSet.setProvider(providerDao.find(providerId));
 				demographicSet.setSetName(setName);
+				demographicSet.setCreatedBy(loggedInProvider);
 				secDemographicSetDao.persist(demographicSet);
 			}
 		}

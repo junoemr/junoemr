@@ -35,6 +35,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -56,6 +58,15 @@ public class SecDemographicSet extends AbstractModel<Integer>
 	@JoinColumn(name = "provider_id", referencedColumnName = "provider_no", nullable = false)
 	private ProviderData provider;
 
+	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime createdAt;
+
+	@Column(name = "created_by")
+	private String createdBy;
+
+	@Column(name = "updated_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime updatedAt;
+
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime deletedAt;
 
@@ -66,5 +77,18 @@ public class SecDemographicSet extends AbstractModel<Integer>
 	public Integer getId()
 	{
 		return id;
+	}
+
+	@PrePersist
+	public void setCreatedTime()
+	{
+		this.setCreatedAt(LocalDateTime.now());
+		this.setUpdatedAt(LocalDateTime.now());
+	}
+
+	@PreUpdate
+	public void setUpdateTime()
+	{
+		this.setUpdatedAt(LocalDateTime.now());
 	}
 }
