@@ -79,23 +79,27 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 					});
 				}
 
-				ctrl.onProviderSelected = () =>
+				ctrl.onProviderSelected = (value) =>
 				{
-					ctrl.reloadSelectedSetsList();
+					ctrl.reloadSelectedSetsList(value);
 				}
-				ctrl.reloadSelectedSetsList = () =>
+				ctrl.reloadSelectedSetsList = async (value) =>
 				{
+					const assignedSets = await securityApiService.getProviderSecurityDemographicSets(value);
 					ctrl.selectedSetsList = ctrl.availableSetsList.map((set) =>
 					{
 						return {
 							label: set,
-							selected: false,
+							selected: assignedSets.includes(set),
+							data: set,
 						};
 					});
 				}
 
-				ctrl.onBlacklistChange = (item, model) =>
+				ctrl.onBlacklistChange = async (item, model) =>
 				{
+					const assignedSets = model.filter((modelItem) => modelItem.selected).map((modelItem) => modelItem.data);
+					await securityApiService.setProviderSecurityDemographicSets(ctrl.selectedProvider, assignedSets);
 				}
 
 				ctrl.onCancel = () =>

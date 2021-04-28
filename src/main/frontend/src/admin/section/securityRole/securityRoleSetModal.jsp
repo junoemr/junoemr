@@ -35,7 +35,7 @@
 			<div class="provider-selection-container">
 				<juno-select ng-model="$ctrl.selectedProvider"
 				             options="$ctrl.providerOptions"
-				             on-change="$ctrl.onProviderSelected()">
+				             on-change="$ctrl.onProviderSelected(value)">
 				</juno-select>
 			</div>
 			<div class="set-selection-container flex-grow">
@@ -58,16 +58,7 @@
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 						             click="$ctrl.onCancel()">
-							Cancel
-						</juno-button>
-					</div>
-					<div class="button-wrapper">
-						<juno-button component-style="$ctrl.resolve.style"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             click="$ctrl.onSave()"
-						             disabled="!$ctrl.canSave()">
-							Save
+							Done
 						</juno-button>
 					</div>
 				</div>

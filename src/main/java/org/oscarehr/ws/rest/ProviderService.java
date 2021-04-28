@@ -35,6 +35,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
@@ -46,6 +47,7 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.security.service.SecurityRolesService;
+import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -66,6 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -109,6 +112,10 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	private SecurityRolesService securityRolesService;
+
+	@Autowired
+	private SecuritySetsService securitySetsService;
+
 
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
@@ -381,6 +388,27 @@ public class ProviderService extends AbstractServiceImpl {
 	public RestResponse<UserSecurityRolesTransfer> getCurrentUserSecurityRoles()
 	{
 		return RestResponse.successResponse(securityRolesService.getUserSecurityRolesTransfer(getLoggedInProviderId()));
+	}
+
+	@GET
+	@Path("/provider/{providerId}/security/sets")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<String> getProviderSecurityDemographicSets(@PathParam("providerId") String providerId)
+	{
+		return RestSearchResponse.successResponseOnePage(securitySetsService.getSecurityDemographicSetNames(providerId));
+	}
+
+	@PUT
+	@Path("/provider/{providerId}/security/sets")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> setProviderSecurityDemographicSets(@PathParam("providerId") String providerId,
+	                                                                List<String> assignedSetNames)
+	{
+		String loggedInProviderId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.CONFIGURE_SECURITY_ROLES_UPDATE);
+		securitySetsService.setSecurityDemographicSets(loggedInProviderId, providerId, assignedSetNames);
+		return RestResponse.successResponse(true);
 	}
 	
 //	@GET

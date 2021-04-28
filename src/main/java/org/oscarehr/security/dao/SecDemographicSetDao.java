@@ -26,11 +26,36 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.security.model.SecDemographicSet;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Query;
+import java.util.List;
+
 @Repository
+@SuppressWarnings("unchecked")
 public class SecDemographicSetDao extends AbstractDao<SecDemographicSet>
 {
 	protected SecDemographicSetDao()
 	{
 		super(SecDemographicSet.class);
+	}
+
+	public List<SecDemographicSet> findAllByProvider(String providerId)
+	{
+		String sql = "SELECT s FROM SecDemographicSet s WHERE s.provider.id=:providerId ORDER BY s.setName ASC";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("providerId", providerId);
+
+		return query.getResultList();
+	}
+
+	public SecDemographicSet findByProviderAndSetName(String providerId, String setName)
+	{
+		String sql = "SELECT s FROM SecDemographicSet s WHERE s.provider.id=:providerId AND s.setName=:setName";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("providerId", providerId);
+		query.setParameter("setName", setName);
+
+		return this.getSingleResultOrNull(query);
 	}
 }

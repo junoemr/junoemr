@@ -23,6 +23,7 @@
 package org.oscarehr.security.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.provider.model.ProviderData;
 
@@ -40,12 +41,15 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name="secDemographicSet")
+@Where(clause="deleted_at IS NULL")
 public class SecDemographicSet extends AbstractModel<Integer>
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
+
+	@Column(name = "set_name")
 	private String setName;
 
 	@ManyToOne(fetch = FetchType.LAZY)
