@@ -481,19 +481,37 @@ oscarApp.config([
 				{
 					return uxService.getDisplayProperties();
 				}]
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.details',
 		{
 			url: '/details',
 			templateUrl: 'src/record/details/details.jsp',
-			controller: 'Record.Details.DetailsController as detailsCtrl'
+			controller: 'Record.Details.DetailsController as detailsCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.summary',
 		{
 			url: '/summary?appointmentNo&encType',
 			templateUrl: 'src/record/summary/summary.jsp',
-			controller: 'Record.Summary.SummaryController as summaryCtrl'
+			controller: 'Record.Summary.SummaryController as summaryCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.forms',
 		{
@@ -502,7 +520,13 @@ oscarApp.config([
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
 				viewState: FORM_CONTROLLER_STATES.COMPLETED
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.forms.add',
 			{
@@ -511,7 +535,13 @@ oscarApp.config([
 				controller: 'Record.Forms.FormController as formCtrl',
 				params: {
 					viewState: FORM_CONTROLLER_STATES.ADD
-				}
+				},
+				meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 			})
 		.state('record.forms.completed',
 			{
@@ -520,7 +550,13 @@ oscarApp.config([
 				controller: 'Record.Forms.FormController as formCtrl',
 				params: {
 					viewState: FORM_CONTROLLER_STATES.COMPLETED
-				}
+				},
+				meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 			})
 		.state('record.forms.revisions',
 		{
@@ -529,7 +565,13 @@ oscarApp.config([
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
 				viewState: FORM_CONTROLLER_STATES.REVISION
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.forms.deleted',
 			{
@@ -538,19 +580,37 @@ oscarApp.config([
 				controller: 'Record.Forms.FormController as formCtrl',
 				params: {
 					viewState: FORM_CONTROLLER_STATES.DELETED
-				}
+				},
+				meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 			})
 		.state('record.consultRequests',
 		{
 			url: '/consults',
 			templateUrl: 'src/consults/consultRequestList.jsp',
-			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl'
+			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.consultResponses',
 		{
 			url: '/consultResponses',
 			templateUrl: 'src/consults/consultResponseList.jsp',
-			controller: 'Consults.ConsultResponseListController as consultResponseListCtrl'
+			controller: 'Consults.ConsultResponseListController as consultResponseListCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.consultRequest',
 		{
@@ -570,7 +630,13 @@ oscarApp.config([
 				{
 					return providerService.getMe();
 				}]
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.consultResponse',
 		{
@@ -587,7 +653,13 @@ oscarApp.config([
 				{
 					return providerService.getMe();
 				}]
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.tickler',
 		{
@@ -603,23 +675,47 @@ oscarApp.config([
 						active: true
 					});
 				}]
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		}).state('record.tracker',
 		{
 			url: '/tracker',
 			templateUrl: 'src/record/tracker/tracker.jsp',
-			controller: 'Record.Tracker.TrackerController as trackerCtrl'
+			controller: 'Record.Tracker.TrackerController as trackerCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
         .state('record.patientEducation',
         {
             url: '/patientEducation',
-            component: 'imdHealthLanding'
+            component: 'imdHealthLanding',
+	        meta:
+	        {
+		        auth: {
+			        checkDemographicAccess: true,
+		        },
+	        },
         })
 		.state('record.phr',
 		{
 			url: '/phr',
 			templateUrl: 'src/record/phr/phr.jsp',
-			controller: 'Record.PHR.PHRController as phrCtrl'
+			controller: 'Record.PHR.PHRController as phrCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		// .state('admin.integration',
 		.state('k2aConfig',
@@ -662,7 +758,7 @@ oscarApp.run(function ($rootScope, $location, $state, $uibModal, securityApiServ
 	$rootScope.$on('$stateChangeStart', async function (event, toState, toParams, fromState, fromParams)
 	{
 		// check for specific demographic restrictions before state changes
-		if(toParams.demographicNo)
+		if(toState.meta && toState.meta.auth && toState.meta.auth.checkDemographicAccess)
 		{
 			const canAccessDemographic = await securityApiService.canCurrentUserAccessDemographic(toParams.demographicNo);
 			if(!canAccessDemographic)
