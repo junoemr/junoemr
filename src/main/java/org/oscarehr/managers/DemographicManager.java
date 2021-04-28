@@ -161,8 +161,6 @@ public class DemographicManager {
 		return getDemographic(loggedInInfo.getLoggedInProviderNo() , demographicId);
 	}
 	public Demographic getDemographic(String providerNo, Integer demographicId) throws PatientDirectiveException {
-		checkPrivilege(providerNo, SecurityInfoManager.READ, demographicId);
-
 		return demographicDao.getDemographicById(demographicId);
 	}
 		
@@ -796,13 +794,6 @@ public class DemographicManager {
 		if(!SYSTEM_PROVIDER_NO.equals(providerNo))
 		{
 			securityInfoManager.requireOnePrivilege(providerNo, privilege, null, "_demographic");
-		}
-	}
-
-	private void checkPrivilege(String providerNo, String privilege, int demographicNo) {
-		if(!SYSTEM_PROVIDER_NO.equals(providerNo))
-		{
-			securityInfoManager.requireOnePrivilege(providerNo, privilege, demographicNo, "_demographic");
 		}
 	}
 
