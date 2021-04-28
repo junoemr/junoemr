@@ -24,6 +24,7 @@
 package oscar.oscarLab.ca.all.parsers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
@@ -145,6 +146,7 @@ public class AlphaHandler extends DefaultGenericHandler {
     /**
      *  Retrieve the possible segment headers from the OBX fields
      */
+    @Override
     public ArrayList<String> getHeaders(){
         int i;
         int arraySize;
@@ -164,16 +166,14 @@ public class AlphaHandler extends DefaultGenericHandler {
             	}
             } 
         	}else {
-        		for (i=0; i < msg23.getRESPONSE().getORDER_OBSERVATIONReps(); i++){
-
-                    currentHeader = getObservationHeader(i, 0);
-                    arraySize = headers.size();
-                    if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1))){
-                        headers.add(currentHeader);
-                    }
-
-                } 
-            }
+				// Very similar to how MessageHandler does it, but looking in a different spot for the OBR headers
+				HashSet<String> uniqueHeaders = new HashSet<>();
+				for (i = 0; i < msg23.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
+				{
+					uniqueHeaders.add(getObservationHeader(i, 0));
+				}
+				headers = new ArrayList<>(uniqueHeaders);
+			}
             return(headers);
         }catch(Exception e){
             logger.error("Could not create header list", e);
