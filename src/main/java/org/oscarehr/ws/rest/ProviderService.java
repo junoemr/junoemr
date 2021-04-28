@@ -391,6 +391,13 @@ public class ProviderService extends AbstractServiceImpl {
 	}
 
 	@GET
+	@Path("/self/security/access/demographic/{demographicId}")
+	public RestResponse<Boolean> canCurrentUserAccessDemographic(@PathParam("demographicId") Integer demographicId)
+	{
+		return RestResponse.successResponse(securityInfoManager.isAllowedAccessToPatientRecord(getLoggedInProviderId(), demographicId));
+	}
+
+	@GET
 	@Path("/provider/{providerId}/security/sets")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<String> getProviderSecurityDemographicSets(@PathParam("providerId") String providerId)

@@ -81,5 +81,10 @@ angular.module("Common.Security").service("securityApiService", [
         {
             return (await service.providerApi.setProviderSecurityDemographicSets(providerId, data)).data.body;
         }
+
+        service.canCurrentUserAccessDemographic = async (demographicId: number): Promise<any> =>
+        {
+            return (await service.providerApi.canCurrentUserAccessDemographic(demographicId)).data.body;
+        }
     }
 ]);

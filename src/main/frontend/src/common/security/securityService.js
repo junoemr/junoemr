@@ -93,44 +93,6 @@ angular.module("Common.Services").service("securityService", [
 
 			return deferred.promise;
 		};
-
-		service.isAllowedAccessToPatientRecord = function isAllowedAccessToPatientRecord(demographicNo)
-		{
-			var deferred = $q.defer();
-
-			$http(
-			{
-				url: service.apiPath + 'persona/isAllowedAccessToPatientRecord',
-				method: "POST",
-				data: JSON.stringify(
-				{
-					"demographicNo": demographicNo
-				}),
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("securityService::isAllowedAccessToPatientRecord error", errors);
-					deferred.reject("An error occured while fetching access rights");
-				});
-
-			return deferred.promise;
-		};
-
-		service.hasOneOfPermissions = function hasOneOfPermissions(permission_array)
-		{
-			return true;
-		};
-
-		service.hasPermission = function hasPermission(permission)
-		{
-			return true;
-		};
-
 		return service;
 	}
 ]);

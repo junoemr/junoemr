@@ -309,9 +309,6 @@ public class SecurityInfoManager
 		
 		return false;
 	}
-	public boolean isAllowedAccessToPatientRecord(LoggedInInfo loggedInInfo, Integer demographicNo) {
-		return isAllowedAccessToPatientRecord(loggedInInfo.getLoggedInProviderNo(), demographicNo);
-	}
 
 	public boolean isAllowedAccessToPatientRecord(String providerNo, Integer demographicNo)
 	{
