@@ -29,11 +29,13 @@ import com.quatro.model.security.Secobjprivilege;
 import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +112,13 @@ public class SecurityInfoManager
 	@Autowired
 	private ProviderDataDao providerDataDao;
 
+	@Autowired
+	private DemographicSetsDao demographicSetsDao;
+
+	@Autowired
+	private SecuritySetsService securitySetsService;
+
+	@Deprecated // use roles service
 	public List<Secuserrole> getRoles(String providerNo)
 	{
 		@SuppressWarnings("unchecked")
@@ -117,10 +126,12 @@ public class SecurityInfoManager
 		return results;
 	}
 
+	@Deprecated // use roles service
 	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo)
 	{
 		return getSecurityObjects(loggedInInfo.getLoggedInProviderNo());
 	}
+	@Deprecated // use roles service
 	public List<Secobjprivilege> getSecurityObjects(String providerNo)
 	{
 		List<String> roleNames = new ArrayList<>();
@@ -164,12 +175,12 @@ public class SecurityInfoManager
 	@Deprecated // use enum version instead
 	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, String demographicNo)
 	{
-		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, demographicNo);
+		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, (demographicNo != null ? Integer.parseInt(demographicNo) : null));
 	}
 
 	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME objectName)
 	{
-		return hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), (demographicNo != null ? String.valueOf(demographicNo) : null));
+		return hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), demographicNo);
 	}
 
 	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME objectName)
@@ -238,10 +249,16 @@ public class SecurityInfoManager
 		return hasOnePrivileges(providerNo, privilege, null, hasObjList);
 	}
 
-	private boolean hasPrivilege(String providerNo, String objectName, String privilege, String demographicNo)
+	private boolean hasPrivilege(String providerNo, String objectName, String privilege, Integer demographicNo)
 	{
 		try
 		{
+			if(demographicNo != null && !isAllowedAccessToPatientRecord(providerNo, demographicNo))
+			{
+				return false;
+			}
+
+			//TODO remove old logic when possible
 			List<String> roleNameLs = new ArrayList<>();
 			for(Secuserrole role : getRoles(providerNo))
 			{
@@ -296,8 +313,20 @@ public class SecurityInfoManager
 		return isAllowedAccessToPatientRecord(loggedInInfo.getLoggedInProviderNo(), demographicNo);
 	}
 
-	public boolean isAllowedAccessToPatientRecord(String providerNo, Integer demographicNo) {
-		
+	public boolean isAllowedAccessToPatientRecord(String providerNo, Integer demographicNo)
+	{
+		List<String> blacklist = securitySetsService.getSecurityDemographicSetNames(providerNo);
+		List<String> setsWithPatient = demographicSetsDao.findSetNamesByDemographicNo(demographicNo);
+
+		for(String blacklistedSet : blacklist)
+		{
+			if(setsWithPatient.contains(blacklistedSet))
+			{
+				return false;
+			}
+		}
+
+		//TODO remove this old system when we can
 		List<String> roleNameLs = new ArrayList<>();
 		for(Secuserrole role:getRoles(providerNo)) {
 			roleNameLs.add(role.getRoleName());
@@ -335,7 +364,7 @@ public class SecurityInfoManager
 		}
 		for(SecObjectName.OBJECT_NAME objectName : requiredObjList)
 		{
-			if(!hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), (demographicNo != null ? String.valueOf(demographicNo) : null)))
+			if(!hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), demographicNo))
 			{
 				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName.getValue() + ")");
 			}
@@ -387,7 +416,7 @@ public class SecurityInfoManager
 	{
 		for(String objectName:requiredObjList)
 		{
-			if(hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			if(hasPrivilege(providerNo, objectName, privilege, demographicNo))
 			{
 				return;
 			}
