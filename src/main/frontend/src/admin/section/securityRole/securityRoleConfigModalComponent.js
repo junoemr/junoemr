@@ -65,7 +65,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 							id: null,
 							name: "",
 							description: "",
-							securityPermissions: {},
+							securityPermissions: [],
 						};
 					}
 					else
@@ -88,11 +88,10 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 						return {
 							label: transfer.permission,
 							selected: permissionNames.includes(transfer.permission),
+							tooltip: transfer.description,
 							data: transfer,
 						};
 					});
-					console.info(currentPermissions);
-					console.info(ctrl.permissionsList);
 				}
 
 				ctrl.canEdit = () =>

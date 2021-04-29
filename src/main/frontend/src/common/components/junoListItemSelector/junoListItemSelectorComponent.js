@@ -30,7 +30,8 @@ angular.module('Common.Components').component('junoListItemSelector', {
 		componentStyle: "<?",
 		labelSelected: "@?",
 		labelOptions: "@?",
-		onChange: "&?"
+		onChange: "&?",
+		disabled: "<?",
 	},
 	controller: ['$scope',
 		function ($scope)

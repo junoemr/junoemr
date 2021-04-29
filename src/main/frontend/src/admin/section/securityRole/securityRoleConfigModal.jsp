@@ -54,6 +54,7 @@
 				<div class="flex-grow overflow-auto">
 					<juno-list-item-selector label-options="Available Permissions"
 					                         label-selected="Assigned Permissions"
+					                         disabled="!$ctrl.canEdit()"
 					                         ng-model="$ctrl.permissionsList">
 					</juno-list-item-selector>
 				</div>

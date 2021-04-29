@@ -5,16 +5,20 @@
 			<button ng-repeat="item in $ctrl.selected"
 			        class="list-group-item list-group-item-action"
 			        ng-class="{'active': (item === $ctrl.activeSelection)}"
+			        ng-disabled="$ctrl.disabled"
+			        title="{{item.tooltip}}"
 			        ng-click="$ctrl.setActiveSelection(item)">
 				{{item.label}}
 			</button>
 		</div>
 	</div>
 	<div class="flex-column selection-controls">
-		<juno-button click="$ctrl.addToSelected($ctrl.activeOption)">
+		<juno-button disabled="$ctrl.disabled"
+		             click="$ctrl.addToSelected($ctrl.activeOption)">
 			<i class="icon icon-arrow-left"></i>
 		</juno-button>
-		<juno-button click="$ctrl.removeFromSelected($ctrl.activeSelection)">
+		<juno-button disabled="$ctrl.disabled"
+		             click="$ctrl.removeFromSelected($ctrl.activeSelection)">
 			<i class="icon icon-arrow-right"></i>
 		</juno-button>
 	</div>
@@ -24,6 +28,8 @@
 			<button ng-repeat="item in $ctrl.options"
 			        class="list-group-item list-group-item-action"
 			        ng-class="{'active': (item === $ctrl.activeOption)}"
+			        ng-disabled="$ctrl.disabled"
+			        title="{{item.tooltip}}"
 					ng-click="$ctrl.setActiveOption(item)">
 				{{item.label}}
 			</button>
