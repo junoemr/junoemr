@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -240,7 +241,7 @@ public class SecurityRolesService
 			secObjPrivilege.setProviderNo(providerId);
 			secObjPrivilege.setRoleUserGroup(secRole.getName());
 			secObjPrivilege.setPriority(0);
-			secObjPrivilege.setPrivilege(getPrivilegeForModel(privilegeLevels));
+			secObjPrivilege.setPrivilege(getLegacyPrivilege(privilegeLevels));
 			secObjPrivilege.setPermissionRead(privilegeLevels.contains(SecurityInfoManager.PRIVILEGE_LEVEL.READ));
 			secObjPrivilege.setPermissionUpdate(privilegeLevels.contains(SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE));
 			secObjPrivilege.setPermissionCreate(privilegeLevels.contains(SecurityInfoManager.PRIVILEGE_LEVEL.CREATE));
@@ -277,22 +278,30 @@ public class SecurityRolesService
 		List<SecurityPermissionTransfer> transfers = new LinkedList<>();
 		for (SecObjPrivilege secObjPrivilege : secObjPrivileges)
 		{
-			for(SecurityInfoManager.PRIVILEGE_LEVEL level : getPrivilegeLevels(secObjPrivilege.getPrivilege()))
-			{
-				String objectName = secObjPrivilege.getId().getObjectName();
-				Permission permission = Permission.from(
-						SecObjectName.OBJECT_NAME.fromValueString(objectName), level);
+			SecObjectName.OBJECT_NAME objectName = SecObjectName.OBJECT_NAME.fromValueString(secObjPrivilege.getId().getObjectName());
 
-				if(permission != null)
-				{
-					SecurityPermissionTransfer transfer = new SecurityPermissionTransfer();
-					transfer.setDescription(level.name() + " " + StringUtils.lowerCase(nameEntityMap.get(objectName).getDescription()));
-					transfer.setPermission(permission);
-					transfers.add(transfer);
-				}
+			if(secObjPrivilege.isPermissionRead())
+			{
+				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.READ);
+				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+			}
+			if(secObjPrivilege.isPermissionUpdate())
+			{
+				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE);
+				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+			}
+			if(secObjPrivilege.isPermissionCreate())
+			{
+				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE);
+				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+			}
+			if(secObjPrivilege.isPermissionDelete())
+			{
+				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE);
+				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
 			}
 		}
-		return transfers;
+		return transfers.stream().filter(Objects::nonNull).collect(Collectors.toList());
 	}
 	private List<SecurityPermissionTransfer> getAllSecurityPermissions()
 	{
@@ -301,29 +310,25 @@ public class SecurityRolesService
 
 		for(Permission permission : Permission.values())
 		{
-			SecurityPermissionTransfer transfer = new SecurityPermissionTransfer();
-			transfer.setDescription(permission.getPrivilegeLevel().name() + " " + StringUtils.lowerCase(nameEntityMap.get(permission.getObjectName().getValue()).getDescription()));
-			transfer.setPermission(permission);
-			transfers.add(transfer);
+			transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
 		}
 		return transfers;
 	}
 
-	private List<SecurityInfoManager.PRIVILEGE_LEVEL> getPrivilegeLevels(String privilege)
+	private SecurityPermissionTransfer toSecurityPermissionTransfer(Permission permission, Map<String, SecObjectName> nameEntityMap)
 	{
-		List<SecurityInfoManager.PRIVILEGE_LEVEL> privilegeList = new ArrayList<>(4);
-		switch(privilege)
+		if (permission != null)
 		{
-			case SecurityInfoManager.ALL: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE);
-			case SecurityInfoManager.CREATE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.CREATE);
-			case SecurityInfoManager.UPDATE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE);
-			case SecurityInfoManager.READ: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.READ); break;
-			case SecurityInfoManager.DELETE: privilegeList.add(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE); break;
+			SecurityPermissionTransfer transfer = new SecurityPermissionTransfer();
+			transfer.setDescription(permission.getPrivilegeLevel().name() + " " +
+					StringUtils.lowerCase(nameEntityMap.get(permission.getObjectName().getValue()).getDescription()));
+			transfer.setPermission(permission);
+			return transfer;
 		}
-		return privilegeList;
+		return null;
 	}
 
-	private String getPrivilegeForModel(List<SecurityInfoManager.PRIVILEGE_LEVEL> privileges)
+	private String getLegacyPrivilege(List<SecurityInfoManager.PRIVILEGE_LEVEL> privileges)
 	{
 		String privilegeLevel = null;
 		if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE)
