@@ -306,6 +306,9 @@ public class CaseManagementPrint {
 				"",
 				"U",
 				"");
+
+		Collections.sort(labs);
+
 		LinkedHashMap<String, LabResultData> accessionMap = new LinkedHashMap<>();
 
 		for (int i = 0; i < labs.size(); i++)
