@@ -40,20 +40,20 @@ angular.module("Common.Security").service("securityRolesService", [
 		}
 
 		/**
-		 * check the current users privileges, return true if all requirements are met
-		 * @param requiredPrivileges - the privileges required
+		 * check the current users permissions, return true if all requirements are met
+		 * @param requiredPermissions - the permissions required
 		 */
-		service.hasSecurityPrivileges = (...requiredPrivileges: SecurityPermissionTransfer.PermissionEnum[]): boolean =>
+		service.hasSecurityPrivileges = (...requiredPermissions: SecurityPermissionTransfer.PermissionEnum[]): boolean =>
 		{
 			if (service.rolesData
 				&& service.rolesData.securityPermissions
-				&& requiredPrivileges
-				&& requiredPrivileges.length > 0)
+				&& requiredPermissions
+				&& requiredPermissions.length > 0)
 			{
 				const permissions = service.rolesData.securityPermissions.map((value) => value.permission);
-				for (let i = 0; i < requiredPrivileges.length; i++)
+				for (let i = 0; i < requiredPermissions.length; i++)
 				{
-					if(!permissions.includes(requiredPrivileges[i]))
+					if(!permissions.includes(requiredPermissions[i]))
 					{
 						return false;
 					}

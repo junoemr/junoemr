@@ -31,7 +31,7 @@
 	</modal-title>
 
 	<modal-body>
-		<div class="overflow-auto height-100">
+		<div class="overflow-auto height-100 flex-column">
 			<div class="role-details">
 				<h3>Role Details</h3>
 
@@ -49,25 +49,14 @@
 				            disabled="!$ctrl.canEdit()">
 				</juno-input>
 			</div>
-			<div class="role-access">
+			<div class="role-access overflow-auto flex-column">
 				<h3>Role Permissions</h3>
-
-				<ul class="list-group">
-					<li ng-repeat="access in $ctrl.accessList" class="list-group-item">
-						<div class="flex-row">
-							<juno-select
-									label="{{access.name}}"
-									ng-model="access.permissionLevel"
-									options="$ctrl.permissionLevelOptions"
-									class="access-selection"
-									disabled="!$ctrl.canEdit()">
-							</juno-select>
-							<div class="access-description flex-column flex-grow justify-content-center">
-								<span>{{access.description}}</span>
-							</div>
-						</div>
-					</li>
-				</ul>
+				<div class="flex-grow overflow-auto">
+					<juno-list-item-selector label-options="Available Permissions"
+					                         label-selected="Assigned Permissions"
+					                         ng-model="$ctrl.permissionsList">
+					</juno-list-item-selector>
+				</div>
 			</div>
 		</div>
 	</modal-body>

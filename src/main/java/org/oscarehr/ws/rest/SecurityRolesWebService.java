@@ -23,12 +23,11 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.ws.rest.transfer.security.SecurityObjectTransfer;
+import org.oscarehr.ws.rest.transfer.security.SecurityPermissionTransfer;
 import org.oscarehr.ws.rest.transfer.security.SecurityRoleTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,12 +51,12 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	private SecurityRolesService securityRolesService;
 
 	@GET
-	@Path("/accesses")
+	@Path("/permissions/all")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<SecurityObjectTransfer> getAccessObjects()
+	public RestSearchResponse<SecurityPermissionTransfer> getAllPermissions()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
-		return RestSearchResponse.successResponseOnePage(securityRolesService.getAllSecurityObjectsTransfer());
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_SECURITY_ROLES_READ);
+		return RestSearchResponse.successResponseOnePage(securityRolesService.getAllSecurityPermissionsTransfer());
 	}
 
 	@GET
@@ -65,7 +64,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<SecurityRoleTransfer> getRoles()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_SECURITY_ROLES_READ);
 		return RestSearchResponse.successResponseOnePage(securityRolesService.getAllRoles());
 	}
 
@@ -76,7 +75,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	public RestResponse<SecurityRoleTransfer> addRole(SecurityRoleTransfer transfer)
 	{
 		String providerNo = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		securityInfoManager.requireAllPrivilege(providerNo, Permission.CONFIGURE_SECURITY_ROLES_CREATE);
 		return RestResponse.successResponse(securityRolesService.addRole(providerNo, transfer));
 	}
 
@@ -85,7 +84,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<SecurityRoleTransfer> getRole(@PathParam("roleId") Integer roleId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_SECURITY_ROLES_READ);
 		return RestResponse.successResponse(securityRolesService.getRole(roleId));
 	}
 
@@ -96,7 +95,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	public RestResponse<SecurityRoleTransfer> updateRole(@PathParam("roleId") Integer roleId, SecurityRoleTransfer transfer)
 	{
 		String providerNo = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		securityInfoManager.requireAllPrivilege(providerNo, Permission.CONFIGURE_SECURITY_ROLES_UPDATE);
 		return RestResponse.successResponse(securityRolesService.updateRole(providerNo, roleId, transfer));
 	}
 
@@ -106,7 +105,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> deleteRole(@PathParam("roleId") Integer roleId)
 	{
 		String providerNo = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN_SECURITY);
+		securityInfoManager.requireAllPrivilege(providerNo, Permission.CONFIGURE_SECURITY_ROLES_DELETE);
 		return RestResponse.successResponse(securityRolesService.deleteRole(providerNo, roleId));
 	}
 }

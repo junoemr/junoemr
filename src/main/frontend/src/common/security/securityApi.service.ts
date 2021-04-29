@@ -67,9 +67,9 @@ angular.module("Common.Security").service("securityApiService", [
             return (await service.securityRoleApi.deleteRole(roleId)).data.body;
         }
 
-        service.getAccessObjects = async (): Promise<any> =>
+        service.getAllPermissions = async (): Promise<any> =>
         {
-            return (await service.securityRoleApi.getAccessObjects()).data.body;
+            return (await service.securityRoleApi.getAllPermissions()).data.body;
         }
 
         service.getProviderSecurityDemographicSets = async (providerId: string): Promise<any> =>

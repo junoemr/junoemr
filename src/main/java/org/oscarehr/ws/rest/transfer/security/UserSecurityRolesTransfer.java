@@ -23,29 +23,19 @@
 package org.oscarehr.ws.rest.transfer.security;
 
 import lombok.Data;
-import org.oscarehr.security.model.SecObjectName;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class UserSecurityRolesTransfer implements Serializable
 {
 	private List<SecurityRoleTransfer> roles;
 	private List<SecurityPermissionTransfer> securityPermissions;
-	private Map<SecObjectName.OBJECT_NAME, SecurityObjectTransfer> accessObjects;
 
 	public UserSecurityRolesTransfer()
 	{
 		securityPermissions = new LinkedList<>();
-		accessObjects = new HashMap<>();
-	}
-
-	public void addAccess(SecObjectName.OBJECT_NAME objectName, SecurityObjectTransfer privilege)
-	{
-		accessObjects.put(objectName, privilege);
 	}
 }

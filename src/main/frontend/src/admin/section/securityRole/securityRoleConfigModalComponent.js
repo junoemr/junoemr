@@ -26,7 +26,7 @@ import {
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
-import {SecurityPermissions, SecurityRole} from "../../../common/security/securityConstants";
+import {SecurityPermissions} from "../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('securityRoleConfigModal',
 	{
@@ -41,37 +41,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 			'securityRolesService',
 			function ($uibModal, securityApiService, securityRolesService)
 			{
-				let ctrl = this;
-				ctrl.PrivilegesEnum = SecurityRole.PRIVILEGE_LEVEL;
-
-				ctrl.permissionLevelValues = Object.freeze({
-					read: "r",
-					readUpdate: "ru",
-					readUpdateWrite: "ruw",
-					readUpdateWriteDelete: "ruwd",
-				});
-				ctrl.permissionLevelOptions = Object.freeze([
-					{
-						label: "None",
-						value: null,
-					},
-					{
-						label: "Read",
-						value: ctrl.permissionLevelValues.read,
-					},
-					{
-						label: "Read/Update",
-						value: ctrl.permissionLevelValues.readUpdate,
-					},
-					{
-						label: "Read/Update/Create",
-						value: ctrl.permissionLevelValues.readUpdateWrite,
-					},
-					{
-						label: "Read/Update/Create/Delete",
-						value: ctrl.permissionLevelValues.readUpdateWriteDelete,
-					},
-				]);
+				const ctrl = this;
 
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -79,22 +49,23 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.role = null;
 				ctrl.newRole = true;
-				ctrl.accessList = [];
 				ctrl.isLoading = true;
 
+				ctrl.allSecurityPermissions = [];
+				ctrl.permissionsList = [];
 
 				ctrl.$onInit = async () =>
 				{
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-
 					ctrl.newRole = ctrl.resolve.newRole;
+
 					if(ctrl.newRole)
 					{
 						ctrl.role = {
 							id: null,
 							name: "",
 							description: "",
-							accessObjects: {},
+							securityPermissions: {},
 						};
 					}
 					else
@@ -102,98 +73,26 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 						ctrl.role = await securityApiService.getRole(ctrl.resolve.roleId);
 					}
 
-					ctrl.allSecurityObjects = await securityApiService.getAccessObjects();
-					ctrl.computeAccessList();
+					ctrl.allSecurityPermissions = await securityApiService.getAllPermissions();
+					await ctrl.loadPermissionsList();
 					ctrl.isLoading = false;
 				}
 
-				// rebuild the access list
-				ctrl.computeAccessList = () =>
+				ctrl.loadPermissionsList = async () =>
 				{
-					ctrl.accessList = [];
-					for (let i = 0; i < ctrl.allSecurityObjects.length; i++)
+					let currentPermissions = ctrl.role.securityPermissions;
+					let permissionNames = currentPermissions.map((transfer) => transfer.permission);
+
+					ctrl.permissionsList = ctrl.allSecurityPermissions.map((transfer) =>
 					{
-						const secObject = ctrl.allSecurityObjects[i];
-						const access = {
-							id: i,
-							name: secObject.name,
-							description: secObject.description,
-							permissionLevel: ctrl.getPermissionLevelForOptions(ctrl.role.accessObjects[secObject.name]),
+						return {
+							label: transfer.permission,
+							selected: permissionNames.includes(transfer.permission),
+							data: transfer,
 						};
-						ctrl.accessList.push(access);
-					}
-				}
-
-				// translate model to frontend selection permissionLevelOptions
-				ctrl.getPermissionLevelForOptions = (accessObject) =>
-				{
-					// this will change once the backend system removes the 'levels' of permission
-					if(accessObject && accessObject.privileges)
-					{
-						if (accessObject.privileges.includes(ctrl.PrivilegesEnum.READ)
-							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.CREATE)
-							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.UPDATE)
-							&& accessObject.privileges.includes(ctrl.PrivilegesEnum.DELETE))
-						{
-							return ctrl.permissionLevelValues.readUpdateWriteDelete;
-						}
-						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.CREATE))
-						{
-							return ctrl.permissionLevelValues.readUpdateWrite;
-						}
-						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.UPDATE))
-						{
-							return ctrl.permissionLevelValues.readUpdate;
-						}
-						else if (accessObject.privileges.includes(ctrl.PrivilegesEnum.READ))
-						{
-							return ctrl.permissionLevelValues.read;
-						}
-					}
-					return null;
-				}
-
-				// translate ui object back to the model
-				ctrl.translateAccessListToModel = () =>
-				{
-					for (let i = 0; i < ctrl.accessList.length; i++)
-					{
-						const accessObj = ctrl.accessList[i];
-						ctrl.role.accessObjects[accessObj.name] = {
-							name: accessObj.name,
-							description: accessObj.description,
-							privileges: ctrl.getPermissionsForModel(accessObj.permissionLevel),
-						}
-					}
-				}
-
-				// change permissions selection to model permissions
-				ctrl.getPermissionsForModel = (permissionLevel) =>
-				{
-					let permissions = [];
-					if(permissionLevel === ctrl.permissionLevelValues.read)
-					{
-						permissions.push(ctrl.PrivilegesEnum.READ);
-					}
-					else if(permissionLevel === ctrl.permissionLevelValues.readUpdate)
-					{
-						permissions.push(ctrl.PrivilegesEnum.READ);
-						permissions.push(ctrl.PrivilegesEnum.UPDATE);
-					}
-					else if(permissionLevel === ctrl.permissionLevelValues.readUpdateWrite)
-					{
-						permissions.push(ctrl.PrivilegesEnum.READ);
-						permissions.push(ctrl.PrivilegesEnum.UPDATE);
-						permissions.push(ctrl.PrivilegesEnum.CREATE);
-					}
-					else if(permissionLevel === ctrl.permissionLevelValues.readUpdateWriteDelete)
-					{
-						permissions.push(ctrl.PrivilegesEnum.READ);
-						permissions.push(ctrl.PrivilegesEnum.UPDATE);
-						permissions.push(ctrl.PrivilegesEnum.CREATE);
-						permissions.push(ctrl.PrivilegesEnum.DELETE);
-					}
-					return permissions;
+					});
+					console.info(currentPermissions);
+					console.info(ctrl.permissionsList);
 				}
 
 				ctrl.canEdit = () =>
@@ -237,6 +136,11 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					Juno.Common.Util.errorAlert($uibModal, "Error", "Failed to modify role");
 				}
 
+				ctrl.applyChangesToRole = () =>
+				{
+					ctrl.role.securityPermissions = ctrl.permissionsList.filter((permission) => permission.selected).map((permission) => permission.data);
+				}
+
 				ctrl.onUpdate = async () =>
 				{
 					const userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Warning",
@@ -247,7 +151,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					if(userOk)
 					{
 						ctrl.isLoading = true;
-						ctrl.translateAccessListToModel();
+						ctrl.applyChangesToRole();
 						securityApiService.updateRole(ctrl.role.id, ctrl.role).then((response) =>
 						{
 							ctrl.modalInstance.close({
@@ -265,7 +169,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				ctrl.onCreate = () =>
 				{
 					ctrl.isLoading = true;
-					ctrl.translateAccessListToModel();
+					ctrl.applyChangesToRole();
 					securityApiService.addRole(ctrl.role).then((response) =>
 					{
 						ctrl.modalInstance.close({

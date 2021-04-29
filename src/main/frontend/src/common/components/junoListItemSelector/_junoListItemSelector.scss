@@ -1,5 +1,6 @@
 .juno-list-item-selector {
   height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center !important;
@@ -33,6 +34,7 @@
 
     .list-group {
       height: 100%;
+      overflow: auto;
       background-color: var(--color-neutral-lightest);
       .list-group-item {
         background-color: var(--color-neutral-lightest);

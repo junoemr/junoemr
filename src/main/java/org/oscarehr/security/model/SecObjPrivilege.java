@@ -48,8 +48,22 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 	@EmbeddedId
 	private SecObjPrivilegePrimaryKey id;
 
+	@Deprecated
 	private String privilege = "|0|";
 
+	@Column(name = "permission_read")
+	private boolean permissionRead;
+
+	@Column(name = "permission_update")
+	private boolean permissionUpdate;
+
+	@Column(name = "permission_create")
+	private boolean permissionCreate;
+
+	@Column(name = "permission_delete")
+	private boolean permissionDelete;
+
+	@Deprecated
 	private int priority = 0;
 
 	@Column(name = "provider_no")

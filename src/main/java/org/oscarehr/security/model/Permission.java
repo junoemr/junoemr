@@ -201,4 +201,21 @@ public enum Permission
 		}
 		return null;
 	}
+
+	/**
+	 * allow us to identify OBJECT_NAME(s) that are used by this enum
+	 * @param objectName - the object to check for
+	 * @return true if one or more Permission include this object as a value
+	 */
+	public static boolean includesObjectAsValue(SecObjectName.OBJECT_NAME objectName)
+	{
+		for (Permission permission : Permission.values())
+		{
+			if(permission.getObjectName().equals(objectName))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

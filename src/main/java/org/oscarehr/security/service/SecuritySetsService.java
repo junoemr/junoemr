@@ -83,7 +83,7 @@ public class SecuritySetsService
 			}
 		}
 
-		LogAction.addLogEntry(loggedInProvider, LogConst.ACTION_UPDATE, LogConst.CON_SECURITY, LogConst.STATUS_SUCCESS,
-				"Demographic Set Blacklist: [" + String.join(", ", assignedSetNames) + "]");
+		LogAction.addLogEntry(loggedInProvider, null, LogConst.ACTION_UPDATE, LogConst.CON_SECURITY, LogConst.STATUS_SUCCESS,
+				providerId, null, "Demographic Set Blacklist: [" + String.join(", ", assignedSetNames) + "]");
 	}
 }
