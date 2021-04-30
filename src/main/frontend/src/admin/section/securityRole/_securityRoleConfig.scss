@@ -21,13 +21,20 @@
       text-align: center;
     }
 
-    .system-managed {
-      color: var(--color-red-base);
+    .system-managed,
+    .inherits-role {
       text-align: center;
-
       i {
         font-size: 18px;
       }
+    }
+
+    .system-managed {
+      color: var(--color-red-base);
+    }
+    .inherits-role {
+      color: var(--color-primary-base);
+      position: absolute;
     }
 
     label {

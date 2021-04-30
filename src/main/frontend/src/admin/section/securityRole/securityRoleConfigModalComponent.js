@@ -48,6 +48,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.role = null;
+				ctrl.parentRole = null;
 				ctrl.newRole = true;
 				ctrl.isLoading = true;
 
@@ -65,8 +66,8 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 						let parentRoleId = null;
 						if(ctrl.resolve.roleId) // new inherited role
 						{
-							const parentRole = await securityApiService.getRole(ctrl.resolve.roleId);
-							securityPermissions = parentRole.securityPermissions;
+							ctrl.parentRole = await securityApiService.getRole(ctrl.resolve.roleId);
+							securityPermissions = ctrl.parentRole.securityPermissions;
 							parentRoleId = ctrl.resolve.roleId;
 						}
 
@@ -81,6 +82,10 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					else
 					{
 						ctrl.role = await securityApiService.getRole(ctrl.resolve.roleId);
+						if(ctrl.role.parentRoleId)
+						{
+							ctrl.parentRole = await securityApiService.getRole(ctrl.role.parentRoleId);
+						}
 					}
 
 					ctrl.allSecurityPermissions = await securityApiService.getAllPermissions();
@@ -136,7 +141,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.isInheritedRole = () =>
 				{
-					return ctrl.role && ctrl.role.parentRoleId;
+					return Boolean(ctrl.parentRole);
 				}
 
 				ctrl.onCancel = () =>

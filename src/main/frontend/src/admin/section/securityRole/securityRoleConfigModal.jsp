@@ -50,6 +50,10 @@
 				</juno-input>
 			</div>
 			<div class="role-access overflow-auto flex-column">
+				<div class="flex-row justify-content-center inherits-role" ng-if="$ctrl.isInheritedRole()">
+					<i class="icon icon-info-circle"></i>
+					<p>This role inherits permissions from the {{$ctrl.parentRole.name}} role</p>
+				</div>
 				<h3>Role Permissions</h3>
 				<div class="flex-grow overflow-auto">
 					<juno-list-item-selector label-options="Available Permissions"
