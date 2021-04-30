@@ -86,7 +86,8 @@ public class SecurityRolesService
 			roleTransfers.add(getRoleTransfer(role, false));
 			privilegeObjects.addAll(role.getSecObjPrivilege());
 		}
-		transfer.setSecurityPermissions(getSecurityPermissions(new ArrayList<>(privilegeObjects)));
+		//TODO ensure this works with inheritance
+		transfer.setSecurityPermissions(getSecurityPermissionsTransfer(new ArrayList<>(privilegeObjects)));
 		transfer.setRoles(roleTransfers);
 		return transfer;
 	}
@@ -192,6 +193,10 @@ public class SecurityRolesService
 		secRole.setName(input.getName());
 		secRole.setDescription(input.getDescription());
 		secRole.setSystemManaged(input.isSystemManaged());
+		if(input.getParentRoleId() != null)
+		{
+			secRole.setParentSecRole(secRoleDao.find(input.getParentRoleId()));
+		}
 		return secRole;
 	}
 
@@ -200,7 +205,7 @@ public class SecurityRolesService
 		Integer roleId = secRole.getId();
 		List<Permission> permissions = transfers.stream().map(SecurityPermissionTransfer::getPermission).collect(Collectors.toList());
 		List<SecObjPrivilege> currentlyAssignedPrivileges = secObjPrivilegeDao.findByRoleId(roleId);
-		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
+//		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
 
 		// delete all the existing entries that are valid permissions
 		for (SecObjPrivilege current : currentlyAssignedPrivileges)
@@ -230,7 +235,8 @@ public class SecurityRolesService
 			}
 		}
 
-		// save the new security objects
+		// build the new security objects
+		Map<String, SecObjPrivilege> objectMap = new HashMap<>();
 		for (Map.Entry<SecObjectName.OBJECT_NAME, List<SecurityInfoManager.PRIVILEGE_LEVEL>> entry : privilegeMap.entrySet())
 		{
 			SecObjectName.OBJECT_NAME objectName = entry.getKey();
@@ -247,8 +253,49 @@ public class SecurityRolesService
 			secObjPrivilege.setPermissionCreate(privilegeLevels.contains(SecurityInfoManager.PRIVILEGE_LEVEL.CREATE));
 			secObjPrivilege.setPermissionDelete(privilegeLevels.contains(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE));
 			secObjPrivilege.setSecRole(secRole);
-			secObjPrivilege.setSecObjectName(nameEntityMap.get(secObjPrivilege.getId().getObjectName()));
+			secObjPrivilege.setInclusive(true);
+//			secObjPrivilege.setSecObjectName(nameEntityMap.get(secObjPrivilege.getId().getObjectName()));
+			objectMap.put(objectName.getValue(), secObjPrivilege);
+		}
 
+		SecRole parentSecRole = secRole.getParentSecRole();
+		if(parentSecRole != null)
+		{
+			// get parent permissions
+			List<SecObjPrivilege> parentPrivileges = getRolePrivileges(parentSecRole).stream()
+					.filter((privilege) -> Permission.includesObjectAsValue(SecObjectName.OBJECT_NAME.fromValueString(privilege.getId().getObjectName())))
+					.collect(Collectors.toList());
+
+			for(SecObjPrivilege parentPrivilege : parentPrivileges)
+			{
+				String parentObjectName = parentPrivilege.getId().getObjectName();
+				SecObjPrivilege childPrivilege = objectMap.get(parentObjectName);
+				// if parent has permission that is missing from child list, add a copy of it and set included = false
+				if(childPrivilege == null)
+				{
+					SecObjPrivilege parentCopy = new SecObjPrivilege(parentPrivilege);
+					parentCopy.setInclusive(false);
+					parentCopy.setProviderNo(providerId);
+					parentCopy.setRoleUserGroup(secRole.getName());
+					parentCopy.setId(new SecObjPrivilegePrimaryKey(roleId, parentObjectName));
+					parentCopy.setSecRole(secRole);
+//					parentCopy.setSecObjectName(nameEntityMap.get(parentObjectName));
+					objectMap.put(parentObjectName, parentCopy);
+				}
+				// if permission and privileges identical to parent, remove them from the list
+				else if ((childPrivilege.isPermissionRead() == parentPrivilege.isPermissionRead())
+						&& (childPrivilege.isPermissionUpdate() == parentPrivilege.isPermissionUpdate())
+						&& (childPrivilege.isPermissionCreate() == parentPrivilege.isPermissionCreate())
+						&& (childPrivilege.isPermissionDelete() == parentPrivilege.isPermissionDelete()))
+				{
+					objectMap.remove(parentObjectName);
+				}
+			}
+		}
+
+		// save the remaining ones
+		for(SecObjPrivilege secObjPrivilege : objectMap.values())
+		{
 			secObjPrivilegeDao.persist(secObjPrivilege);
 		}
 	}
@@ -263,15 +310,54 @@ public class SecurityRolesService
 		transfer.setDescription(secRole.getDescription());
 		transfer.setSystemManaged(secRole.isSystemManaged());
 
+		SecRole parentRole = secRole.getParentSecRole();
+		if(parentRole != null)
+		{
+			transfer.setParentRoleId(parentRole.getId());
+		}
+
 		// privileges are not always needed and may have additional database hits as they are lazy loaded
 		if(includePrivileges)
 		{
-			transfer.setSecurityPermissions(getSecurityPermissions(secRole.getSecObjPrivilege()));
+			transfer.setSecurityPermissions(getSecurityPermissionsTransfer(getRolePrivileges(secRole)));
 		}
 		return transfer;
 	}
 
-	private List<SecurityPermissionTransfer> getSecurityPermissions(List<SecObjPrivilege> secObjPrivileges)
+	private List<SecObjPrivilege> getRolePrivileges(SecRole role)
+	{
+		SecRole parentRole = role.getParentSecRole();
+		List<SecObjPrivilege> rolePrivileges = role.getSecObjPrivilege();
+		if(parentRole == null)
+		{
+			return rolePrivileges;
+		}
+		List<SecObjPrivilege> parentPrivileges = getRolePrivileges(parentRole);
+
+		// create a map of privileges
+		Map<String, SecObjPrivilege> objectMap = new HashMap<>();
+		for(SecObjPrivilege secObjPrivilege : parentPrivileges)
+		{
+			objectMap.put(secObjPrivilege.getId().getObjectName(), secObjPrivilege);
+		}
+
+		for(SecObjPrivilege rolePrivilege : rolePrivileges)
+		{
+			if(rolePrivilege.isInclusive())
+			{
+				// overwrite or add the child value, as it takes precedence
+				objectMap.put(rolePrivilege.getId().getObjectName(), rolePrivilege);
+			}
+			else
+			{
+				// remove the excluded roles from parent list if they exist
+				objectMap.remove(rolePrivilege.getId().getObjectName());
+			}
+		}
+		return new ArrayList<>(objectMap.values());
+	}
+
+	private List<SecurityPermissionTransfer> getSecurityPermissionsTransfer(List<SecObjPrivilege> secObjPrivileges)
 	{
 		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
 
@@ -303,6 +389,7 @@ public class SecurityRolesService
 		}
 		return transfers.stream().filter(Objects::nonNull).collect(Collectors.toList());
 	}
+
 	private List<SecurityPermissionTransfer> getAllSecurityPermissions()
 	{
 		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();

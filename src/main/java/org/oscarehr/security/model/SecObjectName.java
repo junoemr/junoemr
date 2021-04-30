@@ -245,8 +245,8 @@ public class SecObjectName extends AbstractModel<String>
 	@Column(name="orgapplicable")
 	private Boolean orgApplicable;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "secObjectName")
-	private List<SecObjPrivilege> secObjPrivileges;
+//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "secObjectName")
+//	private List<SecObjPrivilege> secObjPrivileges;
 
 	@Override
 	public String getId()

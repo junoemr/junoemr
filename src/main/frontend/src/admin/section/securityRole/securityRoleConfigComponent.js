@@ -40,7 +40,7 @@ angular.module('Admin.Section').component('securityRoleConfig',
 			'securityRolesService',
 			function ($uibModal, NgTableParams, securityApiService, securityRolesService)
 			{
-				let ctrl = this;
+				const ctrl = this;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -78,6 +78,11 @@ angular.module('Admin.Section').component('securityRoleConfig',
 				ctrl.onAddRole = () =>
 				{
 					ctrl.openDetailsModal(null, true);
+				}
+
+				ctrl.onExtendRole = (role) =>
+				{
+					ctrl.openDetailsModal(role, true);
 				}
 
 				ctrl.canAddRole = () =>

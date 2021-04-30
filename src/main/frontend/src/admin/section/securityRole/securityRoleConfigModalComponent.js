@@ -61,11 +61,21 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 					if(ctrl.newRole)
 					{
+						let securityPermissions = [];
+						let parentRoleId = null;
+						if(ctrl.resolve.roleId) // new inherited role
+						{
+							const parentRole = await securityApiService.getRole(ctrl.resolve.roleId);
+							securityPermissions = parentRole.securityPermissions;
+							parentRoleId = ctrl.resolve.roleId;
+						}
+
 						ctrl.role = {
 							id: null,
 							name: "",
 							description: "",
-							securityPermissions: [],
+							securityPermissions: securityPermissions,
+							parentRoleId: parentRoleId,
 						};
 					}
 					else
@@ -122,6 +132,11 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				ctrl.isSystemManaged = () =>
 				{
 					return ctrl.role && ctrl.role.systemManaged;
+				}
+
+				ctrl.isInheritedRole = () =>
+				{
+					return ctrl.role && ctrl.role.parentRoleId;
 				}
 
 				ctrl.onCancel = () =>

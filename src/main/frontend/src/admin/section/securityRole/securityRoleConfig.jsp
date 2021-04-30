@@ -50,6 +50,15 @@
 					Details
 				</juno-button>
 			</td>
+			<td>
+				<juno-button component-style="$ctrl.componentStyle"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+				             click="$ctrl.onExtendRole(role)"
+				             disabled="!$ctrl.canAddRole()">
+					+
+				</juno-button>
+			</td>
 		</tr>
 		</tbody>
 	</table>

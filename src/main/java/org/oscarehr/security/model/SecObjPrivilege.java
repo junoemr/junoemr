@@ -83,10 +83,31 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 	@JoinColumn(name = "secRoleId", referencedColumnName = "role_no", nullable = false, insertable = false, updatable = false)
 	private SecRole secRole;
 
-	@MapsId("objectName")
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "objectName", referencedColumnName = "objectName", nullable = false, insertable = false, updatable = false)
-	private SecObjectName secObjectName;
+//	@MapsId("objectName")
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "objectName", referencedColumnName = "objectName", nullable = false, insertable = false, updatable = false)
+//	private SecObjectName secObjectName;
+
+	public SecObjPrivilege()
+	{
+	}
+
+	public SecObjPrivilege(SecObjPrivilege toCopy)
+	{
+		this.id = null;
+		this.privilege = toCopy.privilege;
+		this.permissionRead = toCopy.permissionRead;
+		this.permissionUpdate = toCopy.permissionUpdate;
+		this.permissionCreate = toCopy.permissionCreate;
+		this.permissionDelete = toCopy.permissionDelete;
+		this.priority = toCopy.priority;
+		this.providerNo = toCopy.providerNo;
+		this.inclusive = toCopy.inclusive;
+		this.roleUserGroup = toCopy.roleUserGroup;
+		this.deletedAt = null;
+		this.secRole = null;
+//		this.secObjectName = null;
+	}
 
 	@Override
 	public SecObjPrivilegePrimaryKey getId()

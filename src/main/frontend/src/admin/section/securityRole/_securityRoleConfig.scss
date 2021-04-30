@@ -2,6 +2,14 @@
   @include juno-table-default;
   .button-wrapper {
     width: 128px;
+
+    .role-extend-button {
+      width: 32px;
+    }
+  }
+  .col-role-actions {
+    display: flex;
+    flex-direction: row;
   }
 }
 
