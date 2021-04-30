@@ -33,6 +33,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -70,6 +72,10 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "secRole")
 	private List<SecUserRole> secUserRoles;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_sec_role_id", referencedColumnName = "role_no")
+	private SecRole parentSecRole;
 
 	@Override
 	public Integer getId()

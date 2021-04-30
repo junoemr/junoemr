@@ -63,6 +63,9 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 	@Column(name = "permission_delete")
 	private boolean permissionDelete;
 
+	@Column(name = "inclusive")
+	private boolean inclusive;
+
 	@Deprecated
 	private int priority = 0;
 

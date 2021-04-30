@@ -1,0 +1,3 @@
+
+ALTER TABLE secRole ADD COLUMN IF NOT EXISTS parent_sec_role_id int(10) DEFAULT NULL AFTER system_managed;
+ALTER TABLE secObjPrivilege ADD COLUMN IF NOT EXISTS inclusive BOOLEAN NOT NULL DEFAULT TRUE AFTER objectName;
