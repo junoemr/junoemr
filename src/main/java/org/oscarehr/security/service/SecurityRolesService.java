@@ -78,23 +78,37 @@ public class SecurityRolesService
 	{
 		UserSecurityRolesTransfer transfer = new UserSecurityRolesTransfer();
 		List<SecurityRoleTransfer> roleTransfers = new ArrayList<>();
-		Set<SecObjPrivilege> privilegeObjects = new HashSet<>(); // remove duplicates during insert
-		for (SecUserRole secUserRole : secUserRoleDao.getUserRoles(providerId))
+
+		List<SecUserRole> userRoles = secUserRoleDao.getUserRoles(providerId);
+		for (SecUserRole userRole : userRoles)
 		{
-			// queries here could be reduced, but in most cases 1-3 roles is expected
-			SecRole role = secUserRole.getSecRole();
-			roleTransfers.add(getRoleTransfer(role, false));
-			privilegeObjects.addAll(role.getSecObjPrivilege());
+			roleTransfers.add(getRoleTransfer(userRole.getSecRole(), false));
 		}
-		//TODO ensure this works with inheritance
-		transfer.setSecurityPermissions(getSecurityPermissionsTransfer(new ArrayList<>(privilegeObjects)));
+		transfer.setSecurityPermissions(getSecurityPermissionsTransfer(getRolePrivileges(userRoles)));
 		transfer.setRoles(roleTransfers);
 		return transfer;
 	}
 
 	public List<SecurityPermissionTransfer> getAllSecurityPermissionsTransfer()
 	{
-		return getAllSecurityPermissions();
+		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
+		List<SecurityPermissionTransfer> transfers = new LinkedList<>();
+
+		for(Permission permission : Permission.values())
+		{
+			transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+		}
+		return transfers;
+	}
+
+	public List<Permission> getSecurityPermissions(SecRole secRole)
+	{
+		return getSecurityPermissions(getRolePrivileges(secRole));
+	}
+
+	public List<Permission> getSecurityPermissionsForUser(String providerId)
+	{
+		return getSecurityPermissions(getRolePrivileges(secUserRoleDao.getUserRoles(providerId)));
 	}
 
 	public List<SecurityRoleTransfer> getAllRoles()
@@ -324,6 +338,11 @@ public class SecurityRolesService
 		return transfer;
 	}
 
+	private List<SecObjPrivilege> getRolePrivileges(List<SecUserRole> userRoles)
+	{
+		return null; //TODO - filter duplicates and prioritize more permissive roles
+	}
+
 	private List<SecObjPrivilege> getRolePrivileges(SecRole role)
 	{
 		SecRole parentRole = role.getParentSecRole();
@@ -360,59 +379,47 @@ public class SecurityRolesService
 	private List<SecurityPermissionTransfer> getSecurityPermissionsTransfer(List<SecObjPrivilege> secObjPrivileges)
 	{
 		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
+		List<Permission> permissions = getSecurityPermissions(secObjPrivileges);
 
-		List<SecurityPermissionTransfer> transfers = new LinkedList<>();
+		return permissions.stream()
+				.map((permission) -> (toSecurityPermissionTransfer(permission, nameEntityMap)))
+				.collect(Collectors.toList());
+	}
+
+	private List<Permission> getSecurityPermissions(List<SecObjPrivilege> secObjPrivileges)
+	{
+		List<Permission> permissions = new LinkedList<>();
 		for (SecObjPrivilege secObjPrivilege : secObjPrivileges)
 		{
 			SecObjectName.OBJECT_NAME objectName = SecObjectName.OBJECT_NAME.fromValueString(secObjPrivilege.getId().getObjectName());
 
 			if(secObjPrivilege.isPermissionRead())
 			{
-				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.READ);
-				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+				permissions.add(Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.READ));
 			}
 			if(secObjPrivilege.isPermissionUpdate())
 			{
-				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE);
-				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+				permissions.add(Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE));
 			}
 			if(secObjPrivilege.isPermissionCreate())
 			{
-				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE);
-				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+				permissions.add(Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE));
 			}
 			if(secObjPrivilege.isPermissionDelete())
 			{
-				Permission permission = Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE);
-				transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
+				permissions.add(Permission.from(objectName, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE));
 			}
 		}
-		return transfers.stream().filter(Objects::nonNull).collect(Collectors.toList());
-	}
-
-	private List<SecurityPermissionTransfer> getAllSecurityPermissions()
-	{
-		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
-		List<SecurityPermissionTransfer> transfers = new LinkedList<>();
-
-		for(Permission permission : Permission.values())
-		{
-			transfers.add(toSecurityPermissionTransfer(permission, nameEntityMap));
-		}
-		return transfers;
+		return permissions.stream().filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	private SecurityPermissionTransfer toSecurityPermissionTransfer(Permission permission, Map<String, SecObjectName> nameEntityMap)
 	{
-		if (permission != null)
-		{
-			SecurityPermissionTransfer transfer = new SecurityPermissionTransfer();
-			transfer.setDescription(permission.getPrivilegeLevel().name() + " " +
-					StringUtils.lowerCase(nameEntityMap.get(permission.getObjectName().getValue()).getDescription()));
-			transfer.setPermission(permission);
-			return transfer;
-		}
-		return null;
+		SecurityPermissionTransfer transfer = new SecurityPermissionTransfer();
+		transfer.setDescription(permission.getPrivilegeLevel().name() + " " +
+				StringUtils.lowerCase(nameEntityMap.get(permission.getObjectName().getValue()).getDescription()));
+		transfer.setPermission(permission);
+		return transfer;
 	}
 
 	private String getLegacyPrivilege(List<SecurityInfoManager.PRIVILEGE_LEVEL> privileges)

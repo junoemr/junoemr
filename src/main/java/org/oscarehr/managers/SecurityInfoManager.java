@@ -35,6 +35,7 @@ import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -104,7 +105,7 @@ public class SecurityInfoManager
 
 
 	@Autowired
-	private SecuserroleDao secUserRoleDao;
+	private SecuserroleDao secuserroleDao;
 	
 	@Autowired
 	private SecobjprivilegeDao secobjprivilegeDao;
@@ -116,13 +117,16 @@ public class SecurityInfoManager
 	private DemographicSetsDao demographicSetsDao;
 
 	@Autowired
+	private SecurityRolesService securityRolesService;
+
+	@Autowired
 	private SecuritySetsService securitySetsService;
 
 	@Deprecated // use roles service
 	public List<Secuserrole> getRoles(String providerNo)
 	{
 		@SuppressWarnings("unchecked")
-		List<Secuserrole> results = secUserRoleDao.findByProviderNo(providerNo);
+		List<Secuserrole> results = secuserroleDao.findByProviderNo(providerNo);
 		return results;
 	}
 
@@ -212,16 +216,10 @@ public class SecurityInfoManager
 	{
 		return hasPrivileges(providerNo, null, permissions);
 	}
+
 	public boolean hasPrivileges(String providerNo, Integer demographicId, Permission... permissions)
 	{
-		for (Permission permission : permissions)
-		{
-			if (!hasPrivilege(providerNo, permission.getPrivilegeLevel(), demographicId, permission.getObjectName()))
-			{
-				return false;
-			}
-		}
-		return true;
+		return (demographicId == null || isAllowedAccessToPatientRecord(providerNo, demographicId)) && hasRoleAccess(providerNo, permissions);
 	}
 
 	/**
@@ -247,6 +245,19 @@ public class SecurityInfoManager
 	public boolean hasOnePrivileges(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME... hasObjList)
 	{
 		return hasOnePrivileges(providerNo, privilege, null, hasObjList);
+	}
+
+	private boolean hasRoleAccess(String providerNo, Permission... permissions)
+	{
+		List<Permission> userPermissions = securityRolesService.getSecurityPermissionsForUser(providerNo);
+		for(Permission permission : permissions)
+		{
+			if(!userPermissions.contains(permission))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private boolean hasPrivilege(String providerNo, String objectName, String privilege, Integer demographicNo)
@@ -378,9 +389,15 @@ public class SecurityInfoManager
 		{
 			return;
 		}
-		for (Permission permission : permissions)
+		if(demographicId != null && !isAllowedAccessToPatientRecord(providerNo, demographicId))
 		{
-			if (!hasPrivilege(providerNo, permission.getPrivilegeLevel(), demographicId, permission.getObjectName()))
+			throw new SecurityException("user des not have access to patient #" + demographicId);
+		}
+
+		List<Permission> userPermissions = securityRolesService.getSecurityPermissionsForUser(providerNo);
+		for(Permission permission : permissions)
+		{
+			if(!userPermissions.contains(permission))
 			{
 				throw new SecurityException("missing required permissions: " + permission.name());
 			}
