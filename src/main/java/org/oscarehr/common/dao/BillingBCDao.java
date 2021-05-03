@@ -18,12 +18,11 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.NativeSql;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
 
 /**
  * Billing DAO containing BC-specific extensions.
@@ -81,7 +80,6 @@ public class BillingBCDao extends BillingDao {
 	      return query.getResultList();
 	    
     }
-
 
 	/**
 	 * Selects visit type and description from billingvisit table for the specified region

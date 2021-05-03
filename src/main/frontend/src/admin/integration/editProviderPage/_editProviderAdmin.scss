@@ -44,6 +44,12 @@
 		padding-top: 0;
 	}
 
+	.juno-select {
+		padding-top: 4px;
+		margin-top: 8px;
+		margin-bottom: 8px;
+	}
+
 	.field-error {
 		input {
 			border-color: $color-red-base;

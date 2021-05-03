@@ -560,15 +560,15 @@
 						</juno-typeahead>
 
 						<!-- service location -->
-						<juno-typeahead
-										title="Service Location"
-										name="serviceLocation"
-										model="$ctrl.provider.bcServiceLocation"
-										options="$ctrl.bcServiceLocationOptions"
-										placeholder="Search..."
-										disabled="$ctrl.fieldsDisabled"
+						<juno-select
+							ng-model="$ctrl.provider.bcServiceLocation"
+							options="$ctrl.bcServiceLocationOptions"
+							placeholder="Select a billing SLC code"
+							label="Service Location Code"
+							label-position="$ctrl.LABEL_POSITION"
+							disabled="$ctrl.fieldsDisabled"
 						>
-						</juno-typeahead>
+						</juno-select>
 					</div>
 
 					<!-- ON billing -->

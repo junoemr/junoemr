@@ -271,7 +271,7 @@ public class BillingFormData implements Serializable {
 
 	}
 
-	public class BillingVisit implements Serializable
+	public static class BillingVisit implements Serializable
 	{
 		String billingvisit = "";
 		String description = "";

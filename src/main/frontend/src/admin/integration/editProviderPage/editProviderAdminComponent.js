@@ -25,6 +25,7 @@ import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi
 import {ProvidersServiceApi} from "../../../../generated";
 import {SitesApi} from "../../../../generated";
 import {BILLING_REGION} from "../../../billing/billingConstants";
+import {LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
 
 angular.module('Admin.Integration').component('editProviderAdmin',
@@ -57,6 +58,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		let sitesApi =  new SitesApi($http, $httpParamSerializer, '../ws/rs');
+
+		ctrl.LABEL_POSITION = LABEL_POSITION.TOP
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
@@ -492,7 +495,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					ctrl.bcServiceLocationOptions.push(
 							{
 								label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
-								value: visitCode.visitType
+								value: visitCode.visitType + "|" + visitCode.visitDescription
 							}
 					);
 				}
