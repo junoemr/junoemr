@@ -47,8 +47,6 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 	{
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
-		//DatabaseUtil.createTestProvider();
-		//DatabaseUtil.createProviderSite();
 	}
 
 	@AfterClass
@@ -61,28 +59,6 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 				"OscarJob", "OscarJobType", "provider", "providerbillcenter", "ProviderPreference", "secUserRole",
 				"tickler_text_suggest", "validations"
 		);
-	}
-
-	public void composeMessage(String subject)
-	{
-		driver.findElement(By.xpath("//input[@name='subject']")).sendKeys(subject);
-		driver.findElement(By.xpath("//textarea[@name='message']")).sendKeys("Test Message");
-		driver.findElements(By.xpath("//input[@name='tblDFR1']")).get(1).click();
-	}
-
-	public void archiveMessage()
-	{
-		int size = driver.findElements(By.xpath("//input[@name='messageNo']")).size();
-		driver.findElement(By.xpath("//input[@value='" + size + "']")).click();
-		driver.findElement(By.xpath("//input[@value='archive']")).click();
-		driver.findElement(By.linkText("Deleted Message")).click();
-	}
-
-	public void unarchiveMessage()
-	{
-		driver.findElement(By.xpath("//input[@name='messageNo']")).click();
-		driver.findElement(By.xpath("//input[@value='unarchive']")).click();
-		driver.findElement(By.linkText("Refresh Inbox")).click();
 	}
 
 	@Test
@@ -182,4 +158,27 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 		Thread.sleep(1000);
 		Assert.assertTrue("Message was NOT sent from eChart successfully.", PageUtil.isExistsBy(By.linkText("Message from eChart"), driver));
 	}
+
+	private void composeMessage(String subject)
+	{
+		driver.findElement(By.xpath("//input[@name='subject']")).sendKeys(subject);
+		driver.findElement(By.xpath("//textarea[@name='message']")).sendKeys("Test Message");
+		driver.findElements(By.xpath("//input[@name='tblDFR1']")).get(1).click();
+	}
+
+	private void archiveMessage()
+	{
+		int size = driver.findElements(By.xpath("//input[@name='messageNo']")).size();
+		driver.findElement(By.xpath("//input[@value='" + size + "']")).click();
+		driver.findElement(By.xpath("//input[@value='archive']")).click();
+		driver.findElement(By.linkText("Deleted Message")).click();
+	}
+
+	private void unarchiveMessage()
+	{
+		driver.findElement(By.xpath("//input[@name='messageNo']")).click();
+		driver.findElement(By.xpath("//input[@value='unarchive']")).click();
+		driver.findElement(By.linkText("Refresh Inbox")).click();
+	}
+
 }
