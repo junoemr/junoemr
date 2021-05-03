@@ -84,7 +84,7 @@ public class SecurityRolesService
 		{
 			roleTransfers.add(getRoleTransfer(userRole.getSecRole(), false));
 		}
-		transfer.setSecurityPermissions(getSecurityPermissionsTransfer(getRolePrivileges(userRoles)));
+		transfer.setSecurityPermissions(getSecurityPermissionsTransfer(getRolePermissions(userRoles)));
 		transfer.setRoles(roleTransfers);
 		return transfer;
 	}
@@ -108,7 +108,7 @@ public class SecurityRolesService
 
 	public List<Permission> getSecurityPermissionsForUser(String providerId)
 	{
-		return getSecurityPermissions(getRolePrivileges(secUserRoleDao.getUserRoles(providerId)));
+		return getRolePermissions(secUserRoleDao.getUserRoles(providerId));
 	}
 
 	public List<SecurityRoleTransfer> getAllRoles()
@@ -333,14 +333,20 @@ public class SecurityRolesService
 		// privileges are not always needed and may have additional database hits as they are lazy loaded
 		if(includePrivileges)
 		{
-			transfer.setSecurityPermissions(getSecurityPermissionsTransfer(getRolePrivileges(secRole)));
+			transfer.setSecurityPermissions(getSecurityPermissionsTransferFromEntities(getRolePrivileges(secRole)));
 		}
 		return transfer;
 	}
 
-	private List<SecObjPrivilege> getRolePrivileges(List<SecUserRole> userRoles)
+	private List<Permission> getRolePermissions(List<SecUserRole> userRoles)
 	{
-		return null; //TODO - filter duplicates and prioritize more permissive roles
+		// use hash set to easily remove duplicates on add
+		Set<Permission> permissionSet = new HashSet<>();
+		for(SecUserRole userRole : userRoles)
+		{
+			permissionSet.addAll(getSecurityPermissions(getRolePrivileges(userRole.getSecRole())));
+		}
+		return new ArrayList<>(permissionSet);
 	}
 
 	private List<SecObjPrivilege> getRolePrivileges(SecRole role)
@@ -376,11 +382,15 @@ public class SecurityRolesService
 		return new ArrayList<>(objectMap.values());
 	}
 
-	private List<SecurityPermissionTransfer> getSecurityPermissionsTransfer(List<SecObjPrivilege> secObjPrivileges)
+	private List<SecurityPermissionTransfer> getSecurityPermissionsTransferFromEntities(List<SecObjPrivilege> secObjPrivileges)
+	{
+		List<Permission> permissions = getSecurityPermissions(secObjPrivileges);
+		return getSecurityPermissionsTransfer(permissions);
+	}
+
+	private List<SecurityPermissionTransfer> getSecurityPermissionsTransfer(List<Permission> permissions)
 	{
 		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
-		List<Permission> permissions = getSecurityPermissions(secObjPrivileges);
-
 		return permissions.stream()
 				.map((permission) -> (toSecurityPermissionTransfer(permission, nameEntityMap)))
 				.collect(Collectors.toList());
