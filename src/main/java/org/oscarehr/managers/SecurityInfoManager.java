@@ -182,11 +182,13 @@ public class SecurityInfoManager
 		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, (demographicNo != null ? Integer.parseInt(demographicNo) : null));
 	}
 
+	@Deprecated
 	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME objectName)
 	{
 		return hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), demographicNo);
 	}
 
+	@Deprecated
 	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME objectName)
 	{
 		return hasPrivilege(providerNo, privilege, null, objectName);
@@ -200,6 +202,7 @@ public class SecurityInfoManager
 	 * @param hasObjList - a list of security objects to check
 	 * @return - true or false indicating pass or fail of the privilege check.
 	 */
+	@Deprecated
 	public boolean hasPrivileges(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... hasObjList)
 	{
 		for(SecObjectName.OBJECT_NAME objectName : hasObjList)
@@ -229,7 +232,9 @@ public class SecurityInfoManager
 	 * @param demographicNo - demographic on which the check should be preformed (can be null)
 	 * @param hasObjList - a list of security objects to check
 	 * @return - true or false indicating pass or fail of the privilege check.
+	 * @deprecated use Permission enum version
 	 */
+	@Deprecated
 	public boolean hasOnePrivileges(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... hasObjList)
 	{
 		for(SecObjectName.OBJECT_NAME objectName : hasObjList)
@@ -242,6 +247,7 @@ public class SecurityInfoManager
 		return false;
 	}
 
+	@Deprecated //deprecated - use Permission enum version
 	public boolean hasOnePrivileges(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME... hasObjList)
 	{
 		return hasOnePrivileges(providerNo, privilege, null, hasObjList);
@@ -260,6 +266,7 @@ public class SecurityInfoManager
 		return true;
 	}
 
+	@Deprecated //deprecated - use Permission enum version
 	private boolean hasPrivilege(String providerNo, String objectName, String privilege, Integer demographicNo)
 	{
 		try
@@ -363,7 +370,9 @@ public class SecurityInfoManager
 	 * @param demographicNo - an optional demographic number ( for blocking individual patient records where appropriate)
 	 * @param requiredObjList - the required security objects for access to the emr module
 	 * @throws SecurityException - if the requirements are not me by the provider record
+	 * @deprecated - use Permission enum version
 	 */
+	@Deprecated
 	public void requireAllPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... requiredObjList)
 	{
 		if(requiredObjList == null)
@@ -410,7 +419,9 @@ public class SecurityInfoManager
 	 * @param privilege - the privilege level required
 	 * @param requiredObjList - the required security objects for access to the emr module
 	 * @throws SecurityException - if the requirements are not me by the provider record
+	 * @deprecated - use Permission enum version
 	 */
+	@Deprecated
 	public void requireAllPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME... requiredObjList)
 	{
 		requireAllPrivilege(providerNo, privilege, null, requiredObjList);
@@ -423,9 +434,9 @@ public class SecurityInfoManager
 	 * @param demographicNo - an optional demographic number ( for blocking individual patient records where appropriate)
 	 * @param requiredObjList - the required security objects for access to the emr module
 	 * @throws SecurityException - if the requirements are not me by the provider record
-	 * @deprecated - use enum version of requireAllPrivilege. no access should use an OR on securityObjects
+	 * @deprecated - use Permission enum version of requireAllPrivilege. no access should use an OR on securityObjects
 	 */
-	@Deprecated // use enum version instead
+	@Deprecated
 	public void requireOnePrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
 	{
 		for(String objectName:requiredObjList)
