@@ -18,8 +18,6 @@
 
 package org.oscarehr.common.model;
 
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +31,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.Set;
 
 @Entity
 @Table(name="site")
@@ -83,6 +82,9 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 
 	@Column(name="alberta_connect_care_department_id")
 	private String albertaConnectCareDepartmentId;
+
+	@Column(name="bc_service_location_code")
+	private String bcServiceLocationCode;
 
 	@Column(name="bc_facility_number")
 	private String bcFacilityNumber;
@@ -338,6 +340,14 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public void setUuid(String uuid)
 	{
 		this.uuid = uuid;
+	}
+
+	public String getBcServiceLocationCode() {
+		return bcServiceLocationCode;
+	}
+
+	public void setBcServiceLocationCode(String bcServiceLocationCode) {
+		this.bcServiceLocationCode = bcServiceLocationCode;
 	}
 
 	@Override
