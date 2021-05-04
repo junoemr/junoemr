@@ -1145,7 +1145,11 @@ iDate++;
    <div class="row add-box" id="add-box-<%=measure%>">
 
    <div class="col-lg-5">
-    <span title="If you would like this measurement to display in your progress note then you need to select this checkbox."><input type="checkbox" name="<%=name%>_note" id="<%=name%>_note" value="addtonote"> <small>add to progress note</small></span>
+	   <span title="If you would like this measurement to display in your progress note then you need to select this checkbox.">
+		   <input type="checkbox" name="<%=name%>_note" id="<%=name%>_note" value="addtonote">
+		   <small>add to progress note</small>
+		   <input type="hidden" name="addNewNote" value="true">
+	   </span>
    </div><!-- col-lg-5 -->
    <div class="col-lg-7 data-input-area">
 	<div class="form-group" style="display:inline-block !important; margin:0px;padding:0px;">

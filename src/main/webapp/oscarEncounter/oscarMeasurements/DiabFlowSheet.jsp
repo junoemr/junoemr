@@ -721,7 +721,8 @@ fieldset[disabled] .btn-primary:active
 <body>
 
 	<form id="mainForm" name="mainForm" action="<%=request.getContextPath()%>/oscarEncounter/FormUpdate.do">
-	<input type="hidden"  name="ycoord"
+		<input type="hidden" name="addNewNote" value=false">
+ 	<input type="hidden"  name="ycoord"
 	<%if (request.getParameter("ycoord") != null) { %>
 		value="<%=request.getParameter("ycoord")%>"
 	<%} else {%>
