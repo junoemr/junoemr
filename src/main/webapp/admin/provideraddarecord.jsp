@@ -140,6 +140,12 @@ if (request.getParameter("bc_bcp_eligible") != null)
     providerBilling.setBcBCPEligible(request.getParameter("bc_bcp_eligible").equals("1"));
 }
 
+String serviceLocationCode = request.getParameter("bc_service_location_code");
+if (serviceLocationCode != null && !serviceLocationCode.equals("-1"))
+{
+	providerBilling.setBcServiceLocationCode(request.getParameter("bc_service_location_code"));
+}
+
 provider.setBillingOpts(providerBilling);
 
 String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));

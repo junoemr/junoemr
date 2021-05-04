@@ -419,17 +419,6 @@ for (int i=0; i<sites.size(); i++) {
 					slcCodes.add(new BillingVisit(visit));
 				}
 		%>
-		<tr>
-			<td align="right">BC Service Location Code</td>
-			<td>
-			<select name="bc_service_location_code">
-				<% for (BillingVisit slcCode : slcCodes) { %>
-					<option value="<%=slcCode.getVisitType()%>"><%=slcCode.getDisplayName()%></option>
-				<% } %>
-			</select>
-			</td>
-		</tr>
-
         <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
         <tr>
             <td align="right">BCP Eligible?</td>
@@ -440,6 +429,17 @@ for (int i=0; i<sites.size(); i++) {
                 </select>
         </tr>
         <% } %>
+        <tr>
+            <td align="right">BC Service Location Code</td>
+            <td>
+                <select name="bc_service_location_code">
+                    <option value="-1" disabled>Set BC Service Location Code</option>
+                    <% for (BillingVisit slcCode : slcCodes) { %>
+                    <option value="<%=slcCode.getVisitType()%>"><%=slcCode.getDisplayName()%></option>
+                    <% } %>
+                </select>
+            </td>
+        </tr>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
 			<td><input type="text" name="alberta_e_delivery_ids"></td>

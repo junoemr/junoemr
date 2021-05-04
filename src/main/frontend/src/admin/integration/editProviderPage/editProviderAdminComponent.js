@@ -495,7 +495,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					ctrl.bcServiceLocationOptions.push(
 							{
 								label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
-								value: visitCode.visitType + "|" + visitCode.visitDescription
+								value: visitCode.visitType
 							}
 					);
 				}

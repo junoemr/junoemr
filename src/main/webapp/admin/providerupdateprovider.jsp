@@ -76,6 +76,9 @@
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingFormData" %>
+<%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
+<%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
 <html:html locale="true">
 
 
@@ -452,8 +455,17 @@ jQuery(document).ready( function() {
 			</td>
 		</tr>
 		<% } %>
-		<%
-			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
+		<% if (OscarProperties.getInstance().isBritishColumbiaInstanceType()) {
+			BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
+			List<BillingFormData.BillingVisit> slcCodes = new ArrayList<BillingFormData.BillingVisit>();
+
+			List<Object[]> visits = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+            for (Object[] visit : visits)
+            {
+            	slcCodes.add(new BillingFormData.BillingVisit(visit));
+            }
+
+            String providerSLCCode = provider.getBillingOpts().getBcServiceLocationCode();
 		%>
             <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
                 boolean isBCPEnabled = provider.getBillingOpts() != null && provider.getBillingOpts().getBcBCPEligible();
@@ -467,6 +479,15 @@ jQuery(document).ready( function() {
                 </select>
         </tr>
             <% } %>
+        <td align="right">BC Service Location Code</td>
+        <td>
+            <select name="bc_service_location_code">
+                <option value="-1" disabled>Set BC Service Location Code</option>
+                <% for (BillingFormData.BillingVisit slcCode : slcCodes) { %>
+                <option value="<%=slcCode.getVisitType()%>" <%=slcCode.getVisitType().equals(providerSLCCode) ? "selected" : ""%>><%=slcCode.getDisplayName()%></option>
+                <% } %>
+            </select>
+        </td>
 		<tr>
             <% // We are using the albertaEDeliveryId column to store IHA provider mnemonics on BC instances. %>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>

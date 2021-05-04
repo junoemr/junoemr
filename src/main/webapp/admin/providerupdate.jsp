@@ -221,6 +221,12 @@ if (securityInfoManager.userCanModify(request.getParameter("current_user"),reque
 				provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
 			}
 
+			String bcServiceLocationCode = request.getParameter("bc_service_location_code");
+			if (bcServiceLocationCode != null && !bcServiceLocationCode.equals("-1"))
+            {
+            	provider.getBillingOpts().setBcServiceLocationCode(bcServiceLocationCode);
+            }
+
 			UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
 
 			String officialFirstName = request.getParameter("officialFirstName");
