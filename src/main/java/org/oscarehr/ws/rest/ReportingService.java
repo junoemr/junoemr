@@ -27,11 +27,10 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.EFormReportToolDao;
 import org.oscarehr.common.model.DemographicSets;
 import org.oscarehr.common.model.EFormReportTool;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.DemographicSetsManager;
 import org.oscarehr.managers.EFormReportToolManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.EFormReportToolConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -66,7 +65,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<AbstractSearchResponse<String>> listDemographicSets()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.REPORT_READ);
 
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 		
@@ -81,7 +80,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<DemographicSets> getDemographicSetByName(@PathParam("name") String name)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.REPORT_READ);
 
 		AbstractSearchResponse<DemographicSets> response = new AbstractSearchResponse<DemographicSets>();
 		
@@ -101,7 +100,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<EFormReportToolTo1> eformReportToolList()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.REPORT_READ);
 		
 		List<EFormReportTool> results = eformReportToolManager.findAll(getLoggedInInfo(), 0, EFormReportToolDao.MAX_LIST_RETURN_SIZE);
 		
@@ -122,7 +121,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse addEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.REPORT_CREATE);
 
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -145,7 +144,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse populateEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.REPORT_CREATE);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -161,7 +160,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse removeEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.REPORT_DELETE);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		
@@ -176,7 +175,7 @@ public class ReportingService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse markLatestEFormReportTool(EFormReportToolTo1 json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.REPORT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.REPORT_UPDATE);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		

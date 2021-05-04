@@ -23,10 +23,9 @@
  */
 package org.oscarehr.ws.rest;
 
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.DemographicMergedConverter;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicMergedTo1;
@@ -62,7 +61,7 @@ public class DemographicMergeService extends AbstractServiceImpl
 	@Path("/{parentId}")
 	public OscarSearchResponse<DemographicMergedTo1> getMergedDemographicIds(@PathParam("parentId") Integer parentId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		DemographicMergedConverter converter = new DemographicMergedConverter();
 		List<DemographicMerged> children = demographicManager.getMergedDemographics(getLoggedInInfo(), parentId);
@@ -87,7 +86,7 @@ public class DemographicMergeService extends AbstractServiceImpl
 	@Path("/")
 	public void mergeDemographic(@QueryParam("parentId") Integer parentId, @QueryParam("childId") Integer childId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_UPDATE);
 
 		List<Integer> children = new ArrayList<Integer>();
 		children.add(childId);
@@ -107,7 +106,7 @@ public class DemographicMergeService extends AbstractServiceImpl
 	@Path("/")
 	public void unmergeDemographic(@QueryParam("parentId") Integer parentId, @QueryParam("childsId") Integer childId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_UPDATE);
 
 		List<Integer> children = new ArrayList<Integer>();
 		children.add(childId);

@@ -42,7 +42,6 @@ import org.oscarehr.myoscar.client.ws_manager.MessageManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.phr.util.MyOscarUtils;
 import org.oscarehr.security.model.Permission;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ProgramProviderConverter;

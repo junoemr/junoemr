@@ -33,13 +33,12 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
@@ -93,7 +92,7 @@ public class DemographicWs extends AbstractWs
 	 */
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicId, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
 
 		Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicId);
 		if(demographic == null)
@@ -113,7 +112,7 @@ public class DemographicWs extends AbstractWs
 
 	public DemographicTransfer getDemographicByMyOscarUserName(String myOscarUserName)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		Demographic demographic = demographicManager.getDemographicByMyOscarUserName(getLoggedInInfo(), myOscarUserName);
 		return (DemographicTransfer.toTransfer(demographic));
@@ -121,7 +120,7 @@ public class DemographicWs extends AbstractWs
 
 	public List<DemographicTransfer> searchDemographicByName(String searchString, int startIndex, int itemsToReturn)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		List<Demographic> demographics = demographicManager.searchDemographicByName(getLoggedInInfo(), searchString, startIndex, itemsToReturn);
 		List<DemographicTransfer> transferList = new ArrayList<DemographicTransfer>();
@@ -142,7 +141,7 @@ public class DemographicWs extends AbstractWs
 
 	public PhrVerificationTransfer getLatestPhrVerificationByDemographic(Integer demographicId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicId, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
 
 		PHRVerification phrVerification = demographicManager.getLatestPhrVerificationByDemographicId(getLoggedInInfo(), demographicId);
 		return (PhrVerificationTransfer.toTransfer(phrVerification));
@@ -153,7 +152,7 @@ public class DemographicWs extends AbstractWs
 	 */
 	public boolean isPhrVerifiedToSendMessages(Integer demographicId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicId, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
 
 		return demographicManager.isPhrVerifiedToSendMessages(getLoggedInInfo(), demographicId);
 	}
@@ -163,7 +162,7 @@ public class DemographicWs extends AbstractWs
 	 */
 	public boolean isPhrVerifiedToSendMedicalData(Integer demographicId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicId, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
 
 		return demographicManager.isPhrVerifiedToSendMedicalData(getLoggedInInfo(), demographicId);
 	}
@@ -173,7 +172,7 @@ public class DemographicWs extends AbstractWs
 	 */
 	public DemographicTransfer[] searchDemographicsByAttributes(String hin, String firstName, String lastName, Gender gender, Calendar dateOfBirth, String city, String province, String phone, String email, String alias, int startIndex, int itemsToReturn)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		List<Demographic> demographics = demographicManager.searchDemographicsByAttributes(getLoggedInInfo(), hin, firstName, lastName, gender, dateOfBirth, city, province, phone, email, alias, startIndex, itemsToReturn);
 		return (DemographicTransfer.toTransfers(demographics));
@@ -184,7 +183,7 @@ public class DemographicWs extends AbstractWs
 	 */
 	public Integer[] getAdmittedDemographicIdsByProgramProvider(Integer programId, String providerNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		logger.debug("programId=" + programId + ", providerNo=" + providerNo);
 		List<Integer> results = demographicManager.getAdmittedDemographicIdsByProgramAndProvider(getLoggedInInfo(), programId, providerNo);
@@ -194,7 +193,7 @@ public class DemographicWs extends AbstractWs
 	public Integer[] getDemographicIdsWithMyOscarAccounts(@WebParam(name="startDemographicIdExclusive") Integer startDemographicIdExclusive,
 	                                                      @WebParam(name="itemsToReturn") int itemsToReturn)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		List<Integer> results = demographicManager.getDemographicIdsWithMyOscarAccounts(getLoggedInInfo(), startDemographicIdExclusive, itemsToReturn);
 		return (results.toArray(new Integer[0]));
@@ -202,7 +201,7 @@ public class DemographicWs extends AbstractWs
 
 	public DemographicTransfer[] getDemographics(Integer[] demographicIds)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		for(Integer i : demographicIds)
@@ -216,7 +215,7 @@ public class DemographicWs extends AbstractWs
 
 	public List getDemographicsByHealthNum(String hin)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		List<Demographic> demographicList = demographicManager.getDemographicsByHealthNum(hin);
 
@@ -241,7 +240,7 @@ public class DemographicWs extends AbstractWs
 
 	public DemographicTransfer getDemographicByHealthNumber(String healthNumber) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		if (healthNumber == null || healthNumber.isEmpty())
 		{
@@ -265,7 +264,7 @@ public class DemographicWs extends AbstractWs
 	public Integer addDemographic(DemographicTransfer demographicTransfer,
 	                              @Nullable DemographicIntegrationTransfer integrationTransfer) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_CREATE);
 
 		MessageContext mc = wsContext.getMessageContext();
 		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
@@ -297,8 +296,7 @@ public class DemographicWs extends AbstractWs
 
 	public void updateDemographic(DemographicTransfer demographicTransfer) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
-				demographicTransfer.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicTransfer.getDemographicNo(), Permission.DEMOGRAPHIC_UPDATE);
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 
@@ -332,7 +330,7 @@ public class DemographicWs extends AbstractWs
 	 */
 	public List<DemographicContact> getDemographicContact(int demographicNo, int type) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.DEMOGRAPHIC_READ);
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		if(demographicManager.getDemographic(loggedInInfo, demographicNo) == null)
@@ -357,8 +355,7 @@ public class DemographicWs extends AbstractWs
 
 	public EligibilityCheckTransfer checkEligibility(DemographicTransfer demographicTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicTransfer.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicTransfer.getDemographicNo(), Permission.DEMOGRAPHIC_READ);
 
 		EligibilityCheckTransfer transfer;
 		try

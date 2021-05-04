@@ -23,12 +23,6 @@
  */
 package org.oscarehr.common.web;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -36,13 +30,17 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.EpisodeDao;
 import org.oscarehr.common.model.Episode;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
-
 import oscar.OscarProperties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.List;
 
 public class EpisodeAction extends DispatchAction {
 
@@ -58,7 +56,7 @@ public class EpisodeAction extends DispatchAction {
 		Integer demographicNo = Integer.parseInt(request.getParameter("demographicNo"));
 
 		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+				demographicNo, Permission.DEMOGRAPHIC_READ);
 		
 		List<Episode> episodes = episodeDao.findAll(demographicNo);
 		request.setAttribute("episodes",episodes);
@@ -100,8 +98,7 @@ public class EpisodeAction extends DispatchAction {
 		BeanUtils.copyProperties(episode, e, new String[]{"id","lastUpdateTime","lastUpdateUser"});
 		e.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, e.getDemographicNo(), SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), e.getDemographicNo(), Permission.DEMOGRAPHIC_CREATE);
 		
 		if(id != null && id.intValue()>0) {
 			episodeDao.merge(e);

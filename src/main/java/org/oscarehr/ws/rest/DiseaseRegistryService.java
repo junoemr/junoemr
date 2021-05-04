@@ -30,8 +30,7 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.QuickListDao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.QuickListView;
-import org.oscarehr.security.model.SecObjectName;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.DiagnosisTo1;
 import org.oscarehr.ws.rest.to.model.DxQuickList;
@@ -117,8 +116,7 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<IssueTo1> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.DXRESEARCH, SecObjectName.OBJECT_NAME.CASEMGMT_ISSUES);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_ISSUE_READ);
 
 		Issue issue = issueDao.findIssueByTypeAndCode(codingSystem, code);
 		if(issue != null) {
@@ -142,8 +140,7 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public Response addToDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo, IssueTo1 issue)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
-				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.DXRESEARCH);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.DX_CREATE);
 
 		boolean activeEntryExists = dxresearchDao.activeEntryExists(demographicNo, issue.getType(), issue.getCode());
 		

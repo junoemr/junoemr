@@ -26,9 +26,8 @@ package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.AllergyManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.external.soap.v1.transfer.AllergyTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,7 +47,7 @@ public class AllergyWs extends AbstractWs
 
 	public AllergyTransfer getAllergy(Integer allergyId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ALLERGY);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ALLERGY_READ);
 
 		Allergy allergy = allergyManager.getAllergy(getLoggedInInfo(), allergyId);
 		return (AllergyTransfer.toTransfer(allergy));
@@ -56,7 +55,7 @@ public class AllergyWs extends AbstractWs
 
 	public AllergyTransfer[] getAllergiesUpdatedAfterDate(Date updatedAfterThisDateInclusive, int itemsToReturn)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ALLERGY);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ALLERGY_READ);
 
 		List<Allergy> allergies = allergyManager.getUpdatedAfterDate(getLoggedInInfo(), updatedAfterThisDateInclusive, itemsToReturn);
 		return (AllergyTransfer.toTransfers(allergies));
@@ -64,7 +63,7 @@ public class AllergyWs extends AbstractWs
 
 	public AllergyTransfer[] getAllergiesByProgramProviderDemographicDate(Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateInclusive, int itemsToReturn)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ALLERGY);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),Permission.ALLERGY_READ);
 
 		List<Allergy> allergies = allergyManager.getAllergiesByProgramProviderDemographicDate(getLoggedInInfo(), programId, providerNo, demographicId, updatedAfterThisDateInclusive, itemsToReturn);
 		return (AllergyTransfer.toTransfers(allergies));

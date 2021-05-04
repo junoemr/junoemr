@@ -24,9 +24,8 @@
 package org.oscarehr.ws.rest;
 
 import org.oscarehr.common.model.MessageList;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.MessagingManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.MessagingConverter;
 import org.oscarehr.ws.rest.to.MessagingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class MessagingService extends AbstractServiceImpl {
 	public MessagingResponse getMyUnreadMessages(@QueryParam("startIndex") int startIndex, @QueryParam("limit") int limit)
 	{
 		String loggedInProviderId = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.MESSAGE);
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.MESSAGE_READ);
 
 		List<MessageList> msgs = messagingManager.getMyInboxMessages(getLoggedInInfo(), loggedInProviderId, MessageList.STATUS_NEW, startIndex, limit);
 
@@ -78,7 +77,7 @@ public class MessagingService extends AbstractServiceImpl {
 	public int getMyUnreadMessages(@QueryParam("demoAttachedOnly") boolean demoAttachedOnly)
 	{
 		String loggedInProviderId = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.MESSAGE);
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.MESSAGE_READ);
 		return messagingManager.getMyInboxMessageCount(getLoggedInInfo(), loggedInProviderId, demoAttachedOnly);
 	}
 }

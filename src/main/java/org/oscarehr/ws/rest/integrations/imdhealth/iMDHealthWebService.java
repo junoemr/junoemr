@@ -24,12 +24,13 @@
 package org.oscarehr.ws.rest.integrations.imdhealth;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.integration.exception.IntegrationException;
 import org.oscarehr.integration.imdhealth.service.IMDHealthService;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.imdhealth.transfer.IMDHealthCredentialsTo1;
 import org.oscarehr.ws.rest.integrations.imdhealth.transfer.IMDHealthIntegrationTo1;
@@ -78,7 +79,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/SSOLink")
 	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IntegrationException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), siteId);
 		return RestResponse.successResponse(ssoLink);

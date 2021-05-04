@@ -23,19 +23,18 @@
  */
 package org.oscarehr.managers;
 
-import java.util.Date;
-import java.util.List;
-
 import org.oscarehr.common.dao.ConsentDao;
 import org.oscarehr.common.dao.ConsentTypeDao;
 import org.oscarehr.common.model.Consent;
 import org.oscarehr.common.model.ConsentType;
-import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import oscar.log.LogAction;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Manages the various consents required from patients for participation in specific programs
@@ -113,8 +112,7 @@ public class PatientConsentManager {
 	 */
 	public void addConsent(LoggedInInfo loggedinInfo, int demographic_no, int consentTypeId, boolean explicit)
 	{
-		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(), Permission.DEMOGRAPHIC_CREATE);
 		
 		LogAction.addLogSynchronous(loggedinInfo, "PatientConsentManager.addConsent", " Demographic: " + demographic_no);
 		
@@ -187,8 +185,7 @@ public class PatientConsentManager {
 	 */
 	public void optoutConsent(LoggedInInfo loggedinInfo, int consentId)
 	{
-		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(), Permission.DEMOGRAPHIC_CREATE);
 		
 		LogAction.addLogSynchronous(loggedinInfo, "PatientConsentManager.optoutConsent[consentID]", " ConsentId: " + consentId);
 		
@@ -241,8 +238,7 @@ public class PatientConsentManager {
 	 */
 	public Consent getConsentByDemographicAndConsentType(LoggedInInfo loggedinInfo, int demographic_no, ConsentType consentType)
 	{
-		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(), Permission.DEMOGRAPHIC_READ);
 		
 		if( consentType == null ) {
 			return null;
@@ -259,8 +255,7 @@ public class PatientConsentManager {
 	 */
 	public List<Consent> getAllConsentsByDemographic(LoggedInInfo loggedinInfo, int demographic_no)
 	{
-		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographic_no, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(loggedinInfo.getLoggedInProviderNo(), Permission.DEMOGRAPHIC_READ);
 
 		List<Consent> consent = consentDao.findByDemographic(demographic_no);
 		

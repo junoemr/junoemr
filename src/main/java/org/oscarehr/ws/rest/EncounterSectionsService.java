@@ -36,8 +36,7 @@ import org.oscarehr.casemgmt.service.EncounterService;
 import org.oscarehr.casemgmt.service.MultiSearchResult;
 import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.EncounterTemplate;
-import org.oscarehr.security.model.SecObjectName;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,8 +106,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	)
 			throws EncounterSectionException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.ECHART);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ECHART_READ);
 
 		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
 
@@ -131,8 +129,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	)
 			throws EncounterSectionException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.ECHART);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ECHART_READ);
 
 		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
 

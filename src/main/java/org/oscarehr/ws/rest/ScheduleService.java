@@ -40,7 +40,6 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.AppointmentType;
 import org.oscarehr.common.model.LookupListItem;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ScheduleManager;
@@ -53,6 +52,7 @@ import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.service.Schedule;
 import org.oscarehr.schedule.service.ScheduleGroupService;
 import org.oscarehr.schedule.service.ScheduleTemplateService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
@@ -124,7 +124,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	                                                                @DefaultValue("8") @QueryParam("resultCount") Integer resultCount
 	)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		List<ScheduleSearchResult> resultList = new ArrayList<>();
 		ProviderConverter providerConverter = new ProviderConverter();
@@ -167,7 +167,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<PatientListItemTransfer> getAppointmentsForDay(@PathParam("date") String dateStr) throws ParseException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		String providerNo = this.getCurrentProvider().getProviderNo();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
@@ -235,7 +235,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public SchedulingResponse getAppointmentHistory(@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		SchedulingResponse response = new SchedulingResponse();
 		List<Appointment> appts = appointmentManager.getAppointmentHistoryWithoutDeleted(getLoggedInInfo(), demographicNo, 0, OscarAppointmentDao.MAX_LIST_RETURN_SIZE);
@@ -293,7 +293,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<AppointmentStatusTo1> getAppointmentStatuses()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		AbstractSearchResponse<AppointmentStatusTo1> response = new AbstractSearchResponse<>();
 
@@ -311,7 +311,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<AppointmentTypeTo1> getAppointmentTypes()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		List<AppointmentType> types = scheduleManager.getAppointmentTypes();
 
@@ -326,7 +326,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<LookupListItemTo1> getAppointmentReasons()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		List<LookupListItem> items = appointmentManager.getReasons();
 
@@ -342,7 +342,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<ScheduleGroup> getScheduleGroups()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups();
 
@@ -355,7 +355,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<ScheduleTemplateCode> getScheduleTemplateCodes()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		List<ScheduleTemplateCode> scheduleTemplateCodes =
 			scheduleTemplateService.getScheduleTemplateCodes();
@@ -368,7 +368,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<CalendarAppointmentStatus> getCalendarAppointmentStatuses()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		List<CalendarAppointmentStatus> appointmentStatusList =
 			appointmentStatusService.getCalendarAppointmentStatusList();
@@ -391,7 +391,7 @@ public class ScheduleService extends AbstractServiceImpl {
 			@QueryParam("slotDuration") Integer slotDurationInMin
 	)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
 		Message message = PhaseInterceptorChain.getCurrentMessage();
 		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);

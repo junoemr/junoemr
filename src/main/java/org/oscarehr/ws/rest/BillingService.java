@@ -29,9 +29,8 @@ import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
 import org.oscarehr.billing.CA.ON.dao.OntarioMasterNumberDao;
 import org.oscarehr.common.dao.BillingBCDao;
 import org.oscarehr.common.dao.BillingServiceDao;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.BillingManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.ServiceTypeConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -81,7 +80,7 @@ public class BillingService extends AbstractServiceImpl
 	@Produces("application/json")
 	public AbstractSearchResponse<ServiceTypeTo> getUniqueServiceTypes(@QueryParam("type") String type)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.BILLING_READ);
 
 		AbstractSearchResponse<ServiceTypeTo> response = new AbstractSearchResponse<ServiceTypeTo>();
 		ServiceTypeConverter converter = new ServiceTypeConverter();

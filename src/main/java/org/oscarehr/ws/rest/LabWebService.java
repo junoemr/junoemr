@@ -26,14 +26,14 @@ package org.oscarehr.ws.rest;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
-import org.oscarehr.security.model.SecObjectName;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.ProviderLabRoutingConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.ProviderLabRoutingTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -57,7 +57,7 @@ public class LabWebService extends AbstractServiceImpl
     @Path("/{labID}/provider/{providerID}/labRouting")
     public RestResponse<ProviderLabRoutingTransfer> getProviderLabRouting(@PathParam("labID") Integer labID, @PathParam("providerID") String providerID)
     {
-        securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.LAB);
+        securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.LAB_READ);
 
         List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labID, ProviderLabRoutingModel.LAB_TYPE_LABS, providerID);
 

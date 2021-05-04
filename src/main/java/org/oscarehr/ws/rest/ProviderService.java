@@ -35,8 +35,6 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.security.model.Permission;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
@@ -46,6 +44,8 @@ import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.MiscUtils;
@@ -268,7 +268,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.BILLING_READ);
 
 		ProviderBilling billing = providerService.getProviderBilling(providerNo);
 		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
@@ -337,7 +337,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<PatientListItemTransfer> getRecentDemographicsViewed()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		int providerNo = Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo());
 		int offset = 0;

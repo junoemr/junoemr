@@ -25,7 +25,6 @@ package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
@@ -34,6 +33,7 @@ import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
@@ -91,7 +91,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(providerNoStr, demographicNo, Permission.DEMOGRAPHIC_READ);
 		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(demographicNo);
 
 		LogAction.addLogEntry(providerNoStr, demographicTransfer.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
@@ -107,7 +107,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	public RestResponse<DemographicTransferOutbound> putDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo,
 	                                                                @Valid DemographicTransferInbound demographicTo)
 	{
-		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), demographicNo, Permission.DEMOGRAPHIC_UPDATE);
 
 		return RestResponse.errorResponse("Not Implemented");
 	}
@@ -121,7 +121,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
 
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(providerNoStr, Permission.DEMOGRAPHIC_CREATE);
 		hinValidationService.validateNoDuplication(demographicTo.getHin(), demographicTo.getHcVersion(), demographicTo.getHcType());
 		Demographic demographic = demographicService.addNewDemographicRecord(providerNoStr, demographicTo);
 
@@ -140,8 +140,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicId,
-				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(providerNoStr, demographicId, Permission.DOCUMENT_UPDATE);
 
 		documentService.assignDocumentToDemographic(documentId, demographicId);
 		LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
@@ -160,8 +159,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicId,
-				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.EFORM);
+		securityInfoManager.requireAllPrivilege(providerNoStr, demographicId, Permission.EFORM_CREATE);
 
 		EFormData eForm = eFormService.saveNewEFormWithDatabaseTags(transfer.getTemplateId(), demographicId, providerNo,
 				transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);

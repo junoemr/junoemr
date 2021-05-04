@@ -24,9 +24,8 @@
 package org.oscarehr.ws.rest;
 
 import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.AllergyManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.AllergyConverter;
 import org.oscarehr.ws.rest.to.AllergyResponse;
 import org.oscarehr.ws.rest.to.model.AllergyTo1;
@@ -52,9 +51,7 @@ public class AllergyService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AllergyResponse getCurrentAllergies(@QueryParam("demographicNo") Integer demographicNo) {
 
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.ALLERGY);
-
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ALLERGY_READ);
 		List<Allergy> allergies = allergyManager.getActiveAllergies(getLoggedInInfo(), demographicNo);
 		
 		List<AllergyTo1> allergiesT = new AllergyConverter().getAllAsTransferObjects(getLoggedInInfo(), allergies);

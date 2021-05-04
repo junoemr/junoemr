@@ -23,22 +23,20 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
-import org.oscarehr.security.model.SecObjectName;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.service.PreventionManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.PreventionConverter;
 import org.oscarehr.ws.rest.to.PreventionResponse;
 import org.oscarehr.ws.rest.to.model.PreventionTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.util.List;
 
 
 @Path("/preventions")
@@ -53,7 +51,7 @@ public class PreventionService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public PreventionResponse getCurrentPreventions(@QueryParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.PREVENTION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.PREVENTION_READ);
 
 		List<Prevention> preventions = preventionManager.getPreventionsByDemographicNo(getLoggedInInfo(), demographicNo);
 		

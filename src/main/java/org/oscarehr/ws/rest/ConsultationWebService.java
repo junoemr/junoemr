@@ -35,7 +35,6 @@ import org.oscarehr.common.model.ConsultationResponse;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.consultations.ConsultationRequestSearchFilter;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
 import org.oscarehr.consultations.model.ConsultDocs;
@@ -46,7 +45,7 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ConsultationRequestConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationResponseConverter;
@@ -143,7 +142,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection
 			)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 
 		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
 		List<ConsultationRequestSearchResult> resultList;
@@ -200,7 +199,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			@QueryParam("invertStatus") boolean invertStatus
 			)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
 
 		if (page < 1)
@@ -236,11 +235,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationRequestTo1> getRequest(@PathParam("requestId") Integer requestId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.CONSULTATION,
-				SecObjectName.OBJECT_NAME.EDOC,
-				SecObjectName.OBJECT_NAME.EFORM,
-				SecObjectName.OBJECT_NAME.LAB);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+				Permission.CONSULTATION_READ,
+				Permission.DOCUMENT_READ,
+				Permission.EFORM_READ,
+				Permission.LAB_READ);
 
 		ConsultationRequestTo1 request;
 		try
@@ -272,7 +271,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationRequestTo1> getNewRequest(@QueryParam("demographicNo") Integer demographicId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 		ConsultationRequestTo1 request;
 		try
 		{
@@ -317,11 +316,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	                                                                           @QueryParam("demographicId") Integer demographicId,
 	                                                                           @QueryParam("attached") boolean attached)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.CONSULTATION,
-				SecObjectName.OBJECT_NAME.EDOC,
-				SecObjectName.OBJECT_NAME.EFORM,
-				SecObjectName.OBJECT_NAME.LAB);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+				Permission.CONSULTATION_READ,
+				Permission.DOCUMENT_READ,
+				Permission.EFORM_READ,
+				Permission.LAB_READ);
 
 		List<EDoc> edocs;
 		List<EFormData> eforms;
@@ -354,11 +353,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationRequestTo1> saveRequest(ConsultationRequestTo1 data)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
-				SecObjectName.OBJECT_NAME.CONSULTATION,
-				SecObjectName.OBJECT_NAME.EDOC,
-				SecObjectName.OBJECT_NAME.EFORM,
-				SecObjectName.OBJECT_NAME.LAB);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+				Permission.CONSULTATION_CREATE,
+				Permission.DOCUMENT_READ,
+				Permission.EFORM_READ,
+				Permission.LAB_READ);
 
 		ConsultationRequest request;
 		if(data.getId() == null)
@@ -383,7 +382,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<String> eSendRequest(@PathParam("requestId") Integer requestId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 		try
 		{
 			consultationManager.doHl7Send(getLoggedInInfo(), requestId);
@@ -418,7 +417,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			@QueryParam("sortColumn") @DefaultValue("ReferralDate") String sortColumn,
 			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection
 	) {
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 
 		ConsultationResponseSearchFilter filter = new ConsultationResponseSearchFilter();
 		List<ConsultationResponseSearchResult> resultList;
@@ -462,11 +461,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public ConsultationResponseTo1 getResponse(@QueryParam("responseId") Integer responseId, @QueryParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.CONSULTATION,
-				SecObjectName.OBJECT_NAME.EDOC,
-				SecObjectName.OBJECT_NAME.EFORM,
-				SecObjectName.OBJECT_NAME.LAB);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+				Permission.CONSULTATION_READ,
+				Permission.DOCUMENT_READ,
+				Permission.EFORM_READ,
+				Permission.LAB_READ);
 
 		ConsultationResponseTo1 response = new ConsultationResponseTo1();
 		
@@ -510,11 +509,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<ConsultationAttachmentTo1> getResponseAttachments(@QueryParam("responseId") Integer responseId, @QueryParam("demographicNo") Integer demographicNo, @QueryParam("attached") boolean attached)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				SecObjectName.OBJECT_NAME.CONSULTATION,
-				SecObjectName.OBJECT_NAME.EDOC,
-				SecObjectName.OBJECT_NAME.EFORM,
-				SecObjectName.OBJECT_NAME.LAB);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+				Permission.CONSULTATION_READ,
+				Permission.DOCUMENT_READ,
+				Permission.EFORM_READ,
+				Permission.LAB_READ);
 
 		List<ConsultationAttachmentTo1> attachments = new ArrayList<ConsultationAttachmentTo1>();
 		String demographicNoStr = demographicNo.toString();
@@ -537,11 +536,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ConsultationResponseTo1> saveRequest(ConsultationResponseTo1 data)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
-				SecObjectName.OBJECT_NAME.CONSULTATION,
-				SecObjectName.OBJECT_NAME.EDOC,
-				SecObjectName.OBJECT_NAME.EFORM,
-				SecObjectName.OBJECT_NAME.LAB);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+				Permission.CONSULTATION_CREATE,
+				Permission.DOCUMENT_READ,
+				Permission.EFORM_READ,
+				Permission.LAB_READ);
 		try
 		{
 			ConsultationResponse response;
@@ -570,7 +569,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public ReferralResponse getReferralPathwaysByService(@QueryParam("serviceName") String serviceName)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 
 		ReferralResponse response = new ReferralResponse();
 		
@@ -606,7 +605,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public ProfessionalSpecialistTo1 getProfessionalSpecialist(@QueryParam("specId") Integer specId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 
 		ProfessionalSpecialist ps = consultationManager.getProfessionalSpecialist(specId);
 		if(ps != null)
@@ -622,7 +621,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<LetterheadTo1> getLetterheadList()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 
 		List<LetterheadTo1> letterheadList = consultationService.getLetterheadList();
 		return RestSearchResponse.successResponse(letterheadList, 1, letterheadList.size(), letterheadList.size());

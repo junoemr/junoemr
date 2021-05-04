@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.CustomFilter;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
@@ -37,6 +36,7 @@ import org.oscarehr.encounterNote.service.TicklerNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
 import org.oscarehr.ticklers.service.TicklerService;
 import org.oscarehr.util.SpringUtils;
@@ -87,7 +87,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public TicklerResponse search(JSONObject json, @QueryParam("startIndex") int startIndex, @QueryParam("limit") int limit)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_READ);
 		
 		CustomFilter cf = new CustomFilter(true);
 		
@@ -144,7 +144,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public TicklerResponse getMyTicklers(@QueryParam("limit") int limit)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_READ);
 		
 		CustomFilter cf = new CustomFilter(true);
 		cf.setAssignee(getLoggedInInfo().getLoggedInProviderNo());
@@ -179,7 +179,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 										  @QueryParam("includeProgram") boolean includeProgram,
 										  @QueryParam("includeUpdates") boolean includeUpdates)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_READ);
 
 		AbstractCriteriaSearch.SORTDIR sortDir = AbstractCriteriaSearch.SORTDIR.valueOf(sortDirection);
 		TicklerCriteriaSearch.SORT_MODE sortMode = TicklerCriteriaSearch.SORT_MODE.valueOf(sortColumn);
@@ -225,7 +225,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse completeTicklers(JSONObject json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_UPDATE);
 		GenericRESTResponse response = new GenericRESTResponse();
 
 		JSONArray ticklerIds = json.getJSONArray("ticklers");
@@ -244,7 +244,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public GenericRESTResponse deleteTicklers(JSONObject json)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_DELETE);
 
 		GenericRESTResponse response = new GenericRESTResponse();
 		JSONArray ticklerIds = json.getJSONArray("ticklers");
@@ -265,8 +265,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	                                         JSONObject json)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE,
-				json.getInt("id"), SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), json.getInt("id"), Permission.TICKLER_UPDATE);
 
 		Tickler tickler = ticklerManager.getTickler(getLoggedInInfo(), json.getInt("id"));
 		
@@ -320,7 +319,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public AbstractSearchResponse<TicklerTextSuggestTo1> getTextSuggestions()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_READ);
 		
 		AbstractSearchResponse<TicklerTextSuggestTo1> response = new AbstractSearchResponse<TicklerTextSuggestTo1>();
 		List<TicklerTextSuggest> suggestions = ticklerManager.getActiveTextSuggestions(getLoggedInInfo());
@@ -339,7 +338,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	                                      Tickler tickler)
 	{
 		String loggedInProviderNo = getLoggedInProviderId();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_CREATE);
 
 		tickler.setUpdateDate(new Date());
 		tickler.setCreator(loggedInProviderNo);

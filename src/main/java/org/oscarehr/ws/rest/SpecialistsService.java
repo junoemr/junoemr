@@ -28,8 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.security.model.SecObjectName;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
@@ -63,7 +62,7 @@ public class SpecialistsService extends AbstractServiceImpl
 	                                                                               @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
 
 		if(page < 1) page = 1;
 		int offset = perPage * (page-1);

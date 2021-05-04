@@ -28,9 +28,8 @@ import org.apache.tools.ant.util.DateUtils;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.ProgramManager2;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.AdmissionConverter;
 import org.oscarehr.ws.rest.conversion.ProgramConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -68,7 +67,7 @@ public class ProgramService extends AbstractServiceImpl {
 			@QueryParam("startIndex") Integer startIndex,
 			@QueryParam("numToReturn") Integer numToReturn) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 		
 		AbstractSearchResponse<AdmissionTo1> response = new  AbstractSearchResponse<AdmissionTo1>();
 		

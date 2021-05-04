@@ -30,9 +30,9 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -91,7 +91,7 @@ public class AppService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<Boolean> isK2AActive()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_READ);
 		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
 	
@@ -101,7 +101,7 @@ public class AppService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public RestResponse<String> initK2A(JSONObject k2aClinicTo1, @Context HttpServletRequest request)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_CREATE);
 
 		if (appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null) {
 			return RestResponse.errorResponse("K2A Already Initialized");
@@ -176,7 +176,7 @@ public class AppService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestSearchResponse<RssItem> postK2AComment(RssItem comment)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_CREATE);
 
 		int total = 0;
 
@@ -238,7 +238,7 @@ public class AppService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<Date> removeK2AComment(@PathParam("commentId") String commentId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.APP_DEFINITION);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_DELETE);
 
 		try
 		{

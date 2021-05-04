@@ -28,12 +28,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DocumentManager;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
@@ -67,7 +66,7 @@ public class DocumentWs extends AbstractWs {
 	public DocumentTransfer getDocument(Integer documentId)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.DOCUMENT_READ);
 		try
 		{
 			Document document = documentManager.getDocument(loggedInInfo, documentId);
@@ -84,7 +83,7 @@ public class DocumentWs extends AbstractWs {
 	public DocumentTransfer[] getDocumentsUpdateAfterDate(Date updatedAfterThisDateExclusive, int itemsToReturn)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.DOCUMENT_READ);
 
 		List<Document> documents = documentManager.getDocumentsUpdateAfterDate(loggedInInfo, updatedAfterThisDateExclusive, itemsToReturn);
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
@@ -93,7 +92,7 @@ public class DocumentWs extends AbstractWs {
 	public DocumentTransfer[] getDocumentsByProgramProviderDemographicDate(Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.DOCUMENT_READ);
 
 		List<Document> documents = documentManager.getDocumentsByProgramProviderDemographicDate(loggedInInfo, programId, providerNo, demographicId, updatedAfterThisDateExclusive, itemsToReturn);
 		logger.debug("programId=" + programId + ", providerNo=" + providerNo + ", demographicId=" + demographicId + ", updatedAfterThisDateExclusive=" + DateFormatUtils.ISO_DATETIME_FORMAT.format(updatedAfterThisDateExclusive) + ", itemsToReturn=" + itemsToReturn + ", results=" + documents.size());
@@ -103,7 +102,7 @@ public class DocumentWs extends AbstractWs {
 	@SkipContentLoggingInbound
 	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException, InterruptedException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.EDOC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DOCUMENT_CREATE);
 		// Decode document
 		Base64 base64 = new Base64();
 		byte[] docContents = base64.decode(docContentsBase64);

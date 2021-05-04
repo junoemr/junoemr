@@ -35,13 +35,13 @@ import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.EncounterTemplate;
-import org.oscarehr.security.model.Permission;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -384,8 +384,7 @@ public class RecordUxService extends AbstractServiceImpl {
 	public SummaryTo1 getFullSummmary(@PathParam("demographicNo") Integer demographicNo, @PathParam(value = "summaryCode") String summaryCode)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.ECHART);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.ECHART_READ);
 
 		Summary summaryInterface = (Summary) SpringUtils.getBean(MY_MAP.get(summaryCode));
 		SummaryTo1 summary = summaryInterface.getSummary(loggedInInfo, demographicNo, summaryCode);
@@ -501,8 +500,7 @@ public class RecordUxService extends AbstractServiceImpl {
 								 @QueryParam("printOps") String jsonString,
 								 @Context HttpServletRequest request)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ,
-				demographicNo, SecObjectName.OBJECT_NAME.ECHART);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ECHART_READ);
 
 		JSONObject jsonobject = JSONObject.fromObject(jsonString);
 
@@ -570,7 +568,7 @@ public class RecordUxService extends AbstractServiceImpl {
 			@QueryParam("itemsToReturn") Integer itemsToReturn)
 	{
 
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ECHART);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ECHART_READ);
 
 		String name = obj.getString("name");
 		
@@ -590,7 +588,7 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public EncounterTemplateResponse getEncounterTemplate(JSONObject obj)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ECHART);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ECHART_READ);
 
 		String name = obj.getString("name");
 		
@@ -623,7 +621,7 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<DashboardTo1>> getDashboardList()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ECHART);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ECHART_READ);
 
 		ArrayList<DashboardTo1> dashboardTo1s = new ArrayList<>();
     	List<Dashboard> dashboards = dashboardDao.getDashboards();

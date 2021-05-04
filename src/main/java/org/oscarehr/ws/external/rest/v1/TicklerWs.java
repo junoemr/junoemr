@@ -25,9 +25,9 @@ package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.oscarehr.common.dao.TicklerDao;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ticklers.service.TicklerService;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.transfer.tickler.TicklerTransferInbound;
@@ -67,7 +67,7 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Operation(summary = "Retrieve a tickler by id")
 	public RestResponse<TicklerTransferOutbound> getTickler(@PathParam("id") Integer id)
 	{
-		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), Permission.TICKLER_READ);
 
 		if (id == null)
 		{
@@ -89,7 +89,7 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Operation(summary = "Update the specified tickler")
 	public RestResponse<TicklerTransferOutbound> updateTickler(@PathParam("id") Integer id, @Valid TicklerTransferInbound ticklerIn)
 	{
-		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), Permission.TICKLER_UPDATE);
 
 		if (ticklerIn == null)
 		{
@@ -117,7 +117,7 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Operation(summary="Create a new tickler")
 	public RestResponse<TicklerTransferOutbound> createTickler( @Valid TicklerTransferInbound ticklerIn)
 	{
-		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.TICKLER);
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), Permission.TICKLER_CREATE);
 
 		if (ticklerIn == null)
 		{

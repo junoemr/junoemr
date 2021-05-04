@@ -23,27 +23,27 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
+import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
+import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.service.HRMService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
+import org.springframework.beans.factory.annotation.Autowired;
+import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
+import oscar.util.StringUtils;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.oscarehr.casemgmt.dto.EncounterNotes;
-import org.oscarehr.casemgmt.dto.EncounterSectionNote;
-import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
-import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.security.model.Permission;
-import org.oscarehr.security.model.SecObjectName;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
-import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
-import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.service.HRMService;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import oscar.OscarProperties;
-import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
 public class EncounterHRMService extends EncounterSectionService
 {
