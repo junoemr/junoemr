@@ -23,7 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.model.ProgramProvider;
@@ -37,25 +36,21 @@ import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DashboardManager;
 import org.oscarehr.managers.MessagingManager;
-import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.client.ws_manager.MessageManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.phr.util.MyOscarUtils;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ProgramProviderConverter;
-import org.oscarehr.ws.rest.conversion.SecobjprivilegeConverter;
-import org.oscarehr.ws.rest.conversion.SecuserroleConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.DashboardPreferences;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.NavbarResponse;
 import org.oscarehr.ws.rest.to.PersonaResponse;
-import org.oscarehr.ws.rest.to.PersonaRightsResponse;
 import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.MenuItemTo1;
 import org.oscarehr.ws.rest.to.model.MenuTo1;
@@ -95,9 +90,6 @@ public class PersonaService extends AbstractServiceImpl {
 	private ConsultationManager consultationManager;
 	
 	@Autowired
-	private PreferenceManager preferenceManager;
-	
-	@Autowired
 	private AppManager appManager;
 	
 	@Autowired
@@ -105,56 +97,7 @@ public class PersonaService extends AbstractServiceImpl {
 
 	@Autowired
 	private AdminNavService adminNavService;
-	
-	
-	@GET
-	@Path("/rights")
-	@Produces("application/json")
-	public PersonaRightsResponse getMyRights() {
-		PersonaRightsResponse response = new PersonaRightsResponse();
 
-		SecuserroleConverter converter = new SecuserroleConverter();
-		response.setRoles(converter.getAllAsTransferObjects(getLoggedInInfo(),securityInfoManager.getRoles(getLoggedInInfo().getLoggedInProviderNo())));
-		
-		SecobjprivilegeConverter converter2 = new SecobjprivilegeConverter();
-		response.setPrivileges(converter2.getAllAsTransferObjects(getLoggedInInfo(),securityInfoManager.getSecurityObjects(getLoggedInInfo())));
-			
-		return response;
-	}
-	
-	@GET
-	@Path("/hasRight")
-	@Produces("application/json")
-	public GenericRESTResponse hasRight(@QueryParam("objectName") String objectName, @QueryParam("privilege") String privilege, @QueryParam("demographicNo") String demographicNo) {
-		GenericRESTResponse response = new GenericRESTResponse();
-		response.setSuccess(securityInfoManager.hasPrivilege(getLoggedInInfo(), objectName, privilege, demographicNo));
-		
-		return response;
-	}
-	
-	@POST
-	@Path("/hasRights")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public AbstractSearchResponse<Boolean> hasRights(JSONObject json) {
-		AbstractSearchResponse<Boolean> response = new AbstractSearchResponse<Boolean>();
-		
-		JSONArray ja = json.getJSONArray("items");
-		for(int x=0;x<ja.size();x++) {
-			JSONObject o = (JSONObject)ja.get(x);
-			String objectName = o.getString("objectName");
-			String privilege = o.getString("privilege");
-			Integer demographicNo = null;
-			if(o.has("demographicNo")) {
-				demographicNo = o.getInt("demographicNo");
-			}
-			response.getContent().add(securityInfoManager.hasPrivilege(getLoggedInInfo(), objectName, privilege, (demographicNo!=null)?demographicNo.toString():null));
-		}
-		response.setTotal(response.getContent().size());
-		
-		return response;
-	}
-	
 	@GET
 	@Path("/navbar")
 	@Produces("application/json")
@@ -190,7 +133,7 @@ public class PersonaService extends AbstractServiceImpl {
 		MenuTo1 messengerMenu = new MenuTo1();
 		int menuItemCounter = 0;
 
-		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.MESSAGE))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.MESSAGE_READ))
 		{
 			int ptMessageCount = messagingManager.getMyInboxMessageCount(getLoggedInInfo(), currentUserId, true);
 			messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newOscarMessages"), "" + ptMessageCount, "classic");
@@ -213,7 +156,7 @@ public class PersonaService extends AbstractServiceImpl {
 			messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newMyOscarMessages"), phrMessageCount, "phr");
 		}
 
-		if (securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APP_DEFINITION)
+		if (securityInfoManager.hasPrivileges(currentUserId, Permission.K2A_READ)
 				&& appManager.isK2AEnabled())
 		{
 			String k2aMessageCount = appManager.getK2ANotificationNumber(getLoggedInInfo());
@@ -236,7 +179,7 @@ public class PersonaService extends AbstractServiceImpl {
 		MenuTo1 menu = new MenuTo1()
 				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard");
 
-		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.APPOINTMENT))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.APPOINTMENT_READ))
 		{
 			if (OscarProperties.getInstance().isScheduleEnabled() || getLoggedInInfo().getLoggedInProvider().getSuperAdmin())
 			{
@@ -248,13 +191,12 @@ public class PersonaService extends AbstractServiceImpl {
 			}
 		}
 
-		if(securityInfoManager.hasPrivileges(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, null,
-				SecObjectName.OBJECT_NAME.EDOC, SecObjectName.OBJECT_NAME.LAB, SecObjectName.OBJECT_NAME.HRM))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.LAB_READ, Permission.DOCUMENT_READ, Permission.HRM_READ))
 		{
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.inbox"), null, "inbox");
 		}
 
-		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.CONSULTATION))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.CONSULTATION_READ))
 		{
 			if (!consultationManager.isConsultResponseEnabled())
 			{
@@ -278,17 +220,17 @@ public class PersonaService extends AbstractServiceImpl {
 			}
 		}
 
-		//TODO add "star" states, Ex: admin.* to indicate any state starting with admin
-		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.TICKLER))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.TICKLER_READ))
 		{
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.tickler"), null, "ticklers");
 		}
 			//.add(0,"K2A",null,"#/k2a")
-		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.BILLING))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.BILLING_READ))
 		{
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.billing"), null, "billing");
 		}
 
+		//TODO add "star" states, Ex: admin.* to indicate any state starting with admin
 		menu.addWithStates(idCounter++,bundle.getString("navbar.menu.admin"),null,
 							Arrays.asList("admin.landingPage",
 											"admin.frame",
@@ -304,17 +246,16 @@ public class PersonaService extends AbstractServiceImpl {
 											"admin.viewUser",
 											"admin.manageUsers",
 											"admin.manageAppointmentQueues"));
-		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.REPORT))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.REPORT_READ))
 		{
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.reports"), null, "reports");
 		}
-		if(securityInfoManager.hasPrivilege(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.EDOC))
+		if(securityInfoManager.hasPrivileges(currentUserId, Permission.DOCUMENT_READ))
 		{
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.documents"), null, "documents");
 		}
 
-		if (securityInfoManager.hasPrivileges(currentUserId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, null,
-				SecObjectName.OBJECT_NAME.DEMOGRAPHIC, SecObjectName.OBJECT_NAME.APPOINTMENT)
+		if (securityInfoManager.hasPrivileges(currentUserId, Permission.DEMOGRAPHIC_READ, Permission.APPOINTMENT_READ)
 				&& IsPropertiesOn.isTelehealthEnabled())
 		{
 			menu.addNewTab(idCounter++, "MyHealthAccess", null,
@@ -480,14 +421,12 @@ public class PersonaService extends AbstractServiceImpl {
 	@Path("/updatePreferences")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse updatePreferences(JSONObject json){
-		Provider provider = getCurrentProvider();
+	public GenericRESTResponse updatePreferences(JSONObject json)
+	{
+		String loggedInProviderId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.PREFERENCE_UPDATE);
 		GenericRESTResponse response = new GenericRESTResponse();
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_pref", "u", null)) {
-			throw new RuntimeException("Access Denied");
-		}
-		
+
 		Boolean value = null;
 		
 		if(json.has("expiredTicklersOnly")) {
@@ -497,13 +436,13 @@ public class PersonaService extends AbstractServiceImpl {
 		if(value != null) {
 
 			UserPropertyDAO propDao =(UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
-			UserProperty prop = propDao.getProp(provider.getProviderNo(), "dashboard.expiredTicklersOnly");
+			UserProperty prop = propDao.getProp(loggedInProviderId, "dashboard.expiredTicklersOnly");
 			if(prop != null) {
 				prop.setValue(String.valueOf(value));
 			} else {
 				prop = new UserProperty();
 				prop.setName("dashboard.expiredTicklersOnly");
-				prop.setProviderNo(provider.getProviderNo());
+				prop.setProviderNo(loggedInProviderId);
 				prop.setValue(String.valueOf(value));
 			}
 			

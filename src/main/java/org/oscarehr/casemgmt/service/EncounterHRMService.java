@@ -33,6 +33,7 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
 import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
@@ -98,8 +99,8 @@ public class EncounterHRMService extends EncounterSectionService
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
 		Integer demographicNo = Integer.parseInt(sectionParams.getDemographicNo());
-		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo, SecObjectName.OBJECT_NAME.HRM)
+		if(!securityInfoManager.hasPrivileges(
+				sectionParams.getLoggedInInfo().getLoggedInProviderNo(), demographicNo, Permission.HRM_READ)
 				|| !OscarProperties.getInstance().hasHRMDocuments())
 		{
 			return EncounterNotes.noNotes();

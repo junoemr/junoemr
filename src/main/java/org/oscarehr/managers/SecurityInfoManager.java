@@ -23,18 +23,16 @@
  */
 package org.oscarehr.managers;
 
-import com.quatro.dao.security.SecobjprivilegeDao;
-import com.quatro.dao.security.SecuserroleDao;
-import com.quatro.model.security.Secobjprivilege;
-import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.LoggedInInfo;
@@ -48,7 +46,6 @@ import oscar.util.OscarRoleObjectPrivilege;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -103,12 +100,8 @@ public class SecurityInfoManager
 		}
 	}
 
-
 	@Autowired
-	private SecuserroleDao secuserroleDao;
-	
-	@Autowired
-	private SecobjprivilegeDao secobjprivilegeDao;
+	private SecUserRoleDao secUserRoleDao;
 
 	@Autowired
 	private ProviderDataDao providerDataDao;
@@ -121,34 +114,6 @@ public class SecurityInfoManager
 
 	@Autowired
 	private SecuritySetsService securitySetsService;
-
-	@Deprecated // use roles service
-	public List<Secuserrole> getRoles(String providerNo)
-	{
-		@SuppressWarnings("unchecked")
-		List<Secuserrole> results = secuserroleDao.findByProviderNo(providerNo);
-		return results;
-	}
-
-	@Deprecated // use roles service
-	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo)
-	{
-		return getSecurityObjects(loggedInInfo.getLoggedInProviderNo());
-	}
-	@Deprecated // use roles service
-	public List<Secobjprivilege> getSecurityObjects(String providerNo)
-	{
-		List<String> roleNames = new ArrayList<>();
-		for(Secuserrole role : getRoles(providerNo))
-		{
-			roleNames.add(role.getRoleName());
-		}
-		roleNames.add(providerNo);
-
-		List<Secobjprivilege> results = secobjprivilegeDao.getByRoles(roleNames);
-
-		return results;
-	}
 
 	/**
 	 * Checks to see if this provider has the privilege to the security object being requested.
@@ -192,27 +157,6 @@ public class SecurityInfoManager
 	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME objectName)
 	{
 		return hasPrivilege(providerNo, privilege, null, objectName);
-	}
-
-	/**
-	 * check if the user has all of the requested privileges
-	 * @param providerNo - provider to check
-	 * @param privilege - privilege to check
-	 * @param demographicNo - demographic on which the check should be preformed (can be null)
-	 * @param hasObjList - a list of security objects to check
-	 * @return - true or false indicating pass or fail of the privilege check.
-	 */
-	@Deprecated
-	public boolean hasPrivileges(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... hasObjList)
-	{
-		for(SecObjectName.OBJECT_NAME objectName : hasObjList)
-		{
-			if(!hasPrivilege(providerNo, privilege, demographicNo, objectName))
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 
 	public boolean hasPrivileges(String providerNo, Permission... permissions)
@@ -276,46 +220,28 @@ public class SecurityInfoManager
 				return false;
 			}
 
-			//TODO remove old logic when possible
 			List<String> roleNameLs = new ArrayList<>();
-			for(Secuserrole role : getRoles(providerNo))
+			for(SecUserRole role : secUserRoleDao.getUserRoles(providerNo))
 			{
 				roleNameLs.add(role.getRoleName());
 			}
 			roleNameLs.add(providerNo);
 			String roleNames = StringUtils.join(roleNameLs, ",");
-			
-			boolean noMatchingRoleToSpecificPatient = true;
-			List v = null;
-			if (demographicNo!=null) {
-				v = OscarRoleObjectPrivilege.getPrivilegeProp(objectName+"$"+demographicNo);
-				List<String> roleInObj = (List<String>)v.get(1);
-				
-				for (String objRole : roleInObj) {
-					if (roleNames.toLowerCase().contains(objRole.toLowerCase().trim())) {
-						noMatchingRoleToSpecificPatient = false;
-						break;
-					}
-				}
-			}
-			if (noMatchingRoleToSpecificPatient) v = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
-			
-			if (!noMatchingRoleToSpecificPatient && OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), NO_RIGHTS))
-			{
-					throw new PatientDirectiveException("Patient has requested user not access record");
-			} else  if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "x")) {
+
+			List privilegeProps = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
+			if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), "x")) {
 				return true;
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), CREATE)) {
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), CREATE)) {
 				return ((READ+UPDATE+ CREATE).contains(privilege));
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), UPDATE)) {
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), UPDATE)) {
 				return ((READ+UPDATE).contains(privilege));
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), READ)) {
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), READ)) {
 				return (READ.equals(privilege));
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), DELETE)) {
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), DELETE)) {
 				return (DELETE.equals(privilege));
 			}
 	
@@ -340,26 +266,6 @@ public class SecurityInfoManager
 				return false;
 			}
 		}
-
-		//TODO remove this old system when we can
-		List<String> roleNameLs = new ArrayList<>();
-		for(Secuserrole role:getRoles(providerNo)) {
-			roleNameLs.add(role.getRoleName());
-		}
-		roleNameLs.add(providerNo);
-		String roleNames = StringUtils.join(roleNameLs, ",");
-		
-		
-		Vector v = OscarRoleObjectPrivilege.getPrivilegeProp("_demographic$"+demographicNo);
-		if(OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "o")) {
-			return false;
-		}
-		
-		v = OscarRoleObjectPrivilege.getPrivilegeProp("_eChart$"+demographicNo);
-		if(OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "o")) {
-			return false;
-		}
-		
 		return true;
 	}
 

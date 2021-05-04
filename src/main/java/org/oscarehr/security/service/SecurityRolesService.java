@@ -111,6 +111,17 @@ public class SecurityRolesService
 		return getRolePermissions(secUserRoleDao.getUserRoles(providerId));
 	}
 
+	@Deprecated // for legacy use only
+	public List<SecObjPrivilege> getSecurityObjectsForUser(String providerId)
+	{
+		List<SecObjPrivilege> secObjPrivileges = new LinkedList<>();
+		for(SecUserRole userRole : secUserRoleDao.getUserRoles(providerId))
+		{
+			secObjPrivileges.addAll(getRolePrivileges(userRole.getSecRole()));
+		}
+		return new ArrayList<>(secObjPrivileges);
+	}
+
 	public List<SecurityRoleTransfer> getAllRoles()
 	{
 		List<SecRole> allRoles = secRoleDao.findAll();

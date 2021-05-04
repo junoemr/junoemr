@@ -24,7 +24,6 @@
 
 package oscar.eform;
 
-import com.quatro.model.security.Secobjprivilege;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -42,22 +41,22 @@ import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.ConsultationRequestDao;
 import org.oscarehr.common.dao.EFormGroupDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
-import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.EFormGroup;
 import org.oscarehr.common.model.OscarMsgType;
-import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.security.model.SecRole;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.managers.ProgramManager2;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.service.PreventionManager;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.model.SecRole;
+import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -93,6 +92,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * use the oscarehr/eform/service objects for anything new
@@ -742,14 +742,16 @@ public class EFormUtil {
 		return (results);
 	}
 
-	public static ArrayList<HashMap<String, ? extends Object>> listPatientEForms(LoggedInInfo loggedInInfo, String sortBy, String deleted, String demographic_no, String groupName, int offset, int numToReturn) {		
-		SecurityInfoManager secInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-		List<String> privs = new ArrayList<String>();
-		for(Secobjprivilege p: secInfoManager.getSecurityObjects(loggedInInfo)) {
-			if(p.getObjectname_code().startsWith("_eform.")) {
-				privs.add(p.getObjectname_code());
-			}
-		}
+	public static ArrayList<HashMap<String, ? extends Object>> listPatientEForms(LoggedInInfo loggedInInfo, String sortBy, String deleted, String demographic_no, String groupName, int offset, int numToReturn)
+	{
+		SecurityRolesService securityRolesService = SpringUtils.getBean(SecurityRolesService.class);
+
+		// refactor of legacy permissions checks. is this still needed?
+		List<String> privilegeNames = securityRolesService.getSecurityObjectsForUser(loggedInInfo.getLoggedInProviderNo())
+				.stream()
+				.map((object) -> object.getId().getObjectName())
+				.filter((objectName) -> objectName.startsWith("_eform."))
+				.collect(Collectors.toList());
 		
 		Boolean current = true;
 		if(deleted.equals("deleted")) {
@@ -759,7 +761,7 @@ public class EFormUtil {
 		}
 		
 		
-		List<EFormData> results1 = eFormDataDao.findInstancedInGroups(current, Integer.valueOf(demographic_no), groupName, sortBy, offset, numToReturn, privs);
+		List<EFormData> results1 = eFormDataDao.findInstancedInGroups(current, Integer.parseInt(demographic_no), groupName, sortBy, offset, numToReturn, privilegeNames);
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
 		
 		for(EFormData x:results1) {
