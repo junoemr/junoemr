@@ -25,9 +25,6 @@
 
 package org.oscarehr.common.web;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -37,12 +34,17 @@ import org.oscarehr.clinic.dao.ClinicBillingAddressDAO;
 import org.oscarehr.clinic.model.ClinicBillingAddress;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
+import oscar.OscarProperties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class ClinicManageAction extends DispatchAction
 {
 
     private ClinicDAO clinicDAO;
     private ClinicBillingAddressDAO clinicBillingAddressDAO;
+    private OscarProperties oscarProperties = OscarProperties.getInstance();
 
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
@@ -111,7 +113,7 @@ public class ClinicManageAction extends DispatchAction
             oldClinic.setClinicPhone(clinicFromForm.getClinicPhone());
             oldClinic.setClinicFax(clinicFromForm.getClinicFax());
             oldClinic.setClinicLocationCode(clinicFromForm.getClinicLocationCode());
-            oldClinic.setBcFacilityNumber(clinicFromForm.getBcFacilityNumber());
+
             oldClinic.setClinicDelimPhone(clinicFromForm.getClinicDelimPhone());
             oldClinic.setClinicDelimFax(clinicFromForm.getClinicDelimFax());
             oldClinic.setClinicEmail(clinicFromForm.getClinicEmail());
@@ -121,6 +123,18 @@ public class ClinicManageAction extends DispatchAction
             {
                 oldClinic.setClinicBillingAddress(clinicFromForm.getClinicBillingAddress());
             }
+
+            if (oscarProperties.isBritishColumbiaInstanceType())
+            {
+                oldClinic.setBcFacilityNumber(clinicFromForm.getBcFacilityNumber());
+            }
+
+            if (oscarProperties.isAlbertaInstanceType())
+            {
+                oldClinic.setAlbertaConnectCareDepartmentId(clinicFromForm.getAlbertaConnectCareDepartmentId());
+                oldClinic.setAlbertaConnectCareLabId(clinicFromForm.getAlbertaConnectCareLabId());
+            }
+
             clinicDAO.save(oldClinic);
         }
         else
