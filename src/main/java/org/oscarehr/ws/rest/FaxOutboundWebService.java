@@ -24,10 +24,10 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.fax.schedulingTasks.OutboundFaxSchedulingTask;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -66,7 +66,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxOutboxTransferOutbound> resend(@PathParam("id") Long id) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_UPDATE);
 
 		return RestResponse.successResponse(outgoingFaxService.resendFax(id));
 	}
@@ -77,7 +77,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxOutboxTransferOutbound> setNotificationStatus(@PathParam("id") Long id, String status)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_UPDATE);
 
 		return RestResponse.successResponse(outgoingFaxService.setNotificationStatus(id, status));
 	}
@@ -88,7 +88,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxOutboxTransferOutbound> archive(@PathParam("id") Long id)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_UPDATE);
 
 		return RestResponse.successResponse(outgoingFaxService.setArchived(id, true));
 	}
@@ -98,7 +98,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<LocalDateTime> getNextPushTime()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 
 		return RestResponse.successResponse(outboundFaxSchedulingTask.getNextRunTime());
 	}
@@ -110,7 +110,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@SkipContentLoggingOutbound
 	public Response download(@PathParam("id") Long id)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 
 		FileInputStream stream = null;
 		String filename = "faxed-document-" + id + ".pdf";

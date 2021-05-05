@@ -35,10 +35,10 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.on.CommonLabResultData;
@@ -69,8 +69,7 @@ public class SendMostResponProvAction extends Action
 		String docLabId = request.getParameter("docLabId");
 		String docLabType = request.getParameter("docLabType");
 
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, demographicId, SecObjectName.OBJECT_NAME.LAB);
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicId, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.LAB_CREATE, Permission.DEMOGRAPHIC_READ);
 
 		Demographic demographic = demographicDao.find(demographicId);
 		String mrpNo = StringUtils.trimToNull(demographic.getProviderNo());

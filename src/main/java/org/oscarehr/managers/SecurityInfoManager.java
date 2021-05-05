@@ -270,34 +270,24 @@ public class SecurityInfoManager
 	}
 
 	/**
-	 * Check that the given provider has all of the required security access rights
+	 * require that the given provider has all of the required permissions, throw exception if requirements are not met
 	 * @param providerNo - the provider ID
-	 * @param privilege - the privilege level required
-	 * @param demographicNo - an optional demographic number ( for blocking individual patient records where appropriate)
-	 * @param requiredObjList - the required security objects for access to the emr module
+	 * @param permissions - the required security objects for access to the emr module
 	 * @throws SecurityException - if the requirements are not me by the provider record
-	 * @deprecated - use Permission enum version
 	 */
-	@Deprecated
-	public void requireAllPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... requiredObjList)
-	{
-		if(requiredObjList == null)
-		{
-			return;
-		}
-		for(SecObjectName.OBJECT_NAME objectName : requiredObjList)
-		{
-			if(!hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), demographicNo))
-			{
-				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName.getValue() + ")");
-			}
-		}
-	}
-
 	public void requireAllPrivilege(String providerNo, Permission... permissions)
 	{
 		requireAllPrivilege(providerNo, null, permissions);
 	}
+
+	/**
+	 * require that the given provider has all of the required permissions, throw exception if requirements are not met.
+	 * also checks access to a specific demographic chart
+	 * @param providerNo - the provider ID
+	 * @param demographicId - the demographic to check access
+	 * @param permissions - the required security objects for access to the emr module
+	 * @throws SecurityException - if the requirements are not me by the provider record
+	 */
 	public void requireAllPrivilege(String providerNo, Integer demographicId, Permission... permissions)
 	{
 		if(permissions == null)
@@ -317,20 +307,6 @@ public class SecurityInfoManager
 				throw new SecurityException("missing required permissions: " + permission.name());
 			}
 		}
-	}
-
-	/**
-	 * Check that the given provider has all of the required security access rights
-	 * @param providerNo - the provider ID
-	 * @param privilege - the privilege level required
-	 * @param requiredObjList - the required security objects for access to the emr module
-	 * @throws SecurityException - if the requirements are not me by the provider record
-	 * @deprecated - use Permission enum version
-	 */
-	@Deprecated
-	public void requireAllPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME... requiredObjList)
-	{
-		requireAllPrivilege(providerNo, privilege, null, requiredObjList);
 	}
 
 	/**

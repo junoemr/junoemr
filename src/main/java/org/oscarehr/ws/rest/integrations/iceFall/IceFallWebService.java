@@ -25,7 +25,6 @@ package org.oscarehr.ws.rest.integrations.iceFall;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
@@ -37,8 +36,8 @@ import org.oscarehr.integration.iceFall.service.IceFallRESTService;
 import org.oscarehr.integration.iceFall.service.IceFallService;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogEntryListTo1;
@@ -178,8 +177,7 @@ public class IceFallWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> sendFormToIceFall(IceFallSendFormTo1 iceFallSendFormTo1)
 	{
 		Provider provider = getCurrentProvider();
-		securityInfoManager.requireAllPrivilege(provider.getProviderNo(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE,
-				SecObjectName.OBJECT_NAME.RX, SecObjectName.OBJECT_NAME.EFORM);
+		securityInfoManager.requireAllPrivilege(provider.getProviderNo(), Permission.RX_CREATE, Permission.EFORM_CREATE);
 
 		Demographic demo = demographicDao.find(iceFallSendFormTo1.getDemographicNo());
 

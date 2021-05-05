@@ -25,7 +25,6 @@ package org.oscarehr.ws.rest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
@@ -35,6 +34,7 @@ import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -90,7 +90,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 																	   @DefaultValue("10")
 																			   Integer perPage)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 
 		page = validPageNo(page);
 		perPage = limitedResultCount(perPage);
@@ -111,7 +111,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> isEnabled(@PathParam("id") Long id)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 
 		FaxAccount faxSettings = faxAccountDao.find(id);
 		return RestResponse.successResponse(faxSettings.isIntegrationEnabled());
@@ -122,7 +122,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> getAccountSettings(@PathParam("id") Long id)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 
 		FaxAccountTransferOutbound accountSettingsTo1 = FaxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
 		return RestResponse.successResponse(accountSettingsTo1);
@@ -135,7 +135,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> addAccountSettings(FaxAccountTransferInbound accountSettingsTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_CREATE);
 
 		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
@@ -152,7 +152,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestResponse<FaxAccountTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
 																		  FaxAccountTransferInbound accountSettingsTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_UPDATE);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
 		if (faxAccount == null)
@@ -180,7 +180,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> testConnection(FaxAccountTransferInbound accountSettingsTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 
 		boolean success = faxAccountService.testConnectionStatus(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
 		return RestResponse.successResponse(success);
@@ -194,7 +194,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
 												FaxAccountTransferInbound accountSettingsTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_CONFIG);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 
 		// if the password is not changed, use the saved one
 		String password = accountSettingsTo1.getPassword();
@@ -218,7 +218,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 																 @QueryParam("endDate") String endDateStr,
 																 @QueryParam("startDate") String startDateStr)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 
 		page = validPageNo(page);
 		perPage = limitedResultCount(perPage);
@@ -257,7 +257,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 																   @QueryParam("combinedStatus") String combinedStatus,
 																   @QueryParam("archived") String archived)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.FAX_DOCUMENTS);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 
 		page = validPageNo(page);
 		perPage = limitedResultCount(perPage);

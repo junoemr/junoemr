@@ -28,9 +28,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.ProviderRoleService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.log.LogAction;
@@ -55,7 +55,7 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("ADD ROLE");
-			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
+			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_CREATE);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, String.valueOf(providerId));
 
 			if(!providerRoleService.validRoleName(roleNew))
@@ -104,7 +104,7 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("UPDATE ROLE");
-			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
+			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_UPDATE);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
 			if(!providerRoleService.validRoleName(roleNew))
@@ -145,7 +145,7 @@ public class ProviderRoleAction extends DispatchAction
 		try
 		{
 			logger.info("DELETE ROLE");
-			securityInfoManager.requireAllPrivilege(currentProviderNo, SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN_USER_ADMIN);
+			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_DELETE);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
 			if(!providerRoleService.validRoleName(roleNew))

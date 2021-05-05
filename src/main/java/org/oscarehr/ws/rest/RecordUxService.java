@@ -41,7 +41,6 @@ import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.security.model.Permission;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -275,8 +274,7 @@ public class RecordUxService extends AbstractServiceImpl {
 				summaryList.add(new SummaryTo1("Incoming", count++, SummaryTo1.INCOMING_CODE));
 			}
 
-			if(securityInfoManager.hasPrivilege(loggedInProviderId, SecurityInfoManager.PRIVILEGE_LEVEL.READ, demographicNo,
-					SecObjectName.OBJECT_NAME.NEW_CASEMGMT_DECISION_SUPPORT_ALERTS)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DECISION_SUPPORT_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DS_SUPPORT_POS))
 			{
 				summaryList.add(new SummaryTo1("Decision Support", count++, SummaryTo1.DECISIONSUPPORT_CODE));

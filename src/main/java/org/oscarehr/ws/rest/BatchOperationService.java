@@ -23,12 +23,12 @@
 
 package org.oscarehr.ws.rest;
 
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.dx.service.DxResearchService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.batch.DemographicBatchDxUpdateTo1;
@@ -67,7 +67,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Boolean> deactivateDemographics(DemographicBatchOperationTo1 demoTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.DELETE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_DELETE);
 		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.IN.name());
 	}
 
@@ -77,7 +77,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Boolean> activateDemographics(DemographicBatchOperationTo1 demoTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.CREATE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_UPDATE);
 		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.AC.name());
 	}
 
@@ -87,7 +87,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Boolean> setDemographicDxCode(DemographicBatchDxUpdateTo1 demoTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), SecurityInfoManager.PRIVILEGE_LEVEL.UPDATE, SecObjectName.OBJECT_NAME.ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_UPDATE);
 
 		MiscUtils.getLogger().info("Performing batch demographic dx code assignment: " + demoTo1.toString());
 		try
