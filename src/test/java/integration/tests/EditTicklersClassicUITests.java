@@ -80,8 +80,8 @@ public class EditTicklersClassicUITests extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("menuTitletickler")));
 		driver.findElement(By.id("menuTitletickler")).click();
+		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(4000);
 		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='priority']"), priority);
 		dropdownSelectByVisibleText(driver, By.id("site"), clinic);
 		driver.findElement(By.xpath("//textarea[@name='textarea']")).sendKeys(reminderMessage);

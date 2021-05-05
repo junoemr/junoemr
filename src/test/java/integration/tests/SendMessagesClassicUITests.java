@@ -140,10 +140,10 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitlemsgs")));
 		driver.findElement(By.xpath("//div[@id='menuTitlemsgs']//descendant::a[contains(., '+')]")).click();
+		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
 
 		//** Send Message **
-		Thread.sleep(2000);
 		composeMessage(subjectEchart);
 		driver.findElement(By.xpath("//input[@value='Send Message']")).click();
 
