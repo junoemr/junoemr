@@ -1,3 +1,5 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 	'$scope',
@@ -8,7 +10,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	'$uibModal',
 	'consultService',
 	'demographicService',
-	'securityService',
+	'securityRolesService',
 	'summaryService',
 	'staticDataService',
 	'consult',
@@ -23,18 +25,17 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		$uibModal,
 		consultService,
 		demographicService,
-		securityService,
+		securityRolesService,
 		summaryService,
 		staticDataService,
 		consult,
 		user)
 	{
-
-		var controller = this;
+		const controller = this;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.consult = consult;
 
-		console.log(consult);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
 		consult.serviceList = Juno.Common.Util.toArray(consult.serviceList);
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
@@ -60,35 +61,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.initialize = function()
 		{
-			//get access rights
-			securityService.hasRight("_con", "r").then(
-				function success(results)
-				{
-					controller.consultReadAccess = results;
-				},
-				function error(errors)
-				{
-					console.error(errors);
-				});
-			securityService.hasRight("_con", "u").then(
-				function success(results)
-				{
-					controller.consultUpdateAccess = results;
-				},
-				function error(errors)
-				{
-					console.error(errors);
-				});
-			securityService.hasRight("_con", "w").then(
-				function success(results)
-				{
-					controller.consultWriteAccess = results;
-				},
-				function error(errors)
-				{
-					console.error(errors);
-				});
-
 			//set demographic info
 			demographicService.getDemographic(consult.demographicId).then(
 				function success(results)
@@ -356,7 +328,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		{
 			if (consult.appointmentHour != null && consult.appointmentMinute != null && !consult.patientWillBook)
 			{
-				apptTime = moment(Date.now());
+				let apptTime = moment(Date.now());
 				apptTime.set('hours', consult.appointmentHour);
 				apptTime.set('minute', consult.appointmentMinute);
 				consult.appointmentTime = apptTime;
@@ -417,12 +389,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			var deferred = $q.defer();
 			var valid = true;
 
-			if (!controller.consultWriteAccess && consult.id == null)
+			if (consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_CREATE))
 			{
 				alert("You don't have right to save new consult");
 				valid = false;
 			}
-			if (!controller.consultUpdateAccess)
+			else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_UPDATE))
 			{
 				alert("You don't have right to update consult");
 				valid = false;

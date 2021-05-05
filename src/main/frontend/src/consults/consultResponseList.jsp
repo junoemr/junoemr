@@ -104,7 +104,7 @@ ng-if="consultResponseListCtrl.hideSearchPatient != true">
 					<label>Patient</label>
 					<div class="input-group">
 						<input type="text"
-						       ng-disabled="!consultRequestListCtrl.canAccessDemographics()"
+						       ng-disabled="!consultResponseListCtrl.canAccessDemographics()"
 							   ng-model="consultResponseListCtrl.demographicName"
 							   placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
 							   uib-typeahead="pt.demographicNo as pt.name for pt in consultResponseListCtrl.searchPatients($viewValue)"
@@ -112,7 +112,7 @@ ng-if="consultResponseListCtrl.hideSearchPatient != true">
 							   class="form-control"/>
 						<span class="input-group-btn">
 							<button class="btn btn-default"
-							        ng-disabled="!consultRequestListCtrl.canAccessDemographics()"
+							        ng-disabled="!consultResponseListCtrl.canAccessDemographics()"
 									ng-click="consultResponseListCtrl.removeDemographicAssignment()">
 								<span class="glyphicon glyphicon-remove"></span>
 							</button>
@@ -163,7 +163,7 @@ ng-if="consultResponseListCtrl.hideSearchPatient != true">
 			<tbody>
 				<tr ng-repeat="consult in $data">
 					<td>
-						<button ng-disabled="!consultRequestListCtrl.canEditConsults()"
+						<button ng-disabled="!consultResponseListCtrl.canEditConsults()"
 						        ng-click="consultResponseListCtrl.editConsult(consult)"
 						        class="btn btn-xs btn-primary hand-hover">
 							<bean:message key="global.edit" bundle="ui"/>

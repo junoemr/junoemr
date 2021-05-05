@@ -1,3 +1,5 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 	'$scope',
@@ -7,7 +9,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 	'$uibModal',
 	'consultService',
 	'demographicService',
-	'securityService',
+	'securityRolesService',
 	'summaryService',
 	'staticDataService',
 	'consult',
@@ -21,46 +23,18 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		$uibModal,
 		consultService,
 		demographicService,
-		securityService,
+		securityRolesService,
 		summaryService,
 		staticDataService,
 		consult,
 		user)
 	{
 
-		var controller = this;
+		const controller = this;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.initialize = function()
 		{
-			//get access rights
-			securityService.hasRight("_con", "r").then(
-				function success(results)
-				{
-					controller.consultReadAccess = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-			securityService.hasRight("_con", "u").then(
-				function success(results)
-				{
-					controller.consultUpdateAccess = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-			securityService.hasRight("_con", "w").then(
-				function success(results)
-				{
-					controller.consultWriteAccess = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-
 			controller.consult = consult;
 			consult.referringDoctorList = Juno.Common.Util.toArray(consult.referringDoctorList);
 			consult.faxList = Juno.Common.Util.toArray(consult.faxList);
@@ -308,7 +282,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		{
 			if (consult.appointmentHour !== null && consult.appointmentMinute !== null)
 			{
-				apptTime = moment(Date.now());
+				let apptTime = moment(Date.now());
 				apptTime.set('hours', consult.appointmentHour);
 				apptTime.set('minute', consult.appointmentMinute);
 				consult.appointmentTime = apptTime;
@@ -358,12 +332,12 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		controller.save = function save()
 		{
-			if (!controller.consultWriteAccess && consult.id == null)
+			if (consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_CREATE))
 			{
 				alert("You don't have right to save new consult");
 				return false;
 			}
-			if (!controller.consultUpdateAccess)
+			else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_UPDATE))
 			{
 				alert("You don't have right to update consult");
 				return false;
