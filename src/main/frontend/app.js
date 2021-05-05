@@ -753,23 +753,29 @@ oscarApp.config([
 	$httpProvider.interceptors.push('errorInterceptor');
 }]);
 
-oscarApp.run(function ($rootScope, $location, $state, $uibModal, securityApiService)
-{
-	$rootScope.$on('$stateChangeStart', async function (event, toState, toParams, fromState, fromParams)
+oscarApp.run([
+	'$rootScope',
+	'$location',
+	'$state',
+	'$uibModal',
+	'securityApiService',
+	function ($rootScope, $location, $state, $uibModal, securityApiService)
 	{
-		// check for specific demographic restrictions before state changes
-		if(toState.meta && toState.meta.auth && toState.meta.auth.checkDemographicAccess)
+		$rootScope.$on('$stateChangeStart', async function (event, toState, toParams, fromState, fromParams)
 		{
-			const canAccessDemographic = await securityApiService.canCurrentUserAccessDemographic(toParams.demographicNo);
-			if(!canAccessDemographic)
+			// check for specific demographic restrictions before state changes
+			if (toState.meta && toState.meta.auth && toState.meta.auth.checkDemographicAccess)
 			{
-				event.preventDefault();
-				$state.go(fromState);
-				Juno.Common.Util.errorAlert($uibModal, "Security Restriction", "You do not have required permissions to access this patient record");
+				const canAccessDemographic = await securityApiService.canCurrentUserAccessDemographic(toParams.demographicNo);
+				if (!canAccessDemographic)
+				{
+					event.preventDefault();
+					$state.go(fromState);
+					Juno.Common.Util.errorAlert($uibModal, "Security Restriction", "You do not have required permissions to access this patient record");
+				}
 			}
-		}
-	})
-});
+		})
+	}]);
 
 // For debugging purposes
 /*
