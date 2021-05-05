@@ -31,12 +31,18 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.dao.BillingBCDao;
+import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingLocationTo1;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingVisitCodeTo1;
 
 public class SitesManageAction extends DispatchAction {
 
     private SiteDao siteDao;
+    private BillingBCDao bcBillingDao = SpringUtils.getBean(BillingBCDao.class);
 
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
@@ -47,8 +53,12 @@ public class SitesManageAction extends DispatchAction {
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
         List<Site> sites = siteDao.getAllSites();
-
         request.setAttribute("sites", sites);
+        
+        List<Object[]> codes = bcBillingDao.findBillingLocations(BillingServiceDao.BC);
+        List<BCBillingLocationTo1> serviceLocationCodes = BCBillingLocationTo1.fromList(codes);
+        request.setAttribute("serviceLocationCodes", serviceLocationCodes);
+        
         return mapping.findForward("list");
     }
 
@@ -58,6 +68,11 @@ public class SitesManageAction extends DispatchAction {
 
     	Site s = new Site();
     	lazyForm.set("site", s);
+		
+		List<Object[]> codes = bcBillingDao.findBillingVisits(BillingServiceDao.BC);
+		List<BCBillingVisitCodeTo1> serviceLocationCodes = BCBillingVisitCodeTo1.fromList(codes);
+		
+		request.setAttribute("serviceLocationCodes", serviceLocationCodes);
 
         return mapping.findForward("details");
     }

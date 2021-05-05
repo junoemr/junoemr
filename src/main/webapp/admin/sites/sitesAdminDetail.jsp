@@ -173,6 +173,17 @@
                             <td><nested:text property="site.albertaConnectCareDepartmentId"></nested:text></td>
                         </tr>
                         <tr class="province-specific bc" style="display: none">
+                            <td>Service Location Code:</td>
+                            <td>
+                                <nested:select property="site.bcServiceLocationCode">
+                                    <html:option value="">Select a Service Location Code</html:option>
+                                    <c:forEach items="${serviceLocationCodes}" var="code">
+                                        <html:option value="${code.visitType}">(${code.visitType}) ${code.visitDescription}</html:option>
+                                    </c:forEach>
+                                </nested:select>
+                            </td>
+                        </tr>
+                        <tr class="province-specific bc" style="display: none">
                             <td>BCP Facility Number:</td>
                             <td><nested:text property="site.bcFacilityNumber"></nested:text></td>
                         </tr>
