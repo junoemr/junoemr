@@ -40,7 +40,10 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Entity
@@ -95,5 +98,38 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 	public int compareTo(SecRole o)
 	{
 		return (name.compareTo(o.name));
+	}
+
+	public List<SecObjPrivilege> getPrivilegesWithInheritance()
+	{
+		SecRole parentRole = this.getParentSecRole();
+		List<SecObjPrivilege> rolePrivileges = this.getSecObjPrivilege();
+		if(parentRole == null)
+		{
+			return rolePrivileges;
+		}
+		List<SecObjPrivilege> parentPrivileges = parentRole.getPrivilegesWithInheritance();
+
+		// create a map of privileges
+		Map<String, SecObjPrivilege> objectMap = new HashMap<>();
+		for(SecObjPrivilege secObjPrivilege : parentPrivileges)
+		{
+			objectMap.put(secObjPrivilege.getId().getObjectName(), secObjPrivilege);
+		}
+
+		for(SecObjPrivilege rolePrivilege : rolePrivileges)
+		{
+			if(rolePrivilege.isInclusive())
+			{
+				// overwrite or add the child value, as it takes precedence
+				objectMap.put(rolePrivilege.getId().getObjectName(), rolePrivilege);
+			}
+			else
+			{
+				// remove the excluded roles from parent list if they exist
+				objectMap.remove(rolePrivilege.getId().getObjectName());
+			}
+		}
+		return new ArrayList<>(objectMap.values());
 	}
 }
