@@ -37,9 +37,17 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege>
 {
-
-	public SecObjPrivilegeDao() {
+	public SecObjPrivilegeDao()
+	{
 		super(SecObjPrivilege.class);
+	}
+
+	public void persistAll(List<SecObjPrivilege> secObjPrivileges)
+	{
+		for (SecObjPrivilege secObjPrivilege : secObjPrivileges)
+		{
+			this.persist(secObjPrivilege);
+		}
 	}
 	
 	public List<SecObjPrivilege> findByObjectNames(Collection<String> objectNames) {
