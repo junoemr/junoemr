@@ -142,15 +142,22 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getOBXName( int i, int j)
+	public String getOBXName(int i, int j)
 	{
-		String obxname = super.getOBXName(i, j);
-		if (obxname.isEmpty())
+		String OBXName = super.getOBXName(i, j);
+		if (!OBXName.isEmpty())
+		{
+			return OBXName;
+		}
+
+		String OBXIdentifier = super.getOBXIdentifier(i, j);
+		if (!OBXIdentifier.isEmpty())
+		{
+			return OBXIdentifier;
+		}
+		else
 		{
 			return DEFAULT_OBX_NAME;
-		}
-		else {
-			return obxname;
 		}
 
 	}
