@@ -207,10 +207,10 @@ public class SecurityRolesService
 	}
 
 	/*
-	 * ======================================= private methods =======================================
+	 * ======================================= private/protected methods =======================================
 	 */
 
-	private SecRole copyToSecRole(SecurityRoleTransfer input, SecRole secRole)
+	protected SecRole copyToSecRole(SecurityRoleTransfer input, SecRole secRole)
 	{
 		BeanUtils.copyProperties(input, secRole, "parentRoleId", "securityPermissions");
 		if(input.getParentRoleId() != null)
@@ -220,7 +220,18 @@ public class SecurityRolesService
 		return secRole;
 	}
 
-	private void deleteExistingRolePrivileges(Integer roleId)
+	protected List<Permission> getRolePermissions(List<SecUserRole> userRoles)
+	{
+		// use hash set to easily remove duplicates on add
+		Set<Permission> permissionSet = new HashSet<>();
+		for(SecUserRole userRole : userRoles)
+		{
+			permissionSet.addAll(secObjPrivilegeToPermissionConverter.convertToSingleList(userRole.getSecRole().getPrivilegesWithInheritance()));
+		}
+		return new ArrayList<>(permissionSet);
+	}
+
+	protected void deleteExistingRolePrivileges(Integer roleId)
 	{
 		List<SecObjPrivilege> currentlyAssignedPrivileges = secObjPrivilegeDao.findByRoleId(roleId);
 		for (SecObjPrivilege current : currentlyAssignedPrivileges)
@@ -232,7 +243,7 @@ public class SecurityRolesService
 		}
 	}
 
-	private List<SecObjPrivilege> getPrivilegesForRole(String providerId, SecRole secRole, List<SecurityPermissionTransfer> transfers)
+	protected List<SecObjPrivilege> getPrivilegesForRole(String providerId, SecRole secRole, List<SecurityPermissionTransfer> transfers)
 	{
 		List<Permission> permissions = transfers.stream().map(SecurityPermissionTransfer::getPermission).collect(Collectors.toList());
 		Map<String, SecObjPrivilege> objectMap = convertPermissionsToSecObjPrivilegesMap(providerId, secRole, permissions);
@@ -258,6 +269,10 @@ public class SecurityRolesService
 					parentCopy.setRoleUserGroup(secRole.getName());
 					parentCopy.setPriority(0);
 					parentCopy.setPrivilege(NO_RIGHTS);
+					parentCopy.setPermissionRead(false);
+					parentCopy.setPermissionUpdate(false);
+					parentCopy.setPermissionCreate(false);
+					parentCopy.setPermissionDelete(false);
 					parentCopy.setId(new SecObjPrivilegePrimaryKey(secRole.getId(), parentObjectName));
 					parentCopy.setSecRole(secRole);
 //					parentCopy.setSecObjectName(nameEntityMap.get(parentObjectName));
@@ -322,17 +337,6 @@ public class SecurityRolesService
 		return objectMap;
 	}
 
-	private List<Permission> getRolePermissions(List<SecUserRole> userRoles)
-	{
-		// use hash set to easily remove duplicates on add
-		Set<Permission> permissionSet = new HashSet<>();
-		for(SecUserRole userRole : userRoles)
-		{
-			permissionSet.addAll(secObjPrivilegeToPermissionConverter.convertToSingleList(userRole.getSecRole().getPrivilegesWithInheritance()));
-		}
-		return new ArrayList<>(permissionSet);
-	}
-
 	private String getLegacyPrivilege(List<SecurityInfoManager.PRIVILEGE_LEVEL> privileges)
 	{
 		String privilegeLevel = null;
@@ -352,6 +356,10 @@ public class SecurityRolesService
 		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.READ))
 		{
 			privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.READ.asString();
+		}
+		else if(privileges.contains(SecurityInfoManager.PRIVILEGE_LEVEL.DELETE))
+		{
+			privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.DELETE.asString();
 		}
 		return privilegeLevel;
 	}

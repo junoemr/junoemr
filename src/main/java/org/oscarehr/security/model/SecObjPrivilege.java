@@ -95,17 +95,17 @@ public class SecObjPrivilege extends AbstractModel<SecObjPrivilegePrimaryKey>
 	public SecObjPrivilege(SecObjPrivilege toCopy)
 	{
 		this.id = null;
-		this.privilege = toCopy.privilege;
-		this.permissionRead = toCopy.permissionRead;
-		this.permissionUpdate = toCopy.permissionUpdate;
-		this.permissionCreate = toCopy.permissionCreate;
-		this.permissionDelete = toCopy.permissionDelete;
-		this.priority = toCopy.priority;
-		this.providerNo = toCopy.providerNo;
-		this.inclusive = toCopy.inclusive;
-		this.roleUserGroup = toCopy.roleUserGroup;
+		this.privilege = toCopy.getPrivilege();
+		this.permissionRead = toCopy.isPermissionRead();
+		this.permissionUpdate = toCopy.isPermissionUpdate();
+		this.permissionCreate = toCopy.isPermissionCreate();
+		this.permissionDelete = toCopy.isPermissionDelete();
+		this.priority = toCopy.getPriority();
+		this.providerNo = toCopy.getProviderNo();
+		this.inclusive = toCopy.isInclusive();
+		this.roleUserGroup = toCopy.getRoleUserGroup();
 		this.deletedAt = null;
-		this.secRole = null;
+		this.secRole = toCopy.getSecRole();
 //		this.secObjectName = null;
 	}
 

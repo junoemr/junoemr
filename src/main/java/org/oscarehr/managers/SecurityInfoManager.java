@@ -166,7 +166,7 @@ public class SecurityInfoManager
 
 	public boolean hasPrivileges(String providerNo, Integer demographicId, Permission... permissions)
 	{
-		return (demographicId == null || isAllowedAccessToPatientRecord(providerNo, demographicId)) && hasRoleAccess(providerNo, permissions);
+		return (demographicId == null || isAllowedAccessToPatientRecord(providerNo, demographicId)) && hasAllPermissions(providerNo, permissions);
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class SecurityInfoManager
 		return hasOnePrivileges(providerNo, privilege, null, hasObjList);
 	}
 
-	private boolean hasRoleAccess(String providerNo, Permission... permissions)
+	private boolean hasAllPermissions(String providerNo, Permission... permissions)
 	{
 		List<Permission> userPermissions = securityRolesService.getSecurityPermissionsForUser(providerNo);
 		for(Permission permission : permissions)
