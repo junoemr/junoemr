@@ -27,9 +27,9 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.security.BaseSecurityTest;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjPrivilege;
-import org.oscarehr.security.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.security.model.SecRole;
 import org.oscarehr.ws.rest.transfer.security.SecurityPermissionTransfer;
@@ -44,10 +44,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.oscarehr.managers.SecurityInfoManager.ALL;
-import static org.oscarehr.managers.SecurityInfoManager.NO_RIGHTS;
 import static org.oscarehr.managers.SecurityInfoManager.PRIVILEGE_LEVEL;
 
-public class SecurityRolesServiceTest
+public class SecurityRolesServiceTest extends BaseSecurityTest
 {
 	@Autowired
 	@InjectMocks
@@ -169,16 +168,12 @@ public class SecurityRolesServiceTest
 
 		assertEquals("wrong number of permissions found", 2, secObjPrivileges.size());
 
-		SecObjPrivilege appointmentPriv = secObjPrivileges.stream()
-				.filter(objPrivilege -> objPrivilege.getId().getObjectName().equals(SecObjectName.OBJECT_NAME.APPOINTMENT.getValue()))
-				.findAny().orElse(null);
+		SecObjPrivilege appointmentPriv = findByObjectName(secObjPrivileges, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		assertNotNull("missing appointment privilege object", appointmentPriv);
 		assertTrue("incorrect inclusive state", appointmentPriv.isInclusive());
 		assertCorrectPermissionLevels(true, true, false, false, appointmentPriv);
 
-		SecObjPrivilege demoPriv = secObjPrivileges.stream()
-				.filter(objPrivilege -> objPrivilege.getId().getObjectName().equals(SecObjectName.OBJECT_NAME.DEMOGRAPHIC.getValue()))
-				.findAny().orElse(null);
+		SecObjPrivilege demoPriv = findByObjectName(secObjPrivileges, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		assertNotNull("missing demographic privilege object", demoPriv);
 		assertTrue("incorrect inclusive state", demoPriv.isInclusive());
 		assertCorrectPermissionLevels(true, true, true, false, demoPriv);
@@ -204,9 +199,7 @@ public class SecurityRolesServiceTest
 		// should only have the appointment privilege, since the parent has the identical demographic privilege
 		assertEquals("wrong number of permissions found", 1, secObjPrivileges.size());
 
-		SecObjPrivilege appointmentPriv = secObjPrivileges.stream()
-				.filter(objPrivilege -> objPrivilege.getId().getObjectName().equals(SecObjectName.OBJECT_NAME.APPOINTMENT.getValue()))
-				.findAny().orElse(null);
+		SecObjPrivilege appointmentPriv = findByObjectName(secObjPrivileges, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		assertNotNull("missing appointment privilege object", appointmentPriv);
 		assertTrue("incorrect inclusive state", appointmentPriv.isInclusive());
 		assertCorrectPermissionLevels(true, false, false, false, appointmentPriv);
@@ -232,16 +225,12 @@ public class SecurityRolesServiceTest
 		// should have both the appointment and demographic privileges, since the parent demographic privilege has more rights
 		assertEquals("wrong number of permissions found", 2, secObjPrivileges.size());
 
-		SecObjPrivilege appointmentPriv = secObjPrivileges.stream()
-				.filter(objPrivilege -> objPrivilege.getId().getObjectName().equals(SecObjectName.OBJECT_NAME.APPOINTMENT.getValue()))
-				.findAny().orElse(null);
+		SecObjPrivilege appointmentPriv = findByObjectName(secObjPrivileges, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		assertNotNull("missing appointment privilege object", appointmentPriv);
 		assertTrue("incorrect inclusive state", appointmentPriv.isInclusive());
 		assertCorrectPermissionLevels(true, false, false, false, appointmentPriv);
 
-		SecObjPrivilege demoPriv = secObjPrivileges.stream()
-				.filter(objPrivilege -> objPrivilege.getId().getObjectName().equals(SecObjectName.OBJECT_NAME.DEMOGRAPHIC.getValue()))
-				.findAny().orElse(null);
+		SecObjPrivilege demoPriv = findByObjectName(secObjPrivileges, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		assertNotNull("missing demographic privilege object", demoPriv);
 		assertTrue("incorrect inclusive state", demoPriv.isInclusive());
 		assertCorrectPermissionLevels(true, false, false, false, demoPriv);
@@ -264,60 +253,18 @@ public class SecurityRolesServiceTest
 
 		List<SecObjPrivilege> secObjPrivileges = securityRolesService.getPrivilegesForRole(providerId, mockSecRole, toTransfers(permissions));
 
-		// should have both the appointment and demographic privileges, since the parent demographic privilege has more rights
+		// should have both the appointment and demographic privileges, but the demographic should not be inclusive
 		assertEquals("wrong number of permissions found", 2, secObjPrivileges.size());
 
-		SecObjPrivilege appointmentPriv = secObjPrivileges.stream()
-				.filter(objPrivilege -> objPrivilege.getId().getObjectName().equals(SecObjectName.OBJECT_NAME.APPOINTMENT.getValue()))
-				.findAny().orElse(null);
+		SecObjPrivilege appointmentPriv = findByObjectName(secObjPrivileges, SecObjectName.OBJECT_NAME.APPOINTMENT);
 		assertNotNull("missing appointment privilege object", appointmentPriv);
 		assertTrue("incorrect inclusive state", appointmentPriv.isInclusive());
 		assertCorrectPermissionLevels(true, false, false, false, appointmentPriv);
 
-		SecObjPrivilege demoPriv = secObjPrivileges.stream()
-				.filter(objPrivilege -> objPrivilege.getId().getObjectName().equals(SecObjectName.OBJECT_NAME.DEMOGRAPHIC.getValue()))
-				.findAny().orElse(null);
+		SecObjPrivilege demoPriv = findByObjectName(secObjPrivileges, SecObjectName.OBJECT_NAME.DEMOGRAPHIC);
 		assertNotNull("missing demographic privilege object", demoPriv);
 		assertFalse("incorrect inclusive state", demoPriv.isInclusive());
 		assertCorrectPermissionLevels(false, false, false, false, demoPriv);
-	}
-
-	private void assertCorrectPermissionLevels(boolean read, boolean update, boolean create, boolean delete, SecObjPrivilege actualObject)
-	{
-		assertEquals("invalid read state", read, actualObject.isPermissionRead());
-		assertEquals("invalid update state", update, actualObject.isPermissionUpdate());
-		assertEquals("invalid create state", create, actualObject.isPermissionCreate());
-		assertEquals("invalid delete state", delete, actualObject.isPermissionDelete());
-
-		String legacyPrivilegeLevel = actualObject.getPrivilege();
-		String errorMessage = "invalid legacy privilege";
-		if(actualObject.isInclusive())
-		{
-			if(create && update && read && delete)
-			{
-				assertEquals(errorMessage, ALL, legacyPrivilegeLevel);
-			}
-			else if(create)
-			{
-				assertEquals(errorMessage, PRIVILEGE_LEVEL.CREATE.asString(), legacyPrivilegeLevel);
-			}
-			else if (update)
-			{
-				assertEquals(errorMessage, PRIVILEGE_LEVEL.UPDATE.asString(), legacyPrivilegeLevel);
-			}
-			else if (read)
-			{
-				assertEquals(errorMessage, PRIVILEGE_LEVEL.READ.asString(), legacyPrivilegeLevel);
-			}
-			else if (delete)
-			{
-				assertEquals(errorMessage, PRIVILEGE_LEVEL.DELETE.asString(), legacyPrivilegeLevel);
-			}
-		}
-		else
-		{
-			assertEquals(errorMessage, NO_RIGHTS, legacyPrivilegeLevel);
-		}
 	}
 
 	private SecRole mockSecRole(Integer id, String name)
@@ -326,23 +273,6 @@ public class SecurityRolesServiceTest
 		Mockito.when(secRole.getId()).thenReturn(id);
 		Mockito.when(secRole.getName()).thenReturn(name);
 		return secRole;
-	}
-
-	private SecObjPrivilege mockSecObjPrivilege(Integer roleId, String objectName, boolean read, boolean update, boolean create, boolean delete, String legacyPrivilege)
-	{
-		SecObjPrivilegePrimaryKey primaryKey = Mockito.mock(SecObjPrivilegePrimaryKey.class);
-		Mockito.when(primaryKey.getObjectName()).thenReturn(objectName);
-		Mockito.when(primaryKey.getSecRoleId()).thenReturn(roleId);
-
-		SecObjPrivilege secObjPrivilege = Mockito.mock(SecObjPrivilege.class);
-		Mockito.when(secObjPrivilege.getId()).thenReturn(primaryKey);
-		Mockito.when(secObjPrivilege.isPermissionRead()).thenReturn(read);
-		Mockito.when(secObjPrivilege.isPermissionUpdate()).thenReturn(update);
-		Mockito.when(secObjPrivilege.isPermissionCreate()).thenReturn(create);
-		Mockito.when(secObjPrivilege.isPermissionDelete()).thenReturn(delete);
-		Mockito.when(secObjPrivilege.getPrivilege()).thenReturn(legacyPrivilege);
-
-		return secObjPrivilege;
 	}
 
 	private List<SecurityPermissionTransfer> toTransfers(List<Permission> permissions)
