@@ -143,7 +143,7 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 
 		//** Send Message **
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		composeMessage(subjectEchart);
 		driver.findElement(By.xpath("//input[@value='Send Message']")).click();
 

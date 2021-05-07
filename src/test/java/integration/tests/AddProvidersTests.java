@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
@@ -62,6 +63,7 @@ public class AddProvidersTests extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 
 		// Add a provider record page
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//h5[contains(.,'Add a Provider Record')]")));
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
