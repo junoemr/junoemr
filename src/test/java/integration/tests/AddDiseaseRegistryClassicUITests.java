@@ -38,6 +38,7 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.sql.SQLException;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 
 public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 {
@@ -75,7 +76,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Disease Registry")));
 		driver.findElement(By.linkText("Disease Registry")).click();
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
 		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
@@ -83,14 +84,10 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='xml_research4']")).sendKeys(asthma);
 		driver.findElement(By.xpath("//input[@name='xml_research5']")).sendKeys(hypertension);
 		driver.findElement(By.xpath("//input[@value='Add']")).click();
-		driver.findElement(By.xpath("//input[@name='xml_research1']")).clear();
-		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(chronicObstructivePulmonary);
-		driver.findElement(By.xpath("//input[@name='xml_research2']")).clear();
-		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(ckd);
-		driver.findElement(By.xpath("//input[@name='xml_research3']")).clear();
-		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(hiv);
-		driver.findElement(By.xpath("//input[@name='xml_research4']")).clear();
-		driver.findElement(By.xpath("//input[@name='xml_research4']")).sendKeys(inr);
+		textEdit(driver, By.xpath("//input[@name='xml_research1']"), chronicObstructivePulmonary);
+		textEdit(driver, By.xpath("//input[@name='xml_research2']"), ckd);
+		textEdit(driver, By.xpath("//input[@name='xml_research3']"), hiv);
+		textEdit(driver, By.xpath("//input[@name='xml_research4']"), inr);
 		driver.findElement(By.xpath("//input[@name='xml_research5']")).clear();
 		driver.findElement(By.xpath("//input[@value='Add']")).click();
 
