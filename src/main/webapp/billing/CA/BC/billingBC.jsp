@@ -191,7 +191,7 @@ if(!authed) {
             AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
             Appointment appointment = appointmentManager.getAppointment(info, Integer.parseInt(appointmentNo));
 
-            SiteService siteService = SpringUtils.getBean(AppointmentManager.class);
+            SiteService siteService = SpringUtils.getBean(SiteService.class);
             Site site = siteService.getSiteByName(appointment.getLocation());
 
             if (site != null && ConversionUtils.hasContent(site.getBcServiceLocationCode()))
@@ -1011,7 +1011,7 @@ if(wcbneeds != null){%>
 			sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
 			thisForm.setXml_location(sxml_location);
 
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromRequest(request);
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request.getSession());
 			sxml_visittype = getDefaultVisitType(loggedInInfo, sxml_provider, bean.getApptNo());
 			thisForm.setXml_visittype(sxml_visittype);
 

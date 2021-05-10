@@ -343,12 +343,10 @@ Juno.BillingHelper.BC._updateServiceLocationCode = function(providerNo, siteNo, 
 
         if (siteNo)
         {
-            console.log("asking for site SLC");
             Juno.BillingHelper._siteBillingWrapper(siteNo, function (site)
             {
                 if (site && site.bcServiceLocationCode)
                 {
-                    console.log('using site value instead of provider');
                     Juno.BillingHelper.BC._setSelectToValue($serviceLocationSelect, site.bcServiceLocationCode);
                 }
                 else
@@ -357,7 +355,6 @@ Juno.BillingHelper.BC._updateServiceLocationCode = function(providerNo, siteNo, 
                     {
                         if (clinicSLC)
                         {
-                            console.log("using clinic value instead of site");
                             Juno.BillingHelper.BC._setSelectToValue($serviceLocationSelect, clinicSLC);
                         }
                     }));
@@ -365,8 +362,7 @@ Juno.BillingHelper.BC._updateServiceLocationCode = function(providerNo, siteNo, 
             })
             return;
         }
-
-        console.log("using clinic instead of provider");
+        
         Juno.BillingHelper._systemPreferenceWrapper("service_location_code", "", (function (clinicSLC)
         {
             if (clinicSLC)
@@ -446,7 +442,6 @@ Juno.BillingHelper.BC.initRuralRetentionCodeHook = function(context, $providerSe
  */
 Juno.BillingHelper.BC.initServiceLocationCodeHook = function(context, $providerSelect, $siteSelect, $serviceLocationSelect)
 {
-    console.log("init slc hook");
     Juno.BillingHelper.BC._localJunoInstance = context;
 
     $providerSelect.change(function()
