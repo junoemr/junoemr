@@ -177,22 +177,22 @@ if(!authed) {
     // Provider and site are formatted a little differently, they store the code key, whereas the clinic
     // property is stored as "key|description".  Since the front end expects that latter, we need to properly
     // format the codes associated with provider and site.
-
     ProviderService providerService = SpringUtils.getBean(ProviderService.class);
   	ProviderData provider = providerService.getProviderEager(billingProviderNo);
-  	if (provider.getBillingOpts() != null && ConversionUtils.hasContent(provider.getBillingOpts().getBcServiceLocationCode()))
+  	if (provider != null && provider.getBillingOpts() != null && ConversionUtils.hasContent(provider.getBillingOpts().getBcServiceLocationCode()))
     {
         String providerCode = provider.getBillingOpts().getBcServiceLocationCode();
         return providerCode + "|" + slcCodesMap.get(providerCode);
     }
 
-  	if (OscarProperties.getInstance().isMultisiteEnabled())
+  	// appointmentNo = 0 is passed in when direct billing via master record
+  	if (OscarProperties.getInstance().isMultisiteEnabled() && !appointmentNo.equals("0"))
     {
-        AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
-        Appointment appt = apptManager.getAppointment(info, Integer.parseInt(appointmentNo));
+        AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
+        Appointment appointment = appointmentManager.getAppointment(info, Integer.parseInt(appointmentNo));
 
         SiteService siteService = SpringUtils.getBean(AppointmentManager.class);
-        Site site = siteService.getSiteByName(appt.getLocation());
+        Site site = siteService.getSiteByName(appointment.getLocation());
 
         if (site != null && ConversionUtils.hasContent(site.getBcServiceLocationCode()))
         {
