@@ -31,8 +31,6 @@ import java.util.List;
 @Repository
 public class BillingBCDao extends BillingDao {
 	
-	public BillingBCDao(){};
-
 	/**
 	 * Selects service code, description, value and percentage from ctl_bilingservice and billingservice tables.
 	 */

@@ -164,48 +164,48 @@ if(!authed) {
      * 3) The clinic's default billing code
      * @return
      */
-  private String getDefaultVisitType(LoggedInInfo info, String billingProviderNo, String appointmentNo)
-  {
-  	BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
-  	Map<String, String> slcCodesMap = new HashMap<String, String>();
-  	List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
-    for (Object[] visitCode : visitCodes)
+    private String getDefaultVisitType(LoggedInInfo info, String billingProviderNo, String appointmentNo)
     {
-    	slcCodesMap.put((String)visitCode[0], (String)visitCode[1]);
-    }
-
-    // Provider and site are formatted a little differently, they store the code key, whereas the clinic
-    // property is stored as "key|description".  Since the front end expects that latter, we need to properly
-    // format the codes associated with provider and site.
-    ProviderService providerService = SpringUtils.getBean(ProviderService.class);
-  	ProviderData provider = providerService.getProviderEager(billingProviderNo);
-  	if (provider != null && provider.getBillingOpts() != null && ConversionUtils.hasContent(provider.getBillingOpts().getBcServiceLocationCode()))
-    {
-        String providerCode = provider.getBillingOpts().getBcServiceLocationCode();
-        return providerCode + "|" + slcCodesMap.get(providerCode);
-    }
-
-  	// appointmentNo = 0 is passed in when direct billing via master record
-  	if (OscarProperties.getInstance().isMultisiteEnabled() && !appointmentNo.equals("0"))
-    {
-        AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
-        Appointment appointment = appointmentManager.getAppointment(info, Integer.parseInt(appointmentNo));
-
-        SiteService siteService = SpringUtils.getBean(AppointmentManager.class);
-        Site site = siteService.getSiteByName(appointment.getLocation());
-
-        if (site != null && ConversionUtils.hasContent(site.getBcServiceLocationCode()))
+        BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
+        Map<String, String> slcCodesMap = new HashMap<String, String>();
+        List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+        for (Object[] visitCode : visitCodes)
         {
-        	String siteCode = site.getBcServiceLocationCode();
-            return siteCode + "|" + slcCodesMap.get(siteCode);
+            slcCodesMap.put((String)visitCode[0], (String)visitCode[1]);
         }
+
+        // Provider and site are formatted a little differently, they store the code key, whereas the clinic
+        // property is stored as "key|description".  Since the front end expects that latter, we need to properly
+        // format the codes associated with provider and site.
+        ProviderService providerService = SpringUtils.getBean(ProviderService.class);
+        ProviderData provider = providerService.getProviderEager(billingProviderNo);
+        if (provider != null && provider.getBillingOpts() != null && ConversionUtils.hasContent(provider.getBillingOpts().getBcServiceLocationCode()))
+        {
+            String providerCode = provider.getBillingOpts().getBcServiceLocationCode();
+            return providerCode + "|" + slcCodesMap.get(providerCode);
+        }
+
+        // appointmentNo = 0 is passed in when direct billing via master record
+        if (OscarProperties.getInstance().isMultisiteEnabled() && !appointmentNo.equals("0"))
+        {
+            AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
+            Appointment appointment = appointmentManager.getAppointment(info, Integer.parseInt(appointmentNo));
+
+            SiteService siteService = SpringUtils.getBean(AppointmentManager.class);
+            Site site = siteService.getSiteByName(appointment.getLocation());
+
+            if (site != null && ConversionUtils.hasContent(site.getBcServiceLocationCode()))
+            {
+                String siteCode = site.getBcServiceLocationCode();
+                return siteCode + "|" + slcCodesMap.get(siteCode);
+            }
+        }
+
+        SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
+        String clinicSLCCode = systemPreferences.getPreferenceValue("service_location_code", "");
+
+        return clinicSLCCode;
     }
-
-    SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
-    String clinicSLCCode = systemPreferences.getPreferenceValue("service_location_code", "");
-
-    return clinicSLCCode;
-  }
 
     /**
      * Get the provider to use for this billing, going down the following priorities until one is not null or empty.

@@ -37,7 +37,7 @@ angular.module('Common.Components').component('junoSelect', {
 	},
 	controller: [function ()
 	{
-		let ctrl = this
+		let ctrl = this;
 
 		ctrl.$onInit = () =>
 		{
