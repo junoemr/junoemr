@@ -156,6 +156,15 @@
 													 component-style="pageStyle">
 				</care-team-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
+				<roster-display-section ng-model="detailsCtrl.page.demo"
+										ng-if="detailsCtrl.instanceType === 'ON'"
+										validations="detailsCtrl.validations"
+										component-style="pageStyle">
+				</roster-display-section>
+				<juno-divider component-style="pageStyle"
+							  ng-if="detailsCtrl.instanceType === 'ON'">
+				</juno-divider>
+
 
 				<additional-information-section ng-model="detailsCtrl.page.demo"
 																				validations="detailsCtrl.validations"

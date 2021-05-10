@@ -51,6 +51,7 @@ import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
+import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
@@ -119,6 +120,8 @@ public class DemographicManager {
 	@Autowired
 	private DemographicDao demographicDao;
 	@Autowired
+	private org.oscarehr.demographic.dao.DemographicDao newDemographicDao;
+	@Autowired
 	private DemographicExtDao demographicExtDao;
 	@Autowired
 	private DemographicCustDao demographicCustDao;
@@ -155,6 +158,9 @@ public class DemographicManager {
 
 	@Autowired
 	private HinValidationService hinValidationService;
+
+	@Autowired
+	private DemographicRosterService demographicRosterService;
 
 	@Deprecated
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
@@ -371,6 +377,20 @@ public class DemographicManager {
 		else if (previousStatusDate.compareTo(currentStatusDate) != 0)
 		{
 			demographic.setPatientStatusDate(currentStatusDate);
+		}
+
+		String oldRosterStatus = prevDemo.getRosterStatus();
+
+		// check if anything around rostering changed
+		if (oldRosterStatus != null && (
+				(demographic.getRosterDate() != null && demographic.getRosterDate() != prevDemo.getRosterDate())
+						|| (demographic.getRosterStatus() != null && !demographic.getRosterStatus().equals(prevDemo.getRosterStatus()))
+						|| (demographic.getRosterTerminationDate() != null && demographic.getRosterTerminationDate() != prevDemo.getRosterTerminationDate())
+						|| (demographic.getRosterTerminationReason() != null && !demographic.getRosterTerminationReason().equals(prevDemo.getRosterTerminationReason()))
+				))
+		{
+			// Use the previous demo as the reference point
+			demographicRosterService.saveRosterHistory(newDemographicDao.find(demographic.getDemographicNo()));
 		}
 
 		//retain merge info
@@ -628,10 +648,6 @@ public class DemographicManager {
 
 	public List<String> getPatientStatusList() {
 		return demographicDao.search_ptstatus();
-	}
-
-	public List<String> getRosterStatusList() {
-		return demographicDao.getRosterStatuses();
 	}
 
 	/**

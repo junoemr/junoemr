@@ -298,11 +298,7 @@ public class DemographicsService extends AbstractServiceImpl
 		try
 		{
 			// get the list
-			List<String> statusList;
-			if("ROSTER".equalsIgnoreCase(listType))
-				statusList = demographicManager.getRosterStatusList();
-			else
-				statusList = demographicManager.getPatientStatusList();
+			List<String> statusList = demographicManager.getPatientStatusList();
 
 			// create transfer objects list
 			List<StatusValueTo1> resultList = new ArrayList<>(statusList.size());

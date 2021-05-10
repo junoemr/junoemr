@@ -22,7 +22,7 @@
 */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {SystemPreferenceApi} from "../../../../../generated/"
+import {RosterServiceApi, SystemPreferenceApi} from "../../../../../generated/"
 
 angular.module('Record.Details').component('careTeamSection', {
 	templateUrl: 'src/record/details/components/careTeamSection/careTeamSection.jsp',
@@ -98,13 +98,6 @@ angular.module('Record.Details').component('careTeamSection', {
 					function success(data) {
 						ctrl.midwives = data.map((doc) => {return {label: doc.name, value: doc.providerNo}});
 						ctrl.midwives.push({label: "--", value: ""})
-					}
-			);
-
-			demographicsService.getStatusList("roster").then(
-					function success(data)
-					{
-						ctrl.rosterStatusList = data;
 					}
 			);
 
@@ -184,30 +177,6 @@ angular.module('Record.Details').component('careTeamSection', {
 		ctrl.addNewPatientStatus = (status) =>
 		{
 			this.patientStatusList.push({"label": status, "value": status});
-		}
-
-		ctrl.openAddRosterStatusModal = async () =>
-		{
-			try
-			{
-				let newStatus = await Juno.Common.Util.openInputDialog($uibModal, "Add Roster Status",
-						"Input the new roster status", ctrl.componentStyle)
-
-				if (newStatus)
-				{
-					ctrl.addNewRosterStatus(newStatus);
-					ctrl.ngModel.rosterStatus = newStatus;
-				}
-			}
-			catch (e)
-			{
-				//user abort (Esc key)
-			}
-		}
-
-		ctrl.addNewRosterStatus = (newStatus) =>
-		{
-			ctrl.rosterStatusList.push({"label": newStatus, "value": newStatus});
 		}
 
 		ctrl.updatePatientStatusDate = () =>

@@ -2006,6 +2006,7 @@
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
 								org.oscarehr.ws.rest.DemographicsService
+								org.oscarehr.ws.rest.RosterService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
                                 org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
                                 org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
