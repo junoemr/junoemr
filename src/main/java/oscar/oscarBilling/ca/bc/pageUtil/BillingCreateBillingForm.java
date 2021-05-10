@@ -25,16 +25,15 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.oscarehr.util.MiscUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public final class BillingCreateBillingForm extends ActionForm {
   private static final Logger _log = MiscUtils.getLogger();

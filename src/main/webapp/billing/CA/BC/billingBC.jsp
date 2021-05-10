@@ -66,6 +66,14 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.managers.AppointmentManager" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.clinic.service.ClinicService" %>
+<%@ page import="org.oscarehr.provider.service.ProviderService" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<%@ page import="org.oscarehr.site.service.SiteService" %>
+<%@ page import="oscar.oscarBilling.ca.bc.pageUtil.BillingForm" %>
+<%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
+<%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -147,6 +155,90 @@ if(!authed) {
       {
           return null;
       }
+  }
+
+    /**
+     * Get the Service Location code to use with this billing, going down the following priorities until one is not null or empty
+     * 1) The billing provider's default SLC code
+     * 2) (If multisite) The default SLC code for the site associated with the appointment
+     * 3) The clinic's default billing code
+     * @return
+     */
+  private String getDefaultVisitType(LoggedInInfo info, String billingProviderNo, String appointmentNo)
+  {
+  	BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
+  	Map<String, String> slcCodesMap = new HashMap<String, String>();
+  	List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+    for (Object[] visitCode : visitCodes)
+    {
+    	slcCodesMap.put((String)visitCode[0], (String)visitCode[1]);
+    }
+
+    // Provider and site are formatted a little differently, they store the code key, whereas the clinic
+    // property is stored as "key|description".  Since the front end expects that latter, we need to properly
+    // format the codes associated with provider and site.
+
+    ProviderService providerService = SpringUtils.getBean(ProviderService.class);
+  	ProviderData provider = providerService.getProviderEager(billingProviderNo);
+  	if (provider.getBillingOpts() != null && ConversionUtils.hasContent(provider.getBillingOpts().getBcServiceLocationCode()))
+    {
+        String providerCode = provider.getBillingOpts().getBcServiceLocationCode();
+        return providerCode + "|" + slcCodesMap.get(providerCode);
+    }
+
+  	if (OscarProperties.getInstance().isMultisiteEnabled())
+    {
+        AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
+        Appointment appt = apptManager.getAppointment(info, Integer.parseInt(appointmentNo));
+
+        SiteService siteService = SpringUtils.getBean(AppointmentManager.class);
+        Site site = siteService.getSiteByName(appt.getLocation());
+
+        if (site != null && ConversionUtils.hasContent(site.getBcServiceLocationCode()))
+        {
+        	String siteCode = site.getBcServiceLocationCode();
+            return siteCode + "|" + slcCodesMap.get(siteCode);
+        }
+    }
+
+    SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
+    String clinicSLCCode = systemPreferences.getPreferenceValue("service_location_code", "");
+
+    return clinicSLCCode;
+  }
+
+    /**
+     * Get the provider to use for this billing, going down the following priorities until one is not null or empty.
+     *
+     * 1) The provider on the billing session bean
+     * 2) Property: auto_populate_billing_bc_billingPhysicianID
+     * 3) The provider associaed with the appointment being billed
+     * 3) The demographic's MRP
+     *
+     * This method has no side effects
+     * @param bean BillingSessionBean
+     * @param properties OscarProperties
+     * @param demo demographic being billed
+
+     * @return providerNo of the provider to use for the billing
+     */
+  private String getDefaultProvider(BillingSessionBean bean, OscarProperties properties, org.oscarehr.common.model.Demographic demo)
+  {
+  	String sxml_provider = bean.getBillingProvider();
+
+  	if(!ConversionUtils.hasContent(sxml_provider) || sxml_provider.trim().equals("none"))
+      {
+          // OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
+          sxml_provider = properties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
+
+          // OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
+          if(properties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("none"))
+          {
+              sxml_provider = demo.getProviderNo();
+          }
+      }
+
+      return sxml_provider;
   }
 %>
 <%
@@ -282,7 +374,7 @@ if(!authed) {
         var $facilityNumber = jQuery('#facility-number');
         var $siteSelect = jQuery('#site-select');
         var $ruralRetentionSelect = jQuery('select[name=xml_location]');
-				var $serviceLocationSelect = jQuery('select[name=xml_visittype]');
+		var $serviceLocationSelect = jQuery('select[name=xml_visittype]');
 
         if ($siteSelect.length > 0)
         {
@@ -294,7 +386,7 @@ if(!authed) {
         }
 
         Juno.BillingHelper.BC.initRuralRetentionCodeHook("<%=request.getContextPath() %>", $providerSelect, $ruralRetentionSelect);
-			  Juno.BillingHelper.BC.initServiceLocationCodeHook("<%=request.getContextPath() %>", $providerSelect, $serviceLocationSelect);
+        Juno.BillingHelper.BC.initServiceLocationCodeHook("<%=request.getContextPath() %>", $providerSelect, $siteSelect, $serviceLocationSelect);
     });
 
 //creates a javaspt array of associated dx codes
@@ -910,31 +1002,25 @@ if(wcbneeds != null){%>
 		sxml_provider = ((String) thisForm.getXml_provider());
 		sxml_location = ((String) thisForm.getXml_location());
 		sxml_visittype = ((String) thisForm.getXml_visittype());
+
 		if(sxml_location.compareTo("") == 0)
 		{
+            sxml_provider = getDefaultProvider(bean, OscarProperties.getInstance(), demo);
+            thisForm.setXml_provider(sxml_provider);
+
 			sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
-			sxml_visittype = systemPreferenceService.getPreferenceValue("service_location_code", "");
-			sxml_provider = bean.getBillingProvider();
 			thisForm.setXml_location(sxml_location);
-			thisForm.setXml_provider(sxml_provider);
+
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromRequest(request);
+			sxml_visittype = getDefaultVisitType(loggedInInfo, sxml_provider, bean.getApptNo());
 			thisForm.setXml_visittype(sxml_visittype);
+
 			if("YES".equalsIgnoreCase(OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING")))
 			{
 				thisForm.setXml_encounter("8");
 			}
 		}
-		if(sxml_provider == null || sxml_provider.trim().equals("") || sxml_provider.trim().equals("none"))
-		{
-			// OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
-			sxml_provider = oscarProperties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
 
-			// OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
-			if(oscarProperties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("none"))
-			{
-				sxml_provider = demo.getProviderNo();
-			}
-			thisForm.setXml_provider(sxml_provider);
-		}
 		String apDate = thisForm.getXml_appointment_date();
 		if(apDate != null && apDate.trim().length() == 0)
 		{

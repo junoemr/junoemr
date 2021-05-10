@@ -18,11 +18,6 @@
 
 package org.oscarehr.common.web;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
@@ -36,8 +31,14 @@ import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.transfer.billing.BCBillingLocationTo1;
 import org.oscarehr.ws.rest.transfer.billing.BCBillingVisitCodeTo1;
+import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SitesManageAction extends DispatchAction {
 
@@ -53,12 +54,28 @@ public class SitesManageAction extends DispatchAction {
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
         List<Site> sites = siteDao.getAllSites();
-        request.setAttribute("sites", sites);
-        
-        List<Object[]> codes = bcBillingDao.findBillingLocations(BillingServiceDao.BC);
-        List<BCBillingLocationTo1> serviceLocationCodes = BCBillingLocationTo1.fromList(codes);
-        request.setAttribute("serviceLocationCodes", serviceLocationCodes);
-        
+
+        // In lieu of creating a custom decorator for this field (See element:column documentation -- overkill)
+		// we will format the SLC code for display here.  This should be safe because there are no
+		// write operations to the Site entity on this page.
+		List<Object[]> codes = bcBillingDao.findBillingVisits(BillingServiceDao.BC);
+		Map<String, String> slcCodes = new HashMap<>();
+		for (Object[] code: codes)
+		{
+			slcCodes.put((String)code[0], (String) code[1]);
+		}
+
+		for (Site site : sites)
+		{
+			if (ConversionUtils.hasContent(site.getBcServiceLocationCode()))
+			{
+				String code = site.getBcServiceLocationCode();
+				String codeDescription = slcCodes.get(code);
+				site.setBcServiceLocationCode("(" + code + ") " + codeDescription);
+			}
+		}
+
+		request.setAttribute("sites", sites);
         return mapping.findForward("list");
     }
 
@@ -71,7 +88,7 @@ public class SitesManageAction extends DispatchAction {
 		
 		List<Object[]> codes = bcBillingDao.findBillingVisits(BillingServiceDao.BC);
 		List<BCBillingVisitCodeTo1> serviceLocationCodes = BCBillingVisitCodeTo1.fromList(codes);
-		
+
 		request.setAttribute("serviceLocationCodes", serviceLocationCodes);
 
         return mapping.findForward("details");
@@ -133,8 +150,12 @@ public class SitesManageAction extends DispatchAction {
 			oldSite.setCity(siteFromForm.getCity());
 			oldSite.setProvince(siteFromForm.getProvince());
 			oldSite.setPostal(siteFromForm.getPostal());
+
 			oldSite.setAlbertaConnectCareLabId(siteFromForm.getAlbertaConnectCareLabId());
 			oldSite.setAlbertaConnectCareDepartmentId(siteFromForm.getAlbertaConnectCareDepartmentId());
+
+			oldSite.setBcFacilityNumber(siteFromForm.getBcFacilityNumber());
+			oldSite.setBcServiceLocationCode(siteFromForm.getBcServiceLocationCode());
 
 			siteDao.save(oldSite);
 		}
@@ -152,8 +173,12 @@ public class SitesManageAction extends DispatchAction {
 
     	String siteId = request.getParameter("siteId");
         Site s = siteDao.getById(new Integer(siteId));
-
         lazyForm.set("site", s);
+
+		List<Object[]> codes = bcBillingDao.findBillingVisits(BillingServiceDao.BC);
+		List<BCBillingVisitCodeTo1> serviceLocationCodes = BCBillingVisitCodeTo1.fromList(codes);
+		request.setAttribute("serviceLocationCodes", serviceLocationCodes);
+
         return mapping.findForward("details");
     }
 
@@ -161,4 +186,5 @@ public class SitesManageAction extends DispatchAction {
 	{
 		this.siteDao = siteDao;
 	}
+
 }

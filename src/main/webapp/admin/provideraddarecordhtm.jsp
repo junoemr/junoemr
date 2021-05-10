@@ -413,10 +413,10 @@ for (int i=0; i<sites.size(); i++) {
 			if (OscarProperties.getInstance().isBritishColumbiaInstanceType()) {
 				BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
 				List<BillingVisit> slcCodes = new ArrayList<BillingVisit>();
-				List<Object[]> visits = billingBCDao.findBillingVisits(BillingServiceDao.BC);
-				for (Object[] visit : visits)
+				List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+				for (Object[] visitCode : visitCodes)
 				{
-					slcCodes.add(new BillingVisit(visit));
+					slcCodes.add(new BillingVisit(visitCode));
 				}
 		%>
         <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>

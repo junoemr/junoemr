@@ -459,10 +459,10 @@ jQuery(document).ready( function() {
 			BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
 			List<BillingFormData.BillingVisit> slcCodes = new ArrayList<BillingFormData.BillingVisit>();
 
-			List<Object[]> visits = billingBCDao.findBillingVisits(BillingServiceDao.BC);
-            for (Object[] visit : visits)
+			List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+            for (Object[] visitCode : visitCodes)
             {
-            	slcCodes.add(new BillingFormData.BillingVisit(visit));
+            	slcCodes.add(new BillingFormData.BillingVisit(visitCode));
             }
 
             String providerSLCCode = provider.getBillingOpts().getBcServiceLocationCode();
