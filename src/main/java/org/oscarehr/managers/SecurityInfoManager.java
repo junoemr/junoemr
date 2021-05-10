@@ -256,7 +256,7 @@ public class SecurityInfoManager
 
 	public boolean isAllowedAccessToPatientRecord(String providerNo, Integer demographicNo)
 	{
-		List<String> blacklist = securitySetsService.getSecurityDemographicSetNames(providerNo);
+		List<String> blacklist = securitySetsService.getSecurityDemographicSetNamesBlacklist(providerNo);
 		List<String> setsWithPatient = demographicSetsDao.findSetNamesByDemographicNo(demographicNo);
 
 		for(String blacklistedSet : blacklist)

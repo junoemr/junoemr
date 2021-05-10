@@ -397,23 +397,23 @@ public class ProviderService extends AbstractServiceImpl {
 	}
 
 	@GET
-	@Path("/provider/{providerId}/security/sets")
+	@Path("/provider/{providerId}/security/sets/blacklist")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<String> getProviderSecurityDemographicSets(@PathParam("providerId") String providerId)
+	public RestSearchResponse<String> getProviderSecurityDemographicSetsBlacklist(@PathParam("providerId") String providerId)
 	{
-		return RestSearchResponse.successResponseOnePage(securitySetsService.getSecurityDemographicSetNames(providerId));
+		return RestSearchResponse.successResponseOnePage(securitySetsService.getSecurityDemographicSetNamesBlacklist(providerId));
 	}
 
 	@PUT
-	@Path("/provider/{providerId}/security/sets")
+	@Path("/provider/{providerId}/security/sets/blacklist")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> setProviderSecurityDemographicSets(@PathParam("providerId") String providerId,
-	                                                                List<String> assignedSetNames)
+	public RestResponse<Boolean> setProviderSecurityDemographicSetsBlacklist(@PathParam("providerId") String providerId,
+	                                                                         List<String> assignedSetNames)
 	{
 		String loggedInProviderId = getLoggedInProviderId();
 		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.CONFIGURE_SECURITY_ROLES_UPDATE);
-		securitySetsService.setSecurityDemographicSets(loggedInProviderId, providerId, assignedSetNames);
+		securitySetsService.setSecurityDemographicSetsBlacklist(loggedInProviderId, providerId, assignedSetNames);
 		return RestResponse.successResponse(true);
 	}
 	

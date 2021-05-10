@@ -85,7 +85,7 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 				}
 				ctrl.reloadSelectedSetsList = async (value) =>
 				{
-					const assignedSets = await securityApiService.getProviderSecurityDemographicSets(value);
+					const assignedSets = await securityApiService.getProviderSecurityDemographicSetsBlacklist(value);
 					ctrl.selectedSetsList = ctrl.availableSetsList.map((set) =>
 					{
 						return {
@@ -99,7 +99,7 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 				ctrl.onBlacklistChange = async (item, model) =>
 				{
 					const assignedSets = model.filter((modelItem) => modelItem.selected).map((modelItem) => modelItem.data);
-					await securityApiService.setProviderSecurityDemographicSets(ctrl.selectedProvider, assignedSets);
+					await securityApiService.setProviderSecurityDemographicSetsBlacklist(ctrl.selectedProvider, assignedSets);
 				}
 
 				ctrl.onCancel = () =>

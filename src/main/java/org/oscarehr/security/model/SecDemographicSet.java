@@ -29,6 +29,8 @@ import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -46,6 +48,10 @@ import java.time.LocalDateTime;
 @Where(clause="deleted_at IS NULL")
 public class SecDemographicSet extends AbstractModel<Integer>
 {
+	enum SET_TYPE {
+		BLACKLIST,
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -53,6 +59,10 @@ public class SecDemographicSet extends AbstractModel<Integer>
 
 	@Column(name = "set_name")
 	private String setName;
+
+	@Column(name = "set_type")
+	@Enumerated(EnumType.STRING)
+	private SET_TYPE setType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "provider_id", referencedColumnName = "provider_no", nullable = false)
@@ -90,5 +100,10 @@ public class SecDemographicSet extends AbstractModel<Integer>
 	public void setUpdateTime()
 	{
 		this.setUpdatedAt(LocalDateTime.now());
+	}
+
+	public void setSetTypeBlacklist()
+	{
+		this.setSetType(SET_TYPE.BLACKLIST);
 	}
 }

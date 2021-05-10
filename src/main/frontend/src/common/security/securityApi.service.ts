@@ -72,14 +72,14 @@ angular.module("Common.Security").service("securityApiService", [
             return (await service.securityRoleApi.getAllPermissions()).data.body;
         }
 
-        service.getProviderSecurityDemographicSets = async (providerId: string): Promise<any> =>
+        service.getProviderSecurityDemographicSetsBlacklist = async (providerId: string): Promise<any> =>
         {
-            return (await service.providerApi.getProviderSecurityDemographicSets(providerId)).data.body;
+            return (await service.providerApi.getProviderSecurityDemographicSetsBlacklist(providerId)).data.body;
         }
 
-        service.setProviderSecurityDemographicSets = async (providerId: string, data: any): Promise<any> =>
+        service.setProviderSecurityDemographicSetsBlacklist = async (providerId: string, data: any): Promise<any> =>
         {
-            return (await service.providerApi.setProviderSecurityDemographicSets(providerId, data)).data.body;
+            return (await service.providerApi.setProviderSecurityDemographicSetsBlacklist(providerId, data)).data.body;
         }
 
         service.canCurrentUserAccessDemographic = async (demographicId: number): Promise<any> =>
