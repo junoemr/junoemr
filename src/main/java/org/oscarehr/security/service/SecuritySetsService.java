@@ -46,7 +46,7 @@ public class SecuritySetsService
 	@Autowired
 	private ProviderDataDao providerDao;
 
-	public List<String> getSecurityDemographicSetNames(String providerId)
+	public List<String> getSecurityDemographicSetNamesBlacklist(String providerId)
 	{
 		List<SecDemographicSet> assignedSets = secDemographicSetDao.findAllByProvider(providerId);
 		return assignedSets.stream()
@@ -54,7 +54,7 @@ public class SecuritySetsService
 				.collect(Collectors.toList());
 	}
 
-	public void setSecurityDemographicSets(String loggedInProvider, String providerId, List<String> assignedSetNames)
+	public void setSecurityDemographicSetsBlacklist(String loggedInProvider, String providerId, List<String> assignedSetNames)
 	{
 		List<SecDemographicSet> currentlyAssignedSets = secDemographicSetDao.findAllByProvider(providerId);
 
@@ -78,6 +78,7 @@ public class SecuritySetsService
 				demographicSet = new SecDemographicSet();
 				demographicSet.setProvider(providerDao.find(providerId));
 				demographicSet.setSetName(setName);
+				demographicSet.setSetTypeBlacklist();
 				demographicSet.setCreatedBy(loggedInProvider);
 				secDemographicSetDao.persist(demographicSet);
 			}
