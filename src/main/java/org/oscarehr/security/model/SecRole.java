@@ -87,11 +87,11 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 	}
 
 	@PreUpdate
-	public void checkSystemManaged()
+	public void checkSystemManaged() throws IllegalAccessException
 	{
 		if(this.isSystemManaged())
 		{
-			throw new RuntimeException("System managed roles cannot be modified");
+			throw new IllegalAccessException("System managed roles cannot be modified");
 		}
 	}
 

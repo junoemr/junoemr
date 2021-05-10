@@ -154,7 +154,7 @@ public class SecurityRolesService
 		return secRoleToSecurityRoleTransferConverter.convert(secRole, false);
 	}
 
-	public SecurityRoleTransfer updateRole(String loggedInProviderId, Integer roleId, SecurityRoleTransfer updatedRoleTransfer)
+	public SecurityRoleTransfer updateRole(String loggedInProviderId, Integer roleId, SecurityRoleTransfer updatedRoleTransfer) throws IllegalAccessException
 	{
 		if(roleId == null || !roleId.equals(updatedRoleTransfer.getId()))
 		{
@@ -163,7 +163,7 @@ public class SecurityRolesService
 		SecRole secRole = secRoleDao.find(roleId);
 		if(secRole.isSystemManaged())
 		{
-			throw new RuntimeException("System managed roles cannot be modified");
+			throw new IllegalAccessException("System managed roles cannot be modified");
 		}
 		secRole = copyToSecRole(updatedRoleTransfer, secRole);
 		secRoleDao.merge(secRole);
@@ -177,12 +177,12 @@ public class SecurityRolesService
 		return secRoleToSecurityRoleTransferConverter.convert(secRole, false);
 	}
 
-	public boolean deleteRole(String loggedInProviderId, Integer roleId)
+	public boolean deleteRole(String loggedInProviderId, Integer roleId) throws IllegalAccessException
 	{
 		SecRole role = secRoleDao.find(roleId);
 		if(role.isSystemManaged())
 		{
-			throw new RuntimeException("System managed roles cannot be deleted");
+			throw new IllegalAccessException("System managed roles cannot be deleted");
 		}
 
 		// remove existing provider connections to this role

@@ -92,7 +92,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	@Path("/role/{roleId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<SecurityRoleTransfer> updateRole(@PathParam("roleId") Integer roleId, SecurityRoleTransfer transfer)
+	public RestResponse<SecurityRoleTransfer> updateRole(@PathParam("roleId") Integer roleId, SecurityRoleTransfer transfer) throws IllegalAccessException
 	{
 		String providerNo = getLoggedInProviderId();
 		securityInfoManager.requireAllPrivilege(providerNo, Permission.CONFIGURE_SECURITY_ROLES_UPDATE);
@@ -102,7 +102,7 @@ public class SecurityRolesWebService extends AbstractServiceImpl
 	@DELETE
 	@Path("/role/{roleId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> deleteRole(@PathParam("roleId") Integer roleId)
+	public RestResponse<Boolean> deleteRole(@PathParam("roleId") Integer roleId) throws IllegalAccessException
 	{
 		String providerNo = getLoggedInProviderId();
 		securityInfoManager.requireAllPrivilege(providerNo, Permission.CONFIGURE_SECURITY_ROLES_DELETE);
