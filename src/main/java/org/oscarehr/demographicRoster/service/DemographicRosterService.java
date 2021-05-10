@@ -26,8 +26,10 @@ package org.oscarehr.demographicRoster.service;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.rosterStatus.model.RosterStatus;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
+import org.oscarehr.ws.conversion.DemographicRosterToTransferConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.ConversionUtils;
@@ -45,6 +47,9 @@ public class DemographicRosterService
 
 	@Autowired
 	RosterStatusService rosterStatusService;
+
+	@Autowired
+	DemographicRosterToTransferConverter demographicRosterToTransferConverter;
 
 	/**
 	 * Create a demographic roster history entry, given a demographic record.
@@ -76,9 +81,9 @@ public class DemographicRosterService
 		return demographicRoster;
 	}
 
-	public List<DemographicRoster> getRosteredHistory(Integer demographicNo)
+	public List<DemographicRosterTransfer> getRosteredHistory(Integer demographicNo)
 	{
-		return demographicRosterDao.getActiveForDemographic(demographicNo);
+		return demographicRosterToTransferConverter.convert(demographicRosterDao.getActiveForDemographic(demographicNo));
 	}
 
 }

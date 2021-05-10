@@ -27,11 +27,15 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DemographicRosterToTransferConverter extends AbstractModelConverter<DemographicRoster, DemographicRosterTransfer>
 {
+	@Autowired
+	RosterStatusToTransferConverter rosterStatusToTransferConverter;
+
 	@Override
 	public DemographicRosterTransfer convert(DemographicRoster demographicRoster)
 	{
@@ -41,7 +45,9 @@ public class DemographicRosterToTransferConverter extends AbstractModelConverter
 		}
 
 		DemographicRosterTransfer transfer = new DemographicRosterTransfer();
-		BeanUtils.copyProperties(demographicRoster, transfer);
+		BeanUtils.copyProperties(demographicRoster, transfer, "rosterStatus");
+
+		transfer.setRosterStatus(rosterStatusToTransferConverter.convert(demographicRoster.getRosterStatus()));
 
 		return transfer;
 	}

@@ -49,19 +49,26 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                         });
                     }
                 );
+            }
 
-                // Below is copy-pasted from care team component, but needs to be changed
-                // We don't want people adding new statuses from here
-                ctrl.openRosteredHistoryModal = async () =>
+            ctrl.openRosteredHistoryModal = () =>
+            {
+                $uibModal.open(
+                    {
+                        component: 'rosteredHistoryModal',
+                        backdrop: 'static',
+                        windowClass: "juno-modal lg",
+                        resolve: {
+                            demographic: ctrl.ngModel,
+                        }
+                    }
+                ).result.then((_ignored) =>
                 {
-                    let modalInstance = $uibModal.open(
-                        {
-                            component: 'rosteredHistoryModal',
-                            backdrop: 'static',
-                            windowClass: "juno-modal"
-                        });
-                }
-
+                    // modal is display only, no results to return
+                }).catch((_reason) =>
+                {
+                        // do nothing on cancel
+                });
             }
         }
     ]
