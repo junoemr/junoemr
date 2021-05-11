@@ -261,4 +261,9 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		}
 		return ynIndicator;
 	}
+
+	protected String toYnIndicatorString(Boolean indicator)
+	{
+		return ((indicator != null) && indicator) ? CDSConstants.Y_INDICATOR_TRUE : CDSConstants.Y_INDICATOR_FALSE;
+	}
 }
