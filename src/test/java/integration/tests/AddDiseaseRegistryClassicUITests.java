@@ -76,7 +76,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		Thread.sleep(2000);
 		String currWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.linkText("Disease Registry")).click();
-		Thread.sleep(2000);
+		Thread.sleep(4000);
 		PageUtil.switchToLastWindow(driver);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
 		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
