@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.measurement.BloodPressureMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesComplicationsScreeningMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesMotivationalCounselingMeasurement;
@@ -182,7 +183,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected DiabetesComplicationScreening getComplicationsScreening(DiabetesComplicationsScreeningMeasurement exportStructure)
 	{
 		DiabetesComplicationScreening complicationScreening = objectFactory.createDiabetesComplicationScreening();
-		complicationScreening.setExamCode(exportStructure.getMeasurementValue());
+		complicationScreening.setExamCode(toCT037Code(exportStructure.getMeasurementValue()));
 		complicationScreening.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return complicationScreening;
 	}
@@ -237,7 +238,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 		return selfMonitoringBloodGlucose;
 	}
 
-	private String parseToYnIndicator(String valueToParse)
+	protected String parseToYnIndicator(String valueToParse)
 	{
 		boolean isYes = false;
 		if(valueToParse != null)
@@ -250,10 +251,36 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 				case "t":
 				case "true":
 				{
-					isYes = true;
+					isYes = true; break;
+				}
+				default:
+				{
+					logEvent("Unknown indicator value '" + valueToParse + "' mapping exported as " + CDSConstants.Y_INDICATOR_FALSE + ". Expected yes/no mapping");
 				}
 			}
 		}
 		return toYnIndicatorString(isYes);
+	}
+
+	protected String toCT037Code(String value)
+	{
+		String code = null;
+		if(value != null)
+		{
+			switch (value.toLowerCase())
+			{
+				case "retinal exam":
+				case "32468-1": code = "32468-1"; break;
+				case "foot exam":
+				case "11397-7": code = "11397-7"; break;
+				case "neurological exam":
+				case "67536-3": code = "67536-3"; break;
+				default:
+				{
+					logEvent("Invalid diabetes complication screening value '" + value + "' not included in export data");
+				}
+			}
+		}
+		return code;
 	}
 }
