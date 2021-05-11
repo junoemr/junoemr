@@ -134,7 +134,7 @@ public class CDSExportMapperTest
 	@Test
 	public void testCreateResidualInfoDataElement()
 	{
-		CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT;
+		CDSConstants.ResidualInfoDataType dataType = CDSConstants.ResidualInfoDataType.TEXT;
 		String name = "key";
 		String value = "value";
 
@@ -148,7 +148,7 @@ public class CDSExportMapperTest
 	@Test
 	public void testAddNonNullDataElements_String()
 	{
-		CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT;
+		CDSConstants.ResidualInfoDataType dataType = CDSConstants.ResidualInfoDataType.TEXT;
 		String name = "key";
 		String value = "value";
 
@@ -165,7 +165,7 @@ public class CDSExportMapperTest
 	@Test
 	public void testAddNonNullDataElements_StringNull()
 	{
-		CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT;
+		CDSConstants.ResidualInfoDataType dataType = CDSConstants.ResidualInfoDataType.TEXT;
 		String name = "key";
 		ObjectFactory objectFactory = new ObjectFactory();
 		ResidualInformation residualInformation = objectFactory.createResidualInformation();
@@ -187,7 +187,7 @@ public class CDSExportMapperTest
 		ResidualInformation.DataElement dataElement = residualInformation.getDataElement().get(0);
 
 		assertEquals(name, dataElement.getName());
-		assertEquals(CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE.toString(), dataElement.getDataType());
+		assertEquals(CDSConstants.ResidualInfoDataType.DATE.toString(), dataElement.getDataType());
 		assertEquals("2021-01-06", dataElement.getContent());
 	}
 
@@ -215,7 +215,7 @@ public class CDSExportMapperTest
 		ResidualInformation.DataElement dataElement = residualInformation.getDataElement().get(0);
 
 		assertEquals(name, dataElement.getName());
-		assertEquals(CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE.toString(), dataElement.getDataType());
+		assertEquals(CDSConstants.ResidualInfoDataType.DATE.toString(), dataElement.getDataType());
 		assertEquals("2021-01-06", dataElement.getContent());
 	}
 
@@ -232,7 +232,7 @@ public class CDSExportMapperTest
 		ResidualInformation.DataElement dataElement = residualInformation.getDataElement().get(0);
 
 		assertEquals(name, dataElement.getName());
-		assertEquals(CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE_PARTIAL.toString(), dataElement.getDataType());
+		assertEquals(CDSConstants.ResidualInfoDataType.DATE_PARTIAL.toString(), dataElement.getDataType());
 		assertEquals("2021-01", dataElement.getContent());
 	}
 
@@ -249,7 +249,7 @@ public class CDSExportMapperTest
 		ResidualInformation.DataElement dataElement = residualInformation.getDataElement().get(0);
 
 		assertEquals(name, dataElement.getName());
-		assertEquals(CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE_PARTIAL.toString(), dataElement.getDataType());
+		assertEquals(CDSConstants.ResidualInfoDataType.DATE_PARTIAL.toString(), dataElement.getDataType());
 		assertEquals("2021", dataElement.getContent());
 	}
 
