@@ -27,11 +27,13 @@ Juno.BillingHelper.BC._isSiteSelected = function isSiteSelected(siteNo)
  */
 Juno.BillingHelper.BC._setSelectToValue = function setSelectToValue($select, targetVal)
 {
-    for (var $option of $select.children("option").toArray()) {
+    for (var $option of $select.children("option").toArray())
+    {
         $option = jQuery($option);
         var match = $option.val().match(/^\w/);
 
-        if (match && match[0] === targetVal) {
+        if (match && match[0] === targetVal)
+        {
             $select.val($option.val());
         }
     }
@@ -186,7 +188,8 @@ Juno.BillingHelper.BC._updateFacilityNumber = function updateFacilityNumber($fac
 
 Juno.BillingHelper.BC._filterSiteSelectOptions = function filterSiteSelectOptions($siteSelect, ignoreList)
 {
-    $siteSelect.children("option").each(function () {
+    $siteSelect.children("option").each(function ()
+    {
         var option = jQuery(this);
 
         option.removeProp('selected');

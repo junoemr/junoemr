@@ -342,53 +342,12 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 		this.uuid = uuid;
 	}
 
-	public String getBcServiceLocationCode() {
+	public String getBcServiceLocationCode()
+	{
 		return bcServiceLocationCode;
 	}
-
-	public void setBcServiceLocationCode(String bcServiceLocationCode) {
+	public void setBcServiceLocationCode(String bcServiceLocationCode)
+	{
 		this.bcServiceLocationCode = bcServiceLocationCode;
-	}
-
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((siteId == null) ? 0 : siteId.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
-			return true;
-		}
-
-		if (obj == null)
-		{
-			return false;
-		}
-
-		if (getClass() != obj.getClass())
-		{
-			return false;
-		}
-
-		Site other = (Site) obj;
-		if (siteId == null)
-		{
-			if (other.siteId != null)
-			{
-				return false;
-			}
-		}
-		else if (!siteId.equals(other.siteId))
-		{
-			return false;
-		}
-		return true;
 	}
 }

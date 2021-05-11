@@ -489,15 +489,16 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			try
 			{
 				let result = await billingService.getBCBillingVisitCodes();
-				ctrl.bcServiceLocationOptions = [];
+				ctrl.bcServiceLocationOptions = [{
+					label: "No default service code",
+					value: null,
+				}];
 				for (let visitCode of result.data.body)
 				{
-					ctrl.bcServiceLocationOptions.push(
-							{
+					ctrl.bcServiceLocationOptions.push({
 								label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
 								value: visitCode.visitType
-							}
-					);
+							});
 				}
 			}
 			catch (e)

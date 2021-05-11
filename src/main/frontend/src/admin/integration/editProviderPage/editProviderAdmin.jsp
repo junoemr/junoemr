@@ -564,6 +564,7 @@
 							ng-model="$ctrl.provider.bcServiceLocation"
 							options="$ctrl.bcServiceLocationOptions"
 							placeholder="Set BC Service Location Code"
+                            placeholder-value="null"
 							label="Service Location Code"
 							label-position="$ctrl.LABEL_POSITION"
 							disabled="$ctrl.fieldsDisabled"
