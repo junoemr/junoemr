@@ -24,6 +24,7 @@
 package org.oscarehr.demographicRoster.transfer;
 
 import lombok.Data;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ public class DemographicRosterTransfer
 	private String providerNo;
 	private LocalDateTime rosterDate;
 	private LocalDateTime rosterTerminationDate;
-	private String rosterTerminationReason;
+	private DemographicRoster.ROSTER_TERMINATION_REASON rosterTerminationReason;
 	private RosterStatusTransfer rosterStatus;
 	private LocalDateTime addedAt;
 }

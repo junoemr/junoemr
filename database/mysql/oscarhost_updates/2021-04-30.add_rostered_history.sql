@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `demographic_roster` (
     roster_status_id INTEGER NOT NULL,
     roster_date TIMESTAMP NULL,
     roster_termination_date TIMESTAMP NULL,
-    roster_termination_reason VARCHAR(2),
+    roster_termination_reason VARCHAR(64),
     added_at TIMESTAMP NOT NULL DEFAULT NOW(),
     CONSTRAINT demographic_roster_demographic_no_fk FOREIGN KEY(demographic_no) REFERENCES demographic (demographic_no),
     CONSTRAINT demographic_roster_provider_no_fk FOREIGN KEY (`rostered_provider_no`) REFERENCES `provider` (`provider_no`) ON UPDATE CASCADE,

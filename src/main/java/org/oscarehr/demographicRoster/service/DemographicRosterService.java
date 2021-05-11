@@ -73,7 +73,9 @@ public class DemographicRosterService
 		if (demographicRoster.getRosterStatus().isTerminated())
 		{
 			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
-			demographicRoster.setRosterTerminationReason(demographic.getRosterTerminationReason());
+			DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(
+					Integer.parseInt(demographic.getRosterTerminationReason()));
+			demographicRoster.setRosterTerminationReason(terminationReason);
 		}
 
 		demographicRosterDao.persist(demographicRoster);
@@ -85,5 +87,4 @@ public class DemographicRosterService
 	{
 		return demographicRosterToTransferConverter.convert(demographicRosterDao.getActiveForDemographic(demographicNo));
 	}
-
 }

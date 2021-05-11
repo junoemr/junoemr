@@ -40,6 +40,12 @@ import java.time.LocalDateTime;
 @Table(name = "roster_status")
 public class RosterStatus extends AbstractModel<Integer> implements Serializable
 {
+
+	public static final String ROSTER_STATUS_FEE_SERVICE = "FS";
+	public static final String ROSTER_STATUS_ROSTERED = "RO";
+	public static final String ROSTER_STATUS_NOT_ROSTERED = "NR";
+	public static final String ROSTER_STATUS_TERMINATED = "TE";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
