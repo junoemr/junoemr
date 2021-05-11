@@ -73,8 +73,8 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		String inr = "42731";
 
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		Thread.sleep(2000);
 		String currWindowHandle = driver.getWindowHandle();
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Disease Registry")));
 		driver.findElement(By.linkText("Disease Registry")).click();
 		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
