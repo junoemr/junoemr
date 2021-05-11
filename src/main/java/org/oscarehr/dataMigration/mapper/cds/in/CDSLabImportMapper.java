@@ -44,6 +44,10 @@ import java.util.List;
 @Component
 public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryResults>, List<Lab>>
 {
+	public static final String UNKNOWN_OBR_NAME = "UNKNOWN TEST TYPE";
+	public static final String UNKNOWN_OBX_ID = "UNKNOWN ID";
+	public static final String UNKNOWN_OBX_NAME = "UNKNOWN TEST NAME";
+
 	public CDSLabImportMapper()
 	{
 		super();
@@ -160,7 +164,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	{
 		LabObservation labObservation = new LabObservation();
 		LaboratoryResults result0 = importLabGroup.get(0); //they should all be the same, so use the first one
-		labObservation.setName(result0.getTestName());
+		labObservation.setName(getOBRName(result0));
 		labObservation.setRequestDateTime(toNullableLocalDateTime(result0.getLabRequisitionDateTime()));
 		labObservation.setObservationDateTime(toNullableLocalDateTime(result0.getCollectionDateTime()));
 		labObservation.setReportStatus(getReportStatusEnum(result0));
@@ -168,8 +172,8 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		for(LaboratoryResults importLabResults : importLabGroup)
 		{
 			LabObservationResult result = new LabObservationResult();
-			result.setName(importLabResults.getTestNameReportedByLab());
-			result.setIdentifier(importLabResults.getLabTestCode());
+			result.setName(getOBXName(importLabResults));
+			result.setIdentifier(getOBXId(importLabResults));
 			result.setObservationDateTime(toNullableLocalDateTime(importLabResults.getCollectionDateTime()));
 
 			LaboratoryResults.Result labResult = importLabResults.getResult();
@@ -209,6 +213,40 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		}
 
 		return labObservation;
+	}
+
+	private String getOBRName(LaboratoryResults importLabResults)
+	{
+		String name = StringUtils.trimToNull(importLabResults.getTestName());
+		if(name == null)
+		{
+			name = UNKNOWN_OBR_NAME;
+		}
+		return name;
+	}
+
+	private String getOBXName(LaboratoryResults importLabResults)
+	{
+		String name = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
+		if(name == null)
+		{
+			name = StringUtils.trimToNull(importLabResults.getLabTestCode());
+		}
+		if(name == null)
+		{
+			name = UNKNOWN_OBX_NAME;
+		}
+		return name;
+	}
+
+	private String getOBXId(LaboratoryResults importLabResults)
+	{
+		String id = StringUtils.trimToNull(importLabResults.getLabTestCode());
+		if(id == null)
+		{
+			id = UNKNOWN_OBX_ID;
+		}
+		return id;
 	}
 
 	protected Hl7TextInfo.REPORT_STATUS getReportStatusEnum(LaboratoryResults laboratoryResults)
