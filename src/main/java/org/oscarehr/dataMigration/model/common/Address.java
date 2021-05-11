@@ -29,6 +29,8 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 @Data
 public class Address extends AbstractTransientModel
 {
+	public static String REGION_CODE_OTHER = "OT";
+
 	public enum RESIDENCY_STATUS
 	{
 		CURRENT,
@@ -65,5 +67,20 @@ public class Address extends AbstractTransientModel
 	{
 		return StringUtils.trimToNull(
 				StringUtils.trimToEmpty(getAddressLine1()) + " " + StringUtils.trimToEmpty(getAddressLine2()));
+	}
+
+	public String getSubdivisionCodeCT013Format()
+	{
+		return getSubdivisionCodeCT013Format(regionCode, countryCode);
+	}
+
+	public static String getSubdivisionCodeCT013Format(String regionCode, String countryCode)
+	{
+		String code = null;
+		if(regionCode != null && !regionCode.equals(REGION_CODE_OTHER))
+		{
+			code = countryCode + "-" + regionCode;
+		}
+		return code;
 	}
 }

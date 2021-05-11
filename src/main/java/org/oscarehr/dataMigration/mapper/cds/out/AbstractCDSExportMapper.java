@@ -77,7 +77,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 			structured.setLine1(addressModel.getAddressLine1());
 			structured.setLine2(addressModel.getAddressLine2());
 			structured.setCity(addressModel.getCity());
-			structured.setCountrySubdivisionCode(addressModel.getRegionCode());
+			structured.setCountrySubdivisionCode(addressModel.getSubdivisionCodeCT013Format());
 			structured.setPostalZipCode(postalZipCode);
 
 			cdsAddress.setStructured(structured);
