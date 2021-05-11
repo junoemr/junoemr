@@ -458,11 +458,11 @@ jQuery(document).ready( function() {
 		{
 			BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
 
-			List<BillingVisit> slcCodes = new ArrayList<BillingVisit>();
+			List<BillingVisit> serviceLocationCodes = new ArrayList<BillingVisit>();
 			List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
             for (Object[] visitCode : visitCodes)
             {
-            	slcCodes.add(new BillingVisit(visitCode));
+            	serviceLocationCodes.add(new BillingVisit(visitCode));
             }
 
             String providerSLCCode = provider.getBillingOpts().getBcServiceLocationCode();
@@ -483,7 +483,7 @@ jQuery(document).ready( function() {
         <td>
             <select name="bc_service_location_code">
                 <option value="" <%=providerSLCCode == null ? "selected" : ""%>>None</option>
-                <% for (BillingVisit slcCode : slcCodes) { %>
+                <% for (BillingVisit slcCode : serviceLocationCodes) { %>
                 <option value="<%=slcCode.getVisitType()%>" <%=slcCode.getVisitType().equals(providerSLCCode) ? "selected" : ""%>><%=slcCode.getDisplayName()%></option>
                 <% } %>
             </select>

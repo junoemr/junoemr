@@ -203,9 +203,9 @@ if(!authed) {
         }
 
         SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
-        String clinicSLCCode = systemPreferences.getPreferenceValue("service_location_code", "");
+        String clinicServiceLocationCode = systemPreferences.getPreferenceValue("service_location_code", "");
 
-        return clinicSLCCode;
+        return clinicServiceLocationCode;
     }
 
     /**
@@ -225,21 +225,21 @@ if(!authed) {
      */
   private String getDefaultProvider(BillingSessionBean bean, OscarProperties properties, org.oscarehr.common.model.Demographic demo)
   {
-  	String sxml_provider = bean.getBillingProvider();
+  	String xmlProvider = bean.getBillingProvider();
 
-  	if(!ConversionUtils.hasContent(sxml_provider) || sxml_provider.trim().equals("none"))
+  	if(!ConversionUtils.hasContent(xmlProvider) || xmlProvider.trim().equals("none"))
       {
-          // OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
-          sxml_provider = properties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
+          // Set the default billing physician. Overrides appointment physician
+          xmlProvider = properties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
 
-          // OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
-          if(properties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("none"))
+          // Autofill based on assigned provider. Only if not already autofilled
+          if(properties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && xmlProvider.trim().equals("none"))
           {
-              sxml_provider = demo.getProviderNo();
+              xmlProvider = demo.getProviderNo();
           }
       }
 
-      return sxml_provider;
+      return xmlProvider;
   }
 %>
 <%

@@ -25,7 +25,8 @@ package oscar.oscarBilling.ca.bc.data;
 
 import java.io.Serializable;
 
-public class BillingVisit implements Serializable {
+public class BillingVisit implements Serializable
+{
 	String billingvisit = "";
 	String description = "";
 	String displayName = "";
@@ -34,7 +35,8 @@ public class BillingVisit implements Serializable {
 		this(String.valueOf(o[0]), String.valueOf(o[1]));
 	}
 
-	public BillingVisit(String billingvisit, String description) {
+	public BillingVisit(String billingvisit, String description)
+	{
 		this.billingvisit = billingvisit;
 		this.description = description;
 
@@ -44,11 +46,13 @@ public class BillingVisit implements Serializable {
 		return billingvisit;
 	}
 
-	public String getDescription() {
+	public String getDescription()
+	{
 		return description;
 	}
 
-	public String getDisplayName() {
+	public String getDisplayName()
+	{
 		return billingvisit + "|" + description;
 	}
 
