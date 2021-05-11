@@ -121,9 +121,9 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 
 		// Attempt to view prevention and verify information is correct
 		driver.findElement(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]")).click();
-		PageUtil.switchToLastWindow(driver);
 		Thread.sleep(2000);
-
+		PageUtil.switchToLastWindow(driver);
+		
 		// Pull out current assigned values and make sure they match
 		String currentName = driver.findElement(By.xpath("//input[@name='name']")).getAttribute("value");
 		String currentLocation = driver.findElement(By.xpath("//input[@name='location']")).getAttribute("value");
