@@ -191,7 +191,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected DiabetesMotivationalCounselling getMotivationsCounseling(DiabetesMotivationalCounselingMeasurement exportStructure)
 	{
 		DiabetesMotivationalCounselling motivationalCounselling = objectFactory.createDiabetesMotivationalCounselling();
-		motivationalCounselling.setCounsellingPerformed(exportStructure.getMeasurementValue());
+		motivationalCounselling.setCounsellingPerformed(toCT038Code(exportStructure.getMeasurementValue()));
 		motivationalCounselling.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return motivationalCounselling;
 	}
@@ -279,6 +279,36 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 				{
 					logEvent("Invalid diabetes complication screening value '" + value + "' not included in export data");
 				}
+			}
+		}
+		return code;
+	}
+
+	protected String toCT038Code(String value)
+	{
+		String code = null;
+		if(value != null)
+		{
+			if(value.toLowerCase().contains("nutrition"))
+			{
+				code = "Nutrition";
+			}
+			else if(value.toLowerCase().contains("exercise"))
+			{
+				code = "Exercise";
+			}
+			else if(value.toLowerCase().contains("smoking") || value.toLowerCase().contains("cessation"))
+			{
+				code = "Smoking Cessation";
+			}
+			else if(value.toLowerCase().contains("other"))
+			{
+				code = "Other";
+			}
+			else
+			{
+				code = "Other";
+				logEvent("Invalid diabetes motivational counselling value '" + value + "' set as '" + code + "' in export data");
 			}
 		}
 		return code;

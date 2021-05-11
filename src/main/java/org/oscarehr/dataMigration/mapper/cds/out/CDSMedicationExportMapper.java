@@ -31,9 +31,6 @@ import org.springframework.stereotype.Component;
 import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
 
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.Y_INDICATOR_FALSE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;
-
 @Component
 public class CDSMedicationExportMapper extends AbstractCDSExportMapper<MedicationsAndTreatments, Medication>
 {
