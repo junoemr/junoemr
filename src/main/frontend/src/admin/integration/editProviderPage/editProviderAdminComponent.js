@@ -59,7 +59,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		let sitesApi =  new SitesApi($http, $httpParamSerializer, '../ws/rs');
 
-		ctrl.LABEL_POSITION = LABEL_POSITION.TOP
+		ctrl.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
@@ -490,15 +490,16 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			{
 				let result = await billingService.getBCBillingVisitCodes();
 				ctrl.bcServiceLocationOptions = [{
-					label: "No default service code",
+					label: "None",
 					value: null,
 				}];
+
 				for (let visitCode of result.data.body)
 				{
 					ctrl.bcServiceLocationOptions.push({
-								label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
-								value: visitCode.visitType
-							});
+						label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
+						value: visitCode.visitType
+					});
 				}
 			}
 			catch (e)

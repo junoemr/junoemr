@@ -64,7 +64,6 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
 <%@ page import="org.oscarehr.common.dao.SiteDao"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ page import="org.oscarehr.common.model.Site"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.oscarehr.common.model.ProviderSite"%>
@@ -76,9 +75,9 @@
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="oscar.oscarBilling.ca.bc.data.BillingFormData" %>
 <%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
 <%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
 <html:html locale="true">
 
 
@@ -455,14 +454,15 @@ jQuery(document).ready( function() {
 			</td>
 		</tr>
 		<% } %>
-		<% if (OscarProperties.getInstance().isBritishColumbiaInstanceType()) {
+		<% if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
+		{
 			BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
-			List<BillingFormData.BillingVisit> slcCodes = new ArrayList<BillingFormData.BillingVisit>();
 
+			List<BillingVisit> slcCodes = new ArrayList<BillingVisit>();
 			List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
             for (Object[] visitCode : visitCodes)
             {
-            	slcCodes.add(new BillingFormData.BillingVisit(visitCode));
+            	slcCodes.add(new BillingVisit(visitCode));
             }
 
             String providerSLCCode = provider.getBillingOpts().getBcServiceLocationCode();
@@ -482,8 +482,8 @@ jQuery(document).ready( function() {
         <td align="right">BC Service Location Code</td>
         <td>
             <select name="bc_service_location_code">
-                <option value="-1" disabled>Set BC Service Location Code</option>
-                <% for (BillingFormData.BillingVisit slcCode : slcCodes) { %>
+                <option value="" <%=providerSLCCode == null ? "selected" : ""%>>None</option>
+                <% for (BillingVisit slcCode : slcCodes) { %>
                 <option value="<%=slcCode.getVisitType()%>" <%=slcCode.getVisitType().equals(providerSLCCode) ? "selected" : ""%>><%=slcCode.getDisplayName()%></option>
                 <% } %>
             </select>

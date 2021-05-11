@@ -141,9 +141,9 @@ if (request.getParameter("bc_bcp_eligible") != null)
 }
 
 String serviceLocationCode = request.getParameter("bc_service_location_code");
-if (serviceLocationCode != null && !serviceLocationCode.equals("-1"))
+if (serviceLocationCode != null)
 {
-	providerBilling.setBcServiceLocationCode(request.getParameter("bc_service_location_code"));
+	providerBilling.setBcServiceLocationCode(StringUtils.trimToNull(serviceLocationCode));
 }
 
 provider.setBillingOpts(providerBilling);

@@ -43,7 +43,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
 <%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
-<%@ page import="oscar.oscarBilling.ca.bc.data.BillingFormData.BillingVisit" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
 <%
 
   String curProvider_no,userfirstname,userlastname;
@@ -412,11 +412,12 @@ for (int i=0; i<sites.size(); i++) {
 		<%
 			if (OscarProperties.getInstance().isBritishColumbiaInstanceType()) {
 				BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
-				List<BillingVisit> slcCodes = new ArrayList<BillingVisit>();
+
+				List<BillingVisit> serviceLocationCodes = new ArrayList<BillingVisit>();
 				List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
 				for (Object[] visitCode : visitCodes)
 				{
-					slcCodes.add(new BillingVisit(visitCode));
+					serviceLocationCodes.add(new BillingVisit(visitCode));
 				}
 		%>
         <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
@@ -433,9 +434,9 @@ for (int i=0; i<sites.size(); i++) {
             <td align="right">BC Service Location Code</td>
             <td>
                 <select name="bc_service_location_code">
-                    <option value="-1" disabled>Set BC Service Location Code</option>
-                    <% for (BillingVisit slcCode : slcCodes) { %>
-                    <option value="<%=slcCode.getVisitType()%>"><%=slcCode.getDisplayName()%></option>
+                    <option value="" selected>None</option>
+                    <% for (BillingVisit serviceLocationCode : serviceLocationCodes) { %>
+                    <option value="<%=serviceLocationCode.getVisitType()%>"><%=serviceLocationCode.getDisplayName()%></option>
                     <% } %>
                 </select>
             </td>

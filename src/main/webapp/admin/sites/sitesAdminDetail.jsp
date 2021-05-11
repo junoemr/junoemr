@@ -176,7 +176,7 @@
                             <td>Service Location Code:</td>
                             <td>
                                 <nested:select property="site.bcServiceLocationCode">
-                                    <html:option value="">Select a Service Location Code</html:option>
+                                    <html:option value="">None</html:option>
                                     <c:forEach items="${serviceLocationCodes}" var="code">
                                         <html:option value="${code.visitType}">(${code.visitType}) ${code.visitDescription}</html:option>
                                     </c:forEach>

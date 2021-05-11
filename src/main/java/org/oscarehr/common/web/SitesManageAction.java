@@ -59,10 +59,10 @@ public class SitesManageAction extends DispatchAction {
 		// we will format the SLC code for display here.  This should be safe because there are no
 		// write operations to the Site entity on this page.
 		List<Object[]> codes = bcBillingDao.findBillingVisits(BillingServiceDao.BC);
-		Map<String, String> slcCodes = new HashMap<>();
+		Map<String, String> serviceLocationCodes = new HashMap<>();
 		for (Object[] code: codes)
 		{
-			slcCodes.put((String)code[0], (String) code[1]);
+			serviceLocationCodes.put((String)code[0], (String) code[1]);
 		}
 
 		for (Site site : sites)
@@ -70,7 +70,7 @@ public class SitesManageAction extends DispatchAction {
 			if (ConversionUtils.hasContent(site.getBcServiceLocationCode()))
 			{
 				String code = site.getBcServiceLocationCode();
-				String codeDescription = slcCodes.get(code);
+				String codeDescription = serviceLocationCodes.get(code);
 				site.setBcServiceLocationCode("(" + code + ") " + codeDescription);
 			}
 		}
@@ -155,7 +155,8 @@ public class SitesManageAction extends DispatchAction {
 			oldSite.setAlbertaConnectCareDepartmentId(siteFromForm.getAlbertaConnectCareDepartmentId());
 
 			oldSite.setBcFacilityNumber(siteFromForm.getBcFacilityNumber());
-			oldSite.setBcServiceLocationCode(siteFromForm.getBcServiceLocationCode());
+			// empty string is used as the key for the unset value in the select menu.
+			oldSite.setBcServiceLocationCode(StringUtils.trimToNull(siteFromForm.getBcServiceLocationCode()));
 
 			siteDao.save(oldSite);
 		}

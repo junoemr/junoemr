@@ -216,15 +216,17 @@ if (securityInfoManager.userCanModify(request.getParameter("current_user"),reque
 			// Since each provincial billing option is only presented to the user if the appropriate province is selected
 			// we should check that each parameter is present before writing, otherwise we'll overwrite existing data
 
-			if (request.getParameter("bc_bcp_eligible") != null)
+			String bcBCPEligible = request.getParameter("bc_bcp_eligible");
+			if (bcBCPEligible != null)
 			{
-				provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
+				provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(bcBCPEligible) == 1);
 			}
 
 			String bcServiceLocationCode = request.getParameter("bc_service_location_code");
-			if (bcServiceLocationCode != null && !bcServiceLocationCode.equals("-1"))
+			if (bcServiceLocationCode != null)
             {
-            	provider.getBillingOpts().setBcServiceLocationCode(bcServiceLocationCode);
+            	// In this case, empty string corresponds to "None set", so it should be null in the db.
+            	provider.getBillingOpts().setBcServiceLocationCode(StringUtils.trimToNull(bcServiceLocationCode));
             }
 
 			UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");

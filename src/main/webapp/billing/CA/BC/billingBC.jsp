@@ -74,6 +74,7 @@ if(!authed) {
 <%@ page import="oscar.oscarBilling.ca.bc.pageUtil.BillingForm" %>
 <%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
 <%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -259,7 +260,7 @@ if(!authed) {
 	String group2Header = billform.getServiceGroupName("Group2", bean.getBillForm());
 	String group3Header = billform.getServiceGroupName("Group3", bean.getBillForm());
 	BillingFormData.BillingPhysician[] billphysician = billform.getProviderList();
-	BillingFormData.BillingVisit[] billvisit = billform.getVisitType(bean.getBillRegion());
+	BillingVisit[] billvisit = billform.getVisitType(bean.getBillRegion());
 	BillingFormData.Location[] billlocation = billform.getLocationList(bean.getBillRegion());
 	BillingFormData.Diagnostic[] diaglist = billform.getDiagnosticList(bean.getBillForm(), bean.getBillRegion());
 	BillingFormData.BillingForm[] billformlist = billform.getFormList();

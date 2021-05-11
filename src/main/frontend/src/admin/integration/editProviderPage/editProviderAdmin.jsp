@@ -563,10 +563,8 @@
 						<juno-select
 							ng-model="$ctrl.provider.bcServiceLocation"
 							options="$ctrl.bcServiceLocationOptions"
-							placeholder="Set BC Service Location Code"
-                            placeholder-value="null"
 							label="Service Location Code"
-							label-position="$ctrl.LABEL_POSITION"
+							label-position="$ctrl.LABEL_POSITION.TOP"
 							disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-select>

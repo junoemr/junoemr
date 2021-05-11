@@ -24,14 +24,6 @@
 
 package oscar.oscarBilling.ca.bc.data;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.billing.CA.BC.dao.BillingStatusTypesDao;
 import org.oscarehr.billing.CA.BC.model.BillingStatusTypes;
@@ -48,10 +40,17 @@ import org.oscarehr.common.model.DiagnosticCode;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.entities.BillingStatusType;
 import oscar.entities.PaymentType;
 import oscar.util.UtilDateUtilities;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 public class BillingFormData implements Serializable {
 
@@ -267,36 +266,6 @@ public class BillingFormData implements Serializable {
 
 		public String getDescription() {
 			return description;
-		}
-
-	}
-
-	public static class BillingVisit implements Serializable
-	{
-		String billingvisit = "";
-		String description = "";
-		String displayName = "";
-
-		public BillingVisit(Object[] o) {
-			this(String.valueOf(o[0]), String.valueOf(o[1]));
-		}
-
-		public BillingVisit(String billingvisit, String description) {
-			this.billingvisit = billingvisit;
-			this.description = description;
-
-		}
-
-		public String getVisitType() {
-			return billingvisit;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-
-		public String getDisplayName() {
-			return billingvisit + "|" + description;
 		}
 
 	}
