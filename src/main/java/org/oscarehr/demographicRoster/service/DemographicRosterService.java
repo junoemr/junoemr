@@ -60,14 +60,19 @@ public class DemographicRosterService
 	{
 		DemographicRoster demographicRoster = new DemographicRoster();
 		demographicRoster.setDemographicNo(demographic.getDemographicId());
-		// We are assuming that MRP at the time of roster status existing is who the rostered provider was
-		demographicRoster.setProviderNo(demographic.getProviderNo());
 		demographicRoster.setRosterDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterDate()));
 
 		// Going to take a second look at this
 		// Optional implies, well, optional, but we require this
 		Optional<RosterStatus> rosterStatus = rosterStatusService.findByStatus(demographic.getRosterStatus());
 		rosterStatus.ifPresent(demographicRoster::setRosterStatus);
+
+		// Only set rostered provider if the status is roster-y
+		if (demographicRoster.getRosterStatus().isRostered())
+		{
+			// We are assuming that MRP at the time of roster status existing is who the rostered provider was
+			demographicRoster.setProviderNo(demographic.getProviderNo());
+		}
 
 		// Only set terminated-y fields if it's a status that implies termination
 		if (demographicRoster.getRosterStatus().isTerminated())

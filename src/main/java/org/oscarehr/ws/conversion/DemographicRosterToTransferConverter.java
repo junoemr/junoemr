@@ -29,12 +29,16 @@ import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.oscarehr.PMmodule.dao.ProviderDao;
 
 @Component
 public class DemographicRosterToTransferConverter extends AbstractModelConverter<DemographicRoster, DemographicRosterTransfer>
 {
 	@Autowired
 	RosterStatusToTransferConverter rosterStatusToTransferConverter;
+
+	@Autowired
+	ProviderDao providerDao;
 
 	@Override
 	public DemographicRosterTransfer convert(DemographicRoster demographicRoster)
@@ -52,6 +56,8 @@ public class DemographicRosterToTransferConverter extends AbstractModelConverter
 		{
 			transfer.setRosterTerminationDescription(demographicRoster.getRosterTerminationReason().getDescription());
 		}
+
+		transfer.setProviderFullName(providerDao.getProviderName(transfer.getProviderNo()));
 
 		return transfer;
 	}

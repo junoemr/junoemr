@@ -22,7 +22,7 @@ VALUES
 CREATE TABLE IF NOT EXISTS `demographic_roster` (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     demographic_no INTEGER NOT NULL,
-    rostered_provider_no VARCHAR(6) NOT NULL,
+    rostered_provider_no VARCHAR(6) DEFAULT NULL,
     roster_status_id INTEGER NOT NULL,
     roster_date TIMESTAMP NULL,
     roster_termination_date TIMESTAMP NULL,

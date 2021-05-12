@@ -45,7 +45,19 @@ angular.module('Record.Details').component('rosteredHistoryModal', {
 
             demographicApi.getRosteredHistory(ctrl.demographic.demographicNo).then(
                 (data) => {
-                    ctrl.rosteredHistory = data.data.body;
+                    ctrl.rosteredHistory = data.data.body.map((entry) => {
+                        return {
+                            statusDescription: entry.rosterStatus.statusDescription,
+                            provider: entry.providerFullName,
+                            rosterDate: Juno.Common.Util.formatMomentDate(
+                                Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterDate)),
+                            rosterTerminationDate: entry.rosterTerminationDate == null ? "" :
+                                Juno.Common.Util.formatMomentDate(
+                                    Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterTerminationDate)),
+                            rosterTerminationDescription: entry.rosterTerminationDescription,
+                            addedAt: Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.addedAt),
+                        }
+                    });
                 });
         }
 

@@ -21,10 +21,10 @@
                 <tbody>
                 <tr ng-repeat="entry in $ctrl.rosteredHistory">
                     <td data-title="'Status Description'">
-                        {{entry.rosterStatus.statusDescription}}
+                        {{entry.statusDescription}}
                     </td>
-                    <td data-title="'Rostered Provider'">
-                        {{entry.providerNo}}
+                    <td data-title="'Rostered To'">
+                        {{entry.provider}}
                     </td>
                     <td data-title="'Rostered Date'">
                         {{entry.rosterDate}}
