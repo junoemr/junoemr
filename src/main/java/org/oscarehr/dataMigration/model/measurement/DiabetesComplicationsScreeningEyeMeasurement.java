@@ -43,4 +43,10 @@ public class DiabetesComplicationsScreeningEyeMeasurement extends DiabetesCompli
 	{
 		return MEASUREMENT_TYPE_DILATED_EYE_EXAM;
 	}
+
+	@Override
+	public String getCT037CodeValue()
+	{
+		return "32468-1"; // retinal exam
+	}
 }

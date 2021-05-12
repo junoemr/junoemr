@@ -184,7 +184,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected DiabetesComplicationScreening getComplicationsScreening(DiabetesComplicationsScreeningMeasurement exportStructure)
 	{
 		DiabetesComplicationScreening complicationScreening = objectFactory.createDiabetesComplicationScreening();
-		complicationScreening.setExamCode(toCT037Code(exportStructure.getMeasurementValue()));
+		complicationScreening.setExamCode(exportStructure.getCT037CodeValue());
 		complicationScreening.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return complicationScreening;
 	}
@@ -251,27 +251,5 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 			logEvent("Unknown indicator value '" + valueToParse + "' mapping exported as " + CDSConstants.Y_INDICATOR_FALSE + ". Expected yes/no");
 		}
 		return toYnIndicatorString(isYes);
-	}
-
-	protected String toCT037Code(String value)
-	{
-		String code = null;
-		if(value != null)
-		{
-			switch (value.toLowerCase())
-			{
-				case "retinal exam":
-				case "32468-1": code = "32468-1"; break;
-				case "foot exam":
-				case "11397-7": code = "11397-7"; break;
-				case "neurological exam":
-				case "67536-3": code = "67536-3"; break;
-				default:
-				{
-					logEvent("Invalid diabetes complication screening value '" + value + "' not included in export data");
-				}
-			}
-		}
-		return code;
 	}
 }

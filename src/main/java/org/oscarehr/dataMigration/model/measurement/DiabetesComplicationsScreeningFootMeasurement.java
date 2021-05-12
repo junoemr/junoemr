@@ -46,4 +46,10 @@ public class DiabetesComplicationsScreeningFootMeasurement extends DiabetesCompl
 	{
 		return (this.typeCode != null) ? this.typeCode : MEASUREMENT_TYPE_FOOT_EXAM;
 	}
+
+	@Override
+	public String getCT037CodeValue()
+	{
+		return "11397-7"; // foot exam
+	}
 }

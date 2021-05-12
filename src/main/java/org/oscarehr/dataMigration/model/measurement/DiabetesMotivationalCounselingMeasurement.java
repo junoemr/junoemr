@@ -51,7 +51,7 @@ public class DiabetesMotivationalCounselingMeasurement extends Measurement
 	}
 
 	/**
-	 * get the string value as defined in the CT-018 table for OMD
+	 * get the string value as defined in the CT-038 table for OMD
 	 * @return - the omd value
 	 */
 	public String getCT038CodeValue()

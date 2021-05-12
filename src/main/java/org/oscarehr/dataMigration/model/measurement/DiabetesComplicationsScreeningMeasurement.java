@@ -35,4 +35,10 @@ public abstract class DiabetesComplicationsScreeningMeasurement extends Measurem
 	{
 		super(dbModel);
 	}
+
+	/**
+	 * get the string value as defined in the CT-037 table for OMD
+	 * @return - the omd value
+	 */
+	public abstract String getCT037CodeValue();
 }
