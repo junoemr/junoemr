@@ -5,35 +5,38 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
+ * <p>
  * This software was written for
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.conversion;
 
-import org.springframework.stereotype.Component;
+package org.oscarehr.ws.rest.conversion.messaging;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.messaging.model.Messageable;
+import org.oscarehr.ws.rest.transfer.messaging.MessageableDto;
+import org.springframework.beans.BeanUtils;
 
-@Component
-public abstract class AbstractModelConverter<T, K> implements ListModelConverter<T, K>
+public class MessageableToMessageableDtoConverter extends AbstractModelConverter<Messageable<?>, MessageableDto>
 {
+
 	@Override
-	public List<K> convert(Collection<? extends T> entities)
+	public MessageableDto convert(Messageable<?> input)
 	{
-		return entities.stream().map(this::convert).collect(Collectors.toList());
+		MessageableDto messgeableDto = new MessageableDto();
+		BeanUtils.copyProperties(input, messgeableDto, "entity");
+
+		return messgeableDto;
 	}
 }

@@ -5,35 +5,41 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
+ * <p>
  * This software was written for
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.conversion;
 
-import org.springframework.stereotype.Component;
+package org.oscarehr.messaging.model;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Component
-public abstract class AbstractModelConverter<T, K> implements ListModelConverter<T, K>
+public enum MessageableType
 {
-	@Override
-	public List<K> convert(Collection<? extends T> entities)
+	// ==== MHA types ====
+	MHA_CLINIC_USER("Clinic::User"),
+	MHA_PATIENT_USER("Patient::User"),
+	MHA_CLINIC("Clinic::Profile");
+
+	// other types here... demographic, provider...
+
+	// ==========================================================================
+	// Boilerplate
+	// ==========================================================================
+
+	private String name;
+
+	MessageableType(String name)
 	{
-		return entities.stream().map(this::convert).collect(Collectors.toList());
+		this.name = name;
 	}
 }

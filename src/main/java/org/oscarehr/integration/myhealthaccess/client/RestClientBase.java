@@ -29,6 +29,7 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 import oscar.OscarProperties;
 import oscar.util.RESTClient;
@@ -36,6 +37,8 @@ import oscar.util.RESTClient;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public abstract class RestClientBase extends RESTClient
@@ -62,8 +65,14 @@ public abstract class RestClientBase extends RESTClient
 
 	public String formatEndpoint(String endpoint, Object... args)
 	{
+		return formatEndpointFull(endpoint, Arrays.asList(args), null);
+	}
+
+	public String formatEndpointFull(String endpoint, List<Object> pathParams, MultiValueMap<String, String> queryParams)
+	{
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseEndpoint());
-		uriBuilder.path(String.format(endpoint, args));
+		uriBuilder.path(String.format(endpoint, pathParams));
+		uriBuilder.queryParams(queryParams);
 		uriBuilder.fragment(null);
 		return uriBuilder.build().toUriString();
 	}

@@ -5,35 +5,54 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
+ * <p>
  * This software was written for
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.conversion;
 
-import org.springframework.stereotype.Component;
+package org.oscarehr.messaging.model;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.oscarehr.util.LoggedInInfo;
+import org.springframework.util.MimeType;
+import java.time.ZonedDateTime;
 
-@Component
-public abstract class AbstractModelConverter<T, K> implements ListModelConverter<T, K>
+public interface Attachment
 {
-	@Override
-	public List<K> convert(Collection<? extends T> entities)
-	{
-		return entities.stream().map(this::convert).collect(Collectors.toList());
-	}
+	// ==========================================================================
+	// Getters
+	// ==========================================================================
+
+	public String getId();
+	public String getName();
+
+	/**
+	 * attachments data as base64.
+	 * @param loggedInInfo - the logged in user
+	 * @return - base64 encoded attachment data.
+	 */
+	public String getAttachmentBase64Data(LoggedInInfo loggedInInfo);
+
+	/**
+	 * get attachment mime type
+	 * @return - the mime type
+	 */
+	public MimeType getMimeType();
+
+	/**
+	 * get the time at which the attachment was created.
+	 * @return - attachment creation time.
+	 */
+	public ZonedDateTime getCreatedAtDateTime();
+
 }
