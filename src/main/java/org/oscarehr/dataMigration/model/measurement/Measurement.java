@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 public abstract class Measurement extends AbstractTransientModel
 {
 	public static final String VALUE_YES = "yes";
+	public static final String VALUE_NO = "no";
 
 	protected Integer id;
 	protected String measurementValue;

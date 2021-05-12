@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.measurement.BloodPressureMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesSelfManagementChallengesMeasurement;
@@ -81,7 +82,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		{
 			SmokingStatusMeasurement measurement = new SmokingStatusMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(smokingStatus.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(smokingStatus.getStatus());
+			measurement.setMeasurementValue(ynIndicatorToMeasurementValue(smokingStatus.getStatus()));
 			measurements.add(measurement);
 		}
 
@@ -128,18 +129,18 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 
 		for(DiabetesComplicationScreening complicationScreening : importStructure.getDiabetesComplicationsScreening())
 		{
-			String examCode = complicationScreening.getExamCode();
+			String examCode = StringUtils.trimToNull(complicationScreening.getExamCode());
 
 			DiabetesComplicationsScreeningMeasurement measurement;
-			if(CDSConstants.CT037.FOOT_EXAM.getCode().equals(examCode))
+			if(CDSConstants.CT037.FOOT_EXAM.getCode().equalsIgnoreCase(examCode))
 			{
 				measurement = new DiabetesComplicationsScreeningFootMeasurement();
 			}
-			else if (CDSConstants.CT037.RETINAL_EXAM.getCode().equals(examCode))
+			else if (CDSConstants.CT037.RETINAL_EXAM.getCode().equalsIgnoreCase(examCode))
 			{
 				measurement = new DiabetesComplicationsScreeningEyeMeasurement();
 			}
-			else if (CDSConstants.CT037.NEUROLOGICAL_EXAM.getCode().equals(examCode))
+			else if (CDSConstants.CT037.NEUROLOGICAL_EXAM.getCode().equalsIgnoreCase(examCode))
 			{
 				measurement = new DiabetesComplicationsScreeningNeurologicalExamMeasurement();
 			}
@@ -155,22 +156,22 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 
 		for(DiabetesMotivationalCounselling motivationalCounselling : importStructure.getDiabetesMotivationalCounselling())
 		{
-			String counselingPerformed = motivationalCounselling.getCounsellingPerformed();
+			String counselingPerformed = StringUtils.trimToNull(motivationalCounselling.getCounsellingPerformed());
 
 			DiabetesMotivationalCounselingMeasurement measurement;
-			if(CDSConstants.CT038.NUTRITION.getCode().equals(counselingPerformed))
+			if(CDSConstants.CT038.NUTRITION.getCode().equalsIgnoreCase(counselingPerformed))
 			{
 				measurement = new DiabetesMotivationalCounselingNutritionMeasurement();
 			}
-			else if(CDSConstants.CT038.EXERCISE.getCode().equals(counselingPerformed))
+			else if(CDSConstants.CT038.EXERCISE.getCode().equalsIgnoreCase(counselingPerformed))
 			{
 				measurement = new DiabetesMotivationalCounselingExerciseMeasurement();
 			}
-			else if(CDSConstants.CT038.SMOKING_CESSATION.getCode().equals(counselingPerformed))
+			else if(CDSConstants.CT038.SMOKING_CESSATION.getCode().equalsIgnoreCase(counselingPerformed))
 			{
 				measurement = new DiabetesMotivationalCounselingSmokingMeasurement();
 			}
-			else if(CDSConstants.CT038.OTHER.getCode().equals(counselingPerformed))
+			else if(CDSConstants.CT038.OTHER.getCode().equalsIgnoreCase(counselingPerformed))
 			{
 				measurement = new DiabetesMotivationalCounselingOtherMeasurement();
 			}
@@ -196,7 +197,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		{
 			DiabetesSelfManagementChallengesMeasurement measurement = new DiabetesSelfManagementChallengesMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(selfManagementChallenges.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(selfManagementChallenges.getChallengesIdentified());
+			measurement.setMeasurementValue(ynIndicatorToMeasurementValue(selfManagementChallenges.getChallengesIdentified()));
 			measurements.add(measurement);
 		}
 
@@ -204,7 +205,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		{
 			DiabetesSelfManagementEducationalMeasurement measurement = new DiabetesSelfManagementEducationalMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(educationalSelfManagement.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(educationalSelfManagement.getEducationalTrainingPerformed());
+			measurement.setMeasurementValue(ynIndicatorToMeasurementValue(educationalSelfManagement.getEducationalTrainingPerformed()));
 			measurements.add(measurement);
 		}
 
@@ -220,10 +221,15 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		{
 			SelfMonitoringBloodGlucoseMeasurement measurement = new SelfMonitoringBloodGlucoseMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(bloodGlucose.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(bloodGlucose.getSelfMonitoring());
+			measurement.setMeasurementValue(ynIndicatorToMeasurementValue(bloodGlucose.getSelfMonitoring()));
 			measurements.add(measurement);
 		}
 
 		return measurements;
+	}
+
+	private String ynIndicatorToMeasurementValue(String ynIndicator)
+	{
+		return (CDSConstants.Y_INDICATOR_TRUE.equalsIgnoreCase(ynIndicator)) ? Measurement.VALUE_YES : Measurement.VALUE_NO;
 	}
 }
