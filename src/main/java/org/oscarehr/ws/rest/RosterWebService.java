@@ -25,7 +25,6 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
-import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
 import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
 import org.springframework.stereotype.Component;
@@ -34,16 +33,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Path("roster")
-@Component("RosterService")
+@Component("RosterWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "rosterService")
-public class RosterService extends AbstractServiceImpl
+public class RosterWebService extends AbstractServiceImpl
 {
 	@Autowired
 	RosterStatusService rosterStatusService;
@@ -66,14 +64,4 @@ public class RosterService extends AbstractServiceImpl
 		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getActiveRosterStatusList();
 		return RestSearchResponse.successResponseOnePage(rosterStatuses);
 	}
-
-	@GET
-	@Path("/history/{demographicNo}")
-	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(@PathParam("demographicNo") Integer demographicNo)
-	{
-		List<DemographicRosterTransfer> rosteredHistory = demographicRosterService.getRosteredHistory(demographicNo);
-		return RestSearchResponse.successResponseOnePage(rosteredHistory);
-	}
-
-
 }

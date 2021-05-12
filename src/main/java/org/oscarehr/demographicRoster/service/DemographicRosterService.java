@@ -85,6 +85,6 @@ public class DemographicRosterService
 
 	public List<DemographicRosterTransfer> getRosteredHistory(Integer demographicNo)
 	{
-		return demographicRosterToTransferConverter.convert(demographicRosterDao.getActiveForDemographic(demographicNo));
+		return demographicRosterToTransferConverter.convert(demographicRosterDao.findByDemographic(demographicNo));
 	}
 }

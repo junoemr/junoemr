@@ -66,8 +66,8 @@ public class RosterStatus extends AbstractModel<Integer> implements Serializable
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime deletedAt;
 
-	@Column(name = "modified_by")
-	private String modifiedBy;
+	@Column(name = "updated_by")
+	private String updatedBy;
 
 	@Column(name = "system_managed")
 	private boolean systemManaged;

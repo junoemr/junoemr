@@ -38,7 +38,7 @@ public class DemographicRosterDao extends AbstractDao<DemographicRoster>
 		super(DemographicRoster.class);
 	}
 
-	public List<DemographicRoster> getActiveForDemographic(Integer demographicNo)
+	public List<DemographicRoster> findByDemographic(Integer demographicNo)
 	{
 		String sql = "SELECT d FROM DemographicRoster d " +
 				"WHERE d.demographicNo = :demographicNo " +

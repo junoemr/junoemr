@@ -48,6 +48,10 @@ public class DemographicRosterToTransferConverter extends AbstractModelConverter
 		BeanUtils.copyProperties(demographicRoster, transfer, "rosterStatus");
 
 		transfer.setRosterStatus(rosterStatusToTransferConverter.convert(demographicRoster.getRosterStatus()));
+		if (demographicRoster.getRosterTerminationReason() != null)
+		{
+			transfer.setRosterTerminationDescription(demographicRoster.getRosterTerminationReason().getDescription());
+		}
 
 		return transfer;
 	}

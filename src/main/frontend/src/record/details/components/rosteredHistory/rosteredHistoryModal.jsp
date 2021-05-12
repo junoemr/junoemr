@@ -33,7 +33,7 @@
                         {{entry.rosterTerminationDate}}
                     </td>
                     <td data-title="'Termination Reason'">
-                        {{entry.rosterTerminationReason}}
+                        {{entry.rosterTerminationDescription}}
                     </td>
                     <td data-title="'Modified At'">
                         {{entry.addedAt}}

@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
@@ -44,6 +45,8 @@ import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.HinValidationService;
+import org.oscarehr.demographicRoster.service.DemographicRosterService;
+import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
@@ -89,6 +92,7 @@ import java.util.List;
  */
 @Path("/demographic")
 @Component("demographicService")
+@Tag(name = "demographic")
 public class DemographicService extends AbstractServiceImpl {
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -122,6 +126,9 @@ public class DemographicService extends AbstractServiceImpl {
 
 	@Autowired
 	private RecentDemographicAccessService recentDemographicAccessService;
+
+	@Autowired
+	private DemographicRosterService demographicRosterService;
 
 	private CaseManagementManager caseManagementMgr;
 
@@ -521,6 +528,15 @@ public class DemographicService extends AbstractServiceImpl {
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
 
 		return RestResponse.successResponse(issues);
+	}
+
+	@GET
+	@Path("/{demographicNo}/history")
+	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(
+			@PathParam("demographicNo") Integer demographicNo)
+	{
+		List<DemographicRosterTransfer> rosteredHistory = demographicRosterService.getRosteredHistory(demographicNo);
+		return RestSearchResponse.successResponseOnePage(rosteredHistory);
 	}
 
 	private List<CaseManagementIssueTo1> getIssues(HttpServletRequest request, int demographicNo, String filter)

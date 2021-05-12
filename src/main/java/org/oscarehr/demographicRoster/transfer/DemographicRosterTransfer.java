@@ -38,6 +38,8 @@ public class DemographicRosterTransfer
 	private LocalDateTime rosterDate;
 	private LocalDateTime rosterTerminationDate;
 	private DemographicRoster.ROSTER_TERMINATION_REASON rosterTerminationReason;
+	// extra field to help communicate mapping between enum and description
+	private String rosterTerminationDescription;
 	private RosterStatusTransfer rosterStatus;
 	private LocalDateTime addedAt;
 }

@@ -3,7 +3,7 @@ import {
     JUNO_BUTTON_COLOR_PATTERN,
     LABEL_POSITION
 } from "../../../../common/components/junoComponentConstants";
-import {RosterServiceApi} from "../../../../../generated";
+import {DemographicApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('rosteredHistoryModal', {
     templateUrl: 'src/record/details/components/rosteredHistory/rosteredHistoryModal.jsp',
@@ -29,7 +29,7 @@ angular.module('Record.Details').component('rosteredHistoryModal', {
         ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
         ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-        const rosterApi = new RosterServiceApi($http, $httpParamSerializer, '../ws/rs');
+        const demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 
         ctrl.rosteredHistory = [];
         ctrl.tableParams = new NgTableParams(
@@ -43,7 +43,7 @@ angular.module('Record.Details').component('rosteredHistoryModal', {
         {
             ctrl.demographic = ctrl.resolve.demographic;
 
-            rosterApi.getRosteredHistory(ctrl.demographic.demographicNo).then(
+            demographicApi.getRosteredHistory(ctrl.demographic.demographicNo).then(
                 (data) => {
                     ctrl.rosteredHistory = data.data.body;
                 });
