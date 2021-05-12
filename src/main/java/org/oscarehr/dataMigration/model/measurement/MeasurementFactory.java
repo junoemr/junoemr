@@ -22,6 +22,14 @@
  */
 package org.oscarehr.dataMigration.model.measurement;
 
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningEyeMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningFootMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningNeurologicalExamMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingExerciseMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingNutritionMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingOtherMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingSmokingMeasurement;
+
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_BLOOD_PRESSURE;
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_COLLABORATIVE_GOAL_SETTING;
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_EDUCATION;
@@ -65,13 +73,17 @@ public class MeasurementFactory
 			case MEASUREMENT_TYPE_DILATED_EYE_EXAM:
 				return new DiabetesComplicationsScreeningEyeMeasurement(dbModel);
 			case MEASUREMENT_TYPE_FOOT_EXAM:
-			case MEASUREMENT_TYPE_FOOT_EXAM_TEST_LOSS_OF_SENSATION:
 				return new DiabetesComplicationsScreeningFootMeasurement(dbModel);
+			case MEASUREMENT_TYPE_FOOT_EXAM_TEST_LOSS_OF_SENSATION:
+				return new DiabetesComplicationsScreeningNeurologicalExamMeasurement(dbModel);
 			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_NUTRITION:
+				return new DiabetesMotivationalCounselingNutritionMeasurement(dbModel);
 			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_EXERCISE:
+				return new DiabetesMotivationalCounselingExerciseMeasurement(dbModel);
 			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_SMOKING:
+				return new DiabetesMotivationalCounselingSmokingMeasurement(dbModel);
 			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER:
-				return new DiabetesMotivationalCounselingMeasurement(dbModel);
+				return new DiabetesMotivationalCounselingOtherMeasurement(dbModel);
 			case MEASUREMENT_TYPE_COLLABORATIVE_GOAL_SETTING:
 				return new DiabetesSelfManagementCollaborativeMeasurement(dbModel);
 			case MEASUREMENT_TYPE_DIABETES_SELF_MANAGEMENT_CHALLENGES:

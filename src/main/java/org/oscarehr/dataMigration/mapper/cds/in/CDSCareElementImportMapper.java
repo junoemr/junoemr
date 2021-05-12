@@ -22,10 +22,8 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.measurement.BloodPressureMeasurement;
-import org.oscarehr.dataMigration.model.measurement.DiabetesComplicationsScreeningFootMeasurement;
-import org.oscarehr.dataMigration.model.measurement.DiabetesComplicationsScreeningMeasurement;
-import org.oscarehr.dataMigration.model.measurement.DiabetesMotivationalCounselingMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesSelfManagementChallengesMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesSelfManagementCollaborativeMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesSelfManagementEducationalMeasurement;
@@ -37,6 +35,15 @@ import org.oscarehr.dataMigration.model.measurement.SmokingPacksMeasurement;
 import org.oscarehr.dataMigration.model.measurement.SmokingStatusMeasurement;
 import org.oscarehr.dataMigration.model.measurement.WaistCircumferenceMeasurement;
 import org.oscarehr.dataMigration.model.measurement.WeightMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningEyeMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningFootMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningNeurologicalExamMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingExerciseMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingNutritionMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingOtherMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingSmokingMeasurement;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.BloodPressure;
@@ -121,18 +128,59 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 
 		for(DiabetesComplicationScreening complicationScreening : importStructure.getDiabetesComplicationsScreening())
 		{
-			//TODO which sub-class to use? can it be based on code?
-			DiabetesComplicationsScreeningMeasurement measurement = new DiabetesComplicationsScreeningFootMeasurement();
+			String examCode = complicationScreening.getExamCode();
+
+			DiabetesComplicationsScreeningMeasurement measurement;
+			if(CDSConstants.CT037.FOOT_EXAM.getCode().equals(examCode))
+			{
+				measurement = new DiabetesComplicationsScreeningFootMeasurement();
+			}
+			else if (CDSConstants.CT037.RETINAL_EXAM.getCode().equals(examCode))
+			{
+				measurement = new DiabetesComplicationsScreeningEyeMeasurement();
+			}
+			else if (CDSConstants.CT037.NEUROLOGICAL_EXAM.getCode().equals(examCode))
+			{
+				measurement = new DiabetesComplicationsScreeningNeurologicalExamMeasurement();
+			}
+			else
+			{
+				logEvent("'" + examCode + "' is not a valid CT037 value code, and was not imported");
+				continue;
+			}
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(complicationScreening.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(complicationScreening.getExamCode());
+			measurement.setMeasurementValue(Measurement.VALUE_YES);
 			measurements.add(measurement);
 		}
 
 		for(DiabetesMotivationalCounselling motivationalCounselling : importStructure.getDiabetesMotivationalCounselling())
 		{
-			DiabetesMotivationalCounselingMeasurement measurement = new DiabetesMotivationalCounselingMeasurement();
+			String counselingPerformed = motivationalCounselling.getCounsellingPerformed();
+
+			DiabetesMotivationalCounselingMeasurement measurement;
+			if(CDSConstants.CT038.NUTRITION.getCode().equals(counselingPerformed))
+			{
+				measurement = new DiabetesMotivationalCounselingNutritionMeasurement();
+			}
+			else if(CDSConstants.CT038.EXERCISE.getCode().equals(counselingPerformed))
+			{
+				measurement = new DiabetesMotivationalCounselingExerciseMeasurement();
+			}
+			else if(CDSConstants.CT038.SMOKING_CESSATION.getCode().equals(counselingPerformed))
+			{
+				measurement = new DiabetesMotivationalCounselingSmokingMeasurement();
+			}
+			else if(CDSConstants.CT038.OTHER.getCode().equals(counselingPerformed))
+			{
+				measurement = new DiabetesMotivationalCounselingOtherMeasurement();
+			}
+			else
+			{
+				logEvent("'" + counselingPerformed + "' is not a valid CT038 value code, and was not imported");
+				continue;
+			}
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(motivationalCounselling.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(motivationalCounselling.getCounsellingPerformed());
+			measurement.setMeasurementValue(Measurement.VALUE_YES);
 			measurements.add(measurement);
 		}
 

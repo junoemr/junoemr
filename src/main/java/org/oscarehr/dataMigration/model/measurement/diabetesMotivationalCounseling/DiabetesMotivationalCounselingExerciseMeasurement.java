@@ -20,20 +20,21 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.measurement;
+package org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling;
 
 import lombok.Data;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 
-import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DILATED_EYE_EXAM;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_EXERCISE;
 
 @Data
-public class DiabetesComplicationsScreeningEyeMeasurement extends DiabetesComplicationsScreeningMeasurement
+public class DiabetesMotivationalCounselingExerciseMeasurement extends DiabetesMotivationalCounselingMeasurement
 {
-	public DiabetesComplicationsScreeningEyeMeasurement()
+	public DiabetesMotivationalCounselingExerciseMeasurement()
 	{
 		super();
 	}
-	public DiabetesComplicationsScreeningEyeMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	public DiabetesMotivationalCounselingExerciseMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
 	}
@@ -41,12 +42,12 @@ public class DiabetesComplicationsScreeningEyeMeasurement extends DiabetesCompli
 	@Override
 	public String getTypeCode()
 	{
-		return MEASUREMENT_TYPE_DILATED_EYE_EXAM;
+		return MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_EXERCISE;
 	}
 
 	@Override
-	public String getCT037CodeValue()
+	public String getCT038CodeValue()
 	{
-		return "32468-1"; // retinal exam
+		return CDSConstants.CT038.EXERCISE.getCode();
 	}
 }

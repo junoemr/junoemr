@@ -57,6 +57,65 @@ public class CDSConstants
 		N,
 	}
 
+	public enum CT037
+	{
+		FOOT_EXAM("11397-7"),
+		RETINAL_EXAM("32468-1"),
+		NEUROLOGICAL_EXAM("67536-3");
+
+		private final String code;
+		CT037(String code)
+		{
+			this.code = code;
+		}
+		public String getCode()
+		{
+			return this.code;
+		}
+
+		public static CT037 findByCode(String code)
+		{
+			for(CT037 ct : CT037.values())
+			{
+				if(ct.getCode().equals(code))
+				{
+					return ct;
+				}
+			}
+			return null;
+		}
+	}
+
+	public enum CT038
+	{
+		NUTRITION("Nutrition"),
+		EXERCISE("Exercise"),
+		SMOKING_CESSATION("Smoking Cessation"),
+		OTHER("Other");
+
+		private final String code;
+		CT038(String code)
+		{
+			this.code = code;
+		}
+		public String getCode()
+		{
+			return this.code;
+		}
+
+		public static CT038 findByCode(String code)
+		{
+			for(CT038 ct : CT038.values())
+			{
+				if(ct.getCode().equals(code))
+				{
+					return ct;
+				}
+			}
+			return null;
+		}
+	}
+
 	//TODO where should these live?
 	public static final String COUNTRY_CODE_CANADA = "CA";
 	public static final String COUNTRY_CODE_USA = "US";
