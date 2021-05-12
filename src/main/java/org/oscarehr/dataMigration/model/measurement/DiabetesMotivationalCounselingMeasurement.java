@@ -24,7 +24,10 @@ package org.oscarehr.dataMigration.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_EXERCISE;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_NUTRITION;
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_SMOKING;
 
 @Data
 public class DiabetesMotivationalCounselingMeasurement extends Measurement
@@ -45,5 +48,24 @@ public class DiabetesMotivationalCounselingMeasurement extends Measurement
 	public String getTypeCode()
 	{
 		return (this.typeCode != null) ? this.typeCode : MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
+	}
+
+	/**
+	 * get the string value as defined in the CT-018 table for OMD
+	 * @return - the omd value
+	 */
+	public String getCT038CodeValue()
+	{
+		switch (this.typeCode)
+		{
+			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_NUTRITION: return "Nutrition";
+			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_EXERCISE: return "Exercise";
+			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_SMOKING: return "Smoking Cessation";
+			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER: return "Other";
+			default:
+			{
+				throw new IllegalStateException("DiabetesMotivationalCounselingMeasurement has an invalid typeCode");
+			}
+		}
 	}
 }

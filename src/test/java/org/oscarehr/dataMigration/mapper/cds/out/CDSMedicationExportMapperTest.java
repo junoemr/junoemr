@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
@@ -61,24 +60,6 @@ public class CDSMedicationExportMapperTest
 	public void testToStringOrNull_Boolean()
 	{
 		assertEquals("true", cdsMedicationExportMapper.toStringOrNull(true));
-	}
-
-	@Test
-	public void testGetSubsNotAllowedIndicator_Null()
-	{
-		assertEquals(CDSConstants.Y_INDICATOR_FALSE, cdsMedicationExportMapper.getSubsNotAllowedIndicator(null));
-	}
-
-	@Test
-	public void testGetSubsNotAllowedIndicator_False()
-	{
-		assertEquals(CDSConstants.Y_INDICATOR_FALSE, cdsMedicationExportMapper.getSubsNotAllowedIndicator(false));
-	}
-
-	@Test
-	public void testGetSubsNotAllowedIndicator_True()
-	{
-		assertEquals(CDSConstants.Y_INDICATOR_TRUE, cdsMedicationExportMapper.getSubsNotAllowedIndicator(true));
 	}
 
 }

@@ -56,6 +56,7 @@ import xml.cds.v5_0.Weight;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 
 @Component
 public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElements, Measurement>
@@ -191,7 +192,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected DiabetesMotivationalCounselling getMotivationsCounseling(DiabetesMotivationalCounselingMeasurement exportStructure)
 	{
 		DiabetesMotivationalCounselling motivationalCounselling = objectFactory.createDiabetesMotivationalCounselling();
-		motivationalCounselling.setCounsellingPerformed(toCT038Code(exportStructure.getMeasurementValue()));
+		motivationalCounselling.setCounsellingPerformed(exportStructure.getCT038CodeValue());
 		motivationalCounselling.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return motivationalCounselling;
 	}
@@ -241,23 +242,13 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected String parseToYnIndicator(String valueToParse)
 	{
 		boolean isYes = false;
-		if(valueToParse != null)
+		try
 		{
-			switch (valueToParse.toLowerCase())
-			{
-				// add more values here as needed
-				case "y":
-				case "yes":
-				case "t":
-				case "true":
-				{
-					isYes = true; break;
-				}
-				default:
-				{
-					logEvent("Unknown indicator value '" + valueToParse + "' mapping exported as " + CDSConstants.Y_INDICATOR_FALSE + ". Expected yes/no mapping");
-				}
-			}
+			isYes = ConversionUtils.parseBoolean(valueToParse);
+		}
+		catch (ParseException e)
+		{
+			logEvent("Unknown indicator value '" + valueToParse + "' mapping exported as " + CDSConstants.Y_INDICATOR_FALSE + ". Expected yes/no");
 		}
 		return toYnIndicatorString(isYes);
 	}
@@ -279,36 +270,6 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 				{
 					logEvent("Invalid diabetes complication screening value '" + value + "' not included in export data");
 				}
-			}
-		}
-		return code;
-	}
-
-	protected String toCT038Code(String value)
-	{
-		String code = null;
-		if(value != null)
-		{
-			if(value.toLowerCase().contains("nutrition"))
-			{
-				code = "Nutrition";
-			}
-			else if(value.toLowerCase().contains("exercise"))
-			{
-				code = "Exercise";
-			}
-			else if(value.toLowerCase().contains("smoking") || value.toLowerCase().contains("cessation"))
-			{
-				code = "Smoking Cessation";
-			}
-			else if(value.toLowerCase().contains("other"))
-			{
-				code = "Other";
-			}
-			else
-			{
-				code = "Other";
-				logEvent("Invalid diabetes motivational counselling value '" + value + "' set as '" + code + "' in export data");
 			}
 		}
 		return code;
