@@ -205,7 +205,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		String extension = phoneNumber.getExtension();
 
 		PhoneNumber phone = objectFactory.createPhoneNumber();
-		phone.getContent().add(objectFactory.createPhoneNumberNumber(number));
+		phone.getContent().add(objectFactory.createPhoneNumberPhoneNumber(number));
 		if(extension != null)
 		{
 			phone.getContent().add(objectFactory.createPhoneNumberExtension(extension));
