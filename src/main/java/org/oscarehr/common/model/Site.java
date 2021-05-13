@@ -18,8 +18,6 @@
 
 package org.oscarehr.common.model;
 
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +31,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.Set;
 
 @Entity
 @Table(name="site")
@@ -83,6 +82,9 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 
 	@Column(name="alberta_connect_care_department_id")
 	private String albertaConnectCareDepartmentId;
+
+	@Column(name="bc_service_location_code")
+	private String bcServiceLocationCode;
 
 	@Column(name="bc_facility_number")
 	private String bcFacilityNumber;
@@ -340,45 +342,12 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 		this.uuid = uuid;
 	}
 
-	@Override
-	public int hashCode()
+	public String getBcServiceLocationCode()
 	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((siteId == null) ? 0 : siteId.hashCode());
-		return result;
+		return bcServiceLocationCode;
 	}
-
-	@Override
-	public boolean equals(Object obj)
+	public void setBcServiceLocationCode(String bcServiceLocationCode)
 	{
-		if (this == obj)
-		{
-			return true;
-		}
-
-		if (obj == null)
-		{
-			return false;
-		}
-
-		if (getClass() != obj.getClass())
-		{
-			return false;
-		}
-
-		Site other = (Site) obj;
-		if (siteId == null)
-		{
-			if (other.siteId != null)
-			{
-				return false;
-			}
-		}
-		else if (!siteId.equals(other.siteId))
-		{
-			return false;
-		}
-		return true;
+		this.bcServiceLocationCode = bcServiceLocationCode;
 	}
 }

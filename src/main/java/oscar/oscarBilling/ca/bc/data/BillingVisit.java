@@ -21,36 +21,39 @@
  * Canada
  */
 
-package org.oscarehr.site.transfer;
+package oscar.oscarBilling.ca.bc.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
-@Data
-@XmlRootElement
-@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class SiteTransfer implements Serializable
+public class BillingVisit implements Serializable
 {
+	String billingvisit = "";
+	String description = "";
+	String displayName = "";
 
-	private Integer siteId;
-	private String name;
-	private String shortName;
-	private String phone;
-	private String fax;
-	private String bgColor;
-	private String address;
-	private String city;
-	private String province;
-	private String postal;
-	private Integer providerIdFrom;
-	private Integer providerIdTo;
-	private byte status;
-	private Integer siteLogoId = null;
-	private String siteUrl = "";
+	public BillingVisit(Object[] o) {
+		this(String.valueOf(o[0]), String.valueOf(o[1]));
+	}
 
-	private String bcFacilityNumber;
-	private String bcServiceLocationCode;
+	public BillingVisit(String billingvisit, String description)
+	{
+		this.billingvisit = billingvisit;
+		this.description = description;
+
+	}
+
+	public String getVisitType() {
+		return billingvisit;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public String getDisplayName()
+	{
+		return billingvisit + "|" + description;
+	}
+
 }

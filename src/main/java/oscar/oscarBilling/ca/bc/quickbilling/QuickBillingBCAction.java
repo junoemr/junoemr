@@ -41,7 +41,7 @@ import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarBilling.ca.bc.data.BillingFormData;
-import oscar.oscarBilling.ca.bc.data.BillingFormData.BillingVisit;
+import oscar.oscarBilling.ca.bc.data.BillingVisit;
 
 /**
  * @author Dennis Warren
