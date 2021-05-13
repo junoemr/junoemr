@@ -25,7 +25,6 @@ package org.oscarehr.messaging.backend.myhealthaccess.model;
 
 import lombok.Data;
 import org.oscarehr.messaging.model.MessageGroup;
-import org.oscarehr.messaging.model.Messageable;
 
 import java.time.ZonedDateTime;
 import java.util.List;

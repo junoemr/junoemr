@@ -255,6 +255,9 @@ module.exports = {
 			'./src/common/components/iconCard/iconCardComponent.js',
 			'./src/common/components/panel/panelComponent.js',
 
+			'./src/common/layout/module.js',
+			'./src/common/layout/pageWrapper/pageWrapperComponent.js',
+
 			'./src/common/modals/junoAlert/junoAlertComponent.js',
 			'./src/common/modals/junoInputModal/junoInputModalComponent.js',
 			'./src/common/modals/junoSimpleModal/junoSimpleModalComponent.js',
@@ -272,6 +275,9 @@ module.exports = {
 			'./src/layout/components/appointmentQueue/components/appointmentCard/appointmentCardComponent.js',
 			'./src/layout/components/appointmentQueue/modals/module.js',
 			'./src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModalComponent.js',
+
+			'./src/messaging/module.js',
+			'./src/messaging/inbox/messagingInboxComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',

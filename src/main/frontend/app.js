@@ -48,6 +48,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Common.Components',
 	'Common.Util',
 	'Layout',
+	'Messaging',
 	'Tickler',
 	'Record',
 	'Record.Summary',
@@ -273,6 +274,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/documents',
 			templateUrl: 'src/document/documents_classic.jsp',
 			controller: 'Document.DocumentsController'
+		})
+		.state('messaging',
+		{
+			url: "/messaging/:backend/",
+			component: "messagingInbox",
 		})
 		.state('settings',
 		{

@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest.transfer.messaging;
 
 import lombok.Data;
+import org.oscarehr.messaging.model.MessageableType;
 
 import java.io.Serializable;
 
@@ -31,6 +32,6 @@ import java.io.Serializable;
 public class MessageableDto implements Serializable
 {
 	protected String id;
-	protected String type;
+	protected MessageableType type;
 	protected String name;
 }

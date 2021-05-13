@@ -82,24 +82,24 @@ public class MessagesWebService extends MessagingBaseWebService
 
 			@QueryParam("startDateTime") ZonedDateTime startDateTime,
 			@QueryParam("endDateTime") ZonedDateTime endDateTime,
-			@QueryParam("group") MessageGroup group,
+			@QueryParam("group") String group,
 			@QueryParam("limit") Integer limit,
 			@QueryParam("offset") Integer offset,
 			@QueryParam("senderId") String senderId,
-			@QueryParam("senderType") MessageableType senderType,
+			@QueryParam("senderType") String senderType,
 			@QueryParam("recipientId") String recipientId,
-			@QueryParam("recipientType") MessageableType recipientType)
+			@QueryParam("recipientType") String recipientType)
 	{
 		List<? extends Message> messages = this.messagingService.getMessages(
 				getLoggedInInfo(),
 				this.messageableFromIntegrationId(integrationId),
 				startDateTime,
 				endDateTime,
-				group,
+				MessageGroup.valueOf(group),
 				limit,
 				offset,
-				this.messageableFromIdType(senderId, senderType),
-				this.messageableFromIdType(recipientId, recipientType));
+				this.messageableFromIdType(senderId, MessageableType.valueOf(senderType)),
+				this.messageableFromIdType(recipientId, MessageableType.valueOf(recipientType)));
 
 		return RestResponse.successResponse((new MessageToMessageDtoConverter()).convert(messages));
 	}

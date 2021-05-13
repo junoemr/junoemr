@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "sourceMap": true,
+    "target": "ES6",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
   },
   "include": [
     "src/**/*",

@@ -54,6 +54,7 @@
 @import "../src/common/components/accordionList/accordionList";
 @import "../src/common/components/iconCard/iconCard";
 @import "../src/common/components/panel/_panel.scss";
+@import "../src/common/layout/pageWrapper/pageWrapper";
 @import "../src/common/modals/junoAlert/junoAlert";
 @import "../src/common/modals/junoInputModal/junoInputModal";
 @import "../src/common/modals/junoSimpleModal/junoSimpleModal";
@@ -68,6 +69,7 @@
 @import "../src/layout/components/appointmentQueue/appointmentQueue";
 @import "../src/layout/components/appointmentQueue/components/appointmentCard/appointmentCard";
 @import "../src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModal";
+@import "../src/messaging/inbox/messagingInbox";
 @import "../src/help/support";
 @import "../src/schedule/schedule";
 @import "../src/schedule/eventModal";
