@@ -1,4 +1,4 @@
-import MessagingServiceInterface from "../../../service/MessagingServiceInterface";
+import MessagingServiceInterface, {MessageSearchParams} from "../../../service/MessagingServiceInterface";
 import MessageSource from "../../../model/MessageSource";
 import Message from "../../../model/Message";
 import {API_BASE_PATH} from "../../../../constants/ApiConstants";
@@ -41,7 +41,37 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 		}
 		catch(error)
 		{
-			throw new MessagingError(`Failed to retrieve message [${messageId}] with error: ${error.toString()}`)
+			throw new MessagingError(`Failed to retrieve message [${messageId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+		}
+	}
+
+	/**
+	 * search messages from the specified message source.
+	 * @param source - the source to search in.
+	 * @param searchOptions - filters to narrow the search.
+	 * @return search result. list of messages.
+	 */
+	public async searchMessages(source: MessageSource, searchOptions: MessageSearchParams): Promise<Message[]>
+	{
+		try
+		{
+			const messages = (await this._mhaClinicMessagingApi.getMessages(
+				source.id,
+				searchOptions.startDateTime?.toDate(),
+				searchOptions.endDateTime?.toDate(),
+				searchOptions.group.toString(),
+				searchOptions.limit,
+				searchOptions.offset,
+				searchOptions.sender?.id,
+				searchOptions.sender?.type.toString(),
+				searchOptions.recipient?.id,
+				searchOptions.recipient?.type)).data.body;
+
+			return (new MessageDtoToMessageConverter()).convertList(messages);
+		}
+		catch(error)
+		{
+			throw new MessagingError(`Failed to search messages from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
 		}
 	}
 

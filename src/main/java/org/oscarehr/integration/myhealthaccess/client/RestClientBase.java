@@ -71,7 +71,7 @@ public abstract class RestClientBase extends RESTClient
 	public String formatEndpointFull(String endpoint, List<Object> pathParams, MultiValueMap<String, String> queryParams)
 	{
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseEndpoint());
-		uriBuilder.path(String.format(endpoint, pathParams));
+		uriBuilder.path(String.format(endpoint, pathParams.toArray()));
 		uriBuilder.queryParams(queryParams);
 		uriBuilder.fragment(null);
 		return uriBuilder.build().toUriString();

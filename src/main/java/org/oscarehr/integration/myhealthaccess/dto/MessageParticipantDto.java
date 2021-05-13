@@ -24,6 +24,7 @@
 package org.oscarehr.integration.myhealthaccess.dto;
 
 import lombok.Data;
+import org.oscarehr.messaging.model.MessageableType;
 
 import java.io.Serializable;
 
@@ -32,5 +33,5 @@ public class MessageParticipantDto implements Serializable
 {
 	protected String id;
 	protected String name;
-	protected String type;
+	protected MessageableType type;
 }

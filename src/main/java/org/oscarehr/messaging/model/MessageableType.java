@@ -23,12 +23,14 @@
 
 package org.oscarehr.messaging.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum MessageableType
 {
 	// ==== MHA types ====
+	MHA_CLINIC("Clinic::Profile"),
 	MHA_CLINIC_USER("Clinic::User"),
-	MHA_PATIENT_USER("Patient::User"),
-	MHA_CLINIC("Clinic::Profile");
+	MHA_PATIENT_USER("Patient::User");
 
 	// other types here... demographic, provider...
 
@@ -41,5 +43,11 @@ public enum MessageableType
 	MessageableType(String name)
 	{
 		this.name = name;
+	}
+
+	@JsonValue
+	public String getName()
+	{
+		return this.name;
 	}
 }

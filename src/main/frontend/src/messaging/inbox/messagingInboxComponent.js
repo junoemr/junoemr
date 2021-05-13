@@ -22,6 +22,7 @@
 */
 
 import MessagingServiceFactory from "../../lib/messaging/factory/MessagingServiceFactory";
+import MessageSource from "../../lib/messaging/model/MessageSource";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',
@@ -40,9 +41,9 @@ angular.module("Messaging").component('messagingInbox', {
 		ctrl.backend = $stateParams.backend;
 		ctrl.messagingService = MessagingServiceFactory.build(ctrl.backend);
 
-		ctrl.$onInit = () =>
+		ctrl.$onInit = async () =>
 		{
-			ctrl.messagingService.getMessage(new MessageSource("1", "pants"), "")
+			console.log( await ctrl.messagingService.getMessage(new MessageSource("1", "pants"), "1682"));
 		}
 	}],
 });

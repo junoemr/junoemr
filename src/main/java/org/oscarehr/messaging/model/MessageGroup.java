@@ -22,6 +22,8 @@
  */
 package org.oscarehr.messaging.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum MessageGroup
 {
 	ALL("all"),
@@ -38,5 +40,11 @@ public enum MessageGroup
 	MessageGroup(String name)
 	{
 		this.name = name;
+	}
+
+	@JsonValue
+	public String getName()
+	{
+		return this.name;
 	}
 }

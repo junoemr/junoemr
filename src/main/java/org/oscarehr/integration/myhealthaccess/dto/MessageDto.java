@@ -26,6 +26,7 @@ package org.oscarehr.integration.myhealthaccess.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.messaging.model.MessageGroup;
+import org.oscarehr.messaging.model.MessageableType;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -48,9 +49,11 @@ public class MessageDto implements Serializable
 	@JsonProperty("sender_id")
 	protected String senderId;
 	@JsonProperty("sender_type")
-	protected String senderType;
+	protected MessageableType senderType;
 	@JsonProperty("sender_name")
 	protected String senderName;
+	@JsonProperty("meta")
+	protected String metaData;
 
 	protected List<MessageParticipantDto> recipients;
 }

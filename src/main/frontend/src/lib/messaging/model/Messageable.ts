@@ -22,4 +22,23 @@ export default class Messageable
 		this._type = type;
 		this._name = name;
 	}
+
+	// ==========================================================================
+	// Getters
+	// ==========================================================================
+
+	get id(): string
+	{
+		return this._id;
+	}
+
+	get type(): MessageableType
+	{
+		return this._type;
+	}
+
+	get name(): string
+	{
+		return this._name;
+	}
 }
