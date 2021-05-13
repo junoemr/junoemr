@@ -45,7 +45,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
-		<tomcat.version>7.0.76</tomcat.version>
+		<tomcat.version>7.0.107</tomcat.version>
 		<webpack.env>prod</webpack.env>
 		<antrun.skip.jspc>false</antrun.skip.jspc>
 		<oscar.use.integration.prop>false</oscar.use.integration.prop>
