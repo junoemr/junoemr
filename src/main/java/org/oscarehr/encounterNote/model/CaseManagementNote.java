@@ -76,12 +76,15 @@ public class CaseManagementNote extends AbstractModel<Long>
 	@Column(name = "billing_code")
 	private String billingCode;
 
+	@Deprecated
 	@Column(name = "program_no")
 	private String programNo;
 
+	@Deprecated
 	@Column(name = "reporter_caisi_role")
 	private String reporterCaisiRole;
 
+	@Deprecated
 	@Column(name = "reporter_program_team")
 	private String reporterProgramTeam;
 
@@ -288,31 +291,37 @@ public class CaseManagementNote extends AbstractModel<Long>
 		this.billingCode = billingCode;
 	}
 
+	@Deprecated
 	public String getProgramNo()
 	{
 		return programNo;
 	}
 
+	@Deprecated
 	public void setProgramNo(String programNo)
 	{
 		this.programNo = programNo;
 	}
 
+	@Deprecated
 	public String getReporterCaisiRole()
 	{
 		return reporterCaisiRole;
 	}
 
+	@Deprecated
 	public void setReporterCaisiRole(String reporterCaisiRole)
 	{
 		this.reporterCaisiRole = reporterCaisiRole;
 	}
 
+	@Deprecated
 	public String getReporterProgramTeam()
 	{
 		return reporterProgramTeam;
 	}
 
+	@Deprecated
 	public void setReporterProgramTeam(String reporterProgramTeam)
 	{
 		this.reporterProgramTeam = reporterProgramTeam;
