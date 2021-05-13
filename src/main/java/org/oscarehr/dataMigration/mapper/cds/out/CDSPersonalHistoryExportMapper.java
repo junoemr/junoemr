@@ -34,7 +34,7 @@ import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_D
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_PROVIDER;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_START_DATE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_TYPE;
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ResidualInfoDataType;
 
 @Component
 public class CDSPersonalHistoryExportMapper extends AbstractCDSNoteExportMapper<PersonalHistory, SocialHistoryNote>
@@ -54,12 +54,12 @@ public class CDSPersonalHistoryExportMapper extends AbstractCDSNoteExportMapper<
 
 		addNonNullDataElements(
 				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.TEXT,
+				ResidualInfoDataType.TEXT,
 				RESIDUAL_INFO_DATA_NAME_NOTE,
 				exportStructure.getNoteText());
 		addNonNullDataElements(
 				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.DATETIME,
+				ResidualInfoDataType.DATETIME,
 				RESIDUAL_INFO_DATA_NAME_OBS_DATE,
 				ConversionUtils.toDateTimeString(exportStructure.getObservationDate()));
 		addNonNullDataElements(
@@ -72,12 +72,12 @@ public class CDSPersonalHistoryExportMapper extends AbstractCDSNoteExportMapper<
 				exportStructure.getResolutionDate());
 		addNonNullDataElements(
 				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.TEXT,
+				ResidualInfoDataType.TEXT,
 				RESIDUAL_INFO_DATA_NAME_ANNOTATION,
 				exportStructure.getAnnotation());
 		addNonNullDataElements(
 				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.TEXT,
+				ResidualInfoDataType.TEXT,
 				RESIDUAL_INFO_DATA_NAME_PROVIDER,
 				exportStructure.getProvider().getLastName() + "," + exportStructure.getProvider().getFirstName());
 

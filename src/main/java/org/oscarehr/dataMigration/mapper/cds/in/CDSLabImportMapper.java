@@ -186,7 +186,6 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 			result.setRange(getReferenceRange(importLabResults.getReferenceRange()));
 			result.setAbnormal(getAbnormalFlag(importLabResults.getResultNormalAbnormalFlag()));
 
-			//TODO should these go elsewhere?
 			String testResultInfoFromLab = importLabResults.getTestResultsInformationReportedByTheLab();
 			if(testResultInfoFromLab != null)
 			{
@@ -258,7 +257,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		}
 		else
 		{
-			// TODO could map additional statuses here manually to the enum
+			//map additional statuses here manually to the enum
 			return Hl7TextInfo.REPORT_STATUS.F; // unknown status is final, since labs will never get updates, are probably old.
 		}
 	}
@@ -285,14 +284,14 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	protected Boolean getAbnormalFlag(ResultNormalAbnormalFlag abnormalFlag)
 	{
 		Boolean flag;
-		if(abnormalFlag == null || CDSConstants.LAB_ABNORMAL_FLAG.U.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum()))
+		if(abnormalFlag == null || CDSConstants.LabAbnormalFlag.UNKNOWN.getValue().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum()))
 		{
 			flag = null;
 		}
 		else
 		{
-			flag = CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
-					|| getAbnormalFlagFromText(abnormalFlag.getResultNormalAbnormalFlagAsPlainText());
+			CDSConstants.LabAbnormalFlag enumValue = CDSConstants.LabAbnormalFlag.fromValue(abnormalFlag.getResultNormalAbnormalFlagAsEnum());
+			flag = (enumValue != null && enumValue.isAbnormal()) || getAbnormalFlagFromText(abnormalFlag.getResultNormalAbnormalFlagAsPlainText());
 		}
 		return flag;
 	}
@@ -301,8 +300,8 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		boolean flag = false;
 		if(abnormalFlag != null)
 		{
-			flag = CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag);
-			//TODO handle additional free text abnormal values
+			flag = CDSConstants.LabAbnormalFlag.ABNORMAL.getValue().equals(abnormalFlag);
+			//handle additional free text abnormal values here
 		}
 		return flag;
 	}

@@ -40,7 +40,7 @@ public class CDSConstants
 	public static final String RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE = "Next Immunization Date";
 	public static final String RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE = "ImmunizationType";
 
-	public enum RESIDUAL_INFO_DATA_TYPE
+	public enum ResidualInfoDataType
 	{
 		TEXT,
 		NUMERIC,
@@ -50,11 +50,52 @@ public class CDSConstants
 		DATE_PARTIAL,
 	}
 
-	public enum LAB_ABNORMAL_FLAG
+	public enum LabAbnormalFlag
 	{
-		U,
-		Y,
-		N,
+		BELOW_LOW_NORMAL("L", true),
+		ABOVE_HIGH_NORMAL("H", true),
+		BELOW_LOWER_LIMITS("LL", true),
+		ABOVE_HIGH_LIMITS("HH", true),
+		NORMAL("N", false),
+		ABNORMAL("A", true),
+		VERY_ABNORMAL("AA", true),
+		SUSCEPTIBLE("S", true),
+		RESISTANT("R", true),
+		INTERMEDIATE("I", true),
+		MODERATE_SUSCEPTIBLE("MS", true),
+		VERY_SUSCEPTIBLE("VS", true),
+		UNKNOWN("U", false);
+
+		private final String value;
+		private final boolean abnormal;
+
+		LabAbnormalFlag(String value, boolean isAbnormal)
+		{
+			this.value = value;
+			this.abnormal = isAbnormal;
+		}
+
+		public String getValue()
+		{
+			return value;
+		}
+
+		public boolean isAbnormal()
+		{
+			return abnormal;
+		}
+
+		public static LabAbnormalFlag fromValue(String value)
+		{
+			for(LabAbnormalFlag abnormalFlag : LabAbnormalFlag.values())
+			{
+				if(abnormalFlag.getValue().equalsIgnoreCase(value))
+				{
+					return abnormalFlag;
+				}
+			}
+			return null;
+		}
 	}
 
 	//TODO where should these live?

@@ -86,7 +86,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		return cdsAddress;
 	}
 
-	protected ResidualInformation.DataElement createResidualInfoDataElement(CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType, String name, String value)
+	protected ResidualInformation.DataElement createResidualInfoDataElement(CDSConstants.ResidualInfoDataType dataType, String name, String value)
 	{
 		ResidualInformation.DataElement dataElement = objectFactory.createResidualInformationDataElement();
 		dataElement.setDataType(dataType.name());
@@ -96,7 +96,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		return dataElement;
 	}
 
-	protected void addNonNullDataElements(ResidualInformation residualInformation, CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType, String name, String value)
+	protected void addNonNullDataElements(ResidualInformation residualInformation, CDSConstants.ResidualInfoDataType dataType, String name, String value)
 	{
 		if(value != null && !value.isEmpty())
 		{
@@ -105,20 +105,20 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 	}
 	protected void addNonNullDataElements(ResidualInformation residualInformation, String name, LocalDate localDate)
 	{
-		addNonNullDataElements(residualInformation, CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE, name, ConversionUtils.toDateString(localDate));
+		addNonNullDataElements(residualInformation, CDSConstants.ResidualInfoDataType.DATE, name, ConversionUtils.toDateString(localDate));
 	}
 	protected void addNonNullDataElements(ResidualInformation residualInformation, String name, PartialDate partialDate)
 	{
 		if(partialDate != null)
 		{
-			CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType;
+			CDSConstants.ResidualInfoDataType dataType;
 			if(partialDate.isFullDate())
 			{
-				dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE;
+				dataType = CDSConstants.ResidualInfoDataType.DATE;
 			}
 			else
 			{
-				dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE_PARTIAL;
+				dataType = CDSConstants.ResidualInfoDataType.DATE_PARTIAL;
 			}
 			addNonNullDataElements(residualInformation, dataType, name, partialDate.toISOString());
 		}
