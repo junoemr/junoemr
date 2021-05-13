@@ -26,6 +26,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
+import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.PartialDate;
+import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.provider.Provider;
+import org.springframework.beans.factory.annotation.Autowired;
 import xml.cds.v5_0.AddressType;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.DateTimeFullOrPartial;
@@ -34,12 +40,6 @@ import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.PersonNameSimple;
 import xml.cds.v5_0.ResidualInformation;
 import xml.cds.v5_0.YnIndicator;
-import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
-import org.oscarehr.dataMigration.model.common.PartialDate;
-import org.oscarehr.dataMigration.model.common.PartialDateTime;
-import org.oscarehr.dataMigration.model.provider.Provider;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -407,6 +407,24 @@ public class CDSExportMapperTest
 	{
 		YnIndicator ynIndicator = cdsExportMapper.toYnIndicator(true);
 		assertTrue(ynIndicator.isBoolean());
+	}
+
+	@Test
+	public void testToYnIndicatorString_Null()
+	{
+		assertEquals(CDSConstants.Y_INDICATOR_FALSE, cdsExportMapper.toYnIndicatorString(null));
+	}
+
+	@Test
+	public void testToYnIndicatorString_False()
+	{
+		assertEquals(CDSConstants.Y_INDICATOR_FALSE, cdsExportMapper.toYnIndicatorString(false));
+	}
+
+	@Test
+	public void testToYnIndicatorString_True()
+	{
+		assertEquals(CDSConstants.Y_INDICATOR_TRUE, cdsExportMapper.toYnIndicatorString(true));
 	}
 
 }

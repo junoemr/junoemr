@@ -22,9 +22,8 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.measurement.BloodPressureMeasurement;
-import org.oscarehr.dataMigration.model.measurement.DiabetesComplicationsScreeningMeasurement;
-import org.oscarehr.dataMigration.model.measurement.DiabetesMotivationalCounselingMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesSelfManagementChallengesMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesSelfManagementCollaborativeMeasurement;
 import org.oscarehr.dataMigration.model.measurement.DiabetesSelfManagementEducationalMeasurement;
@@ -36,6 +35,8 @@ import org.oscarehr.dataMigration.model.measurement.SmokingPacksMeasurement;
 import org.oscarehr.dataMigration.model.measurement.SmokingStatusMeasurement;
 import org.oscarehr.dataMigration.model.measurement.WaistCircumferenceMeasurement;
 import org.oscarehr.dataMigration.model.measurement.WeightMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening.DiabetesComplicationsScreeningMeasurement;
+import org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling.DiabetesMotivationalCounselingMeasurement;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.BloodPressure;
@@ -55,6 +56,7 @@ import xml.cds.v5_0.Weight;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 
 @Component
 public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElements, Measurement>
@@ -69,7 +71,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	{
 		CareElements careElements = objectFactory.createCareElements();
 
-		//TODO a better pattern for this?
+		//is there a better pattern for this?
 		if(exportStructure instanceof SmokingStatusMeasurement)
 		{
 			careElements.getSmokingStatus().add(getSmokingStatus((SmokingStatusMeasurement) exportStructure));
@@ -129,7 +131,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected SmokingStatus getSmokingStatus(SmokingStatusMeasurement exportStructure)
 	{
 		SmokingStatus smokingStatus = objectFactory.createSmokingStatus();
-		smokingStatus.setStatus(exportStructure.getMeasurementValue());
+		smokingStatus.setStatus(parseToYnIndicator(exportStructure.getMeasurementValue()));
 		smokingStatus.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return smokingStatus;
 	}
@@ -181,16 +183,18 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 
 	protected DiabetesComplicationScreening getComplicationsScreening(DiabetesComplicationsScreeningMeasurement exportStructure)
 	{
+		//TODO should we export these where value is not 'yes'?
 		DiabetesComplicationScreening complicationScreening = objectFactory.createDiabetesComplicationScreening();
-		complicationScreening.setExamCode(exportStructure.getMeasurementValue());
+		complicationScreening.setExamCode(exportStructure.getCT037CodeValue());
 		complicationScreening.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return complicationScreening;
 	}
 
 	protected DiabetesMotivationalCounselling getMotivationsCounseling(DiabetesMotivationalCounselingMeasurement exportStructure)
 	{
+		//TODO should we export these where value is not 'yes'?
 		DiabetesMotivationalCounselling motivationalCounselling = objectFactory.createDiabetesMotivationalCounselling();
-		motivationalCounselling.setCounsellingPerformed(exportStructure.getMeasurementValue());
+		motivationalCounselling.setCounsellingPerformed(exportStructure.getCT038CodeValue());
 		motivationalCounselling.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return motivationalCounselling;
 	}
@@ -207,7 +211,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected DiabetesSelfManagementChallenges getSelfManagementChallenges(DiabetesSelfManagementChallengesMeasurement exportStructure)
 	{
 		DiabetesSelfManagementChallenges selfManagementChallenges = objectFactory.createDiabetesSelfManagementChallenges();
-		selfManagementChallenges.setChallengesIdentified(exportStructure.getMeasurementValue());
+		selfManagementChallenges.setChallengesIdentified(parseToYnIndicator(exportStructure.getMeasurementValue()));
 		selfManagementChallenges.setCodeValue(exportStructure.getMeasurementCode());
 		selfManagementChallenges.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return selfManagementChallenges;
@@ -216,7 +220,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected DiabetesEducationalSelfManagement getEducationalSelfManagement(DiabetesSelfManagementEducationalMeasurement exportStructure)
 	{
 		DiabetesEducationalSelfManagement educationalSelfManagement = objectFactory.createDiabetesEducationalSelfManagement();
-		educationalSelfManagement.setEducationalTrainingPerformed(exportStructure.getMeasurementValue());
+		educationalSelfManagement.setEducationalTrainingPerformed(parseToYnIndicator(exportStructure.getMeasurementValue()));
 		educationalSelfManagement.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return educationalSelfManagement;
 	}
@@ -232,8 +236,22 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected SelfMonitoringBloodGlucose getSelfMonitoringBloodGlucose(SelfMonitoringBloodGlucoseMeasurement exportStructure)
 	{
 		SelfMonitoringBloodGlucose selfMonitoringBloodGlucose = objectFactory.createSelfMonitoringBloodGlucose();
-		selfMonitoringBloodGlucose.setSelfMonitoring(exportStructure.getMeasurementValue());
+		selfMonitoringBloodGlucose.setSelfMonitoring(parseToYnIndicator(exportStructure.getMeasurementValue()));
 		selfMonitoringBloodGlucose.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return selfMonitoringBloodGlucose;
+	}
+
+	protected String parseToYnIndicator(String valueToParse)
+	{
+		boolean isYes = false;
+		try
+		{
+			isYes = ConversionUtils.parseBoolean(valueToParse);
+		}
+		catch (ParseException e)
+		{
+			logEvent("Unknown indicator value '" + valueToParse + "' mapping exported as " + CDSConstants.Y_INDICATOR_FALSE + ". Expected yes/no");
+		}
+		return toYnIndicatorString(isYes);
 	}
 }

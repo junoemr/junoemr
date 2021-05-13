@@ -20,46 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.mapper.cds.out;
+package org.oscarehr.dataMigration.model.measurement.diabetesComplicationsScreening;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Data;
+import org.oscarehr.dataMigration.model.measurement.Measurement;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-public class CDSMedicationExportMapperTest
+@Data
+public abstract class DiabetesComplicationsScreeningMeasurement extends Measurement
 {
-	@Autowired
-	@InjectMocks
-	private CDSMedicationExportMapper cdsMedicationExportMapper;
-
-	@Before
-	public void setUp()
+	public DiabetesComplicationsScreeningMeasurement()
 	{
-		MockitoAnnotations.initMocks(this);
+		super();
+	}
+	public DiabetesComplicationsScreeningMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	{
+		super(dbModel);
 	}
 
-	@Test
-	public void testToStringOrNull_Null()
-	{
-		assertNull(cdsMedicationExportMapper.toStringOrNull((Integer) null));
-		assertNull(cdsMedicationExportMapper.toStringOrNull((Boolean) null));
-	}
-
-	@Test
-	public void testToStringOrNull_String()
-	{
-		assertEquals("10", cdsMedicationExportMapper.toStringOrNull(10));
-	}
-
-	@Test
-	public void testToStringOrNull_Boolean()
-	{
-		assertEquals("true", cdsMedicationExportMapper.toStringOrNull(true));
-	}
-
+	/**
+	 * get the string value as defined in the CT-037 table for OMD
+	 * @return - the omd value
+	 */
+	public abstract String getCT037CodeValue();
 }
