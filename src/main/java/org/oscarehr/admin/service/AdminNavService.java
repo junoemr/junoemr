@@ -762,7 +762,6 @@ public class AdminNavService
 
 		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.manageCourses"), "frame?frameUrl=" + contextPath + "/oscarLearning/CourseManager.jsp"));
 		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.importPatient"), "frame?frameUrl=" + contextPath + "/demographic/demographicImport.jsp"));
-		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.importStudent"), "frame?frameUrl=" + contextPath + "/oscarLearning/StudentImport.jsp"));
 
 		oscarLearningGroup.setItems(oscarLearningItems);
 		return oscarLearningGroup;
