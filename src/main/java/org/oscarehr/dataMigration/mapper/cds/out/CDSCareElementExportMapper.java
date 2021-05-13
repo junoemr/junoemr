@@ -124,7 +124,10 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 		{
 			careElements.getSelfMonitoringBloodGlucose().add(getSelfMonitoringBloodGlucose((SelfMonitoringBloodGlucoseMeasurement) exportStructure));
 		}
-
+		else
+		{
+			return null; // no elements were created, return null to avoid an empty xml element
+		}
 		return careElements;
 	}
 
