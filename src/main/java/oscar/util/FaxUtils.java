@@ -24,19 +24,20 @@
 
 package oscar.util;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.security.dao.SecRoleDao;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.security.model.SecRole;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.dms.EDocUtil;
+import java.util.Date;
+
+import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 
 /**
  * Added for OscarHost fax utilities extended functionality, 2016
@@ -79,45 +80,49 @@ public class FaxUtils {
 			String programNo, String faxNo, Long formId, Integer linkType, String noteTypeName) {
 		
 		try {
-			CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
-			if(demographic_no != null && !demographic_no.trim().isEmpty()) {
-				Provider provider = EDocUtil.getProvider(providerId);
-				if( providerId == null || provider == null) {
-					providerId = "-1"; //system
-					provider = EDocUtil.getProvider(providerId);
+			EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+			DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+			ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
+			if(demographic_no != null && !demographic_no.trim().isEmpty())
+			{
+				ProviderData provider;
+				if (providerId == null)
+				{
+					provider = providerDataDao.find(SYSTEM_PROVIDER_NO);
 					logger.warn("Missing or invalid providerNo for fax encounter note. Assigned to system (-1)");
 				}
-				SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-				SecRole doctorRole = secRoleDao.findByName("doctor");
-				Date now = new Date();
+				else
+				{
+					provider = providerDataDao.find(providerId);
+				}
 				String provFirstName = provider.getFirstName();
 				String provLastName = provider.getLastName();
 				
-				String strNote = "Faxed " + noteTypeName +" to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
+				String strNote = "Faxed " + noteTypeName +" to " + faxNo + " at " + new Date() + " by " + provFirstName + " " + provLastName + ".";
 	
 				// create the note
 				CaseManagementNote cmn = new CaseManagementNote();
-				cmn.setDemographic_no(demographic_no);
-				cmn.setProgram_no(programNo);
-				cmn.setUpdate_date(now);
-				cmn.setObservation_date(now);
-				cmn.setPosition(0);
-				cmn.setReporter_program_team("0");
-				cmn.setPassword("NULL");
-				cmn.setLocked(false);
-				cmn.setReporter_caisi_role(doctorRole.getId().toString());
+				cmn.setDemographic(demographicDao.find(demographic_no));
+				cmn.setProgramNo(programNo);
 				cmn.setNote(strNote);
 				cmn.setHistory(strNote);
-				cmn.setProviderNo(providerId);
+				cmn.setProvider(provider);
 				cmn.setSigned(true);
-				cmn.setSigning_provider_no(providerId);
+				cmn.setSigningProvider(provider);
 				
 				// save the note and create the link
-				Long note_id = cmm.saveNoteSimpleReturnID(cmn);
-				CaseManagementNoteLink cmLink = new CaseManagementNoteLink(linkType, formId, note_id);
-				EDocUtil.addCaseMgmtNoteLink(cmLink);
-				
-				logger.info("Saved note_id=" + note_id.toString() + " for demographic " + demographic_no);
+				CaseManagementNote savedNote;
+				if(CaseManagementNoteLink.DOCUMENT.equals(linkType))
+				{
+					DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
+					savedNote = encounterNoteService.saveDocumentNote(cmn, documentDao.find(formId));
+				}
+				else
+				{
+					savedNote = encounterNoteService.saveChartNote(cmn);
+				}
+				logger.info("Saved note_id=" + savedNote.getId().toString() + " for demographic " + demographic_no);
 				return true;
 			}
 			else {

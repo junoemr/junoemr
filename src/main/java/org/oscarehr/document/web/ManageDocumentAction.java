@@ -270,7 +270,7 @@ public class ManageDocumentAction extends DispatchAction {
 	private void saveDocNote(final HttpServletRequest request, String docDesc, Integer demog, Integer documentId)
 	{
 		EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
-		DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 		ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 		Date now = EDocUtil.getDmsDateTimeAsDate();

@@ -360,7 +360,7 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 	private void addCaseManagementNote(Demographic demo, String description, int noteLink, boolean isSigned, String providerNumber)
 	{
 		EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
-		org.oscarehr.demographic.dao.DemographicDao demographicDao = SpringUtils.getBean(org.oscarehr.demographic.dao.DemographicDao.class);
+		org.oscarehr.demographic.dao.DemographicDao demographicDao = (org.oscarehr.demographic.dao.DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 		ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 		ProviderData provider = providerDao.find(providerNumber);

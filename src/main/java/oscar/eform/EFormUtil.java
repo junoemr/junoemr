@@ -121,7 +121,7 @@ public class EFormUtil {
 	private static final EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 	private static final IssueDao issueDao = SpringUtils.getBean(IssueDao.class);
 	private static final ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
-	private static final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	private static final DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 
 
 	private EFormUtil() {
