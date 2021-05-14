@@ -34,6 +34,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import oscar.OscarProperties;
 import oscar.util.RESTClient;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import java.net.URI;
@@ -68,11 +69,29 @@ public abstract class RestClientBase extends RESTClient
 		return formatEndpointFull(endpoint, Arrays.asList(args), null);
 	}
 
-	public String formatEndpointFull(String endpoint, List<Object> pathParams, MultiValueMap<String, String> queryParams)
+	/**
+	 * generate a url.
+	 * @param endpoint - the rest endpoint to hit.
+	 * @param pathParams - [optional] path parameters for substitution in to the endpoint path.
+	 * @param queryParams - [optional] query parameters
+	 * @return - the url
+	 */
+	public String formatEndpointFull(String endpoint, @Nullable List<Object> pathParams, @Nullable MultiValueMap<String, String> queryParams)
 	{
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseEndpoint());
-		uriBuilder.path(String.format(endpoint, pathParams.toArray()));
-		uriBuilder.queryParams(queryParams);
+		if (pathParams != null)
+		{
+			uriBuilder.path(String.format(endpoint, pathParams.toArray()));
+		}
+		else
+		{
+			uriBuilder.path(endpoint);
+		}
+
+		if (queryParams != null)
+		{
+			uriBuilder.queryParams(queryParams);
+		}
 		uriBuilder.fragment(null);
 		return uriBuilder.build().toUriString();
 	}

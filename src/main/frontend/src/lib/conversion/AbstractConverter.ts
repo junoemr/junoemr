@@ -9,7 +9,11 @@ export default abstract class AbstractConverter<F, T>
 
 	public convertList(from: F[]): T[]
 	{
-		return from.map((from) => this.convert(from));
+		if (from)
+		{
+			return from.map((from) => this.convert(from));
+		}
+		return [];
 	}
 
 }

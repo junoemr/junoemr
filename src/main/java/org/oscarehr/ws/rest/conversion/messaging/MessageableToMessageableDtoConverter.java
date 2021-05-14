@@ -30,6 +30,9 @@ import org.springframework.beans.BeanUtils;
 
 public class MessageableToMessageableDtoConverter extends AbstractModelConverter<Messageable<?>, MessageableDto>
 {
+	// ==========================================================================
+	// AbstractModelConverter Overrides
+	// ==========================================================================
 
 	@Override
 	public MessageableDto convert(Messageable<?> input)

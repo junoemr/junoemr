@@ -95,11 +95,11 @@ public class MessagesWebService extends MessagingBaseWebService
 				this.messageableFromIntegrationId(integrationId),
 				startDateTime,
 				endDateTime,
-				MessageGroup.valueOf(group),
+				group == null ? null : MessageGroup.valueOf(group),
 				limit,
 				offset,
-				this.messageableFromIdType(senderId, MessageableType.valueOf(senderType)),
-				this.messageableFromIdType(recipientId, MessageableType.valueOf(recipientType)));
+				senderId == null ? null : this.messageableFromIdType(senderId, MessageableType.valueOf(senderType)),
+				recipientId == null ? null : this.messageableFromIdType(recipientId, MessageableType.valueOf(recipientType)));
 
 		return RestResponse.successResponse((new MessageToMessageDtoConverter()).convert(messages));
 	}

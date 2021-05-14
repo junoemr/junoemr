@@ -29,8 +29,8 @@ public enum MessageGroup
 	ALL("all"),
 	RECEIVED("received"),
 	SENT("sent"),
-	ARCHIVED("archived");
-
+	ARCHIVED("archived"),
+	UNKNOWN("unknown");
 	// ==========================================================================
 	// Boilerplate
 	// ==========================================================================

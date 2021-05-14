@@ -23,6 +23,7 @@
 
 import MessagingServiceFactory from "../../lib/messaging/factory/MessagingServiceFactory";
 import MessageSource from "../../lib/messaging/model/MessageSource";
+import {MessageGroup} from "../../lib/messaging/model/MessageGroup";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',
@@ -43,7 +44,16 @@ angular.module("Messaging").component('messagingInbox', {
 
 		ctrl.$onInit = async () =>
 		{
-			console.log( await ctrl.messagingService.getMessage(new MessageSource("1", "pants"), "1682"));
+			ctrl.stream = await ctrl.messagingService.searchMessagesAsStream(new MessageSource("1", "pants"), {});
+			console.log(ctrl.stream);
+			let read = 10;
+			while (read > 0 )
+			{
+				const start = performance.now();
+				read = await ctrl.stream.load(50);
+				console.log(performance.now() - start);
+				console.log(ctrl.stream);
+			}
 		}
 	}],
 });

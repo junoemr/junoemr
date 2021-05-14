@@ -57,4 +57,12 @@ export default class Message
 		this._createdAtDateTime = createdAtDateTime;
 	}
 
+	// ==========================================================================
+	// Getters
+	// ==========================================================================
+
+	get createdAtDateTime(): Moment
+	{
+		return this._createdAtDateTime;
+	}
 }

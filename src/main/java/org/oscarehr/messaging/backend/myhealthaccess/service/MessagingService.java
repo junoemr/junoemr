@@ -23,11 +23,13 @@
 
 package org.oscarehr.messaging.backend.myhealthaccess.service;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.MessageDto;
 import org.oscarehr.integration.myhealthaccess.service.ClinicMessagingService;
+import org.oscarehr.messaging.backend.myhealthaccess.conversion.ConversationDtoToMhaConversationConverter;
 import org.oscarehr.messaging.backend.myhealthaccess.conversion.MessageDtoToMhaMessageConverter;
 import org.oscarehr.messaging.model.*;
 import org.oscarehr.util.LoggedInInfo;
@@ -126,7 +128,7 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 	@Override
 	public Number countMessagesInGroup(LoggedInInfo loggedInInfo, Messageable<?> messageable, MessageGroup group)
 	{
-		return null;
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -140,7 +142,9 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 	@Override
 	public Conversation getConversation(LoggedInInfo loggedInInfo, Messageable<?> messageable, String conversationId)
 	{
-		return null;
+		Integration integration = this.getIntegrationFromMessageable(messageable);
+
+		return (new ConversationDtoToMhaConversationConverter()).convert(clinicMessagingService.getConversation(integration, loggedInInfo, conversationId));
 	}
 
 	/**
@@ -169,7 +173,7 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 			@Nullable Messageable<?> sender,
 			@Nullable Messageable<?> receiver)
 	{
-		return null;
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -182,7 +186,7 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 	@Override
 	public Number countConversationsInGroup(LoggedInInfo loggedInInfo, Messageable<?> messageable, MessageGroup group)
 	{
-		return null;
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -194,7 +198,7 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 	@Override
 	public Message sendMessage(LoggedInInfo loggedInInfo, Message message)
 	{
-		return null;
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -207,7 +211,7 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 	@Override
 	public Message replyToConversation(LoggedInInfo loggedInInfo, Message message, Conversation conversation)
 	{
-		return null;
+		throw new NotImplementedException();
 	}
 
 	// ==========================================================================

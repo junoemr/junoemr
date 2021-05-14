@@ -5,9 +5,14 @@ import {API_BASE_PATH} from "../../../../constants/ApiConstants";
 import MessageDtoToMessageConverter from "../../../converter/MessageDtoToMessageConverter";
 import MessagingError from "../../../../error/MessagingError";
 import {MhaClinicMessagingApi} from "../../../../../../generated";
+import StreamingList from "../../../../util/StreamingList";
+import ClinicMailboxStreamSource from "../model/ClinicMailboxStreamSource";
+import Conversation from "../../../model/Conversation";
+import ConversationDtoToConversationConverter from "../../../converter/ConversationDtoToConversationConverter";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
+	protected readonly STREAM_INITIAL_LOAD_COUNT = 10;
 	protected _mhaClinicMessagingApi: MhaClinicMessagingApi;
 
 	// ==========================================================================
@@ -59,19 +64,52 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 				source.id,
 				searchOptions.startDateTime?.toDate(),
 				searchOptions.endDateTime?.toDate(),
-				searchOptions.group.toString(),
+				searchOptions.group?.toString(),
 				searchOptions.limit,
 				searchOptions.offset,
 				searchOptions.sender?.id,
 				searchOptions.sender?.type.toString(),
 				searchOptions.recipient?.id,
-				searchOptions.recipient?.type)).data.body;
+				searchOptions.recipient?.type.toString())).data.body;
 
 			return (new MessageDtoToMessageConverter()).convertList(messages);
 		}
 		catch(error)
 		{
 			throw new MessagingError(`Failed to search messages from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+		}
+	}
+
+	/**
+	 * like searchMessages but returns a streamingList such that all results are not fetched at once but can be fetched piece by piece.
+	 * @param source - the source to search in.
+	 * @param searchOptions - filters to narrow the search.
+	 * @return search results as a StreamingList. Can be used the same as an array however it will not contain all results. You must call load() to get
+	 * additional results.
+	 */
+	public async searchMessagesAsStream(source: MessageSource, searchOptions: MessageSearchParams): Promise<StreamingList<Message>>
+	{
+		const streamSource = new ClinicMailboxStreamSource(this, source, searchOptions);
+		const stream = new StreamingList<Message>([streamSource], (t1, t2) => t1.createdAtDateTime.diff(t2.createdAtDateTime));
+		await stream.load(this.STREAM_INITIAL_LOAD_COUNT);
+		return stream;
+	}
+
+	/**
+	 * get a conversation
+	 * @param source - source to get conversation from
+	 * @param conversationId - the conversation id to get
+	 */
+	public async getConversation(source: MessageSource, conversationId: string): Promise<Conversation>
+	{
+		try
+		{
+			const conversationDto = (await this._mhaClinicMessagingApi.getConversation(source.id, conversationId)).data.body;
+			return (new ConversationDtoToConversationConverter()).convert(conversationDto);
+		}
+		catch(error)
+		{
+			throw new MessagingError(`Failed to retrieve conversation [${conversationId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
 		}
 	}
 

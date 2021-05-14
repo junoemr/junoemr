@@ -27,6 +27,7 @@ import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
 import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
+import org.oscarehr.integration.myhealthaccess.dto.ConversationDto;
 import org.oscarehr.integration.myhealthaccess.dto.MessageDto;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
 import org.oscarehr.messaging.model.MessageGroup;
@@ -100,23 +101,38 @@ public class ClinicMessagingService extends BaseService
 		MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
 		Optional.ofNullable(startDateTime).ifPresent((startDate) -> queryParams.add("start_datetime", startDate.toString()));
 		Optional.ofNullable(endDateTime).ifPresent((endDate) -> queryParams.add("end_datetime", endDate.toString()));
-		Optional.ofNullable(group).ifPresent((messageGroup -> queryParams.add("group", messageGroup.toString())));
+		Optional.ofNullable(group).ifPresent((messageGroup -> queryParams.add("group", messageGroup.getName())));
 		Optional.ofNullable(limit).ifPresent((lim) -> queryParams.add("limit", lim.toString()));
 		Optional.ofNullable(offset).ifPresent((off) -> queryParams.add("offset", off.toString()));
 		if (sender != null)
 		{
 			queryParams.add("sender_id", sender.getId());
-			queryParams.add("sender_type", sender.getType().toString());
+			queryParams.add("sender_type", sender.getType().getName());
 		}
 		if (receiver != null)
 		{
 			queryParams.add("recipient_id", receiver.getId());
-			queryParams.add("recipient_type", receiver.getType().toString());
+			queryParams.add("recipient_type", receiver.getType().getName());
 		}
 
 		String url = restClient.formatEndpointFull("/clinic_user/self/clinic/messages", null, queryParams);
 
 		return Arrays.asList(restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), MessageDto[].class));
+	}
+
+	/**
+	 * get a conversation from the clinic mailbox by id
+	 * @param integration - integration to fetch conversation from
+	 * @param loggedInInfo - logged in info
+ 	 * @param conversationId - the conversation id to fetch.
+	 * @return - the conversation
+	 */
+	public ConversationDto getConversation(Integration integration, LoggedInInfo loggedInInfo, String conversationId)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+		String url = restClient.formatEndpoint("/clinic_user/self/clinic/conversation/%s", conversationId);
+
+		return restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), ConversationDto.class);
 	}
 
 	// ==========================================================================

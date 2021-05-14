@@ -1,3 +1,3 @@
 import {MessageDto} from "../../../../generated";
 
-export type MessageGroup = MessageDto.GroupEnum;
+export import MessageGroup = MessageDto.GroupEnum;

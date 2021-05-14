@@ -34,6 +34,9 @@ import java.util.stream.Collectors;
 
 public class MessageToMessageDtoConverter extends AbstractModelConverter<Message, MessageDto>
 {
+	// ==========================================================================
+	// AbstractModelConverter Overrides
+	// ==========================================================================
 
 	@Override
 	public MessageDto convert(Message input)
