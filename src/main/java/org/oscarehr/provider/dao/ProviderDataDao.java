@@ -162,7 +162,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 
     public List<ProviderRoleTransfer> findProviderSecUserRoles(String lastName, String firstName) {
     	
-		String queryStr = "select p.provider_no, p.first_name, p.last_name, p.super_admin, u.id, u.role_name, pp.role_id " +
+		String queryStr = "select p.provider_no, p.first_name, p.last_name, p.super_admin, u.id, r.role_no, r.role_name, pp.role_id " +
 				"FROM provider p " +
 				"LEFT JOIN secUserRole u ON  p.provider_no=u.provider_no " +
 				"LEFT JOIN secRole r ON (r.role_name = u.role_name) " +
@@ -190,12 +190,13 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 
 		    if(result[4] != null)
 		    {
-			    transfer.setRoleId(new Long((Integer) result[4]));
-			    transfer.setRoleName((String) result[5]);
+			    transfer.setUserRoleId(Long.valueOf((Integer) result[4]));
+			    transfer.setRoleId((Integer) result[5]);
+			    transfer.setRoleName((String) result[6]);
 		    }
-			if(result[6] != null)
+			if(result[7] != null)
 			{
-				transfer.setPrimaryRoleId(((BigInteger) result[6]).longValue());
+				transfer.setPrimaryRoleId(((BigInteger) result[7]).longValue());
 			}
 			transferList.add(transfer);
 	    }

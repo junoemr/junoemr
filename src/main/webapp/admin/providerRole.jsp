@@ -144,7 +144,7 @@
 			%>
 			item = {
 				providerNo: "<%=transfer.getProviderId()%>",
-				role_id: "<%=transfer.getRoleId()%>",
+				role_id: "<%=transfer.getUserRoleId()%>",
 				roleName: "<%=transfer.getRoleName()%>"};
 			items.push(item);
 			<%
@@ -245,7 +245,7 @@
 			String providerNo = transfer.getProviderId();
 			boolean isClickedAccountSuperAdmin = transfer.isSuperAdmin();
 
-			String roleIdStr = (transfer.getRoleId() == null)? "" : String.valueOf(transfer.getRoleId());
+			String userRoleIdString = (transfer.getUserRoleId() == null)? "" : String.valueOf(transfer.getUserRoleId());
 	%>
 	<form name="myform<%= providerNo %>" action="providerRole.do" method="POST">
 		<tr bgcolor="<%=colors[i%2]%>">
@@ -261,10 +261,10 @@
 					<%
 						for(SecRole role : secRoles)
 						{
-							String secRoleName = role.getName();
+							Integer roleId = role.getId();
 					%>
-					<option value="<%=secRoleName%>" <%=secRoleName.equals(transfer.getRoleName()) ? "selected" : "" %>>
-						<%=secRoleName%>
+					<option value="<%=roleId%>" <%=(roleId.equals(transfer.getRoleId())) ? "selected" : "" %>>
+						<%=role.getName()%>
 					</option>
 					<%
 						}
@@ -278,7 +278,7 @@
 			<td align="center">
 				<input type="hidden" name="keyword" value="<%=keyword%>"/>
 				<input type="hidden" name="providerId" value="<%=providerNo%>">
-				<input type="hidden" name="roleId" value="<%= roleIdStr %>">
+				<input type="hidden" name="userRoleId" value="<%= userRoleIdString %>">
 				<input type="hidden" name="roleOld" value="<%= StringUtils.trimToEmpty(transfer.getRoleName())%>">
 				<input type="submit" name="submit" value="Add"
 				       onclick="return updateProviderRoles(this.form, 'addRole', <%=isClickedAccountSuperAdmin%>);">

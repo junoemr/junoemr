@@ -42,37 +42,32 @@ import javax.servlet.http.HttpServletResponse;
 public class ProviderRoleAction extends DispatchAction
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private ProviderRoleService providerRoleService = SpringUtils.getBean(ProviderRoleService.class);
+	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private static final ProviderRoleService providerRoleService = SpringUtils.getBean(ProviderRoleService.class);
 
 	public ActionForward addRole(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		String currentProviderNo = (String) request.getSession().getAttribute("user");
 		String ip = request.getRemoteAddr();
-		Integer providerId = Integer.parseInt(request.getParameter("providerId"));
-		String roleNew = request.getParameter("roleNew");
+		String providerId = request.getParameter("providerId");
+		Integer newRoleId = Integer.parseInt(request.getParameter("roleNew"));
 
 		try
 		{
 			logger.info("ADD ROLE");
 			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_CREATE);
-			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, String.valueOf(providerId));
+			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
-			if(!providerRoleService.validRoleName(roleNew))
+			if(!providerRoleService.hasRole(providerId, newRoleId))
 			{
-				return mapping.findForward("failure");
-			}
-
-			if(!providerRoleService.hasRole(providerId, roleNew))
-			{
-				Secuserrole role = providerRoleService.addRole(providerId, roleNew);
+				Secuserrole role = providerRoleService.addRole(providerId, newRoleId);
 				LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS,
-						String.valueOf(role.getId()), ip, providerId + "|" + roleNew);
-				request.setAttribute("message", "Role " + roleNew + " is added. (" + providerId + ")");
+						String.valueOf(role.getId()), ip, providerId + "|" + newRoleId);
+				request.setAttribute("message", "Role " + newRoleId + " is added. (" + providerId + ")");
 			}
 			else
 			{
-				request.setAttribute("message", "Role " + roleNew + " already exists (" + providerId + ")");
+				request.setAttribute("message", "Role " + newRoleId + " already exists (" + providerId + ")");
 			}
 
 		}
@@ -85,8 +80,8 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.error("Error", e);
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_FAILURE,
-					null, ip, providerId + "|" + roleNew);
-			request.setAttribute("message", "Role " + roleNew + " <font color='red'>NOT</font> added!!! (" + providerId + ")");
+					null, ip, providerId + "|" + newRoleId);
+			request.setAttribute("message", "Role " + newRoleId + " <font color='red'>NOT</font> added!!! (" + providerId + ")");
 			return mapping.findForward("failure");
 		}
 		return mapping.findForward("success");
@@ -97,9 +92,9 @@ public class ProviderRoleAction extends DispatchAction
 		String currentProviderNo = (String) request.getSession().getAttribute("user");
 		String ip = request.getRemoteAddr();
 		String providerId = request.getParameter("providerId");
-		String roleId = request.getParameter("roleId");
-		String roleOld = request.getParameter("roleOld");
-		String roleNew = request.getParameter("roleNew");
+		Integer secUserRoleId = Integer.parseInt(request.getParameter("userRoleId"));
+		String roleNameOld = request.getParameter("roleOld");
+		Integer secRoleId = Integer.parseInt(request.getParameter("roleNew"));
 
 		try
 		{
@@ -107,14 +102,10 @@ public class ProviderRoleAction extends DispatchAction
 			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_UPDATE);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
-			if(!providerRoleService.validRoleName(roleNew))
-			{
-				return mapping.findForward("failure");
-			}
-			providerRoleService.updateRole(Integer.parseInt(currentProviderNo), Integer.parseInt(providerId), Integer.parseInt(roleId), roleNew);
+			providerRoleService.updateRole(currentProviderNo, providerId, secUserRoleId, secRoleId);
 
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS,
-					roleId, ip, providerId + "|" + roleOld + ">" + roleNew);
+					String.valueOf(secUserRoleId), ip, providerId + "|" + roleNameOld + ">" + secRoleId);
 		}
 		catch (SecurityException se)
 		{
@@ -125,8 +116,8 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.error("Error", e);
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_FAILURE,
-					roleId, ip, providerId + "|" + roleOld);
-			request.setAttribute("message", "Role " + roleOld + " is <font color='red'>NOT</font> updated!!! (" + providerId + ")");
+					String.valueOf(secUserRoleId), ip, providerId + "|" + roleNameOld);
+			request.setAttribute("message", "Role " + roleNameOld + " is <font color='red'>NOT</font> updated!!! (" + providerId + ")");
 			return mapping.findForward("failure");
 		}
 
@@ -138,9 +129,9 @@ public class ProviderRoleAction extends DispatchAction
 		String currentProviderNo = (String) request.getSession().getAttribute("user");
 		String ip = request.getRemoteAddr();
 		String providerId = request.getParameter("providerId");
-		String roleId = request.getParameter("roleId");
+		Integer secUserRoleId = Integer.parseInt(request.getParameter("userRoleId"));
 		String roleOld = request.getParameter("roleOld");
-		String roleNew = request.getParameter("roleNew");
+		Integer newRoleId = Integer.parseInt(request.getParameter("roleNew"));
 
 		try
 		{
@@ -148,14 +139,10 @@ public class ProviderRoleAction extends DispatchAction
 			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_DELETE);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
 
-			if(!providerRoleService.validRoleName(roleNew))
-			{
-				return mapping.findForward("failure");
-			}
-			providerRoleService.deleteRole(Integer.parseInt(currentProviderNo), Integer.parseInt(providerId), Integer.parseInt(roleId));
+			providerRoleService.deleteRole(currentProviderNo, providerId, secUserRoleId);
 
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS,
-					roleId, ip, providerId + "|" + roleOld);
+					String.valueOf(newRoleId), ip, providerId + "|" + roleOld);
 			request.setAttribute("message", "Role " + roleOld + " is deleted. (" + providerId + ")");
 		}
 		catch (SecurityException se)
@@ -167,7 +154,7 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.error("Error", e);
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_FAILURE,
-					roleId, ip, providerId + "|" + roleOld);
+					String.valueOf(newRoleId), ip, providerId + "|" + roleOld);
 			request.setAttribute("message", "Role " + roleOld + " is <font color='red'>NOT</font> deleted!!! (" + providerId + ")");
 			return mapping.findForward("failure");
 		}

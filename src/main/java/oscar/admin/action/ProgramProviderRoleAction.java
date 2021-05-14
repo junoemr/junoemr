@@ -53,7 +53,7 @@ public class ProgramProviderRoleAction extends DispatchAction
 			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.CREATE, null, "_admin", "_admin.userAdmin");
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerNoStr);
 
-			providerRoleService.setPrimaryRole(Integer.parseInt(providerNoStr), roleName);
+			providerRoleService.setPrimaryRole(providerNoStr, roleName);
 		}
 		catch (SecurityException se)
 		{

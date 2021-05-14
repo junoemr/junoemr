@@ -31,6 +31,7 @@ import org.oscarehr.common.model.RecycleBin;
 import org.oscarehr.provider.dao.ProgramProviderDao;
 import org.oscarehr.provider.model.ProgramProvider;
 import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.security.model.SecRole;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,10 @@ public class ProviderRoleService
 	ProgramManager programManager;
 
 	@Autowired
-	SecuserroleDao secUserRoleDao;
+	SecuserroleDao secuserroleDao;
+
+	@Autowired
+	SecUserRoleDao secUserRoleDao;
 
 	@Autowired
 	SecRoleDao secRoleDao;
@@ -69,7 +73,7 @@ public class ProviderRoleService
 	 * @param providerId - of the newly added provider's
 	 */
 
-	public boolean setDefaultRoleForNewProvider(Integer providerId)
+	public boolean setDefaultRoleForNewProvider(String providerId)
 	{
 		try
 		{
@@ -84,7 +88,7 @@ public class ProviderRoleService
 		return false;
 	}
 
-	public boolean setDefaultPrimaryRole(Integer providerNo)
+	public boolean setDefaultPrimaryRole(String providerNo)
 	{
 		try
 		{
@@ -106,12 +110,12 @@ public class ProviderRoleService
 	 * @deprecated - don't look up roles by name
 	 */
 	@Deprecated
-	public boolean setPrimaryRole(Integer providerId, String roleName)
+	public boolean setPrimaryRole(String providerId, String roleName)
 	{
 		SecRole secRole = securityRoleDao.findByName(roleName);
 		return  setPrimaryRole(providerId, secRole);
 	}
-	public boolean setPrimaryRole(Integer providerId, SecRole secRole)
+	public boolean setPrimaryRole(String providerId, SecRole secRole)
 	{
 		// not roleName in the table that matching default roleName from property file
 		if(secRole == null)
@@ -140,106 +144,67 @@ public class ProviderRoleService
 		return true;
 	}
 
-	@Deprecated // don't look up roles by name
-	public Secuserrole addRole(Integer roleProviderId, String roleName)
+	public Secuserrole addRole(String roleProviderId, Integer roleId)
 	{
-		SecRole role = secRoleDao.findByName(roleName);
-		return addRole(roleProviderId, role);
+		return addRole(roleProviderId, secRoleDao.find(roleId));
 	}
-	public Secuserrole addRole(Integer roleProviderId, SecRole secRole)
+
+	public Secuserrole addRole(String roleProviderId, SecRole secRole)
 	{
 		Secuserrole secUserRole = new Secuserrole();
 		int defaultActiveyn = 1;
 
-		secUserRole.setProviderNo(String.valueOf(roleProviderId));
+		secUserRole.setProviderNo(roleProviderId);
 		secUserRole.setRoleName(secRole.getName());
 		secUserRole.setRoleId(secRole.getId());
 		secUserRole.setActiveyn(defaultActiveyn);
-		secUserRoleDao.save(secUserRole);
+		secuserroleDao.save(secUserRole);
 		return secUserRole;
 	}
 
-	@Deprecated // don't look up roles by name
-	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
+	public boolean hasRole(String roleProviderId, Integer roleId)
 	{
-		SecRole secRole = secRoleDao.findByName(roleName);
-		return addRoleAndAssignPrimary(roleProviderId, secRole);
-	}
-	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, SecRole secRole)
-	{
-		Secuserrole secUserRole = addRole(roleProviderId, secRole);
-
-		Long caisiProgram = new Long(programManager.getDefaultProgramId());
-		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
-		if(programProvider == null)
-		{
-			programProvider = new ProgramProvider();
-			programProvider.setProgramId(caisiProgram);
-			programProvider.setProviderNo(String.valueOf(roleProviderId));
-			programProvider.setRoleId(Long.valueOf(secRole.getId()));
-			programProviderDao.persist(programProvider);
-		}
-		else
-		{
-			programProvider.setProgramId(caisiProgram);
-			programProvider.setProviderNo(String.valueOf(roleProviderId));
-			programProvider.setRoleId(Long.valueOf(secRole.getId()));
-			programProviderDao.merge(programProvider);
-		}
-		return secUserRole;
+		return secUserRoleDao.findByProviderAndRoleId(roleProviderId, roleId) != null;
 	}
 
-	public boolean hasRole(Integer roleProviderId, String roleName)
+	public void updateRole(String currentProviderId, String roleProviderId, Integer secUserRoleId, Integer roleId)
 	{
-		List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(String.valueOf(roleProviderId), roleName);
-		return !existingRoles.isEmpty();
-	}
-
-	public void updateRole(Integer currentProviderId, Integer roleProviderId, Integer roleId, String roleName)
-	{
-		if(!hasRole(roleProviderId, roleName))
+		if(!hasRole(roleProviderId, roleId))
 		{
-			deleteRole(currentProviderId, roleProviderId, roleId);
-			addRole(roleProviderId, roleName);
+			deleteRole(currentProviderId, roleProviderId, secUserRoleId);
+			addRole(roleProviderId, roleId);
 		}
 	}
 
-	public void deleteRole(Integer currentProviderId, Integer roleProviderId, Integer roleId)
+	public void deleteRole(String currentProviderId, String roleProviderId, Integer secUserRoleId)
 	{
-		Secuserrole secUserRole = secUserRoleDao.findById(roleId);
+		Secuserrole secUserRole = secuserroleDao.findById(secUserRoleId);
 		String oldRole = secUserRole.getRoleName();
-		secUserRoleDao.delete(secUserRole);
+		secuserroleDao.delete(secUserRole);
 
 		RecycleBin recycleBin = new RecycleBin();
-		recycleBin.setProviderNo(String.valueOf(currentProviderId));
+		recycleBin.setProviderNo(currentProviderId);
 		recycleBin.setUpdateDateTime(new java.util.Date());
 		recycleBin.setTableName("secUserRole");
 		recycleBin.setKeyword(roleProviderId + "|" + oldRole);
 		recycleBin.setTableContent("<provider_no>" + roleProviderId + "</provider_no>" + "<role_name>" + oldRole + "</role_name>");
 		recycleBinDao.persist(recycleBin);
-
-	}
-
-	public boolean validRoleName(String roleName)
-	{
-		return secRoleDao.roleExistsWithName(roleName);
 	}
 
 	/**
 	 * assign the specified roles to the provider
-	 * @param roles - role id list
-	 * @param providerNo - the provider to assign to.
+	 * @param roleIds - role id list
+	 * @param providerId - the provider to assign to.
 	 */
-	public synchronized void assignProviderRoles(List<Integer> roles, Integer providerNo)
+	public synchronized void assignProviderRoles(List<Integer> roleIds, String providerId)
 	{
-		if (roles != null)
+		if (roleIds != null)
 		{
-			for (Integer role : roles)
+			for (Integer roleId : roleIds)
 			{
-				String roleName = secRoleDao.find(role).getName();
-				if (!hasRole(providerNo, roleName))
+				if (!hasRole(providerId, roleId))
 				{
-					addRole(providerNo, roleName);
+					addRole(providerId, roleId);
 				}
 			}
 		}
@@ -254,7 +219,7 @@ public class ProviderRoleService
 	{
 		if (roles != null)
 		{
-			List<Secuserrole> secUserRoles = secUserRoleDao.findByProviderNo(providerNo.toString());
+			List<Secuserrole> secUserRoles = secuserroleDao.findByProviderNo(providerNo.toString());
 			for (Secuserrole userRole : secUserRoles)
 			{
 				boolean contains = false;
@@ -270,7 +235,7 @@ public class ProviderRoleService
 
 				if (!contains)
 				{
-					secUserRoleDao.delete(userRole);
+					secuserroleDao.delete(userRole);
 				}
 			}
 		}
