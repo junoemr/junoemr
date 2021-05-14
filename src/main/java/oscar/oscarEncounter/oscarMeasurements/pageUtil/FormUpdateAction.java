@@ -9,20 +9,9 @@
 
 package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.GenericValidator;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -41,21 +30,21 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
+import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.util.ConversionUtils;
 
-import org.oscarehr.security.dao.SecRoleDao;
-import org.oscarehr.security.model.SecRole;
-
-import oscar.oscarEncounter.data.EctProgram;
-
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.apache.log4j.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class FormUpdateAction extends Action {
 	
@@ -216,46 +205,6 @@ public class FormUpdateAction extends Action {
 
 		return mapping.findForward("success");
 	}
-
-	public void addNote(String demographic_no, String providerNo, String prog_no, String note, int apptNoInt, HttpServletRequest request){
-		HttpSession session = request.getSession();
-		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());
-		CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
-
-		
-		SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");
-		String reporter_caisi_role=doctorRole.getId().toString();
-
-		SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");  
-		Date date = new Date(); 
-		String formattedDate= "["+df.format(date)+" .: ]";
-		note = formattedDate+"\n"+ note;
- 
-		    
-		        CaseManagementNote cmn = new CaseManagementNote();
-				cmn.setUpdate_date(date);
-				cmn.setObservation_date(date);
-				cmn.setDemographic_no(demographic_no);
-				cmn.setProviderNo(providerNo);
-				cmn.setNote(note);
-				cmn.setSigned(true);
-				cmn.setSigning_provider_no(providerNo);
-				cmn.setProgram_no(prog_no);
-				cmn.setReporter_caisi_role(reporter_caisi_role);
-								
-				cmn.setReporter_program_team("0");
-				cmn.setPassword("NULL");
-				cmn.setLocked(false);
-				cmn.setHistory(note+"-----hi story----");
-				cmn.setPosition(0);
-				cmn.setAppointmentNo(apptNoInt);
-				
-				
-				cmm.saveNoteSimple(cmn);
-		
-	}
-	
 
 	public void doCommentInput(FlowSheetItem item, EctMeasurementTypesBean mtypeBean, MeasurementFlowSheet mFlowsheet, String inputType, String mInstructions, String comment, String date, String apptNo, HttpServletRequest request) {
 		String demographicNo = request.getParameter("demographic_no");
