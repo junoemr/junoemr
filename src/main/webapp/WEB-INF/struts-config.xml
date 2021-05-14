@@ -502,10 +502,6 @@
 			<form-property name="userId" type="java.lang.String" />
 		</form-bean>
 
-		<form-bean name="courseManagerForm" type="org.apache.struts.validator.DynaValidatorForm">
-			<form-property name="name" type="java.lang.String" />
-		</form-bean>
-
 		<form-bean name="ocularProcForm" type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="proc" type="org.oscarehr.eyeform.model.EyeformOcularProcedure" />
 		</form-bean>
@@ -1698,9 +1694,6 @@
 		
 		<action parameter="method" path="/oscarResearch/oscarDxResearch/dxResearchLoadAssociations" name="dxAssociationsForm" scope="request" type="oscar.oscarResearch.oscarDxResearch.pageUtil.dxResearchLoadAssociationsAction">
 			<forward name="success" path="/oscarResearch/oscarDxResearch/dxResearchSelectAssociations.jsp" redirect="true" />
-		</action>
-		<action parameter="method" path="/oscarLearning/CourseManager" name="courseManagerForm" scope="request" type="org.oscarehr.learning.web.CourseManagerAction">
-			<forward name="success" path="/oscarLearning/CourseManager.jsp" redirect="true" />
 		</action>
 		<action input="/billing/CA/BC/billingBC.jsp" name="BillingCreateBillingForm" path="/billing" scope="session" type="oscar.oscarBilling.ca.bc.pageUtil.BillingAction" validate="false">
 			<forward name="BC" path="/billing/CA/BC/billingBC.jsp" />

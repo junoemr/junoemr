@@ -938,12 +938,6 @@ public boolean isBirthday(String schedDate,String demBday){
 									</caisi:isModuleLoad>
 								</li>
 							</security:oscarSec>
-							<oscar:oscarPropertiesCheck property="OSCAR_LEARNING" value="yes">
-								<li>
-									<a HREF="#" ONCLICK ="popupPage2('../oscarLearning/CourseView.jsp','<bean:message key="global.courseview"/>');return false;" TITLE='<bean:message key="global.courseview"/>'>
-										<span id="oscar_courseview"><bean:message key="global.btncourseview"/></span></a>
-								</li>
-							</oscar:oscarPropertiesCheck>
 
 							<oscar:oscarPropertiesCheck property="referral_menu" value="yes">
 								<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.misc" rights="r">
