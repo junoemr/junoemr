@@ -531,7 +531,7 @@ public class DemographicService extends AbstractServiceImpl {
 	}
 
 	@GET
-	@Path("/{demographicNo}/history")
+	@Path("/{demographicNo}/rosterHistory")
 	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(
 			@PathParam("demographicNo") Integer demographicNo)
 	{

@@ -27,11 +27,32 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.rosterStatus.model.RosterStatus;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Query;
+import java.util.List;
+
 @Repository
 public class RosterStatusDao extends AbstractDao<RosterStatus>
 {
 	protected RosterStatusDao()
 	{
 		super(RosterStatus.class);
+	}
+
+	public List<RosterStatus> findAllActive()
+	{
+		String sql = "SELECT r FROM RosterStatus r WHERE r.deletedAt IS NULL";
+
+		Query query = entityManager.createQuery(sql);
+
+		return query.getResultList();
+	}
+
+	public List<RosterStatus> findAllInactive()
+	{
+		String sql = "SELECT r FROM RosterStatus r WHERE r.deletedAt IS NOT NULL";
+
+		Query query = entityManager.createQuery(sql);
+
+		return query.getResultList();
 	}
 }

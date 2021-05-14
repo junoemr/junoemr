@@ -77,6 +77,7 @@ public class DemographicRosterService
 		// Only set terminated-y fields if it's a status that implies termination
 		if (demographicRoster.getRosterStatus().isTerminated())
 		{
+			demographicRoster.setRosterDate(null);
 			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
 			DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(
 					Integer.parseInt(demographic.getRosterTerminationReason()));

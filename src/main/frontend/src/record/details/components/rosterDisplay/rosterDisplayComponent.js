@@ -38,7 +38,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
 
                 ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
-                rosterApi.getActiveRosterStatuses().then(
+                rosterApi.getRosterStatuses(true).then(
                     (data) =>
                     {
                         ctrl.rosterStatusList = data.data.body.map((entry) => {

@@ -58,9 +58,22 @@ public class RosterStatusService
 				.findFirst();
 	}
 
-	public List<RosterStatusTransfer> getRosterStatusList()
+	public List<RosterStatusTransfer> getRosterStatusList(Boolean active)
 	{
-		return rosterStatusToTransferConverter.convert(rosterStatusDao.findAll());
+		List<RosterStatus> statuses;
+		if (active != null && active)
+		{
+			statuses = rosterStatusDao.findAllActive();
+		}
+		else if (active != null)
+		{
+			statuses = rosterStatusDao.findAllInactive();
+		}
+		else
+		{
+			statuses = rosterStatusDao.findAll();
+		}
+		return rosterStatusToTransferConverter.convert(statuses);
 	}
 
 	public List<RosterStatusTransfer> getActiveRosterStatusList()

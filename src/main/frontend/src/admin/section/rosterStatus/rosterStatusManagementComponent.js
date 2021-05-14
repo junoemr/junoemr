@@ -32,26 +32,12 @@ angular.module('Admin').component('rosterStatusManagement',
                 ctrl.rosterStatuses = [];
                 const rosterApi = new RosterServiceApi($http, $httpParamSerializer, '../ws/rs');
 
-                // for drag n drop
-                ctrl.dragStartY = 0;
-
                 ctrl.$onInit = () =>
                 {
                     ctrl.tableParams = new NgTableParams(
                         {
                             page: 1,
                             count: -1,
-                            sorting:
-                                {
-                                    order: 'asc',
-                                }
-                        },
-                        {
-                            // called when sort order changes
-                            getData: (params) =>
-                            {
-                                ctrl.sortMode = params.orderBy();
-                            }
                         }
                     );
                     ctrl.getStatuses();

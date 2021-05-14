@@ -34,8 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -52,23 +55,15 @@ public class RosterWebService extends AbstractServiceImpl
 	DemographicRosterService demographicRosterService;
 
 	@GET
-	@Path("/status")
-	public RestSearchResponse<RosterStatusTransfer> getRosterStatuses()
+	@Path("/statuses")
+	public RestSearchResponse<RosterStatusTransfer> getRosterStatuses(@QueryParam("active") Boolean active)
 	{
-		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getRosterStatusList();
-		return RestSearchResponse.successResponseOnePage(rosterStatuses);
-	}
-
-	@GET
-	@Path("/status/active")
-	public RestSearchResponse<RosterStatusTransfer> getActiveRosterStatuses()
-	{
-		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getActiveRosterStatusList();
+		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getRosterStatusList(active);
 		return RestSearchResponse.successResponseOnePage(rosterStatuses);
 	}
 
 	@POST
-	@Path("/status/add")
+	@Path("/status")
 	public RestResponse<RosterStatusTransfer> addStatus(RosterStatusTransfer rosterStatusTransfer)
 	{
 		String currentProvider = getCurrentProvider().getProviderNo();
@@ -77,9 +72,11 @@ public class RosterWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(rosterStatusTransfer);
 	}
 
-	@POST
-	@Path("/status/")
-	public RestResponse<RosterStatusTransfer> editStatus(RosterStatusTransfer rosterStatusTransfer)
+	@PUT
+	@Path("/status/{id}")
+	public RestResponse<RosterStatusTransfer> editStatus(
+			@PathParam("id") Integer id,
+			RosterStatusTransfer rosterStatusTransfer)
 	{
 		String currentProvider = getCurrentProvider().getProviderNo();
 		rosterStatusTransfer = rosterStatusService.editStatus(rosterStatusTransfer, currentProvider);
