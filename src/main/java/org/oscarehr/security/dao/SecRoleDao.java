@@ -26,6 +26,7 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.security.model.SecRole;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
 import javax.persistence.Query;
 import java.util.List;
@@ -71,13 +72,25 @@ public class SecRoleDao extends AbstractDao<SecRole>
 
  	/** BAD! Stop using this. we want to be able to rename roles */
  	@Deprecated
-    public SecRole findByName(String name) {
+    public SecRole findByName(String name)
+    {
     	Query q = entityManager.createQuery("select x from SecRole x where x.name=:name");
 
     	q.setParameter("name", name);
     	
     	return this.getSingleResultOrNull(q);
     }
+
+	public SecRole findSystemDefaultRole()
+	{
+		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
+		SecRole defaultRole = this.findByName(providerDefaultRoleName);
+		if(defaultRole == null)
+		{
+			throw new IllegalStateException("Default system role '" + providerDefaultRoleName + "' does not exist");
+		}
+		return defaultRole;
+	}
 
     public boolean roleExistsWithName(String name)
     {

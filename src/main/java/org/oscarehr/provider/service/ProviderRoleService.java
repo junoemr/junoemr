@@ -24,24 +24,27 @@ package org.oscarehr.provider.service;
 
 import com.quatro.dao.security.SecuserroleDao;
 import com.quatro.model.security.Secuserrole;
+import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.RecycleBinDao;
-import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.model.RecycleBin;
-import org.oscarehr.security.model.SecRole;
 import org.oscarehr.provider.dao.ProgramProviderDao;
 import org.oscarehr.provider.model.ProgramProvider;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.model.SecRole;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.OscarProperties;
 
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ProviderRoleService
 {
+	public static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
 	SecRoleDao securityRoleDao;
@@ -63,37 +66,36 @@ public class ProviderRoleService
 
 
 	/**
-	 * @param providerID - of the newly added provider's
+	 * @param providerId - of the newly added provider's
 	 */
 
-	public boolean setDefaultRoleForNewProvider(Integer providerID)
+	public boolean setDefaultRoleForNewProvider(Integer providerId)
 	{
-
-		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
-
-		boolean isDefaultRoleNameExist = setPrimaryRole(providerID, providerDefaultRoleName);
-
-		if(!isDefaultRoleNameExist)
+		try
 		{
-			return false;
+			SecRole defaultRole = secRoleDao.findSystemDefaultRole();
+			addRole(providerId, defaultRole);
+			return true;
 		}
-
-		addRole(providerID, providerDefaultRoleName);
-
-		return true;
+		catch (IllegalStateException e)
+		{
+			logger.error("Default Role Error", e);
+		}
+		return false;
 	}
 
 	public boolean setDefaultPrimaryRole(Integer providerNo)
 	{
-		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
-		if (providerDefaultRoleName != null)
+		try
 		{
-			return setPrimaryRole(providerNo, providerDefaultRoleName);
+			SecRole defaultRole = secRoleDao.findSystemDefaultRole();
+			return setPrimaryRole(providerNo, defaultRole);
 		}
-		else
+		catch (IllegalStateException e)
 		{
-			return false;
+			logger.error("Default Role Error", e);
 		}
+		return false;
 	}
 
 	/**
@@ -101,11 +103,16 @@ public class ProviderRoleService
 	 * @param providerId - provider record id
 	 * @param roleName - name of the role to assign
 	 * @return - if no role in the table match property file's default role, return false;
+	 * @deprecated - don't look up roles by name
 	 */
+	@Deprecated
 	public boolean setPrimaryRole(Integer providerId, String roleName)
 	{
 		SecRole secRole = securityRoleDao.findByName(roleName);
-
+		return  setPrimaryRole(providerId, secRole);
+	}
+	public boolean setPrimaryRole(Integer providerId, SecRole secRole)
+	{
 		// not roleName in the table that matching default roleName from property file
 		if(secRole == null)
 		{
@@ -133,25 +140,34 @@ public class ProviderRoleService
 		return true;
 	}
 
-
+	@Deprecated // don't look up roles by name
 	public Secuserrole addRole(Integer roleProviderId, String roleName)
+	{
+		SecRole role = secRoleDao.findByName(roleName);
+		return addRole(roleProviderId, role);
+	}
+	public Secuserrole addRole(Integer roleProviderId, SecRole secRole)
 	{
 		Secuserrole secUserRole = new Secuserrole();
 		int defaultActiveyn = 1;
 
-		SecRole role = secRoleDao.findByName(roleName);
 		secUserRole.setProviderNo(String.valueOf(roleProviderId));
-		secUserRole.setRoleName(roleName);
-		secUserRole.setRoleId(role.getId());
+		secUserRole.setRoleName(secRole.getName());
+		secUserRole.setRoleId(secRole.getId());
 		secUserRole.setActiveyn(defaultActiveyn);
 		secUserRoleDao.save(secUserRole);
 		return secUserRole;
 	}
 
-
+	@Deprecated // don't look up roles by name
 	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
 	{
-		Secuserrole secUserRole = addRole(roleProviderId, roleName);
+		SecRole secRole = secRoleDao.findByName(roleName);
+		return addRoleAndAssignPrimary(roleProviderId, secRole);
+	}
+	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, SecRole secRole)
+	{
+		Secuserrole secUserRole = addRole(roleProviderId, secRole);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
 		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
@@ -160,14 +176,14 @@ public class ProviderRoleService
 			programProvider = new ProgramProvider();
 			programProvider.setProgramId(caisiProgram);
 			programProvider.setProviderNo(String.valueOf(roleProviderId));
-			programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
+			programProvider.setRoleId(Long.valueOf(secRole.getId()));
 			programProviderDao.persist(programProvider);
 		}
 		else
 		{
 			programProvider.setProgramId(caisiProgram);
 			programProvider.setProviderNo(String.valueOf(roleProviderId));
-			programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
+			programProvider.setRoleId(Long.valueOf(secRole.getId()));
 			programProviderDao.merge(programProvider);
 		}
 		return secUserRole;
@@ -206,7 +222,7 @@ public class ProviderRoleService
 
 	public boolean validRoleName(String roleName)
 	{
-		return (secRoleDao.findByName(roleName) != null);
+		return secRoleDao.roleExistsWithName(roleName);
 	}
 
 	/**
