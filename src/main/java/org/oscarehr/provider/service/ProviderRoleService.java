@@ -48,25 +48,25 @@ public class ProviderRoleService
 	public static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	SecRoleDao securityRoleDao;
+	private SecRoleDao securityRoleDao;
 
 	@Autowired
-	ProgramProviderDao programProviderDao;
+	private ProgramProviderDao programProviderDao;
 
 	@Autowired
-	ProgramManager programManager;
+	private ProgramManager programManager;
 
 	@Autowired
-	SecuserroleDao secuserroleDao;
+	private SecuserroleDao secuserroleDao;
 
 	@Autowired
-	SecUserRoleDao secUserRoleDao;
+	private SecUserRoleDao secUserRoleDao;
 
 	@Autowired
-	SecRoleDao secRoleDao;
+	private SecRoleDao secRoleDao;
 
 	@Autowired
-	RecycleBinDao recycleBinDao;
+	private RecycleBinDao recycleBinDao;
 
 
 	/**
@@ -105,15 +105,13 @@ public class ProviderRoleService
 	/**
 	 * Assign a primary role to the provider
 	 * @param providerId - provider record id
-	 * @param roleName - name of the role to assign
+	 * @param secRoleId - id of the role to assign
 	 * @return - if no role in the table match property file's default role, return false;
-	 * @deprecated - don't look up roles by name
 	 */
-	@Deprecated
-	public boolean setPrimaryRole(String providerId, String roleName)
+	public boolean setPrimaryRole(String providerId, Integer secRoleId)
 	{
-		SecRole secRole = securityRoleDao.findByName(roleName);
-		return  setPrimaryRole(providerId, secRole);
+		SecRole secRole = securityRoleDao.find(secRoleId);
+		return setPrimaryRole(providerId, secRole);
 	}
 	public boolean setPrimaryRole(String providerId, SecRole secRole)
 	{

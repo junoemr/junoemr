@@ -29,6 +29,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.ProviderRoleService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -44,16 +45,17 @@ public class ProgramProviderRoleAction extends DispatchAction
 	public ActionForward setPrimaryRole(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		String providerNoStr = request.getParameter("primaryRoleProvider");
-		String roleName = request.getParameter("primaryRoleRole");
+		String roleIdStr = request.getParameter("primaryRoleRole");
 		try
 		{
 			logger.info("SET PRIMARY ROLE");
+			Integer roleId = Integer.parseInt(roleIdStr);
 
 			String currentProviderNo = (String) request.getSession().getAttribute("user");
-			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.CREATE, null, "_admin", "_admin.userAdmin");
+			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.ADMIN_CREATE);
 			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerNoStr);
 
-			providerRoleService.setPrimaryRole(providerNoStr, roleName);
+			providerRoleService.setPrimaryRole(providerNoStr, roleId);
 		}
 		catch (SecurityException se)
 		{

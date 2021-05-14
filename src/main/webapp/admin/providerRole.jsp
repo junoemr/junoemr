@@ -144,8 +144,9 @@
 			%>
 			item = {
 				providerNo: "<%=transfer.getProviderId()%>",
-				role_id: "<%=transfer.getUserRoleId()%>",
-				roleName: "<%=transfer.getRoleName()%>"};
+				secUserRoleId: "<%=transfer.getUserRoleId()%>",
+				roleName: "<%=transfer.getRoleName()%>",
+				roleId: "<%=transfer.getRoleId()%>"};
 			items.push(item);
 			<%
 		}
@@ -161,9 +162,9 @@
 			var provider = $("#primaryRoleProvider").val();
 			for (var i = 0; i < items.length; i++)
 			{
-				if (items[i].providerNo == provider && items[i].role_id != "")
+				if (items[i].providerNo == provider && items[i].secUserRoleId != "")
 				{
-					$("#primaryRoleRole").append('<option value="' + items[i].roleName + '">' + items[i].roleName + '</option>');
+					$("#primaryRoleRole").append('<option value="' + items[i].roleId + '">' + items[i].roleName + '</option>');
 				}
 			}
 		}
