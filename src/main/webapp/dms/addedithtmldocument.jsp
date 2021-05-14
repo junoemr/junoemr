@@ -121,7 +121,7 @@ if (request.getAttribute("completedForm") != null) {
     oldDoc = false;
 }
 
-List<Map<String,String>> pdList = new ProviderData().getProviderList();
+List<Map<String,String>> pdList = new ProviderData().getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
 ArrayList<String> doctypes = EDocUtil.getDoctypes(module);
 String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_DOCUMENT;
 String annotation_tableid = editDocumentNo;

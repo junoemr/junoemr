@@ -42,6 +42,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.prevention.model.Prevention" %>
+<%@ page import="org.apache.commons.collections4.ListUtils" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -144,7 +145,10 @@
         layoutType = "default";
     }
 
-    List<Map<String, String>>  providers = ProviderData.getProviderList();
+    List<Map<String, String>> doctorProviders = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
+    List<Map<String, String>> nurseProviders = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_NURSE);
+    List<Map<String, String>> providers = ListUtils.union(doctorProviders, nurseProviders);
+
     if (creatorProviderNo.isEmpty())
     {
 	    creatorProviderNo = provider;

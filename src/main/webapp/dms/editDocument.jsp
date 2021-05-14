@@ -121,7 +121,7 @@
 		fileName = currentDoc.getFileName();
 	}
 
-	List<Map<String, String>> pdList = new ProviderData().getProviderList();
+	List<Map<String, String>> pdList = new ProviderData().getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
 	ArrayList doctypes = EDocUtil.getDoctypes(formdata.getFunction());
 	String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_DOCUMENT;
 	String annotation_tableid = editDocumentNo;

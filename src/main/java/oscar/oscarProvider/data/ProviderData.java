@@ -87,7 +87,8 @@ public class ProviderData {
 	+------------------------+--------------+------+-----+------------+-------+
 	*/
 
-	private static final String PROVIDER_TYPE_DOCTOR = "doctor";
+	public static final String PROVIDER_TYPE_DOCTOR = "doctor";
+	public static final String PROVIDER_TYPE_NURSE = "nurse";
 	String provider_no;
 	String last_name;
 	String first_name;
@@ -578,16 +579,17 @@ public class ProviderData {
 		this.signed_confidentiality = signed_confidentiality;
 	}
 
-	public static List<Map<String, String>> getProviderList() {
+	public static List<Map<String, String>> getProviderList(String providerType)
+	{
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByType(PROVIDER_TYPE_DOCTOR);
+		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByType(providerType);
 
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-		for (org.oscarehr.provider.model.ProviderData p : providers) {
+		for (org.oscarehr.provider.model.ProviderData p : providers)
+		{
 			result.add(toMap(p));
 		}
 		return result;
-
 	}
 
 	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData p) {

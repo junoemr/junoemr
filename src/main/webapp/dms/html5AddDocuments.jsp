@@ -61,7 +61,7 @@
         <%
             QueueDao queueDao = (QueueDao) SpringUtils.getBean("queueDao");
             List<Hashtable> queues=queueDao.getQueues();
-            List providers = ProviderData.getProviderList();
+            List providers = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
             String queueIdStr = (String) request.getSession().getAttribute("preferredQueue");
             int queueId = 1;
             if (queueIdStr != null) {
