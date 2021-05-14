@@ -41,7 +41,7 @@ public class DemographicRosterDao extends AbstractDao<DemographicRoster>
 	public List<DemographicRoster> findByDemographic(Integer demographicNo)
 	{
 		String sql = "SELECT d FROM DemographicRoster d " +
-				"WHERE d.demographicNo = :demographicNo " +
+				"WHERE d.demographicId = :demographicNo " +
 				"ORDER BY d.id DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("demographicNo", demographicNo);

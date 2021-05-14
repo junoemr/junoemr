@@ -59,7 +59,7 @@ public class DemographicRosterService
 	public DemographicRoster saveRosterHistory(Demographic demographic)
 	{
 		DemographicRoster demographicRoster = new DemographicRoster();
-		demographicRoster.setDemographicNo(demographic.getDemographicId());
+		demographicRoster.setDemographicId(demographic.getDemographicId());
 		demographicRoster.setRosterDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterDate()));
 
 		// Going to take a second look at this

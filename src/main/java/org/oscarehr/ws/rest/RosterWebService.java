@@ -27,11 +27,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
 import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.stereotype.Component;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -63,5 +65,25 @@ public class RosterWebService extends AbstractServiceImpl
 	{
 		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getActiveRosterStatusList();
 		return RestSearchResponse.successResponseOnePage(rosterStatuses);
+	}
+
+	@POST
+	@Path("/status/add")
+	public RestResponse<RosterStatusTransfer> addStatus(RosterStatusTransfer rosterStatusTransfer)
+	{
+		String currentProvider = getCurrentProvider().getProviderNo();
+		rosterStatusTransfer = rosterStatusService.addStatus(rosterStatusTransfer, currentProvider);
+
+		return RestResponse.successResponse(rosterStatusTransfer);
+	}
+
+	@POST
+	@Path("/status/")
+	public RestResponse<RosterStatusTransfer> editStatus(RosterStatusTransfer rosterStatusTransfer)
+	{
+		String currentProvider = getCurrentProvider().getProviderNo();
+		rosterStatusTransfer = rosterStatusService.editStatus(rosterStatusTransfer, currentProvider);
+
+		return RestResponse.successResponse(rosterStatusTransfer);
 	}
 }

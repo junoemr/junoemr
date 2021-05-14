@@ -1,0 +1,6 @@
+.roster-status-header {
+  @extend %juno-page-header;
+  h3 {
+    color: $color-neutral-white;
+  }
+}

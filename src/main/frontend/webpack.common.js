@@ -358,6 +358,8 @@ module.exports = {
 			'./src/admin/section/dataManagement/demographicExport/demographicExportComponent.js',
 			'./src/admin/systemProperties/systemPropertiesComponent.js',
 			'./src/admin/systemProperties/rx/propertiesRxComponent.js',
+			'./src/admin/section/rosterStatus/rosterStatusManagementComponent.js',
+			'./src/admin/section/rosterStatus/modals/editRosterStatusModalComponent.js',
 			'./src/billing/billingController.js',
 
 			'./src/consults/module.js',

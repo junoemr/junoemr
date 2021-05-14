@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
 public class DemographicRosterTransfer
 {
 	private Integer id;
-	private Integer demographicNo;
+	private Integer demographicId;
 	private String providerNo;
 	private String providerFullName;
 	private LocalDateTime rosterDate;

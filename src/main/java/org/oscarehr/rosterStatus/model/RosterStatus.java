@@ -72,7 +72,7 @@ public class RosterStatus extends AbstractModel<Integer> implements Serializable
 	@Column(name = "system_managed")
 	private boolean systemManaged;
 
-	@Column(name = "is_rostered")
+	@Column(name = "rostered")
 	private boolean rostered;
 
 	@Column(name = "is_terminated")

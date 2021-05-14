@@ -243,6 +243,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.rosterStatus',
+		{
+			url: '/rosterStatus',
+			component: 'rosterStatusManagement',
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',

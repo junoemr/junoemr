@@ -7,12 +7,12 @@ CREATE TABLE IF NOT EXISTS `roster_status` (
     deleted_at TIMESTAMP NULL,
     updated_by VARCHAR(6) NOT NULL,
     system_managed BOOLEAN NOT NULL DEFAULT FALSE,
-    is_rostered BOOLEAN NOT NULL DEFAULT FALSE,
+    rostered BOOLEAN NOT NULL DEFAULT FALSE,
     is_terminated BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT unique_roster_status UNIQUE(roster_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `roster_status`(roster_status, status_description, created_at, updated_at, updated_by, system_managed, is_rostered, is_terminated)
+INSERT INTO `roster_status`(roster_status, status_description, created_at, updated_at, updated_by, system_managed, rostered, is_terminated)
 VALUES
    ("TE", "Terminated", NOW(), NOW(), "999900", TRUE, FALSE, TRUE),
    ("RO", "Rostered", NOW(), NOW(), "999900", TRUE, TRUE, FALSE),

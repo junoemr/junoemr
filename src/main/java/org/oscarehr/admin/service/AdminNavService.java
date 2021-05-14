@@ -560,6 +560,14 @@ public class AdminNavService
 			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/rx"));
 		}
 
+		OscarProperties oscarProperties = OscarProperties.getInstance();
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin") &&
+				oscarProperties.isOntarioInstanceType())
+		{
+			systemManagementItems.add(new AdminNavItemTo1("Roster Status Settings", "rosterStatus"));
+		}
+
 		systemManagementGroup.setItems(systemManagementItems);
 		return systemManagementGroup;
 	}

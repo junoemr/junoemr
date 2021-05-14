@@ -122,7 +122,7 @@ public class DemographicRoster extends AbstractModel<Integer> implements Seriali
 	private Integer id;
 
 	@Column(name = "demographic_no")
-	private Integer demographicNo;
+	private Integer demographicId;
 
 	@Column(name = "rostered_provider_no")
 	private String providerNo;

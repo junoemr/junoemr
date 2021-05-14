@@ -51,9 +51,9 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                 );
             }
 
-            ctrl.openRosteredHistoryModal = () =>
+            ctrl.openRosteredHistoryModal = async () =>
             {
-                $uibModal.open(
+                await $uibModal.open(
                     {
                         component: 'rosteredHistoryModal',
                         backdrop: 'static',
@@ -62,12 +62,9 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                             demographic: ctrl.ngModel,
                         }
                     }
-                ).result.then((_ignored) =>
+                ).catch((_reason) =>
                 {
-                    // modal is display only, no results to return
-                }).catch((_reason) =>
-                {
-                        // do nothing on cancel
+                    // do nothing on cancel
                 });
             }
         }
