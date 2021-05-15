@@ -21,4 +21,27 @@
 * Canada
 */
 
-angular.module("Messaging", ["Messaging.Components", "Common.Services", "Common.Components", "Common.Layout"]);
+import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
+
+angular.module("Messaging.Components").component('messageView', {
+	templateUrl: 'src/messaging/inbox/components/messageView/messageView.jsp',
+	bindings: {
+	},
+	controller: [
+		"$scope",
+		"$stateParams",
+		function (
+			$scope,
+			$stateParams
+		)
+		{
+			let ctrl = this;
+			ctrl.messageId = $stateParams.messageId;
+			ctrl.componentStyle = JUNO_STYLE.GREY;
+
+			ctrl.$onInit = async () =>
+			{
+
+			}
+		}],
+});

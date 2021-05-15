@@ -1,8 +1,10 @@
+import {MessageSourceType} from "./MessageSourceType";
 
 export default class MessageSource
 {
 	protected _id: string;
 	protected _name: string;
+	protected _type: MessageSourceType;
 
 	// ==========================================================================
 	// Public Methods
@@ -12,11 +14,13 @@ export default class MessageSource
 	 * a source of messages.
 	 * @param id - the id of this source.
 	 * @param name - the name of the source
+	 * @param type - [optional] source type. meaning is implementation specific.
 	 */
-	constructor(id: string, name: string)
+	constructor(id: string, name: string, type = MessageSourceType.PHYSICAL)
 	{
 		this._id = id;
 		this._name = name;
+		this._type = type;
 	}
 
 	// ==========================================================================
@@ -31,5 +35,10 @@ export default class MessageSource
 	get name(): string
 	{
 		return this._name;
+	}
+
+	get type(): MessageSourceType
+	{
+		return this._type;
 	}
 }

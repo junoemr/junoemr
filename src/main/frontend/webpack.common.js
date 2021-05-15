@@ -238,6 +238,7 @@ module.exports = {
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
+			'./src/common/components/junoCollapseArea/junoCollapseAreaComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
 			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
@@ -277,6 +278,11 @@ module.exports = {
 			'./src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModalComponent.js',
 
 			'./src/messaging/module.js',
+			'./src/messaging/inbox/components/module.js',
+			'./src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBarComponent.js',
+			'./src/messaging/inbox/components/inboxSelect/inboxSelectComponent.js',
+			'./src/messaging/inbox/components/messageList/messageListComponent.js',
+			'./src/messaging/inbox/components/messageView/messageViewComponent.js',
 			'./src/messaging/inbox/messagingInboxComponent.js',
 
 			'./src/patient/module.js',

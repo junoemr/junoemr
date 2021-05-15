@@ -43,6 +43,19 @@ export default interface MessagingServiceInterface
 	 * @param conversationId - the conversation id to get
 	 */
 	getConversation(source: MessageSource, conversationId: string): Promise<Conversation>;
+
+
+	/**
+	 * get a list of all available message sources.
+	 * @return list of message sources
+	 */
+	getMessageSources(): Promise<MessageSource[]>;
+
+	/**
+	 * get a list of allowed message groups for this messaging service
+	 * @return list of allowed groups
+	 */
+	getMessageGroups(): Promise<MessageGroup[]>;
 }
 
 /**

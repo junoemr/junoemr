@@ -22,8 +22,7 @@
 */
 
 import MessagingServiceFactory from "../../lib/messaging/factory/MessagingServiceFactory";
-import MessageSource from "../../lib/messaging/model/MessageSource";
-import {MessageGroup} from "../../lib/messaging/model/MessageGroup";
+import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',
@@ -32,28 +31,40 @@ angular.module("Messaging").component('messagingInbox', {
 	controller: [
 		"$scope",
 		"$stateParams",
+		"$state",
 		function (
 			$scope,
-			$stateParams
+			$stateParams,
+			$state
 		)
 	{
 		let ctrl = this;
-
 		ctrl.backend = $stateParams.backend;
-		ctrl.messagingService = MessagingServiceFactory.build(ctrl.backend);
+		ctrl.selectedSourceId = $stateParams.source;
+		ctrl.selectedGroupId = $stateParams.group;
+		ctrl.messagingService = MessagingServiceFactory.build($stateParams.backend);
+		ctrl.componentStyle = JUNO_STYLE.GREY;
+		ctrl.messageSources = [];
+		ctrl.groups = [];
 
 		ctrl.$onInit = async () =>
 		{
-			ctrl.stream = await ctrl.messagingService.searchMessagesAsStream(new MessageSource("1", "pants"), {});
-			console.log(ctrl.stream);
-			let read = 10;
-			while (read > 0 )
-			{
-				const start = performance.now();
-				read = await ctrl.stream.load(50);
-				console.log(performance.now() - start);
-				console.log(ctrl.stream);
-			}
+			ctrl.messageSources = await ctrl.messagingService.getMessageSources();
+			ctrl.groups = await ctrl.messagingService.getMessageGroups();
+
+			$scope.$apply();
+		}
+
+		/**
+		 * called when the user's selection of source / message group changes
+		 * @param sourceId - the new source id
+		 * @param groupId - the new message group id
+		 */
+		ctrl.onSourceGroupChange = (sourceId, groupId) =>
+		{
+			ctrl.selectedSourceId = sourceId;
+			ctrl.selectedGroupId = groupId;
+			$state.go(".", {backend: ctrl.backend, source: sourceId, group: groupId});
 		}
 	}],
 });

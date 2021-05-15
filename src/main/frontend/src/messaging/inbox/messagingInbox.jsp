@@ -1,8 +1,23 @@
-<page-wrapper>
+<page-wrapper class="messaging-inbox">
 	<page-header>
-		<h1>Mailbox for backend: {{$ctrl.backend}}</h1>
+		<h6>Backend: {{$ctrl.backend}} Source: {{$ctrl.selectedSourceId}} Group: {{$ctrl.selectedGroupId}}</h6>
 	</page-header>
-	<page-body>
-		<h2>Mailbox here</h2>
+	<page-body class="flex-item-grow flex-col messaging-inbox ">
+		<inbox-header-bar component-style="$ctrl.componentStyle"></inbox-header-bar>
+
+		<div class="flex-item-grow flex-row overflow-x-auto">
+			<inbox-select class="w-256 w-min-256 h-min-100"
+			              component-style="$ctrl.componentStyle"
+			              groups="$ctrl.groups"
+			              sources="$ctrl.messageSources"
+			              selected-source-id="$ctrl.selectedSourceId"
+			              selected-group-id="$ctrl.selectedGroupId"
+			              on-select="$ctrl.onSourceGroupChange(sourceId, groupId)"
+			>
+			</inbox-select>
+			<message-list class="message-list-pane h-min-100" component-style="$ctrl.componentStyle"></message-list>
+
+			<ui-view class="flex-item-grow h-min-100"></ui-view>
+		</div>
 	</page-body>
 </page-wrapper>

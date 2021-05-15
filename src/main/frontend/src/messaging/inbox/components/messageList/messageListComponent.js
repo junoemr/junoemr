@@ -21,4 +21,26 @@
 * Canada
 */
 
-angular.module("Messaging", ["Messaging.Components", "Common.Services", "Common.Components", "Common.Layout"]);
+import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
+
+angular.module("Messaging.Components").component('messageList', {
+	templateUrl: 'src/messaging/inbox/components/messageList/messageList.jsp',
+	bindings: {
+		componentStyle: "<?",
+	},
+	controller: [
+		"$scope",
+		"$stateParams",
+		function (
+			$scope,
+			$stateParams
+		)
+		{
+			let ctrl = this;
+
+			ctrl.$onInit = () =>
+			{
+				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+			};
+		}],
+});

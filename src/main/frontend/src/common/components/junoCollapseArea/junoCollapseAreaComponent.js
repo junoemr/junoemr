@@ -21,4 +21,41 @@
 * Canada
 */
 
-angular.module("Messaging", ["Messaging.Components", "Common.Services", "Common.Components", "Common.Layout"]);
+import {JUNO_STYLE} from "../junoComponentConstants";
+
+angular.module('Common.Components').component('junoCollapseArea', {
+	templateUrl: 'src/common/components/junoCollapseArea/junoCollapseArea.jsp',
+	bindings: {
+		collapsed: "=?",
+		componentStyle: "<?",
+		label: "<",
+	},
+	transclude: true,
+	controller: ['$scope', function ($scope)
+	{
+		const ctrl = this;
+
+		ctrl.$onInit = () =>
+		{
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+			ctrl.collapsed = ctrl.collapsed !== undefined ? ctrl.collapsed : true;
+		};
+
+		ctrl.toggleCollapse = () =>
+		{
+			ctrl.collapsed = !ctrl.collapsed;
+		}
+
+		ctrl.componentClasses = () =>
+		{
+			return [ctrl.componentStyle];
+		};
+
+		ctrl.iconClass = () =>
+		{
+			return ctrl.collapsed ? "icon-chevron-up" : "icon-chevron-down";
+		}
+
+	}],
+
+});

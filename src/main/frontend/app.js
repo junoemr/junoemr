@@ -275,10 +275,30 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			templateUrl: 'src/document/documents_classic.jsp',
 			controller: 'Document.DocumentsController'
 		})
-		.state('messaging',
+		.state("messaging",
 		{
-			url: "/messaging/:backend/",
+			url: "/messaging"
+		})
+		.state('messaging.view',
+		{
+			url: "/view/:backend/source/:source/group/:group",
 			component: "messagingInbox",
+			params: {
+				backend: {
+					dynamic: true,
+				},
+				source: {
+					dynamic: true,
+				},
+				group: {
+					dynamic: true,
+				},
+			}
+		})
+		.state('messaging.view.message',
+		{
+			url: "/message/:messageId/view",
+			component: "messageView",
 		})
 		.state('settings',
 		{

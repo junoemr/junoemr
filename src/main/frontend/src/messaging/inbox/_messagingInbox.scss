@@ -1,3 +1,9 @@
 .messaging-inbox {
-	background-color: red;
+	@include juno-font-body-smallest();
+	color: var(--color-neutral-darkest);
+
+	.message-list-pane {
+		width: 344px;
+		min-width: 344px;
+	}
 }

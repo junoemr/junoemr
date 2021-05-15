@@ -23,6 +23,7 @@
 @import "bootstrap-timepicker/timepicker";
 // Global stuff
 @import "global";
+@import "layout";
 // TODO-legacy: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
 @import "forms";
@@ -40,6 +41,7 @@
 @import "../src/common/components/junoButton/junoButton";
 @import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
+@import "../src/common/components/junoCollapseArea/junoCollapseArea";
 @import "../src/common/components/junoInput/junoInput";
 @import "../src/common/components/junoPatientSelect/junoPatientSelect";
 @import "../src/common/components/junoSelect/junoSelect";
@@ -69,6 +71,10 @@
 @import "../src/layout/components/appointmentQueue/appointmentQueue";
 @import "../src/layout/components/appointmentQueue/components/appointmentCard/appointmentCard";
 @import "../src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModal";
+@import "../src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBar";
+@import "../src/messaging/inbox/components/inboxSelect/inboxSelect";
+@import "../src/messaging/inbox/components/messageList/messageList";
+@import "../src/messaging/inbox/components/messageView/messageView";
 @import "../src/messaging/inbox/messagingInbox";
 @import "../src/help/support";
 @import "../src/schedule/schedule";
