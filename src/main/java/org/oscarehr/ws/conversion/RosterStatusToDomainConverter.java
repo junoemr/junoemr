@@ -29,6 +29,8 @@ import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class RosterStatusToDomainConverter extends AbstractModelConverter<RosterStatusTransfer, RosterStatus>
 {
@@ -42,6 +44,15 @@ public class RosterStatusToDomainConverter extends AbstractModelConverter<Roster
 
 		RosterStatus rosterStatus = new RosterStatus();
 		BeanUtils.copyProperties(transfer, rosterStatus);
+
+		// model has no associated boolean field, have to set this here while we have access to transfer
+		LocalDateTime deletedAt = null;
+		if (!transfer.isActive())
+		{
+			deletedAt = LocalDateTime.now();
+		}
+		rosterStatus.setDeletedAt(deletedAt);
+
 		return rosterStatus;
 	}
 }

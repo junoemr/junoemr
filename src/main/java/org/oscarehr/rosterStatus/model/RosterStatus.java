@@ -31,9 +31,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PostLoad;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -68,9 +66,6 @@ public class RosterStatus extends AbstractModel<Integer> implements Serializable
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime deletedAt;
 
-	@Transient
-	private boolean active;
-
 	@Column(name = "updated_by")
 	private String updatedBy;
 
@@ -83,9 +78,8 @@ public class RosterStatus extends AbstractModel<Integer> implements Serializable
 	@Column(name = "is_terminated")
 	private boolean terminated;
 
-	@PostLoad
-	void onPostLoad()
+	public boolean isActive()
 	{
-		this.active = deletedAt == null;
+		return this.deletedAt == null;
 	}
 }

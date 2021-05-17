@@ -49,6 +49,7 @@ public class RosterStatusToTransferConverter extends AbstractModelConverter<Rost
 		BeanUtils.copyProperties(rosterStatus, transfer);
 		// for display
 		transfer.setUpdatedByProviderName(providerDao.getProviderName(transfer.getUpdatedBy()));
+		transfer.setActive(transfer.getDeletedAt() == null);
 
 		return transfer;
 	}
