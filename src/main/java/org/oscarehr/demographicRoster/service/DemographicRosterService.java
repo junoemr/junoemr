@@ -71,7 +71,8 @@ public class DemographicRosterService
 		if (demographicRoster.getRosterStatus().isRostered())
 		{
 			// We are assuming that MRP at the time of roster status existing is who the rostered provider was
-			demographicRoster.setProviderNo(demographic.getProviderNo());
+			demographicRoster.setRosteredPhysician(demographic.getFamilyDoctorName());
+			demographicRoster.setOhipNo(demographic.getFamilyDoctorNumber());
 		}
 
 		// Only set terminated-y fields if it's a status that implies termination

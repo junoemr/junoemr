@@ -13,11 +13,13 @@ angular.module('Record.Details').component('rosterDisplaySection', {
         "$http",
         "$httpParamSerializer",
         "staticDataService",
+        "referralDoctorsService",
         function($scope,
                  $uibModal,
                  $http,
                  $httpParamSerializer,
-                 staticDataService)
+                 staticDataService,
+                 referralDoctorsService)
         {
             let ctrl = this;
             let rosterApi = new RosterServiceApi($http, $httpParamSerializer, '../ws/rs');
@@ -26,6 +28,8 @@ angular.module('Record.Details').component('rosterDisplaySection', {
             $scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             $scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
+            ctrl.numberRegex=/^\d*$/
+            ctrl.familyDoctors = [{value: "", label: "--"}];
             ctrl.rosterTermReasons = staticDataService.getRosterTerminationReasons();
 
             ctrl.rosterDateValid = true;
@@ -51,21 +55,60 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                 );
             }
 
+            // TODO Currently duplicated from careTeamSectionComponent - should this be its own component?
+            ctrl.updateFamilyDoctors = (docSearchString, docReferralNo) =>
+            {
+                referralDoctorsService.searchReferralDoctors(docSearchString, docReferralNo, 1, 10).then(
+                    function success(results)
+                    {
+                        let familyDoctors = new Array(results.length);
+
+                        for (let i = 0; i < results.length; i++)
+                        {
+                            let displayName = results[i].lastName + ', ' + results[i].firstName;
+                            familyDoctors[i] = {
+                                label: displayName,
+                                value: displayName,
+                                referralNo: results[i].referralNo
+                            };
+                            if (results[i].specialtyType != null && results[i].specialtyType != "")
+                            {
+                                familyDoctors[i].label += " [" + results[i].referralNo + "]";
+                            }
+                        }
+
+                        ctrl.familyDoctors = familyDoctors;
+                    },
+                    function failure(errors)
+                    {
+                        console.log(errors);
+                    }
+                );
+            }
+
+            ctrl.updateFamilyDocNo = (value) =>
+            {
+                ctrl.ngModel.scrFamilyDocNo = value.referralNo;
+            }
+
             ctrl.openRosteredHistoryModal = async () =>
             {
-                await $uibModal.open(
-                    {
-                        component: 'rosteredHistoryModal',
-                        backdrop: 'static',
-                        windowClass: "juno-modal lg",
-                        resolve: {
-                            demographic: ctrl.ngModel,
-                        }
-                    }
-                ).catch((_reason) =>
+                try
+                {
+                    await $uibModal.open(
+                        {
+                            component: 'rosteredHistoryModal',
+                            backdrop: 'static',
+                            windowClass: "juno-modal lg",
+                            resolve: {
+                                demographic: ctrl.ngModel,
+                            }
+                        })
+                }
+                catch(_reason)
                 {
                     // do nothing on cancel
-                });
+                }
             }
         }
     ]

@@ -124,8 +124,11 @@ public class DemographicRoster extends AbstractModel<Integer> implements Seriali
 	@Column(name = "demographic_no")
 	private Integer demographicId;
 
-	@Column(name = "rostered_provider_no")
-	private String providerNo;
+	@Column(name = "rostered_physician")
+	private String rosteredPhysician;
+
+	@Column(name = "ohip_no")
+	private String ohipNo;
 
 	@Column(name = "roster_date", columnDefinition = "TIMESTAMP")
 	private LocalDateTime rosterDate;

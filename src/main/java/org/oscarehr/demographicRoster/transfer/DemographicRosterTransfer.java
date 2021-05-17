@@ -34,8 +34,8 @@ public class DemographicRosterTransfer
 {
 	private Integer id;
 	private Integer demographicId;
-	private String providerNo;
-	private String providerFullName;
+	private String rosteredPhysician;
+	private String ohipNo;
 	private LocalDateTime rosterDate;
 	private LocalDateTime rosterTerminationDate;
 	private DemographicRoster.ROSTER_TERMINATION_REASON rosterTerminationReason;

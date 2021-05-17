@@ -104,7 +104,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.showEligibility = false;
 		controller.properties = $scope.$parent.recordCtrl.properties;
 		controller.displayMessages = messagesFactory.factory();
-		controller.instanceType = null;
 		controller.validations = {};
 
 		$scope.JUNO_STYLE = JUNO_STYLE;
@@ -112,13 +111,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.init = function init()
 		{
-			systemPreferenceApi.getPropertyValue("instance_type").then(
-				(data) =>
-				{
-					controller.instanceType = data.data.body;
-				}
-			)
-
 			demographicService.getDemographic($stateParams.demographicNo).then(
 				function success(results)
 				{

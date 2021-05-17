@@ -1,14 +1,22 @@
 <div class="demographic-details-section roster-section">
     <h4 class="title">
-        Rostering
+        Rostering/Enrollment
     </h4>
 
     <div class="fields">
         <div class="column">
-            <juno-input component-style="$ctrl.componentStyle"
-                        ng-model="$ctrl.ngModel.rosteredProvider"
-                        label="Rostered Physician">
-            </juno-input>
+            <!-- Family Doctor -->
+            <juno-typeahead model="$ctrl.ngModel.scrFamilyDoc"
+                            options="$ctrl.familyDoctors"
+                            filter-options="false"
+                            name="FamilyDoctor"
+                            title="Family Doctor"
+                            placeholder="Family Doctor"
+                            label-position="LABEL_POSITION.LEFT"
+                            on-change="$ctrl.updateFamilyDoctors(value)"
+                            on-selected="$ctrl.updateFamilyDocNo(value)"
+                            component-style="$ctrl.componentStyle">
+            </juno-typeahead>
             <!-- Roster Status -->
             <juno-select ng-model="$ctrl.ngModel.rosterStatus"
                          options="$ctrl.rosterStatusList"
@@ -28,11 +36,14 @@
         </div>
 
         <div class="column">
-            <juno-button ng-click="$ctrl.openRosteredHistoryModal()"
-                         button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
-                         button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
-                View Rostered History
-            </juno-button>
+            <!-- Family Doctor Number -->
+            <juno-input
+                        ng-model="$ctrl.ngModel.scrFamilyDocNo"
+                        label="Family Doctor #"
+                        placeholder="Family Doctor #"
+                        valid-regex="$ctrl.numberRegex"
+                        component-style="$ctrl.componentStyle">
+            </juno-input>
             <!-- Date Rostered -->
             <juno-date-select ng-model="$ctrl.ngModel.rosterDate"
                               label="Roster Date"
@@ -48,5 +59,15 @@
             </juno-date-select>
         </div>
 
+    </div>
+    <div class="fields">
+        <div class="">
+            <juno-button class="rostered-history-button"
+                         ng-click="$ctrl.openRosteredHistoryModal()"
+                         button-color="JUNO_BUTTON_COLOR.PRIMARY"
+                         button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
+                View Rostered History
+            </juno-button>
+        </div>
     </div>
 </div>

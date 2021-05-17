@@ -49,8 +49,9 @@ angular.module('Record.Details').component('rosteredHistoryModal', {
                         return {
                             statusDescription: entry.rosterStatus.statusDescription,
                             provider: entry.providerFullName,
-                            rosterDate: Juno.Common.Util.formatMomentDate(
-                                Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterDate)),
+                            rosterDate: entry.rosterDate == null? "" :
+                                Juno.Common.Util.formatMomentDate(
+                                    Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterDate)),
                             rosterTerminationDate: entry.rosterTerminationDate == null ? "" :
                                 Juno.Common.Util.formatMomentDate(
                                     Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterTerminationDate)),

@@ -24,7 +24,7 @@
                         {{entry.statusDescription}}
                     </td>
                     <td data-title="'Rostered To'">
-                        {{entry.provider}}
+                        {{entry.rosteredPhysician}}
                     </td>
                     <td data-title="'Rostered Date'">
                         {{entry.rosterDate}}

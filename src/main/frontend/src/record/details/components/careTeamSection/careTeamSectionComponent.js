@@ -49,34 +49,26 @@ angular.module('Record.Details').component('careTeamSection', {
                   referralDoctorsService)
 	{
 		let ctrl = this;
-        let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
-            '../ws/rs');
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.numberRegex=/^\d*$/
 		ctrl.patientStatusList = [];
 		ctrl.referralDoctors = [{value: "", label: "--"}];
-		ctrl.rosterTermReasons = staticDataService.getRosterTerminationReasons();
 
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-		ctrl.rosterDateValid = true;
 		ctrl.patientStatusDateValid = true;
 		ctrl.endDateValid = true;
 		ctrl.dateJoinedValid = true;
-		ctrl.terminationDateValid = true;
-        ctrl.familyDoctorEnabled = false;
 
 		ctrl.$onInit = () =>
 		{
 			// add date validations
-			ctrl.validations["rosterDate"] = Juno.Validations.validationCustom(() => ctrl.rosterDateValid);
 			ctrl.validations["patientStatusDate"] = Juno.Validations.validationCustom(() => ctrl.patientStatusDateValid);
 			ctrl.validations["endDate"] = Juno.Validations.validationCustom(() => ctrl.endDateValid);
 			ctrl.validations["dateJoined"] = Juno.Validations.validationCustom(() => ctrl.dateJoinedValid);
-			ctrl.validations["terminationDate"] = Juno.Validations.validationCustom(() => ctrl.terminationDateValid);
 
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
@@ -107,14 +99,6 @@ angular.module('Record.Details').component('careTeamSection', {
 						ctrl.patientStatusList = data;
 					}
 			);
-
-			systemPreferenceApi.getPropertyEnabled("demographic_family_doctor").then(
-                (response) =>
-                {
-                    ctrl.familyDoctorEnabled = response.data.body;
-                }
-            )
-
 		}
 
 		ctrl.updateReferralDoctors = (docSearchString, docReferralNo) =>
@@ -149,11 +133,6 @@ angular.module('Record.Details').component('careTeamSection', {
 		{
 			ctrl.ngModel.scrReferralDocNo = value.referralNo;
 		}
-
-		ctrl.updateFamilyDocNo = (value) =>
-        {
-            ctrl.ngModel.scrFamilyDocNo = value.referralNo;
-        }
 
 		ctrl.openAddPatientStatusModal = async () =>
 		{
