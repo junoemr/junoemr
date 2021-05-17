@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ProblemList;
@@ -57,7 +58,7 @@ public class CDSProblemDxExportMapper extends AbstractCDSNoteExportMapper<Proble
 
 	protected StandardCoding getDiagnosisCode(DxRecord exportStructure)
 	{
-		String codingSystem = (exportStructure.getCodingSystem() != null) ? exportStructure.getCodingSystem().getValue() : DxRecord.CodingSystem.ICD9.getValue();
+		String codingSystem = (exportStructure.getCodingSystem() != null) ? exportStructure.getCodingSystem().getValue() : CDSConstants.CodingSystem.ICD9.getValue();
 
 		StandardCoding standardCoding = objectFactory.createStandardCoding();
 		standardCoding.setStandardCodingSystem(codingSystem);

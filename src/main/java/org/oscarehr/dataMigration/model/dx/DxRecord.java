@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.model.dx;
 
 import lombok.Data;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.provider.Provider;
 
@@ -65,41 +66,11 @@ public class DxRecord extends AbstractTransientModel
 			return null;
 		}
 	}
-	public enum CodingSystem
-	{
-		ENCODE_FM("ENCODE-FM"),
-		SNOMED_CT("SNOMED-CT"),
-		ICD9("ICD9"),
-		ICD10_CA("ICD10-CA"),
-		ICPC_2("ICPC-2");
-
-		private final String value;
-		CodingSystem(String value)
-		{
-			this.value = value;
-		}
-
-		public String getValue()
-		{
-			return this.value;
-		}
-		public static CodingSystem fromValue(String value)
-		{
-			for(CodingSystem status : CodingSystem.values())
-			{
-				if(status.getValue().equalsIgnoreCase(value))
-				{
-					return status;
-				}
-			}
-			return null;
-		}
-	}
 
 	private Integer id;
 	private Status status;
 	private String dxCode;
-	private CodingSystem codingSystem;
+	private CDSConstants.CodingSystem codingSystem;
 	private String codeDescription;
 	private Provider provider;
 	private LocalDate startDate;

@@ -174,4 +174,35 @@ public class CDSConstants
 
 	// this document-class value shows up in HRM and CDS documentation but does not match the schema
 	public static final String DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE = "Medical Record Report";
+
+	public enum CodingSystem
+	{
+		ENCODE_FM("ENCODE-FM"),
+		SNOMED_CT("SNOMED-CT"),
+		ICD9("ICD9"),
+		ICD10_CA("ICD10-CA"),
+		ICPC_2("ICPC-2");
+
+		private final String value;
+		CodingSystem(String value)
+		{
+			this.value = value;
+		}
+
+		public String getValue()
+		{
+			return this.value;
+		}
+		public static CodingSystem fromValue(String value)
+		{
+			for(CodingSystem status : CodingSystem.values())
+			{
+				if(status.getValue().equalsIgnoreCase(value))
+				{
+					return status;
+				}
+			}
+			return null;
+		}
+	}
 }

@@ -25,6 +25,7 @@ package org.oscarehr.dataMigration.converter.out;
 import org.oscarehr.common.dao.Icd9Dao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Icd9;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 	public DxRecord convert(Dxresearch input)
 	{
 		DxRecord dxRecord = new DxRecord();
-		DxRecord.CodingSystem codingSystem = DxRecord.CodingSystem.fromValue(input.getCodingSystem());
+		CDSConstants.CodingSystem codingSystem = CDSConstants.CodingSystem.fromValue(input.getCodingSystem());
 
 		dxRecord.setId(input.getId());
 		dxRecord.setCodingSystem(codingSystem);
@@ -54,7 +55,7 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 		return dxRecord;
 	}
 
-	private String getCodeDescription(DxRecord.CodingSystem codingSystem, String code)
+	private String getCodeDescription(CDSConstants.CodingSystem codingSystem, String code)
 	{
 		String description = null;
 		if(codingSystem != null && code != null)
