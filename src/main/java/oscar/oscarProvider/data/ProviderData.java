@@ -37,6 +37,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Locale;
 
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.dao.ProviderPreferenceDao;
@@ -590,6 +593,14 @@ public class ProviderData {
 			result.add(toMap(provider));
 		}
 		return result;
+	}
+
+	public static List<Map<String, String>> getSortedMergedProviderList(List<Map<String, String>> listToReturn, List<Map<String, String>> listToMerge, String sortBy)
+	{
+		listToReturn.addAll(listToMerge);
+		Collections.sort(listToReturn, Comparator.comparing(currentProviderMap -> currentProviderMap.get(sortBy).toLowerCase(Locale.getDefault())));
+
+		return listToReturn;
 	}
 
 	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData p) {

@@ -43,8 +43,6 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.prevention.model.Prevention" %>
-<%@ page import="java.util.Comparator" %>
-<%@ page import="java.util.Locale" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -152,16 +150,7 @@
 
     if (providers != null && nurseProviders != null)
     {
-        providers.addAll(nurseProviders);
-
-        Collections.sort(providers, new Comparator<Map<String, String>>()
-        {
-            @Override
-            public int compare(Map<String, String> currentProviderMap, Map<String, String> nextProviderMap)
-            {
-                return currentProviderMap.get("lastName").toLowerCase(Locale.getDefault()).compareTo(nextProviderMap.get("lastName").toLowerCase(Locale.getDefault()));
-            }
-        });
+        providers = ProviderData.getSortedMergedProviderList(providers, nurseProviders, "lastName");
     }
 
     if (creatorProviderNo.isEmpty())
