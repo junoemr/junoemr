@@ -456,7 +456,18 @@ angular.module('Layout').component("primaryNavigation", {
 				}
 				else if (item.label === "Billing")
 				{
-					url = ctrl.billRegion === "CLINICAID" ? "../billing.do?billRegion=CLINICAID&action=invoice_reports" : "../billing/CA/BC/billStatus.jsp";
+					switch(ctrl.billRegion)
+					{
+						case "CLINICAID":
+							url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
+							break;
+						case "BC":
+							url = "../billing/CA/BC/billStatus.jsp";
+							break;
+						case "ON":
+							url = "../billing/CA/ON/billStatus.jsp";
+						default:"../billing.do?billRegion=CLINICAID&action=invoice_reports";
+					}
 					wname = "billing";
 				}
 				else if (item.label === "eDocs")
