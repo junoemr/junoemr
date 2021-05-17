@@ -23,10 +23,9 @@ angular.module('Admin').component('editStatusModal', {
             $scope.LABEL_POSITION = LABEL_POSITION;
             $scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
             $scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-            ctrl.componentStyle = JUNO_STYLE.DEFAULT;
+            ctrl.componentStyle = JUNO_STYLE.GREY;
 
             ctrl.editMode = false;
-
             ctrl.$onInit = () =>
             {
                 ctrl.status = ctrl.resolve.status;
@@ -50,7 +49,7 @@ angular.module('Admin').component('editStatusModal', {
             {
                 if (ctrl.editMode === true)
                 {
-                    rosterApi.editStatus(ctrl.status).then(
+                    rosterApi.editStatus(ctrl.status.id, ctrl.status).then(
                         () =>
                         {
                             ctrl.close();
@@ -59,7 +58,7 @@ angular.module('Admin').component('editStatusModal', {
                 }
                 else
                 {
-                    rosterApi.addStatus(ctrl.status).then(
+                    rosterApi.addStatus(ctrl.status.id, ctrl.status).then(
                         () =>
                         {
                             ctrl.close();

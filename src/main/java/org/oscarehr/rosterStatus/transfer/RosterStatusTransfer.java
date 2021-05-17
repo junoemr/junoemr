@@ -37,7 +37,9 @@ public class RosterStatusTransfer
 	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
 	private String updatedBy;
+	private String updatedByProviderName;
 	private boolean systemManaged;
 	private boolean rostered;
 	private boolean terminated;
+	private boolean isActive;
 }

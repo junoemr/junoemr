@@ -5,6 +5,10 @@
 
     <div class="fields">
         <div class="column">
+            <juno-input component-style="$ctrl.componentStyle"
+                        ng-model="$ctrl.ngModel.rosteredProvider"
+                        label="Rostered Physician">
+            </juno-input>
             <!-- Roster Status -->
             <juno-select ng-model="$ctrl.ngModel.rosterStatus"
                          options="$ctrl.rosterStatusList"
@@ -24,6 +28,11 @@
         </div>
 
         <div class="column">
+            <juno-button ng-click="$ctrl.openRosteredHistoryModal()"
+                         button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
+                         button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
+                View Rostered History
+            </juno-button>
             <!-- Date Rostered -->
             <juno-date-select ng-model="$ctrl.ngModel.rosterDate"
                               label="Roster Date"
@@ -38,12 +47,6 @@
                               component-style="$ctrl.componentStyle">
             </juno-date-select>
         </div>
-
-        <juno-button ng-click="$ctrl.openRosteredHistoryModal()"
-                    button-color="JUNO_BUTTON_COLOR.PRIMARY"
-                    button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
-            View Rostered History
-        </juno-button>
 
     </div>
 </div>

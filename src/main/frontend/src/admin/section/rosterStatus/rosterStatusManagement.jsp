@@ -16,7 +16,7 @@
                 {{status.updatedAt}}
             </td>
             <td data-title="'Updated By'">
-                {{status.updatedBy}}
+                {{status.updatedByProviderName}}
             </td>
             <td data-title="'Is Rostered'">
                 {{status.rostered}}

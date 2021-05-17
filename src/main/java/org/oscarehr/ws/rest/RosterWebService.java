@@ -25,6 +25,7 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
 import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -45,6 +47,7 @@ import java.util.List;
 @Path("roster")
 @Component("RosterWebService")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "rosterService")
 public class RosterWebService extends AbstractServiceImpl
 {
@@ -54,10 +57,14 @@ public class RosterWebService extends AbstractServiceImpl
 	@Autowired
 	DemographicRosterService demographicRosterService;
 
+	@Autowired
+	SecurityInfoManager securityInfoManager;
+
 	@GET
 	@Path("/statuses")
 	public RestSearchResponse<RosterStatusTransfer> getRosterStatuses(@QueryParam("active") Boolean active)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_demographic");
 		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getRosterStatusList(active);
 		return RestSearchResponse.successResponseOnePage(rosterStatuses);
 	}
@@ -66,6 +73,7 @@ public class RosterWebService extends AbstractServiceImpl
 	@Path("/status")
 	public RestResponse<RosterStatusTransfer> addStatus(RosterStatusTransfer rosterStatusTransfer)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
 		String currentProvider = getCurrentProvider().getProviderNo();
 		rosterStatusTransfer = rosterStatusService.addStatus(rosterStatusTransfer, currentProvider);
 
@@ -78,6 +86,7 @@ public class RosterWebService extends AbstractServiceImpl
 			@PathParam("id") Integer id,
 			RosterStatusTransfer rosterStatusTransfer)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
 		String currentProvider = getCurrentProvider().getProviderNo();
 		rosterStatusTransfer = rosterStatusService.editStatus(rosterStatusTransfer, currentProvider);
 

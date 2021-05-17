@@ -1,6 +1,15 @@
-.roster-status-header {
-  @extend %juno-page-header;
-  h3 {
-    color: $color-neutral-white;
+.roster-status-edit-modal {
+  .roster-status-input {
+    display: flex;
+    margin: 5px;
+  }
+
+  .roster-status-checkbox-container {
+    display: flex;
+    margin: 5px;
+  }
+
+  .roster-status-footer {
+    display: flex;
   }
 }

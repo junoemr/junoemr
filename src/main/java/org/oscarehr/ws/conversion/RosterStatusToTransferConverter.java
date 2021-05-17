@@ -23,15 +23,20 @@
 
 package org.oscarehr.ws.conversion;
 
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.rosterStatus.model.RosterStatus;
 import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RosterStatusToTransferConverter extends AbstractModelConverter<RosterStatus, RosterStatusTransfer>
 {
+	@Autowired
+	ProviderDao providerDao;
+
 	@Override
 	public RosterStatusTransfer convert(RosterStatus rosterStatus)
 	{
@@ -42,6 +47,9 @@ public class RosterStatusToTransferConverter extends AbstractModelConverter<Rost
 
 		RosterStatusTransfer transfer = new RosterStatusTransfer();
 		BeanUtils.copyProperties(rosterStatus, transfer);
+		// for display
+		transfer.setUpdatedByProviderName(providerDao.getProviderName(transfer.getUpdatedBy()));
+
 		return transfer;
 	}
 }

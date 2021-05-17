@@ -30,6 +30,8 @@ import org.oscarehr.ws.conversion.RosterStatusToDomainConverter;
 import org.oscarehr.ws.conversion.RosterStatusToTransferConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -89,9 +91,24 @@ public class RosterStatusService
 		RosterStatus rosterStatus = rosterStatusToDomainConverter.convert(statusTransfer);
 		rosterStatus.setCreatedAt(LocalDateTime.now());
 		rosterStatus.setUpdatedAt(LocalDateTime.now());
-
 		rosterStatus.setUpdatedBy(providerNo);
+
+		if (rosterStatus.isActive())
+		{
+			rosterStatus.setDeletedAt(null);
+		}
+		else
+		{
+			rosterStatus.setDeletedAt(LocalDateTime.now());
+		}
+
 		rosterStatusDao.persist(rosterStatus);
+
+		LogAction.addLogEntry(providerNo,
+				LogConst.ACTION_ADD,
+				LogConst.CON_ADMIN,
+				LogConst.STATUS_SUCCESS,
+				"Roster Status: " + rosterStatus.getRosterStatus());
 
 		return rosterStatusToTransferConverter.convert(rosterStatus);
 	}
@@ -102,7 +119,22 @@ public class RosterStatusService
 		rosterStatus.setUpdatedAt(LocalDateTime.now());
 		rosterStatus.setUpdatedBy(editingProvider);
 
+		if (rosterStatus.isActive())
+		{
+			rosterStatus.setDeletedAt(null);
+		}
+		else
+		{
+			rosterStatus.setDeletedAt(LocalDateTime.now());
+		}
+
 		rosterStatusDao.merge(rosterStatus);
+
+		LogAction.addLogEntry(editingProvider,
+				LogConst.ACTION_EDIT,
+				LogConst.CON_ADMIN,
+				LogConst.STATUS_SUCCESS,
+				"Roster Status EDITED: " + rosterStatus.getRosterStatus());
 
 		return rosterStatusToTransferConverter.convert(rosterStatus);
 	}

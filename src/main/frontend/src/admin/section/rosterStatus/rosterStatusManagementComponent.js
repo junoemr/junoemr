@@ -48,7 +48,27 @@ angular.module('Admin').component('rosterStatusManagement',
                     await rosterApi.getRosterStatuses().then(
                         (data) =>
                         {
-                            ctrl.rosterStatuses = data.data.body;
+                            ctrl.rosterStatuses = data.data.body.map((status) =>
+                            {
+                                return {
+                                    id: status.id,
+                                    rosterStatus: status.rosterStatus,
+                                    statusDescription: status.statusDescription,
+                                    createdAt: Juno.Common.Util.formatMomentDateTimeNoTimezone(
+                                        Juno.Common.Util.getDatetimeNoTimezoneMoment(status.createdAt)),
+                                    updatedAt: Juno.Common.Util.formatMomentDateTimeNoTimezone(
+                                        Juno.Common.Util.getDatetimeNoTimezoneMoment(status.updatedAt)),
+                                    deletedAt: status.active ? null :
+                                        Juno.Common.Util.formatMomentDateTimeNoTimezone(
+                                            Juno.Common.Util.getDatetimeNoTimezoneMoment(status.deletedAt)),
+                                    updatedBy: status.updatedBy,
+                                    updatedByProviderName: status.updatedByProviderName,
+                                    systemManaged: status.systemManaged,
+                                    rostered: status.rostered,
+                                    terminated: status.terminated,
+                                    active: status.active,
+                                }
+                            });
                         }
                     );
                 }
@@ -59,6 +79,7 @@ angular.module('Admin').component('rosterStatusManagement',
                         {
                             component: 'editStatusModal',
                             backdrop: 'static',
+                            windowClass: 'juno-modal sml',
                             resolve: {
                                 status: status,
                             }

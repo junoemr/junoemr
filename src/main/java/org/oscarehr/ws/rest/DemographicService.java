@@ -49,6 +49,7 @@ import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -535,6 +536,7 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(
 			@PathParam("demographicNo") Integer demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_demographic");
 		List<DemographicRosterTransfer> rosteredHistory = demographicRosterService.getRosteredHistory(demographicNo);
 		return RestSearchResponse.successResponseOnePage(rosteredHistory);
 	}
