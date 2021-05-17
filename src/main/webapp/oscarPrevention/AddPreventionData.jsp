@@ -40,9 +40,11 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="java.util.Collections" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.prevention.model.Prevention" %>
-<%@ page import="org.apache.commons.collections4.ListUtils" %>
+<%@ page import="java.util.Comparator" %>
+<%@ page import="java.util.Locale" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -145,9 +147,22 @@
         layoutType = "default";
     }
 
-    List<Map<String, String>> doctorProviders = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
+    List<Map<String, String>> providers = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
     List<Map<String, String>> nurseProviders = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_NURSE);
-    List<Map<String, String>> providers = ListUtils.union(doctorProviders, nurseProviders);
+
+    if (providers != null && nurseProviders != null)
+    {
+        providers.addAll(nurseProviders);
+
+        Collections.sort(providers, new Comparator<Map<String, String>>()
+        {
+            @Override
+            public int compare(Map<String, String> currentProviderMap, Map<String, String> nextProviderMap)
+            {
+                return currentProviderMap.get("lastName").toLowerCase(Locale.getDefault()).compareTo(nextProviderMap.get("lastName").toLowerCase(Locale.getDefault()));
+            }
+        });
+    }
 
     if (creatorProviderNo.isEmpty())
     {

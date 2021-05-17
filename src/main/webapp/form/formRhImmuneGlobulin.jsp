@@ -91,8 +91,7 @@
     String project_home = request.getContextPath().substring(1);
     boolean bView = false;
     if (request.getParameter("view") != null && request.getParameter("view").equals("1")) bView = true;
-    
-    List providers = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
+
     String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd");
     String providerName = "";
     String provider = (String) session.getAttribute("user");

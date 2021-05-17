@@ -585,9 +585,9 @@ public class ProviderData {
 		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByType(providerType);
 
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-		for (org.oscarehr.provider.model.ProviderData p : providers)
+		for (org.oscarehr.provider.model.ProviderData provider : providers)
 		{
-			result.add(toMap(p));
+			result.add(toMap(provider));
 		}
 		return result;
 	}

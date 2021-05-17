@@ -61,7 +61,7 @@
         <%
             QueueDao queueDao = (QueueDao) SpringUtils.getBean("queueDao");
             List<Hashtable> queues=queueDao.getQueues();
-            List providers = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
+            List<Map<String, String>> doctorProviders = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
             String queueIdStr = (String) request.getSession().getAttribute("preferredQueue");
             int queueId = 1;
             if (queueIdStr != null) {
@@ -332,8 +332,8 @@
                 <label for="providerDrop" class="fields">Send to Provider:</label>
                 <select onchange="javascript:addProviderToPost(this);" id="providerDrop" name="providerDrop">
                     <option value="-2" <%=("-2".equals(provider) ? " selected" : "")%> >None</option>
-                    <%for (int i = 0; i < providers.size(); i++) {
-                                    Map h = (Map) providers.get(i);%>
+                    <%for (int i = 0; i < doctorProviders.size(); i++) {
+                                    Map h = (Map) doctorProviders.get(i);%>
                     <option value="<%= h.get("providerNo")%>" <%= (h.get("providerNo").equals(provider) ? " selected" : "")%>><%= h.get("lastName")%> <%= h.get("firstName")%></option>
                     <%}%>
                 </select>
