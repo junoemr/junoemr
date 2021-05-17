@@ -456,7 +456,7 @@ angular.module('Layout').component("primaryNavigation", {
 				}
 				else if (item.label === "Billing")
 				{
-					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
+					url = ctrl.billRegion === "CLINICAID" ? "../billing.do?billRegion=CLINICAID&action=invoice_reports" : "../billing/CA/BC/billStatus.jsp";
 					wname = "billing";
 				}
 				else if (item.label === "eDocs")
