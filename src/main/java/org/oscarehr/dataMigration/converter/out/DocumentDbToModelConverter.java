@@ -30,14 +30,15 @@ import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
-import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
-import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class DocumentDbToModelConverter extends
@@ -101,16 +102,15 @@ public class DocumentDbToModelConverter extends
 			throw new RuntimeException("Missing Document File", e);
 		}
 
-		CaseManagementNoteLink noteLink = caseManagementNoteLinkDao.getNoteLinkByTableIdAndTableName(input.getId(), CaseManagementNoteLink.DOCUMENT);
-		if(noteLink != null)
+		List<CaseManagementNoteLink> noteLinks = caseManagementNoteLinkDao.findAllNoteLinkByTableIdAndTableName(input.getId(), CaseManagementNoteLink.DOCUMENT);
+		if(noteLinks != null && !noteLinks.isEmpty())
 		{
-			CaseManagementNote note = noteLink.getNote();
-
-			// don't export system created notes
-			if(!note.getProvider().getId().equals(ProviderData.SYSTEM_PROVIDER_NO))
-			{
-				exportDocument.setAnnotation(note.getNote());
-			}
+			// join all non empty document notes into a single string
+			String annotationNote = noteLinks.stream()
+					.map((noteLink) -> StringUtils.trimToNull(noteLink.getNote().getNote()))
+					.filter(Objects::nonNull)
+					.collect(Collectors.joining("\n"));
+			exportDocument.setAnnotation(annotationNote);
 		}
 
 		return exportDocument;
