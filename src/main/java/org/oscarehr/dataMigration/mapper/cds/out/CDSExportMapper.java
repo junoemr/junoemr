@@ -47,7 +47,9 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, org.oscareh
 	@Autowired
 	private  CDSPastHealthExportMapper cdsPastHealthExportMapper;
 	@Autowired
-	private  CDSProblemExportMapper cdsProblemExportMapper;
+	private CDSProblemNoteExportMapper cdsProblemNoteExportMapper;
+	@Autowired
+	private CDSProblemDxExportMapper cdsProblemDxExportMapper;
 	@Autowired
 	private  CDSRiskFactorExportMapper cdsRiskFactorExportMapper;
 	@Autowired
@@ -111,7 +113,9 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, org.oscareh
 		if(exportPreferences.isExportProblemList())
 		{
 			patientRecord.getProblemList().addAll(
-					cdsProblemExportMapper.exportAll(exportStructure.getConcernNoteList()));
+					cdsProblemDxExportMapper.exportAll(exportStructure.getDxList()));
+			patientRecord.getProblemList().addAll(
+					cdsProblemNoteExportMapper.exportAll(exportStructure.getConcernNoteList()));
 			instant = LogAction.printDuration(instant, "ExportMapper: problems");
 		}
 		if(exportPreferences.isExportRiskFactors())

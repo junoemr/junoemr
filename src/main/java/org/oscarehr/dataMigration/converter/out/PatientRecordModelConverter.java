@@ -27,6 +27,7 @@ import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DemographicPharmacyDao;
+import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
@@ -34,10 +35,10 @@ import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.DemographicPharmacy;
+import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.PharmacyInfo;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.out.contact.DemographicContactDbToModelConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.dataMigration.converter.out.note.ConcernNoteDbToModelConverter;
@@ -48,6 +49,7 @@ import org.oscarehr.dataMigration.converter.out.note.ReminderNoteDbToModelConver
 import org.oscarehr.dataMigration.converter.out.note.RiskFactorNoteDbToModelConverter;
 import org.oscarehr.dataMigration.converter.out.note.SocialHistoryNoteDbToModelConverter;
 import org.oscarehr.dataMigration.model.PatientRecord;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -133,6 +135,9 @@ public class PatientRecordModelConverter extends
 	private ConcernNoteDbToModelConverter concernNoteModelConverter;
 
 	@Autowired
+	private DxDbToModelConverter dxDbToModelConverter;
+
+	@Autowired
 	private PreventionDao preventionDao;
 
 	@Autowired
@@ -140,6 +145,9 @@ public class PatientRecordModelConverter extends
 
 	@Autowired
 	private DrugDao drugDao;
+
+	@Autowired
+	private DxresearchDAO dxresearchDAO;
 
 	@Autowired
 	private MedicationDbToModelConverter medicationDbToModelConverter;
@@ -212,6 +220,10 @@ public class PatientRecordModelConverter extends
 		List<Drug> drugs = drugDao.findByDemographicId(input.getDemographicId());
 		patientRecord.setMedicationList(medicationDbToModelConverter.convert(drugs));
 		instant = LogAction.printDuration(instant, "Patient Record Model: Load drugs");
+
+		List<Dxresearch> dxresearchList = dxresearchDAO.getDxResearchItemsByPatient(input.getDemographicId());
+		patientRecord.setDxList(dxDbToModelConverter.convert(dxresearchList));
+		instant = LogAction.printDuration(instant, "Patient Record Model: Load dx");
 
 		//TODO replace with new prescribeIT system
 		List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findByDemographicId(input.getDemographicId());
