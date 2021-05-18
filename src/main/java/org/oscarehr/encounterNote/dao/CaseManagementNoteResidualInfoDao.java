@@ -27,6 +27,9 @@ import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
+import java.util.List;
+
 @SuppressWarnings("unchecked")
 @Transactional
 @Repository("encounterNote.dao.CaseManagementNoteResidualInfoDao")
@@ -35,5 +38,16 @@ public class CaseManagementNoteResidualInfoDao extends AbstractDao<CaseManagemen
 	public CaseManagementNoteResidualInfoDao()
 	{
 		super(CaseManagementNoteResidualInfo.class);
+	}
+
+	public List<CaseManagementNoteResidualInfo> findByNoteId(Long noteId)
+	{
+		// select model name must match specified @Entity name in model object
+		String queryString = "SELECT x FROM model_CaseManagementNoteResidualInfo x " +
+				"WHERE x.note.noteId=:noteId";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("noteId", noteId);
+
+		return query.getResultList();
 	}
 }
