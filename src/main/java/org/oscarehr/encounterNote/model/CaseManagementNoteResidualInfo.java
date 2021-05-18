@@ -20,16 +20,41 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.common;
+package org.oscarehr.encounterNote.model;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.common.model.AbstractModel;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Data
-public class ResidualInfo extends AbstractTransientModel
+@Entity(name = "model_CaseManagementNoteResidualInfo")
+@Table(name = "casemgmt_note_residual_info")
+public class CaseManagementNoteResidualInfo extends AbstractModel<Long>
 {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Long id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "note_id")
+	private CaseManagementNote note;
+
+	@Column(name = "key")
 	private String key;
+
+	@Column(name = "value")
 	private String value;
+
+	@Column(name = "value_type")
 	private String valueType;
 }

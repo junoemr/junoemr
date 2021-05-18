@@ -144,6 +144,10 @@ public class CaseManagementNote extends AbstractModel<Long>
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id.caseManagementNote", cascade = CascadeType.PERSIST)
 	private List<CaseManagementIssueNote> issueNoteList;
 
+	// with cascade, these entities will be persisted/merged/deleted when this class is.
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
+	private List<CaseManagementNoteResidualInfo> residualInfoList;
+
 	public CaseManagementNote() {}
 
 	/** construct a copy of the given note */
@@ -466,6 +470,16 @@ public class CaseManagementNote extends AbstractModel<Long>
 	public void setNoteExtensionList(List<CaseManagementNoteExt> noteExtensionList)
 	{
 		this.noteExtensionList = noteExtensionList;
+	}
+
+	public List<CaseManagementNoteResidualInfo> getResidualInfoList()
+	{
+		return residualInfoList;
+	}
+
+	public void setResidualInfoList(List<CaseManagementNoteResidualInfo> residualInfoList)
+	{
+		this.residualInfoList = residualInfoList;
 	}
 
 	public void addExtension(CaseManagementNoteExt ext)

@@ -20,16 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.common;
+package org.oscarehr.dataMigration.converter.in;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
+import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
-@Data
-public class ResidualInfo extends AbstractTransientModel
+@Component
+public class ResidualInfoModelToDbConverter extends BaseModelToDbConverter<ResidualInfo, CaseManagementNoteResidualInfo>
 {
-	private Long id;
-	private String key;
-	private String value;
-	private String valueType;
+	@Override
+	public CaseManagementNoteResidualInfo convert(ResidualInfo input)
+	{
+		CaseManagementNoteResidualInfo residualInfo = new CaseManagementNoteResidualInfo();
+		BeanUtils.copyProperties(input, residualInfo, "note");
+
+		return residualInfo;
+	}
 }

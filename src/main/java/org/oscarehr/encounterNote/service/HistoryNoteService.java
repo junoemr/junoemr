@@ -22,22 +22,29 @@
  */
 package org.oscarehr.encounterNote.service;
 
+import org.oscarehr.dataMigration.converter.in.ResidualInfoModelToDbConverter;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public abstract class HistoryNoteService extends BaseNoteService
 {
+	@Autowired
+	protected ResidualInfoModelToDbConverter residualInfoModelToDbConverter;
+
 	protected CaseManagementNote saveHistoryNote(CaseManagementNote note, String summaryCode)
 	{
 		return saveHistoryNote(note, findOrCreateCaseManagementIssue(note, summaryCode));
@@ -86,7 +93,10 @@ public abstract class HistoryNoteService extends BaseNoteService
 		return caseManagementIssue;
 	}
 
-	protected void addAnnotationLink(CaseManagementNote note, String annotationText)
+	protected void addAnnotationLink(
+			CaseManagementNote note,
+			String annotationText,
+			List<ResidualInfo> residualInfoList)
 	{
 		if(annotationText != null)
 		{
@@ -95,6 +105,10 @@ public abstract class HistoryNoteService extends BaseNoteService
 			annotationLink.setLinkedCaseManagementNoteId(Math.toIntExact(note.getId()));
 			annotationNote.setProgramNo(note.getProgramNo());
 			annotationNote.setReporterCaisiRole(note.getReporterCaisiRole());
+			if(residualInfoList != null)
+			{
+				annotationNote.setResidualInfoList(residualInfoModelToDbConverter.convert(residualInfoList));
+			}
 			saveNote(annotationNote); // will also save the link through cascade
 		}
 	}

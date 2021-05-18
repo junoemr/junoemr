@@ -20,16 +20,20 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.common;
+package org.oscarehr.encounterNote.dao;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-@Data
-public class ResidualInfo extends AbstractTransientModel
+@SuppressWarnings("unchecked")
+@Transactional
+@Repository("encounterNote.dao.CaseManagementNoteResidualInfoDao")
+public class CaseManagementNoteResidualInfoDao extends AbstractDao<CaseManagementNoteResidualInfo>
 {
-	private Long id;
-	private String key;
-	private String value;
-	private String valueType;
+	public CaseManagementNoteResidualInfoDao()
+	{
+		super(CaseManagementNoteResidualInfo.class);
+	}
 }

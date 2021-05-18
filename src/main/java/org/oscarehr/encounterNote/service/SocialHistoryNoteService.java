@@ -49,7 +49,7 @@ public class SocialHistoryNoteService extends HistoryNoteService
 		CaseManagementNote note = socialHistoryNoteModelToDbConverter.convert(noteModel);
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveSocialHistoryNote(note);
-		addAnnotationLink(savedNote, noteModel.getAnnotation());
+		addAnnotationLink(savedNote, noteModel.getAnnotation(), noteModel.getResidualInfo());
 
 		// now that notes have id's, save the partial date data
 		if(savedNote.getNoteExtensionList() != null)
