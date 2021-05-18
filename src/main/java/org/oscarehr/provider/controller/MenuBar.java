@@ -94,7 +94,8 @@ public class MenuBar
 
 	public boolean isK2AEnabled()
 	{
-		return this.appManager.isK2AEnabled() && this.systemPreferences.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
+		return this.systemPreferences.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false) &&
+				       this.appManager.isK2AEnabled();
 	}
 
 	public boolean isHasDashboards()
