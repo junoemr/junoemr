@@ -46,12 +46,15 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.RSSResponse;
 import org.oscarehr.ws.rest.to.model.RssItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
@@ -66,6 +69,9 @@ public class RSSFeedService extends AbstractServiceImpl {
 
 	Logger logger = MiscUtils.getLogger();
 	
+	@Autowired
+	SystemPreferenceService systemPreferenceService;
+	
 	@GET
 	@Path("/rss")
 	@Produces("application/json")
@@ -73,7 +79,7 @@ public class RSSFeedService extends AbstractServiceImpl {
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {
-			if(key.equals("k2a")) {
+			if(key.equals("k2a") && systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false)) {
 				AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	    		AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
 	    		
@@ -159,13 +165,7 @@ public class RSSFeedService extends AbstractServiceImpl {
 			    			}
 			    			response.setTotal(response.getContent().size());
 			    		}
-		    		} else {
-			    		RssItem item = new RssItem();
-			    		item.setType("Utilize K2A Now!");
-			    		item.setBody("Receive the latest evidence and information from your trusted network! Sign into K2A now, by visiting User Settings > Integration > K2A Login.");
-			    		item.setId((long)k2aApp.getId());
-			    		response.getContent().add(item);
-			    	}
+		    		}
 	    		}
 			}
 		}

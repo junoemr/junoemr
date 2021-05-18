@@ -24,8 +24,10 @@
 package org.oscarehr.provider.controller;
 
 import org.oscarehr.common.model.Dashboard;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.DashboardManager;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
@@ -44,6 +46,7 @@ public class MenuBar
 
 	private AppManager appManager;
 	private LoggedInInfo loggedInInfo;
+	private SystemPreferenceService systemPreferences;
 
 	private List<Dashboard> dashboards;
 
@@ -64,6 +67,7 @@ public class MenuBar
 		currentDay = cal.get(Calendar.DAY_OF_MONTH);
 
 		this.appManager = SpringUtils.getBean(AppManager.class);
+		this.systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
 
 		this.dashboards = this.loadDashboards();
 	}
@@ -90,7 +94,7 @@ public class MenuBar
 
 	public boolean isK2AEnabled()
 	{
-		return this.appManager.isK2AEnabled();
+		return this.appManager.isK2AEnabled() && this.systemPreferences.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
 	}
 
 	public boolean isHasDashboards()
