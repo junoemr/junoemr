@@ -904,7 +904,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 				else
 				{
-					url = "../billing/CA/BC/billcontroller.page.jsp?lastName=" + encodeURI(controller.page.demo.lastName) + "&firstName=" + encodeURI(controller.page.demo.firstName) + "&filterPatient=true&demographicNo=" + controller.page.demo.demographicNo;
+					url = "../billing/CA/BC/billStatus.jsp?lastName=" + encodeURI(controller.page.demo.lastName) + "&firstName=" + encodeURI(controller.page.demo.firstName) + "&filterPatient=true&demographicNo=" + controller.page.demo.demographicNo;
 				}
 			}
 			else if (func === "CreateInvoice")
