@@ -147,10 +147,7 @@
     List<Map<String, String>> providers = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
     List<Map<String, String>> nurseProviders = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_NURSE);
 
-    if (providers != null && nurseProviders != null)
-    {
-        providers = ProviderData.getSortedMergedProviderList(providers, nurseProviders, "lastName");
-    }
+    providers = ProviderData.getSortedMergedProviderList(providers, nurseProviders, "lastName");
 
     if (creatorProviderNo.isEmpty())
     {
