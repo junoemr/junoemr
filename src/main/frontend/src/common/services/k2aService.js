@@ -47,7 +47,7 @@ angular.module("Common.Services").service("k2aService", [
 		 */
 		service.isK2AEnabled = async () =>
 		{
-			const response = await service.systemPreferenceApi.getPreferenceEnabled("integration.k2a.enabled");
+			const response = await service.systemPreferenceApi.getPreferenceEnabled("integration.know2Act.enabled");
 			return response.data.body;
 		}
 		
