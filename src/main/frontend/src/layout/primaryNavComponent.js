@@ -459,15 +459,14 @@ angular.module('Layout').component("primaryNavigation", {
 				{
 					switch(ctrl.billRegion)
 					{
-						case BILLING_REGION.CLINICAID:
-							url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
-							break;
 						case BILLING_REGION.BC:
 							url = "../billing/CA/BC/billStatus.jsp";
 							break;
 						case BILLING_REGION.ON:
 							url = "../billing/CA/ON/billStatus.jsp";
-						default:"../billing.do?billRegion=CLINICAID&action=invoice_reports";
+							break;
+						default:
+							url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
 					}
 					wname = "billing";
 				}
