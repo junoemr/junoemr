@@ -75,6 +75,9 @@ public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immuniz
 		immunization.setNextDate(getResidualDataElementAsDate(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE));
 		immunization.setProvider(toProviderNames(getResidualDataElementAsString(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_PROVIDER)));
 
+		immunization.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo(),
+				RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE, RESIDUAL_INFO_DATA_NAME_PROVIDER));
+
 		return immunization;
 	}
 

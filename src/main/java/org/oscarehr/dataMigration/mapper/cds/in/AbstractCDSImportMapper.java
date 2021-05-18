@@ -30,6 +30,7 @@ import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -48,7 +49,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
@@ -87,19 +90,30 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected ResidualInformation.DataElement getResidualDataElement(ResidualInformation residualInformation, String ... keys)
+	/**
+	 Convert residual info to the model structure.
+	 @param residualInformation the data element to convert
+	 @param ignoreKeys any data key names that should be ignored. this is intended for keys that are known to be imported elsewhere
+	 */
+	protected List<ResidualInfo> importAllResidualInfo(ResidualInformation residualInformation, String ... ignoreKeys)
 	{
-		if(residualInformation != null && keys != null)
+		List<ResidualInfo> residualInfoList = null;
+		if(residualInformation != null)
 		{
+			residualInfoList = new ArrayList<>(residualInformation.getDataElement().size());
 			for(ResidualInformation.DataElement dataElement : residualInformation.getDataElement())
 			{
-				if(Arrays.stream(keys).anyMatch(dataElement.getName()::equals))
+				if(Arrays.stream(ignoreKeys).noneMatch(dataElement.getName()::equals))
 				{
-					return dataElement;
+					ResidualInfo residualInfo = new ResidualInfo();
+					residualInfo.setKey(dataElement.getName());
+					residualInfo.setValue(dataElement.getContent());
+					residualInfo.setValueType(dataElement.getDataType());
+					residualInfoList.add(residualInfo);
 				}
 			}
 		}
-		return null;
+		return residualInfoList;
 	}
 
 	protected Long getResidualDataElementAsLong(ResidualInformation residualInformation, String ... keys)
@@ -126,6 +140,21 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		if(dataElement != null)
 		{
 			return dataElement.getContent();
+		}
+		return null;
+	}
+
+	private ResidualInformation.DataElement getResidualDataElement(ResidualInformation residualInformation, String ... keys)
+	{
+		if(residualInformation != null && keys != null)
+		{
+			for(ResidualInformation.DataElement dataElement : residualInformation.getDataElement())
+			{
+				if(Arrays.stream(keys).anyMatch(dataElement.getName()::equals))
+				{
+					return dataElement;
+				}
+			}
 		}
 		return null;
 	}

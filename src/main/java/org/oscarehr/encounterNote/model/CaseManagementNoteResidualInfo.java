@@ -40,21 +40,33 @@ import javax.persistence.Table;
 @Table(name = "casemgmt_note_residual_info")
 public class CaseManagementNoteResidualInfo extends AbstractModel<Long>
 {
+	public CaseManagementNoteResidualInfo()
+	{
+	}
+	public CaseManagementNoteResidualInfo(CaseManagementNoteResidualInfo infoToCopy, CaseManagementNote referenceNote)
+	{
+		this.id = null;
+		this.note = referenceNote;
+		this.key = infoToCopy.key;
+		this.value = infoToCopy.value;
+		this.valueType = infoToCopy.valueType;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "note_id")
+	@JoinColumn(name = "note_id", nullable = false)
 	private CaseManagementNote note;
 
-	@Column(name = "key")
+	@Column(name = "\"key\"", nullable = false)
 	private String key;
 
-	@Column(name = "value")
+	@Column(name = "\"value\"")
 	private String value;
 
-	@Column(name = "value_type")
+	@Column(name = "value_type", nullable = false)
 	private String valueType;
 }

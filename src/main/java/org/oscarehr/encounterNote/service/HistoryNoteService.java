@@ -29,6 +29,7 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
+import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
 import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,8 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public abstract class HistoryNoteService extends BaseNoteService
 {
+	public static final String DEFAULT_RESIDUAL_INFO_NOTE_TEXT = "Residual Info Dump";
+
 	@Autowired
 	protected ResidualInfoModelToDbConverter residualInfoModelToDbConverter;
 
@@ -98,6 +101,10 @@ public abstract class HistoryNoteService extends BaseNoteService
 			String annotationText,
 			List<ResidualInfo> residualInfoList)
 	{
+		if(annotationText == null && residualInfoList != null && !residualInfoList.isEmpty())
+		{
+			annotationText = DEFAULT_RESIDUAL_INFO_NOTE_TEXT;
+		}
 		if(annotationText != null)
 		{
 			CaseManagementNote annotationNote = buildAnnotationNote(note, annotationText);
@@ -107,7 +114,9 @@ public abstract class HistoryNoteService extends BaseNoteService
 			annotationNote.setReporterCaisiRole(note.getReporterCaisiRole());
 			if(residualInfoList != null)
 			{
-				annotationNote.setResidualInfoList(residualInfoModelToDbConverter.convert(residualInfoList));
+				List<CaseManagementNoteResidualInfo> noteResidualInfo = residualInfoModelToDbConverter.convert(residualInfoList);
+				noteResidualInfo.forEach((residualInfo) -> residualInfo.setNote(annotationNote));// set the note reference
+				annotationNote.setResidualInfoList(noteResidualInfo);
 			}
 			saveNote(annotationNote); // will also save the link through cascade
 		}

@@ -205,6 +205,15 @@ public class CaseManagementNote extends AbstractModel<Long>
 				issueNoteList.add(new CaseManagementIssueNote(issueNoteToCopy, this));
 			}
 		}
+
+		if(noteToCopy.residualInfoList != null)
+		{
+			this.residualInfoList = new ArrayList<>(noteToCopy.residualInfoList.size());
+			for(CaseManagementNoteResidualInfo noteResidualInfo : noteToCopy.residualInfoList)
+			{
+				residualInfoList.add(new CaseManagementNoteResidualInfo(noteResidualInfo, this));
+			}
+		}
 	}
 
 	public Long getId()
