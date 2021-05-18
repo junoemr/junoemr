@@ -410,7 +410,7 @@
 						</div>
 						<div class="form-group col-sm-12">
 							<label>Rx Interaction Warning Level:</label>
-								<select ng-model="pref.rxInteractionWarningLevel" class="form-control" ng-options="p.value as p.label for p in settingsCtrl.rxInteractionWarningLevels">
+								<select ng-model="settingsCtrl.pref.rxInteractionWarningLevel" class="form-control" ng-options="p.value as p.label for p in settingsCtrl.rxInteractionWarningLevels">
 							</select>
 						</div>
 
