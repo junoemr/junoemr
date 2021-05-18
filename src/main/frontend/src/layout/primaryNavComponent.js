@@ -1,3 +1,4 @@
+import {BILLING_REGION} from "../billing/billingConstants";
 
 angular.module('Layout').component("primaryNavigation", {
 	bindings: {},
@@ -458,13 +459,13 @@ angular.module('Layout').component("primaryNavigation", {
 				{
 					switch(ctrl.billRegion)
 					{
-						case "CLINICAID":
+						case BILLING_REGION.CLINICAID:
 							url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
 							break;
-						case "BC":
+						case BILLING_REGION.BC:
 							url = "../billing/CA/BC/billStatus.jsp";
 							break;
-						case "ON":
+						case BILLING_REGION.ON:
 							url = "../billing/CA/ON/billStatus.jsp";
 						default:"../billing.do?billRegion=CLINICAID&action=invoice_reports";
 					}
