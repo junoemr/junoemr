@@ -29,7 +29,6 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
-import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
 import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,13 +37,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public abstract class HistoryNoteService extends BaseNoteService
 {
-	public static final String DEFAULT_RESIDUAL_INFO_NOTE_TEXT = "Residual Info Dump";
-
 	@Autowired
 	protected ResidualInfoModelToDbConverter residualInfoModelToDbConverter;
 
@@ -101,40 +99,20 @@ public abstract class HistoryNoteService extends BaseNoteService
 			String annotationText,
 			List<ResidualInfo> residualInfoList)
 	{
-		if(annotationText == null && residualInfoList != null && !residualInfoList.isEmpty())
+		Optional<CaseManagementNote> annotationNoteOptional = buildBaseAnnotationNote(annotationText, residualInfoList);
+		if(annotationNoteOptional.isPresent())
 		{
-			annotationText = DEFAULT_RESIDUAL_INFO_NOTE_TEXT;
-		}
-		if(annotationText != null)
-		{
-			CaseManagementNote annotationNote = buildAnnotationNote(note, annotationText);
-			CaseManagementNoteLink annotationLink = new CaseManagementNoteLink(annotationNote);
-			annotationLink.setLinkedCaseManagementNoteId(Math.toIntExact(note.getId()));
-			annotationNote.setProgramNo(note.getProgramNo());
-			annotationNote.setReporterCaisiRole(note.getReporterCaisiRole());
-			if(residualInfoList != null)
-			{
-				List<CaseManagementNoteResidualInfo> noteResidualInfo = residualInfoModelToDbConverter.convert(residualInfoList);
-				noteResidualInfo.forEach((residualInfo) -> residualInfo.setNote(annotationNote));// set the note reference
-				annotationNote.setResidualInfoList(noteResidualInfo);
-			}
-			saveNote(annotationNote); // will also save the link through cascade
-		}
-	}
-
-	private CaseManagementNote buildAnnotationNote(CaseManagementNote note, String annotationText)
-	{
-		CaseManagementNote annotationNote = null;
-		if(annotationText != null)
-		{
-			annotationNote = new CaseManagementNote();
-			annotationNote.setNote(annotationText);
+			CaseManagementNote annotationNote = annotationNoteOptional.get();
 			annotationNote.setProvider(note.getProvider());
 			annotationNote.setSigned(note.getSigned());
 			annotationNote.setSigningProvider(note.getSigningProvider());
 			annotationNote.setObservationDate(note.getObservationDate());
 			annotationNote.setDemographic(note.getDemographic());
+			annotationNote.setProgramNo(note.getProgramNo());
+			annotationNote.setReporterCaisiRole(note.getReporterCaisiRole());
+			CaseManagementNoteLink annotationLink = new CaseManagementNoteLink(annotationNote);
+			annotationLink.setLinkedCaseManagementNoteId(Math.toIntExact(note.getId()));
+			saveNote(annotationNote); // will also save the link through cascade
 		}
-		return annotationNote;
 	}
 }

@@ -47,6 +47,7 @@ import org.oscarehr.dataMigration.model.demographic.Demographic;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
+import org.oscarehr.dataMigration.model.immunization.Immunization;
 import org.oscarehr.dataMigration.model.lab.Lab;
 import org.oscarehr.dataMigration.model.lab.LabObservation;
 import org.oscarehr.dataMigration.model.lab.LabObservationResult;
@@ -57,6 +58,7 @@ import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicContactService;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
@@ -72,6 +74,7 @@ import org.oscarehr.prevention.dao.PreventionExtDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.rx.service.MedicationService;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 
@@ -180,6 +184,9 @@ public class PatientImportService
 
 	@Autowired
 	private HRMService hrmService;
+
+	@Autowired
+	private ProviderService providerService;
 
 	public org.oscarehr.demographic.model.Demographic importDemographic(GenericFile importFile,
 	                              PatientImportContext context,
@@ -292,16 +299,27 @@ public class PatientImportService
 
 	private void persistPreventions(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
 	{
-		List<Prevention> preventions = preventionModelToDbConverter.convert(patientRecord.getImmunizationList());
-
-		for(Prevention prevention : preventions)
+		for(Immunization immunization : patientRecord.getImmunizationList())
 		{
+			Prevention prevention = preventionModelToDbConverter.convert(immunization);
 			prevention.setDemographicId(dbDemographic.getId());
 			preventionDao.persist(prevention);
 
 			for(PreventionExt ext : prevention.getPreventionExtensionList())
 			{
 				preventionExtDao.persist(ext);
+			}
+
+			Optional<CaseManagementNote> immunizationNoteOptional = encounterNoteService.buildBaseAnnotationNote(
+					null, immunization.getResidualInfo());
+			if(immunizationNoteOptional.isPresent())
+			{
+				CaseManagementNote immunizationNote = immunizationNoteOptional.get();
+				ProviderData providerData = providerService.getProvider(prevention.getProviderNo());
+				immunizationNote.setProvider(providerData);
+				immunizationNote.setSigningProvider(providerData);
+				immunizationNote.setDemographic(dbDemographic);
+				encounterNoteService.savePreventionNote(immunizationNote, prevention);
 			}
 		}
 	}
