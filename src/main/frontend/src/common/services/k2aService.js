@@ -87,12 +87,11 @@ angular.module("Common.Services").service("k2aService", [
 			junoHttp.get(service.apiPath + '/app/K2AActive', config).then(
 				function success(response)
 				{
-					console.log(response);
 					deferred.resolve(response.data);
 				},
 				function error(error)
 				{
-					console.log("k2aService::isK2AInit error", error);
+					console.error("k2aService::isK2AInit error", error);
 					deferred.reject("An error occured while getting k2a content");
 				});
 			
@@ -113,7 +112,7 @@ angular.module("Common.Services").service("k2aService", [
 				},
 				function error(error)
 				{
-					console.log("k2aService::initK2A error", error);
+					console.error("k2aService::initK2A error", error);
 					deferred.reject("An error occured while trying to initialize k2a");
 				});
 

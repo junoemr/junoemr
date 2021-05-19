@@ -165,7 +165,13 @@ public class RSSFeedService extends AbstractServiceImpl {
 			    			}
 			    			response.setTotal(response.getContent().size());
 			    		}
-		    		}
+		    		} else {
+			    		RssItem item = new RssItem();
+			    		item.setType("Utilize K2A Now!");
+			    		item.setBody("Receive the latest evidence and information from your trusted network! Sign into K2A now, by visiting User Settings > Integration > K2A Login.");
+			    		item.setId((long)k2aApp.getId());
+			    		response.getContent().add(item);
+			    	}
 	    		}
 			}
 		}
