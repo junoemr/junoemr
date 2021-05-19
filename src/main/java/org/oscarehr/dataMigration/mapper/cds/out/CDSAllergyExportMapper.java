@@ -68,12 +68,12 @@ public class CDSAllergyExportMapper extends AbstractCDSExportMapper<AllergiesAnd
 			ResidualInformation residualInformation = objectFactory.createResidualInformation();
 			addNonNullDataElements(
 					residualInformation,
-					CDSConstants.RESIDUAL_INFO_DATA_TYPE.NUMERIC,
+					CDSConstants.ResidualInfoDataType.NUMERIC,
 					RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET,
 					ageOfOnset);
 			addNonNullDataElements(
 					residualInformation,
-					CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
+					CDSConstants.ResidualInfoDataType.TEXT,
 					RESIDUAL_INFO_DATA_NAME_ONSET_REACTION,
 					onsetOfReaction.getDescription());
 			allergiesAndAdverseReactions.setResidualInfo(residualInformation);

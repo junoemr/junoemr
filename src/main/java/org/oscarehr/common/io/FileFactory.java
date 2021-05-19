@@ -617,7 +617,7 @@ public class FileFactory
 			{
 				genFile = new PDFFile(file);
 			}
-			else if("application/xml".equals(fileContent))
+			else if("application/xml".equals(fileContent) || "text/xml".equals(fileContent))
 			{
 				genFile = new XMLFile(file);
 			}

@@ -40,7 +40,7 @@ public class CDSConstants
 	public static final String RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE = "Next Immunization Date";
 	public static final String RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE = "ImmunizationType";
 
-	public enum RESIDUAL_INFO_DATA_TYPE
+	public enum ResidualInfoDataType
 	{
 		TEXT,
 		NUMERIC,
@@ -50,11 +50,111 @@ public class CDSConstants
 		DATE_PARTIAL,
 	}
 
-	public enum LAB_ABNORMAL_FLAG
+	public enum LabAbnormalFlag
 	{
-		U,
-		Y,
-		N,
+		BELOW_LOW_NORMAL("L", true),
+		ABOVE_HIGH_NORMAL("H", true),
+		BELOW_LOWER_LIMITS("LL", true),
+		ABOVE_HIGH_LIMITS("HH", true),
+		NORMAL("N", false),
+		ABNORMAL("A", true),
+		VERY_ABNORMAL("AA", true),
+		SUSCEPTIBLE("S", true),
+		RESISTANT("R", true),
+		INTERMEDIATE("I", true),
+		MODERATE_SUSCEPTIBLE("MS", true),
+		VERY_SUSCEPTIBLE("VS", true),
+		UNKNOWN("U", false);
+
+		private final String value;
+		private final boolean abnormal;
+
+		LabAbnormalFlag(String value, boolean isAbnormal)
+		{
+			this.value = value;
+			this.abnormal = isAbnormal;
+		}
+
+		public String getValue()
+		{
+			return value;
+		}
+
+		public boolean isAbnormal()
+		{
+			return abnormal;
+		}
+
+		public static LabAbnormalFlag fromValue(String value)
+		{
+			for(LabAbnormalFlag abnormalFlag : LabAbnormalFlag.values())
+			{
+				if(abnormalFlag.getValue().equalsIgnoreCase(value))
+				{
+					return abnormalFlag;
+				}
+			}
+			return null;
+		}
+	}
+
+	public enum CT037
+	{
+		FOOT_EXAM("11397-7"),
+		RETINAL_EXAM("32468-1"),
+		NEUROLOGICAL_EXAM("67536-3");
+
+		private final String code;
+		CT037(String code)
+		{
+			this.code = code;
+		}
+		public String getCode()
+		{
+			return this.code;
+		}
+
+		public static CT037 findByCode(String code)
+		{
+			for(CT037 ct : CT037.values())
+			{
+				if(ct.getCode().equals(code))
+				{
+					return ct;
+				}
+			}
+			return null;
+		}
+	}
+
+	public enum CT038
+	{
+		NUTRITION("Nutrition"),
+		EXERCISE("Exercise"),
+		SMOKING_CESSATION("Smoking Cessation"),
+		OTHER("Other");
+
+		private final String code;
+		CT038(String code)
+		{
+			this.code = code;
+		}
+		public String getCode()
+		{
+			return this.code;
+		}
+
+		public static CT038 findByCode(String code)
+		{
+			for(CT038 ct : CT038.values())
+			{
+				if(ct.getCode().equals(code))
+				{
+					return ct;
+				}
+			}
+			return null;
+		}
 	}
 
 	//TODO where should these live?
@@ -74,4 +174,35 @@ public class CDSConstants
 
 	// this document-class value shows up in HRM and CDS documentation but does not match the schema
 	public static final String DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE = "Medical Record Report";
+
+	public enum CodingSystem
+	{
+		ENCODE_FM("ENCODE-FM"),
+		SNOMED_CT("SNOMED-CT"),
+		ICD9("ICD9"),
+		ICD10_CA("ICD10-CA"),
+		ICPC_2("ICPC-2");
+
+		private final String value;
+		CodingSystem(String value)
+		{
+			this.value = value;
+		}
+
+		public String getValue()
+		{
+			return this.value;
+		}
+		public static CodingSystem fromValue(String value)
+		{
+			for(CodingSystem status : CodingSystem.values())
+			{
+				if(status.getValue().equalsIgnoreCase(value))
+				{
+					return status;
+				}
+			}
+			return null;
+		}
+	}
 }

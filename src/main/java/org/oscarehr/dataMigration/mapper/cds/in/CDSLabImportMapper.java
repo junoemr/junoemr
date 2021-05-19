@@ -44,6 +44,10 @@ import java.util.List;
 @Component
 public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryResults>, List<Lab>>
 {
+	public static final String UNKNOWN_OBR_NAME = "UNKNOWN TEST TYPE";
+	public static final String UNKNOWN_OBX_ID = "UNKNOWN ID";
+	public static final String UNKNOWN_OBX_NAME = "UNKNOWN TEST NAME";
+
 	public CDSLabImportMapper()
 	{
 		super();
@@ -53,6 +57,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	public List<Lab> importToJuno(List<LaboratoryResults> importLabResultList)
 	{
 		List<Lab> labList = new ArrayList<>();
+		int nonce = 0;
 
 		// Group all the results based on labName and accession number
 		// results with matching accession number coming from the same lab will be treated as a single lab in Juno
@@ -61,7 +66,20 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		{
 			String labName = laboratoryResults.getLaboratoryName();
 			String accessionNumber = laboratoryResults.getAccessionNumber();
-			String hashKey = labName + accessionNumber;
+
+			String hashKey;
+			if(StringUtils.trimToNull(accessionNumber) == null)
+			{
+				// use the nonce to ensure unique keys if there is no accession number.
+				// null accession labs should not be grouped together.
+				hashKey = labName + nonce;
+				nonce++;
+				logEvent(labName + " lab is missing accession number. A generated accession number will be assigned");
+			}
+			else
+			{
+				hashKey = labName + accessionNumber;
+			}
 
 			if(groupedLabHash.containsKey(hashKey))
 			{
@@ -88,7 +106,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	{
 		Lab lab = new Lab();
 
-		lab.setAccessionNumber(importLabGroup.get(0).getAccessionNumber());
+		lab.setAccessionNumber(StringUtils.trimToNull(importLabGroup.get(0).getAccessionNumber()));
 		lab.setSendingFacility(importLabGroup.get(0).getLaboratoryName());
 		lab.setEmrReceivedDateTime(LocalDateTime.now());
 		lab.setMessageDateTime(toNullableLocalDateTime(importLabGroup.get(0).getCollectionDateTime()));
@@ -146,7 +164,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	{
 		LabObservation labObservation = new LabObservation();
 		LaboratoryResults result0 = importLabGroup.get(0); //they should all be the same, so use the first one
-		labObservation.setName(result0.getTestName());
+		labObservation.setName(getOBRName(result0));
 		labObservation.setRequestDateTime(toNullableLocalDateTime(result0.getLabRequisitionDateTime()));
 		labObservation.setObservationDateTime(toNullableLocalDateTime(result0.getCollectionDateTime()));
 		labObservation.setReportStatus(getReportStatusEnum(result0));
@@ -154,8 +172,8 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		for(LaboratoryResults importLabResults : importLabGroup)
 		{
 			LabObservationResult result = new LabObservationResult();
-			result.setName(importLabResults.getTestNameReportedByLab());
-			result.setIdentifier(importLabResults.getLabTestCode());
+			result.setName(getOBXName(importLabResults));
+			result.setIdentifier(getOBXId(importLabResults));
 			result.setObservationDateTime(toNullableLocalDateTime(importLabResults.getCollectionDateTime()));
 
 			LaboratoryResults.Result labResult = importLabResults.getResult();
@@ -168,7 +186,6 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 			result.setRange(getReferenceRange(importLabResults.getReferenceRange()));
 			result.setAbnormal(getAbnormalFlag(importLabResults.getResultNormalAbnormalFlag()));
 
-			//TODO should these go elsewhere?
 			String testResultInfoFromLab = importLabResults.getTestResultsInformationReportedByTheLab();
 			if(testResultInfoFromLab != null)
 			{
@@ -197,6 +214,40 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		return labObservation;
 	}
 
+	private String getOBRName(LaboratoryResults importLabResults)
+	{
+		String name = StringUtils.trimToNull(importLabResults.getTestName());
+		if(name == null)
+		{
+			name = UNKNOWN_OBR_NAME;
+		}
+		return name;
+	}
+
+	private String getOBXName(LaboratoryResults importLabResults)
+	{
+		String name = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
+		if(name == null)
+		{
+			name = StringUtils.trimToNull(importLabResults.getLabTestCode());
+		}
+		if(name == null)
+		{
+			name = UNKNOWN_OBX_NAME;
+		}
+		return name;
+	}
+
+	private String getOBXId(LaboratoryResults importLabResults)
+	{
+		String id = StringUtils.trimToNull(importLabResults.getLabTestCode());
+		if(id == null)
+		{
+			id = UNKNOWN_OBX_ID;
+		}
+		return id;
+	}
+
 	protected Hl7TextInfo.REPORT_STATUS getReportStatusEnum(LaboratoryResults laboratoryResults)
 	{
 		String statusStr = laboratoryResults.getTestResultStatus();
@@ -206,7 +257,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		}
 		else
 		{
-			// TODO could map additional statuses here manually to the enum
+			//map additional statuses here manually to the enum
 			return Hl7TextInfo.REPORT_STATUS.F; // unknown status is final, since labs will never get updates, are probably old.
 		}
 	}
@@ -233,14 +284,14 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	protected Boolean getAbnormalFlag(ResultNormalAbnormalFlag abnormalFlag)
 	{
 		Boolean flag;
-		if(abnormalFlag == null || CDSConstants.LAB_ABNORMAL_FLAG.U.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum()))
+		if(abnormalFlag == null || CDSConstants.LabAbnormalFlag.UNKNOWN.getValue().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum()))
 		{
 			flag = null;
 		}
 		else
 		{
-			flag = CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
-					|| getAbnormalFlagFromText(abnormalFlag.getResultNormalAbnormalFlagAsPlainText());
+			CDSConstants.LabAbnormalFlag enumValue = CDSConstants.LabAbnormalFlag.fromValue(abnormalFlag.getResultNormalAbnormalFlagAsEnum());
+			flag = (enumValue != null && enumValue.isAbnormal()) || getAbnormalFlagFromText(abnormalFlag.getResultNormalAbnormalFlagAsPlainText());
 		}
 		return flag;
 	}
@@ -249,8 +300,8 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		boolean flag = false;
 		if(abnormalFlag != null)
 		{
-			flag = CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag);
-			//TODO handle additional free text abnormal values
+			flag = CDSConstants.LabAbnormalFlag.ABNORMAL.getValue().equals(abnormalFlag);
+			//handle additional free text abnormal values here
 		}
 		return flag;
 	}

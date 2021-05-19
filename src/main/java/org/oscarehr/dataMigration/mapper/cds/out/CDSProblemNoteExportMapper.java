@@ -27,9 +27,9 @@ import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ProblemList;
 
 @Component
-public class CDSProblemExportMapper extends AbstractCDSNoteExportMapper<ProblemList, ConcernNote>
+public class CDSProblemNoteExportMapper extends AbstractCDSNoteExportMapper<ProblemList, ConcernNote>
 {
-	public CDSProblemExportMapper()
+	public CDSProblemNoteExportMapper()
 	{
 		super();
 	}
@@ -40,7 +40,7 @@ public class CDSProblemExportMapper extends AbstractCDSNoteExportMapper<ProblemL
 		ProblemList problemList = objectFactory.createProblemList();
 
 		problemList.setProblemDiagnosisDescription(exportStructure.getNoteText());
-		problemList.setDiagnosisCode(null); //TODO
+		problemList.setDiagnosisCode(null); // not available when exporting from notes
 		problemList.setProblemDescription(exportStructure.getProblemDescription());
 		problemList.setProblemStatus(exportStructure.getProblemStatus());
 		problemList.setOnsetDate(toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));

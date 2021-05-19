@@ -20,19 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.measurement;
+package org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling;
 
 import lombok.Data;
+import org.oscarehr.dataMigration.model.measurement.Measurement;
 
 @Data
-public abstract class DiabetesComplicationsScreeningMeasurement extends Measurement
+public abstract class DiabetesMotivationalCounselingMeasurement extends Measurement
 {
-	public DiabetesComplicationsScreeningMeasurement()
+	public DiabetesMotivationalCounselingMeasurement()
 	{
 		super();
 	}
-	public DiabetesComplicationsScreeningMeasurement(org.oscarehr.common.model.Measurement dbModel)
+
+	public DiabetesMotivationalCounselingMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
 	}
+
+	/**
+	 * get the string value as defined in the CT-038 table for OMD
+	 * @return - the omd value
+	 */
+	public abstract String getCT038CodeValue();
 }

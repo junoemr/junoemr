@@ -37,6 +37,15 @@
 		background-color: $color-neutral-lighter;
 		padding-top: 20px;
 		padding-bottom: 20px;
+
+		.annotation-button-wrapper {
+			width: 32px;
+			min-width: 32px;
+			height: 32px;
+			i {
+				font-size: 24px;
+			}
+		}
 	}
 }
 

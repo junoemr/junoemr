@@ -105,20 +105,20 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 	{
 		ResultNormalAbnormalFlag resultNormalAbnormalFlag = objectFactory.createResultNormalAbnormalFlag();
 
-		CDSConstants.LAB_ABNORMAL_FLAG abnormalEnum;
+		CDSConstants.LabAbnormalFlag abnormalEnum;
 		if(isAbnormal == null)
 		{
-			abnormalEnum = CDSConstants.LAB_ABNORMAL_FLAG.U;
+			abnormalEnum = CDSConstants.LabAbnormalFlag.UNKNOWN;
 		}
 		else if(isAbnormal)
 		{
-			abnormalEnum = CDSConstants.LAB_ABNORMAL_FLAG.Y;
+			abnormalEnum = CDSConstants.LabAbnormalFlag.ABNORMAL;
 		}
 		else
 		{
-			abnormalEnum = CDSConstants.LAB_ABNORMAL_FLAG.N;
+			abnormalEnum = CDSConstants.LabAbnormalFlag.NORMAL;
 		}
-		resultNormalAbnormalFlag.setResultNormalAbnormalFlagAsEnum(abnormalEnum.name());
+		resultNormalAbnormalFlag.setResultNormalAbnormalFlagAsEnum(abnormalEnum.getValue());
 
 		return resultNormalAbnormalFlag;
 	}

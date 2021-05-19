@@ -84,7 +84,7 @@ public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immuniz
 		// add provider info
 		addNonNullDataElements(
 				residualInformation,
-				CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
+				CDSConstants.ResidualInfoDataType.TEXT,
 				RESIDUAL_INFO_DATA_NAME_PROVIDER,
 				exportStructure.getProvider().getLastName() + "," + exportStructure.getProvider().getFirstName());
 
@@ -93,7 +93,7 @@ public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immuniz
 		{
 			addNonNullDataElements(
 					residualInformation,
-					CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
+					CDSConstants.ResidualInfoDataType.TEXT,
 					RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE,
 					exportStructure.getPreventionType());
 		}

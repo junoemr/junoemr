@@ -20,46 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.mapper.cds.out;
+package org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Data;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
 
-public class CDSMedicationExportMapperTest
+@Data
+public class DiabetesMotivationalCounselingOtherMeasurement extends DiabetesMotivationalCounselingMeasurement
 {
-	@Autowired
-	@InjectMocks
-	private CDSMedicationExportMapper cdsMedicationExportMapper;
-
-	@Before
-	public void setUp()
+	public DiabetesMotivationalCounselingOtherMeasurement()
 	{
-		MockitoAnnotations.initMocks(this);
+		super();
+	}
+	public DiabetesMotivationalCounselingOtherMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	{
+		super(dbModel);
 	}
 
-	@Test
-	public void testToStringOrNull_Null()
+	@Override
+	public String getTypeCode()
 	{
-		assertNull(cdsMedicationExportMapper.toStringOrNull((Integer) null));
-		assertNull(cdsMedicationExportMapper.toStringOrNull((Boolean) null));
+		return MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
 	}
 
-	@Test
-	public void testToStringOrNull_String()
+	@Override
+	public String getCT038CodeValue()
 	{
-		assertEquals("10", cdsMedicationExportMapper.toStringOrNull(10));
+		return CDSConstants.CT038.OTHER.getCode();
 	}
-
-	@Test
-	public void testToStringOrNull_Boolean()
-	{
-		assertEquals("true", cdsMedicationExportMapper.toStringOrNull(true));
-	}
-
 }

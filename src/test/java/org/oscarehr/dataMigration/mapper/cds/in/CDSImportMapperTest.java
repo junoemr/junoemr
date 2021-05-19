@@ -711,7 +711,7 @@ public class CDSImportMapperTest
 	public void testResidualDataElementAsLong()
 	{
 		String dataKey = "key";
-		CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.NUMERIC;
+		CDSConstants.ResidualInfoDataType dataType = CDSConstants.ResidualInfoDataType.NUMERIC;
 		Long expectedLongValue = Long.valueOf(32);
 
 		ObjectFactory objectFactory = new ObjectFactory();
@@ -735,7 +735,7 @@ public class CDSImportMapperTest
 	public void testResidualDataElementAsDate()
 	{
 		String dataKey = "key";
-		CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE;
+		CDSConstants.ResidualInfoDataType dataType = CDSConstants.ResidualInfoDataType.DATE;
 		LocalDate expectedDateValue = LocalDate.of(2021, 1, 6);
 
 		ObjectFactory objectFactory = new ObjectFactory();
@@ -759,7 +759,7 @@ public class CDSImportMapperTest
 	public void testResidualDataElementAsString()
 	{
 		String dataKey = "key";
-		CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT;
+		CDSConstants.ResidualInfoDataType dataType = CDSConstants.ResidualInfoDataType.TEXT;
 		String expectedStringValue = "sample string value";
 
 		ObjectFactory objectFactory = new ObjectFactory();
