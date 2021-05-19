@@ -23,14 +23,14 @@
 package org.oscarehr.dataMigration.converter.out;
 
 import org.apache.commons.lang3.StringUtils;
-import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,12 +55,14 @@ public class DemographicDbToModelConverter extends
 		}
 
 		org.oscarehr.dataMigration.model.demographic.Demographic exportDemographic = new org.oscarehr.dataMigration.model.demographic.Demographic();
-		BeanUtils.copyProperties(input, exportDemographic, "address", "dateOfBirth", "title", "officialLanguage");
+		BeanUtils.copyProperties(input, exportDemographic, "address", "email", "dateOfBirth", "title", "sin", "officialLanguage");
 
 		exportDemographic.setId(input.getDemographicId());
 		exportDemographic.setDateOfBirth(input.getDateOfBirth());
 		exportDemographic.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
 		exportDemographic.setSex(Person.SEX.getIgnoreCase(input.getSex()));
+		exportDemographic.setSin(numericSin(input.getSin()));
+		exportDemographic.setEmail(StringUtils.trimToNull(input.getEmail()));
 
 		exportDemographic.setHealthNumber(StringUtils.trimToNull(input.getHin()));
 		exportDemographic.setHealthNumberVersion(StringUtils.trimToNull(input.getVer()));
@@ -149,5 +151,10 @@ public class DemographicDbToModelConverter extends
 			referralProvider.setOhipNumber(StringUtils.trimToNull(referralProviderNumber));
 		}
 		return referralProvider;
+	}
+
+	private String numericSin(String unformatted)
+	{
+		return (unformatted == null) ? null : unformatted.replaceAll("[^0-9]", "");
 	}
 }

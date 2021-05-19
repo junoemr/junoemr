@@ -20,30 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.measurement;
+package org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling;
 
 import lombok.Data;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 
-import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_FOOT_EXAM;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_SMOKING;
 
 @Data
-public class DiabetesComplicationsScreeningFootMeasurement extends DiabetesComplicationsScreeningMeasurement
+public class DiabetesMotivationalCounselingSmokingMeasurement extends DiabetesMotivationalCounselingMeasurement
 {
-	private String typeCode;
-
-	public DiabetesComplicationsScreeningFootMeasurement()
+	public DiabetesMotivationalCounselingSmokingMeasurement()
 	{
 		super();
 	}
-	public DiabetesComplicationsScreeningFootMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	public DiabetesMotivationalCounselingSmokingMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
-		this.typeCode = dbModel.getType();
 	}
 
 	@Override
 	public String getTypeCode()
 	{
-		return (this.typeCode != null) ? this.typeCode : MEASUREMENT_TYPE_FOOT_EXAM;
+		return MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_SMOKING;
+	}
+
+	@Override
+	public String getCT038CodeValue()
+	{
+		return CDSConstants.CT038.SMOKING_CESSATION.getCode();
 	}
 }

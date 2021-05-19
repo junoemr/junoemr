@@ -66,6 +66,7 @@ public class GenericFile
 			"application/octet-stream",
 			"text/csv",
 			"text/plain",
+			"text/xml",
 			"image/tiff",
 			"image/jpeg",
 			"image/png",

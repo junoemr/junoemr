@@ -31,9 +31,6 @@ import org.springframework.stereotype.Component;
 import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
 
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.Y_INDICATOR_FALSE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;
-
 @Component
 public class CDSMedicationExportMapper extends AbstractCDSExportMapper<MedicationsAndTreatments, Medication>
 {
@@ -106,7 +103,7 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setDosageUnitOfMeasure(medication.getUnit());
 		medicationsAndTreatments.setStrength(getDrugMeasure(medication));
 
-		medicationsAndTreatments.setSubstitutionNotAllowed(getSubsNotAllowedIndicator(medication.getNoSubs()));
+		medicationsAndTreatments.setSubstitutionNotAllowed(toYnIndicatorString(medication.getNoSubs()));
 
 		return medicationsAndTreatments;
 	}
@@ -130,11 +127,6 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 			drugMeasure.setUnitOfMeasure(strengthUnit);
 		}
 		return drugMeasure;
-	}
-
-	protected String getSubsNotAllowedIndicator(Boolean noSubs)
-	{
-		return ((noSubs != null) && noSubs) ? Y_INDICATOR_TRUE : Y_INDICATOR_FALSE;
 	}
 
 	protected String toStringOrNull(Boolean bool)

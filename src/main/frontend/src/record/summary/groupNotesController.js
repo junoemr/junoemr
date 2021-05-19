@@ -387,6 +387,20 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 		};
 
+		controller.openAnnotation = () =>
+		{
+			const tableId = controller.groupNotesForm.encounterNote.noteId;
+			if(tableId)
+			{
+				const win = "Annotation" + tableId;
+				const url = "../annotation/annotation.jsp?" +
+					"display=" + 1 + // notes module - from casemgmt_note_link
+					"&table_id=" + tableId +
+					"&demo=" + $stateParams.demographicNo;
+				window.open(url, win, "scrollbars=yes, location=no, width=647, height=600");
+			}
+		}
+
 		controller.searchIssues = function searchIssues(term)
 		{
 			var search = {

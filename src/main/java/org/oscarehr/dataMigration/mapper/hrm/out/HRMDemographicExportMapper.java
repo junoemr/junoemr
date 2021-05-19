@@ -24,6 +24,7 @@ package org.oscarehr.dataMigration.mapper.hrm.out;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.common.Person;
@@ -160,7 +161,8 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		healthCard.setNumber(exportStructure.getHealthNumber());
 		healthCard.setVersion(exportStructure.getHealthNumberVersion());
 		healthCard.setExpirydate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
-		healthCard.setProvinceCode(exportStructure.getHealthNumberProvinceCode());
+		healthCard.setProvinceCode(org.oscarehr.dataMigration.model.common.Address.getSubdivisionCodeCT013Format(
+				exportStructure.getHealthNumberProvinceCode(), CDSConstants.COUNTRY_CODE_CANADA));
 
 		return healthCard;
 	}
@@ -314,7 +316,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 			structured.setLine1(addressModel.getAddressLine1());
 			structured.setLine2(addressModel.getAddressLine2());
 			structured.setCity(addressModel.getCity());
-			structured.setCountrySubdivisionCode(addressModel.getRegionCode());
+			structured.setCountrySubdivisionCode(addressModel.getSubdivisionCodeCT013Format());
 			structured.setPostalZipCode(postalZipCode);
 
 			address.setStructured(structured);
