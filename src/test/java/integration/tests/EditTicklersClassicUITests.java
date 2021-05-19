@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
@@ -77,11 +76,11 @@ public class EditTicklersClassicUITests extends SeleniumTestBase
 
 		// *** Add Tickler Note ***
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
-		String currWindowHandle = driver.getWindowHandle();
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("menuTitletickler")));
-		driver.findElement(By.id("menuTitletickler")).click();
-		PageUtil.switchToLastWindow(driver);
 		Thread.sleep(2000);
+		String currWindowHandle = driver.getWindowHandle();
+		driver.findElement(By.id("menuTitletickler")).click();
+		Thread.sleep(2000);
+		PageUtil.switchToLastWindow(driver);
 		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='priority']"), priority);
 		dropdownSelectByVisibleText(driver, By.id("site"), clinic);
 		driver.findElement(By.xpath("//textarea[@name='textarea']")).sendKeys(reminderMessage);
