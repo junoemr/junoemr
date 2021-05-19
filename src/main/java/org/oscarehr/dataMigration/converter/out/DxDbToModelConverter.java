@@ -22,14 +22,15 @@
  */
 package org.oscarehr.dataMigration.converter.out;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.oscarehr.common.dao.Icd9Dao;
+import org.oscarehr.common.dao.OscarCodeDao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Icd9;
-import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
+import org.oscarehr.common.model.OscarCode;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -46,6 +47,9 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 	private Icd9Dao icd9Dao;
 
 	@Autowired
+	private OscarCodeDao oscarCodeDao;
+
+	@Autowired
 	protected PatientExportContextService patientExportContextService;
 
 	@Override
@@ -59,8 +63,7 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 		dxRecord.setUpdateDate(ConversionUtils.toLocalDateTime(input.getUpdateDate()));
 		dxRecord.setProvider(findProvider(input.getProviderNo()));
 
-		CDSConstants.CodingSystem codingSystem = CDSConstants.CodingSystem.fromValue(input.getCodingSystem());
-		boolean valid = fillCodeInfo(dxRecord, codingSystem, input.getDxresearchCode());
+		boolean valid = fillCodeInfo(dxRecord, input.getCodingSystem(), input.getDxresearchCode());
 		return (valid) ? dxRecord : null; // only return valid entries. null can be filtered out
 	}
 
@@ -71,15 +74,21 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 		return entities.stream().map(this::convert).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
-	private boolean fillCodeInfo(DxRecord dxRecord, CDSConstants.CodingSystem codingSystem, String code)
+	private boolean fillCodeInfo(DxRecord dxRecord, String codingSystemStr, String code)
 	{
-		if(codingSystem != null && code != null)
+		DxRecord.DxCodingSystem codingSystem = DxRecord.DxCodingSystem.fromValue(codingSystemStr);
+		if(codingSystem != null)
 		{
+			dxRecord.setCodingSystem(codingSystem);
 			switch(codingSystem)
 			{
 				case ICD9: fillIcd9Info(dxRecord, code); break;
-				default: throw new NotImplementedException(codingSystem + " dx conversion not implemented");
+				case OSCAR_CODE: fillOscarCodeInfo(dxRecord, code); break;
 			}
+		}
+		else
+		{
+			logConversionError("Dx record with unknown coding system '" + codingSystemStr + "' could not be loaded");
 		}
 		return (dxRecord.getDxCode() != null);
 	}
@@ -89,18 +98,39 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 		Icd9 icd9 = icd9Dao.findByCode(icd9Code);
 		if(icd9 != null)
 		{
-			dxRecord.setCodingSystem(CDSConstants.CodingSystem.ICD9);
 			dxRecord.setDxCode(icd9.getCode());
 			dxRecord.setCodeDescription(icd9.getDescription());
 		}
 		else
 		{
-			PatientExportContext context = patientExportContextService.getContext();
-			String message = "Invalid icd9 code '" + icd9Code + "' could not be loaded";
-			if(context != null)
-			{
-				context.getExportLogger().logEvent("[" + context.getCurrentProcessIdentifier() + "] " + message);
-			}
+			logConversionError("Invalid icd9 code '" + icd9Code + "' could not be loaded");
+		}
+	}
+
+	private void fillOscarCodeInfo(DxRecord dxRecord, String oscarCodeStr)
+	{
+		OscarCode oscarCode = oscarCodeDao.findByCode(oscarCodeStr);
+		if(oscarCode != null)
+		{
+			dxRecord.setDxCode(oscarCode.getCode());
+			dxRecord.setCodeDescription(oscarCode.getDescription());
+		}
+		else
+		{
+			logConversionError("Invalid OscarCode code '" + oscarCodeStr + "' could not be loaded");
+		}
+	}
+
+	private void logConversionError(String message)
+	{
+		PatientExportContext context = patientExportContextService.getContext();
+		if(context != null)
+		{
+			context.getExportLogger().logEvent("[" + context.getCurrentProcessIdentifier() + "] " + message);
+		}
+		else
+		{
+			MiscUtils.getLogger().warn(message);
 		}
 	}
 }

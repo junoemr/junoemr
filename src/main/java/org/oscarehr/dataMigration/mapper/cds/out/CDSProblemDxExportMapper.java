@@ -41,9 +41,21 @@ public class CDSProblemDxExportMapper extends AbstractCDSNoteExportMapper<Proble
 	{
 		ProblemList problemList = objectFactory.createProblemList();
 
-		// if diagnosis code is filled and there is no free text, ProblemDiagnosisDescription should match the code description
-		problemList.setProblemDiagnosisDescription(exportStructure.getCodeDescription());
-		problemList.setDiagnosisCode(getDiagnosisCode(exportStructure));
+		DxRecord.DxCodingSystem dxCodingSystem = exportStructure.getCodingSystem();
+		// export with coding system if possible
+		if(dxCodingSystem != null && dxCodingSystem.getCdsCodingSystem() != null)
+		{
+			// if diagnosis code is filled and there is no free text, ProblemDiagnosisDescription should match the code description
+			problemList.setProblemDiagnosisDescription(exportStructure.getCodeDescription());
+			problemList.setDiagnosisCode(getDiagnosisCode(exportStructure, dxCodingSystem.getCdsCodingSystem()));
+		}
+		else // export similar to notes
+		{
+			problemList.setProblemDescription(
+					((dxCodingSystem != null) ? dxCodingSystem.getValue() : "") +
+							"[" + exportStructure.getDxCode() + "]: "
+							+ exportStructure.getCodeDescription());
+		}
 
 		problemList.setProblemStatus(exportStructure.getStatus().name());
 		problemList.setOnsetDate(toNullableDateFullOrPartial(exportStructure.getStartDate()));
@@ -56,12 +68,10 @@ public class CDSProblemDxExportMapper extends AbstractCDSNoteExportMapper<Proble
 		return problemList;
 	}
 
-	protected StandardCoding getDiagnosisCode(DxRecord exportStructure)
+	protected StandardCoding getDiagnosisCode(DxRecord exportStructure, CDSConstants.CodingSystem codingSystem)
 	{
-		String codingSystem = (exportStructure.getCodingSystem() != null) ? exportStructure.getCodingSystem().getValue() : CDSConstants.CodingSystem.ICD9.getValue();
-
 		StandardCoding standardCoding = objectFactory.createStandardCoding();
-		standardCoding.setStandardCodingSystem(codingSystem);
+		standardCoding.setStandardCodingSystem(codingSystem.getValue());
 		standardCoding.setStandardCode(exportStructure.getDxCode());
 		standardCoding.setStandardCodeDescription(exportStructure.getCodeDescription());
 		return standardCoding;
