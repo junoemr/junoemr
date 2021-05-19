@@ -62,8 +62,6 @@ public class DemographicRosterService
 		demographicRoster.setDemographicId(demographic.getDemographicId());
 		demographicRoster.setRosterDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterDate()));
 
-		// Going to take a second look at this
-		// Optional implies, well, optional, but we require this
 		Optional<RosterStatus> rosterStatus = rosterStatusService.findByStatus(demographic.getRosterStatus());
 		rosterStatus.ifPresent(demographicRoster::setRosterStatus);
 

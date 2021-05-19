@@ -48,7 +48,7 @@ angular.module('Record.Details').component('rosteredHistoryModal', {
                     ctrl.rosteredHistory = data.data.body.map((entry) => {
                         return {
                             statusDescription: entry.rosterStatus.statusDescription,
-                            provider: entry.providerFullName,
+                            rosteredPhysician: entry.rosteredPhysician,
                             rosterDate: entry.rosterDate == null? "" :
                                 Juno.Common.Util.formatMomentDate(
                                     Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterDate)),
