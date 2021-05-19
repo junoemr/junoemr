@@ -36,6 +36,7 @@ import org.oscarehr.provider.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -82,6 +83,7 @@ public class AllergyService
 			allergyNote.setProvider(providerData);
 			allergyNote.setSigningProvider(providerData);
 			allergyNote.setDemographic(dbDemographic);
+			allergyNote.setObservationDate(ConversionUtils.toLegacyDate(allergy.getStartDate().toLocalDate()));
 			encounterNoteService.saveAllergyNote(allergyNote, dbAllergy);
 		}
 	}

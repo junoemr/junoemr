@@ -116,6 +116,7 @@ public class MedicationService
 			medicationNote.setProvider(providerData);
 			medicationNote.setSigningProvider(providerData);
 			medicationNote.setDemographic(demographic);
+			medicationNote.setObservationDate(drug.getRxDate());
 			encounterNoteService.saveDrugNote(medicationNote, drug);
 		}
 	}

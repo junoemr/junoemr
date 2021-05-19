@@ -319,6 +319,7 @@ public class PatientImportService
 				immunizationNote.setProvider(providerData);
 				immunizationNote.setSigningProvider(providerData);
 				immunizationNote.setDemographic(dbDemographic);
+				immunizationNote.setObservationDate(prevention.getPreventionDate());
 				encounterNoteService.savePreventionNote(immunizationNote, prevention);
 			}
 		}
