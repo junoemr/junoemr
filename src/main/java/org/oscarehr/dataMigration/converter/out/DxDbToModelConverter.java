@@ -22,14 +22,22 @@
  */
 package org.oscarehr.dataMigration.converter.out;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.oscarehr.common.dao.Icd9Dao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
+import org.oscarehr.dataMigration.service.context.PatientExportContext;
+import org.oscarehr.dataMigration.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxRecord>
@@ -37,38 +45,62 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 	@Autowired
 	private Icd9Dao icd9Dao;
 
+	@Autowired
+	protected PatientExportContextService patientExportContextService;
+
 	@Override
 	public DxRecord convert(Dxresearch input)
 	{
 		DxRecord dxRecord = new DxRecord();
-		CDSConstants.CodingSystem codingSystem = CDSConstants.CodingSystem.fromValue(input.getCodingSystem());
 
 		dxRecord.setId(input.getId());
-		dxRecord.setCodingSystem(codingSystem);
-		dxRecord.setDxCode(input.getDxresearchCode());
-		dxRecord.setCodeDescription(getCodeDescription(codingSystem, input.getDxresearchCode()));
 		dxRecord.setStatus(DxRecord.Status.fromValue(input.getStatus()));
 		dxRecord.setStartDate(ConversionUtils.toNullableLocalDate(input.getStartDate()));
 		dxRecord.setUpdateDate(ConversionUtils.toLocalDateTime(input.getUpdateDate()));
 		dxRecord.setProvider(findProvider(input.getProviderNo()));
 
-		return dxRecord;
+		CDSConstants.CodingSystem codingSystem = CDSConstants.CodingSystem.fromValue(input.getCodingSystem());
+		boolean valid = fillCodeInfo(dxRecord, codingSystem, input.getDxresearchCode());
+		return (valid) ? dxRecord : null; // only return valid entries. null can be filtered out
 	}
 
-	private String getCodeDescription(CDSConstants.CodingSystem codingSystem, String code)
+	// override to filter null values
+	@Override
+	public List<DxRecord> convert(Collection<Dxresearch> entities)
 	{
-		String description = null;
+		return entities.stream().map(this::convert).filter(Objects::nonNull).collect(Collectors.toList());
+	}
+
+	private boolean fillCodeInfo(DxRecord dxRecord, CDSConstants.CodingSystem codingSystem, String code)
+	{
 		if(codingSystem != null && code != null)
 		{
 			switch(codingSystem)
 			{
-				case ICD9: {
-					Icd9 icd9 = icd9Dao.findByCode(code);
-					description = icd9.getDescription();
-					break;
-				}
+				case ICD9: fillIcd9Info(dxRecord, code); break;
+				default: throw new NotImplementedException(codingSystem + " dx conversion not implemented");
 			}
 		}
-		return description;
+		return (dxRecord.getDxCode() != null);
+	}
+
+	private void fillIcd9Info(DxRecord dxRecord, String icd9Code)
+	{
+		Icd9 icd9 = icd9Dao.findByCode(icd9Code);
+		if(icd9 != null)
+		{
+			dxRecord.setCodingSystem(CDSConstants.CodingSystem.ICD9);
+			dxRecord.setDxCode(icd9.getCode());
+			dxRecord.setCodeDescription(icd9.getDescription());
+		}
+		else
+		{
+			PatientExportContext context = patientExportContextService.getContext();
+			String message = "Invalid icd9 code '" + icd9Code + "' could not be loaded";
+			if(context != null)
+			{
+				context.getExportLogger().logEvent("[" + context.getCurrentProcessIdentifier() + "] " + message);
+			}
+		}
 	}
 }
