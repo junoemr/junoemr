@@ -28,6 +28,7 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
 import org.oscarehr.demographic.model.Demographic;
@@ -35,7 +36,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicIntegration;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-
+import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
@@ -69,6 +70,9 @@ public class DemographicService
 	@Autowired
 	private DemographicDao demographicDao;
 
+	@Autowired
+	private DemographicCustDao demographicCustDao;
+
 	// ONLY FOR LEGACY SUPPORT. DO NOT USE
 	@Autowired
 	private org.oscarehr.common.dao.DemographicDao legacyDemographicDao;
@@ -88,6 +92,9 @@ public class DemographicService
 	@Autowired
 	private IntegrationPushUpdateService integrationPushUpdateService;
 
+	@Autowired
+	private DemographicModelToDbConverter demographicModelToDBConverter;
+
 	public enum SEARCH_MODE
 	{
 		demographicNo, name, phone, dob, address, hin, chart_no, email
@@ -102,7 +109,7 @@ public class DemographicService
 	{
 		Demographic demographic = demographicDao.find(demographicNo);
 		List<DemographicExt> demoExtras = demographic.getDemographicExtList();
-		DemographicCust demoCustom = demographic.getDemographicCust().get(0);
+		DemographicCust demoCustom = demographic.getDemographicCust();
 
 		return DemographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
 	}
@@ -332,6 +339,15 @@ public class DemographicService
 
 		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
 	}
+	public Demographic addNewDemographicRecord(String providerNoStr, org.oscarehr.dataMigration.model.demographic.Demographic demographicModel)
+	{
+		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
+		List<DemographicExt> demographicExtensions = demographic.getDemographicExtList();
+		DemographicCust demoCustom = demographic.getDemographicCust();
+
+		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
+	}
+
 	public Demographic addNewDemographicRecord(String providerNoStr, Demographic demographic,
 	                                    DemographicCust demoCustom, List<DemographicExt> demographicExtensions)
 	{
@@ -343,7 +359,8 @@ public class DemographicService
 		{
 			// save the custom fields
 			demoCustom.setId(demographicNo);
-			demographicManager.createUpdateDemographicCust(providerNoStr, demoCustom);
+			demoCustom.setDemographic(demographic);
+			demographicCustDao.persist(demoCustom);
 		}
 		for(DemographicExt extension : demographicExtensions)
 		{

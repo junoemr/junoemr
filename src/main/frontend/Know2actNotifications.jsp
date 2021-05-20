@@ -30,7 +30,7 @@
 
 <html lang="en" ng-app="oscarProviderViewModule">
 <head></head>
-<body ng-controller="Admin.Integration.Know2act.k2aNotificationController as k2aNoteCtrl">
+<body ng-controller="Admin.Section.Know2act.k2aNotificationController as k2aNoteCtrl">
 
 <!--
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
@@ -38,7 +38,7 @@
 -->
 <!-- Hide the main program nav as a fix for having angular in an iframe/window -->
 <!--
-<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
+<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/section/know2act/Know2actHideNavBars.css">
 -->
 
 <div class="k2a-notification">

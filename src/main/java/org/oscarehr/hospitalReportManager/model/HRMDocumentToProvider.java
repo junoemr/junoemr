@@ -9,72 +9,43 @@
 
 package org.oscarehr.hospitalReportManager.model;
 
-import java.util.Date;
+import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.util.Date;
 
-import org.oscarehr.common.model.AbstractModel;
-
+@Data
 @Entity
-public class HRMDocumentToProvider extends AbstractModel<Integer>  {
-
+public class HRMDocumentToProvider extends AbstractModel<Integer>
+{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	private String providerNo;
-	private String hrmDocumentId;
-	private Integer signedOff =0;
+	private boolean viewed;
+	private boolean signedOff;
 	private Date signedOffTimestamp;
-	private Integer viewed = 0;
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "hrmDocumentId")
+	private HRMDocument hrmDocument;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "providerNo", insertable = false, updatable = false)
+	private ProviderData provider;
+
 	@Override
-    public Integer getId() {
-	    return id;
-    }
-
-	public String getProviderNo() {
-    	return providerNo;
-    }
-
-	public void setProviderNo(String providerNo) {
-    	this.providerNo = providerNo;
-    }
-
-	public Integer getSignedOff() {
-    	return signedOff;
-    }
-
-	public void setSignedOff(Integer signedOff) {
-    	this.signedOff = signedOff;
-    }
-
-	public Date getSignedOffTimestamp() {
-    	return signedOffTimestamp;
-    }
-
-	public void setSignedOffTimestamp(Date signedOffTimestamp) {
-    	this.signedOffTimestamp = signedOffTimestamp;
-    }
-
-	public String getHrmDocumentId() {
-    	return hrmDocumentId;
-    }
-
-	public void setHrmDocumentId(String hrmDocumentId) {
-    	this.hrmDocumentId = hrmDocumentId;
-    }
-
-	public Integer getViewed() {
-    	return viewed;
-    }
-
-	public void setViewed(Integer viewed) {
-    	this.viewed = viewed;
-    }
-	
-	
+	public Integer getId()
+	{
+		return id;
+	}
 }

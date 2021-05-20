@@ -346,4 +346,11 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		String result = resultList.get(0);
 		return (ConversionUtils.fromIntString(result)) + 1;
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<ProviderData> findNoteEditors(String noteUuid) {
+		Query query = entityManager.createQuery("SELECT distinct p FROM ProviderData p INNER JOIN p.caseManagementNotes cmn WHERE cmn.uuid = :uuid");
+		query.setParameter("uuid", noteUuid);
+		return query.getResultList();
+	}
 }

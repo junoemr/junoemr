@@ -483,6 +483,31 @@ Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, m
 	).result;
 };
 
+Juno.Common.Util.showProgressBar = function showProgressBar($uibModal, $q, deferral, title, style)
+{
+	let deferred = $q.defer();
+
+	$uibModal.open(
+		{
+			component: 'junoProgressModalComponent',
+			backdrop: 'static',
+			windowClass: "juno-progress-modal",
+			resolve: {
+				title: () => title,
+				deferral: () => deferral,
+				style: () => style,
+			}
+		}
+	).result.then((result) =>
+	{
+		deferred.resolve(result);
+	}).catch((reason) =>
+	{
+		deferred.reject(reason);
+	});
+	return deferred.promise;
+};
+
 /**
  * open a telehealth window for the specified appointment
  * @param demographicNo - the demographic who the appointment is for

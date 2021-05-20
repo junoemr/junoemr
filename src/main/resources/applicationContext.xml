@@ -334,6 +334,7 @@
 	<bean id="encounterTeamService" class="org.oscarehr.casemgmt.service.EncounterTeamService" autowire="byName" />
 	<bean id="encounterTicklerService" class="org.oscarehr.casemgmt.service.EncounterTicklerService" autowire="byName" />
 	<bean id="encounterUnresolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService" autowire="byName" />
+	<bean id="encounterHRMService" class="org.oscarehr.casemgmt.service.EncounterHRMService" autowire="byName" />
 
 	<!-- This is from the applicationContextCaisi.xml, but there is a struts action that relies -->
 	<!-- on it existing. -->

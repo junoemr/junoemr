@@ -78,7 +78,9 @@ import cdshrm.TransactionInformationDocument.TransactionInformation;
 /**
  *
  * @author ronnie
+ * @deprecated - use HRMFileParser with the hrm model instead
  */
+@Deprecated
 public class CreateHRMFile {
 
     static public void create(DemographicsDocument.Demographics demographic, List<ReportsReceivedDocument.ReportsReceived> reports, String filepath) {

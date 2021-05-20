@@ -48,6 +48,8 @@ import static oscar.util.StringUtils.filterControlCharacters;
 public class DemographicExt extends AbstractModel<Integer> implements Serializable {
 
 	public static final String KEY_DEMO_CELL = "demo_cell";
+	public static final String KEY_DEMO_H_PHONE_EXT = "hPhoneExt";
+	public static final String KEY_DEMO_W_PHONE_EXT = "wPhoneExt";
 
 	@Transient
     private int hashCode = Integer.MIN_VALUE;// primary key

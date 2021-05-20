@@ -425,6 +425,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		sectionList.add(EncounterSection.TYPE_MESSENGER);
 		sectionList.add(EncounterSection.TYPE_MEASUREMENTS);
 		sectionList.add(EncounterSection.TYPE_CONSULTATIONS);
+		sectionList.add(EncounterSection.TYPE_HRM);
 		sectionList.add(EncounterSection.TYPE_ALLERGIES);
 		sectionList.add(EncounterSection.TYPE_MEDICATIONS);
 		sectionList.add(EncounterSection.TYPE_UNRESOLVED_ISSUES);
@@ -492,6 +493,11 @@ public class JunoEncounterAction extends DispatchActionSupport
 		leftSections.add(EncounterSection.TYPE_MESSENGER);
 		leftSections.add(EncounterSection.TYPE_MEASUREMENTS);
 		leftSections.add(EncounterSection.TYPE_CONSULTATIONS);
+
+		if(OscarProperties.getInstance().hasHRMDocuments())
+		{
+			leftSections.add(EncounterSection.TYPE_HRM);
+		}
 
 		junoEncounterForm.setLeftNoteSections(leftSections);
 

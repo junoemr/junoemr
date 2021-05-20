@@ -75,13 +75,13 @@ public class LabService
 		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, null, null, null);
 	}
 
-	public void persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
+	public Hl7TextMessage persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
 	                             Demographic demographic, List<ProviderData> providerList) throws UnsupportedEncodingException
 	{
-		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, demographic, providerList, null);
+		return persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, demographic, providerList, null);
 	}
 
-	public void persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
+	public Hl7TextMessage persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
 	                             Demographic demographic, List<ProviderData> providerList, String inboxRouteStatus) throws UnsupportedEncodingException
 	{
 		String labType = messageHandler.getMsgType();
@@ -124,7 +124,7 @@ public class LabService
 
 		//TODO additional logic for lab uploads. Most of the lab specific stuff that should get moved to the handler
 
-		persistNewHL7Lab(hl7TextMessage, hl7TextInfo, demographic, providerList, inboxRouteStatus);
+		return persistNewHL7Lab(hl7TextMessage, hl7TextInfo, demographic, providerList, inboxRouteStatus);
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class LabService
 		return discipline;
 	}
 
-	private void persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, List<ProviderData> providerList, String inboxRouteStatus)
+	private Hl7TextMessage persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, List<ProviderData> providerList, String inboxRouteStatus)
 	{
 		hl7TextMessageDao.persist(hl7TextMessage);
 
@@ -189,6 +189,7 @@ public class LabService
 		{
 			routeToProvider(hl7TextMessage.getId(), ProviderLabRoutingDao.PROVIDER_UNMATCHED, inboxRouteStatus);
 		}
+		return hl7TextMessage;
 	}
 
 	private void routeToDemographic(int labId, Integer demographicNo)

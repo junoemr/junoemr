@@ -29,6 +29,8 @@ import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.dataMigration.converter.in.AppointmentModelToDbConverter;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
@@ -93,6 +95,9 @@ public class Appointment
 	IntegrationService integrationService;
 
 	@Autowired
+	AppointmentModelToDbConverter appointmentModelToDbConverter;
+
+	@Autowired
 	private LookupListManager lookupListManager;
 
 	@Autowired
@@ -149,8 +154,8 @@ public class Appointment
 	 * @param loggedInInfo - logged in info.
 	 */
 	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
-																																	LoggedInInfo loggedInInfo, HttpServletRequest request,
-																																	boolean sendNotification)
+	                                                                LoggedInInfo loggedInInfo, HttpServletRequest request,
+	                                                                boolean sendNotification)
 	{
 		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
 		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
@@ -197,7 +202,7 @@ public class Appointment
 	 * @param sendNotification - Whether to send notification of appointment booking to user or not.
 	 */
 	public org.oscarehr.common.model.Appointment saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
-																																						LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
+	                                                                          LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
 	{
 		if (!appointment.getIsVirtual())
 		{
@@ -241,6 +246,29 @@ public class Appointment
 				request.getRemoteAddr());
 
 		return appointment;
+	}
+
+	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.dataMigration.model.appointment.Appointment appointment, Demographic demographic)
+	{
+		org.oscarehr.common.model.Appointment dbAppointment = appointmentModelToDbConverter.convert(appointment);
+		dbAppointment.setDemographicNo(demographic.getDemographicId());
+
+		// for now, Juno does not handle null values in these fields well, so set them to empty string
+		dbAppointment.setReason(StringUtils.trimToEmpty(dbAppointment.getReason()));
+		dbAppointment.setType(StringUtils.trimToEmpty(dbAppointment.getType()));
+		dbAppointment.setLocation(StringUtils.trimToEmpty(dbAppointment.getLocation()));
+		dbAppointment.setResources(StringUtils.trimToEmpty(dbAppointment.getResources()));
+
+		oscarAppointmentDao.persist(dbAppointment);
+		return dbAppointment;
+	}
+
+	public void saveNewAppointments(List<org.oscarehr.dataMigration.model.appointment.Appointment> appointmentList, Demographic demographic)
+	{
+		for(org.oscarehr.dataMigration.model.appointment.Appointment appointment : appointmentList)
+		{
+			saveNewAppointment(appointment, demographic);
+		}
 	}
 
 	/**

@@ -70,6 +70,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
+
 /**
  * Will provide access to demographic data, as well as closely related data such as 
  * extensions (DemographicExt), merge data, archive data, etc.
@@ -791,11 +793,17 @@ public class DemographicManager {
 		checkPrivilege(loggedInInfo.getLoggedInProviderNo(), privilege);
 	}
 	private void checkPrivilege(String providerNo, String privilege) {
-		securityInfoManager.requireOnePrivilege(providerNo, privilege, null, "_demographic");
+		if(!SYSTEM_PROVIDER_NO.equals(providerNo))
+		{
+			securityInfoManager.requireOnePrivilege(providerNo, privilege, null, "_demographic");
+		}
 	}
 
 	private void checkPrivilege(String providerNo, String privilege, int demographicNo) {
-		securityInfoManager.requireOnePrivilege(providerNo, privilege, demographicNo, "_demographic");
+		if(!SYSTEM_PROVIDER_NO.equals(providerNo))
+		{
+			securityInfoManager.requireOnePrivilege(providerNo, privilege, demographicNo, "_demographic");
+		}
 	}
 
 	public void addDemographicWithValidation(LoggedInInfo loggedInInfo, Demographic demographic) throws Exception

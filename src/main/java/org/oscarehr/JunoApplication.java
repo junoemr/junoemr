@@ -24,8 +24,10 @@
 package org.oscarehr;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.init.OscarPropertiesInitializer;
+import org.oscarehr.init.OscarPropertiesInitializerHeadless;
+import org.oscarehr.init.OscarPropertiesInitializerWeb;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,6 +35,8 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
+
+import java.io.IOException;
 
 
 @SpringBootApplication
@@ -49,20 +53,34 @@ public class JunoApplication extends SpringBootServletInitializer
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application)
 	{
 		logger.info("Starting Juno (JunoApplication.configure())");
+
 		return JunoApplication.initSpring(application);
 	}
 
 	// This is used to start the app from Intellij or when running the war file directly
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
-		logger.info("Starting Juno (JunoApplication.main())");
-		JunoApplication.initSpring(new SpringApplicationBuilder(JunoApplication.class)).run(args);
+		if(args.length != 0)
+		{
+			logger.info("Starting Juno (JunoApplication.main()) in headless mode");
+
+			new OscarPropertiesInitializerHeadless().initialize();
+			new SpringApplicationBuilder(JunoApplication.class)
+					.web(WebApplicationType.NONE)
+					.sources(JunoApplication.class)
+					.run(args);
+		}
+		else
+		{
+			logger.info("Starting Juno (JunoApplication.main())");
+			JunoApplication.initSpring(new SpringApplicationBuilder(JunoApplication.class).web(WebApplicationType.SERVLET)).run(args);
+		}
 	}
 
 	private static SpringApplicationBuilder initSpring(SpringApplicationBuilder application)
 	{
 		return application
 			.sources(JunoApplication.class)
-			.initializers(new OscarPropertiesInitializer());
+			.initializers(new OscarPropertiesInitializerWeb());
 	}
 }

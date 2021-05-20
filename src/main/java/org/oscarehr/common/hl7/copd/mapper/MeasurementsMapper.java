@@ -30,9 +30,9 @@ import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.service.CoPDImportService;
-import org.oscarehr.demographicImport.transfer.CoPDRecordData;
-import org.oscarehr.demographicImport.transfer.CoPDRecordMessage;
+import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.transfer.CoPDRecordData;
+import org.oscarehr.dataMigration.transfer.CoPDRecordMessage;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.provider.model.ProviderData;
@@ -40,6 +40,12 @@ import org.oscarehr.provider.model.ProviderData;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_BLOOD_PRESSURE;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_HEIGHT;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WAIST;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WEIGHT;
 
 public class MeasurementsMapper extends AbstractMapper
 {
@@ -83,27 +89,27 @@ public class MeasurementsMapper extends AbstractMapper
 
 			if (miniHealth != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "MMSE", miniHealth, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM, miniHealth, obsDate));
 			}
 
 			if (systolicBP != null && diastolicBP != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "BP", systolicBP + "/" + diastolicBP, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_BLOOD_PRESSURE, systolicBP + "/" + diastolicBP, obsDate));
 			}
 
 			if (height != null && !height.equals("0.0"))
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "HT", height, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_HEIGHT, height, obsDate));
 			}
 
 			if (weight != null && !weight.equals("0.0"))
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "WT", weight, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WEIGHT, weight, obsDate));
 			}
 
 			if (waist != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "WAIS", waist, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WAIST, waist, obsDate));
 			}
 		}
 

@@ -318,6 +318,13 @@
 	</div><!-- modal-body -->		
 		
 	<div class="modal-footer">
+		<div class="annotation-button-wrapper pull-left">
+			<juno-button click="groupNotesCtrl.openAnnotation()"
+			             title="open annotation window"
+			             disabled="!groupNotesCtrl.groupNotesForm.encounterNote.noteId">
+				<i class="icon icon-day-sheet"></i>
+			</juno-button>
+		</div>
 		<!-- TODO-legacy: see what of these can be functions inline or maybe obsolete???
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>" title='<bean:message key="oscarEncounter.Index.btnCopy"/>' onclick="copyCppToCurrentNote(); return false;"> 
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>" title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>' id="anno" style="padding-right: 10px;"> 

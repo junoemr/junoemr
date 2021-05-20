@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 
 import javax.persistence.CascadeType;
@@ -37,6 +38,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -130,6 +132,10 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
     private String supervisor;
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
+
+    // this mapping allows jpa relational query joins in the dao
+	@OneToMany(fetch=FetchType.LAZY , mappedBy="provider")
+	private List<CaseManagementNote> caseManagementNotes;
 
 	/* -- Province specific -- */
 
@@ -249,6 +255,17 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	}
 	public void setWorkPhone(String s) {
 		workPhone = s;
+	}
+
+	public String getCellPhone()
+	{
+		String comments = getComments();
+		String cellNo = null;
+		if(comments != null && comments.contains("<xml_p_cell>"))
+		{
+			cellNo = StringUtils.substringBetween(getComments(), "<xml_p_cell>", "</xml_p_cell>");
+		}
+		return cellNo;
 	}
 
 	public String getOhipNo() {

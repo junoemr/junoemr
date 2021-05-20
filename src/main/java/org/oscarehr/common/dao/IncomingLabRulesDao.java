@@ -26,6 +26,8 @@
 package org.oscarehr.common.dao;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.Query;
 
@@ -63,15 +65,15 @@ public class IncomingLabRulesDao extends AbstractDao<IncomingLabRules>{
 		
 		return results;
 	}
-	
-	public List<IncomingLabRules> findCurrentByProviderNo(String providerNo) {
-		Query q = entityManager.createQuery("select i from IncomingLabRules i where i.providerNo=?1 and i.archive=?2");
-		q.setParameter(1, providerNo);
-		q.setParameter(2, "0");
-		
+
+	public List<IncomingLabRules> findCurrentByProviderNo(String providerNo)
+	{
+		Query q = entityManager.createQuery("select i from IncomingLabRules i where i.providerNo=:providerNo and i.archive=:archive");
+		q.setParameter("providerNo", providerNo);
+		q.setParameter("archive", "0");
+
 		@SuppressWarnings("unchecked")
 		List<IncomingLabRules> results = q.getResultList();
-		
 		return results;
 	}
 	
@@ -83,6 +85,25 @@ public class IncomingLabRulesDao extends AbstractDao<IncomingLabRules>{
 		List<IncomingLabRules> results = q.getResultList();
 		
 		return results;
+	}
+
+	/**
+	 * find all current lab forwarding rules separated & mapped by providerId
+	 * @return - mapped rules, with providerId as the map key
+	 */
+	public Map<String, List<IncomingLabRules>> findActiveAsProviderMap()
+	{
+		String jpql = "SELECT x \n" +
+				"FROM IncomingLabRules x \n" +
+				"WHERE x.archive = :archive ";
+		return entityManager.createQuery(jpql, IncomingLabRules.class)
+				.setParameter("archive", "0")
+				.getResultStream()
+				.collect(
+						Collectors.groupingBy(
+								IncomingLabRules::getProviderNo
+						)
+				);
 	}
 
 	/**

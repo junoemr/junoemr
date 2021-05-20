@@ -58,6 +58,22 @@ import static oscar.util.StringUtils.filterControlCharacters;
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {
+	public static final String GENDER_MALE = "M";
+	public static final String GENDER_FEMALE = "F";
+	public static final String GENDER_OTHER = "O";
+	public static final String GENDER_TRANSGENDER = "T";
+	public static final String GENDER_UNKNOWN = "U";
+
+	public static final String STATUS_ACTIVE = "AC";
+	public static final String STATUS_DECEASED = "DE";
+	public static final String STATUS_INACTIVE = "IN";
+
+	public static final String ROSTER_STATUS_FEE_SERVICE = "FS";
+	public static final String ROSTER_STATUS_ROSTERED = "RO";
+	public static final String ROSTER_STATUS_NOT_ROSTERED = "NR";
+	public static final String ROSTER_STATUS_TERMINATED = "TE";
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "demographic_no")
@@ -178,8 +194,8 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@Column(name = "name_of_father")
 	private String nameOfFather;
 
-	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id")
-	private List<DemographicCust> demographicCust;
+	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic")
+	private DemographicCust demographicCust;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
 	private List<DemographicExt> demographicExtList;
@@ -804,12 +820,12 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.nameOfFather = father;
 	}
 
-	public List<DemographicCust> getDemographicCust()
+	public DemographicCust getDemographicCust()
 	{
 		return demographicCust;
 	}
 
-	public void setDemographicCust(List<DemographicCust> demographicCust)
+	public void setDemographicCust(DemographicCust demographicCust)
 	{
 		this.demographicCust = demographicCust;
 	}

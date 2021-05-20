@@ -1,0 +1,20 @@
+#admin-demographic-import {
+	max-width: 800px;
+
+	.row {
+		margin-bottom: 16px;
+
+		p {
+			@include juno-font-default-size(10px);
+			padding: 0 8px;
+
+			&.notice {
+				background-color: var(--color-orange-lightest);
+				border-color: var(--color-orange-lighter);
+				color: var(--color-orange-darkest);
+				border-radius: 4px;
+				padding: 8px;
+			}
+		}
+	}
+}

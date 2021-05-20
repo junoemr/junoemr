@@ -29,8 +29,8 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographicImport.service.CoPDImportService;
-import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
+import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDPreProcessorService;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 

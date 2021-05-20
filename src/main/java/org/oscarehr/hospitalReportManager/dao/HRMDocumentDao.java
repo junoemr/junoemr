@@ -19,6 +19,7 @@ import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@SuppressWarnings("unchecked")
 public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 
 	public HRMDocumentDao() {
@@ -29,9 +30,20 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);
-		@SuppressWarnings("unchecked")
-		List<HRMDocument> documents = query.getResultList();
-		return documents;
+
+		return query.getResultList();
+	}
+
+	public List<HRMDocument> findByDemographicId(Integer demographicId)
+	{
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x " +
+				"INNER JOIN x.documentToDemographicList d " +
+				"WHERE d.demographic.id = :demographicId " +
+				"ORDER BY x.id";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("demographicId", demographicId);
+
+		return query.getResultList();
 	}
 	
 	public List<HRMDocument> findAll(int offset, int limit) {
@@ -39,18 +51,15 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		Query query = entityManager.createQuery(sql);
 		query.setFirstResult(offset);
 		query.setMaxResults(limit);
-		
-		@SuppressWarnings("unchecked")
-		List<HRMDocument> documents = query.getResultList();
-		return documents;
+
+		return query.getResultList();
 	}
 	
 	
 	public List<Integer> findByHash(String hash) {
-		String sql = "select distinct id from " + this.modelClass.getName() + " x where x.reportHash=?1";
+		String sql = "select distinct x.id from " + this.modelClass.getName() + " x where x.reportHash=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hash);
-		@SuppressWarnings("unchecked")
 		List<Integer> matches = query.getResultList();
 		return matches;
 	}
@@ -59,20 +68,19 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		String sql = "select x from " + this.modelClass.getName() + " x where x.reportLessTransactionInfoHash=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hash);
-		@SuppressWarnings("unchecked")
-		List<HRMDocument> matches = query.getResultList();
-		return matches;
+
+		return query.getResultList();
 	}
 	
 	@SuppressWarnings("unchecked")
     public List<Integer> findAllWithSameNoDemographicInfoHash(String hash) {
-		String sql = "select distinct parentReport from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?1";
+		String sql = "select distinct x.parentReport from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hash);
 		List<Integer> matches = query.getResultList();
 		
 		if (matches != null && matches.size() == 1 && matches.get(0) == null) {
-			sql = "select distinct id from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?1";
+			sql = "select distinct x.id from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?1";
 			query = entityManager.createQuery(sql);
 			query.setParameter(1, hash);
 			matches = query.getResultList();

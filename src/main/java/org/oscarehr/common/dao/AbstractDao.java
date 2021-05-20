@@ -140,7 +140,10 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		Criteria criteria = session.createCriteria(modelClass);
 		criteria = criteriaSearch.setCriteriaProperties(criteria);
 
-		criteria.setMaxResults(criteriaSearch.getLimit());
+		if(!criteriaSearch.hasNoLimit())
+		{
+			criteria.setMaxResults(criteriaSearch.getLimit());
+		}
 		criteria.setFirstResult(criteriaSearch.getOffset());
 
 		return criteria.list();

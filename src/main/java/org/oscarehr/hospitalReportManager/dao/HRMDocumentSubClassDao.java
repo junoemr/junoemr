@@ -9,43 +9,45 @@
 
 package org.oscarehr.hospitalReportManager.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class HRMDocumentSubClassDao extends AbstractDao<HRMDocumentSubClass> {
+import javax.persistence.Query;
+import java.util.List;
 
-	public HRMDocumentSubClassDao() {
+@Repository
+@SuppressWarnings("unchecked")
+public class HRMDocumentSubClassDao extends AbstractDao<HRMDocumentSubClass>
+{
+	public HRMDocumentSubClassDao()
+	{
 		super(HRMDocumentSubClass.class);
 	}
 
-	public List<HRMDocumentSubClass> getSubClassesByDocumentId(Integer id) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1";
+	public List<HRMDocumentSubClass> getSubClassesByDocumentId(Integer id)
+	{
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.hrmDocument.id=:documentId";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, id);
-		@SuppressWarnings("unchecked")
-		List<HRMDocumentSubClass> subClasses = query.getResultList();
-		return subClasses;
+		query.setParameter("documentId", id);
+		return query.getResultList();
 	}
-	
-	public List<HRMDocumentSubClass> getActiveSubClassesByDocumentId(Integer id) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1 and x.isActive=1";
+
+	public List<HRMDocumentSubClass> getActiveSubClassesByDocumentId(Integer id)
+	{
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.hrmDocument.id=:documentId and x.active=:active";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, id);
-		@SuppressWarnings("unchecked")
-		List<HRMDocumentSubClass> subClasses = query.getResultList();
-		return subClasses;
+		query.setParameter("documentId", id);
+		query.setParameter("active", true);
+		return query.getResultList();
 	}
-	
-	public boolean setAllSubClassesForDocumentAsInactive(Integer id) {
-		String sql = "update " + this.modelClass.getName() + " x set isActive=false where x.hrmDocumentId=?1";
+
+	public boolean setAllSubClassesForDocumentAsInactive(Integer id)
+	{
+		String sql = "UPDATE " + this.modelClass.getName() + " x SET x.active=:active WHERE x.hrmDocument.id=:documentId";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, id);
+		query.setParameter("documentId", id);
+		query.setParameter("active", false);
 		return query.executeUpdate() > 0;
 	}
 }
