@@ -806,11 +806,6 @@ OscarProperties props = OscarProperties.getInstance();
 				<div id="collapseEight" class="accordion-body collapse">
 				<div class="accordion-inner">
 				<ul>
-<%--				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=false%>">--%>
-<%--					<li><a href='javascript:void(0);'--%>
-<%--						class="xlink" rel="${ctx}/admin/providerAddRole.jsp">--%>
-<%--					<bean:message key="admin.admin.addRole"/></a></li>--%>
-<%--				</security:oscarSec>--%>
 
 				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.document" rights="r" reverse="<%=false%>">			
 								

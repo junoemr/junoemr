@@ -721,12 +721,6 @@ div.logoutBox {
 		<div class="adminBox">
 		<h3>&nbsp;<bean:message key="admin.admin.SystemManagement" /></h3>
 		<ul>
-		<security:oscarSec roleName="<%=roleName$%>"
-			objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=false%>">
-			<li><a href="#"
-				onclick='popupPage(300,600,&quot;<html:rewrite page="/admin/providerAddRole.jsp"/>&quot;);return false;'>
-			<bean:message key="admin.admin.addRole"/></a></li>
-		</security:oscarSec>
 		
 			<li><a href="#"
 				onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/displayDocumentCategories.jsp"/>&quot;);return false;'><bean:message key="admin.admin.DocumentCategories"/></a></li>
