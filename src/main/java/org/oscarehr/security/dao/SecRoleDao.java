@@ -70,21 +70,14 @@ public class SecRoleDao extends AbstractDao<SecRole>
  		return(results);
  	}
 
- 	/** BAD! Stop using this. we want to be able to rename roles */
- 	@Deprecated
-    public SecRole findByName(String name)
-    {
-    	Query q = entityManager.createQuery("select x from SecRole x where x.name=:name");
-
-    	q.setParameter("name", name);
-    	
-    	return this.getSingleResultOrNull(q);
-    }
-
 	public SecRole findSystemDefaultRole()
 	{
+		// this should be the only case where roles are found by name
 		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
-		SecRole defaultRole = this.findByName(providerDefaultRoleName);
+		Query q = entityManager.createQuery("select x from SecRole x where x.name=:name");
+		q.setParameter("name", providerDefaultRoleName);
+
+		SecRole defaultRole = this.getSingleResultOrNull(q);
 		if(defaultRole == null)
 		{
 			throw new IllegalStateException("Default system role '" + providerDefaultRoleName + "' does not exist");
