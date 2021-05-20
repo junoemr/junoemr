@@ -685,11 +685,11 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	{
 		String sql = "SELECT \n" +
 				"    m.id AS measurement_id,\n" +
-				"    MAX(CASE WHEN me.keyval = 'abnormal' THEN me.val END) AS is_abnormal,\n" +
+				"    COALESCE (MAX(CASE WHEN me.keyval = 'abnormal' THEN me.val END), '') AS is_abnormal,\n" +
 				"    m.dataField AS result,\n" +
 				"    m.dateObserved AS dateCollected,\n" +
-				"    MAX(CASE WHEN me.keyval = 'lab_no' THEN me.val END) AS lab_no,\n" +
-				"    MAX(CASE WHEN me.keyval = 'name' THEN me.val END) AS test_name\n" +
+				"    COALESCE (MAX(CASE WHEN me.keyval = 'lab_no' THEN me.val END), '') AS lab_no,\n" +
+				"    COALESCE (MAX(CASE WHEN me.keyval = 'name' THEN me.val END), '') AS test_name\n" +
 				"FROM measurements m\n" +
 				"JOIN measurementsExt me ON m.id=me.measurement_id\n" +
 				"WHERE m.dataField != ''\n" +
