@@ -28,6 +28,7 @@ import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
 import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.stereotype.Component;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
@@ -74,10 +75,18 @@ public class RosterWebService extends AbstractServiceImpl
 	public RestResponse<RosterStatusTransfer> addStatus(RosterStatusTransfer rosterStatusTransfer)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
-		String currentProvider = getCurrentProvider().getProviderNo();
-		rosterStatusTransfer = rosterStatusService.addStatus(rosterStatusTransfer, currentProvider);
+		try
+		{
+			String currentProvider = getCurrentProvider().getProviderNo();
+			rosterStatusTransfer = rosterStatusService.addStatus(rosterStatusTransfer, currentProvider);
 
-		return RestResponse.successResponse(rosterStatusTransfer);
+			return RestResponse.successResponse(rosterStatusTransfer);
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error(e);
+			return RestResponse.errorResponse("Unable to add roster status, offending transfer: " + rosterStatusTransfer);
+		}
 	}
 
 	@PUT
@@ -87,9 +96,17 @@ public class RosterWebService extends AbstractServiceImpl
 			RosterStatusTransfer rosterStatusTransfer)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
-		String currentProvider = getCurrentProvider().getProviderNo();
-		rosterStatusTransfer = rosterStatusService.editStatus(rosterStatusTransfer, currentProvider);
+		try
+		{
+			String currentProvider = getCurrentProvider().getProviderNo();
+			rosterStatusTransfer = rosterStatusService.editStatus(rosterStatusTransfer, currentProvider);
 
-		return RestResponse.successResponse(rosterStatusTransfer);
+			return RestResponse.successResponse(rosterStatusTransfer);
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error(e);
+			return RestResponse.errorResponse("Unable to edit status with id " + id + "\nOffending transfer: " + rosterStatusTransfer);
+		}
 	}
 }

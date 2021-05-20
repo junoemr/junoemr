@@ -30,27 +30,25 @@
                 ng-model="$ctrl.status.statusDescription"
                 disabled="$ctrl.status.systemManaged">
         </juno-input>
-        <div class="roster-status-checkbox-container">
-            <juno-check-box class="roster-status-checkbox"
-                            label="Is Rostered"
-                            component-style="$ctrl.componentStyle"
-                            ng-model="$ctrl.status.rostered"
-                            disabled="$ctrl.status.systemManaged">
-            </juno-check-box>
-            <juno-check-box
-                    class="roster-status-checkbox"
-                    label="Is Terminated"
-                    component-style="$ctrl.componentStyle"
-                    ng-model="$ctrl.status.terminated"
-                    disabled="$ctrl.status.systemManaged">
-            </juno-check-box>
-            <juno-check-box class="roster-status-checkbox"
-                            label="Enabled"
-                            component-style="$ctrl.componentStyle"
-                            ng-model="$ctrl.status.active"
-                            disabled="$ctrl.status.systemManaged">
-            </juno-check-box>
-        </div>
+        <juno-check-box class="roster-status-checkbox"
+                        label="Is Rostered"
+                        component-style="$ctrl.componentStyle"
+                        ng-model="$ctrl.status.rostered"
+                        disabled="$ctrl.status.systemManaged">
+        </juno-check-box>
+        <juno-check-box
+                class="roster-status-checkbox"
+                label="Is Terminated"
+                component-style="$ctrl.componentStyle"
+                ng-model="$ctrl.status.terminated"
+                disabled="$ctrl.status.systemManaged">
+        </juno-check-box>
+        <juno-check-box class="roster-status-checkbox"
+                        label="Enabled"
+                        component-style="$ctrl.componentStyle"
+                        ng-model="$ctrl.status.active"
+                        disabled="$ctrl.status.systemManaged">
+        </juno-check-box>
     </modal-body>
     <modal-footer>
         <div class="col-md-6">

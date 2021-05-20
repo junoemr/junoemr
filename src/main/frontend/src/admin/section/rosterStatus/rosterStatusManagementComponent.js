@@ -93,6 +93,7 @@ angular.module('Admin').component('rosterStatusManagement',
                         {
                             component: 'editStatusModal',
                             backdrop: 'static',
+                            windowClass: 'juno-modal sml',
                             resolve: {
 
                             }

@@ -33,6 +33,12 @@ angular.module('Admin').component('editStatusModal', {
                 {
                     ctrl.editMode = true;
                 }
+                else
+                {
+                    ctrl.status = {
+                        active: true,
+                    };
+                }
             }
 
             ctrl.close = () =>
@@ -58,7 +64,7 @@ angular.module('Admin').component('editStatusModal', {
                 }
                 else
                 {
-                    rosterApi.addStatus(ctrl.status.id, ctrl.status).then(
+                    rosterApi.addStatus(ctrl.status).then(
                         () =>
                         {
                             ctrl.close();

@@ -10,7 +10,7 @@
                             options="$ctrl.familyDoctors"
                             filter-options="false"
                             name="FamilyDoctor"
-                            title="Family Doctor"
+                            title="Family/Enrolled Doctor"
                             placeholder="Family Doctor"
                             label-position="LABEL_POSITION.LEFT"
                             on-change="$ctrl.updateFamilyDoctors(value)"
@@ -66,7 +66,7 @@
                          ng-click="$ctrl.openRosteredHistoryModal()"
                          button-color="JUNO_BUTTON_COLOR.PRIMARY"
                          button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
-                View Rostered History
+                View Enrollment History
             </juno-button>
         </div>
     </div>
