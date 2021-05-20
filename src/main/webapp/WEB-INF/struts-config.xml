@@ -2716,14 +2716,6 @@
 
 		 <action path="/PageMonitoringService" scope="request" type="org.oscarehr.common.web.PageMonitoringAction" parameter="method" />
 
-		<action path="/casemgmt/NotePermissions" type="org.oscarehr.casemgmt.web.NotePermissionsAction"
-			scope="request" validate="false" parameter="method" />
-                        
-                <action path="/BillingInvoice" scope="request" type="org.oscarehr.common.web.BillingInvoiceAction" parameter="method">
-			<forward name="success" path="/billing/CA/ON/billingONCorrection.jsp" />
-                       <forward name="listSuccess" path="/billing/CA/ON/billingONStatus.jsp" />
-		</action>        
-
             <action path="/BillingONReview" scope="request" type="org.oscarehr.common.web.BillingONReviewAction" parameter="method" />
                  
                  <action path="/admin/GroupPreference" name="groupPreference" scope="request" type="org.oscarehr.common.web.GroupPreferenceAction" parameter="method">
