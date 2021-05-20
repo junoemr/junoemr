@@ -318,6 +318,12 @@ public abstract class BaseNoteService
 			note.setUuid(UUID.randomUUID().toString());
 		}
 
+		// signed without a signing provider is invalid. default signing provider to the note provider
+		if(note.getSigned() && note.getSigningProvider() == null)
+		{
+			note.setSigningProvider(note.getProvider());
+		}
+
 		caseManagementNoteDao.persist(note);
 
 		return note;

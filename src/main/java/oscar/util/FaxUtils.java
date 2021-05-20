@@ -113,7 +113,7 @@ public class FaxUtils {
 				
 				// save the note and create the link
 				CaseManagementNote savedNote;
-				if(CaseManagementNoteLink.DOCUMENT.equals(linkType))
+				if(Integer.valueOf(CaseManagementNoteLink.DOCUMENT).equals(linkType))
 				{
 					DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
 					savedNote = encounterNoteService.saveDocumentNote(cmn, documentDao.find(formId));

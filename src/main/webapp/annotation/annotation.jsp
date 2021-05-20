@@ -46,13 +46,21 @@
 		org.oscarehr.casemgmt.model.CaseManagementNote,
 		org.oscarehr.casemgmt.model.CaseManagementNoteLink,
 		org.oscarehr.casemgmt.service.CaseManagementManager,
-		org.oscarehr.security.dao.SecRoleDao,
-		org.oscarehr.security.model.SecRole,
-		org.oscarehr.util.SpringUtils,
 		oscar.oscarEncounter.data.EctProgram,
-		java.util.Date, java.util.List"%>
+		java.util.List"%>
 <%@page import="oscar.log.LogAction, oscar.log.LogConst"%>
-<%@page import="oscar.dms.EDocUtil"%>
+<%@ page import="org.oscarehr.encounterNote.service.EncounterNoteService" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.CASEMGMTNOTE" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.DRUGS" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.ALLERGIES" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.HL7LAB" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.DOCUMENT" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.EFORMDATA" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.DEMOGRAPHIC" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.PREVENTIONS" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.LABTEST2" %>
+<%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.TICKLER" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -65,7 +73,9 @@
     if (attrib_name==null) attrib_name="";
 
     String demo = request.getParameter("demo");
-    String display = request.getParameter("display");
+	Integer demographicId = Integer.parseInt(demo);
+
+	String display = request.getParameter("display");
     boolean saved = Boolean.valueOf(request.getParameter("saved"));
 
     String tid = request.getParameter("table_id");
@@ -81,6 +91,7 @@
 
     WebApplicationContext  ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
     CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
+	EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 
     Integer tableName = cmm.getTableNameByDisplay(display);
     String note = "";
@@ -134,25 +145,43 @@
     if (saved) {
 	String prog_no = new EctProgram(se).getProgram(user_no);
         //create a note with demo, user_no, prog_no
-	CaseManagementNote cmn = createCMNote(historyNote,request.getParameter("note"), demo, user_no, prog_no);
+	org.oscarehr.encounterNote.model.CaseManagementNote cmn = createCMNote(historyNote,request.getParameter("note"), prog_no);
 	if (cmn!=null) {
-	    if (p_cmn!=null) {  //previous annotation exists
-//            if (p_cmn!=null && note !="") { //previous annotation exists
-		cmn.setUuid(uuid); //assign same UUID to new annotation
-	    }
-	    if (tableName.equals(cml.CASEMGMTNOTE) || tableId.equals(0L)) {
-                //new casemgmt_note may be saved AFTER annotation
-		if (!attrib_name.equals("")) se.setAttribute(attrib_name, cmn);
-            }
-	    if (!tableId.equals(0L)) {
-                    cmm.saveNoteSimple(cmn);
-                    cml = new CaseManagementNoteLink();
-                    cml.setTableName(tableName);
-                    cml.setTableId(tableId);
-                    cml.setNoteId(cmn.getId());
-                    cml.setOtherId(oid);                    
-                    cmm.saveNoteLink(cml);
-                    LogAction.addLog(user_no,LogConst.ANNOTATE, display, String.valueOf(tableId), request.getRemoteAddr(), demo, cmn.getNote());                
+		if (p_cmn != null)
+		{
+			//previous annotation exists
+			cmn.setUuid(uuid); //assign same UUID to new annotation
+		}
+		if (tableName.equals(CASEMGMTNOTE) || tableId.equals(0L))
+		{
+			//new casemgmt_note may be saved AFTER annotation
+			if (!attrib_name.equals("")) se.setAttribute(attrib_name, cmn);
+		}
+	    if (!tableId.equals(0L))
+	    {
+		    org.oscarehr.encounterNote.model.CaseManagementNoteLink link = new org.oscarehr.encounterNote.model.CaseManagementNoteLink(cmn);
+		    int tableIdInt = Math.toIntExact(tableId);
+		    switch (tableName)
+		    {
+			    case CASEMGMTNOTE: link.setLinkedCaseManagementNoteId(tableIdInt); break;
+			    case DRUGS: link.setLinkedDrugId(tableIdInt); break;
+			    case ALLERGIES: link.setLinkedAllergyId(tableIdInt); break;
+			    case HL7LAB: {
+			    	link.setLinkedHl7LabId(tableIdInt);
+				    link.setOtherId(oid);
+			    	break;
+			    }
+			    case DOCUMENT: link.setLinkedDocumentId(tableIdInt); break;
+			    case EFORMDATA: link.setLinkedEFormId(tableIdInt); break;
+			    case DEMOGRAPHIC: link.setLinkedDemographicId(tableIdInt); break;
+			    case PREVENTIONS: link.setLinkedPreventionId(tableIdInt); break;
+			    case LABTEST2: link.setLinkedLabPhysicianInfoId(tableIdInt); break;
+			    case TICKLER: link.setLinkedTicklerId(tableIdInt); break;
+		    }
+		    cmn = encounterNoteService.saveChartNote(cmn, user_no, demographicId);
+
+		    LogAction.addLogEntry(user_no, demographicId, LogConst.ANNOTATE, display, LogConst.STATUS_SUCCESS,
+				    String.valueOf(tableId), request.getRemoteAddr(), cmn.getNote());
 	    }
 	}
 	response.sendRedirect("../close.jsp");
@@ -241,35 +270,28 @@
 
 
 <%!
-    CaseManagementNote createCMNote(CaseManagementNote historyNote,String note, String demo_no, String provider, String program_no) {
-	if (!filled(note)) return null;
+	org.oscarehr.encounterNote.model.CaseManagementNote createCMNote(CaseManagementNote historyNote, String note, String program_no)
+	{
+		if (!filled(note)) return null;
 
-	CaseManagementNote cmNote = new CaseManagementNote();
-	    cmNote.setUpdate_date(new Date());
-	    cmNote.setObservation_date(new Date());
-	    cmNote.setDemographic_no(demo_no);
-	    cmNote.setProviderNo(provider);
-	    cmNote.setSigning_provider_no(provider);
-	    cmNote.setSigned(true);
-	    cmNote.setProgram_no(program_no);
-	    
-	    SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");		
-		cmNote.setReporter_caisi_role(doctorRole.getId().toString());
-	    	    
-	    cmNote.setReporter_program_team("0");
-	    cmNote.setNote(note);
-            String historyStr;
+		org.oscarehr.encounterNote.model.CaseManagementNote cmNote = new org.oscarehr.encounterNote.model.CaseManagementNote();
+		cmNote.setSigned(true);
+		cmNote.setProgramNo(program_no);
 
-            if(historyNote==null || historyNote.getHistory()==null || historyNote.getHistory().trim().length()==0 ){
-                historyStr=note;
-            }
-            else{
-                historyStr=note + "\n" + "   ----------------History Record----------------   \n" + historyNote.getHistory().trim() + "\n";
-            }
-            cmNote.setHistory(historyStr);
-	return cmNote;
-    }
+		cmNote.setNote(note);
+		String historyStr;
+
+		if (historyNote == null || historyNote.getHistory() == null || historyNote.getHistory().trim().length() == 0)
+		{
+			historyStr = note;
+		}
+		else
+		{
+			historyStr = note + "\n" + "   ----------------History Record----------------   \n" + historyNote.getHistory().trim() + "\n";
+		}
+		cmNote.setHistory(historyStr);
+		return cmNote;
+	}
 
     boolean filled(String s) {
 	return (s!=null && s.trim().length()>0);
