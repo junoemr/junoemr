@@ -1,8 +1,13 @@
 .message-view {
+	@include juno-font-body-smallest();
 	min-width: 420px;
 
+	.text-grey {
+		color: var(--color-neutral-dark-grey);
+	}
+
 	.footer-strip {
-		height: 40px;
+		min-height: 40px;
 
 		background-color: var(--color-neutral-lightest);
 		border-top: solid 1px var(--color-neutral-light-grey);

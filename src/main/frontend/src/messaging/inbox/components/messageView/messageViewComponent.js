@@ -22,8 +22,9 @@
 */
 
 import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
+import MessagingServiceFactory from "../../../../lib/messaging/factory/MessagingServiceFactory";
 
-angular.module("Messaging.Components").component('messageView', {
+angular.module("Messaging.Components.View").component('messageView', {
 	templateUrl: 'src/messaging/inbox/components/messageView/messageView.jsp',
 	bindings: {
 	},
@@ -35,13 +36,28 @@ angular.module("Messaging.Components").component('messageView', {
 			$stateParams
 		)
 		{
-			let ctrl = this;
+			const ctrl = this;
+			ctrl.backend = $stateParams.backend;
+			ctrl.sourceId = $stateParams.source;
 			ctrl.messageId = $stateParams.messageId;
+			ctrl.messagingService = MessagingServiceFactory.build($stateParams.backend);
 			ctrl.componentStyle = JUNO_STYLE.GREY;
+			ctrl.message = null;
+			ctrl.isLoading = false;
 
 			ctrl.$onInit = async () =>
 			{
-
+				try
+				{
+					ctrl.isLoading = true;
+					ctrl.message = await ctrl.messagingService.getMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), ctrl.messageId);
+					ctrl.conversation = await ctrl.messagingService.getConversation(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), ctrl.message.conversationId);
+				}
+				finally
+				{
+					ctrl.isLoading = false;
+					$scope.$apply();
+				}
 			}
 		}],
 });

@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -20,13 +21,25 @@
  * Victoria, British Columbia
  * Canada
  */
+ 
+package org.oscarehr.integration.myhealthaccess.dto;
 
-package org.oscarehr.integration.myhealthaccess.exception;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-public class RecordNotFoundException extends BaseException
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+
+@Data
+public class AttachmentDto implements Serializable
 {
-	public RecordNotFoundException(String s)
-	{
-		super(s);
-	}
+	protected String id;
+	protected String name;
+	protected String type;
+	protected String description;
+	@JsonProperty("created_at")
+	protected ZonedDateTime createdAt;
+	@JsonProperty("updated_at")
+	protected ZonedDateTime updatedAt;
+	protected String url;
 }

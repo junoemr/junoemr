@@ -1,8 +1,10 @@
+import ActionAlreadyInProgressError from "../error/ActionAlreadyInProgressError";
 
 export default class StreamingList<T> extends Array<T>
 {
 	protected _sources: StreamSource<T>[];
 	protected _comparator: (t1: T, t2: T) => number;
+	protected _isLoading = false;
 
 	// ==========================================================================
 	// Public Methods
@@ -23,21 +25,45 @@ export default class StreamingList<T> extends Array<T>
 	 * load the next, amount items from the stream in to the list.
 	 * @param amount - the amount of items to load.
 	 * @return - the actual number of items loaded (can be lower if at end of list).
+	 * @throws ActionAlreadyInProgressError if another load operation is already under way.
 	 */
 	public async load(amount: number): Promise<number>
 	{
 		let loaded = 0;
-		for(let i = 0; i < amount; i++)
+
+		if (this._isLoading)
 		{
-			const next = await this.getNext();
-			if (next)
+			throw new ActionAlreadyInProgressError("Streaming List is currently loading new items. Please wait for it to complete")
+		}
+
+		try
+		{
+			this._isLoading = true;
+			for (let i = 0; i < amount; i++)
 			{
-				this.push(next);
-				loaded++;
+				const next = await this.getNext();
+				if (next)
+				{
+					this.push(next);
+					loaded++;
+				}
 			}
+		}
+		finally
+		{
+			this._isLoading = false;
 		}
 
 		return loaded;
+	}
+
+	// ==========================================================================
+	// Getters
+	// ==========================================================================
+
+	get isLoading(): boolean
+	{
+		return this._isLoading;
 	}
 
 	// ==========================================================================
@@ -52,7 +78,7 @@ export default class StreamingList<T> extends Array<T>
 	protected async getNext(): Promise<T>
 	{
 		let nextSource: StreamSource<T> = null;
-		for(let source of this._sources)
+		for(const source of this._sources)
 		{
 			if (await source.peekNext() != null)
 			{

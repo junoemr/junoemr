@@ -61,6 +61,51 @@ export default class Message
 	// Getters
 	// ==========================================================================
 
+	get id(): string
+	{
+		return this._id;
+	}
+
+	get conversationId(): string
+	{
+		return this._conversationId;
+	}
+
+	get subject(): string
+	{
+		return this._subject;
+	}
+
+	get message(): string
+	{
+		return this._message;
+	}
+
+	get group(): MessageGroup
+	{
+		return this._group;
+	}
+
+	get isRead(): boolean
+	{
+		return this._read;
+	}
+
+	get sender(): Messageable
+	{
+		return this._sender;
+	}
+
+	get recipients(): Messageable[]
+	{
+		return this._recipients;
+	}
+
+	get metaData(): any
+	{
+		return this._metaData;
+	}
+
 	get createdAtDateTime(): Moment
 	{
 		return this._createdAtDateTime;

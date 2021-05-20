@@ -25,13 +25,17 @@ package org.oscarehr.ws.rest.myhealthaccess.clinic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.integration.dao.IntegrationDao;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.messaging.factory.MessagingServiceFactory;
 import org.oscarehr.messaging.model.Message;
 import org.oscarehr.messaging.model.MessagingBackendType;
 import org.oscarehr.ws.rest.conversion.messaging.MessageToMessageDtoConverter;
+import org.oscarehr.ws.rest.response.GenericRestResponse;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.messaging.MessageDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -39,6 +43,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("myhealthaccess/integration/{integrationId}/clinic/message/")
 @Component("mhaClinicMessageWebService")
@@ -67,7 +72,14 @@ public class MessageWebService extends MessagingBaseWebService
 			@PathParam("messageId") String messageId
 	)
 	{
-		Message message = this.messagingService.getMessage(getLoggedInInfo(), messageableFromIntegrationId(integrationId), messageId);
-		return RestResponse.successResponse((new MessageToMessageDtoConverter()).convert(message));
+		try
+		{
+			Message message = this.messagingService.getMessage(getLoggedInInfo(), messageableFromIntegrationId(integrationId), messageId);
+			return RestResponse.successResponse((new MessageToMessageDtoConverter()).convert(message));
+		}
+		catch (RecordNotFoundException e)
+		{
+			return null;
+		}
 	}
 }

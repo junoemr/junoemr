@@ -22,25 +22,115 @@
 */
 
 import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
+import MessagingServiceFactory from "../../../../lib/messaging/factory/MessagingServiceFactory";
+import ActionAlreadyInProgressError from "../../../../lib/error/ActionAlreadyInProgressError";
 
 angular.module("Messaging.Components").component('messageList', {
 	templateUrl: 'src/messaging/inbox/components/messageList/messageList.jsp',
 	bindings: {
 		componentStyle: "<?",
+		messagingBackend: "<",
+		sourceId: "<",
+		groupId: "<",
 	},
 	controller: [
 		"$scope",
-		"$stateParams",
+		"$state",
 		function (
 			$scope,
-			$stateParams
+			$state
 		)
 		{
-			let ctrl = this;
+			const ctrl = this;
+			ctrl.messageStream = null;
+			ctrl.debounceTimeout = null;
+			ctrl.DEBOUNC_TIME_MS = 500;
+			ctrl.MESSAGE_FETCH_COUNT = 10;
+			ctrl.selectedMessageId = null;
 
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			};
+
+			/**
+			 * called when user selects a message from the list
+			 * @param message - the selected message
+			 */
+			ctrl.onSelectMessage = (message) =>
+			{
+				ctrl.selectedMessageId = message.id;
+
+				$state.go("messaging.view.message",
+				{
+					backend: ctrl.messagingBackend,
+					source: ctrl.sourceId,
+					group: ctrl.groupId,
+					messageId: message.id,
+				});
+			}
+
+			/**
+			 * fetch more messages for the message list as the user scrolls
+			 */
+			ctrl.fetchMoreMessages = async () =>
+			{
+				if (ctrl.messageStream)
+				{
+					try
+					{
+						await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
+						$scope.$apply();
+					}
+					catch (error)
+					{
+						if (error instanceof ActionAlreadyInProgressError)
+						{
+							// A load is already in progress. Skip load.
+						}
+						else
+						{
+							throw error;
+						}
+					}
+				}
+			}
+
+			/**
+			 * re load messages for the specified source, group & backend.
+			 */
+			ctrl.reloadMessages = async () =>
+			{
+				if (ctrl.sourceId && ctrl.groupId && ctrl.messagingBackend)
+				{
+					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
+
+					ctrl.messageStream = await messagingService.searchMessagesAsStream(
+						await messagingService.getMessageSourceById(ctrl.sourceId),
+						{group: ctrl.groupId});
+					$scope.$apply();
+					await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
+					$scope.$apply();
+				}
+			}
+
+			/**
+			 * start / reset reload debounce timer.
+			 */
+			ctrl.startReloadDebounce = () =>
+			{
+				if (ctrl.debounceTimeout)
+				{
+					window.clearTimeout(ctrl.debounceTimeout);
+				}
+
+				ctrl.messageStream = null;
+				ctrl.debounceTimeout = window.setTimeout(ctrl.reloadMessages, ctrl.DEBOUNC_TIME_MS);
+			}
+
+			// if bindings change reload message list.
+			$scope.$watch("$ctrl.sourceId", ctrl.startReloadDebounce);
+			$scope.$watch("$ctrl.groupId", ctrl.startReloadDebounce);
+			$scope.$watch("$ctrl.messagingBackend", ctrl.startReloadDebounce);
 		}],
 });

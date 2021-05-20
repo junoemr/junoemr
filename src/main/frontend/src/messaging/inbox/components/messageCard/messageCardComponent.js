@@ -22,60 +22,38 @@
 */
 
 import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
-import {MessageGroup} from "../../../../lib/messaging/model/MessageGroup";
 
-angular.module("Messaging.Components").component('inboxSelect', {
-	templateUrl: 'src/messaging/inbox/components/inboxSelect/inboxSelect.jsp',
+angular.module("Messaging.Components").component('messageCard', {
+	templateUrl: 'src/messaging/inbox/components/messageCard/messageCard.jsp',
 	bindings: {
 		componentStyle: "<?",
-		groups: "<",
-		sources: "<",
-		selectedSourceId: "<",
-		selectedGroupId: "<",
-		onSelect: "&",
+		message: "<",
+		selected: "<?",
+		click: "&?"
 	},
 	controller: [
-		"$scope",
-		"$stateParams",
-		function (
-			$scope,
-			$stateParams
-		)
+		function ()
 		{
 			const ctrl = this;
 
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				ctrl.selected = ctrl.selected || false;
 			};
 
-			ctrl.onSourceClick = (sourceId, groupId) =>
+			ctrl.formatMessageDate = (date) =>
 			{
-				ctrl.onSelect({sourceId, groupId});
+				return date.format(Juno.Common.Util.settings.message_date_format);
 			}
 
-			ctrl.getSourceItemClass = (sourceId, groupId) =>
+			ctrl.onClick = () =>
 			{
-				if (ctrl.selectedSourceId === sourceId && ctrl.selectedGroupId === groupId)
+				if (ctrl.click)
 				{
-					return "selected";
+					ctrl.click({});
 				}
-				return "";
 			}
 
-			ctrl.groupNameToHuman = (group) =>
-			{
-				switch(group)
-				{
-					case MessageGroup.ARCHIVED:
-						return "Archived";
-					case MessageGroup.RECEIVED:
-						return "Inbox";
-					case MessageGroup.SENT:
-						return "Sent";
-					default:
-						return group.toString();
-				}
-			}
 		}],
 });

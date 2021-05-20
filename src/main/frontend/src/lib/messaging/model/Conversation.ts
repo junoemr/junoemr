@@ -1,4 +1,5 @@
 import Message from "./Message";
+import Messageable from "./Messageable";
 
 export default class Conversation
 {
@@ -13,5 +14,30 @@ export default class Conversation
 	{
 		this._id = id;
 		this._messages = messages;
+	}
+
+	// ==========================================================================
+	// Getters
+	// ==========================================================================
+
+	get id(): string
+	{
+		return this._id;
+	}
+
+	get messages(): Message[]
+	{
+		return this._messages;
+	}
+
+	/**
+	 * get all participants in this conversation
+	 */
+	get participants(): Messageable[]
+	{
+		// @ts-ignore
+		return Juno.Common.Util.arrayDistinct(this.messages
+				.map((msg) => msg.recipients)
+				.flat(), "id");
 	}
 }

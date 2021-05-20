@@ -41,6 +41,10 @@ body {
 	font-weight: bold;
 }
 
+.body-small {
+	@include juno-font-body-small();
+}
+
 .body-small-bold {
 	@include juno-font-body-small();
 	font-weight: bold;

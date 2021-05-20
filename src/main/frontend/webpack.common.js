@@ -281,7 +281,11 @@ module.exports = {
 			'./src/messaging/inbox/components/module.js',
 			'./src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBarComponent.js',
 			'./src/messaging/inbox/components/inboxSelect/inboxSelectComponent.js',
+			'./src/messaging/inbox/components/messageCard/messageCardComponent.js',
 			'./src/messaging/inbox/components/messageList/messageListComponent.js',
+			'./src/messaging/inbox/components/messageView/module.js',
+			'./src/messaging/inbox/components/messageView/components/module.js',
+			'./src/messaging/inbox/components/messageView/components/message/messageComponent.js',
 			'./src/messaging/inbox/components/messageView/messageViewComponent.js',
 			'./src/messaging/inbox/messagingInboxComponent.js',
 

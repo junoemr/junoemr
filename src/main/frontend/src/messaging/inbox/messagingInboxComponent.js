@@ -38,7 +38,7 @@ angular.module("Messaging").component('messagingInbox', {
 			$state
 		)
 	{
-		let ctrl = this;
+		const ctrl = this;
 		ctrl.backend = $stateParams.backend;
 		ctrl.selectedSourceId = $stateParams.source;
 		ctrl.selectedGroupId = $stateParams.group;
@@ -51,8 +51,6 @@ angular.module("Messaging").component('messagingInbox', {
 		{
 			ctrl.messageSources = await ctrl.messagingService.getMessageSources();
 			ctrl.groups = await ctrl.messagingService.getMessageGroups();
-
-			$scope.$apply();
 		}
 
 		/**

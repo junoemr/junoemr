@@ -2,6 +2,8 @@
 	@include juno-font-body-smallest();
 	color: var(--color-neutral-darkest);
 
+	max-height: calc(max(100vh, 800px) - #{$primary-navbar-height} - #{$page-header-height});
+
 	.message-list-pane {
 		width: 344px;
 		min-width: 344px;

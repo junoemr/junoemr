@@ -106,6 +106,10 @@
 	min-height: 100%;
 }
 
+.h-max-100 {
+	max-height: 100%;
+}
+
 .w-100 {
 	width: 100%;
 }
@@ -385,6 +389,12 @@
 
 .text-left {
 	text-align: left;
+}
+
+.text-ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 // ========================= Overflow helpers ==============================

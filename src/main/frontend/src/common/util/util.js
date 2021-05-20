@@ -16,6 +16,7 @@ Juno.Common.Util.settings = {
 	time_format: "h:mma",
 	date_format: "YYYY-MM-DD",
 	dayofweek_format: "dddd",
+	message_date_format: "h:mm A LL",
 
 	defaultTimeFormat: "HH:mm:ss"
 };
@@ -534,4 +535,25 @@ Juno.Common.Util.ISODayString = function ISODayString(weekday)
 		case 7: return "Saturday";
 		default: throw "Invalid Weekday index '" + weekday + "' (must be in range of 1-7)";
 	}
+}
+
+/**
+ * filter the provided array using the specified property such that only distinct elements remain
+ * @param array - the array to filter
+ * @param property - the property to filter on
+ * @return array with all duplicates removed
+ */
+Juno.Common.Util.arrayDistinct = function arrayDistinct(array, property)
+{
+	const map = new Map();
+
+	array.forEach((item) =>
+	{
+		if (!map.has(item[property]))
+		{
+			map.set(item[property], item);
+		}
+	})
+
+	return Array.from(map.values());
 }

@@ -28,6 +28,7 @@ import org.oscarehr.messaging.model.Attachment;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.util.MimeType;
 
+import java.net.URL;
 import java.time.ZonedDateTime;
 
 @Data
@@ -37,6 +38,27 @@ public class MhaAttachment implements Attachment
 	protected String name;
 	protected MimeType mimeType;
 	protected ZonedDateTime createdAtDateTime;
+	protected URL documentUrl;
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	/**
+	 * create new attachment
+	 * @param id - attachment id
+	 * @param name - attachment name
+	 * @param mimeType - attachment mime type
+	 * @param createdAtDateTime - attachment creation time
+	 * @param documentUrl - the url at which the document can be download
+	 */
+	public MhaAttachment(String id, String name, MimeType mimeType, ZonedDateTime createdAtDateTime, URL documentUrl)
+	{
+		this.id = id;
+		this.name = name;
+		this.mimeType = mimeType;
+		this.createdAtDateTime = createdAtDateTime;
+	}
 
 	// ==========================================================================
 	// Getters

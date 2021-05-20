@@ -36,7 +36,9 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 			$stateParams
 		)
 		{
-			let ctrl = this;
+			const ctrl = this;
+			ctrl.searchTerm = "";
+			$scope.JUNO_STYLE = JUNO_STYLE;
 
 			ctrl.$onInit = () =>
 			{

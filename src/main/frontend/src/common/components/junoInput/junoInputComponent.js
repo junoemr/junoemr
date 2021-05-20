@@ -46,6 +46,7 @@ angular.module('Common.Components').component('junoInput', {
 		// if true do not draw the input "box" just draw its contents
 		noBox: "<?",
 		componentStyle: "<?",
+		icon: "@?"
 	},
 	controller: [ "$scope", function ($scope) {
 		let ctrl = this;
@@ -62,6 +63,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.invalid = ctrl.invalid || false;
 			ctrl.noBox = ctrl.noBox || false;
 			ctrl.onlyNumeric = ctrl.onlyNumeric || false;
+			ctrl.icon = ctrl.icon || null;
 
 			if (ctrl.showInvalidFocus === undefined)
 			{
@@ -89,6 +91,7 @@ angular.module('Common.Components').component('junoInput', {
 				"field-invalid": ctrl.invalid && (ctrl.showInvalidFocus || !ctrl.isFocused),
 				"field-no-border": ctrl.noBox,
 				"field-disabled": ctrl.disabled,
+				"shift-right-for-icon": ctrl.icon,
 			};
 		}
 

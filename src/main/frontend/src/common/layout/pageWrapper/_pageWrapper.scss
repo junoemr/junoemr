@@ -9,6 +9,7 @@
 		flex-direction: column;
 
 		min-height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
+
 		// fixes child margin issues. If a child has margin and the parent does not have padding / margin the margin will apply to the parent
 		padding-top: 1px;
 		margin-top: -1px;

@@ -26,6 +26,7 @@ package org.oscarehr.ws.rest.myhealthaccess.clinic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.integration.dao.IntegrationDao;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.messaging.factory.MessagingServiceFactory;
 import org.oscarehr.messaging.model.Conversation;
 import org.oscarehr.messaging.model.MessagingBackendType;
@@ -68,7 +69,14 @@ public class ConversationWebService extends MessagingBaseWebService
 			@PathParam("integrationId") String integrationId,
 			@PathParam("conversationId") String conversationId)
 	{
-		Conversation conversation = this.messagingService.getConversation(getLoggedInInfo(), messageableFromIntegrationId(integrationId), conversationId);
-		return RestResponse.successResponse((new ConversationToConversationDtoConverter()).convert(conversation));
+		try
+		{
+			Conversation conversation = this.messagingService.getConversation(getLoggedInInfo(), messageableFromIntegrationId(integrationId), conversationId);
+			return RestResponse.successResponse((new ConversationToConversationDtoConverter()).convert(conversation));
+		}
+		catch (RecordNotFoundException e)
+		{
+			return null;
+		}
 	}
 }

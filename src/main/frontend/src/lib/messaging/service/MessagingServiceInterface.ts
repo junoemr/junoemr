@@ -52,6 +52,13 @@ export default interface MessagingServiceInterface
 	getMessageSources(): Promise<MessageSource[]>;
 
 	/**
+	 * get a message source by it's id.
+	 * @param id
+	 * @return the message source
+	 */
+	getMessageSourceById(id: string): Promise<MessageSource>;
+
+	/**
 	 * get a list of allowed message groups for this messaging service
 	 * @return list of allowed groups
 	 */

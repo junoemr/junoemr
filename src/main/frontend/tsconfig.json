@@ -2,8 +2,12 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "ES6",
+    "lib": [
+      "es2019",
+      "dom"
+    ],
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/**/*",

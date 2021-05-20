@@ -54,6 +54,6 @@ public class MessageDto implements Serializable
 	protected String senderName;
 	@JsonProperty("meta")
 	protected String metaData;
-
 	protected List<MessageParticipantDto> recipients;
+	protected List<AttachmentDto> attachments;
 }

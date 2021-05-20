@@ -9,7 +9,7 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 	protected _source: MessageSource;
 	protected _searchParams: MessageSearchParams;
 	protected _offset: number;
-	protected readonly _bucketSize = 50;
+	protected readonly _bucketSize = 25;
 	protected _bucket: Message[];
 	protected _exhausted: boolean;
 

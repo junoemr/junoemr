@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -20,13 +21,31 @@
  * Victoria, British Columbia
  * Canada
  */
+ 
+package org.oscarehr.messaging.backend.myhealthaccess.conversion;
 
-package org.oscarehr.integration.myhealthaccess.exception;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.integration.myhealthaccess.dto.AttachmentDto;
+import org.oscarehr.messaging.backend.myhealthaccess.model.MhaAttachment;
+import org.oscarehr.ws.rest.conversion.ConversionException;
+import org.springframework.util.MimeType;
 
-public class RecordNotFoundException extends BaseException
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class AttachmentDtoToMhaAttachmentConverter extends AbstractModelConverter<AttachmentDto, MhaAttachment>
 {
-	public RecordNotFoundException(String s)
+
+	@Override
+	public MhaAttachment convert(AttachmentDto input)
 	{
-		super(s);
+		try
+		{
+			return new MhaAttachment(input.getId(), input.getName(), MimeType.valueOf(input.getType()), input.getCreatedAt(), new URL(input.getUrl()));
+		}
+		catch (MalformedURLException e)
+		{
+			throw new ConversionException("Failed to convert Attachment Dto with id [" + input.getId() + "] to MhaAttachment with error: " + e.getMessage(), e);
+		}
 	}
 }

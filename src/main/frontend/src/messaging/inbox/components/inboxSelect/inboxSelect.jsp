@@ -1,4 +1,4 @@
-<div class="inbox-select flex-col h-100 w-100">
+<div class="inbox-select flex-col h-100 w-100 overflow-y-auto">
 
 	<div ng-repeat="group in $ctrl.groups" class="message-group-container p-t-32 p-b-32">
 		<juno-collapse-area label="$ctrl.groupNameToHuman(group)"

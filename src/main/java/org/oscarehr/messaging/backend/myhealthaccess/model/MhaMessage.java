@@ -42,7 +42,7 @@ public class MhaMessage implements org.oscarehr.messaging.model.Message
 	protected MhaMessageable sender;
 	protected List<MhaMessageable> recipients;
 	protected String metaData;
-	protected MhaAttachment attachments;
+	protected List<MhaAttachment> attachments;
 
 	// ==========================================================================
 	// Getters

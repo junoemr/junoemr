@@ -5,7 +5,7 @@ import {API_BASE_PATH} from "../../../../constants/ApiConstants";
 import MessageDtoToMessageConverter from "../../../converter/MessageDtoToMessageConverter";
 import MessagingError from "../../../../error/MessagingError";
 import {MhaClinicMessagingApi, MhaIntegrationApi} from "../../../../../../generated";
-import StreamingList from "../../../../util/StreamingList";
+import StreamingList, {StreamSource} from "../../../../util/StreamingList";
 import ClinicMailboxStreamSource from "../model/ClinicMailboxStreamSource";
 import Conversation from "../../../model/Conversation";
 import ConversationDtoToConversationConverter from "../../../converter/ConversationDtoToConversationConverter";
@@ -52,14 +52,42 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async getMessage(source: MessageSource, messageId: string): Promise<Message>
 	{
-		try
+		if (source.id === this.VIRTUAL_SOURCE_ID)
 		{
-			const messageDto = (await this._mhaClinicMessagingApi.getMessage(source.id, messageId)).data.body;
-			return (new MessageDtoToMessageConverter()).convert(messageDto);
+			// try grabbing message from all sources.
+			const searchResults = await Promise.all(this.getPhysicalMessagingSources().map(async (physicalSource) =>
+			{
+				try
+				{
+					return await this.getMessage(physicalSource, messageId)
+				}
+				catch (error)
+				{
+					return null;
+				}
+			}));
+
+			const message = (await Promise.all(searchResults)).filter((msg) => msg != null)[0];
+			if (message)
+			{
+				return message;
+			}
+			else
+			{
+				throw new MessagingError(`Failed to retrieve message [${messageId}] from source [${source.id}]`);
+			}
 		}
-		catch(error)
+		else
 		{
-			throw new MessagingError(`Failed to retrieve message [${messageId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+			try
+			{
+				const messageDto = (await this._mhaClinicMessagingApi.getMessage(source.id, messageId)).data.body;
+				return (new MessageDtoToMessageConverter()).convert(messageDto);
+			}
+			catch(error)
+			{
+				throw new MessagingError(`Failed to retrieve message [${messageId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+			}
 		}
 	}
 
@@ -71,25 +99,41 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async searchMessages(source: MessageSource, searchOptions: MessageSearchParams): Promise<Message[]>
 	{
-		try
+		if (source.id === this.VIRTUAL_SOURCE_ID)
 		{
-			const messages = (await this._mhaClinicMessagingApi.getMessages(
-				source.id,
-				searchOptions.startDateTime?.toDate(),
-				searchOptions.endDateTime?.toDate(),
-				searchOptions.group?.toString(),
-				searchOptions.limit,
-				searchOptions.offset,
-				searchOptions.sender?.id,
-				searchOptions.sender?.type.toString(),
-				searchOptions.recipient?.id,
-				searchOptions.recipient?.type.toString())).data.body;
+			const searchResults = await Promise.all(
+				this.getPhysicalMessagingSources().map((physicalSource) => this.searchMessages(physicalSource, searchOptions)));
 
-			return (new MessageDtoToMessageConverter()).convertList(messages);
+			let messages = searchResults.flat().sort(this.messageSortFunction);
+			if (searchOptions.limit)
+			{
+				messages = messages.slice(0, searchOptions.limit);
+			}
+
+			return messages;
 		}
-		catch(error)
+		else
 		{
-			throw new MessagingError(`Failed to search messages from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+			try
+			{
+				const messages = (await this._mhaClinicMessagingApi.getMessages(
+					source.id,
+					searchOptions.startDateTime?.toDate(),
+					searchOptions.endDateTime?.toDate(),
+					searchOptions.group?.toString(),
+					searchOptions.limit,
+					searchOptions.offset,
+					searchOptions.sender?.id,
+					searchOptions.sender?.type.toString(),
+					searchOptions.recipient?.id,
+					searchOptions.recipient?.type.toString())).data.body;
+
+				return (new MessageDtoToMessageConverter()).convertList(messages);
+			}
+			catch (error)
+			{
+				throw new MessagingError(`Failed to search messages from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+			}
 		}
 	}
 
@@ -102,8 +146,20 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async searchMessagesAsStream(source: MessageSource, searchOptions: MessageSearchParams): Promise<StreamingList<Message>>
 	{
-		const streamSource = new ClinicMailboxStreamSource(this, source, searchOptions);
-		const stream = new StreamingList<Message>([streamSource], (t1, t2) => t1.createdAtDateTime.diff(t2.createdAtDateTime));
+		const streamSources: StreamSource<Message>[] = [];
+		if (source.id === this.VIRTUAL_SOURCE_ID)
+		{
+			this.getPhysicalMessagingSources().forEach((msgSource) =>
+			{
+				streamSources.push(new ClinicMailboxStreamSource(this, msgSource, searchOptions))
+			})
+		}
+		else
+		{
+			streamSources.push(new ClinicMailboxStreamSource(this, source, searchOptions));
+		}
+
+		const stream = new StreamingList<Message>(streamSources, this.messageSortFunction);
 		await stream.load(this.STREAM_INITIAL_LOAD_COUNT);
 		return stream;
 	}
@@ -115,14 +171,42 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async getConversation(source: MessageSource, conversationId: string): Promise<Conversation>
 	{
-		try
+		if (source.id === this.VIRTUAL_SOURCE_ID)
 		{
-			const conversationDto = (await this._mhaClinicMessagingApi.getConversation(source.id, conversationId)).data.body;
-			return (new ConversationDtoToConversationConverter()).convert(conversationDto);
+			// try grabbing conversation from all sources.
+			const searchResults = await Promise.all(this.getPhysicalMessagingSources().map(async (physicalSource) =>
+			{
+				try
+				{
+					return await this.getConversation(physicalSource, conversationId)
+				}
+				catch (error)
+				{
+					return null;
+				}
+			}));
+
+			const conversation = (await Promise.all(searchResults)).filter((msg) => msg != null)[0];
+			if (conversation)
+			{
+				return conversation;
+			}
+			else
+			{
+				throw new MessagingError(`Failed to retrieve conversation [${conversationId}] from source [${source.id}]`);
+			}
 		}
-		catch(error)
+		else
 		{
-			throw new MessagingError(`Failed to retrieve conversation [${conversationId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+			try
+			{
+				const conversationDto = (await this._mhaClinicMessagingApi.getConversation(source.id, conversationId)).data.body;
+				return (new ConversationDtoToConversationConverter()).convert(conversationDto);
+			}
+			catch (error)
+			{
+				throw new MessagingError(`Failed to retrieve conversation [${conversationId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+			}
 		}
 	}
 
@@ -138,6 +222,25 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 		}
 
 		return this._messageSources;
+	}
+
+	/**
+	 * get a message source by it's id.
+	 * @param id
+	 * @return the message source
+	 */
+	public async getMessageSourceById(id: string): Promise<MessageSource>
+	{
+		const source = (await this.getMessageSources()).find((source) => source.id === id);
+
+		if (source)
+		{
+			return source;
+		}
+		else
+		{
+			throw new MessagingError(`Messaging source with id [${id}] could not be found`);
+		}
 	}
 
 	/**
@@ -165,4 +268,24 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 		this._messageSources = this._messageSources.concat((new IntegrationTo1ToMessageSourceConverter()).convertList(integrations));
 	}
 
+	/**
+	 * gets a list of messaging sources excluding any virtual ones.
+	 * @protected
+	 */
+	protected getPhysicalMessagingSources(): MessageSource[]
+	{
+		return this._messageSources.filter((messageSource) => messageSource.type != MessageSourceType.VIRTUAL);
+	}
+
+	/**
+	 * function used for sorting messages via (Array.sort)
+	 * @param m1 - first message
+	 * @param m2 - second message
+	 * @return number - sort order according to sort spec
+	 * @protected
+	 */
+	protected messageSortFunction(m1: Message, m2: Message): number
+	{
+		return m2.createdAtDateTime.diff(m1.createdAtDateTime);
+	}
 }

@@ -1,0 +1,51 @@
+.message-card {
+	height: 88px;
+
+	cursor: pointer;
+	user-select: none;
+
+	&.selected {
+		background-color: var(--color-primary-base);
+		color: var(--color-neutral-white);
+
+		.not-read-circle {
+			background-color: var(--color-neutral-white);
+		}
+
+		.timestamp-text {
+			color: var(--color-neutral-white);
+		}
+	}
+
+	.not-read-circle {
+		width: 8px;
+		height: 8px;
+		margin: 0 20px 0 20px;
+		border-radius: 100%;
+		background-color: var(--color-primary-base);
+
+		&.ng-hide {
+			display: block !important;
+			visibility: hidden;
+		}
+	}
+
+	.timestamp-text {
+		color: var(--color-neutral-dark-grey);
+	}
+
+	.message-subject {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.message-preview {
+		display: -webkit-box;
+		max-height: 28px;
+		overflow: hidden;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		text-overflow: ellipsis;
+	}
+}
