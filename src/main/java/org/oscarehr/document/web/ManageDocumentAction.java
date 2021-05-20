@@ -286,7 +286,7 @@ public class ManageDocumentAction extends DispatchAction {
 			provider = providerDao.find(user_no);
 		}
 
-		String strNote = "Document" + " " + docDesc + " " + "created at " + now + " by " + provider.getFirstName() + " " + provider.getLastName() + ".";
+		String strNote = "Document " + docDesc + " created at " + now + " by " + provider.getFirstName() + " " + provider.getLastName() + ".";
 
 		CaseManagementNote cmn = new CaseManagementNote();
 		cmn.setUpdateDate(now);
