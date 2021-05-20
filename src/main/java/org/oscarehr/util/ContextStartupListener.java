@@ -33,12 +33,10 @@ import org.oscarehr.PMmodule.utility.ProgramAccessCache;
 import org.oscarehr.PMmodule.utility.RoleCache;
 import org.oscarehr.common.jobs.OscarJobUtils;
 import org.oscarehr.hospitalReportManager.HRMFixMissingReportHelper;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.threads.WaitListEmailThread;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
-
-import com.quatro.dao.security.SecroleDao;
-
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
@@ -114,7 +112,7 @@ public class ContextStartupListener implements javax.servlet.ServletContextListe
 	private void createOscarProgramIfNecessary()
 	{
 		ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
-		SecroleDao secRoleDao = (SecroleDao)SpringUtils.getBean("secroleDao");
+		SecRoleDao secRoleDao = SpringUtils.getBean(SecRoleDao.class);
 		ProgramProviderDAO programProviderDao = (ProgramProviderDAO)SpringUtils.getBean("programProviderDAO");
 		
 		Program p = programDao.getProgramByName("OSCAR");
@@ -131,7 +129,7 @@ public class ContextStartupListener implements javax.servlet.ServletContextListe
 		ProgramProvider pp = new ProgramProvider();
 		pp.setProviderNo("999998");
 		pp.setProgramId(p.getId().longValue());
-		pp.setRoleId(secRoleDao.getRoleByName("doctor").getId());
+		pp.setRoleId(secRoleDao.findSystemDefaultRole().getId().longValue());
 		programProviderDao.saveProgramProvider(pp);
 		
 	}

@@ -76,11 +76,6 @@ public class SecroleDao extends HibernateDaoSupport {
         return result;
     }
 
-
-    public List getDefaultRoles() {
-        return this.getHibernateTemplate().find("from Secrole r where r.userDefined=0");
-    }
-
     public void save(Secrole secrole) {
         if (secrole == null) {
             throw new IllegalArgumentException();
