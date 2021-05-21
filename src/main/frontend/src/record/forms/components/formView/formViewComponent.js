@@ -20,7 +20,7 @@
 * Victoria, British Columbia
 * Canada
 */
-import {FORM_CONTROLLER_STATES, FORM_CONTROLLER_SORT_MODES, FORM_CONTROLLER_FORM_TYPES} from "../../formsConstants";
+import {FORM_CONTROLLER_FORM_TYPES, FORM_CONTROLLER_SORT_MODES, FORM_CONTROLLER_STATES} from "../../formsConstants";
 import {SecurityPermissions} from "../../../../common/security/securityConstants";
 
 angular.module('Record.Forms').component('formViewComponent', {
@@ -34,7 +34,6 @@ angular.module('Record.Forms').component('formViewComponent', {
 
         filterForms: '&',
         reloadForms: '&'
-
     },
     controller:[
         'formService',
@@ -55,35 +54,54 @@ angular.module('Record.Forms').component('formViewComponent', {
         ctrl.sortMode = FORM_CONTROLLER_SORT_MODES.FORM_NAME;
         ctrl.SecurityPermissions = SecurityPermissions;
 
+        ctrl.canOpenForm = (form) =>
+        {
+            return (form.id || !form.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_CREATE))
+        }
+        ctrl.canOpenEForm = (eform) =>
+        {
+            return (eform.id || !eform.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_CREATE))
+        }
+
         ctrl.openEForm = function (form)
         {
-            if (ctrl.instancedForms)
+            if(ctrl.canOpenEForm(form))
             {
-                formService.openEFormInstancePopup($stateParams.demographicNo, form.id).then(function (val) {
-                    ctrl.reloadForms({});
-                });
-            }
-            else
-            {
-                formService.openEFormPopup($stateParams.demographicNo, form.formId).then(function (val) {
-                    ctrl.reloadForms({});
-                });
+                if (ctrl.instancedForms)
+                {
+                    formService.openEFormInstancePopup($stateParams.demographicNo, form.id).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
+                else
+                {
+                    formService.openEFormPopup($stateParams.demographicNo, form.formId).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
             }
         };
 
         ctrl.openForm = function (form)
         {
-            if (ctrl.instancedForms)
+            if(ctrl.canOpenForm(form))
             {
-                formService.openFormInstancePopup(form.name, $stateParams.demographicNo, $stateParams.appointmentNo, form.id).then(function (val) {
-                    ctrl.reloadForms({});
-                });
-            }
-            else
-            {
-                formService.openFormPopup(ctrl.providerNo, $stateParams.demographicNo, $stateParams.appointmentNo, form.subject).then(function (val) {
-                    ctrl.reloadForms({});
-                });
+                if (ctrl.instancedForms)
+                {
+                    formService.openFormInstancePopup(form.name, $stateParams.demographicNo, $stateParams.appointmentNo, form.id).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
+                else
+                {
+                    formService.openFormPopup(ctrl.providerNo, $stateParams.demographicNo, $stateParams.appointmentNo, form.subject).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
             }
         };
 
@@ -175,6 +193,7 @@ angular.module('Record.Forms').component('formViewComponent', {
                         ctrl.sortMode = params.orderBy();
                     }
                 });
+            ctrl.disabled = ctrl.disabled || false;
 
             ctrl.cols = [
                 {title: 'Form Name', field: 'name', visible: true, sortable: 'name', displayClass: 'col-md-3'},
