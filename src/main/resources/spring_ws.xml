@@ -386,6 +386,7 @@
 			<!-- MHA -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.message.AttachmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.MessagesWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService"/>

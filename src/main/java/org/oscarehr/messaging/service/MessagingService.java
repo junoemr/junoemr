@@ -23,10 +23,7 @@
 
 package org.oscarehr.messaging.service;
 
-import org.oscarehr.messaging.model.Conversation;
-import org.oscarehr.messaging.model.Message;
-import org.oscarehr.messaging.model.MessageGroup;
-import org.oscarehr.messaging.model.Messageable;
+import org.oscarehr.messaging.model.*;
 import org.oscarehr.util.LoggedInInfo;
 
 import javax.annotation.Nullable;
@@ -143,4 +140,13 @@ public interface MessagingService
 	 * @return - the message that was just appended as a reply to a conversation.
 	 */
 	public Message replyToConversation(LoggedInInfo loggedInInfo, Message message, Conversation conversation);
+
+	/**
+	 * get the binary data for the specified attachment
+	 * @param loggedInInfo - logged info for the current user
+	 * @param messageable - the messageable who owns the attachment
+	 * @param attachment - the attachment to get data for
+	 * @return - binary attachment data
+	 */
+	public byte[] getAttachmentData(LoggedInInfo loggedInInfo, Messageable<?> messageable, Attachment attachment);
 }

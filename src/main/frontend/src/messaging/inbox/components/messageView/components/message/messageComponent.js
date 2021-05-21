@@ -20,11 +20,14 @@
 * Victoria, British Columbia
 * Canada
 */
+import {saveAs} from "file-saver";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../../common/components/junoComponentConstants";
 
 angular.module("Messaging.Components.View.Components").component('message', {
 	templateUrl: 'src/messaging/inbox/components/messageView/components/message/message.jsp',
 	bindings: {
-		message: "<"
+		message: "<",
+		messagingService: "<",
 	},
 	controller: [
 		"$scope",
@@ -44,6 +47,22 @@ angular.module("Messaging.Components.View.Components").component('message', {
 			ctrl.recipientNames = () =>
 			{
 				return ctrl.message.recipients.map((recipient) => recipient.name).join(", ");
+			}
+
+			ctrl.downloadAttachment = async (attachment) =>
+			{
+				// download and convert to byte array
+				const byteString = atob(await ctrl.messagingService.downloadAttachmentData(attachment));
+				const bytes = new Array(byteString.length);
+				for (let i = 0; i < byteString.length; i++) {
+					bytes[i] = byteString.charCodeAt(i);
+				}
+
+				// build blob
+				const blob = new Blob([new Uint8Array(bytes)], {type: attachment.type});
+
+				// save to users computer
+				saveAs(blob, attachment.name);
 			}
 		}],
 });

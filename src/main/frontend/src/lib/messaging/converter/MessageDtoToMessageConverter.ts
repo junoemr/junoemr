@@ -3,6 +3,7 @@ import Message from "../model/Message";
 import {MessageDto} from "../../../../generated";
 import MessageableDtoToMessageableConverter from "./MessageableDtoToMessageableConverter";
 import moment from "moment";
+import AttachmentDtoToAttachmentConverter from "./AttachmentDtoToAttachmentConverter";
 
 export default class MessageDtoToMessageConverter extends AbstractConverter<MessageDto, Message>
 {
@@ -12,7 +13,7 @@ export default class MessageDtoToMessageConverter extends AbstractConverter<Mess
 
 	convert(from: MessageDto): Message
 	{
-		return new Message(
+		const message = new Message(
 			from.id,
 			from.conversationId,
 			from.subject,
@@ -23,7 +24,12 @@ export default class MessageDtoToMessageConverter extends AbstractConverter<Mess
 			(new MessageableDtoToMessageableConverter()).convertList(from.recipients),
 			JSON.parse(from.metaData),
 			moment(from.createdAtDateTime),
+			(new AttachmentDtoToAttachmentConverter()).convertList(from.attachments),
 		);
+
+		message.attachments.forEach((attach) => attach.message = message);
+
+		return message;
 	}
 
 }

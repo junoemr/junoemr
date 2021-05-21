@@ -8,4 +8,10 @@
 		width: 344px;
 		min-width: 344px;
 	}
+
+	@media only screen and (max-width: 1080px) {
+		.inbox-select-pane {
+			width: 128px;
+		}
+	}
 }

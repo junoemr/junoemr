@@ -31,6 +31,7 @@ import org.oscarehr.integration.myhealthaccess.dto.MessageDto;
 import org.oscarehr.integration.myhealthaccess.service.ClinicMessagingService;
 import org.oscarehr.messaging.backend.myhealthaccess.conversion.ConversationDtoToMhaConversationConverter;
 import org.oscarehr.messaging.backend.myhealthaccess.conversion.MessageDtoToMhaMessageConverter;
+import org.oscarehr.messaging.backend.myhealthaccess.model.MhaAttachment;
 import org.oscarehr.messaging.model.*;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,9 +64,10 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * get a message for the messageable by id.
+	 *
 	 * @param loggedInInfo - currently logged in user info
-	 * @param messageable - the messageable (user) who owns the message.
-	 * @param messageId - the message id to fetch.
+	 * @param messageable  - the messageable (user) who owns the message.
+	 * @param messageId    - the message id to fetch.
 	 * @return - the message.
 	 * @throws org.oscarehr.common.exception.NoSuchRecordException - if a message with the given id cannot be found.
 	 */
@@ -79,15 +81,16 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * get messages for a messageable, filtering by the provided parameters.
-	 * @param loggedInInfo - currently logged in user info
-	 * @param messageable - the messageable (user) you want to get messages for.
+	 *
+	 * @param loggedInInfo  - currently logged in user info
+	 * @param messageable   - the messageable (user) you want to get messages for.
 	 * @param startDateTime - [optional] filter messages to only those that where sent after this time.
-	 * @param endDateTime - [optional] filter messages to only those that where sent before this time.
-	 * @param group - [optional] filter messages by group. Group ALL is equivalent to null.
-	 * @param limit - [optional] limit results to this number (use for paging).
-	 * @param offset - [optional] offset results by this number (use for paging).
-	 * @param sender - [optional] filter messages to only those sent by this sender.
-	 * @param receiver - [optional] filter messages to only those received by this recipient.
+	 * @param endDateTime   - [optional] filter messages to only those that where sent before this time.
+	 * @param group         - [optional] filter messages by group. Group ALL is equivalent to null.
+	 * @param limit         - [optional] limit results to this number (use for paging).
+	 * @param offset        - [optional] offset results by this number (use for paging).
+	 * @param sender        - [optional] filter messages to only those sent by this sender.
+	 * @param receiver      - [optional] filter messages to only those received by this recipient.
 	 * @return - a list of messages.
 	 * @throws IllegalArgumentException - if the backend does not support one of the provided arguments
 	 */
@@ -120,9 +123,10 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * get the total count of messages in a group for the given messageable
+	 *
 	 * @param loggedInInfo - currently logged in user info
-	 * @param messageable - the messageable whose group is being counted.
-	 * @param group - the group to count
+	 * @param messageable  - the messageable whose group is being counted.
+	 * @param group        - the group to count
 	 * @return - the count of messages in the group
 	 */
 	@Override
@@ -133,8 +137,9 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * get a conversation for the messageable by id.
-	 * @param loggedInInfo - currently logged in user info
-	 * @param messageable - the messageable (user) whose conversation is to be pulled.
+	 *
+	 * @param loggedInInfo   - currently logged in user info
+	 * @param messageable    - the messageable (user) whose conversation is to be pulled.
 	 * @param conversationId - the conversation id to fetch.
 	 * @return - the conversation.
 	 * @throws org.oscarehr.common.exception.NoSuchRecordException - if a conversation with the given id cannot be found.
@@ -149,15 +154,16 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * get conversations for messageable filtered by the provided parameters
-	 * @param loggedInInfo - currently logged in user info
-	 * @param messageable - the messageable (user) who's conversations are to be searched
+	 *
+	 * @param loggedInInfo  - currently logged in user info
+	 * @param messageable   - the messageable (user) who's conversations are to be searched
 	 * @param startDateTime - [optional] filter conversations to only those that where sent after this time.
-	 * @param endDateTime - [optional] filter conversations to only those that where sent before this time.
-	 * @param group - [optional] filter conversations by group. Group ALL is equivalent to null.
-	 * @param limit - [optional] limit results to this number (use for paging).
-	 * @param offset - [optional] offset results by this number (use for paging).
-	 * @param sender - [optional] filter conversations to only those sent by this sender.
-	 * @param receiver - [optional] filter conversations to only those received by this recipient.
+	 * @param endDateTime   - [optional] filter conversations to only those that where sent before this time.
+	 * @param group         - [optional] filter conversations by group. Group ALL is equivalent to null.
+	 * @param limit         - [optional] limit results to this number (use for paging).
+	 * @param offset        - [optional] offset results by this number (use for paging).
+	 * @param sender        - [optional] filter conversations to only those sent by this sender.
+	 * @param receiver      - [optional] filter conversations to only those received by this recipient.
 	 * @return - list of conversatiosn
 	 * @throws IllegalArgumentException - if the backend does not support one of the provided arguments
 	 */
@@ -178,9 +184,10 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * get the total count of conversations in a group for a messageable
+	 *
 	 * @param loggedInInfo - currently logged in user info
-	 * @param messageable - the messageable whose group is to be counted
-	 * @param group - the group to count
+	 * @param messageable  - the messageable whose group is to be counted
+	 * @param group        - the group to count
 	 * @return - the count of conversations in the group
 	 */
 	@Override
@@ -191,8 +198,9 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * send a message
+	 *
 	 * @param loggedInInfo - currently logged in user info
-	 * @param message - the message to send
+	 * @param message      - the message to send
 	 * @return - the message that was just sent.
 	 */
 	@Override
@@ -203,8 +211,9 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * reply to a conversation
+	 *
 	 * @param loggedInInfo - currently logged in user info
-	 * @param message - the reply to the conversation
+	 * @param message      - the reply to the conversation
 	 * @param conversation - the conversation being replied to.
 	 * @return - the message that was just appended as a reply to a conversation.
 	 */
@@ -212,6 +221,27 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 	public Message replyToConversation(LoggedInInfo loggedInInfo, Message message, Conversation conversation)
 	{
 		throw new NotImplementedException();
+	}
+
+	/**
+	 * get the binary data for the specified attachment
+	 *
+	 * @param loggedInInfo - logged info for the current user
+	 * @param messageable  - the messageable who owns the attachment
+	 * @param attachment   - the attachment to get data for
+	 * @return - binary attachment data
+	 * @throws IllegalArgumentException - if the provided attachment is not an MhaAttachment
+	 */
+	public byte[] getAttachmentData(LoggedInInfo loggedInInfo, Messageable<?> messageable, Attachment attachment)
+	{
+		if (attachment instanceof MhaAttachment)
+		{
+			return this.clinicMessagingService.downloadAttachmentData(getIntegrationFromMessageable(messageable), loggedInInfo, (MhaAttachment) attachment);
+		}
+		else
+		{
+			throw new IllegalArgumentException("MHA messaging service can only download attachment data for MhaAttachments!");
+		}
 	}
 
 	// ==========================================================================

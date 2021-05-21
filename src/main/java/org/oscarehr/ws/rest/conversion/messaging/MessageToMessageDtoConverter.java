@@ -51,6 +51,9 @@ public class MessageToMessageDtoConverter extends AbstractModelConverter<Message
 		messageDto.setSender(messageableConverter.convert(input.getSender()));
 		messageDto.setRecipients(messageableConverter.convert(input.getRecipients()));
 
+		// convert attachments
+		messageDto.setAttachments((new AttachmentToAttachmentDtoConverter()).convert(input.getAttachments()));
+
 		return messageDto;
 	}
 }

@@ -54,6 +54,9 @@ public abstract class RestClientBase extends RESTClient
 	// return base REST endpoint
 	public abstract URI baseEndpoint();
 
+	// get the root uri aka, https://myhealthaccess.ca
+	public abstract URI getRootURI();
+
 	//==========================================================================
 	// Public Methods
 	//==========================================================================

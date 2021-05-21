@@ -35,4 +35,17 @@ public class AttachmentDto implements Serializable
 	protected String name;
 	protected String mimeType;
 	protected ZonedDateTime createdAtDateTime;
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	public AttachmentDto(String id, String name, String mimeType, ZonedDateTime createdAtDateTime)
+	{
+		this.id = id;
+		this.name = name;
+		this.mimeType = mimeType;
+		this.createdAtDateTime = createdAtDateTime;
+	}
+
 }

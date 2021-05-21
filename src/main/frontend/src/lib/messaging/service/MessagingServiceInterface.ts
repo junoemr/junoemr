@@ -5,6 +5,7 @@ import {MessageGroup} from "../model/MessageGroup";
 import Messageable from "../model/Messageable";
 import StreamingList from "../../util/StreamingList";
 import Conversation from "../model/Conversation";
+import Attachment from "../model/Attachment";
 
 export default interface MessagingServiceInterface
 {
@@ -44,6 +45,12 @@ export default interface MessagingServiceInterface
 	 */
 	getConversation(source: MessageSource, conversationId: string): Promise<Conversation>;
 
+	/**
+	 * download base64 attachment data
+	 * @param attachment - that data who's data is to be downloaded
+	 * @return promise - that resolves to base 64 attachment data.
+ 	 */
+	downloadAttachmentData(attachment: Attachment): Promise<string>;
 
 	/**
 	 * get a list of all available message sources.

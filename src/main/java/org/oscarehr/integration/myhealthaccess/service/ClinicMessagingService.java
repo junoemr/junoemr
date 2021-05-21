@@ -30,6 +30,7 @@ import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.ConversationDto;
 import org.oscarehr.integration.myhealthaccess.dto.MessageDto;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
+import org.oscarehr.messaging.backend.myhealthaccess.model.MhaAttachment;
 import org.oscarehr.messaging.model.MessageGroup;
 import org.oscarehr.messaging.model.Messageable;
 import org.oscarehr.util.LoggedInInfo;
@@ -44,6 +45,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 // Do not use this service directly rather use the oscarehr.messaging.service.MessagingService interface.
 @Service
@@ -68,7 +70,7 @@ public class ClinicMessagingService extends BaseService
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 		String url = restClient.formatEndpoint("/clinic_user/self/clinic/message/%s", messageId);
 
-		return restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), MessageDto.class);
+		return this.postProcessMessage(restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), MessageDto.class), restClient);
 	}
 
 	/**
@@ -117,7 +119,7 @@ public class ClinicMessagingService extends BaseService
 
 		String url = restClient.formatEndpointFull("/clinic_user/self/clinic/messages", null, queryParams);
 
-		return Arrays.asList(restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), MessageDto[].class));
+		return this.postProcessMessage(Arrays.asList(restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), MessageDto[].class)), restClient);
 	}
 
 	/**
@@ -132,7 +134,24 @@ public class ClinicMessagingService extends BaseService
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 		String url = restClient.formatEndpoint("/clinic_user/self/clinic/conversation/%s", conversationId);
 
-		return restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), ConversationDto.class);
+		ConversationDto conversationDto = restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), ConversationDto.class);
+		conversationDto.setMessages(this.postProcessMessage(conversationDto.getMessages(), restClient));
+
+		return conversationDto;
+	}
+
+	/**
+	 * get the data for an attachment
+	 * @param integration - integration to fetch attachment from
+	 * @param loggedInInfo - logged in user info
+	 * @param attachment - the attachment who's data is to be downloaded.
+	 * @return - the attachment binary data.
+	 */
+	public byte[] downloadAttachmentData(Integration integration, LoggedInInfo loggedInInfo, MhaAttachment attachment)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		return restClient.doGetWithToken(attachment.getDocumentUrl().toString(), getLoginToken(integration, loggedInInfo), byte[].class);
 	}
 
 	// ==========================================================================
@@ -151,5 +170,33 @@ public class ClinicMessagingService extends BaseService
 				loggedInInfo,
 				Optional.ofNullable(integration.getSite()).map(Site::getName).orElse(null))
 				.getToken();
+	}
+
+	/**
+	 * apply post processing to the incoming MessageDto.
+	 * @param messageDto - the message to process
+	 * @param restClient - the rest client that fetched the message
+	 * @return - the processed message
+	 */
+	protected MessageDto postProcessMessage(MessageDto messageDto, RestClientBase restClient)
+	{
+		// attachment url's are relative to the server they where fetched from. Make them an absolute URL.
+		messageDto.getAttachments().forEach((attachment) ->
+		{
+			attachment.setUrl(restClient.getRootURI().toString() + attachment.getUrl());
+		});
+
+		return messageDto;
+	}
+
+	/**
+	 * just like postProcessMessage but takes a list of messages
+	 * @param messageDtos - messages to process
+	 * @param restClient - the rest client used to fetch the messages
+	 * @return - list of processed messages
+	 */
+	protected List<MessageDto> postProcessMessage(List<MessageDto> messageDtos, RestClientBase restClient)
+	{
+		return messageDtos.stream().map((message) -> this.postProcessMessage(message, restClient)).collect(Collectors.toList());
 	}
 }

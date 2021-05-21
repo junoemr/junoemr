@@ -23,7 +23,6 @@
 
 package org.oscarehr.messaging.model;
 
-import org.oscarehr.util.LoggedInInfo;
 import org.springframework.util.MimeType;
 import java.time.ZonedDateTime;
 
@@ -35,13 +34,6 @@ public interface Attachment
 
 	public String getId();
 	public String getName();
-
-	/**
-	 * attachments data as base64.
-	 * @param loggedInInfo - the logged in user
-	 * @return - base64 encoded attachment data.
-	 */
-	public String getAttachmentBase64Data(LoggedInInfo loggedInInfo);
 
 	/**
 	 * get attachment mime type

@@ -51,7 +51,7 @@ angular.module("Messaging.Components.View").component('messageView', {
 				{
 					ctrl.isLoading = true;
 					ctrl.message = await ctrl.messagingService.getMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), ctrl.messageId);
-					ctrl.conversation = await ctrl.messagingService.getConversation(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), ctrl.message.conversationId);
+					ctrl.conversation = await ctrl.messagingService.getConversation(ctrl.message.source, ctrl.message.conversationId);
 				}
 				finally
 				{

@@ -21,7 +21,11 @@
 * Canada
 */
 
-import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE
+} from "../../../../common/components/junoComponentConstants";
 
 angular.module("Messaging.Components").component('inboxHeaderBar', {
 	templateUrl: 'src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBar.jsp',
@@ -39,6 +43,8 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 			const ctrl = this;
 			ctrl.searchTerm = "";
 			$scope.JUNO_STYLE = JUNO_STYLE;
+			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 			ctrl.$onInit = () =>
 			{

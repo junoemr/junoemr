@@ -18,6 +18,10 @@
 			cursor: pointer;
 			user-select: none;
 
+			&:hover {
+				background-color: var(--color-neutral-lighter);
+			}
+
 			&.selected {
 				background-color: var(--color-primary-lightest);
 			}

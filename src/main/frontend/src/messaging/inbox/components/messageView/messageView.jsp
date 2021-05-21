@@ -10,7 +10,7 @@
 	<!-- Message Feed -->
 	<div ng-if="!$ctrl.isLoading" class="flex-item-grow flex-col p-16 overflow-y-auto">
 		<div ng-repeat="message in $ctrl.conversation.messages" class="flex-col">
-			<message class="m-l-16 m-r-16 m-t-16" message="message"></message>
+			<message class="m-l-16 m-r-16 m-t-16" message="message" messaging-service="$ctrl.messagingService"></message>
 			<juno-divider component-style="$ctrl.componentStyle"></juno-divider>
 		</div>
 	</div>

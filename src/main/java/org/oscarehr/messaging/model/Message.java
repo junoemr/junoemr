@@ -78,6 +78,6 @@ public interface Message
 	 * get a list of attachments
 	 * @return - the attachments
 	 */
-	public Attachment getAttachments();
+	public List<? extends Attachment> getAttachments();
 
 }

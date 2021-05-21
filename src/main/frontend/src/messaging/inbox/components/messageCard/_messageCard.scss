@@ -4,6 +4,10 @@
 	cursor: pointer;
 	user-select: none;
 
+	&:hover {
+		background-color: var(--color-neutral-lightest);
+	}
+
 	&.selected {
 		background-color: var(--color-primary-base);
 		color: var(--color-neutral-white);

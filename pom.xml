@@ -1993,6 +1993,7 @@
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
                                 org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService
+								org.oscarehr.ws.rest.myhealthaccess.clinic.message.AttachmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessagesWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService
                                 org.oscarehr.ws.rest.myhealthaccess.DemographicWebService

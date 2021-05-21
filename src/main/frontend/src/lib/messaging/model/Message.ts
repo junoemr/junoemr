@@ -1,6 +1,8 @@
 import {Moment} from "moment";
 import {MessageGroup} from "./MessageGroup";
 import Messageable from "./Messageable";
+import Attachment from "./Attachment";
+import MessageSource from "./MessageSource";
 
 export default class Message
 {
@@ -14,6 +16,8 @@ export default class Message
 	protected _recipients: Messageable[];
 	protected _metaData: any;
 	protected _createdAtDateTime: Moment;
+	protected _attachments: Attachment[];
+	protected _source: MessageSource;
 
 	// ==========================================================================
 	// Public Methods
@@ -31,6 +35,7 @@ export default class Message
 	 * @param recipients - recipient list of the message
 	 * @param metaData - meta data for the message
 	 * @param createdAtDateTime - time at which the message was created.
+	 * @param attachments - attachments for this message
 	 */
 	constructor(
 		id: string,
@@ -42,7 +47,8 @@ export default class Message
 		sender: Messageable,
 		recipients: Messageable[],
 		metaData: any,
-		createdAtDateTime: Moment
+		createdAtDateTime: Moment,
+		attachments: Attachment[]
 	)
 	{
 		this._id = id;
@@ -55,6 +61,16 @@ export default class Message
 		this._recipients = recipients;
 		this._metaData = metaData;
 		this._createdAtDateTime = createdAtDateTime;
+		this._attachments = attachments;
+	}
+
+	// ==========================================================================
+	// Setters
+	// ==========================================================================
+
+	set source(messageSource: MessageSource)
+	{
+		this._source = messageSource;
 	}
 
 	// ==========================================================================
@@ -109,5 +125,20 @@ export default class Message
 	get createdAtDateTime(): Moment
 	{
 		return this._createdAtDateTime;
+	}
+
+	get attachments(): Attachment[]
+	{
+		return this._attachments;
+	}
+	
+	get hasAttachments(): boolean
+	{
+		return this._attachments && this._attachments.length > 0;
+	}
+
+	get source(): MessageSource
+	{
+		return this._source;
 	}
 }

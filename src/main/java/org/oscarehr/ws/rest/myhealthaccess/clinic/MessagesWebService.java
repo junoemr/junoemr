@@ -30,6 +30,7 @@ import org.oscarehr.messaging.model.Message;
 import org.oscarehr.messaging.model.MessageGroup;
 import org.oscarehr.messaging.model.MessageableType;
 import org.oscarehr.messaging.model.MessagingBackendType;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.conversion.messaging.MessageToMessageDtoConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.messaging.MessageDto;
@@ -77,6 +78,7 @@ public class MessagesWebService extends MessagingBaseWebService
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
+	@SkipContentLoggingOutbound
 	public RestResponse<List<MessageDto>> getMessages(
 			@PathParam("integrationId") String integrationId,
 

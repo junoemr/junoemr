@@ -12,6 +12,7 @@ import ConversationDtoToConversationConverter from "../../../converter/Conversat
 import IntegrationTo1ToMessageSourceConverter from "../../../converter/IntegrationTo1ToMessageSourceConverter";
 import {MessageSourceType} from "../../../model/MessageSourceType";
 import {MessageGroup} from "../../../model/MessageGroup";
+import Attachment from "../../../model/Attachment";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
@@ -82,7 +83,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 			try
 			{
 				const messageDto = (await this._mhaClinicMessagingApi.getMessage(source.id, messageId)).data.body;
-				return (new MessageDtoToMessageConverter()).convert(messageDto);
+				return this.postProcessMessage((new MessageDtoToMessageConverter()).convert(messageDto), source);
 			}
 			catch(error)
 			{
@@ -128,7 +129,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 					searchOptions.recipient?.id,
 					searchOptions.recipient?.type.toString())).data.body;
 
-				return (new MessageDtoToMessageConverter()).convertList(messages);
+				return this.postProcessMessageList((new MessageDtoToMessageConverter()).convertList(messages), source);
 			}
 			catch (error)
 			{
@@ -186,7 +187,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 				}
 			}));
 
-			const conversation = (await Promise.all(searchResults)).filter((msg) => msg != null)[0];
+			const conversation = (await Promise.all(searchResults)).filter((convo) => convo != null)[0];
 			if (conversation)
 			{
 				return conversation;
@@ -201,13 +202,26 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 			try
 			{
 				const conversationDto = (await this._mhaClinicMessagingApi.getConversation(source.id, conversationId)).data.body;
-				return (new ConversationDtoToConversationConverter()).convert(conversationDto);
+				const conversation = (new ConversationDtoToConversationConverter()).convert(conversationDto);
+
+				conversation.messages = this.postProcessMessageList(conversation.messages, source);
+				return conversation
 			}
 			catch (error)
 			{
 				throw new MessagingError(`Failed to retrieve conversation [${conversationId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
 			}
 		}
+	}
+
+	/**
+	 * download base64 attachment data
+	 * @param attachment - that data who's data is to be downloaded
+	 * @return promise - that resolves to base 64 attachment data.
+	 */
+	public async downloadAttachmentData(attachment: Attachment): Promise<string>
+	{
+		return (await this._mhaClinicMessagingApi.getFileDataBase64(attachment.source.id, attachment.message.id, attachment.id)).data.body;
 	}
 
 	/**
@@ -287,5 +301,31 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	protected messageSortFunction(m1: Message, m2: Message): number
 	{
 		return m2.createdAtDateTime.diff(m1.createdAtDateTime);
+	}
+
+	/**
+	 * apply post processing to message
+	 * @param message - message to post process
+	 * @param messageSource - the source form which the message was fetched.
+	 * @return the processed message
+	 * @protected
+	 */
+	protected postProcessMessage(message: Message, messageSource: MessageSource): Message
+	{
+		message.source = messageSource;
+		message.attachments.forEach((attachment) => attachment.source = messageSource);
+		return message;
+	}
+
+	/**
+	 * apply postProcessMessage() to every message in the list
+	 * @param messages - list of messages
+	 * @param messageSource - the source form which the message was fetched.
+	 * @return the process list of messages
+	 * @protected
+	 */
+	protected postProcessMessageList(messages: Message[], messageSource: MessageSource): Message[]
+	{
+		return messages.map((msg) => this.postProcessMessage(msg, messageSource));
 	}
 }

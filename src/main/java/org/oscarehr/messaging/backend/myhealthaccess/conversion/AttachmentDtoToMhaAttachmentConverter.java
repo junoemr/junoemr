@@ -35,6 +35,9 @@ import java.net.URL;
 
 public class AttachmentDtoToMhaAttachmentConverter extends AbstractModelConverter<AttachmentDto, MhaAttachment>
 {
+	// ==========================================================================
+	// AbstractModelConverter Overrides
+	// ==========================================================================
 
 	@Override
 	public MhaAttachment convert(AttachmentDto input)

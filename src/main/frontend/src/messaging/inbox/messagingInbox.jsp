@@ -5,8 +5,8 @@
 	<page-body class="flex-item-grow flex-col messaging-inbox">
 		<inbox-header-bar component-style="$ctrl.componentStyle"></inbox-header-bar>
 
-		<div class="flex-item-grow flex-row overflow-hidden">
-			<inbox-select class="w-256 w-min-256 h-min-100"
+		<div class="flex-item-grow flex-row overflow-hidden overflow-x-auto">
+			<inbox-select class="inbox-select-pane w-256 h-min-100"
 			              component-style="$ctrl.componentStyle"
 			              groups="$ctrl.groups"
 			              sources="$ctrl.messageSources"
