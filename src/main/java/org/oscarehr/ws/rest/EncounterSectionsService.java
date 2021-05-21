@@ -56,14 +56,18 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Path("/encounterSections")
 @Component("EncounterSectionsService")
 public class EncounterSectionsService extends AbstractServiceImpl
 {
 	Logger logger = Logger.getLogger(EFormsService.class);
+
+	private static final long MULTISEARCH_RESULT_COUNT = 10;
 
 	@Context
 	ServletContext context;
@@ -176,15 +180,26 @@ public class EncounterSectionsService extends AbstractServiceImpl
 
 		// Filter results based on the search term
 		List<MultiSearchResult> filteredResults = new ArrayList<>();
+		List<MultiSearchResult> restOfResults = new ArrayList<>();
 		for(MultiSearchResult result: results)
 		{
-			if(StringUtils.containsIgnoreCase(result.getText(), searchTerm))
+			if(StringUtils.startsWithIgnoreCase(result.getText(), searchTerm))
 			{
 				filteredResults.add(result);
 			}
+			else if(StringUtils.containsIgnoreCase(result.getText(), searchTerm))
+			{
+				restOfResults.add(result);
+			}
 		}
 
-		return RestResponse.successResponse(filteredResults);
+		Collections.sort(filteredResults);
+		Collections.sort(restOfResults);
+
+		filteredResults.addAll(restOfResults);
+
+		return RestResponse.successResponse(
+				filteredResults.stream().limit(MULTISEARCH_RESULT_COUNT).collect(Collectors.toList()));
 	}
 
 	private EncounterSectionService.SectionParameters getSectionParams(String appointmentNo)

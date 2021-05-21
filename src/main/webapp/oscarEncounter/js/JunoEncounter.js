@@ -598,7 +598,15 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			},
 			minLength: 2,
 			delay: 100
-		});
+		}).data("ui-autocomplete")._renderItem = function( ul, item )
+		{
+			// HACK: override the _renderItem() method to highlight the search string
+			let txt = String(item.label).replace(new RegExp(this.term, "gi"),"<b>$&</b>");
+			return junoJQuery("<li></li>")
+				.data("ui-autocomplete-item", item)
+				.append("<a>" + txt + "</a>")
+				.appendTo(ul);
+		};
 	};
 
 	this.openTemplatePage = function openTemplatePage(selectedValue)

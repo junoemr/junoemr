@@ -69,7 +69,6 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -830,11 +829,12 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 			@SuppressWarnings("unchecked")
 			List<Demographic> results =  query.list();
-			if(results.size() != 1) {
+			if(results.size() != 1)
+			{
 				String message = "Found (" + Integer.toString(results.size()) +
 						") demographics matching lab. Expected 1.";
 				logger.info(message);
-				throw new NoSuchElementException(message);
+				return null;
 			}
 
 			return results.get(0);
