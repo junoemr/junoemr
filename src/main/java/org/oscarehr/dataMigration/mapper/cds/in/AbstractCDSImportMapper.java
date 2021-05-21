@@ -106,9 +106,9 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 				if(Arrays.stream(ignoreKeys).noneMatch(dataElement.getName()::equals))
 				{
 					ResidualInfo residualInfo = new ResidualInfo();
-					residualInfo.setKey(dataElement.getName());
-					residualInfo.setValue(dataElement.getContent());
-					residualInfo.setValueType(dataElement.getDataType());
+					residualInfo.setContentKey(dataElement.getName());
+					residualInfo.setContentValue(dataElement.getContent());
+					residualInfo.setContentType(dataElement.getDataType());
 					residualInfoList.add(residualInfo);
 				}
 			}

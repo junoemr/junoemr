@@ -47,9 +47,9 @@ public class CaseManagementNoteResidualInfo extends AbstractModel<Long>
 	{
 		this.id = null;
 		this.note = referenceNote;
-		this.key = infoToCopy.key;
-		this.value = infoToCopy.value;
-		this.valueType = infoToCopy.valueType;
+		this.contentKey = infoToCopy.contentKey;
+		this.contentValue = infoToCopy.contentValue;
+		this.contentType = infoToCopy.contentType;
 	}
 
 	@Id
@@ -61,12 +61,12 @@ public class CaseManagementNoteResidualInfo extends AbstractModel<Long>
 	@JoinColumn(name = "note_id", nullable = false)
 	private CaseManagementNote note;
 
-	@Column(name = "\"key\"", nullable = false)
-	private String key;
+	@Column(name = "content_key", nullable = false)
+	private String contentKey;
 
-	@Column(name = "\"value\"")
-	private String value;
+	@Column(name = "content_value")
+	private String contentValue;
 
-	@Column(name = "value_type", nullable = false)
-	private String valueType;
+	@Column(name = "content_type", nullable = false)
+	private String contentType;
 }

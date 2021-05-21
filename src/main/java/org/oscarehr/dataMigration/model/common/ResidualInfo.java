@@ -29,7 +29,7 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 public class ResidualInfo extends AbstractTransientModel
 {
 	private Long id;
-	private String key;
-	private String value;
-	private String valueType;
+	private String contentKey;
+	private String contentValue;
+	private String contentType;
 }

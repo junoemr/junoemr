@@ -105,7 +105,7 @@ public class CDSExportMapperTest
 		assertEquals(expectedAddressLine1, resultAddress.getStructured().getLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getStructured().getLine2());
 		assertEquals(expectedCity, resultAddress.getStructured().getCity());
-		assertEquals(expectedProvince, resultAddress.getStructured().getCountrySubdivisionCode());
+		assertEquals(expectedCountry + "-" + expectedProvince, resultAddress.getStructured().getCountrySubdivisionCode());
 		assertEquals(expectedPostal, resultAddress.getStructured().getPostalZipCode().getPostalCode());
 	}
 

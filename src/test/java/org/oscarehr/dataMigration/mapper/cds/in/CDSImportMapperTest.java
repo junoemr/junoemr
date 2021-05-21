@@ -800,9 +800,9 @@ public class CDSImportMapperTest
 
 		assertEquals(1, residualInfoList.size());
 		ResidualInfo actualResult0 = residualInfoList.get(0);
-		assertEquals(dataKey, actualResult0.getKey());
-		assertEquals(dataType, actualResult0.getValueType());
-		assertEquals(expectedStringValue, actualResult0.getValue());
+		assertEquals(dataKey, actualResult0.getContentKey());
+		assertEquals(dataType, actualResult0.getContentType());
+		assertEquals(expectedStringValue, actualResult0.getContentValue());
 	}
 
 	@Test
@@ -836,9 +836,9 @@ public class CDSImportMapperTest
 		// the elements with the ignored keys should not be in the returned list
 		assertEquals(1, residualInfoList.size());
 		ResidualInfo actualResult0 = residualInfoList.get(0);
-		assertEquals(dataKey1, actualResult0.getKey());
-		assertEquals(dataType1.name(), actualResult0.getValueType());
-		assertEquals(expectedStringValue1, actualResult0.getValue());
+		assertEquals(dataKey1, actualResult0.getContentKey());
+		assertEquals(dataType1.name(), actualResult0.getContentType());
+		assertEquals(expectedStringValue1, actualResult0.getContentValue());
 	}
 
 	@Test

@@ -141,7 +141,7 @@
 	    List<CaseManagementNoteResidualInfo> residualInfoList = caseManagementNoteResidualInfoDao.findByNoteId(p_cmn.getId());
 	    if(residualInfoList != null && !residualInfoList.isEmpty())
 	    {
-		    dump = residualInfoList.stream().map((residualInfo) -> residualInfo.getKey() + ": " + residualInfo.getValue()).collect(Collectors.joining("\n"));
+		    dump = residualInfoList.stream().map((residualInfo) -> residualInfo.getContentKey() + ": " + residualInfo.getContentValue()).collect(Collectors.joining("\n"));
 	    }
     }
     if (saved) {
