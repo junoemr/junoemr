@@ -74,6 +74,22 @@ public class ClinicMessagingService extends BaseService
 	}
 
 	/**
+	 * update the message according to the provided message dto.
+	 * @param integration - the integration (Mha clinic) in which the message resides that you are updating
+	 * @param loggedInInfo - the logged in info of the user performing the action
+	 * @param messageDto - message date to update. Only fields that have an effect are id, subject, message, metaData, read, group.
+	 *                   other attributes are ignored / cannot be updated.
+	 * @return - a fresh copy of the message pulled from the MHA server.
+	 */
+	public MessageDto updateMessage(Integration integration, LoggedInInfo loggedInInfo, MessageDto messageDto)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+		String url = restClient.formatEndpoint("/clinic_user/self/clinic/message/%s", messageDto.getId());
+
+		return this.postProcessMessage(restClient.doPutWithToken(url, getLoginToken(integration, loggedInInfo), messageDto, MessageDto.class), restClient);
+	}
+
+	/**
 	 *
 	 * @param integration - the integration (mha clinic) you which to fetch messages from.
 	 * @param loggedInInfo - the logged in info for the user performing the action
@@ -151,7 +167,10 @@ public class ClinicMessagingService extends BaseService
 	{
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
-		return restClient.doGetWithToken(attachment.getDocumentUrl().toString(), getLoginToken(integration, loggedInInfo), byte[].class);
+		return restClient.doGetWithToken(
+				attachment.getDocumentUrl().orElseThrow(() -> new IllegalArgumentException("Cannot download attachment without url")).toString(),
+				getLoginToken(integration, loggedInInfo),
+				byte[].class);
 	}
 
 	// ==========================================================================

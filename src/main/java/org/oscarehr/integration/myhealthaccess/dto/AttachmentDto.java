@@ -26,11 +26,13 @@ package org.oscarehr.integration.myhealthaccess.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Data
+@NoArgsConstructor
 public class AttachmentDto implements Serializable
 {
 	protected String id;
@@ -42,4 +44,19 @@ public class AttachmentDto implements Serializable
 	@JsonProperty("updated_at")
 	protected ZonedDateTime updatedAt;
 	protected String url;
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	public AttachmentDto(String id, String name, String type, String description, ZonedDateTime createdAt, ZonedDateTime updatedAt, String url)
+	{
+		this.id = id;
+		this.name = name;
+		this.type = type;
+		this.description = description;
+		this.createdAt = createdAt;
+		this.updatedAt = updatedAt;
+		this.url = url;
+	}
 }

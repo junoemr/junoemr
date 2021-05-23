@@ -99,6 +99,13 @@ public abstract class RestClientBase extends RESTClient
 		return uriBuilder.build().toUriString();
 	}
 
+	public <T> T doGetWithToken(String url, String token, Class<T> responseClass)
+	{
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("X-Auth-Token", token);
+		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass);
+	}
+
 	public <U, T> T doPostWithToken(String url, String token, U body, Class<T> responseClass)
 	{
 		HttpHeaders headers = new HttpHeaders();
@@ -106,11 +113,11 @@ public abstract class RestClientBase extends RESTClient
 		return executeRequest(url, HttpMethod.POST, headers, null, body, responseClass);
 	}
 
-	public <T> T doGetWithToken(String url, String token, Class<T> responseClass)
+	public <U, T> T doPutWithToken(String url, String token, U body, Class<T> responseClass)
 	{
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("X-Auth-Token", token);
-		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass);
+		return executeRequest(url, HttpMethod.PUT, headers, null, body, responseClass);
 	}
 
 	//==========================================================================

@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -5,46 +6,51 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * <p>
+ *
  * This software was written for
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
  */
+ 
+package org.oscarehr.ws.rest.conversion.messaging.myhealthaccess;
 
-package org.oscarehr.integration.myhealthaccess.dto;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.messaging.backend.myhealthaccess.model.MhaMessage;
+import org.oscarehr.ws.rest.transfer.messaging.MessageDto;
+import org.springframework.beans.BeanUtils;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.oscarehr.messaging.model.MessageableType;
-
-import java.io.Serializable;
-
-@Data
-@NoArgsConstructor
-public class MessageParticipantDto implements Serializable
+public class MessageDtoToMhaMessageConverter extends AbstractModelConverter<MessageDto, MhaMessage>
 {
-	protected String id;
-	protected String name;
-	protected MessageableType type;
-
 	// ==========================================================================
-	// Public Methods
+	// AbstractModelConverter Overrides
 	// ==========================================================================
 
-	public MessageParticipantDto(String id, String name, MessageableType type)
+	@Override
+	public MhaMessage convert(MessageDto input)
 	{
-		this.id = id;
-		this.name = name;
-		this.type = type;
+		MhaMessage message = new MhaMessage();
+		BeanUtils.copyProperties(input, message, "isRead", "sender", "recipients", "attachments");
+		message.setRead(input.getIsRead());
+
+		// sender
+		message.setSender((new MessageableDtoToMhaMessageableConverter()).convert(input.getSender()));
+
+		// recipients
+		message.setRecipients((new MessageableDtoToMhaMessageableConverter()).convert(input.getRecipients()));
+
+		// attachments
+		message.setAttachments((new AttachmentDtoToMhaAttachmentConverter()).convert(input.getAttachments()));
+
+		return message;
 	}
 }

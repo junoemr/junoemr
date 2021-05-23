@@ -31,7 +31,9 @@ import org.oscarehr.integration.myhealthaccess.dto.MessageDto;
 import org.oscarehr.integration.myhealthaccess.service.ClinicMessagingService;
 import org.oscarehr.messaging.backend.myhealthaccess.conversion.ConversationDtoToMhaConversationConverter;
 import org.oscarehr.messaging.backend.myhealthaccess.conversion.MessageDtoToMhaMessageConverter;
+import org.oscarehr.messaging.backend.myhealthaccess.conversion.MhaMessageToMessageDtoConverter;
 import org.oscarehr.messaging.backend.myhealthaccess.model.MhaAttachment;
+import org.oscarehr.messaging.backend.myhealthaccess.model.MhaMessage;
 import org.oscarehr.messaging.model.*;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +79,29 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 		Integration integration = this.getIntegrationFromMessageable(messageable);
 
 		return (new MessageDtoToMhaMessageConverter()).convert(clinicMessagingService.getMessage(integration, loggedInInfo, messageId));
+	}
+
+	/**
+	 * update attributes of message (save)
+	 * @param loggedInInfo - currently logged in user info
+	 * @param messageable - the messageable (user) who owns the message.
+	 * @param message - the message to update (save).
+	 * @return - a fresh copy of the message after the update.
+	 * @throws IllegalArgumentException - if the messaging backend doesn't support the type of message passed in.
+	 */
+	public Message updateMessage(LoggedInInfo loggedInInfo, Messageable<?> messageable, Message message)
+	{
+		if (message instanceof MhaMessage)
+		{
+			MessageDto messageDto = (new MhaMessageToMessageDtoConverter()).convert((MhaMessage) message);
+
+			return (new MessageDtoToMhaMessageConverter()).convert(
+					this.clinicMessagingService.updateMessage(getIntegrationFromMessageable(messageable), loggedInInfo, messageDto));
+		}
+		else
+		{
+			throw new IllegalArgumentException("MHA messaging service can only update MhaMessage messages");
+		}
 	}
 
 	/**

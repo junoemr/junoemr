@@ -31,11 +31,21 @@ public enum MessageGroup
 	SENT("sent"),
 	ARCHIVED("archived"),
 	UNKNOWN("unknown");
+
 	// ==========================================================================
 	// Boilerplate
 	// ==========================================================================
 
-	private String name;
+	public static MessageGroup fromString(String name) {
+		for (MessageGroup group : MessageGroup.values()) {
+			if (group.name.equals(name)) {
+				return group;
+			}
+		}
+		throw new IllegalArgumentException("MessageGroup has no enum value for [" + name + "]");
+	}
+
+	private final String name;
 
 	MessageGroup(String name)
 	{
@@ -46,5 +56,11 @@ public enum MessageGroup
 	public String getName()
 	{
 		return this.name;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.getName();
 	}
 }

@@ -32,6 +32,7 @@ import org.springframework.util.MimeType;
 
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Data
 public class MhaAttachment implements Attachment
@@ -61,5 +62,14 @@ public class MhaAttachment implements Attachment
 		this.mimeType = mimeType;
 		this.createdAtDateTime = createdAtDateTime;
 		this.documentUrl = documentUrl;
+	}
+
+	// ==========================================================================
+	// Getters
+	// ==========================================================================
+
+	public Optional<URL> getDocumentUrl()
+	{
+		return Optional.ofNullable(this.documentUrl);
 	}
 }

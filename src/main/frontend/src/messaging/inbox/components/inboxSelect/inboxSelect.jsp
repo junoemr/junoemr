@@ -10,7 +10,7 @@
 			     ng-class="$ctrl.getSourceItemClass(source.id, group)"
 			     ng-click="$ctrl.onSourceClick(source.id, group)"
 			>
-				<div class="text-ellipsis">{{source.name}}</div>
+				<div class="text-ellipsis" title="{{source.name}}">{{source.name}}</div>
 			</div>
 		</juno-collapse-area>
 	</div>

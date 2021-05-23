@@ -24,11 +24,13 @@
 package org.oscarehr.ws.rest.transfer.messaging;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Data
+@NoArgsConstructor
 public class AttachmentDto implements Serializable
 {
 	protected String id;

@@ -26,18 +26,23 @@ import {
 	JUNO_BUTTON_COLOR_PATTERN,
 	JUNO_STYLE
 } from "../../../../common/components/junoComponentConstants";
+import MessagingServiceFactory from "../../../../lib/messaging/factory/MessagingServiceFactory";
+import {MessageGroup} from "../../../../lib/messaging/model/MessageGroup";
 
 angular.module("Messaging.Components").component('inboxHeaderBar', {
 	templateUrl: 'src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBar.jsp',
 	bindings: {
 		componentStyle: "<?",
+		selectedMessageId: "<",
+		messageStream: "<",
+		messagingBackendId: "<",
+		sourceId: "<",
+		groupId: "<",
 	},
 	controller: [
 		"$scope",
-		"$stateParams",
 		function (
-			$scope,
-			$stateParams
+			$scope
 		)
 		{
 			const ctrl = this;
@@ -45,11 +50,82 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 			$scope.JUNO_STYLE = JUNO_STYLE;
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+			$scope.MessageGroup = MessageGroup;
 
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			};
 
+			ctrl.markSelectedMessageAsUnread = async () =>
+			{
+				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
+				const message = await ctrl.getSelectedMessage();
+
+				message.read = false;
+				await messagingService.updateMessage(message);
+
+				$scope.$apply();
+			};
+
+			ctrl.archiveSelectedMessage = async () =>
+			{
+				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
+				const message = await ctrl.getSelectedMessage();
+
+				message.archive();
+				await messagingService.updateMessage(message);
+
+				// delete message from message stream
+				if (ctrl.messageStream)
+				{
+					ctrl.messageStream.remove(message);
+				}
+
+				$scope.$apply();
+			}
+
+			ctrl.unarchiveSelectedMessage = async () =>
+			{
+				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
+				const message = await ctrl.getSelectedMessage();
+
+				message.unarchive();
+				await messagingService.updateMessage(message);
+
+				// delete message from message stream
+				if (ctrl.messageStream)
+				{
+					ctrl.messageStream.remove(message);
+				}
+
+				$scope.$apply();
+			}
+
+			/**
+			 * get the currently selected message object
+			 * @returns promise that resolves to the selected message
+			 */
+			ctrl.getSelectedMessage = async () =>
+			{
+				let message = null;
+				// our version of webpack can't parse js files with optional chaining for some reason. Can be one liner with '?'.
+				if (ctrl.messageStream)
+				{
+					message = ctrl.messageStream.find((msg) => msg.id === ctrl.selectedMessageId);
+				}
+
+				if (message)
+				{
+					return message;
+				}
+				else
+				{
+					// selected message may not be in the message stream. This can happen if the user reloads the page
+					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
+					return message = await messagingService.getMessage(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
+				}
+
+			}
 		}],
 });

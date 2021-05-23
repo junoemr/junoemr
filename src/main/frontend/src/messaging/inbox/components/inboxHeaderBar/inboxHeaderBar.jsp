@@ -16,20 +16,36 @@
 		<juno-button class="header-button"
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
-		             component-style="$ctrl.componentStyle">
+		             component-style="$ctrl.componentStyle"
+		             click="$ctrl.markSelectedMessageAsUnread()">
 			<div class="flex-row align-items-center">
 				<span>Mark as Unread</span>
 				<i class="icon icon-dot"></i>
 			</div>
 		</juno-button>
 
-		<!-- Delete -->
-		<juno-button class="header-button m-l-24"
+		<!-- Archive -->
+		<juno-button ng-if="$ctrl.groupId !== MessageGroup.Archived"
+		             class="header-button m-l-24"
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
-		             component-style="$ctrl.componentStyle">
+		             component-style="$ctrl.componentStyle"
+		             click="$ctrl.archiveSelectedMessage()">
 			<div class="flex-row align-items-center">
-				<span>Delete</span>
+				<span>Archive</span>
+				<i class="icon icon-delete"></i>
+			</div>
+		</juno-button>
+
+		<!-- Unarchive -->
+		<juno-button ng-if="$ctrl.groupId === MessageGroup.Archived"
+		             class="header-button m-l-24"
+		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
+		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             component-style="$ctrl.componentStyle"
+		             click="$ctrl.unarchiveSelectedMessage()">
+			<div class="flex-row align-items-center">
+				<span>Unarchive</span>
 				<i class="icon icon-delete"></i>
 			</div>
 		</juno-button>

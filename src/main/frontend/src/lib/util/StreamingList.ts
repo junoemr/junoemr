@@ -57,6 +57,18 @@ export default class StreamingList<T> extends Array<T>
 		return loaded;
 	}
 
+	/**
+	 * remove an item from the list.
+	 * @param item - item to remove. Will only remove first occurrence. No effect if not found.
+	 */
+	public remove(item: T): void
+	{
+		if (this.indexOf(item) !== -1)
+		{
+			this.splice(this.indexOf(item), 1);
+		}
+	}
+
 	// ==========================================================================
 	// Getters
 	// ==========================================================================

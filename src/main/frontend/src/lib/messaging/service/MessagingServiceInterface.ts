@@ -22,6 +22,13 @@ export default interface MessagingServiceInterface
 	getMessage(source: MessageSource, messageId: string): Promise<Message>;
 
 	/**
+	 * update the message attributes
+	 * @param message - the message to update.
+	 * @return message - a freshly loaded copy of the message from the server.
+	 */
+	updateMessage(message: Message): Promise<Message>;
+
+	/**
 	 * search messages from the specified message source.
 	 * @param source - the source to search in.
 	 * @param searchOptions - filters to narrow the search.

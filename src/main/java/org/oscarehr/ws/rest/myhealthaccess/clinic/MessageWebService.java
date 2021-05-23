@@ -30,6 +30,7 @@ import org.oscarehr.messaging.factory.MessagingServiceFactory;
 import org.oscarehr.messaging.model.Message;
 import org.oscarehr.messaging.model.MessagingBackendType;
 import org.oscarehr.ws.rest.conversion.messaging.MessageToMessageDtoConverter;
+import org.oscarehr.ws.rest.conversion.messaging.myhealthaccess.MessageDtoToMhaMessageConverter;
 import org.oscarehr.ws.rest.response.GenericRestResponse;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.messaging.MessageDto;
@@ -38,10 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -82,4 +80,24 @@ public class MessageWebService extends MessagingBaseWebService
 			return null;
 		}
 	}
+
+
+	@PUT
+	@Path("/{messageId}/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<MessageDto> updateMessage(
+			@PathParam("integrationId") String integrationId,
+			@PathParam("messageId") String messageId,
+			MessageDto messageDto
+	)
+	{
+		messageDto.setId(messageId);
+		Message message = this.messagingService.updateMessage(
+				getLoggedInInfo(),
+				messageableFromIntegrationId(integrationId),
+				(new MessageDtoToMhaMessageConverter()).convert(messageDto));
+
+		return RestResponse.successResponse((new MessageToMessageDtoConverter()).convert(message));
+	}
+
 }

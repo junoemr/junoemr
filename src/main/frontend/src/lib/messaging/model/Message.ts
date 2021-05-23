@@ -3,6 +3,7 @@ import {MessageGroup} from "./MessageGroup";
 import Messageable from "./Messageable";
 import Attachment from "./Attachment";
 import MessageSource from "./MessageSource";
+import MessagingError from "../../error/MessagingError";
 
 export default class Message
 {
@@ -64,6 +65,22 @@ export default class Message
 		this._attachments = attachments;
 	}
 
+	/**
+	 * archive the message
+	 */
+	public archive(): void
+	{
+		this._group = MessageGroup.Archived;
+	}
+
+	/**
+	 * unarchive the message
+	 */
+	public unarchive(): void
+	{
+		throw new MessagingError("Base message cannot be unarchived");
+	}
+
 	// ==========================================================================
 	// Setters
 	// ==========================================================================
@@ -71,6 +88,11 @@ export default class Message
 	set source(messageSource: MessageSource)
 	{
 		this._source = messageSource;
+	}
+
+	set read(read: boolean)
+	{
+		this._read = read;
 	}
 
 	// ==========================================================================

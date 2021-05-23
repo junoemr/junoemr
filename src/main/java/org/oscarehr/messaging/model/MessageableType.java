@@ -38,7 +38,16 @@ public enum MessageableType
 	// Boilerplate
 	// ==========================================================================
 
-	private String name;
+	public static MessageableType fromString(String name) {
+		for (MessageableType type : MessageableType.values()) {
+			if (type.name.equals(name)) {
+				return type;
+			}
+		}
+		throw new IllegalArgumentException("MessageableType has no enum value for [" + name + "]");
+	}
+
+	private final String name;
 
 	MessageableType(String name)
 	{
@@ -49,5 +58,11 @@ public enum MessageableType
 	public String getName()
 	{
 		return this.name;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.getName();
 	}
 }

@@ -47,6 +47,16 @@ public interface MessagingService
 	public Message getMessage(LoggedInInfo loggedInInfo, Messageable<?> messageable, String messageId);
 
 	/**
+	 * update attributes of message (save)
+	 * @param loggedInInfo - currently logged in user info
+	 * @param messageable - the messageable (user) who owns the message.
+	 * @param message - the message to update (save).
+	 * @return - a fresh copy of the message after the update.
+	 * @throws IllegalArgumentException - if the messaging backend doesn't support the type of message passed in.
+	 */
+	public Message updateMessage(LoggedInInfo loggedInInfo, Messageable<?> messageable, Message message);
+
+	/**
 	 * get messages for a messageable, filtering by the provided parameters.
 	 * @param loggedInInfo - currently logged in user info
 	 * @param messageable - the messageable (user) you want to get messages for.

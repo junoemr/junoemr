@@ -29,9 +29,11 @@ angular.module("Messaging.Components").component('messageList', {
 	templateUrl: 'src/messaging/inbox/components/messageList/messageList.jsp',
 	bindings: {
 		componentStyle: "<?",
+		selectedMessageId: "=",
 		messagingBackend: "<",
 		sourceId: "<",
 		groupId: "<",
+		messageStreamChange: "&?", // called when the message stream changes. var "stream" is the new message stream
 	},
 	controller: [
 		"$scope",
@@ -46,7 +48,6 @@ angular.module("Messaging.Components").component('messageList', {
 			ctrl.debounceTimeout = null;
 			ctrl.DEBOUNC_TIME_MS = 500;
 			ctrl.MESSAGE_FETCH_COUNT = 10;
-			ctrl.selectedMessageId = null;
 
 			ctrl.$onInit = () =>
 			{
@@ -59,8 +60,14 @@ angular.module("Messaging.Components").component('messageList', {
 			 */
 			ctrl.onSelectMessage = (message) =>
 			{
-				ctrl.selectedMessageId = message.id;
+				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
 
+				// mark message as read
+				message.read = true;
+				messagingService.updateMessage(message);
+
+				// display the selected message
+				ctrl.selectedMessageId = message.id;
 				$state.go("messaging.view.message",
 				{
 					backend: ctrl.messagingBackend,
@@ -111,6 +118,12 @@ angular.module("Messaging.Components").component('messageList', {
 					$scope.$apply();
 					await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
 					$scope.$apply();
+
+					// notify parent of stream change.
+					if (ctrl.messageStreamChange)
+					{
+						ctrl.messageStreamChange({stream: ctrl.messageStream});
+					}
 				}
 			}
 

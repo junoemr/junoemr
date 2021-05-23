@@ -23,6 +23,7 @@
 
 import MessagingServiceFactory from "../../lib/messaging/factory/MessagingServiceFactory";
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
+import StreamingList from "../../lib/util/StreamingList";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',
@@ -42,15 +43,18 @@ angular.module("Messaging").component('messagingInbox', {
 		ctrl.backend = $stateParams.backend;
 		ctrl.selectedSourceId = $stateParams.source;
 		ctrl.selectedGroupId = $stateParams.group;
-		ctrl.messagingService = MessagingServiceFactory.build($stateParams.backend);
 		ctrl.componentStyle = JUNO_STYLE.GREY;
 		ctrl.messageSources = [];
 		ctrl.groups = [];
+		ctrl.messageStream = null;
+		ctrl.selectedMessageId = $stateParams.messageId;
 
 		ctrl.$onInit = async () =>
 		{
-			ctrl.messageSources = await ctrl.messagingService.getMessageSources();
-			ctrl.groups = await ctrl.messagingService.getMessageGroups();
+			const messagingService = MessagingServiceFactory.build($stateParams.backend);
+
+			ctrl.messageSources = await messagingService.getMessageSources();
+			ctrl.groups = await messagingService.getMessageGroups();
 		}
 
 		/**
@@ -63,6 +67,16 @@ angular.module("Messaging").component('messagingInbox', {
 			ctrl.selectedSourceId = sourceId;
 			ctrl.selectedGroupId = groupId;
 			$state.go(".", {backend: ctrl.backend, source: sourceId, group: groupId});
+		};
+
+		ctrl.onMessageStreamChange = (stream) =>
+		{
+			ctrl.messageStream = stream;
+		};
+
+		ctrl.onMessageSelected = (id) =>
+		{
+			ctrl.selectedMessageId = id;
 		}
 	}],
 });

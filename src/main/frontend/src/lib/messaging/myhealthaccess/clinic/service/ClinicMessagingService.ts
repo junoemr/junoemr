@@ -2,17 +2,19 @@ import MessagingServiceInterface, {MessageSearchParams} from "../../../service/M
 import MessageSource from "../../../model/MessageSource";
 import Message from "../../../model/Message";
 import {API_BASE_PATH} from "../../../../constants/ApiConstants";
-import MessageDtoToMessageConverter from "../../../converter/MessageDtoToMessageConverter";
 import MessagingError from "../../../../error/MessagingError";
-import {MhaClinicMessagingApi, MhaIntegrationApi} from "../../../../../../generated";
+import {MessageDto, MhaClinicMessagingApi, MhaIntegrationApi} from "../../../../../../generated";
 import StreamingList, {StreamSource} from "../../../../util/StreamingList";
 import ClinicMailboxStreamSource from "../model/ClinicMailboxStreamSource";
 import Conversation from "../../../model/Conversation";
-import ConversationDtoToConversationConverter from "../../../converter/ConversationDtoToConversationConverter";
 import IntegrationTo1ToMessageSourceConverter from "../../../converter/IntegrationTo1ToMessageSourceConverter";
 import {MessageSourceType} from "../../../model/MessageSourceType";
 import {MessageGroup} from "../../../model/MessageGroup";
 import Attachment from "../../../model/Attachment";
+import MessageToMessageDtoConverter from "../../../converter/MessageToMessageDtoConverter";
+import {message} from "gulp-typescript/release/utils";
+import MessageDtoToMhaMessageConverter from "../../converter/MessageDtoToMhaMessageConverter";
+import ConversationDtoToMhaConversationConverter from "../../converter/ConversationDtoToMhaConversationConverter";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
@@ -83,12 +85,32 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 			try
 			{
 				const messageDto = (await this._mhaClinicMessagingApi.getMessage(source.id, messageId)).data.body;
-				return this.postProcessMessage((new MessageDtoToMessageConverter()).convert(messageDto), source);
+				return this.postProcessMessage((new MessageDtoToMhaMessageConverter()).convert(messageDto), source);
 			}
 			catch(error)
 			{
 				throw new MessagingError(`Failed to retrieve message [${messageId}] from source [${source.id}] with error: ${error.toString()} - ${error.status}`)
 			}
+		}
+	}
+
+	/**
+	 * update the message attributes
+	 * @param message - the message to update.
+	 * @return message - a freshly loaded copy of the message from the server.
+	 */
+	public async updateMessage(message: Message): Promise<Message>
+	{
+		try
+		{
+			const messageDto: MessageDto = (new MessageToMessageDtoConverter()).convert(message);
+			const updatedMessageDto = (await this._mhaClinicMessagingApi.updateMessage(message.source.id, messageDto.id, messageDto)).data.body;
+
+			return this.postProcessMessage((new MessageDtoToMhaMessageConverter()).convert(updatedMessageDto), message.source);
+		}
+		catch(error)
+		{
+			throw new MessagingError(`Failed to update message [${message.id}] in source [${message.source.id}] with error: ${error.toString()} - ${error.status}`)
 		}
 	}
 
@@ -129,7 +151,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 					searchOptions.recipient?.id,
 					searchOptions.recipient?.type.toString())).data.body;
 
-				return this.postProcessMessageList((new MessageDtoToMessageConverter()).convertList(messages), source);
+				return this.postProcessMessageList((new MessageDtoToMhaMessageConverter()).convertList(messages), source);
 			}
 			catch (error)
 			{
@@ -202,7 +224,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 			try
 			{
 				const conversationDto = (await this._mhaClinicMessagingApi.getConversation(source.id, conversationId)).data.body;
-				const conversation = (new ConversationDtoToConversationConverter()).convert(conversationDto);
+				const conversation = (new ConversationDtoToMhaConversationConverter()).convert(conversationDto);
 
 				conversation.messages = this.postProcessMessageList(conversation.messages, source);
 				return conversation
@@ -263,7 +285,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async getMessageGroups(): Promise<MessageGroup[]>
 	{
-		return [MessageGroup.RECEIVED, MessageGroup.SENT, MessageGroup.ARCHIVED];
+		return [MessageGroup.Received, MessageGroup.Sent, MessageGroup.Archived];
 	}
 
 	// ==========================================================================
