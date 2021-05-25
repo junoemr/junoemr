@@ -278,7 +278,7 @@
 					</div>
 				</div>
 			</div>
-			<div ng-show="dashboardCtrl.k2aActive" class="col-lg-3 col-md-12 pull-right">
+			<div ng-if="dashboardCtrl.k2aActive" class="col-lg-3 col-md-12 pull-right">
 				<p class="lead"><bean:message key="dashboard.k2a.header" bundle="ui"/></p>
 				<div id="dashboard-body-right" class="well" ng-show="dashboardCtrl.k2aFeedActive">
 					<div infinite-scroll="dashboardCtrl.updateFeed(dashboardCtrl.k2afeed.length,10)"
