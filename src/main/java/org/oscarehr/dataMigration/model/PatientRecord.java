@@ -29,6 +29,7 @@ import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
 import org.oscarehr.dataMigration.model.document.Document;
+import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.encounterNote.ConcernNote;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
@@ -73,6 +74,7 @@ public class PatientRecord extends AbstractTransientModel
 	private List<RiskFactorNote> riskFactorNoteList;
 	private List<Measurement> measurementList;
 	private List<DemographicContact> contactList;
+	private List<DxRecord> dxList;
 
 	public PatientRecord()
 	{
@@ -93,6 +95,7 @@ public class PatientRecord extends AbstractTransientModel
 		riskFactorNoteList = new ArrayList<>();
 		measurementList = new ArrayList<>();
 		contactList = new ArrayList<>();
+		dxList = new ArrayList<>();
 	}
 
 	public void addAppointment(Appointment appointment)
@@ -201,6 +204,15 @@ public class PatientRecord extends AbstractTransientModel
 			this.hrmDocumentList = new ArrayList<>();
 		}
 		this.hrmDocumentList.add(document);
+	}
+
+	public void addDxRecord(DxRecord dxRecord)
+	{
+		if(this.dxList == null)
+		{
+			this.dxList = new ArrayList<>();
+		}
+		this.dxList.add(dxRecord);
 	}
 
 	@Override

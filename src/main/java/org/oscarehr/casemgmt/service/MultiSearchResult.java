@@ -23,7 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
-public abstract class MultiSearchResult
+public abstract class MultiSearchResult implements Comparable<MultiSearchResult>
 {
 	public abstract String getText();
 
@@ -32,6 +32,11 @@ public abstract class MultiSearchResult
 	public abstract String getOnClick();
 
 	public abstract void setOnClick(String onClick);
+
+	public int compareTo(MultiSearchResult result)
+	{
+		return MultiSearchResult.compareText(this, result);
+	}
 
 	public static int compareText(Object o1, Object o2)
 	{

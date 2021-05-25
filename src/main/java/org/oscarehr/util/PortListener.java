@@ -20,30 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.measurement;
 
-import lombok.Data;
+package org.oscarehr.util;
 
-import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
+import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
-@Data
-public class DiabetesMotivationalCounselingMeasurement extends Measurement
+@Component
+public class PortListener implements ApplicationListener<ServletWebServerInitializedEvent>
 {
-	private String typeCode;
-
-	public DiabetesMotivationalCounselingMeasurement()
-	{
-		super();
-	}
-	public DiabetesMotivationalCounselingMeasurement(org.oscarehr.common.model.Measurement dbModel)
-	{
-		super(dbModel);
-		this.typeCode = dbModel.getType();
-	}
+	private static int port;
 
 	@Override
-	public String getTypeCode()
+	public void onApplicationEvent(final ServletWebServerInitializedEvent event)
 	{
-		return (this.typeCode != null) ? this.typeCode : MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
+		port = event.getWebServer().getPort();
+	}
+
+	public static int getPort()
+	{
+		return port;
 	}
 }

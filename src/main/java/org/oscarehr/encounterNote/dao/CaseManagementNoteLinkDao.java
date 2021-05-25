@@ -29,6 +29,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -71,6 +72,21 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 		query.setMaxResults(1);
 
 		return this.getSingleResultOrNull(query);
+	}
+	public List<CaseManagementNoteLink> findAllNoteLinkByTableIdAndTableName(Integer noteId, Integer tableName)
+	{
+		// select model name must match specified @Entity name in model object
+		String jpql = "SELECT x \n" +
+				"FROM model_CaseManagementNoteLink x \n" +
+				"WHERE x.tableId = :noteId\n" +
+				"AND x.tableName = :tableName\n" +
+				"ORDER BY x.note.noteId DESC";
+
+		Query query = entityManager.createQuery(jpql);
+		query.setParameter("noteId", noteId);
+		query.setParameter("tableName", tableName);
+
+		return query.getResultList();
 	}
 	public CaseManagementNoteLink getNoteLinkByTableIdAndTableName(Integer noteId, Integer tableName)
 	{

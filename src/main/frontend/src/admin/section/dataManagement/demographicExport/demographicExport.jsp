@@ -87,7 +87,7 @@
 					></juno-check-box>
 					<juno-check-box ng-model="$ctrl.exportToggleOptions.exportProblemList"
 					                disabled="!$ctrl.canRunExport()"
-					                label="Export Family History"
+					                label="Export Problem List"
 					                label-position="LABEL_POSITION.LEFT"
 					                component-style="$ctrl.componentStyle"
 					                class="export-label"

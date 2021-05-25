@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.common.Address;
@@ -160,7 +161,8 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		healthCard.setNumber(exportStructure.getHealthNumber());
 		healthCard.setVersion(exportStructure.getHealthNumberVersion());
 		healthCard.setExpirydate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
-		healthCard.setProvinceCode(exportStructure.getHealthNumberProvinceCode());
+		healthCard.setProvinceCode(Address.getSubdivisionCodeCT013Format(
+				exportStructure.getHealthNumberProvinceCode(), CDSConstants.COUNTRY_CODE_CANADA));
 
 		return healthCard;
 	}
@@ -205,7 +207,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		String extension = phoneNumber.getExtension();
 
 		PhoneNumber phone = objectFactory.createPhoneNumber();
-		phone.getContent().add(objectFactory.createPhoneNumberNumber(number));
+		phone.getContent().add(objectFactory.createPhoneNumberPhoneNumber(number));
 		if(extension != null)
 		{
 			phone.getContent().add(objectFactory.createPhoneNumberExtension(extension));

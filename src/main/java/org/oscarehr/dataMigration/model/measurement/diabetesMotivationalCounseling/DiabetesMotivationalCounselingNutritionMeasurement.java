@@ -20,30 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.measurement;
+package org.oscarehr.dataMigration.model.measurement.diabetesMotivationalCounseling;
 
 import lombok.Data;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 
-import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_FOOT_EXAM;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_NUTRITION;
 
 @Data
-public class DiabetesComplicationsScreeningFootMeasurement extends DiabetesComplicationsScreeningMeasurement
+public class DiabetesMotivationalCounselingNutritionMeasurement extends DiabetesMotivationalCounselingMeasurement
 {
-	private String typeCode;
-
-	public DiabetesComplicationsScreeningFootMeasurement()
+	public DiabetesMotivationalCounselingNutritionMeasurement()
 	{
 		super();
 	}
-	public DiabetesComplicationsScreeningFootMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	public DiabetesMotivationalCounselingNutritionMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
-		this.typeCode = dbModel.getType();
 	}
 
 	@Override
 	public String getTypeCode()
 	{
-		return (this.typeCode != null) ? this.typeCode : MEASUREMENT_TYPE_FOOT_EXAM;
+		return MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_NUTRITION;
+	}
+
+	@Override
+	public String getCT038CodeValue()
+	{
+		return CDSConstants.CT038.NUTRITION.getCode();
 	}
 }

@@ -56,7 +56,10 @@ public abstract class AbstractExportMapper<I, E>
 		for(E exportStructure : exportStructures)
 		{
 			I importStructure = exportFromJuno(exportStructure);
-			list.add(importStructure);
+			if(importStructure != null)
+			{
+				list.add(importStructure);
+			}
 		}
 		return list;
 	}
