@@ -30,8 +30,10 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -76,6 +78,8 @@ public class AppService extends AbstractServiceImpl {
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 	
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 	
 	@GET
 	@Path("/getApps/")
@@ -87,8 +91,12 @@ public class AppService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public RestResponse<Boolean> isK2AActive() {
-		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
+	public RestResponse<Boolean> isK2AActive()
+	{
+		boolean k2aEnabled = systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
+		boolean k2aInit = appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null;
+		
+		return RestResponse.successResponse(k2aEnabled && k2aInit);
 	}
 	
 	@POST
