@@ -25,13 +25,22 @@ package org.oscarehr.ws.conversion;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.ws.rest.conversion.DemographicExtConverter;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DemographicToDomainConverter extends AbstractModelConverter<DemographicTo1, Demographic>
 {
+	@Autowired
+	DemographicExtConverter demographicExtConverter;
+
 	@Override
 	public Demographic convert(DemographicTo1 transfer)
 	{
@@ -48,7 +57,9 @@ public class DemographicToDomainConverter extends AbstractModelConverter<Demogra
 				"dobMonth",
 				"dobYear",
 				"familyDoctor",
-				"familyDoctor2"
+				"familyDoctor2",
+				"effDate",
+				"phone2"
 		};
 
 		BeanUtils.copyProperties(transfer, demographic, ignoreProperties);
@@ -59,6 +70,24 @@ public class DemographicToDomainConverter extends AbstractModelConverter<Demogra
 		demographic.setYearOfBirth(transfer.getDobYear());
 		demographic.setReferralDoctor(transfer.getFamilyDoctor());
 		demographic.setFamilyDoctor(transfer.getFamilyDoctor2());
+		demographic.setHcEffectiveDate(transfer.getEffDate());
+		demographic.setPhone2(transfer.getAlternativePhone());
+
+		demographic.setAddress(transfer.getAddress().getAddress());
+		demographic.setCity(transfer.getAddress().getCity());
+		demographic.setProvince(transfer.getAddress().getProvince());
+		demographic.setPostal(transfer.getAddress().getPostal());
+
+		List<DemographicExt> demographicExtList = transfer.getExtras()
+				.stream()
+				.map(extra -> demographicExtConverter.getAsDomainObject(null, extra))
+				.collect(Collectors.toList());
+		// No idea why this has to be done, it's not translating properly
+		for (DemographicExt ext : demographicExtList)
+		{
+			ext.setDemographicNo(demographic.getDemographicId());
+		}
+		demographic.setDemographicExtList(demographicExtList);
 
 		return demographic;
 	}

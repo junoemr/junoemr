@@ -25,13 +25,21 @@ package org.oscarehr.ws.conversion;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.ws.rest.conversion.DemographicExtConverter;
+import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Component
 public class DemographicToTransferConverter extends AbstractModelConverter<Demographic, DemographicTo1>
 {
+	@Autowired
+	DemographicExtConverter demographicExtConverter;
+
 	@Override
 	public DemographicTo1 convert(Demographic demographic)
 	{
@@ -47,6 +55,9 @@ public class DemographicToTransferConverter extends AbstractModelConverter<Demog
 				"yearOfBirth",
 				"referralDoctor",
 				"familyDoctor",
+				"hcEffectiveDate",
+				"phone2",
+				"address"
 		};
 
 		DemographicTo1 transfer = new DemographicTo1();
@@ -58,6 +69,20 @@ public class DemographicToTransferConverter extends AbstractModelConverter<Demog
 		transfer.setDobYear(demographic.getYearOfBirth());
 		transfer.setFamilyDoctor(demographic.getReferralDoctor());
 		transfer.setFamilyDoctor2(demographic.getFamilyDoctor());
+		transfer.setEffDate(demographic.getHcEffectiveDate());
+		transfer.setAlternativePhone(demographic.getPhone2());
+
+		// address is a nested object for reasons
+		AddressTo1 address = new AddressTo1();
+		address.setAddress(demographic.getAddress());
+		address.setProvince(demographic.getProvince());
+		address.setCity(demographic.getCity());
+		address.setPostal(demographic.getPostal());
+
+		transfer.setExtras(demographic.getDemographicExtList().stream()
+				.map(demographicExt -> demographicExtConverter.getAsTransferObject(null, demographicExt))
+				.collect(Collectors.toList())
+		);
 
 		return transfer;
 	}
