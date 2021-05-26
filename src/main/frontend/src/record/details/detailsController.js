@@ -27,6 +27,7 @@
 import {INSTANCE_TYPE, SYSTEM_PROPERTIES, BILLING_TYPE} from "../../common/services/systemPreferenceServiceConstants";
 import {ProvidersServiceApi, SystemPreferenceApi} from "../../../generated";
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
+import {BILLING_REGION} from "../../billing/billingConstants";
 
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
 
@@ -894,17 +895,17 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			var url = null;
 			if (func === "BillingHistory")
 			{
-				if (controller.page.billregion === "CLINICAID")
+				if (controller.page.billregion === BILLING_REGION.CLINICAID)
 				{
 					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports&patient_remote_id=" + controller.page.demo.demographicNo;
 				}
-				else if (controller.page.billregion === "ON")
+				else if (controller.page.billregion === BILLING_REGION.ON)
 				{
 					url = "../billing/CA/ON/billinghistory.jsp?demographic_no=" + controller.page.demo.demographicNo + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName) + "&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10";
 				}
 				else
 				{
-					url = "../billing/CA/BC/billcontroller.page.jsp?lastName=" + encodeURI(controller.page.demo.lastName) + "&firstName=" + encodeURI(controller.page.demo.firstName) + "&filterPatient=true&demographicNo=" + controller.page.demo.demographicNo;
+					url = "../billing/CA/BC/billStatus.jsp?lastName=" + encodeURI(controller.page.demo.lastName) + "&firstName=" + encodeURI(controller.page.demo.firstName) + "&filterPatient=true&demographicNo=" + controller.page.demo.demographicNo;
 				}
 			}
 			else if (func === "CreateInvoice")
