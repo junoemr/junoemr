@@ -70,6 +70,15 @@ public class SecUserRoleDao extends AbstractDao<SecUserRole>
         return query.getResultList();
     }
 
+    public SecUserRole findByProviderAndRoleId(String providerId, Integer secRoleId)
+    {
+        Query query = entityManager.createQuery("SELECT s FROM SecUserRole s WHERE s.providerNo = :providerId AND s.secRole.id = :secRoleId");
+        query.setParameter("providerId", providerId);
+        query.setParameter("secRoleId", secRoleId);
+
+        return this.getSingleResultOrNull(query);
+    }
+
     public List<String> getRecordsAddedAndUpdatedSinceTime(Date date)
     {
         Query query = entityManager.createQuery("SELECT s.providerNo FROM SecUserRole s WHERE s.lastUpdateDate > :date");

@@ -1519,25 +1519,6 @@
 
 		var sig = 'sig' + nId;
 
-        // Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
-        if ((typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() != "undefined") &&
-            (typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() != "undefined"))
-        {
-            if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val().trim().length == 0 ||
-                jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val().trim().length == 0)
-            {
-                // For weird cases where the role id or program number is missing.
-                _missingRoleProgramIdError();
-                return false;
-            } else if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() == "-2" ||
-                jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() == "-2")
-            {
-                // For the case where you're trying to save a note with no available programs or roles
-                _noVisibleProgramsError();
-                return false;
-            }
-        }
-
         saving = true;
         if (ajaxSaveNote(sig, nId, tmp) == false)
         {
@@ -2089,12 +2070,6 @@
 				$(caseNote).focus();
 				return;
 			}
-		}
-
-		// Only works with "note_program_ui_enabled = true" (noteProgram.js)
-		if (typeof _setCurrentProgramAndRoleIdForNote == "function")
-		{
-			_setCurrentProgramAndRoleIdForNote(nId);
 		}
 
 		//get rid of minimize and print buttons
@@ -3980,25 +3955,6 @@
 			var tmp = $(caseNote).value;
 			var sig = 'sig' + nId;
 			//assignNoteAjax('save','list',programId,demographicNo);
-			// Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
-			if ((typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() != "undefined") &&
-				(typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() != "undefined"))
-			{
-				if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val().trim().length == 0 ||
-					jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val().trim().length == 0)
-				{
-					// For weird cases where the role id or program number is missing.
-					_missingRoleProgramIdError();
-					return false;
-				}
-				else if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() == "-2" ||
-					jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() == "-2")
-				{
-					// For the case where you're trying to save a note with no available programs or roles
-					_noVisibleProgramsError();
-					return false;
-				}
-			}
 			saving = true;
 			ajaxSaveNote(sig, nId, tmp);
 			//cancel updating of issues

@@ -41,31 +41,28 @@ import org.oscarehr.caisi_integrator.ws.CachedDemographicDocument;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicDocumentContents;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
 import org.oscarehr.caisi_integrator.ws.FacilityIdIntegerCompositePk;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.security.model.Permission;
-import org.oscarehr.security.model.SecRole;
 import org.oscarehr.sharingcenter.SharingCenterUtil;
 import org.oscarehr.sharingcenter.model.DemographicExport;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
@@ -165,7 +162,7 @@ public class ManageDocumentAction extends DispatchAction {
 				// Removes the link to the "0" provider so that the document no longer shows up as "unclaimed"
 				providerInboxRoutingDAO.removeLinkFromDocument(documentId, "0");
 			}
-			saveDocNote(request, document.getDocdesc(), demographicNoStr, documentIdStr);
+			saveDocNote(request, document.getDocdesc(), Integer.parseInt(demographicNoStr), Integer.parseInt(documentIdStr));
 		}
 		catch(Exception e)
 		{
@@ -270,55 +267,41 @@ public class ManageDocumentAction extends DispatchAction {
 		return demoName;
 	}
 
-	private void saveDocNote(final HttpServletRequest request, String docDesc, String demog, String documentId) {
+	private void saveDocNote(final HttpServletRequest request, String docDesc, Integer demog, Integer documentId)
+	{
+		EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+		ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 		Date now = EDocUtil.getDmsDateTimeAsDate();
-		// String docDesc=d.getDocdesc();
-		CaseManagementNote cmn = new CaseManagementNote();
-		cmn.setUpdate_date(now);
-		cmn.setObservation_date(now);
-		cmn.setDemographic_no(demog);
+
 		HttpSession se = request.getSession();
 		String user_no = (String) se.getAttribute("user");
 		String prog_no = new EctProgram(se).getProgram(user_no);
-		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
-		CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
-		cmn.setProviderNo("-1");// set the provider no to be -1 so the editor appear as 'System'.
-		Provider provider = EDocUtil.getProvider(user_no);
-		String provFirstName = "";
-		String provLastName = "";
-		if(provider!=null) {
-			provFirstName=provider.getFirstName();
-			provLastName=provider.getLastName();
+
+		ProviderData systemProvider = providerDao.find("-1");
+		ProviderData provider = systemProvider;
+		if(user_no != null)
+		{
+			provider = providerDao.find(user_no);
 		}
-		String strNote = "Document" + " " + docDesc + " " + "created at " + now + " by " + provFirstName + " " + provLastName + ".";
 
-		// String strNote="Document"+" "+docDesc+" "+ "created at "+now+".";
+		String strNote = "Document " + docDesc + " created at " + now + " by " + provider.getFirstName() + " " + provider.getLastName() + ".";
+
+		CaseManagementNote cmn = new CaseManagementNote();
+		cmn.setUpdateDate(now);
+		cmn.setObservationDate(now);
+		cmn.setDemographic(demographicDao.find(demog));
 		cmn.setNote(strNote);
+		cmn.setProvider(provider);
 		cmn.setSigned(true);
-		cmn.setSigning_provider_no("-1");
-		cmn.setProgram_no(prog_no);
-		
-		SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");		
-		cmn.setReporter_caisi_role(doctorRole.getId().toString());
-		
-		cmn.setReporter_program_team("0");
-		cmn.setPassword("NULL");
-		cmn.setLocked(false);
+		cmn.setSigningProvider(systemProvider);
+		cmn.setProgramNo(prog_no);
 		cmn.setHistory(strNote);
-		cmn.setPosition(0);
 
-		Long note_id = cmm.saveNoteSimpleReturnID(cmn);
+		CaseManagementNote savedNote = encounterNoteService.saveDocumentNote(cmn, documentDao.find(documentId));
 		// Debugging purposes on the live server
-		MiscUtils.getLogger().info("Document Note ID: "+note_id.toString());
-		
-		// Add a noteLink to casemgmt_note_link
-		CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
-		cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
-		cmnl.setTableId(Long.parseLong(documentId));
-		cmnl.setNoteId(note_id);
-		EDocUtil.addCaseMgmtNoteLink(cmnl);
+		MiscUtils.getLogger().info("Document Note ID: "+savedNote.getId().toString());
 	}
 
 	/*

@@ -78,7 +78,6 @@ import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.oscarehr.ws.rest.to.model.TicklerNoteTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
@@ -188,12 +187,7 @@ public class NotesService extends AbstractServiceImpl
 
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
-		String roles = (String) se.getAttribute("userrole");
-		if(OscarProperties.getInstance().isOscarLearning() && roles != null && roles.contains("moderator"))
-		{
-			logger.info("skipping domain check..provider is a moderator");
-		}
-		else if(
+		if(
 			// TODO-legacy: speed this up
 			!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) &&
 			!caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)

@@ -24,10 +24,11 @@ package org.oscarehr.encounterNote.service;
 
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Hl7TextMessage;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.note.EncounterNoteModelToDbConverter;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
@@ -164,6 +165,18 @@ public class EncounterNoteService extends BaseNoteService
 		link.setLinkedDocumentId(document.getId());
 
 		return saveNote(note);
+	}
+
+	public CaseManagementNote saveEFormNote(CaseManagementNote note, EFormData eForm, List<Issue> issues)
+	{
+		note.setIncludeIssueInNote(true);
+		note.setSigned(true);
+		note.setArchived(false);
+
+		CaseManagementNoteLink link = new CaseManagementNoteLink(note);
+		link.setLinkedEFormId(eForm.getId());
+
+		return saveChartNote(note, issues);
 	}
 
 	public CaseManagementNote saveLabObxNote(EncounterNote noteModel, Demographic demographic, Hl7TextMessage hl7TextMessage, int obrIndex, int obxIndex)

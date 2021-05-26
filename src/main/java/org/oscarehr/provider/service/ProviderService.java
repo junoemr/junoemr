@@ -45,6 +45,7 @@ import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.SecurityRecordTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarProvider.data.ProviderBillCenter;
 
@@ -54,7 +55,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service("provider.service.ProviderService")
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ProviderService
 {
 	@Autowired
@@ -254,7 +255,7 @@ public class ProviderService
 		List<Integer> roleIds = new ArrayList<>();
 		for (SecUserRole role : userRoles)
 		{
-			roleIds.add(secRoleDao.findByName(role.getRoleName()).getId());
+			roleIds.add(role.getSecRole().getId());
 		}
 		providerEditFormTo1.setUserRoles(roleIds);
 
@@ -337,9 +338,9 @@ public class ProviderService
 		// assign provider roles
 		if (providerEditFormTo1.getUserRoles() != null)
 		{
-			providerRoleService.assignProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
+			providerRoleService.assignProviderRoles(providerEditFormTo1.getUserRoles(), String.valueOf(providerNo));
 			providerRoleService.removeOtherProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
-			providerRoleService.setDefaultPrimaryRole(providerNo);
+			providerRoleService.setDefaultPrimaryRole(String.valueOf(providerNo));
 		}
 	}
 

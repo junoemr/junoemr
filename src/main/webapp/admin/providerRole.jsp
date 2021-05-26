@@ -144,8 +144,9 @@
 			%>
 			item = {
 				providerNo: "<%=transfer.getProviderId()%>",
-				role_id: "<%=transfer.getRoleId()%>",
-				roleName: "<%=transfer.getRoleName()%>"};
+				secUserRoleId: "<%=transfer.getUserRoleId()%>",
+				roleName: "<%=transfer.getRoleName()%>",
+				roleId: "<%=transfer.getRoleId()%>"};
 			items.push(item);
 			<%
 		}
@@ -161,9 +162,9 @@
 			var provider = $("#primaryRoleProvider").val();
 			for (var i = 0; i < items.length; i++)
 			{
-				if (items[i].providerNo == provider && items[i].role_id != "")
+				if (items[i].providerNo == provider && items[i].secUserRoleId != "")
 				{
-					$("#primaryRoleRole").append('<option value="' + items[i].roleName + '">' + items[i].roleName + '</option>');
+					$("#primaryRoleRole").append('<option value="' + items[i].roleId + '">' + items[i].roleName + '</option>');
 				}
 			}
 		}
@@ -245,7 +246,7 @@
 			String providerNo = transfer.getProviderId();
 			boolean isClickedAccountSuperAdmin = transfer.isSuperAdmin();
 
-			String roleIdStr = (transfer.getRoleId() == null)? "" : String.valueOf(transfer.getRoleId());
+			String userRoleIdString = (transfer.getUserRoleId() == null)? "" : String.valueOf(transfer.getUserRoleId());
 	%>
 	<form name="myform<%= providerNo %>" action="providerRole.do" method="POST">
 		<tr bgcolor="<%=colors[i%2]%>">
@@ -261,10 +262,10 @@
 					<%
 						for(SecRole role : secRoles)
 						{
-							String secRoleName = role.getName();
+							Integer roleId = role.getId();
 					%>
-					<option value="<%=secRoleName%>" <%=secRoleName.equals(transfer.getRoleName()) ? "selected" : "" %>>
-						<%=secRoleName%>
+					<option value="<%=roleId%>" <%=(roleId.equals(transfer.getRoleId())) ? "selected" : "" %>>
+						<%=role.getName()%>
 					</option>
 					<%
 						}
@@ -278,7 +279,7 @@
 			<td align="center">
 				<input type="hidden" name="keyword" value="<%=keyword%>"/>
 				<input type="hidden" name="providerId" value="<%=providerNo%>">
-				<input type="hidden" name="roleId" value="<%= roleIdStr %>">
+				<input type="hidden" name="userRoleId" value="<%= userRoleIdString %>">
 				<input type="hidden" name="roleOld" value="<%= StringUtils.trimToEmpty(transfer.getRoleName())%>">
 				<input type="submit" name="submit" value="Add"
 				       onclick="return updateProviderRoles(this.form, 'addRole', <%=isClickedAccountSuperAdmin%>);">

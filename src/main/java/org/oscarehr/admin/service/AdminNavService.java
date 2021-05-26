@@ -24,11 +24,11 @@
 package org.oscarehr.admin.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.AdminNavItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,11 +148,6 @@ public class AdminNavService
 						SecObjectName.OBJECT_NAME.ADMIN, SecObjectName.OBJECT_NAME.ADMIN_SHARING_CENTER))
 		{
 			adminNavList.add(getAdminNavSharingCenter(contextPath, resourceBundle));
-		}
-		if(oscarProperties.isPropertyActive("OSCAR_LEARNING") &&
-				securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
-		{
-			adminNavList.add(getAdminNavOscarLearning(contextPath, resourceBundle));
 		}
 
 		return adminNavList;
@@ -752,33 +747,4 @@ public class AdminNavService
 		sharingCenterGroup.setItems(sharingCenterItems);
 		return sharingCenterGroup;
 	}
-
-	private AdminNavGroupTo1 getAdminNavOscarLearning(String contextPath, ResourceBundle resourceBundle)
-	{
-		AdminNavGroupTo1 oscarLearningGroup = new AdminNavGroupTo1();
-		List<AdminNavItemTo1> oscarLearningItems = new ArrayList<>();
-
-		oscarLearningGroup.setName(resourceBundle.getString("admin.admin.learning"));
-
-		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.manageCourses"), "frame?frameUrl=" + contextPath + "/oscarLearning/CourseManager.jsp"));
-		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.importPatient"), "frame?frameUrl=" + contextPath + "/demographic/demographicImport.jsp"));
-		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.importStudent"), "frame?frameUrl=" + contextPath + "/oscarLearning/StudentImport.jsp"));
-
-		oscarLearningGroup.setItems(oscarLearningItems);
-		return oscarLearningGroup;
-	}
-
-	private AdminNavGroupTo1 getAdminNavUpdates(String contextPath, ResourceBundle resourceBundle)
-	{
-		AdminNavGroupTo1 updatesGroup = new AdminNavGroupTo1();
-		List<AdminNavItemTo1> updatesItems = new ArrayList<>();
-
-		updatesGroup.setName(resourceBundle.getString("admin.admin.updates"));
-
-		updatesItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.updates.migrate_onarenhanced"), "frame?frameUrl=" + contextPath + "/pregnancy/migrateToSplitOnArEnhancedForm.jsp"));
-
-		updatesGroup.setItems(updatesItems);
-		return updatesGroup;
-	}
-
 }

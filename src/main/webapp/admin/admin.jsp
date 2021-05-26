@@ -721,12 +721,6 @@ div.logoutBox {
 		<div class="adminBox">
 		<h3>&nbsp;<bean:message key="admin.admin.SystemManagement" /></h3>
 		<ul>
-		<security:oscarSec roleName="<%=roleName$%>"
-			objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=false%>">
-			<li><a href="#"
-				onclick='popupPage(300,600,&quot;<html:rewrite page="/admin/providerAddRole.jsp"/>&quot;);return false;'>
-			<bean:message key="admin.admin.addRole"/></a></li>
-		</security:oscarSec>
 		
 			<li><a href="#"
 				onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/displayDocumentCategories.jsp"/>&quot;);return false;'><bean:message key="admin.admin.DocumentCategories"/></a></li>
@@ -939,25 +933,6 @@ div.logoutBox {
 
 	</security:oscarSec>
 <!-- #Data Management END-->
-
-
-
-<oscar:oscarPropertiesCheck property="OSCAR_LEARNING" value="yes">
-	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
-		<div class="adminBox">
-		<h3>&nbsp;<bean:message key="admin.admin.learning" /></h3>
-		<ul>
-		<li><a href="#"
-				onclick='popupPage(550,800,&quot;<html:rewrite page="/oscarLearning/CourseManager.jsp"/>&quot;);return false;'><bean:message key="admin.admin.learning.manageCourses"/></a></li>
-			<li><a href="#"
-				onclick='popupPage(550,800,&quot;<html:rewrite page="/demographic/demographicImport.jsp"/>&quot;);return false;'><bean:message key="admin.admin.learning.importPatient"/></a></li>
-			<li><a href="#"
-				onclick='popupPage(550,800,&quot;<html:rewrite page="/oscarLearning/StudentImport.jsp"/>&quot;);return false;'><bean:message key="admin.admin.learning.importStudent"/></a></li>
-		</ul>
-		</div>
-	</security:oscarSec>
-</oscar:oscarPropertiesCheck>
-
 
 </caisi:isModuleLoad>
 

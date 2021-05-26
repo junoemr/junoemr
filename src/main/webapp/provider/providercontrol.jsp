@@ -174,7 +174,6 @@
 		props.isPropertyActive("caisi") ||
 		props.isPropertyActive("TORONTO_RFQ") ||
 		props.isPropertyActive("ticklerplus") ||
-		props.isPropertyActive("OSCAR_LEARNING") ||
 		(
 			props.isPropertyActive("optimized_schedule_default_new") &&
 			"1".equals(request.getParameter("oldschedule"))
