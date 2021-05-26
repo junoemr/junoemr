@@ -25,6 +25,7 @@
 
 package oscar.oscarRx.pageUtil;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -55,9 +56,19 @@ public final class RxAddAllergyAction extends Action
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNo, Permission.ALLERGY_CREATE);
+		String allergyToArchive = request.getParameter("allergyToArchive");
 
-		int id = Integer.parseInt(request.getParameter("ID"));
+		if (allergyToArchive != null && !allergyToArchive.isEmpty())
+		{
+			securityInfoManager.requireAllPrivilege(providerNo, Permission.ALLERGY_UPDATE);
+		}
+		else
+		{
+			securityInfoManager.requireAllPrivilege(providerNo, Permission.ALLERGY_CREATE);
+		}
+
+		String drugrefId = request.getParameter("ID");
+		drugrefId = StringUtils.trimToEmpty(drugrefId.equals(String.valueOf((Object) null)) ? null : drugrefId);
 
 		String name = request.getParameter("name");
 		String type = request.getParameter("type");
@@ -69,7 +80,6 @@ public final class RxAddAllergyAction extends Action
 		String onSetOfReaction = request.getParameter("onSetOfReaction");
 		String lifeStage = request.getParameter("lifeStage");
 
-		String allergyToArchive = request.getParameter("allergyToArchive");
 		RxPatientData.Patient patient = (RxPatientData.Patient) request.getSession().getAttribute("Patient");
 
 		int oldAllergyId = 0;
@@ -80,7 +90,7 @@ public final class RxAddAllergyAction extends Action
 			allergy = patient.getAllergy(oldAllergyId);
 		}
 
-		allergy.setDrugrefId(String.valueOf(id));
+		allergy.setDrugrefId(drugrefId);
 		allergy.setDescription(name);
 		allergy.setTypeCode(Integer.parseInt(type));
 		allergy.setReaction(description);
@@ -109,7 +119,7 @@ public final class RxAddAllergyAction extends Action
 			RxDrugData drugData = new RxDrugData();
 			try
 			{
-				RxDrugData.DrugMonograph f = drugData.getDrug("" + id);
+				RxDrugData.DrugMonograph f = drugData.getDrug("" + drugrefId);
 				allergy.setRegionalIdentifier(f.regionalIdentifier);
 			}
 			catch(Exception e)
