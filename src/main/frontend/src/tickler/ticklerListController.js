@@ -255,10 +255,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					{
 						return noteService.getTicklerNote(tickler.id);
 					},
-					ticklerWriteAccess: function()
-					{
-						return controller.canCreate();
-					},
 					me: function()
 					{
 						return providerService.getMe();

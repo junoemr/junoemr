@@ -206,11 +206,11 @@
 	-->
 	<div class="pull-left">
 		<button class="btn btn-warning" ng-click="ticklerViewCtrl.completeTickler()"
-				ng-show="ticklerViewCtrl.ticklerWriteAccess">
+				ng-disabled="!ticklerViewCtrl.canEdit()">
 			<bean:message key="tickler.view.complete" bundle="ui"/>
 		</button>
 		<button class="btn btn-danger" ng-click="ticklerViewCtrl.deleteTickler()"
-				ng-show="ticklerViewCtrl.ticklerWriteAccess">
+		        ng-disabled="!ticklerViewCtrl.canDelete()">
 			<bean:message key="global.delete" bundle="ui"/>
 		</button>
 	</div>
@@ -221,11 +221,11 @@
 		<bean:message key="global.print" bundle="ui"/>
 	</button>
 	<button class="btn btn-success" ng-click="ticklerViewCtrl.saveChanges()"
-			ng-show="ticklerViewCtrl.ticklerWriteAccess">
+	        ng-disabled="!ticklerViewCtrl.canEdit()">
 		<bean:message key="tickler.view.save" bundle="ui"/>
 	</button>
 	<button class="btn btn-success" ng-click="ticklerViewCtrl.saveChangesAndWriteEncounter()"
-	        ng-show="ticklerViewCtrl.ticklerWriteAccess">
+	        ng-disabled="!ticklerViewCtrl.canEdit()">
 		<bean:message key="tickler.view.saveWithEncounter" bundle="ui"/>
 	</button>
 </div>

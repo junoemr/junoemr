@@ -1,3 +1,5 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 	'$scope',
@@ -7,8 +9,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 	'tickler',
 	'ticklerService',
 	'ticklerNote',
-	'ticklerWriteAccess',
 	'providerService',
+	'securityRolesService',
 	'me',
 
 	function(
@@ -19,12 +21,12 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		tickler,
 		ticklerService,
 		ticklerNote,
-		ticklerWriteAccess,
 		providerService,
+		securityRolesService,
 		me)
 	{
 
-		var controller = this;
+		const controller = this;
 
 		controller.ticklerUpdate = angular.copy(tickler);
 
@@ -32,7 +34,6 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		controller.serviceTimeInput = moment(controller.ticklerUpdate.serviceDate).format("hh:mm A");
 
 		controller.me = me;
-		controller.ticklerWriteAccess = ticklerWriteAccess;
 
 		//this object keeps track of the changes being made
 		// controller.ticklerUpdate = {
@@ -373,7 +374,15 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		controller.printTickler = function()
 		{
 			window.open('../Tickler.do?method=print&id=' + tickler.id);
-
 		};
+
+		controller.canEdit = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_UPDATE);
+		}
+		controller.canDelete = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_DELETE);
+		}
 	}
 ]);
