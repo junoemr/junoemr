@@ -22,7 +22,7 @@
 	}
 
 	.juno-simple-modal {
-		padding: 24px 16px 16px 16px;
+		padding: 8px;
 
 		$modal-border-radius: 8px;
 		--juno-simple-modal-width: 400px;
@@ -32,17 +32,27 @@
 		-moz-border-radius: $modal-border-radius !important;
 		border-radius: $modal-border-radius !important;
 
-		.close-btn {
-			position: absolute;
-			top: 0;
-			right: 0;
+		.inner-container {
+			padding: 16px 8px 8px 8px;
 
-			.juno-button {
-				margin: 8px 8px 0 0;
-				height: 24px;
+			&.grey {
+				border: 1px solid var(--color-neutral-light-grey);
+				border-radius: $modal-border-radius;
+				background-color: var(--color-neutral-lightest);
+			}
 
-				i {
-					font-size: 16px;
+			.close-btn {
+				position: absolute;
+				top: 0;
+				right: 0;
+
+				.juno-button {
+					margin: 8px 8px 0 0;
+					height: 24px;
+
+					i {
+						font-size: 16px;
+					}
 				}
 			}
 		}

@@ -1,0 +1,13 @@
+.message-compose {
+	.message-area {
+		border: 1px solid var(--color-neutral-light);
+		border-radius: 8px;
+		background-color: var(--color-neutral-white);
+		overflow: hidden;
+
+		.message-body {
+			border: none;
+			outline: none;
+		}
+	}
+}

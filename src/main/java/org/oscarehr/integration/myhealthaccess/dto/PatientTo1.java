@@ -28,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.springframework.beans.BeanUtils;
@@ -78,6 +80,10 @@ public class PatientTo1
 	private String primaryFax;
 	@JsonProperty("link_status")
 	private String linkStatus;
+	@JsonProperty("can_message_clinic")
+	@Getter
+	@Setter
+	private boolean canMessage;
 
 	public PatientTo1()
 	{
@@ -325,4 +331,5 @@ public class PatientTo1
 	{
 		this.linkStatus = link_status;
 	}
+
 }

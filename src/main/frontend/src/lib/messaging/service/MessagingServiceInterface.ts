@@ -77,6 +77,14 @@ export default interface MessagingServiceInterface
 	 * @return list of allowed groups
 	 */
 	getMessageGroups(): Promise<MessageGroup[]>;
+
+	/**
+	 * search messageables by keyword
+	 * @param messageSource - the source in which to perform the search
+	 * @param keyword - the keyword to search by
+	 * @return a list of matching messageables
+	 */
+	searchMessageables(messageSource: MessageSource, keyword: string): Promise<Messageable[]>;
 }
 
 /**

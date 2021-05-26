@@ -135,6 +135,8 @@ angular.module('Common.Components').component('junoTypeahead',
 			{
 				ctrl.onSelected({value: ctrl.selectedValue});
 			}
+
+			ctrl.doOnChange();
 		}
 
 		ctrl.onKeyPress = function (event)

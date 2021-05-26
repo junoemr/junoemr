@@ -1,7 +1,6 @@
 import AbstractConverter from "../../../conversion/AbstractConverter";
 import {MessageDto} from "../../../../../generated";
 import MhaMessage from "../clinic/model/MhaMessage";
-import Message from "../../model/Message";
 import MessageableDtoToMessageableConverter from "../../converter/MessageableDtoToMessageableConverter";
 import moment from "moment";
 import AttachmentDtoToAttachmentConverter from "../../converter/AttachmentDtoToAttachmentConverter";

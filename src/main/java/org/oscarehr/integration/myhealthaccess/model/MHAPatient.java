@@ -23,6 +23,9 @@
 
 package org.oscarehr.integration.myhealthaccess.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
 import org.springframework.beans.BeanUtils;
 import oscar.util.ConversionUtils;
@@ -56,6 +59,9 @@ public class MHAPatient
 	private String primaryFax;
 
 	private LINK_STATUS linkStatus;
+	@Getter
+	@Setter
+	private boolean canMessage;
 
 	public enum PROVINCE_CODES
 	{
@@ -82,7 +88,21 @@ public class MHAPatient
 		CLINIC_REJECTED,
 		PENDING_CLINIC_CONFIRM,
 		PENDING_PATIENT_CONFIRM,
-		ACTIVE
+		CONFIRMED,
+		VERIFIED;
+
+		@JsonCreator
+		public static LINK_STATUS fromString(String str)
+		{
+			// Old MHA server will send status 'active' instead of 'confirmed' or 'verified'
+			// Convert the value. TODO Can be removed once MHA master branch includes MHA-2069.
+			if (str.equals("active"))
+			{
+				str = "confirmed";
+			}
+
+			return LINK_STATUS.valueOf(str.toUpperCase());
+		}
 	}
 
 	public static boolean isValidProvinceCode(String provinceCode)

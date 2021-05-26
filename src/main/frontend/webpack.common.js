@@ -288,6 +288,9 @@ module.exports = {
 			'./src/messaging/inbox/components/messageView/components/message/messageComponent.js',
 			'./src/messaging/inbox/components/messageView/messageViewComponent.js',
 			'./src/messaging/inbox/messagingInboxComponent.js',
+			'./src/messaging/inbox/modals/module.js',
+			'./src/messaging/inbox/modals/messageCompose/components/messageableSearch/messageableSearchComponent',
+			'./src/messaging/inbox/modals/messageCompose/messageComposeComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',

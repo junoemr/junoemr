@@ -85,9 +85,14 @@
 .flex-item-half-row {
 	flex: 0 0 50%;
 }
+
 .flex-item-grow, .flex-grow{
 	flex-grow: 1 ;
 }
+.flex-item-no-grow {
+	flex-grow: 0;
+}
+
 .flex-item-shrink {
 	flex-shrink: 1;
 }
@@ -115,6 +120,9 @@
 }
 .w-100vw {
 	width: 100vw;
+}
+.w-128 {
+	width: 128px;
 }
 .w-256 {
 	width: 256px;
@@ -157,6 +165,12 @@
 }
 .p-0-important {
 	padding: 0 !important;
+}
+.p-2 {
+	padding: 2px;
+}
+.p-4 {
+	padding: 4px;
 }
 .p-8 {
 	padding: 8px;

@@ -41,8 +41,10 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 	},
 	controller: [
 		"$scope",
+		"$uibModal",
 		function (
-			$scope
+			$scope,
+			$uibModal
 		)
 		{
 			const ctrl = this;
@@ -100,6 +102,22 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				}
 
 				$scope.$apply();
+			}
+
+			ctrl.openComposeModal = async () =>
+			{
+				await $uibModal.open(
+					{
+						component: 'messageCompose',
+						backdrop: 'static',
+						windowClass: "juno-simple-modal-window",
+						resolve: {
+							style: () => JUNO_STYLE.DEFAULT,
+							messagingService: () => MessagingServiceFactory.build(ctrl.messagingBackendId),
+							sourceId: () => ctrl.sourceId,
+						}
+					}
+				).result;
 			}
 
 			/**

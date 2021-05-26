@@ -25,6 +25,7 @@ import {
 	JUNO_STYLE,
 	JUNO_BACKGROUND_STYLE, JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN
 } from "../../components/junoComponentConstants";
+import {JUNO_SIMPLE_MODAL_FILL_COLOR} from "./junoSimpleModalConstants";
 
 angular.module('Common.Components').component('junoSimpleModal',
 		{
@@ -34,6 +35,7 @@ angular.module('Common.Components').component('junoSimpleModal',
 				componentStyle: "<?",
 				modalWidth: "<?",
 				modalHeight: "<?",
+				fillColor: "<?"
 			},
 			transclude: true,
 			controller: ['$scope', function ($scope)
@@ -46,6 +48,7 @@ angular.module('Common.Components').component('junoSimpleModal',
 				ctrl.$onInit = () =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+					ctrl.fillColor = ctrl.fillColor || JUNO_SIMPLE_MODAL_FILL_COLOR.TRANSPARENT;
 				}
 
 				ctrl.$doCheck = () =>
@@ -69,6 +72,11 @@ angular.module('Common.Components').component('junoSimpleModal',
 				ctrl.getComponentClasses = () =>
 				{
 					return [ctrl.componentStyle, ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY]
+				}
+
+				ctrl.getInnerContainerClasses = () =>
+				{
+					return [ctrl.fillColor];
 				}
 			}]
 		});

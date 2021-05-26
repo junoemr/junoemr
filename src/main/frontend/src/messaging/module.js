@@ -21,4 +21,4 @@
 * Canada
 */
 
-angular.module("Messaging", ["Messaging.Components", "Common.Services", "Common.Components", "Common.Layout"]);
+angular.module("Messaging", ["Messaging.Components", "Messaging.Modals", "Common.Services", "Common.Components", "Common.Layout"]);

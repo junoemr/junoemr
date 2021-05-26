@@ -3,7 +3,7 @@ import MessageSource from "../../../model/MessageSource";
 import Message from "../../../model/Message";
 import {API_BASE_PATH} from "../../../../constants/ApiConstants";
 import MessagingError from "../../../../error/MessagingError";
-import {MessageDto, MhaClinicMessagingApi, MhaIntegrationApi} from "../../../../../../generated";
+import {MessageDto, MhaClinicMessagingApi, MhaIntegrationApi, MhaPatientApi} from "../../../../../../generated";
 import StreamingList, {StreamSource} from "../../../../util/StreamingList";
 import ClinicMailboxStreamSource from "../model/ClinicMailboxStreamSource";
 import Conversation from "../../../model/Conversation";
@@ -15,6 +15,10 @@ import MessageToMessageDtoConverter from "../../../converter/MessageToMessageDto
 import {message} from "gulp-typescript/release/utils";
 import MessageDtoToMhaMessageConverter from "../../converter/MessageDtoToMhaMessageConverter";
 import ConversationDtoToMhaConversationConverter from "../../converter/ConversationDtoToMhaConversationConverter";
+import Messageable from "../../../model/Messageable";
+import PatientTo1ToMhaPatientConverter
+	from "../../../../integration/myhealthaccess/converter/PatientTo1ToMhaPatientConverter";
+import MhaPatientToMessageableConverter from "../../converter/MhaPatientToMessageableConverter";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
@@ -22,6 +26,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	protected readonly STREAM_INITIAL_LOAD_COUNT = 10;
 	protected _mhaClinicMessagingApi: MhaClinicMessagingApi;
 	protected _mhaIntegrationApi: MhaIntegrationApi;
+	protected _mhaPatientApi: MhaPatientApi;
 	protected _messageSources: MessageSource[];
 
 	// ==========================================================================
@@ -36,6 +41,11 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 			API_BASE_PATH);
 
 		this._mhaIntegrationApi = new MhaIntegrationApi(
+			angular.injector(["ng"]).get("$http"),
+			angular.injector(["ng"]).get("$httpParamSerializer"),
+			API_BASE_PATH);
+
+		this._mhaPatientApi = new MhaPatientApi(
 			angular.injector(["ng"]).get("$http"),
 			angular.injector(["ng"]).get("$httpParamSerializer"),
 			API_BASE_PATH);
@@ -55,7 +65,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async getMessage(source: MessageSource, messageId: string): Promise<Message>
 	{
-		if (source.id === this.VIRTUAL_SOURCE_ID)
+		if (source.isVirtual)
 		{
 			// try grabbing message from all sources.
 			const searchResults = await Promise.all(this.getPhysicalMessagingSources().map(async (physicalSource) =>
@@ -122,7 +132,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async searchMessages(source: MessageSource, searchOptions: MessageSearchParams): Promise<Message[]>
 	{
-		if (source.id === this.VIRTUAL_SOURCE_ID)
+		if (source.isVirtual)
 		{
 			const searchResults = await Promise.all(
 				this.getPhysicalMessagingSources().map((physicalSource) => this.searchMessages(physicalSource, searchOptions)));
@@ -170,7 +180,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	public async searchMessagesAsStream(source: MessageSource, searchOptions: MessageSearchParams): Promise<StreamingList<Message>>
 	{
 		const streamSources: StreamSource<Message>[] = [];
-		if (source.id === this.VIRTUAL_SOURCE_ID)
+		if (source.isVirtual)
 		{
 			this.getPhysicalMessagingSources().forEach((msgSource) =>
 			{
@@ -194,7 +204,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async getConversation(source: MessageSource, conversationId: string): Promise<Conversation>
 	{
-		if (source.id === this.VIRTUAL_SOURCE_ID)
+		if (source.isVirtual)
 		{
 			// try grabbing conversation from all sources.
 			const searchResults = await Promise.all(this.getPhysicalMessagingSources().map(async (physicalSource) =>
@@ -288,9 +298,68 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 		return [MessageGroup.Received, MessageGroup.Sent, MessageGroup.Archived];
 	}
 
+	/**
+	 * search messageables by keyword
+	 * @param messageSource - the source in which to perform the search
+	 * @param keyword - the keyword to search by
+	 * @return a list of matching messageables
+	 */
+	public searchMessageables(messageSource: MessageSource, keyword: string): Promise<Messageable[]>
+	{
+		if (messageSource.isVirtual)
+		{
+			return this.searchMessageablesVirtual(keyword);
+		}
+		return this.searchMessageablesPhysical(messageSource, keyword);
+	}
+
 	// ==========================================================================
 	// Protected Methods
 	// ==========================================================================
+
+	/**
+	 * searchMessageables impl for physical sources
+	 * @see searchMessageables
+	 * @protected
+	 */
+	protected async searchMessageablesPhysical(messageSource: MessageSource, keyword: string): Promise<Messageable[]>
+	{
+		try
+		{
+			const patients = (await this._mhaPatientApi.searchPatients(messageSource.id, keyword)).data.body;
+
+			if (patients)
+			{
+				const mhaPatients = (new PatientTo1ToMhaPatientConverter()).convertList(patients);
+				return (new MhaPatientToMessageableConverter()).convertList(mhaPatients.filter((patient) => patient.canMessage));
+			}
+		}
+		catch(error)
+		{
+			throw new MessagingError(`Failed to search messageables in source ${messageSource.id} with error: ${error.toString()} - ${error.status}`)
+		}
+		return [];
+	}
+
+	/**
+	 * searchMessageables impl for virtual sources
+	 * @see searchMessageables
+	 * @protected
+	 */
+	protected async searchMessageablesVirtual(keyword: string): Promise<Messageable[]>
+	{
+		let messageables: Messageable[] = [];
+
+		for (let source of this.getPhysicalMessagingSources())
+		{
+			messageables = messageables.concat(await this.searchMessageablesPhysical(source, keyword));
+		}
+
+		// @ts-ignore
+		messageables = Juno.Common.Util.arrayDistinct(messageables, "id");
+
+		return messageables;
+	}
 
 	/**
 	 * load all messaging sources

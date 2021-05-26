@@ -41,4 +41,9 @@ export default class MessageSource
 	{
 		return this._type;
 	}
+
+	get isVirtual(): boolean
+	{
+		return this._type === MessageSourceType.VIRTUAL;
+	}
 }
