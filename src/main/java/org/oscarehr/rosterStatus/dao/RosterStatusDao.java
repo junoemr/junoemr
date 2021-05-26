@@ -55,4 +55,12 @@ public class RosterStatusDao extends AbstractDao<RosterStatus>
 
 		return query.getResultList();
 	}
+
+	public RosterStatus findByStatus(String status)
+	{
+		String sql = "SELECT r FROM RosterStatus r WHERE r.rosterStatus = :status";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("status", status);
+		return getSingleResultOrNull(query);
+	}
 }

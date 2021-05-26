@@ -15,14 +15,14 @@
     </modal-title>
 
     <modal-body>
-        <div ng-if="$ctrl.status.systemManaged">
+        <div class="roster-status-system-managed" ng-if="$ctrl.status.systemManaged">
             This status is managed by the system. You cannot edit this.
         </div>
         <juno-input class="roster-status-input"
                 label="Status"
                 component-style="$ctrl.componentStyle"
                 ng-model="$ctrl.status.rosterStatus"
-                disabled="$ctrl.status.systemManaged">
+                disabled="$ctrl.editMode">
         </juno-input>
         <juno-input class="roster-status-input"
                 label="Description"
@@ -30,25 +30,33 @@
                 ng-model="$ctrl.status.statusDescription"
                 disabled="$ctrl.status.systemManaged">
         </juno-input>
-        <juno-check-box class="roster-status-checkbox"
-                        label="Is Rostered"
-                        component-style="$ctrl.componentStyle"
-                        ng-model="$ctrl.status.rostered"
-                        disabled="$ctrl.status.systemManaged">
-        </juno-check-box>
-        <juno-check-box
-                class="roster-status-checkbox"
-                label="Is Terminated"
-                component-style="$ctrl.componentStyle"
-                ng-model="$ctrl.status.terminated"
-                disabled="$ctrl.status.systemManaged">
-        </juno-check-box>
-        <juno-check-box class="roster-status-checkbox"
-                        label="Enabled"
-                        component-style="$ctrl.componentStyle"
-                        ng-model="$ctrl.status.active"
-                        disabled="$ctrl.status.systemManaged">
-        </juno-check-box>
+        <div>
+            <div class="col-md-4">
+                <juno-check-box class="roster-status-checkbox"
+                                label="Is Rostered"
+                                component-style="$ctrl.componentStyle"
+                                ng-model="$ctrl.status.rostered"
+                                disabled="$ctrl.status.systemManaged">
+                </juno-check-box>
+            </div>
+            <div class="col-md-4">
+                <juno-check-box
+                    class="roster-status-checkbox"
+                    label="Is Terminated"
+                    component-style="$ctrl.componentStyle"
+                    ng-model="$ctrl.status.terminated"
+                    disabled="$ctrl.status.systemManaged">
+                </juno-check-box>
+            </div>
+            <div class="col-md-4">
+                <juno-check-box class="roster-status-checkbox"
+                                label="Enabled"
+                                component-style="$ctrl.componentStyle"
+                                ng-model="$ctrl.status.active"
+                                disabled="$ctrl.status.systemManaged">
+                </juno-check-box>
+            </div>
+        </div>
     </modal-body>
     <modal-footer>
         <div class="col-md-6">

@@ -52,12 +52,9 @@ public class RosterStatusService
 	@Autowired
 	RosterStatusToDomainConverter rosterStatusToDomainConverter;
 
-	public Optional<RosterStatus> findByStatus(String status)
+	public RosterStatus findByStatus(String status)
 	{
-		return rosterStatusDao.findAll()
-				.stream()
-				.filter(rosterStatus -> rosterStatus.getRosterStatus().equals(status))
-				.findFirst();
+		return rosterStatusDao.findByStatus(status);
 	}
 
 	public List<RosterStatusTransfer> getRosterStatusList(Boolean active)

@@ -62,8 +62,8 @@ public class DemographicRosterService
 		demographicRoster.setDemographicId(demographic.getDemographicId());
 		demographicRoster.setRosterDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterDate()));
 
-		Optional<RosterStatus> rosterStatus = rosterStatusService.findByStatus(demographic.getRosterStatus());
-		rosterStatus.ifPresent(demographicRoster::setRosterStatus);
+		RosterStatus rosterStatus = rosterStatusService.findByStatus(demographic.getRosterStatus());
+		demographicRoster.setRosterStatus(rosterStatus);
 
 		// Only set rostered provider if the status is roster-y
 		if (demographicRoster.getRosterStatus().isRostered())
