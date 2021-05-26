@@ -76,6 +76,8 @@ List<AffinityDomainDataObject> affinityDomains = affDao.getAllAffinityDomains();
 
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils, oscar.OscarProperties, oscar.dms.EDoc, oscar.dms.EDocUtil, java.util.ArrayList, java.util.List"%>
 <%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.security.model.Permission" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request" />
 
 
@@ -180,10 +182,18 @@ if( viewstatus == null ) {
 UserPropertyDAO pref = (UserPropertyDAO) WebApplicationContextUtils.getWebApplicationContext(pageContext.getServletContext()).getBean("UserPropertyDAO"); 
 UserProperty up = pref.getProp(user_no, UserProperty.EDOC_BROWSER_IN_DOCUMENT_REPORT);
 Boolean DocumentBrowserLink=false;
- 
-if ( up != null && up.getValue() != null && up.getValue().equals("yes")){ 
-   DocumentBrowserLink = true;
-                            }
+
+if (up != null && up.getValue() != null && up.getValue().equals("yes"))
+{
+    DocumentBrowserLink = true;
+}
+
+SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+boolean hasDocumentCreatePermission = false;
+if(module.equals("demographic"))
+{
+    hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_CREATE);
+}
 %>
 <html:html locale="true">
 <head>
@@ -618,9 +628,12 @@ function popup1(height, width, url, windowName){
       </div>
       <div><input type="button" name="Button"
         value="<bean:message key="dms.documentReport.btnDoneClose"/>"
-        onclick=self.close();> <input type="button" name="print"
+        onclick=self.close();>
+          <input type="button" name="print"
         value='<bean:message key="global.btnPrint"/>'
-        onClick="window.print()"> <input type="button"
+        onClick="window.print()">
+          <input type="button"
+                  <%=(hasDocumentCreatePermission) ? "" : "disabled='disabled'"%>
         value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
 				<% if (faxEnabled) { %>
