@@ -190,9 +190,16 @@ if (up != null && up.getValue() != null && up.getValue().equals("yes"))
 
 SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 boolean hasDocumentCreatePermission = false;
+boolean hasDocumentUpdatePermission = false;
+boolean hasTicklerCreatePermission = false;
+boolean hasNoteCreatePermission = false;
+
 if(module.equals("demographic"))
 {
     hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_CREATE);
+    hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_UPDATE);
+    hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.TICKLER_CREATE);
+    hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.ENCOUNTER_NOTE_CREATE);
 }
 %>
 <html:html locale="true">
@@ -566,7 +573,7 @@ function popup1(height, width, url, windowName){
                 <%
                 }
 
-                if( curdoc.getStatus() != 'D' ) {
+                if( hasDocumentUpdatePermission && curdoc.getStatus() != 'D' ) {
                   if (curdoc.getStatus() == 'H') { %>
                   <a href="#" onclick="popup(450, 600, 'addedithtmldocument.jsp?editDocumentNo=<%=curdoc.getDocId()%>&function=<%=module%>&functionid=<%=moduleid%>', 'EditDoc')">
                   <%
@@ -581,14 +588,14 @@ function popup1(height, width, url, windowName){
                   <%
                 }
 
-                if(module.equals("demographic")){%>
+                if(module.equals("demographic") && hasNoteCreatePermission){%>
                   <a href="#" title="Annotation" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=curdoc.getDocId()%>&demo=<%=moduleid%>','anwin','width=400,height=500');">
                     <img src="../images/notes.gif" border="0">
                   </a>
                            <%
                            }
 
-                 if(!(moduleid.equals(session.getAttribute("user"))&& module.equals("demographic"))) {
+                 if(hasTicklerCreatePermission && !(moduleid.equals(session.getAttribute("user"))&& module.equals("demographic")) ) {
 
                                 String tickler_url;
                               if( org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable() ) {

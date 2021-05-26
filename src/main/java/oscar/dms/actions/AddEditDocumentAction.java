@@ -197,8 +197,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_CREATE);
-		
+
 		if (fm.getMode().equals("") && fm.getFunction().equals("") && fm.getFunctionId().equals("")) {
 			// file size exceeds the upload limit
 			HashMap<String, String> errors = new HashMap<String, String>();
@@ -209,6 +208,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			return mapping.findForward("failEdit");
 		}
 		else if (fm.getMode().equals("add")) {
+			securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_CREATE);
 			// if add/edit success then send redirect, if failed send a forward (need the formdata and errors hashtables while trying to avoid POSTDATA messages)
 			if (addDocument(fm, mapping, request) == true) { // if success
 				ActionRedirect redirect = new ActionRedirect(mapping.findForward("successAdd"));
@@ -234,6 +234,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			}
 		}
 		else {
+			securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_UPDATE);
 			ActionForward forward = editDocument(fm, mapping, request);
 			return forward;
 		}
