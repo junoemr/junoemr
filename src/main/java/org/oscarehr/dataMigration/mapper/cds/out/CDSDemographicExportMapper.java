@@ -52,6 +52,7 @@ import xml.cds.v5_0.PurposeEnumOrPlainText;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
@@ -280,40 +281,44 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		if(!rosterHistory.isEmpty())
 		{
 			enrolment = objectFactory.createDemographicsEnrolment();
-			for(RosterData rosterData : rosterHistory)
-			{
-				Demographics.Enrolment.EnrolmentHistory enrolmentHistory = objectFactory.createDemographicsEnrolmentEnrolmentHistory();
-
-				if(rosterData.isRostered())
-				{
-					enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_TRUE);
-					enrolmentHistory.setEnrollmentDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getRosterDateTime()));
-				}
-				else
-				{
-					enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_FALSE);
-					enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getTerminationDateTime()));
-					if(rosterData.getTerminationReason() != null)
-					{
-						enrolmentHistory.setTerminationReason(String.valueOf(rosterData.getTerminationReason().getTerminationCode()));
-					}
-				}
-
-				Provider rosterProvider = rosterData.getRosterProvider();
-				if(rosterProvider != null)
-				{
-					Demographics.Enrolment.EnrolmentHistory.EnrolledToPhysician enrolledToPhysician =
-							objectFactory.createDemographicsEnrolmentEnrolmentHistoryEnrolledToPhysician();
-					enrolledToPhysician.setName(toPersonNameSimple(rosterProvider));
-					enrolledToPhysician.setOHIPPhysicianId(rosterProvider.getOhipNumber());
-
-					enrolmentHistory.setEnrolledToPhysician(enrolledToPhysician);
-				}
-
-				enrolment.getEnrolmentHistory().add(enrolmentHistory);
-			}
+			enrolment.getEnrolmentHistory().addAll(
+					rosterHistory.stream()
+							.map(this::getEnrollmentHistory)
+							.collect(Collectors.toList()));
 		}
 		return enrolment;
+	}
+
+	protected Demographics.Enrolment.EnrolmentHistory getEnrollmentHistory(RosterData rosterData)
+	{
+		Demographics.Enrolment.EnrolmentHistory enrolmentHistory = objectFactory.createDemographicsEnrolmentEnrolmentHistory();
+
+		if(rosterData.isRostered())
+		{
+			enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_TRUE);
+			enrolmentHistory.setEnrollmentDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getRosterDateTime()));
+		}
+		else
+		{
+			enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_FALSE);
+			enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getTerminationDateTime()));
+			if(rosterData.getTerminationReason() != null)
+			{
+				enrolmentHistory.setTerminationReason(String.valueOf(rosterData.getTerminationReason().getTerminationCode()));
+			}
+		}
+
+		Provider rosterProvider = rosterData.getRosterProvider();
+		if(rosterProvider != null)
+		{
+			Demographics.Enrolment.EnrolmentHistory.EnrolledToPhysician enrolledToPhysician =
+					objectFactory.createDemographicsEnrolmentEnrolmentHistoryEnrolledToPhysician();
+			enrolledToPhysician.setName(toPersonNameSimple(rosterProvider));
+			enrolledToPhysician.setOHIPPhysicianId(rosterProvider.getOhipNumber());
+
+			enrolmentHistory.setEnrolledToPhysician(enrolledToPhysician);
+		}
+		return enrolmentHistory;
 	}
 
 	protected List<Demographics.Contact> getContacts(List<DemographicContact> demographicContactList)

@@ -37,12 +37,9 @@ import xml.cds.v5_0.PersonStatus;
 
 import java.time.LocalDate;
 
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_NOT_ROSTERED;
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
 @Component
 public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, Demographic>
