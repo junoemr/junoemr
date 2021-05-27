@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -863,6 +864,18 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isNewBorn()
 	{
 		return Demographic.isNewBorn(getDateOfBirth(), getVer());
+	}
+
+	/**
+	 * Checks whether this demographic is marked as a BC newborn.
+	 * A demographic is a BC newborn if they have hc_type == BC and ver == 66.
+	 * This method pays no respect to the actual age of the patient.
+	 * @return true / false indicating BC newborn status.
+	 */
+	public boolean isMarkedAsBCNewborn()
+	{
+		return Objects.equals(this.getVer(), BC_NEWBORN_BILLING_CODE) &&
+				Objects.equals(this.getHcType(), HC_TYPE.BC.toString());
 	}
 
 	@PrePersist
