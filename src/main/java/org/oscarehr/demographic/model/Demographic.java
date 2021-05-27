@@ -68,11 +68,6 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public static final String STATUS_DECEASED = "DE";
 	public static final String STATUS_INACTIVE = "IN";
 
-	public static final String ROSTER_STATUS_FEE_SERVICE = "FS";
-	public static final String ROSTER_STATUS_ROSTERED = "RO";
-	public static final String ROSTER_STATUS_NOT_ROSTERED = "NR";
-	public static final String ROSTER_STATUS_TERMINATED = "TE";
-
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

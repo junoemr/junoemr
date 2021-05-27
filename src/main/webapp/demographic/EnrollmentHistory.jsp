@@ -54,6 +54,8 @@
 <%@page import="oscar.util.DateUtils" %>
 <%@page import="oscar.util.StringUtils" %>
 <%@page import="oscar.oscarDemographic.pageUtil.Util" %>
+<%@ page import="org.oscarehr.rosterStatus.model.RosterStatus" %>
+<%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
 <html:html locale="true">
 <head>
 <title>Enrollment History</title>
@@ -132,13 +134,13 @@
 								<td nowrap="nowrap"><%=viewRS(rosterStatus)%></td>
 								
 							<%Provider demoP = providerDao.getProvider(demographic.getProviderNo());
-							   if("RO".equals(rosterStatus)){ %>
+							   if(RosterStatus.ROSTER_STATUS_ROSTERED.equals(rosterStatus)){ %>
 								<td nowrap="nowrap"><%=DateUtils.formatDate(rosterDate,request.getLocale())%></td>
 							<%}else if(StringUtils.filled(rosterStatus)){ %>
 								<td nowrap="nowrap"><%=DateUtils.formatDate(rosterTermDate,request.getLocale())%></td>
 							<%}else{ %>
 								<td nowrap="nowrap"></td>
-								<td nowrap="nowrap"><%=(demoP!=null && "RO".equals(demographic.getRosterStatus()))?demoP.getFormattedName():"" %></td>
+								<td nowrap="nowrap"><%=(demoP!=null && RosterStatus.ROSTER_STATUS_ROSTERED.equals(demographic.getRosterStatus()))?demoP.getFormattedName():"" %></td>
 							<%}
 							   if(StringUtils.filled(demographic.getLastUpdateUser())){ %>
 								<td nowrap="nowrap"><%=providerDao.getProvider(demographic.getLastUpdateUser()).getFormattedName() %></td>
@@ -146,12 +148,15 @@
 								<td nowrap="nowrap">System</td>
 							<%} %>
 							</tr>
-						<%if(!"RO".equals(rosterStatus)
+						<%if(!RosterStatus.ROSTER_STATUS_ROSTERED.equals(rosterStatus)
 								&& demographic.getRosterTerminationReason()!=null
-								&& !demographic.getRosterTerminationReason().equals("")){ %>
+								&& !demographic.getRosterTerminationReason().equals(""))
+						{
+							Integer terminationCode = Integer.parseInt(demographic.getRosterTerminationReason());
+						%>
 							<tr>
 								<td nowrap="nowrap">Termination Reason: </td>
-								<td colspan="5"><%=Util.rosterTermReasonProperties.getReasonByCode(demographic.getRosterTerminationReason()) %></td>
+								<td colspan="5"><%=DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationCode).getDescription()%></td>
 							</tr>
 						<%} %>
 						<%
@@ -173,7 +178,7 @@
 					                	<tr>
 					                		<td nowrap="nowrap"><%=DateUtils.formatDate(da.getLastUpdateDate(),request.getLocale())%></td>
 					                		<td nowrap="nowrap"><%=viewRS(historyRS)%></td>
-				                		<%if("RO".equals(historyRS)){ %>
+				                		<%if(RosterStatus.ROSTER_STATUS_ROSTERED.equals(historyRS)){ %>
 											<td nowrap="nowrap"><%=DateUtils.formatDate(da.getRosterDate(),request.getLocale())%></td>
 										<%}else if( historyRS != null && !historyRS.trim().equals("")){ %>
 											<td nowrap="nowrap"><%=DateUtils.formatDate(da.getRosterTerminationDate(),request.getLocale())%></td>
@@ -181,7 +186,7 @@
 					                		<td nowrap="nowrap">
 					                		<%
 					                		String name = "";
-					                		if(StringUtils.filled(da.getProviderNo()) && "RO".equals(historyRS)) {
+					                		if(StringUtils.filled(da.getProviderNo()) && RosterStatus.ROSTER_STATUS_ROSTERED.equals(historyRS)) {
 					                			Provider p  = providerDao.getProvider(da.getProviderNo());
 					                			if(p != null) {
 					                				name = p.getFormattedName();
@@ -205,12 +210,15 @@
 				                		    <td nowrap="nowrap">System</td>
 				                		<%}%>
 					                	</tr>
-									<%if(!"RO".equals(da.getRosterStatus())
+									<%if(!RosterStatus.ROSTER_STATUS_ROSTERED.equals(da.getRosterStatus())
 											&& da.getRosterTerminationReason()!=null
-											&& !da.getRosterTerminationReason().equals("")){ %>
+											&& !da.getRosterTerminationReason().equals(""))
+									{
+										Integer terminationCode = Integer.parseInt(da.getRosterTerminationReason());
+									%>
 										<tr>
 											<td nowrap="nowrap">Termination Reason: </td>
-											<td colspan="5"><%=Util.rosterTermReasonProperties.getReasonByCode(da.getRosterTerminationReason()) %></td>
+											<td colspan="5"><%=DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationCode).getDescription()%></td>
 										</tr>
 									<%}
 								}

@@ -404,6 +404,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReportByTemplateService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReportingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ResourceService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.RosterWebService" />
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RSSFeedService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ScheduleService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SitesService"/>

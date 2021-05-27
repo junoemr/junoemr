@@ -538,6 +538,7 @@ public class AdminNavService
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobtypes.title"), "frame?frameUrl=" + contextPath + "/admin/jobTypes.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1("Roster Status Settings", "rosterStatus"));
 		}
 
 		if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())

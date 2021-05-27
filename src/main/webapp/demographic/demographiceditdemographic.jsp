@@ -287,6 +287,7 @@ if(!authed) {
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
+<%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
 <html:html locale="true">
 
 <head>
@@ -831,9 +832,18 @@ jQuery(document).ready(function(){
 <body onLoad="setfocus(); checkRosterStatus2();"
 	topmargin="0" leftmargin="0" rightmargin="0" id="demographiceditdemographic">
 <%
-       Demographic demographic = demographicDao.getDemographic(demographic_no);
-       
-       AdmissionManager admissionManager = SpringUtils.getBean(AdmissionManager.class);  
+	Demographic demographic = demographicDao.getDemographic(demographic_no);
+	Integer rosterTerminationCode = 0;
+	try
+	{
+		rosterTerminationCode = Integer.parseInt(demographic.getRosterTerminationReason());
+	}
+	catch (NumberFormatException ignored) {}
+
+	pageContext.setAttribute("rosterTerminationCode", rosterTerminationCode);
+	pageContext.setAttribute("terminationReasons", DemographicRoster.ROSTER_TERMINATION_REASON.values());
+
+	AdmissionManager admissionManager = SpringUtils.getBean(AdmissionManager.class);
      	Admission bedAdmission = admissionManager.getCurrentBedProgramAdmission(demographic.getDemographicNo());
      	List<Admission> serviceAdmissions = admissionManager.getCurrentServiceProgramAdmission(demographic.getDemographicNo());
      	if(serviceAdmissions == null) {
@@ -1693,10 +1703,13 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                                     </li>
 <%
 	String terminationReason = demographic.getRosterTerminationReason();
-	if (null != demographic.getRosterTerminationDate() && StringUtils.isNotBlank(terminationReason)) { %>
+	if (null != demographic.getRosterTerminationDate() && StringUtils.isNotBlank(terminationReason))
+	{
+		Integer terminationCode = Integer.parseInt(terminationReason);
+%>
 													<li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.RosterTerminationReason" />:</span>
-                                                        <span class="info"><%=Util.rosterTermReasonProperties.getReasonByCode(terminationReason) %></span>
+                                                        <span class="info"><%=DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationCode).description%></span>
                                                     </li>
 <%} %>
                                                     <li><span class="label"><bean:message
@@ -3207,9 +3220,12 @@ document.updatedelete.referral_doctor_no.value = refNo;
 								<td align="left" colspan="3">
 									<select  name="roster_termination_reason">
 										<option value="">N/A</option>
-										<%for (String code : Util.rosterTermReasonProperties.getTermReasonCodes()) { %>
-										<option value="<%=code %>" <%=code.equals(rosterTerminationReason)?"selected":"" %> ><%=Util.rosterTermReasonProperties.getReasonByCode(code) %></option>
-										<%} %>
+										<c:forEach items="${terminationReasons}" var="terminationReason">
+											<option value="${terminationReason.getTerminationCode()}"
+													${terminationReason.getTerminationCode() == rosterTerminationCode ? "selected='selected'" : ""}>
+												${terminationReason.getDescription()}
+											</option>
+										</c:forEach>
 									</select>
 								</td>
 							</tr>
