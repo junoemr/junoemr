@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.Demographics;
@@ -44,13 +45,16 @@ import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 @Component
 public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, Demographic>
 {
+	@Autowired
+	protected CDSEnrollmentHistoryImportMapper cdsEnrollmentHistoryImportMapper;
+
 	public CDSDemographicImportMapper()
 	{
 		super();
 	}
 
 	@Override
-	public Demographic importToJuno(Demographics importStructure)
+	public Demographic importToJuno(Demographics importStructure) throws Exception
 	{
 		Demographic demographic = new Demographic();
 		mapBasicInfo(importStructure, demographic);
@@ -136,7 +140,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		}
 	}
 
-	protected void mapCareTeamInfo(Demographics importStructure, Demographic demographic)
+	protected void mapCareTeamInfo(Demographics importStructure, Demographic demographic) throws Exception
 	{
 		demographic.setEmail(importStructure.getEmail());
 		demographic.setMrpProvider(getImportPrimaryPhysician(importStructure));
@@ -150,18 +154,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		Demographics.Enrolment enrollment = importStructure.getEnrolment();
 		if(enrollment != null)
 		{
-			//TODO how to handle multiple enrollments?
-			for(Demographics.Enrolment.EnrolmentHistory enrolmentHistory : enrollment.getEnrolmentHistory())
-			{
-//				demographic.setRosterStatus(ENROLLMENT_STATUS_TRUE.equals(enrolmentHistory.getEnrollmentStatus()) ? ROSTER_STATUS_ROSTERED : ROSTER_STATUS_NOT_ROSTERED);
-//				demographic.setRosterTerminationReason(enrolmentHistory.getTerminationReason());
-//				demographic.setRosterDate(ConversionUtils.toNullableLocalDate(enrolmentHistory.getEnrollmentDate()));
-//				demographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(enrolmentHistory.getEnrollmentDate()));
-			}
-			if(enrollment.getEnrolmentHistory().size() > 1)
-			{
-				logEvent("Demographic enrollment history may be incomplete");
-			}
+			demographic.setRosterHistory(cdsEnrollmentHistoryImportMapper.importAll(enrollment.getEnrolmentHistory()));
 		}
 	}
 

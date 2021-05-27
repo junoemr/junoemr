@@ -23,14 +23,15 @@
 package org.oscarehr.dataMigration.converter.in;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -43,6 +44,9 @@ import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 public class DemographicModelToDbConverter
 		extends BaseModelToDbConverter<org.oscarehr.dataMigration.model.demographic.Demographic, Demographic>
 {
+
+	@Autowired
+	private RosterModelToDbConverter rosterModelToDbConverter;
 
 	@Override
 	public Demographic convert(org.oscarehr.dataMigration.model.demographic.Demographic input)
@@ -67,9 +71,8 @@ public class DemographicModelToDbConverter
 		dbDemographic.setDateJoined(ConversionUtils.toNullableLegacyDate(input.getDateJoined()));
 		dbDemographic.setEndDate(ConversionUtils.toNullableLegacyDate(input.getDateEnded()));
 		dbDemographic.setChartNo(input.getChartNumber());
-//		dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDate(input.getRosterDate()));
-//		dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(input.getRosterTerminationDate()));
 		dbDemographic.setOfficialLanguage((input.getOfficialLanguage() != null) ? input.getOfficialLanguage().getValue() : null);
+		dbDemographic.setRosterHistory(rosterModelToDbConverter.convert(input.getRosterHistory()));
 
 		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
 		if(dbProvider != null)
