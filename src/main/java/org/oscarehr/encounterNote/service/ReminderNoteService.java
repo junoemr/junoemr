@@ -50,7 +50,7 @@ public class ReminderNoteService extends HistoryNoteService
 
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveReminderNote(note);
-		addAnnotationLink(savedNote, noteModel.getAnnotation());
+		addAnnotationLink(savedNote, noteModel.getAnnotation(), noteModel.getResidualInfo());
 
 		if(savedNote.getNoteExtensionList() != null)
 		{

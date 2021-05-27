@@ -25,9 +25,11 @@ package org.oscarehr.dataMigration.model.allergy;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.provider.Provider;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.oscarehr.allergy.model.Allergy.ONSET_DESC_GRADUAL;
 import static org.oscarehr.allergy.model.Allergy.ONSET_DESC_IMMEDIATE;
@@ -155,4 +157,5 @@ public class Allergy extends AbstractTransientModel
 
 	private Provider provider;
 	private String annotation;
+	private List<ResidualInfo> residualInfo;
 }

@@ -23,18 +23,14 @@
 package org.oscarehr.dataMigration.model.encounterNote;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PartialDate;
 
 @Data
-public class FamilyHistoryNote extends BaseNote
+public class FamilyHistoryNote extends BaseCppNote
 {
-	private PartialDate startDate;
-	private PartialDate resolutionDate;
 	private Long ageAtOnset;
 	private String treatment;
 	private String relationship;
 	private String lifeStage;
-	private String annotation;
 
 	public FamilyHistoryNote()
 	{

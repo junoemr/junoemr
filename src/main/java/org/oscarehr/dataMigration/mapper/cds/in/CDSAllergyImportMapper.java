@@ -60,6 +60,8 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		allergy.setAgeOfOnset(getResidualDataElementAsLong(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET));
 		String onsetOfReaction = getResidualDataElementAsString(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_ONSET_REACTION);
 		allergy.setOnsetOfReaction(Allergy.REACTION_ONSET.fromDescription(onsetOfReaction));
+		allergy.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo(),
+				RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET, RESIDUAL_INFO_DATA_NAME_ONSET_REACTION));
 
 		return allergy;
 	}

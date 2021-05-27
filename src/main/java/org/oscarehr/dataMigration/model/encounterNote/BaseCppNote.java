@@ -20,42 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.immunization;
+package org.oscarehr.dataMigration.model.encounterNote;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class Immunization extends AbstractTransientModel
+public abstract class BaseCppNote extends BaseNote
 {
-	private Integer id;
-	private String preventionType;
-	private String drugIdentificationNumber;
-	private PartialDateTime administrationDate;
-	private LocalDate nextDate;
-	private Boolean refused;
-	private Boolean never;
-
-	private Provider provider;
-	private Provider createdBy;
-	private LocalDateTime createdAt;
-	private LocalDateTime lastUpdateDate;
-
-	private String name;
-	private String dose;
-	private String manufacture;
-	private String route;
-	private String lot;
-	private String location;
-	private String reason;
-	private String result;
-	private String comments;
+	private PartialDate startDate;
+	private PartialDate resolutionDate;
+	private String annotation;
 	private List<ResidualInfo> residualInfo;
 }

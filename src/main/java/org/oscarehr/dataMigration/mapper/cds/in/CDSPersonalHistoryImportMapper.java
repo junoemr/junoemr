@@ -93,6 +93,14 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSNoteImportMapper<
 				}
 			}
 		}
+		note.setResidualInfo(importAllResidualInfo(
+				importStructure.getResidualInfo(),
+				RESIDUAL_INFO_DATA_NAME_NOTE,
+				RESIDUAL_INFO_DATA_NAME_OBS_DATE,
+				RESIDUAL_INFO_DATA_NAME_START_DATE,
+				RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE,
+				RESIDUAL_INFO_DATA_NAME_ANNOTATION,
+				RESIDUAL_INFO_DATA_NAME_PROVIDER));
 
 		// use another date if no observation date
 		if(note.getObservationDate() == null)

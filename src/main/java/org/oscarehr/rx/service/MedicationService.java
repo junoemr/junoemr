@@ -24,10 +24,14 @@ package org.oscarehr.rx.service;
 
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.PartialDate;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.DrugModelToDbConverter;
 import org.oscarehr.dataMigration.converter.in.PrescriptionModelToDbConverter;
 import org.oscarehr.dataMigration.model.medication.Medication;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
 import org.oscarehr.rx.model.Drug;
@@ -38,6 +42,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -57,6 +62,12 @@ public class MedicationService
 
 	@Autowired
 	private PrescriptionModelToDbConverter prescriptionModelToDbConverter;
+
+	@Autowired
+	private EncounterNoteService encounterNoteService;
+
+	@Autowired
+	private ProviderService providerService;
 
 
 	public void saveNewMedication(Medication medication, Demographic demographic)
@@ -94,6 +105,19 @@ public class MedicationService
 					PartialDate.TABLE.DRUGS,
 					drug.getId(),
 					PartialDate.DRUGS_ENDDATE);
+		}
+
+		Optional<CaseManagementNote> medicationNoteOptional = encounterNoteService.buildBaseAnnotationNote(
+				medication.getSpecialInstructions(), medication.getResidualInfo());
+		if(medicationNoteOptional.isPresent())
+		{
+			CaseManagementNote medicationNote = medicationNoteOptional.get();
+			ProviderData providerData = providerService.getProvider(drug.getProviderNo());
+			medicationNote.setProvider(providerData);
+			medicationNote.setSigningProvider(providerData);
+			medicationNote.setDemographic(demographic);
+			medicationNote.setObservationDate(drug.getRxDate());
+			encounterNoteService.saveDrugNote(medicationNote, drug);
 		}
 	}
 

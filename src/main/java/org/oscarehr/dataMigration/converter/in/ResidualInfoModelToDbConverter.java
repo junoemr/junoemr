@@ -20,42 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.immunization;
+package org.oscarehr.dataMigration.converter.in;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-@Data
-public class Immunization extends AbstractTransientModel
+@Component
+public class ResidualInfoModelToDbConverter extends BaseModelToDbConverter<ResidualInfo, CaseManagementNoteResidualInfo>
 {
-	private Integer id;
-	private String preventionType;
-	private String drugIdentificationNumber;
-	private PartialDateTime administrationDate;
-	private LocalDate nextDate;
-	private Boolean refused;
-	private Boolean never;
+	@Override
+	public CaseManagementNoteResidualInfo convert(ResidualInfo input)
+	{
+		CaseManagementNoteResidualInfo residualInfo = new CaseManagementNoteResidualInfo();
+		BeanUtils.copyProperties(input, residualInfo, "note");
 
-	private Provider provider;
-	private Provider createdBy;
-	private LocalDateTime createdAt;
-	private LocalDateTime lastUpdateDate;
-
-	private String name;
-	private String dose;
-	private String manufacture;
-	private String route;
-	private String lot;
-	private String location;
-	private String reason;
-	private String result;
-	private String comments;
-	private List<ResidualInfo> residualInfo;
+		return residualInfo;
+	}
 }
