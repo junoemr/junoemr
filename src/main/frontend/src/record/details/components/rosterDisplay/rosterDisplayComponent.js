@@ -40,6 +40,11 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                 ctrl.validations["rosterDate"] = Juno.Validations.validationCustom(() => ctrl.rosterDateValid);
                 ctrl.validations["terminationDate"] = Juno.Validations.validationCustom(() => ctrl.terminationDateValid);
 
+                ctrl.validations["rosterTerminationReason"] = Juno.Validations.validationFieldOr(
+                    Juno.Validations.validationCustom(() => ctrl.ngModel.rosterStatus !== "TE"),
+                    Juno.Validations.validationFieldRequired(ctrl, "ngModel.rosterTerminationReason")
+                );
+
                 ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
                 rosterApi.getRosterStatuses(true).then(
@@ -71,7 +76,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                                 value: displayName,
                                 referralNo: results[i].referralNo
                             };
-                            if (results[i].specialtyType != null && results[i].specialtyType != "")
+                            if (results[i].specialtyType != null && results[i].specialtyType !== "")
                             {
                                 familyDoctors[i].label += " [" + results[i].referralNo + "]";
                             }
