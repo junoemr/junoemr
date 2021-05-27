@@ -44,9 +44,10 @@ export default class Conversation
 	 */
 	get participants(): Messageable[]
 	{
+		const recipients: Messageable[] = this.messages.map((msg) => msg.recipients).flat();
+		const senders: Messageable[] = this.messages.map((msg) => msg.sender);
+
 		// @ts-ignore
-		return Juno.Common.Util.arrayDistinct(this.messages
-				.map((msg) => msg.recipients)
-				.flat(), "id");
+		return Juno.Common.Util.arrayDistinct(senders.concat(recipients), "id");
 	}
 }

@@ -1,7 +1,7 @@
 <div class="message-card flex-col" ng-class="$ctrl.selected ? 'selected' : ''" ng-click="$ctrl.onClick()">
 	<!-- Header row -->
 	<div class="flex-row align-items-center m-t-8 m-b-4 m-r-16">
-		<div ng-hide="$ctrl.message.isRead" class="not-read-circle"></div>
+		<div class="message-circle" ng-class="{'read': $ctrl.message.isRead}"></div>
 		<div class="text-ellipsis"
 		     title="{{$ctrl.message.sender.name}}">
 			From: {{$ctrl.message.sender.name}}

@@ -12,7 +12,7 @@
 		background-color: var(--color-primary-base);
 		color: var(--color-neutral-white);
 
-		.not-read-circle {
+		.message-circle {
 			background-color: var(--color-neutral-white);
 		}
 
@@ -21,16 +21,15 @@
 		}
 	}
 
-	.not-read-circle {
+	.message-circle {
 		width: 8px;
 		height: 8px;
 		margin: 0 20px 0 20px;
 		border-radius: 100%;
 		background-color: var(--color-primary-base);
 
-		&.ng-hide {
-			display: block !important;
-			visibility: hidden;
+		&.read {
+			background-color: var(--color-neutral-lighter);
 		}
 	}
 

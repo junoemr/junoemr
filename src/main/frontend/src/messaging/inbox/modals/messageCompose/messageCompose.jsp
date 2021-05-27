@@ -5,26 +5,37 @@
                    modal-height="512">
 	<div class="message-compose flex-col w-100 h-100 p-16 p-t-8">
 		<!-- Recipient -->
-		<messageable-search id="recipient-search-input" class="m-b-16"
+		<messageable-search ng-if="!$ctrl.isReply"
+		                    class="m-b-16"
 		                    ng-model="$ctrl.recipient"
 		                    messaging-service="$ctrl.messagingService"
 		                    source-id="$ctrl.sourceId"
 		                    component-style="$ctrl.resolve.style">
 		</messageable-search>
+		<!-- Participants -->
+		<juno-input ng-if="$ctrl.isReply"
+		            class="m-b-16"
+		            ng-model="$ctrl.participantNames"
+		            label-position="LABEL_POSITION.TOP"
+		            label="Participants"
+		            readonly="true"
+		            component-style="$ctrl.resolve.style">
+		</juno-input>
 
 		<!-- Subject -->
 		<juno-input class="m-b-16"
 		            ng-model="$ctrl.subject"
 		            label-position="LABEL_POSITION.TOP"
 		            label="Subject"
+		            readonly="$ctrl.isReply"
 		            component-style="$ctrl.resolve.style">
 		</juno-input>
 
 		<!-- Message -->
 		<label>Message</label>
 		<div class="message-area flex-item-grow flex-col">
-			<div class="flex-col h-100 overflow-y-auto p-4">
-				<div id="message-compose-text" class="message-body flex-item-grow" oninput="$ctrl.onMessageChange()" contenteditable="true"></div>
+			<div class="flex-col h-100 overflow-y-auto p-16">
+				<div class="message-body flex-item-grow" ng-ref="$ctrl.messageTextarea" ng-on-input="$ctrl.onMessageChange()" contenteditable="true"></div>
 			</div>
 		</div>
 
@@ -49,7 +60,7 @@
 			<juno-button class="flex-item-no-grow w-128 m-l-4"
 			             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
-			             disabled="!$ctrl.recipient"
+			             disabled="!$ctrl.canSend()"
 			             click="$ctrl.sendMessage()"
 			             component-style="$ctrl.resolve.style">
 				Send

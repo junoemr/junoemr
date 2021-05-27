@@ -37,7 +37,10 @@ angular.module("Messaging.Modals").component('messageCompose', {
 	},
 	controller: [
 		"$scope",
-		function ($scope)
+		"$uibModal",
+		function (
+			$scope,
+			$uibModal)
 		{
 			const ctrl = this;
 
@@ -48,32 +51,66 @@ angular.module("Messaging.Modals").component('messageCompose', {
 
 			ctrl.recipient = null;
 			ctrl.subject = "";
-			ctrl.messageBody = "";
+			ctrl.sending = false;
 
 			ctrl.$onInit = () =>
 			{
 				ctrl.messagingService = ctrl.resolve.messagingService;
 				ctrl.sourceId = ctrl.resolve.sourceId;
 				ctrl.isReply = ctrl.resolve.isReply || false;
+				ctrl.subject = ctrl.resolve.subject || "";
+				ctrl.conversation = ctrl.resolve.conversation || null;
+				ctrl.participantNames = this.getParticipantNames();
 			}
 
-			ctrl.onMessageChange = () =>
-			{
-				const messageBody = document.getElementById("message-compose-text").textContent; // replace with ref if angularjs is upgraded.
-				console.log(messageBody);
-			}
-
+			/**
+			 * send the newly composed message
+			 */
 			ctrl.sendMessage = async () =>
 			{
-				const messageBody = document.getElementById("message-compose-text").textContent; // replace with ref if angularjs is upgraded.
+				try
+				{
+					ctrl.sending = true;
+					let message = MessageFactory.build(
+						ctrl.subject,
+						ctrl.messageTextarea.text(),
+						this.recipient ? [this.recipient] : [],
+						[],
+						ctrl.isReply ? ctrl.conversation : null);
 
-				//let message = MessageFactory.build(ctrl.subject, messageBody, [this.recipient], []);
-				//await ctrl.messagingService.sendMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), message);
+					await ctrl.messagingService.sendMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), message);
+					ctrl.modalInstance.close();
+				}
+				catch(error)
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Failed to send message", "Some thing went wrong while sending your message. Please contact support if the problem persists");
+					throw error;
+				}
+				finally
+				{
+					ctrl.sending = false;
+				}
 			}
 
 			ctrl.onCancel = () =>
 			{
 				ctrl.modalInstance.close();
 			};
+
+			ctrl.canSend = () =>
+			{
+				return ctrl.subject.length > 0 && ctrl.messageTextarea.text().length > 0 &&
+					(ctrl.recipient !== null || ctrl.isReply)
+					&& !ctrl.sending;
+			}
+
+			ctrl.getParticipantNames = () =>
+			{
+				if (ctrl.conversation)
+				{
+					return ctrl.conversation.participants.map((participant) => participant.name).join(", ");
+				}
+				return "";
+			}
 		}],
 });

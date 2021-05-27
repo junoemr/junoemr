@@ -42,9 +42,11 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 	controller: [
 		"$scope",
 		"$uibModal",
+		"$state",
 		function (
 			$scope,
-			$uibModal
+			$uibModal,
+			$state
 		)
 		{
 			const ctrl = this;
@@ -104,8 +106,18 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				$scope.$apply();
 			}
 
-			ctrl.openComposeModal = async () =>
+			ctrl.openComposeModal = async (reply = false) =>
 			{
+				let selectedMessage = null;
+				let selectedConversation = null;
+				if (reply)
+				{
+					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
+
+					selectedMessage = await ctrl.getSelectedMessage();
+					selectedConversation = await messagingService.getConversation(selectedMessage.source, selectedMessage.conversationId);
+				}
+
 				await $uibModal.open(
 					{
 						component: 'messageCompose',
@@ -115,6 +127,9 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 							style: () => JUNO_STYLE.DEFAULT,
 							messagingService: () => MessagingServiceFactory.build(ctrl.messagingBackendId),
 							sourceId: () => ctrl.sourceId,
+							isReply: () => reply,
+							subject: () => reply ? selectedMessage.subject : "",
+							conversation: () => reply ? selectedConversation : null,
 						}
 					}
 				).result;
@@ -143,7 +158,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
 					return message = await messagingService.getMessage(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
 				}
-
 			}
+
 		}],
 });

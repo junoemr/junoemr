@@ -54,6 +54,8 @@
 		<juno-button class="header-button m-l-24"
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             click="$ctrl.openComposeModal(true)"
+		             disabled="!$ctrl.selectedMessageId"
 		             component-style="$ctrl.componentStyle">
 			<div class="flex-row align-items-center">
 				<span>Reply</span>
@@ -67,8 +69,8 @@
 		<juno-button class="header-button m-l-24"
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
-		             component-style="$ctrl.componentStyle"
-		             click="$ctrl.openComposeModal()">
+		             click="$ctrl.openComposeModal()"
+		             component-style="$ctrl.componentStyle">
 			<div class="flex-row align-items-center">
 				<span>Create New Message</span>
 				<i class="icon icon-mail"></i>
