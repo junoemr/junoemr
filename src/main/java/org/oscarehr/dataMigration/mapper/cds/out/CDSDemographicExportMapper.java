@@ -30,6 +30,7 @@ import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
@@ -52,14 +53,13 @@ import xml.cds.v5_0.PurposeEnumOrPlainText;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
+import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 
 @Component
 public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemographicInterface, PatientRecord>
@@ -276,28 +276,43 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 	{
 		Demographics.Enrolment enrolment = null;
 
-		String rosterStatus = exportStructure.getRosterStatus();
-		if(rosterStatus != null)
+		List<RosterData> rosterHistory = exportStructure.getRosterHistory();
+		if(!rosterHistory.isEmpty())
 		{
 			enrolment = objectFactory.createDemographicsEnrolment();
-			Demographics.Enrolment.EnrolmentHistory enrolmentHistory = objectFactory.createDemographicsEnrolmentEnrolmentHistory();
-
-			if(ROSTER_STATUS_ROSTERED.equals(rosterStatus))
+			for(RosterData rosterData : rosterHistory)
 			{
-				enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_TRUE);
-				enrolmentHistory.setEnrollmentDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getRosterDate()));
-			}
-			else
-			{
-				enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_FALSE);
-				enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getRosterTerminationDate()));
-				enrolmentHistory.setTerminationReason(exportStructure.getRosterTerminationReason());
-			}
+				Demographics.Enrolment.EnrolmentHistory enrolmentHistory = objectFactory.createDemographicsEnrolmentEnrolmentHistory();
 
-			enrolment.getEnrolmentHistory().add(enrolmentHistory);
+				if(rosterData.isRostered())
+				{
+					enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_TRUE);
+					enrolmentHistory.setEnrollmentDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getRosterDateTime()));
+				}
+				else
+				{
+					enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_FALSE);
+					enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getTerminationDateTime()));
+					if(rosterData.getTerminationReason() != null)
+					{
+						enrolmentHistory.setTerminationReason(String.valueOf(rosterData.getTerminationReason().getTerminationCode()));
+					}
+				}
+
+				Provider rosterProvider = rosterData.getRosterProvider();
+				if(rosterProvider != null)
+				{
+					Demographics.Enrolment.EnrolmentHistory.EnrolledToPhysician enrolledToPhysician =
+							objectFactory.createDemographicsEnrolmentEnrolmentHistoryEnrolledToPhysician();
+					enrolledToPhysician.setName(toPersonNameSimple(rosterProvider));
+					enrolledToPhysician.setOHIPPhysicianId(rosterProvider.getOhipNumber());
+
+					enrolmentHistory.setEnrolledToPhysician(enrolledToPhysician);
+				}
+
+				enrolment.getEnrolmentHistory().add(enrolmentHistory);
+			}
 		}
-		//TODO include history from the archive?
-
 		return enrolment;
 	}
 

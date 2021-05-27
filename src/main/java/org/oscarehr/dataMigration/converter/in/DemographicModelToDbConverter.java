@@ -67,8 +67,8 @@ public class DemographicModelToDbConverter
 		dbDemographic.setDateJoined(ConversionUtils.toNullableLegacyDate(input.getDateJoined()));
 		dbDemographic.setEndDate(ConversionUtils.toNullableLegacyDate(input.getDateEnded()));
 		dbDemographic.setChartNo(input.getChartNumber());
-		dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDate(input.getRosterDate()));
-		dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(input.getRosterTerminationDate()));
+//		dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDate(input.getRosterDate()));
+//		dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(input.getRosterTerminationDate()));
 		dbDemographic.setOfficialLanguage((input.getOfficialLanguage() != null) ? input.getOfficialLanguage().getValue() : null);
 
 		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);

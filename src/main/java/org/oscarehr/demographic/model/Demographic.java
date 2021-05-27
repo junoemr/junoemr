@@ -22,9 +22,11 @@
  */
 package org.oscarehr.demographic.model;
 
+import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -54,6 +56,7 @@ import java.util.stream.Collectors;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static oscar.util.StringUtils.filterControlCharacters;
 
+@Data
 @Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
@@ -205,6 +208,9 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="provider_no", insertable=false, updatable=false)
 	private ProviderData provider;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographic")
+	private List<DemographicRoster> rosterHistory;
 
 	public static final String BC_NEWBORN_BILLING_CODE = "66";
 
