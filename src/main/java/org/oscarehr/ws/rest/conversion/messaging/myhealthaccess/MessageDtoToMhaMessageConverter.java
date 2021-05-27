@@ -43,7 +43,10 @@ public class MessageDtoToMhaMessageConverter extends AbstractModelConverter<Mess
 		message.setRead(input.getIsRead());
 
 		// sender
-		message.setSender((new MessageableDtoToMhaMessageableConverter()).convert(input.getSender()));
+		if (input.getSender() != null)
+		{
+			message.setSender((new MessageableDtoToMhaMessageableConverter()).convert(input.getSender()));
+		}
 
 		// recipients
 		message.setRecipients((new MessageableDtoToMhaMessageableConverter()).convert(input.getRecipients()));

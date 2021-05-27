@@ -29,6 +29,13 @@ export default interface MessagingServiceInterface
 	updateMessage(message: Message): Promise<Message>;
 
 	/**
+	 * send a message
+	 * @param source - the source to send the message through
+	 * @param message - the message to send.
+	 */
+	sendMessage(source: MessageSource, message: Message): Promise<Message>;
+
+	/**
 	 * search messages from the specified message source.
 	 * @param source - the source to search in.
 	 * @param searchOptions - filters to narrow the search.

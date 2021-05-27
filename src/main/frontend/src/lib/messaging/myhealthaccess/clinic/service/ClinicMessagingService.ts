@@ -125,6 +125,29 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	}
 
 	/**
+	 * send a message
+	 * @param source - the source to send the message through
+	 * @param message - the message to send.
+	 */
+	public async sendMessage(source: MessageSource, message: Message): Promise<Message>
+	{
+		if (source.isVirtual)
+		{
+			throw new MessagingError("Cannot send message through virtual message source");
+		}
+
+		try
+		{
+			const sentMessageDto: MessageDto = (await this._mhaClinicMessagingApi.sendMessage(source.id, (new MessageToMessageDtoConverter()).convert(message))).data.body;
+			return this.postProcessMessage((new MessageDtoToMhaMessageConverter()).convert(sentMessageDto), source);
+		}
+		catch(error)
+		{
+			throw new MessagingError(`Failed to send message through source [${source.id}] with error: ${error.toString()} - ${error.status}`)
+		}
+	}
+
+	/**
 	 * search messages from the specified message source.
 	 * @param source - the source to search in.
 	 * @param searchOptions - filters to narrow the search.

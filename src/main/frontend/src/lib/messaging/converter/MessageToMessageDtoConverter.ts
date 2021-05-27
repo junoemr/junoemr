@@ -21,9 +21,9 @@ export default class MessageToMessageDtoConverter extends AbstractConverter<Mess
 			metaData: JSON.stringify(from.metaData),
 			isRead: from.isRead,
 			group: from.group,
-			sender: (new MessageableToMessageableDtoConverter()).convert(from.sender),
-			recipients: (new MessageableToMessageableDtoConverter()).convertList(from.recipients),
-			attachments: (new AttachmentToAttachmentDtoConverter()).convertList(from.attachments),
+			sender: from.sender ? (new MessageableToMessageableDtoConverter()).convert(from.sender) : null,
+			recipients: from.recipients ? (new MessageableToMessageableDtoConverter()).convertList(from.recipients) : [],
+			attachments: from.attachments ? (new AttachmentToAttachmentDtoConverter()).convertList(from.attachments): [],
 		};
 	}
 }

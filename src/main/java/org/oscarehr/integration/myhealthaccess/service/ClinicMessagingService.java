@@ -90,6 +90,21 @@ public class ClinicMessagingService extends BaseService
 	}
 
 	/**
+	 * send a message.
+	 * @param integration - integration in which to send the message (which MHA clinic to send the message as)
+	 * @param loggedInInfo - logged in user info
+	 * @param messageDto - the message to send. If message contains a conversation_id it is appended to the conversation (reply) instead of sent stand alone.
+	 * @return - a fresh copy of the message that was just sent, returned by the MHA server.
+	 */
+	public MessageDto sendMessage(Integration integration, LoggedInInfo loggedInInfo, MessageDto messageDto)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+		String url = restClient.formatEndpoint("/clinic_user/self/clinic/message/");
+
+		return this.postProcessMessage(restClient.doPostWithToken(url, getLoginToken(integration, loggedInInfo), messageDto, MessageDto.class), restClient);
+	}
+
+	/**
 	 *
 	 * @param integration - the integration (mha clinic) you which to fetch messages from.
 	 * @param loggedInInfo - the logged in info for the user performing the action

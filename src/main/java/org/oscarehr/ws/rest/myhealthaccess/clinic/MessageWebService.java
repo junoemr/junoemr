@@ -62,6 +62,22 @@ public class MessageWebService extends MessagingBaseWebService
 	// Endpoints
 	// ==========================================================================
 
+	@POST
+	@Path("/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<MessageDto> sendMessage(
+			@PathParam("integrationId") String integrationId,
+			MessageDto messageDto)
+	{
+		Message message = this.messagingService.sendMessage(
+				getLoggedInInfo(),
+				messageableFromIntegrationId(integrationId),
+				(new MessageDtoToMhaMessageConverter()).convert(messageDto));
+
+		return RestResponse.successResponse((new MessageToMessageDtoConverter()).convert(message));
+	}
+
 	@GET
 	@Path("/{messageId}/")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -84,6 +100,7 @@ public class MessageWebService extends MessagingBaseWebService
 
 	@PUT
 	@Path("/{messageId}/")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<MessageDto> updateMessage(
 			@PathParam("integrationId") String integrationId,

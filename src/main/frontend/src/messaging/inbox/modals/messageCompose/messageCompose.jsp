@@ -24,7 +24,7 @@
 		<label>Message</label>
 		<div class="message-area flex-item-grow flex-col">
 			<div class="flex-col h-100 overflow-y-auto p-4">
-				<div class="message-body flex-item-grow" contenteditable="true"></div>
+				<div id="message-compose-text" class="message-body flex-item-grow" oninput="$ctrl.onMessageChange()" contenteditable="true"></div>
 			</div>
 		</div>
 
@@ -50,6 +50,7 @@
 			             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
 			             disabled="!$ctrl.recipient"
+			             click="$ctrl.sendMessage()"
 			             component-style="$ctrl.resolve.style">
 				Send
 			</juno-button>

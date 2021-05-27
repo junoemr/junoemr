@@ -137,10 +137,11 @@ public interface MessagingService
 	/**
 	 * send a message
 	 * @param loggedInInfo - currently logged in user info
+	 * @param messageable - the messageable (user) who owns the message.
 	 * @param message - the message to send
 	 * @return - the message that was just sent.
 	 */
-	public Message sendMessage(LoggedInInfo loggedInInfo, Message message);
+	public Message sendMessage(LoggedInInfo loggedInInfo, Messageable<?> messageable, Message message);
 
 	/**
 	 * reply to a conversation

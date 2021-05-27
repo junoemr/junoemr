@@ -27,6 +27,7 @@ import {
 	JUNO_BUTTON_COLOR_PATTERN,
 	LABEL_POSITION
 } from "../../../../common/components/junoComponentConstants";
+import MessageFactory from "../../../../lib/messaging/factory/MessageFactory";
 
 angular.module("Messaging.Modals").component('messageCompose', {
 	templateUrl: 'src/messaging/inbox/modals/messageCompose/messageCompose.jsp',
@@ -47,12 +48,27 @@ angular.module("Messaging.Modals").component('messageCompose', {
 
 			ctrl.recipient = null;
 			ctrl.subject = "";
+			ctrl.messageBody = "";
 
 			ctrl.$onInit = () =>
 			{
 				ctrl.messagingService = ctrl.resolve.messagingService;
 				ctrl.sourceId = ctrl.resolve.sourceId;
 				ctrl.isReply = ctrl.resolve.isReply || false;
+			}
+
+			ctrl.onMessageChange = () =>
+			{
+				const messageBody = document.getElementById("message-compose-text").textContent; // replace with ref if angularjs is upgraded.
+				console.log(messageBody);
+			}
+
+			ctrl.sendMessage = async () =>
+			{
+				const messageBody = document.getElementById("message-compose-text").textContent; // replace with ref if angularjs is upgraded.
+
+				//let message = MessageFactory.build(ctrl.subject, messageBody, [this.recipient], []);
+				//await ctrl.messagingService.sendMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), message);
 			}
 
 			ctrl.onCancel = () =>

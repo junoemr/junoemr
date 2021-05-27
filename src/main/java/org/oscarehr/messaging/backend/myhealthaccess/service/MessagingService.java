@@ -223,15 +223,26 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * send a message
-	 *
 	 * @param loggedInInfo - currently logged in user info
-	 * @param message      - the message to send
+	 * @param messageable - the messageable (user) who owns the message.
+	 * @param message - the message to send
 	 * @return - the message that was just sent.
+	 * @throws IllegalArgumentException if the passed in Message is not an MhaMessage
 	 */
 	@Override
-	public Message sendMessage(LoggedInInfo loggedInInfo, Message message)
+	public Message sendMessage(LoggedInInfo loggedInInfo, Messageable<?> messageable, Message message)
 	{
-		throw new NotImplementedException();
+		if (message instanceof MhaMessage)
+		{
+			MessageDto messageDto = (new MhaMessageToMessageDtoConverter()).convert((MhaMessage) message);
+
+			return (new MessageDtoToMhaMessageConverter()).convert(
+					this.clinicMessagingService.sendMessage(getIntegrationFromMessageable(messageable), loggedInInfo, messageDto));
+		}
+		else
+		{
+			throw new IllegalArgumentException("MHA messaging service can only send MhaMessage messages");
+		}
 	}
 
 	/**
