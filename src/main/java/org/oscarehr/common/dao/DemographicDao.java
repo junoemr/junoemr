@@ -762,7 +762,9 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	public Demographic findMatchingLab(
 			String hin, String firstName, String lastName, String gender, Calendar dateOfBirth) {
 
-		// here we build the sql where clause, to simplify the logic we just append all parameters, then after we'll strip out the first " and" as the logic is easier then checking if we have to add "and" for every parameter.
+		// here we build the sql where clause, to simplify the logic we just append all parameters
+		// then after we'll strip out the first " and"
+		// the logic is easier then checking if we have to add "and" for every parameter.
 		String sqlCommand=null;
 		StringBuilder sqlParameters = new StringBuilder();
 
@@ -813,10 +815,10 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		try {
 			Query query = session.createQuery(sqlCommand);
 
-			if (hin != null) query.setParameter("hin", "%" + hin + "%");
-			if (firstName != null) query.setParameter("firstName", "%" + firstName + "%");
-			if (lastName != null) query.setParameter("lastName", "%" + lastName + "%");
-			if (gender != null) query.setParameter("gender", gender);
+			if (hin != null && !hin.trim().equals("")) query.setParameter("hin", "%" + hin + "%");
+			if (firstName != null && !firstName.trim().equals("")) query.setParameter("firstName", "%" + firstName + "%");
+			if (lastName != null && !lastName.trim().equals("")) query.setParameter("lastName", "%" + lastName + "%");
+			if (gender != null && !gender.trim().equals("")) query.setParameter("gender", gender);
 
 			if (dateOfBirth != null) {
 				query.setParameter("yearOfBirth", ensure2DigitDateHack(dateOfBirth.get(Calendar.YEAR)));
