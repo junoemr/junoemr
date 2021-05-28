@@ -38,6 +38,7 @@ import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
