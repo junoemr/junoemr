@@ -40,6 +40,5 @@ public class RosterStatusTransfer
 	private String updatedByProviderName;
 	private boolean systemManaged;
 	private boolean rostered;
-	private boolean terminated;
 	private boolean isActive;
 }

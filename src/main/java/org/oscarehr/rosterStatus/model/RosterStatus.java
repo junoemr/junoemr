@@ -75,9 +75,6 @@ public class RosterStatus extends AbstractModel<Integer> implements Serializable
 	@Column(name = "rostered")
 	private boolean rostered;
 
-	@Column(name = "is_terminated")
-	private boolean terminated;
-
 	public boolean isActive()
 	{
 		return this.deletedAt == null;

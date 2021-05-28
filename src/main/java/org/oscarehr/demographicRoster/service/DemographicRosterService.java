@@ -64,18 +64,12 @@ public class DemographicRosterService
 		RosterStatus rosterStatus = rosterStatusService.findByStatus(demographic.getRosterStatus());
 		demographicRoster.setRosterStatus(rosterStatus);
 
-		// Only set rostered provider if the status is roster-y
-		if (demographicRoster.getRosterStatus().isRostered())
-		{
-			// We are assuming that MRP at the time of roster status existing is who the rostered provider was
-			demographicRoster.setRosteredPhysician(demographic.getFamilyDoctorName());
-			demographicRoster.setOhipNo(demographic.getFamilyDoctorNumber());
-		}
+		demographicRoster.setRosteredPhysician(demographic.getFamilyDoctorName());
+		demographicRoster.setOhipNo(demographic.getFamilyDoctorNumber());
 
-		// Only set terminated-y fields if it's a status that implies termination
-		if (demographicRoster.getRosterStatus().isTerminated())
+		// Only set terminated fields if it's not explicitly a rostered status
+		if (!demographicRoster.getRosterStatus().isRostered())
 		{
-			demographicRoster.setRosterDate(null);
 			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
 			DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(
 					Integer.parseInt(demographic.getRosterTerminationReason()));

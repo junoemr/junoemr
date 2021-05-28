@@ -37,6 +37,7 @@ angular.module('Admin').component('editStatusModal', {
                 {
                     ctrl.status = {
                         active: true,
+                        rostered: true,
                     };
                 }
             }
@@ -65,9 +66,15 @@ angular.module('Admin').component('editStatusModal', {
                 else
                 {
                     rosterApi.addStatus(ctrl.status).then(
-                        () =>
+                        function success()
                         {
                             ctrl.close();
+                        },
+                        function error(error)
+                        {
+                            console.log(error);
+                            alert("An error occurred while saving." +
+                                "Ensure that the status you are adding does not use the same status as another one.");
                         }
                     )
                 }
