@@ -49,6 +49,7 @@ import java.util.Map;
 public class JunoCommandLineRunner implements ApplicationRunner
 {
 	private static final Logger logger = Logger.getLogger(JunoCommandLineRunner.class);
+	private static final String HEADLESS_ARGUMENT = "headless";
 
 	@Autowired
 	private CommandLineImporter commandLineImporter;
@@ -80,6 +81,24 @@ public class JunoCommandLineRunner implements ApplicationRunner
 			System.exit(1);
 		}
 		System.exit(0);
+	}
+
+	/**
+	 * Determine if we should be running this with a frontend or not.
+	 * Headless mode is preferable for things like imports where we're solely dealing with data.
+	 * @param args list of arguments input to start Juno
+	 * @return true if we want this to run without a frontend, false otherwise
+	 */
+	public static boolean isHeadlessMode(String...args)
+	{
+		for (String argument : args)
+		{
+			if (HEADLESS_ARGUMENT.equals(argument))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private List<CommandLineTask> taskList()
