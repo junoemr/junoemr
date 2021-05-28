@@ -30,22 +30,13 @@
                 ng-model="$ctrl.status.statusDescription"
                 disabled="$ctrl.status.systemManaged">
         </juno-input>
-        <div class="row">
+        <div class="row roster-checkbox-row">
             <div class="col-md-4">
                 <juno-check-box class="roster-status-checkbox"
                                 label="Is Rostered"
                                 component-style="$ctrl.componentStyle"
                                 ng-model="$ctrl.status.rostered"
                                 disabled="$ctrl.status.systemManaged">
-                </juno-check-box>
-            </div>
-            <div class="col-md-4">
-                <juno-check-box
-                    class="roster-status-checkbox"
-                    label="Is Terminated"
-                    component-style="$ctrl.componentStyle"
-                    ng-model="$ctrl.status.terminated"
-                    disabled="$ctrl.status.systemManaged">
                 </juno-check-box>
             </div>
             <div class="col-md-4">
