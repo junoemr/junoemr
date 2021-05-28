@@ -27,6 +27,7 @@
             <juno-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
                          ng-model="$ctrl.ngModel.rosterTerminationReason"
                          options="$ctrl.rosterTermReasons"
+                         invalid="!$ctrl.validations.rosterTerminationReason()"
                          label="Termination Reason"
                          component-style="$ctrl.componentStyle">
             </juno-select>

@@ -30,7 +30,7 @@
                 ng-model="$ctrl.status.statusDescription"
                 disabled="$ctrl.status.systemManaged">
         </juno-input>
-        <div>
+        <div class="row">
             <div class="col-md-4">
                 <juno-check-box class="roster-status-checkbox"
                                 label="Is Rostered"
