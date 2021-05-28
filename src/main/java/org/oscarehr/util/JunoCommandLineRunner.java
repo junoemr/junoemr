@@ -66,7 +66,7 @@ public class JunoCommandLineRunner implements ApplicationRunner
 			{
 				throw new InvalidCommandLineArgumentsException("A task must be specified");
 			}
-			String taskName = args.getNonOptionArgs().get(0);
+			String taskName = args.getNonOptionArgs().get(1);
 			CommandLineTask task = findTask(taskName);
 			task.run(toArgsMap(task, args));
 		}
