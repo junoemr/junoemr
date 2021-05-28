@@ -529,6 +529,14 @@ Varicella Immunoglobulin	VarIg
 		layout="history"	
 		showIfMinRecordNum="1" />
 
+    <item
+        resultDesc=""
+        desc= "Obesity Screening"
+        name="Obesity"
+        layout="history"
+        minAge="12"
+        showIfMinRecordNum="1" />
+
 	<item
 		resultDesc=""
 		desc= "Prolia (denosumab)"
