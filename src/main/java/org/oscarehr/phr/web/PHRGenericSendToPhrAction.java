@@ -64,7 +64,6 @@ import oscar.dms.EDoc;
 import oscar.dms.EDocFactory;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
-import oscar.oscarPrevention.pageUtil.PreventionPrintPdf;
 
 /**
  *
