@@ -40,6 +40,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -147,14 +148,21 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String familyDoctor;
 
 	// roster info
+	@Deprecated
 	@Column(name = "roster_status")
 	private String rosterStatus;
+
+	@Deprecated
 	@Column(name = "roster_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterDate;
+
+	@Deprecated
 	@Column(name = "roster_termination_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterTerminationDate;
+
+	@Deprecated
 	@Column(name = "roster_termination_reason")
 	private String rosterTerminationReason;
 
@@ -210,6 +218,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private ProviderData provider;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographic")
+	@OrderBy(value = "addedAt ASC, id ASC")
 	private List<DemographicRoster> rosterHistory;
 
 	public static final String BC_NEWBORN_BILLING_CODE = "66";

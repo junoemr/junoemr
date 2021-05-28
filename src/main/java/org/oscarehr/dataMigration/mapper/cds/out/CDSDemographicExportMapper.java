@@ -293,10 +293,10 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 	{
 		Demographics.Enrolment.EnrolmentHistory enrolmentHistory = objectFactory.createDemographicsEnrolmentEnrolmentHistory();
 
+		enrolmentHistory.setEnrollmentDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getRosterDateTime()));
 		if(rosterData.isRostered())
 		{
 			enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_TRUE);
-			enrolmentHistory.setEnrollmentDate(ConversionUtils.toNullableXmlGregorianCalendar(rosterData.getRosterDateTime()));
 		}
 		else
 		{

@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -149,12 +150,24 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		demographic.setPatientStatusDate(LocalDate.now());
 		demographic.setDateJoined(LocalDate.now());
 		demographic.setReferralDoctor(toProvider(importStructure.getReferredPhysician()));
-		demographic.setFamilyDoctor(toProvider(importStructure.getFamilyPhysician()));
 
 		Demographics.Enrolment enrollment = importStructure.getEnrolment();
 		if(enrollment != null)
 		{
 			demographic.setRosterHistory(cdsEnrollmentHistoryImportMapper.importAll(enrollment.getEnrolmentHistory()));
+		}
+
+		/* family doctor import logic
+		* Family doctor field in Oscar is the Family Doctor in CDS when rostered status is "not rostered"
+		* Family doctor field in Oscar is the Enrollment Doctor in CDS when rostered status is "rostered" */
+		RosterData currentRosterData = demographic.getCurrentRosterData();
+		if(currentRosterData != null && currentRosterData.isRostered())
+		{
+			demographic.setFamilyDoctor(currentRosterData.getRosterProvider());
+		}
+		else
+		{
+			demographic.setFamilyDoctor(toProvider(importStructure.getFamilyPhysician()));
 		}
 	}
 

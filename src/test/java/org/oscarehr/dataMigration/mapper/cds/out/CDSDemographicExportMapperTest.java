@@ -139,17 +139,15 @@ public class CDSDemographicExportMapperTest
 		mockProvider.setLastName("provider");
 		rosterData.setRosterProvider(mockProvider);
 
+		rosterData.setRosterDateTime(LocalDateTime.of(2021, 12, 24, 12, 0, 0));
 		rosterData.setTerminationDateTime(LocalDateTime.of(2021, 1, 1, 10, 0, 0));
 		rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.ASSIGNED_IN_ERROR);
-
-		// add invalid properties that should not appear in exported results
-		rosterData.setRosterDateTime(LocalDateTime.of(2021, 12, 24, 12, 0, 0));
 
 
 		Demographics.Enrolment.EnrolmentHistory enrolmentHistory = cdsDemographicExportMapper.getEnrollmentHistory(rosterData);
 
 		assertEquals(CDSConstants.ENROLLMENT_STATUS_FALSE, enrolmentHistory.getEnrollmentStatus());
-		assertNull(enrolmentHistory.getEnrollmentDate());
+		assertNotNull(enrolmentHistory.getEnrollmentDate());
 		assertNotNull(enrolmentHistory.getEnrolledToPhysician());
 		assertNotNull(enrolmentHistory.getEnrollmentTerminationDate());
 		assertNotNull(enrolmentHistory.getTerminationReason());
