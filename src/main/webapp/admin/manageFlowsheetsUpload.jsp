@@ -43,44 +43,77 @@
 %>
 
 
+<%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
+<%@ page import="org.apache.commons.fileupload.DiskFileUpload" %>
+<%@ page import="org.apache.commons.fileupload.FileUpload" %>
+<%@ page import="org.apache.commons.fileupload.FileItem" %>
 <%@ page import="org.apache.commons.fileupload.FileUploadException" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.StringWriter" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
+<%@ page import="org.oscarehr.common.model.Flowsheet" %>
+<%@ page import="org.oscarehr.common.dao.FlowsheetDao" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
-<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
-<%@ page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %>
-<%@ page import="org.apache.commons.fileupload.FileItemIterator" %>
-<%@ page import="org.apache.commons.fileupload.FileItemStream" %>
-<%@ page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %>
-<%@ page import="org.apache.commons.io.IOUtils" %>
-<%@ page import="java.io.InputStream" %>
 
 <%
-	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
-	ServletFileUpload fileUpload = new ServletFileUpload(new DiskFileItemFactory());
-	try
-	{
-		// Parse the request
-		FileItemIterator items = fileUpload.getItemIterator(request);
-		//Process the uploaded items
-		while (items.hasNext())
-		{
-			FileItemStream item = items.next();
-			if (!item.isFormField())
-			{
-				InputStream flowsheetStream = item.openStream();
-				String contents = IOUtils.toString(flowsheetStream);
-				flowsheetStream.close();
-				flowsheetService.saveCustomFlowsheet(contents);
-			}
-		}
-	}
-	catch (FileUploadException e)
-	{
-		MiscUtils.getLogger().error("Flowsheet Upload Error: ", e);
-	}
+boolean isMultipart = FileUpload.isMultipartContent(request);
+DiskFileUpload upload = new DiskFileUpload();
 
-	response.sendRedirect("manageFlowsheets.jsp");
+try {
+    //           Parse the request
+    @SuppressWarnings("unchecked")
+    List<FileItem> items = upload.parseRequest(request);
+    //Process the uploaded items
+    Iterator<FileItem> iter = items.iterator();
+    while (iter.hasNext()) {
+        FileItem item = iter.next();
+
+        if (item.isFormField()) {           
+        } else {
+            String contents = item.getString();
+            
+            //validate the data
+            MeasurementFlowSheet fs = null;
+            fs = MeasurementTemplateFlowSheetConfig.getInstance().validateFlowsheet(contents);
+
+            //Check if flowsheet is in the flowsheet table
+			FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
+			Flowsheet existingFlowsheet = flowsheetDao.findByName(fs.getName());
+            if(fs != null) {
+				if(existingFlowsheet == null)
+				{
+					//save to db
+					Flowsheet f = new Flowsheet();
+					f.setContent(contents);
+					f.setCreatedDate(new java.util.Date());
+					f.setEnabled(true);
+					f.setExternal(false);
+					f.setName(fs.getName());
+
+					flowsheetDao.persist(f);
+				} else
+				{
+					existingFlowsheet.setContent(contents);
+					flowsheetDao.merge(existingFlowsheet);
+				}
+
+				MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();
+            } else {
+				MiscUtils.getLogger().error("Invalid Flowsheet XML Format");
+            }
+        }
+    }
+} catch (FileUploadException e)
+{
+	MiscUtils.getLogger().error("Flowsheet Upload Error: ", e);
+} catch (Exception e) {
+	MiscUtils.getLogger().error("Error Uploading Flowsheet: ", e);
+}   
+
+response.sendRedirect("manageFlowsheets.jsp");
 %>

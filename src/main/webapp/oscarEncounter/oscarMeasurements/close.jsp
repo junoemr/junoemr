@@ -36,7 +36,7 @@ function closeWin()
 {
       if (opener.refreshEncounter !== undefined || opener.pasteToEncounterNote !== undefined )
       {
-         let encounterText = '<%=request.getAttribute("textOnEncounter")%>';
+         var encounterText = '<%=request.getAttribute("textOnEncounter")%>';
          opener.pasteToEncounterNote(encounterText.trim());
       }
       self.close();

@@ -23,21 +23,18 @@
 
 package org.oscarehr.casemgmt.service;
 
-import java.util.UUID;
+import com.quatro.service.security.SecurityManager;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
-import org.oscarehr.common.dao.AdmissionDao;
+import org.oscarehr.common.dao.FlowsheetDao;
 import org.oscarehr.common.dao.MeasurementGroupStyleDao;
-import org.oscarehr.common.model.Admission;
+import org.oscarehr.common.model.Flowsheet;
 import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.measurements.model.FlowSheetUserCreated;
-import org.oscarehr.measurements.model.Flowsheet;
-import org.oscarehr.measurements.service.FlowsheetService;
-import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.OscarProperties;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarEncounter.pageUtil.EctDisplayMeasurementsAction;
@@ -48,6 +45,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
 
 public class EncounterMeasurementsService extends EncounterSectionService
 {
@@ -60,7 +59,7 @@ public class EncounterMeasurementsService extends EncounterSectionService
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	private FlowsheetService flowsheetService;
+	FlowsheetDao flowsheetDao;
 
 	@Autowired
 	MeasurementGroupStyleDao groupDao;
@@ -162,42 +161,160 @@ public class EncounterMeasurementsService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
+		SecurityManager securityMgr = new SecurityManager();
 
-		// Add universal flowsheets
-		List<String> flowsheets = flowsheetService.getUniversalFlowsheetNames();
+		ArrayList<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniveralFlowsheets();
 
 		if (!OscarProperties.getInstance().getBooleanProperty("new_flowsheet_enabled", "true"))
 		{
 			flowsheets.remove("diab3");
 		}
 
-		out.addAll(createEncounterSectionNoteList(flowsheets, sectionParams));
+		for (String flowsheetName: flowsheets)
+		{
+			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
+			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, sectionParams.getRoleName()))
+			{
+				Flowsheet fs = null;
+				if ((fs = flowsheetDao.findByName(flowsheetName)) != null)
+				{
+					if (!fs.isEnabled())
+					{
+						continue;
+					}
+				}
 
-		// Next we add dx triggered flowsheets to the module items
+				String fullDisplayName = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
+
+				String winName = flowsheetName + sectionParams.getDemographicNo();
+				String uuid = UUID.randomUUID().toString();
+				int hash = Math.abs(winName.hashCode());
+				String url = sectionParams.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp" +
+						"?uuid=" + uuid +
+						"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo())+
+						"&template=" + encodeUrlParam(flowsheetName) +
+						"&echartUUID=" + encodeUrlParam(sectionParams.geteChartUUID());
+				String onClickString = "popupPage(700,1000,'" + hash + "','" + url + "');";
+				sectionNote.setOnClick(onClickString);
+
+				String displayName = EncounterSectionService.getTrimmedText(fullDisplayName);
+				sectionNote.setText(displayName);
+
+				sectionNote.setTitle(fullDisplayName);
+
+				out.add(sectionNote);
+			}
+		}
+
+		/*
+		XXX: do we plan to use the health tracker?
+		if(OscarProperties.getInstance().getBooleanProperty("health_tracker", "true"))
+		{
+			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
+			//temp while testing
+			String dispname = "Health Tracker";
+
+			winName = "viewTracker" + bean.demographicNo;
+			hash = Math.abs(winName.hashCode());
+			url = "window.open('" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?demographic_no=" + bean.demographicNo + "&template=tracker'," + hash + ",'height=' + screen.height + ',width=' + screen.width +',resizable=yes,scrollbars=yes, fullscreen=yes');return false;";
+			item.setLinkTitle(dispname);
+			dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
+			item.setTitle(dispname);
+			item.setURL(url);
+			Dao.addItem(item);
+		}
+		*/
+
+		//next we add dx triggered flowsheets to the module items
 		dxResearchBeanHandler dxRes = new dxResearchBeanHandler(sectionParams.getDemographicNo());
-		List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-		List<String> dxFlowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
+		Vector dxCodes = dxRes.getActiveCodeListWithCodingSystem();
+		flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
+		for (int f = 0; f < flowsheets.size(); f++)
+		{
+			String flowsheetName = flowsheets.get(f);
+			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, sectionParams.getRoleName()))
+			{
+				Flowsheet fs = null;
+				if ((fs = flowsheetDao.findByName(flowsheetName)) != null)
+				{
+					if (!fs.isEnabled())
+					{
+						continue;
+					}
+				}
 
-		out.addAll(createEncounterSectionNoteList(dxFlowsheets, sectionParams));
+				EncounterSectionNote sectionNote = new EncounterSectionNote();
+
+				String winName = flowsheetName + sectionParams.getDemographicNo();
+				String uuid = UUID.randomUUID().toString();
+				int hash = Math.abs(winName.hashCode());
+				String url = sectionParams.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp" +
+						"?uuid=" + uuid +
+						"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+						"&template=" + encodeUrlParam(flowsheetName) +
+						"&echartUUID=" + encodeUrlParam(sectionParams.geteChartUUID());
+
+				String onClickString = "popupPage(700,1000,'" + hash + "','" + url + "');";
+				sectionNote.setOnClick(onClickString);
+
+				String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
+				sectionNote.setText(EncounterSectionService.getTrimmedText(dispname));
+				sectionNote.setTitle(dispname);
+				out.add(sectionNote);
+			}
+		}
 
 
-		// Next we add program based flowsheets
+		/*
+		XXX: pretty sure this is only used for CAISI
+		//next we add program based flowsheets
 		List<String> programs = new ArrayList<String>();
 		AdmissionDao admissionDao = (AdmissionDao) SpringUtils.getBean("admissionDao");
-		List<Admission> admissions = admissionDao.getCurrentAdmissions(
-			Integer.parseInt(sectionParams.getDemographicNo()));
+		List<Admission> admissions = admissionDao.getCurrentAdmissions(Integer.parseInt(demographicNo));
 		for (Admission admission : admissions)
 		{
 			programs.add(String.valueOf(admission.getProgramId()));
 		}
-		List<String> programFlowsheets = flowsheetService.getFlowsheetNamesFromProgram(programs);
+		flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromPrograms(programs);
+		for (int f = 0; f < flowsheets.size(); f++)
+		{
+			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
+			String flowsheetName = flowsheets.get(f);
+			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName))
+			{
+				Flowsheet fs = null;
+				if ((fs = flowsheetDao.findByName(flowsheetName)) != null)
+				{
+					if (!fs.isEnabled())
+					{
+						continue;
+					}
+				}
 
-		out.addAll(createEncounterSectionNoteList(programFlowsheets, sectionParams));
+				EncounterSectionNote sectionNote = new EncounterSectionNote();
 
+				String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
+				//winName = flowsheetName + bean.demographicNo;
+				//uuid = UUID.randomUUID().toString();
+				//hash = Math.abs(winName.hashCode());
+				//url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid +
+				//		"&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "&echartUUID=" + eChartUUID + "');return false;";
+				//item.setLinkTitle(dispname);
+				dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 
-		// Finally we add specific measurements to module item list
+				sectionNote.setText(dispname);
+				out.add(sectionNote);
+
+				//item.setTitle(dispname);
+				//item.setURL(url);
+				//Dao.addItem(item);
+			}
+		}
+		 */
+
+		//finally we add specific measurements to module item list
 		Integer demo = Integer.valueOf(sectionParams.getDemographicNo());
 		EctMeasurementsDataBeanHandler hd =
 				new EctMeasurementsDataBeanHandler(demo);
@@ -251,101 +368,5 @@ public class EncounterMeasurementsService extends EncounterSectionService
 		out.addAll(measurementTypeNotes);
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
-	}
-
-	private Flowsheet getFlowsheetFromSystemCache(String flowsheetName)
-	{
-		List<Flowsheet> systemFlowsheets = flowsheetService.getSystemFlowsheets();
-		for (Flowsheet systemFlowsheet : systemFlowsheets)
-		{
-			if (systemFlowsheet.getName().equals(flowsheetName))
-			{
-				return systemFlowsheet;
-			}
-		}
-		return null;
-	}
-
-	private Flowsheet getFlowsheetFromDatabaseCache(String flowsheetName)
-	{
-		List<Flowsheet> databaseFlowsheets = flowsheetService.getDatabaseFlowsheets();
-		for (Flowsheet databaseFlowsheet : databaseFlowsheets)
-		{
-			if (databaseFlowsheet.getName().equals(flowsheetName))
-			{
-				return databaseFlowsheet;
-			}
-		}
-		return null;
-	}
-
-	private FlowSheetUserCreated getFlowsheetFromUserCreatedCache(String flowsheetName)
-	{
-		List<FlowSheetUserCreated> userCreatedFlowsheets = flowsheetService.getUserCreatedFlowsheets();
-		for (FlowSheetUserCreated userCreated : userCreatedFlowsheets)
-		{
-			if (userCreated.getName().equals(flowsheetName))
-			{
-				return userCreated;
-			}
-		}
-		return null;
-	}
-
-	private List<EncounterSectionNote> createEncounterSectionNoteList(List<String> flowsheets, SectionParameters sectionParams)
-	{
-		String roleName$ = sectionParams.getRoleName();
-		String demographicNo = sectionParams.getDemographicNo();
-		String eChartUUID = sectionParams.geteChartUUID();
-		String contextPath = sectionParams.getContextPath();
-
-		com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
-		List<EncounterSectionNote> encounterSectionNotes = new ArrayList<>();
-		for (String flowsheetName : flowsheets)
-		{
-			EncounterSectionNote note = new EncounterSectionNote();
-			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName$))
-			{
-				String displayName;
-				Flowsheet fs = getFlowsheetFromSystemCache(flowsheetName);
-				FlowSheetUserCreated userCreated = getFlowsheetFromUserCreatedCache(flowsheetName);
-				if (fs == null)
-				{
-					fs = getFlowsheetFromDatabaseCache(flowsheetName);
-				}
-
-				if (fs != null && fs.isEnabled())
-				{
-					displayName = fs.getDisplayName();
-				}
-				else if (userCreated != null && !userCreated.getArchived())
-				{
-					displayName = userCreated.getDisplayName();
-				}
-				else
-				{
-					continue;
-				}
-
-				String winName = flowsheetName + demographicNo;
-				note.setTitle(displayName);
-				note.setText(getTrimmedText(displayName));
-
-				String uuid = UUID.randomUUID().toString();
-				int hash = Math.abs(winName.hashCode());
-				String url = hash + "','" + contextPath + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp" +
-					"?uuid=" + uuid +
-					"&demographic_no=" + demographicNo +
-					"&template=" + flowsheetName +
-					"&echartUUID=" + eChartUUID;
-
-				String onClickString = "popupPage(700,1000,'" + url + "');";
-
-				note.setOnClick(onClickString);
-
-				encounterSectionNotes.add(note);
-			}
-		}
-		return encounterSectionNotes;
 	}
 }

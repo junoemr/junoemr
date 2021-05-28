@@ -1,0 +1,1 @@
+ALTER TABLE site ADD COLUMN IF NOT EXISTS bc_service_location_code VARCHAR(10) AFTER bc_facility_number;

@@ -42,7 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service("myHealthPatientService")
@@ -57,7 +56,10 @@ public class PatientService extends BaseService
 
 	public boolean isPatientConfirmed(Integer demographicNo, Integration integration)
 	{
-		return isPatientConfirmed(demographicNo, integration, Collections.singletonList(MHAPatient.LINK_STATUS.ACTIVE));
+		return isPatientConfirmed(
+				demographicNo,
+				integration,
+				Arrays.asList(MHAPatient.LINK_STATUS.CONFIRMED, MHAPatient.LINK_STATUS.VERIFIED));
 	}
 
 	/**
@@ -205,7 +207,10 @@ public class PatientService extends BaseService
 			// lookup MHA patient
 			MHAPatient patient = null;
 			// we must consider CLINIC_REJECTED as confirmed to deal with edge case around un_rejecting confirmed patient who's HIN does not match in MHA.
-			if (isPatientConfirmed(demographic.getId(), integration, Arrays.asList(MHAPatient.LINK_STATUS.ACTIVE, MHAPatient.LINK_STATUS.CLINIC_REJECTED)))
+			if (isPatientConfirmed(
+					demographic.getId(),
+					integration,
+					Arrays.asList(MHAPatient.LINK_STATUS.CONFIRMED, MHAPatient.LINK_STATUS.VERIFIED, MHAPatient.LINK_STATUS.CLINIC_REJECTED)))
 			{
 				patient = getConfirmedPatientByDemographicNo(integration, demographic.getId());
 			}

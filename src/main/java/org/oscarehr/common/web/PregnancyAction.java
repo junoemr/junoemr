@@ -23,6 +23,50 @@
  */
 package org.oscarehr.common.web;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.WordUtils;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.util.LabelValueBean;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.dao.AbstractCodeSystemDao;
+import org.oscarehr.common.dao.EFormGroupDao;
+import org.oscarehr.common.dao.EpisodeDao;
+import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.PregnancyFormsDao;
+import org.oscarehr.common.dao.PrintResourceLogDao;
+import org.oscarehr.common.model.AbstractCodeSystemModel;
+import org.oscarehr.common.model.EFormGroup;
+import org.oscarehr.common.model.Episode;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.PrintResourceLog;
+import org.oscarehr.common.model.SnomedCore;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.model.EForm;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
+import oscar.form.FrmLabReq07Record;
+import oscar.form.FrmLabReq10Record;
+import oscar.form.FrmONAREnhancedRecord;
+import oscar.form.FrmONARRecord;
+import oscar.form.FrmRecord;
+import oscar.form.FrmRecordFactory;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
+import oscar.oscarEncounter.data.EctFormData;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -38,53 +82,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
-
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import org.apache.commons.lang.WordUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.util.LabelValueBean;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.AbstractCodeSystemDao;
-import org.oscarehr.allergy.dao.AllergyDao;
-import org.oscarehr.common.model.SnomedCore;
-import org.oscarehr.rx.dao.DrugDao;
-import org.oscarehr.eform.dao.EFormDao;
-import org.oscarehr.common.dao.EFormGroupDao;
-import org.oscarehr.common.dao.EpisodeDao;
-import org.oscarehr.common.dao.MeasurementDao;
-import org.oscarehr.common.dao.PregnancyFormsDao;
-import org.oscarehr.common.dao.PrintResourceLogDao;
-import org.oscarehr.common.model.AbstractCodeSystemModel;
-import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.rx.model.Drug;
-import org.oscarehr.eform.model.EForm;
-import org.oscarehr.common.model.EFormGroup;
-import org.oscarehr.common.model.Episode;
-import org.oscarehr.common.model.Measurement;
-import org.oscarehr.common.model.PrintResourceLog;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.OscarProperties;
-import oscar.form.FrmLabReq07Record;
-import oscar.form.FrmLabReq10Record;
-import oscar.form.FrmONAREnhancedRecord;
-import oscar.form.FrmONARRecord;
-import oscar.form.FrmRecord;
-import oscar.form.FrmRecordFactory;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
-import oscar.oscarEncounter.data.EctFormData;
 
 public class PregnancyAction extends DispatchAction {
 
@@ -156,17 +153,7 @@ public class PregnancyAction extends DispatchAction {
 		episode.setStartDate(new Date());
 		episode.setDescription(mod.getDescription());
 		episodeDao.persist(episode);
-		
-		//start up a new ar on enhanced form
-		try {
-			FrmONAREnhancedRecord f = new FrmONAREnhancedRecord();
-			Properties p = f.getFormRecord(loggedInInfo, demographicNo, 0);
-			p.setProperty("episodeId", String.valueOf(episode.getId()));
-			f.saveFormRecord(p);
-		}catch(SQLException ee) {
-			MiscUtils.getLogger().error("Error",ee);
-		}
-		
+
 		return mapping.findForward("success");
 	}
 
