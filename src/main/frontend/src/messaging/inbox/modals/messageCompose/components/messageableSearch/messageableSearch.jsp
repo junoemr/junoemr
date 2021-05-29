@@ -9,6 +9,7 @@
 			get-options-callback="$ctrl.loadSearchOptions(value)"
 			on-change="$ctrl.checkMessageSelection(value)"
 			on-selected="$ctrl.onMessageableSelected(value)"
+			disabled="$ctrl.disabled"
 			component-style="$ctrl.componentStyle">
 	</juno-typeahead>
 </div>

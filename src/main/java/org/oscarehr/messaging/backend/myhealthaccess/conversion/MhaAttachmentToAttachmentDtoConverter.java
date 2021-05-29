@@ -29,6 +29,7 @@ import org.oscarehr.integration.myhealthaccess.dto.AttachmentDto;
 import org.oscarehr.messaging.backend.myhealthaccess.model.MhaAttachment;
 
 import java.net.URL;
+import java.util.Base64;
 
 public class MhaAttachmentToAttachmentDtoConverter extends AbstractModelConverter<MhaAttachment, AttachmentDto>
 {
@@ -43,6 +44,8 @@ public class MhaAttachmentToAttachmentDtoConverter extends AbstractModelConverte
 				input.getId(),
 				input.getName(),
 				input.getMimeType().toString(),
+				input.getData().map((data) -> data.length).orElse(null),
+				input.getData().map((data) -> Base64.getEncoder().encodeToString(data)).orElse(null),
 				"",
 				input.getCreatedAtDateTime(),
 				null,

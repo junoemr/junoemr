@@ -30,12 +30,7 @@ angular.module("Messaging.Components.View.Components").component('message', {
 		messagingService: "<",
 	},
 	controller: [
-		"$scope",
-		"$stateParams",
-		function (
-			$scope,
-			$stateParams
-		)
+		function ()
 		{
 			const ctrl = this;
 
@@ -47,22 +42,6 @@ angular.module("Messaging.Components.View.Components").component('message', {
 			ctrl.recipientNames = () =>
 			{
 				return ctrl.message.recipients.map((recipient) => recipient.name).join(", ");
-			}
-
-			ctrl.downloadAttachment = async (attachment) =>
-			{
-				// download and convert to byte array
-				const byteString = atob(await ctrl.messagingService.downloadAttachmentData(attachment));
-				const bytes = new Array(byteString.length);
-				for (let i = 0; i < byteString.length; i++) {
-					bytes[i] = byteString.charCodeAt(i);
-				}
-
-				// build blob
-				const blob = new Blob([new Uint8Array(bytes)], {type: attachment.type});
-
-				// save to users computer
-				saveAs(blob, attachment.name);
 			}
 		}],
 });

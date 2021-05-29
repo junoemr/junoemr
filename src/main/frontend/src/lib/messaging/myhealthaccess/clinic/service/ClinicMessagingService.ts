@@ -19,6 +19,8 @@ import Messageable from "../../../model/Messageable";
 import PatientTo1ToMhaPatientConverter
 	from "../../../../integration/myhealthaccess/converter/PatientTo1ToMhaPatientConverter";
 import MhaPatientToMessageableConverter from "../../converter/MhaPatientToMessageableConverter";
+import MhaMessage from "../model/MhaMessage";
+import MhaAttachment from "../model/MhaAttachment";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
@@ -113,7 +115,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	{
 		try
 		{
-			const messageDto: MessageDto = (new MessageToMessageDtoConverter()).convert(message);
+			const messageDto: MessageDto = await (new MessageToMessageDtoConverter()).convert(message);
 			const updatedMessageDto = (await this._mhaClinicMessagingApi.updateMessage(message.source.id, messageDto.id, messageDto)).data.body;
 
 			return this.postProcessMessage((new MessageDtoToMhaMessageConverter()).convert(updatedMessageDto), message.source);
@@ -138,7 +140,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 
 		try
 		{
-			const sentMessageDto: MessageDto = (await this._mhaClinicMessagingApi.sendMessage(source.id, (new MessageToMessageDtoConverter()).convert(message))).data.body;
+			const sentMessageDto: MessageDto = (await this._mhaClinicMessagingApi.sendMessage(source.id, await (new MessageToMessageDtoConverter()).convert(message))).data.body;
 			return this.postProcessMessage((new MessageDtoToMhaMessageConverter()).convert(sentMessageDto), source);
 		}
 		catch(error)
@@ -424,10 +426,13 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 * @return the processed message
 	 * @protected
 	 */
-	protected postProcessMessage(message: Message, messageSource: MessageSource): Message
+	protected postProcessMessage(message: MhaMessage, messageSource: MessageSource): MhaMessage
 	{
 		message.source = messageSource;
-		message.attachments.forEach((attachment) => attachment.source = messageSource);
+		message.attachments.forEach((attachment: MhaAttachment) => {
+			attachment.source = messageSource;
+			attachment.messagingService = this;
+		});
 		return message;
 	}
 
@@ -438,7 +443,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 * @return the process list of messages
 	 * @protected
 	 */
-	protected postProcessMessageList(messages: Message[], messageSource: MessageSource): Message[]
+	protected postProcessMessageList(messages: MhaMessage[], messageSource: MessageSource): MhaMessage[]
 	{
 		return messages.map((msg) => this.postProcessMessage(msg, messageSource));
 	}

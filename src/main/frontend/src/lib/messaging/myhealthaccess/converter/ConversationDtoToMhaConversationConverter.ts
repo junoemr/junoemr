@@ -1,8 +1,7 @@
 import AbstractConverter from "../../../conversion/AbstractConverter";
 import {ConversationDto} from "../../../../../generated";
 import {MhaConversation} from "../clinic/model/MhaConversation";
-import Conversation from "../../model/Conversation";
-import MessageDtoToMessageConverter from "../../converter/MessageDtoToMessageConverter";
+import MessageDtoToMhaMessageConverter from "./MessageDtoToMhaMessageConverter";
 
 export default class ConversationDtoToMhaConversationConverter extends AbstractConverter<ConversationDto, MhaConversation>
 {
@@ -12,7 +11,7 @@ export default class ConversationDtoToMhaConversationConverter extends AbstractC
 
 	convert(from: ConversationDto): MhaConversation
 	{
-		return new MhaConversation(from.id, (new MessageDtoToMessageConverter()).convertList(from.messages));
+		return new MhaConversation(from.id, (new MessageDtoToMhaMessageConverter()).convertList(from.messages));
 	}
 
 }

@@ -25,6 +25,7 @@ package org.oscarehr.messaging.model;
 
 import org.springframework.util.MimeType;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 public interface Attachment
 {
@@ -40,6 +41,12 @@ public interface Attachment
 	 * @return - the mime type
 	 */
 	public MimeType getMimeType();
+
+	/**
+	 * get the attachment file data
+	 * @return attachment binary data
+	 */
+	public Optional<byte[]> getData();
 
 	/**
 	 * get the time at which the attachment was created.

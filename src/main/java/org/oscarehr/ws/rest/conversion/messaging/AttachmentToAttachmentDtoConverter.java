@@ -28,6 +28,8 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.messaging.model.Attachment;
 import org.oscarehr.ws.rest.transfer.messaging.AttachmentDto;
 
+import java.util.Base64;
+
 public class AttachmentToAttachmentDtoConverter extends AbstractModelConverter<Attachment, AttachmentDto>
 {
 
@@ -38,6 +40,7 @@ public class AttachmentToAttachmentDtoConverter extends AbstractModelConverter<A
 	@Override
 	public AttachmentDto convert(Attachment input)
 	{
-		return new AttachmentDto(input.getId(), input.getName(), input.getMimeType().toString(), input.getCreatedAtDateTime());
+		String base64Data = input.getData().map((data) -> Base64.getEncoder().encodeToString(data)).orElse(null);
+		return new AttachmentDto(input.getId(), input.getName(), input.getMimeType().toString(), input.getCreatedAtDateTime(), base64Data);
 	}
 }

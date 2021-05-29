@@ -2,10 +2,6 @@
 	@include juno-font-body-smallest();
 	min-width: 420px;
 
-	.text-grey {
-		color: var(--color-neutral-dark-grey);
-	}
-
 	.footer-strip {
 		min-height: 40px;
 

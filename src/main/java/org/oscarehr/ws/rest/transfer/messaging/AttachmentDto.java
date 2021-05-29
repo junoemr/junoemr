@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Data
 @NoArgsConstructor
@@ -36,6 +37,7 @@ public class AttachmentDto implements Serializable
 	protected String id;
 	protected String name;
 	protected String mimeType;
+	protected String base64Data;
 	protected ZonedDateTime createdAtDateTime;
 
 	// ==========================================================================
@@ -44,10 +46,15 @@ public class AttachmentDto implements Serializable
 
 	public AttachmentDto(String id, String name, String mimeType, ZonedDateTime createdAtDateTime)
 	{
+		this(id, name, mimeType, createdAtDateTime, null);
+	}
+
+	public AttachmentDto(String id, String name, String mimeType, ZonedDateTime createdAtDateTime, String base64Data)
+	{
 		this.id = id;
 		this.name = name;
 		this.mimeType = mimeType;
 		this.createdAtDateTime = createdAtDateTime;
+		this.base64Data = base64Data;
 	}
-
 }

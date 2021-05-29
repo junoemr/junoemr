@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
@@ -38,6 +39,8 @@ public class AttachmentDto implements Serializable
 	protected String id;
 	protected String name;
 	protected String type;
+	protected Integer size;
+	protected String data;
 	protected String description;
 	@JsonProperty("created_at")
 	protected ZonedDateTime createdAt;
@@ -49,11 +52,34 @@ public class AttachmentDto implements Serializable
 	// Public Methods
 	// ==========================================================================
 
-	public AttachmentDto(String id, String name, String type, String description, ZonedDateTime createdAt, ZonedDateTime updatedAt, String url)
+	/**
+	 * create new attachment DTO
+	 * @param id - attachment id
+	 * @param name - attachment name
+	 * @param type - attachment mime type
+	 * @param size - size of the attachment in bytes
+	 * @param data - base64 attachment data
+	 * @param description - text description of attachment
+	 * @param createdAt - time the attachment was created
+	 * @param updatedAt - time the attachment was updated
+	 * @param url - url at which the attachment data can be downloaded
+	 */
+	public AttachmentDto(
+			String id,
+			String name,
+			String type,
+			@Nullable Integer size,
+			@Nullable String data,
+			String description,
+			ZonedDateTime createdAt,
+			ZonedDateTime updatedAt,
+			String url)
 	{
 		this.id = id;
 		this.name = name;
 		this.type = type;
+		this.size = size;
+		this.data = data;
 		this.description = description;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;

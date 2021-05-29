@@ -28,6 +28,9 @@ import {
 	LABEL_POSITION
 } from "../../../../common/components/junoComponentConstants";
 import MessageFactory from "../../../../lib/messaging/factory/MessageFactory";
+import {AllowedAttachmentTypes} from "../../../../lib/messaging/constants/AllowedAttachmentTypes";
+import FileUtil from "../../../../lib/util/FileUtil";
+import AttachmentFactory from "../../../../lib/messaging/factory/AttachmentFactory";
 
 angular.module("Messaging.Modals").component('messageCompose', {
 	templateUrl: 'src/messaging/inbox/modals/messageCompose/messageCompose.jsp',
@@ -52,8 +55,10 @@ angular.module("Messaging.Modals").component('messageCompose', {
 			ctrl.recipient = null;
 			ctrl.subject = "";
 			ctrl.sending = false;
+			ctrl.messageSourceOptions = [];
+			ctrl.attachments = [];
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
 				ctrl.messagingService = ctrl.resolve.messagingService;
 				ctrl.sourceId = ctrl.resolve.sourceId;
@@ -61,6 +66,50 @@ angular.module("Messaging.Modals").component('messageCompose', {
 				ctrl.subject = ctrl.resolve.subject || "";
 				ctrl.conversation = ctrl.resolve.conversation || null;
 				ctrl.participantNames = this.getParticipantNames();
+				ctrl.messageSourceOptions = await ctrl.loadMessageSourceOptions();
+
+				ctrl.setupValidations();
+
+				$scope.$apply();
+			}
+
+			ctrl.setupValidations = () =>
+			{
+				ctrl.validations = {
+					messageText: Juno.Validations.validationFieldRequired(ctrl, "subject",
+						Juno.Validations.validationCustom(() => ctrl.messageTextarea.text().length > 0)),
+
+					sourceSelected: Juno.Validations.validationFieldOr(
+						Juno.Validations.validationCustom(() => ctrl.messageSourceOptions.find((sourceOpt) => sourceOpt.value === ctrl.sourceId)),
+						Juno.Validations.validationFieldTrue(ctrl, "isReply")),
+
+					recipientSelected: Juno.Validations.validationFieldOr(
+						Juno.Validations.validationFieldRequired(ctrl, "recipient"),
+						Juno.Validations.validationFieldTrue(ctrl, "isReply")),
+				};
+			}
+
+			ctrl.loadMessageSourceOptions = async () =>
+			{
+				const sources = (await ctrl.messagingService.getMessageSources()).filter((source) => !source.isVirtual);
+
+				return sources.map((source) => {
+					return {
+						label: source.name,
+						value: source.id,
+					}
+				})
+			}
+
+			ctrl.uploadAttachment = async () =>
+			{
+				const files = await FileUtil.uploadFile(AllowedAttachmentTypes);
+				for (const file of files)
+				{
+					ctrl.attachments.push(AttachmentFactory.build(file.name, file.type, await FileUtil.getFileDataBase64(file)));
+				}
+
+				$scope.$apply();
 			}
 
 			/**
@@ -74,8 +123,8 @@ angular.module("Messaging.Modals").component('messageCompose', {
 					let message = MessageFactory.build(
 						ctrl.subject,
 						ctrl.messageTextarea.text(),
-						this.recipient ? [this.recipient] : [],
-						[],
+						ctrl.recipient ? [ctrl.recipient] : [],
+						ctrl.attachments,
 						ctrl.isReply ? ctrl.conversation : null);
 
 					await ctrl.messagingService.sendMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), message);
@@ -97,11 +146,38 @@ angular.module("Messaging.Modals").component('messageCompose', {
 				ctrl.modalInstance.close();
 			};
 
+			ctrl.onSourceChange = (value) =>
+			{
+				ctrl.recipient = null;
+			}
+
 			ctrl.canSend = () =>
 			{
-				return ctrl.subject.length > 0 && ctrl.messageTextarea.text().length > 0 &&
-					(ctrl.recipient !== null || ctrl.isReply)
-					&& !ctrl.sending;
+				return Juno.Validations.allValidationsValid(ctrl.validations) && !ctrl.sending;
+			}
+
+			ctrl.sendButtonTooltip = () =>
+			{
+				if (ctrl.canSend())
+				{
+					return "";
+				}
+				else if (!ctrl.validations.sourceSelected())
+				{
+					return "Please select a sender";
+				}
+				else if (!ctrl.validations.recipientSelected())
+				{
+					return "Please select a recipient";
+				}
+				else if (!ctrl.validations.messageText())
+				{
+					return "Please fill out the subject and message";
+				}
+				else
+				{
+					return "Unable to send message. If the problem persists please contact support";
+				}
 			}
 
 			ctrl.getParticipantNames = () =>

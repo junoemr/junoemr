@@ -1,4 +1,7 @@
 .message-compose {
+	@include juno-font-body-smallest();
+	color: var(--color-neutral-darkest);
+
 	.message-area {
 		border: 1px solid var(--color-neutral-light);
 		border-radius: 8px;
@@ -8,6 +11,8 @@
 		.message-body {
 			border: none;
 			outline: none;
+
+			flex: 1 0 125px;
 		}
 	}
 }

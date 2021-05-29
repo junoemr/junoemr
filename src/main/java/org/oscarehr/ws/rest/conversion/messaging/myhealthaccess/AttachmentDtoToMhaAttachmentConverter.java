@@ -29,6 +29,8 @@ import org.oscarehr.messaging.backend.myhealthaccess.model.MhaAttachment;
 import org.oscarehr.ws.rest.transfer.messaging.AttachmentDto;
 import org.springframework.util.MimeType;
 
+import java.util.Base64;
+
 public class AttachmentDtoToMhaAttachmentConverter extends AbstractModelConverter<AttachmentDto, MhaAttachment>
 {
 	// ==========================================================================
@@ -38,11 +40,19 @@ public class AttachmentDtoToMhaAttachmentConverter extends AbstractModelConverte
 	@Override
 	public MhaAttachment convert(AttachmentDto input)
 	{
+		String base64Data = input.getBase64Data();
+		byte[] binaryData = null;
+		if (base64Data != null)
+		{
+			binaryData = Base64.getDecoder().decode(base64Data);
+		}
+
 		return new MhaAttachment(
 				input.getId(),
 				input.getName(),
 				MimeType.valueOf(input.getMimeType()),
 				input.getCreatedAtDateTime(),
-				null);
+				null,
+				binaryData);
 	}
 }

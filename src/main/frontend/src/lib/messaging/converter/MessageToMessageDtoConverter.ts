@@ -4,13 +4,13 @@ import {MessageDto} from "../../../../generated";
 import MessageableToMessageableDtoConverter from "./MessageableToMessageableDtoConverter";
 import AttachmentToAttachmentDtoConverter from "./AttachmentToAttachmentDtoConverter";
 
-export default class MessageToMessageDtoConverter extends AbstractConverter<Message, MessageDto>
+export default class MessageToMessageDtoConverter extends AbstractConverter<Message, Promise<MessageDto>>
 {
 	// ==========================================================================
 	// AbstractConverter Implementation
 	// ==========================================================================
 
-	convert(from: Message): MessageDto
+	public async convert(from: Message): Promise<MessageDto>
 	{
 		return {
 			id: from.id,
@@ -23,7 +23,7 @@ export default class MessageToMessageDtoConverter extends AbstractConverter<Mess
 			group: from.group,
 			sender: from.sender ? (new MessageableToMessageableDtoConverter()).convert(from.sender) : null,
 			recipients: from.recipients ? (new MessageableToMessageableDtoConverter()).convertList(from.recipients) : [],
-			attachments: from.attachments ? (new AttachmentToAttachmentDtoConverter()).convertList(from.attachments): [],
+			attachments: from.attachments ? await Promise.all((new AttachmentToAttachmentDtoConverter()).convertList(from.attachments)) : [],
 		};
 	}
 }

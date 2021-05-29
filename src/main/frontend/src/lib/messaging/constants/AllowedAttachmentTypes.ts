@@ -1,0 +1,23 @@
+
+export const AllowedAttachmentTypes = [
+	"image/*",
+	"video/*",
+	"audio/*",
+	"file/*",
+	".txt",
+	".csv",
+	".rtf",
+	"rtx",
+	".jpg", ".jpeg", ".jpe",
+	".jp2",
+	".png",
+	".gif",
+	".bmp",
+	".svg",
+	".tiff",
+	".pdf",
+	".doc", ".docx",
+	".xls", ".xlsx",
+	".wav",
+	".mp3",
+];

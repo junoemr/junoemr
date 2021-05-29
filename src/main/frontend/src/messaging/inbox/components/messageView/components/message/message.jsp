@@ -27,19 +27,11 @@
 		</div>
 
 		<!-- Attachments -->
-		<div ng-if="$ctrl.message.hasAttachments" class="flex-col m-t-32">
-			<div class="text-grey">Attachments</div>
-
-			<div class="flex-row">
-				<div class="flex-col">
-					<div ng-repeat="attachment in $ctrl.message.attachments"
-					     class="attachment flex-row align-items-center m-t-4 p-8"
-					     ng-click="$ctrl.downloadAttachment(attachment)">
-						<i class="download-icon icon icon-cloud-download m-r-8"></i>
-						<span>{{attachment.name}}</span>
-					</div>
-				</div>
-			</div>
+		<div class="m-t-24 flex-row">
+			<attachment-list ng-if="$ctrl.message.hasAttachments"
+			                 single-column="true"
+			                 attachments="$ctrl.message.attachments">
+			</attachment-list>
 		</div>
 
 	</div>

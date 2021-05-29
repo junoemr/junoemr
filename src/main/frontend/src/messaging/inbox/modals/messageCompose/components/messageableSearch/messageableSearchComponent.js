@@ -23,12 +23,13 @@
 
 const {JUNO_STYLE} = require("../../../../../../common/components/junoComponentConstants");
 
-angular.module("Messaging.Modals").component('messageableSearch', {
+angular.module("Messaging.Modals.Components").component('messageableSearch', {
 	templateUrl: 'src/messaging/inbox/modals/messageCompose/components/messageableSearch/messageableSearch.jsp',
 	bindings: {
 		ngModel: "=",
 		messagingService: "<",
 		sourceId: "<",
+		disabled: "<?",
 		componentStyle: "<?"
 	},
 	controller: [
@@ -42,7 +43,20 @@ angular.module("Messaging.Modals").component('messageableSearch', {
 			ctrl.$onInit = async () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				ctrl.disabled = ctrl.disabled || false;
 			}
+
+			$scope.$watch("$ctrl.ngModel", (newVal) =>
+			{
+				if (newVal)
+				{
+					ctrl.selectedMessageableId = newVal.id
+				}
+				else
+				{
+					ctrl.selectedMessageableId = null;
+				}
+			});
 
 			ctrl.checkMessageSelection = (selection) =>
 			{

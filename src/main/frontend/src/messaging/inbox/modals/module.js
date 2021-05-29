@@ -1,2 +1,2 @@
 
-angular.module("Messaging.Modals", [ "Common.Services", "Common.Components"]);
+angular.module("Messaging.Modals", [ "Common.Services", "Common.Components", "Messaging.Components.View.Components", "Messaging.Modals.Components"]);

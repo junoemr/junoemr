@@ -1,16 +1,5 @@
 .message {
-	.attachment {
-		cursor: pointer;
-		user-select: none;
-		border-radius: 8px;
-
-		&:hover {
-			background-color: var(--color-neutral-lightest)
-		}
-
-		.download-icon {
-			font-size: 24px;
-			color: var(--color-primary-base);
-		}
+	.text-grey {
+		color: var(--color-neutral-dark-grey);
 	}
 }

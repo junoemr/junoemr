@@ -10,17 +10,27 @@ export default class Attachment
 	protected _createdAtDateTime: Moment;
 	protected _source: MessageSource;
 	protected _message: Message;
+	protected _base64Data: string;
 
 	// ==========================================================================
 	// Public Methods
 	// ==========================================================================
 
-	constructor(id: string, name: string, type: string, createdAtDateTime: Moment)
+	constructor(id: string, name: string, type: string, createdAtDateTime: Moment, base64Data = null)
 	{
 		this._id = id;
 		this._name = name;
 		this._type = type;
 		this._createdAtDateTime = createdAtDateTime;
+		this._base64Data = base64Data;
+	}
+
+	/**
+	 * get the files data as base64 encoded string
+	 */
+	public async getBase64Data(): Promise<string>
+	{
+		return this._base64Data;
 	}
 
 	// ==========================================================================
@@ -35,6 +45,11 @@ export default class Attachment
 	set message(message: Message)
 	{
 		this._message = message;
+	}
+
+	set base64Data(data: string)
+	{
+		this._base64Data = data;
 	}
 
 	// ==========================================================================

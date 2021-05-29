@@ -126,7 +126,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 						resolve: {
 							style: () => JUNO_STYLE.DEFAULT,
 							messagingService: () => MessagingServiceFactory.build(ctrl.messagingBackendId),
-							sourceId: () => ctrl.sourceId,
+							sourceId: () => reply ? selectedMessage.source.id : ctrl.sourceId,
 							isReply: () => reply,
 							subject: () => reply ? selectedMessage.subject : "",
 							conversation: () => reply ? selectedConversation : null,

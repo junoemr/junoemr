@@ -42,6 +42,7 @@ public class MhaAttachment implements Attachment
 	protected MimeType mimeType;
 	protected ZonedDateTime createdAtDateTime;
 	protected URL documentUrl;
+	protected byte[] data;
 
 	// ==========================================================================
 	// Public Methods
@@ -54,14 +55,34 @@ public class MhaAttachment implements Attachment
 	 * @param mimeType - attachment mime type
 	 * @param createdAtDateTime - attachment creation time
 	 * @param documentUrl - the url at which the document can be download
+	 * @param data - the attachments binary data
 	 */
-	public MhaAttachment(String id, String name, MimeType mimeType, ZonedDateTime createdAtDateTime, URL documentUrl)
+	public MhaAttachment(String id, String name, MimeType mimeType, ZonedDateTime createdAtDateTime, URL documentUrl, byte[] data)
 	{
 		this.id = id;
 		this.name = name;
 		this.mimeType = mimeType;
 		this.createdAtDateTime = createdAtDateTime;
 		this.documentUrl = documentUrl;
+		this.data = data;
+	}
+
+	/**
+	 * @see MhaAttachment
+	 */
+	public MhaAttachment(String id, String name, MimeType mimeType, ZonedDateTime createdAtDateTime, URL documentUrl)
+	{
+		this(id, name, mimeType, createdAtDateTime, documentUrl, null);
+	}
+
+
+	/**
+	 * get the attachment file data
+	 * @return attachment binary data
+	 */
+	public Optional<byte[]> getData()
+	{
+		return Optional.ofNullable(this.data);
 	}
 
 	// ==========================================================================
