@@ -23,19 +23,16 @@
 
 package org.oscarehr.provider.dao;
 
-import org.opensaml.xmlsec.signature.P;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.admin.transfer.ProviderRoleTransfer;
-import oscar.entities.Provider;
 import oscar.util.ConversionUtils;
 
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -266,10 +263,6 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		query.setParameter("pts", providerTypes);
 
 		List<ProviderData> resultList = query.getResultList();
-		if (resultList == null)
-		{
-			return null;
-		}
 		return resultList;
 	}
 

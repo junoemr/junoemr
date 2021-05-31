@@ -595,13 +595,13 @@ public class ProviderData {
 		return result;
 	}
 
-	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData p)
+	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData providerData)
 	{
 	    Map<String, String> result = new HashMap<String, String>();
-	    result.put("providerNo", p.getId());
-	    result.put("firstName", p.getFirstName());
-	    result.put("lastName", p.getLastName());
-	    result.put("ohipNo", p.getOhipNo());
+	    result.put("providerNo", providerData.getId());
+	    result.put("firstName", providerData.getFirstName());
+	    result.put("lastName", providerData.getLastName());
+	    result.put("ohipNo", providerData.getOhipNo());
 	    return result;
     }
 
