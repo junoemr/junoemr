@@ -29,21 +29,21 @@
 <%@ page import="org.oscarehr.common.dao.PreventionsLotNrsDao"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
 <%@ page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@ page import="org.oscarehr.prevention.model.Prevention" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@ page import="oscar.oscarPrevention.PreventionData" %>
 <%@ page import="oscar.oscarPrevention.PreventionDisplayConfig" %>
-<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="oscar.util.ConversionUtils" %>
-<%@ page import="org.oscarehr.prevention.model.Prevention" %>
-<%@ page import="org.oscarehr.provider.model.ProviderData" %>
-<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="javassist.compiler.ast.StringL" %>
 <%@ page import="java.util.Arrays" %>
 

@@ -595,15 +595,8 @@ public class ProviderData {
 		return result;
 	}
 
-	public static List<Map<String, String>> getSortedMergedProviderList(List<Map<String, String>> listToReturn, List<Map<String, String>> listToMerge, String sortBy)
+	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData p)
 	{
-		listToReturn.addAll(listToMerge);
-		Collections.sort(listToReturn, Comparator.comparing(currentProviderMap -> currentProviderMap.get(sortBy).toLowerCase(Locale.getDefault())));
-
-		return listToReturn;
-	}
-
-	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData p) {
 	    Map<String, String> result = new HashMap<String, String>();
 	    result.put("providerNo", p.getId());
 	    result.put("firstName", p.getFirstName());
