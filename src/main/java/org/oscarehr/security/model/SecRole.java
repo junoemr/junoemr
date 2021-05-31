@@ -80,6 +80,9 @@ public class SecRole extends AbstractModel<Integer> implements Serializable, Com
 	@JoinColumn(name = "parent_sec_role_id", referencedColumnName = "role_no")
 	private SecRole parentSecRole;
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parentSecRole")
+	private List<SecRole> childSecRoles;
+
 	@Override
 	public Integer getId()
 	{

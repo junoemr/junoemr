@@ -184,6 +184,10 @@ public class SecurityRolesService
 		{
 			throw new IllegalAccessException("System managed roles cannot be deleted");
 		}
+		if(!role.getChildSecRoles().isEmpty())
+		{
+			throw new IllegalStateException("Inherited roles cannot be deleted. Role extensions must be deleted first.");
+		}
 
 		// remove existing provider connections to this role
 		for(SecUserRole secUserRole : role.getSecUserRoles())

@@ -204,6 +204,15 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 
 				ctrl.onDelete = async () =>
 				{
+					const childCount = (ctrl.role.childRoleIds) ? ctrl.role.childRoleIds.length : 0;
+					if(childCount > 0)
+					{
+						Juno.Common.Util.errorAlert($uibModal, "Action Prevented",
+							"This role cannot be deleted, as " + childCount +
+							" roles inherit from it. Please delete all inheriting roles first.");
+						return;
+					}
+
 					const userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Warning",
 						"You are about to delete a user role. " +
 						"This may change what content you and other system users have access to, including this page.\n" +
