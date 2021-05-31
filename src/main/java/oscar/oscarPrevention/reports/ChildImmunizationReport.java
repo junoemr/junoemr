@@ -27,6 +27,7 @@ package oscar.oscarPrevention.reports;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,17 +36,21 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.oscarDemographic.data.DemographicData;
+import org.oscarehr.util.SpringUtils;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 /**
@@ -82,82 +87,97 @@ public class ChildImmunizationReport implements PreventionReport{
     public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate)
     {
         int inList = 0;
-        double done= 0;
-        ArrayList<PreventionReportDisplay> returnReport = new ArrayList<PreventionReportDisplay>();
+        double done = 0;
+        List<PreventionReportDisplay> returnReport = new ArrayList<>();
+        DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 
         int dontInclude = 0;
-          for (int i = 0; i < list.size(); i ++){//for each  element in arraylist
-             ArrayList<String> fieldList = list.get(i);
-             log.debug("list "+list.size());
-             Integer demo = Integer.parseInt(fieldList.get(0));
-             log.debug("fieldList "+fieldList.size());
+        for (List<String> fieldList : list)
+        {
+            Integer demo = Integer.parseInt(fieldList.get(0));
+            Demographic demoData = demographicDao.find(demo);
 
-			// search prevention_date prevention_type deleted refused
-			ArrayList<Map<String, Object>> prevs1 = PreventionData.getPreventionData(loggedInInfo, PREVENTION_DTAP_IPV, demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs1, demo, PREVENTION_DTAP_IPV,null);
-			ArrayList<Map<String, Object>> prevsDtapIPVHIB = PreventionData.getPreventionData(loggedInInfo, PREVENTION_DTAP_IPV_HIB, demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevsDtapIPVHIB, demo,PREVENTION_DTAP_IPV_HIB,null);
-			ArrayList<Map<String, Object>> prevs2 = PreventionData.getPreventionData(loggedInInfo, PREVENTION_HIB, demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs2, demo,PREVENTION_HIB,null);
-			ArrayList<Map<String, Object>> prevs4 = PreventionData.getPreventionData(loggedInInfo, PREVENTION_MMR,demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,PREVENTION_MMR,null);
-			prevs4.addAll(PreventionData.getPreventionData(loggedInInfo, PREVENTION_MMRV, demo));
-			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,PREVENTION_MMRV,null);
+            // search prevention_date prevention_type deleted refused
+            ArrayList<Map<String, Object>> preventionsDTaPIPV = PreventionData.getPreventionData(loggedInInfo, PREVENTION_DTAP_IPV, demo);
+            PreventionData.addRemotePreventions(loggedInInfo, preventionsDTaPIPV, demo, PREVENTION_DTAP_IPV, null);
 
-             //need to compile accurate dtap numbers
-			 Map<String, Object> hDtapIpv, hDtapIpvHib;
-             boolean add;
+            ArrayList<Map<String, Object>> prevsDtapIPVHIB = PreventionData.getPreventionData(loggedInInfo, PREVENTION_DTAP_IPV_HIB, demo);
+            PreventionData.addRemotePreventions(loggedInInfo, prevsDtapIPVHIB, demo, PREVENTION_DTAP_IPV_HIB, null);
 
-             for( int idx = 0; idx < prevsDtapIPVHIB.size(); ++idx ) {
-                 hDtapIpvHib = prevsDtapIPVHIB.get(idx);
-                 add = true;
-                 for( int idx2 = 0; idx2 < prevs1.size(); ++idx2 ) {
-                     hDtapIpv = prevs1.get(idx2);
-                     if(((String)hDtapIpvHib.get("prevention_date")).equals((hDtapIpv.get("prevention_date")))) {
-                         add = false;
-                         break;
-                     }
-                 }
+            ArrayList<Map<String, Object>> preventionsHiB = PreventionData.getPreventionData(loggedInInfo, PREVENTION_HIB, demo);
+            PreventionData.addRemotePreventions(loggedInInfo, preventionsHiB, demo, PREVENTION_HIB, null);
 
-                 if( add ) {
-                     prevs1.add(hDtapIpvHib);
-                 }
-             }
+            ArrayList<Map<String, Object>> preventionsMMR = PreventionData.getPreventionData(loggedInInfo, PREVENTION_MMR, demo);
+            PreventionData.addRemotePreventions(loggedInInfo, preventionsMMR, demo, PREVENTION_MMR, null);
+            preventionsMMR.addAll(PreventionData.getPreventionData(loggedInInfo, PREVENTION_MMRV, demo));
+            PreventionData.addRemotePreventions(loggedInInfo, preventionsMMR, demo, PREVENTION_MMRV, null);
 
+            //need to compile accurate dtap numbers
+            Map<String, Object> hDtapIpv;
+            Map<String, Object> hDtapIpvHib;
+            boolean add;
 
-             Collections.sort(prevs1, new DtapComparator());
+            for (Map<String, Object> stringObjectMap : prevsDtapIPVHIB)
+            {
+                hDtapIpvHib = stringObjectMap;
+                add = true;
+                for (Map<String, Object> objectMap : preventionsDTaPIPV)
+                {
+                    hDtapIpv = objectMap;
+                    if (((String) hDtapIpvHib.get("prevention_date")).equals((hDtapIpv.get("prevention_date"))))
+                    {
+                        add = false;
+                        break;
+                    }
+                }
 
-             int numDtap = prevs1.size();  //4
-             int numHib  = prevs2.size();  //4
-             int numMMR  = prevs4.size();  //1
+                if (add)
+                {
+                    preventionsDTaPIPV.add(hDtapIpvHib);
+                }
+            }
 
-             log.debug("prev1 "+prevs1.size()+ " prevs2 "+ prevs2.size() +" prev4 "+prevs4.size());
+            preventionsDTaPIPV.sort(new DtapComparator());
 
-             DemographicData dd = new DemographicData();
-             org.oscarehr.common.model.Demographic demoData = dd.getDemographic(loggedInInfo, demo.toString());
-             // This a kludge to get by conformance testing in ontario -- needs to be done in a smarter way
-             int totalImmunizations = numDtap + /*numHib +*/ numMMR ;
-             int recommTotal = 5; //9;NOT SURE HOW HIB WORKS
-             int ageInMonths = DemographicData.getAgeInMonthsAsOf(demoData,asofDate);
-             PreventionReportDisplay prd = new PreventionReportDisplay();
-             prd.demographicNo = demo;
-             prd.bonusStatus = "N";
-             prd.billStatus = "N";
-             prd.numShots = "0";
-             if (totalImmunizations == 0){// no info
+            int numDtap = preventionsDTaPIPV.size();  //4
+            int numHib = preventionsHiB.size();  //4
+            int numMMR = preventionsMMR.size();  //1
+
+            log.debug("prev1 " + preventionsDTaPIPV.size() + " prevs2 " + preventionsHiB.size() + " prev4 " + preventionsMMR.size());
+
+            // This a kludge to get by conformance testing in ontario -- needs to be done in a smarter way
+            int totalImmunizations = numDtap + numHib + numMMR;
+            int recommTotal = 5; //9;NOT SURE HOW HIB WORKS
+            long ageInMonths = ChronoUnit.MONTHS.between(
+                    demoData.getDateOfBirth(),
+                    ConversionUtils.toLocalDate(ConversionUtils.toDateString(asofDate))
+            );
+            PreventionReportDisplay prd = new PreventionReportDisplay();
+            prd.demographicNo = demo;
+            prd.bonusStatus = "N";
+            prd.billStatus = "N";
+            prd.numShots = "0";
+            if (totalImmunizations == 0)
+            {// no info
                 prd.rank = 1;
                 prd.lastDate = "------";
                 prd.state = "No Info";
                 prd.numMonths = "------";
                 prd.color = "Magenta";
-             }else if(  (  prevs1.size()> 0 &&  ineligible(prevs1.get(prevs1.size()-1))) || (  prevs2.size()> 0 && ineligible(prevs2.get(prevs2.size()-1))) || (  prevs4.size()> 0 && ineligible(prevs4.get(prevs4.size()-1))) ){
+            }
+            else if ((preventionsDTaPIPV.size() > 0 && ineligible(preventionsDTaPIPV.get(preventionsDTaPIPV.size() - 1)))
+                    || (preventionsHiB.size() > 0 && ineligible(preventionsHiB.get(preventionsHiB.size() - 1)))
+                    || (preventionsMMR.size() > 0 && ineligible(preventionsMMR.get(preventionsMMR.size() - 1))))
+            {
                 prd.rank = 5;
                 prd.lastDate = "------";
                 prd.state = "Ineligible";
                 prd.numMonths = "------";
                 prd.color = "grey";
                 inList++;
-            }else{
+            }
+            else
+            {
 
                 boolean refused = false;
                 DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -165,101 +185,129 @@ public class ChildImmunizationReport implements PreventionReport{
                 Date lastDate = null;
                 String prevDateStr = "";
 
-                if(prevs1.size() > 0){
-                	Map<String, Object> hDtap = prevs1.get(prevs1.size()-1);
-                   if ( hDtap.get("refused") != null && ((String) hDtap.get("refused")).equals("1")){
-                      refused = true;
-                   }
-                   prevDateStr = (String) hDtap.get("prevention_date");
-                   try{
-                      lastDate = formatter.parse(prevDateStr);
-                   }catch (Exception e){MiscUtils.getLogger().error("Error", e);}
+                if (preventionsDTaPIPV.size() > 0)
+                {
+                    Map<String, Object> hDtap = preventionsDTaPIPV.get(preventionsDTaPIPV.size() - 1);
+                    if (hDtap.get("refused") != null && ((String) hDtap.get("refused")).equals("1"))
+                    {
+                        refused = true;
+                    }
+                    prevDateStr = (String) hDtap.get("prevention_date");
+                    try
+                    {
+                        lastDate = formatter.parse(prevDateStr);
+                    }
+                    catch (Exception e)
+                    {
+                        MiscUtils.getLogger().error("Error", e);
+                    }
                 }
 
-                if(prevs4.size() > 0){
-                	Map<String, Object> hMMR  = prevs4.get(0);  //Changed to get first MMR value instead of last value
-                   if ( hMMR.get("refused") != null && ((String) hMMR.get("refused")).equals("1")){
-                      refused = true;
-                   }
+                if (preventionsMMR.size() > 0)
+                {
+                    Map<String, Object> hMMR = preventionsMMR.get(0);  //Changed to get first MMR value instead of last value
+                    if (hMMR.get("refused") != null && ((String) hMMR.get("refused")).equals("1"))
+                    {
+                        refused = true;
+                    }
 
-                   String mmrDateStr = (String) hMMR.get("prevention_date");
-                   Date prevDate = null;
-                   try{
-                      prevDate = formatter.parse(mmrDateStr);
-                      if (prevDate.after(lastDate)){
-                         lastDate = prevDate;
-                         prevDateStr = mmrDateStr;
-                      }
-                   }catch (Exception e){MiscUtils.getLogger().error("Error", e);}
+                    String mmrDateStr = (String) hMMR.get("prevention_date");
+                    Date prevDate = null;
+                    try
+                    {
+                        prevDate = formatter.parse(mmrDateStr);
+                        if (prevDate.after(lastDate))
+                        {
+                            lastDate = prevDate;
+                            prevDateStr = mmrDateStr;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiscUtils.getLogger().error("Error", e);
+                    }
                 }
 
                 String numMonths = "------";
-                if ( lastDate != null){
-                   int num = UtilDateUtilities.getNumMonths(lastDate,asofDate);
-                   numMonths = ""+num+" months";
+                if (lastDate != null)
+                {
+                    int num = UtilDateUtilities.getNumMonths(lastDate, asofDate);
+                    numMonths = "" + num + " months";
                 }
 
-                Date dob = dd.getDemographicDOB(loggedInInfo, demo.toString());
+                // Converting to date simply to get this code working w/ new demographic model
+                Date dob = ConversionUtils.toLegacyDate(demoData.getDateOfBirth());
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(dob);
                 cal.add(Calendar.MONTH, 30);
                 Date twoYearsAfterDOB = cal.getTime();
-                if( lastDate != null ) {
-                    log.debug("twoYearsAfterDOB date "+twoYearsAfterDOB+ " "+lastDate.before(twoYearsAfterDOB) );
-                    if (!refused && (totalImmunizations >= recommTotal  ) && lastDate.before(twoYearsAfterDOB) && ( ageInMonths >= 18 )){//&& endOfYear.after(prevDate)){
-                       prd.bonusStatus = "Y";
-                       prd.billStatus = "Y";
-                       done++;
+                if (lastDate != null)
+                {
+                    log.debug("twoYearsAfterDOB date " + twoYearsAfterDOB + " " + lastDate.before(twoYearsAfterDOB));
+                    if (!refused && (totalImmunizations >= recommTotal) && lastDate.before(twoYearsAfterDOB) && (ageInMonths >= 18))
+                    {
+                        prd.bonusStatus = "Y";
+                        prd.billStatus = "Y";
+                        done++;
                     }
                 }
                 //outcomes
-                if (!refused && totalImmunizations < recommTotal && ageInMonths >= 18 && ageInMonths <= 23){ // less < 9
-                   prd.rank = 2;
-                   prd.lastDate = prevDateStr;
-                   prd.state = "due";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "yellow"; //FF00FF
+                if (!refused && totalImmunizations < recommTotal && ageInMonths >= 18 && ageInMonths <= 23)
+                { // less < 9
+                    prd.rank = 2;
+                    prd.lastDate = prevDateStr;
+                    prd.state = "due";
+                    prd.numMonths = numMonths;
+                    prd.numShots = "" + totalImmunizations;
+                    prd.color = "yellow"; //FF00FF
 
-                } else if (!refused && totalImmunizations < recommTotal && ageInMonths > 23 ){ // overdue
-                   prd.rank = 2;
-                   prd.lastDate = prevDateStr;
-                   prd.state = "Overdue";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "red"; //FF00FF
+                }
+                else if (!refused && totalImmunizations < recommTotal && ageInMonths > 23)
+                { // overdue
+                    prd.rank = 2;
+                    prd.lastDate = prevDateStr;
+                    prd.state = "Overdue";
+                    prd.numMonths = numMonths;
+                    prd.numShots = "" + totalImmunizations;
+                    prd.color = "red"; //FF00FF
 
-                } else if (refused){  // recorded and refused
-                   prd.rank = 3;
-                   prd.lastDate = "-----";
-                   prd.state = "Refused";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "orange"; //FF9933
-                } else if (totalImmunizations >= recommTotal  ){  // recorded done
-                   prd.rank = 4;
-                   prd.lastDate = prevDateStr;
-                   prd.state = "Up to date";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "green";
-                   //done++;
-                }else{
-                   prd.state = "------";
-                   prd.lastDate = prevDateStr;
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "white";
-                   dontInclude++;
+                }
+                else if (refused)
+                {  // recorded and refused
+                    prd.rank = 3;
+                    prd.lastDate = "-----";
+                    prd.state = "Refused";
+                    prd.numMonths = numMonths;
+                    prd.numShots = "" + totalImmunizations;
+                    prd.color = "orange"; //FF9933
+                }
+                else if (totalImmunizations >= recommTotal)
+                {  // recorded done
+                    prd.rank = 4;
+                    prd.lastDate = prevDateStr;
+                    prd.state = "Up to date";
+                    prd.numMonths = numMonths;
+                    prd.numShots = "" + totalImmunizations;
+                    prd.color = "green";
+                    //done++;
+                }
+                else
+                {
+                    prd.state = "------";
+                    prd.lastDate = prevDateStr;
+                    prd.numMonths = numMonths;
+                    prd.numShots = "" + totalImmunizations;
+                    prd.color = "white";
+                    dontInclude++;
                 }
 
 
-             }
+            }
 
-             letterProcessing( prd,"CIMF",asofDate);
-             returnReport.add(prd);
+            letterProcessing(prd, "CIMF", asofDate);
+            returnReport.add(prd);
 
-          }
+        }
           String percentStr = "0";
           double eligible = list.size() - inList - dontInclude;
           log.debug("eligible "+eligible+" done "+done);
@@ -272,17 +320,17 @@ public class ChildImmunizationReport implements PreventionReport{
 
             Collections.sort(returnReport);
 
-          Hashtable<String,Object> h = new Hashtable<String,Object>();
+          Hashtable<String,Object> returnHash = new Hashtable<String,Object>();
 
-          h.put("up2date",""+Math.round(done));
-          h.put("percent",percentStr);
-          h.put("returnReport",returnReport);
-          h.put("inEligible", ""+inList);
-          h.put("eformSearch","CHI");
-          h.put("followUpType","CIMF");
-          h.put("BillCode", "Q004A");
+          returnHash.put("up2date",""+Math.round(done));
+          returnHash.put("percent",percentStr);
+          returnHash.put("returnReport",returnReport);
+          returnHash.put("inEligible", ""+inList);
+          returnHash.put("eformSearch","CHI");
+          returnHash.put("followUpType","CIMF");
+          returnHash.put("BillCode", "Q004A");
           log.debug("set returnReport "+returnReport);
-          return h;
+          return returnHash;
     }
 
     boolean ineligible(Map<String, Object> h){
@@ -384,30 +432,6 @@ public class ChildImmunizationReport implements PreventionReport{
                   
                   return prd.nextSuggestedProcedure;
 
-                  /*if ( measurementData.getDateObservedAsDate().before(onemon)){
-                	  
-                      if (prd.lastFollupProcedure.equals(this.LETTER1)){
-                                    prd.nextSuggestedProcedure = this.LETTER2;
-                                    return this.LETTER2;
-                      //is last measurementData within 3 months
-                      }else if( measurementData.getDateObservedAsDate().before(threemon)){
-                                  prd.nextSuggestedProcedure = "----";
-                                  return "----";
-                      }else if(prd.lastFollupProcedure.equals(this.LETTER2)){
-                                    prd.nextSuggestedProcedure = this.PHONE1;
-                                    return this.PHONE1;
-                      }else{
-                                  prd.nextSuggestedProcedure = "----";
-                                  return "----";
-                      }
-
-                  }else if(prd.lastFollupProcedure.equals(this.LETTER2)){
-                      prd.nextSuggestedProcedure = this.PHONE1;
-                      return this.PHONE1;
-                  }else{
-                      prd.nextSuggestedProcedure = "----";
-                      return "----";
-                  }*/
               }
           }else if (prd.state.equals("Refused") ){  //Not sure what to do about refused
                 //prd.lastDate = "-----";
