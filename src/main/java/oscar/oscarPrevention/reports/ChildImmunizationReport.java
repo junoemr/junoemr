@@ -54,6 +54,13 @@ import oscar.util.UtilDateUtilities;
  */
 public class ChildImmunizationReport implements PreventionReport{
 
+    public static final String PREVENTION_DTAP_IPV = "DTaP-IPV";
+    public static final String PREVENTION_DTAP_IPV_HIB = "DTaP-IPV-Hib";
+    public static final String PREVENTION_HIB = "Hib";
+    public static final String PREVENTION_MMR = "MMR";
+    public static final String PREVENTION_MMRV = "MMRV";
+    private static final Logger log = MiscUtils.getLogger();
+
     //Sort class for preventions used to sort final list of dtap preventions
     class DtapComparator implements Comparator<Map<String, Object>> {
 
@@ -62,15 +69,18 @@ public class ChildImmunizationReport implements PreventionReport{
         }
     }
 
-
-
-    private static Logger log = MiscUtils.getLogger();
     /** Creates a new instance of ChildImmunizationReport */
-    public ChildImmunizationReport() {
+    public ChildImmunizationReport()
+    {
     }
 
+    public boolean displayNumShots()
+    {
+        return true;
+    }
 
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate){
+    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate)
+    {
         int inList = 0;
         double done= 0;
         ArrayList<PreventionReportDisplay> returnReport = new ArrayList<PreventionReportDisplay>();
@@ -83,16 +93,16 @@ public class ChildImmunizationReport implements PreventionReport{
              log.debug("fieldList "+fieldList.size());
 
 			// search prevention_date prevention_type deleted refused
-			ArrayList<Map<String, Object>> prevs1 = PreventionData.getPreventionData(loggedInInfo, "DTap-IPV", demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs1, demo,"DTap-IPV",null);
-			ArrayList<Map<String, Object>> prevsDtapIPVHIB = PreventionData.getPreventionData(loggedInInfo, "DTaP-IPV-Hib", demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevsDtapIPVHIB, demo,"DTaP-IPV-Hib",null);
-			ArrayList<Map<String, Object>> prevs2 = PreventionData.getPreventionData(loggedInInfo, "Hib", demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs2, demo,"Hib",null);
-			ArrayList<Map<String, Object>> prevs4 = PreventionData.getPreventionData(loggedInInfo, "MMR",demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,"MMR",null);
-			prevs4.addAll(PreventionData.getPreventionData(loggedInInfo, "MMRV", demo));
-			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,"MMRV",null);
+			ArrayList<Map<String, Object>> prevs1 = PreventionData.getPreventionData(loggedInInfo, PREVENTION_DTAP_IPV, demo);
+			PreventionData.addRemotePreventions(loggedInInfo, prevs1, demo, PREVENTION_DTAP_IPV,null);
+			ArrayList<Map<String, Object>> prevsDtapIPVHIB = PreventionData.getPreventionData(loggedInInfo, PREVENTION_DTAP_IPV_HIB, demo);
+			PreventionData.addRemotePreventions(loggedInInfo, prevsDtapIPVHIB, demo,PREVENTION_DTAP_IPV_HIB,null);
+			ArrayList<Map<String, Object>> prevs2 = PreventionData.getPreventionData(loggedInInfo, PREVENTION_HIB, demo);
+			PreventionData.addRemotePreventions(loggedInInfo, prevs2, demo,PREVENTION_HIB,null);
+			ArrayList<Map<String, Object>> prevs4 = PreventionData.getPreventionData(loggedInInfo, PREVENTION_MMR,demo);
+			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,PREVENTION_MMR,null);
+			prevs4.addAll(PreventionData.getPreventionData(loggedInInfo, PREVENTION_MMRV, demo));
+			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,PREVENTION_MMRV,null);
 
              //need to compile accurate dtap numbers
 			 Map<String, Object> hDtapIpv, hDtapIpvHib;
@@ -133,6 +143,7 @@ public class ChildImmunizationReport implements PreventionReport{
              prd.demographicNo = demo;
              prd.bonusStatus = "N";
              prd.billStatus = "N";
+             prd.numShots = "0";
              if (totalImmunizations == 0){// no info
                 prd.rank = 1;
                 prd.lastDate = "------";
