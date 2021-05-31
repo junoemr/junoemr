@@ -64,7 +64,6 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
 <%@ page import="org.oscarehr.common.dao.SiteDao"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ page import="org.oscarehr.common.model.Site"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.oscarehr.common.model.ProviderSite"%>
@@ -76,6 +75,9 @@
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
+<%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
 <html:html locale="true">
 
 
@@ -452,8 +454,18 @@ jQuery(document).ready( function() {
 			</td>
 		</tr>
 		<% } %>
-		<%
-			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
+		<% if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
+		{
+			BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
+
+			List<BillingVisit> serviceLocationCodes = new ArrayList<BillingVisit>();
+			List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+            for (Object[] visitCode : visitCodes)
+            {
+            	serviceLocationCodes.add(new BillingVisit(visitCode));
+            }
+
+            String providerSLCCode = provider.getBillingOpts().getBcServiceLocationCode();
 		%>
             <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
                 boolean isBCPEnabled = provider.getBillingOpts() != null && provider.getBillingOpts().getBcBCPEligible();
@@ -467,6 +479,15 @@ jQuery(document).ready( function() {
                 </select>
         </tr>
             <% } %>
+        <td align="right">BC Service Location Code</td>
+        <td>
+            <select name="bc_service_location_code">
+                <option value="" <%=providerSLCCode == null ? "selected" : ""%>>None</option>
+                <% for (BillingVisit slcCode : serviceLocationCodes) { %>
+                <option value="<%=slcCode.getVisitType()%>" <%=slcCode.getVisitType().equals(providerSLCCode) ? "selected" : ""%>><%=slcCode.getDisplayName()%></option>
+                <% } %>
+            </select>
+        </td>
 		<tr>
             <% // We are using the albertaEDeliveryId column to store IHA provider mnemonics on BC instances. %>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>

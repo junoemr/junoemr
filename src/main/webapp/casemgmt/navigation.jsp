@@ -37,13 +37,11 @@
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.util.MeasurementHelper" %>
 <%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
-<%@ page import="java.util.List" %>
-<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Vector" %>
 
 <% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 <%
-    FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
     String province = oscarVariables.getBillingTypeUpperCase();
     oscar.oscarEncounter.pageUtil.EctSessionBean bean=null;
     if ("true".equalsIgnoreCase((String)session.getAttribute("casemgmt_bean_flag"))){
@@ -359,8 +357,8 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
 </caisi:isModuleLoad>
 <%
 	dxResearchBeanHandler dxRes;
-    List<String> flowsheets;
-	List<String> dxCodes;
+	ArrayList<String> flowsheets;
+	Vector dxCodes;
 %>
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
 <caisirole:SecurityAccess accessName="measurements" accessType="access" providerNo="<%=bean.providerNo%>" demoNo="<%=bean.demographicNo%>" programId="<%=pgId%>">
@@ -371,14 +369,14 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
         <%
             dxRes = new dxResearchBeanHandler(bean.demographicNo);
             dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-            flowsheets = flowsheetService.getUniversalFlowsheetNames();
+            flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniveralFlowsheets();
             for (String flowsheet : flowsheets) {
-                MeasurementFlowSheet measurementFlowSheet = flowsheetService.getFlowsheetTemplate(flowsheet);
+                MeasurementFlowSheet measurementFlowSheet = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(flowsheet);
                 if (MeasurementHelper.flowSheetRequiresWork(bean.demographicNo, measurementFlowSheet)) {
                 %>* <% }         
         %>
         <a href="javascript:void(0)"
-           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=measurementFlowSheet.getDisplayName()%>
+           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheet)%>
         </a><br/>
         <%}%>        
     </td></tr>
@@ -391,12 +389,11 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
         <%
             dxRes = new dxResearchBeanHandler(bean.demographicNo);
             dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-            flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
+            flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
             for (String flowsheet : flowsheets) {
-                MeasurementFlowSheet measurementFlowSheet = flowsheetService.getFlowsheetTemplate(flowsheet);
         %>
         <a href="javascript:void(0)"
-           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=measurementFlowSheet.getDisplayName()%>
+           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheet)%>
         </a>
         <%}%>
 

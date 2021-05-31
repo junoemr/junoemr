@@ -32,7 +32,8 @@ import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 public class JunoGenericLabHandler extends ORU_R01MessageHandler
 {
-	public static final String LAB_TYPE_VALUE= "JUNO-LAB";
+	public static final String LAB_TYPE_VALUE = "JUNO-LAB";
+	public static final String DEFAULT_OBX_NAME = "Unlabelled Test";
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -44,8 +45,9 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getHd1_NamespaceID().getValue();
 
-			return sendingApplication.equals(JunoCoPDLabWriter.SENDING_APP) ||
-					sendingApplication.equals(JunoGenericImportLabWriter.SENDING_APP);
+			return
+				sendingApplication.equals(JunoCoPDLabWriter.SENDING_APP) ||
+				sendingApplication.equals(JunoGenericImportLabWriter.SENDING_APP);
 		}
 		return false;
 	}
@@ -142,5 +144,26 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 	public String getNteForOBX(int i, int j)
 	{
 		return "";
+	}
+
+	@Override
+	public String getOBXName(int i, int j)
+	{
+		String OBXName = super.getOBXName(i, j);
+		if (!OBXName.isEmpty())
+		{
+			return OBXName;
+		}
+
+		String OBXIdentifier = super.getOBXIdentifier(i, j);
+		if (!OBXIdentifier.isEmpty())
+		{
+			return OBXIdentifier;
+		}
+		else
+		{
+			return DEFAULT_OBX_NAME;
+		}
+
 	}
 }

@@ -25,6 +25,10 @@ export enum SYSTEM_PROPERTIES
 {
     INSTANCE_TYPE = "instance_type",
     BILLING_TYPE = "billing_type",
+
+    // AQS
+    AQS_ORGANIZATION_ID = "aqs_organization_id",
+    AQS_ORGANIZATION_SECRET = "aqs_api_secret_key",
 }
 
 export enum INSTANCE_TYPE

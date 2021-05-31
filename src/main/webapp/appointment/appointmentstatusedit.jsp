@@ -40,7 +40,6 @@
 <script src="../js/jquery-3.1.0.min.js" type="text/javascript"></script>
 <script src="../js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
 <script src="../js/jquery.ui.colorPicker.min.js" type="text/javascript"></script>
-<%--<oscar:customInterface section="apptStatusEdit"/>--%>
 
 	<style>
         tr {
@@ -240,7 +239,12 @@
         <table class="margin-t">
             <tr>
                 <td class="header"><bean:message key="admin.appt.status.mgr.label.desc" /></td>
+                <c:if test = "${ canDisable eq 1}">
                 <td><html:text property="description" styleId="appt-description" size="40"></html:text></td>
+                </c:if>
+                <c:if test = "${ canDisable eq 0}">
+                <td><html:text property="description" readonly="true" styleId="appt-description" size="40"></html:text></td>
+                </c:if>
             </tr>
             <tr>
                 <td class="header">Icon</td>

@@ -49,7 +49,8 @@ angular.module('Admin').component('systemPropertiesRx',
 
             ctrl.$onInit = () =>
             {
-                for (let property of ctrl.propertiesList) {
+                for (let property of ctrl.propertiesList)
+                {
                     switch (property.type)
                     {
                         case property_types.boolean:

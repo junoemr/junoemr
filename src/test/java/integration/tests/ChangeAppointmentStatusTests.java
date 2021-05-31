@@ -89,7 +89,8 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void changeAppointmentStatusTestsClassicUI() throws InterruptedException
+	public void changeAppointmentStatusTestsClassicUI()
+			throws InterruptedException
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
@@ -122,7 +123,9 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void changeAppointmentStatusTestsJUNOUI() throws InterruptedException {
+	public void changeAppointmentStatusTestsJUNOUI()
+			throws InterruptedException
+	{
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();

@@ -39,19 +39,11 @@ if(!authed2) {
 %>
 
 <% long startTime = System.currentTimeMillis(); %>
-<%@ page import="org.oscarehr.common.model.FlowSheetCustomization"%>
-<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
-<%@ page import="org.oscarehr.common.dao.FlowSheetCustomizationDao" %>
-<%@ page import="java.util.List" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.util.Recommendation" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.util.RecommendationCondition" %>
-<%@ page import="java.util.Hashtable" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.util.TargetColour" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.util.TargetCondition" %>
-<%@ page import="java.util.Enumeration" %>
+<%@ page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,java.net.*"%>
+<%@ page import="org.jdom.Element,oscar.oscarEncounter.oscarMeasurements.data.*,org.jdom.output.Format,org.jdom.output.XMLOutputter,oscar.oscarEncounter.oscarMeasurements.util.*,java.io.*" %>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="org.oscarehr.common.dao.*,org.oscarehr.common.model.FlowSheetCustomization"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -61,11 +53,12 @@ if(!authed2) {
 <%
     long startTimeToGetP = System.currentTimeMillis();
     if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
+    //int demographic_no = Integer.parseInt(request.getParameter("demographic_no"));
     if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
-
-    FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
  //TODO: MOVE THIS TO AN ACTION
-FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
 String flowsheet   = request.getParameter("flowsheet");
 String measurement = request.getParameter("measurement");
@@ -94,13 +87,14 @@ if(request.getParameter("htracker")!=null && request.getParameter("htracker").eq
 }
 
 
-MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(flowsheet,custList);
+MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(flowsheet,custList);
 long end = System.currentTimeMillis() ;
 long diff = end - start;
 
 Map h2 = mFlowsheet.getMeasurementFlowSheetInfo(measurement);
 List<Recommendation> dsR = mFlowsheet.getDSElements((String) h2.get("measurement_type"));
 FlowSheetItem fsi =mFlowsheet.getFlowSheetItem(measurement);
+//EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -373,8 +367,7 @@ if(request.getParameter("demographic")==null){ %>
 
                            <!-- div style="width:200px;" -->
                            <ul style="display: inline;  list-style-type: none; ">
-                               <%
-                                   Enumeration en = colourHash.keys();
+                               <%Enumeration en = colourHash.keys();
                                while(en.hasMoreElements()){
                                  String colour = (String) en.nextElement();  %>
 

@@ -22,15 +22,33 @@
  */
 package org.oscarehr.integration.aqs.exception;
 
+import ca.cloudpractice.aqs.client.ApiException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import org.oscarehr.integration.aqs.model.AqsErrorResponse;
+import org.oscarehr.util.MiscUtils;
+
 public class AqsCommunicationException extends RuntimeException
 {
+	@Getter
+	protected AqsErrorResponse errorResponse;
+
 	public AqsCommunicationException(String msg)
 	{
 		super(msg);
 	}
 
-	public AqsCommunicationException(String msg, Throwable cause)
+	public AqsCommunicationException(String msg, ApiException cause)
 	{
 		super(msg, cause);
+
+		try
+		{
+			this.errorResponse = (new ObjectMapper()).readValue(cause.getResponseBody(), AqsErrorResponse.class);
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("Failed to deserialize error response from AQS server with error: " + e.toString());
+		}
 	}
 }
