@@ -48,7 +48,6 @@ angular.module("Messaging").component('messagingInbox', {
 		ctrl.groups = [];
 		ctrl.messageStream = null;
 		ctrl.selectedMessageId = $stateParams.messageId;
-		ctrl.messageableFilter = null;
 
 		ctrl.$onInit = async () =>
 		{
@@ -56,6 +55,14 @@ angular.module("Messaging").component('messagingInbox', {
 
 			ctrl.messageSources = await messagingService.getMessageSources();
 			ctrl.groups = await messagingService.getMessageGroups();
+
+			if ($stateParams.messageableId)
+			{
+				// load messageable filter based on query param
+				ctrl.messageableFilter = await messagingService.getMessageable(
+					await messagingService.getMessageSourceById(ctrl.selectedSourceId),
+					$stateParams.messageableId);
+			}
 		}
 
 		/**
@@ -70,15 +77,18 @@ angular.module("Messaging").component('messagingInbox', {
 			$state.go(".", {backend: ctrl.backend, source: sourceId, group: groupId});
 		};
 
-		ctrl.onMessageableFilterChange = (messageable) =>
+		ctrl.onMessageableFilterChange = (messageable, oldMessageable) =>
 		{
-			$state.go(".",
+			if (messageable !== oldMessageable)
 			{
-				backend: ctrl.backend,
-				source: ctrl.selectedSourceId,
-				group: ctrl.selectedGroupId,
-				messageableId: messageable ? messageable.id : null,
-			});
+				$state.go(".",
+					{
+						backend: ctrl.backend,
+						source: ctrl.selectedSourceId,
+						group: ctrl.selectedGroupId,
+						messageableId: messageable ? messageable.id : null,
+					});
+			}
 		}
 
 		ctrl.onMessageStreamChange = (stream) =>

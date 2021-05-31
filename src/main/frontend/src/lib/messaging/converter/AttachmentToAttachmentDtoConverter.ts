@@ -8,13 +8,13 @@ export default class AttachmentToAttachmentDtoConverter extends AbstractConverte
 	// AbstractConverter Implementation
 	// ==========================================================================
 
-	public async convert(from: Attachment): Promise<AttachmentDto>
+	public async convert(from: Attachment, includeAttachmentData= false): Promise<AttachmentDto>
 	{
 		return {
 			id: from.id,
 			name: from.name,
 			mimeType: from.type,
-			base64Data: await from.getBase64Data(),
+			base64Data: includeAttachmentData ? await from.getBase64Data() : null,
 			createdAtDateTime: from.createdAtDateTime.toDate(),
 		};
 	}

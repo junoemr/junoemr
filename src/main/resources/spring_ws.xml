@@ -392,6 +392,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.DemographicWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService"/>
 			<!-- MHA -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.NotesService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.OscarJobService"/>

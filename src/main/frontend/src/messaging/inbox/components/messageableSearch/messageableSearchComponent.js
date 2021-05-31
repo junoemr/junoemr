@@ -52,10 +52,11 @@ angular.module("Messaging.Components").component('messageableSearch', {
 				ctrl.label = ctrl.label || "";
 			}
 
-			$scope.$watch("$ctrl.ngModel", (newVal) =>
+			$scope.$watch("$ctrl.ngModel", async (newVal) =>
 			{
 				if (newVal)
 				{
+					await this.loadSearchOptions(newVal.name);
 					ctrl.selectedMessageableId = newVal.id
 				}
 				else

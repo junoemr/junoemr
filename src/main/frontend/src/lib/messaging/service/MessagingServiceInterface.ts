@@ -86,6 +86,14 @@ export default interface MessagingServiceInterface
 	getMessageGroups(): Promise<MessageGroup[]>;
 
 	/**
+	 * get a messageable by id.
+	 * @param messageSource - the source to fetch the messageable from
+	 * @param messageableId - the id of the messageable to fetch
+	 * @return the messageable
+	 */
+	getMessageable(messageSource: MessageSource, messageableId: string): Promise<Messageable>;
+
+	/**
 	 * search messageables by keyword
 	 * @param messageSource - the source in which to perform the search
 	 * @param keyword - the keyword to search by

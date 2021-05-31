@@ -25,9 +25,15 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.integration.dao.IntegrationDao;
+import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
+import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -37,10 +43,24 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("myhealthaccess/integration/{integrationId}/patient/{remoteId}")
-@Component("PatientWebService")
+@Component("MhaPatientWebService")
 @Tag(name = "mhaPatient")
 public class MhaPatientWebService extends AbstractServiceImpl
 {
+	protected IntegrationDao integrationDao;
+	protected PatientService patientService;
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	@Autowired
+	public MhaPatientWebService(IntegrationDao integrationDao, PatientService patientService)
+	{
+		this.integrationDao = integrationDao;
+		this.patientService = patientService;
+	}
+
 	// ==========================================================================
 	// Endpoints
 	// ==========================================================================
@@ -53,6 +73,14 @@ public class MhaPatientWebService extends AbstractServiceImpl
 			@PathParam("remoteId") String remoteId
 	)
 	{
-		return null;
+		try
+		{
+			Integration integration = integrationDao.find(Integer.parseInt(integrationId));
+			return RestResponse.successResponse(new PatientTo1(this.patientService.getRemotePatient(integration, remoteId)));
+		}
+		catch(InvalidAccessException | RecordNotFoundException e)
+		{
+			return null;
+		}
 	}
 }

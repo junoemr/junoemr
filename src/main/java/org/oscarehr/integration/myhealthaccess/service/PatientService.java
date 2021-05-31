@@ -33,6 +33,7 @@ import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.PatientInviteTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
@@ -45,7 +46,6 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -214,6 +214,23 @@ public class PatientService extends BaseService
 		}
 
 		return null;
+	}
+
+	/**
+	 * get at remote patient from MHA by remote id
+	 * @param integration - the integration to fetch the patient from
+	 * @param remotePatientId - the remote patient id to fetch
+	 * @return - the remote patient
+	 * @throws RecordNotFoundException - if no patient exits with the provided id.
+	 * @throws InvalidAccessException - if you do not have access to the requested patient record.
+	 */
+	public MHAPatient getRemotePatient(Integration integration, String remotePatientId)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		String url = restClient.formatEndpoint("/clinic/%s/patient/%s/", integration.getRemoteId(), remotePatientId);
+
+		return (new MHAPatient(restClient.doGet(url, PatientTo1.class)));
 	}
 
 	/**

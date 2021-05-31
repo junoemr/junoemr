@@ -10,7 +10,7 @@ export default class MessageToMessageDtoConverter extends AbstractConverter<Mess
 	// AbstractConverter Implementation
 	// ==========================================================================
 
-	public async convert(from: Message): Promise<MessageDto>
+	public async convert(from: Message, includeAttachmentData = false): Promise<MessageDto>
 	{
 		return {
 			id: from.id,
@@ -23,7 +23,7 @@ export default class MessageToMessageDtoConverter extends AbstractConverter<Mess
 			group: from.group,
 			sender: from.sender ? (new MessageableToMessageableDtoConverter()).convert(from.sender) : null,
 			recipients: from.recipients ? (new MessageableToMessageableDtoConverter()).convertList(from.recipients) : [],
-			attachments: from.attachments ? await Promise.all((new AttachmentToAttachmentDtoConverter()).convertList(from.attachments)) : [],
+			attachments: from.attachments ? await Promise.all((new AttachmentToAttachmentDtoConverter()).convertList(from.attachments, includeAttachmentData)) : [],
 		};
 	}
 }

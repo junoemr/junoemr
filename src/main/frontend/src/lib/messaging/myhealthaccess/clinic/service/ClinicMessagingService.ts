@@ -140,7 +140,10 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 
 		try
 		{
-			const sentMessageDto: MessageDto = (await this._mhaClinicMessagingApi.sendMessage(source.id, await (new MessageToMessageDtoConverter()).convert(message))).data.body;
+			const sentMessageDto: MessageDto = (await this._mhaClinicMessagingApi.sendMessage(
+				source.id,
+				await (new MessageToMessageDtoConverter()).convert(message, true))).data.body;
+
 			return this.postProcessMessage((new MessageDtoToMhaMessageConverter()).convert(sentMessageDto), source);
 		}
 		catch(error)
@@ -324,6 +327,21 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	}
 
 	/**
+	 * get a messageable by id.
+	 * @param messageSource - the source to fetch the messageable from
+	 * @param messageableId - the id of the messageable to fetch
+	 * @return the messageable
+	 */
+	public async getMessageable(messageSource: MessageSource, messageableId: string): Promise<Messageable>
+	{
+		if (messageSource.isVirtual)
+		{
+			return this.getMessageableVirtual(messageSource, messageableId);
+		}
+		return this.getMessageablePhysical(messageSource, messageableId);
+	}
+
+	/**
 	 * search messageables by keyword
 	 * @param messageSource - the source in which to perform the search
 	 * @param keyword - the keyword to search by
@@ -341,6 +359,55 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	// ==========================================================================
 	// Protected Methods
 	// ==========================================================================
+
+
+	/**
+	 * get a messageable by id from physical source
+	 * @param messageSource - the source to fetch the messageable from
+	 * @param messageableId - the id of the messageable to fetch
+	 * @return the messageable
+	 */
+	protected async getMessageablePhysical(messageSource: MessageSource, messageableId: string): Promise<Messageable>
+	{
+		try
+		{
+			const patient = (await this._mhaPatientApi.getRemotePatient(messageSource.id, messageableId)).data.body;
+			return (new MhaPatientToMessageableConverter()).convert((new PatientTo1ToMhaPatientConverter()).convert(patient));
+		}
+		catch (error)
+		{
+			throw new MessagingError(`Failed to lookup messageable with id ${messageableId} in source ${messageSource.id} with error: ${error.toString()} - ${error.status}`);
+		}
+	}
+	/**
+	 * get a messageable by id from virtual source
+	 * @see getMessageable
+	 * @protected
+	 */
+	protected async getMessageableVirtual(messageSource: MessageSource, messageableId: string): Promise<Messageable>
+	{
+		const searchResults = await Promise.all(this.getPhysicalMessagingSources().map(async (physicalSource) =>
+		{
+			try
+			{
+				return await this.getMessageablePhysical(physicalSource, messageableId)
+			}
+			catch (error)
+			{
+				return null;
+			}
+		}));
+
+		const messageable = (await Promise.all(searchResults)).filter((messageable) => messageable != null)[0];
+		if (messageable)
+		{
+			return messageable;
+		}
+		else
+		{
+			throw new MessagingError(`Failed to retrieve message [${messageableId}] from source [${messageSource.id}]`);
+		}
+	}
 
 	/**
 	 * searchMessageables impl for physical sources
