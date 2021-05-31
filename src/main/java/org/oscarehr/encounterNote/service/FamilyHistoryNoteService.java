@@ -50,7 +50,7 @@ public class FamilyHistoryNoteService extends HistoryNoteService
 
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveFamilyHistoryNote(note);
-		addAnnotationLink(savedNote, noteModel.getAnnotation());
+		addAnnotationLink(savedNote, noteModel.getAnnotation(), noteModel.getResidualInfo());
 
 		if(savedNote.getNoteExtensionList() != null)
 		{

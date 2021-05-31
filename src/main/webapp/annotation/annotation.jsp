@@ -61,6 +61,9 @@
 <%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.LABTEST2" %>
 <%@ page import="static org.oscarehr.encounterNote.model.CaseManagementNoteLink.TICKLER" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.encounterNote.dao.CaseManagementNoteResidualInfoDao" %>
+<%@ page import="org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -92,6 +95,7 @@
     WebApplicationContext  ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
     CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
 	EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+	CaseManagementNoteResidualInfoDao caseManagementNoteResidualInfoDao = (CaseManagementNoteResidualInfoDao) ctx.getBean("encounterNote.dao.CaseManagementNoteResidualInfoDao");
 
     Integer tableName = cmm.getTableNameByDisplay(display);
     String note = "";
@@ -142,6 +146,14 @@
     if (p_cmn_dump!=null) {
         dump = p_cmn_dump.getNote().substring("imported.cms4.2011.06".length());
     }
+    else if(p_cmn != null && p_cmn.getId() != null)
+    {
+	    List<CaseManagementNoteResidualInfo> residualInfoList = caseManagementNoteResidualInfoDao.findByNoteId(p_cmn.getId());
+	    if(residualInfoList != null && !residualInfoList.isEmpty())
+	    {
+		    dump = residualInfoList.stream().map((residualInfo) -> residualInfo.getContentKey() + ": " + residualInfo.getContentValue()).collect(Collectors.joining("\n"));
+	    }
+    }
     if (saved) {
 	String prog_no = new EctProgram(se).getProgram(user_no);
         //create a note with demo, user_no, prog_no
@@ -178,6 +190,8 @@
 			    case LABTEST2: link.setLinkedLabPhysicianInfoId(tableIdInt); break;
 			    case TICKLER: link.setLinkedTicklerId(tableIdInt); break;
 		    }
+
+		    //TODO save residual info with note copy. this is best done with a refactor to note saving.
 		    cmn = encounterNoteService.saveChartNote(cmn, user_no, demographicId);
 
 		    LogAction.addLogEntry(user_no, demographicId, LogConst.ANNOTATE, display, LogConst.STATUS_SUCCESS,

@@ -22,9 +22,11 @@
  */
 package org.oscarehr.demographic.model;
 
+import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -38,6 +40,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -54,6 +57,7 @@ import java.util.stream.Collectors;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static oscar.util.StringUtils.filterControlCharacters;
 
+@Data
 @Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
@@ -67,11 +71,6 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public static final String STATUS_ACTIVE = "AC";
 	public static final String STATUS_DECEASED = "DE";
 	public static final String STATUS_INACTIVE = "IN";
-
-	public static final String ROSTER_STATUS_FEE_SERVICE = "FS";
-	public static final String ROSTER_STATUS_ROSTERED = "RO";
-	public static final String ROSTER_STATUS_NOT_ROSTERED = "NR";
-	public static final String ROSTER_STATUS_TERMINATED = "TE";
 
 
 	@Id
@@ -149,14 +148,21 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String familyDoctor;
 
 	// roster info
+	@Deprecated
 	@Column(name = "roster_status")
 	private String rosterStatus;
+
+	@Deprecated
 	@Column(name = "roster_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterDate;
+
+	@Deprecated
 	@Column(name = "roster_termination_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterTerminationDate;
+
+	@Deprecated
 	@Column(name = "roster_termination_reason")
 	private String rosterTerminationReason;
 
@@ -210,6 +216,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="provider_no", insertable=false, updatable=false)
 	private ProviderData provider;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographic")
+	@OrderBy(value = "addedAt ASC, id ASC")
+	private List<DemographicRoster> rosterHistory;
 
 	public static final String BC_NEWBORN_BILLING_CODE = "66";
 

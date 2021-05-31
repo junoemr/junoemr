@@ -57,6 +57,9 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<Fa
 			logEvent("FamilyHistoryNote [" + note.getObservationDate() + "] has no text value");
 		}
 		note.setNoteText(noteText);
+
+		note.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
+
 		return note;
 	}
 }

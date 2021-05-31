@@ -1103,7 +1103,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (!controller.checkPatientStatus()) return;
 			if (!controller.isPostalComplete()) return;
-			if (!controller.validateSin()) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 

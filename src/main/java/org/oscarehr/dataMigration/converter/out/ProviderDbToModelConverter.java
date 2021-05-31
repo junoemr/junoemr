@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.converter.out;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.Person;
@@ -62,11 +63,11 @@ public class ProviderDbToModelConverter extends
 		address.setResidencyStatusCurrent();
 		exportProvider.addAddress(address);
 
-		exportProvider.setPractitionerNumber(input.getPractitionerNo());
-		exportProvider.setBillingNumber(input.getBillingNo());
-		exportProvider.setRmaNumber(input.getRmaNo());
-		exportProvider.setHsoNumber(input.getHsoNo());
-		exportProvider.setOhipNumber(input.getOhipNo());
+		exportProvider.setPractitionerNumber(StringUtils.trimToNull(input.getPractitionerNo()));
+		exportProvider.setBillingNumber(StringUtils.trimToNull(input.getBillingNo()));
+		exportProvider.setRmaNumber(StringUtils.trimToNull(input.getRmaNo()));
+		exportProvider.setHsoNumber(StringUtils.trimToNull(input.getHsoNo()));
+		exportProvider.setOhipNumber(StringUtils.trimToNull(input.getOhipNo()));
 
 		exportProvider.setHomePhone(PhoneNumber.of(input.getPhone()));
 		exportProvider.setWorkPhone(PhoneNumber.of(input.getWorkPhone()));

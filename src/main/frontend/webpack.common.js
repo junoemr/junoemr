@@ -317,6 +317,8 @@ module.exports = {
 			'./src/record/details/components/contactSection/contactSectionComponent.js',
 			'./src/record/details/components/healthInsuranceSection/healthInsuranceSectionComponent.js',
 			'./src/record/details/components/careTeamSection/careTeamSectionComponent.js',
+			'./src/record/details/components/rosterDisplay/rosterDisplayComponent.js',
+			'./src/record/details/components/rosteredHistory/rosteredHistoryModalComponent.js',
 			'./src/record/details/components/additionalInformationSection/additionalInformationSectionComponent.js',
 			'./src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModalComponent.js',
 			'./src/record/phr/module.js',
@@ -369,6 +371,8 @@ module.exports = {
 			'./src/admin/section/dataManagement/demographicExport/demographicExportComponent.js',
 			'./src/admin/systemProperties/systemPropertiesComponent.js',
 			'./src/admin/systemProperties/rx/propertiesRxComponent.js',
+			'./src/admin/section/rosterStatus/rosterStatusManagementComponent.js',
+			'./src/admin/section/rosterStatus/modals/editRosterStatusModalComponent.js',
 			'./src/billing/billingController.js',
 
 			'./src/consults/module.js',

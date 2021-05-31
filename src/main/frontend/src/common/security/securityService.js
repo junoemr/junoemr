@@ -44,55 +44,6 @@ angular.module("Common.Services").service("securityService", [
 		{
 			service.user = u;
 		};
-
-		service.hasRight = function hasRight(objectName, privilege, demographicNo)
-		{
-			var deferred = $q.defer();
-
-			var url = service.apiPath + 'persona/hasRight?objectName=' +
-				encodeURIComponent(objectName) +
-				'&privilege=' +
-				encodeURIComponent(privilege) +
-				'&demographicNo=' +
-				encodeURIComponent(demographicNo);
-
-			$http.get(url, service.configHeadersWithCache).then(
-				function success(results)
-				{
-					deferred.resolve(results.data.success);
-				},
-				function error(errors)
-				{
-					console.log("securityService::hasRight error", errors);
-					deferred.reject("An error occured while fetching access right");
-				});
-
-			return deferred.promise;
-		};
-
-		service.hasRights = function hasRights(listOfItems)
-		{
-			var deferred = $q.defer();
-
-			$http(
-			{
-				url: service.apiPath + 'persona/hasRights',
-				method: "POST",
-				data: JSON.stringify(listOfItems),
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("securityService::hasRights error", errors);
-					deferred.reject("An error occured while fetching access rights");
-				});
-
-			return deferred.promise;
-		};
 		return service;
 	}
 ]);

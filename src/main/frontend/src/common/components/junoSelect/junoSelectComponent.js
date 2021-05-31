@@ -32,6 +32,7 @@ angular.module('Common.Components').component('junoSelect', {
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
+		invalid: "<?",
 		disabled: "<?",
 		onChange: "&?"
 	},
@@ -43,6 +44,7 @@ angular.module('Common.Components').component('junoSelect', {
 		{
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+			ctrl.invalid = ctrl.invalid || false;
 		};
 
 		ctrl.labelClasses = () =>
@@ -53,6 +55,13 @@ angular.module('Common.Components').component('junoSelect', {
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
+		}
+
+		ctrl.inputClasses = () =>
+		{
+			return {
+				"field-invalid": ctrl.invalid,
+			};
 		}
 
 		ctrl.onSelectChange = (value) =>

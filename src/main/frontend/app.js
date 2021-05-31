@@ -250,6 +250,11 @@ oscarApp.config([
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.rosterStatus',
+		{
+			url: '/rosterStatus',
+			component: 'rosterStatusManagement',
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',

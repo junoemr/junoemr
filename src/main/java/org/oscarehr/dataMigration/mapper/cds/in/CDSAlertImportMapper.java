@@ -52,6 +52,7 @@ public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndS
 		{
 			logEvent("Reminder Note [" + reminderNote.getObservationDate() + "] has no text value");
 		}
+		reminderNote.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
 
 		return reminderNote;
 	}

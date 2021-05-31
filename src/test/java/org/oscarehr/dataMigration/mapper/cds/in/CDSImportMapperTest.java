@@ -28,8 +28,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
+import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.PartialDate;
+import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
+import org.springframework.beans.factory.annotation.Autowired;
+import oscar.util.ConversionUtils;
 import xml.cds.v5_0.AddressStructured;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.DateTimeFullOrPartial;
@@ -40,15 +50,6 @@ import xml.cds.v5_0.PhoneNumberType;
 import xml.cds.v5_0.PostalZipCode;
 import xml.cds.v5_0.ResidualInformation;
 import xml.cds.v5_0.YnIndicator;
-import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
-import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
-import org.oscarehr.dataMigration.model.common.PartialDate;
-import org.oscarehr.dataMigration.model.common.PartialDateTime;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
-import org.oscarehr.dataMigration.model.provider.Provider;
-import org.springframework.beans.factory.annotation.Autowired;
-import oscar.util.ConversionUtils;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -58,6 +59,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -771,6 +773,72 @@ public class CDSImportMapperTest
 		residualInformation.getDataElement().add(dataElement);
 
 		assertEquals(expectedStringValue, cdsImportMapper.getResidualDataElementAsString(residualInformation, dataKey));
+	}
+
+	@Test
+	public void testImportAllResidualInfo_Null()
+	{
+		assertNull(cdsImportMapper.importAllResidualInfo(null));
+	}
+
+	@Test
+	public void testImportAllResidualInfo_Simple()
+	{
+		String dataKey = "key";
+		String dataType = "unknownDataType";
+		String expectedStringValue = "sample string value";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		ResidualInformation residualInformation = objectFactory.createResidualInformation();
+		ResidualInformation.DataElement dataElement = objectFactory.createResidualInformationDataElement();
+		dataElement.setName(dataKey);
+		dataElement.setDataType(dataType);
+		dataElement.setContent(expectedStringValue);
+		residualInformation.getDataElement().add(dataElement);
+
+		List<ResidualInfo> residualInfoList = cdsImportMapper.importAllResidualInfo(residualInformation);
+
+		assertEquals(1, residualInfoList.size());
+		ResidualInfo actualResult0 = residualInfoList.get(0);
+		assertEquals(dataKey, actualResult0.getContentKey());
+		assertEquals(dataType, actualResult0.getContentType());
+		assertEquals(expectedStringValue, actualResult0.getContentValue());
+	}
+
+	@Test
+	public void testImportAllResidualInfo_IgnoreList()
+	{
+		String dataKey1 = "key";
+		CDSConstants.ResidualInfoDataType dataType1 = CDSConstants.ResidualInfoDataType.TEXT;
+		String expectedStringValue1 = "sample string value";
+
+		String dataKey2 = "ignored key";
+		CDSConstants.ResidualInfoDataType dataType2 = CDSConstants.ResidualInfoDataType.TEXT;
+		String expectedStringValue2 = "ignored value";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		ResidualInformation residualInformation = objectFactory.createResidualInformation();
+
+		ResidualInformation.DataElement dataElement1 = objectFactory.createResidualInformationDataElement();
+		dataElement1.setName(dataKey1);
+		dataElement1.setDataType(dataType1.name());
+		dataElement1.setContent(expectedStringValue1);
+		residualInformation.getDataElement().add(dataElement1);
+
+		ResidualInformation.DataElement dataElement2 = objectFactory.createResidualInformationDataElement();
+		dataElement2.setName(dataKey2);
+		dataElement2.setDataType(dataType2.name());
+		dataElement2.setContent(expectedStringValue2);
+		residualInformation.getDataElement().add(dataElement2);
+
+		List<ResidualInfo> residualInfoList = cdsImportMapper.importAllResidualInfo(residualInformation, dataKey2);
+
+		// the elements with the ignored keys should not be in the returned list
+		assertEquals(1, residualInfoList.size());
+		ResidualInfo actualResult0 = residualInfoList.get(0);
+		assertEquals(dataKey1, actualResult0.getContentKey());
+		assertEquals(dataType1.name(), actualResult0.getContentType());
+		assertEquals(expectedStringValue1, actualResult0.getContentValue());
 	}
 
 	@Test

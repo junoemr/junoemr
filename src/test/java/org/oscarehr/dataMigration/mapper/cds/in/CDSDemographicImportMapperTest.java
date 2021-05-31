@@ -29,14 +29,22 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
+import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import xml.cds.v5_0.Demographics;
 import xml.cds.v5_0.ObjectFactory;
+import xml.cds.v5_0.PersonNameSimple;
 import xml.cds.v5_0.PersonStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
@@ -50,6 +58,9 @@ public class CDSDemographicImportMapperTest
 
 	@Mock
 	private PatientImportContextService patientImportContextService;
+
+	@Mock
+	private CDSEnrollmentHistoryImportMapper cdsEnrollmentHistoryImportMapper;
 
 	@Before
 	public void setUp()
@@ -136,4 +147,111 @@ public class CDSDemographicImportMapperTest
 
 		assertEquals(STATUS_ACTIVE, cdsDemographicImportMapper.getPatientStatus(personStatusCode));
 	}
+
+	/**
+	 * ensure enrolled physician is used over family physician when patient is enrolled
+	 */
+	@Test
+	public void testMapCareTeamInfo_EnrolledPhysicianMapping_Rostered() throws Exception
+	{
+		String familyDocFName = "famDoc";
+		String familyDocLName = "incorrect";
+
+		String enrolledDocFName = "enrolledDoc";
+		String enrolledDocLName = "correct";
+		String enrolledDocOhip = "12345";
+
+		//set up
+		ObjectFactory objectFactory = new ObjectFactory();
+
+		List<RosterData> rosterDataList = new ArrayList<>();
+		RosterData rosterData = new RosterData();
+		rosterData.setRostered(true);
+
+		Provider rosterProvider = new Provider();
+		rosterProvider.setFirstName(enrolledDocFName);
+		rosterProvider.setLastName(enrolledDocLName);
+		rosterProvider.setOhipNumber(enrolledDocOhip);
+		rosterData.setRosterProvider(rosterProvider);
+		rosterDataList.add(rosterData);
+
+		PersonNameSimple familyDoctor = objectFactory.createPersonNameSimple();
+		familyDoctor.setFirstName(familyDocFName);
+		familyDoctor.setLastName(familyDocLName);
+
+		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList, familyDoctor);
+
+		// run the test
+		Demographic demographic = new Demographic();
+		cdsDemographicImportMapper.mapCareTeamInfo(importStructure, demographic);
+
+		// check results
+		assertNotNull(demographic.getFamilyDoctor());
+		assertEquals(enrolledDocFName, demographic.getFamilyDoctor().getFirstName());
+		assertEquals(enrolledDocLName, demographic.getFamilyDoctor().getLastName());
+		assertEquals(enrolledDocOhip, demographic.getFamilyDoctor().getOhipNumber());
+	}
+
+	/**
+	 * ensure family physician is used over enrolled physician when patient is not enrolled
+	 */
+	@Test
+	public void testMapCareTeamInfo_EnrolledPhysicianMapping_RosterTerminated() throws Exception
+	{
+		String familyDocFName = "famDoc";
+		String familyDocLName = "correct";
+
+		String enrolledDocFName = "enrolledDoc";
+		String enrolledDocLName = "incorrect";
+		String enrolledDocOhip = "12345";
+
+		//set up
+		ObjectFactory objectFactory = new ObjectFactory();
+
+		List<RosterData> rosterDataList = new ArrayList<>();
+		RosterData rosterData = new RosterData();
+		rosterData.setRostered(false);
+
+		Provider rosterProvider = new Provider();
+		rosterProvider.setFirstName(enrolledDocFName);
+		rosterProvider.setLastName(enrolledDocLName);
+		rosterProvider.setOhipNumber(enrolledDocOhip);
+		rosterData.setRosterProvider(rosterProvider);
+		rosterDataList.add(rosterData);
+
+		PersonNameSimple familyDoctor = objectFactory.createPersonNameSimple();
+		familyDoctor.setFirstName(familyDocFName);
+		familyDoctor.setLastName(familyDocLName);
+
+		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList, familyDoctor);
+
+		// run the test
+		Demographic demographic = new Demographic();
+		cdsDemographicImportMapper.mapCareTeamInfo(importStructure, demographic);
+
+		// check results
+		assertNotNull(demographic.getFamilyDoctor());
+		assertEquals(familyDocFName, demographic.getFamilyDoctor().getFirstName());
+		assertEquals(familyDocLName, demographic.getFamilyDoctor().getLastName());
+	}
+
+	private Demographics mockCareTeamForEnrolledPhysicianCheck(List<RosterData> rosterDataList, PersonNameSimple familyDoctor) throws Exception
+	{
+		Demographics importStructure = Mockito.mock(Demographics.class);
+		Demographics.Enrolment enrollment = Mockito.mock(Demographics.Enrolment.class);
+		Mockito.when(enrollment.getEnrolmentHistory()).thenReturn(null);
+		Mockito.when(cdsEnrollmentHistoryImportMapper.importAll(Mockito.any())).thenReturn(rosterDataList);
+
+		Mockito.when(importStructure.getEnrolment()).thenReturn(enrollment);
+
+		Mockito.when(importStructure.getEmail()).thenReturn("mock@email");
+		Mockito.when(importStructure.getChartNumber()).thenReturn("mock-chart");
+		Mockito.when(importStructure.getPrimaryPhysician()).thenReturn(null);
+		Mockito.when(importStructure.getReferredPhysician()).thenReturn(null);
+		Mockito.when(importStructure.getPersonStatusCode()).thenReturn(null);
+		Mockito.when(importStructure.getFamilyPhysician()).thenReturn(familyDoctor);
+
+		return importStructure;
+	}
+
 }
