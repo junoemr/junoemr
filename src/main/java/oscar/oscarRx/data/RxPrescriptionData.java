@@ -24,6 +24,23 @@
 
 package oscar.oscarRx.data;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.FavoriteDao;
+import org.oscarehr.common.dao.IndivoDocsDao;
+import org.oscarehr.common.model.IndivoDocs;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.dao.PrescriptionDao;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.oscarProvider.data.ProSignatureData;
+import oscar.oscarRx.util.RxUtil;
+import oscar.util.ConversionUtils;
+import oscar.util.DateUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,24 +49,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.log4j.Logger;
-import org.oscarehr.rx.dao.DrugDao;
-import org.oscarehr.common.dao.FavoriteDao;
-import org.oscarehr.common.dao.IndivoDocsDao;
-import org.oscarehr.rx.dao.PrescriptionDao;
-import org.oscarehr.rx.model.Drug;
-import org.oscarehr.common.model.IndivoDocs;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarProvider.data.ProSignatureData;
-import oscar.oscarRx.util.RxUtil;
-import oscar.util.ConversionUtils;
-import oscar.util.DateUtils;
 
 public class RxPrescriptionData {
 
@@ -585,6 +584,7 @@ public class RxPrescriptionData {
 		java.util.Date pickupDate = null;
 		java.util.Date pickupTime = null;
 		java.util.Date writtenDate = null;
+		String rxDateFormat = null;
 		String writtenDateFormat = null;
 		java.util.Date printDate = null;
 		int numPrints = 0;
@@ -909,6 +909,16 @@ public class RxPrescriptionData {
 
 		public java.util.Date getRxDate() {
 			return this.rxDate;
+		}
+
+		public String getRxDateFormat()
+		{
+			return this.rxDateFormat;
+		}
+
+		public void setRxDateFormat(String dateFormat)
+		{
+			this.rxDateFormat = dateFormat;
 		}
 
 		public void setRxDate(java.util.Date RHS) {
