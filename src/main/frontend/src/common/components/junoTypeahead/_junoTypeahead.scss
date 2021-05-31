@@ -3,8 +3,26 @@
 	@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
 	@include juno-form-inputs-colors-default;
 
-	input {
-		flex: 1 1 0;
+	.input-container {
+		position: relative;
+		min-width: 0;
+
+		.icon {
+			font-size: 16px;
+
+			position: absolute;
+			top: calc(50% - 8px);
+			left: 8px;
+		}
+
+		input {
+			flex: 1 1 0;
+			min-width: 0;
+
+			&.shift-right-for-icon {
+				padding-left: 32px;
+			}
+		}
 	}
 
 	.dropdown-menu {

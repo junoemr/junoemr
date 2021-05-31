@@ -18,6 +18,7 @@
 
 			<!-- Recipient -->
 			<messageable-search ng-if="!$ctrl.isReply"
+			                    label="Recipient"
 			                    class="flex-item-grow m-l-2"
 			                    ng-model="$ctrl.recipient"
 			                    messaging-service="$ctrl.messagingService"

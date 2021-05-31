@@ -21,15 +21,19 @@
 * Canada
 */
 
-const {JUNO_STYLE} = require("../../../../../../common/components/junoComponentConstants");
+const {JUNO_STYLE} = require("../../../../common/components/junoComponentConstants");
 
-angular.module("Messaging.Modals.Components").component('messageableSearch', {
-	templateUrl: 'src/messaging/inbox/modals/messageCompose/components/messageableSearch/messageableSearch.jsp',
+angular.module("Messaging.Components").component('messageableSearch', {
+	templateUrl: 'src/messaging/inbox/components/messageableSearch/messageableSearch.jsp',
 	bindings: {
 		ngModel: "=",
+		label: "@?",
+		placeholder: "@?",
 		messagingService: "<",
 		sourceId: "<",
 		disabled: "<?",
+		icon: "@?",
+		onSelected: "&?",
 		componentStyle: "<?"
 	},
 	controller: [
@@ -43,7 +47,9 @@ angular.module("Messaging.Modals.Components").component('messageableSearch', {
 			ctrl.$onInit = async () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				ctrl.placeholder = ctrl.placeholder || "Search";
 				ctrl.disabled = ctrl.disabled || false;
+				ctrl.label = ctrl.label || "";
 			}
 
 			$scope.$watch("$ctrl.ngModel", (newVal) =>
@@ -70,6 +76,11 @@ angular.module("Messaging.Modals.Components").component('messageableSearch', {
 			ctrl.onMessageableSelected = (selection) =>
 			{
 				ctrl.ngModel = selection.data;
+
+				if (ctrl.onSelected)
+				{
+					ctrl.onSelected({value: ctrl.ngModel});
+				}
 			}
 
 			ctrl.loadSearchOptions = async (keyword) =>

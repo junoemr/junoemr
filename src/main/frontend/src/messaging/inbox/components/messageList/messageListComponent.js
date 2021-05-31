@@ -24,6 +24,7 @@
 import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 import MessagingServiceFactory from "../../../../lib/messaging/factory/MessagingServiceFactory";
 import ActionAlreadyInProgressError from "../../../../lib/error/ActionAlreadyInProgressError";
+import {MessageGroup} from "../../../../lib/messaging/model/MessageGroup";
 
 angular.module("Messaging.Components").component('messageList', {
 	templateUrl: 'src/messaging/inbox/components/messageList/messageList.jsp',
@@ -31,6 +32,7 @@ angular.module("Messaging.Components").component('messageList', {
 		componentStyle: "<?",
 		selectedMessageId: "=",
 		messagingBackend: "<",
+		messageableFilter: "<?",
 		sourceId: "<",
 		groupId: "<",
 		messageStreamChange: "&?", // called when the message stream changes. var "stream" is the new message stream
@@ -113,8 +115,7 @@ angular.module("Messaging.Components").component('messageList', {
 					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
 
 					ctrl.messageStream = await messagingService.searchMessagesAsStream(
-						await messagingService.getMessageSourceById(ctrl.sourceId),
-						{group: ctrl.groupId});
+						await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.getMessageSearchParams());
 					$scope.$apply();
 					await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
 					$scope.$apply();
@@ -124,6 +125,17 @@ angular.module("Messaging.Components").component('messageList', {
 					{
 						ctrl.messageStreamChange({stream: ctrl.messageStream});
 					}
+				}
+			}
+
+			ctrl.getMessageSearchParams = () =>
+			{
+				switch (ctrl.groupId)
+				{
+					case MessageGroup.Sent:
+						return {group: ctrl.groupId, recipient: ctrl.messageableFilter}
+					default:
+						return {group: ctrl.groupId, sender: ctrl.messageableFilter}
 				}
 			}
 
@@ -145,5 +157,6 @@ angular.module("Messaging.Components").component('messageList', {
 			$scope.$watch("$ctrl.sourceId", ctrl.startReloadDebounce);
 			$scope.$watch("$ctrl.groupId", ctrl.startReloadDebounce);
 			$scope.$watch("$ctrl.messagingBackend", ctrl.startReloadDebounce);
+			$scope.$watch("$ctrl.messageableFilter", ctrl.startReloadDebounce);
 		}],
 });

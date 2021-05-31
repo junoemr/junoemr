@@ -281,7 +281,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		})
 		.state('messaging.view',
 		{
-			url: "/view/:backend/source/:source/group/:group",
+			url: "/view/:backend/source/:source/group/:group?messageableId",
 			component: "messagingInbox",
 			params: {
 				backend: {
@@ -291,6 +291,9 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 					dynamic: true,
 				},
 				group: {
+					dynamic: true,
+				},
+				messageableId: {
 					dynamic: true,
 				},
 			}

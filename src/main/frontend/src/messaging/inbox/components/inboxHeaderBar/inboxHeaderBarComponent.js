@@ -33,6 +33,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 	templateUrl: 'src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBar.jsp',
 	bindings: {
 		componentStyle: "<?",
+		messageableFilter: "=?",
 		selectedMessageId: "<",
 		messageStream: "<",
 		messagingBackendId: "<",
@@ -50,7 +51,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 		)
 		{
 			const ctrl = this;
-			ctrl.searchTerm = "";
+
 			$scope.JUNO_STYLE = JUNO_STYLE;
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -59,26 +60,25 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				ctrl.messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
 			};
 
 			ctrl.markSelectedMessageAsUnread = async () =>
 			{
-				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
 				const message = await ctrl.getSelectedMessage();
 
 				message.read = false;
-				await messagingService.updateMessage(message);
+				await ctrl.messagingService.updateMessage(message);
 
 				$scope.$apply();
 			};
 
 			ctrl.archiveSelectedMessage = async () =>
 			{
-				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
 				const message = await ctrl.getSelectedMessage();
 
 				message.archive();
-				await messagingService.updateMessage(message);
+				await ctrl.messagingService.updateMessage(message);
 
 				// delete message from message stream
 				if (ctrl.messageStream)
@@ -91,11 +91,10 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 
 			ctrl.unarchiveSelectedMessage = async () =>
 			{
-				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
 				const message = await ctrl.getSelectedMessage();
 
 				message.unarchive();
-				await messagingService.updateMessage(message);
+				await ctrl.messagingService.updateMessage(message);
 
 				// delete message from message stream
 				if (ctrl.messageStream)
@@ -112,10 +111,8 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				let selectedConversation = null;
 				if (reply)
 				{
-					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
-
 					selectedMessage = await ctrl.getSelectedMessage();
-					selectedConversation = await messagingService.getConversation(selectedMessage.source, selectedMessage.conversationId);
+					selectedConversation = await ctrl.messagingService.getConversation(selectedMessage.source, selectedMessage.conversationId);
 				}
 
 				await $uibModal.open(
@@ -125,7 +122,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 						windowClass: "juno-simple-modal-window",
 						resolve: {
 							style: () => JUNO_STYLE.DEFAULT,
-							messagingService: () => MessagingServiceFactory.build(ctrl.messagingBackendId),
+							messagingService: () => ctrl.messagingService,
 							sourceId: () => reply ? selectedMessage.source.id : ctrl.sourceId,
 							isReply: () => reply,
 							subject: () => reply ? selectedMessage.subject : "",
@@ -155,8 +152,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				else
 				{
 					// selected message may not be in the message stream. This can happen if the user reloads the page
-					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
-					return message = await messagingService.getMessage(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
+					return message = await ctrl.messagingService.getMessage(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
 				}
 			}
 

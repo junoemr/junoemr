@@ -1,8 +1,9 @@
 <div class="messageable-search">
 	<juno-typeahead
 			model="$ctrl.selectedMessageableId"
-			title="Recipient"
-			placeholder="Search"
+			title="{{$ctrl.label}}"
+			placeholder="{{$ctrl.placeholder}}"
+			icon="{{$ctrl.icon}}"
 			options="$ctrl.options"
 			filter-options="false"
 			typeahead-min-length="3"

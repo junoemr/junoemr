@@ -3,10 +3,12 @@
 		<h6>Backend: {{$ctrl.backend}} Source: {{$ctrl.selectedSourceId}} Group: {{$ctrl.selectedGroupId}}</h6>
 	</page-header>
 	<page-body class="flex-item-grow flex-col messaging-inbox">
-		<inbox-header-bar component-style="$ctrl.componentStyle"
+		<inbox-header-bar ng-if="$ctrl.backend"
+		                  component-style="$ctrl.componentStyle"
 		                  selected-message-id="$ctrl.selectedMessageId"
 		                  message-stream="$ctrl.messageStream"
 		                  messaging-backend-id="$ctrl.backend"
+		                  messageable-filter="$ctrl.messageableFilter"
 		                  source-id="$ctrl.selectedSourceId"
 		                  group-id="$ctrl.selectedGroupId">
 		</inbox-header-bar>
@@ -26,6 +28,7 @@
 			              messaging-backend="$ctrl.backend"
 			              source-id="$ctrl.selectedSourceId"
 			              group-id="$ctrl.selectedGroupId"
+			              messageable-filter="$ctrl.messageableFilter"
 			              message-stream-change="$ctrl.onMessageStreamChange(stream)"
 			              component-style="$ctrl.componentStyle">
 			</message-list>

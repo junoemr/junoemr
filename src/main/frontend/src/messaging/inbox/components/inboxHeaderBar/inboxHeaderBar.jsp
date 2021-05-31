@@ -3,13 +3,15 @@
 		<h6 class="m-l-32 m-r-8">Inbox</h6>
 	</div>
 
-	<!-- Inbox search keyword -->
-	<juno-input class="search-input"
-	            ng-model="$ctrl.searchTerm"
-	            icon="icon-search"
-	            placeholder="Search"
-	            component-style="JUNO_STYLE.DEFAULT">
-	</juno-input>
+	<!-- Inbox search -->
+	<messageable-search class="search-input"
+	                    ng-model="$ctrl.messageableFilter"
+	                    placeholder="Filter by {{$ctrl.groupId === MessageGroup.Sent ? 'Recipient' : 'Sender'}}"
+	                    messaging-service="$ctrl.messagingService"
+	                    source-id="$ctrl.sourceId"
+	                    icon="icon-search"
+	                    component-style="JUNO_STYLE.DEFAULT">
+	</messageable-search>
 
 	<div class="left-buttons flex-row m-l-32">
 		<!-- Mark as Unread -->

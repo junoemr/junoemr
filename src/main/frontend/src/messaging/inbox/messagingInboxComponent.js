@@ -48,6 +48,7 @@ angular.module("Messaging").component('messagingInbox', {
 		ctrl.groups = [];
 		ctrl.messageStream = null;
 		ctrl.selectedMessageId = $stateParams.messageId;
+		ctrl.messageableFilter = null;
 
 		ctrl.$onInit = async () =>
 		{
@@ -69,6 +70,17 @@ angular.module("Messaging").component('messagingInbox', {
 			$state.go(".", {backend: ctrl.backend, source: sourceId, group: groupId});
 		};
 
+		ctrl.onMessageableFilterChange = (messageable) =>
+		{
+			$state.go(".",
+			{
+				backend: ctrl.backend,
+				source: ctrl.selectedSourceId,
+				group: ctrl.selectedGroupId,
+				messageableId: messageable ? messageable.id : null,
+			});
+		}
+
 		ctrl.onMessageStreamChange = (stream) =>
 		{
 			ctrl.messageStream = stream;
@@ -78,5 +90,7 @@ angular.module("Messaging").component('messagingInbox', {
 		{
 			ctrl.selectedMessageId = id;
 		}
+
+		$scope.$watch("$ctrl.messageableFilter", ctrl.onMessageableFilterChange);
 	}],
 });
