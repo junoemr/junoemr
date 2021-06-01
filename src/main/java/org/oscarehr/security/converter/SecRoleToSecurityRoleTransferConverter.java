@@ -73,6 +73,11 @@ public class SecRoleToSecurityRoleTransferConverter extends AbstractModelConvert
 		{
 			transfer.setParentRoleId(parentRole.getId());
 		}
+		List<SecRole> childRoles = secRole.getChildSecRoles();
+		if(childRoles != null && !childRoles.isEmpty())
+		{
+			transfer.setChildRoleIds(childRoles.stream().map(SecRole::getId).collect(Collectors.toList()));
+		}
 
 		// privileges are not always needed and may have additional database hits as they are lazy loaded
 		if(includePrivileges)

@@ -36,6 +36,7 @@ public class SecurityRoleTransfer implements Serializable
 	private String description;
 	private boolean systemManaged;
 	private Integer parentRoleId;
+	private List<Integer> childRoleIds;
 	private List<SecurityPermissionTransfer> securityPermissions;
 
 	public SecurityRoleTransfer()
