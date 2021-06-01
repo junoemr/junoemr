@@ -53,7 +53,7 @@ public class ProgramProviderRoleAction extends DispatchAction
 
 			String currentProviderNo = (String) request.getSession().getAttribute("user");
 			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.ADMIN_CREATE);
-			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerNoStr);
+			securityInfoManager.requireUserCanModify(currentProviderNo, providerNoStr);
 
 			providerRoleService.setPrimaryRole(providerNoStr, roleId);
 		}

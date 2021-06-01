@@ -337,6 +337,7 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ConstraintViolationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.MhaBaseExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.integrations.aqs.exceptionMapping.AqsCommunicationExceptionMapper"/>
             <bean class="org.oscarehr.ws.rest.exceptionMapping.ScheduleExceptionMapper"/>
             <bean class="org.oscarehr.ws.rest.exceptionMapping.IntegrationExceptionMapper"/>
 

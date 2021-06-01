@@ -29,5 +29,15 @@
 				}
 			}
 		}
+
+		.advanced-options {
+			.credential-inputs {
+				max-width: 512px;
+
+				label {
+					min-width: 140px;
+				}
+			}
+		}
 	}
 }

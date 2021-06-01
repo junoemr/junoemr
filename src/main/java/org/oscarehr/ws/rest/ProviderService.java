@@ -194,14 +194,20 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> enableProvider(@PathParam("id") Integer id, Boolean enable)
 	{
+		String currentProvider = getLoggedInInfo().getLoggedInProviderNo();
 		try
 		{
+			securityInfoManager.requireUserCanModify(currentProvider, id.toString());
 			providerService.enableProvider(id, enable);
 			return RestResponse.successResponse(true);
 		}
 		catch (NoSuchRecordException nsre)
 		{
 			return RestResponse.errorResponse("Cannot find provider, with id: " + id);
+		}
+		catch (SecurityException se)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_INSUFFICIENT_PRIVILEGE);
 		}
 	}
 
@@ -241,16 +247,21 @@ public class ProviderService extends AbstractServiceImpl {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_UPDATE);
-
+		String currentProviderId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(currentProviderId, Permission.ADMIN_UPDATE);
+		securityInfoManager.requireUserCanModify(currentProviderId, providerNo.toString());
 		try
 		{
-			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo);
+			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo, currentProviderId);
 			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
 		}
-		catch(SecurityRecordAlreadyExistsException secRecordExists)
+		catch (SecurityRecordAlreadyExistsException secRecordExists)
 		{
 			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
+		}
+		catch (SecurityException securityException)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_INSUFFICIENT_PRIVILEGE);
 		}
 	}
 
@@ -416,7 +427,7 @@ public class ProviderService extends AbstractServiceImpl {
 		securitySetsService.setSecurityDemographicSetsBlacklist(loggedInProviderId, providerId, assignedSetNames);
 		return RestResponse.successResponse(true);
 	}
-	
+
 //	@GET
 //	@Path("/settings/get")
 //	@Produces("application/json")

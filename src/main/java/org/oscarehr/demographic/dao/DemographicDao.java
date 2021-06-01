@@ -39,4 +39,5 @@ public class DemographicDao extends AbstractDao<Demographic>
 	{
 		return (this.find(demographicNo) != null);
 	}
+
 }

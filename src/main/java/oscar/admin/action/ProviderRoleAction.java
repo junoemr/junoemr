@@ -56,7 +56,7 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.info("ADD ROLE");
 			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_CREATE);
-			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
+			securityInfoManager.requireUserCanModify(currentProviderNo, providerId);
 
 			if(!providerRoleService.hasRole(providerId, newRoleId))
 			{
@@ -100,7 +100,7 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.info("UPDATE ROLE");
 			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_UPDATE);
-			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
+			securityInfoManager.requireUserCanModify(currentProviderNo, providerId);
 
 			providerRoleService.updateRole(currentProviderNo, providerId, secUserRoleId, secRoleId);
 
@@ -137,7 +137,7 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.info("DELETE ROLE");
 			securityInfoManager.requireAllPrivilege(currentProviderNo, Permission.CONFIGURE_PROVIDER_DELETE);
-			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerId);
+			securityInfoManager.requireUserCanModify(currentProviderNo, providerId);
 
 			providerRoleService.deleteRole(currentProviderNo, providerId, secUserRoleId);
 

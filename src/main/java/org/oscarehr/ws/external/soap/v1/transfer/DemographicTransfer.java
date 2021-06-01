@@ -98,7 +98,6 @@ public final class DemographicTransfer {
 	private String nameOfMother;
 	private String nameOfFather;
 
-	
 	public Integer getDemographicNo() {
     	return (demographicNo);
     }

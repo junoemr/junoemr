@@ -31,7 +31,6 @@ import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -44,7 +43,7 @@ public class BasicOscarTests extends SeleniumTestBase
 	Environment environment;
 
 	@Test
-	public void isOscarReachable() throws Exception
+	public void isOscarReachable()
 	{
 		driver.get(Navigation.getOscarUrl(Integer.toString(randomTomcatPort)) + "/index.jsp");
 		Assert.assertTrue("Cannot reach login page",!driver.getTitle().isEmpty());

@@ -20,19 +20,22 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
 import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.measurements.service.FlowsheetService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.util.ConversionUtils;
@@ -50,144 +53,130 @@ public class FormUpdateAction extends Action {
 	
 	private static Logger log = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
+	private EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String date = request.getParameter("date");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "w", null))
-		{
-			throw new SecurityException("missing required security object (_measurement)");
-		}
+		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.MEASUREMENT_CREATE);
 		
 		String testOutput = "";
 		String textOnEncounter = ""; // ********CDM Indicators Update******** \\n";
 		boolean valid = true;
 		boolean errorPage = false;
 		boolean addToNote = false;
+		// Juno & classic UI both hit this page, only one wants to be able to add *new* notes
+		boolean addNewNote = ConversionUtils.fromBoolString(request.getParameter("addNewNote"));
 
 		HttpSession session = request.getSession();
 
-		String temp = request.getParameter("template");	//"diab3";
-		session.setAttribute("temp", temp);
-		String demographic_no = request.getParameter("demographic_no");
+		String template = request.getParameter("template");	//"diab3";
+		session.setAttribute("temp", template);
+		String demographicNo = request.getParameter("demographic_no");
 		String providerNo = (String) session.getAttribute("user");
 		String note = "";
 		String apptNo = (String) session.getAttribute("cur_appointment_no");
-		int apptNoInt=0;
-		if(apptNo!=null){
-		apptNoInt = Integer.parseInt(apptNo);
+		int apptNoInt = 0;
+		if(apptNo != null)
+		{
+			apptNoInt = Integer.parseInt(apptNo);
 		}
-		String user_no = (String) session.getAttribute("user");
-		String prog_no = new EctProgram(session).getProgram(user_no);
+
 
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());
 
 		FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
 
-		List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(temp, providerNo, Integer.parseInt(demographic_no));
+		List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template, providerNo, Integer.parseInt(demographicNo));
 
-		MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(temp, custList);
+		MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+		MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template, custList);
 
-		//List<MeasurementTemplateFlowSheetConfig.Node> nodes = mFlowsheet.getItemHeirarchy();
-	    
-	    List<String> measurementLs = mFlowsheet.getMeasurementList();
-	    ArrayList<String> measurements = new ArrayList(measurementLs);
-
+	    List<String> measurements = new ArrayList<>(mFlowsheet.getMeasurementList());
 		EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
 
-		//FlowSheetItem item;
-		//String measure;
+		List<Measurement> measurementsToSave = new ArrayList<>();
 
-		/*for (int i = 0; i < nodes.size(); i++) {
-			MeasurementTemplateFlowSheetConfig.Node node = nodes.get(i);
-
-			for (int j = 0; j < node.children.size(); j++) {
-				MeasurementTemplateFlowSheetConfig.Node child = node.children.get(j);
-				if (child.children == null && child.flowSheetItem != null) {*/
-		
-			
-		for (String measure:measurements)
+		for (String measure : measurements)
 		{
-			Map<String, String> h2 = mFlowsheet.getMeasurementFlowSheetInfo(measure);
+			Map<String, String> flowSheetInfo = mFlowsheet.getMeasurementFlowSheetInfo(measure);
 	        FlowSheetItem item =  mFlowsheet.getFlowSheetItem(measure);
 					
-	               mFlowsheet.getMeasurementFlowSheetInfo(measure);
-	               EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measure);
-				   // the above can return null if the MeasurementFlowSheet didn't load the entries correctly
-				   if (mtypeBean == null)
-				   {
-					   mtypeBean = mType.getMeasurementType(measure);
-				   }
-					String name = h2.get("display_name").toString().replaceAll("\\W","");
-					String displayName=h2.get("display_name").toString();
-							
-					if (request.getParameter(name) != null && !request.getParameter(name).equals(""))
-					{
+	        mFlowsheet.getMeasurementFlowSheetInfo(measure);
+	        EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measure);
+	        // the above can return null if the MeasurementFlowSheet didn't load the entries correctly
+			if (mtypeBean == null)
+			{
+			   mtypeBean = mType.getMeasurementType(measure);
+			}
 
-						String comment = "";
-						if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").equals(""))
-						{
-							comment = request.getParameter(name + "_comments");
-						}
-						
-						if(request.getParameter(name + "_date") !=null && !request.getParameter(name + "_date").equals(""))
-						{
-							date=request.getParameter(name + "_date");
-						}
-						
-						
-							//create note text
-							if(request.getParameter(name + "_note") !=null && !request.getParameter(name + "_note").equals(""))
-							{
-								addToNote = true;
+			String name = flowSheetInfo.get("display_name").replaceAll("\\W","");
+			String displayName = flowSheetInfo.get("display_name");
 
-								note = note + displayName + ": " + request.getParameter(name);
-								if(name.equals("BP")){
-									note = note + " " + mtypeBean.getMeasuringInstrc();
-								}
-										
-								note = note + "\n Date Observed: " + date;
-								if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").equals(""))
-								{
-									note = note + "\n comment: " + comment;
-								}
-								note=note +"\n\n ";
-							}
-							
-							
-						
-						valid = doInput(item, mtypeBean, mFlowsheet, mtypeBean.getType(), StringUtils.trimToEmpty(mtypeBean.getMeasuringInstrc()), request.getParameter(name), comment, date, apptNo, request);
-						
-												
-						if (!valid)
-						{
-							testOutput += name + ": " + request.getParameter(name) + "\n";
-							errorPage = true;
-							log.error("ERROR: " + testOutput);
-						}
-						else
-						{
-							textOnEncounter += name + " " + request.getParameter(name) + "\\n";
-						}
-
-					}/* why are comments being allowed here with an empty value?
-					
-					else if (request.getParameter(name) != null && request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").equals("")) {
-						String comment = request.getParameter(name + "_comments");
-						if(request.getParameter(name + "_date") !=null && !request.getParameter(name + "_date").equals("")){
-							date=request.getParameter(name + "_date");
-						}
-						
-						doCommentInput(item, mtypeBean, mFlowsheet, mtypeBean.getType(), mtypeBean.getMeasuringInstrc(), comment, date, apptNo, request);
-					}*/
-
+			if (request.getParameter(name) != null && !request.getParameter(name).isEmpty())
+			{
+				String comment = "";
+				if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").isEmpty())
+				{
+					comment = request.getParameter(name + "_comments");
 				}
-		
-				
-		//if (request.getParameter("ycoord") != null) {
-		//	request.setAttribute("ycoord", request.getParameter("ycoord"));
-		//}
+
+				if(request.getParameter(name + "_date") != null && !request.getParameter(name + "_date").isEmpty())
+				{
+					date=request.getParameter(name + "_date");
+				}
+
+				//create note text
+				if(request.getParameter(name + "_note") != null && !request.getParameter(name + "_note").isEmpty())
+				{
+					addToNote = true;
+
+					note = note + displayName + ": " + request.getParameter(name);
+					if(name.equals("BP")){
+						note = note + " " + mtypeBean.getMeasuringInstrc();
+					}
+
+					note = note + "\n Date Observed: " + date;
+					if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").isEmpty())
+					{
+						note = note + "\n comment: " + comment;
+					}
+					note = note +"\n\n ";
+				}
+
+				// For now, the validation and saving of measurements is split into two calls
+				// It should have been to begin with,
+				valid = isValidMeasurement(request, mtypeBean, item.getDisplayName(), request.getParameter(name), date);
+
+				if (!valid)
+				{
+					testOutput += name + ": " + request.getParameter(name) + "\n";
+					errorPage = true;
+					log.error("ERROR: " + testOutput);
+				}
+				else
+				{
+					String savingProvider = (String) session.getAttribute("user");
+					textOnEncounter += name + " " + request.getParameter(name) + "\\n";
+					Measurement measurement = buildMeasurement(comment, request.getParameter(name), demographicNo, mtypeBean, date, apptNo, savingProvider);
+					if (measurement != null)
+					{
+						measurementsToSave.add(measurement);
+					}
+				}
+			}
+		}
+
+		// NOTE: This really should be moved down below mapping for the failure.
+		// Unfortunately the Health Tracker is unable to actually render the errors that we've processed
+		// because this is so tightly coupled to using an ActionMessages workflow.
+		// Currently, this will take all measurements that we've confirmed are OK to save and save them.
+		// If there are any invalid measurements, they will be silently dropped.
+		MeasurementDao measurementDao = (MeasurementDao) SpringUtils.getBean("measurementDao");
+		for (Measurement measurement : measurementsToSave)
+		{
+			measurementDao.persist(measurement);
+		}
 
 		if (errorPage)
 		{
@@ -198,6 +187,20 @@ public class FormUpdateAction extends Action {
 		String submit = request.getParameter("submit");
 		request.setAttribute("textOnEncounter", textOnEncounter);
 
+		if (addToNote && addNewNote)
+		{
+			CaseManagementNote chartNote = new CaseManagementNote();
+			chartNote.setNote(note);
+
+			if(apptNoInt > 0)
+			{
+				OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
+				chartNote.setAppointment(appointmentDao.find(apptNoInt));
+			}
+
+			encounterNoteService.saveChartNote(chartNote, providerNo, Integer.parseInt(demographicNo));
+		}
+
 		if (submit == null  || "Save".equals(submit) || "Save All".equals(submit))
 		{
 			return mapping.findForward("reload");
@@ -206,12 +209,13 @@ public class FormUpdateAction extends Action {
 		return mapping.findForward("success");
 	}
 
-	public void doCommentInput(FlowSheetItem item, EctMeasurementTypesBean mtypeBean, MeasurementFlowSheet mFlowsheet, String inputType, String mInstructions, String comment, String date, String apptNo, HttpServletRequest request) {
+	public void doCommentInput(FlowSheetItem item, EctMeasurementTypesBean mtypeBean, MeasurementFlowSheet mFlowsheet, String inputType, String mInstructions, String comment, String date, String apptNo, HttpServletRequest request)
+	{
 		String demographicNo = request.getParameter("demographic_no");
 		HttpSession session = request.getSession();
 		String providerNo = (String) session.getAttribute("user");
 		String comments = comment;
-		
+
 		MeasurementDao measurementDao = (MeasurementDao) SpringUtils.getBean("measurementDao");
 
 		Measurement measurement = new Measurement();
@@ -221,9 +225,12 @@ public class FormUpdateAction extends Action {
 		measurement.setComments(comments);
 		measurement.setDateObserved(ConversionUtils.fromDateString(date));
 		measurement.setType(inputType);
-		if (apptNo != null) {
+		if(apptNo != null)
+		{
 			measurement.setAppointmentNo(Integer.parseInt(apptNo));
-		} else {
+		}
+		else
+		{
 			measurement.setAppointmentNo(0);
 		}
 		measurement.setProviderNo(providerNo);
@@ -232,112 +239,145 @@ public class FormUpdateAction extends Action {
 
 	}
 
-	public boolean doInput(FlowSheetItem item, EctMeasurementTypesBean mtypeBean, MeasurementFlowSheet mFlowsheet, String inputType, String mInstructions, String value, String comment, String date, String apptNo, HttpServletRequest request) {
+	/**
+	 * Given a potential measurement and augmenting information, determine whether it's good to save.
+	 * @param request the HTTP request that started this whole thing
+	 * @param mtypeBean info around the measurement type we want to record against
+	 * @param displayName the front-facing measurement name, for error purposes
+	 * @param value the value of the measurement we wanna add
+	 * @param date associated date observed
+	 * @return true if it's fine to add measurement, false otherwise
+	 *
+	 * Note this function has a side effect of recording into an ActionMessages object to return for displaying.
+	 * This is highly coupled to the Classic UI currently...
+	 */
+	public boolean isValidMeasurement(HttpServletRequest request, EctMeasurementTypesBean mtypeBean, String displayName, String value, String date)
+	{
+		String mInstructions = StringUtils.trimToEmpty(mtypeBean.getMeasuringInstrc());
+		String inputType = mtypeBean.getType();
+
 		EctValidation ectValidation = new EctValidation();
 		ActionMessages errors = new ActionMessages();
-		
-		String demographicNo = request.getParameter("demographic_no");
-		HttpSession session = request.getSession();
-		String providerNo = (String) session.getAttribute("user");
-		
+
 		String regExp = null;
 		Double dMax = 0.0;
 		Double dMin = 0.0;
 		Integer iMax = 0;
 		Integer iMin = 0;
-		Boolean isDate = false;
+		boolean isDate = false;
 
-		List<Validations> vs = ectValidation.getValidationType(inputType, mInstructions);
-		ectValidation.getRegCharacterExp();
+		List<Validations> validationsList = ectValidation.getValidationType(inputType, mInstructions);
 
 		boolean valid = true;
 
-		if (!vs.isEmpty()) {
-			Validations v = vs.iterator().next();
-			dMax = v.getMaxValue();
-			dMin = v.getMinValue();
-			iMax = v.getMaxLength();
-			iMin = v.getMinLength();
-			regExp = v.getRegularExp();
-			isDate = v.isDate() == null ? false : v.isDate();
+		if (!validationsList.isEmpty()) {
+			Validations validation = validationsList.iterator().next();
+			dMax = validation.getMaxValue();
+			dMin = validation.getMinValue();
+			iMax = validation.getMaxLength();
+			iMin = validation.getMinLength();
+			regExp = validation.getRegularExp();
+			isDate = validation.isDate() == null ? false : validation.isDate();
 		}
 
 		String inputTypeDisplay = mtypeBean.getTypeDisplayName();
-		String inputValueName = item.getDisplayName();
-		String inputValue = value;
-		String comments = comment;
-		String dateObserved = date;
 
-		if (!ectValidation.isInRange(dMax, dMin, inputValue)) {
-			errors.add(inputValueName, new ActionMessage("errors.range", inputTypeDisplay, Double.toString(dMin), Double.toString(dMax)));
+		if (!ectValidation.isInRange(dMax, dMin, value))
+		{
+			errors.add(displayName, new ActionMessage("errors.range", inputTypeDisplay, Double.toString(dMin), Double.toString(dMax)));
 			saveErrors(request, errors);
 			valid = false;
 		}
-		if (!ectValidation.maxLength(iMax, inputValue)) {
-			errors.add(inputValueName, new ActionMessage("errors.maxlength", inputTypeDisplay, Integer.toString(iMax)));
+		if (!ectValidation.maxLength(iMax, value))
+		{
+			errors.add(displayName, new ActionMessage("errors.maxlength", inputTypeDisplay, Integer.toString(iMax)));
 			saveErrors(request, errors);
 			valid = false;
 		}
-		if (!ectValidation.minLength(iMin, inputValue)) {
-			errors.add(inputValueName, new ActionMessage("errors.minlength", inputTypeDisplay, Integer.toString(iMin)));
+		if (!ectValidation.minLength(iMin, value))
+		{
+			errors.add(displayName, new ActionMessage("errors.minlength", inputTypeDisplay, Integer.toString(iMin)));
 			saveErrors(request, errors);
 			valid = false;
 		}
 
-		if (!ectValidation.matchRegExp(regExp, inputValue)) {
-			errors.add(inputValueName, new ActionMessage("errors.invalid", inputTypeDisplay));
+		if (!ectValidation.matchRegExp(regExp, value))
+		{
+			errors.add(displayName, new ActionMessage("errors.invalid", inputTypeDisplay));
 			saveErrors(request, errors);
 			valid = false;
 		}
-		if (!ectValidation.isValidBloodPressure(regExp, inputValue)) {
-			errors.add(inputValueName, new ActionMessage("error.bloodPressure"));
+		if (!ectValidation.isValidBloodPressure(regExp, value))
+		{
+			errors.add(displayName, new ActionMessage("error.bloodPressure"));
 			valid = false;
 		}
-		if (isDate && !ectValidation.isDate(inputValue) && inputValue.compareTo("") != 0) {
-			errors.add(inputValueName, new ActionMessage("errors.invalidDate", inputTypeDisplay));
+		if (isDate && !ectValidation.isDate(value) && value.compareTo("") != 0)
+		{
+			errors.add(displayName, new ActionMessage("errors.invalidDate", inputTypeDisplay));
 			saveErrors(request, errors);
 			valid = false;
 		}
-		if (!ectValidation.isDate(dateObserved) && inputValue.compareTo("") != 0) {
+		if (!ectValidation.isDate(date) && value.compareTo("") != 0)
+		{
 			errors.add("Date", new ActionMessage("errors.invalidDate", inputTypeDisplay));
 			saveErrors(request, errors);
 			valid = false;
 		}
-
-		if (valid) {
-			comments = org.apache.commons.lang.StringEscapeUtils.escapeSql(comments);
-			if (!GenericValidator.isBlankOrNull(inputValue)) {
-
-				Measurement measurement = new Measurement();
-				measurement.setDemographicId(Integer.parseInt(demographicNo));
-				measurement.setDataField(inputValue);
-				measurement.setMeasuringInstruction(mInstructions);
-				if (comments.equals("")) {
-					comments = " ";
-				}
-				measurement.setComments(comments);
-				measurement.setDateObserved(ConversionUtils.fromDateString(dateObserved));
-				measurement.setType(inputType);
-				if (apptNo != null) {
-					measurement.setAppointmentNo(Integer.parseInt(apptNo));
-				} else {
-					measurement.setAppointmentNo(0);
-				}
-				measurement.setProviderNo(providerNo);
-
-				//Find if the same data has already been entered into the system
-				MeasurementDao measurementDao = (MeasurementDao) SpringUtils.getBean("measurementDao");
-				List<Measurement> measurements = measurementDao.findMatching(measurement);
-				
-				if (measurements.size() == 0) {
-					//Write to the Database if all input values are valid
-					measurementDao.persist(measurement);
-				}
-			}
-
-		}
-
 		return valid;
 	}
 
+	/**
+	 * Given a bunch of supporting information around a measurement, build a model that is ready for persistence.
+	 * Procedure also checks to see if there is a duplicate with the same value+date.
+	 * @param comments any comments associated with measurement
+	 * @param inputValue the value of the measurement
+	 * @param demographicNo demographic this is being recorded for
+	 * @param mtypeBean contains stuff relating to the measurement type
+	 * @param dateObserved the date when the measurement was observed
+	 * @param apptNo an associated appointment, if we have one
+	 * @param providerNo whichever provider recorded this
+	 * @return a Measurement model if it will be a new measurement (not blank, null, or already recorded), null otherwise
+	 */
+	public Measurement buildMeasurement(String comments, String inputValue, String demographicNo, EctMeasurementTypesBean mtypeBean, String dateObserved, String apptNo, String providerNo)
+	{
+		String mInstructions = StringUtils.trimToEmpty(mtypeBean.getMeasuringInstrc());
+		String inputType = mtypeBean.getType();
+		comments = org.apache.commons.lang.StringEscapeUtils.escapeSql(comments);
+		if (!GenericValidator.isBlankOrNull(inputValue))
+		{
+			Measurement measurement = new Measurement();
+			measurement.setDemographicId(Integer.parseInt(demographicNo));
+			measurement.setDataField(inputValue);
+			measurement.setMeasuringInstruction(mInstructions);
+			if (comments.isEmpty())
+			{
+				comments = " ";
+			}
+			measurement.setComments(comments);
+			measurement.setDateObserved(ConversionUtils.fromDateString(dateObserved));
+			measurement.setType(inputType);
+			if (apptNo != null)
+			{
+				measurement.setAppointmentNo(Integer.parseInt(apptNo));
+			}
+			else
+			{
+				measurement.setAppointmentNo(0);
+			}
+			measurement.setProviderNo(providerNo);
+
+			//Find if the same data has already been entered into the system
+			MeasurementDao measurementDao = (MeasurementDao) SpringUtils.getBean("measurementDao");
+			List<Measurement> measurements = measurementDao.findMatching(measurement);
+
+			if (measurements.size() == 0)
+			{
+				return measurement;
+			}
+		}
+
+		// Either the measurement is blank, null, or already recorded
+		return null;
+	}
 }

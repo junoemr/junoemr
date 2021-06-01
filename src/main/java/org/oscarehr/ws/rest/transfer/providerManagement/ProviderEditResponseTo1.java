@@ -29,6 +29,7 @@ public class ProviderEditResponseTo1
 
 	public static final String STATUS_SUCCESS = "SUCCESS";
 	public static final String STATUS_SEC_RECORD_EXISTS = "SECURITY_RECORD_EXISTS";
+	public static final String STATUS_INSUFFICIENT_PRIVILEGE = "INSUFFICIENT_PRIVILEGE";
 
 	public ProviderEditResponseTo1(String providerNo, String status)
 	{

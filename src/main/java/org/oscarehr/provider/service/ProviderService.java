@@ -53,6 +53,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service("provider.service.ProviderService")
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -286,15 +287,26 @@ public class ProviderService
 		return provider;
 	}
 
-	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	/**
+	 * edit a provider record.
+	 * @param providerEditFormTo1 - the provider edit forum from the front end containing the provider information to edit
+	 * @param providerNo - the providerNo to edit
+	 * @param editingProviderNo - the providerNo doing the edit
+	 * @return - the update provider
+	 */
+	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo, String editingProviderNo)
 	{
 		ProviderData providerData = providerDataDao.find(providerNo.toString());
 		if (providerData != null)
 		{
 			ProviderData newProviderData = providerEditFormTo1.getProviderData();
 
+			// set last update date
+			newProviderData.setLastUpdateUser(editingProviderNo);
+			newProviderData.setLastUpdateDate(new Date());
+
 			// transfer super admin flag
-			newProviderData.setSuperAdmin(providerData.getSuperAdmin());
+			newProviderData.setSuperAdmin(providerData.isSuperAdmin());
 
 			// edit provider
 			newProviderData.setProviderNo(providerNo);
@@ -474,5 +486,12 @@ public class ProviderService
 		}
 		existingRecord.setUserName(source.getUserName());
 		existingRecord.setEmail(source.getEmail());
+	}
+
+	public void createAndSaveProviderImdHealthUuid(ProviderData providerData)
+	{
+		UUID newUuid = UUID.randomUUID();
+		providerData.setImdHealthUuid(newUuid.toString());
+		providerDataDao.merge(providerData);
 	}
 }

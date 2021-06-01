@@ -42,6 +42,7 @@
 @import "../src/common/components/junoCheckBox/junoCheckBox";
 @import "../src/common/components/junoFileChooser/junoFileChooser";
 @import "../src/common/components/junoInput/junoInput";
+@import "../src/common/components/junoInputSave/junoInputSave";
 @import "../src/common/components/junoListItemSelector/junoListItemSelector";
 @import "../src/common/components/junoPatientSelect/junoPatientSelect";
 @import "../src/common/components/junoProgressBar/junoProgressBar";
@@ -99,7 +100,8 @@
 @import "../src/settings/settings";
 @import "../src/tickler/tickler";
 @import "../src/consults/consults";
-@import "../src/admin/systemProperties/systemProperties";
+@import "../src/admin/systemProperties/scss/common";
+@import "../src/admin/systemProperties/components/junoSelectSave/junoSelectSave";
 @import "../src/admin/section/know2act/Know2act";
 @import "../src/admin/section/fax/fax";
 @import "../src/admin/section/landingPage/landingPage";

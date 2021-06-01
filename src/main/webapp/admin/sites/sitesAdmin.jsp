@@ -91,6 +91,7 @@
                         <display-el:column property="albertaConnectCareDepartmentId" title="CC Department Id"/>
                     </oscarProps:oscarPropertiesCheck>
                     <oscarProps:oscarPropertiesCheck property="instance_type" value="BC">
+                        <display-el:column property="bcServiceLocationCode" title="Service Location Code"/>
                         <display-el:column property="bcFacilityNumber" title="BCP Facility Number"/>
                     </oscarProps:oscarPropertiesCheck>
                     <% if (org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable())

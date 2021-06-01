@@ -56,7 +56,6 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				{
 					controller.teams = results;
 					controller.teams.unshift(allTeams);
-					console.log(JSON.stringify(results));
 				},
 				function error(errors)
 				{

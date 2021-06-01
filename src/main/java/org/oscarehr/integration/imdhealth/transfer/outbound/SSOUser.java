@@ -26,6 +26,8 @@ package org.oscarehr.integration.imdhealth.transfer.outbound;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.provider.model.ProviderData;
+
 import java.io.Serializable;
 
 @Data
@@ -42,26 +44,50 @@ public class SSOUser implements Serializable
 	@JsonProperty("last_name")
 	private String lastName;
 
+	@JsonProperty ("practitioner_type")
+	private String practitionerType = "Other";
+
+	@JsonProperty ("other_type")
+	private String otherType = "Juno Practitioner";
+
+
 	/* OPTIONAL FIELDS (Implementation TBD)
 
 	private String gender;
-	private String practitionerType;
 	private String preferredLocale;
 	private String prefix;
-
 	*/
 
-	public static SSOUser fromProvider(Provider provider, String practiceId)
+	public static SSOUser fromProvider(Provider provider)
 	{
 		SSOUser user = new SSOUser();
 
-		// externalId must be globally unique across the credential.  This implementation should be safe
-		// regardless of whether we decide to go with issuing the credential to cloudpractice vs individual clinics
-
-		user.externalId = "juno_" + practiceId + "_" + provider.getProviderNo();
+		user.externalId = provider.getImdHealthUuid();
 		user.firstName = provider.getFirstName();
 		user.lastName = provider.getLastName();
 
 		return user;
+	}
+
+	public static SSOUser fromProvider(ProviderData provider)
+	{
+		SSOUser user = new SSOUser();
+
+		user.externalId = provider.getImdHealthUuid();
+		user.firstName = provider.getFirstName();
+		user.lastName = provider.getLastName();
+
+		return user;
+	}
+
+	/**
+	 * Check if a provider can be converted to an valid SSOUser.
+	 *
+	 * @param provider provider to check
+	 * @return true if able to convert
+	 */
+	public static boolean canConvertProvider(ProviderData provider)
+	{
+		return provider != null;
 	}
 }

@@ -33,6 +33,7 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
+import org.oscarehr.ws.external.soap.v1.converter.DemographicModelToSoapTransferConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.service.DemographicService;
@@ -84,6 +85,9 @@ public class DemographicWs extends AbstractWs
 
 	@Autowired
 	private HinValidationService hinValidationService;
+
+	@Autowired
+	private DemographicModelToSoapTransferConverter demographicModelToSoapTransferConverter;
 
 	/**
 	 * get demographic by ID if available
@@ -238,6 +242,12 @@ public class DemographicWs extends AbstractWs
 		return (out);
 	}
 
+	/**
+	 * Given a demographic health insurance number, attempt to locate the associated demographic
+	 * @param healthNumber HIN for a demographic that may be in the system
+	 * @return a single Demographic if we can find one, null otherwise
+	 * @throws Exception if health number is clearly incorrect
+	 */
 	public DemographicTransfer getDemographicByHealthNumber(String healthNumber) throws Exception
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
@@ -247,12 +257,11 @@ public class DemographicWs extends AbstractWs
 			throw new Exception("null or empty health numbers are not permitted");
 		}
 
-		Demographic demographic = demographicManager.getDemographicByHealthNumber(healthNumber);
+		org.oscarehr.demographic.model.Demographic demographic = demographicManager.getDemographicByHealthNumber(healthNumber);
 
 		if (demographic != null)
 		{
-			DemographicTransfer result = DemographicTransfer.toTransfer(demographic);
-			return result;
+			return demographicModelToSoapTransferConverter.convert(demographic);
 		}
 
 		return null;

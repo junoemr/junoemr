@@ -1,3 +1,5 @@
+const glob = require("glob")
+
 const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -169,7 +171,6 @@ module.exports = {
 			'./src/common/services/personaService.js',
 			'./src/common/services/programService.js',
 			'./src/common/services/providerService.js',
-			'./src/common/services/providersService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
 			'./src/common/services/staticDataService.js',
@@ -240,6 +241,7 @@ module.exports = {
 			'./src/common/components/junoFileChooser/junoFileChooserComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
 			'./src/common/components/junoListItemSelector/junoListItemSelectorComponent.js',
+			'./src/common/components/junoInputSave/junoInputSaveComponent.js',
 			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
 			'./src/common/components/junoProgressBar/junoProgressBarComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
@@ -293,6 +295,8 @@ module.exports = {
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
 			'./src/dashboard/ticklerConfigureController.js',
+
+			...(glob.sync("./src/integration/**/*.js", {nosort: true})),
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
@@ -371,8 +375,12 @@ module.exports = {
 			'./src/admin/section/dataManagement/demographicExport/demographicExportComponent.js',
 			'./src/admin/systemProperties/systemPropertiesComponent.js',
 			'./src/admin/systemProperties/rx/propertiesRxComponent.js',
+			'./src/admin/systemProperties/general/propertiesGeneralComponent.js',
+			'./src/admin/systemProperties/billing/propertiesBillingComponent.js',
+			'./src/admin/systemProperties/components/junoSelectSave/junoSelectSaveComponent.js',
 			'./src/admin/section/rosterStatus/rosterStatusManagementComponent.js',
 			'./src/admin/section/rosterStatus/modals/editRosterStatusModalComponent.js',
+
 			'./src/billing/billingController.js',
 
 			'./src/consults/module.js',

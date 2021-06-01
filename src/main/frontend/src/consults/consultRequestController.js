@@ -1,9 +1,12 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
+import {LABEL_POSITION} from "../common/components/junoComponentConstants";
+import {ProvidersServiceApi} from "../../generated";
 
 angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 	'$scope',
 	'$http',
+	"$httpParamSerializer",
 	'$q',
 	'$resource',
 	'$location',
@@ -19,6 +22,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	function(
 		$scope,
 		$http,
+		$httpParamSerializer,
 		$q,
 		$resource,
 		$location,
@@ -33,6 +37,8 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	{
 		const controller = this;
 		controller.SecurityPermissions = SecurityPermissions;
+
+		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
 		controller.consult = consult;
 
@@ -61,6 +67,8 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.initialize = function()
 		{
+			controller.labelPosition = LABEL_POSITION;
+
 			//set demographic info
 			demographicService.getDemographic(consult.demographicId).then(
 				function success(results)
@@ -129,8 +137,32 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			//set attachments
 			consult.attachments = Juno.Common.Util.toArray(consult.attachments);
 			Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
+
+			providersServiceApi.getActive().then(
+				function success(results)
+				{
+					controller.providers = [];
+					for (let provider of results.data.body)
+					{
+						controller.providers.push({
+							label: provider.name,
+							value: provider.providerNo
+						})
+					}
+				},
+				function error(results)
+				{
+					console.error("Failed to get provider list with error: " + results);
+				}
+			)
 		};
 		controller.initialize();
+
+		// providerNo is what is used as the referral provider for saving
+		controller.onReferralPractitionerSelected = (provider) =>
+		{
+			controller.consult.providerNo = provider;
+		};
 
 		controller.changeLetterhead = function changeLetterhead(letterhead)
 		{
@@ -311,9 +343,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				alert("Please select a Letterhead");
 				return true;
 			}
-			if (!controller.consult.professionalSpecialist)
+			if (!controller.consult.serviceId)
 			{
-				alert("Please select a Specialist");
+				alert("Please select a Service");
 				return true;
 			}
 			if (controller.consult.demographic == null || controller.consult.demographic == "")
@@ -409,10 +441,10 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				controller.consultSaving = true; //show saving banner
 				controller.setAppointmentTime();
 
-				consultService.saveRequest(consult).then(
+				consultService.saveRequest(controller.consult).then(
 					function success(results)
 					{
-						if (consult.id == null)
+						if (controller.consult.id == null)
 						{
 							$location.path("/record/" + consult.demographicId + "/consult/" + results.id);
 						}

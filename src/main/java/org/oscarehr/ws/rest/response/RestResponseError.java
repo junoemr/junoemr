@@ -35,12 +35,14 @@ public class RestResponseError implements Serializable
 		VALIDATION,
 	}
 	private final String message;
+	private Serializable data = null;
 	private final ERROR_TYPE type;
 
 	public RestResponseError()
 	{
 		this((String) null);
 	}
+
 	public RestResponseError(String message)
 	{
 		this(message, ERROR_TYPE.GENERIC);
@@ -57,6 +59,12 @@ public class RestResponseError implements Serializable
 		this.type = type;
 	}
 
+	public RestResponseError(String message, Serializable data)
+	{
+		this(message);
+		this.data = data;
+	}
+
 	public String getMessage()
 	{
 		return message;
@@ -65,5 +73,10 @@ public class RestResponseError implements Serializable
 	public ERROR_TYPE getType()
 	{
 		return type;
+	}
+
+	public Serializable getData()
+	{
+		return this.data;
 	}
 }
