@@ -122,6 +122,7 @@
 
 	<!-- Managed Beans -->
 	<context:component-scan base-package="org.oscarehr.appointment.dao" />
+	<context:component-scan base-package="org.oscarehr.clinic" />
 	<context:component-scan base-package="org.oscarehr.common.dao" />
 	<context:component-scan base-package="org.oscarehr.common.server" />
 	<context:component-scan base-package="org.oscarehr.common.conversion" />
@@ -154,7 +155,6 @@
 	<context:component-scan base-package="org.oscarehr.securityLog" />
 	<context:component-scan base-package="org.oscarehr.fax" />
 	<context:component-scan base-package="org.oscarehr.admin" />
-	<context:component-scan base-package="org.oscarehr.measurements" />
 	<context:component-scan base-package="org.oscarehr.forms" />
 	<context:component-scan base-package="org.oscarehr.integration.aqs" />
 	<context:component-scan base-package="org.oscarehr.integration.iceFall" />

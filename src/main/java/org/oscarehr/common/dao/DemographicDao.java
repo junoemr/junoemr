@@ -760,65 +760,79 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	}
 
 	public Demographic findMatchingLab(
-			String hin, String firstName, String lastName, String gender, Calendar dateOfBirth) {
+			String hin, String firstName, String lastName, String gender, Calendar dateOfBirth)
+	{
+		// at least 1 parameter must exist
+		// we remove the first " and" because the first clause is after the "where" in the sql statement.
+		if (hin == null && (firstName == null && lastName == null && dateOfBirth == null))
+		{
+			String message = "Health number or name and date of birth are required to match a lab to a patient";
+			logger.error(message);
+			throw new IllegalArgumentException(message);
+		}
 
-		// here we build the sql where clause, to simplify the logic we just append all parameters, then after we'll strip out the first " and" as the logic is easier then checking if we have to add "and" for every parameter.
-		String sqlCommand=null;
+		// here we build the sql where clause, to simplify the logic we just append all parameters
+		// then after we'll strip out the first " and"
+		// the logic is easier then checking if we have to add "and" for every parameter.
+		;
 		StringBuilder sqlParameters = new StringBuilder();
 
-		if (hin != null  && !hin.trim().equals("")) {
-
-			sqlParameters.append(" and d.Hin like :hin");
+		if (hin != null  && !hin.trim().isEmpty())
+		{
+			sqlParameters.append(" AND d.Hin LIKE :hin");
 			// Remove names, if health number exists and client has name matching turned off
-			if(OscarProperties.getInstance().getBooleanProperty(
-				"LAB_NOMATCH_NAMES", "yes"))
+			if(OscarProperties.getInstance().getBooleanProperty("LAB_NOMATCH_NAMES", "yes"))
 			{
 				firstName = null;
 				lastName = null;
 			}
 		}
 
-		if (hin != null && !hin.trim().equals("")) {
-			sqlParameters.append(" and d.Hin like :hin");
+		if (firstName != null && !firstName.trim().isEmpty())
+		{
+			sqlParameters.append(" AND d.FirstName LIKE :firstName");
 		}
-		if (firstName != null && !firstName.trim().equals("")) {
-			sqlParameters.append(" and d.FirstName like :firstName");
+		if (lastName != null && !lastName.trim().isEmpty())
+		{
+			sqlParameters.append(" AND d.LastName LIKE :lastName");
 		}
-		if (lastName != null && !lastName.trim().equals("")) {
-			sqlParameters.append(" and d.LastName like :lastName");
+		if (gender != null && !gender.trim().isEmpty())
+		{
+			sqlParameters.append(" AND d.Sex = :gender");
 		}
-		if (gender != null && !gender.trim().equals("")) {
-			sqlParameters.append(" and d.Sex = :gender");
+		if (dateOfBirth != null)
+		{
+			sqlParameters.append(" AND d.YearOfBirth = :yearOfBirth");
+			sqlParameters.append(" AND d.MonthOfBirth = :monthOfBirth");
+			sqlParameters.append(" AND d.DateOfBirth = :dateOfBirth");
 		}
 
-		if (dateOfBirth != null) {
-			sqlParameters.append(" and d.YearOfBirth = :yearOfBirth");
-			sqlParameters.append(" and d.MonthOfBirth = :monthOfBirth");
-			sqlParameters.append(" and d.DateOfBirth = :dateOfBirth");
-		}
-
-		// at least 1 parameter must exist
-		// we remove the first " and" because the first clause is after the "where" in the sql statement.
-		if (hin == null && (firstName == null && lastName == null && dateOfBirth == null)) {
-			String message = "Health number or name and date of birth are required to match a lab to a patient";
-			logger.info(message);
-			throw (new IllegalArgumentException(message));
-		}
-		else {
-			sqlCommand = "from Demographic d where" +
-					sqlParameters.substring(" and".length(), sqlParameters.length());
-		}
+		String sqlCommand = "FROM Demographic d WHERE" + sqlParameters.substring(" AND".length(), sqlParameters.length());
 
 		Session session = this.getSession();
-		try {
+		try
+		{
 			Query query = session.createQuery(sqlCommand);
 
-			if (hin != null) query.setParameter("hin", "%" + hin + "%");
-			if (firstName != null) query.setParameter("firstName", "%" + firstName + "%");
-			if (lastName != null) query.setParameter("lastName", "%" + lastName + "%");
-			if (gender != null) query.setParameter("gender", gender);
+			if (hin != null && !hin.trim().isEmpty())
+			{
+				query.setParameter("hin", "%" + hin + "%");
+			}
+			if (firstName != null && !firstName.trim().isEmpty())
+			{
+				query.setParameter("firstName", "%" + firstName + "%");
+			}
+			if (lastName != null && !lastName.trim().isEmpty())
+			{
+				query.setParameter("lastName", "%" + lastName + "%");
+			}
+			if (gender != null && !gender.trim().isEmpty())
+			{
+				query.setParameter("gender", gender);
+			}
 
-			if (dateOfBirth != null) {
+			if (dateOfBirth != null)
+			{
 				query.setParameter("yearOfBirth", ensure2DigitDateHack(dateOfBirth.get(Calendar.YEAR)));
 				query.setParameter("monthOfBirth", ensure2DigitDateHack(dateOfBirth.get(Calendar.MONTH)+1));
 				query.setParameter("dateOfBirth", ensure2DigitDateHack(dateOfBirth.get(Calendar.DAY_OF_MONTH)));
@@ -831,8 +845,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			List<Demographic> results =  query.list();
 			if(results.size() != 1)
 			{
-				String message = "Found (" + Integer.toString(results.size()) +
-						") demographics matching lab. Expected 1.";
+				String message = "Found (" + results.size() + ") demographics matching lab. Expected 1.";
 				logger.info(message);
 				return null;
 			}
@@ -1524,31 +1537,6 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		if (log.isDebugEnabled()) {
 			log.debug("saveClient: id=" + client.getDemographicNo());
 		}
-	}
-
-	public Demographic getDemographicByHealthNumber(String healthNumber)
-	{
-		String hql = "from Demographic d where d.Hin = :hin";
-
-		OscarProperties oscarProperties = OscarProperties.getInstance();
-		if (oscarProperties.isBritishColumbiaInstanceType())
-		{
-				hql += " and d.Ver != '66'";
-		}
-
-		Session session = this.getSession();
-		try
-		{
-			Query query = session.createQuery(hql);
-			query.setParameter("hin", healthNumber);
-
-			return (Demographic)query.uniqueResult();
-		}
-		finally
-		{
-			this.releaseSession(session);
-		}
-
 	}
 
 	public static class ClientListsReportResults {

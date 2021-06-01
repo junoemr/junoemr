@@ -11,10 +11,12 @@ angular.module('Admin').component('editStatusModal', {
         "$scope",
         "$http",
         "$httpParamSerializer",
+        "$uibModal",
         function(
             $scope,
             $http,
-            $httpParamSerializer
+            $httpParamSerializer,
+            $uibModal
         )
         {
             let ctrl = this;
@@ -73,8 +75,9 @@ angular.module('Admin').component('editStatusModal', {
                         function error(error)
                         {
                             console.log(error);
-                            alert("An error occurred while saving." +
-                                "Ensure that the status you are adding does not use the same status as another one.");
+                            Juno.Common.Util.errorAlert($uibModal, "Error",
+                                "An error occurred while saving. " +
+                                "Ensure the status code you use does not share the same code as another roster status.");
                         }
                     )
                 }

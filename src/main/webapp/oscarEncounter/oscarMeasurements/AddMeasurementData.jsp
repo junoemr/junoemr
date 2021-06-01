@@ -27,6 +27,7 @@
 <%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
 <%@page import="org.oscarehr.common.model.FlowSheetCustomization"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctMeasurementsForm"%>
@@ -35,7 +36,6 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="java.time.LocalDateTime" %>
-<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -52,13 +52,12 @@
 	String template = request.getParameter("template");
 	String uuid = request.getParameter("uuid");
 
-	FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
-	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
+	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) SpringUtils.getBean("flowSheetCustomizationDao");
+	MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
 	List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template, (String) session.getAttribute("user"), Integer.parseInt(demographic_no));
-	MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(template, custList);
+	MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template, custList);
 
-	String provider = (String) session.getValue("user");
 	String prevDate = ConversionUtils.toDateTimeNoSecString(LocalDateTime.now());
 %>
 
@@ -326,9 +325,9 @@
 
                <input type="hidden" name="measurement" value="<%=measurement%>"/>
 
-               <input type="hidden" name="<%= "value(inputType-" + ctr + ")" %>" value="<%=type%>"/>
-               <input type="hidden" name="<%= "value(inputTypeDisplayName-" + ctr + ")" %>" value="<%=typeDisplayName%>"/>
-               <input type="hidden" name="<%= "value(validation-" + ctr + ")" %>" value="<%=validation%>"/>
+                   <input type="hidden" name="<%= "value(inputType-" + ctr + ")" %>" value="<%=type%>"/>
+                   <input type="hidden" name="<%= "value(inputTypeDisplayName-" + ctr + ")" %>" value="<%=typeDisplayName%>"/>
+                   <input type="hidden" name="<%= "value(validation-" + ctr + ")" %>" value="<%=validation%>"/>
 
                <% if ( id != null ) { %>
                <input type="hidden" name="id" value="<%=id%>"/>

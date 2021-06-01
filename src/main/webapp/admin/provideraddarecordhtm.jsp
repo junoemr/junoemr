@@ -41,6 +41,9 @@
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
+<%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
 <%
 
   String curProvider_no,userfirstname,userlastname;
@@ -405,8 +408,17 @@ for (int i=0; i<sites.size(); i++) {
 			<td><input type="text" name="alberta_tak_no" maxlength="20"></td>
 		</tr>
 		<%} %>
+		<%-- END OF AB SPECIFIC SECTION --%>
 		<%
-			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
+			if (OscarProperties.getInstance().isBritishColumbiaInstanceType()) {
+				BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
+
+				List<BillingVisit> serviceLocationCodes = new ArrayList<BillingVisit>();
+				List<Object[]> visitCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+				for (Object[] visitCode : visitCodes)
+				{
+					serviceLocationCodes.add(new BillingVisit(visitCode));
+				}
 		%>
         <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
         <tr>
@@ -418,11 +430,23 @@ for (int i=0; i<sites.size(); i++) {
                 </select>
         </tr>
         <% } %>
+        <tr>
+            <td align="right">BC Service Location Code</td>
+            <td>
+                <select name="bc_service_location_code">
+                    <option value="" selected>None</option>
+                    <% for (BillingVisit serviceLocationCode : serviceLocationCodes) { %>
+                    <option value="<%=serviceLocationCode.getVisitType()%>"><%=serviceLocationCode.getDisplayName()%></option>
+                    <% } %>
+                </select>
+            </td>
+        </tr>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
 			<td><input type="text" name="alberta_e_delivery_ids"></td>
 		</tr>
 		<%} %>
+		<%-- END OF BC SPECIFIC SECTION --%>
 		<% if (OscarProperties.getInstance().isOntarioInstanceType()) { %>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.fromOntarioLifeLabsId" />:</td>

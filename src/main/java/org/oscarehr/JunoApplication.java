@@ -26,6 +26,7 @@ package org.oscarehr;
 import org.apache.log4j.Logger;
 import org.oscarehr.init.OscarPropertiesInitializerHeadless;
 import org.oscarehr.init.OscarPropertiesInitializerWeb;
+import org.oscarehr.util.JunoCommandLineRunner;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -60,7 +61,7 @@ public class JunoApplication extends SpringBootServletInitializer
 	// This is used to start the app from Intellij or when running the war file directly
 	public static void main(String[] args) throws IOException
 	{
-		if(args.length != 0)
+		if(args.length != 0 && JunoCommandLineRunner.isHeadlessMode(args))
 		{
 			logger.info("Starting Juno (JunoApplication.main()) in headless mode");
 

@@ -37,6 +37,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -62,7 +64,8 @@ public class AddProvidersTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addProvidersClassicUITest() throws Exception 
+	public void addProvidersClassicUITest()
+			throws Exception
 	{
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
@@ -79,6 +82,7 @@ public class AddProvidersTests extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 
 		// Add a provider record page
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//h5[contains(.,'Add a Provider Record')]")));
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='Suggest']")).click();

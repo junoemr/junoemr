@@ -29,7 +29,6 @@ require('font-awesome/css/font-awesome.min.css');
 require('angular-drag-and-drop-lists');
 require('file-saver');
 
-import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
 
 var oscarApp = angular.module('oscarProviderViewModule', [
@@ -238,6 +237,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
             url: '/systemProperties',
             component: 'systemProperties'
         })
+		.state('admin.systemProperties.general',
+		{
+			url: '/general',
+			component: 'systemPropertiesGeneral',
+		})
         .state('admin.systemProperties.rx',
         {
             url: '/rx',
@@ -247,6 +251,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		{
 			url: '/rosterStatus',
 			component: 'rosterStatusManagement',
+		})
+		.state('admin.systemProperties.billing',
+		{
+			url: '/billing',
+			component: 'systemPropertiesBilling',
 		})
 		.state('ticklers',
 		{
@@ -286,6 +295,19 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/documents',
 			templateUrl: 'src/document/documents_classic.jsp',
 			controller: 'Document.DocumentsController'
+		})
+		.state("integration",
+		{
+			url: "/integration",
+		})
+		.state("integration.mha",
+		{
+			url: "/mha"
+		})
+		.state("integration.mha.billingRedirect",
+		{
+			url: "/billingRedirect?appointmentNo&demographicNo&providerNo",
+			component: 'billingRedirect'
 		})
 		.state('settings',
 		{

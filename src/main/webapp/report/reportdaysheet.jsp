@@ -256,7 +256,7 @@ function printDaysheet() {
 	 */
 	AppointmentStatus daysheetPrintedStatus = appointmentStatusDao.findByStatus(AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_PRINTED);
 
-	if (print.equals("yes") && daysheetPrintedStatus.getDescription().equals("Daysheet Printed") && daysheetPrintedStatus.getActive() == 1)
+	if (print.equals("yes") && daysheetPrintedStatus.getDescription().equals("Daysheet Printed") && daysheetPrintedStatus.isActive())
 	{
 		//If dsmode is equal to 'new' we're coming from the daysheet report function. If 'newappt' we're coming from the add appointment and print preview function
 		if ("new".equals(dsmode))

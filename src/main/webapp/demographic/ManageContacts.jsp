@@ -26,6 +26,8 @@
 
 <%@ page import="org.oscarehr.common.model.DemographicContact"%>
 <%@ page import="java.util.List"%>
+<%@ page import="org.oscarehr.common.model.DemographicContact"%>
+<%@ page import="org.apache.commons.text.StringEscapeUtils" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
@@ -304,8 +306,8 @@ jQuery(document).ready(function() {
 					setSelect(num,'contact','consentToContact','<%=dc.isConsentToContact()?"1":"0"%>');
 					setSelect(num,'contact','active','<%=dc.isActive()?"1":"0"%>');
 					setInput(num,'contact','contactId','<%=dc.getContactId()%>');
-					setInput(num,'contact','contactName','<%=dc.getContactName()%>');
-					setTextarea(num,'contact','note','<%=dc.getNote()!=null?dc.getNote():""%>');
+					setInput(num,'contact','contactName','<%=StringEscapeUtils.escapeEcmaScript(dc.getContactName())%>');
+					setTextarea(num,'contact','note','<%=dc.getNote()!=null?StringEscapeUtils.escapeEcmaScript(dc.getNote()):""%>');
 					<%if(dc.getSdm() != null && dc.getSdm().equals("true")) {%>setChecked(num,'contact','sdm');<%}%>
 					<%if(dc.getEc() != null && dc.getEc().equals("true")) {%>setChecked(num,'contact','ec');<%}%>
 			    <%
@@ -320,12 +322,12 @@ jQuery(document).ready(function() {
 					addProContactExisting();
 					var num = jQuery("#procontact_num").val();
 					setInput(num,'procontact','id','<%=dc.getId()%>');
-					setSelectExistingRole(num,'procontact','<%=dc.getRole()%>');
+					setSelectExistingRole(num,'procontact','<%=StringEscapeUtils.escapeEcmaScript(dc.getRole())%>');
 					setSelect(num,'procontact','consentToContact','<%=dc.isConsentToContact()?"1":"0"%>');
 					setSelect(num,'procontact','active','<%=dc.isActive()?"1":"0"%>');
 					setSelectExisting(num,'procontact','type','<%=dc.getType()%>');
 					setInput(num,'procontact','contactId','<%=dc.getContactId()%>');
-					setInput(num,'procontact','contactName','<%=dc.getContactName()%>');
+					setInput(num,'procontact','contactName','<%=StringEscapeUtils.escapeEcmaScript(dc.getContactName())%>');
 			    <%
 			}
 		}
