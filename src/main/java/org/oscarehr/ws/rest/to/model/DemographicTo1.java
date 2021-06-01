@@ -30,6 +30,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Getter;
+import lombok.Setter;
+import org.oscarehr.demographic.model.Demographic;
 import oscar.util.Jackson.DateDeserializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -111,6 +114,15 @@ public class DemographicTo1 implements Serializable {
 	private Integer admissionProgramId;
 	private String nameOfMother;
 	private String nameOfFather;
+	@Getter
+	@Setter
+	private Date electronicMessagingConsentGivenAt;
+	@Getter
+	@Setter
+	private Date electronicMessagingConsentRejectedAt;
+	@Getter
+	@Setter
+	private Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS electronicMessagingConsentStatus;
 
 	private List<DemographicExtTo1> extras = new ArrayList<DemographicExtTo1>();
 	private List<WaitingListNameTo1> waitingListNames = new ArrayList<WaitingListNameTo1>();

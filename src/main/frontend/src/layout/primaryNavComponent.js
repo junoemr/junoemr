@@ -1,3 +1,4 @@
+import {BILLING_REGION} from "../billing/billingConstants";
 
 angular.module('Layout').component("primaryNavigation", {
 	bindings: {},
@@ -456,7 +457,17 @@ angular.module('Layout').component("primaryNavigation", {
 				}
 				else if (item.label === "Billing")
 				{
-					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
+					switch(ctrl.billRegion)
+					{
+						case BILLING_REGION.BC:
+							url = "../billing/CA/BC/billStatus.jsp";
+							break;
+						case BILLING_REGION.ON:
+							url = "../billing/CA/ON/billStatus.jsp";
+							break;
+						default:
+							url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
+					}
 					wname = "billing";
 				}
 				else if (item.label === "eDocs")

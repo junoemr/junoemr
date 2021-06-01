@@ -44,6 +44,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -69,6 +71,8 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "requestId")
+	@Getter
+	@Setter
 	private Integer id;
 	
 	@Column(name = "referalDate")
@@ -124,11 +128,6 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
     private Integer fdid = null;
     private String source;
     
-    
-	@Override
-    public Integer getId() {
-	    return(id);
-    }
 
 	public Date getReferralDate() {
     	return referralDate;

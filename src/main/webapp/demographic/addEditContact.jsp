@@ -45,13 +45,9 @@
 -->
 
 <%@ include file="/taglibs.jsp"%>
-<%@ page import="java.util.Properties"%>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="oscar.OscarProperties" %>
 <%
-  
-  String msg = "Enter contact details.";
-  Properties	prop  = new Properties();
-  
+  OscarProperties props = OscarProperties.getInstance();
 %>
 <html:html locale="true">
 <head>
@@ -59,54 +55,28 @@
 <title>Add/Edit Contact</title>
 <script language="JavaScript">
 
-      <!--
-		function setfocus() {
-		  this.focus();
-		  document.forms[0].referral_no.focus();
-		  document.forms[0].referral_no.select();
-		}
-	    function onSearch() {
-	        //document.forms[0].submit.value="Search";
-	        var ret = checkreferral_no();
-	        return ret;
+	    function onSave(event)
+        {
+            event.preventDefault();
+
+            var isValid = true;
+
+            if(!document.forms[0]["contact.lastName"].value)
+            {
+                isValid = false;
+                alert ("The field \"Last Name\" is empty.");
+            }
+            else if (!document.forms[0]["contact.firstName"].value)
+            {
+                isValid = false;
+                alert ("The field \"First Name\" is empty.");
+            }
+
+            if (isValid)
+            {
+                document.forms[0].submit();
+            }
 	    }
-	    function onSave() {
-	        //document.forms[0].submit.value="Save";
-	        /*
-	        var ret = true;
-	        if(ret==true) {
-				ret = checkAllFields();
-			}
-	        if(ret==true) {
-	            ret = confirm("Are you sure you want to save?");
-	        }
-	        */
-	        return true;
-	    }
-		
-		function checkAllFields() {
-	        var b = true;
-	        if(document.forms[0].last_name.value.length<=0){
-	            b = false;
-	            alert ("The field \"Last Name\" is empty.");
-	        } else if(document.forms[0].first_name.value.length<=0) {
-	            b = false;
-	            alert ("The field \"First Name\" is empty.");
-	        }
-			return b;
-	    }
-	    function isNumber(s){
-	        var i;
-	        for (i = 0; i < s.length; i++){
-	            // Check that current character is number.
-	            var c = s.charAt(i);
-	            if (c == ".") continue;
-	            if (((c < "0") || (c > "9"))) return false;
-	        }
-	        // All characters are numbers.
-	        return true;
-	    }
-//-->
 
       </script>
 </head>
@@ -121,7 +91,7 @@
 <center>
 <table BORDER="1" CELLPADDING="0" CELLSPACING="0" WIDTH="80%">
 	<tr BGCOLOR="#CCFFFF">
-		<th><%=msg%></th>
+		<th>Enter Contact Details</th>
 	</tr>
 </table>
 </center>
@@ -165,30 +135,25 @@
 	<tr bgcolor="#EEEEFF">
 		<td align="right"><b>Province</b></td>
 		<td>
-		<% String region = prop.getProperty("province", "");
-              	 region = "".equals(region) ? "ON" : region;
-              %> <select name="contact.province">
-			<option value="AB" <%=region.equals("AB")?" selected":""%>>AB-Alberta</option>
-			<option value="BC" <%=region.equals("BC")?" selected":""%>>BC-British
-			Columbia</option>
-			<option value="MB" <%=region.equals("MB")?" selected":""%>>MB-Manitoba</option>
-			<option value="NB" <%=region.equals("NB")?" selected":""%>>NB-New
-			Brunswick</option>
-			<option value="NL" <%=region.equals("NL")?" selected":""%>>NL-Newfoundland
-			& Labrador</option>
-			<option value="NT" <%=region.equals("NT")?" selected":""%>>NT-Northwest
-			Territory</option>
-			<option value="NS" <%=region.equals("NS")?" selected":""%>>NS-Nova
-			Scotia</option>
-			<option value="NU" <%=region.equals("NU")?" selected":""%>>NU-Nunavut</option>
-			<option value="ON" <%=region.equals("ON")?" selected":""%>>ON-Ontario</option>
-			<option value="PE" <%=region.equals("PE")?" selected":""%>>PE-Prince
-			Edward Island</option>
-			<option value="QC" <%=region.equals("QC")?" selected":""%>>QC-Quebec</option>
-			<option value="SK" <%=region.equals("SK")?" selected":""%>>SK-Saskatchewan</option>
-			<option value="YT" <%=region.equals("YT")?" selected":""%>>YT-Yukon</option>
-			<option value="US" <%=region.equals("US")?" selected":""%>>US
-			resident</option>
+		<%
+            String defaultProv = props.getInstanceTypeUpperCase();
+        %>
+            <select name="contact.province">
+			<option value="AB" <%=defaultProv.equals("AB") ? " selected" : ""%>>Alberta</option>
+			<option value="BC" <%=defaultProv.equals("BC") ? " selected" : ""%>>British Columbia</option>
+			<option value="MB" <%=defaultProv.equals("MB") ? " selected" : ""%>>Manitoba</option>
+			<option value="NB" <%=defaultProv.equals("NB") ? " selected" : ""%>>New Brunswick</option>
+			<option value="NL" <%=defaultProv.equals("NL") ? " selected" : ""%>>Newfoundland & Labrador</option>
+			<option value="NT" <%=defaultProv.equals("NT") ? " selected" : ""%>>Northwest Territories</option>
+			<option value="NS" <%=defaultProv.equals("NS") ? " selected" : ""%>>Nova Scotia</option>
+			<option value="NU" <%=defaultProv.equals("NU") ? " selected" : ""%>>Nunavut</option>
+			<option value="ON" <%=defaultProv.equals("ON") ? " selected" : ""%>>Ontario</option>
+			<option value="PE" <%=defaultProv.equals("PE") ? " selected" : ""%>>Prince Edward Island</option>
+			<option value="QC" <%=defaultProv.equals("QC") ? " selected" : ""%>>Quebec</option>
+			<option value="SK" <%=defaultProv.equals("SK") ? " selected" : ""%>>Saskatchewan</option>
+			<option value="YT" <%=defaultProv.equals("YT") ? " selected" : ""%>>Yukon Territory</option>
+			<option value="US" <%=defaultProv.equals("US") ? " selected" : ""%>>US Resident</option>
+            <option value="OT">Other</option>
 		</select> Country 
 		<input type="text" name="contact.country" value="<c:out value="${contact.country}"/>" size="2" maxlength="2">
 		</td>
@@ -242,7 +207,7 @@
 	</tr>
 	<tr>
 		<td align="center" bgcolor="#CCCCFF" colspan="2">
-			<input type="submit" name="submit" value="<bean:message key="admin.resourcebaseurl.btnSave"/>" onclick="javascript:return onSave();"> 			
+			<input type="button" name="Save" value="<bean:message key="admin.resourcebaseurl.btnSave"/>" onclick="return onSave(event);">
 			<input type="button" name="Cancel" value="<bean:message key="admin.resourcebaseurl.btnExit"/>" onClick="window.close()">
 		</td>
 	</tr>	

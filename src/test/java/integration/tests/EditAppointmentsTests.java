@@ -86,7 +86,8 @@ public class EditAppointmentsTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void editAppointmentTestsClassicUI() throws InterruptedException
+	public void editAppointmentTestsClassicUI()
+			throws InterruptedException
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();

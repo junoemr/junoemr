@@ -20,7 +20,15 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div id="imdhealth-admin">
+<div id="imdhealth-admin" ng-if="$ctrl.isBusy">
+    <juno-loading-indicator
+            class="loading-indicator-container"
+            message = "Synchronizing"
+            message-alignment="vertical"
+            indicator-type="dot-pulse"
+    ></juno-loading-indicator>
+</div>
+<div id="imdhealth-admin" ng-if="!$ctrl.isBusy">
     <h1>Patient Education by iMD Health</h1>
     <div class="marketing-container">
         <p>iMD Health is designed for healthcare professionals at every level of care to better engage, inform and educate patients about their conditions and treatment plans. </p>

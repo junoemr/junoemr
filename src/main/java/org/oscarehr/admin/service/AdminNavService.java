@@ -424,8 +424,7 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupPreference"), "frame?frameUrl=" + contextPath + "/admin/groupPreferences.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.preventionNotification.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionManager.jsp"));
 
-		// TODO remove super admin requirement when ready for general use
-		if(securityInfoManager.isSuperAdmin(providerNo) && systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
+		if(systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
 		{
 			scheduleItems.add(new AdminNavItemTo1("Manage Appointment Queues", "manageAppointmentQueues"));
 		}
@@ -557,7 +556,7 @@ public class AdminNavService
 
 		if (securityInfoManager.isSuperAdmin(providerNo))
 		{
-			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/rx"));
+			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/general"));
 		}
 
 		systemManagementGroup.setItems(systemManagementItems);
