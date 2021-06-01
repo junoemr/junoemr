@@ -337,8 +337,6 @@ module.exports = {
 			'./src/admin/adminController.js',
 			'./src/admin/systemProperties/systemPropertiesComponent.js',
 			'./src/admin/systemProperties/rx/propertiesRxComponent.js',
-			'./src/admin/systemProperties/systemPropertiesComponent.js',
-			'./src/admin/systemProperties/rx/propertiesRxComponent.js',
 			'./src/admin/systemProperties/general/propertiesGeneralComponent.js',
 			'./src/admin/systemProperties/billing/propertiesBillingComponent.js',
 			'./src/admin/section/module.js',
