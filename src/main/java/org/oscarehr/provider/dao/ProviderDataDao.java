@@ -252,15 +252,15 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 	 */
 	@SuppressWarnings("unchecked")
 	public List<ProviderData> findByType(String providerType) {
-		Query query = createQuery("p", "p.providerType = :pt and p.status = '1' order by p.lastName, p.firstName");
-		query.setParameter("pt", providerType);
+		Query query = createQuery("p", "p.providerType = :providerType and p.status = '1' order by p.lastName, p.firstName");
+		query.setParameter("providerType", providerType);
 		return query.getResultList();
 	}
 
 	public List<ProviderData> findAllByType(List<String> providerTypes)
 	{
-		Query query = createQuery("p", "p.providerType IN (:pts) ORDER BY p.lastName, p.firstName");
-		query.setParameter("pts", providerTypes);
+		Query query = createQuery("p", "p.providerType IN (:providerTypes) ORDER BY p.lastName, p.firstName");
+		query.setParameter("providerTypes", providerTypes);
 
 		List<ProviderData> resultList = query.getResultList();
 		return resultList;
