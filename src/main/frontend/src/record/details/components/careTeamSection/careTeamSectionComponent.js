@@ -22,7 +22,7 @@
 */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {RosterServiceApi, SystemPreferenceApi} from "../../../../../generated/"
+import {ProvidersServiceApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('careTeamSection', {
 	templateUrl: 'src/record/details/components/careTeamSection/careTeamSection.jsp',
@@ -36,7 +36,6 @@ angular.module('Record.Details').component('careTeamSection', {
         "$http",
         "$httpParamSerializer",
 		"staticDataService",
-		"providersService",
 		"demographicsService",
 		"referralDoctorsService",
 		function ($scope,
@@ -44,11 +43,11 @@ angular.module('Record.Details').component('careTeamSection', {
                   $http,
                   $httpParamSerializer,
                   staticDataService,
-                  providersService,
                   demographicsService,
                   referralDoctorsService)
 	{
 		let ctrl = this;
+        let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
@@ -72,23 +71,23 @@ angular.module('Record.Details').component('careTeamSection', {
 
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
-			providersService.getBySecurityRole("doctor").then(
+			providersServiceApi.getBySecurityRole("doctor").then(
 					function success(data) {
-						ctrl.doctors = data.map((doc) => {return {label: doc.name, value: doc.providerNo}});
+						ctrl.doctors = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
 						ctrl.doctors.push({label: "--", value: ""})
 					}
 			);
 
-			providersService.getBySecurityRole("nurse").then(
+			providersServiceApi.getBySecurityRole("nurse").then(
 					function success(data) {
-						ctrl.nurses = data.map((doc) => {return {label: doc.name, value: doc.providerNo}});
+						ctrl.nurses = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
 						ctrl.nurses.push({label: "--", value: ""})
 					}
 			);
 
-			providersService.getBySecurityRole("midwife").then(
+			providersServiceApi.getBySecurityRole("midwife").then(
 					function success(data) {
-						ctrl.midwives = data.map((doc) => {return {label: doc.name, value: doc.providerNo}});
+						ctrl.midwives = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
 						ctrl.midwives.push({label: "--", value: ""})
 					}
 			);

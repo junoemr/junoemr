@@ -24,10 +24,12 @@
 package org.oscarehr.site.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
+@Data
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class SiteTransfer implements Serializable
@@ -50,164 +52,5 @@ public class SiteTransfer implements Serializable
 	private String siteUrl = "";
 
 	private String bcFacilityNumber;
-
-	public Integer getSiteId()
-	{
-		return siteId;
-	}
-
-	public void setSiteId(Integer siteId)
-	{
-		this.siteId = siteId;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public String getShortName()
-	{
-		return shortName;
-	}
-
-	public void setShortName(String shortName)
-	{
-		this.shortName = shortName;
-	}
-
-	public String getPhone()
-	{
-		return phone;
-	}
-
-	public void setPhone(String phone)
-	{
-		this.phone = phone;
-	}
-
-	public String getFax()
-	{
-		return fax;
-	}
-
-	public void setFax(String fax)
-	{
-		this.fax = fax;
-	}
-
-	public String getBgColor()
-	{
-		return bgColor;
-	}
-
-	public void setBgColor(String bgColor)
-	{
-		this.bgColor = bgColor;
-	}
-
-	public String getAddress()
-	{
-		return address;
-	}
-
-	public void setAddress(String address)
-	{
-		this.address = address;
-	}
-
-	public String getCity()
-	{
-		return city;
-	}
-
-	public void setCity(String city)
-	{
-		this.city = city;
-	}
-
-	public String getProvince()
-	{
-		return province;
-	}
-
-	public void setProvince(String province)
-	{
-		this.province = province;
-	}
-
-	public String getPostal()
-	{
-		return postal;
-	}
-
-	public void setPostal(String postal)
-	{
-		this.postal = postal;
-	}
-
-	public Integer getProviderIdFrom()
-	{
-		return providerIdFrom;
-	}
-
-	public void setProviderIdFrom(Integer providerIdFrom)
-	{
-		this.providerIdFrom = providerIdFrom;
-	}
-
-	public Integer getProviderIdTo()
-	{
-		return providerIdTo;
-	}
-
-	public void setProviderIdTo(Integer providerIdTo)
-	{
-		this.providerIdTo = providerIdTo;
-	}
-
-	public byte getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(byte status)
-	{
-		this.status = status;
-	}
-
-	public Integer getSiteLogoId()
-	{
-		return siteLogoId;
-	}
-
-	public void setSiteLogoId(Integer siteLogoId)
-	{
-		this.siteLogoId = siteLogoId;
-	}
-
-	public String getSiteUrl()
-	{
-		return siteUrl;
-	}
-
-	public void setSiteUrl(String siteUrl)
-	{
-		this.siteUrl = siteUrl;
-	}
-
-	public String getBcFacilityNumber()
-	{
-		return bcFacilityNumber;
-	}
-
-	public void setBcFacilityNumber(String bcFacilityNumber)
-	{
-		this.bcFacilityNumber = bcFacilityNumber;
-	}
+	private String bcServiceLocationCode;
 }

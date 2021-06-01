@@ -120,6 +120,11 @@ public class CaseManagementPrint {
 		{
 			notes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, false);
 		}
+		else if (startDate != null && endDate != null)
+		{
+			notes = newCaseManagementNoteDao.findLatestRevisionOfAllNotes(demographicNo, false);
+			notes = filterNotesByDate(notes, startDate, endDate);
+		}
 		else
 		{
 			notes = getNotesToPrint(noteIds, loggedInInfo, demoNo);
@@ -303,6 +308,9 @@ public class CaseManagementPrint {
 				"",
 				"U",
 				"");
+
+		Collections.sort(labs);
+
 		LinkedHashMap<String, LabResultData> accessionMap = new LinkedHashMap<>();
 
 		for (int i = 0; i < labs.size(); i++)

@@ -16,13 +16,13 @@ Juno.Common.Util.settings = {
 	time_format: "h:mma",
 	date_format: "YYYY-MM-DD",
 	dayofweek_format: "dddd",
-
 	defaultTimeFormat: "HH:mm:ss"
 };
 
 Juno.Common.Util.DisplaySettings = {
 	dateFormat: "yyyy-MM-dd",
 	timeFormat: "HH:mm a",
+	calendarDateFormat: 'dddd MMM Do',
 };
 
 Juno.Common.Util.exists = function exists(object) {

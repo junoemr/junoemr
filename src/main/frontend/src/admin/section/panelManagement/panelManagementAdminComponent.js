@@ -21,13 +21,26 @@
  * Canada
  */
 
+import {ProvidersServiceApi} from "../../../../generated";
+
 angular.module('Admin.Section').component('panelManagementAdmin',
 {
 	templateUrl: 'src/admin/section/panelManagement/panelManagement.jsp',
 	bindings: {},
-	controller: ['$scope', 'providersService', 'uxService', function ($scope, providersService, uxService)
+	controller: [
+		'$scope',
+		'$http',
+		'$httpParamSerializer',
+		'uxService',
+		function (
+			$scope,
+			$http,
+			$httpParamSerializer,
+			uxService)
 	{
 		let ctrl = this;
+
+		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
 		ctrl.selectedProvider = null;
 		ctrl.selectedPanel = null;
@@ -41,11 +54,11 @@ angular.module('Admin.Section').component('panelManagementAdmin',
 
 		ctrl.$onInit = function ()
 		{
-			providersService.getAll().then(
+			providersServiceApi.getAll().then(
 					function success(result)
 					{
 						ctrl.providers = [];
-						for (let provider of result)
+						for (let provider of result.data.body)
 						{
 							ctrl.providers.push({
 								label: provider.name,

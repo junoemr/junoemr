@@ -53,7 +53,7 @@
 
 	boolean isSiteAccessPrivacy = false;
 	boolean authed = true;
-	boolean isCurrentLoginSuperAdmin = currentProvider.getSuperAdmin();
+	boolean isCurrentLoginSuperAdmin = currentProvider.isSuperAdmin();
 
 %>
 

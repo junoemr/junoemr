@@ -25,6 +25,8 @@ package org.oscarehr.ws.rest.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.io.Serializable;
+
 @Schema(description = "Response wrapper object for single results")
 public class RestResponse<T> extends GenericRestResponse<RestResponseHeaders, T, RestResponseError>
 {
@@ -52,8 +54,14 @@ public class RestResponse<T> extends GenericRestResponse<RestResponseHeaders, T,
 	{
 		return errorResponse(new RestResponseHeaders(), error);
 	}
+
 	public static <T> RestResponse<T> errorResponse(String errorMessage)
 	{
 		return errorResponse(new RestResponseError(errorMessage));
+	}
+
+	public static <T> RestResponse<T> errorResponse(String errorMessage, Serializable data)
+	{
+		return errorResponse(new RestResponseError(errorMessage, data));
 	}
 }

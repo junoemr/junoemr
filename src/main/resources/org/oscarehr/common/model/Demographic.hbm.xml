@@ -84,5 +84,8 @@
 		<property column="name_of_mother" length="32" name="nameOfMother" type="string" />
 		<property column="name_of_father" length="32" name="nameOfFather" type="string" />
 
+		<property column="electronic_messaging_consent_given_at" name="electronicMessagingConsentGivenAt" type="timestamp" />
+		<property column="electronic_messaging_consent_rejected_at" name="electronicMessagingConsentRejectedAt" type="timestamp" />
+
 	</class>
 </hibernate-mapping>

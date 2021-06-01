@@ -81,11 +81,13 @@ public class EFormTests extends SeleniumTestBase
 	@After
 	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
-		SchemaUtils.restoreTable("casemgmt_note", "eChart", "eform", "eform_data", "eform_instance", "eform_values", "measurementType", "validations");
+		SchemaUtils.restoreTable("casemgmt_note", "eChart", "eform", "eform_data", "eform_instance",
+				"eform_values", "measurementType", "validations");
 	}
 
 	@Test
-	public void canAddTravel_Form_v4EForm() throws InterruptedException
+	public void canAddTravel_Form_v4EForm()
+			throws InterruptedException
 	{
 		//navigate to eform addition page
 		String oldUrl = driver.getCurrentUrl();
