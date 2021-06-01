@@ -2220,10 +2220,20 @@
 
 		function validateRxDate() {
 			var x = true;
-			jQuery('input[name^="rxDate__"]').each(function(){
-				var str1  = jQuery(this).val();
 
+			jQuery('input[name^="rxDate_"]').each(function(){
+				var str1  = jQuery(this).val();
 				var dt = str1.split("-");
+				var notJustYear = dt[0].length>4
+
+				if (notJustYear && !str1.includes("-"))
+				{
+					jQuery(this).focus();
+					alert('Start Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
+					x = false;
+					return;
+				}
+
 				if (dt.length>3) {
 					jQuery(this).focus();
 					alert('Start Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
@@ -2232,9 +2242,9 @@
 				}
 
 				var dt1=1, mon1=0, yr1=parseInt(dt[0],10);
-				if (isNaN(yr1) || yr1<0 || yr1>9999) {
+				if (isNaN(yr1) || yr1<1900 || yr1>9999) {
 					jQuery(this).focus();
-					alert('Invalid Start Date! Please check the year');
+					alert('Invalid Start Date! Please check the year. Must be yyyy or yyyy-mm or yyyy-mm-dd');
 					x = false;
 					return;
 				}
@@ -2242,7 +2252,7 @@
 					mon1 = parseInt(dt[1],10)-1;
 					if (isNaN(mon1) || mon1<0 || mon1>11) {
 						jQuery(this).focus();
-						alert('Invalid Start Date! Please check the month');
+						alert('Invalid Start Date! Please check the month. Must be yyyy or yyyy-mm or yyyy-mm-dd');
 						x = false;
 						return;
 					}
@@ -2251,7 +2261,7 @@
 					dt1 = parseInt(dt[2],10);
 					if (isNaN(dt1) || dt1<1 || dt1>31) {
 						jQuery(this).focus();
-						alert('Invalid Start Date! Please check the day');
+						alert('Invalid Start Date! Please check the day. Must be yyyy or yyyy-mm or yyyy-mm-dd');
 						x = false;
 						return;
 					}
@@ -2274,10 +2284,20 @@
 
 		function validateWrittenDate() {
 			var x = true;
+
 			jQuery('input[name^="writtenDate_"]').each(function(){
 				var str1  = jQuery(this).val();
-
 				var dt = str1.split("-");
+				var notJustYear = dt[0].length>4
+
+				if (notJustYear && !str1.includes("-"))
+				{
+					jQuery(this).focus();
+					alert('Written Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
+					x = false;
+					return;
+				}
+
 				if (dt.length>3) {
 					jQuery(this).focus();
 					alert('Written Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
@@ -2286,7 +2306,7 @@
 				}
 
 				var dt1=1, mon1=0, yr1=parseInt(dt[0],10);
-				if (isNaN(yr1) || yr1<0 || yr1>9999) {
+				if (isNaN(yr1) || yr1<1900 || yr1>9999) {
 					jQuery(this).focus();
 					alert('Invalid Written Date! Please check the year');
 					x = false;
