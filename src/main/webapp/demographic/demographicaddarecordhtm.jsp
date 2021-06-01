@@ -81,6 +81,8 @@
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@ page import="org.oscarehr.eform.model.EForm" %>
 <%@ page import="java.sql.ResultSet" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+
 
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <%
@@ -95,7 +97,9 @@
     boolean privateConsentEnabled = privateConsentEnabledProperty != null && privateConsentEnabledProperty.equals("true");
 
     LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 %>
+
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 
 <%@ include file="../admin/dbconnection.jsp"%>
@@ -151,6 +155,7 @@
 	    PatientConsentManager patientConsentManager = SpringUtils.getBean( PatientConsentManager.class );
 		pageContext.setAttribute( "consentTypes", patientConsentManager.getConsentTypes() );
 	}
+
 %>
 <html:html locale="true">
 <head>
@@ -812,7 +817,7 @@ function ignoreDuplicates() {
 					key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></td>
 				<td id="phoneCell" align="left"><input type="text" id="phone" name="phone"
 				   	onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone)"
-					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
+					value="<%=systemPreferenceService.getPreferenceValue("phone_prefix", "")%>"> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input
 					type="text" id="hPhoneExt" name="hPhoneExt" value="" size="4" /></td>
 				<td id="phoneWorkLbl" align="right"><b><bean:message

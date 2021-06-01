@@ -31,6 +31,8 @@
 <%@page import="oscar.oscarRx.data.RxPrescriptionData" %>
 <%@page import="oscar.oscarRx.util.RxUtil" %>
 <%@page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.HashSet" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -55,7 +57,15 @@
 
     if(listRxDrugs != null)
     {
-	    String specStr = RxUtil.getSpecialInstructions();
+    	// This happens to be indexed in the database, and seems to be as unique as GCNNo.
+	    Set<String> drugRegionalIdentifiers = new HashSet<String>();
+
+	    for (RxPrescriptionData.Prescription rx : listRxDrugs)
+        {
+        	drugRegionalIdentifiers.add(rx.getRegionalIdentifier());
+        }
+
+        String specStr = RxUtil.getSpecialInstructionsOptimized(drugRegionalIdentifiers);
 
 	    for(RxPrescriptionData.Prescription rx : listRxDrugs)
 	    {

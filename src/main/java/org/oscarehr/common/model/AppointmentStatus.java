@@ -131,6 +131,11 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 		this.active = active;
 	}
 
+	public boolean isActive()
+	{
+		return active == 1;
+	}
+
 	public int getEditable() {
 		return editable;
 	}
@@ -138,7 +143,12 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 	public void setEditable(int editable) {
 		this.editable = editable;
 	}
-	
+
+	public boolean isEditable()
+	{
+		return editable == 1;
+	}
+
     public String getShortLetters() {
 		return shortLetters;
 	}

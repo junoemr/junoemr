@@ -1,5 +1,6 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import {AqsQueuesApi} from "../../../../generated";
+import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 	{
@@ -14,6 +15,8 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 			'$uibModal',
 			'staticDataService',
 			'NgTableParams',
+			'securityService',
+			'systemPreferenceService',
 			function (
 				$q,
 				$http,
@@ -23,6 +26,8 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 				$uibModal,
 				staticDataService,
 				NgTableParams,
+				securityService,
+				systemPreferenceService,
 			)
 			{
 				let ctrl = this;
@@ -38,8 +43,12 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.userIsSuperAdmin = securityService.getUser().superAdmin;
+				ctrl.showAdvancedOptions = false;
+				ctrl.organizationName = null;
+				ctrl.organizationSecret = null;
 
-				ctrl.$onInit = function ()
+				ctrl.$onInit = async function ()
 				{
 					ctrl.tableParams = new NgTableParams(
 						{
@@ -58,6 +67,8 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 							}
 						}
 					);
+
+					ctrl.organizationName = await systemPreferenceService.getPreference(SYSTEM_PROPERTIES.AQS_ORGANIZATION_ID, null);
 
 					ctrl.loadQueuesList();
 				};
@@ -128,6 +139,30 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 						{
 							// modal dismissed
 						});
+				}
+
+				// toggle advanced options display
+				ctrl.toggleAdvanced = () =>
+				{
+					ctrl.showAdvancedOptions = !ctrl.showAdvancedOptions;
+				}
+
+				// update AQS credentials
+				ctrl.updateAqsCredentials = async () =>
+				{
+					if (ctrl.organizationName)
+					{
+						systemPreferenceService.setPreference(SYSTEM_PROPERTIES.AQS_ORGANIZATION_ID, ctrl.organizationName);
+					}
+
+					if (ctrl.organizationSecret)
+					{
+						systemPreferenceService.setPreference(SYSTEM_PROPERTIES.AQS_ORGANIZATION_SECRET, ctrl.organizationSecret);
+					}
+
+					// reload queues.
+					ctrl.queueList = [];
+					ctrl.loadQueuesList();
 				}
 
 				ctrl.loadQueuesList = () =>

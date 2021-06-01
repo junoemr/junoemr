@@ -44,13 +44,13 @@ import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.util.ConversionUtils;
 
 import javax.servlet.ServletException;
@@ -67,7 +67,6 @@ public class EctMeasurementsAction extends Action
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 	private CaseManagementNoteDao caseManagementNoteDao = (CaseManagementNoteDao) SpringUtils.getBean("encounterNote.dao.CaseManagementNoteDao");
-	private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException
@@ -91,9 +90,10 @@ public class EctMeasurementsAction extends Action
 		{
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());
 			FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+			MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
 			List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template, (String) session.getAttribute("user"), Integer.parseInt(demographicNo));
-			mFlowsheet = flowsheetService.getCustomizedFlowsheet(template, custList);
+			mFlowsheet = templateConfig.getFlowSheet(template, custList);
 		}
 
 		String numType = frm.getValue("numType");
