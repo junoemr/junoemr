@@ -2222,46 +2222,48 @@
 			var x = true;
 
 			jQuery('input[name^="rxDate_"]').each(function(){
-				var str1  = jQuery(this).val();
-				var dt = str1.split("-");
-				var notJustYear = dt[0].length>4
+				var startDate  = jQuery(this).val();
+				var match = startDate.match(/^(\d+-?)+\d+$/);
+				var splitStartDate = startDate.split("-");
+				var notJustYear = splitStartDate[0].length > 4;
+				var warning = "Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.";
 
-				if (notJustYear && !str1.includes("-"))
+				if ((notJustYear && !startDate.includes("-")) || !match)
 				{
 					jQuery(this).focus();
-					alert('Start Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
+					alert(warning);
 					x = false;
 					return;
 				}
 
-				if (dt.length>3) {
+				if (splitStartDate.length > 3) {
 					jQuery(this).focus();
-					alert('Start Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
+					alert(warning);
 					x = false;
 					return;
 				}
 
-				var dt1=1, mon1=0, yr1=parseInt(dt[0],10);
+				var dt1=1, mon1=0, yr1=parseInt(splitStartDate[0],10);
 				if (isNaN(yr1) || yr1<1900 || yr1>9999) {
 					jQuery(this).focus();
-					alert('Invalid Start Date! Please check the year. Must be yyyy or yyyy-mm or yyyy-mm-dd');
+					alert(warning + " Please check the year.");
 					x = false;
 					return;
 				}
-				if (dt.length>1) {
-					mon1 = parseInt(dt[1],10)-1;
+				if (splitStartDate.length > 1) {
+					mon1 = parseInt(splitStartDate[1],10)-1;
 					if (isNaN(mon1) || mon1<0 || mon1>11) {
 						jQuery(this).focus();
-						alert('Invalid Start Date! Please check the month. Must be yyyy or yyyy-mm or yyyy-mm-dd');
+						alert(warning + " Please check the month.");
 						x = false;
 						return;
 					}
 				}
-				if (dt.length>2) {
-					dt1 = parseInt(dt[2],10);
+				if (splitStartDate.length > 2) {
+					dt1 = parseInt(splitStartDate[2],10);
 					if (isNaN(dt1) || dt1<1 || dt1>31) {
 						jQuery(this).focus();
-						alert('Invalid Start Date! Please check the day. Must be yyyy or yyyy-mm or yyyy-mm-dd');
+						alert(warning + " Please check the day.");
 						x = false;
 						return;
 					}
@@ -2271,7 +2273,7 @@
 
 				if(date1 > now) {
 					jQuery(this).focus();
-					alert('Start Date cannot be in the future. (' + str1 +')');
+					alert('Start Date cannot be in the future. (' + startDate +')');
 					x = false;
 					return;
 				}
@@ -2286,46 +2288,48 @@
 			var x = true;
 
 			jQuery('input[name^="writtenDate_"]').each(function(){
-				var str1  = jQuery(this).val();
-				var dt = str1.split("-");
-				var notJustYear = dt[0].length>4
+				var writtenDate = jQuery(this).val();
+				var match = writtenDate.match(/^(\d+-?)+\d+$/);
+				var splitWrittenDate = writtenDate.split("-");
+				var notJustYear = splitWrittenDate[0].length > 4;
+				var warning = "Written Date must be yyyy or yyyy-mm or yyyy-mm-dd."
 
-				if (notJustYear && !str1.includes("-"))
+				if (notJustYear && !writtenDate.includes("-") || !match)
 				{
 					jQuery(this).focus();
-					alert('Written Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
+					alert(warning);
 					x = false;
 					return;
 				}
 
-				if (dt.length>3) {
+				if (splitWrittenDate.length > 3) {
 					jQuery(this).focus();
-					alert('Written Date wrong format! Must be yyyy or yyyy-mm or yyyy-mm-dd');
+					alert(warning);
 					x = false;
 					return;
 				}
 
-				var dt1=1, mon1=0, yr1=parseInt(dt[0],10);
-				if (isNaN(yr1) || yr1<1900 || yr1>9999) {
+				var dt1=1, mon1=0, yr1=parseInt(splitWrittenDate[0],10);
+				if (isNaN(yr1) || yr1 < 1900 || yr1 > 9999) {
 					jQuery(this).focus();
-					alert('Invalid Written Date! Please check the year');
+					alert(warning + " Please check the year");
 					x = false;
 					return;
 				}
-				if (dt.length>1) {
-					mon1 = parseInt(dt[1],10)-1;
-					if (isNaN(mon1) || mon1<0 || mon1>11) {
+				if (splitWrittenDate.length > 1) {
+					mon1 = parseInt(splitWrittenDate[1],10)-1;
+					if (isNaN(mon1) || mon1 < 0 || mon1 > 11) {
 						jQuery(this).focus();
-						alert('Invalid Written Date! Please check the month');
+						alert(warning + " Please check the month");
 						x = false;
 						return;
 					}
 				}
-				if (dt.length>2) {
-					dt1 = parseInt(dt[2],10);
-					if (isNaN(dt1) || dt1<1 || dt1>31) {
+				if (splitWrittenDate.length > 2) {
+					dt1 = parseInt(splitWrittenDate[2],10);
+					if (isNaN(dt1) || dt1 < 1 || dt1 > 31) {
 						jQuery(this).focus();
-						alert('Invalid Written Date! Please check the day');
+						alert(warning + " Please check the day");
 						x = false;
 						return;
 					}
@@ -2335,7 +2339,7 @@
 
 				if(date1 > now) {
 					jQuery(this).focus();
-					alert('Written Date cannot be in the future. (' + str1 +')');
+					alert('Written Date cannot be in the future. (' + writtenDate +')');
 					x = false;
 					return;
 				}
