@@ -47,7 +47,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Tickler',
 	'Record',
 	'Record.Summary',
-	'Record.Tracker',
 	'Record.Details',
 	'Record.PHR',
 	'Record.Forms',
@@ -713,8 +712,7 @@ oscarApp.config([
 		}).state('record.tracker',
 		{
 			url: '/tracker',
-			templateUrl: 'src/record/tracker/tracker.jsp',
-			controller: 'Record.Tracker.TrackerController as trackerCtrl',
+			component: 'healthTracker',
 			meta:
 			{
 				auth: {
@@ -722,6 +720,7 @@ oscarApp.config([
 				},
 			},
 		})
+
         .state('record.patientEducation',
         {
             url: '/patientEducation',
