@@ -52,10 +52,20 @@ import oscar.util.UtilDateUtilities;
  *
  * @author jay
  */
-public class PapReport implements PreventionReport {
+public class PapReport implements PreventionReport
+{
     private static Logger log = MiscUtils.getLogger();
-    /** Creates a new instance of PapReport */
-    public PapReport() {
+
+    /**
+     * Creates a new instance of PapReport
+     */
+    public PapReport()
+    {
+    }
+
+    public boolean displayNumShots()
+    {
+        return false;
     }
 
     public Hashtable runReport(LoggedInInfo loggedInInfo,ArrayList list,Date asofDate){
