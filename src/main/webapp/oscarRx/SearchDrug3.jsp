@@ -2226,19 +2226,18 @@
 				var match = startDate.match(/^(\d+-?)+\d+$/);
 				var splitStartDate = startDate.split("-");
 				var notJustYear = splitStartDate[0].length > 4;
-				var warning = "Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.";
 
 				if ((notJustYear && !startDate.includes("-")) || !match)
 				{
 					jQuery(this).focus();
-					alert(warning);
+					alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
 					x = false;
 					return;
 				}
 
 				if (splitStartDate.length > 3) {
 					jQuery(this).focus();
-					alert(warning);
+					alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
 					x = false;
 					return;
 				}
@@ -2246,7 +2245,7 @@
 				var dt1=1, mon1=0, yr1=parseInt(splitStartDate[0],10);
 				if (isNaN(yr1) || yr1<1900 || yr1>9999) {
 					jQuery(this).focus();
-					alert(warning + " Please check the year.");
+					alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the year.");
 					x = false;
 					return;
 				}
@@ -2254,7 +2253,7 @@
 					mon1 = parseInt(splitStartDate[1],10)-1;
 					if (isNaN(mon1) || mon1<0 || mon1>11) {
 						jQuery(this).focus();
-						alert(warning + " Please check the month.");
+						alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the month.");
 						x = false;
 						return;
 					}
@@ -2263,7 +2262,7 @@
 					dt1 = parseInt(splitStartDate[2],10);
 					if (isNaN(dt1) || dt1<1 || dt1>31) {
 						jQuery(this).focus();
-						alert(warning + " Please check the day.");
+						alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the day.");
 						x = false;
 						return;
 					}
@@ -2292,19 +2291,18 @@
 				var match = writtenDate.match(/^(\d+-?)+\d+$/);
 				var splitWrittenDate = writtenDate.split("-");
 				var notJustYear = splitWrittenDate[0].length > 4;
-				var warning = "Written Date must be yyyy or yyyy-mm or yyyy-mm-dd."
 
 				if (notJustYear && !writtenDate.includes("-") || !match)
 				{
 					jQuery(this).focus();
-					alert(warning);
+					alert("Written Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
 					x = false;
 					return;
 				}
 
 				if (splitWrittenDate.length > 3) {
 					jQuery(this).focus();
-					alert(warning);
+					alert("Written Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
 					x = false;
 					return;
 				}
@@ -2312,7 +2310,7 @@
 				var dt1=1, mon1=0, yr1=parseInt(splitWrittenDate[0],10);
 				if (isNaN(yr1) || yr1 < 1900 || yr1 > 9999) {
 					jQuery(this).focus();
-					alert(warning + " Please check the year");
+					alert("Written Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the year");
 					x = false;
 					return;
 				}
@@ -2320,7 +2318,7 @@
 					mon1 = parseInt(splitWrittenDate[1],10)-1;
 					if (isNaN(mon1) || mon1 < 0 || mon1 > 11) {
 						jQuery(this).focus();
-						alert(warning + " Please check the month");
+						alert("Written Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the month");
 						x = false;
 						return;
 					}
@@ -2329,7 +2327,7 @@
 					dt1 = parseInt(splitWrittenDate[2],10);
 					if (isNaN(dt1) || dt1 < 1 || dt1 > 31) {
 						jQuery(this).focus();
-						alert(warning + " Please check the day");
+						alert("Written Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the day");
 						x = false;
 						return;
 					}
