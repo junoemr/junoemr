@@ -47,6 +47,9 @@ import static oscar.util.StringUtils.filterControlCharacters;
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {
+	public static final int FIRST_NAME_MAX_LENGTH = 30;
+	public static final int LAST_NAME_MAX_LENGTH = 30;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "demographic_no")

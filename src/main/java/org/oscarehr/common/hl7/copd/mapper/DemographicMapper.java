@@ -43,7 +43,7 @@ import java.util.List;
 public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
-	private final String DEMO_NULL_NAME="NULL_NAME";
+	private final String DEMO_NULL_NAME = "NULL_NAME";
 
 	public DemographicMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
@@ -127,8 +127,13 @@ public class DemographicMapper extends AbstractMapper
 		{
 			firstName += " " + middleName;
 		}
+		firstName = firstName.replaceAll("<", "").replaceAll(">", "");
 
-		return firstName.replaceAll("<", "").replaceAll(">", "");
+		if (firstName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
+		{
+			MiscUtils.getLogger().warn("Demographic first name is too long. Will be truncated to: '" + firstName.substring(0, Demographic.FIRST_NAME_MAX_LENGTH) + "'");
+		}
+		return firstName;
 	}
 	public String getLastName(int rep) throws HL7Exception
 	{
@@ -138,7 +143,13 @@ public class DemographicMapper extends AbstractMapper
 			MiscUtils.getLogger().warn("demographic has no last name! using: " + DEMO_NULL_NAME);
 			return DEMO_NULL_NAME;
 		}
-		return lastName.replaceAll("<", "").replaceAll(">", "");
+		lastName = lastName.replaceAll("<", "").replaceAll(">", "");
+
+		if (lastName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
+		{
+			MiscUtils.getLogger().warn("Demographic last name is too long. Will be truncated to: '" + lastName.substring(0, Demographic.LAST_NAME_MAX_LENGTH) + "'");
+		}
+		return lastName;
 	}
 
 	public boolean hasFirstName(int rep) throws HL7Exception
