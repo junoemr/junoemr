@@ -121,6 +121,13 @@ public class DemographicMapper extends AbstractMapper
 			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
 			return DEMO_NULL_NAME;
 		}
+		// Append middle name to firstName if it exists to prevent data loss. Middle name doesn't have a place in Juno
+		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
+		if (middleName != null)
+		{
+			firstName += " " + middleName;
+		}
+
 		return firstName.replaceAll("<", "").replaceAll(">", "");
 	}
 	public String getLastName(int rep) throws HL7Exception
@@ -137,7 +144,8 @@ public class DemographicMapper extends AbstractMapper
 	public boolean hasFirstName(int rep) throws HL7Exception
 	{
 		String firstName = StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue());
-		return  firstName != null;
+		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
+		return  firstName != null || middleName != null;
 	}
 
 	public boolean hasLastName(int rep) throws HL7Exception
