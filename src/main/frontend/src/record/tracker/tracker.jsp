@@ -21,6 +21,29 @@
 * Canada
 --%>
 
-<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.MEASUREMENT_READ">
-    <h1>NEW Health Tracker component</h1>
-</juno-security-check>
+<div class="health-tracker-component">
+    <h1>Patient Health Tracker</h1>
+
+    <juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.FLOWSHEET_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ]">
+        <table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
+            <tbody>
+            <tr ng-repeat="flowsheet in $ctrl.flowsheets">
+                <td data-title="'Flowsheet'">
+                    {{flowsheet.name}}
+                </td>
+                <td data-title="'Description'">
+                    {{flowsheet.description}}
+                </td>
+                <td>
+                    <juno-button component-style="$ctrl.componentStyle"
+                                 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                                 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+                                 click="$ctrl.onFlowsheetSelect(flowsheet)">
+                        Open Flowsheet
+                    </juno-button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </juno-security-check>
+</div>

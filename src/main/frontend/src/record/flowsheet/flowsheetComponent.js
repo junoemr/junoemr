@@ -24,9 +24,9 @@
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
 
-angular.module('Record.Tracker').component('healthTracker',
+angular.module('Record.Flowsheet').component('flowsheet',
 	{
-		templateUrl: 'src/record/tracker/tracker.jsp',
+		templateUrl: 'src/record/flowsheet/flowsheet.jsp',
 		bindings: {
 			componentStyle: "<?",
 		},
@@ -37,28 +37,28 @@ angular.module('Record.Tracker').component('healthTracker',
 			function (
 				$state,
 				$stateParams,
-				flowsheetApiService)
+				flowsheetApiService,
+			)
 			{
 				const ctrl = this;
+
 				ctrl.SecurityPermissions = SecurityPermissions;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.flowsheets = [];
+				ctrl.flowsheet = null;
 
 				ctrl.$onInit = async () =>
 				{
-					ctrl.demographicNo = $stateParams.demographicNo;
-					ctrl.flowsheets = await flowsheetApiService.getAllFlowsheets();
+					ctrl.flowsheet = await flowsheetApiService.getFlowsheet($stateParams.flowsheetId);
 				}
 
-				ctrl.onFlowsheetSelect = (flowsheet) =>
+				ctrl.toHealthTracker = () =>
 				{
-					$state.transitionTo('record.flowsheet',
+					$state.transitionTo('record.tracker',
 						{
-							demographicNo: ctrl.demographicNo,
-							flowsheetId: flowsheet.id,
+							demographicNo: $stateParams.demographicNo,
 						},
 						{
 							notify: false

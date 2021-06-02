@@ -46,10 +46,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Layout',
 	'Tickler',
 	'Record',
-	'Record.Summary',
-	'Record.Details',
-	'Record.PHR',
-	'Record.Forms',
 	'Schedule',
 	'Settings',
 	'Report',
@@ -709,7 +705,8 @@ oscarApp.config([
 					checkDemographicAccess: true,
 				},
 			},
-		}).state('record.tracker',
+		})
+		.state('record.tracker',
 		{
 			url: '/tracker',
 			component: 'healthTracker',
@@ -720,7 +717,17 @@ oscarApp.config([
 				},
 			},
 		})
-
+		.state('record.flowsheet',
+		{
+			url: '/flowsheet/:flowsheetId',
+			component: 'flowsheet',
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
+		})
         .state('record.patientEducation',
         {
             url: '/patientEducation',

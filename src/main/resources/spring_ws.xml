@@ -372,6 +372,8 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxAccountWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxInboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.FlowsheetWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.FlowsheetsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
 			<!-- AQS (Appointment Queue Service) -->
