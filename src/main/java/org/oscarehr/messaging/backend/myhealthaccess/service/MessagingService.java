@@ -148,16 +148,16 @@ public class MessagingService implements org.oscarehr.messaging.service.Messagin
 
 	/**
 	 * get the total count of messages in a group for the given messageable
-	 *
 	 * @param loggedInInfo - currently logged in user info
-	 * @param messageable  - the messageable whose group is being counted.
-	 * @param group        - the group to count
+	 * @param messageable - the messageable whose group is being counted.
+	 * @param group - the group to count
+	 * @param onlyUnread - if true only unread messages will be counted
 	 * @return - the count of messages in the group
 	 */
 	@Override
-	public Number countMessagesInGroup(LoggedInInfo loggedInInfo, Messageable<?> messageable, MessageGroup group)
+	public Integer countMessagesInGroup(LoggedInInfo loggedInInfo, Messageable<?> messageable, MessageGroup group, Boolean onlyUnread)
 	{
-		throw new NotImplementedException();
+		return this.clinicMessagingService.countMessages(getIntegrationFromMessageable(messageable), loggedInInfo, group, onlyUnread);
 	}
 
 	/**

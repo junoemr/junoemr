@@ -24,6 +24,7 @@
 import MessagingServiceFactory from "../../lib/messaging/factory/MessagingServiceFactory";
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import StreamingList from "../../lib/util/StreamingList";
+import {MessageGroup} from "../../lib/messaging/model/MessageGroup";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',

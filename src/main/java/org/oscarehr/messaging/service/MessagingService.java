@@ -86,9 +86,10 @@ public interface MessagingService
 	 * @param loggedInInfo - currently logged in user info
 	 * @param messageable - the messageable whose group is being counted.
 	 * @param group - the group to count
+	 * @param onlyUnread - if true only unread messages will be counted
 	 * @return - the count of messages in the group
 	 */
-	public Number countMessagesInGroup(LoggedInInfo loggedInInfo, Messageable<?> messageable, MessageGroup group);
+	public Integer countMessagesInGroup(LoggedInInfo loggedInInfo, Messageable<?> messageable, MessageGroup group, Boolean onlyUnread);
 
 	/**
 	 * get a conversation for the messageable by id.

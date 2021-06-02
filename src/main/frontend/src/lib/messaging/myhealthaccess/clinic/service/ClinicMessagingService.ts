@@ -226,6 +226,25 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	}
 
 	/**
+	 * count messages.
+	 * @param source - source to count messages in
+	 * @param group - [optional] group to count messages in
+	 * @param onlyUnread - [optional] if true only count unread messages
+	 * @return the count of messages
+	 */
+	public async countMessages(source: MessageSource, group = MessageGroup.All, onlyUnread = false): Promise<number>
+	{
+		if (source.isVirtual)
+		{
+			return await this.getPhysicalMessagingSources().reduce(async (total: Promise<number>, physicalSource) => {
+				return (await total) + (await this.countMessages(physicalSource, group, onlyUnread));
+			}, new Promise((resolve) => resolve(0))) as number;
+		}
+
+		return (await this._mhaClinicMessagingApi.countMessages(source.id, group.toString(), onlyUnread)).data.body;
+	}
+
+	/**
 	 * get a conversation
 	 * @param source - source to get conversation from
 	 * @param conversationId - the conversation id to get
@@ -296,6 +315,20 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 		}
 
 		return this._messageSources;
+	}
+
+	/**
+	 * get the default source
+	 * @return the default source
+	 */
+	public async getDefaultMessageSource(): Promise<MessageSource>
+	{
+		if (this._messageSources.length === 0)
+		{
+			await this.loadMessagingSources();
+		}
+
+		return this._messageSources.find((source) => source.id === this.VIRTUAL_SOURCE_ID);
 	}
 
 	/**

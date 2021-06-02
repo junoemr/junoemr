@@ -1,7 +1,6 @@
 .page-wrapper {
 	& > .header {
 		@extend %juno-page-header;
-		padding-top: 6px;
 	}
 
 	& > .body {

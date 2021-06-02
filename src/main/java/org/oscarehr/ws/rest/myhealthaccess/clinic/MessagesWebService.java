@@ -106,4 +106,21 @@ public class MessagesWebService extends MessagingBaseWebService
 		return RestResponse.successResponse((new MessageToMessageDtoConverter()).convert(messages));
 	}
 
+	@GET
+	@Path("/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Integer> countMessages(
+			@PathParam("integrationId") String integrationId,
+
+			@QueryParam("group") String group,
+			@QueryParam("onlyUnread") Boolean onlyUnread
+	)
+	{
+		return RestResponse.successResponse(this.messagingService.countMessagesInGroup(
+				getLoggedInInfo(),
+				messageableFromIntegrationId(integrationId),
+				MessageGroup.fromString(group),
+				onlyUnread
+		));
+	}
 }

@@ -53,6 +53,15 @@ export default interface MessagingServiceInterface
 	searchMessagesAsStream(source: MessageSource, searchOptions: MessageSearchParams): Promise<StreamingList<Message>>;
 
 	/**
+	 * count messages.
+	 * @param source - source to count messages in
+	 * @param group - [optional] group to count messages in
+	 * @param onlyUnread - [optional] if true only count unread messages
+	 * @return the count of messages
+	 */
+	countMessages(source: MessageSource, group?: MessageGroup, onlyUnread?: boolean): Promise<number>;
+
+	/**
 	 * get a conversation
 	 * @param source - source to get conversation from
 	 * @param conversationId - the conversation id to get
@@ -71,6 +80,12 @@ export default interface MessagingServiceInterface
 	 * @return list of message sources
 	 */
 	getMessageSources(): Promise<MessageSource[]>;
+
+	/**
+	 * get the default source
+	 * @return the default source
+	 */
+	getDefaultMessageSource(): Promise<MessageSource>;
 
 	/**
 	 * get a message source by it's id.

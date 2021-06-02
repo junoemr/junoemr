@@ -1,6 +1,6 @@
 <page-wrapper class="messaging-inbox">
-	<page-header>
-		<h6>Backend: {{$ctrl.backend}} Source: {{$ctrl.selectedSourceId}} Group: {{$ctrl.selectedGroupId}}</h6>
+	<page-header class="flex-row align-items-center h-100">
+		<h6>Patient Messenger</h6>
 	</page-header>
 	<page-body class="flex-item-grow flex-col messaging-inbox">
 		<inbox-header-bar ng-if="$ctrl.backend"

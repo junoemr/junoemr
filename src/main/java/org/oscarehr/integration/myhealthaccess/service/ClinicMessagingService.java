@@ -28,6 +28,7 @@ import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
 import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.ConversationDto;
+import org.oscarehr.integration.myhealthaccess.dto.MessageCountDto;
 import org.oscarehr.integration.myhealthaccess.dto.MessageDto;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
 import org.oscarehr.messaging.backend.myhealthaccess.model.MhaAttachment;
@@ -151,6 +152,27 @@ public class ClinicMessagingService extends BaseService
 		String url = restClient.formatEndpointFull("/clinic_user/self/clinic/messages", null, queryParams);
 
 		return this.postProcessMessage(Arrays.asList(restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), MessageDto[].class)), restClient);
+	}
+
+	/**
+	 * count the number of messages in the provided integration / group combo
+	 * @param integration - the integration (mha clinic) you which to count messages in.
+	 * @param loggedInInfo - the logged in info for the user performing the action.
+	 * @param group - the group you want to count messages in.
+	 * @param onlyUnread - if true only unread messages are counted.
+	 * @return - the count of messages
+	 */
+	public Integer countMessages(Integration integration,	LoggedInInfo loggedInInfo, MessageGroup group, Boolean onlyUnread)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+		queryParams.add("only_unread", onlyUnread.toString());
+		queryParams.add("group", group.getName());
+
+		String url = restClient.formatEndpointFull("/clinic_user/self/clinic/messages/count", null, queryParams);
+
+		return restClient.doGetWithToken(url, getLoginToken(integration, loggedInInfo), MessageCountDto.class).getCount();
 	}
 
 	/**
