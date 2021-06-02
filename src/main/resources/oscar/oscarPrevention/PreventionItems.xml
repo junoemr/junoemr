@@ -527,7 +527,7 @@ Varicella Immunoglobulin	VarIg
          desc= "Obesity Screening"
             name="Obesity"
             layout="history"
-            minAge="12"
+            minAge="5"
             showIfMinRecordNum="1" />
 
 	<item
