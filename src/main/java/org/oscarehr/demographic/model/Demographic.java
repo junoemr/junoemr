@@ -32,6 +32,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -57,8 +58,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	// base info
 	@Column(name = "first_name")
+	@Size(max = FIRST_NAME_MAX_LENGTH)
 	private String firstName;
 	@Column(name = "last_name")
+	@Size(max = LAST_NAME_MAX_LENGTH)
 	private String lastName;
 	@Column(name = "title")
 	private String title;

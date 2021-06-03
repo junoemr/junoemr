@@ -119,7 +119,7 @@ public class DemographicMapper extends AbstractMapper
 		if (firstName == null)
 		{
 			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
-			return DEMO_NULL_NAME;
+			firstName = DEMO_NULL_NAME;
 		}
 		// Append middle name to firstName if it exists to prevent data loss. Middle name doesn't have a place in Juno
 		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
@@ -131,7 +131,8 @@ public class DemographicMapper extends AbstractMapper
 
 		if (firstName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
 		{
-			MiscUtils.getLogger().warn("Demographic first name is too long. Will be truncated to: '" + firstName.substring(0, Demographic.FIRST_NAME_MAX_LENGTH) + "'");
+			firstName = firstName.substring(0, Demographic.FIRST_NAME_MAX_LENGTH);
+			MiscUtils.getLogger().warn("Demographic first name is too long. Will be truncated to: '" + firstName + "'");
 		}
 		return firstName;
 	}
@@ -147,22 +148,20 @@ public class DemographicMapper extends AbstractMapper
 
 		if (lastName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
 		{
-			MiscUtils.getLogger().warn("Demographic last name is too long. Will be truncated to: '" + lastName.substring(0, Demographic.LAST_NAME_MAX_LENGTH) + "'");
+			lastName = lastName.substring(0, Demographic.LAST_NAME_MAX_LENGTH);
+			MiscUtils.getLogger().warn("Demographic last name is too long. Will be truncated to: '" + lastName + "'");
 		}
 		return lastName;
 	}
 
 	public boolean hasFirstName(int rep) throws HL7Exception
 	{
-		String firstName = StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue());
-		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
-		return  firstName != null || middleName != null;
+		return !this.getFirstName(rep).equals(DEMO_NULL_NAME);
 	}
 
 	public boolean hasLastName(int rep) throws HL7Exception
 	{
-		String lastName = StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue());
-		return  lastName != null;
+		return !this.getLastName(rep).equals(DEMO_NULL_NAME);
 	}
 
 	public String getSex()
