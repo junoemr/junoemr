@@ -18,16 +18,19 @@ angular.module('Report').controller('Report.ReportsController', [
 	'$filter',
 	'$log',
 	'ReportNavigation',
+	'securityService',
 
 	function(
 		$scope,
 		$state,
 		$filter,
 		$log,
-		ReportNavigation)
+		ReportNavigation,
+		securityService,)
 	{
 
 		var controller = this;
+		controller.me = securityService.getUser().providerNo;
 
 		$scope.$emit('configureShowPatientList', false);
 
@@ -158,7 +161,7 @@ angular.module('Report').controller('Report.ReportsController', [
 				numberLabel: "24",
 				name: 'Unbilled Reports',
 				templateUrl: 'src/report/report_iframe.jsp',
-				iframeUrl: '../billing/CA/billingReportCenter.jsp?displaymode=billreport'
+				iframeUrl: '../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=' + controller.me
 			},
 		];
 
