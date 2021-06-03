@@ -1,9 +1,9 @@
 import AbstractConverter from "../../../conversion/AbstractConverter";
 import {MessageDto} from "../../../../../generated";
 import MhaMessage from "../clinic/model/MhaMessage";
-import MessageableDtoToMessageableConverter from "../../converter/MessageableDtoToMessageableConverter";
 import moment from "moment";
 import AttachmentDtoToMhaAttachmentConverter from "./AttachmentDtoToMhaAttachmentConverter";
+import MessageableDtoToMhaMessageableConverter from "./MessageableDtoToMhaMessageableConverter";
 
 export default class MessageDtoToMhaMessageConverter extends AbstractConverter<MessageDto, MhaMessage>
 {
@@ -20,8 +20,8 @@ export default class MessageDtoToMhaMessageConverter extends AbstractConverter<M
 			from.message,
 			from.group,
 			from.isRead,
-			(new MessageableDtoToMessageableConverter()).convert(from.sender),
-			(new MessageableDtoToMessageableConverter()).convertList(from.recipients),
+			(new MessageableDtoToMhaMessageableConverter()).convert(from.sender),
+			(new MessageableDtoToMhaMessageableConverter()).convertList(from.recipients),
 			JSON.parse(from.metaData),
 			moment(from.createdAtDateTime),
 			(new AttachmentDtoToMhaAttachmentConverter()).convertList(from.attachments),

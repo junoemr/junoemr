@@ -1,4 +1,4 @@
-import {MhaDemographicApi} from "../../../../../generated";
+import {MhaDemographicApi, MhaPatientApi} from "../../../../../generated";
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
 import MhaPatient from "../model/MhaPatient";
 import MhaConfigService from "./MhaConfigService";
@@ -8,6 +8,7 @@ export default class MhaPatientService
 {
 	protected _mhaConfigService: MhaConfigService;
 	protected _mhaDemographicApi: MhaDemographicApi;
+	protected _mhaPatientApi: MhaPatientApi;
 
 	// ==========================================================================
 	// Public Methods
@@ -21,6 +22,37 @@ export default class MhaPatientService
 			angular.injector(["ng"]).get("$http"),
 			angular.injector(["ng"]).get("$httpParamSerializer"),
 			API_BASE_PATH);
+
+		this._mhaPatientApi = new MhaPatientApi(
+			angular.injector(["ng"]).get("$http"),
+			angular.injector(["ng"]).get("$httpParamSerializer"),
+			API_BASE_PATH);
+	}
+
+	/**
+	 * get an MHA profile by id. Searching all integrations.
+	 * @param remoteId - the
+	 */
+	public async getProfile(remoteId: string): Promise<MhaPatient>
+	{
+		let profiles = await Promise.all((await this._mhaConfigService.getMhaIntegrations()).map(async (integration) =>
+		{
+			return this.getProfileFromIntegration(integration.id, remoteId);
+		}));
+
+		// even if multiple profiles are returned they will all be the same.
+		return profiles[0];
+	}
+
+	/**
+	 * get an MHA profile by id from the specified integration.
+	 * @param integrationId - integration to get the profile from
+	 * @param remoteId - the remote id of the profile
+	 * @return mha profile or null if profile cannot be found.
+	 */
+	public async getProfileFromIntegration(integrationId: number, remoteId: string): Promise<MhaPatient>
+	{
+		return (new PatientTo1ToMhaPatientConverter()).convert((await this._mhaPatientApi.getRemotePatient(integrationId.toString(), remoteId)).data.body);
 	}
 
 	/**
@@ -42,12 +74,12 @@ export default class MhaPatientService
 	 */
 	public async profilesForDemographic(demographicNo: string): Promise<MhaPatient[]>
 	{
-		let patientTransfers = await Promise.all((await this._mhaConfigService.getMhaIntegrations()).map(async (integration) =>
+		let profiles = await Promise.all((await this._mhaConfigService.getMhaIntegrations()).map(async (integration) =>
 		{
 			return this.profileForDemographic(integration.id, demographicNo);
 		}));
 
-		return patientTransfers.filter((patientDto) => patientDto != null);
+		return profiles.filter((patientDto) => patientDto != null);
 	}
 
 }

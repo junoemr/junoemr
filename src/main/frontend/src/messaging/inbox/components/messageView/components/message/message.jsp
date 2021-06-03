@@ -4,14 +4,33 @@
 	<div class="flex-col">
 		<!-- From, and message date -->
 		<div class="flex-row justify-content-space-between">
-			<div>From: {{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}} </div>
+			<div>
+				From:
+				<a ng-if="$ctrl.demographicMapping.has($ctrl.message.sender.id)"
+				   ng-click="$ctrl.toDemographicSummary($ctrl.demographicMapping.get($ctrl.message.sender.id))">
+					{{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
+				</a>
+				<span ng-if="!$ctrl.demographicMapping.has($ctrl.message.sender.id)">
+					{{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
+				</span>
+			</div>
 			<div class="text-grey">{{$ctrl.formattedMessageDate()}}</div>
 		</div>
 
 		<!-- Recipients -->
 		<div class="m-t-32">
 			<div class="text-grey m-b-8">Recipient</div>
-			<div>{{$ctrl.recipientNames()}}</div>
+			<div>
+				<span ng-repeat="recipient in $ctrl.message.recipients">
+					<a ng-if="$ctrl.demographicMapping.has(recipient.id)"
+					   ng-click="$ctrl.toDemographicSummary($ctrl.demographicMapping.get(recipient.id))">
+						{{recipient.name}}
+					</a>
+					<span ng-if="!$ctrl.demographicMapping.has(recipient.id)">
+						{{recipient.name}}
+					</span>
+				</span>
+			</div>
 		</div>
 
 		<!-- Subject -->

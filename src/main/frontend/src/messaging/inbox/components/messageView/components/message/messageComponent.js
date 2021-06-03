@@ -22,6 +22,7 @@
 */
 import {saveAs} from "file-saver";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../../common/components/junoComponentConstants";
+import {MessageableLocalType} from "../../../../../../lib/messaging/model/MessageableLocalType";
 
 angular.module("Messaging.Components.View.Components").component('message', {
 	templateUrl: 'src/messaging/inbox/components/messageView/components/message/message.jsp',
@@ -30,22 +31,52 @@ angular.module("Messaging.Components.View.Components").component('message', {
 		messagingService: "<",
 	},
 	controller: [
-		function ()
+		"$scope",
+		"$state",
+		function (
+			$scope,
+			$state)
 		{
 			const ctrl = this;
+			ctrl.demographicMapping = new Map();
+
+			ctrl.$onInit = async () =>
+			{
+				await ctrl.loadDemographicMapping();
+
+				$scope.$apply();
+			};
+
+			/**
+			 * setup the messageable id to demographic id mapping.
+			 */
+			ctrl.loadDemographicMapping = async () =>
+			{
+				ctrl.demographicMapping = new Map();
+				const messageables = ctrl.message.recipients.concat([ctrl.message.sender]);
+
+				for (const messageable of messageables)
+				{
+					if (await messageable.hasLocalMapping() && (await messageable.localType()) === MessageableLocalType.DEMOGRAPHIC)
+					{
+						ctrl.demographicMapping.set(messageable.id, await messageable.localId());
+					}
+				}
+
+				console.log(ctrl.demographicMapping);
+			};
 
 			ctrl.formattedMessageDate = () =>
 			{
 				return ctrl.message.createdAtDateTime.format(Juno.Common.Util.settings.message_date_format);
-			}
+			};
 
-			ctrl.recipientNames = () =>
+			ctrl.toDemographicSummary = (demographicNo) =>
 			{
-				if (ctrl.message.recipients.length <= 0)
-				{
-					return "Account Deleted";
-				}
-				return ctrl.message.recipients.map((recipient) => recipient.name).join(", ");
-			}
+				$state.go("record.summary", {
+					demographicNo: demographicNo
+				});
+			};
+
 		}],
 });
