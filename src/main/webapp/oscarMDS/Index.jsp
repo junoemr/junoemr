@@ -732,15 +732,15 @@
 		</tr>
 	</table>
 
-	<table id="readerViewTable" style="table-layout: fixed;border-color: blue;border-width: thin;border-spacing: 0px;background-color: #E0E1FF" width="100%" border="1">
+	<table id="readerViewTable" style="table-layout: fixed;border-color: blue;border-width: thin;border-spacing: 0px;background-color: #E0E1FF" width="100%" height="100%" border="1">
 		<col width="120">
 		<col width="100%">
 		<tr height="600px">
 			<td id="categoryList" valign="top" style="overflow:hidden;border-color: blue;border-width: thin;background-color: #E0E1FF" >
 
 			</td>
-			<td style="width:100%;height:600px;background-color: #E0E1FF">
-				<div id="docViews" style="width:100%;height:600px;overflow:auto;" onscroll="handleScroll(this)">
+			<td style="width:100%;height:100%;background-color: #E0E1FF">
+				<div id="docViews" style="width:100%;height:100%;overflow:auto;" onscroll="handleScroll(this)">
 
 				</div>
 			</td>
