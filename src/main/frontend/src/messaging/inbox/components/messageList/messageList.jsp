@@ -17,6 +17,7 @@
 			<message-card message="message"
 			              selected="message.id === $ctrl.selectedMessageId"
 			              component-style="$ctrl.componentStyle"
+			              sent-view="$ctrl.groupId === MessageGroup.Sent"
 			              click="$ctrl.onSelectMessage(message)">
 			</message-card>
 		</div>

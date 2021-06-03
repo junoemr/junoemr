@@ -29,6 +29,7 @@ angular.module("Messaging.Components").component('messageCard', {
 		componentStyle: "<?",
 		message: "<",
 		selected: "<?",
+		sentView: "<?",
 		click: "&?"
 	},
 	controller: [
@@ -40,11 +41,17 @@ angular.module("Messaging.Components").component('messageCard', {
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				ctrl.selected = ctrl.selected || false;
+				ctrl.sentView = ctrl.sentView || false;
 			};
 
 			ctrl.formatMessageDate = (date) =>
 			{
 				return date.format(Juno.Common.Util.settings.message_date_format);
+			}
+
+			ctrl.recipientNames = () =>
+			{
+				return ctrl.message.recipients.map((recipient) => recipient.name).join(", ");
 			}
 
 			ctrl.onClick = () =>

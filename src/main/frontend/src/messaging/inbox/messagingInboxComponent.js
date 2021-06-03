@@ -75,7 +75,7 @@ angular.module("Messaging").component('messagingInbox', {
 		{
 			ctrl.selectedSourceId = sourceId;
 			ctrl.selectedGroupId = groupId;
-			$state.go(".", {backend: ctrl.backend, source: sourceId, group: groupId});
+			$state.go(".", {backend: ctrl.backend, source: sourceId, group: groupId}, {location: "replace"});
 		};
 
 		ctrl.onMessageableFilterChange = (messageable, oldMessageable) =>

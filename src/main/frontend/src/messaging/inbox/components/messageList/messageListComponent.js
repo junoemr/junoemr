@@ -46,6 +46,9 @@ angular.module("Messaging.Components").component('messageList', {
 		)
 		{
 			const ctrl = this;
+
+			$scope.MessageGroup = MessageGroup;
+
 			ctrl.messageStream = null;
 			ctrl.debounceTimeout = null;
 			ctrl.DEBOUNC_TIME_MS = 500;
@@ -76,7 +79,7 @@ angular.module("Messaging.Components").component('messageList', {
 					source: ctrl.sourceId,
 					group: ctrl.groupId,
 					messageId: message.id,
-				});
+				}, {location: "replace"});
 			}
 
 			/**
