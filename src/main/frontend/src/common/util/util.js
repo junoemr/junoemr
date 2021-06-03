@@ -289,15 +289,13 @@ Juno.Common.Util.objectArrayIndexOf = function objectArrayIndexOf(array, searchT
 
 Juno.Common.Util.isIntegerString = function isIntegerString(string)
 {
-	var parsed_string = parseInt(string);
-
-	if (/^-?\d+$/.test(string.toString()))
+	if (string === undefined || string === null)
 	{
-		return true;
+		return false;
 	}
-
-	return false;
+	return /^-?\d+$/.test(string.toString());
 };
+
 Juno.Common.Util.isNumber = function isNumber(object)
 {
 	return typeof object === "number";

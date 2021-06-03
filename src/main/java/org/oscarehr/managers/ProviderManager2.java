@@ -840,6 +840,11 @@ public class ProviderManager2
 		property = getMappedOrNewProperty(map, "default_sex", providerNo);
 		property.setValue(settings.getDefaultSex());
 		property = getMappedOrNewProperty(map, "consultation_time_period_warning", providerNo);
+		// if deleted from frontend
+		if (settings.getConsultationTimePeriodWarning() != null && settings.getConsultationTimePeriodWarning().isEmpty())
+		{
+			settings.setConsultationTimePeriodWarning(null);
+		}
 		property.setValue(settings.getConsultationTimePeriodWarning());
 		property = getMappedOrNewProperty(map, "consultation_team_warning", providerNo);
 		property.setValue(settings.getConsultationTeamWarning());
@@ -1008,6 +1013,11 @@ public class ProviderManager2
 			if (prop.getValue() != null)
 			{
 				propertyDao.merge(prop);
+			}
+			// Specific case where we do actually wanna delete the value if it's null
+			else if (prop.getName().equals("consultation_time_period_warning"))
+			{
+				propertyDao.remove(prop);
 			}
 		}
 	}
