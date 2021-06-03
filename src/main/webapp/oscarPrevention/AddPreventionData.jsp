@@ -73,6 +73,7 @@
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
     ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
     String demographic_no = request.getParameter("demographic_no");
     String id = request.getParameter("id");
     Map<String, Object> existingPrevention = null;
@@ -159,7 +160,7 @@
 
     for (ProviderData currentProvider : providerList)
     {
-        if (currentProvider.getProviderNo().equals(creatorProviderNo))
+        if (currentProvider.getProviderNo().toString().equals(creatorProviderNo))
         {
             creatorName = currentProvider.getDisplayName();
         }
