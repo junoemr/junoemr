@@ -117,8 +117,12 @@ angular.module("Messaging.Components").component('messageList', {
 					ctrl.messageStream = await messagingService.searchMessagesAsStream(
 						await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.getMessageSearchParams());
 					$scope.$apply();
-					await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
-					$scope.$apply();
+
+					if (ctrl.messageStream)
+					{
+						await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
+						$scope.$apply();
+					}
 
 					// notify parent of stream change.
 					if (ctrl.messageStreamChange)

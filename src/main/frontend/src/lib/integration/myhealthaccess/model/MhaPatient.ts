@@ -178,7 +178,12 @@ export default class MhaPatient
 
 	get isConfirmed(): boolean
 	{
-		return this._linkStatus === LinkStatus.CONFIRMED || this._linkStatus === LinkStatus.VERIFIED
+		return this._linkStatus === LinkStatus.CONFIRMED || this._linkStatus === LinkStatus.VERIFIED;
+	}
+
+	get isVerified(): boolean
+	{
+		return this._linkStatus === LinkStatus.VERIFIED;
 	}
 
 	get canMessage(): boolean

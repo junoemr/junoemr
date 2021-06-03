@@ -13,6 +13,11 @@ export default class PatientTo1ToMhaPatientConverter extends AbstractConverter<P
 
 	convert(from: PatientTo1): MhaPatient
 	{
+		if (!from)
+		{
+			return null;
+		}
+
 		const patientTo1 = from as any;
 		const mhaPatient = new MhaPatient();
 

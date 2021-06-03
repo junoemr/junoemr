@@ -35,7 +35,7 @@ public class PatientSingleSearchResponseTo1
 	{
 		SUCCESS,
 		NOT_FOUND,
-		NON_UNIQUE
+		NOT_UNIQUE
 	}
 
 	@JsonProperty("patient")
@@ -58,7 +58,7 @@ public class PatientSingleSearchResponseTo1
 
 	public boolean isNotUnique()
 	{
-		return status == STATUS_CODE.NON_UNIQUE;
+		return status == STATUS_CODE.NOT_UNIQUE;
 	}
 
 	// true if this transfer contains a list of patients
