@@ -20,34 +20,41 @@
 * Victoria, British Columbia
 * Canada
 --%>
+<div class="flowsheet-item">
+	<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
+	<div>{{$ctrl.model.description}}</div>
 
-<div class="flowsheet-container">
-	<h3>{{$ctrl.flowsheet.name}} flowsheet</h3>
+	<div ng-repeat="alert in $ctrl.alerts">
+		<div class="alert alert-danger" role="alert">
+			{{alert.validationFailMessage}}
+		</div>
+	</div>
 
-	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.FLOWSHEET_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ]">
-		<div>
+	<div ng-repeat="recommendation in $ctrl.model.recommendationRules">
+		<div class="alert" ng-class="$ctrl.getAlertClass(recommendation.strength)" role="alert">
+			{{recommendation.message}}
+		</div>
+	</div>
+
+	<div class="flex-row">
+		<div class="flex-grow">
+			<juno-check-box ng-if="$ctrl.valueIsBoolean()"
+			                label="Completed"
+			                ng-model="$ctrl.newEntry.value">
+			</juno-check-box>
+			<juno-input ng-if="!$ctrl.valueIsBoolean()"
+			            label="Add New"
+			            ng-model="$ctrl.newEntry.value"
+			            only-numeric="$ctrl.valueIsNumeric()">
+			</juno-input>
+		</div>
+		<div class="action-button-container">
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-			             click="$ctrl.toHealthTracker()">
-				<< Health Tracker
+			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+			             click="$ctrl.validateAndSubmit()">
+				Submit
 			</juno-button>
 		</div>
-
-		<div ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups">
-			<panel no-header="!itemGroup.name">
-				<panel-header>
-					<h6>{{itemGroup.name}}</h6>
-					<span>{{itemGroup.description}}</span>
-				</panel-header>
-				<panel-body>
-					<div ng-repeat="item in itemGroup.flowsheetItems">
-						<flowsheet-item model="item">
-						</flowsheet-item>
-					</div>
-				</panel-body>
-			</panel>
-		</div>
-
-	</juno-security-check>
+	</div>
 </div>

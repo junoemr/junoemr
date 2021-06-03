@@ -25,10 +25,13 @@ package org.oscarehr.measurements.model;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
+import java.util.List;
+
 @Data
-public class FlowsheetModel extends AbstractTransientModel
+public class FlowsheetItemGroup extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
 	private String description;
+	private List<FlowsheetItem> flowsheetItems;
 }

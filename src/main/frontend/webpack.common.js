@@ -311,6 +311,7 @@ module.exports = {
 			'./src/record/flowsheet/module.js',
 			'./src/record/flowsheet/flowsheetComponent.js',
 			'./src/record/flowsheet/flowsheetApi.service.ts',
+			'./src/record/flowsheet/components/flowsheetItemComponent.js',
 			'./src/record/forms/module.js',
 			'./src/record/forms/formsController.js',
 			'./src/record/forms/components/formView/formViewComponent.js',

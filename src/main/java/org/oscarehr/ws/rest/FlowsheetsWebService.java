@@ -23,9 +23,11 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.measurements.model.FlowsheetModel;
+import org.oscarehr.measurements.model.Flowsheet;
+import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
@@ -42,20 +44,14 @@ import java.util.Arrays;
 @Tag(name = "flowsheetsService")
 public class FlowsheetsWebService extends AbstractServiceImpl
 {
+	@Autowired
+	private FlowsheetService flowsheetService;
+
 	@GET
 	@Path("/")
-	public RestSearchResponse<FlowsheetModel> getFlowsheets()
+	public RestSearchResponse<Flowsheet> getFlowsheets()
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ);
-		return RestSearchResponse.successResponseOnePage(Arrays.asList(dummyFlowsheet(1), dummyFlowsheet(2)));
-	}
-
-	//TODO remove - for dev work only
-	private FlowsheetModel dummyFlowsheet(Integer id)
-	{
-		FlowsheetModel flowsheet = new FlowsheetModel();
-		flowsheet.setId(id);
-		flowsheet.setName("flowsheet test");
-		return flowsheet;
+		return RestSearchResponse.successResponseOnePage(Arrays.asList(flowsheetService.getFlowsheet(1), flowsheetService.getFlowsheet(2)));
 	}
 }
