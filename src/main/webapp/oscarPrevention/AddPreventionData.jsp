@@ -404,7 +404,7 @@ clear: left;
 	  {
 	   		hideItem('lot');
 	  }
-	  }
+  }
 
 
 var warnOnWindowClose=true;
@@ -498,7 +498,7 @@ function displayCloseWarning(){
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
                                       <%for (int i=0; i < providerList.size(); i++) {
                                            ProviderData providerData = providerList.get(i);%>
-                                        <option value="<%= providerData.getProviderNo()%>" <%= ( providerData.getProviderNo().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -555,7 +555,7 @@ function displayCloseWarning(){
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
                                       <%for (int i=0; i < providerList.size(); i++) {
                                            ProviderData providerData = providerList.get(i);%>
-                                        <option value="<%= providerData.getProviderNo()%>" <%= ( providerData.getProviderNo().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -650,7 +650,7 @@ function displayCloseWarning(){
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
                                       <%for (int i=0; i < providerList.size(); i++) {
                                            ProviderData providerData = providerList.get(i);%>
-                                        <option value="<%= providerData.getProviderNo()%>" <%= ( providerData.getProviderNo().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -690,7 +690,7 @@ function displayCloseWarning(){
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
                                       <%for (int i=0; i < providerList.size(); i++) {
                                            ProviderData providerData = providerList.get(i);%>
-                                        <option value="<%= providerData.getProviderNo()%>" <%= ( providerData.getProviderNo().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName()%></option>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName()%></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>

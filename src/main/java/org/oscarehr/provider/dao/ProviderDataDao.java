@@ -266,7 +266,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		{
 			return (List<ProviderData>)EMPTY_LIST;
 		}
-		Query query = createQuery("p", "p.providerType IN (:providerTypes) ORDER BY p.lastName, p.firstName");
+		Query query = createQuery("p", "p.providerType IN (:providerTypes) AND p.status = '1' ORDER BY p.lastName, p.firstName");
 		query.setParameter("providerTypes", providerTypes);
 
 		List<ProviderData> resultList = query.getResultList();
