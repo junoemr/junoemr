@@ -154,6 +154,12 @@ angular.module('Report').controller('Report.ReportsController', [
 				templateUrl: 'src/report/report_iframe.jsp',
 				iframeUrl: '../oscarReport/reportByTemplate/homePage.jsp'
 			},
+			{
+				numberLabel: "24",
+				name: 'Unbilled Reports',
+				templateUrl: 'src/report/report_iframe.jsp',
+				iframeUrl: '../billing/CA/billingReportCenter.jsp?displaymode=billreport'
+			},
 		];
 
 		controller.init = function init()
