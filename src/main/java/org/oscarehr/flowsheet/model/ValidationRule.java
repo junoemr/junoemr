@@ -20,21 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.measurements.model;
+package org.oscarehr.flowsheet.model;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
 @Data
-public class RecommendationRule extends AbstractTransientModel
+public class ValidationRule extends AbstractTransientModel
 {
-	public enum Strength
-	{
-		RECOMMENDATION,
-		WARNING,
-		DANGER,
-	}
-
-	private Strength strength;
-	private String message;
+	private String validationRegex;
+	private String validationFailMessage;
 }

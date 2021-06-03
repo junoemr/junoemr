@@ -20,14 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.measurements.service;
+package org.oscarehr.flowsheet.service;
 
 
-import org.oscarehr.measurements.model.Flowsheet;
-import org.oscarehr.measurements.model.FlowsheetItem;
-import org.oscarehr.measurements.model.FlowsheetItemGroup;
-import org.oscarehr.measurements.model.RecommendationRule;
-import org.oscarehr.measurements.model.ValidationRule;
+import org.oscarehr.flowsheet.model.Flowsheet;
+import org.oscarehr.flowsheet.model.FlowsheetItem;
+import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
+import org.oscarehr.flowsheet.model.RecommendationRule;
+import org.oscarehr.flowsheet.model.ValidationRule;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

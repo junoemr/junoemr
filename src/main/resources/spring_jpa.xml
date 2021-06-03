@@ -157,6 +157,7 @@
 	<context:component-scan base-package="org.oscarehr.fax" />
 	<context:component-scan base-package="org.oscarehr.admin" />
 	<context:component-scan base-package="org.oscarehr.forms" />
+	<context:component-scan base-package="org.oscarehr.flowsheet" />
 	<context:component-scan base-package="org.oscarehr.integration.aqs" />
 	<context:component-scan base-package="org.oscarehr.integration.iceFall" />
     <context:component-scan base-package="org.oscarehr.integration.imdhealth" />

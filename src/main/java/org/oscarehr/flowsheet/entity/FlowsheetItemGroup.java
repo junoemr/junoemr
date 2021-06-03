@@ -20,18 +20,44 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.measurements.model;
+package org.oscarehr.flowsheet.entity;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.common.model.AbstractModel;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 @Data
-public class FlowsheetItemGroup extends AbstractTransientModel
+@Entity(name = "entity.FlowsheetItemGroup")
+@Table(name = "flowsheet_item_group")
+public class FlowsheetItemGroup extends AbstractModel<Integer>
 {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Integer id;
+
+	@Column(name = "item_name")
 	private String name;
+
+	@Column(name = "description")
 	private String description;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "flowsheet_id")
+	private Flowsheet flowsheet;
+
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetItemGroup", cascade = CascadeType.ALL)
 	private List<FlowsheetItem> flowsheetItems;
 }

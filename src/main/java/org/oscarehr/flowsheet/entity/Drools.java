@@ -20,18 +20,41 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.measurements.model;
+package org.oscarehr.flowsheet.entity;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.common.model.AbstractModel;
 
-import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-public class Flowsheet extends AbstractTransientModel
+@Entity
+@Table(name = "drools")
+public class Drools extends AbstractModel<Integer>
 {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Integer id;
-	private String name;
+
+	@Column(name = "drl_file")
+	private String filename;
+
+	@Column(name = "description")
 	private String description;
-	private List<FlowsheetItemGroup> flowsheetItemGroups;
+
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name = "flowsheet_drools", joinColumns = @JoinColumn(name="drools_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_id"))
+	private Set<Flowsheet> flowsheets = new HashSet<>();
 }
