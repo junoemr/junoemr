@@ -45,6 +45,8 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.util.ConversionUtils;
 
+import static org.oscarehr.provider.model.ProviderData.PROVIDER_TYPE_DOCTOR;
+
 /**
  *
  * @author  Jay Gallagher
@@ -87,8 +89,6 @@ public class ProviderData {
 	+------------------------+--------------+------+-----+------------+-------+
 	*/
 
-	public static final String PROVIDER_TYPE_DOCTOR = "doctor";
-	public static final String PROVIDER_TYPE_NURSE = "nurse";
 	String provider_no;
 	String last_name;
 	String first_name;

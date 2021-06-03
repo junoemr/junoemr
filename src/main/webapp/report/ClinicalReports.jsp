@@ -77,7 +77,7 @@ if(!authed) {
             DemographicSetManager demoSets = new DemographicSetManager();
             List<String> demoSetList = demoSets.getDemographicSets();
 
-            List<Map<String,String>> providers = ProviderData.getProviderList(ProviderData.PROVIDER_TYPE_DOCTOR);
+            List<Map<String,String>> providers = ProviderData.getProviderList(org.oscarehr.provider.model.ProviderData.PROVIDER_TYPE_DOCTOR);
 
             String[] headings = (String[]) request.getAttribute("showfields");
 %>
