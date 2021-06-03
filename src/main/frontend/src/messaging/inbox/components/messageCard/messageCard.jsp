@@ -7,7 +7,7 @@
 		<div ng-if="!$ctrl.sentView"
 		     class="text-ellipsis"
 		     title="{{$ctrl.message.sender.name}}">
-			From: {{$ctrl.message.sender.name}}
+			From: {{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
 		</div>
 		<div ng-if="$ctrl.sentView"
 		     class="text-ellipsis"

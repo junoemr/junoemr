@@ -51,6 +51,10 @@ angular.module("Messaging.Components").component('messageCard', {
 
 			ctrl.recipientNames = () =>
 			{
+				if (ctrl.message.recipients.length <= 0)
+				{
+					return "Account Deleted";
+				}
 				return ctrl.message.recipients.map((recipient) => recipient.name).join(", ");
 			}
 

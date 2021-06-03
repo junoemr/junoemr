@@ -4,7 +4,7 @@
 	<div class="flex-col">
 		<!-- From, and message date -->
 		<div class="flex-row justify-content-space-between">
-			<div>From: {{$ctrl.message.sender.name}} </div>
+			<div>From: {{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}} </div>
 			<div class="text-grey">{{$ctrl.formattedMessageDate()}}</div>
 		</div>
 
