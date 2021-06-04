@@ -579,10 +579,10 @@ public class ProviderData {
 		this.signed_confidentiality = signed_confidentiality;
 	}
 
-	public static List<Map<String, String>> getProviderList(String providerType)
+	public static List<Map<String, String>> getProviderList()
 	{
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByType(providerType);
+		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByType(PROVIDER_TYPE_DOCTOR);
 
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 		for (org.oscarehr.provider.model.ProviderData provider : providers)

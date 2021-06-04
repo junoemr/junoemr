@@ -92,6 +92,7 @@
     boolean bView = false;
     if (request.getParameter("view") != null && request.getParameter("view").equals("1")) bView = true;
 
+    List providers = ProviderData.getProviderList();
     String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd");
     String providerName = "";
     String provider = (String) session.getAttribute("user");

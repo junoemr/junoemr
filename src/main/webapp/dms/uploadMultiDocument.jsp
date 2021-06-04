@@ -58,7 +58,7 @@
 <%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="oscar.oscarProvider.data.*"%>
 <%
-            List<Map<String, String>> doctorProviders = ProviderData.getProviderList(org.oscarehr.provider.model.ProviderData.PROVIDER_TYPE_DOCTOR);
+            List<Map<String, String>> doctorProviders = ProviderData.getProviderList();
             String provider = "";
 
 //if delete request is made

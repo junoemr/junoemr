@@ -45,7 +45,6 @@
 	import="oscar.util.*, oscar.form.*, oscar.form.data.*,java.util.*,oscar.oscarPrevention.*"%>
 <%@ page
 	import="oscar.oscarProvider.data.*,oscar.oscarWorkflow.*,oscar.oscarEncounter.oscarMeasurements.bean.*"%>
-<%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -75,7 +74,7 @@
     boolean bView = false;
     if (request.getParameter("view") != null && request.getParameter("view").equals("1")) bView = true;
     
-    List<Map<String, String>> doctorProviders = oscar.oscarProvider.data.ProviderData.getProviderList(org.oscarehr.provider.model.ProviderData.PROVIDER_TYPE_DOCTOR);
+    List<Map<String, String>> doctorProviders = ProviderData.getProviderList();
     String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd");
     String providerName = "";
     String provider = (String) session.getAttribute("user");
