@@ -45,7 +45,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.alerts = [];
+				ctrl.validationAlerts = [];
 
 				ctrl.$onInit = async () =>
 				{
@@ -82,19 +82,19 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 
 				ctrl.validate = () =>
 				{
-					ctrl.alerts = [];
+					ctrl.validationAlerts = [];
 					if(ctrl.model.validationRules)
 					{
 						ctrl.model.validationRules.forEach((rule) =>
 						{
 							if (rule.validationRegex && !(new RegExp(rule.validationRegex).test(ctrl.newEntry.value)))
 							{
-								ctrl.alerts.push(rule);
+								ctrl.validationAlerts.push(rule);
 							}
 						});
 					}
-					console.info(ctrl.alerts);
-					return ctrl.alerts.length === 0;
+					console.info(ctrl.validationAlerts);
+					return ctrl.validationAlerts.length === 0;
 				}
 
 				ctrl.validateAndSubmit = () =>

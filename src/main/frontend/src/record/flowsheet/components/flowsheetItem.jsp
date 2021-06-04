@@ -24,15 +24,15 @@
 	<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
 	<div>{{$ctrl.model.description}}</div>
 
-	<div ng-repeat="alert in $ctrl.alerts">
+	<div ng-repeat="alert in $ctrl.validationAlerts">
 		<div class="alert alert-danger" role="alert">
 			{{alert.validationFailMessage}}
 		</div>
 	</div>
 
-	<div ng-repeat="recommendation in $ctrl.model.recommendationRules">
-		<div class="alert" ng-class="$ctrl.getAlertClass(recommendation.strength)" role="alert">
-			{{recommendation.message}}
+	<div ng-repeat="alert in $ctrl.model.flowsheetItemAlerts">
+		<div class="alert" ng-class="$ctrl.getAlertClass(alert.strength)" role="alert">
+			{{alert.message}}
 		</div>
 	</div>
 

@@ -89,16 +89,18 @@ public class MeasurementInfo {
         log.debug(logMessage);
     }
 
-    public ArrayList getWarnings(){
-        if (warning == null){
-           warning = new ArrayList();
+    public ArrayList<String> getWarnings()
+    {
+        if(warning == null)
+        {
+            warning = new ArrayList<>();
         }
         return warning;
     }
 
-    public ArrayList getRecommendations(){
+    public ArrayList<String> getRecommendations(){
         if (recommendations == null){
-           recommendations = new ArrayList();
+           recommendations = new ArrayList<>();
         }
         return recommendations;
     }

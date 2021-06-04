@@ -20,21 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.dao;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.flowsheet.entity.Drools;
+import org.springframework.stereotype.Repository;
 
-@Data
-public class RecommendationRule extends AbstractTransientModel
+@Repository
+public class DroolsDao extends AbstractDao<Drools>
 {
-	public enum Strength
+	protected DroolsDao()
 	{
-		RECOMMENDATION,
-		WARNING,
-		DANGER,
+		super(Drools.class);
 	}
-
-	private Strength strength;
-	private String message;
 }

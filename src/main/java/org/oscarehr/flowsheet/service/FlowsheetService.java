@@ -23,22 +23,32 @@
 package org.oscarehr.flowsheet.service;
 
 
+import org.drools.FactException;
+import org.drools.IntegrationException;
+import org.drools.RuleBase;
+import org.drools.WorkingMemory;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
+import org.oscarehr.flowsheet.entity.Drools;
 import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.entity.ValueType;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
+import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
-import org.oscarehr.flowsheet.model.RecommendationRule;
 import org.oscarehr.flowsheet.model.ValidationRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -46,6 +56,9 @@ public class FlowsheetService
 {
 	@Autowired
 	private FlowsheetDao flowsheetDao;
+
+	@Autowired
+	private DroolsCachingService droolsCachingService;
 
 	@Autowired
 	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
@@ -59,6 +72,54 @@ public class FlowsheetService
 	public Flowsheet getFlowsheet(Integer flowsheetId)
 	{
 		return flowsheetEntityToModelConverter.convert(flowsheetDao.find(flowsheetId));
+	}
+
+	public Flowsheet getFlowsheetForDemographic(Integer flowsheetId, Integer demographicId) throws IntegrationException, IOException, SAXException, FactException
+	{
+		org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity = flowsheetDao.find(flowsheetId);
+		Flowsheet flowsheet = flowsheetEntityToModelConverter.convert(flowsheetEntity);
+
+		MeasurementInfo measurementInfo = new MeasurementInfo(String.valueOf(demographicId));
+
+		List<String> flowsheetMeasurementCodes = flowsheetEntity.getFlowsheetItems()
+				.stream()
+				.filter((item) -> ItemType.MEASUREMENT.equals(item.getType()))
+				.map(org.oscarehr.flowsheet.entity.FlowsheetItem::getTypeCode)
+				.collect(Collectors.toList());
+		measurementInfo.getMeasurements(flowsheetMeasurementCodes);
+
+		for(Drools drools : flowsheetEntity.getDrools())
+		{
+			RuleBase ruleBase = droolsCachingService.getDroolsRuleBase(drools.getFilename());
+			getMessages(measurementInfo, ruleBase);
+		}
+
+		List<FlowsheetItemAlert> flowsheetItemAlerts = new LinkedList<>();
+		for(String recommendation : measurementInfo.getRecommendations())
+		{
+			FlowsheetItemAlert flowsheetItemAlert = new FlowsheetItemAlert();
+			flowsheetItemAlert.setStrength(FlowsheetItemAlert.Strength.RECOMMENDATION);
+			flowsheetItemAlert.setMessage(recommendation);
+			flowsheetItemAlerts.add(flowsheetItemAlert);
+		}
+
+		for(String warning : measurementInfo.getWarnings())
+		{
+			FlowsheetItemAlert flowsheetItemAlert = new FlowsheetItemAlert();
+			flowsheetItemAlert.setStrength(FlowsheetItemAlert.Strength.WARNING);
+			flowsheetItemAlert.setMessage(warning);
+			flowsheetItemAlerts.add(flowsheetItemAlert);
+		}
+		flowsheet.setFlowsheetItemAlerts(flowsheetItemAlerts);
+
+		return flowsheet;
+	}
+
+	public void getMessages(MeasurementInfo mi, RuleBase ruleBase) throws FactException
+	{
+		WorkingMemory workingMemory = ruleBase.newWorkingMemory();
+		workingMemory.assertObject(mi);
+		workingMemory.fireAllRules();
 	}
 
 	private Flowsheet dummyFlowsheet(Integer id)
@@ -93,10 +154,10 @@ public class FlowsheetService
 		flowsheetItem3.setValidationRules(Arrays.asList(validationRule));
 
 
-		RecommendationRule recommendationRule = new RecommendationRule();
-		recommendationRule.setMessage("Value should be within range 0-10");
-		recommendationRule.setStrength(RecommendationRule.Strength.RECOMMENDATION);
-		flowsheetItem3.setRecommendationRules(Arrays.asList(recommendationRule));
+		FlowsheetItemAlert flowsheetItemAlert = new FlowsheetItemAlert();
+		flowsheetItemAlert.setMessage("Value should be within range 0-10");
+		flowsheetItemAlert.setStrength(FlowsheetItemAlert.Strength.RECOMMENDATION);
+		flowsheetItem3.setFlowsheetItemAlerts(Arrays.asList(flowsheetItemAlert));
 
 		flowsheet.setFlowsheetItemGroups(Arrays.asList(flowsheetItemGroup, flowsheetItemGroup2));
 		return flowsheet;

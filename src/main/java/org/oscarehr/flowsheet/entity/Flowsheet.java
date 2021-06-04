@@ -80,4 +80,13 @@ public class Flowsheet extends AbstractModel<Integer>
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_triggers_icd9", joinColumns = @JoinColumn(name="flowsheet_id"), inverseJoinColumns = @JoinColumn(name="icd9_id"))
 	private Set<Icd9> icd9Triggers = new HashSet<>();
+
+	/**
+	 * must be overridden to prevent default impl from infinite loading jpa links
+	 */
+	@Override
+	public int hashCode()
+	{
+		return id;
+	}
 }

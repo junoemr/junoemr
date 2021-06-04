@@ -24,22 +24,17 @@ package org.oscarehr.flowsheet.model;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
-
-import java.util.List;
 
 @Data
-public class FlowsheetItem extends AbstractTransientModel
+public class FlowsheetItemAlert extends AbstractTransientModel
 {
-	private Integer id;
-	private String name;
-	private String description;
+	public enum Strength
+	{
+		RECOMMENDATION,
+		WARNING,
+		DANGER,
+	}
 
-	private ItemType type;
-	private String typeCode;
-
-	private ValueType valueType;
-	private List<ValidationRule> validationRules;
-	private List<FlowsheetItemAlert> flowsheetItemAlerts;
+	private Strength strength;
+	private String message;
 }

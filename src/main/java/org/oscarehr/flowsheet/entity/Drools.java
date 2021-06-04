@@ -57,4 +57,13 @@ public class Drools extends AbstractModel<Integer>
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_drools", joinColumns = @JoinColumn(name="drools_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_id"))
 	private Set<Flowsheet> flowsheets = new HashSet<>();
+
+	/**
+	 * must be overridden to prevent default impl from infinite loading jpa links
+	 */
+	@Override
+	public int hashCode()
+	{
+		return id;
+	}
 }

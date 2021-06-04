@@ -81,4 +81,13 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_item_validations", joinColumns = @JoinColumn(name="flowsheet_id"), inverseJoinColumns = @JoinColumn(name="validations_id"))
 	private Set<Validations> validations = new HashSet<>();
+
+	/**
+	 * must be overridden to prevent default impl from infinite loading jpa links
+	 */
+	@Override
+	public int hashCode()
+	{
+		return id;
+	}
 }

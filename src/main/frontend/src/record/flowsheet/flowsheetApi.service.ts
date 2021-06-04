@@ -37,9 +37,9 @@ angular.module("Record.Flowsheet").service("flowsheetApiService", [
 		service.flowsheetApi = new FlowsheetServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
 
-		service.getFlowsheet = async (flowsheetId: number): Promise<any> =>
+		service.getFlowsheet = async (flowsheetId: number, demographicId: number): Promise<any> =>
 		{
-			return (await service.flowsheetApi.getFlowsheet(flowsheetId)).data.body;
+			return (await service.flowsheetApi.getFlowsheet(flowsheetId, demographicId)).data.body;
 		}
 
 		service.getAllFlowsheets = async (): Promise<any> =>
