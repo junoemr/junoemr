@@ -146,7 +146,7 @@ public class DemographicMapper extends AbstractMapper
 		}
 		lastName = lastName.replaceAll("<", "").replaceAll(">", "");
 
-		if (lastName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
+		if (lastName.length() > Demographic.LAST_NAME_MAX_LENGTH)
 		{
 			lastName = lastName.substring(0, Demographic.LAST_NAME_MAX_LENGTH);
 			MiscUtils.getLogger().warn("Demographic last name is too long. Will be truncated to: '" + lastName + "'");
