@@ -20,26 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.dao;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.flowsheet.entity.Flowsheet;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-@Data
-public class FlowsheetItem extends AbstractTransientModel
+@Repository("flowsheet.dao.FlowsheetDao")
+public class FlowsheetDao extends AbstractDao<Flowsheet>
 {
-	private Integer id;
-	private String name;
-	private String description;
+	protected FlowsheetDao()
+	{
+		super(Flowsheet.class);
+	}
 
-	private ItemType type;
-	private String typeCode;
-
-	private ValueType valueType;
-	private List<ValidationRule> validationRules;
-	private List<RecommendationRule> recommendationRules;
+	@Override
+	protected String getModelClassTableName()
+	{
+		return "entity.Flowsheet";
+	}
 }

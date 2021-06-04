@@ -1,3 +1,5 @@
+RENAME TABLE Flowsheet TO FlowsheetOld;
+
 CREATE TABLE IF NOT EXISTS flowsheet
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -57,11 +59,11 @@ CREATE TABLE IF NOT EXISTS flowsheet_item
 
 CREATE TABLE IF NOT EXISTS flowsheet_item_validations
 (
-    validations_id  INTEGER NOT NULL,
-    flowsheet_id    INTEGER NOT NULL,
-    PRIMARY KEY (validations_id, flowsheet_id),
+    validations_id  INTEGER UNSIGNED NOT NULL,
+    flowsheet_item_id    INTEGER NOT NULL,
+    PRIMARY KEY (validations_id, flowsheet_item_id),
     CONSTRAINT `flowsheet_item_validations_validations_id_fk` FOREIGN KEY (validations_id) REFERENCES validations (id),
-    CONSTRAINT `flowsheet_item_validations_flowsheet_id_fk` FOREIGN KEY (flowsheet_id) REFERENCES flowsheet (id)
+    CONSTRAINT `flowsheet_item_validations_flowsheet_item_id_fk` FOREIGN KEY (flowsheet_item_id) REFERENCES flowsheet_item (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS flowsheet_rule

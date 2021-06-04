@@ -20,26 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.converter;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.flowsheet.model.FlowsheetItem;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-@Data
-public class FlowsheetItem extends AbstractTransientModel
+@Component
+public class FlowsheetItemEntityToModelConverter extends AbstractModelConverter<org.oscarehr.flowsheet.entity.FlowsheetItem, FlowsheetItem>
 {
-	private Integer id;
-	private String name;
-	private String description;
+	@Override
+	public FlowsheetItem convert(org.oscarehr.flowsheet.entity.FlowsheetItem input)
+	{
+		FlowsheetItem flowsheetItemModel = new FlowsheetItem();
+		BeanUtils.copyProperties(input, flowsheetItemModel);
 
-	private ItemType type;
-	private String typeCode;
-
-	private ValueType valueType;
-	private List<ValidationRule> validationRules;
-	private List<RecommendationRule> recommendationRules;
+		return flowsheetItemModel;
+	}
 }

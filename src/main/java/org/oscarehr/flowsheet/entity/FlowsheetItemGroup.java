@@ -48,7 +48,7 @@ public class FlowsheetItemGroup extends AbstractModel<Integer>
 	@Column(name = "id")
 	private Integer id;
 
-	@Column(name = "item_name")
+	@Column(name = "group_name")
 	private String name;
 
 	@Column(name = "description")

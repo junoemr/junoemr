@@ -31,11 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Arrays;
 
 @Path("flowsheets")
 @Component("flowsheetsWebService")
@@ -49,9 +50,15 @@ public class FlowsheetsWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/")
-	public RestSearchResponse<Flowsheet> getFlowsheets()
+	public RestSearchResponse<Flowsheet> getFlowsheets(
+			@QueryParam("page") @DefaultValue("1") Integer page,
+			@QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ);
-		return RestSearchResponse.successResponseOnePage(Arrays.asList(flowsheetService.getFlowsheet(1), flowsheetService.getFlowsheet(2)));
+		return RestSearchResponse.successResponseOnePage(flowsheetService.getFlowsheets(offset, perPage));
 	}
 }

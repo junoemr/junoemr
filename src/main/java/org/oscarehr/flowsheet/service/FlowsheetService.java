@@ -23,25 +23,42 @@
 package org.oscarehr.flowsheet.service;
 
 
+import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
+import org.oscarehr.flowsheet.dao.FlowsheetDao;
+import org.oscarehr.flowsheet.entity.ItemType;
+import org.oscarehr.flowsheet.entity.ValueType;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
 import org.oscarehr.flowsheet.model.RecommendationRule;
 import org.oscarehr.flowsheet.model.ValidationRule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class FlowsheetService
 {
+	@Autowired
+	private FlowsheetDao flowsheetDao;
+
+	@Autowired
+	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
+
+
+	public List<Flowsheet> getFlowsheets(int offset, int perPage)
+	{
+		return flowsheetEntityToModelConverter.convert(flowsheetDao.findAll(offset, perPage));
+	}
 
 	public Flowsheet getFlowsheet(Integer flowsheetId)
 	{
-		return dummyFlowsheet(flowsheetId);
+		return flowsheetEntityToModelConverter.convert(flowsheetDao.find(flowsheetId));
 	}
 
 	private Flowsheet dummyFlowsheet(Integer id)
@@ -55,9 +72,9 @@ public class FlowsheetService
 		flowsheetItemGroup.setName("item Group");
 		flowsheetItemGroup.setDescription("This represents a grouping of similar or related flowsheet items");
 
-		FlowsheetItem flowsheetItem1 = dummyMeasurementItem(1, "Review Blood Glucose Records", "REBG",
-				"Fasting or pre-meal glucose level 4-7; 2hrs after meal 5-10", FlowsheetItem.ValueType.STRING);
-		FlowsheetItem flowsheetItem2 = dummyMeasurementItem(2, "Education Nutrition", "EDNL", null, FlowsheetItem.ValueType.BOOLEAN);
+		FlowsheetItem flowsheetItem1 = dummyMeasurementItem(100, "Review Blood Glucose Records", "REBG",
+				"Fasting or pre-meal glucose level 4-7; 2hrs after meal 5-10", ValueType.STRING);
+		FlowsheetItem flowsheetItem2 = dummyMeasurementItem(200, "Education Nutrition", "EDNL", null, ValueType.BOOLEAN);
 
 		flowsheetItemGroup.setFlowsheetItems(Arrays.asList(flowsheetItem1, flowsheetItem2));
 
@@ -66,7 +83,7 @@ public class FlowsheetService
 		flowsheetItemGroup2.setDescription("This represents a single element without specific a grouping");
 
 
-		FlowsheetItem flowsheetItem3 = dummyMeasurementItem(3, "BMI", "BMI", "Target: 18.5 - 24.9 (kg/m<sup>2</sup>)", FlowsheetItem.ValueType.STRING);
+		FlowsheetItem flowsheetItem3 = dummyMeasurementItem(300, "BMI", "BMI", "Target: 18.5 - 24.9 (kg/m<sup>2</sup>)", ValueType.STRING);
 		flowsheetItemGroup2.setFlowsheetItems(Arrays.asList(flowsheetItem3));
 
 		ValidationRule validationRule = new ValidationRule();
@@ -85,12 +102,12 @@ public class FlowsheetService
 		return flowsheet;
 	}
 
-	private FlowsheetItem dummyMeasurementItem(Integer id, String name, String typeCode, String guideline, FlowsheetItem.ValueType valueType)
+	private FlowsheetItem dummyMeasurementItem(Integer id, String name, String typeCode, String guideline, ValueType valueType)
 	{
 		FlowsheetItem flowsheetItem = new FlowsheetItem();
 		flowsheetItem.setId(id);
 		flowsheetItem.setName(name);
-		flowsheetItem.setType(FlowsheetItem.ItemType.MEASUREMENT);
+		flowsheetItem.setType(ItemType.MEASUREMENT);
 		flowsheetItem.setTypeCode(typeCode);
 
 		flowsheetItem.setValueType(valueType);

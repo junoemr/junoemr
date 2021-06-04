@@ -20,26 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.entity;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
-
-import java.util.List;
-
-@Data
-public class FlowsheetItem extends AbstractTransientModel
+public enum ValueType
 {
-	private Integer id;
-	private String name;
-	private String description;
-
-	private ItemType type;
-	private String typeCode;
-
-	private ValueType valueType;
-	private List<ValidationRule> validationRules;
-	private List<RecommendationRule> recommendationRules;
+	STRING,
+	NUMERIC,
+	BOOLEAN,
 }

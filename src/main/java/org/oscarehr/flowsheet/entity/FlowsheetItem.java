@@ -48,17 +48,6 @@ import java.util.Set;
 @Table(name = "flowsheet_item")
 public class FlowsheetItem extends AbstractModel<Integer>
 {
-	public enum ValueType {
-		STRING,
-		NUMERIC,
-		BOOLEAN,
-	}
-
-	public enum ItemType {
-		MEASUREMENT,
-		PREVENTION,
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
