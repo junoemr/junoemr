@@ -740,7 +740,7 @@
 
 			</td>
 			<td style="width:100%;height:100%;background-color: #E0E1FF">
-				<div id="docViews" style="width:100%;height:100%;overflow:auto;" onscroll="handleScroll(this)">
+				<div id="docViews" style="width:100%;height:100vh;overflow:auto;" onscroll="handleScroll(this)">
 
 				</div>
 			</td>
