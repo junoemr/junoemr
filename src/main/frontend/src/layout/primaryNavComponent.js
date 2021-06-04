@@ -36,7 +36,7 @@ angular.module('Layout').component("primaryNavigation", {
 		          $uibModal,
 		          $interval,
 		          $http,
-							$httpParamSerializer,
+		          $httpParamSerializer,
 		          securityService,
 		          personaService,
 		          billingService,

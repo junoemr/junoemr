@@ -575,11 +575,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.addSiteAssignment = function(siteId)
 		{
-			console.log("WHA");
-			console.log(siteId);
 			if (siteId && !ctrl.provider.siteAssignments.includes(siteId))
 			{
-				console.log("FOOBAR");
 				ctrl.provider.siteAssignments.push(siteId);
 			}
 
