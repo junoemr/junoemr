@@ -7,7 +7,7 @@ export const AllowedAttachmentTypes = [
 	".txt",
 	".csv",
 	".rtf",
-	"rtx",
+	".rtx",
 	".jpg", ".jpeg", ".jpe",
 	".jp2",
 	".png",

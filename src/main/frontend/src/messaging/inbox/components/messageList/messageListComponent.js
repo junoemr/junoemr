@@ -51,7 +51,7 @@ angular.module("Messaging.Components").component('messageList', {
 
 			ctrl.messageStream = null;
 			ctrl.debounceTimeout = null;
-			ctrl.DEBOUNC_TIME_MS = 500;
+			ctrl.DEBOUNCE_TIME_MS = 500;
 			ctrl.MESSAGE_FETCH_COUNT = 10;
 
 			ctrl.$onInit = () =>
@@ -157,7 +157,7 @@ angular.module("Messaging.Components").component('messageList', {
 				}
 
 				ctrl.messageStream = null;
-				ctrl.debounceTimeout = window.setTimeout(ctrl.reloadMessages, ctrl.DEBOUNC_TIME_MS);
+				ctrl.debounceTimeout = window.setTimeout(ctrl.reloadMessages, ctrl.DEBOUNCE_TIME_MS);
 			}
 
 			// if bindings change reload message list.
