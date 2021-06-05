@@ -36,6 +36,7 @@ import org.springframework.beans.BeanUtils;
 import oscar.util.Jackson.LocalDateSerializer;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PatientTo1
@@ -84,6 +85,10 @@ public class PatientTo1
 	@Getter
 	@Setter
 	private boolean canMessage;
+	@JsonProperty("local_id")
+	@Getter
+	@Setter
+	private String demographicNo;
 
 	public PatientTo1()
 	{
@@ -91,10 +96,11 @@ public class PatientTo1
 
 	public PatientTo1(MHAPatient mhaPatient)
 	{
-		BeanUtils.copyProperties(mhaPatient, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
+		BeanUtils.copyProperties(mhaPatient, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus", "demographicNo");
 		this.healthCareProvinceCode = mhaPatient.getHealthCareProvinceCode().name();
 		this.addressProvinceCode = mhaPatient.getAddressProvinceCode().name();
 		this.linkStatus = mhaPatient.getLinkStatus().name();
+		this.demographicNo = mhaPatient.getDemographicNo().orElse(null);
 	}
 
 	public PatientTo1(Demographic demographic, String cellPhone)
@@ -120,6 +126,7 @@ public class PatientTo1
 		this.cellPhone = cellPhone;
 		this.primaryFax = null;
 		this.linkStatus = MHAPatient.LINK_STATUS.NO_LINK.name();
+		this.demographicNo = demographic.getId().toString();
 	}
 
 	public String getId()
@@ -331,5 +338,4 @@ public class PatientTo1
 	{
 		this.linkStatus = link_status;
 	}
-
 }

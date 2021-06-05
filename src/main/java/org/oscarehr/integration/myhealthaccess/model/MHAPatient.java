@@ -25,13 +25,16 @@ package org.oscarehr.integration.myhealthaccess.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
 import org.springframework.beans.BeanUtils;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
+@NoArgsConstructor
 public class MHAPatient
 {
 	private String id;
@@ -62,6 +65,8 @@ public class MHAPatient
 	@Getter
 	@Setter
 	private boolean canMessage;
+	@Setter
+	private String demographicNo;
 
 	public enum PROVINCE_CODES
 	{
@@ -125,11 +130,6 @@ public class MHAPatient
 			return PROVINCE_CODES.valueOf(provinceCode);
 		}
 		return PROVINCE_CODES.UNKNOWN;
-	}
-
-	public MHAPatient()
-	{
-
 	}
 
 	public MHAPatient(PatientTo1 patientTo1)
@@ -348,5 +348,10 @@ public class MHAPatient
 	public void setLinkStatus(LINK_STATUS linkStatus)
 	{
 		this.linkStatus = linkStatus;
+	}
+
+	public Optional<String> getDemographicNo()
+	{
+		return Optional.ofNullable(this.demographicNo);
 	}
 }

@@ -30,18 +30,18 @@ export default class MhaPatientService
 	}
 
 	/**
-	 * get an MHA profile by id. Searching all integrations.
+	 * get mha profiles from all integrations matching this id.
 	 * @param remoteId - the
+	 * @return promise that resolves to a list of MHA profiles.
 	 */
-	public async getProfile(remoteId: string): Promise<MhaPatient>
+	public async getProfiles(remoteId: string): Promise<MhaPatient[]>
 	{
 		let profiles = await Promise.all((await this._mhaConfigService.getMhaIntegrations()).map(async (integration) =>
 		{
-			return this.getProfileFromIntegration(integration.id, remoteId);
+			return this.getProfile(integration.id, remoteId);
 		}));
 
-		// even if multiple profiles are returned they will all be the same.
-		return profiles[0];
+		return profiles.filter((profile) => !!profile);
 	}
 
 	/**
@@ -50,7 +50,7 @@ export default class MhaPatientService
 	 * @param remoteId - the remote id of the profile
 	 * @return mha profile or null if profile cannot be found.
 	 */
-	public async getProfileFromIntegration(integrationId: number, remoteId: string): Promise<MhaPatient>
+	public async getProfile(integrationId: number, remoteId: string): Promise<MhaPatient>
 	{
 		return (new PatientTo1ToMhaPatientConverter()).convert((await this._mhaPatientApi.getRemotePatient(integrationId.toString(), remoteId)).data.body);
 	}

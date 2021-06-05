@@ -17,6 +17,7 @@
 		cursor: pointer;
 		user-select: none;
 		border-radius: 8px;
+		max-width: max-content;
 
 		&:hover {
 			background-color: var(--color-neutral-lightest)
@@ -27,8 +28,10 @@
 			color: var(--color-primary-base);
 		}
 
-		.icon-close {
-			font-size: 18px;
+		.juno-button {
+			.icon {
+				font-size: 20px;
+			}
 		}
 	}
 }

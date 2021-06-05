@@ -1989,6 +1989,7 @@
 								org.oscarehr.ws.rest.ScheduleService
 								org.oscarehr.ws.rest.SitesService
 								org.oscarehr.ws.rest.AppointmentService
+								org.oscarehr.ws.rest.demographic.DocumentWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
                                 org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService

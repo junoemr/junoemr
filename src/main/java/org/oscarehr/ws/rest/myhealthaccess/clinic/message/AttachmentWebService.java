@@ -46,7 +46,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Base64;
 import java.util.Optional;
 
-@Path("myhealthaccess/integration/{integrationId}/clinic/message/{messageId}/attachment/}")
+@Path("myhealthaccess/integration/{integrationId}/clinic/message/{messageId}/attachment/")
 @Component("mhaAttachmentWebService")
 @Tag(name = "mhaClinicMessaging")
 public class AttachmentWebService extends MessagingBaseWebService

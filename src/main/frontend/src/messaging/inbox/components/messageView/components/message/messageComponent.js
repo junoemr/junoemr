@@ -62,8 +62,6 @@ angular.module("Messaging.Components.View.Components").component('message', {
 						ctrl.demographicMapping.set(messageable.id, await messageable.localId());
 					}
 				}
-
-				console.log(ctrl.demographicMapping);
 			};
 
 			ctrl.formattedMessageDate = () =>

@@ -32,11 +32,14 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.exception.MissingArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -50,8 +53,10 @@ import oscar.log.LogConst;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -125,6 +130,43 @@ public class DocumentService
 	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
 	{
 		return uploadNewDemographicDocument(document, fileInputStream, null);
+	}
+
+	/**
+	 * upload (add) a new document to a demographics chart.
+	 * @param loggedInInfo - the logged in info of the provider performing the upload
+	 * @param document - the document to upload
+	 * @param demographic - the demogrpahic to attach this document to.
+	 * @param base64Data - base64 data to be contained in the document.
+	 * @return - the newly uploaded document
+	 */
+	public Document uploadNewDemographicDocument(
+			LoggedInInfo loggedInInfo,
+			Document document,
+			Demographic demographic,
+			String base64Data) throws IOException, InterruptedException
+	{
+		// set creator of document to user performing addition.
+		document.setDocCreator(loggedInInfo.getLoggedInProviderNo());
+
+		// decode doc data.
+		InputStream inputStream;
+		byte[] binaryData = Base64.getDecoder().decode(base64Data);
+		inputStream = new ByteArrayInputStream(binaryData);
+
+		// upload.
+		Document newDocument = uploadNewDemographicDocument(document, inputStream, demographic.getId());
+
+		// audit log
+		LogAction.addLogEntry(
+				loggedInInfo.getLoggedInProviderNo(),
+				demographic.getId(),
+				LogConst.ACTION_ADD,
+				LogConst.CON_DOCUMENT,
+				LogConst.STATUS_SUCCESS,
+				String.valueOf(document.getDocumentNo()), loggedInInfo.getIp(), document.getDocfilename());
+
+		return newDocument;
 	}
 
 	/**
@@ -209,6 +251,11 @@ public class DocumentService
 		if(document.getProgramId() == null)
 		{
 			document.setProgramId(programManager.getDefaultProgramId());
+		}
+		if (document.getResponsible() == null)
+		{
+			// NULL is not allowed however empty string is fine.
+			document.setResponsible("");
 		}
 		documentDao.persist(document);
 		return document;

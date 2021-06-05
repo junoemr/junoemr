@@ -27,29 +27,43 @@ import {
 	JUNO_STYLE
 } from "../../../../common/components/junoComponentConstants";
 import FileUtil from "../../../../lib/util/FileUtil";
+import {MessageableLocalType} from "../../../../lib/messaging/model/MessageableLocalType";
+import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
+import {JunoDocumentFactory} from "../../../../lib/documents/factory/JunoDocumentFactory";
+import DocumentService from "../../../../lib/documents/service/DocumentService";
 
 angular.module("Messaging.Components").component('attachmentList', {
 	templateUrl: 'src/messaging/inbox/components/attachmentList/attachmentList.jsp',
 	bindings: {
 		attachments: "=",
+		message: "<?",
 		showRemoveButton: "<?",
 		singleColumn: "<?",
+		showAttachToChart: "<?",
 		componentStyle: "<",
 	},
 	controller: [
 		"$scope",
-		function ($scope)
+		"$uibModal",
+		function (
+			$scope,
+			$uibModal)
 		{
 			const ctrl = this;
+			const documentService = new DocumentService();
 
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			ctrl.$onInit = () =>
+			ctrl.isLoading = false;
+
+			ctrl.$onInit = async () =>
 			{
 				ctrl.showRemoveButton = ctrl.showRemoveButton || false;
 				ctrl.singleColumn = ctrl.singleColumn || false;
+				ctrl.showAttachToChart = ctrl.showAttachToChart || false;
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				ctrl.canAttachToChart = (await ctrl.messageablesWhoCanAttachToChart()).length > 0;
 			}
 
 			ctrl.attachmentListClasses = () =>
@@ -57,6 +71,49 @@ angular.module("Messaging.Components").component('attachmentList', {
 				return {
 					"single-column": ctrl.singleColumn,
 				};
+			}
+
+			ctrl.attachToChart = async (attachment) =>
+			{
+				try
+				{
+					ctrl.isLoading = true;
+					const targets = await ctrl.messageablesWhoCanAttachToChart();
+
+					if (targets.length > 1)
+					{
+						console.error("Attaching document to chart when there is more than one option is not implemented");
+						ctrl.showAttachmentErrorAlert();
+					}
+					else if (targets.length === 1)
+					{
+						const junoDoc = JunoDocumentFactory.build(attachment.name, attachment.name, attachment.type, await attachment.getBase64Data());
+						await documentService.uploadDocumentToDemographicChart(junoDoc, await targets[0].localId());
+					}
+					else
+					{
+						console.error("no messageables to attach the document to");
+						ctrl.showAttachmentErrorAlert();
+					}
+				}
+				catch(error)
+				{
+					console.error(error);
+					ctrl.showAttachmentErrorAlert();
+				}
+				finally
+				{
+					ctrl.isLoading = false;
+					$scope.$apply();
+				}
+			}
+
+			ctrl.showAttachmentErrorAlert = () =>
+			{
+				Juno.Common.Util.errorAlert(
+					$uibModal,
+					"Count not attach to chart",
+					"Some thing went wrong. Please contact support if the problem persists");
 			}
 
 			ctrl.removeAttachment = (attachment) =>
@@ -67,6 +124,42 @@ angular.module("Messaging.Components").component('attachmentList', {
 			ctrl.downloadAttachment = async (attachment) =>
 			{
 				await FileUtil.saveFile(attachment.name, attachment.type, await attachment.getBase64Data());
+			}
+
+			/**
+			 * get all messageables attached to this message with local demographic mapping.
+			 */
+			ctrl.messageablesWithDemographicMapping = async () =>
+			{
+				const possibleTargets = ctrl.message.recipients.concat(ctrl.message.sender);
+
+				possibleTargets.map(async (target) =>{
+					if (await target.hasLocalMapping() && (await target.localType()) === MessageableLocalType.DEMOGRAPHIC)
+					{
+						return target;
+					}
+					return null;
+				});
+
+				return (await Promise.all(possibleTargets)).filter((target) => !!target);
+			};
+
+			/**
+			 * get a list of messageables who can have documents attached to their charts.
+			 */
+			ctrl.messageablesWhoCanAttachToChart = async () =>
+			{
+				let messageables = await ctrl.messageablesWithDemographicMapping();
+				messageables = await Promise.all(messageables.map( async (messageable) =>
+				{
+					if ((await messageable.localMappingConfidenceLevel()) === MessageableMappingConfidence.HIGH)
+					{
+						return messageable;
+					}
+					return null;
+				}));
+
+				return messageables.filter((messageable) => !!messageable);
 			}
 		}],
 });

@@ -1,5 +1,6 @@
 import {MessageableType} from "./MessageableType";
 import {MessageableLocalType} from "./MessageableLocalType";
+import {MessageableMappingConfidence} from "./MessageableMappingConfidence";
 
 export default class Messageable
 {
@@ -31,6 +32,17 @@ export default class Messageable
 	public async hasLocalMapping(): Promise<boolean>
 	{
 		return false;
+	}
+
+	/**
+	 * get the confidence level of the local mapping. This indicates how certain the mapping to the local entity is.
+	 * For example if you match to a demogrpahic by HIN you would select MEDIUM. However if the mapping is based on a direct
+	 * id match you would return HIGH. Certain features will be restricted depending on confidence.
+	 * @return a promise that resolves to the confidence level of this messageable's mapping to a local entity.
+	 */
+	public async localMappingConfidenceLevel(): Promise<MessageableMappingConfidence>
+	{
+		return MessageableMappingConfidence.NONE;
 	}
 
 	/**

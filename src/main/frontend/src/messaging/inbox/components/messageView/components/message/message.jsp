@@ -7,10 +7,11 @@
 			<div>
 				From:
 				<a ng-if="$ctrl.demographicMapping.has($ctrl.message.sender.id)"
+				   title="To Chart"
 				   ng-click="$ctrl.toDemographicSummary($ctrl.demographicMapping.get($ctrl.message.sender.id))">
 					{{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
 				</a>
-				<span ng-if="!$ctrl.demographicMapping.has($ctrl.message.sender.id)">
+				<span ng-if="!$ctrl.demographicMapping.has($ctrl.message.sender.id)" title="Cannot be matched to chart">
 					{{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
 				</span>
 			</div>
@@ -23,10 +24,11 @@
 			<div>
 				<span ng-repeat="recipient in $ctrl.message.recipients">
 					<a ng-if="$ctrl.demographicMapping.has(recipient.id)"
+					   title="To Chart"
 					   ng-click="$ctrl.toDemographicSummary($ctrl.demographicMapping.get(recipient.id))">
 						{{recipient.name}}
 					</a>
-					<span ng-if="!$ctrl.demographicMapping.has(recipient.id)">
+					<span ng-if="!$ctrl.demographicMapping.has(recipient.id)" title="Cannot be matched to chart">
 						{{recipient.name}}
 					</span>
 				</span>
@@ -49,6 +51,8 @@
 		<div class="m-t-24 flex-row">
 			<attachment-list ng-if="$ctrl.message.hasAttachments"
 			                 single-column="true"
+			                 show-attach-to-chart="true"
+			                 message="$ctrl.message"
 			                 attachments="$ctrl.message.attachments">
 			</attachment-list>
 		</div>

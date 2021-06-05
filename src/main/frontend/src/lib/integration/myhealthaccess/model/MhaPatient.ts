@@ -20,7 +20,8 @@ export default class MhaPatient
 	protected _province: Province;
 
 	protected _linkStatus: LinkStatus;
-	private _canMessage: boolean;
+	protected _canMessage: boolean;
+	protected _demographicNo: string;
 
 	// ==========================================================================
 	// Setters
@@ -99,6 +100,11 @@ export default class MhaPatient
 	set canMessage(value: boolean)
 	{
 		this._canMessage = value;
+	}
+
+	set demographicNo(value: string)
+	{
+		this._demographicNo = value;
 	}
 
 // ==========================================================================
@@ -189,5 +195,10 @@ export default class MhaPatient
 	get canMessage(): boolean
 	{
 		return this._canMessage;
+	}
+
+	get demographicNo(): string
+	{
+		return this._demographicNo;
 	}
 }
