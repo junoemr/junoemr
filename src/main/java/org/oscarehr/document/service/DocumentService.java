@@ -39,7 +39,6 @@ import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.exception.MissingArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

@@ -36,7 +36,6 @@ import org.springframework.beans.BeanUtils;
 import oscar.util.Jackson.LocalDateSerializer;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PatientTo1
