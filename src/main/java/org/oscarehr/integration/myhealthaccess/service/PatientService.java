@@ -33,7 +33,6 @@ import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.PatientInviteTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
-import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
