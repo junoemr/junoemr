@@ -24,42 +24,20 @@ package org.oscarehr.flowsheet.model;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
-public class FlowsheetItem extends AbstractTransientModel
+public class FlowsheetItemData extends AbstractTransientModel
 {
 	private Integer id;
-	private String name;
-	private String description;
+	private String value;
 
-	private ItemType type;
-	private String typeCode;
+	private LocalDateTime observationDateTime;
+	private LocalDateTime createdDateTime;
+	private LocalDateTime updatedDateTime;
 
-	private ValueType valueType;
-	private String valueLabel;
-	private List<ValidationRule> validationRules;
-	private List<FlowsheetItemAlert> flowsheetItemAlerts;
-	private List<FlowsheetItemData> data;
-
-	public FlowsheetItem()
+	public FlowsheetItemData()
 	{
-		validationRules = new ArrayList<>();
-		flowsheetItemAlerts = new ArrayList<>();
-		data = new ArrayList<>();
-	}
-
-	public void addFlowsheetItemAlert(FlowsheetItemAlert alert)
-	{
-		flowsheetItemAlerts.add(alert);
-	}
-
-	public void addFlowsheetItemData(FlowsheetItemData itemData)
-	{
-		data.add(itemData);
 	}
 }

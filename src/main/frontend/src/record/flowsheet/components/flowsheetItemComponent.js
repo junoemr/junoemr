@@ -33,9 +33,13 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
+			demographicId: "<",
+			flowsheetId: "<",
 		},
 		controller: [
+			'flowsheetApiService',
 			function (
+				flowsheetApiService,
 			)
 			{
 				const ctrl = this;
@@ -51,6 +55,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 				{
 					ctrl.newEntry = {
 						value: "",
+						observationDateTime: moment(),
 					};
 				}
 
@@ -97,12 +102,18 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					return ctrl.validationAlerts.length === 0;
 				}
 
-				ctrl.validateAndSubmit = () =>
+				ctrl.validateAndSubmit = async () =>
 				{
 					if(ctrl.validate())
 					{
-						console.info("TODO submit");
-						//submit
+						try
+						{
+							let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.flowsheetId, ctrl.model.id, ctrl.newEntry);
+						}
+						catch (error)
+						{
+							console.warn(error);
+						}
 					}
 				}
 

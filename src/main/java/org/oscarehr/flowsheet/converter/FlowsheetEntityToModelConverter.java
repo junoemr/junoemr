@@ -54,6 +54,7 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 
 	private List<FlowsheetItemGroup> buildGroups(org.oscarehr.flowsheet.entity.Flowsheet input)
 	{
+		// add items by group
 		List<FlowsheetItemGroup> groups = new LinkedList<>();
 		for(org.oscarehr.flowsheet.entity.FlowsheetItemGroup group: input.getFlowsheetItemGroups())
 		{
@@ -62,11 +63,15 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 			groups.add(groupModel);
 		}
 
+		// add un-grouped items
 		for(FlowsheetItem item : input.getFlowsheetItems())
 		{
-			FlowsheetItemGroup groupModel = new FlowsheetItemGroup();
-			groupModel.setFlowsheetItems(Arrays.asList(flowsheetItemEntityToModelConverter.convert(item)));
-			groups.add(groupModel);
+			if(item.getFlowsheetItemGroup() == null)
+			{
+				FlowsheetItemGroup groupModel = new FlowsheetItemGroup();
+				groupModel.setFlowsheetItems(Arrays.asList(flowsheetItemEntityToModelConverter.convert(item)));
+				groups.add(groupModel);
+			}
 		}
 		return groups;
 	}

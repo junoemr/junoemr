@@ -1,3 +1,5 @@
+import {JUNO_STYLE} from "../../../common/components/junoComponentConstants";
+
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -21,23 +23,21 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
 
-angular.module('Record.Flowsheet').component('flowsheet',
+const {JUNO_BUTTON_COLOR_PATTERN} = require("../../../common/components/junoComponentConstants");
+const {JUNO_BUTTON_COLOR} = require("../../../common/components/junoComponentConstants");
+const {LABEL_POSITION} = require("../../../common/components/junoComponentConstants");
+const {SecurityPermissions} = require("../../../common/security/securityConstants");
+
+angular.module('Record.Flowsheet').component('flowsheetItemData',
 	{
-		templateUrl: 'src/record/flowsheet/flowsheet.jsp',
+		templateUrl: 'src/record/flowsheet/components/flowsheetItemData.jsp',
 		bindings: {
 			componentStyle: "<?",
+			model: "<",
 		},
 		controller: [
-			'$state',
-			'$stateParams',
-			'flowsheetApiService',
 			function (
-				$state,
-				$stateParams,
-				flowsheetApiService,
 			)
 			{
 				const ctrl = this;
@@ -47,24 +47,16 @@ angular.module('Record.Flowsheet').component('flowsheet',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.flowsheet = null;
-				ctrl.demographicId = null;
+				ctrl.validationAlerts = [];
 
 				ctrl.$onInit = async () =>
 				{
-					ctrl.demographicId = $stateParams.demographicNo;
-					ctrl.flowsheet = await flowsheetApiService.getDemographicFlowsheet(ctrl.demographicId, $stateParams.flowsheetId);
+					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				}
 
-				ctrl.toHealthTracker = () =>
+				ctrl.getDateForDisplay = (dateTime) =>
 				{
-					$state.transitionTo('record.tracker',
-						{
-							demographicNo: $stateParams.demographicNo,
-						},
-						{
-							notify: false
-						});
+					return Juno.Common.Util.formatDate(dateTime) + ' ' + Juno.Common.Util.formatTime(dateTime);
 				}
 			}]
 	});

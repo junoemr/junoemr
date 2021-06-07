@@ -25,24 +25,22 @@
 
 package oscar.oscarEncounter.oscarMeasurements;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  *
@@ -58,7 +56,7 @@ public class MeasurementInfo {
     HashMap<String,Boolean> hiddens = new HashMap<String,Boolean>();
 
     ArrayList measurementList = new ArrayList();
-    Hashtable measurementHash = new Hashtable();
+    Hashtable<String, ArrayList<EctMeasurementsDataBean>> measurementHash = new Hashtable<>();
     ArrayList itemList = new ArrayList();
     String demographicNo = "";
     
@@ -119,19 +117,20 @@ public class MeasurementInfo {
     }
 
 
-    public void getMeasurements(List<String> list){
-        for (int i =0; i < list.size(); i++){
-           String measurement = list.get(i);
-           EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(Integer.valueOf(demographicNo), measurement);
-           Collection v = ect.getMeasurementsData();
-           measurementList.add(new ArrayList(v));
-           measurementHash.put(measurement,new ArrayList(v));
+    public void getMeasurements(List<String> list)
+    {
+        for(int i = 0; i < list.size(); i++)
+        {
+            String measurement = list.get(i);
+            EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(Integer.valueOf(demographicNo), measurement);
+            List<EctMeasurementsDataBean> measurementsData = ect.getMeasurementsData();
+            measurementList.add(new ArrayList(measurementsData));
+            measurementHash.put(measurement, new ArrayList<>(measurementsData));
         }
-
     }
 
-    public ArrayList getMeasurementData(String measurement){
-        return (ArrayList) measurementHash.get(measurement);
+    public ArrayList<EctMeasurementsDataBean> getMeasurementData(String measurement){
+        return measurementHash.get(measurement);
     }
 
     public void addRecommendation(String measurement,String recommendationMessage){

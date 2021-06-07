@@ -20,46 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.dao;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Data
-public class FlowsheetItem extends AbstractTransientModel
+@Repository("flowsheet.dao.FlowsheetItemDao")
+public class FlowsheetItemDao extends AbstractDao<FlowsheetItem>
 {
-	private Integer id;
-	private String name;
-	private String description;
-
-	private ItemType type;
-	private String typeCode;
-
-	private ValueType valueType;
-	private String valueLabel;
-	private List<ValidationRule> validationRules;
-	private List<FlowsheetItemAlert> flowsheetItemAlerts;
-	private List<FlowsheetItemData> data;
-
-	public FlowsheetItem()
+	protected FlowsheetItemDao()
 	{
-		validationRules = new ArrayList<>();
-		flowsheetItemAlerts = new ArrayList<>();
-		data = new ArrayList<>();
+		super(FlowsheetItem.class);
 	}
 
-	public void addFlowsheetItemAlert(FlowsheetItemAlert alert)
+	@Override
+	protected String getModelClassTableName()
 	{
-		flowsheetItemAlerts.add(alert);
-	}
-
-	public void addFlowsheetItemData(FlowsheetItemData itemData)
-	{
-		data.add(itemData);
+		return "entity.FlowsheetItem";
 	}
 }

@@ -42,7 +42,10 @@
 				</panel-header>
 				<panel-body>
 					<div ng-repeat="item in itemGroup.flowsheetItems">
-						<flowsheet-item model="item">
+						<flowsheet-item
+								flowsheet-id="$ctrl.flowsheet.id"
+								demographic-id="$ctrl.demographicId"
+								model="item">
 						</flowsheet-item>
 					</div>
 				</panel-body>

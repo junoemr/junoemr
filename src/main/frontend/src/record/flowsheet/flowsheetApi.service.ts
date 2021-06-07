@@ -38,7 +38,7 @@ angular.module("Record.Flowsheet").service("flowsheetApiService", [
 		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicFlowsheetsApi = new DemographicFlowsheetApi($http, $httpParamSerializer, '../ws/rs');
 
-		service.getDemographicFlowsheet = async (flowsheetId: number, demographicId: number): Promise<any> =>
+		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<any> =>
 		{
 			return (await service.demographicFlowsheetsApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body;
 		}
@@ -46,6 +46,11 @@ angular.module("Record.Flowsheet").service("flowsheetApiService", [
 		service.getAllFlowsheets = async (): Promise<any> =>
 		{
 			return (await service.flowsheetsApi.getFlowsheets()).data.body;
+		}
+
+		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: object): Promise<any> =>
+		{
+			return (await service.demographicFlowsheetsApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
 		}
 	}
 ]);

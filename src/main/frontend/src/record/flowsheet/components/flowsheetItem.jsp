@@ -48,6 +48,12 @@
 			            only-numeric="$ctrl.valueIsNumeric()">
 			</juno-input>
 		</div>
+		<div>
+			<juno-date-select
+					label="Observation Date"
+					ng-model="$ctrl.newEntry.observationDate">
+			</juno-date-select>
+		</div>
 		<div class="action-button-container">
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
@@ -55,6 +61,14 @@
 			             click="$ctrl.validateAndSubmit()">
 				Submit
 			</juno-button>
+		</div>
+	</div>
+	<div class="flex-row">
+		<div class="flex-grow">
+			<div ng-repeat="data in $ctrl.model.data">
+				<flowsheet-item-data model="data">
+				</flowsheet-item-data>
+			</div>
 		</div>
 	</div>
 </div>

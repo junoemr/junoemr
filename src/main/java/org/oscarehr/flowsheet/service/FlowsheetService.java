@@ -34,6 +34,7 @@ import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
+import org.oscarehr.flowsheet.model.FlowsheetItemData;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -91,6 +94,20 @@ public class FlowsheetService
 				{
 					FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getWarning(measurementTypeCode), FlowsheetItemAlert.Strength.WARNING);
 					item.addFlowsheetItemAlert(alert);
+				}
+
+				// set existing data
+				List<EctMeasurementsDataBean> measurementsDataBeans = measurementInfo.getMeasurementData(measurementTypeCode);
+				for(EctMeasurementsDataBean dataBean : measurementsDataBeans)
+				{
+					FlowsheetItemData itemData = new FlowsheetItemData();
+					itemData.setId(dataBean.getId());
+					itemData.setValue(dataBean.getDataField());
+					itemData.setObservationDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateObservedAsDate()));
+					itemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
+					itemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
+
+					item.addFlowsheetItemData(itemData);
 				}
 			}
 		}
