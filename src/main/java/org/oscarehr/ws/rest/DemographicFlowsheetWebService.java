@@ -27,7 +27,6 @@ import org.drools.FactException;
 import org.drools.IntegrationException;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.service.FlowsheetService;
-import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,22 +40,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-@Path("flowsheet")
-@Component("flowsheetWebService")
+@Path("demographic/{demographicNo}/flowsheet")
+@Component("demographicFlowsheetWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Tag(name = "flowsheetService")
-public class FlowsheetWebService extends AbstractServiceImpl
+@Tag(name = "demographicFlowsheet")
+public class DemographicFlowsheetWebService extends AbstractServiceImpl
 {
 	@Autowired
 	private FlowsheetService flowsheetService;
 
 	@GET
-	@Path("/{id}")
-	public RestResponse<Flowsheet> getFlowsheet(@PathParam("id") Integer flowsheetId)
+	@Path("/{flowsheetId}")
+	public RestResponse<Flowsheet> getFlowsheetForDemographic(
+			@PathParam("demographicNo") Integer demographicId,
+			@PathParam("flowsheetId") Integer flowsheetId)
 			throws IntegrationException, IOException, SAXException, FactException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ, Permission.MEASUREMENT_READ);
-		return RestResponse.successResponse(flowsheetService.getFlowsheet(flowsheetId));
+		return RestResponse.successResponse(flowsheetService.getFlowsheetForDemographic(flowsheetId, demographicId));
 	}
 }

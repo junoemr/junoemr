@@ -51,7 +51,7 @@ angular.module('Record.Flowsheet').component('flowsheet',
 
 				ctrl.$onInit = async () =>
 				{
-					ctrl.flowsheet = await flowsheetApiService.getFlowsheet($stateParams.flowsheetId, $stateParams.demographicNo);
+					ctrl.flowsheet = await flowsheetApiService.getDemographicFlowsheet($stateParams.demographicNo, $stateParams.flowsheetId);
 				}
 
 				ctrl.toHealthTracker = () =>

@@ -105,5 +105,22 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 						//submit
 					}
 				}
+
+				ctrl.getInputLabel = () =>
+				{
+					let label = ctrl.model.valueLabel;
+					if(!label)
+					{
+						if(ctrl.valueIsBoolean())
+						{
+							label = "Complete";
+						}
+						else
+						{
+							label = "Add New";
+						}
+					}
+					return label;
+				}
 			}]
 	});

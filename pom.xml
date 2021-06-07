@@ -2080,6 +2080,7 @@
 								org.oscarehr.ws.rest.ProvidersService
                                 org.oscarehr.ws.rest.DemographicService
                                 org.oscarehr.ws.rest.DemographicsService
+								org.oscarehr.ws.rest.DemographicFlowsheetWebService
 								org.oscarehr.ws.rest.FlowsheetWebService
 								org.oscarehr.ws.rest.FlowsheetsWebService
                                 org.oscarehr.ws.rest.RosterWebService
