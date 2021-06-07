@@ -29,50 +29,50 @@
     boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_edoc" rights="w" reverse="<%=true%>">
-	<%authed=false; %>
-	<%response.sendRedirect("../securityError.jsp?type=_edoc");%>
+    <%authed=false; %>
+    <%response.sendRedirect("../securityError.jsp?type=_edoc");%>
 </security:oscarSec>
 <%
-	if(!authed) {
-		return;
-	}
+    if(!authed) {
+        return;
+    }
 %>
 
 <!--   /** No SWF Object Multiple File Upload
-     * @version         1.1.1
-     * @compatibility   Chrome 1, FireFox 3+, Internet Explorer 5+, Opera 8+, Safari 3+
-     * @author          Andrea Giammarchi
-     * @blog            webreflection.blogspot.com
-     * @license         Mit Style License
-     */
+* @version         1.1.1
+* @compatibility   Chrome 1, FireFox 3+, Internet Explorer 5+, Opera 8+, Safari 3+
+* @author          Andrea Giammarchi
+* @blog            webreflection.blogspot.com
+* @license         Mit Style License
+*/
 -->
 <%@page import="oscar.dms.data.*,oscar.oscarProvider.data.*,java.util.*,oscar.oscarLab.ca.on.CommonLabResultData,org.oscarehr.util.SpringUtils,org.oscarehr.common.dao.QueueDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+"http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
-    <head>
-          <title><bean:message key="inboxmanager.document.title"/></title>
-        <script type="text/javascript" src="../share/javascript/prototype.js"></script>
-        <script type="text/javascript" src="../share/javascript/scriptaculous.js"></script>
-        <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css" />
+<head>
+    <title><bean:message key="inboxmanager.document.title"/></title>
+    <script type="text/javascript" src="../share/javascript/prototype.js"></script>
+    <script type="text/javascript" src="../share/javascript/scriptaculous.js"></script>
+    <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css" />
 
-        <%
-            QueueDao queueDao = (QueueDao) SpringUtils.getBean("queueDao");
-            List<Hashtable> queues=queueDao.getQueues();
-            List<Map<String, String>> doctorProviders = ProviderData.getProviderList();
-            String queueIdStr = (String) request.getSession().getAttribute("preferredQueue");
-            int queueId = 1;
-            if (queueIdStr != null) {
-                queueIdStr = queueIdStr.trim();
-                queueId = Integer.parseInt(queueIdStr);
-            }
-            String provider = CommonLabResultData.NOT_ASSIGNED_PROVIDER_NO;
-            //String provider ="";//(String) session.getValue("user");
-%>
+    <%
+        QueueDao queueDao = (QueueDao) SpringUtils.getBean("queueDao");
+        List<Hashtable> queues=queueDao.getQueues();
+        List providers = ProviderData.getProviderList();
+        String queueIdStr = (String) request.getSession().getAttribute("preferredQueue");
+        int queueId = 1;
+        if (queueIdStr != null) {
+            queueIdStr = queueIdStr.trim();
+            queueId = Integer.parseInt(queueIdStr);
+        }
+        String provider = CommonLabResultData.NOT_ASSIGNED_PROVIDER_NO;
+        //String provider ="";//(String) session.getValue("user");
+    %>
 
-        <style type="text/css">
+    <style type="text/css">
         * {
             font-family:Verdana,Tahoma,Arial,sans-serif;
             font-size: 10pt;
@@ -116,10 +116,10 @@
             left: 0;
             cursor:pointer;
         }
-        </style>
-        <script type="text/javascript" src="../share/javascript/noswfupload.js"></script>
+    </style>
+    <script type="text/javascript" src="../share/javascript/noswfupload.js"></script>
 
-        <script type="text/javascript">
+    <script type="text/javascript">
 
         // add dedicated css
         noswfupload.css("../share/css/noswfupload.css", "../share/css/noswfupload-icons.css");
@@ -142,16 +142,16 @@
                 // noswfupload wrap Object
                 wrap;
 
-                upload_url=form.getAttribute("action") || form.action;
+            upload_url=form.getAttribute("action") || form.action;
             // if we do not need the form ...
-                // move inputs outside the form since we do not need it
-                with(form.parentNode){
-                    appendChild(input);
-                    appendChild(submit);
-                };
+            // move inputs outside the form since we do not need it
+            with(form.parentNode){
+                appendChild(input);
+                appendChild(submit);
+            };
 
-                // remove the form
-                form.parentNode.removeChild(form);
+            // remove the form
+            form.parentNode.removeChild(form);
 
             // create the noswfupload.wrap Object with 1Mb of limit
             wrap = noswfupload.wrap(input, 10024 * 10024);
@@ -188,7 +188,7 @@
 
             // accepted file types (filter)
             // wrap.fileType = "Images (*.jpg, *.jpeg, *.png, *.gif, *.bmp)";
-             wrap.fileType = "PDF (*.pdf, *.PDF)";
+            wrap.fileType = "PDF (*.pdf, *.PDF)";
             // fileType could contain whatever text but filter checks *.{extension} if present
 
             // handlers
@@ -245,13 +245,13 @@
 
             // generated if there is something wrong during upload
             wrap.onerror = function(msg){
-            	// just inform the user something was wrong
+                // just inform the user something was wrong
                 noswfupload.text(this.dom.info, "WARNING: Unable to upload " + this.file.fileName + "(" + msg + ")");
             };
 
             // generated when every file has been sent (one or more, it does not matter)
             wrap.onload = function(rpe, xhr){
-            	var self = this;
+                var self = this;
                 // just show everything is fine ...
                 noswfupload.text(this.dom.info, "Upload complete");
 
@@ -269,85 +269,85 @@
 
         };
 
-     function changeProviderAndQueue(){
+        function changeProviderAndQueue(){
             upload_url="../dms/addEditDocument.do?method=html5MultiUpload&queue="+$('queue').value+"&provider="+$('provider').value;
 
-     }
-     function addProviderToPost(ele){
-                $('provider').value=ele.options[ele.selectedIndex].value;
-                changeProviderAndQueue();
-            }
-    function addQueueToPost(ele){
-                $('queue').value=ele.options[ele.selectedIndex].value;
-                changeProviderAndQueue();
-            }
-        </script>
-<style type="text/css">
-            div.maindiv {
-                background-color: #f2f7ff;
-                border: 1px solid #acb3f5;
-                height: 390px;
-            }
-            .noswfupload{
-                 background-color: #f2f7ff;
-            }
-            div.maindivheading {
-                font-family:Verdana,Tahoma,Arial,sans-serif;
-                background-color: #acb3f5;
-                font-size: 14px;
-            }
-            label.labels {
-                float: left;
-                clear: left;
-                width: 160px;
-            }
-            .fields{
-                font-family:Verdana,Tahoma,Arial,sans-serif;
-                font-size: 10pt;
-            }
+        }
+        function addProviderToPost(ele){
+            $('provider').value=ele.options[ele.selectedIndex].value;
+            changeProviderAndQueue();
+        }
+        function addQueueToPost(ele){
+            $('queue').value=ele.options[ele.selectedIndex].value;
+            changeProviderAndQueue();
+        }
+    </script>
+    <style type="text/css">
+        div.maindiv {
+            background-color: #f2f7ff;
+            border: 1px solid #acb3f5;
+            height: 390px;
+        }
+        .noswfupload{
+            background-color: #f2f7ff;
+        }
+        div.maindivheading {
+            font-family:Verdana,Tahoma,Arial,sans-serif;
+            background-color: #acb3f5;
+            font-size: 14px;
+        }
+        label.labels {
+            float: left;
+            clear: left;
+            width: 160px;
+        }
+        .fields{
+            font-family:Verdana,Tahoma,Arial,sans-serif;
+            font-size: 10pt;
+        }
 
 
-        </style>
-    </head>
-    <body>
-        <div class="maindiv">
-            <div class="maindivheading">
-                &nbsp;&nbsp;&nbsp; <bean:message key="inboxmanager.document.addMultipleDocuments"/>
+    </style>
+</head>
+<body>
+<div class="maindiv">
+    <div class="maindivheading">
+        &nbsp;&nbsp;&nbsp; <bean:message key="inboxmanager.document.addMultipleDocuments"/>
+    </div>
+    <div >
+        <input type="hidden" id="queue" value="<%=queueId%>"/>
+        <input type="hidden" id="provider" value="<%=provider%>"/>
+        <label for="queueDrop" class="fields">Send to Queue:</label>
+        <select onchange="javascript:addQueueToPost(this);" id="queueDrop" name="queueDrop">
+
+            <%
+                for (Hashtable ht : queues) {
+                    int id = (Integer)ht.get("id");
+                    String qName = (String) ht.get("queue");
+            %>
+            <option value="<%=id%>" <%=((id == queueId) ? " selected" : "")%>><%= qName%> </option>
+            <%}%>
+        </select>
+        <br/>
+        <label for="providerDrop" class="fields">Send to Provider:</label>
+        <select onchange="javascript:addProviderToPost(this);" id="providerDrop" name="providerDrop">
+            <option value="-2" <%=("-2".equals(provider) ? " selected" : "")%> >None</option>
+            <%for (int i = 0; i < providers.size(); i++) {
+                Map h = (Map) providers.get(i);%>
+            <option value="<%= h.get("providerNo")%>" <%= (h.get("providerNo").equals(provider) ? " selected" : "")%>><%= h.get("lastName")%> <%= h.get("firstName")%></option>
+            <%}%>
+        </select>
+    </div>
+    <div class="form">
+        <form id="noswfupload_form" method="post" action="../dms/addEditDocument.do?method=html5MultiUpload&queue=<%=queueId%>&provider=<%=provider%>" enctype="multipart/form-data">
+            <div>
+                <input type="file" name="filedata" />
+                <input id="noswfuploadSubmit" class="submit" type="submit" value="Upload File" />
             </div>
-           <div >
-                <input type="hidden" id="queue" value="<%=queueId%>"/>
-                <input type="hidden" id="provider" value="<%=provider%>"/>
-                <label for="queueDrop" class="fields">Send to Queue:</label>
-                <select onchange="javascript:addQueueToPost(this);" id="queueDrop" name="queueDrop">
+        </form>
+    </div>
+</div>
 
-                    <%
-                                for (Hashtable ht : queues) {
-                                    int id = (Integer)ht.get("id");
-                                    String qName = (String) ht.get("queue");
-                    %>
-                    <option value="<%=id%>" <%=((id == queueId) ? " selected" : "")%>><%= qName%> </option>
-                    <%}%>
-                </select>
-                <br/>
-                <label for="providerDrop" class="fields">Send to Provider:</label>
-                <select onchange="javascript:addProviderToPost(this);" id="providerDrop" name="providerDrop">
-                    <option value="-2" <%=("-2".equals(provider) ? " selected" : "")%> >None</option>
-                    <%for (int i = 0; i < doctorProviders.size(); i++) {
-                                    Map h = (Map) doctorProviders.get(i);%>
-                    <option value="<%= h.get("providerNo")%>" <%= (h.get("providerNo").equals(provider) ? " selected" : "")%>><%= h.get("lastName")%> <%= h.get("firstName")%></option>
-                    <%}%>
-                </select>
-            </div>
-        <div class="form">
-            <form id="noswfupload_form" method="post" action="../dms/addEditDocument.do?method=html5MultiUpload&queue=<%=queueId%>&provider=<%=provider%>" enctype="multipart/form-data">
-                <div>
-                    <input type="file" name="filedata" />
-                    <input id="noswfuploadSubmit" class="submit" type="submit" value="Upload File" />
-                </div>
-            </form>
-        </div>
-        </div>
-
-    </body>
+</body>
 
 </html>
