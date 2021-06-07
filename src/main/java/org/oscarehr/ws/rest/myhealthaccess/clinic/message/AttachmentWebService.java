@@ -32,7 +32,6 @@ import org.oscarehr.messaging.model.Attachment;
 import org.oscarehr.messaging.model.Message;
 import org.oscarehr.messaging.model.MessagingBackendType;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.myhealthaccess.clinic.MessagingBaseWebService;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;

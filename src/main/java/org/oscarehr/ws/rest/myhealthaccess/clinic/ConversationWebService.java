@@ -30,7 +30,6 @@ import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException
 import org.oscarehr.messaging.factory.MessagingServiceFactory;
 import org.oscarehr.messaging.model.Conversation;
 import org.oscarehr.messaging.model.MessagingBackendType;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.messaging.ConversationToConversationDtoConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.messaging.ConversationDto;
