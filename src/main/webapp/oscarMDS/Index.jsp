@@ -739,9 +739,13 @@
 			<td id="categoryList" valign="top" style="overflow:hidden;border-color: blue;border-width: thin;background-color: #E0E1FF" >
 
 			</td>
-			<td style="width:100%;height:100%;background-color: #E0E1FF">
-				<div id="docViews" style="width:100%;height:100vh;overflow:auto;" onscroll="handleScroll(this)">
-
+			<td style="width:100%;height:100%;background-color: #E0E1FF; display: inline;">
+				<div id="docViews" style="width:100%;height:100vh;overflow:auto; display:inline-block;" onscroll="handleScroll(this)">
+				</div>
+				</div>
+				</div>
+				</div>
+				</div>
 				</div>
 			</td>
 		</tr>
