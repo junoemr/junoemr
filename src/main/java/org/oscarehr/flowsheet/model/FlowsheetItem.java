@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.entity.ValueType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -40,6 +41,18 @@ public class FlowsheetItem extends AbstractTransientModel
 	private String typeCode;
 
 	private ValueType valueType;
+	private String valueLabel;
 	private List<ValidationRule> validationRules;
 	private List<FlowsheetItemAlert> flowsheetItemAlerts;
+
+	public FlowsheetItem()
+	{
+		validationRules = new ArrayList<>();
+		flowsheetItemAlerts = new ArrayList<>();
+	}
+
+	public void addFlowsheetItemAlert(FlowsheetItemAlert alert)
+	{
+		flowsheetItemAlerts.add(alert);
+	}
 }

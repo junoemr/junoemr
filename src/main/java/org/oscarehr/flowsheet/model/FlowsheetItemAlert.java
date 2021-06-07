@@ -37,4 +37,15 @@ public class FlowsheetItemAlert extends AbstractTransientModel
 
 	private Strength strength;
 	private String message;
+
+	public FlowsheetItemAlert()
+	{
+		this(null, Strength.RECOMMENDATION);
+	}
+
+	public FlowsheetItemAlert(String message, Strength strength)
+	{
+		this.message = message;
+		this.strength = strength;
+	}
 }

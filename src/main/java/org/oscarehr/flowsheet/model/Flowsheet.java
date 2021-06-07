@@ -25,6 +25,7 @@ package org.oscarehr.flowsheet.model;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -35,5 +36,8 @@ public class Flowsheet extends AbstractTransientModel
 	private String description;
 	private List<FlowsheetItemGroup> flowsheetItemGroups;
 
-	private List<FlowsheetItemAlert> flowsheetItemAlerts;
+	public Flowsheet()
+	{
+		flowsheetItemGroups = new ArrayList<>();
+	}
 }

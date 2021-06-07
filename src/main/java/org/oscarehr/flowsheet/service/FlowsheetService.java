@@ -31,12 +31,10 @@ import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.entity.Drools;
 import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
-import org.oscarehr.flowsheet.model.ValidationRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,8 +43,6 @@ import org.xml.sax.SAXException;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,8 +75,34 @@ public class FlowsheetService
 		org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity = flowsheetDao.find(flowsheetId);
 		Flowsheet flowsheet = flowsheetEntityToModelConverter.convert(flowsheetEntity);
 
+		MeasurementInfo measurementInfo = loadMeasurementInfoWithDrools(flowsheetEntity, demographicId);
+		for(FlowsheetItemGroup group : flowsheet.getFlowsheetItemGroups())
+		{
+			for(FlowsheetItem item : group.getFlowsheetItems())
+			{
+				// set item specific alerts
+				String measurementTypeCode = item.getTypeCode();
+				if(measurementInfo.hasRecommendation(measurementTypeCode))
+				{
+					FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getRecommendation(measurementTypeCode), FlowsheetItemAlert.Strength.RECOMMENDATION);
+					item.addFlowsheetItemAlert(alert);
+				}
+				if(measurementInfo.hasWarning(measurementTypeCode))
+				{
+					FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getWarning(measurementTypeCode), FlowsheetItemAlert.Strength.WARNING);
+					item.addFlowsheetItemAlert(alert);
+				}
+			}
+		}
+		return flowsheet;
+	}
+
+	private MeasurementInfo loadMeasurementInfoWithDrools(org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity, Integer demographicId)
+			throws IntegrationException, IOException, SAXException, FactException
+	{
 		MeasurementInfo measurementInfo = new MeasurementInfo(String.valueOf(demographicId));
 
+		// fill measurementInfo measurement codes. prereq for applying drools
 		List<String> flowsheetMeasurementCodes = flowsheetEntity.getFlowsheetItems()
 				.stream()
 				.filter((item) -> ItemType.MEASUREMENT.equals(item.getType()))
@@ -88,31 +110,13 @@ public class FlowsheetService
 				.collect(Collectors.toList());
 		measurementInfo.getMeasurements(flowsheetMeasurementCodes);
 
+		// load drools alerts. the measurementInfo object alerts/recommendations will be filled
 		for(Drools drools : flowsheetEntity.getDrools())
 		{
 			RuleBase ruleBase = droolsCachingService.getDroolsRuleBase(drools.getFilename());
 			getMessages(measurementInfo, ruleBase);
 		}
-
-		List<FlowsheetItemAlert> flowsheetItemAlerts = new LinkedList<>();
-		for(String recommendation : measurementInfo.getRecommendations())
-		{
-			FlowsheetItemAlert flowsheetItemAlert = new FlowsheetItemAlert();
-			flowsheetItemAlert.setStrength(FlowsheetItemAlert.Strength.RECOMMENDATION);
-			flowsheetItemAlert.setMessage(recommendation);
-			flowsheetItemAlerts.add(flowsheetItemAlert);
-		}
-
-		for(String warning : measurementInfo.getWarnings())
-		{
-			FlowsheetItemAlert flowsheetItemAlert = new FlowsheetItemAlert();
-			flowsheetItemAlert.setStrength(FlowsheetItemAlert.Strength.WARNING);
-			flowsheetItemAlert.setMessage(warning);
-			flowsheetItemAlerts.add(flowsheetItemAlert);
-		}
-		flowsheet.setFlowsheetItemAlerts(flowsheetItemAlerts);
-
-		return flowsheet;
+		return measurementInfo;
 	}
 
 	public void getMessages(MeasurementInfo mi, RuleBase ruleBase) throws FactException
@@ -120,59 +124,5 @@ public class FlowsheetService
 		WorkingMemory workingMemory = ruleBase.newWorkingMemory();
 		workingMemory.assertObject(mi);
 		workingMemory.fireAllRules();
-	}
-
-	private Flowsheet dummyFlowsheet(Integer id)
-	{
-		Flowsheet flowsheet = new Flowsheet();
-		flowsheet.setId(id);
-		flowsheet.setName("sample flowsheet");
-		flowsheet.setDescription("flowsheet description text goes here");
-
-		FlowsheetItemGroup flowsheetItemGroup = new FlowsheetItemGroup();
-		flowsheetItemGroup.setName("item Group");
-		flowsheetItemGroup.setDescription("This represents a grouping of similar or related flowsheet items");
-
-		FlowsheetItem flowsheetItem1 = dummyMeasurementItem(100, "Review Blood Glucose Records", "REBG",
-				"Fasting or pre-meal glucose level 4-7; 2hrs after meal 5-10", ValueType.STRING);
-		FlowsheetItem flowsheetItem2 = dummyMeasurementItem(200, "Education Nutrition", "EDNL", null, ValueType.BOOLEAN);
-
-		flowsheetItemGroup.setFlowsheetItems(Arrays.asList(flowsheetItem1, flowsheetItem2));
-
-
-		FlowsheetItemGroup flowsheetItemGroup2 = new FlowsheetItemGroup();
-		flowsheetItemGroup2.setDescription("This represents a single element without specific a grouping");
-
-
-		FlowsheetItem flowsheetItem3 = dummyMeasurementItem(300, "BMI", "BMI", "Target: 18.5 - 24.9 (kg/m<sup>2</sup>)", ValueType.STRING);
-		flowsheetItemGroup2.setFlowsheetItems(Arrays.asList(flowsheetItem3));
-
-		ValidationRule validationRule = new ValidationRule();
-		validationRule.setValidationRegex("([0-9]+)\\/([0-9]+)");
-		validationRule.setValidationFailMessage("Invalid data format");
-
-		flowsheetItem3.setValidationRules(Arrays.asList(validationRule));
-
-
-		FlowsheetItemAlert flowsheetItemAlert = new FlowsheetItemAlert();
-		flowsheetItemAlert.setMessage("Value should be within range 0-10");
-		flowsheetItemAlert.setStrength(FlowsheetItemAlert.Strength.RECOMMENDATION);
-		flowsheetItem3.setFlowsheetItemAlerts(Arrays.asList(flowsheetItemAlert));
-
-		flowsheet.setFlowsheetItemGroups(Arrays.asList(flowsheetItemGroup, flowsheetItemGroup2));
-		return flowsheet;
-	}
-
-	private FlowsheetItem dummyMeasurementItem(Integer id, String name, String typeCode, String guideline, ValueType valueType)
-	{
-		FlowsheetItem flowsheetItem = new FlowsheetItem();
-		flowsheetItem.setId(id);
-		flowsheetItem.setName(name);
-		flowsheetItem.setType(ItemType.MEASUREMENT);
-		flowsheetItem.setTypeCode(typeCode);
-
-		flowsheetItem.setValueType(valueType);
-
-		return flowsheetItem;
 	}
 }

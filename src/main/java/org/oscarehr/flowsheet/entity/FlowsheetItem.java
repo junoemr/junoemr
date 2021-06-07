@@ -70,6 +70,9 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	@Enumerated(value = EnumType.STRING)
 	private ValueType valueType;
 
+	@Column(name = "value_label")
+	private String valueLabel;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "flowsheet_id")
 	private Flowsheet flowsheet;
