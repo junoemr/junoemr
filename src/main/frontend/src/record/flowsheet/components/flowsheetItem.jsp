@@ -26,7 +26,7 @@
 
 	<div ng-repeat="alert in $ctrl.validationAlerts">
 		<div class="alert alert-danger" role="alert">
-			{{alert.validationFailMessage}}
+			{{alert.message}}
 		</div>
 	</div>
 
@@ -51,14 +51,14 @@
 		<div>
 			<juno-date-select
 					label="Observation Date"
-					ng-model="$ctrl.newEntry.observationDate">
+					ng-model="$ctrl.newEntry.observationDateTime">
 			</juno-date-select>
 		</div>
 		<div class="action-button-container">
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-			             click="$ctrl.validateAndSubmit()">
+			             click="$ctrl.submitNewItemData()">
 				Submit
 			</juno-button>
 		</div>

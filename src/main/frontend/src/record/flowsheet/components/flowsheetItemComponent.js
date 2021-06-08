@@ -85,35 +85,37 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					}
 				}
 
-				ctrl.validate = () =>
+				// ctrl.validate = () =>
+				// {
+				// 	ctrl.validationAlerts = [];
+				// 	if(ctrl.model.validationRules)
+				// 	{
+				// 		ctrl.model.validationRules.forEach((rule) =>
+				// 		{
+				// 			if (rule.validationRegex && !(new RegExp(rule.validationRegex).test(ctrl.newEntry.value)))
+				// 			{
+				// 				ctrl.validationAlerts.push(rule);
+				// 			}
+				// 		});
+				// 	}
+				// 	console.info(ctrl.validationAlerts);
+				// 	return ctrl.validationAlerts.length === 0;
+				// }
+
+				ctrl.submitNewItemData = async () =>
 				{
 					ctrl.validationAlerts = [];
-					if(ctrl.model.validationRules)
+					try
 					{
-						ctrl.model.validationRules.forEach((rule) =>
-						{
-							if (rule.validationRegex && !(new RegExp(rule.validationRegex).test(ctrl.newEntry.value)))
-							{
-								ctrl.validationAlerts.push(rule);
-							}
-						});
+						let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.flowsheetId, ctrl.model.id, ctrl.newEntry);
+						ctrl.model.data.add(newDataElement);
 					}
-					console.info(ctrl.validationAlerts);
-					return ctrl.validationAlerts.length === 0;
-				}
-
-				ctrl.validateAndSubmit = async () =>
-				{
-					if(ctrl.validate())
+					catch (errorObject)
 					{
-						try
-						{
-							let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.flowsheetId, ctrl.model.id, ctrl.newEntry);
-						}
-						catch (error)
-						{
-							console.warn(error);
-						}
+						console.warn(errorObject);
+						return ctrl.validationAlerts.push({
+							message: errorObject.data.error.message,
+						});
 					}
 				}
 

@@ -59,6 +59,9 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 		for(org.oscarehr.flowsheet.entity.FlowsheetItemGroup group: input.getFlowsheetItemGroups())
 		{
 			FlowsheetItemGroup groupModel = new FlowsheetItemGroup();
+			groupModel.setId(group.getId());
+			groupModel.setName(group.getDescription());
+			groupModel.setDescription(group.getDescription());
 			groupModel.setFlowsheetItems(flowsheetItemEntityToModelConverter.convert(group.getFlowsheetItems()));
 			groups.add(groupModel);
 		}
