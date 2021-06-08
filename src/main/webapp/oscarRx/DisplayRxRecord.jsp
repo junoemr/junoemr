@@ -100,10 +100,11 @@ Drug drug = drugDao.find(drugId);
 									PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
 									String rxDate = partialDateDao.getDatePartial(drug.getRxDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_STARTDATE);
 									String writtenDate = partialDateDao.getDatePartial(drug.getWrittenDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_WRITTENDATE);
+									String endDate = partialDateDao.getDatePartial(drug.getEndDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_STARTDATE);
 									%>
 									<br>   
 									Rx Date: <%=rxDate%><br>
-									Rx End Date: <%= drug.getEndDate() %><br>
+									Rx End Date: <%= endDate %><br>
 									Written Date: <%=writtenDate%><br>
 									Create Date: <%= drug.getCreateDate()%><br>
 									<br>

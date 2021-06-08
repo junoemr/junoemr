@@ -197,6 +197,7 @@ oscar.oscarRx.pageUtil.RxSessionBean rxBean = null;
 							{
 							    String displayStartDate = partialDateDao.getDatePartial(drug.startDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_STARTDATE);
 							    String displayWrittenDate = partialDateDao.getDatePartial(drug.writtenDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_WRITTENDATE);
+							    String displayEndDate = partialDateDao.getDatePartial(drug.endDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_STARTDATE);
 								String arch="";
 								if (drug.isArchived)
 								{
@@ -214,7 +215,7 @@ oscar.oscarRx.pageUtil.RxSessionBean rxBean = null;
 						<td>
 						<%if(!drug.startDate.equals("0001/01/01") )
 						{%>
-							<%=drug.endDate%>
+							<%=displayEndDate%>
 						<%}%>
 						</td>
 						<td>
