@@ -25,7 +25,6 @@
 package org.oscarehr.measurements.service;
 
 
-import org.apache.struts.action.ActionMessage;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
@@ -38,6 +37,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 @Component
 public class MeasurementsService
@@ -85,6 +85,13 @@ public class MeasurementsService
 		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, "");
 	}
 
+	public Measurement createNewMeasurementAndPersist(Integer demographicNo, String providerNo, String type, String observation, Date obsDate)
+	{
+		Measurement measurement = createNewMeasurement(demographicNo, providerNo, type, observation, obsDate);
+		measurementDao.persist(measurement);
+		return measurement;
+	}
+
 	public List<String> getValidationErrors(String inputType, String inputValue)
 	{
 		EctValidation ectValidation = new EctValidation();
@@ -103,8 +110,10 @@ public class MeasurementsService
 
 	private List<String> getValidationErrors(String inputType, String inputValue, EctValidation ectValidation, List<Validations> validations)
 	{
+		List<Validations> validationsWithoutDuplicates = validations.stream().distinct().collect(Collectors.toList());
+
 		List<String> validationErrors = new LinkedList<>();
-		for(Validations validation : validations)
+		for(Validations validation : validationsWithoutDuplicates)
 		{
 			Double dMax = validation.getMaxValue();
 			Double dMin = validation.getMinValue();
@@ -115,27 +124,27 @@ public class MeasurementsService
 			ResourceBundle resourceBundle = ResourceBundle.getBundle("oscarResources");
 			if (!ectValidation.isInRange(dMax, dMin, inputValue))
 			{
-				validationErrors.add(new ActionMessage("errors.range", inputType, Double.toString(dMin), Double.toString(dMax)).toString());
+				validationErrors.add(formatResourceString(resourceBundle, "errors.range", inputType, Double.toString(dMin), Double.toString(dMax)));
 			}
 
 			if (!ectValidation.maxLength(iMax, inputValue))
 			{
-				validationErrors.add(new ActionMessage("errors.maxlength", inputType, Integer.toString(iMax)).toString());
+				validationErrors.add(formatResourceString(resourceBundle, "errors.maxlength", inputType, Integer.toString(iMax)));
 			}
 
 			if (!ectValidation.minLength(iMin, inputValue))
 			{
-				validationErrors.add(new ActionMessage("errors.minlength", inputType, Integer.toString(iMin)).toString());
+				validationErrors.add(formatResourceString(resourceBundle, "errors.minlength", inputType, Integer.toString(iMin)));
 			}
 
 			if (!ectValidation.matchRegExp(regExp, inputValue))
 			{
-				validationErrors.add(new ActionMessage("errors.invalid", inputType).toString());
+				validationErrors.add(formatResourceString(resourceBundle, "errors.invalid", inputType));
 			}
 
 			if (!ectValidation.isValidBloodPressure(regExp, inputValue))
 			{
-				validationErrors.add(new ActionMessage("error.bloodPressure").toString());
+				validationErrors.add(formatResourceString(resourceBundle, "error.bloodPressure"));
 			}
 
 //			if (!ectValidation.isDate(measurement.getDateObserved()) && inputValue.compareTo("")!=0)
@@ -144,5 +153,27 @@ public class MeasurementsService
 //			}
 		}
 		return validationErrors;
+	}
+
+	/**
+	 * need to format the resource string due to legacy use.
+	 * @param resourceBundle the resource bundle
+	 * @param key the resource key
+	 * @param values values to inject, custom string interpolation
+	 * @return formatted string
+	 */
+	private String formatResourceString(ResourceBundle resourceBundle , String key, String... values)
+	{
+		String resource = resourceBundle.getString(key);
+
+		if(values != null)
+		{
+			for(int i = 0; i < values.length; i++)
+			{
+				resource = resource.replaceAll("\\{" + i + "\\}", values[i]);
+			}
+		}
+		resource = resource.replaceAll("<\\/*li>", "");
+		return resource;
 	}
 }

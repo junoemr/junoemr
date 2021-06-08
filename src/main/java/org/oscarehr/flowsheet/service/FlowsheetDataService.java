@@ -75,7 +75,7 @@ public class FlowsheetDataService
 
 		if(validationErrors.isEmpty())
 		{
-			Measurement measurement = measurementsService.createNewMeasurement(
+			Measurement measurement = measurementsService.createNewMeasurementAndPersist(
 					demographicId,
 					providerId,
 					flowsheetItem.getTypeCode(),

@@ -58,17 +58,15 @@
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+			             disabled="!$ctrl.canSubmitItem()"
 			             click="$ctrl.submitNewItemData()">
-				Submit
+				Add
 			</juno-button>
 		</div>
 	</div>
 	<div class="flex-row">
-		<div class="flex-grow">
-			<div ng-repeat="data in $ctrl.model.data">
-				<flowsheet-item-data model="data">
-				</flowsheet-item-data>
-			</div>
-		</div>
+		<flowsheet-item-data ng-repeat="data in $ctrl.model.data"
+		                     model="data">
+		</flowsheet-item-data>
 	</div>
 </div>
