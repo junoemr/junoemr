@@ -32,6 +32,7 @@ import org.oscarehr.flowsheet.converter.PreventionToFlowsheetItemDataConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.entity.Drools;
 import org.oscarehr.flowsheet.entity.ItemType;
+import org.oscarehr.flowsheet.entity.SeverityLevel;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
@@ -111,12 +112,12 @@ public class FlowsheetService
 		String measurementTypeCode = item.getTypeCode();
 		if(measurementInfo.hasRecommendation(measurementTypeCode))
 		{
-			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getRecommendation(measurementTypeCode), FlowsheetItemAlert.Strength.RECOMMENDATION);
+			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getRecommendation(measurementTypeCode), SeverityLevel.RECOMMENDATION);
 			item.addFlowsheetItemAlert(alert);
 		}
 		if(measurementInfo.hasWarning(measurementTypeCode))
 		{
-			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getWarning(measurementTypeCode), FlowsheetItemAlert.Strength.WARNING);
+			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getWarning(measurementTypeCode), SeverityLevel.WARNING);
 			item.addFlowsheetItemAlert(alert);
 		}
 

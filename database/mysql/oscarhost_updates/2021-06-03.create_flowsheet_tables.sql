@@ -61,10 +61,7 @@ CREATE TABLE IF NOT EXISTS flowsheet_item
 CREATE TABLE IF NOT EXISTS flowsheet_rule
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    flowsheet_id    INTEGER(10) NOT NULL,
     rule_name       VARCHAR(255) NOT NULL,
-    rule_severity   VARCHAR(255) NOT NULL,
-    rule_message    TEXT,
     description     TEXT,
 
     created_at      DATETIME NOT NULL,
@@ -72,9 +69,7 @@ CREATE TABLE IF NOT EXISTS flowsheet_rule
     updated_at      DATETIME NOT NULL,
     updated_by      VARCHAR(6) DEFAULT NULL,
     deleted_at      DATETIME,
-    deleted_by      VARCHAR(6) DEFAULT NULL,
-
-    CONSTRAINT `flowsheet_rule_flowsheet_id_fk` FOREIGN KEY (flowsheet_id) REFERENCES flowsheet (id)
+    deleted_by      VARCHAR(6) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS flowsheet_rule_condition
@@ -93,6 +88,34 @@ CREATE TABLE IF NOT EXISTS flowsheet_rule_condition
     deleted_by          VARCHAR(6) DEFAULT NULL,
 
     CONSTRAINT `flowsheet_rule_condition_flowsheet_rule_id_fk` FOREIGN KEY (flowsheet_rule_id) REFERENCES flowsheet_rule (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS flowsheet_rule_consequence
+(
+    id                      INTEGER PRIMARY KEY AUTO_INCREMENT,
+    flowsheet_rule_id       INTEGER(10) NOT NULL,
+    consequence_name        VARCHAR(255) NOT NULL,
+    consequence_type        VARCHAR(255) NOT NULL,
+    consequence_severity    VARCHAR(255) NOT NULL,
+    consequence_message     TEXT,
+
+    created_at          DATETIME NOT NULL,
+    created_by          VARCHAR(6) DEFAULT NULL,
+    updated_at          DATETIME NOT NULL,
+    updated_by          VARCHAR(6) DEFAULT NULL,
+    deleted_at          DATETIME,
+    deleted_by          VARCHAR(6) DEFAULT NULL,
+
+    CONSTRAINT `flowsheet_rule_consequence_flowsheet_rule_id_fk` FOREIGN KEY (flowsheet_rule_id) REFERENCES flowsheet_rule (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS flowsheet_item_flowsheet_rule
+(
+    flowsheet_item_id     INTEGER NOT NULL,
+    flowsheet_rule_id     INTEGER NOT NULL,
+    PRIMARY KEY (flowsheet_item_id, flowsheet_rule_id),
+    CONSTRAINT `flowsheet_item_flowsheet_rule_flowsheet_item_id_fk` FOREIGN KEY (flowsheet_item_id) REFERENCES flowsheet_item (id),
+    CONSTRAINT `flowsheet_item_flowsheet_rule_flowsheet_rule_id_fk` FOREIGN KEY (flowsheet_rule_id) REFERENCES flowsheet_rule (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS drools

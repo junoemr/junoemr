@@ -80,17 +80,17 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					return ctrl.model.type === "PREVENTION";
 				}
 
-				ctrl.getAlertClass = (strength) =>
+				ctrl.getAlertClass = (severityLevel) =>
 				{
-					if(strength === "RECOMMENDATION")
+					if(severityLevel === "RECOMMENDATION")
 					{
 						return "alert-info";
 					}
-					if(strength === "WARNING")
+					if(severityLevel === "WARNING")
 					{
 						return "alert-warning";
 					}
-					if(strength === "DANGER")
+					if(severityLevel === "DANGER")
 					{
 						return "alert-danger";
 					}

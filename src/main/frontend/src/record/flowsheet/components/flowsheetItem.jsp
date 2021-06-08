@@ -31,7 +31,7 @@
 	</div>
 
 	<div ng-repeat="alert in $ctrl.model.flowsheetItemAlerts">
-		<div class="alert" ng-class="$ctrl.getAlertClass(alert.strength)" role="alert">
+		<div class="alert" ng-class="$ctrl.getAlertClass(alert.severityLevel)" role="alert">
 			{{alert.message}}
 		</div>
 	</div>

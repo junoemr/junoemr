@@ -25,7 +25,6 @@ package org.oscarehr.flowsheet.entity;
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -35,70 +34,39 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
-@Entity(name = "entity.FlowsheetItem")
-@Table(name = "flowsheet_item")
-public class FlowsheetItem extends AbstractModel<Integer>
+@Entity(name = "entity.FlowsheetRuleConsequence")
+@Table(name = "flowsheet_rule_consequence")
+public class FlowsheetRuleConsequence extends AbstractModel<Integer>
 {
+	public enum ConsequenceType {
+		ALERT,
+		HIDDEN
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
 
-	@Column(name = "item_name")
+	@Column(name = "consequence_name")
 	private String name;
 
-	@Column(name = "description")
-	private String description;
-
-	@Column(name = "item_type")
+	@Column(name = "consequence_type")
 	@Enumerated(value = EnumType.STRING)
-	private ItemType type;
+	private ConsequenceType type;
 
-	@Column(name = "item_type_code")
-	private String typeCode;
-
-	@Column(name = "value_type")
+	@Column(name = "consequence_severity")
 	@Enumerated(value = EnumType.STRING)
-	private ValueType valueType;
+	private SeverityLevel severityLevel;
 
-	@Column(name = "value_label")
-	private String valueLabel;
+	@Column(name = "consequence_message")
+	private String message;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "flowsheet_id")
-	private Flowsheet flowsheet;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "flowsheet_item_group_id")
-	private Flowsheet flowsheetItemGroup;
-
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_item_flowsheet_rule", joinColumns = @JoinColumn(name="flowsheet_item_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_rule_id"))
-	private Set<FlowsheetRule> flowsheetRules = new HashSet<>();
-
-	/**
-	 * must be overridden to prevent default impl from infinite loading jpa links
-	 */
-	@Override
-	public int hashCode()
-	{
-		return id;
-	}
-
-	public boolean isMeasurementType()
-	{
-		return ItemType.MEASUREMENT.equals(this.type);
-	}
-	public boolean isPreventionType()
-	{
-		return ItemType.PREVENTION.equals(this.type);
-	}
+	@JoinColumn(name = "flowsheet_rule_id")
+	private FlowsheetRule flowsheetRule;
 }

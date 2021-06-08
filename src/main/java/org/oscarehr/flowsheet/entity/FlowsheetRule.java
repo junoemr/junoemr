@@ -28,29 +28,24 @@ import org.oscarehr.common.model.AbstractModel;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity(name = "entity.FlowsheetRule")
 @Table(name = "flowsheet_rule")
 public class FlowsheetRule extends AbstractModel<Integer>
 {
-	public enum SeverityLevel {
-		RECOMMENDATION,
-		WARNING,
-		DANGER,
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -59,20 +54,16 @@ public class FlowsheetRule extends AbstractModel<Integer>
 	@Column(name = "rule_name")
 	private String name;
 
-	@Column(name = "rule_severity")
-	@Enumerated(value = EnumType.STRING)
-	private SeverityLevel severityLevel;
-
-	@Column(name = "rule_message")
-	private String message;
-
 	@Column(name = "description")
 	private String description;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "flowsheet_id")
-	private Flowsheet flowsheet;
-
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetRule", cascade = CascadeType.ALL)
 	private List<FlowsheetRuleCondition> conditions;
+
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetRule", cascade = CascadeType.ALL)
+	private List<FlowsheetRuleConsequence> consequences;
+
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name = "flowsheet_item_flowsheet_rule", joinColumns = @JoinColumn(name="flowsheet_rule_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_item_id"))
+	private Set<FlowsheetItem> flowsheetItems = new HashSet<>();
 }

@@ -20,27 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.entity;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.SeverityLevel;
-
-@Data
-public class FlowsheetItemAlert extends AbstractTransientModel
+public enum SeverityLevel
 {
-	private SeverityLevel severityLevel;
-	private String message;
-
-	public FlowsheetItemAlert()
-	{
-		this(null, SeverityLevel.RECOMMENDATION);
-	}
-
-	public FlowsheetItemAlert(String message, SeverityLevel severityLevel)
-	{
-		this.message = message;
-		this.severityLevel = severityLevel;
-	}
+	RECOMMENDATION,
+	WARNING,
+	DANGER,
 }
-

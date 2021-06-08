@@ -70,9 +70,6 @@ public class Flowsheet extends AbstractModel<Integer>
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheet", cascade = CascadeType.ALL)
 	private List<FlowsheetItemGroup> flowsheetItemGroups;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheet", cascade = CascadeType.ALL)
-	private List<FlowsheetRule> flowsheetRules;
-
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_drools", joinColumns = @JoinColumn(name="flowsheet_id"), inverseJoinColumns = @JoinColumn(name="drools_id"))
 	private Set<Drools> drools = new HashSet<>();
