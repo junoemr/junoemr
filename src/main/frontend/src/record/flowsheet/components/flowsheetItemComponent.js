@@ -108,7 +108,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					try
 					{
 						let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.flowsheetId, ctrl.model.id, ctrl.newEntry);
-						ctrl.model.data.add(newDataElement);
+						ctrl.model.data.push(newDataElement);
 					}
 					catch (errorObject)
 					{

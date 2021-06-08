@@ -82,7 +82,7 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	private Flowsheet flowsheetItemGroup;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_item_validations", joinColumns = @JoinColumn(name="flowsheet_id"), inverseJoinColumns = @JoinColumn(name="validations_id"))
+	@JoinTable(name = "flowsheet_item_validations", joinColumns = @JoinColumn(name="flowsheet_item_id"), inverseJoinColumns = @JoinColumn(name="validations_id"))
 	private Set<Validations> validations = new HashSet<>();
 
 	/**

@@ -25,12 +25,19 @@
 package org.oscarehr.measurements.service;
 
 
+import org.apache.struts.action.ActionMessage;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.Validations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 @Component
 public class MeasurementsService
@@ -76,5 +83,66 @@ public class MeasurementsService
 	public Measurement createNewMeasurement(Integer demographicNo, String providerNo, String type, String observation, Date obsDate)
 	{
 		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, "");
+	}
+
+	public List<String> getValidationErrors(String inputType, String inputValue)
+	{
+		EctValidation ectValidation = new EctValidation();
+		List<Validations> validations = ectValidation.getValidationType(inputType, null);
+		return getValidationErrors(inputType, inputValue, ectValidation, validations);
+	}
+
+	public List<String> getValidationErrors(String inputType, String inputValue, List<Validations> validations)
+	{
+		EctValidation ectValidation = new EctValidation();
+		List<Validations> measurementValidation = ectValidation.getValidationType(inputType, null);
+		List<Validations> allValidations = new ArrayList<>(validations);
+		allValidations.addAll(measurementValidation);
+		return getValidationErrors(inputType, inputValue, ectValidation, allValidations);
+	}
+
+	private List<String> getValidationErrors(String inputType, String inputValue, EctValidation ectValidation, List<Validations> validations)
+	{
+		List<String> validationErrors = new LinkedList<>();
+		for(Validations validation : validations)
+		{
+			Double dMax = validation.getMaxValue();
+			Double dMin = validation.getMinValue();
+			Integer iMax = validation.getMaxLength();
+			Integer iMin = validation.getMinLength();
+			String regExp = validation.getRegularExp();
+
+			ResourceBundle resourceBundle = ResourceBundle.getBundle("oscarResources");
+			if (!ectValidation.isInRange(dMax, dMin, inputValue))
+			{
+				validationErrors.add(new ActionMessage("errors.range", inputType, Double.toString(dMin), Double.toString(dMax)).toString());
+			}
+
+			if (!ectValidation.maxLength(iMax, inputValue))
+			{
+				validationErrors.add(new ActionMessage("errors.maxlength", inputType, Integer.toString(iMax)).toString());
+			}
+
+			if (!ectValidation.minLength(iMin, inputValue))
+			{
+				validationErrors.add(new ActionMessage("errors.minlength", inputType, Integer.toString(iMin)).toString());
+			}
+
+			if (!ectValidation.matchRegExp(regExp, inputValue))
+			{
+				validationErrors.add(new ActionMessage("errors.invalid", inputType).toString());
+			}
+
+			if (!ectValidation.isValidBloodPressure(regExp, inputValue))
+			{
+				validationErrors.add(new ActionMessage("error.bloodPressure").toString());
+			}
+
+//			if (!ectValidation.isDate(measurement.getDateObserved()) && inputValue.compareTo("")!=0)
+//			{
+//				errors.add(inputType, new ActionMessage("errors.invalidDate", inputType));
+//			}
+		}
+		return validationErrors;
 	}
 }

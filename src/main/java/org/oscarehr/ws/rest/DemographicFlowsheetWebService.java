@@ -78,6 +78,6 @@ public class DemographicFlowsheetWebService extends AbstractServiceImpl
 			FlowsheetItemData flowsheetItem)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.MEASUREMENT_CREATE);
-		return RestResponse.successResponse(flowsheetDataService.addFlowsheetItemData(flowsheetItemId, flowsheetItem));
+		return RestResponse.successResponse(flowsheetDataService.addFlowsheetItemData(getLoggedInProviderId(), demographicId, flowsheetItemId, flowsheetItem));
 	}
 }

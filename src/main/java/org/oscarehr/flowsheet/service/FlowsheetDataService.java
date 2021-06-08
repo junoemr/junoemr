@@ -23,16 +23,23 @@
 package org.oscarehr.flowsheet.service;
 
 
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.Validations;
 import org.oscarehr.flowsheet.dao.FlowsheetItemDao;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
 import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
+import org.oscarehr.measurements.service.MeasurementsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import javax.validation.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -41,16 +48,19 @@ public class FlowsheetDataService
 	@Autowired
 	private FlowsheetItemDao flowsheetItemDao;
 
-	public FlowsheetItemData addFlowsheetItemData(Integer flowsheetItemId, FlowsheetItemData itemData)
+	@Autowired
+	private MeasurementsService measurementsService;
+
+	public FlowsheetItemData addFlowsheetItemData(String providerId, Integer demographicId, Integer flowsheetItemId, FlowsheetItemData itemData)
 	{
 		FlowsheetItem flowsheetItem = flowsheetItemDao.find(flowsheetItemId);
 		if(ItemType.MEASUREMENT.equals(flowsheetItem.getType()))
 		{
-			return addFlowsheetMeasurement(flowsheetItem, itemData);
+			return addFlowsheetMeasurement(providerId, demographicId, flowsheetItem, itemData);
 		}
 		else if(ItemType.PREVENTION.equals(flowsheetItem.getType()))
 		{
-			return addPreventionMeasurement(flowsheetItem, itemData);
+			return addPreventionMeasurement(providerId, demographicId, flowsheetItem, itemData);
 		}
 		else
 		{
@@ -58,12 +68,36 @@ public class FlowsheetDataService
 		}
 	}
 
-	private FlowsheetItemData addFlowsheetMeasurement(FlowsheetItem flowsheetItem, FlowsheetItemData itemData)
+	private FlowsheetItemData addFlowsheetMeasurement(String providerId, Integer demographicId, FlowsheetItem flowsheetItem, FlowsheetItemData itemData)
 	{
-		throw new ValidationException("TODO"); //TODO
+		Set<Validations> validations = flowsheetItem.getValidations();
+		List<String> validationErrors = measurementsService.getValidationErrors(flowsheetItem.getTypeCode(), itemData.getValue(), new ArrayList<>(validations));
+
+		if(validationErrors.isEmpty())
+		{
+			Measurement measurement = measurementsService.createNewMeasurement(
+					demographicId,
+					providerId,
+					flowsheetItem.getTypeCode(),
+					itemData.getValue(),
+					ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()));
+
+			FlowsheetItemData flowsheetItemData = new FlowsheetItemData();
+			flowsheetItemData.setId(measurement.getId());
+			flowsheetItemData.setValue(measurement.getDataField());
+			flowsheetItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(measurement.getDateObserved()));
+			flowsheetItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(measurement.getCreateDate()));
+			flowsheetItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(measurement.getCreateDate()));
+
+			return flowsheetItemData;
+		}
+		else
+		{
+			throw new ValidationException(String.join(",\n", validationErrors));
+		}
 	}
 
-	private FlowsheetItemData addPreventionMeasurement(FlowsheetItem flowsheetItem, FlowsheetItemData itemData)
+	private FlowsheetItemData addPreventionMeasurement(String providerId, Integer demographicId, FlowsheetItem flowsheetItem, FlowsheetItemData itemData)
 	{
 		throw new ValidationException("TODO"); //TODO
 	}
