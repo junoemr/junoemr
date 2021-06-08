@@ -22,9 +22,14 @@
  */
 package org.oscarehr.demographic.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.document.model.CtlDocument;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -36,6 +41,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -194,6 +200,13 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="provider_no", insertable=false, updatable=false)
 	private ProviderData provider;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "demographic")
+	@WhereJoinTable(clause = "module = '" + CtlDocument.MODULE_DEMOGRAPHIC + "'")
+	@Where(clause= "status != '" + Document.STATUS_DELETED +"'")
+	@Getter
+	@Setter
+	private List<Document> documents;
 
 	public static final String BC_NEWBORN_BILLING_CODE = "66";
 

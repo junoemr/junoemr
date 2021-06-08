@@ -6,8 +6,9 @@ import JunoDocumentToDocumentTransferInboundConverter
 	from "../converter/JunoDocumentToDocumentTransferInboundConverter";
 import DocumentTransferOutboundToJunoDocumentConverter
 	from "../converter/DocumentTransferOutboundToJunoDocumentConverter";
+import DocumentError from "../../error/document/DocumentError";
 
-export default class DocumentService
+export default class DemographicDocumentService
 {
 	protected _demogrpahicApi: DemographicApi;
 
@@ -21,6 +22,25 @@ export default class DocumentService
 			angular.injector(["ng"]).get("$http"),
 			angular.injector(["ng"]).get("$httpParamSerializer"),
 			API_BASE_PATH);
+	}
+
+	/**
+	 * get all documents for this specified demographic (document data not included).
+	 * @param demographicNo - the demographic whose documents are to be fetched.
+	 * @return promise that resolves to a list of documents.
+	 */
+	public async getDemographicDocuments(demographicNo: string): Promise<JunoDocument[]>
+	{
+		try
+		{
+			const docTransfers: DocumentTransferOutbound[] = (await this._demogrpahicApi.searchDocuments(demographicNo)).data.body;
+			return (new DocumentTransferOutboundToJunoDocumentConverter()).convertList(docTransfers);
+		}
+		catch(error)
+		{
+			console.error(error);
+			throw new DocumentError(`Failed to retrieve demographic [${demographicNo}]s documents due to ${error.toString()}`);
+		}
 	}
 
 	/**

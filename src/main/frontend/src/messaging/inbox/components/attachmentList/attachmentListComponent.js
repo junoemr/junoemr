@@ -30,7 +30,7 @@ import FileUtil from "../../../../lib/util/FileUtil";
 import {MessageableLocalType} from "../../../../lib/messaging/model/MessageableLocalType";
 import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
 import {JunoDocumentFactory} from "../../../../lib/documents/factory/JunoDocumentFactory";
-import DocumentService from "../../../../lib/documents/service/DocumentService";
+import DemographicDocumentService from "../../../../lib/documents/service/DemographicDocumentService";
 
 angular.module("Messaging.Components").component('attachmentList', {
 	templateUrl: 'src/messaging/inbox/components/attachmentList/attachmentList.jsp',
@@ -50,7 +50,7 @@ angular.module("Messaging.Components").component('attachmentList', {
 			$uibModal)
 		{
 			const ctrl = this;
-			const documentService = new DocumentService();
+			const documentService = new DemographicDocumentService();
 
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;

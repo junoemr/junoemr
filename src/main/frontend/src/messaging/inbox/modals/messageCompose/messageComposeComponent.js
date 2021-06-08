@@ -31,6 +31,7 @@ import MessageFactory from "../../../../lib/messaging/factory/MessageFactory";
 import {AllowedAttachmentTypes} from "../../../../lib/messaging/constants/AllowedAttachmentTypes";
 import FileUtil from "../../../../lib/util/FileUtil";
 import AttachmentFactory from "../../../../lib/messaging/factory/AttachmentFactory";
+import DemographicDocumentService from "../../../../lib/documents/service/DemographicDocumentService";
 
 angular.module("Messaging.Modals").component('messageCompose', {
 	templateUrl: 'src/messaging/inbox/modals/messageCompose/messageCompose.jsp',
@@ -103,11 +104,20 @@ angular.module("Messaging.Modals").component('messageCompose', {
 
 			ctrl.uploadAttachment = async () =>
 			{
-				const files = await FileUtil.uploadFile(AllowedAttachmentTypes);
-				for (const file of files)
-				{
-					ctrl.attachments.push(AttachmentFactory.build(file.name, file.type, await FileUtil.getFileDataBase64(file)));
-				}
+				const attachments = await $uibModal.open({
+					component: "attachmentSelect",
+					backdrop: 'static',
+					windowClass: "juno-simple-modal-window",
+					resolve: {
+						style: () => ctrl.resolve.style,
+					}
+				});
+
+				// const files = await FileUtil.uploadFile(AllowedAttachmentTypes);
+				// for (const file of files)
+				// {
+				// 	ctrl.attachments.push(AttachmentFactory.build(file.name, file.type, await FileUtil.getFileDataBase64(file)));
+				// }
 
 				$scope.$apply();
 			}

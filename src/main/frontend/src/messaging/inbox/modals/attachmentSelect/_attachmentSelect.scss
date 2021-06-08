@@ -1,0 +1,28 @@
+.attachment-select {
+	.layout-grid {
+		display: grid;
+		grid-template-columns: .2fr 8px .8fr;
+		grid-template-rows: 8px .8fr 8px .2fr;
+
+		.grid-item {
+			border: solid 1px var(--color-neutral-light-grey);
+			border-radius: 8px;
+			background-color: var(--color-neutral-white);
+
+			&.source-select {
+				grid-column: 1 / 2;
+				grid-row: 2;
+			}
+
+			&.attachment-select {
+				grid-column: 3;
+				grid-row: 2;
+			}
+
+			&.selected-attachments {
+				grid-column: 1 / 4;
+				grid-row: 4;
+			}
+		}
+	}
+}

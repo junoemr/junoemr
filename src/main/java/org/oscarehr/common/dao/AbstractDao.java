@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ParamAppender;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -91,12 +92,30 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		entityManager.refresh(o);
 	}
 
-	public T find(Object id) {
+	public T find(Object id)
+	{
 		return (entityManager.find(modelClass, id));
 	}
 
-	public Optional<T> findOptional(Object id) {
+	public Optional<T> findOptional(Object id)
+	{
 		return Optional.ofNullable(entityManager.find(modelClass, id));
+	}
+
+	/**
+	 * find entity by primary key or throw exception if not found.
+	 * @param id - primary key to search by
+	 * @return - the found entity
+	 * @throws EntityNotFoundException - if the primary key does not match any entity
+	 */
+	public T findOrThrow(Object id)
+	{
+		T entity = (entityManager.find(modelClass, id));
+		if (entity == null)
+		{
+			throw new EntityNotFoundException();
+		}
+		return entity;
 	}
 
 	/**
