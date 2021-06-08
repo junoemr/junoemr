@@ -24,9 +24,7 @@ package org.oscarehr.flowsheet.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.common.model.Validations;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,12 +34,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Entity(name = "entity.FlowsheetItem")
@@ -80,10 +74,6 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "flowsheet_item_group_id")
 	private Flowsheet flowsheetItemGroup;
-
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_item_validations", joinColumns = @JoinColumn(name="flowsheet_item_id"), inverseJoinColumns = @JoinColumn(name="validations_id"))
-	private Set<Validations> validations = new HashSet<>();
 
 	/**
 	 * must be overridden to prevent default impl from infinite loading jpa links

@@ -58,15 +58,6 @@ CREATE TABLE IF NOT EXISTS flowsheet_item
     CONSTRAINT `flowsheet_item_flowsheet_item_group_id_fk` FOREIGN KEY (flowsheet_item_group_id) REFERENCES flowsheet_item_group (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_item_validations
-(
-    validations_id  INTEGER UNSIGNED NOT NULL,
-    flowsheet_item_id    INTEGER NOT NULL,
-    PRIMARY KEY (validations_id, flowsheet_item_id),
-    CONSTRAINT `flowsheet_item_validations_validations_id_fk` FOREIGN KEY (validations_id) REFERENCES validations (id),
-    CONSTRAINT `flowsheet_item_validations_flowsheet_item_id_fk` FOREIGN KEY (flowsheet_item_id) REFERENCES flowsheet_item (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS flowsheet_rule
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,

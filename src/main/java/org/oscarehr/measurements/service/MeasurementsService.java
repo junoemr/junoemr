@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,15 +96,6 @@ public class MeasurementsService
 		EctValidation ectValidation = new EctValidation();
 		List<Validations> validations = ectValidation.getValidationType(inputType, null);
 		return getValidationErrors(inputType, inputValue, ectValidation, validations);
-	}
-
-	public List<String> getValidationErrors(String inputType, String inputValue, List<Validations> validations)
-	{
-		EctValidation ectValidation = new EctValidation();
-		List<Validations> measurementValidation = ectValidation.getValidationType(inputType, null);
-		List<Validations> allValidations = new ArrayList<>(validations);
-		allValidations.addAll(measurementValidation);
-		return getValidationErrors(inputType, inputValue, ectValidation, allValidations);
 	}
 
 	private List<String> getValidationErrors(String inputType, String inputValue, EctValidation ectValidation, List<Validations> validations)

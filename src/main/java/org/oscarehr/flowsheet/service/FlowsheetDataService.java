@@ -24,7 +24,6 @@ package org.oscarehr.flowsheet.service;
 
 
 import org.oscarehr.common.model.Measurement;
-import org.oscarehr.common.model.Validations;
 import org.oscarehr.flowsheet.dao.FlowsheetItemDao;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
 import org.oscarehr.flowsheet.entity.ItemType;
@@ -37,9 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -70,8 +67,7 @@ public class FlowsheetDataService
 
 	private FlowsheetItemData addFlowsheetMeasurement(String providerId, Integer demographicId, FlowsheetItem flowsheetItem, FlowsheetItemData itemData)
 	{
-		Set<Validations> validations = flowsheetItem.getValidations();
-		List<String> validationErrors = measurementsService.getValidationErrors(flowsheetItem.getTypeCode(), itemData.getValue(), new ArrayList<>(validations));
+		List<String> validationErrors = measurementsService.getValidationErrors(flowsheetItem.getTypeCode(), itemData.getValue());
 
 		if(validationErrors.isEmpty())
 		{
