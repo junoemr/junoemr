@@ -100,6 +100,7 @@ Drug drug = drugDao.find(drugId);
 									PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
 									String rxDate = partialDateDao.getDatePartial(drug.getRxDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_STARTDATE);
 									String writtenDate = partialDateDao.getDatePartial(drug.getWrittenDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_WRITTENDATE);
+									//endDate is determined using the startDate. Display the endDate in the same partial date format as the startDate (when it's partial)
 									String endDate = partialDateDao.getDatePartial(drug.getEndDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_STARTDATE);
 									%>
 									<br>   

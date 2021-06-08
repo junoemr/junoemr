@@ -197,6 +197,7 @@ oscar.oscarRx.pageUtil.RxSessionBean rxBean = null;
 							{
 							    String displayStartDate = partialDateDao.getDatePartial(drug.startDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_STARTDATE);
 							    String displayWrittenDate = partialDateDao.getDatePartial(drug.writtenDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_WRITTENDATE);
+							    //endDate is determined using the startDate. Display the endDate in the same partial date format as the startDate (when it's partial)
 							    String displayEndDate = partialDateDao.getDatePartial(drug.endDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_STARTDATE);
 								String arch="";
 								if (drug.isArchived)
