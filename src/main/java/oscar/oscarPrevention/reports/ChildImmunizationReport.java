@@ -25,6 +25,16 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarDemographic.data.DemographicData;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+import oscar.util.UtilDateUtilities;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,26 +43,34 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarDemographic.data.DemographicData;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.UtilDateUtilities;
-
 /**
+ * Childhood Immunization Cumulative Preventative Care Bonus (April 2020)
  *
- * @author jay
+ * This bonus is based on the percentage of the target population who have received all of the
+ * ministry supplied immunizations as recommended by the National Advisory Committee on
+ * Immunization.  The target population consists of enrolled patients who are aged 30 to 42
+ * months of age, inclusive as of March 31st of the fiscal year for which the bonus is being
+ * claimed.  These patients must have received all applicable immunizations by 30 months of age
+ *
  */
-public class ChildImmunizationReport implements PreventionReport{
+public class ChildImmunizationReport implements PreventionReport {
+
+    private static Map<String, Integer> requiredSchedule = new HashMap<>();
+
+    static
+    {
+        requiredSchedule.put("DTapIPVHib", 4);
+        requiredSchedule.put("PneuC13", 4);
+        requiredSchedule.put("Rot", 2);
+        requiredSchedule.put("MenCC", 3);
+        requiredSchedule.put("MMR", 2);
+    }
 
     //Sort class for preventions used to sort final list of dtap preventions
     class DtapComparator implements Comparator<Map<String, Object>> {
@@ -62,15 +80,45 @@ public class ChildImmunizationReport implements PreventionReport{
         }
     }
 
-
-
     private static Logger log = MiscUtils.getLogger();
-    /** Creates a new instance of ChildImmunizationReport */
-    public ChildImmunizationReport() {
+
+    /**
+     * @param loggedInInfo LoggedInInfo
+     * @param list List of demographics.  Each demographic takes the form of a 3 member list  <List><List>{demoNo, lastName, firstName}</List></List>
+     * @param asofDate Date to use as "today" for the purposes of the calculation.
+     * @return
+     */
+    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate)
+    {
+        List<PreventionReportDisplay> childhoodImmunizationReport = new ArrayList<>();
+
+        List<ReportPatientInfo> patientInfoList = ReportPatientInfo.fromList(list);
+
+        // Assume all patients in this list are between 30 and 42 months of age as of March 31st on the year of asOfDate
+        for (ReportPatientInfo patientinfo : patientInfoList)
+        {
+            ArrayList<Map<String, Object>> something = PreventionData.getPreventionData(loggedInInfo, patientinfo.demographicNo);
+
+            // Count preventions here.
+            // TODO:  What to do with refused? or ineligible???
+            int DTapIPVHib = 0;
+            int PneuC = 0;
+            int Rot = 0;
+            int MenCC = 0;
+            int MMR = 0;
+
+            // turn the 'something' collection into a stream for each of the immunization and do a count on the prevention
+            // type
+
+            int totalUpToDate = 0;
+        }
+
+
+        return null;
     }
 
 
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate){
+    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate, boolean foobar){
         int inList = 0;
         double done= 0;
         ArrayList<PreventionReportDisplay> returnReport = new ArrayList<PreventionReportDisplay>();
