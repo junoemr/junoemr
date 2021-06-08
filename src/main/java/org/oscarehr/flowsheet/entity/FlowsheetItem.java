@@ -83,4 +83,13 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	{
 		return id;
 	}
+
+	public boolean isMeasurementType()
+	{
+		return ItemType.MEASUREMENT.equals(this.type);
+	}
+	public boolean isPreventionType()
+	{
+		return ItemType.PREVENTION.equals(this.type);
+	}
 }

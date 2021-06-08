@@ -38,11 +38,11 @@
 
 	<div class="flex-row">
 		<div class="flex-grow">
-			<juno-check-box ng-if="$ctrl.valueIsBoolean()"
+			<juno-check-box ng-if="$ctrl.isTypeMeasurement() && $ctrl.valueIsBoolean()"
 			                label="{{$ctrl.getInputLabel()}}"
 			                ng-model="$ctrl.newEntry.value">
 			</juno-check-box>
-			<juno-input ng-if="!$ctrl.valueIsBoolean()"
+			<juno-input ng-if="$ctrl.isTypeMeasurement() && !$ctrl.valueIsBoolean()"
 			            label="{{$ctrl.getInputLabel()}}"
 			            ng-model="$ctrl.newEntry.value"
 			            only-numeric="$ctrl.valueIsNumeric()">

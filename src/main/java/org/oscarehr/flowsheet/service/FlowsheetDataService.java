@@ -24,15 +24,18 @@ package org.oscarehr.flowsheet.service;
 
 
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.flowsheet.converter.PreventionToFlowsheetItemDataConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetItemDao;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
 import org.oscarehr.measurements.service.MeasurementsService;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarPrevention.PreventionData;
 import oscar.util.ConversionUtils;
 
 import javax.validation.ValidationException;
@@ -48,16 +51,22 @@ public class FlowsheetDataService
 	@Autowired
 	private MeasurementsService measurementsService;
 
+	@Autowired
+	private PreventionDao preventionDao;
+
+	@Autowired
+	private PreventionToFlowsheetItemDataConverter preventionToFlowsheetItemDataConverter;
+
 	public FlowsheetItemData addFlowsheetItemData(String providerId, Integer demographicId, Integer flowsheetItemId, FlowsheetItemData itemData)
 	{
 		FlowsheetItem flowsheetItem = flowsheetItemDao.find(flowsheetItemId);
-		if(ItemType.MEASUREMENT.equals(flowsheetItem.getType()))
+		if(flowsheetItem.isMeasurementType())
 		{
 			return addFlowsheetMeasurement(providerId, demographicId, flowsheetItem, itemData);
 		}
-		else if(ItemType.PREVENTION.equals(flowsheetItem.getType()))
+		else if(flowsheetItem.isPreventionType())
 		{
-			return addPreventionMeasurement(providerId, demographicId, flowsheetItem, itemData);
+			return addFlowsheetPrevention(providerId, demographicId, flowsheetItem, itemData);
 		}
 		else
 		{
@@ -89,12 +98,27 @@ public class FlowsheetDataService
 		}
 		else
 		{
+			//TODO make validation exception handle a list
 			throw new ValidationException(String.join(",\n", validationErrors));
 		}
 	}
 
-	private FlowsheetItemData addPreventionMeasurement(String providerId, Integer demographicId, FlowsheetItem flowsheetItem, FlowsheetItemData itemData)
+	private FlowsheetItemData addFlowsheetPrevention(String providerId, Integer demographicId, FlowsheetItem flowsheetItem, FlowsheetItemData itemData)
 	{
-		throw new ValidationException("TODO"); //TODO
+		Integer preventionId = PreventionData.insertPreventionData(
+				providerId,
+				demographicId,
+				ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()),
+				providerId,
+				null,
+				flowsheetItem.getTypeCode(),
+				false,
+				false,
+				null,
+				false,
+				null);
+
+		Prevention prevention = preventionDao.find(preventionId);
+		return preventionToFlowsheetItemDataConverter.convert(prevention);
 	}
 }

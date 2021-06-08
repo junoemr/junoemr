@@ -70,6 +70,16 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					return ctrl.model.valueType === "NUMBER";
 				}
 
+				ctrl.isTypeMeasurement = () =>
+				{
+					return ctrl.model.type === "MEASUREMENT";
+				}
+
+				ctrl.isTypePrevention = () =>
+				{
+					return ctrl.model.type === "PREVENTION";
+				}
+
 				ctrl.getAlertClass = (strength) =>
 				{
 					if(strength === "RECOMMENDATION")
@@ -88,7 +98,10 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 
 				ctrl.canSubmitItem = () =>
 				{
-					return (!ctrl.isLoading && !Juno.Common.Util.isBlank(ctrl.newEntry.value));
+					return (!ctrl.isLoading && (
+							ctrl.isTypePrevention() ||
+							ctrl.isTypeMeasurement() && !Juno.Common.Util.isBlank(ctrl.newEntry.value))
+					);
 				}
 
 				ctrl.submitNewItemData = async () =>
@@ -102,7 +115,6 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					}
 					catch (errorObject)
 					{
-						console.warn(errorObject);
 						return ctrl.validationAlerts.push({
 							message: errorObject.data.error.message,
 						});

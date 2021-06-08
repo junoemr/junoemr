@@ -64,20 +64,59 @@ public class PreventionData {
 		// prevent instantiation
 	}
 
-	public static Integer insertPreventionData(String creator, String demoNo, String date, String providerNo, String providerName, String preventionType, String refused, String nextDate, String neverWarn, ArrayList<Map<String, String>> list) {
+	@Deprecated
+	public static Integer insertPreventionData(
+			String creator,
+			String demoNo,
+			String date,
+			String providerNo,
+			String providerName,
+			String preventionType,
+			String refused,
+			String nextDate,
+			String neverWarn,
+			ArrayList<Map<String, String>> list)
+	{
+		return insertPreventionData(
+				creator,
+				Integer.parseInt(demoNo),
+				ConversionUtils.fromDateString(date, ConversionUtils.TS_NO_SEC_PATTERN),
+				providerNo,
+				providerName,
+				preventionType,
+				refused.trim().equals("1"),
+				refused.trim().equals("2"),
+				ConversionUtils.fromDateString(nextDate, ConversionUtils.DEFAULT_DATE_PATTERN),
+				neverWarn.trim().equals("1"),
+				list);
+	}
+	public static Integer insertPreventionData(
+			String creator,
+			Integer demoNo,
+			Date date,
+			String providerNo,
+			String providerName,
+			String preventionType,
+			boolean refused,
+			boolean ineligible,
+			Date nextDate,
+			boolean neverWarn,
+			ArrayList<Map<String, String>> list)
+	{
 		Integer insertId = -1;
-		try {
+		try
+		{
 			Prevention prevention = new Prevention();
 			prevention.setCreatorProviderNo(creator);
-			prevention.setDemographicId(Integer.valueOf(demoNo));
-			prevention.setPreventionDate(ConversionUtils.fromDateString(date, ConversionUtils.TS_NO_SEC_PATTERN));
+			prevention.setDemographicId(demoNo);
+			prevention.setPreventionDate(date);
 			prevention.setProviderNo(providerNo);
 			prevention.setProviderName(providerName);
 			prevention.setPreventionType(preventionType);
-			prevention.setNextDate(ConversionUtils.fromDateString(nextDate, ConversionUtils.DEFAULT_DATE_PATTERN));
-			prevention.setNever(neverWarn.trim().equals("1"));
-			if (refused.trim().equals("1")) prevention.setRefused(true);
-			else if (refused.trim().equals("2")) prevention.setIneligible(true);
+			prevention.setNextDate(nextDate);
+			prevention.setNever(neverWarn);
+			prevention.setRefused(refused);
+			prevention.setIneligible(ineligible);
 
 			preventionDao.persist(prevention);
 			if (prevention.getId() == null) return insertId;

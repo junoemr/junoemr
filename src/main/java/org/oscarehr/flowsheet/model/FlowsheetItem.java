@@ -53,6 +53,15 @@ public class FlowsheetItem extends AbstractTransientModel
 		data = new ArrayList<>();
 	}
 
+	public boolean isMeasurementType()
+	{
+		return ItemType.MEASUREMENT.equals(this.type);
+	}
+	public boolean isPreventionType()
+	{
+		return ItemType.PREVENTION.equals(this.type);
+	}
+
 	public void addFlowsheetItemAlert(FlowsheetItemAlert alert)
 	{
 		flowsheetItemAlerts.add(alert);

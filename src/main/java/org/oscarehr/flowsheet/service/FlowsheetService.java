@@ -28,6 +28,7 @@ import org.drools.IntegrationException;
 import org.drools.RuleBase;
 import org.drools.WorkingMemory;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
+import org.oscarehr.flowsheet.converter.PreventionToFlowsheetItemDataConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.entity.Drools;
 import org.oscarehr.flowsheet.entity.ItemType;
@@ -36,6 +37,8 @@ import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -62,6 +65,12 @@ public class FlowsheetService
 	@Autowired
 	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
 
+	@Autowired
+	private PreventionToFlowsheetItemDataConverter preventionToFlowsheetItemDataConverter;
+
+	@Autowired
+	private PreventionDao preventionDao;
+
 
 	public List<Flowsheet> getFlowsheets(int offset, int perPage)
 	{
@@ -83,35 +92,58 @@ public class FlowsheetService
 		{
 			for(FlowsheetItem item : group.getFlowsheetItems())
 			{
-				// set item specific alerts
-				String measurementTypeCode = item.getTypeCode();
-				if(measurementInfo.hasRecommendation(measurementTypeCode))
+				if(item.isMeasurementType())
 				{
-					FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getRecommendation(measurementTypeCode), FlowsheetItemAlert.Strength.RECOMMENDATION);
-					item.addFlowsheetItemAlert(alert);
+					fillMeasurementItemDataAndAlerts(measurementInfo, item);
 				}
-				if(measurementInfo.hasWarning(measurementTypeCode))
+				else
 				{
-					FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getWarning(measurementTypeCode), FlowsheetItemAlert.Strength.WARNING);
-					item.addFlowsheetItemAlert(alert);
-				}
-
-				// set existing data
-				List<EctMeasurementsDataBean> measurementsDataBeans = measurementInfo.getMeasurementData(measurementTypeCode);
-				for(EctMeasurementsDataBean dataBean : measurementsDataBeans)
-				{
-					FlowsheetItemData itemData = new FlowsheetItemData();
-					itemData.setId(dataBean.getId());
-					itemData.setValue(dataBean.getDataField());
-					itemData.setObservationDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateObservedAsDate()));
-					itemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
-					itemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
-
-					item.addFlowsheetItemData(itemData);
+					fillPreventionItemDataAndAlerts(demographicId, item);
 				}
 			}
 		}
 		return flowsheet;
+	}
+
+	private void fillMeasurementItemDataAndAlerts(MeasurementInfo measurementInfo, FlowsheetItem item)
+	{
+		// set item specific alerts
+		String measurementTypeCode = item.getTypeCode();
+		if(measurementInfo.hasRecommendation(measurementTypeCode))
+		{
+			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getRecommendation(measurementTypeCode), FlowsheetItemAlert.Strength.RECOMMENDATION);
+			item.addFlowsheetItemAlert(alert);
+		}
+		if(measurementInfo.hasWarning(measurementTypeCode))
+		{
+			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getWarning(measurementTypeCode), FlowsheetItemAlert.Strength.WARNING);
+			item.addFlowsheetItemAlert(alert);
+		}
+
+		// set existing data
+		List<EctMeasurementsDataBean> measurementsDataBeans = measurementInfo.getMeasurementData(measurementTypeCode);
+		for(EctMeasurementsDataBean dataBean : measurementsDataBeans)
+		{
+			FlowsheetItemData itemData = new FlowsheetItemData();
+			itemData.setId(dataBean.getId());
+			itemData.setValue(dataBean.getDataField());
+			itemData.setObservationDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateObservedAsDate()));
+			itemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
+			itemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
+
+			item.addFlowsheetItemData(itemData);
+		}
+	}
+
+	private void fillPreventionItemDataAndAlerts(Integer demographicId, FlowsheetItem item)
+	{
+		//TODO load alert rules etc. drools not set up for preventions
+
+		List<Prevention> preventions = preventionDao.findByTypeAndDemoNo(item.getTypeCode(), demographicId);
+		for(Prevention prevention : preventions)
+		{
+			item.addFlowsheetItemData(preventionToFlowsheetItemDataConverter.convert(prevention));
+		}
 	}
 
 	private MeasurementInfo loadMeasurementInfoWithDrools(org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity, Integer demographicId)
