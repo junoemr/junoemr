@@ -25,11 +25,11 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.oscarehr.util.LoggedInInfo;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
-
-import org.oscarehr.util.LoggedInInfo;
 
 /**
  *

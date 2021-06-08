@@ -48,6 +48,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Childhood Immunization Cumulative Preventative Care Bonus (April 2020)
@@ -61,16 +62,7 @@ import java.util.Map;
  */
 public class ChildImmunizationReport implements PreventionReport {
 
-    private static Map<String, Integer> requiredSchedule = new HashMap<>();
 
-    static
-    {
-        requiredSchedule.put("DTapIPVHib", 4);
-        requiredSchedule.put("PneuC13", 4);
-        requiredSchedule.put("Rot", 2);
-        requiredSchedule.put("MenCC", 3);
-        requiredSchedule.put("MMR", 2);
-    }
 
     //Sort class for preventions used to sort final list of dtap preventions
     class DtapComparator implements Comparator<Map<String, Object>> {
@@ -94,29 +86,114 @@ public class ChildImmunizationReport implements PreventionReport {
 
         List<ReportPatientInfo> patientInfoList = ReportPatientInfo.fromList(list);
 
-        // Assume all patients in this list are between 30 and 42 months of age as of March 31st on the year of asOfDate
+        // Assume all patients in this list are between 30 and 42 months of age as of March 31st on the year of asOfDate,
+        // since this is passed in as part of a demographic query.
         for (ReportPatientInfo patientinfo : patientInfoList)
         {
-            ArrayList<Map<String, Object>> something = PreventionData.getPreventionData(loggedInInfo, patientinfo.demographicNo);
+            //  Each Map<String,Object> is a prevention item, with field names as keys... this is ridiculous.
+            ArrayList<Map<String, Object>> preventions = PreventionData.getPreventionData(loggedInInfo, patientinfo.demographicNo);
 
-            // Count preventions here.
-            // TODO:  What to do with refused? or ineligible???
-            int DTapIPVHib = 0;
-            int PneuC = 0;
-            int Rot = 0;
-            int MenCC = 0;
-            int MMR = 0;
+            Map<String, Integer> requiredImmunizations = getChildhoodSchedule();
+            for (Map<String, Object> prevention : preventions)
+            {
+                String type = (String) prevention.get("type");
+                switch (type)
+                {
+                    case "DTaP-IPV-Hib":
+                    case "Pneu-C":
+                    case "Rot":
+                    case "MenC-C":
+                    case "MMR":
+                    {
+                        requiredImmunizations.put(type, requiredImmunizations.get(type) - 1);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
 
-            // turn the 'something' collection into a stream for each of the immunization and do a count on the prevention
-            // type
-
-            int totalUpToDate = 0;
+            int immunizationsCompleted = calculateScheduleCompletion(requiredImmunizations);
+            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted);
+            childhoodImmunizationReport.add(entry);
         }
 
+        Hashtable<String,Object> h = new Hashtable<String,Object>();
 
-        return null;
+        h.put("up2date","99");
+        h.put("percent", "99.9%");
+        h.put("returnReport", childhoodImmunizationReport);
+        h.put("ineligible", "99");
+        h.put("eformSearch","CHI");
+        h.put("followUpType","CIMF");
+        h.put("BillCode", "Q004A");
+
+        return h;
     }
 
+    public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted)
+    {
+        // Possible States
+        // No Info -- Immunizations = 0
+        // Ineligible
+        // Refused
+        // Due -- Missing at least one, child is at least 18mo and below 2yo
+        // OverDue -- Missing at least one, and child is over 2 years old
+        // Done
+        // Other
+
+        // Report has a don't include variable to exclude from eligibility....
+
+/*
+        public Integer demographicNo = null;
+        public String lastDate = null;
+        public int rank = 0;
+        public String state = null;
+        public String numMonths = null;
+        public String color = null;
+        public String numShots = null;
+        public String bonusStatus= null;
+        public String billStatus = null;
+
+        //FollowUp Data
+        public Date lastFollowup = null;
+        public String lastFollupProcedure =null;
+        public String nextSuggestedProcedure=null;*/
+
+
+        PreventionReportDisplay entry = new PreventionReportDisplay();
+        entry.demographicNo = patientInfo.demographicNo;
+        entry.numShots = Integer.toString(immunizationsCompleted);
+
+        if (immunizationsCompleted == 0)
+        {
+            entry.rank = 1;
+            entry.lastDate = "------";
+            entry.state = "No Info";
+            entry.numMonths = "------";
+            entry.color = "magenta";
+        }
+        else if (immunizationsCompleted == 5)
+        {
+            entry.rank = 4;
+            entry.lastDate = "??????";
+            entry.state = "Up to date";
+            entry.numMonths = "??????";
+            entry.color = "green";
+        }
+        else
+        {
+            entry.rank = 2;
+            entry.lastDate = "??????";
+            entry.state = "due";
+            entry.numMonths = "??????";
+            entry.color = "yellow";
+        }
+
+        // TODO: overdue, refused, ineligible, other...
+
+        return entry;
+    }
 
     public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate, boolean foobar){
         int inList = 0;
@@ -474,5 +551,30 @@ public class ChildImmunizationReport implements PreventionReport {
        return null;
    }
 
+   private Map<String, Integer> getChildhoodSchedule()
+   {
+       Map<String, Integer> requiredChildHoodImmunizations = new HashMap<>();
+       requiredChildHoodImmunizations.put("DTaP-IPV-Hib", 4);
+       requiredChildHoodImmunizations.put("Pneu-C", 3);
+       requiredChildHoodImmunizations.put("Rot", 2);
+       requiredChildHoodImmunizations.put("MenC-C", 3);
+       requiredChildHoodImmunizations.put("MMR", 2);
 
+       // Keep track of at least one refusal or ineligibility
+       requiredChildHoodImmunizations.put("ineligible", 0);
+       requiredChildHoodImmunizations.put("refused", 0);
+
+       return requiredChildHoodImmunizations;
+   }
+
+   private int calculateScheduleCompletion(Map<String, Integer> immunizations)
+   {
+       int completed = immunizations.entrySet()
+                      .stream()
+                      .filter(immunization -> immunization.getValue() > 0)
+                      .collect(Collectors.toList())
+                      .size();
+
+       return completed;
+   }
 }
