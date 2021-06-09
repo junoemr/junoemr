@@ -92,11 +92,17 @@ public class ChildImmunizationReport implements PreventionReport {
         {
             //  Each Map<String,Object> is a prevention item, with field names as keys... this is ridiculous.
             ArrayList<Map<String, Object>> preventions = PreventionData.getPreventionData(loggedInInfo, patientinfo.demographicNo);
+            
+            boolean refused = false;
+            boolean ineligible = false;
 
+            Date latestPrevention = null;
+            
             Map<String, Integer> requiredImmunizations = getChildhoodSchedule();
             for (Map<String, Object> prevention : preventions)
             {
-                String type = (String) prevention.get("type");
+             
+            	String type = (String) prevention.get("type");
                 switch (type)
                 {
                     case "DTaP-IPV-Hib":
@@ -106,6 +112,11 @@ public class ChildImmunizationReport implements PreventionReport {
                     case "MMR":
                     {
                         requiredImmunizations.put(type, requiredImmunizations.get(type) - 1);
+	                    Date preventionDate = (Date) prevention.get("prevention_date_asDate");
+                        if (latestPrevention == null || preventionDate.after(latestPrevention))
+                        {
+                        	latestPrevention = preventionDate;
+                        }
                         break;
                     }
                     default:
@@ -114,7 +125,7 @@ public class ChildImmunizationReport implements PreventionReport {
             }
 
             int immunizationsCompleted = calculateScheduleCompletion(requiredImmunizations);
-            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted);
+            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted, latestPrevention);
             childhoodImmunizationReport.add(entry);
         }
 
@@ -131,18 +142,18 @@ public class ChildImmunizationReport implements PreventionReport {
         return h;
     }
 
-    public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted)
+    public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted, Date latestPrevention)
     {
-        // Possible States
-        // No Info -- Immunizations = 0
-        // Ineligible
-        // Refused
-        // Due -- Missing at least one, child is at least 18mo and below 2yo
-        // OverDue -- Missing at least one, and child is over 2 years old
-        // Done
-        // Other
-
-        // Report has a don't include variable to exclude from eligibility....
+	    // Possible States
+	    // No Info -- Immunizations = 0
+	    // Ineligible
+	    // Refused
+	    // Due -- Missing at least one, child is at least 18mo and below 2yo
+	    // OverDue -- Missing at least one, and child is over 2 years old
+	    // Done
+	    // Other
+	
+	    // Report has a don't include variable to exclude from eligibility....
 
 /*
         public Integer demographicNo = null;
@@ -159,11 +170,24 @@ public class ChildImmunizationReport implements PreventionReport {
         public Date lastFollowup = null;
         public String lastFollupProcedure =null;
         public String nextSuggestedProcedure=null;*/
-
-
-        PreventionReportDisplay entry = new PreventionReportDisplay();
-        entry.demographicNo = patientInfo.demographicNo;
-        entry.numShots = Integer.toString(immunizationsCompleted);
+	
+	    PreventionReportDisplay entry = new PreventionReportDisplay();
+	    entry.demographicNo = patientInfo.demographicNo;
+	    entry.numShots = Integer.toString(immunizationsCompleted);
+	
+	    if (latestPrevention != null)
+	    {
+		    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		    entry.lastDate = dateFormat.format(latestPrevention);
+	    }
+	    else
+	    {
+	    	entry.lastDate = "------";
+	    }
+	    
+        // TODO these are placeholders
+	    entry.bonusStatus = "N";
+	    entry.billStatus = "N";
 
         if (immunizationsCompleted == 0)
         {
@@ -559,11 +583,7 @@ public class ChildImmunizationReport implements PreventionReport {
        requiredChildHoodImmunizations.put("Rot", 2);
        requiredChildHoodImmunizations.put("MenC-C", 3);
        requiredChildHoodImmunizations.put("MMR", 2);
-
-       // Keep track of at least one refusal or ineligibility
-       requiredChildHoodImmunizations.put("ineligible", 0);
-       requiredChildHoodImmunizations.put("refused", 0);
-
+       
        return requiredChildHoodImmunizations;
    }
 
@@ -571,7 +591,7 @@ public class ChildImmunizationReport implements PreventionReport {
    {
        int completed = immunizations.entrySet()
                       .stream()
-                      .filter(immunization -> immunization.getValue() > 0)
+                      .filter(immunization -> immunization.getValue() <= 0)
                       .collect(Collectors.toList())
                       .size();
 
