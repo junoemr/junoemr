@@ -20,47 +20,52 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.encounterNote;
+package org.oscarehr.dataMigration.model.dx;
 
 import lombok.Data;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.dx.DxCode;
-import org.oscarehr.dataMigration.model.provider.Provider;
-import org.oscarehr.dataMigration.model.provider.Reviewer;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
-public abstract class BaseNote extends AbstractTransientModel
+public class DxCode extends AbstractTransientModel
 {
-	private String id;
-	private String noteText;
-	private String revisionId;
-	private LocalDateTime observationDate;
-	private Provider provider;
-	private Reviewer signingProvider;
-	private List<Provider> editors;
+	private String code;
+	private DxCodingSystem codingSystem;
+	private String description;
 
-	private String programId;
-	private String roleId;
-
-	private List<DxCode> dxIssueCodes;
-
-	public BaseNote()
+	public enum DxCodingSystem
 	{
-		this.editors = new ArrayList<>();
-		this.dxIssueCodes = new ArrayList<>();
-	}
+		ICD9("ICD9", CDSConstants.CodingSystem.ICD9),
+		OSCAR_CODE("OscarCode", null);
 
-	public void addEditor(Provider editor)
-	{
-		this.editors.add(editor);
-	}
+		private final String value;
+		private final CDSConstants.CodingSystem cdsCodingSystem;
 
-	public void addIssueCode(DxCode issueCode)
-	{
-		this.dxIssueCodes.add(issueCode);
+		DxCodingSystem(String value, CDSConstants.CodingSystem cdsCodingSystem)
+		{
+			this.value = value;
+			this.cdsCodingSystem = cdsCodingSystem;
+		}
+
+		public String getValue()
+		{
+			return this.value;
+		}
+		public CDSConstants.CodingSystem getCdsCodingSystem()
+		{
+			return this.cdsCodingSystem;
+		}
+
+		public static DxCodingSystem fromValue(String value)
+		{
+			for(DxCodingSystem status : DxCodingSystem.values())
+			{
+				if(status.getValue().equalsIgnoreCase(value))
+				{
+					return status;
+				}
+			}
+			return null;
+		}
 	}
 }

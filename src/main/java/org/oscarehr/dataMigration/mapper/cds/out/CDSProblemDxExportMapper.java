@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.mapper.cds.out;
 
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ProblemList;
@@ -41,7 +42,7 @@ public class CDSProblemDxExportMapper extends AbstractCDSNoteExportMapper<Proble
 	{
 		ProblemList problemList = objectFactory.createProblemList();
 
-		DxRecord.DxCodingSystem dxCodingSystem = exportStructure.getCodingSystem();
+		DxCode.DxCodingSystem dxCodingSystem = exportStructure.getCodingSystem();
 		// export with coding system if possible
 		if(dxCodingSystem != null && dxCodingSystem.getCdsCodingSystem() != null)
 		{

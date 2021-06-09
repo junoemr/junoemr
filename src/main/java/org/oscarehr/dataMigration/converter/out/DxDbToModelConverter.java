@@ -27,6 +27,7 @@ import org.oscarehr.common.dao.OscarCodeDao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.common.model.OscarCode;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
@@ -76,7 +77,7 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 
 	private boolean fillCodeInfo(DxRecord dxRecord, String codingSystemStr, String code)
 	{
-		DxRecord.DxCodingSystem codingSystem = DxRecord.DxCodingSystem.fromValue(codingSystemStr);
+		DxCode.DxCodingSystem codingSystem = DxCode.DxCodingSystem.fromValue(codingSystemStr);
 		if(codingSystem != null)
 		{
 			dxRecord.setCodingSystem(codingSystem);
