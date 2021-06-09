@@ -40,6 +40,7 @@ angular.module('Admin.Section').component('imdHealthAdmin',
                 clientSecret: ""
             };
 
+            ctrl.isBusy = false;
             ctrl.imdIntegrations = [];
 
             ctrl.LABEL_POSITION = LABEL_POSITION;
@@ -65,9 +66,7 @@ angular.module('Admin.Section').component('imdHealthAdmin',
                         Juno.Common.Util.errorAlert($uibModal, "Error", "Could not update integration");
                         console.log(error);
                     });
-
             };
-
 
             ctrl.fetchIntegrations = () =>
             {
@@ -103,25 +102,34 @@ angular.module('Admin.Section').component('imdHealthAdmin',
 
              ctrl.syncIntegrations = (integrationId) =>
              {
+                 ctrl.isBusy = true;
+
                   imdHealthWebService.syncIntegrations(integrationId)
                       .then((response ) =>
                       {
-                          let failedIntegrations = response.data.body;
+                          let failureMessages = response.data.body;
 
-                          if (failedIntegrations.length < 1)
+                          if (failureMessages.length < 1)
                           {
-                              Juno.Common.Util.successAlert($uibModal,"Success", "Successfully synced");
+                              Juno.Common.Util.successAlert($uibModal,"Success", "Successfully synchronized all sites");
                           }
                           else
                           {
-                              Juno.Common.Util.errorAlert($uibModal, "Failure", "Could not sync integrations");
-                              console.log(failedIntegrations.join(' | '));
+                              Juno.Common.Util.errorAlert($uibModal,
+                                  "Attention",
+                                  "Could not synchronize the following:" + '\n' + failureMessages.join('\n'));
+
+                              console.log(failureMessages.join('\n'));
                           }
                       })
                       .catch((error) =>
                       {
+                        Juno.Common.Util.errorAlert($uibModal, "There was a problem synchronizing your integration");
                         console.log(error);
                       })
+                      .finally(() => {
+                          ctrl.isBusy = false;
+                      });
              }
 
             ctrl.testSSO = (integrationId) =>

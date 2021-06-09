@@ -22,6 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {ElectronicMessagingConsentStatus} from "../../../../lib/demographic/ElectronicMessagingConsentStatus";
 
 angular.module('Record.Details').component('contactSection', {
 	templateUrl: 'src/record/details/components/contactSection/contactSection.jsp',
@@ -38,6 +39,7 @@ angular.module('Record.Details').component('contactSection', {
 
 		ctrl.provinces = staticDataService.getProvinces();
 		ctrl.phoneNumberRegex = /^[\d-\s()]*$/;
+		ctrl.electronicMessagingConsentOptions = [];
 
 		ctrl.$onInit = () =>
 		{
@@ -46,6 +48,53 @@ angular.module('Record.Details').component('contactSection', {
 			ctrl.validations = Object.assign(ctrl.validations, {
 				email: Juno.Validations.validationEmail(ctrl, "ngModel.email"),
 			});
+
+			ctrl.buildElectronicMessagingConsentOptions();
+		}
+
+		ctrl.buildElectronicMessagingConsentOptions = () =>
+		{
+			ctrl.electronicMessagingConsentOptions = [
+				{
+					label: "No Consent",
+					value: ElectronicMessagingConsentStatus.NONE,
+				},
+				{
+					label: "Consented",
+					value: ElectronicMessagingConsentStatus.CONSENTED,
+				},
+				{
+					label: "Revoked",
+					value: ElectronicMessagingConsentStatus.REVOKED,
+				},
+			];
+		};
+
+		ctrl.onConsentStatusChange = (value) =>
+		{
+			// Update consent timestamps for immediate UI feedback.
+			// Exact value will be calculated by the backend on save.
+			ctrl.ngModel.electronicMessagingConsentGivenAt = moment();
+			ctrl.ngModel.electronicMessagingConsentRejectedAt = moment();
+		}
+
+		/**
+		 * get a string representing the date on which electronic messaging was consented to.
+		 * @returns {string}
+		 */
+		ctrl.getElectronicMessagingConsentStatusText = () =>
+		{
+			if (ctrl.ngModel && ctrl.ngModel.electronicMessagingConsentStatus !== ElectronicMessagingConsentStatus.NONE)
+			{
+				let eventDate = ctrl.ngModel.electronicMessagingConsentGivenAt;
+				if (ctrl.ngModel.electronicMessagingConsentStatus === ElectronicMessagingConsentStatus.REVOKED)
+				{
+					eventDate = ctrl.ngModel.electronicMessagingConsentRejectedAt;
+				}
+
+				return `On, ${Juno.Common.Util.formatMomentTime(moment(eventDate), Juno.Common.Util.settings.date_format)}`;
+			}
+			return "";
 		}
 
 	}]

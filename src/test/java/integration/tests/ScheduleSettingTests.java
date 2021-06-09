@@ -28,6 +28,7 @@ import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
+import java.io.IOException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,13 +40,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -138,7 +137,9 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(addingButton).click();
 	}
 
-	public static void setupTemplate(String currWindowHandle, Set<String> oldWindowHandles) throws InterruptedException {
+	public static void setupTemplate(String currWindowHandle, Set<String> oldWindowHandles)
+			throws InterruptedException
+	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
@@ -155,9 +156,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
 	{
-		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		//webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());
@@ -181,7 +180,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 	}
 
 	@Test
-	public void setScheduleTest() throws Exception
+	public void setScheduleTest()
+			throws Exception
 	{
 		String holidayName = "Happy Monday";
 

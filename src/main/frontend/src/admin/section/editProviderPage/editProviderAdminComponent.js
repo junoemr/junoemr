@@ -22,8 +22,10 @@
  */
 import {EDIT_PROVIDER_MODE} from "./editProviderAdminConstants";
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
+import {ProvidersServiceApi} from "../../../../generated";
 import {SitesApi} from "../../../../generated";
 import {BILLING_REGION} from "../../../billing/billingConstants";
+import {LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
 
 angular.module('Admin.Section').component('editProviderAdmin',
@@ -38,7 +40,6 @@ angular.module('Admin.Section').component('editProviderAdmin',
 		'$location',
 		'$uibModal',
 		'staticDataService',
-		'providersService',
 		'providerService',
 		'billingService',
 		function (
@@ -49,14 +50,16 @@ angular.module('Admin.Section').component('editProviderAdmin',
 			$location,
 			$uibModal,
 			staticDataService,
-			providersService,
 			providerService,
 			billingService)
 	{
 		let ctrl = this;
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		let sitesApi =  new SitesApi($http, $httpParamSerializer, '../ws/rs');
+
+		ctrl.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
@@ -220,7 +223,8 @@ angular.module('Admin.Section').component('editProviderAdmin',
 			connectCareProviderId: null,
 			takNumber: null,
 			lifeLabsClientIds: null,
-			eDeliveryIds: null
+			eDeliveryIds: null,
+			imdHealthUuid: null
 		};
 
 		ctrl.setupFormValidations = function()
@@ -294,11 +298,11 @@ angular.module('Admin.Section').component('editProviderAdmin',
 
 		ctrl.$onInit = async function()
 		{
-			providersService.getAllProviderRoles().then(
+			providersServiceApi.getProviderRoles().then(
 					function success(result)
 					{
 						ctrl.roleOptions = [];
-						for (let role of result)
+						for (let role of result.data.body)
 						{
 							ctrl.roleOptions.push({
 								label: role.roleName,
@@ -485,15 +489,17 @@ angular.module('Admin.Section').component('editProviderAdmin',
 			try
 			{
 				let result = await billingService.getBCBillingVisitCodes();
-				ctrl.bcServiceLocationOptions = [];
+				ctrl.bcServiceLocationOptions = [{
+					label: "None",
+					value: null,
+				}];
+
 				for (let visitCode of result.data.body)
 				{
-					ctrl.bcServiceLocationOptions.push(
-							{
-								label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
-								value: visitCode.visitType
-							}
-					);
+					ctrl.bcServiceLocationOptions.push({
+						label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
+						value: visitCode.visitType
+					});
 				}
 			}
 			catch (e)
@@ -789,6 +795,10 @@ angular.module('Admin.Section').component('editProviderAdmin',
 				if (result.error.message === "SECURITY_RECORD_EXISTS")
 				{
 					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "User name or email already in use");
+				}
+				else if (result.error.message === "INSUFFICIENT_PRIVILEGE")
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Sorry, you are not authorized to make changes to this user.");
 				}
 				else
 				{

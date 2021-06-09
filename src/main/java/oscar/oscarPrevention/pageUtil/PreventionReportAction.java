@@ -110,7 +110,12 @@ public class PreventionReportAction extends Action {
 			
 			PreventionReport report = PreventionReportFactory.getPreventionReport(prevention);
 			Hashtable h = report.runReport(loggedInInfo, list, asofDate);
-			
+
+			if (report.displayNumShots())
+			{
+				request.setAttribute("ReportType", "yes");
+			}
+
 			request.setAttribute("asDate", asofDate);
 			request.setAttribute("up2date", h.get("up2date"));
 			request.setAttribute("percent", h.get("percent"));

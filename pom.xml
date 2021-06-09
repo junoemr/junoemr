@@ -59,6 +59,8 @@
 		<oscar.dbinit.skip>false</oscar.dbinit.skip>
 		<cxf.version>3.2.12</cxf.version>
 		<memcachedSessionManager.version>2.3.2</memcachedSessionManager.version>
+		<jaxb.version>2.3.1</jaxb.version>
+		<jaxbcore.version>2.3.0.1</jaxbcore.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -188,6 +190,14 @@
 			<artifactId>javax.transaction-api</artifactId>
 			<version>1.3</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.interceptor/javax.interceptor-api -->
+		<dependency>
+			<groupId>javax.interceptor</groupId>
+			<artifactId>javax.interceptor-api</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
 
 
 		<!-- general libraries -->
@@ -775,22 +785,27 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-xjc</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxbcore.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.4</version>
 		</dependency>
 		<!-- for xsd generation -->
 		<dependency>
@@ -2073,6 +2088,7 @@
                                 org.oscarehr.ws.rest.DemographicsService
                                 org.oscarehr.ws.rest.RosterWebService
                                 org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
+								org.oscarehr.ws.rest.ProvidersService
                                 org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
                                 org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
                                 org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService

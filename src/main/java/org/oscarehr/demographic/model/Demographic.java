@@ -23,6 +23,8 @@
 package org.oscarehr.demographic.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
@@ -148,21 +150,14 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String familyDoctor;
 
 	// roster info
-	@Deprecated
 	@Column(name = "roster_status")
 	private String rosterStatus;
-
-	@Deprecated
 	@Column(name = "roster_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterDate;
-
-	@Deprecated
 	@Column(name = "roster_termination_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterTerminationDate;
-
-	@Deprecated
 	@Column(name = "roster_termination_reason")
 	private String rosterTerminationReason;
 
@@ -199,6 +194,16 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String nameOfMother;
 	@Column(name = "name_of_father")
 	private String nameOfFather;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_given_at")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentGivenAt;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_rejected_at", columnDefinition = "TIMESTAMP")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentRejectedAt;
 
 	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic")
 	private DemographicCust demographicCust;
@@ -240,6 +245,13 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		SK,
 		YT,
 		PP
+	}
+
+	public enum ELECTRONIC_MESSAGING_CONSENT_STATUS
+	{
+		NONE,
+		CONSENTED,
+		REVOKED,
 	}
 
 	/**
@@ -925,5 +937,51 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isActive()
 	{
 		return !getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
+
+	/**
+	 * get the patients electronic messaging consent status
+	 * @return - the patients consent status
+	 */
+	public ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
+	{
+		if (this.electronicMessagingConsentRejectedAt != null)
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.REVOKED;
+		}
+		else if (this.electronicMessagingConsentGivenAt != null)
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.CONSENTED;
+		}
+		else
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+		}
+	}
+
+	/**
+	 * Update the patients electronic messaging consent status.
+	 * @param status - the new consent status to use.
+	 */
+	public void updateElectronicMessagingConsentStatus(ELECTRONIC_MESSAGING_CONSENT_STATUS status)
+	{
+		if (this.getElectronicMessagingConsentStatus() != status && status != null)
+		{
+			// status has changed. update!
+			switch(status)
+			{
+				case NONE:
+					this.setElectronicMessagingConsentGivenAt(null);
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+				case REVOKED:
+					this.setElectronicMessagingConsentRejectedAt(new Date());
+					break;
+				case CONSENTED:
+					this.setElectronicMessagingConsentGivenAt(new Date());
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+			}
+		}
 	}
 }

@@ -73,10 +73,10 @@ public class iMDHealthWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/SSOLink")
-	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IntegrationException
+	public RestResponse<String> getSSOLink(@QueryParam("demographicNo") Integer demographicNo, @QueryParam("siteId") Integer siteId) throws IntegrationException
 	{
-		// TODO security permissions
-		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), siteId);
+		// TODO demographicNo
+		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), demographicNo, siteId);
 		return RestResponse.successResponse(ssoLink);
 	}
 
@@ -84,7 +84,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/{integrationId}/sync")
 	public RestResponse<List<String>> syncIntegrations(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
-		List<String> synced = imdHealthService.initializeAllUsers(getHttpServletRequest().getSession(), integrationId);
+		List<String> synced = imdHealthService.initializeAllUsers(integrationId);
 		return RestResponse.successResponse(synced);
 	}
 

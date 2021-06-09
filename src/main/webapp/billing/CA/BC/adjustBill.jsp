@@ -106,7 +106,7 @@ if(!authed) {
   ////
   BillingFormData billform = new BillingFormData();
   BillingFormData.BillingPhysician[] billphysician = billform.getProviderList();
-  BillingFormData.BillingVisit[] billvisit = billform.getVisitType(billRegion);
+  BillingVisit[] billvisit = billform.getVisitType(billRegion);
   request.setAttribute("billvisit",billvisit);
   BillingFormData.Location[] billlocation = billform.getLocationList(billRegion);
   BillingFormData.BillingForm[] billformlist = billform.getFormList();
@@ -656,7 +656,7 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
               <select name="serviceLocation" style="font-size:80%;">
               <%
               for (int i = 0; i < billvisit.length; i++) {
-                oscar.oscarBilling.ca.bc.data.BillingFormData.BillingVisit visit = billvisit[i];
+                BillingVisit visit = billvisit[i];
                 String selected = serviceLocation.equals(visit.getVisitType())?"selected":"";
               %>
               <option value="<%=visit.getVisitType()%>" <%=selected%>><%=visit.getDescription()%> </option>

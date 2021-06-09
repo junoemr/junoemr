@@ -59,6 +59,11 @@ public class FOBTReport implements PreventionReport{
     public FOBTReport() {
     }
 
+    public boolean displayNumShots()
+    {
+        return false;
+    }
+
     public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo,ArrayList<ArrayList<String>> list,Date asofDate){
 
         int inList = 0;

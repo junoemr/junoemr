@@ -46,6 +46,7 @@
 								component-style="$ctrl.resolve.style">
 				</juno-input>
 				<juno-input
+								ng-if="$ctrl.showOnDemandSettings"
 								label="Text Notification Phone(s)"
 								ng-model="$ctrl.notifyPhoneNumbers"
 								component-style="$ctrl.resolve.style">

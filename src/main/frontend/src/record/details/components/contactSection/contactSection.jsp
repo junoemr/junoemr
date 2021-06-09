@@ -110,6 +110,20 @@
 								component-style="$ctrl.componentStyle">
 				</juno-check-box>
 			</div>
+
+			<!-- Electronic Messaginc Consent -->
+			<div class="e-messaging-consent">
+				<juno-select ng-model="$ctrl.ngModel.electronicMessagingConsentStatus"
+								options="$ctrl.electronicMessagingConsentOptions"
+								label="E-Messaging Consent"
+								component-style="$ctrl.componentStyle"
+								on-change="$ctrl.onConsentStatusChange(value)">
+				</juno-select>
+
+				<span class="consent-date">
+					{{$ctrl.getElectronicMessagingConsentStatusText()}}
+				</span>
+			</div>
 		</div>
 	</div>
 </div>
