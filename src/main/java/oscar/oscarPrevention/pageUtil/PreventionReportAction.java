@@ -30,14 +30,6 @@
 
 package oscar.oscarPrevention.pageUtil;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -47,13 +39,19 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarPrevention.reports.PreventionReport;
 import oscar.oscarPrevention.reports.PreventionReportFactory;
 import oscar.oscarReport.data.RptDemographicQueryBuilder;
 import oscar.oscarReport.data.RptDemographicQueryLoader;
 import oscar.oscarReport.pageUtil.RptDemographicReportForm;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Hashtable;
 
 /**
  *
@@ -79,7 +77,9 @@ public class PreventionReportAction extends Action {
 
 		String setName = request.getParameter("patientSet");
 		String prevention = request.getParameter("prevention");
-		Date asofDate = UtilDateUtilities.getDateFromString(request.getParameter("asofDate"), "yyyy-MM-dd");
+		String testAOD = ((PreventionReportForm) form).asofDate;
+		Date asofDate = UtilDateUtilities.getDateFromString(testAOD, "yyyy-MM-dd");
+
 		if (asofDate == null) {
 			Calendar today = Calendar.getInstance();
 			asofDate = today.getTime();
@@ -101,9 +101,9 @@ public class PreventionReportAction extends Action {
 			RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
 			frm = demoL.queryLoader(frm);
 			frm.addDemoIfNotPresent();
-			frm.setAsofDate(request.getParameter("asofDate"));
+			frm.setAsofDate(testAOD);
 			RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
-			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, request.getParameter("asofDate"));
+			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, testAOD);
 
 			log.debug("set size " + list.size());
 
