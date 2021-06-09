@@ -34,6 +34,7 @@ import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
+import oscar.oscarDemographic.pageUtil.Util;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.AddressType;
 import xml.cds.v5_0.Demographics;
@@ -85,7 +86,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		demographics.getAddress().addAll(getExportAddresses(exportDemographic));
 		demographics.getPhoneNumber().addAll(getExportPhones(exportDemographic));
 		demographics.setPreferredOfficialLanguage(getExportOfficialLanguage(exportDemographic.getOfficialLanguage()));
-		demographics.setPreferredSpokenLanguage(exportDemographic.getSpokenLanguage());
+		demographics.setPreferredSpokenLanguage(getISO639_2LanguageCode(exportDemographic.getSpokenLanguage()));
 		demographics.getContact().addAll(getContacts(exportStructure.getContactList()));
 		demographics.setNoteAboutPatient(exportDemographic.getPatientNote());
 		demographics.setEnrolment(getEnrollment(exportDemographic));
@@ -396,5 +397,27 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 			}
 		}
 		return preferredPharmacy;
+	}
+
+	/**
+	 * attempts to get the ISO 639-2 language code. will return the original language parameter if not able to match a code.
+	 * @param language the language to look up
+	 * @return the iso language code, or the original language string
+	 */
+	protected String getISO639_2LanguageCode(String language)
+	{
+		if(language != null)
+		{
+			String isoValue = Util.convertLanguageToCode(language);
+			if(isoValue != null)
+			{
+				return isoValue;
+			}
+			else
+			{
+				logEvent("Language could not map to ISO-639-2 value: " + language);
+			}
+		}
+		return language;
 	}
 }
