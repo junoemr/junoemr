@@ -23,15 +23,10 @@
 package org.oscarehr.dataMigration.model.encounterNote;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PartialDate;
 
 @Data
-public class ReminderNote extends BaseNote
+public class ReminderNote extends BaseCppNote
 {
-	private PartialDate startDate;
-	private PartialDate resolutionDate;
-	private String annotation;
-
 	public ReminderNote()
 	{
 		super();

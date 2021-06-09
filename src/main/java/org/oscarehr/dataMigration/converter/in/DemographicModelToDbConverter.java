@@ -23,14 +23,17 @@
 package org.oscarehr.dataMigration.converter.in;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.dataMigration.model.common.Address;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -38,11 +41,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
+import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
+import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINATED;
 
 @Component
 public class DemographicModelToDbConverter
 		extends BaseModelToDbConverter<org.oscarehr.dataMigration.model.demographic.Demographic, Demographic>
 {
+
+	@Autowired
+	private RosterModelToDbConverter rosterModelToDbConverter;
 
 	@Override
 	public Demographic convert(org.oscarehr.dataMigration.model.demographic.Demographic input)
@@ -67,9 +75,20 @@ public class DemographicModelToDbConverter
 		dbDemographic.setDateJoined(ConversionUtils.toNullableLegacyDate(input.getDateJoined()));
 		dbDemographic.setEndDate(ConversionUtils.toNullableLegacyDate(input.getDateEnded()));
 		dbDemographic.setChartNo(input.getChartNumber());
-		dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDate(input.getRosterDate()));
-		dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(input.getRosterTerminationDate()));
 		dbDemographic.setOfficialLanguage((input.getOfficialLanguage() != null) ? input.getOfficialLanguage().getValue() : null);
+		dbDemographic.setRosterHistory(rosterModelToDbConverter.convert(input.getRosterHistory()));
+
+		//set legacy roster data fields. exclude rostered provider, use the family doctor that was already determined
+		RosterData currentRosterData = input.getCurrentRosterData();
+		if(currentRosterData != null)
+		{
+			dbDemographic.setRosterStatus(currentRosterData.isRostered() ? ROSTER_STATUS_ROSTERED : ROSTER_STATUS_TERMINATED);
+			dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getRosterDateTime()));
+			dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getTerminationDateTime()));
+
+			DemographicRoster.ROSTER_TERMINATION_REASON reason = currentRosterData.getTerminationReason();
+			dbDemographic.setRosterTerminationReason((reason != null) ? String.valueOf(reason.getTerminationCode()) : null);
+		}
 
 		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
 		if(dbProvider != null)
@@ -138,21 +157,20 @@ public class DemographicModelToDbConverter
 		dbDemographic.setDemographicCust(demographicCust);
 
 		// referral doc and family doc are not real providers and need to be handled differently from regular provider lookups
-		//TODO look up in specialists table?
 		Provider referralDoc = input.getReferralDoctor();
 		if(referralDoc != null)
 		{
 			dbDemographic.setReferralDoctor("<rdohip>" + StringUtils.trimToEmpty(referralDoc.getOhipNumber()) + "</rdohip><rd>"
-					+ StringUtils.trimToEmpty(referralDoc.getLastName()) + ","
+					+ StringUtils.trimToEmpty(referralDoc.getLastName()) + ", "
 					+ StringUtils.trimToEmpty(referralDoc.getFirstName()) + "</rd>");
 		}
 
 		Provider familyDoc = input.getFamilyDoctor();
 		if(familyDoc != null)
 		{
-			dbDemographic.setReferralDoctor("<fdname>" + StringUtils.trimToEmpty(familyDoc.getOhipNumber()) + "</fdname><fd>"
-					+ StringUtils.trimToEmpty(familyDoc.getLastName()) + ","
-					+ StringUtils.trimToEmpty(familyDoc.getFirstName()) + "</fd>");
+			dbDemographic.setFamilyDoctor("<fd>" + StringUtils.trimToEmpty(familyDoc.getOhipNumber()) + "</fd><fdname>"
+					+ StringUtils.trimToEmpty(familyDoc.getLastName()) + ", "
+					+ StringUtils.trimToEmpty(familyDoc.getFirstName()) + "</fdname>");
 		}
 
 		return dbDemographic;

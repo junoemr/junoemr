@@ -41,6 +41,7 @@ public class CDSAlertExportMapper extends AbstractCDSNoteExportMapper<AlertsAndS
 		alertsAndSpecialNeeds.setAlertDescription(exportStructure.getNoteText());
 		alertsAndSpecialNeeds.setDateActive(toNullableDateFullOrPartial(exportStructure.getStartDate()));
 		alertsAndSpecialNeeds.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
+		alertsAndSpecialNeeds.setNotes(exportStructure.getAnnotation());
 
 		return alertsAndSpecialNeeds;
 	}

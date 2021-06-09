@@ -26,13 +26,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
+import org.oscarehr.dataMigration.model.common.Person;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
+import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.springframework.beans.factory.annotation.Autowired;
 import xml.cds.v5_0.Demographics;
 import xml.cds.v5_0.Gender;
 import xml.cds.v5_0.PersonStatus;
-import org.oscarehr.dataMigration.model.common.Person;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
@@ -93,6 +101,56 @@ public class CDSDemographicExportMapperTest
 		assertEquals(Gender.O, cdsDemographicExportMapper.getExportGender(Person.SEX.OTHER));
 		assertEquals(Gender.O, cdsDemographicExportMapper.getExportGender(Person.SEX.TRANSGENDER));
 		assertEquals(Gender.U, cdsDemographicExportMapper.getExportGender(Person.SEX.UNKNOWN));
+	}
+
+	@Test
+	public void testGetEnrollmentHistory_rosteredFieldsFilled()
+	{
+		RosterData rosterData = new RosterData();
+		rosterData.setRostered(true);
+		rosterData.setRosterDateTime(LocalDateTime.of(2021, 12, 24, 12, 0, 0));
+
+		Provider mockProvider = new Provider();
+		mockProvider.setFirstName("test");
+		mockProvider.setLastName("provider");
+		rosterData.setRosterProvider(mockProvider);
+
+		// add invalid properties that should not appear in exported results
+		rosterData.setTerminationDateTime(LocalDateTime.of(2021, 1, 1, 10, 0, 0));
+		rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.ASSIGNED_IN_ERROR);
+
+		Demographics.Enrolment.EnrolmentHistory enrolmentHistory = cdsDemographicExportMapper.getEnrollmentHistory(rosterData);
+
+		assertEquals(CDSConstants.ENROLLMENT_STATUS_TRUE, enrolmentHistory.getEnrollmentStatus());
+		assertNotNull(enrolmentHistory.getEnrollmentDate());
+		assertNotNull(enrolmentHistory.getEnrolledToPhysician());
+		assertNull(enrolmentHistory.getEnrollmentTerminationDate());
+		assertNull(enrolmentHistory.getTerminationReason());
+	}
+
+	@Test
+	public void testGetEnrollmentHistory_terminatedFieldsFilled()
+	{
+		RosterData rosterData = new RosterData();
+		rosterData.setRostered(false);
+
+		Provider mockProvider = new Provider();
+		mockProvider.setFirstName("test");
+		mockProvider.setLastName("provider");
+		rosterData.setRosterProvider(mockProvider);
+
+		rosterData.setRosterDateTime(LocalDateTime.of(2021, 12, 24, 12, 0, 0));
+		rosterData.setTerminationDateTime(LocalDateTime.of(2021, 1, 1, 10, 0, 0));
+		rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.ASSIGNED_IN_ERROR);
+
+
+		Demographics.Enrolment.EnrolmentHistory enrolmentHistory = cdsDemographicExportMapper.getEnrollmentHistory(rosterData);
+
+		assertEquals(CDSConstants.ENROLLMENT_STATUS_FALSE, enrolmentHistory.getEnrollmentStatus());
+		assertNotNull(enrolmentHistory.getEnrollmentDate());
+		assertNotNull(enrolmentHistory.getEnrolledToPhysician());
+		assertNotNull(enrolmentHistory.getEnrollmentTerminationDate());
+		assertNotNull(enrolmentHistory.getTerminationReason());
 	}
 
 }

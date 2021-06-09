@@ -58,6 +58,11 @@ public class FluReport implements PreventionReport {
     public FluReport() {
     }
 
+    public boolean displayNumShots()
+    {
+        return false;
+    }
+
     public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate){
         int inList = 0;
         double done= 0;

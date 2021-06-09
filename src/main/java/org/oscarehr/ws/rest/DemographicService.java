@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
@@ -44,11 +45,16 @@ import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.HinValidationService;
+import org.oscarehr.demographicRoster.service.DemographicRosterService;
+import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.conversion.DemographicToDomainConverter;
+import org.oscarehr.ws.conversion.DemographicToTransferConverter;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
@@ -89,6 +95,7 @@ import java.util.List;
  */
 @Path("/demographic")
 @Component("demographicService")
+@Tag(name = "demographic")
 public class DemographicService extends AbstractServiceImpl {
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -123,6 +130,15 @@ public class DemographicService extends AbstractServiceImpl {
 	@Autowired
 	private RecentDemographicAccessService recentDemographicAccessService;
 
+	@Autowired
+	private DemographicRosterService demographicRosterService;
+
+	@Autowired
+	private DemographicToDomainConverter demographicToDomainConverter;
+
+	@Autowired
+	private DemographicToTransferConverter demographicToTransferConverter;
+
 	private CaseManagementManager caseManagementMgr;
 
 	public void setCaseManagementManager(CaseManagementManager caseManagementMgr)
@@ -133,6 +149,7 @@ public class DemographicService extends AbstractServiceImpl {
 	@Autowired
 	private HinValidationService hinValidationService;
 
+	@Deprecated // use ToTransfer/ToDomain + JPA demographic model
 	private DemographicConverter demoConverter = new DemographicConverter();
 	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
 	private WaitingListNameConverter waitingListNameConverter = new WaitingListNameConverter();
@@ -349,7 +366,10 @@ public class DemographicService extends AbstractServiceImpl {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data) {
+	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.UPDATE, data.getDemographicNo(), "_demographic");
 
 		try
 		{
@@ -376,16 +396,20 @@ public class DemographicService extends AbstractServiceImpl {
 				WLWaitingListUtil.updateWaitingListRecord(data.getWaitingListID().toString(), data.getWaitingListNote(), data.getDemographicNo().toString(), null);
 			}
 
-			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
-			demographicManager.updateDemographic(getLoggedInInfo(), demographic);
+			org.oscarehr.demographic.model.Demographic demographic = demographicToDomainConverter.convert(data);
+			demographicManager.updateDemographic(loggedInInfo, demographic);
 
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographic.getDemographicId(),
+					LogConst.ACTION_UPDATE,
+					LogConst.CON_DEMOGRAPHIC,
+					LogConst.STATUS_SUCCESS,
+					null,
+					loggedInInfo.getIp());
 
-			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+			Integer providerNo = Integer.parseInt(loggedInInfo.getLoggedInProviderNo());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getId());
 
-			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
+			return RestResponse.successResponse(demographicToTransferConverter.convert(demographic));
 		}
 		catch (Exception e)
 		{
@@ -521,6 +545,16 @@ public class DemographicService extends AbstractServiceImpl {
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
 
 		return RestResponse.successResponse(issues);
+	}
+
+	@GET
+	@Path("/{demographicNo}/rosterHistory")
+	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(
+			@PathParam("demographicNo") Integer demographicNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_demographic");
+		List<DemographicRosterTransfer> rosteredHistory = demographicRosterService.getRosteredHistory(demographicNo);
+		return RestSearchResponse.successResponseOnePage(rosteredHistory);
 	}
 
 	private List<CaseManagementIssueTo1> getIssues(HttpServletRequest request, int demographicNo, String filter)

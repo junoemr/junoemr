@@ -470,8 +470,8 @@ function displayCloseWarning(){
 		       <legend>Summary</legend>
 		       <textarea name="summary" readonly><%=summary%></textarea>
 <%if (hasImportExtra) { %>
-				<a href="javascript:void(0);" title="Extra data from Import" onclick="window.open('../annotation/importExtra.jsp?display=<%=annotation_display %>&amp;table_id=<%=id %>&amp;demo=<%=demographic_no %>','anwin','width=400,height=250');">
-				 <img src="../images/notes.gif" align="right" alt="Extra data from Import" height="16" width="13" border="0"> </a>
+                    <a href="javascript:void(0);" title="Extra data from Import" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display %>&amp;table_id=<%=id %>&amp;demo=<%=demographic_no %>','anwin','width=800,height=600');">
+                    <img src="../images/notes.gif" align="right" alt="Extra data from Import" height="16" width="13" border="0"> </a>
 <%} %>
 		   </fieldset>
 	       </div>

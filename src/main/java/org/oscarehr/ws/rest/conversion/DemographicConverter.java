@@ -36,7 +36,7 @@ import java.time.LocalDate;
 public class DemographicConverter extends AbstractConverter<Demographic, DemographicTo1> {
 	
 	private static Logger logger = Logger.getLogger(DemographicConverter.class);
-	
+
 	private DemographicExtConverter demoExtConverter = new DemographicExtConverter();
 	private ProviderConverter providerConverter = new ProviderConverter();
 
@@ -115,6 +115,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setNewsletter(transfer.getNewsletter());
 		demographic.setNameOfMother(transfer.getNameOfMother());
 		demographic.setNameOfFather(transfer.getNameOfFather());
+		demographic.updateElectronicMessagingConsentStatus(transfer.getElectronicMessagingConsentStatus());
 
 		DemographicExt[] exts = new DemographicExt[transfer.getExtras().size()];
 		for (int i = 0; i < transfer.getExtras().size(); i++) {
@@ -203,6 +204,9 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setNewsletter(demographic.getNewsletter());
 		transfer.setNameOfMother(demographic.getNameOfMother());
 		transfer.setNameOfFather(demographic.getNameOfFather());
+		transfer.setElectronicMessagingConsentGivenAt(demographic.getElectronicMessagingConsentGivenAt());
+		transfer.setElectronicMessagingConsentRejectedAt(demographic.getElectronicMessagingConsentRejectedAt());
+		transfer.setElectronicMessagingConsentStatus(demographic.getElectronicMessagingConsentStatus());
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
@@ -216,6 +220,4 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 
 		return transfer;
 	}
-
-	
 }

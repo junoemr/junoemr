@@ -48,7 +48,7 @@ public class ConcernNoteService extends HistoryNoteService
 		CaseManagementNote note = concernNoteModelToDbConverter.convert(noteModel);
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveConcernNote(note);
-		addAnnotationLink(savedNote, noteModel.getAnnotation());
+		addAnnotationLink(savedNote, noteModel.getAnnotation(), noteModel.getResidualInfo());
 
 		if(savedNote.getNoteExtensionList() != null)
 		{

@@ -84,4 +84,21 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 		}
 		return providerRecord;
 	}
+
+	protected Provider getProviderFromString(String referralProviderName, String referralProviderNumber)
+	{
+		Provider referralProvider = null;
+		if(referralProviderName != null && referralProviderName.contains(","))
+		{
+			String[] nameArray = referralProviderName.split(",", 2);
+			String firstName = StringUtils.trimToNull(nameArray[1]);
+			String lastName = StringUtils.trimToNull(nameArray[0]);
+
+			referralProvider = new Provider();
+			referralProvider.setFirstName((firstName != null) ? firstName : "Missing");
+			referralProvider.setLastName((lastName != null) ? lastName : "Missing");
+			referralProvider.setOhipNumber(StringUtils.trimToNull(referralProviderNumber));
+		}
+		return referralProvider;
+	}
 }

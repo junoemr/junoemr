@@ -32,24 +32,28 @@
 package oscar.oscarPrevention.pageUtil;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.dao.ClinicDAO;
+import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
-import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.dao.PreventionExtDao;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
-import oscar.oscarClinic.ClinicData;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
@@ -62,320 +66,370 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.ColumnText;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
+import oscar.util.ConversionUtils;
+
+import static org.oscarehr.prevention.model.Prevention.REFUSED_STATUS_COMPLETED;
+import static org.oscarehr.prevention.model.Prevention.REFUSED_STATUS_REFUSED;
+import static org.oscarehr.prevention.model.Prevention.REFUSED_STATUS_INELIGIBLE;
+
 /*
  * @author rjonasz
  */
-public class PreventionPrintPdf {
-
-    private int curPage;
-    private float upperYcoord;
-    private ColumnText ct;
-    private Document document;
-    private PdfContentByte cb;
-    
-    private final int LINESPACING = 1;
+public class PreventionPrintPdf
+{
     private final float LEADING = 12;
-    
-    private final Map<String,String> readableStatuses = new HashMap<String,String>();
-    
+
+    private final Map<Character, String> READABLE_STATUSES = new HashMap<>();
+    private final Font SECTION_HEADER_FONT;
+    private final Font BODY_FONT;
+
     /** Creates a new instance of PreventionPrintPdf */
-    public PreventionPrintPdf() {
-    	readableStatuses.put("0","Completed or Normal");
-    	readableStatuses.put("1","Refused");
-    	readableStatuses.put("2","Ineligible");
+    public PreventionPrintPdf()
+    {
+        READABLE_STATUSES.put(REFUSED_STATUS_COMPLETED,"Completed or Normal");
+        READABLE_STATUSES.put(REFUSED_STATUS_REFUSED,"Refused");
+        READABLE_STATUSES.put(REFUSED_STATUS_INELIGIBLE,"Ineligible");
+
+        SECTION_HEADER_FONT = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.BOLD, Color.BLACK);
+        BODY_FONT = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, Color.BLACK);
     }
-    
-    public void printPdf(HttpServletRequest request, HttpServletResponse response) throws IOException, DocumentException {
-        response.setContentType("application/pdf");  //octet-stream
-        response.setHeader("Content-Disposition", "attachment; filename=\"Prevention.pdf\"");
-        String[] headerIds = request.getParameterValues("printHP");
-        printPdf(headerIds, request, response.getOutputStream());
-    }
-    
-    public void printPdf(String[] headerIds, HttpServletRequest request, OutputStream outputStream) throws IOException, DocumentException{
-        
-        //make sure we have data to print      
-        if( headerIds == null )
-            throw new DocumentException();
-        
-        String demoNo = request.getParameter("demographicNo");
-        DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-        Demographic demo = demographicManager.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demoNo);
-        
-        if (demo == null) 
-            throw new DocumentException();
-        
+
+    /**
+     * Generate PDF containing prevention information for a given demographic.
+     * Should produce a PDF looking similar to what Ontario's "Yellow Card" looks like.
+     * @param preventionSections section names that we want to print
+     * @param demographicId demographic identifier to read prevention data for
+     * @param outputStream output stream we are filling with a PDF
+     */
+    public void generatePDF(List<String> preventionSections, Integer demographicId, OutputStream outputStream) throws DocumentException
+    {
+        DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
+        Demographic demographic = demographicDao.find(demographicId);
+
         //Create the document we are going to write to
-        document = new Document();
-        // PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+        Document document = new Document();
         PdfWriter writer = PdfWriterFactory.newInstance(document, outputStream, FontSettings.HELVETICA_10PT);
         document.setPageSize(PageSize.LETTER);
-                
-        //Create the font we are going to print to       
-        Font font = FontFactory.getFont(FontFactory.HELVETICA, 9, Font.NORMAL, Color.BLACK);     
-               
-        StringBuilder demoInfo = new StringBuilder(demo.getSexDesc()).append(" Age: ").append(demo.getAge()).append(" (").append(demo.getBirthDayAsString()).append(")")
-                .append(" HIN: (").append(demo.getHcType()).append(") ").append(demo.getHin()).append(" ").append(demo.getVer());                                                                 
-              
+
+        //Header will be printed at top of every page beginning with p2
+        Phrase titlePhrase = createTitle(demographic);
+        HeaderFooter header = new HeaderFooter(titlePhrase,false);
+        header.setAlignment(HeaderFooter.ALIGN_RIGHT);
+        header.setBorder(Rectangle.BOTTOM);
+        document.setHeader(header);
+        document.open();
+        PdfContentByte contentBytes = writer.getDirectContent();
+
+        //Clinic Address Information
+        Paragraph clinicParagraph = getClinicInfo();
+        document.add(clinicParagraph);
+
+        //get top y-coord for starting to print columns
+        int LINE_SPACING = 1;
+        float upperYcoord = document.top() - header.getHeight() - (clinicParagraph.getLeading() * 4f) - BODY_FONT.getCalculatedLeading(LINE_SPACING);
+
+        ColumnText columnText = new ColumnText(contentBytes);
+        columnText.setSimpleColumn(document.left(), document.bottom(), document.right()/2f, upperYcoord);
+
+        boolean onColumnLeft = true;
+        PreventionDao preventionDao = SpringUtils.getBean(PreventionDao.class);
+
+        // get everything then filter by the ones we want to keep
+        for (String preventionType : preventionSections)
+        {
+            List<Prevention> preventions = preventionDao.findByTypeAndDemoNo(preventionType, demographic.getDemographicId());
+            String preventionHeader = "Prevention " + preventionType + "\n";
+            Phrase procHeader = new Phrase(LEADING, preventionHeader, SECTION_HEADER_FONT);
+            columnText.addText(procHeader);
+            columnText.setAlignment(Element.ALIGN_LEFT);
+            columnText.setIndent(0);
+            columnText.setFollowingIndent(0);
+            float titleYPos = columnText.getYLine();
+
+            for (Prevention prevention : preventions)
+            {
+                //check whether the Prevention Title can fit on the page
+                int status = columnText.go(true);
+                boolean writeTitleOk = !ColumnText.hasMoreText(status);
+
+                Phrase procedure = buildPreventionBody(demographic, prevention);
+
+                //check if the Date/Age/Comments title can fit on the page.
+                columnText.addText(procedure);
+                columnText.setAlignment(Element.ALIGN_LEFT);
+                columnText.setIndent(10);
+                columnText.setFollowingIndent(0);
+                float detailYPos = columnText.getYLine();
+                status = columnText.go(true);
+
+                boolean writeDetailOk = !ColumnText.hasMoreText(status);
+
+                Phrase commentsPhrase = buildPreventionComments(prevention);
+
+                //Check if the comments can fit on the page
+                columnText.addText(commentsPhrase);
+                columnText.setAlignment(Element.ALIGN_JUSTIFIED);
+                columnText.setIndent(25);
+                columnText.setFollowingIndent(25);
+                float commentYPos = columnText.getYLine();
+                status = columnText.go(true);
+
+                boolean writeCommentsOk = !ColumnText.hasMoreText(status);
+
+                boolean proceedWrite = true;
+                if (writeDetailOk && writeCommentsOk)
+                {
+
+                    //write on the same column and page
+                    if (writeTitleOk)
+                    {
+                        //we still need to write the title
+                        columnText.addText(procHeader);
+                        columnText.setAlignment(Element.ALIGN_LEFT);
+                        columnText.setYLine(titleYPos);
+                        columnText.setIndent(0);
+                        columnText.setFollowingIndent(0);
+                        columnText.go();
+                    }
+                    else
+                    {
+                        proceedWrite = false;
+                    }
+
+                    if (proceedWrite)
+                    {
+                        //Date and Age
+                        columnText.addText(procedure);
+                        columnText.setAlignment(Element.ALIGN_LEFT);
+                        columnText.setYLine(detailYPos);
+                        columnText.setIndent(10);
+                        columnText.setFollowingIndent(0);
+                        columnText.go();
+
+                        //Comments
+                        columnText.addText(commentsPhrase);
+                        columnText.setAlignment(Element.ALIGN_JUSTIFIED);
+                        columnText.setYLine(commentYPos);
+                        columnText.setIndent(25);
+                        columnText.setFollowingIndent(25);
+                        columnText.go();
+                    }
+                }
+                else
+                {
+                    proceedWrite = false;
+                }
+                //We can't fit the prevention we are printing into the current column on the current page we are printing to
+                if (!proceedWrite)
+                {
+                    if (onColumnLeft)
+                    {
+                        //Print to the right column (i.e. we are printing to the current page)
+                        onColumnLeft = false;
+                        columnText.setSimpleColumn(document.right()/2f, document.bottom(), document.right(), upperYcoord);
+                    }
+                    else
+                    {
+                        //Print to the left column (i.e. we are starting a new page)
+                        onColumnLeft = true;
+                        upperYcoord = document.top() - header.getHeight() - BODY_FONT.getCalculatedLeading(LINE_SPACING);
+                        document.newPage();
+
+                        columnText.setSimpleColumn(document.left(), document.bottom(), document.right()/2f, upperYcoord);
+                    }
+
+                    columnText.setText(procHeader);
+                    columnText.setAlignment(Element.ALIGN_LEFT);
+                    columnText.setIndent(0);
+                    columnText.setFollowingIndent(0);
+                    columnText.go();
+
+                    //Date and Age
+                    columnText.setText(procedure);
+                    columnText.setAlignment(Element.ALIGN_LEFT);
+                    columnText.setIndent(10);
+                    columnText.setFollowingIndent(0);
+                    columnText.go();
+
+                    //Comments
+                    columnText.setText(commentsPhrase);
+                    columnText.setAlignment(Element.ALIGN_JUSTIFIED);
+                    columnText.setIndent(25);
+                    columnText.setFollowingIndent(25);
+                    columnText.go();
+                }
+            }
+
+        }
+        document.close();
+    }
+
+    // *** HELPER FUNCTIONS ***
+
+    /**
+     * Given a demographic, create and populate the header of a PDF printout with its information
+     * @param demographic demographic to create header for
+     * @return a Phrase to be re-used for building the PDF
+     */
+    private Phrase createTitle(Demographic demographic)
+    {
         //Header will be printed at top of every page beginning with p2
         Phrase titlePhrase = new Phrase(16, "Preventions", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, Font.BOLD, Color.BLACK));
         titlePhrase.add(Chunk.NEWLINE);
-        titlePhrase.add(new Chunk(demo.getFormattedName(),FontFactory.getFont(FontFactory.HELVETICA, 14, Font.NORMAL, Color.BLACK)));
-        titlePhrase.add(Chunk.NEWLINE);         
-        titlePhrase.add(new Chunk(demoInfo.toString(), FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL, Color.BLACK)));
-        
-        String mrp = request.getParameter("mrp");
-        if (mrp != null && OscarProperties.getInstance().getBooleanProperty("mrp_model","yes")){
-        	Properties prop = (Properties) request.getSession().getAttribute("providerBean");
-                titlePhrase.add(Chunk.NEWLINE);
-                titlePhrase.add(new Chunk("MRP: " + prop.getProperty(mrp,"unknown"), FontFactory.getFont(FontFactory.HELVETICA, 12, Font.BOLD, Color.BLACK)));
+        titlePhrase.add(new Chunk(demographic.getFormattedName(), FontFactory.getFont(FontFactory.HELVETICA, 14, Font.NORMAL, Color.BLACK)));
+        titlePhrase.add(Chunk.NEWLINE);
+        String demographicInformation = getDescriptionForSex(demographic.getSex()) +
+                " Age: " + ChronoUnit.YEARS.between(demographic.getDateOfBirth(), LocalDateTime.now()) +
+                " (" + ConversionUtils.toDateString(demographic.getDateOfBirth()) + ") " +
+                "HIN: (" + demographic.getHcType() + ") " + demographic.getHin() + " " + demographic.getVer();
+        titlePhrase.add(new Chunk(demographicInformation, FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL, Color.BLACK)));
+
+        ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
+        if (demographic.getProviderNo() != null)
+        {
+            // Note: if we had this class managed by Spring we could remove this hit on the provider dao
+            ProviderData providerData = providerDataDao.find(demographic.getProviderNo());
+            titlePhrase.add(Chunk.NEWLINE);
+            titlePhrase.add(new Chunk("MRP: " + providerData.getDisplayName(), FontFactory.getFont(FontFactory.HELVETICA, 12, Font.BOLD, Color.BLACK)));
         }
-        
-        HeaderFooter header = new HeaderFooter(titlePhrase,false);        
-        header.setAlignment(HeaderFooter.ALIGN_RIGHT);
-        header.setBorder(Rectangle.BOTTOM);
-        document.setHeader(header);  
-        document.open();
-        cb = writer.getDirectContent();
-        
-        //Clinic Address Information
-        ClinicData clinicData = new ClinicData();
-        clinicData.refreshClinicData();
- 
-        StringBuilder clinicAddrCont = new StringBuilder(clinicData.getClinicCity()).append(", ").append(clinicData.getClinicProvince()).append(" ").append(clinicData.getClinicPostal());       
-                
-        Paragraph clinicParagraph = new Paragraph(LEADING, clinicData.getClinicName(), FontFactory.getFont(FontFactory.HELVETICA, 12, Font.BOLD, Color.BLACK));
-        clinicParagraph.add(Chunk.NEWLINE);
-        clinicParagraph.add(new Chunk(clinicData.getClinicAddress(),FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, Color.BLACK)));
-        clinicParagraph.add(Chunk.NEWLINE);
-        clinicParagraph.add(new Chunk(clinicAddrCont.toString(),FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, Color.BLACK)));
-        clinicParagraph.add(Chunk.NEWLINE);
-        clinicParagraph.add(new Chunk("Ph.",FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD, Color.BLACK)));
-        clinicParagraph.add(new Chunk(clinicData.getClinicPhone(),FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, Color.BLACK)));
-        clinicParagraph.add(new Chunk(" Fax.",FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD, Color.BLACK)));
-        clinicParagraph.add(new Chunk(clinicData.getClinicFax(),FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, Color.BLACK)));
-        clinicParagraph.setAlignment(Paragraph.ALIGN_CENTER);
-        document.add(clinicParagraph);
-        
-        //get top y-coord for starting to print columns
-        upperYcoord = document.top() - header.getHeight() -(clinicParagraph.getLeading()*4f) - font.getCalculatedLeading(LINESPACING);
-        
-        int subIdx;
-        String preventionHeader, procedureAge, procedureDate, procedureStatus;
-        
-        //1 - obtain number of lines of incoming prevention data
-        boolean showComments = OscarProperties.getInstance().getBooleanProperty("prevention_show_comments", "true");        
-                      
-        //3 - Start the column
-        ct = new ColumnText(cb);
-        ct.setSimpleColumn(document.left(), document.bottom(), document.right()/2f, upperYcoord);
-        
-        curPage = 1;
-        
-        boolean onColumnLeft = true;
-                        
-        //now we can start to print the prevention data
-        for(int idx = 0; idx < headerIds.length; ++idx) {
 
-            preventionHeader = request.getParameter("preventionHeader" + headerIds[idx]);
-            Phrase procHeader = new Phrase(LEADING, "Prevention " + preventionHeader + "\n", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Font.BOLD, Color.BLACK));
-            ct.addText(procHeader);
-            ct.setAlignment(Element.ALIGN_LEFT);
-            ct.setIndent(0);
-            ct.setFollowingIndent(0);
-            float titleYPos = ct.getYLine();
-            
-            //check whether the Prevention Title can fit on the page
-            boolean writeTitleOk = true;
-            int status = ct.go(true);
-            if (ColumnText.hasMoreText(status)) {
-                writeTitleOk = false;
-            }
-                
-            subIdx = 0;
-           
-            while( (procedureAge = request.getParameter("preventProcedureAge" + headerIds[idx] + "-" + subIdx)) != null ) {
-                procedureDate = request.getParameter("preventProcedureDate" + headerIds[idx] + "-" + subIdx);
-                procedureStatus = request.getParameter("preventProcedureStatus" + headerIds[idx] + "-" + subIdx);
-                procedureStatus = readableStatuses.get(procedureStatus);              
-                
-                if( procedureStatus == null ) {
-                	procedureStatus = "N/A";
-                }
-              
-                //Age                
-                Phrase procedure = new Phrase(LEADING, "Age:", FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, Color.BLACK));
-                procedure.add(new Chunk(procedureAge,FontFactory.getFont(FontFactory.HELVETICA, 9, Font.NORMAL, Color.BLACK)));
-                procedure.add(Chunk.NEWLINE);
-                
-                //Date
-                procedure.add("Date:");
-                procedure.add(new Chunk(procedureDate, FontFactory.getFont(FontFactory.HELVETICA, 9, Font.NORMAL, Color.BLACK)));
-                procedure.add(Chunk.NEWLINE);
-                
-                //Status
-                procedure.add("Status:");
-                procedure.add(new Chunk(procedureStatus, FontFactory.getFont(FontFactory.HELVETICA, 9, Font.NORMAL, Color.BLACK)));
-                procedure.add(Chunk.NEWLINE);
-                
-                String procedureComments = null;
-                if (showComments) { 
-                    procedureComments = request.getParameter("preventProcedureComments" + headerIds[idx] + "-" + subIdx);
-                    if (procedureComments != null && !procedureComments.isEmpty()){
-                        procedure.add("Comments:");
-                        procedure.add(Chunk.NEWLINE);                        
-                    }
-                }
-                         
-                //check if the Date/Age/Comments title can fit on the page.
-                ct.addText(procedure);
-                ct.setAlignment(Element.ALIGN_LEFT);
-                ct.setIndent(10);
-                ct.setFollowingIndent(0);
-                float detailYPos = ct.getYLine();
-                status = ct.go(true);
-                
-                boolean writeDetailOk = true;
-                if (ColumnText.hasMoreText(status)) {
-                    writeDetailOk = false;
-                }
-                
-                //Comments
-                Phrase commentsPhrase = new Phrase(LEADING, "", FontFactory.getFont(FontFactory.HELVETICA, 9, Font.NORMAL, Color.BLACK));
-                if (showComments && procedureComments != null && !procedureComments.isEmpty()){
-                    commentsPhrase.add(procedureComments);
-                    commentsPhrase.add(Chunk.NEWLINE);                                                                
-                }
-                
-                commentsPhrase.add(Chunk.NEWLINE);
-               
-                //Check if the comments can fit on the page
-                ct.addText(commentsPhrase);
-                ct.setAlignment(Element.ALIGN_JUSTIFIED);
-                ct.setIndent(25);
-                ct.setFollowingIndent(25);
-                float commentYPos = ct.getYLine();
-                status = ct.go(true);
-                
-                boolean writeCommentsOk = true;
-                if (ColumnText.hasMoreText(status)) {
-                    writeCommentsOk = false;
-                }                                
-
-                 boolean proceedWrite = true;
-                 if (writeDetailOk && writeCommentsOk) {
-                                        
-                    //write on the same column and page
-                    if (subIdx == 0) {
-                        if (writeTitleOk) {
-                            //we still need to write the title
-                            ct.addText(procHeader);
-                            ct.setAlignment(Element.ALIGN_LEFT);
-                            ct.setYLine(titleYPos);
-                            ct.setIndent(0);
-                            ct.setFollowingIndent(0);                     
-                            ct.go(); 
-                        }
-                        else {
-                            proceedWrite = false;
-                        }
-                    }
-                    
-                    if (proceedWrite) {
-                        //Date and Age
-                        ct.addText(procedure);
-                        ct.setAlignment(Element.ALIGN_LEFT);
-                        ct.setYLine(detailYPos);
-                        ct.setIndent(10);
-                        ct.setFollowingIndent(0);
-                        ct.go();
-
-                        //Comments
-                        ct.addText(commentsPhrase);
-                        ct.setAlignment(Element.ALIGN_JUSTIFIED);
-                        ct.setYLine(commentYPos);
-                        ct.setIndent(25);
-                        ct.setFollowingIndent(25);
-                        ct.go();
-                    }
-                }
-                else {
-                    proceedWrite = false;
-                }
-                    
-                //We can't fit the prevention we are printing into the current column on the current page we are printing to 
-                if (!proceedWrite) {
-                                        
-                    if (onColumnLeft) {  
-                        //Print to the right column (i.e. we are printing to the current page)
-                        onColumnLeft = false;
-                        ct.setSimpleColumn(document.right()/2f, document.bottom(), document.right(), upperYcoord);                                                
-                    }
-                    else {
-                        //Print to the left column (i.e. we are starting a new page)
-                        onColumnLeft = true;
-                        ColumnText.showTextAligned(cb, Phrase.ALIGN_CENTER, new Phrase("-" + curPage + "-"), document.right()/2f, document.bottom()-(document.bottomMargin()/2f), 0f);
-                        addPromoText();                       
-                        upperYcoord = document.top() - header.getHeight() - font.getCalculatedLeading(LINESPACING);
-                        document.newPage();
-                        
-                        curPage++;
-                        ct.setSimpleColumn(document.left(), document.bottom(), document.right()/2f, upperYcoord);
-                    }
-                    
-                    //Title (if we are starting to print a new prevention, use the Prevention name as title, otherwise if we 
-                    //are in the middle of printing a prevention that has multiple items, identify this as a continued prevention
-                    if (subIdx != 0) {
-                        Phrase contdProcHeader = new Phrase(LEADING, "Prevention " + preventionHeader + " (cont'd)\n", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Font.ITALIC, Color.BLACK));
-                        ct.setText(contdProcHeader);
-                    } else { 
-                        ct.setText(procHeader);
-                    }
-                    ct.setAlignment(Element.ALIGN_LEFT);
-                    ct.setIndent(0);
-                    ct.setFollowingIndent(0);                          
-                    ct.go();
-                    titleYPos = ct.getYLine();
-                    
-
-                    //Date and Age
-                    ct.setText(procedure);
-                    ct.setAlignment(Element.ALIGN_LEFT);
-                    ct.setIndent(10);
-                    ct.setFollowingIndent(0);                    
-                    ct.go();                   
-
-                    //Comments
-                    ct.setText(commentsPhrase);
-                    ct.setAlignment(Element.ALIGN_JUSTIFIED);
-                    ct.setIndent(25);
-                    ct.setFollowingIndent(25);                   
-                    ct.go();                   
-                    
-                }
-
-                ++subIdx;
-            }
-            
-        }
-        
-        //Make sure last page has the footer
-        ColumnText.showTextAligned(cb, Phrase.ALIGN_CENTER, new Phrase("-" + curPage + "-"), document.right()/2f, document.bottom()-(document.bottomMargin()/2f), 0f);
-        addPromoText(); 
-        
-        document.close();
+        return titlePhrase;
     }
-            
-    private void addPromoText() throws DocumentException, IOException{
-        if ( OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") != null){
-            cb.beginText();
-            cb.setFontAndSize(BaseFont.createFont(BaseFont.HELVETICA,BaseFont.CP1252,BaseFont.NOT_EMBEDDED), 6);
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT"), PageSize.LETTER.getWidth()/2, 5, 0);
-            cb.endText();
+
+    /**
+     * Get and populate a Paragraph object with information about the clinic.
+     * @return paragraph object containing structured clinic info for re-use
+     */
+    private Paragraph getClinicInfo()
+    {
+        ClinicDAO clinicDAO = SpringUtils.getBean(ClinicDAO.class);
+        Clinic clinic = clinicDAO.getClinic();
+
+        Paragraph clinicParagraph = new Paragraph(LEADING, clinic.getClinicName(), SECTION_HEADER_FONT);
+        clinicParagraph.add(Chunk.NEWLINE);
+        clinicParagraph.add(new Chunk(clinic.getClinicAddress(), BODY_FONT));
+        clinicParagraph.add(Chunk.NEWLINE);
+        clinicParagraph.add(new Chunk(clinic.getClinicCity() + ", " + clinic.getClinicProvince() + " " + clinic.getClinicPostal(), BODY_FONT));
+        clinicParagraph.add(Chunk.NEWLINE);
+        clinicParagraph.add(new Chunk("Ph.", BODY_FONT));
+        clinicParagraph.add(new Chunk(clinic.getClinicPhone(), BODY_FONT));
+        clinicParagraph.add(new Chunk(" Fax.", BODY_FONT));
+        clinicParagraph.add(new Chunk(clinic.getClinicFax(), BODY_FONT));
+        clinicParagraph.setAlignment(Paragraph.ALIGN_CENTER);
+
+        return clinicParagraph;
+    }
+
+    /**
+     * Given a demographic and a prevention, build a printable version of that prevention.
+     * @param demographic demographic to read, largely for comparing dates
+     * @param prevention the prevention to build a printable section for
+     * @return printable Phrase
+     */
+    private Phrase buildPreventionBody(Demographic demographic, Prevention prevention)
+    {
+        ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
+        String procedureAge = Long.toString(
+                ChronoUnit.YEARS.between(
+                        demographic.getDateOfBirth(),
+                        ConversionUtils.toLocalDateTime(prevention.getPreventionDate())));
+        String procedureDate = ConversionUtils.toDateString(prevention.getPreventionDate());
+
+        String procedureStatus = READABLE_STATUSES.get(REFUSED_STATUS_COMPLETED);
+        if (prevention.isRefused())
+        {
+            procedureStatus = READABLE_STATUSES.get(REFUSED_STATUS_REFUSED);
+        }
+        else if (prevention.isIneligible())
+        {
+            procedureStatus = READABLE_STATUSES.get(REFUSED_STATUS_INELIGIBLE);
+        }
+
+        String procedureAdministeringProvider = providerDataDao.find(prevention.getProviderNo()).getDisplayName();
+
+        Phrase procedure = new Phrase(LEADING, "Age: ", BODY_FONT);
+        procedure.add(new Chunk(procedureAge, BODY_FONT));
+        procedure.add(Chunk.NEWLINE);
+
+        //Date
+        procedure.add("Date: ");
+        procedure.add(new Chunk(procedureDate, BODY_FONT));
+        procedure.add(Chunk.NEWLINE);
+
+        //Status
+        procedure.add("Status: ");
+        procedure.add(new Chunk(procedureStatus, BODY_FONT));
+        procedure.add(Chunk.NEWLINE);
+
+        procedure.add("Administering Provider: ");
+        procedure.add(new Chunk(procedureAdministeringProvider, BODY_FONT));
+        procedure.add(Chunk.NEWLINE);
+
+        return procedure;
+    }
+
+    /**
+     * Build a section specifically for comments left by a provider about a given prevention.
+     *
+     * Only populates with information if 'prevention_show_comments' is overridden on the properties file with true.
+     * @param prevention prevention to build comments section for
+     * @return printable phrase containing prevention comments
+     */
+    private Phrase buildPreventionComments(Prevention prevention)
+    {
+        Phrase commentsPhrase = new Phrase(LEADING, "", BODY_FONT);
+
+        // only add comments in if property is set to true (or not set at all)
+        if (OscarProperties.getInstance().getBooleanProperty("prevention_show_comments", "true"))
+        {
+            String procedureComments = "";
+
+            // Note: if this were managed by Spring we wouldn't have to get this manually
+            PreventionExtDao preventionExtDao = SpringUtils.getBean(PreventionExtDao.class);
+            List<PreventionExt> preventionExtList = preventionExtDao.findByPreventionId(prevention.getId());
+            for (PreventionExt preventionExt : preventionExtList)
+            {
+                if (preventionExt.getkeyval().equals("comments"))
+                {
+                    procedureComments = preventionExt.getVal();
+                }
+            }
+
+            if (procedureComments != null && !procedureComments.isEmpty())
+            {
+                commentsPhrase.add(procedureComments);
+                commentsPhrase.add(Chunk.NEWLINE);
+            }
+        }
+
+        commentsPhrase.add(Chunk.NEWLINE);
+        return commentsPhrase;
+    }
+
+    /**
+     * Given the sex for a demographic, return a more print-friendly description.
+     *
+     * When the Gender enum updates are merged into spring-boot we can replace this with that.
+     * @param sex presumably a single-character value indicating what sex we're asking about
+     * @return a description if we can match it
+     */
+    private String getDescriptionForSex(String sex)
+    {
+        switch(sex)
+        {
+            case "M":
+                return "Male";
+            case "F":
+                return "Female";
+            case "T":
+                return "Transgender";
+            default:
+                return "Unknown";
         }
     }
 }

@@ -39,16 +39,21 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
+import org.oscarehr.common.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
+import org.oscarehr.common.model.FlowSheetUserCreated;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.util.Recommendation;
 import oscar.oscarEncounter.oscarMeasurements.util.RecommendationCondition;
 import oscar.oscarEncounter.oscarMeasurements.util.TargetColour;
@@ -57,8 +62,8 @@ import oscar.oscarEncounter.oscarMeasurements.util.TargetCondition;
 public class FlowSheetCustomAction extends DispatchAction {
     private static final Logger logger = MiscUtils.getLogger();
 
-    private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
-    private FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+    private FlowSheetCustomizationDao flowSheetCustomizationDao =  (FlowSheetCustomizationDao) SpringUtils.getBean("flowSheetCustomizationDao");
+    private FlowSheetUserCreatedDao flowSheetUserCreatedDao = (FlowSheetUserCreatedDao) SpringUtils.getBean("flowSheetUserCreatedDao");
     private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
     
     public void setFlowSheetCustomizationDao(FlowSheetCustomizationDao flowSheetCustomizationDao) {
@@ -81,7 +86,8 @@ public class FlowSheetCustomAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_demographic)");
         }
         
-        MeasurementFlowSheet mFlowsheet = flowsheetService.getFlowsheetTemplate(flowsheet);
+        MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+        MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(flowsheet);
 
         if (request.getParameter("measurement") != null) {
 
@@ -125,7 +131,24 @@ public class FlowSheetCustomAction extends DispatchAction {
             if (h.get("measurement_type") != null) {
                 FlowSheetItem item = new FlowSheetItem(h);
                 item.setRecommendations(ds);
-                flowsheetService.addFlowsheetCustomization(item, FlowSheetCustomization.ADD, flowsheet, prevItem, (String) request.getSession().getAttribute("user"), demographicNo);
+                Element va = templateConfig.getItemFromObject(item);
+
+                XMLOutputter outp = new XMLOutputter();
+                outp.setFormat(Format.getPrettyFormat());
+
+                FlowSheetCustomization cust = new FlowSheetCustomization();
+                cust.setAction(FlowSheetCustomization.ADD);
+                cust.setPayload(outp.outputString(va));
+                cust.setFlowsheet(flowsheet);
+                cust.setMeasurement(prevItem);//THIS THE MEASUREMENT TO SET THIS AFTER!
+                cust.setProviderNo((String) request.getSession().getAttribute("user"));
+                cust.setDemographicNo(demographicNo);
+                cust.setCreateDate(new Date());
+
+                logger.debug("SAVE "+cust);
+
+                flowSheetCustomizationDao.persist(cust);
+
             }
         }
         request.setAttribute("demographic",demographicNo);
@@ -134,6 +157,7 @@ public class FlowSheetCustomAction extends DispatchAction {
     }
 
     public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
+        MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
         String flowsheet = request.getParameter("flowsheet");
         String demographicNo = "0";
@@ -197,6 +221,24 @@ public class FlowSheetCustomAction extends DispatchAction {
                         rec.setRecommendationCondition(conds);
                         recommendations.add(rec);
                     }
+                    //////
+                    /*  Strength:   <select name="strength<%=count%>">
+                        Text: <input type="text" name="text<%=count%>" length="100"  value="<%=e.getText()%>" />
+                        <select name="type<%=count%>c<%=condCount%>" >
+                        Param: <input type="text" name="param<%=count%>c<%=condCount%>" value="<%=s(cond.getParam())%>" />
+                        Value: <input type="text" name="value<%=count%>c<%=condCount%>" value="<%=cond.getValue()%>" />
+                    */
+                    //////
+
+                    
+                    
+                    
+//                    String mRange = request.getParameter("monthrange" + extrachar);
+//                    String strn = request.getParameter("strength" + extrachar);
+//                    String dsText = request.getParameter("text" + extrachar);
+//                    if (!mRange.trim().equals("")){
+//                       ds.add(new Recommendation("" + h.get("measurement_type"), mRange, strn, dsText));
+//                    }
                 }else if(s.startsWith("col")){
                     String extrachar = s.replaceAll("col", "").trim();
                     logger.debug("EXTRA CHA "+extrachar);
@@ -233,7 +275,50 @@ public class FlowSheetCustomAction extends DispatchAction {
             item.setTargetColour(targets);
             item.setRecommendations(recommendations);
 
-            flowsheetService.addFlowsheetCustomization(item, FlowSheetCustomization.UPDATE, flowsheet, item.getItemName(), (String) request.getSession().getAttribute("user"), demographicNo);
+
+
+
+
+            //DEALING WITH TARGET DATA//////////
+
+          /*
+            <select name="type<%=targetCount%>c1">
+               <option value="-1">Not Set</option>
+                <option value="getDataAsDouble"       >Number Value</option>
+                <option value="isMale"              > Is Male </option>
+                <option value="isFemale"            > Is Female </option>
+                <option value="getNumberFromSplit"  > Number Split </option>
+                <option value="isDataEqualTo"       >  String </option>
+           </select>
+
+           Param: <input type="text" name="param<%=targetCount%>c1" value="" />
+           Value: <input type="text" name="value<%=targetCount%>c1" value="" />
+
+             */
+
+
+            ////////////
+
+
+
+            Element va = templateConfig.getItemFromObject(item);
+
+            XMLOutputter outp = new XMLOutputter();
+            outp.setFormat(Format.getPrettyFormat());
+
+            FlowSheetCustomization cust = new FlowSheetCustomization();
+            cust.setAction(FlowSheetCustomization.UPDATE);
+            cust.setPayload(outp.outputString(va));
+            cust.setFlowsheet(flowsheet);
+            if(demographicNo != null ){
+               cust.setDemographicNo(demographicNo);
+            }
+            cust.setMeasurement(item.getItemName());//THIS THE MEASUREMENT TO SET THIS AFTER!
+            cust.setProviderNo((String) request.getSession().getAttribute("user"));
+            logger.debug("UPDATE "+cust);
+
+            flowSheetCustomizationDao.persist(cust);
+
         }
         request.setAttribute("demographic",demographicNo);
         request.setAttribute("flowsheet", flowsheet);
@@ -293,30 +378,54 @@ public class FlowSheetCustomAction extends DispatchAction {
     }
 
 
-	/*
-	 * Order of operations:
-	 * - add flowsheet to system
-	 * - persist flowsheet in database
-	 * - reload flowsheets in system to ensure system knows about new sheet
-	 */
-	public ActionForward createNewFlowSheet(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	{
-		String dxcodeTriggers 		= request.getParameter("dxcodeTriggers");
-		String displayName 			= request.getParameter("displayName");
-		String warningColour 		= request.getParameter("warningColour");
-		String recommendationColour = request.getParameter("recommendationColour");
+    /*first add it as a flowsheet into the current system.  The save it to the database so that it will be there on reboot */
+    public ActionForward createNewFlowSheet(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
+        logger.debug("IN create new flowsheet");
+        //String name let oscar create the name
+    	String dxcodeTriggers 		= request.getParameter("dxcodeTriggers");
+    	String displayName 			= request.getParameter("displayName");
+    	String warningColour 		= request.getParameter("warningColour");
+    	String recommendationColour = request.getParameter("recommendationColour");
+    	//String topHTML 				= request.getParameter("topHTML");  // Not supported yet
 
-		MeasurementFlowSheet measurementFlowSheet = new MeasurementFlowSheet();
-		measurementFlowSheet.setName(displayName);
-		measurementFlowSheet.parseDxTriggers(dxcodeTriggers);
-		measurementFlowSheet.setDisplayName(displayName);
-		measurementFlowSheet.setWarningColour(warningColour);
-		measurementFlowSheet.setRecommendationColour(recommendationColour);
 
-		flowsheetService.addFlowsheet(measurementFlowSheet);
-		measurementFlowSheet.loadRuleBase();
+    	/// NEW FLOWSHEET CODE
+    	MeasurementFlowSheet m = new MeasurementFlowSheet();
+        m.parseDxTriggers(dxcodeTriggers);
+        m.setDisplayName(displayName);
+        m.setWarningColour(warningColour);
+        m.setRecommendationColour(recommendationColour);
 
-		flowsheetService.createUserFlowSheet(measurementFlowSheet);
-		return mapping.findForward("newflowsheet");
-	}
+        //Im not sure if adding an initializing measurement is required yet
+        /*
+        Map<String,String> h = new HashMap<String,String>();
+        h.put("measurement_type","WT");
+        h.put("display_name","WT");
+        h.put("value_name","WT");
+
+        FlowSheetItem fsi = new FlowSheetItem( h);
+        m.addListItem(fsi);
+*/
+        MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+        String name =  templateConfig.addFlowsheet( m );
+        m.loadRuleBase();
+    	/// END FLOWSHEET CODE
+
+        FlowSheetUserCreated fsuc = new FlowSheetUserCreated();
+        fsuc.setName(name);
+        fsuc.setDisplayName(displayName);
+        fsuc.setDxcodeTriggers(dxcodeTriggers);
+        fsuc.setWarningColour(warningColour);
+        fsuc.setRecommendationColour(recommendationColour);
+        fsuc.setArchived(false);
+        fsuc.setCreatedDate(new Date());
+        flowSheetUserCreatedDao.persist(fsuc);
+
+        return mapping.findForward("newflowsheet");
+    }
+
+
+
+
+
 }

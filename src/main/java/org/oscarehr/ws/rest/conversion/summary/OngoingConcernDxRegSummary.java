@@ -26,11 +26,10 @@ package org.oscarehr.ws.rest.conversion.summary;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
@@ -129,11 +128,8 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 			}
 		}
 		
-		Collections.sort(list, Collections.reverseOrder(new Comparator<SummaryItemTo1>() {
-			  public int compare(SummaryItemTo1 o1, SummaryItemTo1 o2) {
-			      return o1.getDate().compareTo(o2.getDate());
-			  }
-		}));
+		// Reverse date sorting with null having lowest priority (ie: will be last).
+		list.sort((SummaryItemTo1 i1, SummaryItemTo1 i2) -> ObjectUtils.compare(i2.getDate(), i1.getDate()));
 		
 		for(int i = 0; i < list.size(); i++){
 			list.get(i).setId(i);
