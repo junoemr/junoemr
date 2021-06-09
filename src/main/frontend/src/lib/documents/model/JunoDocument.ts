@@ -1,6 +1,7 @@
 import {DocumentStatus} from "./DocumentStatus";
 import {Moment} from "moment";
 import JunoFile from "./JunoFile";
+import DocumentService from "../service/DocumentService";
 
 export default class JunoDocument implements JunoFile
 {
@@ -42,9 +43,14 @@ export default class JunoDocument implements JunoFile
 
 	public async getBase64Data(): Promise<string>
 	{
+		if (!this._base64Data)
+		{
+			// if we do not have the file data load it from the server.
+			this._base64Data = await (await (new DocumentService()).getDocument(this.documentNo)).getBase64Data();
+		}
+
 		return this._base64Data;
 	}
-
 
 	// ==========================================================================
 	// Setters

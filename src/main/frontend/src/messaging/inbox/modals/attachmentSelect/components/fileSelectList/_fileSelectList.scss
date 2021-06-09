@@ -5,6 +5,10 @@
 		height: 2.66em;
 		cursor: pointer;
 
+		//&:not(:last-child) {
+		//	border-bottom: solid 1px var(--color-neutral-light-grey);
+		//}
+
 		&:hover {
 			background-color: var(--color-neutral-lighter);
 		}
@@ -14,9 +18,13 @@
 			color: var(--color-neutral-white);
 		}
 
-		.file-date,
-		.file-type {
+		.file-date {
 			width: 128px;
+		}
+
+		.file-type,
+		.file-check {
+			width: 72px;
 		}
 	}
 

@@ -5,7 +5,7 @@
 	.layout-grid {
 		display: grid;
 		grid-template-columns: 192px 8px minmax(0, 1fr);
-		grid-template-rows: 32px 8px minmax(0, 1fr) 8px 146px 8px 34px;
+		grid-template-rows: 32px 8px minmax(0, 1fr) 30px 70px 8px 34px;
 
 		.grid-item {
 
@@ -19,7 +19,11 @@
 			}
 
 			&.source-select {
-				grid-area: 1 / 1 / 8 / 2;
+				grid-area: 1 / 1 / 6 / 2;
+			}
+
+			&.attach-from-computer {
+				grid-area: 7 / 1 / 8 / 2;
 			}
 
 			&.file-list-header {
@@ -31,11 +35,25 @@
 
 					height: 100%;
 					border-left: solid 1px var(--color-neutral-light-grey);
+
+					&.date-header {
+						width: 128px;
+					}
+					&.type-header {
+						width: 72px;
+					}
+					&.blank-header {
+						width: 82px;
+					}
 				}
 			}
 
 			&.file-list {
 				grid-area: 3 / 3 / 4 / 4;
+			}
+
+			&.selected-attachments-header {
+				grid-area: 4 / 3 / 5 / 4;
 			}
 
 			&.selected-attachments {

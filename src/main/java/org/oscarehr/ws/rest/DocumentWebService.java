@@ -22,77 +22,60 @@
  * Canada
  */
  
-package org.oscarehr.ws.rest.demographic;
+package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
-import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferOutbound;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-@Path("demographic/{demographicNo}/document/")
-@Component("DemographicDocumentWebService")
-@Tag(name = "demographic")
+@Path("document/")
+@Component("DocumentWebService")
+@Tag(name = "document")
 public class DocumentWebService extends AbstractServiceImpl
 {
-	protected SecurityInfoManager securityInfoManager;
-	protected DocumentService documentService;
-	protected DemographicDao demographicDao;
+	protected DocumentDao documentDao;
 
 	// ==========================================================================
 	// Public Methods
 	// ==========================================================================
 
 	@Autowired
-	public DocumentWebService(
-			SecurityInfoManager securityInfoManager,
-			DocumentService documentService,
-			DemographicDao demographicDao)
+	public DocumentWebService(DocumentDao documentDao)
 	{
-		this.securityInfoManager = securityInfoManager;
-		this.documentService = documentService;
-		this.demographicDao = demographicDao;
+		this.documentDao = documentDao;
 	}
 
 	// ==========================================================================
 	// Endpoints
 	// ==========================================================================
 
-	@Path("/")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
+	@GET
+	@Path("/{documentNo}/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DocumentTransferOutbound> createDocument(@PathParam("demographicNo") String demographicNo, DocumentTransferInbound documentTransfer) throws IOException, InterruptedException
+	public RestResponse<DocumentTransferOutbound> getDocument(@PathParam("documentNo") String documentNo) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(
 				getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.WRITE,
-				Integer.parseInt(demographicNo),
+				SecurityInfoManager.READ,
+				null,
 				"_edoc");
 
-		documentTransfer.setDocumentNo(null);
+		Document document = this.documentDao.findOrThrow(Integer.parseInt(documentNo));
 
-		Document newDocument = documentService.uploadNewDemographicDocument(
-				getLoggedInInfo(),
-				DocumentConverter.getInboundAsDomainObject(documentTransfer),
-				demographicDao.findOrThrow(Integer.parseInt(demographicNo)),
-				documentTransfer.getBase64EncodedFile());
-
-		return RestResponse.successResponse(DocumentConverter.getAsTransferObject(newDocument, false));
+		return RestResponse.successResponse(DocumentConverter.getAsTransferObject(document, true));
 	}
+
 }

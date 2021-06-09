@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Path("demographic/{demographicNo}/documents/")
-@Component("DocumentsWebService")
+@Component("DemographicDocumentsWebService")
 @Tag(name = "demographic")
 public class DocumentsWebService extends AbstractServiceImpl
 {

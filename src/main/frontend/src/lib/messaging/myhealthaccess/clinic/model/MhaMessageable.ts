@@ -9,6 +9,27 @@ import {LinkStatus, linkStatusToVerificationLevel} from "../../../../integration
 export default class MhaMessageable extends Messageable
 {
 	// ==========================================================================
+	// Cache attributes
+	// ==========================================================================
+
+	// Checking with MHA is expensive.
+	// Cache profiles here after first lookup from MHA.
+	protected profiles: MhaPatient[] = null;
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	/**
+	 * clear any caches in this messageable. The next time the data is needed
+	 * it will be pulled from the MHA server.
+	 */
+	public clearCache(): void
+	{
+		this.profiles = null;
+	}
+
+	// ==========================================================================
 	// Public Messageable Overrides
 	// ==========================================================================
 
@@ -20,9 +41,13 @@ export default class MhaMessageable extends Messageable
 	{
 		if (this.type === MessageableType.PatientUser)
 		{
-			const mhaPatientService = new MhaPatientService();
-			const profile: MhaPatient = (await mhaPatientService.getProfiles(this.id)).find((profile) => profile.isConfirmed);
+			if (!this.profiles)
+			{
+				const mhaPatientService = new MhaPatientService();
+				this.profiles = (await mhaPatientService.getProfiles(this.id));
+			}
 
+			const profile: MhaPatient = this.profiles.find((profile) => profile.isConfirmed);
 			return !!profile;
 		}
 		return false;
@@ -38,9 +63,13 @@ export default class MhaMessageable extends Messageable
 	{
 		if (this.type === MessageableType.PatientUser)
 		{
-			const mhaPatientService = new MhaPatientService();
-			const profiles: MhaPatient[] = (await mhaPatientService.getProfiles(this.id));
-			const linkStatus = profiles.reduce((linkStatus, profile) => {
+			if (!this.profiles)
+			{
+				const mhaPatientService = new MhaPatientService();
+				this.profiles = (await mhaPatientService.getProfiles(this.id));
+			}
+
+			const linkStatus = this.profiles.reduce((linkStatus, profile) => {
 				return linkStatusToVerificationLevel(linkStatus) < linkStatusToVerificationLevel(profile.linkStatus) ? profile.linkStatus : linkStatus
 			}, LinkStatus.NO_LINK);
 
@@ -65,9 +94,13 @@ export default class MhaMessageable extends Messageable
 	{
 		if (this.type === MessageableType.PatientUser)
 		{
-			const mhaPatientService = new MhaPatientService();
-			const profile: MhaPatient = (await mhaPatientService.getProfiles(this.id)).find((profile) => profile.isConfirmed);
+			if (!this.profiles)
+			{
+				const mhaPatientService = new MhaPatientService();
+				this.profiles = (await mhaPatientService.getProfiles(this.id));
+			}
 
+			const profile: MhaPatient = this.profiles.find((profile) => profile.isConfirmed);
 			if (profile)
 			{
 				return profile.demographicNo;

@@ -69,6 +69,7 @@ angular.module("Messaging.Components").component('attachmentList', {
 				if (ctrl.showAttachToChart)
 				{
 					ctrl.canAttachToChart = (await ctrl.messageablesWhoCanAttachToChart()).length > 0;
+					$scope.$apply();
 				}
 			}
 

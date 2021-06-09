@@ -10,7 +10,15 @@
 			background-color: var(--color-neutral-lighter);
 		}
 		&.selected {
-			background-color: var(--color-neutral-light);
+			color: var(--color-neutral-white);
+			background-color: var(--color-primary-base);
+		}
+
+		&.disabled,
+		&.selected.disabled {
+			cursor: help;
+			color: var(--color-neutral-light-grey);
+			background-color: var(--color-neutral-lighter);
 		}
 
 	}

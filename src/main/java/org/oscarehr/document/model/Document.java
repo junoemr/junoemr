@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -46,11 +45,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -60,8 +57,6 @@ import javax.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
-import org.hibernate.annotations.Where;
-import org.hibernate.annotations.WhereJoinTable;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.demographic.model.Demographic;
 

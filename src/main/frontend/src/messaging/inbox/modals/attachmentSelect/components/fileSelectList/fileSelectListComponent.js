@@ -21,11 +21,15 @@
 * Canada
 */
 
+import {JUNO_BUTTON_COLOR} from "../../../../../../common/components/junoComponentConstants";
+
 angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSelectList', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/components/fileSelectList/fileSelectList.jsp',
 	bindings: {
 		fileOptions: "<",
+		selectedFiles: "=",
 		onFileSelected: "&",
+		onFileRemoved: "&"
 	},
 	controller: [
 		"$scope",
@@ -34,6 +38,8 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 		{
 			const ctrl = this;
 
+			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+
 			ctrl.formatFileDate = (date) =>
 			{
 				return date.format(Juno.Common.Util.settings.date_format);
@@ -41,10 +47,44 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 
 			ctrl.onFileSelect = (file) =>
 			{
-				if (ctrl.onFileSelected)
+				if (file.selected)
 				{
-					ctrl.onFileSelected({value: file});
+					ctrl.removeFile(file);
+					if (ctrl.onFileRemoved)
+					{
+						ctrl.onFileRemoved({value: file});
+					}
 				}
+				else
+				{
+					ctrl.addFile(file);
+					if (ctrl.onFileSelected)
+					{
+						ctrl.onFileSelected({value: file});
+					}
+				}
+			}
+
+			ctrl.addFile = (junoFile) =>
+			{
+				ctrl.selectedFiles.push(junoFile);
+			}
+
+			ctrl.removeFile = (junoFile) =>
+			{
+				const index = ctrl.selectedFiles.indexOf(junoFile);
+				if (index !== -1)
+				{
+					ctrl.selectedFiles.splice(index, 1);
+				}
+			}
+
+			ctrl.updateFileSelectState = () =>
+			{
+				ctrl.fileOptions.forEach((fileOpt) =>
+				{
+					fileOpt.selected = ctrl.selectedFiles.includes(fileOpt);
+				});
 			}
 
 			ctrl.fileTypeHuman = (mimeString) =>
@@ -57,5 +97,7 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 				return t2.value - t1.value;
 			}
 
+			$scope.$watchCollection("$ctrl.fileOptions", ctrl.updateFileSelectState);
+			$scope.$watchCollection("$ctrl.selectedFiles", ctrl.updateFileSelectState);
 		}]
 });

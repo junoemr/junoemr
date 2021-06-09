@@ -29,6 +29,7 @@ import {
 } from "../../../../common/components/junoComponentConstants";
 import MessageFactory from "../../../../lib/messaging/factory/MessageFactory";
 import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
+import JunoFileToAttachmentConverter from "../../../../lib/messaging/converter/JunoFileToAttachmentConverter";
 
 angular.module("Messaging.Modals").component('messageCompose', {
 	templateUrl: 'src/messaging/inbox/modals/messageCompose/messageCompose.jsp',
@@ -101,7 +102,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 
 			ctrl.uploadAttachment = async () =>
 			{
-				const attachments = await $uibModal.open({
+				const newFiles = await $uibModal.open({
 					component: "attachmentSelect",
 					backdrop: 'static',
 					windowClass: "juno-simple-modal-window",
@@ -109,13 +110,9 @@ angular.module("Messaging.Modals").component('messageCompose', {
 						style: () => ctrl.resolve.style,
 						messageable: () => ctrl.recipient,
 					}
-				});
+				}).result;
 
-				// const files = await FileUtil.uploadFile(AllowedAttachmentTypes);
-				// for (const file of files)
-				// {
-				// 	ctrl.attachments.push(AttachmentFactory.build(file.name, file.type, await FileUtil.getFileDataBase64(file)));
-				// }
+				ctrl.attachments = ctrl.attachments.concat(await Promise.all((new JunoFileToAttachmentConverter()).convertList(newFiles)));
 
 				$scope.$apply();
 			}

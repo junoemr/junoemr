@@ -50,7 +50,7 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			ctrl.selectedAttachments = []; // Type Attachment[]
+			ctrl.selectedAttachments = []; // Type JunoFile[]
 			ctrl.currentFileList = []; // Type JunoFile[]
 			ctrl.documentFileList = []; // Type JunoFile[]
 			ctrl.canReadChart = false;
@@ -68,6 +68,11 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 					ctrl.currentFileList = ctrl.documentFileList;
 					$scope.$apply();
 				}
+			}
+
+			ctrl.closeModal = (returnAttachments = false) =>
+			{
+				ctrl.modalInstance.close(returnAttachments ? ctrl.selectedAttachments : []);
 			}
 
 			ctrl.switchFileSource = async (source) =>
@@ -91,13 +96,6 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 				{
 					ctrl.selectedAttachments.push(AttachmentFactory.build(file.name, file.type, await FileUtil.getFileDataBase64(file)))
 				}
-
-				$scope.$apply();
-			}
-
-			ctrl.addAttachment = async (junoFile) =>
-			{
-				ctrl.selectedAttachments.push(await (new JunoFileToAttachmentConverter).convert(junoFile));
 
 				$scope.$apply();
 			}

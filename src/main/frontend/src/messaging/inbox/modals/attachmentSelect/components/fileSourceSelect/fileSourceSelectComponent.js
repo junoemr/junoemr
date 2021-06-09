@@ -39,8 +39,6 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 			const ctrl = this;
 
 			$scope.FileSource = FileSource;
-			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 			ctrl.$onInit = () =>
 			{
@@ -65,6 +63,7 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 			{
 				return {
 					"selected": source === ctrl.selectedSource,
+					"disabled": ctrl.hideChartSources,
 				};
 			}
 		}]

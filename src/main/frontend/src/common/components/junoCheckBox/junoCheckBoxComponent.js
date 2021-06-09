@@ -26,15 +26,17 @@ import {JUNO_BUTTON_COLOR, JUNO_STYLE, LABEL_POSITION} from "../junoComponentCon
 angular.module('Common.Components').component('junoCheckBox', {
 	templateUrl: 'src/common/components/junoCheckBox/junoCheckBox.jsp',
 	bindings: {
-		ngModel: "=",
+		ngModel: "=?",
 		title: "@?",
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
 		buttonColor: "<?",
-		//alternate value returned when checkbox is true
+		// alternate value returned when checkbox is true
 		trueValue: "<?",
 		disabled: "<?",
+		// a dummy checkbox will never update ngModel.
+		dummy: "<?",
 		change: "&?",
 	},
 	controller: [ function () {
@@ -42,22 +44,28 @@ angular.module('Common.Components').component('junoCheckBox', {
 
 		ctrl.$onInit = () =>
 		{
+			ctrl.ngModel = ctrl.ngModel || false;
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.buttonColor = ctrl.buttonColor || JUNO_BUTTON_COLOR.PRIMARY;
 			ctrl.trueValue = ctrl.trueValue || true;
+			ctrl.dummy = ctrl.dummy || false;
 		};
 
 		ctrl.onClick = () =>
 		{
-			if (ctrl.ngModel === ctrl.trueValue)
+			if (!ctrl.dummy)
 			{
-				ctrl.ngModel = false;
+				if (ctrl.ngModel === ctrl.trueValue)
+				{
+					ctrl.ngModel = false;
+				}
+				else
+				{
+					ctrl.ngModel = ctrl.trueValue;
+				}
 			}
-			else
-			{
-				ctrl.ngModel = ctrl.trueValue;
-			}
+
 			if(ctrl.change)
 			{
 				ctrl.change({value: ctrl.ngModel});
