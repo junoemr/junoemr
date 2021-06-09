@@ -1,6 +1,6 @@
 <div class="attachment-list flex-col">
 
-	<div class="text-grey">Attachments</div>
+	<div ng-if="!$ctrl.hideHeader" class="text-grey">Attachments</div>
 
 	<div class="flex-row flex-wrap" ng-class="$ctrl.attachmentListClasses()">
 		<div ng-repeat="attachment in $ctrl.attachments"

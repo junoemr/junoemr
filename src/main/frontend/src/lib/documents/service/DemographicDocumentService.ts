@@ -55,7 +55,7 @@ export default class DemographicDocumentService
 		try
 		{
 			const docTransfer: DocumentTransferOutbound =
-				(await this._demogrpahicApi.createDocument(demographicNo, (new JunoDocumentToDocumentTransferInboundConverter()).convert(document))).data.body;
+				(await this._demogrpahicApi.createDocument(demographicNo, await (new JunoDocumentToDocumentTransferInboundConverter()).convert(document))).data.body;
 
 			return (new DocumentTransferOutboundToJunoDocumentConverter()).convert(docTransfer);
 		}

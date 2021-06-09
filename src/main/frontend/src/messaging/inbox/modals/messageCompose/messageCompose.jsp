@@ -75,7 +75,11 @@
 		<div class="flex-row m-t-16">
 			<div class="flex-item-grow flex-row">
 				<!-- Add Attachment -->
-				<juno-button class="flex-item-no-grow" click="$ctrl.uploadAttachment()" component-style="$ctrl.resolve.style">
+				<juno-button class="flex-item-no-grow"
+				             click="$ctrl.uploadAttachment()"
+				             disabled="!$ctrl.recipient"
+				             title="{{!$ctrl.recipient ? 'Please select a recipient' : ''}}"
+				             component-style="$ctrl.resolve.style">
 					<div class="flex-row align-items-center p-l-8 p-r-8 h-100">
 						Add Attachment
 						<i class="icon-cloud-upload m-l-8 body-normal"></i>

@@ -293,6 +293,8 @@ module.exports = {
 			'./src/messaging/inbox/modals/module.js',
 			'./src/messaging/inbox/modals/attachmentSelect/components/module.js',
 			'./src/messaging/inbox/modals/attachmentSelect/attachmentSelectComponent.js',
+			'./src/messaging/inbox/modals/attachmentSelect/components/fileSelectList/fileSelectListComponent.js',
+			'./src/messaging/inbox/modals/attachmentSelect/components/fileSourceSelect/fileSourceSelectComponent.js',
 			'./src/messaging/inbox/modals/messageCompose/messageComposeComponent.js',
 
 			'./src/patient/module.js',

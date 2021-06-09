@@ -16,6 +16,7 @@ export default class DocumentTransferOutboundToJunoDocumentConverter extends Abs
 		doc.documentNo = from.documentNo.toString();
 		doc.status = from.status;
 		doc.createdAt = moment(from.createdDateTime);
+		doc.updatedAt = moment(from.updateDateTime);
 		doc.observedAt = moment(from.observationDate);
 		doc.publicDocument = from.publicDocument;
 		doc.documentType = from.documentType;

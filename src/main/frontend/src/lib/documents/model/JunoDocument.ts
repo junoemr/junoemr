@@ -1,7 +1,8 @@
 import {DocumentStatus} from "./DocumentStatus";
 import {Moment} from "moment";
+import JunoFile from "./JunoFile";
 
-export default class JunoDocument
+export default class JunoDocument implements JunoFile
 {
 	protected _documentNo: string;
 	protected _fileName: string;
@@ -24,8 +25,9 @@ export default class JunoDocument
 	protected _appointmentNo: string;
 
 	protected _reviewedAt: Moment;
-	private _observedAt: Moment;
+	protected _observedAt: Moment;
 	protected _createdAt: Moment;
+	private _updatedAt: Moment;
 
 	// ==========================================================================
 	// Public
@@ -37,6 +39,12 @@ export default class JunoDocument
 		this.documentDescription = description;
 		this.base64Data = base64Data;
 	}
+
+	public async getBase64Data(): Promise<string>
+	{
+		return this._base64Data;
+	}
+
 
 	// ==========================================================================
 	// Setters
@@ -137,6 +145,11 @@ export default class JunoDocument
 		this._createdAt = value;
 	}
 
+	set updatedAt(value: Moment)
+	{
+		this._updatedAt = value;
+	}
+
 	set contentType(value: string)
 	{
 		this._contentType = value;
@@ -149,6 +162,11 @@ export default class JunoDocument
 	get fileName(): string
 	{
 		return this._fileName;
+	}
+
+	get name(): string
+	{
+		return this.fileName;
 	}
 
 	get documentNo(): string
@@ -164,11 +182,6 @@ export default class JunoDocument
 	get documentDescription(): string
 	{
 		return this._documentDescription;
-	}
-
-	get base64Data(): string
-	{
-		return this._base64Data;
 	}
 
 	get documentXml(): string
@@ -241,8 +254,18 @@ export default class JunoDocument
 		return this._createdAt;
 	}
 
+	get updatedAt(): Moment
+	{
+		return this._updatedAt;
+	}
+
 	get contentType(): string
 	{
 		return this._contentType;
+	}
+
+	get type(): string
+	{
+		return this.contentType;
 	}
 }

@@ -23,6 +23,14 @@
 
 
 import {JUNO_SIMPLE_MODAL_FILL_COLOR} from "../../../../common/modals/junoSimpleModal/junoSimpleModalConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../common/components/junoComponentConstants";
+import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
+import DemographicDocumentService from "../../../../lib/documents/service/DemographicDocumentService";
+import JunoFileToAttachmentConverter from "../../../../lib/messaging/converter/JunoFileToAttachmentConverter";
+import {FileSource} from "./components/fileSourceSelect/FileSource";
+import {AllowedAttachmentTypes} from "../../../../lib/messaging/constants/AllowedAttachmentTypes";
+import FileUtil from "../../../../lib/util/FileUtil";
+import AttachmentFactory from "../../../../lib/messaging/factory/AttachmentFactory";
 
 angular.module("Messaging.Modals").component('attachmentSelect', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/attachmentSelect.jsp',
@@ -36,9 +44,87 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 			$scope)
 		{
 			const ctrl = this;
+			const demographicDocumentService = new DemographicDocumentService();
 
 			$scope.JUNO_SIMPLE_MODAL_FILL_COLOR = JUNO_SIMPLE_MODAL_FILL_COLOR;
+			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
+			ctrl.selectedAttachments = []; // Type Attachment[]
+			ctrl.currentFileList = []; // Type JunoFile[]
+			ctrl.documentFileList = []; // Type JunoFile[]
+			ctrl.canReadChart = false;
 
+			ctrl.$onInit = async () =>
+			{
+				ctrl.messageable = ctrl.resolve.messageable;
+				ctrl.canReadChart = await ctrl.checkCanReadChart();
+
+				await ctrl.loadDocumentFiles();
+
+				// set default to patient documents
+				if (ctrl.canReadChart)
+				{
+					ctrl.currentFileList = ctrl.documentFileList;
+					$scope.$apply();
+				}
+			}
+
+			ctrl.switchFileSource = async (source) =>
+			{
+				switch (source)
+				{
+					case FileSource.COMPUTER:
+						await ctrl.attachFilesFromComputer();
+						break;
+					case FileSource.DOCUMENTS:
+						ctrl.currentFileList = ctrl.documentFileList;
+						break;
+				}
+			}
+
+			ctrl.attachFilesFromComputer = async () =>
+			{
+				const files = await FileUtil.uploadFile(AllowedAttachmentTypes);
+
+				for (const file of files)
+				{
+					ctrl.selectedAttachments.push(AttachmentFactory.build(file.name, file.type, await FileUtil.getFileDataBase64(file)))
+				}
+
+				$scope.$apply();
+			}
+
+			ctrl.addAttachment = async (junoFile) =>
+			{
+				ctrl.selectedAttachments.push(await (new JunoFileToAttachmentConverter).convert(junoFile));
+
+				$scope.$apply();
+			}
+
+			/**
+			 * load the list of documents that could be attached to the message
+			 */
+			ctrl.loadDocumentFiles = async () =>
+			{
+				ctrl.documentFileList = [];
+
+				if (ctrl.canReadChart)
+				{
+					// JunoDocument conforms to JunoFile.
+					ctrl.documentFileList = await demographicDocumentService.getDemographicDocuments(await ctrl.messageable.localId());
+				}
+			}
+
+			/**
+			 * checks if the patients chart can be read.
+			 * @return promise that resolves to true / false
+			 */
+			ctrl.checkCanReadChart = async () =>
+			{
+				return ctrl.messageable &&
+					await ctrl.messageable.hasLocalMapping() &&
+					(await ctrl.messageable.localMappingConfidenceLevel()) === MessageableMappingConfidence.HIGH;
+			}
 		}]
 });

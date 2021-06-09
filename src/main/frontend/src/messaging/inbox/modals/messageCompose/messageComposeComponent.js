@@ -28,10 +28,7 @@ import {
 	LABEL_POSITION
 } from "../../../../common/components/junoComponentConstants";
 import MessageFactory from "../../../../lib/messaging/factory/MessageFactory";
-import {AllowedAttachmentTypes} from "../../../../lib/messaging/constants/AllowedAttachmentTypes";
-import FileUtil from "../../../../lib/util/FileUtil";
-import AttachmentFactory from "../../../../lib/messaging/factory/AttachmentFactory";
-import DemographicDocumentService from "../../../../lib/documents/service/DemographicDocumentService";
+import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
 
 angular.module("Messaging.Modals").component('messageCompose', {
 	templateUrl: 'src/messaging/inbox/modals/messageCompose/messageCompose.jsp',
@@ -110,6 +107,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 					windowClass: "juno-simple-modal-window",
 					resolve: {
 						style: () => ctrl.resolve.style,
+						messageable: () => ctrl.recipient,
 					}
 				});
 

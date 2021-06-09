@@ -1,27 +1,49 @@
 .attachment-select {
+	@include juno-font-body-smallest();
+	color: var(--color-neutral-darkest);
+
 	.layout-grid {
 		display: grid;
-		grid-template-columns: .2fr 8px .8fr;
-		grid-template-rows: 8px .8fr 8px .2fr;
+		grid-template-columns: 192px 8px minmax(0, 1fr);
+		grid-template-rows: 32px 8px minmax(0, 1fr) 8px 146px 8px 34px;
 
 		.grid-item {
-			border: solid 1px var(--color-neutral-light-grey);
-			border-radius: 8px;
-			background-color: var(--color-neutral-white);
 
-			&.source-select {
-				grid-column: 1 / 2;
-				grid-row: 2;
+			&.source-select,
+			&.file-list,
+			&.file-list-header,
+			&.selected-attachments {
+				border: solid 1px var(--color-neutral-light-grey);
+				border-radius: 8px;
+				background-color: var(--color-neutral-lightest);
 			}
 
-			&.attachment-select {
-				grid-column: 3;
-				grid-row: 2;
+			&.source-select {
+				grid-area: 1 / 1 / 8 / 2;
+			}
+
+			&.file-list-header {
+				grid-area: 1 / 3 / 2 / 4;
+
+				.header-item {
+					display: flex;
+					align-items: center;
+
+					height: 100%;
+					border-left: solid 1px var(--color-neutral-light-grey);
+				}
+			}
+
+			&.file-list {
+				grid-area: 3 / 3 / 4 / 4;
 			}
 
 			&.selected-attachments {
-				grid-column: 1 / 4;
-				grid-row: 4;
+				grid-area: 5 / 3 / 6 / 4;
+			}
+
+			&.buttons {
+				grid-area: 7 / 3 / 8 / 4;
 			}
 		}
 	}

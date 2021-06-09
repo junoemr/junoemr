@@ -40,6 +40,7 @@ angular.module("Messaging.Components").component('attachmentList', {
 		showRemoveButton: "<?",
 		singleColumn: "<?",
 		showAttachToChart: "<?",
+		hideHeader: "<?",
 		componentStyle: "<",
 	},
 	controller: [
@@ -62,8 +63,13 @@ angular.module("Messaging.Components").component('attachmentList', {
 				ctrl.showRemoveButton = ctrl.showRemoveButton || false;
 				ctrl.singleColumn = ctrl.singleColumn || false;
 				ctrl.showAttachToChart = ctrl.showAttachToChart || false;
+				ctrl.hideHeader = ctrl.hideHeader || false;
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-				ctrl.canAttachToChart = (await ctrl.messageablesWhoCanAttachToChart()).length > 0;
+
+				if (ctrl.showAttachToChart)
+				{
+					ctrl.canAttachToChart = (await ctrl.messageablesWhoCanAttachToChart()).length > 0;
+				}
 			}
 
 			ctrl.attachmentListClasses = () =>
@@ -139,6 +145,11 @@ angular.module("Messaging.Components").component('attachmentList', {
 			 */
 			ctrl.messageablesWithDemographicMapping = async () =>
 			{
+				if (!ctrl.message)
+				{
+					return [];
+				}
+
 				const possibleTargets = ctrl.message.recipients.concat(ctrl.message.sender);
 
 				possibleTargets.map(async (target) =>{

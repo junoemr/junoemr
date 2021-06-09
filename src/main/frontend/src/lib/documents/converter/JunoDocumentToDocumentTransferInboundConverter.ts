@@ -2,13 +2,13 @@ import AbstractConverter from "../../conversion/AbstractConverter";
 import JunoDocument from "../model/JunoDocument";
 import {DocumentTransferInbound} from "../../../../generated";
 
-export default class JunoDocumentToDocumentTransferInboundConverter extends AbstractConverter<JunoDocument, DocumentTransferInbound>
+export default class JunoDocumentToDocumentTransferInboundConverter extends AbstractConverter<JunoDocument, Promise<DocumentTransferInbound>>
 {
 	// ==========================================================================
 	// AbstractConverter Implementation
 	// ==========================================================================
 
-	convert(from: JunoDocument): DocumentTransferInbound
+	public async convert(from: JunoDocument): Promise<DocumentTransferInbound>
 	{
 		return {
 			documentNo: parseInt(from.documentNo),
@@ -16,7 +16,7 @@ export default class JunoDocumentToDocumentTransferInboundConverter extends Abst
 			createdDateTime: from.createdAt?.toDate(),
 			observationDate: from.observedAt?.toString(),
 			publicDocument: from.publicDocument,
-			base64EncodedFile: from.base64Data,
+			base64EncodedFile: await from.getBase64Data(),
 			documentType: from.documentType,
 			documentClass: from.documentClass,
 			documentSubClass: from.documentSubClass,

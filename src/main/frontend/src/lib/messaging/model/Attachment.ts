@@ -1,8 +1,9 @@
 import {Moment} from "moment";
 import MessageSource from "./MessageSource";
 import Message from "./Message";
+import JunoFile from "../../documents/model/JunoFile";
 
-export default class Attachment
+export default class Attachment implements JunoFile
 {
 	protected _id: string;
 	protected _name: string;
@@ -73,6 +74,17 @@ export default class Attachment
 
 	get createdAtDateTime(): Moment
 	{
+		return this._createdAtDateTime;
+	}
+
+	get createdAt(): Moment
+	{
+		return this._createdAtDateTime;
+	}
+
+	get updatedAt(): Moment
+	{
+		// attachments cannot be updated.
 		return this._createdAtDateTime;
 	}
 

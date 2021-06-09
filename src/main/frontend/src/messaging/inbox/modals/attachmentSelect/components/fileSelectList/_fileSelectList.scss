@@ -1,0 +1,23 @@
+.file-list {
+	overflow-y: auto;
+
+	.file-row {
+		height: 2.66em;
+		cursor: pointer;
+
+		&:hover {
+			background-color: var(--color-neutral-lighter);
+		}
+
+		&:active {
+			background-color: var(--color-primary-base);
+			color: var(--color-neutral-white);
+		}
+
+		.file-date,
+		.file-type {
+			width: 128px;
+		}
+	}
+
+}
