@@ -40,6 +40,7 @@ import oscar.util.ConversionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
 import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINATED;
@@ -69,7 +70,7 @@ public class DemographicModelToDbConverter
 		dbDemographic.setTitle(input.getTitleString());
 		dbDemographic.setHin(input.getHealthNumber());
 		dbDemographic.setVer(input.getHealthNumberVersion());
-		dbDemographic.setHcType(input.getHealthNumberProvinceCode());
+		dbDemographic.setHcType(getProvinceCode(input.getHealthNumberProvinceCode(), input.getHealthNumberCountryCode()));
 		dbDemographic.setHcRenewDate(ConversionUtils.toNullableLegacyDate(input.getHealthNumberRenewDate()));
 		dbDemographic.setHcEffectiveDate(ConversionUtils.toNullableLegacyDate(input.getHealthNumberEffectiveDate()));
 		dbDemographic.setDateJoined(ConversionUtils.toNullableLegacyDate(input.getDateJoined()));
@@ -108,7 +109,7 @@ public class DemographicModelToDbConverter
 			{
 				dbDemographic.setAddress(address.getAddressLinesString());
 				dbDemographic.setCity(address.getCity());
-				dbDemographic.setProvince(address.getRegionCode());
+				dbDemographic.setProvince(getProvinceCode(address.getRegionCode(), address.getCountryCode()));
 				dbDemographic.setPostal(address.getPostalCode());
 			}
 		}
@@ -174,5 +175,22 @@ public class DemographicModelToDbConverter
 		}
 
 		return dbDemographic;
+	}
+
+	/** juno stores non Canadian regions (us states) with the country coe (ie US-NY). This method formats the province code based on country
+	 * @param provinceCode the province code
+	 * @param countryCode the country code
+	 * @return province code that should be saved
+	 */
+	private String getProvinceCode(String provinceCode, String countryCode)
+	{
+		if(COUNTRY_CODE_USA.equals(countryCode))
+		{
+			return countryCode + "-" + provinceCode;
+		}
+		else
+		{
+			return provinceCode;
+		}
 	}
 }

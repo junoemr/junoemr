@@ -69,7 +69,8 @@ public class DemographicDbToModelConverter extends
 
 		exportDemographic.setHealthNumber(StringUtils.trimToNull(input.getHin()));
 		exportDemographic.setHealthNumberVersion(StringUtils.trimToNull(input.getVer()));
-		exportDemographic.setHealthNumberProvinceCode(StringUtils.trimToNull(input.getHcType()));
+		exportDemographic.setHealthNumberProvinceCode(findRegionCodeValue(StringUtils.trimToNull(input.getHcType())));
+		exportDemographic.setHealthNumberCountryCode(findCountryCodeValue(StringUtils.trimToNull(input.getHcType()), COUNTRY_CODE_CANADA));
 		exportDemographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(input.getHcRenewDate()));
 		exportDemographic.setHealthNumberEffectiveDate(ConversionUtils.toNullableLocalDate(input.getHcEffectiveDate()));
 		exportDemographic.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
@@ -81,15 +82,7 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setFamilyDoctor(getFamilyProvider(input));
 		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
 		exportDemographic.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
-
-		Address address = new Address();
-		address.setAddressLine1(StringUtils.trimToNull(input.getAddress()));
-		address.setCity(StringUtils.trimToNull(input.getCity()));
-		address.setRegionCode(StringUtils.trimToNull(input.getProvince()));
-		address.setCountryCode(COUNTRY_CODE_CANADA);
-		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
-		address.setResidencyStatusCurrent();
-		exportDemographic.addAddress(address);
+		exportDemographic.addAddress(buildAddress(input));
 
 		// phone conversions
 		if(input.getPhone() != null)
@@ -120,6 +113,59 @@ public class DemographicDbToModelConverter extends
 			//TODO midwife/nurse,resident providers ?
 		}
 		return exportDemographic;
+	}
+
+	protected Address buildAddress(Demographic input)
+	{
+		Address address = new Address();
+		address.setAddressLine1(StringUtils.trimToNull(input.getAddress()));
+		address.setCity(StringUtils.trimToNull(input.getCity()));
+
+		// non canadian regions (ie US states) are stored in the province field like 'US-NY' etc.
+		String provinceCode = StringUtils.trimToNull(input.getProvince());
+		address.setRegionCode(findRegionCodeValue(provinceCode));
+		address.setCountryCode(findCountryCodeValue(provinceCode, COUNTRY_CODE_CANADA));
+		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
+		address.setResidencyStatusCurrent();
+
+		return address;
+	}
+
+	/**
+	 * parse out the province code from the province value
+	 * @param provinceCode to be parsed
+	 * @return the province code
+	 */
+	private String findRegionCodeValue(String provinceCode)
+	{
+		if(provinceCode != null && provinceCode.contains("-"))
+		{
+			String[] provinceCodeSplit = provinceCode.split("-");
+			return provinceCodeSplit[1];
+		}
+		else
+		{
+			return provinceCode;
+		}
+	}
+
+	/**
+	 * parse out the country code from the province value, or return the default.
+	 * @param provinceCode to be parsed
+	 * @param defaultCountry to be used in case province code has no country code part
+	 * @return the country code
+	 */
+	private String findCountryCodeValue(String provinceCode, String defaultCountry)
+	{
+		if(provinceCode != null && provinceCode.contains("-"))
+		{
+			String[] provinceCodeSplit = provinceCode.split("-");
+			return provinceCodeSplit[0];
+		}
+		else
+		{
+			return defaultCountry;
+		}
 	}
 
 	private PhoneNumber buildPhoneNumber(String phoneNumber, String extension)

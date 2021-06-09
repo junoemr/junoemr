@@ -80,6 +80,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	private String healthNumber;
 	private String healthNumberVersion;
 	private String healthNumberProvinceCode;
+	private String healthNumberCountryCode;
 	private LocalDate healthNumberEffectiveDate;
 	private LocalDate healthNumberRenewDate;
 	private String chartNumber;
@@ -103,10 +104,6 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 
 	// roster info
 	private List<RosterData> rosterHistory;
-//	private String rosterStatus;
-//	private LocalDate rosterDate;
-//	private LocalDate rosterTerminationDate;
-//	private String rosterTerminationReason;
 
 	// other info
 	private String lastUpdateProviderId;

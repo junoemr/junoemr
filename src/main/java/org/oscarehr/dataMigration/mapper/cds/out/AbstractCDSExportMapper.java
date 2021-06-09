@@ -48,6 +48,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
+
 @Component
 public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper<I, E>
 {
@@ -74,7 +76,14 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 			cdsAddress = objectFactory.createAddress();
 			AddressStructured structured = objectFactory.createAddressStructured();
 			PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
-			postalZipCode.setPostalCode(addressModel.getPostalCode());
+			if(COUNTRY_CODE_USA.equals(addressModel.getCountryCode()))
+			{
+				postalZipCode.setZipCode(addressModel.getPostalCode());
+			}
+			else
+			{
+				postalZipCode.setPostalCode(addressModel.getPostalCode());
+			}
 
 			structured.setLine1(addressModel.getAddressLine1());
 			structured.setLine2(addressModel.getAddressLine2());
