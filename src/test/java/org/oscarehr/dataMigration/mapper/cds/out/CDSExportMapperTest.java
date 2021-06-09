@@ -25,12 +25,18 @@ package org.oscarehr.dataMigration.mapper.cds.out;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.logger.cds.CDSExportLogger;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.service.context.PatientExportContext;
+import org.oscarehr.dataMigration.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import xml.cds.v5_0.AddressType;
 import xml.cds.v5_0.DateFullOrPartial;
@@ -39,6 +45,7 @@ import xml.cds.v5_0.LifeStage;
 import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.PersonNameSimple;
 import xml.cds.v5_0.ResidualInformation;
+import xml.cds.v5_0.StandardCoding;
 import xml.cds.v5_0.YnIndicator;
 
 import java.time.LocalDate;
@@ -48,6 +55,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class CDSExportMapperTest
 {
@@ -55,10 +63,17 @@ public class CDSExportMapperTest
 	@InjectMocks
 	private CDSExportMapper cdsExportMapper;
 
+	@Mock
+	private PatientExportContextService patientExportContextService;
+
 	@Before
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
+		CDSExportLogger cdsExportLoggerMock = Mockito.mock(CDSExportLogger.class);
+		PatientExportContext patientExportContextMock = Mockito.mock(PatientExportContext.class);
+		when(patientExportContextMock.getExportLogger()).thenReturn(cdsExportLoggerMock);
+		when(patientExportContextService.getContext()).thenReturn(patientExportContextMock);
 	}
 
 	@Test
@@ -425,6 +440,44 @@ public class CDSExportMapperTest
 	public void testToYnIndicatorString_True()
 	{
 		assertEquals(CDSConstants.Y_INDICATOR_TRUE, cdsExportMapper.toYnIndicatorString(true));
+	}
+
+	@Test
+	public void testGetStandardCoding_Null()
+	{
+		assertNull(cdsExportMapper.getStandardCoding(null));
+	}
+
+	@Test
+	public void testGetStandardCoding_Icd9()
+	{
+		String expectedCode = "250";
+		String expectedCodeSystem = CDSConstants.CodingSystem.ICD9.getValue();
+		String expectedDescription = "sample description";
+		DxCode dxCode = new DxCode();
+
+		dxCode.setCode(expectedCode);
+		dxCode.setCodingSystem(DxCode.DxCodingSystem.ICD9);
+		dxCode.setDescription(expectedDescription);
+
+		StandardCoding result = cdsExportMapper.getStandardCoding(dxCode);
+		assertEquals(expectedCode, result.getStandardCode());
+		assertEquals(expectedCodeSystem, result.getStandardCodingSystem());
+		assertEquals(expectedDescription, result.getStandardCodeDescription());
+	}
+
+	@Test
+	public void testGetStandardCoding_cds_invalid()
+	{
+		String expectedCode = "250";
+		String expectedDescription = "sample description";
+		DxCode dxCode = new DxCode();
+
+		dxCode.setCode(expectedCode);
+		dxCode.setCodingSystem(DxCode.DxCodingSystem.OSCAR_CODE);
+		dxCode.setDescription(expectedDescription);
+
+		assertNull(cdsExportMapper.getStandardCoding(dxCode));
 	}
 
 }
