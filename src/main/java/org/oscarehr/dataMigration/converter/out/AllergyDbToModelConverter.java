@@ -22,8 +22,8 @@
  */
 package org.oscarehr.dataMigration.converter.out;
 
-import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.dataMigration.model.allergy.Allergy;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -35,7 +35,7 @@ import oscar.util.ConversionUtils;
 
 @Component
 public class AllergyDbToModelConverter extends
-		BaseDbToModelConverter<Allergy, org.oscarehr.dataMigration.model.allergy.Allergy>
+		BaseDbToModelConverter<org.oscarehr.allergy.model.Allergy, Allergy>
 {
 
 	@Autowired
@@ -45,15 +45,15 @@ public class AllergyDbToModelConverter extends
 	private CaseManagementNoteLinkDao caseManagementNoteLinkDao;
 
 	@Override
-	public org.oscarehr.dataMigration.model.allergy.Allergy convert(Allergy input)
+	public Allergy convert(org.oscarehr.allergy.model.Allergy input)
 	{
 		if(input == null)
 		{
 			return null;
 		}
-		org.oscarehr.dataMigration.model.allergy.Allergy allergy = new org.oscarehr.dataMigration.model.allergy.Allergy();
+		Allergy allergy = new Allergy();
 		BeanUtils.copyProperties(input, allergy, "entryDate", "startDate", "providerNo",
-				"ageOfOnset", "regionalIdentifier", "onsetOfReaction");
+				"ageOfOnset", "regionalIdentifier", "onsetOfReaction", "severityOfReaction");
 
 		org.oscarehr.common.model.PartialDate dbPartialDate = partialDateDao.getPartialDate(
 				org.oscarehr.common.model.PartialDate.TABLE_ALLERGIES,
@@ -67,13 +67,15 @@ public class AllergyDbToModelConverter extends
 		allergy.setProvider(findProvider(input.getProviderNo()));
 		allergy.setAgeOfOnset(input.getAgeOfOnset() != null ? Long.parseLong(input.getAgeOfOnset()) : null);
 		allergy.setAnnotation(getNote(input));
-		allergy.setOnsetOfReaction(org.oscarehr.dataMigration.model.allergy.Allergy.REACTION_ONSET.fromCodeString(
+		allergy.setOnsetOfReaction(Allergy.REACTION_ONSET.fromCodeString(
 				(input.getOnsetOfReaction() != null) ? Integer.parseInt(input.getOnsetOfReaction()) : null));
+		allergy.setSeverityOfReaction(Allergy.REACTION_SEVERITY.fromCodeString(
+				(input.getSeverityOfReaction() != null) ? Integer.parseInt(input.getSeverityOfReaction()) : null));
 
 		return allergy;
 	}
 
-	private String getNote(Allergy input)
+	private String getNote(org.oscarehr.allergy.model.Allergy input)
 	{
 		String noteString = null;
 		CaseManagementNoteLink link = caseManagementNoteLinkDao.findLatestAllergyNoteLinkById(input.getId());
