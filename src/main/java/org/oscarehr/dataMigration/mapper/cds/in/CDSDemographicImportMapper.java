@@ -100,6 +100,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			demographic.setHealthNumber(StringUtils.trimToNull(healthCard.getNumber()));
 			demographic.setHealthNumberVersion(StringUtils.trimToNull(healthCard.getVersion()));
 			demographic.setHealthNumberProvinceCode(getSubregionCode(StringUtils.trimToNull(healthCard.getProvinceCode())));
+			demographic.setHealthNumberCountryCode(getCountryCode(StringUtils.trimToNull(healthCard.getProvinceCode())));
 			demographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(healthCard.getExpirydate()));
 		}
 	}
