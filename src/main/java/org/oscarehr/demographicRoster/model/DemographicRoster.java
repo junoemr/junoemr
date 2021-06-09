@@ -25,6 +25,7 @@ package org.oscarehr.demographicRoster.model;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.rosterStatus.model.RosterStatus;
 
 import javax.persistence.Column;
@@ -36,6 +37,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -146,4 +148,8 @@ public class DemographicRoster extends AbstractModel<Integer> implements Seriali
 
 	@Column(name = "added_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime addedAt;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "demographic_no", insertable = false, updatable = false)
+	private Demographic demographic;
 }

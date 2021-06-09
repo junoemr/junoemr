@@ -20,29 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.mapper.cds.out;
 
-import org.oscarehr.dataMigration.model.encounterNote.ReminderNote;
-import org.springframework.stereotype.Component;
-import xml.cds.v5_0.AlertsAndSpecialNeeds;
+package org.oscarehr.dataMigration.model.demographic;
 
-@Component
-public class CDSAlertExportMapper extends AbstractCDSNoteExportMapper<AlertsAndSpecialNeeds, ReminderNote>
+import lombok.Data;
+import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
+
+import java.time.LocalDateTime;
+
+@Data
+public class RosterData extends AbstractTransientModel
 {
-	public CDSAlertExportMapper()
-	{
-		super();
-	}
-
-	@Override
-	public AlertsAndSpecialNeeds exportFromJuno(ReminderNote exportStructure)
-	{
-		AlertsAndSpecialNeeds alertsAndSpecialNeeds = objectFactory.createAlertsAndSpecialNeeds();
-		alertsAndSpecialNeeds.setAlertDescription(exportStructure.getNoteText());
-		alertsAndSpecialNeeds.setDateActive(toNullableDateFullOrPartial(exportStructure.getStartDate()));
-		alertsAndSpecialNeeds.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
-		alertsAndSpecialNeeds.setNotes(exportStructure.getAnnotation());
-
-		return alertsAndSpecialNeeds;
-	}
+	private Integer id;
+	private String statusCode;
+	private String statusDescription;
+	private boolean isRostered;
+	private LocalDateTime rosterDateTime;
+	private LocalDateTime terminationDateTime;
+	private DemographicRoster.ROSTER_TERMINATION_REASON terminationReason;
+	private Provider rosterProvider;
 }

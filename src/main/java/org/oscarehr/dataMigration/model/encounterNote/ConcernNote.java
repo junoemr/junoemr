@@ -23,17 +23,13 @@
 package org.oscarehr.dataMigration.model.encounterNote;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PartialDate;
 
 @Data
-public class ConcernNote extends BaseNote
+public class ConcernNote extends BaseCppNote
 {
-	private PartialDate startDate;
-	private PartialDate resolutionDate;
 	private String problemDescription;
 	private String problemStatus;
 	private String lifeStage;
-	private String annotation;
 
 	public ConcernNote()
 	{

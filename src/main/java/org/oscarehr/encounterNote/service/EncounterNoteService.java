@@ -24,9 +24,9 @@ package org.oscarehr.encounterNote.service;
 
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Hl7TextMessage;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.note.EncounterNoteModelToDbConverter;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
@@ -34,6 +34,7 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,6 +151,18 @@ public class EncounterNoteService extends BaseNoteService
 
 		CaseManagementNoteLink link = new CaseManagementNoteLink(note);
 		link.setLinkedDrugId(drug.getId());
+
+		return saveNote(note);
+	}
+
+	public CaseManagementNote savePreventionNote(CaseManagementNote note, Prevention prevention)
+	{
+		note.setIncludeIssueInNote(true);
+		note.setSigned(true);
+		note.setArchived(false);
+
+		CaseManagementNoteLink link = new CaseManagementNoteLink(note);
+		link.setLinkedPreventionId(prevention.getId());
 
 		return saveNote(note);
 	}

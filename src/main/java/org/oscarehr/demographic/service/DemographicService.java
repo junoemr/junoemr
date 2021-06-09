@@ -37,6 +37,8 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicIntegration;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
+import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
@@ -88,6 +90,9 @@ public class DemographicService
 
 	@Autowired
 	private AdmissionDao admissionDao;
+
+	@Autowired
+	private DemographicRosterDao demographicRosterDao;
 
 	@Autowired
 	private IntegrationPushUpdateService integrationPushUpdateService;
@@ -368,6 +373,11 @@ public class DemographicService
 			extension.setDemographicNo(demographicNo);
 			extension.setProviderNo(providerNoStr);
 			demographicManager.createExtension(providerNoStr, extension);
+		}
+		for(DemographicRoster demographicRoster : demographic.getRosterHistory())
+		{
+			demographicRoster.setDemographicId(demographicNo);
+			demographicRosterDao.persist(demographicRoster);
 		}
 		return demographic;
 	}

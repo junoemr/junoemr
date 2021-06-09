@@ -28,7 +28,6 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
-import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.parser.cds.CDSFileParser;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DemographicExporter;
@@ -50,8 +49,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static oscar.util.ConversionUtils.DATE_PATTERN_DAY;
 import static oscar.util.ConversionUtils.DATE_PATTERN_MONTH;
@@ -62,8 +59,6 @@ public class CDSExporter implements DemographicExporter
 {
 	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
 
-	private final ConcurrentMap<String, Integer> providerExportCountHash;
-
 	@Autowired
 	private CDSExportMapper cdsExportMapper;
 
@@ -72,7 +67,6 @@ public class CDSExporter implements DemographicExporter
 
 	public CDSExporter()
 	{
-		providerExportCountHash = new ConcurrentHashMap<>();
 	}
 
 	public GenericFile exportDemographic(PatientRecord patientRecord) throws Exception
@@ -83,7 +77,7 @@ public class CDSExporter implements DemographicExporter
 
 		PatientExportContext context = patientExportContextService.getContext();
 		context.getExportLogger().logSummaryLine(patientRecord);
-		incrementProviderExportCount(demographic);
+		context.incrementProviderExportCount(demographic.getMrpProvider());
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
 		instant = LogAction.printDuration(instant, "Exporter: model to CDS structure conversion");
 
@@ -124,25 +118,6 @@ public class CDSExporter implements DemographicExporter
 		return filename.replaceAll("[\\s,.]", "-") + ".xml";
 	}
 
-	protected synchronized void incrementProviderExportCount(Demographic demographic)
-	{
-		Provider provider = demographic.getMrpProvider();
-		String providerKey = "Provider Unassigned";
-		if(provider != null)
-		{
-			providerKey = StringUtils.trimToEmpty(
-					StringUtils.trimToEmpty(provider.getTitleString()) + " " + provider.getFirstName() + " " + provider.getLastName());
-		}
-		if(providerExportCountHash.containsKey(providerKey))
-		{
-			providerExportCountHash.put(providerKey, providerExportCountHash.get(providerKey) + 1);
-		}
-		else
-		{
-			providerExportCountHash.put(providerKey, 1);
-		}
-	}
-
 	protected GenericFile createEventLog() throws IOException
 	{
 		PatientExportContext context = patientExportContextService.getContext();
@@ -170,7 +145,7 @@ public class CDSExporter implements DemographicExporter
 		streamWriter.write(paddedReadmeLine("Date and Time", ConversionUtils.toDateTimeString(ZonedDateTime.now())));
 
 		// CDS requires the readme to display a count of how many demographics are exported for each provider.
-		for(Map.Entry<String, Integer> entry : providerExportCountHash.entrySet())
+		for(Map.Entry<String, Integer> entry : context.getProviderExportCountHash().entrySet())
 		{
 			String providerName = entry.getKey();
 			Object exportCounter = entry.getValue();
