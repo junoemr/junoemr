@@ -46,6 +46,9 @@ public class DemographicDbToModelConverter extends
 	@Autowired
 	private DemographicExtDao demographicExtDao;
 
+	@Autowired
+	private RosterDbToModelConverter rosterDbToModelConverter;
+
 	@Override
 	public org.oscarehr.dataMigration.model.demographic.Demographic convert(Demographic input)
 	{
@@ -72,8 +75,7 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
 		exportDemographic.setDateEnded(ConversionUtils.toNullableLocalDate(input.getEndDate()));
 		exportDemographic.setChartNumber(StringUtils.trimToNull(input.getChartNo()));
-		exportDemographic.setRosterDate(ConversionUtils.toNullableLocalDate(input.getRosterDate()));
-		exportDemographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(input.getRosterTerminationDate()));
+		exportDemographic.setRosterHistory(rosterDbToModelConverter.convert(input.getRosterHistory()));
 		exportDemographic.setMrpProvider(findProvider(input.getProviderNo()));
 		exportDemographic.setReferralDoctor(getReferralProvider(input));
 		exportDemographic.setFamilyDoctor(getFamilyProvider(input));
@@ -128,29 +130,12 @@ public class DemographicDbToModelConverter extends
 
 	private Provider getReferralProvider(Demographic input)
 	{
-		return getReferralProvider(input.getReferralDoctorName(), input.getReferralDoctorNumber());
+		return getProviderFromString(input.getReferralDoctorName(), input.getReferralDoctorNumber());
 	}
 
 	private Provider getFamilyProvider(Demographic input)
 	{
-		return getReferralProvider(input.getFamilyDoctorName(), input.getFamilyDoctorNumber());
-	}
-
-	private Provider getReferralProvider(String referralProviderName, String referralProviderNumber)
-	{
-		Provider referralProvider = null;
-		if(referralProviderName != null && referralProviderName.contains(","))
-		{
-			String[] nameArray = referralProviderName.split(",", 2);
-			String firstName = StringUtils.trimToNull(nameArray[1]);
-			String lastName = StringUtils.trimToNull(nameArray[0]);
-
-			referralProvider = new Provider();
-			referralProvider.setFirstName((firstName != null) ? firstName : "Missing");
-			referralProvider.setLastName((lastName != null) ? lastName : "Missing");
-			referralProvider.setOhipNumber(StringUtils.trimToNull(referralProviderNumber));
-		}
-		return referralProvider;
+		return getProviderFromString(input.getFamilyDoctorName(), input.getFamilyDoctorNumber());
 	}
 
 	private String numericSin(String unformatted)

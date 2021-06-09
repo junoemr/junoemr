@@ -20,29 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.mapper.cds.out;
+package org.oscarehr.dataMigration.converter.in;
 
-import org.oscarehr.dataMigration.model.encounterNote.ReminderNote;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
+import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
-import xml.cds.v5_0.AlertsAndSpecialNeeds;
 
 @Component
-public class CDSAlertExportMapper extends AbstractCDSNoteExportMapper<AlertsAndSpecialNeeds, ReminderNote>
+public class ResidualInfoModelToDbConverter extends BaseModelToDbConverter<ResidualInfo, CaseManagementNoteResidualInfo>
 {
-	public CDSAlertExportMapper()
-	{
-		super();
-	}
-
 	@Override
-	public AlertsAndSpecialNeeds exportFromJuno(ReminderNote exportStructure)
+	public CaseManagementNoteResidualInfo convert(ResidualInfo input)
 	{
-		AlertsAndSpecialNeeds alertsAndSpecialNeeds = objectFactory.createAlertsAndSpecialNeeds();
-		alertsAndSpecialNeeds.setAlertDescription(exportStructure.getNoteText());
-		alertsAndSpecialNeeds.setDateActive(toNullableDateFullOrPartial(exportStructure.getStartDate()));
-		alertsAndSpecialNeeds.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
-		alertsAndSpecialNeeds.setNotes(exportStructure.getAnnotation());
+		CaseManagementNoteResidualInfo residualInfo = new CaseManagementNoteResidualInfo();
+		BeanUtils.copyProperties(input, residualInfo, "note");
 
-		return alertsAndSpecialNeeds;
+		return residualInfo;
 	}
 }

@@ -24,6 +24,8 @@
 
 --%>
 <%@page import="org.oscarehr.rx.dao.DrugDao,org.oscarehr.rx.model.Drug,org.oscarehr.util.MiscUtils,org.oscarehr.util.SpringUtils,org.oscarehr.PMmodule.dao.ProviderDao,org.oscarehr.common.dao.DemographicDao" %>
+<%@page import="org.oscarehr.common.dao.PartialDateDao" %>
+<%@ page import="org.oscarehr.common.model.PartialDate" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -94,11 +96,17 @@ Drug drug = drugDao.find(drugId);
 									<%}%>
 									<% if(drug.getCustomName() != null && !drug.getCustomName().equalsIgnoreCase("null") ){ %>
 									Drug Description: <%= drug.getCustomName()%><br>
-									<%}%>
+									<%}
+									PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
+									String rxDate = partialDateDao.getDatePartial(drug.getRxDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_STARTDATE);
+									String writtenDate = partialDateDao.getDatePartial(drug.getWrittenDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_WRITTENDATE);
+									//endDate is determined using the startDate. Display the endDate in the same partial date format as the startDate (when it's partial)
+									String endDate = partialDateDao.getDatePartial(drug.getEndDate(), PartialDate.TABLE_DRUGS, Integer.parseInt(id), PartialDate.DRUGS_STARTDATE);
+									%>
 									<br>   
-									Rx Date: <%= drug.getRxDate() %><br>
-									Rx End Date: <%= drug.getEndDate() %><br>
-									Written Date: <%= drug.getWrittenDate()%><br>
+									Rx Date: <%=rxDate%><br>
+									Rx End Date: <%= endDate %><br>
+									Written Date: <%=writtenDate%><br>
 									Create Date: <%= drug.getCreateDate()%><br>
 									<br>
 									ATC: <%= drug.getAtc()%><br>

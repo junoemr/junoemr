@@ -90,8 +90,8 @@ public class SecurityDao  extends AbstractDao<Security> {
 	 * @return - security record.
 	 */
 	public Security findByEmail(String email) {
-		Query query = entityManager.createQuery("select x from Security x where x.email=?");
-		query.setParameter(1, email);
+		Query query = entityManager.createQuery("select x from Security x where x.email=:email");
+		query.setParameter("email", email);
 		return getSingleResultOrNull(query);
 	}
 	

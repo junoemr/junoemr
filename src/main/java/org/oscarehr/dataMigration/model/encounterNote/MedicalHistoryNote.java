@@ -26,14 +26,11 @@ import lombok.Data;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 
 @Data
-public class MedicalHistoryNote extends BaseNote
+public class MedicalHistoryNote extends BaseCppNote
 {
-	private PartialDate startDate;
-	private PartialDate resolutionDate;
 	private PartialDate procedureDate;
 	private String treatment;
 	private String lifeStage;
-	private String annotation;
 
 	public MedicalHistoryNote()
 	{

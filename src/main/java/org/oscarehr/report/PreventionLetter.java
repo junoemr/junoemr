@@ -20,29 +20,31 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.mapper.cds.out;
 
-import org.oscarehr.dataMigration.model.encounterNote.ReminderNote;
-import org.springframework.stereotype.Component;
-import xml.cds.v5_0.AlertsAndSpecialNeeds;
+package org.oscarehr.report;
 
-@Component
-public class CDSAlertExportMapper extends AbstractCDSNoteExportMapper<AlertsAndSpecialNeeds, ReminderNote>
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class PreventionLetter
 {
-	public CDSAlertExportMapper()
-	{
-		super();
-	}
+    private String firstName;
+    private String lastName;
+    private String address;
+    private String city;
+    private String province;
+    private String postal;
 
-	@Override
-	public AlertsAndSpecialNeeds exportFromJuno(ReminderNote exportStructure)
-	{
-		AlertsAndSpecialNeeds alertsAndSpecialNeeds = objectFactory.createAlertsAndSpecialNeeds();
-		alertsAndSpecialNeeds.setAlertDescription(exportStructure.getNoteText());
-		alertsAndSpecialNeeds.setDateActive(toNullableDateFullOrPartial(exportStructure.getStartDate()));
-		alertsAndSpecialNeeds.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
-		alertsAndSpecialNeeds.setNotes(exportStructure.getAnnotation());
+    private String clinicName;
+    private String clinicAddress;
+    private String clinicCity;
+    private String clinicProvince;
+    private String clinicPostal;
+    private String clinicPhone;
 
-		return alertsAndSpecialNeeds;
-	}
+    private String providerFName;
+    private String providerLName;
 }
+

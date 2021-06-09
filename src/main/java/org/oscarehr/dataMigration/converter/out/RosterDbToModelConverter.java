@@ -20,29 +20,33 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.mapper.cds.out;
+package org.oscarehr.dataMigration.converter.out;
 
-import org.oscarehr.dataMigration.model.encounterNote.ReminderNote;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.springframework.stereotype.Component;
-import xml.cds.v5_0.AlertsAndSpecialNeeds;
 
 @Component
-public class CDSAlertExportMapper extends AbstractCDSNoteExportMapper<AlertsAndSpecialNeeds, ReminderNote>
+public class RosterDbToModelConverter extends BaseDbToModelConverter<DemographicRoster, RosterData>
 {
-	public CDSAlertExportMapper()
-	{
-		super();
-	}
-
 	@Override
-	public AlertsAndSpecialNeeds exportFromJuno(ReminderNote exportStructure)
+	public RosterData convert(DemographicRoster input)
 	{
-		AlertsAndSpecialNeeds alertsAndSpecialNeeds = objectFactory.createAlertsAndSpecialNeeds();
-		alertsAndSpecialNeeds.setAlertDescription(exportStructure.getNoteText());
-		alertsAndSpecialNeeds.setDateActive(toNullableDateFullOrPartial(exportStructure.getStartDate()));
-		alertsAndSpecialNeeds.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
-		alertsAndSpecialNeeds.setNotes(exportStructure.getAnnotation());
+		if(input == null)
+		{
+			return null;
+		}
 
-		return alertsAndSpecialNeeds;
+		RosterData rosterData = new RosterData();
+		rosterData.setId(input.getId());
+		rosterData.setStatusCode(input.getRosterStatus().getRosterStatus());
+		rosterData.setStatusDescription(input.getRosterStatus().getStatusDescription());
+		rosterData.setRostered(input.getRosterStatus().isRostered());
+		rosterData.setRosterProvider(getProviderFromString(input.getRosteredPhysician(), input.getOhipNo()));
+		rosterData.setRosterDateTime(input.getRosterDate());
+		rosterData.setTerminationDateTime(input.getRosterTerminationDate());
+		rosterData.setTerminationReason(input.getRosterTerminationReason());
+
+		return rosterData;
 	}
 }

@@ -23,17 +23,13 @@
 package org.oscarehr.dataMigration.model.encounterNote;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PartialDate;
 
 @Data
-public class RiskFactorNote extends BaseNote
+public class RiskFactorNote extends BaseCppNote
 {
-	private PartialDate startDate;
-	private PartialDate resolutionDate;
 	private Long ageAtOnset;
 	private String exposureDetails;
 	private String lifeStage;
-	private String annotation;
 
 	public RiskFactorNote()
 	{
