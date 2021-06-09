@@ -96,6 +96,7 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 		input.getIssueNoteList()
 				.stream()
 				.map((link) -> link.getId().getCaseManagementIssue().getIssue())
+				.distinct()
 				.forEach((issue) ->
 				{
 					DxCode dxCode = new DxCode();

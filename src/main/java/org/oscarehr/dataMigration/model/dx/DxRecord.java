@@ -68,9 +68,7 @@ public class DxRecord extends AbstractTransientModel
 
 	private Integer id;
 	private Status status;
-	private String dxCode;
-	private DxCode.DxCodingSystem codingSystem;
-	private String codeDescription;
+	private DxCode dxCode;
 	private Provider provider;
 	private LocalDate startDate;
 	private LocalDateTime updateDate;
