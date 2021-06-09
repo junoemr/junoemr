@@ -293,7 +293,7 @@ public class DemographicService extends AbstractServiceImpl {
 						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
 						if (demoContactTo1.getPhone() == null || demoContactTo1.getPhone().equals(""))
 						{
-							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), demographicNo, DemographicExt.KEY_DEMO_CELL);
+							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_CELL);
 							if (ext != null) demoContactTo1.setPhone(ext.getValue());
 						}
 					}
