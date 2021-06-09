@@ -48,6 +48,7 @@ public class FlowsheetRuleCondition extends AbstractModel<Integer>
 		VALUE_LT,
 		VALUE_LE,
 		MONTHS_SINCE,
+		NEVER_GIVEN,
 	}
 
 	@Id

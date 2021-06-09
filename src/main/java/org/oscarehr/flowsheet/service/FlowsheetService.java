@@ -24,14 +24,12 @@ package org.oscarehr.flowsheet.service;
 
 
 import org.drools.FactException;
-import org.drools.IntegrationException;
 import org.drools.RuleBase;
 import org.drools.WorkingMemory;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.converter.PreventionToFlowsheetItemDataConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.entity.Drools;
-import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.entity.SeverityLevel;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
@@ -44,12 +42,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.SAXException;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.util.ConversionUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,16 +57,19 @@ public class FlowsheetService
 	private FlowsheetDao flowsheetDao;
 
 	@Autowired
+	private PreventionDao preventionDao;
+
+	@Autowired
 	private DroolsCachingService droolsCachingService;
+
+	@Autowired
+	private FlowsheetRuleService flowsheetRuleService;
 
 	@Autowired
 	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
 
 	@Autowired
 	private PreventionToFlowsheetItemDataConverter preventionToFlowsheetItemDataConverter;
-
-	@Autowired
-	private PreventionDao preventionDao;
 
 
 	public List<Flowsheet> getFlowsheets(int offset, int perPage)
@@ -83,7 +82,7 @@ public class FlowsheetService
 		return flowsheetEntityToModelConverter.convert(flowsheetDao.find(flowsheetId));
 	}
 
-	public Flowsheet getFlowsheetForDemographic(Integer flowsheetId, Integer demographicId) throws IntegrationException, IOException, SAXException, FactException
+	public Flowsheet getFlowsheetForDemographic(Integer flowsheetId, Integer demographicId) throws Exception
 	{
 		org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity = flowsheetDao.find(flowsheetId);
 		Flowsheet flowsheet = flowsheetEntityToModelConverter.convert(flowsheetEntity);
@@ -148,14 +147,14 @@ public class FlowsheetService
 	}
 
 	private MeasurementInfo loadMeasurementInfoWithDrools(org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity, Integer demographicId)
-			throws IntegrationException, IOException, SAXException, FactException
+			throws Exception
 	{
 		MeasurementInfo measurementInfo = new MeasurementInfo(String.valueOf(demographicId));
 
 		// fill measurementInfo measurement codes. prereq for applying drools
 		List<String> flowsheetMeasurementCodes = flowsheetEntity.getFlowsheetItems()
 				.stream()
-				.filter((item) -> ItemType.MEASUREMENT.equals(item.getType()))
+				.filter(org.oscarehr.flowsheet.entity.FlowsheetItem::isMeasurementType)
 				.map(org.oscarehr.flowsheet.entity.FlowsheetItem::getTypeCode)
 				.collect(Collectors.toList());
 		measurementInfo.getMeasurements(flowsheetMeasurementCodes);
@@ -166,10 +165,12 @@ public class FlowsheetService
 			RuleBase ruleBase = droolsCachingService.getDroolsRuleBase(drools.getFilename());
 			getMessages(measurementInfo, ruleBase);
 		}
+
+		flowsheetRuleService.fillMeasurementInfo(measurementInfo, flowsheetEntity);
 		return measurementInfo;
 	}
 
-	public void getMessages(MeasurementInfo mi, RuleBase ruleBase) throws FactException
+	private void getMessages(MeasurementInfo mi, RuleBase ruleBase) throws FactException
 	{
 		WorkingMemory workingMemory = ruleBase.newWorkingMemory();
 		workingMemory.assertObject(mi);

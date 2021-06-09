@@ -62,7 +62,7 @@ public class DemographicFlowsheetWebService extends AbstractServiceImpl
 	public RestResponse<Flowsheet> getFlowsheetForDemographic(
 			@PathParam("demographicNo") Integer demographicId,
 			@PathParam("flowsheetId") Integer flowsheetId)
-			throws IntegrationException, IOException, SAXException, FactException
+			throws Exception
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.FLOWSHEET_READ);
 		return RestResponse.successResponse(flowsheetService.getFlowsheetForDemographic(flowsheetId, demographicId));
