@@ -68,14 +68,9 @@ public class ChildImmunizationReport implements PreventionReport{
     /** Creates a new instance of ChildImmunizationReport */
     public ChildImmunizationReport() {
     }
-	
-	public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate)
-	{
-		return null;
-	}
 
 
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate, boolean notUsed){
+    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate){
         int inList = 0;
         double done= 0;
         ArrayList<PreventionReportDisplay> returnReport = new ArrayList<PreventionReportDisplay>();
@@ -131,7 +126,7 @@ public class ChildImmunizationReport implements PreventionReport{
              DemographicData dd = new DemographicData();
              org.oscarehr.common.model.Demographic demoData = dd.getDemographic(loggedInInfo, demo.toString());
              // This a kludge to get by conformance testing in ontario -- needs to be done in a smarter way
-             int totalImmunizations = numDtap + numHib + numMMR ;
+             int totalImmunizations = numDtap + /*numHib +*/ numMMR ;
              int recommTotal = 5; //9;NOT SURE HOW HIB WORKS
              int ageInMonths = DemographicData.getAgeInMonthsAsOf(demoData,asofDate);
              PreventionReportDisplay prd = new PreventionReportDisplay();
