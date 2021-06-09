@@ -23,7 +23,6 @@
 package org.oscarehr.dataMigration.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.common.Address;
@@ -163,7 +162,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		healthCard.setVersion(exportStructure.getHealthNumberVersion());
 		healthCard.setExpirydate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
 		healthCard.setProvinceCode(Address.getSubdivisionCodeCT013Format(
-				exportStructure.getHealthNumberProvinceCode(), CDSConstants.COUNTRY_CODE_CANADA));
+				exportStructure.getHealthNumberProvinceCode(), exportStructure.getHealthNumberCountryCode()));
 
 		return healthCard;
 	}

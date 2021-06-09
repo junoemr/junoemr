@@ -110,6 +110,32 @@ public class CDSExportMapperTest
 	}
 
 	@Test
+	public void testToCdsAddress_Filled_US()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedStateCode = "NY";
+		String expectedCountry = "US";
+		String expectedZip = "40170";
+
+		Address address = new Address();
+		address.setAddressLine1(expectedAddressLine1);
+		address.setAddressLine2(expectedAddressLine2);
+		address.setCity(expectedCity);
+		address.setRegionCode(expectedStateCode);
+		address.setCountryCode(expectedCountry);
+		address.setPostalCode(expectedZip);
+
+		xml.cds.v5_0.Address resultAddress = cdsExportMapper.toCdsAddress(address, AddressType.R);
+		assertEquals(expectedAddressLine1, resultAddress.getStructured().getLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getStructured().getLine2());
+		assertEquals(expectedCity, resultAddress.getStructured().getCity());
+		assertEquals(expectedCountry + "-" + expectedStateCode, resultAddress.getStructured().getCountrySubdivisionCode());
+		assertEquals(expectedZip, resultAddress.getStructured().getPostalZipCode().getZipCode());
+	}
+
+	@Test
 	public void testPersonNameSimple_Null()
 	{
 		assertNull(cdsExportMapper.toPersonNameSimple(null));
