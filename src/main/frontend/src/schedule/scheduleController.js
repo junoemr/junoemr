@@ -996,8 +996,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let bookingStatusElem = eventElement.find('.book-status-container');
 				let bookingStatusBox = bookingStatusElem.children(".booking-status-box");
 				let telehealthElem = eventElement.find('.event-telehealth');
-				// By default this element is hidden
+				let criticalElem = eventElement.find('.event-critical')
+				// By default these elements are hidden
 				telehealthElem.hide();
+				criticalElem.hide();
 				// var eventSite = $scope.sites[event.data.site];
 
 				/* set up status icon + color/hover etc. */
@@ -1030,6 +1032,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventName = "";
 				let eventReason = "";
 				let eventNotes = "";
+
+				console.log("***********************")
+				console.log(event.data);
+
+				if (event.data.critical)
+				{
+					criticalElem.show();
+				}
 
 				// telehealth
 				if (controller.telehealthEnabled && event.data.virtual)

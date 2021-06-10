@@ -384,7 +384,8 @@ public class Appointment
 						null,
 						details.isConfirmed(),
 						details.getCreatorSecurityId(),
-						details.getBookingSource()
+						details.getBookingSource(),
+						details.getUrgency().equals("critical")
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)

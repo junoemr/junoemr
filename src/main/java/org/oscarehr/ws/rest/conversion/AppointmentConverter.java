@@ -293,6 +293,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
 		calendarAppointment.setAppointmentName(appointmentName);
 		calendarAppointment.setConfirmed(appointment.isConfirmed());
+		calendarAppointment.setCritical(appointment.getUrgency().equals("critical"));
 		if (appointment.getBookingSource() != null)
 		{
 			calendarAppointment.setBookingSource(appointment.getBookingSource().toString());
