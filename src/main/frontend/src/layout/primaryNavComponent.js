@@ -359,8 +359,9 @@ angular.module('Layout').component("primaryNavigation", {
 					console.log(errors);
 				});
 
-			// mha
-			ctrl.updateMhaPatientMessagesCount();
+			await ctrl.updateMhaPatientMessagesCount();
+
+			$scope.$apply();
 		};
 
 		ctrl.getOverdueTicklerCount = function getOverdueTicklerCount()

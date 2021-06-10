@@ -39,6 +39,8 @@ export default class StreamingList<T> extends Array<T>
 		try
 		{
 			this._isLoading = true;
+
+			await this.preloadSources();
 			for (let i = 0; i < amount; i++)
 			{
 				const next = await this.getNext();
@@ -112,6 +114,11 @@ export default class StreamingList<T> extends Array<T>
 		return null;
 	}
 
+	protected async preloadSources(): Promise<void>
+	{
+		await Promise.all(this._sources.map((source) => source.preload()));
+	}
+
 }
 
 export interface StreamSource<T>
@@ -131,4 +138,10 @@ export interface StreamSource<T>
 	 * @return the next item or null if no more items.
 	 */
 	popNext(): Promise<T>;
+	
+	/**
+	 * Called by user to indicate to a source that it should preload stream content.
+	 * This is for performance reasons only. There is not requirement to actually preload any thing.
+	 */
+	preload(): Promise<void>;
 }

@@ -53,6 +53,11 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 		return null;
 	}
 
+	public async preload(): Promise<void>
+	{
+		await this.refillIfRequired();
+	}
+
 	// ==========================================================================
 	// Protected Methods
 	// ==========================================================================
