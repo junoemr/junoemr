@@ -28,6 +28,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.parser.cds.CDSFileParser;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DemographicExporter;
@@ -44,6 +45,7 @@ import xml.cds.v5_0.OmdCds;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class CDSExporter implements DemographicExporter
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
 		instant = LogAction.printDuration(instant, "Exporter: model to CDS structure conversion");
 
-		GenericFile exportFile = parser.write(omdCds, context.getTempDirectory());
+		GenericFile exportFile = parser.write(omdCds, getExportFolder(patientRecord.getDemographic(), context.getTempDirectory()));
 		exportFile.rename(createExportFilename(demographic));
 
 		instant = LogAction.printDuration(instant, "Exporter: file write and rename");
@@ -110,12 +112,41 @@ public class CDSExporter implements DemographicExporter
 	 */
 	protected String createExportFilename(Demographic demographic)
 	{
-		String filename =
-				demographic.getFirstName().replace("_", "-") + "_" +
-				demographic.getLastName().replace("_", "-") + "_" +
-				demographic.getId() + "_" +
-				ConversionUtils.toDateString(demographic.getDateOfBirth(), DATE_PATTERN_DAY + DATE_PATTERN_MONTH + DATE_PATTERN_YEAR);
+		String filename = GenericFile.getSanitizedFileName(
+				String.join("_",
+						demographic.getFirstName().replace("_", "-"),
+						demographic.getLastName().replace("_", "-"),
+						String.valueOf(demographic.getId()),
+						ConversionUtils.toDateString(demographic.getDateOfBirth(), DATE_PATTERN_DAY + DATE_PATTERN_MONTH + DATE_PATTERN_YEAR)
+				));
 		return filename.replaceAll("[\\s,.]", "-") + ".xml";
+	}
+
+	/**
+	 * OMD requires export files to be separated into folders by MRP with a specific naming convention.
+	 * Format: PhysicianFN_PhysicianLN_OHIPBillingNumber
+	 * @param demographic the patient record
+	 * @param baseDirectory the main export folder path
+	 * @return the patient specific export directory path
+	 */
+	protected Path getExportFolder(Demographic demographic, Path baseDirectory) throws IOException
+	{
+		String folderName;
+		Provider mrpProvider = demographic.getMrpProvider();
+		if(mrpProvider != null)
+		{
+			folderName = GenericFile.getSanitizedFileName(
+					String.join("_",
+							StringUtils.trimToEmpty(mrpProvider.getFirstName()),
+							StringUtils.trimToEmpty(mrpProvider.getLastName()),
+							StringUtils.trimToEmpty(mrpProvider.getOhipNumber())
+					));
+		}
+		else
+		{
+			folderName = "mrp_unassigned";
+		}
+		return FileFactory.createSubDirectoryIfNotExists(baseDirectory, folderName);
 	}
 
 	protected GenericFile createEventLog() throws IOException

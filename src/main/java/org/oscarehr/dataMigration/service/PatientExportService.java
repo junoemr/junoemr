@@ -22,9 +22,9 @@
  */
 package org.oscarehr.dataMigration.service;
 
-import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
+import org.oscarehr.common.io.ZipFileFactory;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.logger.ExportLogger;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
@@ -150,8 +150,10 @@ public class PatientExportService
 			@Override
 			public void handleExportResults(List<GenericFile> exportFiles, String contextId) throws IOException
 			{
-				zipFile = FileFactory.packageZipFile(exportFiles, true);
-				String exportDirectory = patientExportContextService.getContext().getExportPreferences().getExportDirectory();
+				PatientExportContext exportContext = patientExportContextService.getContext();
+
+				zipFile = ZipFileFactory.packageZipFile(exportContext.getTempDirectory(), true);
+				String exportDirectory = exportContext.getExportPreferences().getExportDirectory();
 
 				if(exportDirectory != null)
 				{
