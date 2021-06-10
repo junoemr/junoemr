@@ -87,7 +87,7 @@ String curUser_no = (String) session.getAttribute("user");
             </tr>
             <tr>
                 <td style="margin:0px;padding:0px;">
-					<div id="listViewDocs" style="height:536px; overflow:auto;" onscroll="handleScroll(this)">
+					<div id="listViewDocs" style="height:calc(100vh - 120px); overflow:auto;" onscroll="handleScroll(this)">
 					<style type="text/css">
 						#summaryView td, #summaryView th {
 							padding: 0px 5px;
