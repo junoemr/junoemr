@@ -1033,9 +1033,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventReason = "";
 				let eventNotes = "";
 
-				console.log("***********************")
-				console.log(event.data);
-
 				if (event.data.critical)
 				{
 					criticalElem.show();
