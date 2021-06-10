@@ -36,6 +36,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.io.ZIPFile;
+import org.oscarehr.common.io.ZipFileFactory;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DataMigrationService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
@@ -424,7 +425,7 @@ public class DemographicsService extends AbstractServiceImpl
 		{
 			logFiles.add(FileFactory.getImportLogFile(processId, fileName));
 		}
-		ZIPFile zipFile = FileFactory.packageZipFile(logFiles);
+		ZIPFile zipFile = ZipFileFactory.packageZipFile(logFiles);
 
 		String filename = "import-logs.zip";
 		Response.ResponseBuilder response = Response.ok(zipFile.toFileInputStream());
