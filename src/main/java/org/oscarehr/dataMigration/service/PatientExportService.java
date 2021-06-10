@@ -22,9 +22,9 @@
  */
 package org.oscarehr.dataMigration.service;
 
-import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
+import org.oscarehr.common.io.ZipFileFactory;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.logger.ExportLogger;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
@@ -152,7 +152,7 @@ public class PatientExportService
 			{
 				PatientExportContext exportContext = patientExportContextService.getContext();
 
-				zipFile = FileFactory.packageZipFile(exportContext.getTempDirectory(), true);
+				zipFile = ZipFileFactory.packageZipFile(exportContext.getTempDirectory(), true);
 				String exportDirectory = exportContext.getExportPreferences().getExportDirectory();
 
 				if(exportDirectory != null)

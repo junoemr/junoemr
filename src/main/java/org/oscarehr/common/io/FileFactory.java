@@ -23,7 +23,6 @@
 
 package org.oscarehr.common.io;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -44,7 +43,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 public class FileFactory
 {
@@ -412,77 +410,6 @@ public class FileFactory
 		}
 		logger.info("Overwriting file contents: " + file.getPath());
 		return writeInputStream(fileInputStream, file, true, true);
-	}
-
-	public static ZIPFile packageZipFile(List<GenericFile> filesToZip) throws IOException
-	{
-		return packageZipFile(filesToZip, false);
-	}
-
-	/**
-	 * zip a list of files. this will create a zip file with all files in the base location. no sub-directories
-	 */
-	public static ZIPFile packageZipFile(List<GenericFile> filesToZip, boolean deleteAfterZip) throws IOException
-	{
-		GenericFile tmpFile = createTempFile(".zip");
-		ZIPFile zipFile = new ZIPFile(tmpFile.getFileObject());
-		ZipOutputStream zipOutputStream = new ZipOutputStream(zipFile.asFileOutputStream());
-
-		for(GenericFile file : filesToZip)
-		{
-			ZipEntry ze = new ZipEntry(file.getName());
-			zipOutputStream.putNextEntry(ze);
-			zipOutputStream.write(file.toByteArray());
-			zipOutputStream.closeEntry();
-		}
-		zipOutputStream.close();
-
-		if(deleteAfterZip)
-		{
-			for(GenericFile file : filesToZip)
-			{
-				file.deleteFile();
-			}
-		}
-		return zipFile;
-	}
-
-	public static ZIPFile packageZipFile(Path directoryToZip) throws IOException
-	{
-		return packageZipFile(directoryToZip, false);
-	}
-
-	/**
-	 * zip a directory and all it's contents. keep folder structure intact
-	 */
-	public static ZIPFile packageZipFile(Path directoryToZip, boolean deleteAfterZip) throws IOException
-	{
-		GenericFile tmpFile = createTempFile(".zip");
-		ZIPFile zipFile = new ZIPFile(tmpFile.getFileObject());
-		ZipOutputStream zipOutputStream = new ZipOutputStream(zipFile.asFileOutputStream());
-
-		Files.walk(directoryToZip)
-				.filter(path -> !Files.isDirectory(path))
-				.forEach(path -> {
-					ZipEntry zipEntry = new ZipEntry(directoryToZip.relativize(path).toString());
-					try
-					{
-						zipOutputStream.putNextEntry(zipEntry);
-						Files.copy(path, zipOutputStream);
-						zipOutputStream.closeEntry();
-					}
-					catch(IOException e)
-					{
-						logger.error("Directory Zip Error", e);
-					}
-				});
-		zipOutputStream.close();
-
-		if(deleteAfterZip)
-		{
-			FileUtils.deleteDirectory(directoryToZip.toFile());
-		}
-		return zipFile;
 	}
 
 	/**
