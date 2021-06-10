@@ -135,6 +135,7 @@ public class PapReport implements PreventionReport
 
 
                 Calendar cal = Calendar.getInstance();
+                cal.setTime(asofDate);
                 cal.add(Calendar.YEAR, -3);
                 Date dueDate = cal.getTime();
                 cal.add(Calendar.MONTH,-6);
@@ -151,7 +152,6 @@ public class PapReport implements PreventionReport
 
 
                 String numMonths = "------";
-                int monthsBeforeAsOfDate = UtilDateUtilities.getNumMonths(prevDate,asofDate);
                 if ( prevDate != null){
                    int num = UtilDateUtilities.getNumMonths(prevDate,asofDate);
                    numMonths = ""+num+" months";
@@ -180,31 +180,44 @@ public class PapReport implements PreventionReport
                 log.debug("due Date "+dueDate.toString()+" cutoffDate "+cutoffDate.toString()+" prevDate "+prevDate.toString());
                 log.debug("due Date  ("+dueDate.toString()+" ) After Prev ("+prevDate.toString() +" ) "+dueDate.after(prevDate));
                 log.debug("cutoff Date  ("+cutoffDate.toString()+" ) before Prev ("+prevDate.toString() +" ) "+cutoffDate.before(prevDate));
-                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate) && monthsBeforeAsOfDate > 36 ){ // overdue
+
+                // due
+                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "due";
                    prd.numMonths = numMonths;
                    prd.color = "yellow"; //FF00FF
-                   if (!prd.bonusStatus.equals("Y")){
+                   if (!prd.bonusStatus.equals("Y"))
+                   {
                       prd.bonusStatus = "Y";
                       doneWithGrace++;
                    }
-
-                } else if (!refused && cutoffDate.after(prevDate) && monthsBeforeAsOfDate > 36){ // overdue
+                }
+                // overdue
+                else if (!refused && cutoffDate.after(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "Overdue";
                    prd.numMonths = numMonths;
                    prd.color = "red"; //FF00FF
 
-                } else if (refused){  // recorded and refused
+                }
+                // recorded and refused
+                else if (refused)
+                {
                    prd.rank = 3;
                    prd.lastDate = prevDateStr;
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
-                } else if (dueDate.before(prevDate) || monthsBeforeAsOfDate < 36){  // recorded done
+
+                }
+                // recorded done
+                else if (dueDate.before(prevDate))
+                {
                    prd.rank = 4;
                    prd.lastDate = prevDateStr;
                    prd.state = "Up to date";

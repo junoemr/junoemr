@@ -112,6 +112,7 @@ public class FOBTReport implements PreventionReport{
                 }
 
                 Calendar cal = Calendar.getInstance();
+                cal.setTime(asofDate);
                 cal.add(Calendar.YEAR, -2);
                 Date dueDate = cal.getTime();
                 cal.add(Calendar.MONTH,-6);
@@ -145,7 +146,6 @@ public class FOBTReport implements PreventionReport{
 
                 //Calendar today = Calendar.getInstance();
                 //change as of date to run the report for a different year
-                 int monthsBeforeAsOfDate = UtilDateUtilities.getNumMonths(prevDate,asofDate);
                 String numMonths = "------";
                 if ( prevDate != null){
                    int num = UtilDateUtilities.getNumMonths(prevDate,asofDate);
@@ -157,35 +157,46 @@ public class FOBTReport implements PreventionReport{
                 log.debug("due Date "+dueDate.toString()+" cutoffDate "+cutoffDate.toString()+" prevDate "+prevDate.toString());
                 log.debug("due Date  ("+dueDate.toString()+" ) After Prev ("+prevDate.toString() +" ) "+dueDate.after(prevDate));
                 log.debug("cutoff Date  ("+cutoffDate.toString()+" ) before Prev ("+prevDate.toString() +" ) "+cutoffDate.before(prevDate));
-                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate) && monthsBeforeAsOfDate > 24){ // overdue
+
+                // due
+                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "due";
                    prd.numMonths = numMonths;
                    prd.color = "yellow"; //FF00FF
                    doneWithGrace++;
-
-                } else if (!refused && cutoffDate.after(prevDate) && monthsBeforeAsOfDate > 24){ // overdue
+                }
+                // overdue
+                else if (!refused && cutoffDate.after(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "Overdue";
                    prd.numMonths = numMonths;
                    prd.color = "red"; //FF00FF
-
-                } else if (refused){  // recorded and refused
+                }
+                // recorded and refused
+                else if (refused)
+                {
                    prd.rank = 3;
                    prd.lastDate = "-----";
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
-                } else if( dueDate.before(prevDate) && result.equalsIgnoreCase("pending") ) {
+                }
+                // pending
+                else if( dueDate.before(prevDate) && result.equalsIgnoreCase("pending") ) {
                     prd.rank = 4;
                     prd.lastDate = prevDateStr;
                     prd.state = "Pending";
                     prd.numMonths = numMonths;
                     prd.color = "pink";
-
-                } else if (dueDate.before(prevDate) && monthsBeforeAsOfDate > 24){  // recorded done
+                }
+                // recorded done
+                else if (dueDate.before(prevDate))
+                {
                    prd.rank = 4;
                    prd.lastDate = prevDateStr;
                    prd.state = "Up to date";
