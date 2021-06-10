@@ -22,10 +22,13 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.encounterNote.FamilyHistoryNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.FamilyHistory;
 import xml.cds.v5_0.StandardCoding;
+
+import java.util.List;
 
 @Component
 public class CDSFamilyHistoryExportMapper extends AbstractCDSNoteExportMapper<FamilyHistory, FamilyHistoryNote>
@@ -53,10 +56,16 @@ public class CDSFamilyHistoryExportMapper extends AbstractCDSNoteExportMapper<Fa
 		return familyHistory;
 	}
 
-	/*TODO - do we want to export DiagnosisProcedureCode at all? how do we decide on the code?
-	 *  the cds 4 exporter used a random attached issue code if there was one */
+	/**
+	 * we can only export 1 attached code per note in the cds format, so we will just pick the first one
+	 */
 	protected StandardCoding getDiagnosisProcedureCode(FamilyHistoryNote exportStructure)
 	{
+		List<DxCode> dxCodes = exportStructure.getDxIssueCodes();
+		if(dxCodes != null && !dxCodes.isEmpty())
+		{
+			return getStandardCoding(dxCodes.get(0));
+		}
 		return null;
 	}
 }

@@ -64,7 +64,6 @@ import oscar.dms.EDoc;
 import oscar.dms.EDocFactory;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
-import oscar.oscarPrevention.pageUtil.PreventionPrintPdf;
 
 /**
  *
@@ -101,11 +100,6 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
             LabPDFCreator labPdfCreator = new LabPDFCreator(request, response.getOutputStream());
             labPdfCreator.printPdf();
             return null;
-        }
-        if (module != null && module.equals("prevention")) {
-            PreventionPrintPdf preventionPrintPdf = new PreventionPrintPdf();
-            String[] headerIds = request.getParameterValues("printHP");
-            preventionPrintPdf.printPdf(headerIds, request, response.getOutputStream());
         }
         if (module != null && module.equals("echart")) {
         	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -179,18 +173,6 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
                 OutputStream os = newEDoc.getFileOutputStream();
                 LabPDFCreator labPDFCreator = new LabPDFCreator(request, os);
                 labPDFCreator.printPdf();
-            }
-            else if (module != null && module.equals("prevention")) {
-                String[] headerIds = request.getParameterValues("printHP");
-
-                type = "others";
-                fileName =  "immunizationtophr";
-                description = subject;
-                newEDoc = eDocFactory.createEDoc(description, type, fileName, contentType, html, creatorId, responsibleId, source, status, observationDate, reviewerId, observationDate, docModule, docModuleId);
-
-                OutputStream os = newEDoc.getFileOutputStream();
-                PreventionPrintPdf preventionPrintPdf = new PreventionPrintPdf();
-                preventionPrintPdf.printPdf(headerIds, request, os);
             } else if (module != null && module.equals("echart")) {
                 type = "others";
                 fileName =  "echarttophr";

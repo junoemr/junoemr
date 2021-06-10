@@ -148,21 +148,14 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String familyDoctor;
 
 	// roster info
-	@Deprecated
 	@Column(name = "roster_status")
 	private String rosterStatus;
-
-	@Deprecated
 	@Column(name = "roster_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterDate;
-
-	@Deprecated
 	@Column(name = "roster_termination_date")
 	@Temporal(TemporalType.DATE)
 	private Date rosterTerminationDate;
-
-	@Deprecated
 	@Column(name = "roster_termination_reason")
 	private String rosterTerminationReason;
 

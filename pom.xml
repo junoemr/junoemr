@@ -191,6 +191,14 @@
 			<version>1.3</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/javax.interceptor/javax.interceptor-api -->
+		<dependency>
+			<groupId>javax.interceptor</groupId>
+			<artifactId>javax.interceptor-api</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
+
 
 		<!-- general libraries -->
 		<dependency>
@@ -2084,6 +2092,7 @@
 								org.oscarehr.ws.rest.FlowsheetWebService
 								org.oscarehr.ws.rest.FlowsheetsWebService
                                 org.oscarehr.ws.rest.RosterWebService
+								org.oscarehr.ws.rest.ProvidersService
 								org.oscarehr.ws.rest.SecurityRolesWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
                                 org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService

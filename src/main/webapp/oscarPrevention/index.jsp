@@ -656,8 +656,8 @@ text-align:left;
                     if( alist.size() > 0 ) {
                     %>
 					<div style="position: relative; float: left; padding-right: 10px;">
-						<input style="display: none;" type="checkbox" name="printHP"
-							   value="<%=i%>" checked /> <%}else {%>
+						<input style="display: none;" type="checkbox" name="printHP" value="<%=prevName%>" checked />
+					<%}else {%>
 						<div style="position: relative; float: left; padding-right: 25px;">
 							<span style="display: none;" name="printSp">&nbsp;</span> <%}%>
 						</div>
@@ -720,8 +720,7 @@ text-align:left;
 					{
 				%>
 		<div style="position: relative; float: left; padding-right: 10px;">
-		<input style="display: none;" type="checkbox" name="printHP"
-			value="<%=i%>" checked /> <%}else {%>
+		<input style="display: none;" type="checkbox" name="printHP" value="<%=alist.get(i).get("id")%>" checked /> <%}else {%>
 		<div style="position: relative; float: left; padding-right: 25px;">
 		<span style="display: none;" name="printSp">&nbsp;</span> <%}%>
 		</div>

@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS `roster_status` (
 
 INSERT IGNORE INTO `roster_status`(roster_status, status_description, created_at, updated_at, updated_by, system_managed, rostered)
 VALUES
-   ("TE", "Terminated", NOW(), NOW(), "999900", TRUE, FALSE),
-   ("RO", "Rostered", NOW(), NOW(), "999900", TRUE, TRUE),
-   ("NR", "Not Rostered", NOW(), NOW(), "999900", TRUE, FALSE),
-   ("FS", "Fee for Service", NOW(), NOW(), "999900", TRUE, TRUE);
+   ("TE", "Terminated", NOW(), NOW(), "-1", TRUE, FALSE),
+   ("RO", "Rostered", NOW(), NOW(), "-1", TRUE, TRUE),
+   ("NR", "Not Rostered", NOW(), NOW(), "-1", TRUE, FALSE),
+   ("FS", "Fee for Service", NOW(), NOW(), "-1", TRUE, TRUE);
 
 INSERT IGNORE INTO `roster_status`(roster_status, status_description, created_at, updated_at, updated_by, rostered)
 SELECT DISTINCT
