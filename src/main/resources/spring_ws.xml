@@ -363,8 +363,8 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicMergeService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DocumentsWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DocumentWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentWebService"/>

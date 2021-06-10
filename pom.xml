@@ -1985,29 +1985,29 @@
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
 							<value>
-                                org.oscarehr.ws.rest.SystemPreferenceWebService
+								org.oscarehr.ws.rest.SystemPreferenceWebService
 								org.oscarehr.ws.rest.ScheduleService
 								org.oscarehr.ws.rest.SitesService
 								org.oscarehr.ws.rest.AppointmentService
-								org.oscarehr.ws.rest.demographic.DocumentsWebService
-								org.oscarehr.ws.rest.demographic.DocumentWebService
+								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
+								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
 								org.oscarehr.ws.rest.DocumentWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
-                                org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
+								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.message.AttachmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessagesWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService
-                                org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
+								org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
-                            </value>
+							</value>
 						</systemProperty>
 						<systemProperty>
 							<key>openApiSpecBuilder.outputDirectory</key>

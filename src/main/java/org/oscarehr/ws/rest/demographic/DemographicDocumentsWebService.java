@@ -24,31 +24,33 @@
  
 package org.oscarehr.ws.rest.demographic;
 
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.document.model.Document;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
-import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferOutbound;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
+import javax.transaction.Transactional;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Path("demographic/{demographicNo}/document/")
-@Component("DemographicDocumentWebService")
+@Path("demographic/{demographicNo}/documents/")
+@Component("DemographicDocumentsWebService")
 @Tag(name = "demographic")
-public class DocumentWebService extends AbstractServiceImpl
+public class DemographicDocumentsWebService extends AbstractServiceImpl
 {
 	protected SecurityInfoManager securityInfoManager;
 	protected DocumentService documentService;
@@ -59,7 +61,7 @@ public class DocumentWebService extends AbstractServiceImpl
 	// ==========================================================================
 
 	@Autowired
-	public DocumentWebService(
+	public DemographicDocumentsWebService(
 			SecurityInfoManager securityInfoManager,
 			DocumentService documentService,
 			DemographicDao demographicDao)
@@ -73,26 +75,33 @@ public class DocumentWebService extends AbstractServiceImpl
 	// Endpoints
 	// ==========================================================================
 
+	@GET
 	@Path("/")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DocumentTransferOutbound> createDocument(@PathParam("demographicNo") String demographicNo, DocumentTransferInbound documentTransfer) throws IOException, InterruptedException
+	@Transactional
+	public RestResponse<List<DocumentTransferOutbound>> searchDocuments(
+			@PathParam("demographicNo") String demographicNo) throws IOException
 	{
 		securityInfoManager.requireAllPrivilege(
 				getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.WRITE,
+				SecurityInfoManager.READ,
 				Integer.parseInt(demographicNo),
 				"_edoc");
 
-		documentTransfer.setDocumentNo(null);
+		Demographic demo = demographicDao.findOrThrow(Integer.parseInt(demographicNo));
 
-		Document newDocument = documentService.uploadNewDemographicDocument(
-				getLoggedInInfo(),
-				DocumentConverter.getInboundAsDomainObject(documentTransfer),
-				demographicDao.findOrThrow(Integer.parseInt(demographicNo)),
-				documentTransfer.getBase64EncodedFile());
+		List<DocumentTransferOutbound> docTransfers = demo.getDocuments().stream().map((doc) ->
+		{
+			try
+			{
+				return DocumentConverter.getAsTransferObject(doc, false);
+			}
+			catch(IOException e)
+			{
+				throw new RuntimeException("Failed to convert document to transfer", e);
+			}
+		}).collect(Collectors.toList());
 
-		return RestResponse.successResponse(DocumentConverter.getAsTransferObject(newDocument, false));
+		return RestResponse.successResponse(docTransfers);
 	}
 }
