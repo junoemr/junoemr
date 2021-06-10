@@ -187,7 +187,8 @@ public class FOBTReport implements PreventionReport{
                    prd.color = "orange"; //FF9933
                 }
                 // pending
-                else if( dueDate.before(prevDate) && result.equalsIgnoreCase("pending") ) {
+                else if( dueDate.before(prevDate) && result.equalsIgnoreCase("pending") )
+                {
                     prd.rank = 4;
                     prd.lastDate = prevDateStr;
                     prd.state = "Pending";

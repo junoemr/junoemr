@@ -158,7 +158,7 @@ public class MammogramReport implements PreventionReport{
                 log.debug("due Date  ("+dueDate.toString()+" ) After Prev ("+prevDate.toString() +" ) "+dueDate.after(prevDate));
                 log.debug("cutoff Date  ("+cutoffDate.toString()+" ) before Prev ("+prevDate.toString() +" ) "+cutoffDate.before(prevDate));
 
-                 // overdue
+                 // due
                 if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate))
                 {
                    prd.rank = 2;

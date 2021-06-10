@@ -77,12 +77,12 @@ public class PreventionReportAction extends Action {
 
 		String setName = request.getParameter("patientSet");
 		String prevention = request.getParameter("prevention");
-		String testAOD = ((PreventionReportForm) form).asofDate;
-		Date asofDate = UtilDateUtilities.getDateFromString(testAOD, "yyyy-MM-dd");
+		String asofDate = ((PreventionReportForm) form).asofDate;
+		Date asofDateDate = UtilDateUtilities.getDateFromString(asofDate, "yyyy-MM-dd");
 
-		if (asofDate == null) {
+		if (asofDateDate == null) {
 			Calendar today = Calendar.getInstance();
-			asofDate = today.getTime();
+			asofDateDate = today.getTime();
 		}
 		
 		/* some fast error checking */
@@ -101,22 +101,22 @@ public class PreventionReportAction extends Action {
 			RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
 			frm = demoL.queryLoader(frm);
 			frm.addDemoIfNotPresent();
-			frm.setAsofDate(testAOD);
+			frm.setAsofDate(asofDate);
 			RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
-			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, testAOD);
+			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, asofDate);
 
 			log.debug("set size " + list.size());
 
 			
 			PreventionReport report = PreventionReportFactory.getPreventionReport(prevention);
-			Hashtable h = report.runReport(loggedInInfo, list, asofDate);
+			Hashtable h = report.runReport(loggedInInfo, list, asofDateDate);
 
 			if (report.displayNumShots())
 			{
 				request.setAttribute("ReportType", "yes");
 			}
 
-			request.setAttribute("asDate", asofDate);
+			request.setAttribute("asDate", asofDateDate);
 			request.setAttribute("up2date", h.get("up2date"));
 			request.setAttribute("percent", h.get("percent"));
 			request.setAttribute("percentWithGrace", h.get("percentWithGrace"));
