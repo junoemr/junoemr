@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.service.context;
 
 import lombok.Data;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.dataMigration.logger.ExportLogger;
@@ -32,7 +33,6 @@ import org.oscarehr.dataMigration.service.DemographicExporter;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -65,7 +65,7 @@ public class PatientExportContext extends PollableContext
 			try
 			{
 				MiscUtils.getLogger().info("remove temp directory: " + tempDirectory.toString());
-				Files.deleteIfExists(tempDirectory);
+				FileUtils.deleteDirectory(tempDirectory.toFile()); // will recursive delete directory
 			}
 			catch(IOException e)
 			{

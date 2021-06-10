@@ -23,6 +23,7 @@
 
 package org.oscarehr.common.io;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -210,6 +211,18 @@ public class FileFactory
 		Path tempDir = Files.createTempDirectory("juno");
 		logger.info("Created temp directory: " + tempDir.toString());
 		return tempDir;
+	}
+
+	/**
+	 * create a sub directory within the base directory
+	 * @return - the directory path
+	 * @throws IOException
+	 */
+	public static Path createSubDirectoryIfNotExists(Path baseDirectory, String subDirectory) throws IOException
+	{
+		Path subDir = Files.createDirectory(Paths.get(baseDirectory.toString(), subDirectory));
+		logger.info("Created sub directory: " + subDir.toString());
+		return subDir;
 	}
 
 	/**
@@ -405,6 +418,10 @@ public class FileFactory
 	{
 		return packageZipFile(filesToZip, false);
 	}
+
+	/**
+	 * zip a list of files. this will create a zip file with all files in the base location. no sub-directories
+	 */
 	public static ZIPFile packageZipFile(List<GenericFile> filesToZip, boolean deleteAfterZip) throws IOException
 	{
 		GenericFile tmpFile = createTempFile(".zip");
@@ -426,6 +443,44 @@ public class FileFactory
 			{
 				file.deleteFile();
 			}
+		}
+		return zipFile;
+	}
+
+	public static ZIPFile packageZipFile(Path directoryToZip) throws IOException
+	{
+		return packageZipFile(directoryToZip, false);
+	}
+
+	/**
+	 * zip a directory and all it's contents. keep folder structure intact
+	 */
+	public static ZIPFile packageZipFile(Path directoryToZip, boolean deleteAfterZip) throws IOException
+	{
+		GenericFile tmpFile = createTempFile(".zip");
+		ZIPFile zipFile = new ZIPFile(tmpFile.getFileObject());
+		ZipOutputStream zipOutputStream = new ZipOutputStream(zipFile.asFileOutputStream());
+
+		Files.walk(directoryToZip)
+				.filter(path -> !Files.isDirectory(path))
+				.forEach(path -> {
+					ZipEntry zipEntry = new ZipEntry(directoryToZip.relativize(path).toString());
+					try
+					{
+						zipOutputStream.putNextEntry(zipEntry);
+						Files.copy(path, zipOutputStream);
+						zipOutputStream.closeEntry();
+					}
+					catch(IOException e)
+					{
+						logger.error("Directory Zip Error", e);
+					}
+				});
+		zipOutputStream.close();
+
+		if(deleteAfterZip)
+		{
+			FileUtils.deleteDirectory(directoryToZip.toFile());
 		}
 		return zipFile;
 	}

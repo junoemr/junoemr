@@ -150,8 +150,10 @@ public class PatientExportService
 			@Override
 			public void handleExportResults(List<GenericFile> exportFiles, String contextId) throws IOException
 			{
-				zipFile = FileFactory.packageZipFile(exportFiles, true);
-				String exportDirectory = patientExportContextService.getContext().getExportPreferences().getExportDirectory();
+				PatientExportContext exportContext = patientExportContextService.getContext();
+
+				zipFile = FileFactory.packageZipFile(exportContext.getTempDirectory(), true);
+				String exportDirectory = exportContext.getExportPreferences().getExportDirectory();
 
 				if(exportDirectory != null)
 				{
