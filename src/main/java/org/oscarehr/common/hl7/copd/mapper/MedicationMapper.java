@@ -601,7 +601,12 @@ public class MedicationMapper extends AbstractMapper
 				.getTq16_ServiceDuration().getCq1_Quantity().getValue());
 		if(durationUnitStr != null)
 		{
-			return Integer.parseInt(durationUnitStr);
+			int duration = (int) Math.ceil(Double.parseDouble(durationUnitStr));
+			if (!durationUnitStr.equals(duration + ".0"))
+			{
+				MiscUtils.getLogger().warn("Following duration unit is losing information when taking the ceiling and cast to integer: " + durationUnitStr);
+			}
+			return duration;
 		}
 		return 0;
 	}
