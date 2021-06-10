@@ -44,7 +44,6 @@ angular.module('Common.Components').component('junoCheckBox', {
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.ngModel = ctrl.ngModel || false;
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.buttonColor = ctrl.buttonColor || JUNO_BUTTON_COLOR.PRIMARY;
