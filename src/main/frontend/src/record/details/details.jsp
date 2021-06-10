@@ -180,64 +180,51 @@
 				</div>
 			</div>
 		<br/>
-
-					<additional-information-section ng-model="detailsCtrl.page.demo"
-					                                validations="detailsCtrl.validations"
-					                                component-style="pageStyle">
-					</additional-information-section>
-					<juno-divider component-style="pageStyle"></juno-divider>
-				</div>
-			</div>
-			<br/>
-
 			<div class=" col-md-10 col-lg-4">
 				<div class="clearfix col-md-12">
 					<img class="pull-left" id="photo"
-						title="Click to upload photo"
-						ng-click="detailsCtrl.launchPhoto()"
-						ng-src="../imageRenderingServlet?source=local_client&clientId={{detailsCtrl.page.demo.demographicNo}}"
+						 title="Click to upload photo"
+						 ng-click="detailsCtrl.launchPhoto()"
+						 ng-src="../imageRenderingServlet?source=local_client&clientId={{detailsCtrl.page.demo.demographicNo}}"
 					/>
 				</div>
-				<br/>
-				<div>
-					<div id="pd2" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
-						<div class="col-md-12">
-							<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
-							<textarea id="alert-text-box" ng-model="detailsCtrl.page.demo.alert" class="form-control form-control-details"></textarea>
-						</div>
-						<br/>
-						<div class="col-md-12">
-							<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
-							<textarea id="notes-text-box" ng-model="detailsCtrl.page.demo.scrNotes" class="form-control form-control-details"></textarea>
-						</div>
-					</div>
-					<hr>
+				<div id="pd2" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
 					<div class="col-md-12">
-						<h3 class="form-heading">
-							<bean:message key="global.contacts"/>
-							<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="detailsCtrl.manageContacts()">
-								<bean:message key="web.record.details.manage"/>
-							</button>
-						</h3>
-						<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContacts">
-							<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
-							<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
-							<div class="col-md-5">{{dc.phone}}</div>
-						</div>
+						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
+						<textarea id="alert-text-box" ng-model="detailsCtrl.page.demo.alert" class="form-control form-control-details"></textarea>
 					</div>
-					<hr>
+					<br/>
 					<div class="col-md-12">
-						<h3 class="form-heading">
-							<bean:message key="web.record.details.proContacts"/>
-							<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="detailsCtrl.manageContacts()">
-								<bean:message key="web.record.details.manage"/>
-							</button>
-						</h3>
-						<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContactPros">
-							<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
-							<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
-							<div class="col-md-5">{{dc.phone}}</div>
-						</div>
+						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
+						<textarea id="notes-text-box" ng-model="detailsCtrl.page.demo.scrNotes" class="form-control form-control-details"></textarea>
+					</div>
+				</div>
+				<hr>
+				<div class="col-md-12">
+					<h3 class="form-heading">
+						<bean:message key="global.contacts"/>
+						<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="detailsCtrl.manageContacts()">
+							<bean:message key="web.record.details.manage"/>
+						</button>
+					</h3>
+					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContacts">
+						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
+						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
+						<div class="col-md-5">{{dc.phone}}</div>
+					</div>
+				</div>
+				<hr>
+				<div class="col-md-12">
+					<h3 class="form-heading">
+						<bean:message key="web.record.details.proContacts"/>
+						<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="detailsCtrl.manageContacts()">
+							<bean:message key="web.record.details.manage"/>
+						</button>
+					</h3>
+					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContactPros">
+						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
+						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
+						<div class="col-md-5">{{dc.phone}}</div>
 					</div>
 				</div>
 			</div>
