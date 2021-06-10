@@ -683,7 +683,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	 */
 	public List<LabGridDisplay> getLabMeasurementsForPatient(Integer demographicNo)
 	{
-		String sql = "SELECT \n" +
+		String sql = "SELECT * FROM (SELECT \n" +
 				"    m.id AS measurement_id,\n" +
 				"    MAX(CASE WHEN me.keyval = 'abnormal' THEN me.val END) AS is_abnormal,\n" +
 				"    m.dataField AS result,\n" +
@@ -696,7 +696,8 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 				"AND me.keyVal in ('name', 'lab_no', 'abnormal')\n" +
 				"AND m.demographicNo = :demographicNo\n" +
 				"GROUP BY m.id, m.dataField, m.dateObserved\n" +
-				"ORDER BY m.dateObserved DESC";
+				"ORDER BY m.dateObserved DESC) AS result\n" +
+				"WHERE result.lab_no IS NOT NULL";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("demographicNo", demographicNo);
 		List<Object[]> labMeasurements = query.getResultList();

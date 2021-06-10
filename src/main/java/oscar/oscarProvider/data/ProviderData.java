@@ -45,6 +45,8 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.util.ConversionUtils;
 
+import static org.oscarehr.provider.model.ProviderData.PROVIDER_TYPE_DOCTOR;
+
 /**
  *
  * @author  Jay Gallagher
@@ -87,7 +89,6 @@ public class ProviderData {
 	+------------------------+--------------+------+-----+------------+-------+
 	*/
 
-	private static final String PROVIDER_TYPE_DOCTOR = "doctor";
 	String provider_no;
 	String last_name;
 	String first_name;
@@ -578,24 +579,26 @@ public class ProviderData {
 		this.signed_confidentiality = signed_confidentiality;
 	}
 
-	public static List<Map<String, String>> getProviderList() {
+	public static List<Map<String, String>> getProviderList()
+	{
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
 		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByType(PROVIDER_TYPE_DOCTOR);
 
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-		for (org.oscarehr.provider.model.ProviderData p : providers) {
-			result.add(toMap(p));
+		for (org.oscarehr.provider.model.ProviderData provider : providers)
+		{
+			result.add(toMap(provider));
 		}
 		return result;
-
 	}
 
-	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData p) {
+	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData providerData)
+	{
 	    Map<String, String> result = new HashMap<String, String>();
-	    result.put("providerNo", p.getId());
-	    result.put("firstName", p.getFirstName());
-	    result.put("lastName", p.getLastName());
-	    result.put("ohipNo", p.getOhipNo());
+	    result.put("providerNo", providerData.getId());
+	    result.put("firstName", providerData.getFirstName());
+	    result.put("lastName", providerData.getLastName());
+	    result.put("ohipNo", providerData.getOhipNo());
 	    return result;
     }
 

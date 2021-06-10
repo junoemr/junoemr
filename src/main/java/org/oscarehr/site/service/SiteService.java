@@ -48,6 +48,17 @@ public class SiteService
 	private SiteDao siteDao;
 
 	/**
+	 * Find a site by name.  This method will return both active and inactive sites.
+	 *
+	 * @param siteName name of site
+	 * @return site
+	 */
+	public Site getSiteByName(String siteName)
+	{
+		return siteDao.findByName(siteName);
+	}
+
+	/**
 	 * assign the provider to the specified sites.
 	 * @param siteIds - site ids to assign
 	 * @param providerNo - the provider to assign sites for

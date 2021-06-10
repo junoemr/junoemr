@@ -195,7 +195,7 @@
 						/>
 					</div>
 
-					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'medhx'">
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'medhx' || groupNotesCtrl.page.code == 'famhx' ">
 						<div ng-if="groupNotesCtrl.page.code == 'medhx' || groupNotesCtrl.page.code == 'famhx' " > 
 							<label class="control-label"><bean:message key="oscarEncounter.treatment.title" /></label>
 							<input  type="text" class="form-control" id="treatment" 

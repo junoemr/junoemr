@@ -137,10 +137,10 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 		String subjectEchart = "Message from eChart";
 		String patientLName = patientLNames[0];
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
-		String currWindowHandle = driver.getWindowHandle();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitlemsgs")));
-		driver.findElement(By.xpath("//div[@id='menuTitlemsgs']//descendant::a[contains(., '+')]")).click();
 		Thread.sleep(2000);
+		String currWindowHandle = driver.getWindowHandle();
+		driver.findElement(By.xpath("//div[@id='menuTitlemsgs']//descendant::a[contains(., '+')]")).click();
+		Thread.sleep(4000);
 		PageUtil.switchToLastWindow(driver);
 
 		//** Send Message **

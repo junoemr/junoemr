@@ -258,6 +258,9 @@
 		<jaxws:features>
 			<ref bean="soapLoggingPackage"/>
 		</jaxws:features>
+		<jaxws:properties>
+			<entry key="org.apache.cxf.stax.maxTextLength" value="268435456" />
+		</jaxws:properties>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#integrationWs" address="/IntegrationService" >
