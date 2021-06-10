@@ -3,7 +3,15 @@
                    fill-color="JUNO_SIMPLE_MODAL_FILL_COLOR.GREY"
                    modal-width="1024"
                    modal-height="512">
-	<div class="message-compose flex-col w-100 h-100 p-16 p-t-8">
+	<!-- Loading indicator -->
+	<div ng-if="$ctrl.sending" class="flex-col justify-content-center h-100 h-100">
+		<juno-loading-indicator message-alignment="vertical"
+		                        message="Sending..."
+		                        indicator-type="dot-pulse">
+		</juno-loading-indicator>
+	</div>
+
+	<div ng-if="!$ctrl.sending" class="message-compose flex-col w-100 h-100 p-16 p-t-8">
 		<div class="flex-row m-b-16">
 			<!-- Sender -->
 			<juno-select ng-if="!$ctrl.isReply"
@@ -26,6 +34,7 @@
 			                    disabled="!$ctrl.validations.sourceSelected()"
 			                    component-style="$ctrl.resolve.style">
 			</messageable-search>
+
 			<!-- Participants -->
 			<juno-input ng-if="$ctrl.isReply"
 			            class="flex-item-grow"

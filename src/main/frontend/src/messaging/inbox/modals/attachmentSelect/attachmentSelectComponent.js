@@ -31,6 +31,7 @@ import {FileSource} from "./components/fileSourceSelect/FileSource";
 import {AllowedAttachmentTypes} from "../../../../lib/messaging/constants/AllowedAttachmentTypes";
 import FileUtil from "../../../../lib/util/FileUtil";
 import AttachmentFactory from "../../../../lib/messaging/factory/AttachmentFactory";
+import Attachment from "../../../../lib/messaging/model/Attachment";
 
 angular.module("Messaging.Modals").component('attachmentSelect', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/attachmentSelect.jsp',
@@ -40,8 +41,10 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 	},
 	controller: [
 		"$scope",
+		"$uibModal",
 		function (
-			$scope)
+			$scope,
+			$uibModal)
 		{
 			const ctrl = this;
 			const demographicDocumentService = new DemographicDocumentService();
@@ -94,7 +97,20 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 
 				for (const file of files)
 				{
-					ctrl.selectedAttachments.push(AttachmentFactory.build(file.name, file.type, await FileUtil.getFileDataBase64(file)))
+					const base64Data = await FileUtil.getFileDataBase64(file);
+					const binaryData = atob(base64Data);
+
+					if (binaryData.length <= Attachment.MAX_ATTACHMENT_SIZE_BYTES)
+					{
+						ctrl.selectedAttachments.push(AttachmentFactory.build(file.name, file.type, base64Data))
+					}
+					else
+					{
+						Juno.Common.Util.errorAlert($uibModal,
+							"File is to big",
+							`File ${file.name} is ${Math.trunc(binaryData.length / 1024 / 1024)} MB which 
+							exceeds the limit of ${Attachment.MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024} MB.`);
+					}
 				}
 
 				$scope.$apply();

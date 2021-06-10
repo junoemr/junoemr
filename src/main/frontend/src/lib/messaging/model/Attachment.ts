@@ -5,6 +5,8 @@ import JunoFile from "../../documents/model/JunoFile";
 
 export default class Attachment implements JunoFile
 {
+	public static readonly MAX_ATTACHMENT_SIZE_BYTES = 1024*1024*25 // 25 MB.
+
 	protected _id: string;
 	protected _name: string;
 	protected _type: string;

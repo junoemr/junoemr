@@ -22,6 +22,8 @@
 */
 
 import {JUNO_BUTTON_COLOR} from "../../../../../../common/components/junoComponentConstants";
+import {AllowedAttachmentMimeTypes} from "../../../../../../lib/messaging/constants/AllowedAttachmentTypes";
+import Attachment from "../../../../../../lib/messaging/model/Attachment";
 
 angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSelectList', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/components/fileSelectList/fileSelectList.jsp',
@@ -33,8 +35,10 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 	},
 	controller: [
 		"$scope",
+		"$uibModal",
 		function (
-			$scope)
+			$scope,
+			$uibModal)
 		{
 			const ctrl = this;
 
@@ -65,9 +69,31 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 				}
 			}
 
-			ctrl.addFile = (junoFile) =>
+			ctrl.addFile = async (junoFile) =>
 			{
-				ctrl.selectedFiles.push(junoFile);
+				if (AllowedAttachmentMimeTypes.includes(junoFile.type))
+				{
+					const fileBinary = atob(await junoFile.getBase64Data());
+
+					if (fileBinary.length <= Attachment.MAX_ATTACHMENT_SIZE_BYTES)
+					{
+						ctrl.selectedFiles.push(junoFile);
+						$scope.$apply();
+					}
+					else
+					{
+						Juno.Common.Util.errorAlert($uibModal,
+							"File is to big",
+							`File ${junoFile.name} is ${Math.trunc(fileBinary.length / 1024 / 1024)} MB which 
+							exceeds the limit of ${Attachment.MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024} MB.`);
+					}
+				}
+				else
+				{
+					Juno.Common.Util.errorAlert($uibModal,
+						"File type not allowed",
+						`File ${junoFile.name} of type ${ctrl.fileTypeHuman(junoFile.type)} cannot be attached to patient messages.`);
+				}
 			}
 
 			ctrl.removeFile = (junoFile) =>
@@ -89,7 +115,11 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 
 			ctrl.fileTypeHuman = (mimeString) =>
 			{
-				return mimeString.replace(/^[^/]*\//, '');
+				if (mimeString)
+				{
+					return mimeString.replace(/^[^/]*\//, '');
+				}
+				return "Unknown";
 			}
 
 			ctrl.dateCompare = (t1, t2) =>
