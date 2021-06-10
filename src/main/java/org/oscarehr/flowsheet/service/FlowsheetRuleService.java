@@ -23,90 +23,35 @@
 package org.oscarehr.flowsheet.service;
 
 
+import org.oscarehr.flowsheet.converter.FlowsheetRuleDbToModelConverter;
 import org.oscarehr.flowsheet.entity.Flowsheet;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.entity.FlowsheetRule;
-import org.oscarehr.flowsheet.entity.FlowsheetRuleCondition;
-import org.oscarehr.flowsheet.entity.FlowsheetRuleConsequence;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 
-import java.util.List;
-
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class FlowsheetRuleService
 {
-	public void fillMeasurementInfo(MeasurementInfo measurementInfo, Flowsheet flowsheetEntity)
+	@Autowired
+	private FlowsheetRuleDbToModelConverter flowsheetRuleDbToModelConverter;
+
+	public void applyFlowsheetRules(MeasurementInfo measurementInfo, Flowsheet flowsheetEntity)
 	{
 		for(FlowsheetItem flowsheetItem : flowsheetEntity.getFlowsheetItems())
 		{
-			for(FlowsheetRule rule : flowsheetItem.getFlowsheetRules())
-			{
-				applyRule(measurementInfo, flowsheetItem, rule);
-			}
-		}
-	}
-
-	private void applyRule(MeasurementInfo measurementInfo, FlowsheetItem flowsheetItem, FlowsheetRule rule)
-	{
-		String measurementType = flowsheetItem.getTypeCode();
-		for(FlowsheetRuleCondition condition : rule.getConditions())
-		{
-			switch(condition.getType())
-			{
-				case MONTHS_SINCE:
-				{
-					int monthsSince = measurementInfo.getLastDateRecordedInMonths(measurementType);
-					if(monthsSince >= Integer.parseInt(condition.getValue()))
-					{
-						applyConsequences(measurementInfo, measurementType, rule.getConsequences());
-					}
-					break;
-				}
-				case NEVER_GIVEN:
-				{
-					int monthsSince = measurementInfo.getLastDateRecordedInMonths(measurementType);
-					if(monthsSince < 0)
-					{
-						applyConsequences(measurementInfo, measurementType, rule.getConsequences());
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	private void applyConsequences(MeasurementInfo measurementInfo, String measurementType, List<FlowsheetRuleConsequence> consequences)
-	{
-		for(FlowsheetRuleConsequence consequence : consequences)
-		{
-			switch(consequence.getType())
-			{
-				case ALERT:
-				{
-					switch(consequence.getSeverityLevel())
-					{
-						case RECOMMENDATION:
-						{
-							measurementInfo.addRecommendation(measurementType, consequence.getMessage()); break;
-						}
-						case WARNING:
-						case DANGER:
-						{
-							measurementInfo.addWarning(measurementType, consequence.getMessage()); break;
-						}
-					}
-					break;
-				}
-				case HIDDEN:
-				{
-					measurementInfo.addHidden(measurementType, true);
-					break;
-				}
-			}
+			// filter out rules that do not meet all conditions, and apply consequences for rules where all conditions are met.
+			flowsheetRuleDbToModelConverter.convert(flowsheetItem.getFlowsheetRules())
+					.stream()
+					.filter((rule) -> rule.getConditions()
+							.stream()
+							.allMatch((condition) -> condition.meetsRequirements(flowsheetItem, measurementInfo)))
+					.forEach((rule) -> rule.getConsequences()
+							.forEach((consequence) -> consequence.apply(flowsheetItem, measurementInfo))
+					);
 		}
 	}
 }

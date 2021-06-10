@@ -20,53 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.model.rule.condition;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 
 @Data
-public class FlowsheetItem extends AbstractTransientModel
+public abstract class FlowsheetRuleCondition extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
-	private String description;
+	private String value;
 
-	private ItemType type;
-	private String typeCode;
-
-	private ValueType valueType;
-	private String valueLabel;
-	private List<FlowsheetItemAlert> flowsheetItemAlerts;
-	private List<FlowsheetItemData> data;
-
-	public FlowsheetItem()
-	{
-		flowsheetItemAlerts = new ArrayList<>();
-		data = new ArrayList<>();
-	}
-
-	public boolean isMeasurementType()
-	{
-		return ItemType.MEASUREMENT.equals(this.type);
-	}
-	public boolean isPreventionType()
-	{
-		return ItemType.PREVENTION.equals(this.type);
-	}
-
-	public void addFlowsheetItemAlert(FlowsheetItemAlert alert)
-	{
-		flowsheetItemAlerts.add(alert);
-	}
-
-	public void addFlowsheetItemData(FlowsheetItemData itemData)
-	{
-		data.add(itemData);
-	}
+	public abstract boolean meetsRequirements(FlowsheetItem flowsheetItem, MeasurementInfo measurementInfo);
 }

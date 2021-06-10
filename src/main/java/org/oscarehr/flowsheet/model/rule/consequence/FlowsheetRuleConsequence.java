@@ -20,14 +20,21 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.model.rule.consequence;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.oscarehr.flowsheet.entity.SeverityLevel;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 
 @Data
-public class ValidationRule extends AbstractTransientModel
+public abstract class FlowsheetRuleConsequence extends AbstractTransientModel
 {
-	private String validationRegex;
-	private String validationFailMessage;
+	private Integer id;
+	private String name;
+	private String message;
+	private SeverityLevel severityLevel;
+
+	public abstract void apply(FlowsheetItem flowsheetItem, MeasurementInfo measurementInfo);
 }

@@ -20,53 +20,21 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.flowsheet.model.rule;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.ItemType;
-import org.oscarehr.flowsheet.entity.ValueType;
+import org.oscarehr.flowsheet.model.rule.condition.FlowsheetRuleCondition;
+import org.oscarehr.flowsheet.model.rule.consequence.FlowsheetRuleConsequence;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class FlowsheetItem extends AbstractTransientModel
+public class FlowsheetRule extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
 	private String description;
-
-	private ItemType type;
-	private String typeCode;
-
-	private ValueType valueType;
-	private String valueLabel;
-	private List<FlowsheetItemAlert> flowsheetItemAlerts;
-	private List<FlowsheetItemData> data;
-
-	public FlowsheetItem()
-	{
-		flowsheetItemAlerts = new ArrayList<>();
-		data = new ArrayList<>();
-	}
-
-	public boolean isMeasurementType()
-	{
-		return ItemType.MEASUREMENT.equals(this.type);
-	}
-	public boolean isPreventionType()
-	{
-		return ItemType.PREVENTION.equals(this.type);
-	}
-
-	public void addFlowsheetItemAlert(FlowsheetItemAlert alert)
-	{
-		flowsheetItemAlerts.add(alert);
-	}
-
-	public void addFlowsheetItemData(FlowsheetItemData itemData)
-	{
-		data.add(itemData);
-	}
+	private List<FlowsheetRuleCondition> conditions;
+	private List<FlowsheetRuleConsequence> consequences;
 }

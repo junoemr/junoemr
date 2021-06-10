@@ -166,7 +166,7 @@ public class FlowsheetService
 			getMessages(measurementInfo, ruleBase);
 		}
 
-		flowsheetRuleService.fillMeasurementInfo(measurementInfo, flowsheetEntity);
+		flowsheetRuleService.applyFlowsheetRules(measurementInfo, flowsheetEntity);
 		return measurementInfo;
 	}
 
