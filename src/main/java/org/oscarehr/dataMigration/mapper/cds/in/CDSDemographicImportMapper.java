@@ -30,6 +30,7 @@ import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.oscarDemographic.pageUtil.Util;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.Demographics;
 import xml.cds.v5_0.HealthCard;
@@ -88,7 +89,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			demographic.setOfficialLanguage(OfficialSpokenLanguageCode.FRE.equals(officialLanguage) ?
 					Demographic.OFFICIAL_LANGUAGE.FRENCH : Demographic.OFFICIAL_LANGUAGE.ENGLISH);
 		}
-		demographic.setSpokenLanguage(StringUtils.trimToNull(importStructure.getPreferredSpokenLanguage()));
+		demographic.setSpokenLanguage(fromISO639_2LanguageCode(StringUtils.trimToNull(importStructure.getPreferredSpokenLanguage())));
 		demographic.setPatientNote(StringUtils.trimToNull(importStructure.getNoteAboutPatient()));
 	}
 
@@ -100,6 +101,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			demographic.setHealthNumber(StringUtils.trimToNull(healthCard.getNumber()));
 			demographic.setHealthNumberVersion(StringUtils.trimToNull(healthCard.getVersion()));
 			demographic.setHealthNumberProvinceCode(getSubregionCode(StringUtils.trimToNull(healthCard.getProvinceCode())));
+			demographic.setHealthNumberCountryCode(getCountryCode(StringUtils.trimToNull(healthCard.getProvinceCode())));
 			demographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(healthCard.getExpirydate()));
 		}
 	}
@@ -227,5 +229,26 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			provider.setPractitionerNumber(mrp.getPrimaryPhysicianCPSO());
 		}
 		return provider;
+	}
+
+	/**
+	 * @param code the code to look up
+	 * @return the language string, or the code if mapping failed
+	 */
+	protected String fromISO639_2LanguageCode(String code)
+	{
+		if(code != null)
+		{
+			String language = Util.convertCodeToLanguage(code);
+			if(language != null)
+			{
+				return language;
+			}
+			else
+			{
+				logEvent("ISO 639-2 code could not map to language: " + code);
+			}
+		}
+		return code;
 	}
 }

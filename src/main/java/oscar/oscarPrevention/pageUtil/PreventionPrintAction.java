@@ -32,59 +32,59 @@
 package oscar.oscarPrevention.pageUtil;
 
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.lowagie.text.DocumentException;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import com.lowagie.text.DocumentException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
  * Convert submitted preventions into pdf and return file
  */
-public class PreventionPrintAction extends Action {
-    private static Logger logger=MiscUtils.getLogger(); 
+public class PreventionPrintAction extends Action
+{
+    private static final Logger logger = MiscUtils.getLogger();
+    private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
-    private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-    
-   
-   public PreventionPrintAction() {
-   }
-   
-   public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
-       
-	   if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_prevention", "r", null)) {
- 		  throw new SecurityException("missing required security object (_prevention)");
- 	  }
-	   
-       
-       try {           
-           PreventionPrintPdf pdf = new PreventionPrintPdf();
-           pdf.printPdf(request, response);
-           
-       }catch(DocumentException de) {            
-            logger.error("", de);
-            request.setAttribute("printError", new Boolean(true));
+    public PreventionPrintAction() {
+    }
+
+    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
+    {
+        LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+        securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.PREVENTION_READ);
+
+        try
+        {
+            List<String> preventionSections = Arrays.asList(request.getParameterValues("printHP"));
+            Integer demographicId = Integer.parseInt(request.getParameter("demographicNo"));
+
+            PreventionPrintPdf pdf = new PreventionPrintPdf();
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=\"Prevention.pdf\"");
+            pdf.generatePDF(preventionSections, demographicId, response.getOutputStream());
+        }
+        catch(DocumentException | IOException de)
+        {
+            logger.error(de);
+            request.setAttribute("printError", true);
             return mapping.findForward("error");
-       }
-       catch(IOException ioe) {
-            logger.error("", ioe);
-            request.setAttribute("printError", new Boolean(true));
-            return mapping.findForward("error");
-       } 
-              
-       return null;
-   }   
-                                    
+        }
+
+        return null;
+    }
+
 }

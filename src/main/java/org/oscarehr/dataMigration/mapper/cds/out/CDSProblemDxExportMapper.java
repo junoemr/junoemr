@@ -22,11 +22,10 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
-import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ProblemList;
-import xml.cds.v5_0.StandardCoding;
 
 @Component
 public class CDSProblemDxExportMapper extends AbstractCDSNoteExportMapper<ProblemList, DxRecord>
@@ -41,20 +40,24 @@ public class CDSProblemDxExportMapper extends AbstractCDSNoteExportMapper<Proble
 	{
 		ProblemList problemList = objectFactory.createProblemList();
 
-		DxRecord.DxCodingSystem dxCodingSystem = exportStructure.getCodingSystem();
+		DxCode dxCode = exportStructure.getDxCode();
 		// export with coding system if possible
-		if(dxCodingSystem != null && dxCodingSystem.getCdsCodingSystem() != null)
+		if(dxCode != null && dxCode.getCodingSystem() != null)
 		{
 			// if diagnosis code is filled and there is no free text, ProblemDiagnosisDescription should match the code description
-			problemList.setProblemDiagnosisDescription(exportStructure.getCodeDescription());
-			problemList.setDiagnosisCode(getDiagnosisCode(exportStructure, dxCodingSystem.getCdsCodingSystem()));
+			problemList.setProblemDiagnosisDescription(dxCode.getDescription());
+			problemList.setDiagnosisCode(getStandardCoding(dxCode));
 		}
-		else // export similar to notes
+		else if(dxCode != null) // export similar to notes
 		{
 			problemList.setProblemDescription(
-					((dxCodingSystem != null) ? dxCodingSystem.getValue() : "") +
-							"[" + exportStructure.getDxCode() + "]: "
-							+ exportStructure.getCodeDescription());
+					((dxCode.getCodingSystem() != null) ? dxCode.getCodingSystem().getValue() : "") +
+							"[" + dxCode.getCode() + "]: "
+							+ dxCode.getDescription());
+		}
+		else
+		{
+			logEvent("Dx Record is missing a required code");
 		}
 
 		problemList.setProblemStatus(exportStructure.getStatus().name());
@@ -66,14 +69,5 @@ public class CDSProblemDxExportMapper extends AbstractCDSNoteExportMapper<Proble
 		}
 
 		return problemList;
-	}
-
-	protected StandardCoding getDiagnosisCode(DxRecord exportStructure, CDSConstants.CodingSystem codingSystem)
-	{
-		StandardCoding standardCoding = objectFactory.createStandardCoding();
-		standardCoding.setStandardCodingSystem(codingSystem.getValue());
-		standardCoding.setStandardCode(exportStructure.getDxCode());
-		standardCoding.setStandardCodeDescription(exportStructure.getCodeDescription());
-		return standardCoding;
 	}
 }

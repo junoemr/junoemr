@@ -58,7 +58,7 @@
 				<div class="list-group">
 					<a  ng-repeat="report in reportsCtrl.getReports() | filter: reportsCtrl.reportFilter "
 					 class="list-group-item default" ng-click="reportsCtrl.selectReport(report)">
-						<span class="badge badge-info numberLabel">{{$index + 1}}</span>
+						<span class="badge badge-info numberLabel">{{report.numberLabel}}</span>
 						<span>{{report.name}}</span>
 					</a>
 				</div>

@@ -150,6 +150,19 @@ public class CDSImportMapperTest
 	}
 
 	@Test
+	public void testGetCountryCode_Null()
+	{
+		assertNull(cdsImportMapper.getCountryCode(null));
+	}
+
+	@Test
+	public void testGetCountryCode_CountryAndProvince()
+	{
+		assertEquals("CA", cdsImportMapper.getCountryCode("CA-BC"));
+		assertEquals("US", cdsImportMapper.getCountryCode("US-NY"));
+	}
+
+	@Test
 	public void testGetAddress_Null()
 	{
 		assertNull(cdsImportMapper.getAddress(null));
