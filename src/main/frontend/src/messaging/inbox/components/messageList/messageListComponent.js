@@ -47,6 +47,8 @@ angular.module("Messaging.Components").component('messageList', {
 		{
 			const ctrl = this;
 
+			const NEW_MESSAGE_CHECK_INTERVAL_MS = 60000; // 1 minute;
+
 			$scope.MessageGroup = MessageGroup;
 
 			ctrl.messageStream = null;
@@ -54,10 +56,57 @@ angular.module("Messaging.Components").component('messageList', {
 			ctrl.DEBOUNCE_TIME_MS = 500;
 			ctrl.MESSAGE_FETCH_COUNT = 10;
 
+			ctrl.newMessagesCheckInterval = null;
+			ctrl.currentMessageCount = null;
+
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				ctrl.setupNewMessageCheck();
 			};
+
+			ctrl.$onDestroy = () =>
+			{
+				if (ctrl.newMessagesCheckInterval)
+				{
+					window.clearInterval(ctrl.newMessagesCheckInterval);
+				}
+			}
+
+			/**
+			 * setup periodic new message check
+			 */
+			ctrl.setupNewMessageCheck = () =>
+			{
+				ctrl.newMessagesCheckInterval = window.setInterval(async () =>
+				{
+					if (ctrl.shouldCheckForNewMessages())
+					{
+						const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
+						const count = await messagingService.countMessages(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.groupId);
+
+						if (count !== ctrl.currentMessageCount)
+						{
+							const diff = count - ctrl.currentMessageCount;
+							const newMessages = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId),
+								ctrl.getMessageSearchParams(diff, 0));
+							ctrl.messageStream.unshift(...newMessages);
+
+							ctrl.currentMessageCount = count;
+							$scope.$apply();
+						}
+					}
+				}, NEW_MESSAGE_CHECK_INTERVAL_MS);
+			}
+
+			/**
+			 * if true the system should check for new messages periodically
+			 * @return true / false
+			 */
+			ctrl.shouldCheckForNewMessages = () =>
+			{
+				return ctrl.messageStream && ctrl.currentMessageCount && !ctrl.messageableFilter;
+			}
 
 			/**
 			 * called when user selects a message from the list
@@ -127,6 +176,11 @@ angular.module("Messaging.Components").component('messageList', {
 						$scope.$apply();
 					}
 
+					// get initial message count
+					ctrl.currentMessageCount = await messagingService.countMessages(
+						await messagingService.getMessageSourceById(ctrl.sourceId),
+						ctrl.groupId);
+
 					// notify parent of stream change.
 					if (ctrl.messageStreamChange)
 					{
@@ -135,14 +189,14 @@ angular.module("Messaging.Components").component('messageList', {
 				}
 			}
 
-			ctrl.getMessageSearchParams = () =>
+			ctrl.getMessageSearchParams = (limit = null, offset = null) =>
 			{
 				switch (ctrl.groupId)
 				{
 					case MessageGroup.Sent:
-						return {group: ctrl.groupId, recipient: ctrl.messageableFilter}
+						return {group: ctrl.groupId, recipient: ctrl.messageableFilter, limit, offset}
 					default:
-						return {group: ctrl.groupId, sender: ctrl.messageableFilter}
+						return {group: ctrl.groupId, sender: ctrl.messageableFilter, limit, offset}
 				}
 			}
 

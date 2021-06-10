@@ -1,6 +1,6 @@
 <div class="message">
 
-	<!-- Conversation Header -->
+	<!-- Message -->
 	<div class="flex-col">
 		<!-- From, and message date -->
 		<div class="flex-row justify-content-space-between">
@@ -47,8 +47,15 @@
 			<p>{{$ctrl.message.message}}</p>
 		</div>
 
+
+		<!-- Loading indicator (Don't display attachments until loading complete) -->
+		<div ng-if="$ctrl.loading && $ctrl.message.hasAttachments" class="flex-row flex-col justify-content-center">
+			<juno-loading-indicator message-alignment="vertical"
+			                        indicator-type="dot-pulse">
+			</juno-loading-indicator>
+		</div>
 		<!-- Attachments -->
-		<div class="m-t-24 flex-row">
+		<div ng-if="!$ctrl.loading" class="m-t-24 flex-row">
 			<attachment-list ng-if="$ctrl.message.hasAttachments"
 			                 single-column="true"
 			                 show-attach-to-chart="true"

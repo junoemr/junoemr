@@ -39,12 +39,20 @@ angular.module("Messaging.Components.View.Components").component('message', {
 		{
 			const ctrl = this;
 			ctrl.demographicMapping = new Map();
+			ctrl.loading = false;
 
 			ctrl.$onInit = async () =>
 			{
-				await ctrl.loadDemographicMapping();
-
-				$scope.$apply();
+				try
+				{
+					ctrl.loading = true;
+					await ctrl.loadDemographicMapping();
+				}
+				finally
+				{
+					ctrl.loading = false;
+					$scope.$apply();
+				}
 			};
 
 			/**
