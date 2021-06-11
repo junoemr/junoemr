@@ -84,7 +84,7 @@ public class PatientTo1
 	@Getter
 	@Setter
 	private boolean canMessage;
-	@JsonProperty("local_id")
+	@JsonProperty("remote_id")
 	@Getter
 	@Setter
 	private String demographicNo;
