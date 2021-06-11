@@ -19,8 +19,16 @@
 		}
 
 		.file-type,
-		.file-check {
+		.file-check,
+		.loading-indicator {
 			width: 72px;
+		}
+	}
+
+	.loading-indicator {
+		.loading-spinner-container {
+			width: 2em;
+			height: 2em;
 		}
 	}
 

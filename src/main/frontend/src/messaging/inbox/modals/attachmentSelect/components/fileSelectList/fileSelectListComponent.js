@@ -44,6 +44,8 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 
+			ctrl.fileCurrentlyBeingAdded = null;
+
 			ctrl.formatFileDate = (date) =>
 			{
 				return date.format(Juno.Common.Util.settings.date_format);
@@ -73,19 +75,28 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 			{
 				if (AllowedAttachmentMimeTypes.includes(junoFile.type))
 				{
-					const fileBinary = atob(await junoFile.getBase64Data());
+					try
+					{
+						ctrl.fileCurrentlyBeingAdded = junoFile;
 
-					if (fileBinary.length <= Attachment.MAX_ATTACHMENT_SIZE_BYTES)
-					{
-						ctrl.selectedFiles.push(junoFile);
-						$scope.$apply();
-					}
-					else
-					{
-						Juno.Common.Util.errorAlert($uibModal,
-							"File is to big",
-							`File ${junoFile.name} is ${Math.trunc(fileBinary.length / 1024 / 1024)} MB which 
+						const fileBinary = atob(await junoFile.getBase64Data());
+
+						if (fileBinary.length <= Attachment.MAX_ATTACHMENT_SIZE_BYTES)
+						{
+							ctrl.selectedFiles.push(junoFile);
+						}
+						else
+						{
+							Juno.Common.Util.errorAlert($uibModal,
+								"File is to big",
+								`File ${junoFile.name} is ${Math.trunc(fileBinary.length / 1024 / 1024)} MB which 
 							exceeds the limit of ${Attachment.MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024} MB.`);
+						}
+					}
+					finally
+					{
+						ctrl.fileCurrentlyBeingAdded = null;
+						$scope.$apply();
 					}
 				}
 				else

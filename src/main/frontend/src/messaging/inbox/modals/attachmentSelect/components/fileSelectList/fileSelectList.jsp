@@ -18,8 +18,15 @@
 				{{$ctrl.fileTypeHuman(file.type)}}
 			</div>
 
+			<!-- Loading indicator -->
+			<div ng-if="$ctrl.fileCurrentlyBeingAdded === file"
+			     class="flex-col justify-content-center h-100 h-100">
+				<juno-loading-indicator indicator-type="spinner" title="Attaching...">
+				</juno-loading-indicator>
+			</div>
 			<!-- Checkbox -->
-			<div class="file-check flex-row justify-content-center align-items-center">
+			<div ng-if="$ctrl.fileCurrentlyBeingAdded !== file"
+			     class="file-check flex-row justify-content-center align-items-center">
 				<juno-check-box ng-model="file.selected"
 				                dummy="true"
 				                button-color="JUNO_BUTTON_COLOR.PRIMARY">
