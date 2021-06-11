@@ -44,7 +44,7 @@ import oscar.oscarPrevention.reports.PreventionReportFactory;
 import oscar.oscarReport.data.RptDemographicQueryBuilder;
 import oscar.oscarReport.data.RptDemographicQueryLoader;
 import oscar.oscarReport.pageUtil.RptDemographicReportForm;
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -78,7 +78,7 @@ public class PreventionReportAction extends Action {
 		String setName = request.getParameter("patientSet");
 		String prevention = request.getParameter("prevention");
 		String asofDate = ((PreventionReportForm) form).asofDate;
-		Date asofDateDate = UtilDateUtilities.getDateFromString(asofDate, "yyyy-MM-dd");
+		Date asofDateDate = ConversionUtils.fromDateString(asofDate);
 
 		if (asofDateDate == null) {
 			Calendar today = Calendar.getInstance();

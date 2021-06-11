@@ -32,10 +32,11 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -145,10 +146,10 @@ public class MammogramReport implements PreventionReport{
                 //Calendar today = Calendar.getInstance();
                 //change as of date to run the report for a different year
 
-                 int monthsBeforeAsOfDate = UtilDateUtilities.getNumMonths(prevDate,asofDate);
                 String numMonths = "------";
-                if ( prevDate != null){
-                   int num = UtilDateUtilities.getNumMonths(prevDate,asofDate);
+                if (prevDate != null){
+                   long num = ChronoUnit.MONTHS.between(ConversionUtils.toLocalDate(ConversionUtils.toDateString(prevDate)),
+                                ConversionUtils.toLocalDate(ConversionUtils.toDateString(asofDate)));
                    numMonths = ""+num+" months";
                 }
 
