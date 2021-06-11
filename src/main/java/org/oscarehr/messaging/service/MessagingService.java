@@ -23,7 +23,12 @@
 
 package org.oscarehr.messaging.service;
 
-import org.oscarehr.messaging.model.*;
+
+import org.oscarehr.messaging.model.Attachment;
+import org.oscarehr.messaging.model.Conversation;
+import org.oscarehr.messaging.model.Message;
+import org.oscarehr.messaging.model.MessageGroup;
+import org.oscarehr.messaging.model.Messageable;
 import org.oscarehr.util.LoggedInInfo;
 
 import javax.annotation.Nullable;
