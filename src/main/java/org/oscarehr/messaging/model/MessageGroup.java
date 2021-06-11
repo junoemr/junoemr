@@ -36,9 +36,12 @@ public enum MessageGroup
 	// Boilerplate
 	// ==========================================================================
 
-	public static MessageGroup fromString(String name) {
-		for (MessageGroup group : MessageGroup.values()) {
-			if (group.name.equals(name)) {
+	public static MessageGroup fromString(String name)
+	{
+		for (MessageGroup group : MessageGroup.values())
+		{
+			if (group.name.equals(name))
+			{
 				return group;
 			}
 		}
