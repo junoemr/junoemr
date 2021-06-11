@@ -52,6 +52,8 @@ public class MessageDto implements Serializable
 	protected MessageableType senderType;
 	@JsonProperty("sender_name")
 	protected String senderName;
+	@JsonProperty("sender_identification_name")
+	protected String senderIdentificationName;
 	@JsonProperty("meta")
 	protected String metaData;
 	protected List<MessageParticipantDto> recipients;

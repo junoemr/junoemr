@@ -33,16 +33,18 @@ public class MhaMessageable implements Messageable<MhaMessageable>
 	protected String id;
 	protected MessageableType type;
 	protected String name;
+	protected String identificationName;
 
 
 	// ==========================================================================
 	// Public Methods
 	// ==========================================================================
 
-	public MhaMessageable(String id, String name, MessageableType type)
+	public MhaMessageable(String id, String name, String identificationName, MessageableType type)
 	{
 		this.id = id;
 		this.name = name;
+		this.identificationName = identificationName;
 		this.type = type;
 	}
 

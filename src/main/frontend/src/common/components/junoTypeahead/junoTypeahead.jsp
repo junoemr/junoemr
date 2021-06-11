@@ -35,6 +35,7 @@
 						autocomplete="off"
 						ng-class="$ctrl.inputClasses()"
 						ng-model="$ctrl.selectedValue"
+						ng-model-options="{debounce: 50}"
 						uib-typeahead="option as option.label for option in $ctrl.getOptions($viewValue)"
 						typeahead-select-on-exact="true"
 						typeahead-on-select="$ctrl.onSelect()"

@@ -21,6 +21,8 @@
 * Canada
 */
 
+import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
+
 const {JUNO_STYLE} = require("../../../../common/components/junoComponentConstants");
 
 angular.module("Messaging.Components").component('messageableSearch', {
@@ -43,6 +45,8 @@ angular.module("Messaging.Components").component('messageableSearch', {
 			const ctrl = this;
 			ctrl.selectedMessageableId = null;
 			ctrl.options = [];
+			ctrl.showHighConfidenceCheckmark = false;
+			ctrl.patientConfidenceMessage = "";
 
 			ctrl.$onInit = async () =>
 			{
@@ -58,6 +62,7 @@ angular.module("Messaging.Components").component('messageableSearch', {
 				{
 					await this.loadSearchOptions(newVal.name);
 					ctrl.selectedMessageableId = newVal.id
+					ctrl.updateCheckmarkVisibility();
 				}
 				else
 				{
@@ -65,12 +70,13 @@ angular.module("Messaging.Components").component('messageableSearch', {
 				}
 			});
 
-			ctrl.checkMessageSelection = (selection) =>
+			ctrl.checkMessageableSelection = (selection) =>
 			{
 				if (ctrl.ngModel && ctrl.ngModel.id !== selection)
 				{
 					// clear selection if id no longer matches
 					ctrl.ngModel = null;
+					ctrl.updateCheckmarkVisibility();
 				}
 			}
 
@@ -82,14 +88,16 @@ angular.module("Messaging.Components").component('messageableSearch', {
 				{
 					ctrl.onSelected({value: ctrl.ngModel});
 				}
+
+				ctrl.updateCheckmarkVisibility();
 			}
 
 			ctrl.loadSearchOptions = async (keyword) =>
 			{
 				if (keyword)
 				{
-					// strip ',' character
-					keyword = keyword.replace(/,/g, '');
+					// strip "formatting" characters
+					keyword = keyword.replace(/[,()]/g, '');
 				}
 
 				if (keyword && keyword.length > 2)
@@ -99,7 +107,7 @@ angular.module("Messaging.Components").component('messageableSearch', {
 					ctrl.options = messageables.map((messageable) =>
 					{
 						return {
-							label: messageable.name,
+							label: messageable.identificationName,
 							value: messageable.id,
 							data: messageable,
 						}
@@ -108,5 +116,19 @@ angular.module("Messaging.Components").component('messageableSearch', {
 
 				return ctrl.options;
 			};
+
+			ctrl.updateCheckmarkVisibility = async () =>
+			{
+				if (ctrl.ngModel)
+				{
+					ctrl.showHighConfidenceCheckmark = (await ctrl.ngModel.localMappingConfidenceLevel()) === MessageableMappingConfidence.HIGH;
+					ctrl.patientConfidenceMessage = await ctrl.ngModel.localMappingConfidenceExplanationString();
+					$scope.$apply();
+				}
+				else
+				{
+					ctrl.showHighConfidenceCheckmark = false;
+				}
+			}
 		}],
 });

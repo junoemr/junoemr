@@ -9,6 +9,7 @@
 		<div class="source-select grid-item justify-content-center p-t-48 p-b-16">
 			<file-source-select class="d-inline-block h-100 w-100"
 			                    hide-chart-sources="!$ctrl.canReadChart"
+			                    messageable="$ctrl.messageable"
 			                    on-source-selected="$ctrl.switchFileSource(value)">
 			</file-source-select>
 		</div>

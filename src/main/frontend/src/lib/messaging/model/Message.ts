@@ -124,6 +124,11 @@ export default class Message
 		return this._group;
 	}
 
+	get read(): boolean
+	{
+		return  this._read;
+	}
+
 	get isRead(): boolean
 	{
 		return this._read;

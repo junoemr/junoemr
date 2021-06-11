@@ -23,6 +23,7 @@
 
 package org.oscarehr.integration.myhealthaccess.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.oscarehr.messaging.model.MessageableType;
@@ -35,6 +36,8 @@ public class MessageParticipantDto implements Serializable
 {
 	protected String id;
 	protected String name;
+	@JsonProperty("identification_name")
+	protected String identificationName;
 	protected MessageableType type;
 
 	// ==========================================================================
@@ -43,8 +46,14 @@ public class MessageParticipantDto implements Serializable
 
 	public MessageParticipantDto(String id, String name, MessageableType type)
 	{
+		this(id, name, null, type);
+	}
+
+	public MessageParticipantDto(String id, String name, String identificationName, MessageableType type)
+	{
 		this.id = id;
 		this.name = name;
+		this.identificationName = identificationName != null ? identificationName : name;
 		this.type = type;
 	}
 }

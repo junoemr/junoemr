@@ -45,21 +45,35 @@ public class MessagingBaseWebService extends AbstractServiceImpl
 	// Protected Methods
 	// ==========================================================================
 
+	/**
+	 * get messageable object for the integration
+	 * @param integrationId - integrtation to build the messageable for
+	 * @return - a new messageable
+	 */
 	protected MhaMessageable messageableFromIntegrationId(String integrationId)
 	{
 		Integration integration = this.integrationDao.find(Integer.parseInt(integrationId));
 
+		String integrationName = integration.getSite() == null ? "" : integration.getSite().getName();
+
 		return new MhaMessageable(
 				integration.getRemoteId(),
-				integration.getSite() == null ? "" : integration.getSite().getName(),
+				integrationName,
+				integrationName,
 				MessageableType.MHA_CLINIC);
 	}
 
+	/**
+	 * build a basic messageable form just the id & type.
+	 * @param id - the id of the messageable
+	 * @param type - the type of the messageable
+	 * @return - a basic mesageable.
+	 */
 	protected MhaMessageable messageableFromIdType(String id, MessageableType type)
 	{
 		if (id != null && type != null)
 		{
-			return new MhaMessageable(id, "", type);
+			return new MhaMessageable(id, "", "", type);
 		}
 		else
 		{

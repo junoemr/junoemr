@@ -10,7 +10,7 @@ export default class MessageableDtoToMessageableConverter extends AbstractConver
 
 	convert(from: MessageableDto): Messageable
 	{
-		return new Messageable(from.id, from.type, from.name);
+		return new Messageable(from.id, from.type, from.name, from.identificationName);
 	}
 
 }

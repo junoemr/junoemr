@@ -30,6 +30,7 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 		selectedSource: "=?",
 		onSourceSelected: "&?",
 		hideChartSources: "<?",
+		messageable: "<?",
 	},
 	controller: [
 		"$scope",
@@ -40,10 +41,11 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 
 			$scope.FileSource = FileSource;
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
 				ctrl.selectedSource = ctrl.selectedSource || FileSource.DOCUMENTS;
 				ctrl.hideChartSources = ctrl.hideChartSources || false;
+				ctrl.confidenceLevelMessage = await ctrl.messageable.localMappingConfidenceExplanationString();
 			}
 
 			ctrl.selectSource = (source) =>

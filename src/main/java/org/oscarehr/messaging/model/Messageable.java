@@ -53,6 +53,14 @@ public interface Messageable<T>
 	public String getName();
 
 	/**
+	 * Get the "identification name" of the mssageable. This is similar to name
+	 * but includes additional information for identification purposes. for example
+	 * Jon, Wick (9594562543) (2021-01-01)
+	 * @return a descriptive name of the messageable.
+	 */
+	public String getIdentificationName();
+
+	/**
 	 * get the entity which this messageable represents.
 	 * @return returns the entity. This could be a new object or could just be 'this'.
 	 */

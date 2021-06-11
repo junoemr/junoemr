@@ -14,6 +14,7 @@ export default class MessageableToMessageableDtoConverter extends AbstractConver
 			id: from.id,
 			type: from.type,
 			name: from.name,
+			identificationName: from.identificationName,
 		};
 	}
 

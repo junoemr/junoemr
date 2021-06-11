@@ -43,7 +43,7 @@ public class MessageDtoToMhaMessageConverter extends AbstractModelConverter<Mess
 		BeanUtils.copyProperties(input, mhaMessage, "senderId", "senderType", "senderName", "recipients", "attachments");
 
 		// convert sender / recipients
-		mhaMessage.setSender(new MhaMessageable(input.getSenderId(), input.getSenderName(), input.getSenderType()));
+		mhaMessage.setSender(new MhaMessageable(input.getSenderId(), input.getSenderName(), input.getSenderIdentificationName(), input.getSenderType()));
 		mhaMessage.setRecipients((new MessageParticipantDtoToMhaMessageableConverter()).convert(input.getRecipients()));
 
 		// convert attachments

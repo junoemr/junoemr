@@ -117,8 +117,11 @@ angular.module("Messaging.Components").component('messageList', {
 				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
 
 				// mark message as read
-				message.read = true;
-				messagingService.updateMessage(message);
+				if (!message.read)
+				{
+					message.read = true;
+					messagingService.updateMessage(message);
+				}
 
 				// display the selected message
 				ctrl.selectedMessageId = message.id;

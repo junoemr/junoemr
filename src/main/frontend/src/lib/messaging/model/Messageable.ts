@@ -7,6 +7,7 @@ export default class Messageable
 	protected _id: string;
 	protected _type: MessageableType;
 	protected _name: string;
+	protected _identificationName: string;
 
 	// ==========================================================================
 	// Public Methods
@@ -17,12 +18,14 @@ export default class Messageable
 	 * @param id - id of the messageble
 	 * @param type - type of the messageable
 	 * @param name - name of the messageable. ex: "Smith, Jon".
+	 * @param identificationName - a more descriptive name used to identify the messageable
 	 */
-	constructor(id: string, type: MessageableType, name: string)
+	constructor(id: string, type: MessageableType, name: string, identificationName = null)
 	{
 		this._id = id;
 		this._type = type;
 		this._name = name;
+		this._identificationName = identificationName;
 	}
 
 	/**
@@ -43,6 +46,17 @@ export default class Messageable
 	public async localMappingConfidenceLevel(): Promise<MessageableMappingConfidence>
 	{
 		return MessageableMappingConfidence.NONE;
+	}
+
+	/**
+	 * a string explaining to the user why this messageable is at the current confidence level.
+	 * An example might be, "Patient Chart Connection Active" for HIGH confidence.
+	 * or "Patient chart unavailable please do X, Y, & Z to connect..."
+	 * @return promise that resolves to an explanatory string.
+	 */
+	public async localMappingConfidenceExplanationString(): Promise<string>
+	{
+		return null;
 	}
 
 	/**
@@ -80,5 +94,10 @@ export default class Messageable
 	get name(): string
 	{
 		return this._name;
+	}
+
+	get identificationName(): string
+	{
+		return this._identificationName;
 	}
 }

@@ -5,7 +5,10 @@
 
 	.message-group-container {
 		border-bottom: solid 1px var(--color-neutral-light-grey);
-		--juno-collapse-area-label-left-indent: 32px;
+
+		.juno-collapse-area {
+			--label-left-indent: 32px;
+		}
 
 		.source-item {
 			display: flex;

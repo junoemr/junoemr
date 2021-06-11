@@ -4,6 +4,7 @@ import MhaPatient from "../model/MhaPatient";
 import {map} from "angular-ui-router";
 import {Province} from "../../../constants/Province";
 import {LinkStatus} from "../model/LinkStatus";
+import moment from "moment";
 
 export default class PatientTo1ToMhaPatientConverter extends AbstractConverter<PatientTo1, MhaPatient>
 {
@@ -25,6 +26,7 @@ export default class PatientTo1ToMhaPatientConverter extends AbstractConverter<P
 		mhaPatient.firstName = patientTo1.first_name;
 		mhaPatient.middleName = patientTo1.middle_name;
 		mhaPatient.lastName = patientTo1.last_name;
+		mhaPatient.birthDate = patientTo1.birth_date ? moment(patientTo1.birth_date) : null;
 
 		mhaPatient.healthCareProvinceCode = Province[patientTo1.health_care_province_code];
 		mhaPatient.healthNumber = patientTo1.health_number;

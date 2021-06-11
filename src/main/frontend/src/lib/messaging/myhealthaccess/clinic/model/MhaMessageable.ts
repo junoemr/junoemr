@@ -87,6 +87,26 @@ export default class MhaMessageable extends Messageable
 	}
 
 	/**
+	 * a string explaining to the user why this messageable is at the current confidence level.
+	 * An example might be, "Patient Chart Connection Active" for HIGH confidence.
+	 * or "Patient chart unavailable please do X, Y, & Z to connect..."
+	 * @return promise that resolves to an explanatory string.
+	 */
+	public async localMappingConfidenceExplanationString(): Promise<string>
+	{
+		switch(await this.localMappingConfidenceLevel())
+		{
+			case MessageableMappingConfidence.NONE:
+			case MessageableMappingConfidence.LOW:
+				return "MHA patient is unconfirmed. To access their eChart you must verify the connection";
+			case MessageableMappingConfidence.MEDIUM:
+				return "MHA patient is confirmed. To access their eChart you must verify the connection";
+			case MessageableMappingConfidence.HIGH:
+				return "MHA patient is verified";
+		}
+	}
+
+	/**
 	 * local entity id. i.e. (provider or demographic id).
 	 * @return promise that resolves to local entity id or null if not available
 	 */

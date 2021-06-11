@@ -6,7 +6,7 @@
 		<div class="source flex-row align-items-center"
 		     ng-class="$ctrl.sourceClasses(FileSource.DOCUMENTS)"
 		     ng-click="$ctrl.selectSource(FileSource.DOCUMENTS)"
-		     title="{{$ctrl.hideChartSources ? 'Patient Chart Unavailable' : ''}}">
+		     title="{{$ctrl.hideChartSources ? $ctrl.confidenceLevelMessage : ''}}">
 			<span> Documents </span>
 		</div>
 	</div>

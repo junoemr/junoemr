@@ -1,5 +1,6 @@
 import {LinkStatus} from "./LinkStatus";
 import {Province} from "../../../constants/Province";
+import {Moment} from "moment";
 
 export default class MhaPatient
 {
@@ -7,6 +8,7 @@ export default class MhaPatient
 	protected _firstName: string;
 	protected _middleName: string;
 	protected _lastName: string;
+	private _birthDate: Moment;
 
 	protected _healthCareProvinceCode: Province;
 	protected _healthNumber: string;
@@ -45,6 +47,11 @@ export default class MhaPatient
 	set lastName(value: string)
 	{
 		this._lastName = value;
+	}
+
+	set birthDate(value: Moment)
+	{
+		this._birthDate = value;
 	}
 
 	set healthCareProvinceCode(value: Province)
@@ -130,6 +137,11 @@ export default class MhaPatient
 	get lastName(): string
 	{
 		return this._lastName;
+	}
+
+	get birthDate(): Moment
+	{
+		return this._birthDate;
 	}
 
 	get healthCareProvinceCode(): Province

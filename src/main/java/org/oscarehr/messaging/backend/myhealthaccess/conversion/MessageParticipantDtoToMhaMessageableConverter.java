@@ -36,6 +36,6 @@ public class MessageParticipantDtoToMhaMessageableConverter extends AbstractMode
 	@Override
 	public MhaMessageable convert(MessageParticipantDto input)
 	{
-		return new MhaMessageable(input.getId(), input.getName(), input.getType());
+		return new MhaMessageable(input.getId(), input.getName(), input.getIdentificationName(), input.getType());
 	}
 }

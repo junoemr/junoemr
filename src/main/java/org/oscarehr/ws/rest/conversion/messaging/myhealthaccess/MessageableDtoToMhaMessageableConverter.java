@@ -37,6 +37,6 @@ public class MessageableDtoToMhaMessageableConverter extends AbstractModelConver
 	@Override
 	public MhaMessageable convert(MessageableDto input)
 	{
-		return new MhaMessageable(input.getId(), input.getName(), input.getType());
+		return new MhaMessageable(input.getId(), input.getName(), input.getIdentificationName(), input.getType());
 	}
 }

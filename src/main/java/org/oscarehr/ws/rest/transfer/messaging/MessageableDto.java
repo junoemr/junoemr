@@ -34,4 +34,5 @@ public class MessageableDto implements Serializable
 	protected String id;
 	protected MessageableType type;
 	protected String name;
+	protected String identificationName;
 }

@@ -7,7 +7,7 @@
 			<div>
 				From:
 				<a ng-if="$ctrl.demographicMapping.has($ctrl.message.sender.id)"
-				   title="To Chart"
+				   title="To chart"
 				   ng-click="$ctrl.toDemographicSummary($ctrl.demographicMapping.get($ctrl.message.sender.id))">
 					{{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
 				</a>
@@ -24,7 +24,7 @@
 			<div>
 				<span ng-repeat="recipient in $ctrl.message.recipients">
 					<a ng-if="$ctrl.demographicMapping.has(recipient.id)"
-					   title="To Chart"
+					   title="To chart"
 					   ng-click="$ctrl.toDemographicSummary($ctrl.demographicMapping.get(recipient.id))">
 						{{recipient.name}}
 					</a>

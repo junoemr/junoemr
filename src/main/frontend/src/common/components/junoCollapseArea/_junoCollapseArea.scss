@@ -1,11 +1,8 @@
-// style variable defaults
-:root {
-	--juno-collapse-area-label-left-indent: 0px;
-}
-
 .juno-collapse-area {
+	--label-left-indent: 0px;
+
 	.header {
-		margin-left: var(--juno-collapse-area-label-left-indent);
+		margin-left: var(--label-left-indent);
 		cursor: pointer;
 	}
 

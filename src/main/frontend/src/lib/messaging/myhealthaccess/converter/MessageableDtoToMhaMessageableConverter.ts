@@ -10,7 +10,7 @@ export default class MessageableDtoToMhaMessageableConverter extends AbstractCon
 
 	convert(from: MessageableDto): MhaMessageable
 	{
-		return new MhaMessageable(from.id, from.type, from.name);
+		return new MhaMessageable(from.id, from.type, from.name, from.identificationName);
 	}
 
 }
