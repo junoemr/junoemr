@@ -24,8 +24,7 @@ package org.oscarehr.decisionSupport2.model.condition;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfoLookup;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 
 @Data
 public abstract class DsCondition extends AbstractTransientModel
@@ -34,5 +33,5 @@ public abstract class DsCondition extends AbstractTransientModel
 	private String name;
 	private String value;
 
-	public abstract boolean meetsRequirements(FlowsheetItem flowsheetItem, FlowsheetInfoLookup flowsheetInfoLookup);
+	public abstract boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup);
 }

@@ -32,9 +32,9 @@ import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.converter.PreventionToFlowsheetItemDataConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.decisionSupport2.entity.Drools;
-import org.oscarehr.flowsheet.entity.SeverityLevel;
+import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 import org.oscarehr.flowsheet.model.Flowsheet;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
+import org.oscarehr.decisionSupport2.model.DsInfoCache;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
@@ -111,20 +111,20 @@ public class FlowsheetService
 		return flowsheet;
 	}
 
-	private void fillItemAlerts(FlowsheetInfo flowsheetInfo, FlowsheetItem item)
+	private void fillItemAlerts(DsInfoCache dsInfoCache, FlowsheetItem item)
 	{
 		// set item specific alerts
 		String measurementTypeCode = item.getTypeCode();
-		if(flowsheetInfo.hasRecommendation(measurementTypeCode))
+		if(dsInfoCache.hasRecommendation(measurementTypeCode))
 		{
-			flowsheetInfo.getWarnings(measurementTypeCode).forEach((recommendation) -> {
+			dsInfoCache.getWarnings(measurementTypeCode).forEach((recommendation) -> {
 				FlowsheetItemAlert alert = new FlowsheetItemAlert(recommendation, SeverityLevel.RECOMMENDATION);
 				item.addFlowsheetItemAlert(alert);
 			});
 		}
-		if(flowsheetInfo.hasWarning(measurementTypeCode))
+		if(dsInfoCache.hasWarning(measurementTypeCode))
 		{
-			flowsheetInfo.getWarnings(measurementTypeCode).forEach((warning) -> {
+			dsInfoCache.getWarnings(measurementTypeCode).forEach((warning) -> {
 				FlowsheetItemAlert alert = new FlowsheetItemAlert(warning, SeverityLevel.WARNING);
 				item.addFlowsheetItemAlert(alert);
 			});

@@ -24,7 +24,7 @@ package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.flowsheet.entity.SeverityLevel;
+import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

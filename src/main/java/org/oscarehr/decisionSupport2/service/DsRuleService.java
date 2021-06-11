@@ -24,10 +24,10 @@ package org.oscarehr.decisionSupport2.service;
 
 
 import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
+import org.oscarehr.decisionSupport2.model.DsInfoCache;
+import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 import org.oscarehr.flowsheet.entity.Flowsheet;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfoLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -40,7 +40,7 @@ public class DsRuleService
 	@Autowired
 	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
 
-	public void applyFlowsheetRules(FlowsheetInfoLookup flowsheetInfoLookup, FlowsheetInfo flowsheetInfo, Flowsheet flowsheetEntity)
+	public void applyFlowsheetRules(DsInfoLookup dsInfoLookup, DsInfoCache dsInfoCache, Flowsheet flowsheetEntity)
 	{
 		for(FlowsheetItem flowsheetItem : flowsheetEntity.getFlowsheetItems())
 		{
@@ -49,9 +49,9 @@ public class DsRuleService
 					.stream()
 					.filter((rule) -> rule.getConditions()
 							.stream()
-							.allMatch((condition) -> condition.meetsRequirements(flowsheetItem, flowsheetInfoLookup)))
+							.allMatch((condition) -> condition.meetsRequirements(flowsheetItem.getTypeCode(), dsInfoLookup)))
 					.forEach((rule) -> rule.getConsequences()
-							.forEach((consequence) -> consequence.apply(flowsheetItem, flowsheetInfo))
+							.forEach((consequence) -> consequence.apply(flowsheetItem.getTypeCode(), dsInfoCache))
 					);
 		}
 	}

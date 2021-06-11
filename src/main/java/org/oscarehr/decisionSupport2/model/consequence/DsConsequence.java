@@ -24,9 +24,7 @@ package org.oscarehr.decisionSupport2.model.consequence;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.entity.SeverityLevel;
+import org.oscarehr.decisionSupport2.model.DsInfoCache;
 
 @Data
 public abstract class DsConsequence extends AbstractTransientModel
@@ -36,5 +34,5 @@ public abstract class DsConsequence extends AbstractTransientModel
 	private String message;
 	private SeverityLevel severityLevel;
 
-	public abstract void apply(FlowsheetItem flowsheetItem, FlowsheetInfo flowsheetInfo);
+	public abstract void apply(String typeCode, DsInfoCache dsInfoCache);
 }

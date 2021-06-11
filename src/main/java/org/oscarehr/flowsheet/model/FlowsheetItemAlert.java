@@ -24,7 +24,7 @@ package org.oscarehr.flowsheet.model;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.SeverityLevel;
+import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 
 @Data
 public class FlowsheetItemAlert extends AbstractTransientModel

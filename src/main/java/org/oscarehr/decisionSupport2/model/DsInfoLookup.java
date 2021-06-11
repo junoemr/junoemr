@@ -20,11 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.entity;
+package org.oscarehr.decisionSupport2.model;
 
-public enum SeverityLevel
+public interface DsInfoLookup
 {
-	RECOMMENDATION,
-	WARNING,
-	DANGER,
+	int getLastDateRecordedInMonths(String typeCode);
+	int getLastValueAsInt(String typeCode);
+	int isDataEqualToYes(String typeCode);
 }

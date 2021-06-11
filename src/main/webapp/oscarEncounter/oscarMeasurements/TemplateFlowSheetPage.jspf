@@ -160,8 +160,8 @@
 
 
     String flowSheet = mFlowsheet.getDisplayName();
-    ArrayList<String> warnings = mi.getWarnings();
-    ArrayList<String> recomendations = mi.getRecommendations();
+    List<String> warnings = mi.getWarnings();
+    List<String> recomendations = mi.getRecommendations();
     ArrayList comments = new ArrayList();
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"

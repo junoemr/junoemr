@@ -58,10 +58,10 @@ public class DsRule extends AbstractModel<Integer>
 	@Column(name = "description")
 	private String description;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetRule", cascade = CascadeType.ALL)
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "dsRule", cascade = CascadeType.ALL)
 	private List<DsRuleCondition> conditions;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetRule", cascade = CascadeType.ALL)
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "dsRule", cascade = CascadeType.ALL)
 	private List<DsRuleConsequence> consequences;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

@@ -28,8 +28,8 @@ package oscar.oscarEncounter.oscarMeasurements;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfoLookup;
+import org.oscarehr.decisionSupport2.model.DsInfoCache;
+import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
@@ -38,26 +38,26 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandle
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author jay
  */
-public class MeasurementInfo implements FlowsheetInfo, FlowsheetInfoLookup
+public class MeasurementInfo implements DsInfoCache, DsInfoLookup
 {
-    private static Logger log = MiscUtils.getLogger();
+    private static final Logger log = MiscUtils.getLogger();
 
-    ArrayList<String> warning = null;
-    Hashtable<String,String> warningHash = new Hashtable<String,String>();
-    ArrayList<String> recommendations = null;
-    Hashtable<String,String> recommendationHash = new Hashtable<String,String>();
-    HashMap<String,Boolean> hiddens = new HashMap<String,Boolean>();
+    private final List<String> warning = new ArrayList<>();
+    private final Map<String, List<String>> warningHash = new HashMap<>();
+    private final List<String> recommendations = new ArrayList<>();
+    private final Map<String, List<String>> recommendationHash = new HashMap<>();
+    private final Map<String, Boolean> hiddens = new HashMap<>();
 
-    ArrayList measurementList = new ArrayList();
+    List<EctMeasurementsDataBean> measurementList = new ArrayList<>();
     Hashtable<String, ArrayList<EctMeasurementsDataBean>> measurementHash = new Hashtable<>();
     String demographicNo = "";
 
@@ -66,19 +66,10 @@ public class MeasurementInfo implements FlowsheetInfo, FlowsheetInfoLookup
         demographicNo = demographic;
     }
 
-    public ArrayList getList(){
-        ArrayList<String> list = new ArrayList<String>();
-
-        Enumeration<String> e = warningHash.keys();
-        while (e.hasMoreElements()){
-            list.add(e.nextElement());
-        }
-
-        e = recommendationHash.keys();
-        while (e.hasMoreElements()){
-            list.add(e.nextElement());
-        }
-
+    public ArrayList getList()
+    {
+        ArrayList<String> list = new ArrayList<>(warningHash.keySet());
+        list.addAll(recommendationHash.keySet());
         return list;
     }
 
@@ -86,29 +77,25 @@ public class MeasurementInfo implements FlowsheetInfo, FlowsheetInfoLookup
         log.debug(logMessage);
     }
 
-    public ArrayList<String> getWarnings()
+    public List<String> getWarnings()
     {
-        if(warning == null)
-        {
-            warning = new ArrayList<>();
-        }
         return warning;
     }
 
-    public ArrayList<String> getRecommendations(){
-        if (recommendations == null){
-           recommendations = new ArrayList<>();
-        }
+    public List<String> getRecommendations()
+    {
         return recommendations;
     }
 
     @Override
-    public boolean getHidden(String measurement){
-    	if (hiddens.get(measurement) == null) return false;
-    	return hiddens.get(measurement);
+    public boolean getHidden(String measurement)
+    {
+        if(hiddens.get(measurement) == null) return false;
+        return hiddens.get(measurement);
     }
 
-    public void setDemographic(String demographic){
+    public void setDemographic(String demographic)
+    {
         demographicNo = demographic;
     }
 
@@ -124,74 +111,90 @@ public class MeasurementInfo implements FlowsheetInfo, FlowsheetInfoLookup
             String measurement = list.get(i);
             EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(Integer.valueOf(demographicNo), measurement);
             List<EctMeasurementsDataBean> measurementsData = ect.getMeasurementsData();
-            measurementList.add(new ArrayList(measurementsData));
+            measurementList.addAll(measurementsData);
             measurementHash.put(measurement, new ArrayList<>(measurementsData));
         }
     }
 
-    public ArrayList<EctMeasurementsDataBean> getMeasurementData(String measurement){
+    public ArrayList<EctMeasurementsDataBean> getMeasurementData(String measurement)
+    {
         return measurementHash.get(measurement);
     }
 
     @Override
-    public void addRecommendation(String measurement,String recommendationMessage){
-        if (recommendations == null){
-           recommendations = new ArrayList<>();
+    public void addRecommendation(String measurement, String recommendationMessage)
+    {
+        if(recommendationHash.containsKey(measurement))
+        {
+            recommendationHash.get(measurement).add(recommendationMessage);
         }
-        recommendationHash.put(measurement,recommendationMessage);
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(recommendationMessage);
+            recommendationHash.put(measurement, messageList);
+        }
         recommendations.add(recommendationMessage);
     }
 
     @Override
-    public void addWarning(String measurement,String warningMessage){
-        if (warning == null){
-           warning = new ArrayList<>();
+    public void addWarning(String measurement, String warningMessage)
+    {
+        if(warningHash.containsKey(measurement))
+        {
+            warningHash.get(measurement).add(warningMessage);
         }
-        warningHash.put(measurement,warningMessage);
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(warningMessage);
+            warningHash.put(measurement, messageList);
+        }
         warning.add(warningMessage);
     }
 
     @Override
-    public void addHidden(String measurement, boolean hidden) {
-    	hiddens.put(measurement, hidden);
+    public void addHidden(String measurement, boolean hidden)
+    {
+        hiddens.put(measurement, hidden);
     }
 
     @Override
-    public boolean hasWarning(String measurement){
-        boolean warn = false;
-        if (warningHash.get(measurement) != null){
-            warn = true;
-        }
-        return warn;
+    public boolean hasWarning(String measurement)
+    {
+        return warningHash.get(measurement) != null;
     }
 
     @Override
-    public boolean hasRecommendation(String measurement){
-        boolean warn = false;
-        if (recommendationHash.get(measurement) != null){
-            warn = true;
-        }
-        return warn;
+    public boolean hasRecommendation(String measurement)
+    {
+        return recommendationHash.get(measurement) != null;
     }
 
-    public String getRecommendation(String measurement){
+    @Deprecated
+    public String getRecommendation(String measurement)
+    {
+        List<String> recommendations = recommendationHash.get(measurement);
+        return (recommendations != null && !recommendations.isEmpty()) ? String.join(", ", recommendations) : null;
+    }
+
+    @Override
+    public List<String> getRecommendations(String measurement)
+    {
         return recommendationHash.get(measurement);
     }
 
-    @Override
-    public List<String> getRecommendations(String typeCode)
+    @Deprecated
+    public String getWarning(String measurement)
     {
-        return null; //TODO
-    }
-
-    public String getWarning(String measurement){
-        return warningHash.get(measurement);
+        List<String> warnings = warningHash.get(measurement);
+        return (warnings != null && !warnings.isEmpty()) ? String.join(", ", warnings) : null;
     }
 
     @Override
     public List<String> getWarnings(String measurement)
     {
-        return null; //TODO
+        return warningHash.get(measurement);
     }
 
     @Override

@@ -24,7 +24,7 @@ package org.oscarehr.decisionSupport2.model;
 
 import java.util.List;
 
-public interface FlowsheetInfo
+public interface DsInfoCache
 {
 	void addWarning(String typeCode, String message);
 	void addRecommendation(String typeCode, String message);

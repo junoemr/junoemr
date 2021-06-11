@@ -23,15 +23,14 @@
 package org.oscarehr.decisionSupport2.model.consequence;
 
 import lombok.Data;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.oscarehr.decisionSupport2.model.DsInfoCache;
 
 @Data
 public class ConsequenceHideItemType extends DsConsequence
 {
 	@Override
-	public void apply(FlowsheetItem flowsheetItem, FlowsheetInfo flowsheetInfo)
+	public void apply(String typeCode, DsInfoCache dsInfoCache)
 	{
-		flowsheetInfo.addHidden(flowsheetItem.getTypeCode(), true);
+		dsInfoCache.addHidden(typeCode, true);
 	}
 }

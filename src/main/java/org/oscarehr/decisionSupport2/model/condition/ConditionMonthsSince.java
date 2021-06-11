@@ -23,16 +23,15 @@
 package org.oscarehr.decisionSupport2.model.condition;
 
 import lombok.Data;
-import org.oscarehr.decisionSupport2.model.FlowsheetInfoLookup;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 
 @Data
 public class ConditionMonthsSince extends DsCondition
 {
 	@Override
-	public boolean meetsRequirements(FlowsheetItem flowsheetItem, FlowsheetInfoLookup flowsheetInfoLookup)
+	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
-		int monthsSince = flowsheetInfoLookup.getLastDateRecordedInMonths(flowsheetItem.getTypeCode());
+		int monthsSince = dsInfoLookup.getLastDateRecordedInMonths(typeCode);
 		return (monthsSince > Double.parseDouble(getValue()));
 	}
 }
