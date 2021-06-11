@@ -20,19 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model.rule.condition;
+package org.oscarehr.flowsheet.model;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.model.FlowsheetInfoLookup;
-
-@Data
-public abstract class FlowsheetRuleCondition extends AbstractTransientModel
+public interface FlowsheetInfoLookup
 {
-	private Integer id;
-	private String name;
-	private String value;
-
-	public abstract boolean meetsRequirements(FlowsheetItem flowsheetItem, FlowsheetInfoLookup flowsheetInfoLookup);
+	int getLastDateRecordedInMonths(String typeCode);
+	int getLastValueAsInt(String typeCode);
+	int isDataEqualToYes(String typeCode);
 }

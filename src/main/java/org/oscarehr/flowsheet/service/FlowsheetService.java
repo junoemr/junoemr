@@ -32,6 +32,7 @@ import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.entity.Drools;
 import org.oscarehr.flowsheet.entity.SeverityLevel;
 import org.oscarehr.flowsheet.model.Flowsheet;
+import org.oscarehr.flowsheet.model.FlowsheetInfo;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
@@ -92,36 +93,46 @@ public class FlowsheetService
 		{
 			for(FlowsheetItem item : group.getFlowsheetItems())
 			{
+
 				if(item.isMeasurementType())
 				{
-					fillMeasurementItemDataAndAlerts(measurementInfo, item);
+					fillItemAlerts(measurementInfo, item);
+					fillMeasurementItemData(measurementInfo, item);
 				}
 				else
 				{
-					fillPreventionItemDataAndAlerts(demographicId, item);
+					fillItemAlerts(measurementInfo, item);
+					fillPreventionItemData(demographicId, item);
 				}
 			}
 		}
 		return flowsheet;
 	}
 
-	private void fillMeasurementItemDataAndAlerts(MeasurementInfo measurementInfo, FlowsheetItem item)
+	private void fillItemAlerts(FlowsheetInfo flowsheetInfo, FlowsheetItem item)
 	{
 		// set item specific alerts
 		String measurementTypeCode = item.getTypeCode();
-		if(measurementInfo.hasRecommendation(measurementTypeCode))
+		if(flowsheetInfo.hasRecommendation(measurementTypeCode))
 		{
-			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getRecommendation(measurementTypeCode), SeverityLevel.RECOMMENDATION);
-			item.addFlowsheetItemAlert(alert);
+			flowsheetInfo.getWarnings(measurementTypeCode).forEach((recommendation) -> {
+				FlowsheetItemAlert alert = new FlowsheetItemAlert(recommendation, SeverityLevel.RECOMMENDATION);
+				item.addFlowsheetItemAlert(alert);
+			});
 		}
-		if(measurementInfo.hasWarning(measurementTypeCode))
+		if(flowsheetInfo.hasWarning(measurementTypeCode))
 		{
-			FlowsheetItemAlert alert = new FlowsheetItemAlert(measurementInfo.getWarning(measurementTypeCode), SeverityLevel.WARNING);
-			item.addFlowsheetItemAlert(alert);
-		}
+			flowsheetInfo.getWarnings(measurementTypeCode).forEach((warning) -> {
+				FlowsheetItemAlert alert = new FlowsheetItemAlert(warning, SeverityLevel.WARNING);
+				item.addFlowsheetItemAlert(alert);
+			});
 
+		}
+	}
+	private void fillMeasurementItemData(MeasurementInfo measurementInfo, FlowsheetItem item)
+	{
 		// set existing data
-		List<EctMeasurementsDataBean> measurementsDataBeans = measurementInfo.getMeasurementData(measurementTypeCode);
+		List<EctMeasurementsDataBean> measurementsDataBeans = measurementInfo.getMeasurementData(item.getTypeCode());
 		for(EctMeasurementsDataBean dataBean : measurementsDataBeans)
 		{
 			FlowsheetItemData itemData = new FlowsheetItemData();
@@ -135,10 +146,8 @@ public class FlowsheetService
 		}
 	}
 
-	private void fillPreventionItemDataAndAlerts(Integer demographicId, FlowsheetItem item)
+	private void fillPreventionItemData(Integer demographicId, FlowsheetItem item)
 	{
-		//TODO load alert rules etc. drools not set up for preventions
-
 		List<Prevention> preventions = preventionDao.findByTypeAndDemoNo(item.getTypeCode(), demographicId);
 		for(Prevention prevention : preventions)
 		{
@@ -166,7 +175,7 @@ public class FlowsheetService
 			getMessages(measurementInfo, ruleBase);
 		}
 
-		flowsheetRuleService.applyFlowsheetRules(measurementInfo, flowsheetEntity);
+		flowsheetRuleService.applyFlowsheetRules(measurementInfo, measurementInfo, flowsheetEntity);
 		return measurementInfo;
 	}
 

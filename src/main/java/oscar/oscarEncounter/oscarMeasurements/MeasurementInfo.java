@@ -28,7 +28,8 @@ package oscar.oscarEncounter.oscarMeasurements;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.flowsheet.model.FlowsheetInfo;
+import org.oscarehr.flowsheet.model.FlowsheetInfoLookup;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
@@ -46,7 +47,8 @@ import java.util.List;
  *
  * @author jay
  */
-public class MeasurementInfo {
+public class MeasurementInfo implements FlowsheetInfo, FlowsheetInfoLookup
+{
     private static Logger log = MiscUtils.getLogger();
 
     ArrayList<String> warning = null;
@@ -57,11 +59,8 @@ public class MeasurementInfo {
 
     ArrayList measurementList = new ArrayList();
     Hashtable<String, ArrayList<EctMeasurementsDataBean>> measurementHash = new Hashtable<>();
-    ArrayList itemList = new ArrayList();
     String demographicNo = "";
-    
-    DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-     
+
     /** Creates a new instance of MeasurementInfo */
     public MeasurementInfo(String demographic) {
         demographicNo = demographic;
@@ -102,7 +101,8 @@ public class MeasurementInfo {
         }
         return recommendations;
     }
-    
+
+    @Override
     public boolean getHidden(String measurement){
     	if (hiddens.get(measurement) == null) return false;
     	return hiddens.get(measurement);
@@ -133,27 +133,30 @@ public class MeasurementInfo {
         return measurementHash.get(measurement);
     }
 
+    @Override
     public void addRecommendation(String measurement,String recommendationMessage){
         if (recommendations == null){
-           recommendations = new ArrayList();
+           recommendations = new ArrayList<>();
         }
         recommendationHash.put(measurement,recommendationMessage);
         recommendations.add(recommendationMessage);
     }
 
+    @Override
     public void addWarning(String measurement,String warningMessage){
         if (warning == null){
-           warning = new ArrayList();
+           warning = new ArrayList<>();
         }
         warningHash.put(measurement,warningMessage);
         warning.add(warningMessage);
     }
-    
+
+    @Override
     public void addHidden(String measurement, boolean hidden) {
     	hiddens.put(measurement, hidden);
     }
 
-
+    @Override
     public boolean hasWarning(String measurement){
         boolean warn = false;
         if (warningHash.get(measurement) != null){
@@ -162,6 +165,7 @@ public class MeasurementInfo {
         return warn;
     }
 
+    @Override
     public boolean hasRecommendation(String measurement){
         boolean warn = false;
         if (recommendationHash.get(measurement) != null){
@@ -174,21 +178,25 @@ public class MeasurementInfo {
         return recommendationHash.get(measurement);
     }
 
+    @Override
+    public List<String> getRecommendations(String typeCode)
+    {
+        return null; //TODO
+    }
+
     public String getWarning(String measurement){
         return warningHash.get(measurement);
     }
 
-//    public void setIndicationColour(String measurement,int threshold,String comparison){
-//        ArrayList list = getMeasurementData(measurement);
-//        if ( list != null){
-//            for (int i =0; i < list.size(); i++){
-//                EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(i);
-//                String val = mdata.getDataField();
-//            }
-//        }
-//    }
+    @Override
+    public List<String> getWarnings(String measurement)
+    {
+        return null; //TODO
+    }
 
-    public int getLastDateRecordedInMonths(String measurement){
+    @Override
+    public int getLastDateRecordedInMonths(String measurement)
+    {
         int numMonths = -1;
         ArrayList list = getMeasurementData(measurement);
         Hashtable h =  null;
@@ -231,7 +239,9 @@ public class MeasurementInfo {
         return message;
     }
 
-    public int getLastValueAsInt(String measurement){
+    @Override
+    public int getLastValueAsInt(String measurement)
+    {
 
         int value = -1; //TODO-legacy not sure how to handle a non int value.
         ArrayList list = getMeasurementData(measurement);
@@ -247,7 +257,8 @@ public class MeasurementInfo {
         log.debug("Returning the number of months "+value);
         return value;
     }
-    
+
+    @Override
     public int isDataEqualToYes(String measurement){   	
         int v = 0;
         String str="";

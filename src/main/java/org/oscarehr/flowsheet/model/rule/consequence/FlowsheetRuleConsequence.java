@@ -26,7 +26,7 @@ import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
 import org.oscarehr.flowsheet.entity.SeverityLevel;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
+import org.oscarehr.flowsheet.model.FlowsheetInfo;
 
 @Data
 public abstract class FlowsheetRuleConsequence extends AbstractTransientModel
@@ -36,5 +36,5 @@ public abstract class FlowsheetRuleConsequence extends AbstractTransientModel
 	private String message;
 	private SeverityLevel severityLevel;
 
-	public abstract void apply(FlowsheetItem flowsheetItem, MeasurementInfo measurementInfo);
+	public abstract void apply(FlowsheetItem flowsheetItem, FlowsheetInfo flowsheetInfo);
 }

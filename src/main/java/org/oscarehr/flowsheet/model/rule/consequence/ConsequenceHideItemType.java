@@ -24,14 +24,14 @@ package org.oscarehr.flowsheet.model.rule.consequence;
 
 import lombok.Data;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
+import org.oscarehr.flowsheet.model.FlowsheetInfo;
 
 @Data
 public class ConsequenceHideItemType extends FlowsheetRuleConsequence
 {
 	@Override
-	public void apply(FlowsheetItem flowsheetItem, MeasurementInfo measurementInfo)
+	public void apply(FlowsheetItem flowsheetItem, FlowsheetInfo flowsheetInfo)
 	{
-		measurementInfo.addHidden(flowsheetItem.getTypeCode(), true);
+		flowsheetInfo.addHidden(flowsheetItem.getTypeCode(), true);
 	}
 }

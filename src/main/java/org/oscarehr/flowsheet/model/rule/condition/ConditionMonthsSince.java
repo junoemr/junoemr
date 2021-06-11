@@ -24,15 +24,15 @@ package org.oscarehr.flowsheet.model.rule.condition;
 
 import lombok.Data;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
+import org.oscarehr.flowsheet.model.FlowsheetInfoLookup;
 
 @Data
 public class ConditionMonthsSince extends FlowsheetRuleCondition
 {
 	@Override
-	public boolean meetsRequirements(FlowsheetItem flowsheetItem, MeasurementInfo measurementInfo)
+	public boolean meetsRequirements(FlowsheetItem flowsheetItem, FlowsheetInfoLookup flowsheetInfoLookup)
 	{
-		int monthsSince = measurementInfo.getLastDateRecordedInMonths(flowsheetItem.getTypeCode());
+		int monthsSince = flowsheetInfoLookup.getLastDateRecordedInMonths(flowsheetItem.getTypeCode());
 		return (monthsSince > Double.parseDouble(getValue()));
 	}
 }

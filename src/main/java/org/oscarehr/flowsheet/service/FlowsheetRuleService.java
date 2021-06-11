@@ -26,11 +26,12 @@ package org.oscarehr.flowsheet.service;
 import org.oscarehr.flowsheet.converter.FlowsheetRuleDbToModelConverter;
 import org.oscarehr.flowsheet.entity.Flowsheet;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.oscarehr.flowsheet.model.FlowsheetInfo;
+import org.oscarehr.flowsheet.model.FlowsheetInfoLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -39,7 +40,7 @@ public class FlowsheetRuleService
 	@Autowired
 	private FlowsheetRuleDbToModelConverter flowsheetRuleDbToModelConverter;
 
-	public void applyFlowsheetRules(MeasurementInfo measurementInfo, Flowsheet flowsheetEntity)
+	public void applyFlowsheetRules(FlowsheetInfoLookup flowsheetInfoLookup, FlowsheetInfo flowsheetInfo, Flowsheet flowsheetEntity)
 	{
 		for(FlowsheetItem flowsheetItem : flowsheetEntity.getFlowsheetItems())
 		{
@@ -48,9 +49,9 @@ public class FlowsheetRuleService
 					.stream()
 					.filter((rule) -> rule.getConditions()
 							.stream()
-							.allMatch((condition) -> condition.meetsRequirements(flowsheetItem, measurementInfo)))
+							.allMatch((condition) -> condition.meetsRequirements(flowsheetItem, flowsheetInfoLookup)))
 					.forEach((rule) -> rule.getConsequences()
-							.forEach((consequence) -> consequence.apply(flowsheetItem, measurementInfo))
+							.forEach((consequence) -> consequence.apply(flowsheetItem, flowsheetInfo))
 					);
 		}
 	}

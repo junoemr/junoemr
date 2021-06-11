@@ -24,25 +24,25 @@ package org.oscarehr.flowsheet.model.rule.consequence;
 
 import lombok.Data;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
+import org.oscarehr.flowsheet.model.FlowsheetInfo;
 
 @Data
 public class ConsequenceAlert extends FlowsheetRuleConsequence
 {
 	@Override
-	public void apply(FlowsheetItem flowsheetItem, MeasurementInfo measurementInfo)
+	public void apply(FlowsheetItem flowsheetItem, FlowsheetInfo flowsheetInfo)
 	{
 		switch(getSeverityLevel())
 		{
 			case RECOMMENDATION:
 			{
-				measurementInfo.addRecommendation(flowsheetItem.getTypeCode(), getMessage());
+				flowsheetInfo.addRecommendation(flowsheetItem.getTypeCode(), getMessage());
 				break;
 			}
 			case WARNING:
 			case DANGER:
 			{
-				measurementInfo.addWarning(flowsheetItem.getTypeCode(), getMessage());
+				flowsheetInfo.addWarning(flowsheetItem.getTypeCode(), getMessage());
 				break;
 			}
 		}

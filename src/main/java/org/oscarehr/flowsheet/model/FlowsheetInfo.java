@@ -20,19 +20,20 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model.rule.condition;
+package org.oscarehr.flowsheet.model;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.model.FlowsheetInfoLookup;
+import java.util.List;
 
-@Data
-public abstract class FlowsheetRuleCondition extends AbstractTransientModel
+public interface FlowsheetInfo
 {
-	private Integer id;
-	private String name;
-	private String value;
+	void addWarning(String typeCode, String message);
+	void addRecommendation(String typeCode, String message);
+	void addHidden(String typeCode, boolean isHidden);
 
-	public abstract boolean meetsRequirements(FlowsheetItem flowsheetItem, FlowsheetInfoLookup flowsheetInfoLookup);
+	boolean hasWarning(String typeCode);
+	boolean hasRecommendation(String typeCode);
+	boolean getHidden(String measurement);
+
+	List<String> getWarnings(String typeCode);
+	List<String> getRecommendations(String typeCode);
 }
