@@ -128,7 +128,7 @@ angular.module("Messaging.Components").component('attachmentList', {
 				Juno.Common.Util.errorAlert(
 					$uibModal,
 					"Count not attach to chart",
-					"Some thing went wrong. Please contact support if the problem persists");
+					"Something went wrong. Please contact support if the problem persists");
 			}
 
 			ctrl.removeAttachment = (attachment) =>

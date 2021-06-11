@@ -34,6 +34,6 @@ export function linkStatusToVerificationLevel(linkStatus: LinkStatus): number
 		case LinkStatus.VERIFIED:
 			return 6;
 		default:
-			throw Error(`Counld not convert link status to number. Link status [${linkStatus}] is not a know enum value`);
+			throw Error(`Could not convert link status to number. Link status [${linkStatus}] is not a known enum value`);
 	}
 }

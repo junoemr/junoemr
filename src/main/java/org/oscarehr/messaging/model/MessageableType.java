@@ -38,9 +38,12 @@ public enum MessageableType
 	// Boilerplate
 	// ==========================================================================
 
-	public static MessageableType fromString(String name) {
-		for (MessageableType type : MessageableType.values()) {
-			if (type.name.equals(name)) {
+	public static MessageableType fromString(String name)
+	{
+		for (MessageableType type : MessageableType.values())
+		{
+			if (type.name.equals(name))
+			{
 				return type;
 			}
 		}
