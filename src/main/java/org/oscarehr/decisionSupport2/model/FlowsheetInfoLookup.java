@@ -20,19 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model.rule.condition;
+package org.oscarehr.decisionSupport2.model;
 
-import lombok.Data;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.model.FlowsheetInfoLookup;
-
-@Data
-public class ConditionMonthsSince extends FlowsheetRuleCondition
+public interface FlowsheetInfoLookup
 {
-	@Override
-	public boolean meetsRequirements(FlowsheetItem flowsheetItem, FlowsheetInfoLookup flowsheetInfoLookup)
-	{
-		int monthsSince = flowsheetInfoLookup.getLastDateRecordedInMonths(flowsheetItem.getTypeCode());
-		return (monthsSince > Double.parseDouble(getValue()));
-	}
+	int getLastDateRecordedInMonths(String typeCode);
+	int getLastValueAsInt(String typeCode);
+	int isDataEqualToYes(String typeCode);
 }

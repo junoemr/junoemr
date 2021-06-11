@@ -20,10 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.entity;
+package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.flowsheet.entity.Flowsheet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

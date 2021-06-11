@@ -20,21 +20,54 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model.rule.consequence;
+package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.flowsheet.entity.SeverityLevel;
-import org.oscarehr.flowsheet.model.FlowsheetInfo;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Data
-public abstract class FlowsheetRuleConsequence extends AbstractTransientModel
+@Entity
+@Table(name = "ds_rule_consequence")
+public class DsRuleConsequence extends AbstractModel<Integer>
 {
+	public enum ConsequenceType {
+		ALERT,
+		HIDDEN
+	}
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Integer id;
+
+	@Column(name = "consequence_name")
 	private String name;
-	private String message;
+
+	@Column(name = "consequence_type")
+	@Enumerated(value = EnumType.STRING)
+	private ConsequenceType type;
+
+	@Column(name = "consequence_severity")
+	@Enumerated(value = EnumType.STRING)
 	private SeverityLevel severityLevel;
 
-	public abstract void apply(FlowsheetItem flowsheetItem, FlowsheetInfo flowsheetInfo);
+	@Column(name = "consequence_message")
+	private String message;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ds_rule_id")
+	private DsRule dsRule;
 }

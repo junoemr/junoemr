@@ -24,6 +24,7 @@ package org.oscarehr.flowsheet.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.decisionSupport2.entity.DsRule;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -81,8 +82,8 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	private Flowsheet flowsheetItemGroup;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_item_flowsheet_rule", joinColumns = @JoinColumn(name="flowsheet_item_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_rule_id"))
-	private Set<FlowsheetRule> flowsheetRules = new HashSet<>();
+	@JoinTable(name = "flowsheet_item_ds_rule", joinColumns = @JoinColumn(name="flowsheet_item_id"), inverseJoinColumns = @JoinColumn(name="ds_rule_id"))
+	private Set<DsRule> dsRules = new HashSet<>();
 
 	/**
 	 * must be overridden to prevent default impl from infinite loading jpa links

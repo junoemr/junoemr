@@ -20,11 +20,21 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.decisionSupport2.model;
 
-public interface FlowsheetInfoLookup
+import lombok.Data;
+import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.decisionSupport2.model.condition.DsCondition;
+import org.oscarehr.decisionSupport2.model.consequence.DsConsequence;
+
+import java.util.List;
+
+@Data
+public class DsRule extends AbstractTransientModel
 {
-	int getLastDateRecordedInMonths(String typeCode);
-	int getLastValueAsInt(String typeCode);
-	int isDataEqualToYes(String typeCode);
+	private Integer id;
+	private String name;
+	private String description;
+	private List<DsCondition> conditions;
+	private List<DsConsequence> consequences;
 }

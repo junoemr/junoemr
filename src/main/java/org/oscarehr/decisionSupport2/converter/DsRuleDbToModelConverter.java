@@ -20,31 +20,32 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.converter;
+package org.oscarehr.decisionSupport2.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.flowsheet.model.rule.consequence.ConsequenceAlert;
-import org.oscarehr.flowsheet.model.rule.consequence.ConsequenceHideItemType;
-import org.oscarehr.flowsheet.model.rule.consequence.FlowsheetRuleConsequence;
+import org.oscarehr.decisionSupport2.model.DsRule;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FlowsheetRuleConsequenceDbToModelConverter extends AbstractModelConverter<org.oscarehr.flowsheet.entity.FlowsheetRuleConsequence, FlowsheetRuleConsequence>
+public class DsRuleDbToModelConverter extends AbstractModelConverter<org.oscarehr.decisionSupport2.entity.DsRule, DsRule>
 {
+	@Autowired
+	private DsConditionDbToModelConverter dsConditionDbToModelConverter;
+
+	@Autowired
+	private DsConsequenceDbToModelConverter dsConsequenceDbToModelConverter;
+
 	@Override
-	public FlowsheetRuleConsequence convert(org.oscarehr.flowsheet.entity.FlowsheetRuleConsequence input)
+	public DsRule convert(org.oscarehr.decisionSupport2.entity.DsRule input)
 	{
-		FlowsheetRuleConsequence consequence;
-		switch(input.getType())
-		{
-			case ALERT: consequence = new ConsequenceAlert(); break;
-			case HIDDEN: consequence = new ConsequenceHideItemType(); break;
-			default: throw new IllegalStateException(input.getType() + " is not a valid consequence type");
-		}
+		DsRule dsRule = new DsRule();
+		BeanUtils.copyProperties(input, dsRule, "conditions" ,"consequences");
 
-		BeanUtils.copyProperties(input, consequence);
+		dsRule.setConditions(dsConditionDbToModelConverter.convert(input.getConditions()));
+		dsRule.setConsequences(dsConsequenceDbToModelConverter.convert(input.getConsequences()));
 
-		return consequence;
+		return dsRule;
 	}
 }

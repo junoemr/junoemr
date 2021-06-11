@@ -25,6 +25,7 @@ package org.oscarehr.flowsheet.entity;
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Icd9;
+import org.oscarehr.decisionSupport2.entity.Drools;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

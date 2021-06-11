@@ -20,32 +20,32 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.converter;
+package org.oscarehr.decisionSupport2.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.flowsheet.model.rule.FlowsheetRule;
+import org.oscarehr.decisionSupport2.entity.DsRuleConsequence;
+import org.oscarehr.decisionSupport2.model.consequence.ConsequenceAlert;
+import org.oscarehr.decisionSupport2.model.consequence.ConsequenceHideItemType;
+import org.oscarehr.decisionSupport2.model.consequence.DsConsequence;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FlowsheetRuleDbToModelConverter extends AbstractModelConverter<org.oscarehr.flowsheet.entity.FlowsheetRule, FlowsheetRule>
+public class DsConsequenceDbToModelConverter extends AbstractModelConverter<DsRuleConsequence, DsConsequence>
 {
-	@Autowired
-	private FlowsheetRuleConditionDbToModelConverter flowsheetRuleConditionDbToModelConverter;
-
-	@Autowired
-	private FlowsheetRuleConsequenceDbToModelConverter flowsheetRuleConsequenceDbToModelConverter;
-
 	@Override
-	public FlowsheetRule convert(org.oscarehr.flowsheet.entity.FlowsheetRule input)
+	public DsConsequence convert(DsRuleConsequence input)
 	{
-		FlowsheetRule flowsheetRule = new FlowsheetRule();
-		BeanUtils.copyProperties(input, flowsheetRule, "conditions" ,"consequences");
+		DsConsequence consequence;
+		switch(input.getType())
+		{
+			case ALERT: consequence = new ConsequenceAlert(); break;
+			case HIDDEN: consequence = new ConsequenceHideItemType(); break;
+			default: throw new IllegalStateException(input.getType() + " is not a valid consequence type");
+		}
 
-		flowsheetRule.setConditions(flowsheetRuleConditionDbToModelConverter.convert(input.getConditions()));
-		flowsheetRule.setConsequences(flowsheetRuleConsequenceDbToModelConverter.convert(input.getConsequences()));
+		BeanUtils.copyProperties(input, consequence);
 
-		return flowsheetRule;
+		return consequence;
 	}
 }

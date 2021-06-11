@@ -20,14 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model.rule.consequence;
+package org.oscarehr.decisionSupport2.model.consequence;
 
 import lombok.Data;
+import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.model.FlowsheetInfo;
 
 @Data
-public class ConsequenceAlert extends FlowsheetRuleConsequence
+public class ConsequenceAlert extends DsConsequence
 {
 	@Override
 	public void apply(FlowsheetItem flowsheetItem, FlowsheetInfo flowsheetInfo)

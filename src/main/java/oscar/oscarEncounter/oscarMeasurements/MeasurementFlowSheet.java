@@ -34,7 +34,7 @@ import org.drools.WorkingMemory;
 import org.drools.io.RuleBaseLoader;
 import org.jdom.Element;
 import org.oscarehr.common.dao.DxDao;
-import org.oscarehr.flowsheet.service.DroolsCachingService;
+import org.oscarehr.decisionSupport2.service.DroolsCachingService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;

@@ -20,22 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.converter;
+package org.oscarehr.decisionSupport2.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.flowsheet.model.rule.condition.ConditionMonthsSince;
-import org.oscarehr.flowsheet.model.rule.condition.ConditionNeverGiven;
-import org.oscarehr.flowsheet.model.rule.condition.FlowsheetRuleCondition;
+import org.oscarehr.decisionSupport2.entity.DsRuleCondition;
+import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSince;
+import org.oscarehr.decisionSupport2.model.condition.ConditionNeverGiven;
+import org.oscarehr.decisionSupport2.model.condition.DsCondition;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FlowsheetRuleConditionDbToModelConverter extends AbstractModelConverter<org.oscarehr.flowsheet.entity.FlowsheetRuleCondition, FlowsheetRuleCondition>
+public class DsConditionDbToModelConverter extends AbstractModelConverter<DsRuleCondition, DsCondition>
 {
 	@Override
-	public FlowsheetRuleCondition convert(org.oscarehr.flowsheet.entity.FlowsheetRuleCondition input)
+	public DsCondition convert(DsRuleCondition input)
 	{
-		FlowsheetRuleCondition condition;
+		DsCondition condition;
 		switch(input.getType())
 		{
 			case NEVER_GIVEN: condition = new ConditionNeverGiven(); break;

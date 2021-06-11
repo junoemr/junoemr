@@ -26,13 +26,15 @@ package org.oscarehr.flowsheet.service;
 import org.drools.FactException;
 import org.drools.RuleBase;
 import org.drools.WorkingMemory;
+import org.oscarehr.decisionSupport2.service.DroolsCachingService;
+import org.oscarehr.decisionSupport2.service.DsRuleService;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.converter.PreventionToFlowsheetItemDataConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
-import org.oscarehr.flowsheet.entity.Drools;
+import org.oscarehr.decisionSupport2.entity.Drools;
 import org.oscarehr.flowsheet.entity.SeverityLevel;
 import org.oscarehr.flowsheet.model.Flowsheet;
-import org.oscarehr.flowsheet.model.FlowsheetInfo;
+import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
@@ -64,7 +66,7 @@ public class FlowsheetService
 	private DroolsCachingService droolsCachingService;
 
 	@Autowired
-	private FlowsheetRuleService flowsheetRuleService;
+	private DsRuleService dsRuleService;
 
 	@Autowired
 	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
@@ -175,7 +177,7 @@ public class FlowsheetService
 			getMessages(measurementInfo, ruleBase);
 		}
 
-		flowsheetRuleService.applyFlowsheetRules(measurementInfo, measurementInfo, flowsheetEntity);
+		dsRuleService.applyFlowsheetRules(measurementInfo, measurementInfo, flowsheetEntity);
 		return measurementInfo;
 	}
 

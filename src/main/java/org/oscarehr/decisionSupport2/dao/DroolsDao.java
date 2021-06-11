@@ -20,20 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.model;
+package org.oscarehr.decisionSupport2.dao;
 
-import java.util.List;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.decisionSupport2.entity.Drools;
+import org.springframework.stereotype.Repository;
 
-public interface FlowsheetInfo
+@Repository
+public class DroolsDao extends AbstractDao<Drools>
 {
-	void addWarning(String typeCode, String message);
-	void addRecommendation(String typeCode, String message);
-	void addHidden(String typeCode, boolean isHidden);
-
-	boolean hasWarning(String typeCode);
-	boolean hasRecommendation(String typeCode);
-	boolean getHidden(String measurement);
-
-	List<String> getWarnings(String typeCode);
-	List<String> getRecommendations(String typeCode);
+	protected DroolsDao()
+	{
+		super(Drools.class);
+	}
 }

@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS flowsheet_item
     CONSTRAINT `flowsheet_item_flowsheet_item_group_id_fk` FOREIGN KEY (flowsheet_item_group_id) REFERENCES flowsheet_item_group (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_rule
+CREATE TABLE IF NOT EXISTS ds_rule
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
     rule_name       VARCHAR(255) NOT NULL,
@@ -72,10 +72,10 @@ CREATE TABLE IF NOT EXISTS flowsheet_rule
     deleted_by      VARCHAR(6) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_rule_condition
+CREATE TABLE IF NOT EXISTS ds_rule_condition
 (
     id                  INTEGER PRIMARY KEY AUTO_INCREMENT,
-    flowsheet_rule_id   INTEGER(10) NOT NULL,
+    ds_rule_id   INTEGER(10) NOT NULL,
     condition_name      VARCHAR(255) NOT NULL,
     condition_type      VARCHAR(255) NOT NULL,
     condition_value     VARCHAR(255),
@@ -87,13 +87,13 @@ CREATE TABLE IF NOT EXISTS flowsheet_rule_condition
     deleted_at          DATETIME,
     deleted_by          VARCHAR(6) DEFAULT NULL,
 
-    CONSTRAINT `flowsheet_rule_condition_flowsheet_rule_id_fk` FOREIGN KEY (flowsheet_rule_id) REFERENCES flowsheet_rule (id)
+    CONSTRAINT `ds_rule_condition_ds_rule_id_fk` FOREIGN KEY (ds_rule_id) REFERENCES ds_rule (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_rule_consequence
+CREATE TABLE IF NOT EXISTS ds_rule_consequence
 (
     id                      INTEGER PRIMARY KEY AUTO_INCREMENT,
-    flowsheet_rule_id       INTEGER(10) NOT NULL,
+    ds_rule_id       INTEGER(10) NOT NULL,
     consequence_name        VARCHAR(255) NOT NULL,
     consequence_type        VARCHAR(255) NOT NULL,
     consequence_severity    VARCHAR(255) NOT NULL,
@@ -106,16 +106,16 @@ CREATE TABLE IF NOT EXISTS flowsheet_rule_consequence
     deleted_at          DATETIME,
     deleted_by          VARCHAR(6) DEFAULT NULL,
 
-    CONSTRAINT `flowsheet_rule_consequence_flowsheet_rule_id_fk` FOREIGN KEY (flowsheet_rule_id) REFERENCES flowsheet_rule (id)
+    CONSTRAINT `ds_rule_consequence_ds_rule_id_fk` FOREIGN KEY (ds_rule_id) REFERENCES ds_rule (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_item_flowsheet_rule
+CREATE TABLE IF NOT EXISTS flowsheet_item_ds_rule
 (
     flowsheet_item_id     INTEGER NOT NULL,
-    flowsheet_rule_id     INTEGER NOT NULL,
-    PRIMARY KEY (flowsheet_item_id, flowsheet_rule_id),
-    CONSTRAINT `flowsheet_item_flowsheet_rule_flowsheet_item_id_fk` FOREIGN KEY (flowsheet_item_id) REFERENCES flowsheet_item (id),
-    CONSTRAINT `flowsheet_item_flowsheet_rule_flowsheet_rule_id_fk` FOREIGN KEY (flowsheet_rule_id) REFERENCES flowsheet_rule (id)
+    ds_rule_id     INTEGER NOT NULL,
+    PRIMARY KEY (flowsheet_item_id, ds_rule_id),
+    CONSTRAINT `flowsheet_item_ds_rule_flowsheet_item_id_fk` FOREIGN KEY (flowsheet_item_id) REFERENCES flowsheet_item (id),
+    CONSTRAINT `flowsheet_item_ds_rule_ds_rule_id_fk` FOREIGN KEY (ds_rule_id) REFERENCES ds_rule (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS drools

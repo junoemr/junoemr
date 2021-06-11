@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.service;
+package org.oscarehr.decisionSupport2.service;
 
 import org.drools.IntegrationException;
 import org.drools.RuleBase;

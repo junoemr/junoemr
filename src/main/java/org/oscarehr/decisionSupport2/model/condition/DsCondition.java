@@ -20,17 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.dao;
+package org.oscarehr.decisionSupport2.model.condition;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.flowsheet.entity.Drools;
-import org.springframework.stereotype.Repository;
+import lombok.Data;
+import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.decisionSupport2.model.FlowsheetInfoLookup;
+import org.oscarehr.flowsheet.entity.FlowsheetItem;
 
-@Repository
-public class DroolsDao extends AbstractDao<Drools>
+@Data
+public abstract class DsCondition extends AbstractTransientModel
 {
-	protected DroolsDao()
-	{
-		super(Drools.class);
-	}
+	private Integer id;
+	private String name;
+	private String value;
+
+	public abstract boolean meetsRequirements(FlowsheetItem flowsheetItem, FlowsheetInfoLookup flowsheetInfoLookup);
 }

@@ -20,53 +20,51 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.entity;
+package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.flowsheet.entity.FlowsheetItem;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
-@Entity(name = "entity.FlowsheetRuleCondition")
-@Table(name = "flowsheet_rule_condition")
-public class FlowsheetRuleCondition extends AbstractModel<Integer>
+@Entity
+@Table(name = "ds_rule")
+public class DsRule extends AbstractModel<Integer>
 {
-	public enum ConditionType {
-		VALUE_GT,
-		VALUE_GE,
-		VALUE_LT,
-		VALUE_LE,
-		MONTHS_SINCE,
-		NEVER_GIVEN,
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
 
-	@Column(name = "condition_name")
+	@Column(name = "rule_name")
 	private String name;
 
-	@Column(name = "condition_type")
-	@Enumerated(value = EnumType.STRING)
-	private ConditionType type;
+	@Column(name = "description")
+	private String description;
 
-	@Column(name = "condition_value")
-	private String value;
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetRule", cascade = CascadeType.ALL)
+	private List<DsRuleCondition> conditions;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "flowsheet_rule_id")
-	private FlowsheetRule flowsheetRule;
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetRule", cascade = CascadeType.ALL)
+	private List<DsRuleConsequence> consequences;
+
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name = "flowsheet_item_ds_rule", joinColumns = @JoinColumn(name="ds_rule_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_item_id"))
+	private Set<FlowsheetItem> flowsheetItems = new HashSet<>();
 }

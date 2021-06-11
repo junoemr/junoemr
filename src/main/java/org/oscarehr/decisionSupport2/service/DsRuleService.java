@@ -20,14 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.service;
+package org.oscarehr.decisionSupport2.service;
 
 
-import org.oscarehr.flowsheet.converter.FlowsheetRuleDbToModelConverter;
+import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
 import org.oscarehr.flowsheet.entity.Flowsheet;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.oscarehr.flowsheet.model.FlowsheetInfo;
-import org.oscarehr.flowsheet.model.FlowsheetInfoLookup;
+import org.oscarehr.decisionSupport2.model.FlowsheetInfo;
+import org.oscarehr.decisionSupport2.model.FlowsheetInfoLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,17 +35,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class FlowsheetRuleService
+public class DsRuleService
 {
 	@Autowired
-	private FlowsheetRuleDbToModelConverter flowsheetRuleDbToModelConverter;
+	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
 
 	public void applyFlowsheetRules(FlowsheetInfoLookup flowsheetInfoLookup, FlowsheetInfo flowsheetInfo, Flowsheet flowsheetEntity)
 	{
 		for(FlowsheetItem flowsheetItem : flowsheetEntity.getFlowsheetItems())
 		{
 			// filter out rules that do not meet all conditions, and apply consequences for rules where all conditions are met.
-			flowsheetRuleDbToModelConverter.convert(flowsheetItem.getFlowsheetRules())
+			dsRuleDbToModelConverter.convert(flowsheetItem.getDsRules())
 					.stream()
 					.filter((rule) -> rule.getConditions()
 							.stream()
