@@ -31,7 +31,9 @@ import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.PMmodule.caisi_integrator.RemotePreventionHelper;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicPrevention;
 import org.oscarehr.caisi_integrator.ws.CachedFacility;
+import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dao.PreventionExtDao;
@@ -59,6 +61,7 @@ public class PreventionData {
 	private static Logger log = MiscUtils.getLogger();
 	private static PreventionDao preventionDao = (PreventionDao) SpringUtils.getBean("preventionDao");
 	private static PreventionExtDao preventionExtDao = (PreventionExtDao) SpringUtils.getBean("preventionExtDao");
+	private static final PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
 
 	private PreventionData() {
 		// prevent instantiation
@@ -70,7 +73,10 @@ public class PreventionData {
 			Prevention prevention = new Prevention();
 			prevention.setCreatorProviderNo(creator);
 			prevention.setDemographicId(Integer.valueOf(demoNo));
-			prevention.setPreventionDate(ConversionUtils.fromDateString(date, ConversionUtils.TS_NO_SEC_PATTERN));
+
+			String prevDateFormat = partialDateDao.getFormat(date);
+			prevention.setPreventionDate(ConversionUtils.fromDateString(prevDateFormat));
+
 			prevention.setProviderNo(providerNo);
 			prevention.setProviderName(providerName);
 			prevention.setPreventionType(preventionType);
@@ -81,6 +87,8 @@ public class PreventionData {
 
 			preventionDao.persist(prevention);
 			if (prevention.getId() == null) return insertId;
+
+			partialDateDao.setPartialDate(PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE, prevDateFormat);
 
 			insertId = prevention.getId();
 			for (int i = 0; i < list.size(); i++) {

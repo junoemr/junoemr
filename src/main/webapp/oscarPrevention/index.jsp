@@ -44,6 +44,7 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
 	PreventionDao preventionDao = SpringUtils.getBean(PreventionDao.class);
+	PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
 
 	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	boolean authed=true;
@@ -136,6 +137,9 @@ if(!authed) {
 <%@ page import="org.oscarehr.prevention.dto.PreventionListData" %>
 <%@ page import="org.oscarehr.prevention.dao.PreventionDao" %>
 <%@ page import="org.oscarehr.managers.DemographicManager" %>
+<%@ page import="org.oscarehr.common.dao.PartialDateDao" %>
+<%@ page import="org.oscarehr.common.model.PartialDate" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 <html:html locale="true">
 
 <head>
@@ -674,6 +678,9 @@ text-align:left;
 							for (int k = 0; k < alist.size(); k++)
 							{
 								Map<String,Object> hdata = alist.get(k);
+								String preventionDate = (String) hdata.get("prevention_date_no_time");
+	                            String formattedPrevDate = partialDateDao.getDatePartial(preventionDate, PartialDate.TABLE_PREVENTIONS, Integer.parseInt((String)hdata.get("id")), PartialDate.PREVENTION_DATE);
+
 								Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
 								result = hExt.get("result");
 
@@ -684,11 +691,11 @@ text-align:left;
 								}
 						%>
 
-						<div class="preventionProcedure" onclick="<%=onClickCode%>" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
+						<div class="preventionProcedure" onclick="<%=onClickCode%>" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=formattedPrevDate%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
 
 							<!--this is setting the style <%=r(hdata.get("refused"),result)%>  -->
 							<p <%=r(hdata.get("refused"),result)%> >Age: <%=hdata.get("age")%> <%if(result!=null && result.equals("abnormal")){out.print("result:"+result);}%> <br />
-								<!--<%=refused(hdata.get("refused"))%>-->Date: <%=hdata.get("prevention_date_no_time")%>
+								<!--<%=refused(hdata.get("refused"))%>-->Date: <%=formattedPrevDate%>
 										<%if (hExt.get("comments") != null && (hExt.get("comments")).length()>0) {
                     if (oscar.OscarProperties.getInstance().getBooleanProperty("prevention_show_comments","yes")){%>
 							<div class="comments"><span><%=hExt.get("comments")%></span></div>
@@ -736,12 +743,14 @@ text-align:left;
                             String result;
                             for (int k = 0; k < alist.size(); k++){
                            		Map<String,String> hdata = alist.get(k);
+	                            String preventionDate = hdata.get("prevention_date_no_time");
+	                            String formattedPrevDate = partialDateDao.getDatePartial(preventionDate, PartialDate.TABLE_PREVENTIONS, Integer.valueOf(hdata.get("id")), PartialDate.PREVENTION_DATE);
                             Map<String,String> hExt = PreventionData.getPreventionKeyValues(hdata.get("id"));
                             result = hExt.get("result");
                             %>
-		<div class="preventionProcedure" onclick="javascript:popup(465,635,'AddPreventionData.jsp?id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>','addPreventionData')" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
+		<div class="preventionProcedure" onclick="javascript:popup(465,635,'AddPreventionData.jsp?id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>','addPreventionData')" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=formattedPrevDate%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
 		<p <%=r(hdata.get("refused"), result)%>>Age: <%=hdata.get("age")%> <br />
-		<!--<%=refused(hdata.get("refused"))%>-->Date: <%=hdata.get("prevention_date_no_time")%>
+		<!--<%=refused(hdata.get("refused"))%>-->Date: <%=formattedPrevDate%>
 		<%if (hExt.get("comments") != null && (hExt.get("comments")).length()>0) {
                      if (oscar.OscarProperties.getInstance().getBooleanProperty("prevention_show_comments","yes")){ %>
                      <div class="comments"><span><%=hExt.get("comments")%></span></div>
@@ -799,8 +808,10 @@ text-align:left;
             String result;
             for (int k = 0; k < alist.size(); k++)
             {
-            	Map<String,Object> hdata = alist.get(k);
+                Map<String,Object> hdata = alist.get(k);
           	  Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
+          	  String preventionDate = (String) hdata.get("prevention_date_no_time");
+          	  String formattedPrevDate = partialDateDao.getDatePartial(preventionDate, PartialDate.TABLE_PREVENTIONS, Integer.valueOf((String) hdata.get("id")), PartialDate.PREVENTION_DATE);
             result = hExt.get("result");
 
             String onClickCode="javascript:popup(465,635,'AddPreventionData.jsp?id="+hdata.get("id")+"&amp;demographic_no="+demographic_no+"','addPreventionData')";
@@ -808,7 +819,7 @@ text-align:left;
         %>
 		<div class="preventionProcedure" onclick="<%=onClickCode%>">
 		<p <%=r(hdata.get("refused"),result)%>>Age: <%=hdata.get("age")%> <br />
-		<!--<%=refused(hdata.get("refused"))%>-->Date: <%=hdata.get("prevention_date_no_time")%>
+		<!--<%=refused(hdata.get("refused"))%>-->Date: <%=formattedPrevDate%>
 		<%=getFromFacilityMsg(hdata)%></p>
 		</div>
 		<%}%>
