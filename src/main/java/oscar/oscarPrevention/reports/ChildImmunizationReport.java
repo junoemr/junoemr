@@ -26,6 +26,7 @@
 package oscar.oscarPrevention.reports;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import oscar.oscarDemographic.data.DemographicData;
@@ -62,7 +63,10 @@ import java.util.stream.Collectors;
  */
 public class ChildImmunizationReport implements PreventionReport {
 
-
+    public boolean displayNumShots()
+    {
+        return true;
+    }
 
     //Sort class for preventions used to sort final list of dtap preventions
     class DtapComparator implements Comparator<Map<String, Object>> {
@@ -83,6 +87,9 @@ public class ChildImmunizationReport implements PreventionReport {
     public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate)
     {
         List<PreventionReportDisplay> childhoodImmunizationReport = new ArrayList<>();
+        int eligiblePatientCount = 0;
+        int qualifiesForBonusCount  = 0;
+        int ineligiblePatientCount = 0;
 
         List<ReportPatientInfo> patientInfoList = ReportPatientInfo.fromList(list);
 
@@ -92,9 +99,10 @@ public class ChildImmunizationReport implements PreventionReport {
         {
             //  Each Map<String,Object> is a prevention item, with field names as keys... this is ridiculous.
             ArrayList<Map<String, Object>> preventions = PreventionData.getPreventionData(loggedInInfo, patientinfo.demographicNo);
-            
-            boolean refused = false;
-            boolean ineligible = false;
+
+            // These two fields track legacy behaviour.  I'm not sure at this moment if they are correct.
+            boolean atLeastOneRefused = false;
+            boolean atLeastOneIneligible = false;
 
             Date latestPrevention = null;
             
@@ -111,11 +119,26 @@ public class ChildImmunizationReport implements PreventionReport {
                     case "MenC-C":
                     case "MMR":
                     {
-                        requiredImmunizations.put(type, requiredImmunizations.get(type) - 1);
-	                    Date preventionDate = (Date) prevention.get("prevention_date_asDate");
-                        if (latestPrevention == null || preventionDate.after(latestPrevention))
+                        boolean refused = String.valueOf(Prevention.REFUSED_STATUS_REFUSED).equals(prevention.get("refused"));
+                        boolean ineligible = String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE).equals(prevention.get("refused"));
+
+                        if (refused)
                         {
-                        	latestPrevention = preventionDate;
+                            atLeastOneRefused = true;
+                        }
+	                    else if (ineligible)
+                        {
+                            atLeastOneIneligible = true;
+                        }
+	                    else
+                        {
+                            requiredImmunizations.put(type, requiredImmunizations.get(type) - 1);
+
+                            Date preventionDate = (Date) prevention.get("prevention_date_asDate");
+                            if (latestPrevention == null || preventionDate.after(latestPrevention))
+                            {
+                                latestPrevention = preventionDate;
+                            }
                         }
                         break;
                     }
@@ -125,24 +148,40 @@ public class ChildImmunizationReport implements PreventionReport {
             }
 
             int immunizationsCompleted = calculateScheduleCompletion(requiredImmunizations);
-            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted, latestPrevention);
+            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted, latestPrevention, atLeastOneRefused, atLeastOneIneligible);
             childhoodImmunizationReport.add(entry);
+
+            if (atLeastOneIneligible)
+            {
+                ineligiblePatientCount++;
+            }
+            else
+            {
+                eligiblePatientCount++;
+            }
+
+            if (immunizationsCompleted == 5)
+            {
+                qualifiesForBonusCount++;
+            }
         }
 
-        Hashtable<String,Object> h = new Hashtable<String,Object>();
+        int percentCompliant = Math.round(((float)qualifiesForBonusCount / (float)eligiblePatientCount) * 100);
 
-        h.put("up2date","99");
-        h.put("percent", "99.9%");
-        h.put("returnReport", childhoodImmunizationReport);
-        h.put("ineligible", "99");
-        h.put("eformSearch","CHI");
-        h.put("followUpType","CIMF");
-        h.put("BillCode", "Q004A");
+        Hashtable<String,Object> reportParams = new Hashtable<>();
 
-        return h;
+        reportParams.put("up2date", String.valueOf(qualifiesForBonusCount));
+        reportParams.put("percent",  String.valueOf(percentCompliant));
+        reportParams.put("returnReport", childhoodImmunizationReport);
+        reportParams.put("ineligible", String.valueOf(ineligiblePatientCount));     // TODO this doesn't actually register correctly
+        reportParams.put("eformSearch","CHI");
+        reportParams.put("followUpType","CIMF");
+        reportParams.put("BillCode", "Q004A");
+
+        return reportParams;
     }
 
-    public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted, Date latestPrevention)
+    public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted, Date latestPrevention, boolean refused, boolean ineligible)
     {
 	    // Possible States
 	    // No Info -- Immunizations = 0
@@ -189,10 +228,24 @@ public class ChildImmunizationReport implements PreventionReport {
 	    entry.bonusStatus = "N";
 	    entry.billStatus = "N";
 
-        if (immunizationsCompleted == 0)
+	    if (ineligible)
+        {
+            entry.rank = 5;
+            entry.state = "Ineligible";
+            entry.numMonths = "------";
+            entry.color = "grey";
+        }
+        else if (refused)
+        {
+            entry.rank = 3;
+            entry.lastDate = "-----";
+            entry.state = "Refused";
+            entry.numMonths = "??????";
+            entry.color = "orange";
+        }
+        else if (immunizationsCompleted == 0 && latestPrevention == null)
         {
             entry.rank = 1;
-            entry.lastDate = "------";
             entry.state = "No Info";
             entry.numMonths = "------";
             entry.color = "magenta";
@@ -200,7 +253,6 @@ public class ChildImmunizationReport implements PreventionReport {
         else if (immunizationsCompleted == 5)
         {
             entry.rank = 4;
-            entry.lastDate = "??????";
             entry.state = "Up to date";
             entry.numMonths = "??????";
             entry.color = "green";
@@ -208,13 +260,12 @@ public class ChildImmunizationReport implements PreventionReport {
         else
         {
             entry.rank = 2;
-            entry.lastDate = "??????";
             entry.state = "due";
             entry.numMonths = "??????";
             entry.color = "yellow";
         }
 
-        // TODO: overdue, refused, ineligible, other...
+        // TODO: overdue other...
 
         return entry;
     }

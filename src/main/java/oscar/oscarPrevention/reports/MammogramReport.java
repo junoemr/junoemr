@@ -25,6 +25,15 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+import oscar.util.UtilDateUtilities;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,16 +46,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.UtilDateUtilities;
-
 /**
  *
  * @author jay
@@ -57,7 +56,12 @@ public class MammogramReport implements PreventionReport{
     public MammogramReport() {
     }
 
-    public Hashtable runReport(LoggedInInfo loggedInInfo,ArrayList<ArrayList<String>> list,Date asofDate){
+    @Override
+    public boolean displayNumShots() {
+        return false;
+    }
+
+    public Hashtable runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate){
         int inList = 0;
         double done= 0,doneWithGrace = 0;
         ArrayList<PreventionReportDisplay> returnReport = new ArrayList<PreventionReportDisplay>();

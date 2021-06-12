@@ -36,5 +36,7 @@ import java.util.Hashtable;
  * @author jay
  */
 public interface PreventionReport {
+    public boolean displayNumShots();
+
     public Hashtable runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate);
 }

@@ -26,6 +26,15 @@
 package oscar.oscarPrevention.reports;
 
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+import oscar.util.UtilDateUtilities;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,16 +46,6 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.UtilDateUtilities;
 
 /**
  *
@@ -428,6 +427,10 @@ public class PapReport implements PreventionReport {
        return null;
    }
 
+    @Override
+    public boolean displayNumShots() {
+        return false;
+    }
 }
 
 
