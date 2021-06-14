@@ -147,7 +147,7 @@
 					<div class="cancel-btn-text">
 						Cancel Connection
 					</div>
-				</juno-button><juno-button disabled="$ctrl.hasActiveConnection()"
+				</juno-button><juno-button disabled="$ctrl.currentProfile"
 					             component-style="$ctrl.resolve.style"
 					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 					             ng-click="$ctrl.openInviteConfirmModal()"
