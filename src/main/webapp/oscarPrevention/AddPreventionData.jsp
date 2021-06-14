@@ -47,6 +47,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	  boolean authed=true;
@@ -55,6 +56,7 @@
 	<%authed=false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_prevention");%>
 </security:oscarSec>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
 
     if(!authed)
@@ -187,9 +189,18 @@
 <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css">
 <link rel="stylesheet" type="text/css" media="all" href="../share/calendar/calendar.css" title="win2k-cold-1" />
 
+
+    <script type="text/javascript" src="${ ctx }/js/jquery-1.7.1.min.js" ></script>
+    <script type="text/javascript" src="${ ctx }/js/jquery-ui-1.8.18.custom.min.js" ></script>
+
 <script type="text/javascript" src="../share/calendar/calendar.js" ></script>
 <script type="text/javascript" src="../share/calendar/lang/<bean:message key="global.javascript.calendar"/>" ></script>
 <script type="text/javascript" src="../share/calendar/calendar-setup.js" ></script>
+
+
+    <script>
+        jQuery.noConflict();
+    </script>
 
 <style type="text/css">
   div.ImmSet h2 {  }
@@ -711,7 +722,7 @@ function displayCloseWarning(){
                    </fieldset>
                </div>
                <br/>
-               <input type="submit" value="Save">
+               <input type="submit" value="Save" onclick=" return validatePreventionDate()">
                <% if ( id != null ) { %>
                <input type="submit" name="delete" value="Delete"/>
                <% } %>
@@ -728,12 +739,95 @@ function displayCloseWarning(){
         </tr>
     </table>
 <script type="text/javascript">
-Calendar.setup( { inputField : "prevDate", ifFormat : "%Y-%m-%d %H:%M", showsTime :true, button : "date", singleClick : true, step : 1 } );
+Calendar.setup( { inputField : "prevDate", ifFormat : "%Y-%m-%d", showsTime :true, button : "date", singleClick : true, step : 1 } );
 Calendar.setup( { inputField : "nextDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "nextDateCal", singleClick : true, step : 1 } );
 </script>
 </body>
 </html:html>
+
+<script>
+function validatePreventionDate()
+{
+    var x = true;
+
+    jQuery('input[name="prevDate"]').each(function()
+    {
+        var startDate = jQuery(this).val();
+        if (startDate.length > 10)
+        {
+            startDate = startDate.slice(0, 10);
+        }
+        var match = startDate.match(/^(\d+-?)+\d+$/);
+        var splitStartDate = startDate.split("-");
+        var notJustYear = splitStartDate[0].length > 4;
+
+
+        if ((notJustYear && !startDate.includes("-")) || !match)
+        {
+            jQuery(this).focus();
+            alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
+            x = false;
+            return;
+        }
+
+        if (splitStartDate.length > 3)
+        {
+            jQuery(this).focus();
+            alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
+            x = false;
+            return;
+        }
+
+        var dt1 = 1, mon1 = 0, yr1 = parseInt(splitStartDate[0], 10);
+        if (isNaN(yr1) || yr1 < 1900 || yr1 > 9999)
+        {
+            jQuery(this).focus();
+            alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the year.");
+            x = false;
+            return;
+        }
+        if (splitStartDate.length > 1)
+        {
+            mon1 = parseInt(splitStartDate[1], 10) - 1;
+            if (isNaN(mon1) || mon1 < 0 || mon1 > 11)
+            {
+                jQuery(this).focus();
+                alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the month.");
+                x = false;
+                return;
+            }
+        }
+        if (splitStartDate.length > 2)
+        {
+            dt1 = parseInt(splitStartDate[2], 10);
+            if (isNaN(dt1) || dt1 < 1 || dt1 > 31)
+            {
+                jQuery(this).focus();
+                alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the day.");
+                x = false;
+                return;
+            }
+        }
+        var date1 = new Date(yr1, mon1, dt1);
+        var now = new Date();
+
+        if (date1 > now)
+        {
+            jQuery(this).focus();
+            alert('Start Date cannot be in the future. (' + startDate + ')');
+            x = false;
+            return;
+        }
+    });
+    return x;
+}
+
+
+</script>
 <%!
+
+
+
 
 String completed(boolean b){
     String ret ="";
