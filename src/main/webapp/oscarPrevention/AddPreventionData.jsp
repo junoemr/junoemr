@@ -828,8 +828,6 @@ function validatePreventionDate()
     });
     return x;
 }
-
-
 </script>
 <%!
 

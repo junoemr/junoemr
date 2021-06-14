@@ -74,12 +74,12 @@ public class PreventionData {
 			prevention.setCreatorProviderNo(creator);
 			prevention.setDemographicId(Integer.valueOf(demoNo));
 
-			String prevDateFormat = partialDateDao.getFormat(date);
-			if(prevDateFormat == "YYYY")
+			String preventionDateFormat = partialDateDao.getFormat(date);
+			if(preventionDateFormat == "YYYY")
 			{
 				date += "-01-01";
 			}
-			if (prevDateFormat == "YYYY-MM")
+			if (preventionDateFormat == "YYYY-MM")
 			{
 				date += "-01";
 			}
@@ -96,7 +96,7 @@ public class PreventionData {
 
 			preventionDao.persist(prevention);
 			if (prevention.getId() == null) return insertId;
-			partialDateDao.setPartialDate(PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE, prevDateFormat);
+			partialDateDao.setPartialDate(PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE, preventionDateFormat);
 
 			insertId = prevention.getId();
 			for (int i = 0; i < list.size(); i++) {
