@@ -116,6 +116,7 @@ public class FOBTReport implements PreventionReport{
                 cal.setTime(asofDate);
                 cal.add(Calendar.YEAR, -2);
                 Date dueDate = cal.getTime();
+                cal.setTime((dueDate));
                 cal.add(Calendar.MONTH,-6);
                 Date cutoffDate = cal.getTime();
 
