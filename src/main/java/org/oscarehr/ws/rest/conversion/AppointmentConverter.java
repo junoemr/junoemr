@@ -270,6 +270,8 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		{
 			appointmentName = appointment.getName();
 		}
+		
+		boolean isCritical = "critical".equals(appointment.getUrgency());
 
 		CalendarAppointment calendarAppointment = new CalendarAppointment();
 		calendarAppointment.setAppointmentNo(appointment.getId());
@@ -293,7 +295,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
 		calendarAppointment.setAppointmentName(appointmentName);
 		calendarAppointment.setConfirmed(appointment.isConfirmed());
-		calendarAppointment.setCritical(appointment.getUrgency().equals("critical"));
+		calendarAppointment.setCritical(isCritical);
 		if (appointment.getBookingSource() != null)
 		{
 			calendarAppointment.setBookingSource(appointment.getBookingSource().toString());
