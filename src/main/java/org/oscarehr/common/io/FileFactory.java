@@ -218,8 +218,12 @@ public class FileFactory
 	 */
 	public static Path createSubDirectoryIfNotExists(Path baseDirectory, String subDirectory) throws IOException
 	{
-		Path subDir = Files.createDirectory(Paths.get(baseDirectory.toString(), subDirectory));
-		logger.info("Created sub directory: " + subDir.toString());
+		Path subDir = Paths.get(baseDirectory.toString(), subDirectory);
+		if(!subDir.toFile().exists())
+		{
+			Files.createDirectory(subDir);
+			logger.info("Created sub directory: " + subDir.toString());
+		}
 		return subDir;
 	}
 
