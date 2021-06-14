@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
@@ -70,10 +71,14 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		}
 
 		medicationsAndTreatments.setNotes(medication.getComment());
-		medicationsAndTreatments.setPrescriptionInstructions(medication.getInstructions());
+		medicationsAndTreatments.setPrescriptionInstructions(
+				StringUtils.trimToNull(
+					StringUtils.trimToEmpty(medication.getInstructions()) + "\n" +
+						StringUtils.trimToEmpty(medication.getSpecialInstructions())
+				));
 		medicationsAndTreatments.setPatientCompliance(toYnIndicator(medication.getPatientCompliance()));
-		medicationsAndTreatments.setTreatmentType(medication.getETreatmentType());
-		medicationsAndTreatments.setPrescriptionStatus(medication.getRxStatus());
+		medicationsAndTreatments.setTreatmentType((medication.getETreatmentType() != null) ? medication.getETreatmentType().getValue() : null);
+		medicationsAndTreatments.setPrescriptionStatus((medication.getRxStatus() != null) ? medication.getRxStatus().getValue() : null);
 		medicationsAndTreatments.setNonAuthoritativeIndicator(toStringOrNull(medication.getNonAuthoritative()));
 		medicationsAndTreatments.setPriorPrescriptionReferenceIdentifier(null); //TODO
 		medicationsAndTreatments.setDispenseInterval(toStringOrNull(medication.getDispenseInterval()));

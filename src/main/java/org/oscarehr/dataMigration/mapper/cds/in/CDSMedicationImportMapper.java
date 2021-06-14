@@ -25,6 +25,7 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.exception.InvalidFrequencyCodeException;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
@@ -96,8 +97,8 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		medication.setComment(importStructure.getNotes());
 		medication.setInstructions(importStructure.getPrescriptionInstructions());
 		medication.setPatientCompliance(getYIndicator(importStructure.getPatientCompliance()));
-		medication.setETreatmentType(importStructure.getTreatmentType());
-		medication.setRxStatus(importStructure.getPrescriptionStatus());
+		medication.setETreatmentType(CDSConstants.TreatmentType.fromValue(importStructure.getTreatmentType()));
+		medication.setRxStatus(CDSConstants.PrescriptionStatus.fromValue(importStructure.getPrescriptionStatus()));
 		medication.setNonAuthoritative(toBooleanOrNull(importStructure.getNonAuthoritativeIndicator()));
 		// TODO importStructure.getPriorPrescriptionReferenceIdentifier();
 		medication.setDispenseInterval(toIntOrNull(importStructure.getDispenseInterval()));
