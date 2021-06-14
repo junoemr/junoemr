@@ -75,14 +75,8 @@ public class PreventionData {
 			prevention.setDemographicId(Integer.valueOf(demoNo));
 
 			String preventionDateFormat = partialDateDao.getFormat(date);
-			if(preventionDateFormat == "YYYY")
-			{
-				date += "-01-01";
-			}
-			if (preventionDateFormat == "YYYY-MM")
-			{
-				date += "-01";
-			}
+
+			date = makeFullDate(preventionDateFormat, date);
 
 			prevention.setPreventionDate(ConversionUtils.fromDateString(date));
 
@@ -600,6 +594,19 @@ public class PreventionData {
 			log.error(e.getMessage(), e);
 		}
 		return h;
+	}
+
+
+	private static String makeFullDate(String dateFormat, String date) {
+		if(dateFormat == "YYYY")
+		{
+			date += "-01-01";
+		}
+		if (dateFormat == "YYYY-MM")
+		{
+			date += "-01";
+		}
+		return date;
 	}
 
 	private static void addToHashIfNotNull(Map<String, Object> h, String key, String val) {
