@@ -540,7 +540,9 @@ public class PreventionData {
 				addToHashIfNotNull(h, "never", prevention.isNever() ? "1" : "0");
 				addToHashIfNotNull(h, "creator", prevention.getCreatorProviderNo());
 
-				String summary = "Prevention " + prevention.getPreventionType() + " provided by " + providerName + " on " + preventionDate;
+				String formattedPreventionDate = partialDateDao.getDatePartial(preventionDate, PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE);
+
+				String summary = "Prevention " + prevention.getPreventionType() + " provided by " + providerName + " on " + formattedPreventionDate;
 				summary = summary + " entered by " + creatorName + " on " + lastUpdateDate;
 				Map<String, String> ext = getPreventionKeyValues(prevention.getId().toString());
 

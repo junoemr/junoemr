@@ -42,6 +42,8 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.prevention.model.Prevention" %>
+<%@ page import="org.oscarehr.common.dao.PartialDateDao" %>
+<%@ page import="org.oscarehr.common.model.PartialDate" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -71,6 +73,7 @@
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
     String demographic_no = request.getParameter("demographic_no");
+    PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
     String id = request.getParameter("id");
     Map<String, Object> existingPrevention = null;
 
@@ -94,7 +97,11 @@
     {
         existingPrevention = PreventionData.getPreventionById(id);
 
-        prevDate = (String) existingPrevention.get("preventionDate");
+
+
+        String prevDate1 = (String) existingPrevention.get("preventionDate");
+        prevDate = partialDateDao.getDatePartial(prevDate1, PartialDate.TABLE_PREVENTIONS, Integer.parseInt(id), PartialDate.PREVENTION_DATE);
+
         providerName = (String) existingPrevention.get("providerName");
         provider = (String) existingPrevention.get("provider_no");
         creatorProviderNo = (String) existingPrevention.get("creator");
