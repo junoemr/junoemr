@@ -1,4 +1,5 @@
 import {ProviderPreferenceApi} from "../../generated";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Consults').controller('Consults.ConsultRequestListController', [
 	'$http',
