@@ -683,7 +683,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 								const dateText = moment($scope.datepickerSelectedDate)
 									.format(Juno.Common.Util.DisplaySettings.calendarDateFormat);
 
-								const selectedProviderNo = $scope.selectedSchedule.providerNos[0];
+								const selectedProviderNo = controller.selectedSchedule.providerNos[0];
 								const apptCount = controller.appointmentCount[selectedProviderNo] || 0;
 
 								let header = $('.fc-day-header > span');

@@ -7,8 +7,7 @@
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
-import {SitesApi} from "../../generated";
-import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
+import {MhaAppointmentApi, MhaDemographicApi, MhaIntegrationApi, SitesApi} from "../../generated";
 import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Schedule').component('eventComponent', {
@@ -446,10 +445,17 @@ angular.module('Schedule').component('eventComponent', {
 											sitesApi.getProviderSiteBySchedule(controller.providerModel.providerNo, $scope.eventData.startDate).then(
 													function success(result)
 													{// assign to schedule site that we are booking in to.
-														let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
-														if (site)
+														if(result.data.body)
 														{
-															$scope.eventData.site = site.value;
+															let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
+															if (site)
+															{
+																$scope.eventData.site = site.value;
+															}
+															else
+															{
+																controller.assignDefaultSite();
+															}
 														}
 														else
 														{
