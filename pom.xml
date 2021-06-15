@@ -2092,7 +2092,6 @@
 								org.oscarehr.ws.rest.FlowsheetWebService
 								org.oscarehr.ws.rest.FlowsheetsWebService
                                 org.oscarehr.ws.rest.RosterWebService
-								org.oscarehr.ws.rest.ProvidersService
 								org.oscarehr.ws.rest.SecurityRolesWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
                                 org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
