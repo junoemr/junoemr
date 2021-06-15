@@ -70,6 +70,15 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	public static final String PROVIDER_STATUS_ACTIVE		= "1";
 	public static final String PROVIDER_STATUS_INACTIVE = "0";
 
+
+	// providerTypes
+	public static final String PROVIDER_TYPE_DOCTOR 		= "doctor";
+	public static final String PROVIDER_TYPE_RECEPTIONIST 	= "receptionist";
+	public static final String PROVIDER_TYPE_NURSE			= "nurse";
+	public static final String PROVIDER_TYPE_RESIDENT 		= "resident";
+	public static final String PROVIDER_TYPE_MIDWIFE		= "midwife";
+	public static final String PROVIDER_TYPE_ADMIN			= "admin";
+
 	/**
 	 * default serial version id for serializable
 	 */
