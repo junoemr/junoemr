@@ -512,7 +512,7 @@ table.ele thead {
                           <th>Next Appt.</th>
                           <th>Status</th>
                           <%if (type != null ){ %>
-                          <th>Shot #</th>
+                          <th># Shots</th>
                           <%}%>                          
                           <th>Bonus Stat</th>
                           <th>Since Last Procedure Date</th>

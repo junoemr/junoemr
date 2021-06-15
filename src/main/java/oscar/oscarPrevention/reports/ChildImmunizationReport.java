@@ -84,7 +84,7 @@ public class ChildImmunizationReport implements PreventionReport {
      * @param asofDate Date to use as "today" for the purposes of the calculation.
      * @return
      */
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate)
+    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asOfDate)
     {
         List<PreventionReportDisplay> childhoodImmunizationReport = new ArrayList<>();
         int eligiblePatientCount = 0;
@@ -106,7 +106,7 @@ public class ChildImmunizationReport implements PreventionReport {
 
             Date latestPrevention = null;
             
-            Map<String, Integer> requiredImmunizations = getChildhoodSchedule();
+            Map<String, Integer> immunizationsRemaining = createChildhoodSchedule();
             for (Map<String, Object> prevention : preventions)
             {
              
@@ -132,7 +132,7 @@ public class ChildImmunizationReport implements PreventionReport {
                         }
 	                    else
                         {
-                            requiredImmunizations.put(type, requiredImmunizations.get(type) - 1);
+                            immunizationsRemaining.put(type, immunizationsRemaining.get(type) - 1);
 
                             Date preventionDate = (Date) prevention.get("prevention_date_asDate");
                             if (latestPrevention == null || preventionDate.after(latestPrevention))
@@ -147,8 +147,8 @@ public class ChildImmunizationReport implements PreventionReport {
                 }
             }
 
-            int immunizationsCompleted = calculateScheduleCompletion(requiredImmunizations);
-            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted, latestPrevention, atLeastOneRefused, atLeastOneIneligible);
+            int immunizationsCompleted = calculateScheduleCompletion(immunizationsRemaining);
+            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted, latestPrevention, asOfDate, atLeastOneRefused, atLeastOneIneligible);
             childhoodImmunizationReport.add(entry);
 
             if (atLeastOneIneligible)
@@ -167,21 +167,23 @@ public class ChildImmunizationReport implements PreventionReport {
         }
 
         int percentCompliant = Math.round(((float)qualifiesForBonusCount / (float)eligiblePatientCount) * 100);
+        
+        String contactBillingCode = "Q004A";
 
         Hashtable<String,Object> reportParams = new Hashtable<>();
 
         reportParams.put("up2date", String.valueOf(qualifiesForBonusCount));
         reportParams.put("percent",  String.valueOf(percentCompliant));
         reportParams.put("returnReport", childhoodImmunizationReport);
-        reportParams.put("ineligible", String.valueOf(ineligiblePatientCount));     // TODO this doesn't actually register correctly
+        reportParams.put("inEligible", String.valueOf(ineligiblePatientCount));
         reportParams.put("eformSearch","CHI");
         reportParams.put("followUpType","CIMF");
-        reportParams.put("BillCode", "Q004A");
+        reportParams.put("BillCode", contactBillingCode);
 
         return reportParams;
     }
-
-    public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted, Date latestPrevention, boolean refused, boolean ineligible)
+    
+	public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted, Date latestPrevention, Date asOfDate, boolean refused, boolean ineligible)
     {
 	    // Possible States
 	    // No Info -- Immunizations = 0
@@ -218,50 +220,48 @@ public class ChildImmunizationReport implements PreventionReport {
 	    {
 		    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		    entry.lastDate = dateFormat.format(latestPrevention);
+		
+		    int monthsSinceLastPrevention = UtilDateUtilities.getNumMonths(latestPrevention, asOfDate);
+		    entry.numMonths = monthsSinceLastPrevention + " months";
 	    }
 	    else
 	    {
 	    	entry.lastDate = "------";
+	    	entry.numMonths = "------";
 	    }
 	    
         // TODO these are placeholders
 	    entry.bonusStatus = "N";
 	    entry.billStatus = "N";
-
+	    
 	    if (ineligible)
         {
             entry.rank = 5;
             entry.state = "Ineligible";
-            entry.numMonths = "------";
             entry.color = "grey";
         }
         else if (refused)
         {
             entry.rank = 3;
-            entry.lastDate = "-----";
             entry.state = "Refused";
-            entry.numMonths = "??????";
             entry.color = "orange";
         }
         else if (immunizationsCompleted == 0 && latestPrevention == null)
         {
             entry.rank = 1;
             entry.state = "No Info";
-            entry.numMonths = "------";
             entry.color = "magenta";
         }
         else if (immunizationsCompleted == 5)
         {
             entry.rank = 4;
             entry.state = "Up to date";
-            entry.numMonths = "??????";
             entry.color = "green";
         }
         else
         {
             entry.rank = 2;
             entry.state = "due";
-            entry.numMonths = "??????";
             entry.color = "yellow";
         }
 
@@ -626,25 +626,25 @@ public class ChildImmunizationReport implements PreventionReport {
        return null;
    }
 
-   private Map<String, Integer> getChildhoodSchedule()
+   private Map<String, Integer> createChildhoodSchedule()
    {
-       Map<String, Integer> requiredChildHoodImmunizations = new HashMap<>();
+   	   // Format is <type, # of required shots>
+	   Map<String, Integer> requiredChildHoodImmunizations = new HashMap<>();
        requiredChildHoodImmunizations.put("DTaP-IPV-Hib", 4);
        requiredChildHoodImmunizations.put("Pneu-C", 3);
        requiredChildHoodImmunizations.put("Rot", 2);
-       requiredChildHoodImmunizations.put("MenC-C", 3);
-       requiredChildHoodImmunizations.put("MMR", 2);
+       requiredChildHoodImmunizations.put("MenC-C", 1);
+       requiredChildHoodImmunizations.put("MMR", 1);
        
        return requiredChildHoodImmunizations;
    }
 
    private int calculateScheduleCompletion(Map<String, Integer> immunizations)
    {
-       int completed = immunizations.entrySet()
-                      .stream()
-                      .filter(immunization -> immunization.getValue() <= 0)
-                      .collect(Collectors.toList())
-                      .size();
+       int completed = (int) immunizations.entrySet()
+                                          .stream()
+                                          .filter(immunization -> immunization.getValue() <= 0)
+                                          .count();
 
        return completed;
    }
