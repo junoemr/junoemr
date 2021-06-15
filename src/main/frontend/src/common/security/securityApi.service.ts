@@ -24,7 +24,7 @@
     Canada
 
  */
-import {ProviderApi, SecurityRolesApi} from "../../../generated";
+import {ProviderApi, ProvidersServiceApi, SecurityRolesApi} from "../../../generated";
 
 angular.module("Common.Security").service("securityApiService", [
     '$http',
@@ -35,6 +35,7 @@ angular.module("Common.Security").service("securityApiService", [
     {
         const service = this;
         service.providerApi = new ProviderApi($http, $httpParamSerializer, '../ws/rs');
+        service.providersApi = new ProvidersServiceApi($http, $httpParamSerializer, '../ws/rs');
         service.securityRoleApi = new SecurityRolesApi($http, $httpParamSerializer, '../ws/rs');
 
         service.getCurrentUserSecurityRoles = async (): Promise<any> =>
@@ -85,6 +86,11 @@ angular.module("Common.Security").service("securityApiService", [
         service.canCurrentUserAccessDemographic = async (demographicId: number): Promise<any> =>
         {
             return (await service.providerApi.canCurrentUserAccessDemographic(demographicId)).data.body;
+        }
+
+        service.getAllProviders = async (): Promise<any> =>
+        {
+            return (await service.providersApi.getAll()).data.body;
         }
     }
 ]);

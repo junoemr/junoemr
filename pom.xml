@@ -2089,7 +2089,6 @@
                                 org.oscarehr.ws.rest.DemographicService
                                 org.oscarehr.ws.rest.DemographicsService
                                 org.oscarehr.ws.rest.RosterWebService
-								org.oscarehr.ws.rest.ProvidersService
 								org.oscarehr.ws.rest.SecurityRolesWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
                                 org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService

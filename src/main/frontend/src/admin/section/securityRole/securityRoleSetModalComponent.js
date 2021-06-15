@@ -20,12 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-import {
-	JUNO_BUTTON_COLOR,
-	JUNO_BUTTON_COLOR_PATTERN,
-	JUNO_STYLE,
-	LABEL_POSITION
-} from "../../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('securityRoleSetModal',
@@ -39,12 +34,10 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 			'$uibModal',
 			'securityApiService',
 			'securityRolesService',
-			'providersService',
 			'reportingService',
 			function ($uibModal,
 			          securityApiService,
 			          securityRolesService,
-			          providersService,
 			          reportingService)
 			{
 				const ctrl = this;
@@ -63,7 +56,7 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 				{
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 
-					providersService.getAll().then((results) =>
+					securityApiService.getAllProviders().then((results) =>
 					{
 						ctrl.providerOptions = results.map((provider) =>
 						{
