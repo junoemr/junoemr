@@ -23,36 +23,64 @@
 package org.oscarehr.decisionSupport2.service;
 
 
-import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
+import org.drools.FactException;
+import org.drools.RuleBase;
+import org.drools.WorkingMemory;
 import org.oscarehr.decisionSupport2.model.DsInfoCache;
 import org.oscarehr.decisionSupport2.model.DsInfoLookup;
-import org.oscarehr.flowsheet.entity.Flowsheet;
-import org.oscarehr.flowsheet.entity.FlowsheetItem;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.decisionSupport2.model.DsRule;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
+import oscar.oscarPrevention.Prevention;
+
+import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DsRuleService
 {
-	@Autowired
-	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
-
-	public void applyFlowsheetRules(DsInfoLookup dsInfoLookup, DsInfoCache dsInfoCache, Flowsheet flowsheetEntity)
+	/** filter out rules that do not meet all conditions, and apply consequences for rules where all conditions are met.
+	 * @param dsInfoLookup the object where conditions can look up facts. facts determine if a condition is met
+	 * @param dsInfoCache the object where changes are made by consequences. Ex: a consequence will add an alert to the dsInfoCache
+	 * @param typeCode the type code to check requirements for
+	 * @param dsRules the set of rules to apply
+	 */
+	public void applyRules(DsInfoLookup dsInfoLookup, DsInfoCache dsInfoCache, String typeCode, List<DsRule> dsRules)
 	{
-		for(FlowsheetItem flowsheetItem : flowsheetEntity.getFlowsheetItems())
-		{
-			// filter out rules that do not meet all conditions, and apply consequences for rules where all conditions are met.
-			dsRuleDbToModelConverter.convert(flowsheetItem.getDsRules())
+		dsRules.stream()
+			.filter((rule) -> rule.getConditions()
 					.stream()
-					.filter((rule) -> rule.getConditions()
-							.stream()
-							.allMatch((condition) -> condition.meetsRequirements(flowsheetItem.getTypeCode(), dsInfoLookup)))
-					.forEach((rule) -> rule.getConsequences()
-							.forEach((consequence) -> consequence.apply(flowsheetItem.getTypeCode(), dsInfoCache))
-					);
-		}
+					.allMatch((condition) -> condition.meetsRequirements(typeCode, dsInfoLookup)))
+			.forEach((rule) -> rule.getConsequences()
+					.forEach((consequence) -> consequence.apply(typeCode, dsInfoCache))
+			);
+	}
+
+	/**
+	 * apply the rules defined in the drools rule base to the given object
+	 * @param ruleBase the rule base
+	 * @param mi measurement info object
+	 * @throws FactException
+	 */
+	public void applyRuleBase(RuleBase ruleBase, MeasurementInfo mi) throws FactException
+	{
+		WorkingMemory workingMemory = ruleBase.newWorkingMemory();
+		workingMemory.assertObject(mi);
+		workingMemory.fireAllRules();
+	}
+
+	/**
+	 * apply the rules defined in the drools rule base to the given object
+	 * @param ruleBase the rule base
+	 * @param prevention prevention info object
+	 * @throws FactException
+	 */
+	public void applyRuleBase(RuleBase ruleBase, Prevention prevention) throws FactException
+	{
+		WorkingMemory workingMemory = ruleBase.newWorkingMemory();
+		workingMemory.assertObject(prevention);
+		workingMemory.fireAllRules();
 	}
 }

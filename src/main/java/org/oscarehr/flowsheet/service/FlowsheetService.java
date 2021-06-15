@@ -25,28 +25,31 @@ package org.oscarehr.flowsheet.service;
 
 import org.drools.FactException;
 import org.drools.RuleBase;
-import org.drools.WorkingMemory;
+import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
+import org.oscarehr.decisionSupport2.entity.Drools;
+import org.oscarehr.decisionSupport2.model.DsInfoCache;
+import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 import org.oscarehr.decisionSupport2.service.DroolsCachingService;
 import org.oscarehr.decisionSupport2.service.DsRuleService;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.converter.PreventionToFlowsheetItemDataConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
-import org.oscarehr.decisionSupport2.entity.Drools;
-import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 import org.oscarehr.flowsheet.model.Flowsheet;
-import org.oscarehr.decisionSupport2.model.DsInfoCache;
 import org.oscarehr.flowsheet.model.FlowsheetItem;
 import org.oscarehr.flowsheet.model.FlowsheetItemAlert;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarPrevention.PreventionDS;
+import oscar.oscarPrevention.PreventionData;
 import oscar.util.ConversionUtils;
 
 import java.util.List;
@@ -74,6 +77,9 @@ public class FlowsheetService
 	@Autowired
 	private PreventionToFlowsheetItemDataConverter preventionToFlowsheetItemDataConverter;
 
+	@Autowired
+	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
+
 
 	public List<Flowsheet> getFlowsheets(int offset, int perPage)
 	{
@@ -91,11 +97,12 @@ public class FlowsheetService
 		Flowsheet flowsheet = flowsheetEntityToModelConverter.convert(flowsheetEntity);
 
 		MeasurementInfo measurementInfo = loadMeasurementInfoWithDrools(flowsheetEntity, demographicId);
+		oscar.oscarPrevention.Prevention preventionInfo = loadPreventionInfoWithDrools(flowsheetEntity, demographicId);
+
 		for(FlowsheetItemGroup group : flowsheet.getFlowsheetItemGroups())
 		{
 			for(FlowsheetItem item : group.getFlowsheetItems())
 			{
-
 				if(item.isMeasurementType())
 				{
 					fillItemAlerts(measurementInfo, item);
@@ -103,7 +110,7 @@ public class FlowsheetService
 				}
 				else
 				{
-					fillItemAlerts(measurementInfo, item);
+					fillItemAlerts(preventionInfo, item);
 					fillPreventionItemData(demographicId, item);
 				}
 			}
@@ -131,6 +138,7 @@ public class FlowsheetService
 
 		}
 	}
+
 	private void fillMeasurementItemData(MeasurementInfo measurementInfo, FlowsheetItem item)
 	{
 		// set existing data
@@ -174,17 +182,30 @@ public class FlowsheetService
 		for(Drools drools : flowsheetEntity.getDrools())
 		{
 			RuleBase ruleBase = droolsCachingService.getDroolsRuleBase(drools.getFilename());
-			getMessages(measurementInfo, ruleBase);
+			dsRuleService.applyRuleBase(ruleBase, measurementInfo);
 		}
 
-		dsRuleService.applyFlowsheetRules(measurementInfo, measurementInfo, flowsheetEntity);
+		// load the database alerts, similar to the drools alerts above
+		for(org.oscarehr.flowsheet.entity.FlowsheetItem flowsheetItem : flowsheetEntity.getFlowsheetItems())
+		{
+			dsRuleService.applyRules(measurementInfo, measurementInfo, flowsheetItem.getTypeCode(), dsRuleDbToModelConverter.convert(flowsheetItem.getDsRules()));
+		}
+
 		return measurementInfo;
 	}
 
-	private void getMessages(MeasurementInfo mi, RuleBase ruleBase) throws FactException
+	private oscar.oscarPrevention.Prevention loadPreventionInfoWithDrools(org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity, Integer demographicId)
+			throws FactException
 	{
-		WorkingMemory workingMemory = ruleBase.newWorkingMemory();
-		workingMemory.assertObject(mi);
-		workingMemory.fireAllRules();
+		oscar.oscarPrevention.Prevention prevention = PreventionData.getPrevention(new LoggedInInfo(), demographicId);
+		dsRuleService.applyRuleBase(PreventionDS.ruleBase, prevention);
+
+		// load the database alerts, similar to the drools alerts above
+		for(org.oscarehr.flowsheet.entity.FlowsheetItem flowsheetItem : flowsheetEntity.getFlowsheetItems())
+		{
+			dsRuleService.applyRules(prevention, prevention, flowsheetItem.getTypeCode(), dsRuleDbToModelConverter.convert(flowsheetItem.getDsRules()));
+		}
+
+		return prevention;
 	}
 }
