@@ -1,5 +1,6 @@
 import Integration from "../../model/Integration";
 import {IntegrationType} from "../../model/IntegrationType";
+import MhaConfigService from "../service/MhaConfigService";
 
 export default class MhaIntegration implements Integration
 {
@@ -34,7 +35,7 @@ export default class MhaIntegration implements Integration
 	 * check if integration enabled or not.
 	 * @return always true. MHA integrations have no disable state.
 	 */
-	isEnabled(): boolean
+	public isEnabled(): boolean
 	{
 		// MHA integrations can't be disabled
 		return true;
@@ -44,9 +45,9 @@ export default class MhaIntegration implements Integration
 	 * Check that the connection to the remote service represented by this integration is "working"
 	 * @return promise that resolves to true / false indicating if the connection is valid.
 	 */
-	checkConnection(): Promise<boolean>
+	public async checkConnection(): Promise<boolean>
 	{
-		return Promise.resolve(false);
+		return await (new MhaConfigService()).testIntegrationConnection(this);
 	}
 
 	// ==========================================================================

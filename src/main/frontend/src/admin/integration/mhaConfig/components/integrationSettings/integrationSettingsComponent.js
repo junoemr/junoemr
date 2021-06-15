@@ -61,7 +61,7 @@ angular.module('Admin.Integration').component('integrationSettings',
 
 				ctrl.testConnection = async () =>
 				{
-					ctrl.connectionOk = await mhaConfigService.testIntegrationConnection(ctrl.integration);
+					ctrl.connectionOk = await ctrl.integration.checkConnection();
 					$scope.$apply();
 				}
 
