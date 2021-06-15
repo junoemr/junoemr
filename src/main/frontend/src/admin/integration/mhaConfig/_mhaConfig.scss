@@ -1,0 +1,11 @@
+.mha-config {
+	@include juno-font-body-smallest();
+	color: var(--color-neutral-darkest);
+
+	.content-area {
+		&> div {
+			width: 100%;
+			max-width: 75em;
+		}
+	}
+}

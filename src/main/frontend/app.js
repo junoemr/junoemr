@@ -236,6 +236,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.mhaConfig',
+		{
+			url: "/mhaConfig",
+			component: "mhaConfig",
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',

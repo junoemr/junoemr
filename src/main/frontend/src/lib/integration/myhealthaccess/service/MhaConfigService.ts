@@ -1,5 +1,7 @@
 import {IntegrationTo1, MhaIntegrationApi} from "../../../../../generated";
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
+import IntegrationTo1ToMhaIntegrationConverter from "../converter/IntegrationTo1ToMhaIntegrationConverter";
+import MhaIntegration from "../model/MhaIntegration";
 
 export default class MhaConfigService
 {
@@ -29,8 +31,27 @@ export default class MhaConfigService
 	 * get a list of all MHA integrations on this Juno server.
 	 * @return promise that resolves to list of integrations.
 	 */
-	public async getMhaIntegrations(): Promise<IntegrationTo1[]>
+	public async getMhaIntegrations(): Promise<MhaIntegration[]>
 	{
-		return (await this._mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+		return (new IntegrationTo1ToMhaIntegrationConverter()).convertList((await this._mhaIntegrationApi.searchIntegrations(null, true)).data.body);
+	}
+
+	/**
+	 * delete the specified integration
+	 * @param integration - the integration to delete
+	 */
+	public async deleteIntegration(integration: MhaIntegration): Promise<void>
+	{
+		await this._mhaIntegrationApi.deleteMhaIntegration(integration.id);
+	}
+
+	/**
+	 * test the connection of the specified integration
+	 * @param integration - the integration to test
+	 * @return promise that resolves to true / false indicating if the integration connection is valid.
+	 */
+	public async testIntegrationConnection(integration: MhaIntegration): Promise<boolean>
+	{
+		return (await this._mhaIntegrationApi.testConnection(integration.id)).data.body;
 	}
 }

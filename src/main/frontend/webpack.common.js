@@ -362,6 +362,11 @@ module.exports = {
 			'./src/admin/integration/panelManagement/panelManagementAdminComponent.js',
 			'./src/admin/integration/editProviderPage/editProviderAdminComponent.js',
 			'./src/admin/integration/manageUserPage/manageUserAdminComponent.js',
+			'./src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.js',
+			'./src/admin/integration/mhaConfig/components/module.js',
+			'./src/admin/integration/mhaConfig/components/integrationList/integrationListComponent.js',
+			'./src/admin/integration/mhaConfig/components/integrationSettings/integrationSettingsComponent.js',
+			'./src/admin/integration/mhaConfig/mhaConfigComponent.js',
 			'./src/admin/integration/integrationModules/integrationModulesComponent.js',
 			'./src/admin/integration/iceFall/iceFallAdminComponent.js',
 			'./src/admin/integration/iceFall/settings/iceFallAdminSettingsComponent.js',
@@ -373,7 +378,6 @@ module.exports = {
 			'./src/admin/integration/know2act/Know2actNotificationController.js',
 			'./src/admin/integration/know2act/Know2actTemplateController.js',
 			'./src/admin/integration/frameContent/frameContentController.js',
-			'./src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.js',
 
 			'./src/billing/billingController.js',
 

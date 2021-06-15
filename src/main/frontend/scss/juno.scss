@@ -125,6 +125,9 @@
 @import "../src/admin/integration/editProviderPage/editProviderAdmin";
 @import "../src/admin/integration/manageUserPage/manageUserAdmin";
 @import "../src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueues";
+@import "../src/admin/integration/mhaConfig/components/integrationList/integrationList";
+@import "../src/admin/integration/mhaConfig/components/integrationSettings/integrationSettings";
+@import "../src/admin/integration/mhaConfig/mhaConfig";
 @import "../src/common/components/junoTypeahead/junoTypeahead";
 @import "../src/admin/admin";
 @import "../src/admin/integration/frameContent/frameContent";
