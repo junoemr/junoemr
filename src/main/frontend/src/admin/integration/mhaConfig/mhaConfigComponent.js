@@ -33,6 +33,15 @@ angular.module('Admin.Integration').component('mhaConfig',
 			function ($scope)
 		{
 			const ctrl = this;
+			const mhaConfigService = new MhaConfigService();
+
 			ctrl.pageStyle = JUNO_STYLE.GREY;
+			ctrl.mhaEnabled = null;
+
+			ctrl.$onInit = async () =>
+			{
+				ctrl.mhaEnabled = await mhaConfigService.mhaEnabled()
+				$scope.$apply();
+			}
 		}]
 	});

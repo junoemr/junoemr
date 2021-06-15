@@ -674,7 +674,7 @@ public class AdminNavService
 			}
 		}
 
-		if (OscarProperties.getInstance().isMyHealthAccessEnabled() && securityInfoManager.isSuperAdmin(providerNo))
+		if (securityInfoManager.isSuperAdmin(providerNo))
 		{
 			integrationItems.add(new AdminNavItemTo1("MHA Configuration", "mhaConfig"));
 		}

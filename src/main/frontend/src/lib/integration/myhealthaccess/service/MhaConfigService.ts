@@ -1,11 +1,15 @@
-import {IntegrationTo1, MhaIntegrationApi} from "../../../../../generated";
+import {IntegrationTo1, MhaIntegrationApi, SystemPreferenceApi} from "../../../../../generated";
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
 import IntegrationTo1ToMhaIntegrationConverter from "../converter/IntegrationTo1ToMhaIntegrationConverter";
 import MhaIntegration from "../model/MhaIntegration";
+import angular from "angular";
 
 export default class MhaConfigService
 {
+	public static readonly MHA_ENABLE_PROPERTY = "myhealthaccess_telehealth_enabled";
+
 	protected _mhaIntegrationApi: MhaIntegrationApi;
+	protected _systemPreferencesApi: SystemPreferenceApi;
 
 	// ==========================================================================
 	// Public Methods
@@ -17,14 +21,20 @@ export default class MhaConfigService
 			angular.injector(["ng"]).get("$http"),
 			angular.injector(["ng"]).get("$httpParamSerializer"),
 			API_BASE_PATH);
+
+		this._systemPreferencesApi = new SystemPreferenceApi(
+			angular.injector(["ng"]).get("$http"),
+			angular.injector(["ng"]).get("$httpParamSerializer"),
+			API_BASE_PATH);
 	}
 
 	/**
 	 * @return promise that resolves to, true / false indicating if MHA is enabled.
 	 */
-	public async MhaEnabled(): Promise<boolean>
+	public async mhaEnabled(): Promise<boolean>
 	{
-		return (await this.getMhaIntegrations()).length > 0;
+		return (await this.getMhaIntegrations()).length > 0 &&
+			(await this._systemPreferencesApi.getPropertyEnabled(MhaConfigService.MHA_ENABLE_PROPERTY)).data.body;
 	}
 
 	/**
