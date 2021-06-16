@@ -350,6 +350,7 @@ public class Appointment
 					rdohip = rdohip !=null ? rdohip : null;
 				}
 				boolean isSelfBooked = org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name().equals(details.getBookingSource());
+				boolean isCritical = "critical".equals(details.getUrgency());
 
 				CalendarAppointment appointment = new CalendarAppointment(
 						details.getAppointmentNo(),
@@ -384,7 +385,8 @@ public class Appointment
 						null,
 						details.isConfirmed(),
 						details.getCreatorSecurityId(),
-						details.getBookingSource()
+						details.getBookingSource(),
+						isCritical
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)
