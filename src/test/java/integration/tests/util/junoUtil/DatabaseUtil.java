@@ -62,6 +62,7 @@ public class DatabaseUtil
 			demo.setFirstName(patient.firstName);
 			demo.setLastName(patient.lastName);
 			demo.setSex(patient.sex);
+			demo.setHin(patient.hin);
 			demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
 			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
 		}
