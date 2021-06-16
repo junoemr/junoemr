@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -65,23 +64,14 @@ import java.util.Map;
  */
 public class ChildImmunizationReport implements PreventionReport {
 
-	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+	private static final DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+	private static final Logger log = MiscUtils.getLogger();
 	
     public boolean displayNumShots()
     {
         return true;
     }
-
-    //Sort class for preventions used to sort final list of dtap preventions
-    class DtapComparator implements Comparator<Map<String, Object>> {
-
-        public int compare(Map<String, Object> x, Map<String, Object> y) {
-            return ((String)x.get("prevention_date")).compareTo(((String)y.get("prevention_date")));
-        }
-    }
-
-    private static Logger log = MiscUtils.getLogger();
-
+    
     /**
      * @param loggedInInfo LoggedInInfo
      * @param list List of demographics. Each demographic should take the form of a 3 member list  <List><List>{demoNo, lastName, firstName}</List></List>
@@ -89,7 +79,7 @@ public class ChildImmunizationReport implements PreventionReport {
      *
      * @param asOfDate Date to use as "today" for the purposes of the calculation.  For this report to be accurate for bookkeeping and
      *                 billing, this system to be refactored such that the hard coded date is always March 31st (ie: YYYY-03-31) since
-     *                 that is the end of the fiscal year, and all ages are relative to that day.)
+     *                 that is the end of the fiscal year, and all ages should be relative to that day.)
      *
      * @return a hashtable of report parameters
      */
@@ -167,9 +157,8 @@ public class ChildImmunizationReport implements PreventionReport {
          
 	        childhoodImmunizationReport.add(entry);
 
-            if (entry.state.equals("Ineligible"))
+            if (entry.state.equals("Ineligible")) // For some reason the "-------" state (ie: untargeted) doesn't count as ineligible in the legacy behaviour.
             {
-            	// For some reason the "-------" state (ie: untargeted) doesn't count as ineligible.
                 ineligiblePatientCount++;
             }
             else if (!entry.state.equals("------"))
@@ -182,6 +171,8 @@ public class ChildImmunizationReport implements PreventionReport {
                 qualifiesForBonusCount++;
             }
         }
+        
+        Collections.sort(childhoodImmunizationReport);
 
         int percentCompliant = Math.round(((float)qualifiesForBonusCount / (float)eligiblePatientCount) * 100);
         
@@ -199,15 +190,24 @@ public class ChildImmunizationReport implements PreventionReport {
 
         return reportParams;
     }
-    
-	public PreventionReportDisplay createReportEntry(Demographic patientInfo, int immunizationsCompleted, Date latestPrevention, Date asOfDate, boolean refused, boolean ineligible)
-    {
-    	// demoAge is relative to asOfDate;
 	
+	/**
+	 * Create a row in the childhood prevention report
+	 *
+	 * @param demographic demographic
+	 * @param immunizationsCompleted # of childhood immunizations completed
+	 * @param latestPrevention last childhood prevention date
+	 * @param asOfDate relative date to use as "today" for calculations
+	 * @param refused true if any childhood immunization was refused
+	 * @param ineligible true if ineligible for any childhood immunization
+	 * @return report row
+	 */
+	public PreventionReportDisplay createReportEntry(Demographic demographic, int immunizationsCompleted, Date latestPrevention, Date asOfDate, boolean refused, boolean ineligible)
+    {
 	    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	    PreventionReportDisplay entry = new PreventionReportDisplay();
 	    
-	    entry.demographicNo = patientInfo.getDemographicNo();
+	    entry.demographicNo = demographic.getDemographicNo();
 	    entry.numShots = Integer.toString(immunizationsCompleted);
 	    
 	    if (latestPrevention != null)
@@ -223,11 +223,11 @@ public class ChildImmunizationReport implements PreventionReport {
 	    	entry.numMonths = "------";
 	    }
 	    
-	    boolean eligibleForBonus = eligibleForBonus(patientInfo, immunizationsCompleted, asOfDate, latestPrevention);
-	    if (eligibleForBonus && !refused && !ineligible)
+	    boolean canApplyBonus = eligibleForBonus(demographic, immunizationsCompleted, asOfDate, latestPrevention) && !refused && !ineligible;
+	    if (canApplyBonus)
 	    {
 		    // Legacy implementation had the billing and bonus status being set to "Y" at the same time.
-		    // I don't know why (or what billStatus is), so I am leaving it that way until I know more.
+		    // I don't know why (or even what billStatus is), so I am leaving it that way until I know more.
 	    	entry.bonusStatus = "Y";
 	    	entry.billStatus = "Y";
 	    }
@@ -257,244 +257,32 @@ public class ChildImmunizationReport implements PreventionReport {
         }
         else if (immunizationsCompleted >= 5)
         {
-        	// Note it is possible to be up to date AND NOT bonus eligible if
-	        // the latest vaccination is given past 30mo or patient is not in age range.
-            entry.rank = 4;
-            entry.state = "Up to date";
-            entry.color = "green";
+        	if (canApplyBonus)
+	        {
+		        // Note it is possible to be up to date AND NOT bonus eligible if
+		        // the latest vaccination is given past 30mo or patient is not in age range.
+		        entry.rank = 4;
+		        entry.state = "Up to date";
+		        entry.color = "green";
+	        }
+        	else
+	        {
+		        // This state was in the legacy implementation, it catches everything that's not targeted for the
+		        // compliance bonus.
+		        entry.state = "------";
+		        entry.color = "white";
+	        }
         }
-        else if (immunizationsCompleted < 5)
+        else
         {
             entry.rank = 2;
             entry.state = "due";
             entry.color = "yellow";
         }
-        // TODO decide whether to leave this in...
-        else
-	    {
-		    // If age is ever considered, this should be accessible for demographics which are missing 1 or more shots
-		    // but have not aged into the age required for prevention targeting.  Left in for legacy purposes.
-		    entry.state = "other";
-		    entry.color = "white";
-	    }
+        
         return entry;
     }
-
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate, boolean foobar){
-        int inList = 0;
-        double done= 0;
-        ArrayList<PreventionReportDisplay> returnReport = new ArrayList<PreventionReportDisplay>();
-
-        int dontInclude = 0;
-          for (int i = 0; i < list.size(); i ++){//for each  element in arraylist
-             ArrayList<String> fieldList = list.get(i);
-             log.debug("list "+list.size());
-             Integer demo = Integer.parseInt(fieldList.get(0));
-             log.debug("fieldList "+fieldList.size());
-
-			// search prevention_date prevention_type deleted refused
-			ArrayList<Map<String, Object>> prevs1 = PreventionData.getPreventionData(loggedInInfo, "DTap-IPV", demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs1, demo,"DTap-IPV",null);
-			ArrayList<Map<String, Object>> prevsDtapIPVHIB = PreventionData.getPreventionData(loggedInInfo, "DTaP-IPV-Hib", demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevsDtapIPVHIB, demo,"DTaP-IPV-Hib",null);
-			ArrayList<Map<String, Object>> prevs2 = PreventionData.getPreventionData(loggedInInfo, "Hib", demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs2, demo,"Hib",null);
-			ArrayList<Map<String, Object>> prevs4 = PreventionData.getPreventionData(loggedInInfo, "MMR",demo);
-			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,"MMR",null);
-			prevs4.addAll(PreventionData.getPreventionData(loggedInInfo, "MMRV", demo));
-			PreventionData.addRemotePreventions(loggedInInfo, prevs4, demo,"MMRV",null);
-
-             //need to compile accurate dtap numbers
-			 Map<String, Object> hDtapIpv, hDtapIpvHib;
-             boolean add;
-
-             for( int idx = 0; idx < prevsDtapIPVHIB.size(); ++idx ) {
-                 hDtapIpvHib = prevsDtapIPVHIB.get(idx);
-                 add = true;
-                 for( int idx2 = 0; idx2 < prevs1.size(); ++idx2 ) {
-                     hDtapIpv = prevs1.get(idx2);
-                     if(((String)hDtapIpvHib.get("prevention_date")).equals((hDtapIpv.get("prevention_date")))) {
-                         add = false;
-                         break;
-                     }
-                 }
-
-                 if( add ) {
-                     prevs1.add(hDtapIpvHib);
-                 }
-             }
-
-
-             Collections.sort(prevs1, new DtapComparator());
-
-             int numDtap = prevs1.size();  //4
-             int numHib  = prevs2.size();  //4
-             int numMMR  = prevs4.size();  //1
-
-             log.debug("prev1 "+prevs1.size()+ " prevs2 "+ prevs2.size() +" prev4 "+prevs4.size());
-
-             DemographicData dd = new DemographicData();
-             org.oscarehr.common.model.Demographic demoData = dd.getDemographic(loggedInInfo, demo.toString());
-             // This a kludge to get by conformance testing in ontario -- needs to be done in a smarter way
-             int totalImmunizations = numDtap + /*numHib +*/ numMMR ;
-             int recommTotal = 5; //9;NOT SURE HOW HIB WORKS
-             int ageInMonths = DemographicData.getAgeInMonthsAsOf(demoData,asofDate);
-             PreventionReportDisplay prd = new PreventionReportDisplay();
-             prd.demographicNo = demo;
-             prd.bonusStatus = "N";
-             prd.billStatus = "N";
-             if (totalImmunizations == 0){// no info
-                prd.rank = 1;
-                prd.lastDate = "------";
-                prd.state = "No Info";
-                prd.numMonths = "------";
-                prd.color = "Magenta";
-             }else if(  (  prevs1.size()> 0 &&  ineligible(prevs1.get(prevs1.size()-1))) || (  prevs2.size()> 0 && ineligible(prevs2.get(prevs2.size()-1))) || (  prevs4.size()> 0 && ineligible(prevs4.get(prevs4.size()-1))) ){
-                prd.rank = 5;
-                prd.lastDate = "------";
-                prd.state = "Ineligible";
-                prd.numMonths = "------";
-                prd.color = "grey";
-                inList++;
-            }else{
-
-                boolean refused = false;
-                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
-                Date lastDate = null;
-                String prevDateStr = "";
-
-                if(prevs1.size() > 0){
-                	Map<String, Object> hDtap = prevs1.get(prevs1.size()-1);
-                   if ( hDtap.get("refused") != null && ((String) hDtap.get("refused")).equals("1")){
-                      refused = true;
-                   }
-                   prevDateStr = (String) hDtap.get("prevention_date");
-                   try{
-                      lastDate = formatter.parse(prevDateStr);
-                   }catch (Exception e){MiscUtils.getLogger().error("Error", e);}
-                }
-
-                if(prevs4.size() > 0){
-                	Map<String, Object> hMMR  = prevs4.get(0);  //Changed to get first MMR value instead of last value
-                   if ( hMMR.get("refused") != null && ((String) hMMR.get("refused")).equals("1")){
-                      refused = true;
-                   }
-
-                   String mmrDateStr = (String) hMMR.get("prevention_date");
-                   Date prevDate = null;
-                   try{
-                      prevDate = formatter.parse(mmrDateStr);
-                      if (prevDate.after(lastDate)){
-                         lastDate = prevDate;
-                         prevDateStr = mmrDateStr;
-                      }
-                   }catch (Exception e){MiscUtils.getLogger().error("Error", e);}
-                }
-
-                String numMonths = "------";
-                if ( lastDate != null){
-                   int num = UtilDateUtilities.getNumMonths(lastDate,asofDate);
-                   numMonths = ""+num+" months";
-                }
-
-                Date dob = dd.getDemographicDOB(loggedInInfo, demo.toString());
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(dob);
-                cal.add(Calendar.MONTH, 30);
-                Date twoYearsAfterDOB = cal.getTime();
-                if( lastDate != null ) {
-                    log.debug("twoYearsAfterDOB date "+twoYearsAfterDOB+ " "+lastDate.before(twoYearsAfterDOB) );
-                    if (!refused && (totalImmunizations >= recommTotal  ) && lastDate.before(twoYearsAfterDOB) && ( ageInMonths >= 18 )){//&& endOfYear.after(prevDate)){
-                       prd.bonusStatus = "Y";
-                       prd.billStatus = "Y";
-                       done++;
-                    }
-                }
-                //outcomes
-                if (!refused && totalImmunizations < recommTotal && ageInMonths >= 18 && ageInMonths <= 23){ // less < 9
-                   prd.rank = 2;
-                   prd.lastDate = prevDateStr;
-                   prd.state = "due";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "yellow"; //FF00FF
-
-                } else if (!refused && totalImmunizations < recommTotal && ageInMonths > 23 ){ // overdue
-                   prd.rank = 2;
-                   prd.lastDate = prevDateStr;
-                   prd.state = "Overdue";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "red"; //FF00FF
-
-                } else if (refused){  // recorded and refused
-                   prd.rank = 3;
-                   prd.lastDate = "-----";
-                   prd.state = "Refused";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "orange"; //FF9933
-                } else if (totalImmunizations >= recommTotal  ){  // recorded done
-                   prd.rank = 4;
-                   prd.lastDate = prevDateStr;
-                   prd.state = "Up to date";
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "green";
-                   //done++;
-                }else{
-                   prd.state = "------";
-                   prd.lastDate = prevDateStr;
-                   prd.numMonths = numMonths;
-                   prd.numShots = ""+totalImmunizations;
-                   prd.color = "white";
-                   dontInclude++;
-                }
-
-
-             }
-
-             letterProcessing( prd,"CIMF",asofDate);
-             returnReport.add(prd);
-
-          }
-          String percentStr = "0";
-          double eligible = list.size() - inList - dontInclude;
-          log.debug("eligible "+eligible+" done "+done);
-          if (eligible != 0){
-             double percentage = ( done / eligible ) * 100;
-             log.debug("in percentage  "+percentage   +" "+( done / eligible));
-             percentStr = ""+Math.round(percentage);
-          }
-
-
-            Collections.sort(returnReport);
-
-          Hashtable<String,Object> h = new Hashtable<String,Object>();
-
-          h.put("up2date",""+Math.round(done));
-          h.put("percent",percentStr);
-          h.put("returnReport",returnReport);
-          h.put("inEligible", ""+inList);
-          h.put("eformSearch","CHI");
-          h.put("followUpType","CIMF");
-          h.put("BillCode", "Q004A");
-          log.debug("set returnReport "+returnReport);
-          return h;
-    }
-
-    boolean ineligible(Map<String, Object> h){
-       boolean ret =false;
-       if ( h.get("refused") != null && ((String) h.get("refused")).equals("2")){
-          ret = true;
-       }
-       return ret;
-   }
-
-
-
-
+    
    //TODO: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
 
                 //Get last contact method?
