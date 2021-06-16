@@ -39,7 +39,7 @@ import java.sql.SQLException;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
-public class AddFormsClassicUITests extends SeleniumTestBase
+public class AddEformsClassicUITests extends SeleniumTestBase
 {
 	@BeforeClass
 	public static void setup()
@@ -54,9 +54,9 @@ public class AddFormsClassicUITests extends SeleniumTestBase
 			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		SchemaUtils.restoreTable(
-				"admission", "demographic","encounterForm", "form_hsfo2_visit", "hsfo2_patient", "log",
-				"measurementType", "measurements", "provider", "provider_facility", "provider_recent_demographic_access",
-				"providerbillcenter", "recyclebin", "tickler_update", "validations", "wcb"
+				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate", "eform_data",
+				"Facility", "issue", "log","measurementType", "LookupList", "LookupListItem", "OscarJob", "OscarJobType",
+				"provider", "ProviderPreference", "roster_status", "secUserRole", "tickler_text_suggest", "validations"
 		);
 	}
 
@@ -69,8 +69,9 @@ public class AddFormsClassicUITests extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitleeforms")));
 		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 		PageUtil.switchToLastWindow(driver);
+		Thread.sleep(2000);
 		driver.findElement(By.linkText("letter")).click();
 		PageUtil.switchToLastWindow(driver);
 		driver.findElement(By.id("subject")).sendKeys(subject);
