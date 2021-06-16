@@ -51,11 +51,15 @@ angular.module('Record.Flowsheet').component('flowsheet',
 				ctrl.demographicId = null;
 
 				ctrl.filter = {
-					textFilter: null, // free text filter items
-					showHiddenItems: false, // show hidden/out of range/invalid items
-					dataBeforeDate: null, // only show entries dated before this date
-					dataAfterDate: null,  // only show entries dated after this date
-					dataMaxEntries: null, // only show n most recent entries
+					item: {
+						textFilter: null, // free text filter items
+						showHidden: false, // show hidden/out of range/invalid items
+					},
+					data: {
+						beforeDate: null, // only show entries dated before this date
+						afterDate: null,  // only show entries dated after this date
+						maxEntries: null, // only show n most recent entries
+					},
 				};
 
 				ctrl.filterOptions = {
@@ -88,11 +92,11 @@ angular.module('Record.Flowsheet').component('flowsheet',
 
 				ctrl.clearFilters = () =>
 				{
-					ctrl.filter.textFilter = null;
-					ctrl.filter.showHiddenItems = false;
-					ctrl.filter.dataBeforeDate = null;
-					ctrl.filter.dataAfterDate = null;
-					ctrl.filter.dataMaxEntries = null;
+					ctrl.filter.item.textFilter = null;
+					ctrl.filter.item.showHidden = false;
+					ctrl.filter.data.beforeDate = null;
+					ctrl.filter.data.afterDate = null;
+					ctrl.filter.data.maxEntries = null;
 				};
 
 				ctrl.showFlowsheetGroup = (group) =>
@@ -103,26 +107,14 @@ angular.module('Record.Flowsheet').component('flowsheet',
 				}
 				ctrl.showFlowsheetItem = (item) =>
 				{
-					if(!item)
+					if(!item || (!ctrl.filter.item.showHidden && item.hidden))
 					{
 						return false;
 					}
-
-					if(!ctrl.filter.showHiddenItems && item.hidden)
-					{
-						return false;
-					}
-					else if (!Juno.Common.Util.isBlank(ctrl.filter.textFilter))
-					{
-						console.info(ctrl.filter.textFilter, item.name, item.typeCode, item.description);
-						if ((!item.name || !item.name.toLowerCase().includes(ctrl.filter.textFilter.toLowerCase())) &&
-							(!item.typeCode || !item.typeCode.toLowerCase().includes(ctrl.filter.textFilter.toLowerCase())) &&
-							(!item.description || !item.description.toLowerCase().includes(ctrl.filter.textFilter.toLowerCase())))
-						{
-							return false;
-						}
-					}
-					return true;
+					return !(!Juno.Common.Util.isBlank(ctrl.filter.item.textFilter) &&
+						(!item.name || !item.name.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())) &&
+						(!item.typeCode || !item.typeCode.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())) &&
+						(!item.description || !item.description.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())));
 				}
 			}]
 	});

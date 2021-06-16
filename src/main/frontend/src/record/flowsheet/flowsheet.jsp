@@ -41,13 +41,13 @@
 					<div class="col-md-2">
 						<juno-check-box label="Show Hidden Items"
 						                label-position="$ctrl.LABEL_POSITION.TOP"
-						                ng-model="$ctrl.filter.showHiddenItems">
+						                ng-model="$ctrl.filter.item.showHidden">
 						</juno-check-box>
 					</div>
 					<div class="col-md-10">
 						<juno-input label="Search Items"
 						            label-position="$ctrl.LABEL_POSITION.TOP"
-						            ng-model="$ctrl.filter.textFilter">
+						            ng-model="$ctrl.filter.item.textFilter">
 						</juno-input>
 					</div>
 				</div>
@@ -56,20 +56,20 @@
 					<div class="col-md-2">
 						<juno-select label="Most recent entries"
 						             label-position="$ctrl.LABEL_POSITION.TOP"
-						             ng-model="$ctrl.filter.dataMaxEntries"
+						             ng-model="$ctrl.filter.data.maxEntries"
 						             options="$ctrl.filterOptions.dataMaxOptions">
 						</juno-select>
 					</div>
 					<div class="col-md-4">
-						<juno-date-select label="Before Date"
+						<juno-date-select label="After Date"
 						                  label-position="$ctrl.LABEL_POSITION.TOP"
-						                  ng-model="$ctrl.filter.dataBeforeDate">
+						                  ng-model="$ctrl.filter.data.afterDate">
 						</juno-date-select>
 					</div>
 					<div class="col-md-4">
-						<juno-date-select label="After Date"
+						<juno-date-select label="Before Date"
 						                  label-position="$ctrl.LABEL_POSITION.TOP"
-						                  ng-model="$ctrl.filter.dataAfterDate">
+						                  ng-model="$ctrl.filter.data.beforeDate">
 						</juno-date-select>
 					</div>
 					<div class="col-md-2">
@@ -97,7 +97,10 @@
 						<flowsheet-item
 								flowsheet-id="$ctrl.flowsheet.id"
 								demographic-id="$ctrl.demographicId"
-								model="item">
+								model="item"
+								filter-date-after="$ctrl.filter.data.afterDate"
+								filter-date-before="$ctrl.filter.data.beforeDate"
+								filter-max-entries="$ctrl.filter.data.maxEntries">
 						</flowsheet-item>
 					</div>
 				</panel-body>

@@ -65,7 +65,7 @@
 		</div>
 	</div>
 	<div class="flex-row">
-		<flowsheet-item-data ng-repeat="data in $ctrl.model.data"
+		<flowsheet-item-data ng-repeat="data in $ctrl.model.data | filter:$ctrl.showData"
 		                     model="data">
 		</flowsheet-item-data>
 	</div>

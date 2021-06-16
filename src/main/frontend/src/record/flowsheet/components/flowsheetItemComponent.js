@@ -35,6 +35,9 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 			model: "<",
 			demographicId: "<",
 			flowsheetId: "<",
+			filterDateBefore: "<?",
+			filterDateAfter: "<?",
+			filterMaxEntries: "<?",
 		},
 		controller: [
 			'flowsheetApiService',
@@ -94,6 +97,25 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					{
 						return "alert-danger";
 					}
+				}
+
+				ctrl.showData = (data) =>
+				{
+					if(ctrl.filterDateBefore || ctrl.filterDateAfter)
+					{
+						const observationDate = moment.utc(data.observationDateTime);
+						if (!observationDate.isValid() ||
+							(ctrl.filterDateAfter && ctrl.filterDateAfter.isValid() && !observationDate.isSameOrAfter(ctrl.filterDateAfter, "day")) ||
+							(ctrl.filterDateBefore && ctrl.filterDateBefore.isValid() && !observationDate.isBefore(ctrl.filterDateBefore, "day")))
+						{
+							return false;
+						}
+					}
+					if(ctrl.filterMaxEntries && (ctrl.model.data.findIndex((entry) => entry.id === data.id) > (ctrl.filterMaxEntries - 1)))
+					{
+						return false;
+					}
+					return true;
 				}
 
 				ctrl.canSubmitItem = () =>
