@@ -25,6 +25,7 @@
 
 package oscar.oscarEncounter.oscarMeasurements;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
@@ -291,6 +292,14 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
     	Demographic d = demographicDao.getDemographic(demographicNo);
     	return (sex.trim().equals(d.getSex()));
+    }
+
+    @Override
+    public String getGender()
+    {
+        DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+        Demographic d = demographicDao.getDemographic(demographicNo);
+        return (StringUtils.trimToNull(d.getSex()));
     }
     
     /*

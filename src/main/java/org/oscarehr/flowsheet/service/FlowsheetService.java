@@ -121,22 +121,23 @@ public class FlowsheetService
 	private void fillItemAlerts(DsInfoCache dsInfoCache, FlowsheetItem item)
 	{
 		// set item specific alerts
-		String measurementTypeCode = item.getTypeCode();
-		if(dsInfoCache.hasRecommendation(measurementTypeCode))
+		String typeCode = item.getTypeCode();
+		if(dsInfoCache.hasRecommendation(typeCode))
 		{
-			dsInfoCache.getWarnings(measurementTypeCode).forEach((recommendation) -> {
+			dsInfoCache.getWarnings(typeCode).forEach((recommendation) -> {
 				FlowsheetItemAlert alert = new FlowsheetItemAlert(recommendation, SeverityLevel.RECOMMENDATION);
 				item.addFlowsheetItemAlert(alert);
 			});
 		}
-		if(dsInfoCache.hasWarning(measurementTypeCode))
+		if(dsInfoCache.hasWarning(typeCode))
 		{
-			dsInfoCache.getWarnings(measurementTypeCode).forEach((warning) -> {
+			dsInfoCache.getWarnings(typeCode).forEach((warning) -> {
 				FlowsheetItemAlert alert = new FlowsheetItemAlert(warning, SeverityLevel.WARNING);
 				item.addFlowsheetItemAlert(alert);
 			});
 
 		}
+		item.setHidden(dsInfoCache.getHidden(typeCode));
 	}
 
 	private void fillMeasurementItemData(MeasurementInfo measurementInfo, FlowsheetItem item)

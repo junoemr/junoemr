@@ -39,6 +39,7 @@ public class FlowsheetItem extends AbstractTransientModel
 
 	private ItemType type;
 	private String typeCode;
+	private boolean hidden;
 
 	private ValueType valueType;
 	private String valueLabel;

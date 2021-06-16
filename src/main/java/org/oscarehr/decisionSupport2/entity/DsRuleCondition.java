@@ -49,6 +49,8 @@ public class DsRuleCondition extends AbstractModel<Integer>
 		VALUE_LE,
 		MONTHS_SINCE,
 		NEVER_GIVEN,
+		IS_GENDER,
+		NOT_GENDER,
 	}
 
 	@Id

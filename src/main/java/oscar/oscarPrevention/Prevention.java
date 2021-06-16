@@ -491,4 +491,10 @@ public class Prevention implements DsInfoCache, DsInfoLookup
     {
         return -1;
     }
+
+    @Override
+    public String getGender()
+    {
+        return this.sex;
+    }
 }

@@ -20,12 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.decisionSupport2.model;
+package org.oscarehr.decisionSupport2.model.condition;
 
-public interface DsInfoLookup
+import lombok.Data;
+import org.oscarehr.decisionSupport2.model.DsInfoLookup;
+
+@Data
+public class ConditionIsGender extends DsCondition
 {
-	int getLastDateRecordedInMonths(String typeCode);
-	int getLastValueAsInt(String typeCode);
-	int isDataEqualToYes(String typeCode);
-	String getGender();
+	@Override
+	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
+	{
+		String genderCode = dsInfoLookup.getGender();
+		return (getValue().equalsIgnoreCase(genderCode));
+	}
 }
