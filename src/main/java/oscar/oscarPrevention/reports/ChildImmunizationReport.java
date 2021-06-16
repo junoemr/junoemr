@@ -26,9 +26,12 @@
 package oscar.oscarPrevention.reports;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
@@ -49,7 +52,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Childhood Immunization Cumulative Preventative Care Bonus (April 2020)
@@ -63,6 +65,8 @@ import java.util.stream.Collectors;
  */
 public class ChildImmunizationReport implements PreventionReport {
 
+	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+	
     public boolean displayNumShots()
     {
         return true;
@@ -80,9 +84,14 @@ public class ChildImmunizationReport implements PreventionReport {
 
     /**
      * @param loggedInInfo LoggedInInfo
-     * @param list List of demographics.  Each demographic takes the form of a 3 member list  <List><List>{demoNo, lastName, firstName}</List></List>
-     * @param asofDate Date to use as "today" for the purposes of the calculation.
-     * @return
+     * @param list List of demographics. Each demographic should take the form of a 3 member list  <List><List>{demoNo, lastName, firstName}</List></List>
+     *             except that the contents (and order?) of that list are determined by the demographic query.
+     *
+     * @param asOfDate Date to use as "today" for the purposes of the calculation.  For this report to be accurate for bookkeeping and
+     *                 billing, this system to be refactored such that the hard coded date is always March 31st (ie: YYYY-03-31) since
+     *                 that is the end of the fiscal year, and all ages are relative to that day.)
+     *
+     * @return a hashtable of report parameters
      */
     public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asOfDate)
     {
@@ -92,15 +101,14 @@ public class ChildImmunizationReport implements PreventionReport {
         int ineligiblePatientCount = 0;
 
         List<ReportPatientInfo> patientInfoList = ReportPatientInfo.fromList(list);
-
-        // Assume all patients in this list are between 30 and 42 months of age as of March 31st on the year of asOfDate,
-        // since this is passed in as part of a demographic query.
-        for (ReportPatientInfo patientinfo : patientInfoList)
+        
+        for (ReportPatientInfo patientInfo : patientInfoList)
         {
+        	Demographic demographic = demographicManager.getDemographic(loggedInInfo, patientInfo.demographicNo);
             //  Each Map<String,Object> is a prevention item, with field names as keys... this is ridiculous.
-            ArrayList<Map<String, Object>> preventions = PreventionData.getPreventionData(loggedInInfo, patientinfo.demographicNo);
+            ArrayList<Map<String, Object>> preventions = PreventionData.getPreventionData(loggedInInfo, demographic.getDemographicNo());
 
-            // These two fields track legacy behaviour.  I'm not sure at this moment if they are correct.
+            // These two fields track legacy behaviour.  I'm not sure at this moment if they are correct in terms of billing or bonus calculations
             boolean atLeastOneRefused = false;
             boolean atLeastOneIneligible = false;
 
@@ -147,20 +155,29 @@ public class ChildImmunizationReport implements PreventionReport {
                 }
             }
 
+            
             int immunizationsCompleted = calculateScheduleCompletion(immunizationsRemaining);
-            PreventionReportDisplay entry = createReportEntry(patientinfo, immunizationsCompleted, latestPrevention, asOfDate, atLeastOneRefused, atLeastOneIneligible);
-            childhoodImmunizationReport.add(entry);
+	
+	        // This entire part needs to be refactored, this is running DB queries in a loop for every single row in the table.
+	        // It can be put into the ReportPatientInfo class, but nothing is actually guaranteed to be in there...
+	        // Ideally this would use a hard coded sql query with the only parameter being the rostered provider.
+	        
+            PreventionReportDisplay entry = createReportEntry(demographic, immunizationsCompleted, latestPrevention, asOfDate, atLeastOneRefused, atLeastOneIneligible);
+	        letterProcessing(entry,"CIMF",asOfDate);
+         
+	        childhoodImmunizationReport.add(entry);
 
-            if (atLeastOneIneligible)
+            if (entry.state.equals("Ineligible"))
             {
+            	// For some reason the "-------" state (ie: untargeted) doesn't count as ineligible.
                 ineligiblePatientCount++;
             }
-            else
+            else if (!entry.state.equals("------"))
             {
                 eligiblePatientCount++;
             }
 
-            if (immunizationsCompleted == 5)
+            if (entry.bonusStatus.equals("Y"))
             {
                 qualifiesForBonusCount++;
             }
@@ -183,42 +200,18 @@ public class ChildImmunizationReport implements PreventionReport {
         return reportParams;
     }
     
-	public PreventionReportDisplay createReportEntry(ReportPatientInfo patientInfo, int immunizationsCompleted, Date latestPrevention, Date asOfDate, boolean refused, boolean ineligible)
+	public PreventionReportDisplay createReportEntry(Demographic patientInfo, int immunizationsCompleted, Date latestPrevention, Date asOfDate, boolean refused, boolean ineligible)
     {
-	    // Possible States
-	    // No Info -- Immunizations = 0
-	    // Ineligible
-	    // Refused
-	    // Due -- Missing at least one, child is at least 18mo and below 2yo
-	    // OverDue -- Missing at least one, and child is over 2 years old
-	    // Done
-	    // Other
+    	// demoAge is relative to asOfDate;
 	
-	    // Report has a don't include variable to exclude from eligibility....
-
-/*
-        public Integer demographicNo = null;
-        public String lastDate = null;
-        public int rank = 0;
-        public String state = null;
-        public String numMonths = null;
-        public String color = null;
-        public String numShots = null;
-        public String bonusStatus= null;
-        public String billStatus = null;
-
-        //FollowUp Data
-        public Date lastFollowup = null;
-        public String lastFollupProcedure =null;
-        public String nextSuggestedProcedure=null;*/
-	
+	    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	    PreventionReportDisplay entry = new PreventionReportDisplay();
-	    entry.demographicNo = patientInfo.demographicNo;
+	    
+	    entry.demographicNo = patientInfo.getDemographicNo();
 	    entry.numShots = Integer.toString(immunizationsCompleted);
-	
+	    
 	    if (latestPrevention != null)
 	    {
-		    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		    entry.lastDate = dateFormat.format(latestPrevention);
 		
 		    int monthsSinceLastPrevention = UtilDateUtilities.getNumMonths(latestPrevention, asOfDate);
@@ -230,9 +223,19 @@ public class ChildImmunizationReport implements PreventionReport {
 	    	entry.numMonths = "------";
 	    }
 	    
-        // TODO these are placeholders
-	    entry.bonusStatus = "N";
-	    entry.billStatus = "N";
+	    boolean eligibleForBonus = eligibleForBonus(patientInfo, immunizationsCompleted, asOfDate, latestPrevention);
+	    if (eligibleForBonus && !refused && !ineligible)
+	    {
+		    // Legacy implementation had the billing and bonus status being set to "Y" at the same time.
+		    // I don't know why (or what billStatus is), so I am leaving it that way until I know more.
+	    	entry.bonusStatus = "Y";
+	    	entry.billStatus = "Y";
+	    }
+	    else
+	    {
+	    	entry.bonusStatus = "N";
+	    	entry.billStatus = "N";
+	    }
 	    
 	    if (ineligible)
         {
@@ -252,21 +255,28 @@ public class ChildImmunizationReport implements PreventionReport {
             entry.state = "No Info";
             entry.color = "magenta";
         }
-        else if (immunizationsCompleted == 5)
+        else if (immunizationsCompleted >= 5)
         {
+        	// Note it is possible to be up to date AND NOT bonus eligible if
+	        // the latest vaccination is given past 30mo or patient is not in age range.
             entry.rank = 4;
             entry.state = "Up to date";
             entry.color = "green";
         }
-        else
+        else if (immunizationsCompleted < 5)
         {
             entry.rank = 2;
             entry.state = "due";
             entry.color = "yellow";
         }
-
-        // TODO: overdue other...
-
+        // TODO decide whether to leave this in...
+        else
+	    {
+		    // If age is ever considered, this should be accessible for demographics which are missing 1 or more shots
+		    // but have not aged into the age required for prevention targeting.  Left in for legacy purposes.
+		    entry.state = "other";
+		    entry.color = "white";
+	    }
         return entry;
     }
 
@@ -625,8 +635,12 @@ public class ChildImmunizationReport implements PreventionReport {
        }
        return null;
    }
-
-   private Map<String, Integer> createChildhoodSchedule()
+	
+	/**
+	 * Create a Map<type, # vaccines on schedule>
+	 * @return A map of vaccine types, and the number of times each one should be administered.
+	 */
+	private Map<String, Integer> createChildhoodSchedule()
    {
    	   // Format is <type, # of required shots>
 	   Map<String, Integer> requiredChildHoodImmunizations = new HashMap<>();
@@ -638,8 +652,14 @@ public class ChildImmunizationReport implements PreventionReport {
        
        return requiredChildHoodImmunizations;
    }
-
-   private int calculateScheduleCompletion(Map<String, Integer> immunizations)
+	
+	/**
+	 * Calculate how many of the five childhood vaccinations have had their full schedules completed.
+	 * @param immunizations Map<type, # remaining> vaccines remaining
+	 *
+	 * @return # of vaccines fully completed
+	 */
+	private int calculateScheduleCompletion(Map<String, Integer> immunizations)
    {
        int completed = (int) immunizations.entrySet()
                                           .stream()
@@ -647,5 +667,29 @@ public class ChildImmunizationReport implements PreventionReport {
                                           .count();
 
        return completed;
+   }
+	
+	/**
+	 * Determine if a demographic is eligible for the bonus code.
+	 * A demographic is eligible for the bonus if they meet the following criteria:
+	 *
+	 * 1) They have had full schedules of all 5 childhood immunizations
+	 * 2) They are between 30 and 42 months old, relative to the asOfDate
+	 * 3) Their last childhood immunization was given prior to 30 months old.
+	 *
+	 * @param demographic demographic
+	 * @param asOfDate calculations are relative to this date.
+	 * @param latestPrevention date of the last childhood immunization
+	 * @return true if bonus conditions met
+	 */
+   private boolean eligibleForBonus(Demographic demographic, int numberOfShots, Date asOfDate, Date latestPrevention)
+   {
+   	    int relativeAgeAsOf = DemographicData.getAgeInMonthsAsOf(demographic, asOfDate);
+   	    
+   	    boolean inAgeRange = relativeAgeAsOf >= 30 && relativeAgeAsOf <= 42;
+   	    boolean allShots = numberOfShots >= 5;
+   	    boolean thirtyMonthsAtLastPrevention = latestPrevention != null && DemographicData.getAgeInMonthsAsOf(demographic, latestPrevention) <= 30;
+
+   	    return inAgeRange && allShots && thirtyMonthsAtLastPrevention;
    }
 }
