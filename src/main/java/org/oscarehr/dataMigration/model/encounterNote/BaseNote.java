@@ -24,6 +24,7 @@ package org.oscarehr.dataMigration.model.encounterNote;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 
@@ -45,13 +46,21 @@ public abstract class BaseNote extends AbstractTransientModel
 	private String programId;
 	private String roleId;
 
+	private List<DxCode> dxIssueCodes;
+
 	public BaseNote()
 	{
 		this.editors = new ArrayList<>();
+		this.dxIssueCodes = new ArrayList<>();
 	}
 
 	public void addEditor(Provider editor)
 	{
 		this.editors.add(editor);
+	}
+
+	public void addIssueCode(DxCode issueCode)
+	{
+		this.dxIssueCodes.add(issueCode);
 	}
 }

@@ -45,13 +45,12 @@ import xml.cds.v5_0.OmdCds;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static oscar.util.ConversionUtils.DATE_PATTERN_DAY;
 import static oscar.util.ConversionUtils.DATE_PATTERN_MONTH;
@@ -62,8 +61,6 @@ public class CDSExporter implements DemographicExporter
 {
 	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
 
-	private final ConcurrentMap<String, Integer> providerExportCountHash;
-
 	@Autowired
 	private CDSExportMapper cdsExportMapper;
 
@@ -72,7 +69,6 @@ public class CDSExporter implements DemographicExporter
 
 	public CDSExporter()
 	{
-		providerExportCountHash = new ConcurrentHashMap<>();
 	}
 
 	public GenericFile exportDemographic(PatientRecord patientRecord) throws Exception
@@ -83,11 +79,11 @@ public class CDSExporter implements DemographicExporter
 
 		PatientExportContext context = patientExportContextService.getContext();
 		context.getExportLogger().logSummaryLine(patientRecord);
-		incrementProviderExportCount(demographic);
+		context.incrementProviderExportCount(demographic.getMrpProvider());
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
 		instant = LogAction.printDuration(instant, "Exporter: model to CDS structure conversion");
 
-		GenericFile exportFile = parser.write(omdCds, context.getTempDirectory());
+		GenericFile exportFile = parser.write(omdCds, getExportFolder(patientRecord.getDemographic(), context.getTempDirectory()));
 		exportFile.rename(createExportFilename(demographic));
 
 		instant = LogAction.printDuration(instant, "Exporter: file write and rename");
@@ -116,31 +112,41 @@ public class CDSExporter implements DemographicExporter
 	 */
 	protected String createExportFilename(Demographic demographic)
 	{
-		String filename =
-				demographic.getFirstName().replace("_", "-") + "_" +
-				demographic.getLastName().replace("_", "-") + "_" +
-				demographic.getId() + "_" +
-				ConversionUtils.toDateString(demographic.getDateOfBirth(), DATE_PATTERN_DAY + DATE_PATTERN_MONTH + DATE_PATTERN_YEAR);
+		String filename = GenericFile.getSanitizedFileName(
+				String.join("_",
+						demographic.getFirstName().replace("_", "-"),
+						demographic.getLastName().replace("_", "-"),
+						String.valueOf(demographic.getId()),
+						ConversionUtils.toDateString(demographic.getDateOfBirth(), DATE_PATTERN_DAY + DATE_PATTERN_MONTH + DATE_PATTERN_YEAR)
+				));
 		return filename.replaceAll("[\\s,.]", "-") + ".xml";
 	}
 
-	protected synchronized void incrementProviderExportCount(Demographic demographic)
+	/**
+	 * OMD requires export files to be separated into folders by MRP with a specific naming convention.
+	 * Format: PhysicianFN_PhysicianLN_OHIPBillingNumber
+	 * @param demographic the patient record
+	 * @param baseDirectory the main export folder path
+	 * @return the patient specific export directory path
+	 */
+	protected Path getExportFolder(Demographic demographic, Path baseDirectory) throws IOException
 	{
-		Provider provider = demographic.getMrpProvider();
-		String providerKey = "Provider Unassigned";
-		if(provider != null)
+		String folderName;
+		Provider mrpProvider = demographic.getMrpProvider();
+		if(mrpProvider != null)
 		{
-			providerKey = StringUtils.trimToEmpty(
-					StringUtils.trimToEmpty(provider.getTitleString()) + " " + provider.getFirstName() + " " + provider.getLastName());
-		}
-		if(providerExportCountHash.containsKey(providerKey))
-		{
-			providerExportCountHash.put(providerKey, providerExportCountHash.get(providerKey) + 1);
+			folderName = GenericFile.getSanitizedFileName(
+					String.join("_",
+							StringUtils.trimToEmpty(mrpProvider.getFirstName()),
+							StringUtils.trimToEmpty(mrpProvider.getLastName()),
+							StringUtils.trimToEmpty(mrpProvider.getOhipNumber())
+					));
 		}
 		else
 		{
-			providerExportCountHash.put(providerKey, 1);
+			folderName = "mrp_unassigned";
 		}
+		return FileFactory.createSubDirectoryIfNotExists(baseDirectory, folderName);
 	}
 
 	protected GenericFile createEventLog() throws IOException
@@ -170,7 +176,7 @@ public class CDSExporter implements DemographicExporter
 		streamWriter.write(paddedReadmeLine("Date and Time", ConversionUtils.toDateTimeString(ZonedDateTime.now())));
 
 		// CDS requires the readme to display a count of how many demographics are exported for each provider.
-		for(Map.Entry<String, Integer> entry : providerExportCountHash.entrySet())
+		for(Map.Entry<String, Integer> entry : context.getProviderExportCountHash().entrySet())
 		{
 			String providerName = entry.getKey();
 			Object exportCounter = entry.getValue();

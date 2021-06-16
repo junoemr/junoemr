@@ -25,10 +25,12 @@ package org.oscarehr.dataMigration.model.immunization;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.provider.Provider;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class Immunization extends AbstractTransientModel
@@ -55,4 +57,5 @@ public class Immunization extends AbstractTransientModel
 	private String reason;
 	private String result;
 	private String comments;
+	private List<ResidualInfo> residualInfo;
 }

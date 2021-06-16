@@ -28,6 +28,7 @@ import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -40,11 +41,14 @@ import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.PersonNameSimple;
 import xml.cds.v5_0.PostalZipCode;
 import xml.cds.v5_0.ResidualInformation;
+import xml.cds.v5_0.StandardCoding;
 import xml.cds.v5_0.YnIndicator;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 
 @Component
 public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper<I, E>
@@ -72,7 +76,14 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 			cdsAddress = objectFactory.createAddress();
 			AddressStructured structured = objectFactory.createAddressStructured();
 			PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
-			postalZipCode.setPostalCode(addressModel.getPostalCode());
+			if(COUNTRY_CODE_USA.equals(addressModel.getCountryCode()))
+			{
+				postalZipCode.setZipCode(addressModel.getPostalCode());
+			}
+			else
+			{
+				postalZipCode.setPostalCode(addressModel.getPostalCode());
+			}
 
 			structured.setLine1(addressModel.getAddressLine1());
 			structured.setLine2(addressModel.getAddressLine2());
@@ -265,5 +276,36 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 	protected String toYnIndicatorString(Boolean indicator)
 	{
 		return ((indicator != null) && indicator) ? CDSConstants.Y_INDICATOR_TRUE : CDSConstants.Y_INDICATOR_FALSE;
+	}
+
+
+	protected StandardCoding getStandardCoding(DxCode exportStructure)
+	{
+		StandardCoding standardCoding = null;
+		if(exportStructure != null)
+		{
+			DxCode.DxCodingSystem codingSystem = exportStructure.getCodingSystem();
+			if(codingSystem != null)
+			{
+				CDSConstants.CodingSystem cdsCodingSystem = codingSystem.getCdsCodingSystem();
+				String code = exportStructure.getCode();
+				if(cdsCodingSystem != null && code != null)
+				{
+					standardCoding = objectFactory.createStandardCoding();
+					standardCoding.setStandardCodingSystem(cdsCodingSystem.getValue());
+					standardCoding.setStandardCode(code);
+					standardCoding.setStandardCodeDescription(exportStructure.getDescription());
+				}
+				else
+				{
+					logEvent("Incomplete standard code for coding system '" + codingSystem.getValue() + "' with code '" + code + "'");
+				}
+			}
+			else
+			{
+				logEvent("Missing standard coding system for code '" + exportStructure.getCode() + "'");
+			}
+		}
+		return standardCoding;
 	}
 }

@@ -23,15 +23,19 @@
 package org.oscarehr.dataMigration.service.context;
 
 import lombok.Data;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.dataMigration.logger.ExportLogger;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DemographicExporter;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Data
 public class PatientExportContext extends PollableContext
@@ -44,6 +48,15 @@ public class PatientExportContext extends PollableContext
 	private String exportName;
 	private Path tempDirectory;
 
+	// map for tracking how many demographics are exporter for each provider
+	private final ConcurrentMap<String, Integer> providerExportCountHash;
+
+	public PatientExportContext()
+	{
+		super();
+		providerExportCountHash = new ConcurrentHashMap<>();
+	}
+
 	@Override
 	public synchronized void clean()
 	{
@@ -52,7 +65,7 @@ public class PatientExportContext extends PollableContext
 			try
 			{
 				MiscUtils.getLogger().info("remove temp directory: " + tempDirectory.toString());
-				Files.deleteIfExists(tempDirectory);
+				FileUtils.deleteDirectory(tempDirectory.toFile()); // will recursive delete directory
 			}
 			catch(IOException e)
 			{
@@ -75,6 +88,29 @@ public class PatientExportContext extends PollableContext
 		else
 		{
 			return "Packaging Export Files";
+		}
+	}
+
+	/**
+	 * increment the counter for this provider. for tracking how many demographics are exported for each provider.
+	 * will use a default provider value if the provider is null
+	 * @param provider - the provider to increment
+	 */
+	public synchronized void incrementProviderExportCount(Provider provider)
+	{
+		String providerKey = "Provider Unassigned";
+		if(provider != null)
+		{
+			providerKey = StringUtils.trimToEmpty(
+					StringUtils.trimToEmpty(provider.getTitleString()) + " " + provider.getFirstName() + " " + provider.getLastName());
+		}
+		if(providerExportCountHash.containsKey(providerKey))
+		{
+			providerExportCountHash.put(providerKey, providerExportCountHash.get(providerKey) + 1);
+		}
+		else
+		{
+			providerExportCountHash.put(providerKey, 1);
 		}
 	}
 }

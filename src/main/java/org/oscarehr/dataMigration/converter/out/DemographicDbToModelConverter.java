@@ -46,6 +46,9 @@ public class DemographicDbToModelConverter extends
 	@Autowired
 	private DemographicExtDao demographicExtDao;
 
+	@Autowired
+	private RosterDbToModelConverter rosterDbToModelConverter;
+
 	@Override
 	public org.oscarehr.dataMigration.model.demographic.Demographic convert(Demographic input)
 	{
@@ -66,28 +69,20 @@ public class DemographicDbToModelConverter extends
 
 		exportDemographic.setHealthNumber(StringUtils.trimToNull(input.getHin()));
 		exportDemographic.setHealthNumberVersion(StringUtils.trimToNull(input.getVer()));
-		exportDemographic.setHealthNumberProvinceCode(StringUtils.trimToNull(input.getHcType()));
+		exportDemographic.setHealthNumberProvinceCode(findRegionCodeValue(StringUtils.trimToNull(input.getHcType())));
+		exportDemographic.setHealthNumberCountryCode(findCountryCodeValue(StringUtils.trimToNull(input.getHcType()), COUNTRY_CODE_CANADA));
 		exportDemographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(input.getHcRenewDate()));
 		exportDemographic.setHealthNumberEffectiveDate(ConversionUtils.toNullableLocalDate(input.getHcEffectiveDate()));
 		exportDemographic.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
 		exportDemographic.setDateEnded(ConversionUtils.toNullableLocalDate(input.getEndDate()));
 		exportDemographic.setChartNumber(StringUtils.trimToNull(input.getChartNo()));
-		exportDemographic.setRosterDate(ConversionUtils.toNullableLocalDate(input.getRosterDate()));
-		exportDemographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(input.getRosterTerminationDate()));
+		exportDemographic.setRosterHistory(rosterDbToModelConverter.convert(input.getRosterHistory()));
 		exportDemographic.setMrpProvider(findProvider(input.getProviderNo()));
 		exportDemographic.setReferralDoctor(getReferralProvider(input));
 		exportDemographic.setFamilyDoctor(getFamilyProvider(input));
 		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
 		exportDemographic.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
-
-		Address address = new Address();
-		address.setAddressLine1(StringUtils.trimToNull(input.getAddress()));
-		address.setCity(StringUtils.trimToNull(input.getCity()));
-		address.setRegionCode(StringUtils.trimToNull(input.getProvince()));
-		address.setCountryCode(COUNTRY_CODE_CANADA);
-		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
-		address.setResidencyStatusCurrent();
-		exportDemographic.addAddress(address);
+		exportDemographic.addAddress(buildAddress(input));
 
 		// phone conversions
 		if(input.getPhone() != null)
@@ -120,6 +115,59 @@ public class DemographicDbToModelConverter extends
 		return exportDemographic;
 	}
 
+	protected Address buildAddress(Demographic input)
+	{
+		Address address = new Address();
+		address.setAddressLine1(StringUtils.trimToNull(input.getAddress()));
+		address.setCity(StringUtils.trimToNull(input.getCity()));
+
+		// non canadian regions (ie US states) are stored in the province field like 'US-NY' etc.
+		String provinceCode = StringUtils.trimToNull(input.getProvince());
+		address.setRegionCode(findRegionCodeValue(provinceCode));
+		address.setCountryCode(findCountryCodeValue(provinceCode, COUNTRY_CODE_CANADA));
+		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
+		address.setResidencyStatusCurrent();
+
+		return address;
+	}
+
+	/**
+	 * parse out the province code from the province value
+	 * @param provinceCode to be parsed
+	 * @return the province code
+	 */
+	private String findRegionCodeValue(String provinceCode)
+	{
+		if(provinceCode != null && provinceCode.contains("-"))
+		{
+			String[] provinceCodeSplit = provinceCode.split("-");
+			return provinceCodeSplit[1];
+		}
+		else
+		{
+			return provinceCode;
+		}
+	}
+
+	/**
+	 * parse out the country code from the province value, or return the default.
+	 * @param provinceCode to be parsed
+	 * @param defaultCountry to be used in case province code has no country code part
+	 * @return the country code
+	 */
+	private String findCountryCodeValue(String provinceCode, String defaultCountry)
+	{
+		if(provinceCode != null && provinceCode.contains("-"))
+		{
+			String[] provinceCodeSplit = provinceCode.split("-");
+			return provinceCodeSplit[0];
+		}
+		else
+		{
+			return defaultCountry;
+		}
+	}
+
 	private PhoneNumber buildPhoneNumber(String phoneNumber, String extension)
 	{
 		boolean primaryPhone = phoneNumber.endsWith("*");
@@ -128,29 +176,12 @@ public class DemographicDbToModelConverter extends
 
 	private Provider getReferralProvider(Demographic input)
 	{
-		return getReferralProvider(input.getReferralDoctorName(), input.getReferralDoctorNumber());
+		return getProviderFromString(input.getReferralDoctorName(), input.getReferralDoctorNumber());
 	}
 
 	private Provider getFamilyProvider(Demographic input)
 	{
-		return getReferralProvider(input.getFamilyDoctorName(), input.getFamilyDoctorNumber());
-	}
-
-	private Provider getReferralProvider(String referralProviderName, String referralProviderNumber)
-	{
-		Provider referralProvider = null;
-		if(referralProviderName != null && referralProviderName.contains(","))
-		{
-			String[] nameArray = referralProviderName.split(",", 2);
-			String firstName = StringUtils.trimToNull(nameArray[1]);
-			String lastName = StringUtils.trimToNull(nameArray[0]);
-
-			referralProvider = new Provider();
-			referralProvider.setFirstName((firstName != null) ? firstName : "Missing");
-			referralProvider.setLastName((lastName != null) ? lastName : "Missing");
-			referralProvider.setOhipNumber(StringUtils.trimToNull(referralProviderNumber));
-		}
-		return referralProvider;
+		return getProviderFromString(input.getFamilyDoctorName(), input.getFamilyDoctorNumber());
 	}
 
 	private String numericSin(String unformatted)

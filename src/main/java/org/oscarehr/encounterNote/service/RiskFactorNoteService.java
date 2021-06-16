@@ -48,7 +48,7 @@ public class RiskFactorNoteService extends HistoryNoteService
 		CaseManagementNote note = riskFactorNoteModelToDbConverter.convert(noteModel);
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveRiskFactorNote(note);
-		addAnnotationLink(savedNote, noteModel.getAnnotation());
+		addAnnotationLink(savedNote, noteModel.getAnnotation(), noteModel.getResidualInfo());
 
 		if(savedNote.getNoteExtensionList() != null)
 		{

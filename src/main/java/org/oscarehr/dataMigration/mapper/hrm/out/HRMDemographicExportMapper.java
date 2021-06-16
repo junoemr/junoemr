@@ -30,6 +30,7 @@ import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -54,6 +55,8 @@ import xml.hrm.v4_3.PostalZipCode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 
@@ -92,9 +95,13 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		demographics.setPersonStatusDate(toNullableDateFullOrPartial(exportDemographic.getPatientStatusDate()));
 		demographics.setSIN(exportDemographic.getSin());
 
-		demographics.setEnrollmentStatus(exportDemographic.getRosterStatus());
-		demographics.setEnrollmentDate(toNullableDateFullOrPartial(exportDemographic.getRosterDate()));
-		demographics.setEnrollmentTerminationDate(toNullableDateFullOrPartial(exportDemographic.getRosterTerminationDate()));
+		RosterData rosterData = exportDemographic.getCurrentRosterData();
+		if(rosterData != null)
+		{
+			demographics.setEnrollmentStatus(rosterData.isRostered() ? ENROLLMENT_STATUS_TRUE : ENROLLMENT_STATUS_FALSE);
+			demographics.setEnrollmentDate(toNullableDateFullOrPartial(rosterData.getRosterDateTime()));
+			demographics.setEnrollmentTerminationDate(toNullableDateFullOrPartial(rosterData.getTerminationDateTime()));
+		}
 
 		return demographics;
 	}

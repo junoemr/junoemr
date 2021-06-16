@@ -31,8 +31,10 @@ import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.SecRole;
-import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.dataMigration.converter.in.ResidualInfoModelToDbConverter;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.encounterNote.BaseNote;
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -44,6 +46,7 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
+import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
 import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -62,12 +65,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public abstract class BaseNoteService
 {
+	public static final String DEFAULT_RESIDUAL_INFO_NOTE_TEXT = "Residual Info Dump";
+
 	@Autowired
 	protected CaseManagementNoteDao caseManagementNoteDao;
 
@@ -104,6 +110,9 @@ public abstract class BaseNoteService
 	@Autowired
 	protected ProgramDao programDao;
 
+	@Autowired
+	protected ResidualInfoModelToDbConverter residualInfoModelToDbConverter;
+
 	public NoteIssueTo1 getLatestUnsignedNote(Integer demographicNo, Integer providerNo)
 	{
 		CaseManagementNote note = caseManagementNoteDao.getLatestUnsignedNote(demographicNo, providerNo);
@@ -139,6 +148,36 @@ public abstract class BaseNoteService
 		}
 
 		return note;
+	}
+
+	/**
+	 * creates an optional note based on the annotation text, and sets the residual info on the note
+	 * if there is no text but there is residual info, a note will still be created, but with a default text value.
+	 * @param annotationText the text string
+	 * @param residualInfoList the residual info models list
+	 * @return an optional note, if either of the parameters contains data
+	 */
+	public Optional<CaseManagementNote> buildBaseAnnotationNote(String annotationText,
+	                                                           List<ResidualInfo> residualInfoList)
+	{
+		if(annotationText == null && residualInfoList != null && !residualInfoList.isEmpty())
+		{
+			annotationText = DEFAULT_RESIDUAL_INFO_NOTE_TEXT;
+		}
+		if(annotationText != null)
+		{
+			CaseManagementNote annotationNote = new CaseManagementNote();
+			annotationNote.setNote(annotationText);
+
+			if(residualInfoList != null)
+			{
+				List<CaseManagementNoteResidualInfo> noteResidualInfo = residualInfoModelToDbConverter.convert(residualInfoList);
+				noteResidualInfo.forEach((residualInfo) -> residualInfo.setNote(annotationNote));// set the note reference
+				annotationNote.setResidualInfoList(noteResidualInfo);
+			}
+			return Optional.of(annotationNote);
+		}
+		return Optional.empty();
 	}
 
 	private NoteIssueTo1 getNoteTo1FromNote(CaseManagementNote note)

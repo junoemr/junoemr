@@ -50,7 +50,7 @@ public class MedicalHistoryNoteService extends HistoryNoteService
 
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveMedicalHistoryNote(note);
-		addAnnotationLink(savedNote, noteModel.getAnnotation());
+		addAnnotationLink(savedNote, noteModel.getAnnotation(), noteModel.getResidualInfo());
 
 		if(savedNote.getNoteExtensionList() != null)
 		{

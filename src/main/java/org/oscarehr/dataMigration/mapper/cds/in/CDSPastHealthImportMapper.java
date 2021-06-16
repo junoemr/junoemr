@@ -47,6 +47,7 @@ public class CDSPastHealthImportMapper extends AbstractCDSNoteImportMapper<PastH
 		note.setAnnotation(importStructure.getNotes());
 		note.setTreatment(importStructure.getProblemStatus());
 		note.setObservationDate(coalescePartialDatesToDateTimeWithDefault("Past Health Note", note.getStartDate(), note.getResolutionDate(), note.getProcedureDate()));
+		note.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
 
 		return note;
 	}

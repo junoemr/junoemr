@@ -80,6 +80,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	private String healthNumber;
 	private String healthNumberVersion;
 	private String healthNumberProvinceCode;
+	private String healthNumberCountryCode;
 	private LocalDate healthNumberEffectiveDate;
 	private LocalDate healthNumberRenewDate;
 	private String chartNumber;
@@ -102,10 +103,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	private Provider familyDoctor;
 
 	// roster info
-	private String rosterStatus;
-	private LocalDate rosterDate;
-	private LocalDate rosterTerminationDate;
-	private String rosterTerminationReason;
+	private List<RosterData> rosterHistory;
 
 	// other info
 	private String lastUpdateProviderId;
@@ -126,6 +124,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	public Demographic()
 	{
 		this.addressList = new ArrayList<>();
+		this.rosterHistory = new ArrayList<>();
 	}
 
 	public void addAddress(Address address)
@@ -171,6 +170,16 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 					return address;
 				}
 			}
+		}
+		return null;
+	}
+
+	public RosterData getCurrentRosterData()
+	{
+		if(this.rosterHistory != null && !this.rosterHistory.isEmpty())
+		{
+			//the last record is the most recent
+			return rosterHistory.get(rosterHistory.size() - 1);
 		}
 		return null;
 	}

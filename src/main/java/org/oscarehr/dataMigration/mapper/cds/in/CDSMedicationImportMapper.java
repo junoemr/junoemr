@@ -107,6 +107,8 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 
 		medication.setRxEndDate(getEndDate(importStructure));
 
+		medication.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
+
 		return medication;
 	}
 

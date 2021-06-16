@@ -23,15 +23,10 @@
 package org.oscarehr.dataMigration.model.encounterNote;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PartialDate;
 
 @Data
-public class SocialHistoryNote extends BaseNote
+public class SocialHistoryNote extends BaseCppNote
 {
-	private PartialDate startDate;
-	private PartialDate resolutionDate;
-	private String annotation;
-
 	public SocialHistoryNote()
 	{
 		super();
