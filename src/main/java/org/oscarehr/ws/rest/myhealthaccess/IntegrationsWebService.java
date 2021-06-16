@@ -47,7 +47,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Path("myhealthaccess/integrations")
-@Component("IntegrationsWebService")
+@Component("mhaIntegrationsWebService")
 @Tag(name = "mhaIntegration")
 public class IntegrationsWebService extends AbstractServiceImpl
 {

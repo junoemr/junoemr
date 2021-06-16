@@ -44,7 +44,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("myhealthaccess/integration/{integrationId}/")
-@Component("IntegrationWebService")
+@Component("mhaIntegrationWebService")
 @Tag(name = "mhaIntegration")
 public class IntegrationWebService extends AbstractServiceImpl
 {
