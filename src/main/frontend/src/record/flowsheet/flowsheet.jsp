@@ -34,14 +34,66 @@
 			</juno-button>
 		</div>
 
-		<div ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups">
+		<filter-panel initial-state-expanded="false">
+			<div class="filter-wrapper">
+				<h6>Filter Items</h6>
+				<div class="row">
+					<div class="col-md-2">
+						<juno-check-box label="Show Hidden Items"
+						                label-position="$ctrl.LABEL_POSITION.TOP"
+						                ng-model="$ctrl.filter.showHiddenItems">
+						</juno-check-box>
+					</div>
+					<div class="col-md-10">
+						<juno-input label="Search Items"
+						            label-position="$ctrl.LABEL_POSITION.TOP"
+						            ng-model="$ctrl.filter.textFilter">
+						</juno-input>
+					</div>
+				</div>
+				<h6>Filter Data</h6>
+				<div class="row">
+					<div class="col-md-2">
+						<juno-select label="Most recent entries"
+						             label-position="$ctrl.LABEL_POSITION.TOP"
+						             ng-model="$ctrl.filter.dataMaxEntries"
+						             options="$ctrl.filterOptions.dataMaxOptions">
+						</juno-select>
+					</div>
+					<div class="col-md-4">
+						<juno-date-select label="Before Date"
+						                  label-position="$ctrl.LABEL_POSITION.TOP"
+						                  ng-model="$ctrl.filter.dataBeforeDate">
+						</juno-date-select>
+					</div>
+					<div class="col-md-4">
+						<juno-date-select label="After Date"
+						                  label-position="$ctrl.LABEL_POSITION.TOP"
+						                  ng-model="$ctrl.filter.dataAfterDate">
+						</juno-date-select>
+					</div>
+					<div class="col-md-2">
+						<juno-button component-style="$ctrl.componentStyle"
+						             label="&nbsp"
+						             label-position="$ctrl.LABEL_POSITION.TOP"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
+						             click="$ctrl.clearFilters()">
+							Clear Filters
+						</juno-button>
+					</div>
+				</div>
+			</div>
+		</filter-panel>
+
+		<div ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups | filter:$ctrl.showFlowsheetGroup">
 			<panel no-header="!itemGroup.name">
 				<panel-header>
 					<h6>{{itemGroup.name}}</h6>
 					<span>{{itemGroup.description}}</span>
 				</panel-header>
 				<panel-body>
-					<div ng-repeat="item in itemGroup.flowsheetItems">
+					<div ng-repeat="item in itemGroup.flowsheetItems | filter:$ctrl.showFlowsheetItem">
 						<flowsheet-item
 								flowsheet-id="$ctrl.flowsheet.id"
 								demographic-id="$ctrl.demographicId"

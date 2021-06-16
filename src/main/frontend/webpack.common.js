@@ -234,6 +234,7 @@ module.exports = {
 
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
+			'./src/common/components/filterPanel/filterPanelController.ts',
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',

@@ -1,0 +1,31 @@
+.filter-panel {
+	$common-border-radius: 8px;
+
+	margin: 4px 0 8px 0;
+	a {
+		&:hover {
+			text-decoration: none;
+		}
+		&.focus {
+			outline: none;
+		}
+	}
+
+	.expand-filters-bar {
+		background-color: var(--color-neutral-lighter);
+		border: 1px solid var(--color-neutral-light);
+		color: var(--color-primary-base);
+		height: 34px;
+		padding: 0 8px;
+		.icon {
+			font-size: 16px;
+		}
+	}
+	.filters-main-panel {
+		background-color: var(--color-neutral-white);
+		border: 1px solid var(--color-neutral-light);
+		border-top: none;
+		border-radius: 0 0 $common-border-radius $common-border-radius;
+		padding: 8px 8px 0 8px;
+	}
+}
