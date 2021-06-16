@@ -29,21 +29,27 @@
 <%@ page import="org.oscarehr.common.dao.PreventionsLotNrsDao"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
 <%@ page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@ page import="org.oscarehr.prevention.model.Prevention" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@ page import="oscar.oscarPrevention.PreventionData" %>
 <%@ page import="oscar.oscarPrevention.PreventionDisplayConfig" %>
-<%@ page import="oscar.oscarProvider.data.ProviderData"%>
-<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.prevention.model.Prevention" %>
 <%@ page import="org.oscarehr.common.dao.PartialDateDao" %>
 <%@ page import="org.oscarehr.common.model.PartialDate" %>
+<%@ page import="javassist.compiler.ast.StringL" %>
+<%@ page import="java.util.Arrays" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -72,6 +78,8 @@
     }
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
+    ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
     String demographic_no = request.getParameter("demographic_no");
     PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
     String id = request.getParameter("id");
@@ -153,17 +161,19 @@
         layoutType = "default";
     }
 
-    List<Map<String, String>>  providers = ProviderData.getProviderList();
+    List<String> providerTypes = Arrays.asList(ProviderData.PROVIDER_TYPE_DOCTOR, ProviderData.PROVIDER_TYPE_NURSE);
+    List<ProviderData> providerList = providerDataDao.findAllByType(providerTypes);
+
     if (creatorProviderNo.isEmpty())
     {
 	    creatorProviderNo = provider;
     }
 
-    for (Map<String, String> providerMap : providers)
+    for (ProviderData currentProvider : providerList)
     {
-        if (providerMap.get("providerNo").equals(creatorProviderNo))
+        if (currentProvider.getProviderNo().toString().equals(creatorProviderNo))
         {
-            creatorName = providerMap.get("lastName") + " " + providerMap.get("firstName");
+            creatorName = currentProvider.getDisplayName();
         }
     }
   
@@ -415,7 +425,7 @@ clear: left;
 	  {
 	   		hideItem('lot');
 	  }
-	  }
+  }
 
 
 var warnOnWindowClose=true;
@@ -507,9 +517,9 @@ function displayCloseWarning(){
                             <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -564,9 +574,9 @@ function displayCloseWarning(){
                             <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -659,9 +669,9 @@ function displayCloseWarning(){
                             <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -699,9 +709,9 @@ function displayCloseWarning(){
                             <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="hidden" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName()%></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>

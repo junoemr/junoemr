@@ -289,6 +289,18 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return regionCode;
 	}
 
+	protected String getCountryCode(String subDivisionCode)
+	{
+		String countryCode = null;
+
+		// expected case, something like 'CA-BC'
+		if(subDivisionCode != null && subDivisionCode.contains("-"))
+		{
+			countryCode = subDivisionCode.split("-")[0];
+		}
+		return countryCode;
+	}
+
 	protected Address getAddress(xml.cds.v5_0.Address importAddress)
 	{
 		Address address = null;

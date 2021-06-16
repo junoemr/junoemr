@@ -27,6 +27,7 @@ import org.oscarehr.common.dao.OscarCodeDao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.common.model.OscarCode;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
@@ -76,30 +77,32 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 
 	private boolean fillCodeInfo(DxRecord dxRecord, String codingSystemStr, String code)
 	{
-		DxRecord.DxCodingSystem codingSystem = DxRecord.DxCodingSystem.fromValue(codingSystemStr);
+		DxCode.DxCodingSystem codingSystem = DxCode.DxCodingSystem.fromValue(codingSystemStr);
 		if(codingSystem != null)
 		{
-			dxRecord.setCodingSystem(codingSystem);
+			DxCode dxCode = new DxCode();
+			dxCode.setCodingSystem(codingSystem);
 			switch(codingSystem)
 			{
-				case ICD9: fillIcd9Info(dxRecord, code); break;
-				case OSCAR_CODE: fillOscarCodeInfo(dxRecord, code); break;
+				case ICD9: fillIcd9Info(dxCode, code); break;
+				case OSCAR_CODE: fillOscarCodeInfo(dxCode, code); break;
 			}
+			dxRecord.setDxCode(dxCode);
 		}
 		else
 		{
 			logConversionError("Dx record with unknown coding system '" + codingSystemStr + "' could not be loaded");
 		}
-		return (dxRecord.getDxCode() != null);
+		return (dxRecord.getDxCode() != null && dxRecord.getDxCode().getCode() != null);
 	}
 
-	private void fillIcd9Info(DxRecord dxRecord, String icd9Code)
+	private void fillIcd9Info(DxCode dxCode, String icd9Code)
 	{
 		Icd9 icd9 = icd9Dao.findByCode(icd9Code);
 		if(icd9 != null)
 		{
-			dxRecord.setDxCode(icd9.getCode());
-			dxRecord.setCodeDescription(icd9.getDescription());
+			dxCode.setCode(icd9.getCode());
+			dxCode.setDescription(icd9.getDescription());
 		}
 		else
 		{
@@ -107,13 +110,13 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 		}
 	}
 
-	private void fillOscarCodeInfo(DxRecord dxRecord, String oscarCodeStr)
+	private void fillOscarCodeInfo(DxCode dxCode, String oscarCodeStr)
 	{
 		OscarCode oscarCode = oscarCodeDao.findByCode(oscarCodeStr);
 		if(oscarCode != null)
 		{
-			dxRecord.setDxCode(oscarCode.getCode());
-			dxRecord.setCodeDescription(oscarCode.getDescription());
+			dxCode.setCode(oscarCode.getCode());
+			dxCode.setDescription(oscarCode.getDescription());
 		}
 		else
 		{

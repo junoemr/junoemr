@@ -43,7 +43,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 public class FileFactory
 {
@@ -210,6 +209,22 @@ public class FileFactory
 		Path tempDir = Files.createTempDirectory("juno");
 		logger.info("Created temp directory: " + tempDir.toString());
 		return tempDir;
+	}
+
+	/**
+	 * create a sub directory within the base directory
+	 * @return - the directory path
+	 * @throws IOException
+	 */
+	public static Path createSubDirectoryIfNotExists(Path baseDirectory, String subDirectory) throws IOException
+	{
+		Path subDir = Paths.get(baseDirectory.toString(), subDirectory);
+		if(!subDir.toFile().exists())
+		{
+			Files.createDirectory(subDir);
+			logger.info("Created sub directory: " + subDir.toString());
+		}
+		return subDir;
 	}
 
 	/**
@@ -399,35 +414,6 @@ public class FileFactory
 		}
 		logger.info("Overwriting file contents: " + file.getPath());
 		return writeInputStream(fileInputStream, file, true, true);
-	}
-
-	public static ZIPFile packageZipFile(List<GenericFile> filesToZip) throws IOException
-	{
-		return packageZipFile(filesToZip, false);
-	}
-	public static ZIPFile packageZipFile(List<GenericFile> filesToZip, boolean deleteAfterZip) throws IOException
-	{
-		GenericFile tmpFile = createTempFile(".zip");
-		ZIPFile zipFile = new ZIPFile(tmpFile.getFileObject());
-		ZipOutputStream zipOutputStream = new ZipOutputStream(zipFile.asFileOutputStream());
-
-		for(GenericFile file : filesToZip)
-		{
-			ZipEntry ze = new ZipEntry(file.getName());
-			zipOutputStream.putNextEntry(ze);
-			zipOutputStream.write(file.toByteArray());
-			zipOutputStream.closeEntry();
-		}
-		zipOutputStream.close();
-
-		if(deleteAfterZip)
-		{
-			for(GenericFile file : filesToZip)
-			{
-				file.deleteFile();
-			}
-		}
-		return zipFile;
 	}
 
 	/**
