@@ -21,77 +21,34 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../common/components/junoComponentConstants";
-import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
-import {ItemType} from "../lib/flowsheet/FlowsheetConstants";
+import {SecurityPermissions} from "../../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
 
-angular.module('Flowsheet').component('flowsheetEdit',
+angular.module('Flowsheet').component('flowsheetEditItem',
 	{
-		templateUrl: 'src/flowsheet/flowsheetEdit.jsp',
+		templateUrl: 'src/flowsheet/components/flowsheetEditItem.jsp',
 		bindings: {
 			componentStyle: "<?",
+			model: "<",
 		},
 		controller: [
-			'$state',
-			'$stateParams',
-			'$uibModal',
 			'flowsheetApiService',
 			function (
-				$state,
-				$stateParams,
-				$uibModal,
 				flowsheetApiService,
 			)
 			{
 				const ctrl = this;
 
 				ctrl.SecurityPermissions = SecurityPermissions;
-				ctrl.ItemType = ItemType;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.itemGroups = [];
+				ctrl.rules = [];
 				ctrl.isLoading = true;
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
-					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-					if($stateParams.flowsheetId)
-					{
-						ctrl.flowsheet = await flowsheetApiService.getFlowsheet($stateParams.flowsheetId);
-					}
-					else
-					{
-						ctrl.flowsheet = new FlowsheetModel();
-					}
-					ctrl.isLoading = false;
 				}
-				ctrl.onAddNewGroup = async (): Promise<void> =>
-				{
-					// @ts-ignore
-					let groupName = await Juno.Common.Util.openInputDialog($uibModal,
-						"Add Flowsheet Group",
-						"Please enter a name for this group",
-						ctrl.componentStyle,
-						"Ok",
-						255);
-
-					if(groupName)
-					{
-						const newGroup = {
-							name: groupName,
-							description: null,
-						}
-						ctrl.itemGroups.push(newGroup);
-					}
-				}
-
-				ctrl.onAddNewItem = async (type): Promise<void> =>
-				{
-
-				}
-
 			}]
 	});

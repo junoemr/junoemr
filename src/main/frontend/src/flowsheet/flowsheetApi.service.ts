@@ -25,6 +25,8 @@
 
  */
 import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi} from "../../generated";
+import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
+import FlowsheetTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetTransferToModelConverter";
 
 angular.module("Flowsheet").service("flowsheetApiService", [
 	'$http',
@@ -37,40 +39,41 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.flowsheetApi = new FlowsheetServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
+		service.flowsheetConverter = new FlowsheetTransferToModelConverter();
 
-		service.getAllFlowsheets = async (): Promise<any> =>
+		service.getAllFlowsheets = async (): Promise<Array<FlowsheetModel>> =>
 		{
-			return (await service.flowsheetsApi.getFlowsheets()).data.body;
+			return service.flowsheetConverter.convertAll((await service.flowsheetsApi.getFlowsheets()).data.body);
 		}
 
-		service.getFlowsheet = async (flowsheetId: number): Promise<any> =>
+		service.getFlowsheet = async (flowsheetId: number): Promise<FlowsheetModel> =>
 		{
-			return (await service.flowsheetApi.getFlowsheet(flowsheetId)).data.body;
+			return service.flowsheetConverter.convert((await service.flowsheetApi.getFlowsheet(flowsheetId)).data.body);
 		}
 
-		service.createFlowsheet = async (flowsheetTransfer: object): Promise<any> =>
+		service.createFlowsheet = async (flowsheetTransfer: object): Promise<FlowsheetModel> =>
 		{
-			return (await service.flowsheetApi.createFlowsheet(flowsheetTransfer)).data.body;
+			return service.flowsheetConverter.convert((await service.flowsheetApi.createFlowsheet(flowsheetTransfer)).data.body);
 		}
 
-		service.updateFlowsheet = async (flowsheetId: number, flowsheetTransfer: object): Promise<any> =>
+		service.updateFlowsheet = async (flowsheetId: number, flowsheetTransfer: object): Promise<FlowsheetModel> =>
 		{
-			return (await service.flowsheetApi.updateFlowsheet(flowsheetId, flowsheetTransfer)).data.body;
+			return service.flowsheetConverter.convert((await service.flowsheetApi.updateFlowsheet(flowsheetId, flowsheetTransfer)).data.body);
 		}
 
-		service.setFlowsheetEnabled = async (flowsheetId: number, enabled: boolean): Promise<any> =>
+		service.setFlowsheetEnabled = async (flowsheetId: number, enabled: boolean): Promise<boolean> =>
 		{
 			return (await service.flowsheetApi.setFlowsheetEnabledState(flowsheetId, enabled)).data.body;
 		}
 
-		service.deleteFlowsheet = async (flowsheetId: number): Promise<any> =>
+		service.deleteFlowsheet = async (flowsheetId: number): Promise<boolean> =>
 		{
 			return (await service.flowsheetApi.deleteFlowsheet(flowsheetId)).data.body;
 		}
 
-		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<any> =>
+		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<FlowsheetModel> =>
 		{
-			return (await service.demographicApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body;
+			return service.flowsheetConverter.convert((await service.demographicApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body);
 		}
 
 		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: object): Promise<any> =>

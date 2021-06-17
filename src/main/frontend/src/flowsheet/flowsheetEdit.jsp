@@ -23,4 +23,45 @@
 
 <div class="flowsheet-edit">
 	<h1>Edit Flowsheet</h1>
+
+	<div>
+		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.itemGroups" model="itemGroup">
+			<div ng-repeat="item in itemGroup.flowsheetItems">
+				<flowsheet-edit-item model="item">
+				</flowsheet-edit-item>
+			</div>
+			<div class="flex-row">
+				<div class="add-button-wrapper">
+					<juno-button component-style="$ctrl.componentStyle"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+					             disabled="$ctrl.isLoading"
+					             click="$ctrl.onAddNewItem($ctrl.ItemType.MEASUREMENT)">
+						<i class="icon icon-add"></i>
+						<span>Add Measurement Item</span>
+					</juno-button>
+				</div>
+				<div class="add-button-wrapper">
+					<juno-button component-style="$ctrl.componentStyle"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+					             disabled="$ctrl.isLoading"
+					             click="$ctrl.onAddNewItem($ctrl.ItemType.PREVENTION)">
+						<i class="icon icon-add"></i>
+						<span>Add Prevention Item</span>
+					</juno-button>
+				</div>
+			</div>
+		</flowsheet-item-group>
+	</div>
+	<div class="add-button-wrapper">
+		<juno-button component-style="$ctrl.componentStyle"
+		             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+		             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+		             disabled="$ctrl.isLoading"
+		             click="$ctrl.onAddNewGroup()">
+			<i class="icon icon-add"></i>
+			<span>Add Group</span>
+		</juno-button>
+	</div>
 </div>

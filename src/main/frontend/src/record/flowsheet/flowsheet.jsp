@@ -86,26 +86,17 @@
 			</div>
 		</filter-panel>
 
-		<div ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups | filter:$ctrl.showFlowsheetGroup">
-			<panel no-header="!itemGroup.name">
-				<panel-header>
-					<h6>{{itemGroup.name}}</h6>
-					<span>{{itemGroup.description}}</span>
-				</panel-header>
-				<panel-body>
-					<div ng-repeat="item in itemGroup.flowsheetItems | filter:$ctrl.showFlowsheetItem">
-						<flowsheet-item
-								flowsheet-id="$ctrl.flowsheet.id"
-								demographic-id="$ctrl.demographicId"
-								model="item"
-								filter-date-after="$ctrl.filter.data.afterDate"
-								filter-date-before="$ctrl.filter.data.beforeDate"
-								filter-max-entries="$ctrl.filter.data.maxEntries">
-						</flowsheet-item>
-					</div>
-				</panel-body>
-			</panel>
-		</div>
-
+		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups | filter:$ctrl.showFlowsheetGroup">
+			<div ng-repeat="item in itemGroup.flowsheetItems | filter:$ctrl.showFlowsheetItem">
+				<flowsheet-item
+						flowsheet-id="$ctrl.flowsheet.id"
+						demographic-id="$ctrl.demographicId"
+						model="item"
+						filter-date-after="$ctrl.filter.data.afterDate"
+						filter-date-before="$ctrl.filter.data.beforeDate"
+						filter-max-entries="$ctrl.filter.data.maxEntries">
+				</flowsheet-item>
+			</div>
+		</flowsheet-item-group>
 	</juno-security-check>
 </div>
