@@ -71,7 +71,7 @@
 		</p>
 
 	</div>
-	<form action="https://health.careconnect.ca" method="POST" id="CareConnectForm" style="display:none">
+	<form action="https://bc.careconnect.ca" method="POST" id="CareConnectForm" style="display:none">
 		<input type="hidden" name="phn" value="<%=demographic.getHin()%>">
 		<input type="hidden" name="fn" value="<%=demographic.getFirstName()%>">
 		<input type="hidden" name="ln" value="<%=demographic.getLastName()%>">

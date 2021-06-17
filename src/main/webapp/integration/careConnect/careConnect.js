@@ -29,7 +29,7 @@ Juno.CareConnect.Util.determineCareConnectURL = function determineCareConnectURL
         {
             callback(CARE_CONNECT_PPN_URL);
         },
-        timeout: 2000, // milliseconds
+        timeout: 5000, // milliseconds
         complete: function onTimeout()
         {
             callback(CARE_CONNECT_EXTERNAL_URL);
