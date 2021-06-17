@@ -28,6 +28,7 @@ import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
 import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.AdminNavItemTo1;
@@ -536,6 +537,11 @@ public class AdminNavService
 					"frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/Customization.jsp"));
 		}
 
+		if(securityInfoManager.hasPrivileges(providerNo, Permission.FLOWSHEET_READ))
+		{
+			systemManagementItems.add( new AdminNavItemTo1("Customize Flowsheets", "configureFlowsheets"));
+		}
+
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
 		{
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("oscarprevention.preventionlistmanager.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionListManager.jsp"));
@@ -550,8 +556,6 @@ public class AdminNavService
 		{
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.keyPairGen"), "frame?frameUrl=" + contextPath + "/admin/keygen/keyManager.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.manageFacilities"), "frame?frameUrl=" + contextPath + "/FacilityManager.do"));
-			systemManagementItems.add( new AdminNavItemTo1( "Create New Flowsheet", "frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/adminFlowsheet/NewFlowsheet.jsp"));
-			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.flowsheetManager"), "frame?frameUrl=" + contextPath + "/admin/manageFlowsheets.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.add_lot_nr.title"), "frame?frameUrl=" + contextPath + "/admin/lotnraddrecordhtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));

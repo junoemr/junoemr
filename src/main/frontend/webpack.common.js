@@ -278,6 +278,10 @@ module.exports = {
 			'./src/interceptor/module.js',
 			'./src/interceptor/errorInterceptor.js',
 
+			'./src/flowsheet/module.js',
+			'./src/flowsheet/flowsheetManagerComponent.ts',
+			'./src/flowsheet/flowsheetEditComponent.ts',
+
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
 			'./src/layout/primaryNavComponent.js',

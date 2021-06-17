@@ -24,7 +24,7 @@
     Canada
 
  */
-import {DemographicFlowsheetApi, FlowsheetServiceApi, FlowsheetsServiceApi} from "../../../generated";
+import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi} from "../../../generated";
 
 angular.module("Record.Flowsheet").service("flowsheetApiService", [
 	'$http',
@@ -36,11 +36,16 @@ angular.module("Record.Flowsheet").service("flowsheetApiService", [
 		const service = this;
 		service.flowsheetApi = new FlowsheetServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
-		service.demographicFlowsheetsApi = new DemographicFlowsheetApi($http, $httpParamSerializer, '../ws/rs');
+		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
+
+		service.getFlowsheet = async (flowsheetId: number): Promise<any> =>
+		{
+			return (await service.flowsheetApi.getFlowsheet(flowsheetId)).data.body;
+		}
 
 		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<any> =>
 		{
-			return (await service.demographicFlowsheetsApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body;
+			return (await service.demographicApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body;
 		}
 
 		service.getAllFlowsheets = async (): Promise<any> =>
@@ -50,7 +55,7 @@ angular.module("Record.Flowsheet").service("flowsheetApiService", [
 
 		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: object): Promise<any> =>
 		{
-			return (await service.demographicFlowsheetsApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
+			return (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
 		}
 	}
 ]);

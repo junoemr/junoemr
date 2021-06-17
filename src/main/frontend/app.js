@@ -43,6 +43,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngTable',
 	'ngStorage',
 	'Common',
+	'Flowsheet',
 	'Layout',
 	'Tickler',
 	'Record',
@@ -259,6 +260,16 @@ oscarApp.config([
 		{
 			url: '/billing',
 			component: 'systemPropertiesBilling',
+		})
+		.state('admin.configureFlowsheets',
+		{
+			url: '/configureFlowsheets',
+			component: 'flowsheetManager',
+		})
+		.state('admin.editFlowsheet',
+		{
+			url: '/configureFlowsheets/flowsheet/:flowsheetId',
+			component: 'flowsheetEdit',
 		})
 		.state('ticklers',
 		{

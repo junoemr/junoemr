@@ -44,7 +44,7 @@ import javax.ws.rs.core.MediaType;
 @Component("demographicFlowsheetWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Tag(name = "demographicFlowsheet")
+@Tag(name = "demographic")
 public class DemographicFlowsheetWebService extends AbstractServiceImpl
 {
 	@Autowired
