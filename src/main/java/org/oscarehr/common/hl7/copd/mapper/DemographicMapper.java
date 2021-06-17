@@ -43,7 +43,7 @@ import java.util.List;
 public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
-	private final String DEMO_NULL_NAME="NULL_NAME";
+	private final String DEMO_NULL_NAME = "NULL_NAME";
 
 	public DemographicMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
@@ -119,9 +119,22 @@ public class DemographicMapper extends AbstractMapper
 		if (firstName == null)
 		{
 			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
-			return DEMO_NULL_NAME;
+			firstName = DEMO_NULL_NAME;
 		}
-		return firstName.replaceAll("<", "").replaceAll(">", "");
+		// Append middle name to firstName if it exists to prevent data loss. Middle name doesn't have a place in Juno
+		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
+		if (middleName != null)
+		{
+			firstName += " " + middleName;
+		}
+		firstName = firstName.replaceAll("<", "").replaceAll(">", "");
+
+		if (firstName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
+		{
+			firstName = firstName.substring(0, Demographic.FIRST_NAME_MAX_LENGTH);
+			MiscUtils.getLogger().warn("Demographic first name is too long. Will be truncated to: '" + firstName + "'");
+		}
+		return firstName;
 	}
 	public String getLastName(int rep) throws HL7Exception
 	{
@@ -131,19 +144,24 @@ public class DemographicMapper extends AbstractMapper
 			MiscUtils.getLogger().warn("demographic has no last name! using: " + DEMO_NULL_NAME);
 			return DEMO_NULL_NAME;
 		}
-		return lastName.replaceAll("<", "").replaceAll(">", "");
+		lastName = lastName.replaceAll("<", "").replaceAll(">", "");
+
+		if (lastName.length() > Demographic.LAST_NAME_MAX_LENGTH)
+		{
+			lastName = lastName.substring(0, Demographic.LAST_NAME_MAX_LENGTH);
+			MiscUtils.getLogger().warn("Demographic last name is too long. Will be truncated to: '" + lastName + "'");
+		}
+		return lastName;
 	}
 
 	public boolean hasFirstName(int rep) throws HL7Exception
 	{
-		String firstName = StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue());
-		return  firstName != null;
+		return !this.getFirstName(rep).equals(DEMO_NULL_NAME);
 	}
 
 	public boolean hasLastName(int rep) throws HL7Exception
 	{
-		String lastName = StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue());
-		return  lastName != null;
+		return !this.getLastName(rep).equals(DEMO_NULL_NAME);
 	}
 
 	public String getSex()
