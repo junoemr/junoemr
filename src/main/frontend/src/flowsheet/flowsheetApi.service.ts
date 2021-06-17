@@ -24,9 +24,9 @@
     Canada
 
  */
-import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi} from "../../../generated";
+import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi} from "../../generated";
 
-angular.module("Record.Flowsheet").service("flowsheetApiService", [
+angular.module("Flowsheet").service("flowsheetApiService", [
 	'$http',
 	'$httpParamSerializer',
 	function(
@@ -38,19 +38,39 @@ angular.module("Record.Flowsheet").service("flowsheetApiService", [
 		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 
+		service.getAllFlowsheets = async (): Promise<any> =>
+		{
+			return (await service.flowsheetsApi.getFlowsheets()).data.body;
+		}
+
 		service.getFlowsheet = async (flowsheetId: number): Promise<any> =>
 		{
 			return (await service.flowsheetApi.getFlowsheet(flowsheetId)).data.body;
 		}
 
+		service.createFlowsheet = async (flowsheetTransfer: object): Promise<any> =>
+		{
+			return (await service.flowsheetApi.createFlowsheet(flowsheetTransfer)).data.body;
+		}
+
+		service.updateFlowsheet = async (flowsheetId: number, flowsheetTransfer: object): Promise<any> =>
+		{
+			return (await service.flowsheetApi.updateFlowsheet(flowsheetId, flowsheetTransfer)).data.body;
+		}
+
+		service.setFlowsheetEnabled = async (flowsheetId: number, enabled: boolean): Promise<any> =>
+		{
+			return (await service.flowsheetApi.setFlowsheetEnabledState(flowsheetId, enabled)).data.body;
+		}
+
+		service.deleteFlowsheet = async (flowsheetId: number): Promise<any> =>
+		{
+			return (await service.flowsheetApi.deleteFlowsheet(flowsheetId)).data.body;
+		}
+
 		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<any> =>
 		{
 			return (await service.demographicApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body;
-		}
-
-		service.getAllFlowsheets = async (): Promise<any> =>
-		{
-			return (await service.flowsheetsApi.getFlowsheets()).data.body;
 		}
 
 		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: object): Promise<any> =>

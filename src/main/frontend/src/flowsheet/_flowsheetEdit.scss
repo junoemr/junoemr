@@ -1,3 +1,11 @@
 .flowsheet-manager {
 	@include juno-table-default;
+
+	.button-wrapper {
+		width: 128px;
+	}
+
+	.action-buttons {
+		width: 312px;
+	}
 }

@@ -23,6 +23,7 @@
 package org.oscarehr.flowsheet.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.decisionSupport2.entity.Drools;
@@ -39,6 +40,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +48,7 @@ import java.util.Set;
 @Data
 @Entity(name = "entity.Flowsheet")
 @Table(name = "flowsheet")
+@Where(clause="deleted_at IS NULL")
 public class Flowsheet extends AbstractModel<Integer>
 {
 	@Id
@@ -78,6 +81,12 @@ public class Flowsheet extends AbstractModel<Integer>
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_triggers_icd9", joinColumns = @JoinColumn(name="flowsheet_id"), inverseJoinColumns = @JoinColumn(name="icd9_id"))
 	private Set<Icd9> icd9Triggers = new HashSet<>();
+
+	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime deletedAt;
+
+	@Column(name = "deleted_by")
+	private String deletedBy;
 
 	/**
 	 * must be overridden to prevent default impl from infinite loading jpa links

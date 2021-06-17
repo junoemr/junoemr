@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
 import org.oscarehr.flowsheet.service.FlowsheetDataService;
-import org.oscarehr.flowsheet.service.FlowsheetService;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +47,6 @@ import javax.ws.rs.core.MediaType;
 public class DemographicFlowsheetWebService extends AbstractServiceImpl
 {
 	@Autowired
-	private FlowsheetService flowsheetService;
-
-	@Autowired
 	private FlowsheetDataService flowsheetDataService;
 
 	@GET
@@ -61,7 +57,7 @@ public class DemographicFlowsheetWebService extends AbstractServiceImpl
 			throws Exception
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.FLOWSHEET_READ);
-		return RestResponse.successResponse(flowsheetService.getFlowsheetForDemographic(flowsheetId, demographicId));
+		return RestResponse.successResponse(flowsheetDataService.getFlowsheetForDemographic(flowsheetId, demographicId));
 	}
 
 	@POST

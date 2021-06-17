@@ -32,10 +32,14 @@ angular.module('Flowsheet').component('flowsheetManager',
 		},
 		controller: [
 			'$state',
+			'$uibModal',
 			'flowsheetApiService',
+			'securityRolesService',
 			function (
 				$state,
+				$uibModal,
 				flowsheetApiService,
+				securityRolesService,
 			)
 			{
 				const ctrl = this;
@@ -45,19 +49,83 @@ angular.module('Flowsheet').component('flowsheetManager',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.validationAlerts = [];
-				ctrl.isLoading = false;
+				ctrl.validationAlerts = [] as Array<string>;
+				ctrl.isLoading = true as boolean;
 
-				ctrl.$onInit = async () =>
+				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.flowsheets = await flowsheetApiService.getAllFlowsheets();
+					ctrl.isLoading = false;
 				}
 
-				ctrl.onFlowsheetSelect = (flowsheet) =>
+				ctrl.userCanEdit = (): boolean =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_UPDATE);
+				}
+				ctrl.userCanCreate = (): boolean =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_CREATE);
+				}
+				ctrl.userCanDelete = (): boolean =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_DELETE);
+				}
+
+				ctrl.onFlowsheetNew = (): void =>
+				{
+					ctrl.toFlowsheetEdit(null);
+				}
+
+				ctrl.onFlowsheetEdit = (flowsheet): void =>
+				{
+					ctrl.toFlowsheetEdit(flowsheet.id);
+				}
+
+				ctrl.onFlowsheetDelete = async (flowsheet): Promise<void> =>
+				{
+					// @ts-ignore
+					const userOk : boolean = await Juno.Common.Util.confirmationDialog($uibModal, "Confirm Delete",
+						"You are about to delete flowsheet " + flowsheet.name + "." +
+						"Are you sure you want to delete this flowsheet?");
+
+					if (userOk)
+					{
+						ctrl.isLoading = true;
+						try
+						{
+							await flowsheetApiService.deleteFlowsheet(flowsheet.id);
+							ctrl.flowsheets = ctrl.flowsheets.filter((entry) => entry.id !== flowsheet.id);
+						}
+						finally
+						{
+							ctrl.isLoading = false;
+						}
+					}
+				}
+
+				ctrl.onToggleFlowsheetEnabled = async (flowsheet): Promise<void> =>
+				{
+					ctrl.isLoading = true;
+					try
+					{
+						flowsheet.enabled = await flowsheetApiService.setFlowsheetEnabled(flowsheet.id, !flowsheet.enabled);
+					}
+					finally
+					{
+						ctrl.isLoading = false;
+					}
+				}
+
+				ctrl.toggleFlowsheetEnabledLabel = (flowsheet): string =>
+				{
+					return flowsheet.enabled ? "Disable" : "Enable";
+				}
+
+				ctrl.toFlowsheetEdit = (flowsheetId): void =>
 				{
 					$state.transitionTo('admin.editFlowsheet',
 						{
-							flowsheetId: flowsheet.id,
+							flowsheetId: flowsheetId,
 						},
 						{
 							notify: false

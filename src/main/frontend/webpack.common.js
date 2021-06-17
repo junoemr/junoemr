@@ -281,6 +281,7 @@ module.exports = {
 			'./src/flowsheet/module.js',
 			'./src/flowsheet/flowsheetManagerComponent.ts',
 			'./src/flowsheet/flowsheetEditComponent.ts',
+			'./src/flowsheet/flowsheetApi.service.ts',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
@@ -314,7 +315,6 @@ module.exports = {
 			'./src/record/summary/encounterNoteListComponent.js',
 			'./src/record/flowsheet/module.js',
 			'./src/record/flowsheet/flowsheetComponent.js',
-			'./src/record/flowsheet/flowsheetApi.service.ts',
 			'./src/record/flowsheet/components/flowsheetItemComponent.js',
 			'./src/record/flowsheet/components/flowsheetItemDataComponent.js',
 			'./src/record/forms/module.js',

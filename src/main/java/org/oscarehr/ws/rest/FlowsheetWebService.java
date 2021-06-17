@@ -23,23 +23,25 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.drools.FactException;
-import org.drools.IntegrationException;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.service.FlowsheetService;
+import org.oscarehr.flowsheet.transfer.FlowsheetInboundTransfer;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.xml.sax.SAXException;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 
 @Path("flowsheet")
 @Component("flowsheetWebService")
@@ -51,12 +53,44 @@ public class FlowsheetWebService extends AbstractServiceImpl
 	@Autowired
 	private FlowsheetService flowsheetService;
 
+	@POST
+	@Path("/")
+	public RestResponse<Flowsheet> createFlowsheet(FlowsheetInboundTransfer flowsheet)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_CREATE);
+		return RestResponse.successResponse(flowsheetService.addNewFlowsheet(flowsheet));
+	}
+
 	@GET
 	@Path("/{id}")
 	public RestResponse<Flowsheet> getFlowsheet(@PathParam("id") Integer flowsheetId)
-			throws IntegrationException, IOException, SAXException, FactException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ, Permission.MEASUREMENT_READ);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ);
 		return RestResponse.successResponse(flowsheetService.getFlowsheet(flowsheetId));
+	}
+
+	@PUT
+	@Path("/{id}")
+	public RestResponse<Flowsheet> updateFlowsheet(@PathParam("id") Integer flowsheetId, FlowsheetInboundTransfer flowsheet)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_UPDATE);
+		return RestResponse.successResponse(flowsheetService.updateFlowsheet(flowsheetId, flowsheet));
+	}
+
+	@PATCH
+	@Path("/{id}/enabled")
+	public RestResponse<Boolean> setFlowsheetEnabledState(@PathParam("id") Integer flowsheetId, @QueryParam("state") boolean enabled)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_UPDATE);
+		return RestResponse.successResponse(flowsheetService.setFlowsheetEnabled(flowsheetId, enabled));
+	}
+
+	@DELETE
+	@Path("/{id}")
+	public RestResponse<Boolean> deleteFlowsheet(@PathParam("id") Integer flowsheetId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_DELETE);
+		flowsheetService.deleteFlowsheet(getLoggedInProviderId(), flowsheetId);
+		return RestResponse.successResponse(true);
 	}
 }

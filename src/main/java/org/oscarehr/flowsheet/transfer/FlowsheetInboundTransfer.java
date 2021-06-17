@@ -32,10 +32,8 @@ import java.util.List;
 @Data
 public class FlowsheetInboundTransfer extends AbstractTransientModel
 {
-	private Integer id;
 	private String name;
 	private String description;
-	private boolean enabled;
 	private List<FlowsheetItemGroup> flowsheetItemGroups;
 
 	public FlowsheetInboundTransfer()

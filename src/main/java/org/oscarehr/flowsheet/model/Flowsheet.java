@@ -34,6 +34,8 @@ public class Flowsheet extends AbstractTransientModel
 	private Integer id;
 	private String name;
 	private String description;
+	private boolean enabled;
+	private boolean systemManaged;
 	private List<FlowsheetItemGroup> flowsheetItemGroups;
 
 	public Flowsheet()
