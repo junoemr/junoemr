@@ -80,6 +80,7 @@
 
     String providerName = "";
     String lot = "";
+    String din = "";
     String provider = (String) session.getValue("user");
     Date currentDate = new Date();
     String prevDate = ConversionUtils.toDateString(currentDate, ConversionUtils.TS_NO_SEC_PATTERN);
@@ -123,8 +124,7 @@
         }
         summary = (String) existingPrevention.get("summary");
         extraData = PreventionData.getPreventionKeyValues(id);
-        lot = extraData.get("lot");
-     
+
 	    CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	    List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.PREVENTIONS, Long.valueOf(id));
 	    hasImportExtra = (cml.size()>0);
@@ -509,12 +509,12 @@ function displayCloseWarning(){
                    </fieldset>
                    <fieldset >
                       <legend >Result</legend>
-             			 <label for="name">Name:</label> <input type="text" name="name" value="<%=str((extraData.get("name")),"")%>"/> <br/>
-                         <label for="location">Location:</label> <input type="text" name="location" value="<%=str((extraData.get("location")),"")%>"/> <br/>
-                         <label for="route">Route:</label> <input type="text" name="route"   value="<%=str((extraData.get("route")),"")%>"/><br/>
-                         <label for="dose">Dose:</label> <input type="text" name="dose"  value="<%=str((extraData.get("dose")),"")%>"/><br/>
-                         <label for="lot">Lot:</label>  <input type="text" name="lot" id="lot" value="<%=str(lot,"")%>" />
-                        <select onchange="javascript:updateLotNr(this);" id="lotDrop" name="lotItem" >
+             			 <label for="name">Name:</label> <input type="text" name="name" id="name" value="<%=str((extraData.get("name")),"")%>"/> <br/>
+                         <label for="location">Location:</label> <input type="text" name="location" id="location" value="<%=str((extraData.get("location")),"")%>"/> <br/>
+                         <label for="route">Route:</label> <input type="text" name="route" id="route" value="<%=str((extraData.get("route")),"")%>"/><br/>
+                         <label for="dose">Dose:</label> <input type="text" name="dose" id="dose" value="<%=str((extraData.get("dose")),"")%>"/><br/>
+                         <label for="lot">Lot:</label>  <input type="text" name="lot" id="lot" value="<%=str((extraData.get("lot")),"")%>" />
+                         <select onchange="javascript:updateLotNr(this);" id="lotDrop" name="lotItem" >
                             <%
                                 boolean isLotNumberACustomLot = false;
                             %>
@@ -528,6 +528,7 @@ function displayCloseWarning(){
                             <%}%>
                             <option value="-1" <%=isLotNumberACustomLot ? "" : "selected" %>selected >Other</option>
                          </select><br/>
+                         <label for="din">DIN:</label>  <input type="text" name="din" id="din" value="<%=str((extraData.get("din")), "")%>" />
                          <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture" id="manufacture"  value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
                    </fieldset>
                    <fieldset >
@@ -569,10 +570,11 @@ function displayCloseWarning(){
                          <label for="location">Location:</label> <input type="text" name="location" value="<%=str((extraData.get("location")),"")%>"/> <br/>
                          <label for="route">Route:</label> <input type="text" name="route"   value="<%=str((extraData.get("route")),"")%>"/><br/>
                          <label for="dose">Dose:</label> <input type="text" name="dose"  value="<%=str((extraData.get("dose")),"")%>"/><br/>
-			 <label for="dose1">Dose 1:</label> <input type="checkbox" name="dose1" value="true" <%=checked(str((extraData.get("dose1")),""),"true")%>/><br/>
+                         <label for="dose1">Dose 1:</label> <input type="checkbox" name="dose1" value="true" <%=checked(str((extraData.get("dose1")),""),"true")%>/><br/>
                          <label for="dose2">Dose 2:</label> <input type="checkbox" name="dose2"  value="true" <%=checked(str((extraData.get("dose2")),""),"true")%>/><br/>
                          <label for="lot">Lot:</label> <input type="text" name="lot"  value="<%=str((extraData.get("lot")),"")%>"/><br/>
-                         <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture"   value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
+                         <label for="din">DIN:</label> <input type="text" name="din" value="<%=str((extraData.get("din")),"")%>"/><br/>
+                       <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture"   value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
                    </fieldset>
                    <fieldset>
                        <legend>Info</legend>
