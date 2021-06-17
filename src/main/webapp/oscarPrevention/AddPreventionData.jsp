@@ -528,7 +528,7 @@ function displayCloseWarning(){
                             <%}%>
                             <option value="-1" <%=isLotNumberACustomLot ? "" : "selected" %>selected >Other</option>
                          </select><br/>
-                         <label for="din">DIN:</label>  <input type="text" name="din" id="din" value="<%=str((extraData.get("din")), "")%>" />
+                         <label for="din">DIN:</label>  <input type="text" name="din" id="din" value="<%=str((extraData.get("din")), "")%>" /><br/>
                          <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture" id="manufacture"  value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
                    </fieldset>
                    <fieldset >
