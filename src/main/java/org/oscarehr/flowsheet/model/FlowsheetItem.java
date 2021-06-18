@@ -22,6 +22,7 @@
  */
 package org.oscarehr.flowsheet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.flowsheet.entity.ItemType;
@@ -31,11 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FlowsheetItem extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
 	private String description;
+	private String guideline;
 
 	private ItemType type;
 	private String typeCode;
@@ -56,6 +59,7 @@ public class FlowsheetItem extends AbstractTransientModel
 	{
 		return ItemType.MEASUREMENT.equals(this.type);
 	}
+
 	public boolean isPreventionType()
 	{
 		return ItemType.PREVENTION.equals(this.type);

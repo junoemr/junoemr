@@ -21,12 +21,7 @@
  * Canada
  */
 
-import {
-	JUNO_BUTTON_COLOR,
-	JUNO_STYLE,
-	JUNO_BUTTON_COLOR_PATTERN,
-	JUNO_INPUT_MODAL_TYPE
-} from "../../components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_INPUT_MODAL_TYPE, JUNO_STYLE} from "../../components/junoComponentConstants";
 
 angular.module('Common.Components').component('junoInputModal',
 {
@@ -59,7 +54,9 @@ angular.module('Common.Components').component('junoInputModal',
 			if (ctrl.inputModalType === JUNO_INPUT_MODAL_TYPE.SELECT)
 			{
 				ctrl.value = null;
+				ctrl.placeholder = ctrl.resolve.placeholder || "Please Select an Option";
 			}
+			ctrl.placeholder = ctrl.resolve.placeholder || "Enter text here";
 		}
 
 		ctrl.onKeyDown = (event) =>

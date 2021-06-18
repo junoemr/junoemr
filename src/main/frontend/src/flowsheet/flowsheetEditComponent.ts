@@ -52,7 +52,6 @@ angular.module('Flowsheet').component('flowsheetEdit',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.itemGroups = [];
 				ctrl.isLoading = true;
 
 				ctrl.$onInit = async (): Promise<void> =>
@@ -68,6 +67,12 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 					ctrl.isLoading = false;
 				}
+				ctrl.isNewFlowsheet = (): boolean =>
+				{
+					// @ts-ignore
+					return Juno.Common.Util.isBlank(ctrl.flowsheet.id);
+				}
+
 				ctrl.onAddNewGroup = async (): Promise<void> =>
 				{
 					// @ts-ignore
@@ -76,6 +81,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 						"Please enter a name for this group",
 						ctrl.componentStyle,
 						"Ok",
+						"Enter group name here",
 						255);
 
 					if(groupName)
@@ -84,13 +90,51 @@ angular.module('Flowsheet').component('flowsheetEdit',
 							name: groupName,
 							description: null,
 						}
-						ctrl.itemGroups.push(newGroup);
+						ctrl.flowsheet.flowsheetItemGroups.push(newGroup);
+					}
+				}
+
+				ctrl.onRenameGroup = async (itemGroup): Promise<void> =>
+				{
+					// @ts-ignore
+					let groupName = await Juno.Common.Util.openInputDialog($uibModal,
+						"Rename Flowsheet Group",
+						"Please enter a new name for this group",
+						ctrl.componentStyle,
+						"Ok",
+						"Enter group name here",
+						255);
+
+					if(groupName)
+					{
+						itemGroup.name = groupName;
 					}
 				}
 
 				ctrl.onAddNewItem = async (type): Promise<void> =>
 				{
 
+				}
+
+				ctrl.onCancel = (): void =>
+				{
+					$state.transitionTo('admin.configureFlowsheets',
+						{},
+						{
+							notify: false
+						});
+				}
+
+				ctrl.onSave = async (): Promise<void> =>
+				{
+					if(ctrl.isNewFlowsheet())
+					{
+						ctrl.flowsheet = await flowsheetApiService.createFlowsheet(ctrl.flowsheet);
+					}
+					else
+					{
+						ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
+					}
 				}
 
 			}]

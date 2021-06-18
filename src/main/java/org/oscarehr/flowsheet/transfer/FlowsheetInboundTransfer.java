@@ -34,6 +34,7 @@ public class FlowsheetInboundTransfer extends AbstractTransientModel
 {
 	private String name;
 	private String description;
+	private boolean enabled;
 	private List<FlowsheetItemGroup> flowsheetItemGroups;
 
 	public FlowsheetInboundTransfer()

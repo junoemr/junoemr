@@ -13,7 +13,7 @@
 							class="modal-input"
 							ng-model="$ctrl.value"
 							invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
-							placeholder="Please enter reason here"
+                            placeholder="{{$ctrl.placeholder}}"
 							character-limit="$ctrl.resolve.characterLimit"
 							component-style="$ctrl.resolve.style">
 	</juno-input>
@@ -22,7 +22,7 @@
 							 class="modal-input"
 							 ng-model="$ctrl.value"
 							 options="$ctrl.resolve.options"
-							 placeholder="Please Select An Option"
+							 placeholder="{{$ctrl.placeholder}}"
 							 component-style="$ctrl.resolve.style"
 	>
 	</juno-select>

@@ -59,6 +59,9 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	@Column(name = "description")
 	private String description;
 
+	@Column(name = "guideline")
+	private String guideline;
+
 	@Column(name = "item_type")
 	@Enumerated(value = EnumType.STRING)
 	private ItemType type;

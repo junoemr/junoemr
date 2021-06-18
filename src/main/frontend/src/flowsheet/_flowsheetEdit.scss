@@ -11,6 +11,17 @@
 }
 
 .flowsheet-edit {
+	.save-button-wrapper {
+		width: 128px;
+		padding: 8px;
+	}
+	.icon-only-button-wrapper {
+		width: 48px;
+		padding: 0 4px;
+		i {
+			font-size: 16px;
+		}
+	}
 	.add-button-wrapper {
 		padding: 8px;
 		width: 256px;

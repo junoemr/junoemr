@@ -25,7 +25,29 @@
 
  */
 
-import {FlowsheetItem} from "../../../generated";
+import FlowsheetModel from "../model/FlowsheetModel";
+import {Flowsheet} from "../../../../generated";
 
-export const ItemType = FlowsheetItem.TypeEnum;
-export const ValueType = FlowsheetItem.ValueTypeEnum;
+export default class FlowsheetModelToTransferConverter
+{
+	convert(flowsheetModel: FlowsheetModel): Flowsheet
+	{
+		if (!flowsheetModel)
+		{
+			return null;
+		}
+
+		return {
+			name: flowsheetModel.name,
+			description: flowsheetModel.description,
+			enabled: flowsheetModel.enabled,
+			flowsheetItemGroups: flowsheetModel.flowsheetItemGroups,
+		} as Flowsheet;
+	}
+
+	convertAll(flowsheetTransfers: Array<FlowsheetModel>): Array<Flowsheet>
+	{
+		return flowsheetTransfers.map((transfer) => this.convert(transfer));
+	}
+
+}

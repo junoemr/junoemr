@@ -431,10 +431,11 @@ Juno.Common.Util.confirmationDialog = function confirmationDialog(uibModal, titl
  * @param message - message to display to the user
  * @param style - the style of the modal
  * @param okText - alternate text for the ok button. omit if you want default ("Ok").
+ * @param placeholder - the input placeholder text
  * @param characterLimit - limit the number of characters that can be entered in to the input box. omit for unlimited.
  * @returns {*} - user selection
  */
-Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, message, style, okText, characterLimit)
+Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, message, style, okText, placeholder, characterLimit)
 {
 	return uibModal.open(
 			{
@@ -446,6 +447,7 @@ Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, mes
 					message: () => message,
 					style: () => style,
 					okText: () => okText,
+					placeholder: () => placeholder,
 					characterLimit: () => characterLimit,
 				}
 			}
@@ -460,9 +462,10 @@ Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, mes
  * @param options - the select menu options
  * @param style - style of the modal
  * @param okText - the text to display on the "ok" button. Leave blank for "Ok"
+ * @param placeholder - the input placeholder text
  * @returns {*} - user selection
  */
-Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, message, options, style, okText)
+Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, message, options, style, okText, placeholder)
 {
 	return uibModal.open(
 			{
@@ -474,6 +477,7 @@ Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, m
 					message: () => message,
 					style: () => style,
 					okText: () => okText,
+					placeholder: () => placeholder,
 					options: () => options,
 					type: () => JUNO_INPUT_MODAL_TYPE.SELECT,
 				}
