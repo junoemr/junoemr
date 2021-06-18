@@ -81,7 +81,7 @@ public class DocumentConverter
 		DocumentTransferOutbound transfer = new DocumentTransferOutbound();
 
 		transfer.setDocumentNo(document.getDocumentNo());
-		transfer.setFileName(GenericFile.stripFileNameFormatting(document.getDocfilename()));
+		transfer.setFileName(document.getDocfilename());
 		transfer.setContentType(document.getContenttype());
 		transfer.setNumberOfPages(document.getNumberofpages());
 		transfer.setStatus(String.valueOf(document.getStatus()));

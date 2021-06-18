@@ -172,7 +172,12 @@ export default class JunoDocument implements JunoFile
 
 	get name(): string
 	{
-		return this.fileName;
+		// if already looks like file name
+		if (this.documentDescription?.match(/.*\.[\w]+$/))
+		{
+			return this.documentDescription;
+		}
+		return `${this.documentDescription}${this.fileName.replace(/.*(\.[\w]+)$/g, "$1")}`;
 	}
 
 	get documentNo(): string

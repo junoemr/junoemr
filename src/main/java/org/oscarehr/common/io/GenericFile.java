@@ -415,19 +415,4 @@ public class GenericFile
 
 		return formatter.format(now) + getSanitizedFileName(originalName);
 	}
-
-	/**
-	 * Reverse file name formatting applied by
-	 * GenericFile.getFormattedFileName()
-	 * @param formattedFileName - a file name formatted by getFormattedFileName
-	 * @return - a file name with formatting stripped
-	 */
-	public static String stripFileNameFormatting(String formattedFileName)
-	{
-		if (Pattern.compile("^\\d{" + FILE_TIMESTAMP_PATTERN.length() + "}.*").matcher(formattedFileName).matches())
-		{
-			return formattedFileName.substring(FILE_TIMESTAMP_PATTERN.length());
-		}
-		return formattedFileName;
-	}
 }
