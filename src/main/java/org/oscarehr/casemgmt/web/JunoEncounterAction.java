@@ -100,6 +100,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 	private static final String ACTION_FORWARD_VIEW = "view";
 	private static final String ACTION_FORWARD_ERROR = "error";
 
+	private static final String DEFAULT_APPOINTMENT_VALUE = "";
+	private static final String DEFAULT_BILLING_URL_APPOINTMENT_VALUE = "0";
+
 	private static final String CPP_TYPE_SOCIAL_HISTORY = "SocHistory";
 	private static final String CPP_TYPE_MEDICAL_HISTORY = "MedHistory";
 	private static final String CPP_TYPE_ONGOING_CONCERNS = "Concerns";
@@ -242,17 +245,16 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		String user = (String) session.getAttribute("user");
 
-		String appointmentNo = "";
+		String appointmentNo;
 
 		try
 		{
 			int appointmentNoInt = Integer.parseInt(request.getParameter("appointmentNo"));
-
 			appointmentNo = Integer.toString(appointmentNoInt);
 		}
 		catch(NumberFormatException e)
 		{
-			// Just toss any invalid integers
+		    appointmentNo = DEFAULT_APPOINTMENT_VALUE;
 		}
 
 		String contextPath = request.getContextPath();
@@ -294,7 +296,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 				providerNo,
 				encounterSessionBean.getDemographicNo(),
 				region, // ??
-				appointmentNo,
+				(DEFAULT_APPOINTMENT_VALUE.equals(appointmentNo) ? DEFAULT_BILLING_URL_APPOINTMENT_VALUE : appointmentNo),
 				caseManagementManager.getDemoDisplayName(encounterSessionBean.getDemographicNo()),
 				date, // ??
 				startTime, // ?? I think this is from the appointment, passed through the url
@@ -423,6 +425,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		sectionList.add(EncounterSection.TYPE_MESSENGER);
 		sectionList.add(EncounterSection.TYPE_MEASUREMENTS);
 		sectionList.add(EncounterSection.TYPE_CONSULTATIONS);
+		sectionList.add(EncounterSection.TYPE_HRM);
 		sectionList.add(EncounterSection.TYPE_ALLERGIES);
 		sectionList.add(EncounterSection.TYPE_MEDICATIONS);
 		sectionList.add(EncounterSection.TYPE_UNRESOLVED_ISSUES);
@@ -490,6 +493,11 @@ public class JunoEncounterAction extends DispatchActionSupport
 		leftSections.add(EncounterSection.TYPE_MESSENGER);
 		leftSections.add(EncounterSection.TYPE_MEASUREMENTS);
 		leftSections.add(EncounterSection.TYPE_CONSULTATIONS);
+
+		if(OscarProperties.getInstance().hasHRMDocuments())
+		{
+			leftSections.add(EncounterSection.TYPE_HRM);
+		}
 
 		junoEncounterForm.setLeftNoteSections(leftSections);
 

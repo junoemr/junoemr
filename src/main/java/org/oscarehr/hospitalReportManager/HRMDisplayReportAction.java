@@ -69,7 +69,7 @@ public class HRMDisplayReportAction extends DispatchAction {
 
                     if (document != null) {
                         logger.debug("reading repotFile : "+document.getReportFile());
-                        HRMReport report = HRMReportParser.parseReport(loggedInInfo, document.getReportFile());
+                        HRMReport report = HRMReportParser.parseReport(document.getReportFile(), document.getReportFileSchemaVersion());
                         
                         request.setAttribute("hrmDocument", document);
 
@@ -79,23 +79,24 @@ public class HRMDisplayReportAction extends DispatchAction {
                             request.setAttribute("hrmReportTime", document.getTimeReceived().toString());
                             request.setAttribute("hrmDuplicateNum", document.getNumDuplicatesReceived());
 
-                            List<HRMDocumentToDemographic> demographicLinkList = hrmDocumentToDemographicDao.findByHrmDocumentId(document.getId().toString());
+                            List<HRMDocumentToDemographic> demographicLinkList = hrmDocumentToDemographicDao.findByHrmDocumentId(document.getId());
                             HRMDocumentToDemographic demographicLink = (demographicLinkList.size() > 0 ? demographicLinkList.get(0) : null);
                             request.setAttribute("demographicLink", demographicLink);
 
-                            List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(document.getId().toString());
+                            List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(document.getId());
                             request.setAttribute("providerLinkList", providerLinkList);
 
                             List<HRMDocumentSubClass> subClassList = hrmDocumentSubClassDao.getSubClassesByDocumentId(document.getId());
                             request.setAttribute("subClassList", subClassList);
 
-                            HRMDocumentToProvider thisProviderLink = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(document.getId().toString(), loggedInInfo.getLoggedInProviderNo());
+                            HRMDocumentToProvider thisProviderLink = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(document.getId(), loggedInInfo.getLoggedInProviderNo());
                             request.setAttribute("thisProviderLink", thisProviderLink);
 
-                            if (thisProviderLink != null) {
-                                thisProviderLink.setViewed(1);
-                                hrmDocumentToProviderDao.merge(thisProviderLink);
-                            }
+	                        if(thisProviderLink != null)
+	                        {
+		                        thisProviderLink.setViewed(true);
+		                        hrmDocumentToProviderDao.merge(thisProviderLink);
+	                        }
 
                             HRMDocumentSubClass hrmDocumentSubClass=null;
                             if (subClassList!= null)
@@ -160,6 +161,6 @@ public class HRMDisplayReportAction extends DispatchAction {
 	
 	public static HRMDocumentToProvider getHRMDocumentFromProvider(String providerNo, Integer hrmDocumentId)
 	{
-		return(hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(hrmDocumentId.toString(), providerNo));
+		return(hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(hrmDocumentId, providerNo));
 	}
 }

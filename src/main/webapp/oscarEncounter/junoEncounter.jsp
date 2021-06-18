@@ -216,6 +216,8 @@
 				minDelta: 0.93,
 				minMain: null,
 				minWin: null,
+				openWindows: {},
+				reloadSectionTimer: null,
 			};
 
 
@@ -1113,7 +1115,7 @@
 								<div class="encounter_timer_container">
 									<div style="display: inline-block; position:relative;">
 										<input id="encounter_timer" title="Paste timer data" type="button"
-											   onclick="encounterTimer.putEncounterTimeInNote()" value="00:00"/>
+											   onclick="encounterNote.putEncounterTimeInNote()" value="00:00"/>
 									</div>
 									<input id="encounter_timer_pause" class="encounter_timer_control" type="button"
 										   onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"

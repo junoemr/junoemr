@@ -51,7 +51,6 @@ window.encounterTimer =
         }
     },
 
-
     showEncounterTimerControl: function showEncounterTimerControl(bPaused, pauseId, playId) {
         let pause = jQuery(pauseId);
         let play = jQuery(playId);
@@ -65,28 +64,6 @@ window.encounterTimer =
                 pause.css("display", "inline-block");
             }
         }
-    },
-
-    putEncounterTimeInNote: function putEncounterTimeInNote() {
-        let timer = jQuery("#encounter_timer");
-        let activeNote = jQuery($(caseNote));
-        if (activeNote.length && timer.length) {
-            let endTime = new Date();
-            let timeStr = timer.val();
-
-            if (timeStr.split(":").length < 3) {
-                timeStr = "00:" + timeStr;
-            }
-
-            noteTxt = activeNote.val();
-            noteTxt = noteTxt +
-                "Start time: " + encounterTimer.startTime.getHours() + ":" + ("0" + encounterTimer.startTime.getMinutes()).slice(-2) + "\n" +
-                "End time: " + endTime.getHours() + ":" + ("0" + endTime.getMinutes()).slice(-2) + "\n" +
-                "Duration: " + timeStr + "\n";
-            activeNote.val(noteTxt);
-            adjustCaseNote();
-        }
-
     }
 };
 

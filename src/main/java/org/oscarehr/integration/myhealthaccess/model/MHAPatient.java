@@ -137,7 +137,7 @@ public class MHAPatient
 		BeanUtils.copyProperties(patientTo1, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
 		this.healthCareProvinceCode = stringToProvinceCode(patientTo1.getHealthCareProvinceCode());
 		this.addressProvinceCode = stringToProvinceCode(patientTo1.getAddressProvinceCode());
-		this.linkStatus = LINK_STATUS.valueOf(patientTo1.getLinkStatus().toUpperCase());
+		this.linkStatus = patientTo1.getLinkStatus();
 	}
 
 	public String getId()

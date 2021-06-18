@@ -25,9 +25,11 @@ package org.oscarehr.config;
 
 import de.javakaffee.web.msm.MemcachedBackupSessionManager;
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.webresources.ExtractingRoot;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -41,6 +43,8 @@ import org.springframework.context.annotation.Configuration;
 public class TomcatConfig
 {
 	private final oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
+
+	private static final String QUERY_STRING_CHARACTERS_TO_ALLOW = "[]";
 
 	private final JunoProperties junoProperties;
 
@@ -119,6 +123,15 @@ public class TomcatConfig
 								context.setReloadable(false);
 							}
 						});
+
+				container.addConnectorCustomizers(new TomcatConnectorCustomizer()
+				{
+					@Override
+					public void customize(Connector connector)
+					{
+						connector.setAttribute("relaxedQueryChars", QUERY_STRING_CHARACTERS_TO_ALLOW);
+					}
+				});
 			}
 		};
 	}

@@ -1,0 +1,77 @@
+#edit-provider-admin {
+	@include juno-font-default();
+	@include juno-tab-md(16px);
+	@include juno-tab-color-scheme-white;
+
+	h1 {
+		margin-top: 0;
+	}
+
+	.user-role-list {
+		padding-right: 0;
+
+		ul {
+			list-style-type: none;
+
+			hr {
+				margin-top: $margin-sm;
+				margin-bottom: $margin-sm;
+			}
+
+			i {
+				color: $color-red-base;
+			}
+		}
+	}
+
+	.add-role-button {
+		height: 30px;
+	}
+
+	.edit-provider-fields {
+		panel {
+			margin-bottom: $margin-lg;
+		}
+	}
+
+	.form-group {
+		padding-bottom: 4px;
+		padding-top: 4px;
+	}
+
+	.juno-typeahead {
+		margin-bottom: 8px;
+	}
+
+	.juno-select {
+		padding-top: 4px;
+		margin-top: 8px;
+		margin-bottom: 8px;
+	}
+
+	.field-error {
+		input {
+			border-color: $color-red-base;
+		}
+	}
+
+	.fields-disabled {
+		input {
+			cursor: not-allowed;
+		}
+	}
+
+	.error-message {
+		color: $color-red-base;
+	}
+
+	.bottom-options-bar {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 48px;
+
+		@include background-opacity($color-neutral-white, 0.5);
+	}
+}

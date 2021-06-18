@@ -10,14 +10,10 @@
 
 package oscar.oscarLab.ca.on;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
@@ -30,6 +26,11 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class HRMResultsData {
 
@@ -69,7 +70,7 @@ public class HRMResultsData {
 		HashMap<String,HRMReport> labReports=new HashMap<String,HRMReport>();
 
 		for (HRMDocumentToProvider hrmDocResult : hrmDocResultsProvider) {
-			Integer id = Integer.parseInt(hrmDocResult.getHrmDocumentId());
+			Integer id = hrmDocResult.getHrmDocument().getId();
 			LabResultData lbData = new LabResultData(LabResultData.HRM);
 
 			List<HRMDocument> hrmDocument = hrmDocumentDao.findById(id);
@@ -82,8 +83,8 @@ public class HRMResultsData {
 			lbData.patientName = "Not, Assigned";
 
 			// check if patient is matched
-			List<HRMDocumentToDemographic> hrmDocResultsDemographic = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocument.get(0).getId().toString());
-			HRMReport hrmReport = HRMReportParser.parseReport(loggedInInfo, hrmDocument.get(0).getReportFile());
+			List<HRMDocumentToDemographic> hrmDocResultsDemographic = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocument.get(0).getId());
+			HRMReport hrmReport = HRMReportParser.parseReport(hrmDocument.get(0).getReportFile(), hrmDocument.get(0).getReportFileSchemaVersion());
 			if (hrmReport == null) continue;
 
 			hrmReport.setHrmDocumentId(id);
@@ -195,6 +196,33 @@ public class HRMResultsData {
 
 		// at this point I have to make a random guess, we know it's a duplicate but we can't tell which is newer.
 		return(currentEntry.getHrmDocumentId()>previousEntry.getHrmDocumentId());
+	}
+
+	public static boolean isNewer(HRMDocument currentEntry, HRMDocument previousEntry)
+	{
+		Date currentDate=currentEntry.getReportDate();
+		Date previousDate=previousEntry.getReportDate();
+
+		if(currentDate != null && previousDate != null)
+		{
+			return currentDate.after(previousDate);
+		}
+		else // try to pick the one that's not canceled.
+		{
+			String cancelledValue = HrmDocument.REPORT_STATUS.CANCELLED.getValue();
+			String currentStatus = currentEntry.getReportStatus();
+			String previousStatus = previousEntry.getReportStatus();
+
+			if(!cancelledValue.equals(currentStatus) && cancelledValue.equals(previousStatus))
+			{
+				return (true);
+			}
+			if(cancelledValue.equals(currentStatus) && !cancelledValue.equals(previousStatus))
+			{
+				return (false);
+			}
+			return (currentEntry.getId() > previousEntry.getId());
+		}
 	}
 
 	/*

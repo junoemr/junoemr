@@ -24,6 +24,7 @@ Juno.Common.Util.settings = {
 Juno.Common.Util.DisplaySettings = {
 	dateFormat: "yyyy-MM-dd",
 	timeFormat: "HH:mm a",
+	calendarDateFormat: 'dddd MMM Do',
 };
 
 Juno.Common.Util.exists = function exists(object) {
@@ -290,15 +291,13 @@ Juno.Common.Util.objectArrayIndexOf = function objectArrayIndexOf(array, searchT
 
 Juno.Common.Util.isIntegerString = function isIntegerString(string)
 {
-	var parsed_string = parseInt(string);
-
-	if (/^-?\d+$/.test(string.toString()))
+	if (string === undefined || string === null)
 	{
-		return true;
+		return false;
 	}
-
-	return false;
+	return /^-?\d+$/.test(string.toString());
 };
+
 Juno.Common.Util.isNumber = function isNumber(object)
 {
 	return typeof object === "number";
@@ -482,6 +481,31 @@ Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, m
 				}
 			}
 	).result;
+};
+
+Juno.Common.Util.showProgressBar = function showProgressBar($uibModal, $q, deferral, title, style)
+{
+	let deferred = $q.defer();
+
+	$uibModal.open(
+		{
+			component: 'junoProgressModalComponent',
+			backdrop: 'static',
+			windowClass: "juno-progress-modal",
+			resolve: {
+				title: () => title,
+				deferral: () => deferral,
+				style: () => style,
+			}
+		}
+	).result.then((result) =>
+	{
+		deferred.resolve(result);
+	}).catch((reason) =>
+	{
+		deferred.reject(reason);
+	});
+	return deferred.promise;
 };
 
 /**

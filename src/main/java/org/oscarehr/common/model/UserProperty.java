@@ -138,8 +138,10 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String AQS_INTEGRATION_API_SECRET_KEY = "aqs_api_secret_key";
     public static final String AQS_INTEGRATION_ENABLED = "aqs_enabled";
     public static final String AQS_INTEGRATION_ORGANIZATION_ID = "aqs_organization_id";
-
+    
     public static final String INTEGRATION_IMDHEALTH_ENABLED = "integration.imdHealth.enabled";
+    public static final String INTEGRATION_KNOW2ACT_ENABLED = "integration.know2Act.enabled";
+	public static final String OCEAN_TOOLBAR_ENABLED = "integration.OceanToolBar.enabled";
     
     public static final String DEFAULT_PRINTER_PDF_LABEL="default_printer_pdf_label";
     public static final String DEFAULT_PRINTER_PDF_ENVELOPE="default_printer_pdf_envelope";
@@ -179,7 +181,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
 	public static final String INTEGRATOR_PATIENT_CONSENT = "integrator_patient_consent";	
 	public static final String STUDENT_PARTICIPATION_CONSENT = "student_participation_consent";	
 	public static final String PROVIDER_FOR_TICKLER_WARNING = "provider_for_tickler_warning";
-	public static final String OCEAN_TOOLBAR_ENABLED = "integration.OceanToolBar.enabled";
+	
 
 	public static final String MCEDT_ACCOUNT_PASSWORD = "mcedt_account_password";
 

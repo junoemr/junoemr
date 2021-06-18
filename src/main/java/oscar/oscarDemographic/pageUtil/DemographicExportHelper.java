@@ -101,7 +101,7 @@ public class DemographicExportHelper {
 			MedicationsAndTreatments medi = patientRec.addNewMedicationsAndTreatments();
 			String mSummary = "";
 			if (arr[p].getWrittenDate() != null) {
-				String dateFormat = partialDateDao.getFormat(PartialDate.DRUGS, arr[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
+				String dateFormat = partialDateDao.getFormat(PartialDate.TABLE_DRUGS, arr[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
 				Util.putPartialDate(medi.addNewPrescriptionWrittenDate(), arr[p].getWrittenDate(), dateFormat);
 				mSummary = Util.addSummary("Prescription Written Date", partialDateDao.getDatePartial(arr[p].getWrittenDate(), dateFormat));
 			}

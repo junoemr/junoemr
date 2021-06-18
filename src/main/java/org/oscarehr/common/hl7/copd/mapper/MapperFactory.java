@@ -35,8 +35,8 @@ import org.oscarehr.common.hl7.copd.mapper.wolf.HistoryNoteMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MedicationMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MessageMapperWolf;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
-import org.oscarehr.demographicImport.transfer.CoPDRecordData;
+import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 
 /**
  * constructs mappers based on import source setting.

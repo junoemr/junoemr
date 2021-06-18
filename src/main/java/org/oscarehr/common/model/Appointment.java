@@ -59,7 +59,9 @@ import java.util.Optional;
 @Entity
 @EntityListeners(BeanValidationEventListener.class)
 @Table(name = "appointment")
-public class Appointment extends AbstractModel<Integer> implements Serializable {
+public class Appointment extends AbstractModel<Integer> implements Serializable
+{
+	public static final int DEFAULT_APPOINTMENT_DURATION_MIN = 15;
 
 	public static final String TODO = "t";
 	public static final String CANCELLED = "C";
@@ -146,7 +148,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	@Getter
 	@Setter
-	@OneToOne(mappedBy="appointment", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy="appointment", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	private QueuedAppointmentLink queuedAppointmentLink;
 
 	private String remarks = "";

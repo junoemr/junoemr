@@ -27,9 +27,10 @@ require('pym.js');
 require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
 require('angular-drag-and-drop-lists');
+require('file-saver');
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
-import {EDIT_PROVIDER_MODE} from "./src/admin/integration/editProviderPage/editProviderAdminConstants";
+import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
 
 var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router',
@@ -67,9 +68,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Dashboard',
 	'Consults',
 	'Admin',
-	'Admin.Integration',
-	'Admin.Integration.Know2act',
-	'Admin.Integration.Fax',
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
@@ -139,20 +137,20 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		.state('admin.frame',
 		{
 			url: '/frame?frameUrl&useCompat',
-			templateUrl: 'src/admin/integration/frameContent/frameContent.jsp',
-			controller: 'Admin.Integration.FrameContentController as FrameCtrl'
+			templateUrl: 'src/admin/section/frameContent/frameContent.jsp',
+			controller: 'Admin.Section.FrameContentController as FrameCtrl'
 		})
 		.state('admin.faxConfig',
 		{
 			url: '/faxConfig',
-			templateUrl: 'src/admin/integration/fax/faxConfiguration.jsp',
-			controller: 'Admin.Integration.Fax.FaxConfigurationController as faxController'
+			templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
+			controller: 'Admin.Section.Fax.FaxConfigurationController as faxController'
 		})
 		.state('admin.faxSendReceive',
 		{
 			url: '/faxSendReceive',
-			templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
-			controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
+			templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
+			controller: 'Admin.Section.Fax.FaxSendReceiveController as faxSendReceiveController'
 		})
 		.state('admin.landingPage',
 		{
@@ -222,20 +220,45 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			component: 'manageUsersAdmin',
 		})
 		.state('admin.manageAppointmentQueues',
-        {
-            url: '/manageAppointmentQueues',
-            component: 'manageAppointmentQueuesAdmin',
-		})
+			{
+				url: '/manageAppointmentQueues',
+				component: 'manageAppointmentQueuesAdmin',
+			})
+		.state('admin.demographicImport',
+			{
+				url: '/demographicImport',
+				component: 'demographicImport',
+			})
+		.state('admin.demographicExport',
+			{
+				url: '/demographicExport',
+				component: 'demographicExport',
+			})
         .state('admin.systemProperties',
         {
             url: '/systemProperties',
             component: 'systemProperties'
         })
+		.state('admin.systemProperties.general',
+		{
+			url: '/general',
+			component: 'systemPropertiesGeneral',
+		})
         .state('admin.systemProperties.rx',
         {
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.rosterStatus',
+		{
+			url: '/rosterStatus',
+			component: 'rosterStatusManagement',
+		})
+		.state('admin.systemProperties.billing',
+		{
+			url: '/billing',
+			component: 'systemPropertiesBilling',
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',
@@ -274,6 +297,19 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/documents',
 			templateUrl: 'src/document/documents_classic.jsp',
 			controller: 'Document.DocumentsController'
+		})
+		.state("integration",
+		{
+			url: "/integration",
+		})
+		.state("integration.mha",
+		{
+			url: "/mha"
+		})
+		.state("integration.mha.billingRedirect",
+		{
+			url: "/billingRedirect?appointmentNo&demographicNo&providerNo",
+			component: 'billingRedirect'
 		})
 		.state("messaging",
 		{
@@ -644,33 +680,33 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			{
 			// url: '/admin/integration',
 			url:'/k2aConfig',
-			templateUrl: 'src/admin/integration/know2act/Know2actConfiguration.jsp',
-			controller: 'Admin.Integration.Know2act.k2aConfigController as k2aConfigCtrl'
+			templateUrl: 'src/admin/section/know2act/Know2actConfiguration.jsp',
+			controller: 'Admin.Section.Know2act.k2aConfigController as k2aConfigCtrl'
 		})
 		.state('k2aTemplate',
 			{
 				// url: '/admin/integration',
 				url:'/k2aTemplate',
-				templateUrl: 'src/admin/integration/know2act/Know2actTemplate.jsp',
-				controller: 'Admin.Integration.Know2act.k2aTemplateController as k2aTemplateCtrl'
+				templateUrl: 'src/admin/section/know2act/Know2actTemplate.jsp',
+				controller: 'Admin.Section.Know2act.k2aTemplateController as k2aTemplateCtrl'
 			})
 		.state('k2aNotification',
 			{
 				url: '/k2aNotification',
-				templateUrl: 'src/admin/integration/know2act/Know2actNotifications.jsp',
-				controller: 'Admin.Integration.Know2act.k2aNotificationController as k2aNoteCtrl'
+				templateUrl: 'src/admin/section/know2act/Know2actNotifications.jsp',
+				controller: 'Admin.Section.Know2act.k2aNotificationController as k2aNoteCtrl'
 			})
 		.state('faxConfig',
 			{
 				url: '/faxConfig',
-				templateUrl: 'src/admin/integration/fax/faxConfiguration.jsp',
-				controller: 'Admin.Integration.Fax.FaxConfigurationController as faxController'
+				templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
+				controller: 'Admin.Section.Fax.FaxConfigurationController as faxController'
 			})
 		.state('faxSendReceive',
 			{
 				url: '/faxSendReceive',
-				templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
-				controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
+				templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
+				controller: 'Admin.Section.Fax.FaxSendReceiveController as faxSendReceiveController'
 			});
 
 	// redirect to login page on 401 error.

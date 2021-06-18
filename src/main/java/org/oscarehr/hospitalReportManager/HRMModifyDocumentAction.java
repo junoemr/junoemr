@@ -9,12 +9,6 @@
 
 package org.oscarehr.hospitalReportManager;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -30,9 +24,15 @@ import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.List;
 
 public class HRMModifyDocumentAction extends DispatchAction {
 
@@ -41,6 +41,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	HRMDocumentToProviderDao hrmDocumentToProviderDao = (HRMDocumentToProviderDao) SpringUtils.getBean("HRMDocumentToProviderDao");
 	HRMDocumentSubClassDao hrmDocumentSubClassDao = (HRMDocumentSubClassDao) SpringUtils.getBean("HRMDocumentSubClassDao");
 	HRMDocumentCommentDao hrmDocumentCommentDao = (HRMDocumentCommentDao) SpringUtils.getBean("HRMDocumentCommentDao");
+	ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
 	 private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	 
 	public ActionForward undefined(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
@@ -125,26 +126,26 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 		try {
 			String signedOff = request.getParameter("signedOff");
-			HRMDocumentToProvider providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(reportId, providerNo);
+			HRMDocumentToProvider providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), providerNo);
 			if(providerMapping == null) {
 				//check for unclaimed record, if that exists..update that one
-				providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(reportId, "-1");
+				providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), "-1");
 				if(providerMapping != null) {
 					providerMapping.setProviderNo(providerNo);
 				}
 			}
 			
 			if (providerMapping != null) {
-				providerMapping.setSignedOff(Integer.parseInt(signedOff));
+				providerMapping.setSignedOff(Integer.parseInt(signedOff) == 1);
 				providerMapping.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.merge(providerMapping);
 			}
 			else
 			{
 				HRMDocumentToProvider hrmDocumentToProvider=new HRMDocumentToProvider();
-				hrmDocumentToProvider.setHrmDocumentId(reportId);
+				hrmDocumentToProvider.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(reportId)));
 				hrmDocumentToProvider.setProviderNo(providerNo);
-				hrmDocumentToProvider.setSignedOff(Integer.parseInt(signedOff));
+				hrmDocumentToProvider.setSignedOff(Integer.parseInt(signedOff) == 1);
 				hrmDocumentToProvider.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
 			}
@@ -170,15 +171,15 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		try {
 			HRMDocumentToProvider providerMapping = new HRMDocumentToProvider();
 
-			providerMapping.setHrmDocumentId(hrmDocumentId);
+			providerMapping.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(hrmDocumentId)));
 			providerMapping.setProviderNo(providerNo);
-			providerMapping.setSignedOff(0);
+			providerMapping.setSignedOff(false);
 
 			hrmDocumentToProviderDao.merge(providerMapping);
 
 			
 			//we want to remove any unmatched entries when we do a manual match like this. -1 means unclaimed in this table.
-			HRMDocumentToProvider existingUnmatched = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(hrmDocumentId, "-1");
+			HRMDocumentToProvider existingUnmatched = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(hrmDocumentId), "-1");
 			if(existingUnmatched != null) {
 				hrmDocumentToProviderDao.remove(existingUnmatched.getId());
 			}
@@ -200,7 +201,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
         }
 		
 		try {
-			List<HRMDocumentToDemographic> currentMappingList = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocumentId);
+			List<HRMDocumentToDemographic> currentMappingList = hrmDocumentToDemographicDao.findByHrmDocumentId(Integer.parseInt(hrmDocumentId));
 
 			if (currentMappingList != null) {
 				for (HRMDocumentToDemographic currentMapping : currentMappingList) {
@@ -228,7 +229,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		
 		try {
 			try {
-				List<HRMDocumentToDemographic> currentMappingList = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocumentId);
+				List<HRMDocumentToDemographic> currentMappingList = hrmDocumentToDemographicDao.findByHrmDocumentId(Integer.parseInt(hrmDocumentId));
 
 				if (currentMappingList != null) {
 					for (HRMDocumentToDemographic currentMapping : currentMappingList) {
@@ -241,8 +242,8 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 			HRMDocumentToDemographic demographicMapping = new HRMDocumentToDemographic();
 
-			demographicMapping.setHrmDocumentId(hrmDocumentId);
-			demographicMapping.setDemographicNo(demographicNo);
+			demographicMapping.setHrmDocumentId(Integer.parseInt(hrmDocumentId));
+			demographicMapping.setDemographicNo(Integer.parseInt(demographicNo));
 			demographicMapping.setTimeAssigned(new Date());
 
 			hrmDocumentToDemographicDao.merge(demographicMapping);
@@ -318,10 +319,10 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		try {
 			HRMDocumentComment comment = new HRMDocumentComment();
 
-			comment.setHrmDocumentId(Integer.parseInt(documentId));
+			comment.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(documentId)));
 			comment.setComment(commentString);
 			comment.setCommentTime(new Date());
-			comment.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+			comment.setProvider(providerDataDao.find(loggedInInfo.getLoggedInProviderNo()));
 
 			hrmDocumentCommentDao.merge(comment);
 			request.setAttribute("success", true);

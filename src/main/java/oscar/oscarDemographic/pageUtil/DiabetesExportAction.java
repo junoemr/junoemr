@@ -739,7 +739,7 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
             MedicationsAndTreatments medications = patientRecord.addNewMedicationsAndTreatments();
             medications.setDrugIdentificationNumber(DiabetesDinList.Enum.forString(data));
 
-        	String dateFormat = partialDateDao.getFormat(PartialDate.DRUGS, pa[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
+        	String dateFormat = partialDateDao.getFormat(PartialDate.TABLE_DRUGS, pa[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
         	Util.putPartialDate(medications.addNewPrescriptionWrittenDate(), prescribeDate, dateFormat);
 
             if (Util.calDate(pa[p].getRxDate())!=null) {
@@ -847,7 +847,7 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
 	    else continue;
 
 	    dateValue = dx.getStartDate();
-	    dateFormat = partialDateDao.getFormat(PartialDate.DXRESEARCH, dx.getId().intValue(), PartialDate.DXRESEARCH_STARTDATE);
+	    dateFormat = partialDateDao.getFormat(PartialDate.TABLE_DXRESEARCH, dx.getId().intValue(), PartialDate.DXRESEARCH_STARTDATE);
 	}
 	if (StringUtils.filled(diagValue)) {
 	    ProblemList problemList = patientRecord.addNewProblemList();

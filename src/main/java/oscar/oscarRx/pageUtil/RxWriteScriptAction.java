@@ -25,6 +25,46 @@
 
 package oscar.oscarRx.pageUtil;
 
+import net.sf.json.JSONObject;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.util.MessageResources;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.common.dao.DrugReasonDao;
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DrugReason;
+import org.oscarehr.common.model.PartialDate;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.managers.CodingSystemManager;
+import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
+import oscar.oscarRx.data.RxDrugData;
+import oscar.oscarRx.data.RxDrugData.DrugMonograph.DrugComponent;
+import oscar.oscarRx.data.RxPrescriptionData;
+import oscar.oscarRx.util.RxUtil;
+import oscar.util.StringUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,49 +76,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import net.sf.json.JSONObject;
-
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.util.MessageResources;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.rx.dao.DrugDao;
-import org.oscarehr.common.dao.DrugReasonDao;
-import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.rx.model.Drug;
-import org.oscarehr.common.model.DrugReason;
-import org.oscarehr.common.model.PartialDate;
-import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.managers.CodingSystemManager;
-import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import oscar.log.LogAction;
-import oscar.log.LogConst;
-import oscar.oscarRx.data.RxDrugData;
-import oscar.oscarRx.data.RxDrugData.DrugMonograph.DrugComponent;
-import oscar.oscarRx.data.RxPrescriptionData;
-import oscar.oscarRx.util.RxUtil;
-import oscar.util.StringUtils;
 
 public final class RxWriteScriptAction extends DispatchAction {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
@@ -979,7 +976,8 @@ public final class RxWriteScriptAction extends DispatchAction {
 							if ((val == null) || (val.equals(""))) {
 								rx.setRxDate(RxUtil.StringToDate("0000-00-00", "yyyy-MM-dd"));
 							} else {
-								rx.setRxDate(RxUtil.StringToDate(val, "yyyy-MM-dd"));
+								rx.setRxDateFormat(partialDateDao.getFormat(val));
+								rx.setRxDate(partialDateDao.StringToDate(val));
 							}
                                                 } else if (elem.equals("pickupDate_" + num)) {
 							if ((val == null) || (val.equals(""))) {
@@ -1226,9 +1224,15 @@ public final class RxWriteScriptAction extends DispatchAction {
 							rx.getProviderNo(), request );
 				}
 
-				//write partial date
+				//write partial dates
 				if (StringUtils.filled(rx.getWrittenDateFormat()))
-					partialDateDao.setPartialDate(PartialDate.DRUGS, rx.getDrugId(), PartialDate.DRUGS_WRITTENDATE, rx.getWrittenDateFormat());
+				{
+					partialDateDao.setPartialDate(PartialDate.TABLE_DRUGS, rx.getDrugId(), PartialDate.DRUGS_WRITTENDATE, rx.getWrittenDateFormat());
+				}
+				if (StringUtils.filled(rx.getRxDateFormat()))
+				{
+					partialDateDao.setPartialDate(PartialDate.TABLE_DRUGS, rx.getDrugId(), PartialDate.DRUGS_STARTDATE, rx.getRxDateFormat());
+				}
 			} catch (Exception e) {
 				logger.error("Error", e);
 			}

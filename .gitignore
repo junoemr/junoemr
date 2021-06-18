@@ -35,4 +35,5 @@ utils/tasks/tasks.iml
 classpath.txt
 src/main/webapp/web/
 run_embedded.sh
+id_file
 /.docker

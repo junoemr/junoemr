@@ -328,7 +328,7 @@ public class Drug extends AbstractModel<Integer> implements Serializable {
 		return refillDuration;
 	}
 
-	public void setRefillDuration(int refillDuration) {
+	public void setRefillDuration(Integer refillDuration) {
 		this.refillDuration = refillDuration;
 	}
 
@@ -336,7 +336,7 @@ public class Drug extends AbstractModel<Integer> implements Serializable {
 		return refillQuantity;
 	}
 
-	public void setRefillQuantity(int refillQuantity) {
+	public void setRefillQuantity(Integer refillQuantity) {
 		this.refillQuantity = refillQuantity;
 	}
 

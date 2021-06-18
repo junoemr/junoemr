@@ -1701,11 +1701,13 @@ public class NotesService extends AbstractServiceImpl
 				cmi.setProgram_id(getProgramId(getLoggedInInfo(), providerNo));
 				cmi.setType(is.getRole());
 				cmi.setDemographic_no(demographicNoStr);
+
+				// Only set properties with new notes
+				cmi.setAcute(i.isAcute());
+				cmi.setCertain(i.isCertain());
+				cmi.setMajor(i.isMajor());
+				cmi.setResolved(i.isResolved());
 			}
-			cmi.setAcute(i.isAcute());
-			cmi.setCertain(i.isCertain());
-			cmi.setMajor(i.isMajor());
-			cmi.setResolved(i.isResolved());
 			cmi.setUpdate_date(new Date());
 
 			issuelist.add(cmi);

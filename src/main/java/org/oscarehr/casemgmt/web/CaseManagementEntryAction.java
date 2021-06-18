@@ -2909,11 +2909,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		dateValue = dateValue.trim();
 		dateValue = dateValue.replace("/", "-");
-		if (dateValue.length() == 4 && NumberUtils.isDigits(dateValue)) return PartialDate.YEARONLY;
+		if (dateValue.length() == 4 && NumberUtils.isDigits(dateValue)) return PartialDate.FORMAT_YEAR_ONLY;
 
 		String[] dateParts = dateValue.split("-");
 		if (dateParts.length == 2 && NumberUtils.isDigits(dateParts[0]) && NumberUtils.isDigits(dateParts[1])) {
-			if (dateParts[0].length() == 4 && dateParts[1].length() >= 1 && dateParts[1].length() <= 2) return PartialDate.YEARMONTH;
+			if (dateParts[0].length() == 4 && dateParts[1].length() >= 1 && dateParts[1].length() <= 2) return PartialDate.FORMAT_YEAR_MONTH;
 		}
 		if (dateParts.length == 3 && NumberUtils.isDigits(dateParts[0]) && NumberUtils.isDigits(dateParts[1]) && NumberUtils.isDigits(dateParts[2])) {
 			if (dateParts[0].length() == 4 && dateParts[1].length() >= 1 && dateParts[1].length() <= 2 && dateParts[2].length() >= 1 && dateParts[2].length() <= 2) return ""; // full date
@@ -2925,8 +2925,8 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		if (type == null) return null;
 
 		dateValue = dateValue.replace("/", "-");
-		if (type.equals(PartialDate.YEARONLY)) return dateValue + "-01-01";
-		if (type.equals(PartialDate.YEARMONTH)) return dateValue + "-01";
+		if (type.equals(PartialDate.FORMAT_YEAR_ONLY)) return dateValue + "-01-01";
+		if (type.equals(PartialDate.FORMAT_YEAR_MONTH)) return dateValue + "-01";
 		return dateValue;
 	}
 

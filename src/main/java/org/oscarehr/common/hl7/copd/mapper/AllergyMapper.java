@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;

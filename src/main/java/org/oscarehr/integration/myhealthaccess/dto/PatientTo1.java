@@ -79,7 +79,7 @@ public class PatientTo1
 	@JsonProperty("primary_fax")
 	private String primaryFax;
 	@JsonProperty("link_status")
-	private String linkStatus;
+	private MHAPatient.LINK_STATUS linkStatus;
 	@JsonProperty("can_message_clinic")
 	@Getter
 	@Setter
@@ -98,7 +98,7 @@ public class PatientTo1
 		BeanUtils.copyProperties(mhaPatient, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus", "demographicNo");
 		this.healthCareProvinceCode = mhaPatient.getHealthCareProvinceCode().name();
 		this.addressProvinceCode = mhaPatient.getAddressProvinceCode().name();
-		this.linkStatus = mhaPatient.getLinkStatus().name();
+		this.linkStatus = mhaPatient.getLinkStatus();
 		this.demographicNo = mhaPatient.getDemographicNo().orElse(null);
 	}
 
@@ -124,7 +124,7 @@ public class PatientTo1
 		this.workPhone = demographic.getPhone2();
 		this.cellPhone = cellPhone;
 		this.primaryFax = null;
-		this.linkStatus = MHAPatient.LINK_STATUS.NO_LINK.name();
+		this.linkStatus = MHAPatient.LINK_STATUS.NO_LINK;
 		this.demographicNo = demographic.getId().toString();
 	}
 
@@ -328,12 +328,12 @@ public class PatientTo1
 		this.primaryFax = primaryFax;
 	}
 
-	public String getLinkStatus()
+	public MHAPatient.LINK_STATUS getLinkStatus()
 	{
 		return linkStatus;
 	}
 
-	public void setLinkStatus(String link_status)
+	public void setLinkStatus(MHAPatient.LINK_STATUS link_status)
 	{
 		this.linkStatus = link_status;
 	}

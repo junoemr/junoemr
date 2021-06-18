@@ -51,6 +51,8 @@ import java.sql.SQLException;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EchartTests extends SeleniumTestBase
@@ -77,7 +79,8 @@ public class EchartTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void testWritingNote() throws InterruptedException
+	public void testWritingNote()
+			throws InterruptedException
 	{
 		// login
 		if (!Navigation.isLoggedIn(driver))

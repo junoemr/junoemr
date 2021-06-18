@@ -37,4 +37,5 @@ import org.oscarehr.util.LoggedInInfo;
  */
 public interface PreventionReport {
     public Hashtable runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate);
+    boolean displayNumShots();
 }

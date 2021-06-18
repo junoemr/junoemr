@@ -650,8 +650,8 @@ public class CihiExportPHC_VRSAction extends DispatchAction {
 
 	private void putPartialDate(cdsDtCihiPhcvrs.DateFullOrPartial dfp, Date dateValue, String format) {
         if (dateValue!=null) {
-            if (PartialDate.YEARONLY.equals(format)) dfp.setYearOnly(Util.calDate(dateValue));
-            else if (PartialDate.YEARMONTH.equals(format)) dfp.setYearMonth(Util.calDate(dateValue));
+            if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) dfp.setYearOnly(Util.calDate(dateValue));
+            else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) dfp.setYearMonth(Util.calDate(dateValue));
             else dfp.setFullDate(Util.calDate(dateValue));
         }
     }
@@ -837,7 +837,7 @@ public class CihiExportPHC_VRSAction extends DispatchAction {
         	xmlAllergies.setSeverity(cdsDtCihiPhcvrs.AdverseReactionSeverity.Enum.forString(severity[index]));
         	date = allergy.getStartDate();
         	if( date != null ) {
-        		this.putPartialDate(xmlAllergies.addNewStartDate(), date, PartialDate.ALLERGIES, (int)allergy.getId(), PartialDate.ALLERGIES_STARTDATE);
+        		this.putPartialDate(xmlAllergies.addNewStartDate(), date, PartialDate.TABLE_ALLERGIES, (int)allergy.getId(), PartialDate.ALLERGIES_STARTDATE);
         	}
         }
 	}
@@ -1164,7 +1164,7 @@ public class CihiExportPHC_VRSAction extends DispatchAction {
 
 			Date writtenDate = pa[p].getWrittenDate();
 			if (writtenDate!=null) {
-	        	String dateFormat = partialDateDao.getFormat(PartialDate.DRUGS, pa[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
+	        	String dateFormat = partialDateDao.getFormat(PartialDate.TABLE_DRUGS, pa[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
 	        	this.putPartialDate(medications.addNewPrescriptionWrittenDate(), writtenDate, dateFormat);
 			}
 

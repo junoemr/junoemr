@@ -195,6 +195,10 @@ oscar.oscarRx.pageUtil.RxSessionBean rxBean = null;
 						PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
 						for (StaticScriptBean.DrugDisplayData drug : drugs)
 							{
+							    String displayStartDate = partialDateDao.getDatePartial(drug.startDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_STARTDATE);
+							    String displayWrittenDate = partialDateDao.getDatePartial(drug.writtenDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_WRITTENDATE);
+							    //endDate is determined using the startDate. Display the endDate in the same partial date format as the startDate (when it's partial)
+							    String displayEndDate = partialDateDao.getDatePartial(drug.endDate, PartialDate.TABLE_DRUGS, drug.localDrugId, PartialDate.DRUGS_STARTDATE);
 								String arch="";
 								if (drug.isArchived)
 								{
@@ -203,21 +207,24 @@ oscar.oscarRx.pageUtil.RxSessionBean rxBean = null;
 					%>
 					<tr style="height:20px;<%=arch%>">
 						<td><%=drug.providerName%></td>
-						<td><%
-						if(!drug.startDate.equals("0001/01/01") ){
-							out.print(drug.startDate);
-						}
-						%></td>
-						<td><%
-						if(!drug.startDate.equals("0001/01/01") ){
-							out.print(drug.endDate);
-						}
-						%></td>
-						<td><%
-						if(!drug.writtenDate.equals("0001/01/01") ){
-						out.print(partialDateDao.getDatePartial(drug.writtenDate, PartialDate.DRUGS, drug.localDrugId, PartialDate.DRUGS_WRITTENDATE));
-						}
-						%></td>
+						<td>
+						<%if(!drug.startDate.equals("0001/01/01") )
+						{%>
+							<%=displayStartDate%>
+						<%}%>
+						</td>
+						<td>
+						<%if(!drug.startDate.equals("0001/01/01") )
+						{%>
+							<%=displayEndDate%>
+						<%}%>
+						</td>
+						<td>
+						<%if(!drug.writtenDate.equals("0001/01/01") )
+						{%>
+							<%=displayWrittenDate%>
+						<%}%>
+						</td>
                                                 <td>
                                                 <%if(drug.localDrugId != null){ %>
                                                 <a href="javascript:void(0);"   onclick="popup(600, 425,'DisplayRxRecord.jsp?id=<%=drug.localDrugId%>','displayRxWindow')">

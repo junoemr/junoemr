@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographic.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +31,7 @@ import org.hibernate.annotations.WhereJoinTable;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -43,26 +45,44 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static oscar.util.StringUtils.filterControlCharacters;
 
+@Data
 @Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {
+	public static final int FIRST_NAME_MAX_LENGTH = 30;
+	public static final int LAST_NAME_MAX_LENGTH = 30;
+
+	public static final String GENDER_MALE = "M";
+	public static final String GENDER_FEMALE = "F";
+	public static final String GENDER_OTHER = "O";
+	public static final String GENDER_TRANSGENDER = "T";
+	public static final String GENDER_UNKNOWN = "U";
+
+	public static final String STATUS_ACTIVE = "AC";
+	public static final String STATUS_DECEASED = "DE";
+	public static final String STATUS_INACTIVE = "IN";
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "demographic_no")
@@ -70,8 +90,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	// base info
 	@Column(name = "first_name")
+	@Size(max = FIRST_NAME_MAX_LENGTH)
 	private String firstName;
 	@Column(name = "last_name")
+	@Size(max = LAST_NAME_MAX_LENGTH)
 	private String lastName;
 	@Column(name = "title")
 	private String title;
@@ -182,9 +204,19 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String nameOfMother;
 	@Column(name = "name_of_father")
 	private String nameOfFather;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_given_at")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentGivenAt;
+	@Getter
+	@Setter
+	@Column(name = "electronic_messaging_consent_rejected_at", columnDefinition = "TIMESTAMP")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date electronicMessagingConsentRejectedAt;
 
-	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id")
-	private List<DemographicCust> demographicCust;
+	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic")
+	private DemographicCust demographicCust;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
 	private List<DemographicExt> demographicExtList;
@@ -199,6 +231,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="provider_no", insertable=false, updatable=false)
 	private ProviderData provider;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographic")
+	@OrderBy(value = "addedAt ASC, id ASC")
+	private List<DemographicRoster> rosterHistory;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "demographic")
 	@WhereJoinTable(clause = "module = '" + CtlDocument.MODULE_DEMOGRAPHIC + "'")
@@ -226,6 +262,13 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		SK,
 		YT,
 		PP
+	}
+
+	public enum ELECTRONIC_MESSAGING_CONSENT_STATUS
+	{
+		NONE,
+		CONSENTED,
+		REVOKED,
 	}
 
 	/**
@@ -816,12 +859,12 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.nameOfFather = father;
 	}
 
-	public List<DemographicCust> getDemographicCust()
+	public DemographicCust getDemographicCust()
 	{
 		return demographicCust;
 	}
 
-	public void setDemographicCust(List<DemographicCust> demographicCust)
+	public void setDemographicCust(DemographicCust demographicCust)
 	{
 		this.demographicCust = demographicCust;
 	}
@@ -871,6 +914,18 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		return Demographic.isNewBorn(getDateOfBirth(), getVer());
 	}
 
+	/**
+	 * Checks whether this demographic is marked as a BC newborn.
+	 * A demographic is a BC newborn if they have hc_type == BC and ver == 66.
+	 * This method pays no respect to the actual age of the patient.
+	 * @return true / false indicating BC newborn status.
+	 */
+	public boolean isMarkedAsBCNewborn()
+	{
+		return Objects.equals(this.getVer(), BC_NEWBORN_BILLING_CODE) &&
+				Objects.equals(this.getHcType(), HC_TYPE.BC.toString());
+	}
+
 	@PrePersist
 	@PreUpdate
 	public void sanitizeEntity()
@@ -911,5 +966,51 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isActive()
 	{
 		return !getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
+
+	/**
+	 * get the patients electronic messaging consent status
+	 * @return - the patients consent status
+	 */
+	public ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
+	{
+		if (this.electronicMessagingConsentRejectedAt != null)
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.REVOKED;
+		}
+		else if (this.electronicMessagingConsentGivenAt != null)
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.CONSENTED;
+		}
+		else
+		{
+			return ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+		}
+	}
+
+	/**
+	 * Update the patients electronic messaging consent status.
+	 * @param status - the new consent status to use.
+	 */
+	public void updateElectronicMessagingConsentStatus(ELECTRONIC_MESSAGING_CONSENT_STATUS status)
+	{
+		if (this.getElectronicMessagingConsentStatus() != status && status != null)
+		{
+			// status has changed. update!
+			switch(status)
+			{
+				case NONE:
+					this.setElectronicMessagingConsentGivenAt(null);
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+				case REVOKED:
+					this.setElectronicMessagingConsentRejectedAt(new Date());
+					break;
+				case CONSENTED:
+					this.setElectronicMessagingConsentGivenAt(new Date());
+					this.setElectronicMessagingConsentRejectedAt(null);
+					break;
+			}
+		}
 	}
 }
