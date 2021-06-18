@@ -32,6 +32,8 @@ import org.oscarehr.rx.model.Prescription;
 import org.oscarehr.util.MiscUtils;
 import oscar.oscarRx.data.RxPrescriptionData;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -601,7 +603,13 @@ public class MedicationMapper extends AbstractMapper
 				.getTq16_ServiceDuration().getCq1_Quantity().getValue());
 		if(durationUnitStr != null)
 		{
-			return Integer.parseInt(durationUnitStr);
+			BigDecimal durationPrecise = new BigDecimal(durationUnitStr);
+			int duration = Integer.parseInt(durationPrecise.setScale(0, RoundingMode.CEILING).toString());
+			if (durationPrecise.compareTo(new BigDecimal(duration)) != 0)
+			{
+				MiscUtils.getLogger().warn("Following duration unit is losing information when taking the ceiling and cast to integer: " + durationUnitStr);
+			}
+			return duration;
 		}
 		return 0;
 	}
