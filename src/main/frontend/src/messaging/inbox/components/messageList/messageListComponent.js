@@ -85,16 +85,16 @@ angular.module("Messaging.Components").component('messageList', {
 						const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
 						const count = await messagingService.countMessages(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.groupId);
 
-						if (count !== ctrl.currentMessageCount)
+						if (count > ctrl.currentMessageCount)
 						{
 							const diff = count - ctrl.currentMessageCount;
 							const newMessages = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId),
 								ctrl.getMessageSearchParams(diff, 0));
 							ctrl.messageStream.unshift(...newMessages);
 
-							ctrl.currentMessageCount = count;
 							$scope.$apply();
 						}
+						ctrl.currentMessageCount = count;
 					}
 				}, NEW_MESSAGE_CHECK_INTERVAL_MS);
 			}
@@ -179,16 +179,16 @@ angular.module("Messaging.Components").component('messageList', {
 						$scope.$apply();
 					}
 
-					// get initial message count
-					ctrl.currentMessageCount = await messagingService.countMessages(
-						await messagingService.getMessageSourceById(ctrl.sourceId),
-						ctrl.groupId);
-
 					// notify parent of stream change.
 					if (ctrl.messageStreamChange)
 					{
 						ctrl.messageStreamChange({stream: ctrl.messageStream});
 					}
+
+					// get initial message count
+					ctrl.currentMessageCount = await messagingService.countMessages(
+						await messagingService.getMessageSourceById(ctrl.sourceId),
+						ctrl.groupId);
 				}
 			}
 

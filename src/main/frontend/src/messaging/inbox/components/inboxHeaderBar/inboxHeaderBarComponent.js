@@ -152,7 +152,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				else
 				{
 					// selected message may not be in the message stream. This can happen if the user reloads the page
-					return message = await ctrl.messagingService.getMessage(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
+					return await ctrl.messagingService.getMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
 				}
 			}
 
