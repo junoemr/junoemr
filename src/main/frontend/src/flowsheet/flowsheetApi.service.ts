@@ -24,7 +24,7 @@
     Canada
 
  */
-import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi} from "../../generated";
+import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi, PreventionsApi} from "../../generated";
 import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
 import FlowsheetTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetTransferToModelConverter";
 import FlowsheetModelToTransferConverter from "../lib/flowsheet/converter/FlowsheetModelToTransferConverter";
@@ -40,6 +40,7 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.flowsheetApi = new FlowsheetServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
+		service.preventionsApi = new PreventionsApi($http, $httpParamSerializer, '../ws/rs');
 		service.flowsheetModelConverter = new FlowsheetTransferToModelConverter();
 		service.flowsheetTransferConverter = new FlowsheetModelToTransferConverter();
 
@@ -73,6 +74,11 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.deleteFlowsheet = async (flowsheetId: number): Promise<boolean> =>
 		{
 			return (await service.flowsheetApi.deleteFlowsheet(flowsheetId)).data.body;
+		}
+
+		service.getPreventionTypes = async (): Promise<Array<string>> =>
+		{
+			return (await service.preventionsApi.getPreventionTypes()).data.body;
 		}
 
 		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<FlowsheetModel> =>

@@ -237,6 +237,7 @@ module.exports = {
 			'./src/common/components/filterPanel/filterPanelController.ts',
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
+			'./src/common/components/junoModalCloseButton/junoModalCloseButtonComponent.ts',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoFileChooser/junoFileChooserComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
@@ -284,6 +285,7 @@ module.exports = {
 			'./src/flowsheet/flowsheetApi.service.ts',
 			'./src/flowsheet/components/flowsheetEditItemComponent.ts',
 			'./src/flowsheet/components/flowsheetItemGroupComponent.ts',
+			'./src/flowsheet/components/flowsheetItemModalComponent.ts',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',

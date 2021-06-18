@@ -23,32 +23,39 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.PreventionConverter;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.PreventionResponse;
 import org.oscarehr.ws.rest.to.model.PreventionTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 
 @Path("/preventions")
 @Component("preventionService")
-public class PreventionService extends AbstractServiceImpl {
-
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+@Tag(name = "preventions")
+public class PreventionService extends AbstractServiceImpl
+{
 	@Autowired
 	private PreventionManager preventionManager;
 
 	@GET
 	@Path("/active")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public PreventionResponse getCurrentPreventions(@QueryParam("demographicNo") Integer demographicNo)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.PREVENTION_READ);
@@ -61,5 +68,13 @@ public class PreventionService extends AbstractServiceImpl {
 		response.setPreventions(preventionsT);
 		
 		return response;
+	}
+
+	@GET
+	@Path("/types")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<String> getPreventionTypes()
+	{
+		return RestSearchResponse.successResponseOnePage(preventionManager.getPreventionTypeList());
 	}
 }

@@ -46,6 +46,20 @@
 			</div>
 		</div>
 	</div>
+	<div class="flex-row flex-grow">
+		<div class="flex-column width-25 row-padding-r">
+			<juno-input label="Flowsheet Name"
+			            label-position="$ctrl.LABEL_POSITION.TOP"
+			            ng-model="$ctrl.flowsheet.name">
+			</juno-input>
+		</div>
+		<div class="flex-column flex-grow row-padding-l">
+			<juno-input label="Description"
+			            label-position="$ctrl.LABEL_POSITION.TOP"
+			            ng-model="$ctrl.flowsheet.description">
+			</juno-input>
+		</div>
+	</div>
 
 	<div class="flex-column">
 		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups" model="itemGroup">
@@ -79,7 +93,7 @@
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 						             disabled="$ctrl.isLoading"
-						             click="$ctrl.onAddNewItem($ctrl.ItemType.MEASUREMENT)">
+						             click="$ctrl.onAddNewMeasurementItem(itemGroup)">
 							<i class="icon icon-add"></i>
 							<span>Add Measurement Item</span>
 						</juno-button>
@@ -89,7 +103,7 @@
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 						             disabled="$ctrl.isLoading"
-						             click="$ctrl.onAddNewItem($ctrl.ItemType.PREVENTION)">
+						             click="$ctrl.onAddNewPreventionItem(itemGroup)">
 							<i class="icon icon-add"></i>
 							<span>Add Prevention Item</span>
 						</juno-button>

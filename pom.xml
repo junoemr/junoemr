@@ -2091,6 +2091,7 @@
 								org.oscarehr.ws.rest.DemographicFlowsheetWebService
 								org.oscarehr.ws.rest.FlowsheetWebService
 								org.oscarehr.ws.rest.FlowsheetsWebService
+								org.oscarehr.ws.rest.PreventionService
                                 org.oscarehr.ws.rest.RosterWebService
 								org.oscarehr.ws.rest.SecurityRolesWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService

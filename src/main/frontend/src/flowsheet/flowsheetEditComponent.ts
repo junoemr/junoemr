@@ -111,9 +111,35 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 				}
 
-				ctrl.onAddNewItem = async (type): Promise<void> =>
+				ctrl.onAddNewMeasurementItem = (itemGroup): void =>
 				{
+					ctrl.onAddNewItem(itemGroup, ItemType.MEASUREMENT);
+				}
 
+				ctrl.onAddNewPreventionItem = (itemGroup): void =>
+				{
+					ctrl.onAddNewItem(itemGroup, ItemType.PREVENTION);
+				}
+
+				ctrl.onAddNewItem = (itemGroup, type): void =>
+				{
+					$uibModal.open(
+						{
+							component: 'flowsheetItemModal',
+							backdrop: 'static',
+							windowClass: "juno-modal",
+							resolve: {
+								itemType: () => type,
+								style: () => ctrl.componentStyle,
+							},
+						}
+					).result.then((newItem) =>
+					{
+						itemGroup.flowsheetItems.push(newItem);
+					}).catch((reason) =>
+					{
+
+					});
 				}
 
 				ctrl.onCancel = (): void =>
