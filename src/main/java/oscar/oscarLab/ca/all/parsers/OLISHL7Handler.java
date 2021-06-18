@@ -2293,7 +2293,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public String getDocName() {
 		try {
-			return (getFullDocName("/.OBR-16-"));
+			// Previously getFullDocName
+			// Changed to stop injecting HTML into OLIS labs
+			return (getShortName("/.OBR-16-"));
 		} catch (Exception e) {
 			return ("");
 		}
@@ -2312,14 +2314,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 		try {
 			int i = 0;
-			String docs = getFullDocName("/.OBR-28(" + i + ")-");
+			String docs = getShortName("/.OBR-28(" + i + ")-");
 			i++;
-			String nextDoc = getFullDocName("/.OBR-28(" + i + ")-");
+			String nextDoc = getShortName("/.OBR-28(" + i + ")-");
 
 			while (!nextDoc.equals("")) {
 				docs = docs + ", " + nextDoc;
 				i++;
-				nextDoc = getFullDocName("/.OBR-28(" + i + ")-");
+				nextDoc = getShortName("/.OBR-28(" + i + ")-");
 			}
 
 			return (docs);

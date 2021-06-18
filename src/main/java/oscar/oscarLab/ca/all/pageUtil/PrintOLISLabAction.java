@@ -91,8 +91,7 @@ public class PrintOLISLabAction extends Action
 
 		url.append(scheme);
 		url.append("://");
-		//url.append(request.getServerName());
-		url.append("127.0.0.1");
+		url.append(request.getServerName());
 
 		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443)))
 		{
