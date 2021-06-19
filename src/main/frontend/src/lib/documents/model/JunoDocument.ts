@@ -177,7 +177,7 @@ export default class JunoDocument implements JunoFile
 		{
 			return this.documentDescription;
 		}
-		return `${this.documentDescription}${FileUtil.getFileExtension(this.fileName)}`;
+		return `${this.documentDescription}${FileUtil.getFileExtension(this.fileName) ? FileUtil.getFileExtension(this.fileName) : ""}`;
 	}
 
 	get documentNo(): string
