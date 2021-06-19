@@ -75,7 +75,8 @@ export default class FileUtil
 		// download and convert to byte array
 		const byteString = atob(base64Data);
 		const bytes = new Array(byteString.length);
-		for (let i = 0; i < byteString.length; i++) {
+		for (let i = 0; i < byteString.length; i++)
+		{
 			bytes[i] = byteString.charCodeAt(i);
 		}
 
@@ -84,6 +85,23 @@ export default class FileUtil
 
 		// save to users computer
 		saveAs(blob, name);
+	}
+
+	/**
+	 * extract file extension form file name or file object
+	 * @param file - file object or file name to extract file extension from
+	 * @return the file extension or null if the file name contains no extension.
+	 */
+	public static getFileExtension(file: string | File): string
+	{
+		if (file instanceof File)
+		{
+			file = file.name;
+		}
+
+		return [file.match(/\.[\w]+$/)]
+			.flat()
+			.reduce((extension, match) => match, null);
 	}
 
 	// ==========================================================================

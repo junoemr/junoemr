@@ -2,6 +2,7 @@ import {DocumentStatus} from "./DocumentStatus";
 import {Moment} from "moment";
 import JunoFile from "./JunoFile";
 import DocumentService from "../service/DocumentService";
+import FileUtil from "../../util/FileUtil";
 
 export default class JunoDocument implements JunoFile
 {
@@ -172,12 +173,11 @@ export default class JunoDocument implements JunoFile
 
 	get name(): string
 	{
-		// if already looks like file name
-		if (this.documentDescription?.match(/.*\.[\w]+$/))
+		if (FileUtil.getFileExtension(this.documentDescription))
 		{
 			return this.documentDescription;
 		}
-		return `${this.documentDescription}${this.fileName.replace(/.*(\.[\w]+)$/g, "$1")}`;
+		return `${this.documentDescription}${FileUtil.getFileExtension(this.fileName)}`;
 	}
 
 	get documentNo(): string
