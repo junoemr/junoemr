@@ -1,6 +1,6 @@
 START TRANSACTION;
 
-SELECT COUNT(*) INTO @provider_billing_count FROM provider_billing;
+SELECT COALESCE(MAX(id), 0) INTO @provider_billing_count FROM provider_billing;
 
 -- This is to get X number of entries linked up
 -- i.e. if we have 10 providers but we only need 3 entries, 7 will fail and 3 will insert
