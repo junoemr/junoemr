@@ -25,7 +25,11 @@ package oscar.util;
 
 import junit.framework.Assert;
 import org.junit.Test;
+import org.oscarehr.dataMigration.model.common.PartialDate;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -414,7 +418,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toDateTimeString_NullParameter_ExpectEmptyString()
 	{
-		Assert.assertEquals("", ConversionUtils.toDateTimeString(null));
+		Assert.assertEquals("", ConversionUtils.toDateTimeString((LocalDateTime) null));
 	}
 
 	@Test
@@ -422,6 +426,15 @@ public class ConversionUtilsTest
 	{
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_TS_PATTERN);
+		String expectedString = now.format(formatter);
+		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeString(now));
+	}
+
+	@Test
+	public void toDateTimeString_ZonedDateTimeOfNow_ExpectDateTimeString()
+	{
+		ZonedDateTime now = ZonedDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 		String expectedString = now.format(formatter);
 		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeString(now));
 	}
@@ -935,7 +948,8 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLegacyDate_NullParameter_ExpectNull()
 	{
-		Assert.assertNull(ConversionUtils.toNullableLegacyDate(null));
+		Assert.assertNull(ConversionUtils.toNullableLegacyDate((LocalDate) null));
+		Assert.assertNull(ConversionUtils.toNullableLegacyDate((PartialDate) null));
 	}
 
 	@Test
@@ -953,6 +967,20 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toNullableLegacyDate_PartialDateAtNow_ExpectDate()
+	{
+		Calendar today = new GregorianCalendar();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = today.getTime();
+
+		PartialDate comparisonDate = PartialDate.from(expectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDate(comparisonDate)));
+	}
+
+	@Test
 	public void toLegacyDate_FixedLocalDate_ExpectDate() throws ParseException
 	{
 		String fixedDateString = "2019-04-30";
@@ -965,7 +993,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLegacyDateTime_NullParameter_ExpectNull()
 	{
-		Assert.assertNull(ConversionUtils.toNullableLegacyDateTime(null));
+		Assert.assertNull(ConversionUtils.toNullableLegacyDateTime((LocalDateTime) null));
 	}
 
 	@Test
@@ -1064,6 +1092,51 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toLocalDate_XmlGregorianCalendar_ExpectLocalDate() throws DatatypeConfigurationException
+	{
+		String dateString = "2019-04-30";
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar(dateString);
+
+		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
+		assertThat(expectedDate, is(ConversionUtils.toLocalDate(xmlGregorianCalendar)));
+	}
+
+	@Test
+	public void toLocalDateTime_XmlGregorianCalendar_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		String dateString = "2019-04-30";
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar(dateString);
+		xmlGregorianCalendar.setHour(12);
+		xmlGregorianCalendar.setMinute(45);
+		xmlGregorianCalendar.setSecond(15);
+
+		LocalDateTime expectedDateTime = LocalDateTime.of(2019, 4, 30, 12, 45, 15);
+		assertThat(expectedDateTime, is(ConversionUtils.toLocalDateTime(xmlGregorianCalendar)));
+	}
+
+	@Test
+	public void toLocalDateTime_DateTimeString_ExpectLocalDateTime()
+	{
+		String dateString = "2021-04-30 21:45:15";
+		LocalDateTime expectedDateTime = LocalDateTime.of(2021, 4, 30, 21, 45, 15);
+		assertThat(expectedDateTime, is(ConversionUtils.toLocalDateTime(dateString)));
+	}
+
+	@Test
+	public void toLocalDateTime_NullXmlGregorianCalendar_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableLocalDateTime((XMLGregorianCalendar) null));
+	}
+
+	@Test
+	public void toLocalDateTime_NullDateTimeString_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableLocalDateTime((String) null));
+	}
+
+	@Test
 	public void toZonedLocalDate_FixedDate_ExpectLocalDate()
 	{
 		LocalDate expectedLocalDate = LocalDate.of(2019, 4,30);
@@ -1073,6 +1146,12 @@ public class ConversionUtilsTest
 		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
 		Date fixedDate = expectedTime.getTime();
 		assertThat(expectedLocalDate, is(ConversionUtils.toZonedLocalDate(fixedDate)));
+	}
+
+	@Test
+	public void toNullableZonedLocalDate_NullString_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableZonedLocalDate((String) null));
 	}
 
 	@Test
@@ -1096,7 +1175,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLocalDateTime_NullParameter_ExpectNull()
 	{
-		Assert.assertNull(ConversionUtils.toNullableLocalDateTime(null));
+		assertNull(ConversionUtils.toNullableLocalDateTime((Date) null));
 	}
 
 	@Test
@@ -1235,6 +1314,17 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toLocalTime_XMLGregorianCalendar_ExpectLocalTime() throws DatatypeConfigurationException
+	{
+		String dateTimeString = "2019-04-30T12:45:15";
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar(dateTimeString);
+
+		LocalTime expectedTime = LocalTime.of(12, 45, 15);
+		assertThat(expectedTime, is(ConversionUtils.toLocalTime(xmlGregorianCalendar)));
+	}
+
+	@Test
 	public void toTimestamp_ServerTimeZoneLocalDateTime_ExpectServerTimeZoneTimestamp()
 	{
 		LocalDateTime currTime = LocalDateTime.now();
@@ -1277,6 +1367,88 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toXmlGregorianCalendar_LocalDate_ExpectXmlGregorianCalendar() throws DatatypeConfigurationException
+	{
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-04-30");
+		LocalDate testDate = LocalDate.of(2019, 4, 30);
+		assertThat(xmlGregorianCalendar, is(ConversionUtils.toXmlGregorianCalendar(testDate)));
+	}
+
+	@Test
+	public void toXmlGregorianCalendar_LocalDateTime_ExpectXmlGregorianCalendar() throws DatatypeConfigurationException
+	{
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-04-30");
+		xmlGregorianCalendar.setHour(12);
+		xmlGregorianCalendar.setMinute(45);
+		xmlGregorianCalendar.setSecond(15);
+		LocalDateTime testDateTime = LocalDateTime.of(2019, 4, 30, 12,45, 15);
+		assertThat(xmlGregorianCalendar, is(ConversionUtils.toXmlGregorianCalendar(testDateTime)));
+	}
+
+	@Test
+	public void fillPartialCalendar_fullDate_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2019, 1, 10, 0, 0, 0);
+
+		XMLGregorianCalendar fullDate =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-01-10");
+		XMLGregorianCalendar yearMonth =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2020-02-20");
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDate, yearMonth, yearOnly)));
+	}
+
+	@Test
+	public void fillPartialCalendar_yearMonth_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2020, 2, 1, 0, 0, 0);
+
+		XMLGregorianCalendar fullDate = null;
+		XMLGregorianCalendar yearMonth =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2020-02-20");
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDate, yearMonth, yearOnly)));
+	}
+
+	@Test
+	public void fillPartialCalendar_yearOnly_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2021, 1, 1, 0, 0, 0);
+
+		XMLGregorianCalendar fullDate = null;
+		XMLGregorianCalendar yearMonth = null;
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDate, yearMonth, yearOnly)));
+	}
+
+	@Test
+	public void fillPartialCalendar_fullDateTime_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		LocalDateTime expectedLocalDateTime = LocalDateTime.of(2019, 1, 10, 12, 45, 15);
+
+		XMLGregorianCalendar fullDateTime =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-01-10");
+		fullDateTime.setHour(12);
+		fullDateTime.setMinute(45);
+		fullDateTime.setSecond(15);
+		XMLGregorianCalendar fullDate =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-01-10");
+		XMLGregorianCalendar yearMonth =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2020-02-20");
+		XMLGregorianCalendar yearOnly =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-03-30");
+
+		assertThat(expectedLocalDateTime, is(ConversionUtils.fillPartialCalendar(fullDateTime, fullDate, yearMonth, yearOnly)));
+	}
+
 	public void epochDateSeconds_ExpectZero()
 	{
 		final Date zeroDate = new Date(0);

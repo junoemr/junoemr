@@ -204,9 +204,30 @@ public class LabsDocsSummary implements Summary {
 
 		
 		Collections.sort(list, Collections.reverseOrder(new Comparator<SummaryItemTo1>() {
-			  public int compare(SummaryItemTo1 o1, SummaryItemTo1 o2) {
-			      return o1.getDate().compareTo(o2.getDate());
-			  }
+			public int compare(SummaryItemTo1 o1, SummaryItemTo1 o2)
+			{
+				if (o1 == null && o2 == null)
+				{
+					return 0;
+				}
+				if(o1 == null ^ o2 == null) //XOR
+				{
+					return (o1 == null) ? -1 : 1;
+				}
+
+				Date date1 = o1.getDate();
+				Date date2 = o2.getDate();
+
+				if (date1 == null && date2 == null)
+				{
+					return 0;
+				}
+				if(date1 == null ^ date2 == null) //XOR
+				{
+					return (date1 == null) ? -1 : 1;
+				}
+				return date1.compareTo(date2);
+			}
 		}));
 		
 		

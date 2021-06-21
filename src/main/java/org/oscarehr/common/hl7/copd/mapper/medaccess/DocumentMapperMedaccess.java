@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDImportService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

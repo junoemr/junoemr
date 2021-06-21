@@ -424,8 +424,7 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupPreference"), "frame?frameUrl=" + contextPath + "/admin/groupPreferences.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.preventionNotification.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionManager.jsp"));
 
-		// TODO remove super admin requirement when ready for general use
-		if(securityInfoManager.isSuperAdmin(providerNo) && systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
+		if(systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
 		{
 			scheduleItems.add(new AdminNavItemTo1("Manage Appointment Queues", "manageAppointmentQueues"));
 		}
@@ -538,6 +537,7 @@ public class AdminNavService
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobtypes.title"), "frame?frameUrl=" + contextPath + "/admin/jobTypes.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1("Roster Status Settings", "rosterStatus"));
 		}
 
 		if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())
@@ -557,7 +557,7 @@ public class AdminNavService
 
 		if (securityInfoManager.isSuperAdmin(providerNo))
 		{
-			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/rx"));
+			systemManagementItems.add( new AdminNavItemTo1 ("System Properties", "systemProperties/general"));
 		}
 
 		systemManagementGroup.setItems(systemManagementItems);
@@ -652,8 +652,12 @@ public class AdminNavService
 		{
 			integrationItems.add(new AdminNavItemTo1("schedule HSFO2 XML resubmit", "frame?frameUrl=" + contextPath + URLEncoder.encode("/admin/RecommitHSFO2.do?method=showSchedule")));
 		}
-
-		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.Know2ActConfig"), "frame?frameUrl=" + contextPath + "/web/Know2actConfiguration.jsp"));
+		
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false))
+		{
+			integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.Know2ActConfig"), "frame?frameUrl=" + contextPath + "/web/Know2actConfiguration.jsp"));
+		}
+		
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.integratorPush"), "frame?frameUrl=" + contextPath + "/admin/integratorPushStatus.jsp"));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.born"), "frame?frameUrl=" + contextPath + "/admin/born.jsp"));
 
@@ -690,8 +694,8 @@ public class AdminNavService
 
 		dataManagementGroup.setName(resourceBundle.getString("admin.admin.DataManagement"));
 
-		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DemoExport"), "frame?frameUrl=" + contextPath + "/demographic/demographicExport.jsp"));
-		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DemoImport"), "frame?frameUrl=" + contextPath + "/demographic/demographicImport.jsp"));
+		dataManagementItems.add(new AdminNavItemTo1("Demographic Export", "demographicExport"));
+		dataManagementItems.add(new AdminNavItemTo1("Demographic Import", "demographicImport"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.mergeRec"), "frame?frameUrl=" + contextPath + "/admin/demographicmergerecord.jsp"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnUpdatePatientProvider"), "frame?frameUrl=" + contextPath + "/admin/updatedemographicprovider.jsp"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnInventory"), "frame?frameUrl=" + contextPath + "/admin/productDispensing/products.jsp"));

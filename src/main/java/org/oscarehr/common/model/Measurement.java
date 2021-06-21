@@ -46,6 +46,33 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 
 	public static final int RESULT_LENGTH = 500;
 
+	public static final String MEASUREMENT_TYPE_HEIGHT = "HT";
+	public static final String MEASUREMENT_TYPE_WEIGHT = "WT";
+	public static final String MEASUREMENT_TYPE_WAIST = "WAIS";
+	public static final String MEASUREMENT_TYPE_WC = "WC";
+	public static final String MEASUREMENT_TYPE_BLOOD_PRESSURE = "BP";
+	public static final String MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM = "MMSE";
+	public static final String MEASUREMENT_TYPE_SMOKING_STATUS = "SKST";
+	public static final String MEASUREMENT_TYPE_SMOKING_PACKS_PER_DAY = "POSK";
+	public static final String MEASUREMENT_TYPE_SELF_MONITOR_BLOOD_GLUCOSE = "SMBG";
+	public static final String MEASUREMENT_TYPE_DIABETES_EDUCATION = "DMME";
+	public static final String MEASUREMENT_TYPE_DIABETES_SELF_MANAGEMENT_CHALLENGES = "SMCD";
+	public static final String MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_NUTRITION = "MCCN";
+	public static final String MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_EXERCISE = "MCCE";
+	public static final String MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_SMOKING = "MCCS";
+	public static final String MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER = "MCCO";
+	public static final String MEASUREMENT_TYPE_DILATED_EYE_EXAM = "EYEE";
+	public static final String MEASUREMENT_TYPE_FOOT_EXAM = "FTE";
+	public static final String MEASUREMENT_TYPE_FOOT_EXAM_TEST_LOSS_OF_SENSATION = "FTLS";
+	public static final String MEASUREMENT_TYPE_COLLABORATIVE_GOAL_SETTING = "CGSD";
+	public static final String MEASUREMENT_TYPE_HYPOGLYCEMIC_EPISODES = "HYPE";
+
+	public static final String MEASUREMENT_UNIT_CM = "cm";
+	public static final String MEASUREMENT_UNIT_KG = "kg";
+	public static final String MEASUREMENT_UNIT_MMHG = "mmHg";
+	public static final String MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_COLLABORATIVE = "44943-9";
+	public static final String MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_CHALLENGES = "44941-3";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

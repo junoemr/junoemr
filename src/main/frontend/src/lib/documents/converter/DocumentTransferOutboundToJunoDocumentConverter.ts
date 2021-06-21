@@ -11,8 +11,8 @@ export default class DocumentTransferOutboundToJunoDocumentConverter extends Abs
 
 	convert(from: DocumentTransferOutbound): JunoDocument
 	{
-		// document description is file name...
-		const doc = new JunoDocument(from.documentDescription, from.documentDescription, from.base64EncodedFile);
+
+		const doc = new JunoDocument(from.fileName, from.documentDescription, from.base64EncodedFile);
 		doc.documentNo = from.documentNo.toString();
 		doc.status = from.status;
 		doc.createdAt = moment(from.createdDateTime);

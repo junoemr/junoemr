@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.CoPDImportService;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;

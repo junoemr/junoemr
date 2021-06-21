@@ -30,6 +30,7 @@ import {
 import MessageFactory from "../../../../lib/messaging/factory/MessageFactory";
 import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
 import JunoFileToAttachmentConverter from "../../../../lib/messaging/converter/JunoFileToAttachmentConverter";
+import {MessageableLocalType} from "../../../../lib/messaging/model/MessageableLocalType";
 
 angular.module("Messaging.Modals").component('messageCompose', {
 	templateUrl: 'src/messaging/inbox/modals/messageCompose/messageCompose.jsp',
@@ -67,6 +68,16 @@ angular.module("Messaging.Modals").component('messageCompose', {
 				ctrl.participantNames = this.getParticipantNames();
 				ctrl.messageSourceOptions = await ctrl.loadMessageSourceOptions();
 
+				if (ctrl.isReply && ctrl.conversation)
+				{
+					const demoParticipants = await ctrl.getDemographicParticipants();
+					if (demoParticipants.length > 0)
+					{
+						// just pic first demographic for now. One day we will need to be smarter about this.
+						ctrl.recipient = demoParticipants[0];
+					}
+				}
+
 				ctrl.setupValidations();
 
 				$scope.$apply();
@@ -92,12 +103,21 @@ angular.module("Messaging.Modals").component('messageCompose', {
 			{
 				const sources = (await ctrl.messagingService.getMessageSources()).filter((source) => !source.isVirtual);
 
-				return sources.map((source) => {
+				const sourceOptions = sources.map((source) => {
 					return {
-						label: source.name,
+						label: source.name ? source.name : "Clinic",
 						value: source.id,
 					}
-				})
+				});
+
+				// if only one source present default to it.
+				if (sources.length === 1)
+				{
+					ctrl.sourceId = sources[0].id;
+					$scope.$apply();
+				}
+
+				return sourceOptions;
 			}
 
 			ctrl.uploadAttachment = async () =>
@@ -192,6 +212,24 @@ angular.module("Messaging.Modals").component('messageCompose', {
 					return ctrl.conversation.participants.map((participant) => participant.name).join(", ");
 				}
 				return "";
+			}
+
+			/**
+			 * get participants from the conversation who map to demographics.
+			 */
+			ctrl.getDemographicParticipants = async () =>
+			{
+				const demographicParticipants = await Promise.all(ctrl.conversation.participants
+					.map(async (participant) =>
+					{
+						if ((await participant.localType()) === MessageableLocalType.DEMOGRAPHIC)
+						{
+							return participant
+						}
+						return null;
+					}));
+
+				return demographicParticipants.filter((participant) => participant !== null);
 			}
 		}],
 });

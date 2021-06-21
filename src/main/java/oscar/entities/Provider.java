@@ -28,7 +28,8 @@ package oscar.entities;
  * Encapsulates data from table provider
  *
  */
-public class Provider {
+public class Provider
+{
   private String providerNo = "";
   private String lastName= "";
   private String firstName= "";
@@ -48,7 +49,7 @@ public class Provider {
   private String comments= "";
   private String providerActivity= "";
   private String supervisor = "";
-
+  private String imdHealthUuid = "";
 
   /**
    * Class constructor with no arguments.
@@ -82,7 +83,8 @@ public class Provider {
                   String sex, String dob, String address, String phone,
                   String workPhone, String ohipNo, String rmaNo,
                   String billingNo, String hsoNo, String status,
-                  String comments, String providerActivity) {
+                  String comments, String providerActivity)
+  {
     this.providerNo = providerNo;
     this.lastName = lastName;
     this.firstName = firstName;
@@ -110,148 +112,6 @@ public class Provider {
   public String getProviderNo() {
     return (providerNo != null ? providerNo : "");
   }
-
-  /**
-   * Gets the lastName
-   * @return String lastName
-   */
-  public String getLastName() {
-    return (lastName != null ? lastName : "");
-  }
-
-  /**
-   * Gets the firstName
-   * @return String firstName
-   */
-  public String getFirstName() {
-    return (firstName != null ? firstName : "");
-  }
-
-  /**
-   * Gets the providerType
-   * @return String providerType
-   * @deprecated no longer is use 2010-04-23, marked for future removal 
-   */
-  public String getProviderType() {
-    return (providerType != null ? providerType : "");
-  }
-
-  /**
-   * Gets the specialty
-   * @return String specialty
-   */
-  public String getSpecialty() {
-    return (specialty != null ? specialty : "");
-  }
-
-  /**
-   * Gets the team
-   * @return String team
-   */
-  public String getTeam() {
-    return (team != null ? team : "");
-  }
-
-  /**
-   * Gets the sex
-   * @return String sex
-   */
-  public String getSex() {
-    return (sex != null ? sex : "");
-  }
-
-  /**
-   * Gets the dob
-   * @return String dob
-   */
-  public String getDob() {
-    return dob;
-  }
-
-  /**
-   * Gets the address
-   * @return String address
-   */
-  public String getAddress() {
-    return (address != null ? address : "");
-  }
-
-  /**
-   * Gets the phone
-   * @return String phone
-   */
-  public String getPhone() {
-    return (phone != null ? phone : "");
-  }
-
-  /**
-   * Gets the workPhone
-   * @return String workPhone
-   */
-  public String getWorkPhone() {
-    return (workPhone != null ? workPhone : "");
-  }
-
-  /**
-   * Gets the ohipNo
-   * @return String ohipNo
-   */
-  public String getOhipNo() {
-    return (ohipNo != null ? ohipNo : "");
-  }
-
-  /**
-   * Gets the rmaNo
-   * @return String rmaNo
-   */
-  public String getRmaNo() {
-    return (rmaNo != null ? rmaNo : "");
-  }
-
-  /**
-   * Gets the billingNo
-   * @return String billingNo
-   */
-  public String getBillingNo() {
-    return (billingNo != null ? billingNo : "");
-  }
-
-  /**
-   * Gets the hsoNo
-   * @return String hsoNo
-   */
-  public String getHsoNo() {
-    return (hsoNo != null ? hsoNo : "");
-  }
-
-  /**
-   * Gets the status
-   * @return String status
-   */
-  public String getStatus() {
-    return (status != null ? status : "");
-  }
-
-  /**
-   * Gets the comments
-   * @return String comments
-   */
-  public String getComments() {
-    return (comments != null ? comments : "");
-  }
-
-  /**
-   * Gets the providerActivity
-   * @return String providerActivity
-   */
-  public String getProviderActivity() {
-    return (providerActivity != null ? providerActivity : "");
-  }
-  
-  public String getSupervisor() {
-      return (supervisor != null ? supervisor : "");
-  }
-
   /**
    * Sets the providerNo
    * @param providerNo String
@@ -261,6 +121,13 @@ public class Provider {
   }
 
   /**
+   * Gets the lastName
+   * @return String lastName
+   */
+  public String getLastName() {
+    return (lastName != null ? lastName : "");
+  }
+  /**
    * Sets the lastName
    * @param lastName String
    */
@@ -269,21 +136,43 @@ public class Provider {
   }
 
   /**
-   * Sets the firstName
-   * @param firstName String
+   * Gets the firstName
+   * @return String firstName
    */
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
+  public String getFirstName() {
+    return (firstName != null ? firstName : "");
   }
+  /**
+ * Sets the firstName
+ * @param firstName String
+ */
+  public void setFirstName(String firstName) {
+  this.firstName = firstName;
+}
 
   /**
-   * Sets the providerType
-   * @param providerType String
+   * Gets the providerType
+   * @return String providerType
+   * @deprecated no longer is use 2010-04-23, marked for future removal 
    */
-  public void setProviderType(String providerType) {
-    this.providerType = providerType;
+  public String getProviderType() {
+    return (providerType != null ? providerType : "");
   }
+  /**
+ * Sets the providerType
+ * @param providerType String
+ */
+  public void setProviderType(String providerType) {
+  this.providerType = providerType;
+}
 
+  /**
+   * Gets the specialty
+   * @return String specialty
+   */
+  public String getSpecialty() {
+    return (specialty != null ? specialty : "");
+  }
   /**
    * Sets the specialty
    * @param specialty String
@@ -293,6 +182,13 @@ public class Provider {
   }
 
   /**
+   * Gets the team
+   * @return String team
+   */
+  public String getTeam() {
+    return (team != null ? team : "");
+  }
+  /**
    * Sets the team
    * @param team String
    */
@@ -300,6 +196,13 @@ public class Provider {
     this.team = team;
   }
 
+  /**
+   * Gets the sex
+   * @return String sex
+   */
+  public String getSex() {
+    return (sex != null ? sex : "");
+  }
   /**
    * Sets the sex
    * @param sex String
@@ -309,6 +212,13 @@ public class Provider {
   }
 
   /**
+   * Gets the dob
+   * @return String dob
+   */
+  public String getDob() {
+    return dob;
+  }
+  /**
    * Sets the dob
    * @param dob String
    */
@@ -316,6 +226,13 @@ public class Provider {
     this.dob = dob;
   }
 
+  /**
+   * Gets the address
+   * @return String address
+   */
+  public String getAddress() {
+    return (address != null ? address : "");
+  }
   /**
    * Sets the address
    * @param address String
@@ -325,6 +242,13 @@ public class Provider {
   }
 
   /**
+   * Gets the phone
+   * @return String phone
+   */
+  public String getPhone() {
+    return (phone != null ? phone : "");
+  }
+  /**
    * Sets the phone
    * @param phone String
    */
@@ -332,6 +256,13 @@ public class Provider {
     this.phone = phone;
   }
 
+  /**
+   * Gets the workPhone
+   * @return String workPhone
+   */
+  public String getWorkPhone() {
+    return (workPhone != null ? workPhone : "");
+  }
   /**
    * Sets the workPhone
    * @param workPhone String
@@ -341,6 +272,13 @@ public class Provider {
   }
 
   /**
+   * Gets the ohipNo
+   * @return String ohipNo
+   */
+  public String getOhipNo() {
+    return (ohipNo != null ? ohipNo : "");
+  }
+  /**
    * Sets the ohipNo
    * @param ohipNo String
    */
@@ -348,6 +286,13 @@ public class Provider {
     this.ohipNo = ohipNo;
   }
 
+  /**
+   * Gets the rmaNo
+   * @return String rmaNo
+   */
+  public String getRmaNo() {
+    return (rmaNo != null ? rmaNo : "");
+  }
   /**
    * Sets the rmaNo
    * @param rmaNo String
@@ -357,6 +302,13 @@ public class Provider {
   }
 
   /**
+   * Gets the billingNo
+   * @return String billingNo
+   */
+  public String getBillingNo() {
+    return (billingNo != null ? billingNo : "");
+  }
+  /**
    * Sets the billingNo
    * @param billingNo String
    */
@@ -364,6 +316,13 @@ public class Provider {
     this.billingNo = billingNo;
   }
 
+  /**
+   * Gets the hsoNo
+   * @return String hsoNo
+   */
+  public String getHsoNo() {
+    return (hsoNo != null ? hsoNo : "");
+  }
   /**
    * Sets the hsoNo
    * @param hsoNo String
@@ -373,6 +332,13 @@ public class Provider {
   }
 
   /**
+   * Gets the status
+   * @return String status
+   */
+  public String getStatus() {
+    return (status != null ? status : "");
+  }
+  /**
    * Sets the status
    * @param status String
    */
@@ -380,6 +346,13 @@ public class Provider {
     this.status = status;
   }
 
+  /**
+   * Gets the comments
+   * @return String comments
+   */
+  public String getComments() {
+    return (comments != null ? comments : "");
+  }
   /**
    * Sets the comments
    * @param comments String
@@ -389,6 +362,13 @@ public class Provider {
   }
 
   /**
+   * Gets the providerActivity
+   * @return String providerActivity
+   */
+  public String getProviderActivity() {
+    return (providerActivity != null ? providerActivity : "");
+  }
+  /**
    * Sets the providerActivity
    * @param providerActivity String
    */
@@ -396,9 +376,20 @@ public class Provider {
     this.providerActivity = providerActivity;
   }
   
-  
+  public String getSupervisor() {
+      return (supervisor != null ? supervisor : "");
+  }
   public void setSupervisor(String supervisor ) {
-      this.supervisor = supervisor;
+    this.supervisor = supervisor;
+  }
+
+  public String getImdHealthUuid()
+  {
+    return (imdHealthUuid != null ? imdHealthUuid : "");
+  }
+  public void setImdHealthUuid(String imdHealthUuid)
+  {
+    this.imdHealthUuid = imdHealthUuid;
   }
 
   /**
@@ -415,27 +406,33 @@ public class Provider {
    *
    * @return Object
    */
-  public String getInitials() {
+  public String getInitials()
+  {
     String firstInit = "";
     String lastInit = "";
-    if (this.firstName != null && this.firstName.length() > 0) {
-      if (this.firstName.length() > 1) {
+    if (this.firstName != null && this.firstName.length() > 0)
+    {
+      if (this.firstName.length() > 1)
+      {
         firstInit = firstName.substring(0, 1);
       }
-      else {
+      else
+      {
         firstInit = firstName;
       }
     }
-    if (this.lastName != null && this.lastName.length() > 0) {
-      if (this.lastName.length() > 1) {
+    if (this.lastName != null && this.lastName.length() > 0)
+    {
+      if (this.lastName.length() > 1)
+      {
         lastInit = lastName.substring(0, 1);
       }
-      else {
+      else
+      {
         lastInit = lastName;
       }
     }
 
     return firstInit + lastInit;
   }
-
 }

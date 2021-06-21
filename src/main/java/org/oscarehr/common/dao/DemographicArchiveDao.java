@@ -91,6 +91,13 @@ public class DemographicArchiveDao extends AbstractDao<DemographicArchive> {
 		persist(da);
 		return da.getId();
     }
+
+    public DemographicArchive archiveDemographic(org.oscarehr.demographic.model.Demographic demographic)
+	{
+		DemographicArchive demographicArchive = new DemographicArchive(demographic);
+		persist(demographicArchive);
+		return demographicArchive;
+	}
     
     public List<DemographicArchive> findByDemographicNoChronologically(Integer demographicNo) {
 

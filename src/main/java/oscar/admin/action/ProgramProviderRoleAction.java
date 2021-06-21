@@ -51,7 +51,7 @@ public class ProgramProviderRoleAction extends DispatchAction
 
 			String currentProviderNo = (String) request.getSession().getAttribute("user");
 			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_admin.userAdmin");
-			securityInfoManager.requireSuperAdminPrivilege(currentProviderNo, providerNoStr);
+			securityInfoManager.requireUserCanModify(currentProviderNo, providerNoStr);
 
 			providerRoleService.setPrimaryRole(Integer.parseInt(providerNoStr), roleName);
 		}

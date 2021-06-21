@@ -49,8 +49,10 @@ import org.oscarehr.common.dao.ResourceStorageDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.common.model.ResourceStorage;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -83,6 +85,9 @@ public class ResourceService extends AbstractServiceImpl {
 	
 	@Autowired
 	private PreventionDS preventionDS;
+	
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 
 	// this is duplicated in AppService for some reason.
 	@GET
@@ -93,7 +98,11 @@ public class ResourceService extends AbstractServiceImpl {
     	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
 		    return RestResponse.errorResponse("Insufficient Privileges");
     	}
-		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
+    	
+    	boolean k2aEnabled = systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
+    	boolean k2aInit = appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null;
+    	
+		return RestResponse.successResponse(k2aEnabled && k2aInit);
 	}
 
 	private String getK2aResource(LoggedInInfo loggedInInfo, String requestURI, String baseRequestURI) {

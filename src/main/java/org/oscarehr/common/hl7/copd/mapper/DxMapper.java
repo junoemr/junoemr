@@ -30,7 +30,7 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.List;
 
@@ -174,8 +174,8 @@ public class DxMapper extends AbstractMapper
 		switch(status)
 		{
 			case "I":
-			case "D": return "D"; // deleted
 			case "C": return "C"; // resolved
+			case "D": return "D"; // deleted
 			default: return "A"; // active
 		}
 	}
@@ -214,8 +214,8 @@ public class DxMapper extends AbstractMapper
 	{
 		Date diagnosisDate = getDiagnosisDate(rep);
 		if (diagnosisDate == null)
-		{// diagnostic date cannot be null, force to foobar.
-			diagnosisDate = new Date(1900, Calendar.JANUARY,1);
+		{// diagnostic date cannot be null, force to 1900-01-01.
+			diagnosisDate = new GregorianCalendar(1900, GregorianCalendar.JANUARY,1).getTime();
 		}
 		return diagnosisDate;
 	}

@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static java.util.Collections.EMPTY_LIST;
+
 @Repository
 @Transactional
 public class ProviderDataDao extends AbstractDao<ProviderData>
@@ -251,10 +253,24 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 	 * 		Returns all the active matching providers.
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ProviderData> findByType(String providerType) {
-		Query query = createQuery("p", "p.providerType = :pt and p.status = '1' order by p.lastName, p.firstName");
-		query.setParameter("pt", providerType);
+	public List<ProviderData> findByType(String providerType)
+	{
+		Query query = createQuery("p", "p.providerType = :providerType and p.status = '1' order by p.lastName, p.firstName");
+		query.setParameter("providerType", providerType);
 		return query.getResultList();
+	}
+
+	public List<ProviderData> findAllByType(List<String> providerTypes)
+	{
+		if (providerTypes == null || providerTypes.isEmpty())
+		{
+			return (List<ProviderData>)EMPTY_LIST;
+		}
+		Query query = createQuery("p", "p.providerType IN (:providerTypes) AND p.status = '1' ORDER BY p.lastName, p.firstName");
+		query.setParameter("providerTypes", providerTypes);
+
+		List<ProviderData> resultList = query.getResultList();
+		return resultList;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -345,5 +361,12 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		}
 		String result = resultList.get(0);
 		return (ConversionUtils.fromIntString(result)) + 1;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ProviderData> findNoteEditors(String noteUuid) {
+		Query query = entityManager.createQuery("SELECT distinct p FROM ProviderData p INNER JOIN p.caseManagementNotes cmn WHERE cmn.uuid = :uuid");
+		query.setParameter("uuid", noteUuid);
+		return query.getResultList();
 	}
 }

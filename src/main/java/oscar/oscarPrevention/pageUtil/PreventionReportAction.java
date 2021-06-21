@@ -30,14 +30,6 @@
 
 package oscar.oscarPrevention.pageUtil;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -47,13 +39,19 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarPrevention.reports.PreventionReport;
 import oscar.oscarPrevention.reports.PreventionReportFactory;
 import oscar.oscarReport.data.RptDemographicQueryBuilder;
 import oscar.oscarReport.data.RptDemographicQueryLoader;
 import oscar.oscarReport.pageUtil.RptDemographicReportForm;
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Hashtable;
 
 /**
  *
@@ -79,10 +77,12 @@ public class PreventionReportAction extends Action {
 
 		String setName = request.getParameter("patientSet");
 		String prevention = request.getParameter("prevention");
-		Date asofDate = UtilDateUtilities.getDateFromString(request.getParameter("asofDate"), "yyyy-MM-dd");
-		if (asofDate == null) {
+		String asofDate = ((PreventionReportForm) form).asofDate;
+		Date asofDateDate = ConversionUtils.fromDateString(asofDate);
+
+		if (asofDateDate == null) {
 			Calendar today = Calendar.getInstance();
-			asofDate = today.getTime();
+			asofDateDate = today.getTime();
 		}
 		
 		/* some fast error checking */
@@ -101,17 +101,22 @@ public class PreventionReportAction extends Action {
 			RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
 			frm = demoL.queryLoader(frm);
 			frm.addDemoIfNotPresent();
-			frm.setAsofDate(request.getParameter("asofDate"));
+			frm.setAsofDate(asofDate);
 			RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
-			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, request.getParameter("asofDate"));
+			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, asofDate);
 
 			log.debug("set size " + list.size());
 
 			
 			PreventionReport report = PreventionReportFactory.getPreventionReport(prevention);
-			Hashtable h = report.runReport(loggedInInfo, list, asofDate);
-			
-			request.setAttribute("asDate", asofDate);
+			Hashtable h = report.runReport(loggedInInfo, list, asofDateDate);
+
+			if (report.displayNumShots())
+			{
+				request.setAttribute("ReportType", "yes");
+			}
+
+			request.setAttribute("asDate", asofDateDate);
 			request.setAttribute("up2date", h.get("up2date"));
 			request.setAttribute("percent", h.get("percent"));
 			request.setAttribute("percentWithGrace", h.get("percentWithGrace"));

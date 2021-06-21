@@ -23,26 +23,22 @@
  */
 package oscar.oscarDemographic.pageUtil;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
+import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
+import cds.AppointmentsDocument.Appointments;
+import cds.CareElementsDocument.CareElements;
+import cds.ClinicalNotesDocument.ClinicalNotes;
+import cds.DemographicsDocument.Demographics;
+import cds.FamilyHistoryDocument.FamilyHistory;
+import cds.ImmunizationsDocument.Immunizations;
+import cds.LaboratoryResultsDocument.LaboratoryResults;
+import cds.MedicationsAndTreatmentsDocument.MedicationsAndTreatments;
+import cds.OmdCdsDocument;
+import cds.PastHealthDocument.PastHealth;
+import cds.PatientRecordDocument.PatientRecord;
+import cds.ProblemListDocument.ProblemList;
+import cds.ReportsReceivedDocument.ReportsReceived;
+import cds.RiskFactorsDocument.RiskFactors;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -53,6 +49,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.xmlbeans.XmlOptions;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
@@ -60,12 +57,11 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.common.model.DemographicContact;
@@ -73,6 +69,10 @@ import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
+import org.oscarehr.dataMigration.service.PatientExportService;
+import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.e2e.director.E2ECreator;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
@@ -90,23 +90,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
-
-import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
-import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
-import cds.AppointmentsDocument.Appointments;
-import cds.CareElementsDocument.CareElements;
-import cds.ClinicalNotesDocument.ClinicalNotes;
-import cds.DemographicsDocument.Demographics;
-import cds.FamilyHistoryDocument.FamilyHistory;
-import cds.ImmunizationsDocument.Immunizations;
-import cds.LaboratoryResultsDocument.LaboratoryResults;
-import cds.MedicationsAndTreatmentsDocument.MedicationsAndTreatments;
-import cds.OmdCdsDocument;
-import cds.PastHealthDocument.PastHealth;
-import cds.PatientRecordDocument.PatientRecord;
-import cds.ProblemListDocument.ProblemList;
-import cds.ReportsReceivedDocument.ReportsReceived;
-import cds.RiskFactorsDocument.RiskFactors;
 import oscar.OscarProperties;
 import oscar.appt.ApptStatusData;
 import oscar.dms.EDoc;
@@ -130,6 +113,26 @@ import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -164,8 +167,9 @@ public class DemographicExportAction4 extends Action {
 	private static final String REPORTBINARY = "Binary";
 	private static final String REPORTTEXT = "Text";
 	private static final String RISKFACTOR = "Risk";
-	public static final int CMS4 = 0;
-	public static final int E2E = 1;
+	public static final int CDS5_0 = 0;
+	public static final int CMS4 = 1;
+	public static final int E2E = 2;
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
@@ -254,6 +258,42 @@ public class DemographicExportAction4 extends Action {
 		}
 
 		switch (template) {
+			case CDS5_0:
+			{
+				PatientExportService patientExportService = SpringUtils.getBean(PatientExportService.class);
+
+				ArrayList<File> files = new ArrayList<>();
+				ExportPreferences exportPreferences = new ExportPreferences();
+				exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
+				exportPreferences.setExportAllergiesAndAdverseReactions(exAllergiesAndAdverseReactions);
+				exportPreferences.setExportAppointments(exAppointments);
+				exportPreferences.setExportCareElements(exCareElements);
+				exportPreferences.setExportClinicalNotes(exClinicalNotes);
+				exportPreferences.setExportFamilyHistory(exFamilyHistory);
+				exportPreferences.setExportImmunizations(exImmunizations);
+				exportPreferences.setExportLaboratoryResults(exLaboratoryResults);
+				exportPreferences.setExportMedicationsAndTreatments(exMedicationsAndTreatments);
+				exportPreferences.setExportPastHealth(exPastHealth);
+				exportPreferences.setExportPersonalHistory(exPersonalHistory);
+				exportPreferences.setExportProblemList(exProblemList);
+				exportPreferences.setExportReportsReceived(exReportsReceived);
+				exportPreferences.setExportRiskFactors(exRiskFactors);
+
+				// need to rename the process for the exporter context
+				String originalThreadName = Thread.currentThread().getName();
+				Thread.currentThread().setName(UUID.randomUUID().toString());
+				List<GenericFile> exportFiles = patientExportService.exportDemographicsToList(
+						list, ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportPreferences);
+				Thread.currentThread().setName(originalThreadName);
+
+				for(GenericFile genericFile : exportFiles)
+				{
+					files.add(genericFile.getFileObject());
+				}
+				exportPatientFilesZip(files);
+				ffwd = "success";
+				break;
+			}
 			case CMS4 :
 				if (!Util.checkDir(tmpDir)) {
 					logger.debug("Error! Cannot write to TMP_DIR - Check oscar.properties or dir permissions.");
@@ -1074,7 +1114,7 @@ public class DemographicExportAction4 extends Action {
 									if (alr.getSeverity() != null) aSummary = Util.addSummary(aSummary, "Adverse Reaction Severity", alr.getSeverity().toString());
 								}
 								if (allergy.getStartDate() != null) {
-									dateFormat = partialDateDao.getFormat(PartialDate.ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
+									dateFormat = partialDateDao.getFormat(PartialDate.TABLE_ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
 									Util.putPartialDate(alr.addNewStartDate(), allergy.getStartDate(), dateFormat);
 									aSummary = Util.addSummary(aSummary, "Start Date", partialDateDao.getDatePartial(allergy.getStartDate(), dateFormat));
 								}
@@ -1084,7 +1124,7 @@ public class DemographicExportAction4 extends Action {
 								}
 
 								if (allergies[j].getEntryDate() != null) {
-									dateFormat = partialDateDao.getFormat(PartialDate.ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
+									dateFormat = partialDateDao.getFormat(PartialDate.TABLE_ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
 									Util.putPartialDate(alr.addNewRecordedDate(), allergies[j].getEntryDate(), dateFormat);
 									aSummary = Util.addSummary(aSummary, "Recorded Date", partialDateDao.getDatePartial(allergies[j].getEntryDate(), dateFormat));
 								}
@@ -1224,7 +1264,7 @@ public class DemographicExportAction4 extends Action {
 								MedicationsAndTreatments medi = patientRec.addNewMedicationsAndTreatments();
 								String mSummary = "";
 								if (arr[p].getWrittenDate() != null) {
-									String dateFormat = partialDateDao.getFormat(PartialDate.DRUGS, arr[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
+									String dateFormat = partialDateDao.getFormat(PartialDate.TABLE_DRUGS, arr[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
 									Util.putPartialDate(medi.addNewPrescriptionWrittenDate(), arr[p].getWrittenDate(), dateFormat);
 									mSummary = Util.addSummary("Prescription Written Date", partialDateDao.getDatePartial(arr[p].getWrittenDate(), dateFormat));
 								}
@@ -1736,10 +1776,10 @@ public class DemographicExportAction4 extends Action {
 							}
 
 							// HRM reports
-							List<HRMDocumentToDemographic> hrmDocToDemographics = hrmDocToDemographicDao.findByDemographicNo(demoNo);
+							List<HRMDocumentToDemographic> hrmDocToDemographics = hrmDocToDemographicDao.findByDemographicNo(Integer.parseInt(demoNo));
 							for (HRMDocumentToDemographic hrmDocToDemographic : hrmDocToDemographics) {
-								String hrmDocumentId = hrmDocToDemographic.getHrmDocumentId();
-								List<HRMDocument> hrmDocs = hrmDocDao.findById(Integer.valueOf(hrmDocumentId));
+								Integer hrmDocumentId = hrmDocToDemographic.getHrmDocumentId();
+								List<HRMDocument> hrmDocs = hrmDocDao.findById(hrmDocumentId);
 								for (HRMDocument hrmDoc : hrmDocs) {
 									String reportFile = hrmDoc.getReportFile();
 									if (StringUtils.empty(reportFile)) continue;
@@ -1869,7 +1909,7 @@ public class DemographicExportAction4 extends Action {
 										}
 
 										// Notes
-										List<HRMDocumentComment> comments = hrmDocCommentDao.getCommentsForDocument(Integer.parseInt(hrmDocumentId));
+										List<HRMDocumentComment> comments = hrmDocCommentDao.getCommentsForDocument(hrmDocumentId);
 										String notes = null;
 										for (HRMDocumentComment comment : comments) {
 											notes = Util.addLine(notes, comment.getComment());

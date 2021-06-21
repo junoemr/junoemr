@@ -102,9 +102,10 @@ public class PatientService extends BaseService
 	 * @param integration - the mha integration to look in
 	 * @param hin - the health number to search
 	 * @param hinProvince - the province of the health number
+	 * @param isNewborn - if the patient is a newborn or not. This determines which set of patients MHA will search.
 	 * @return an MHA patient object.
 	 */
-	public MHAPatient getPatientByHin(Integration integration, String hin, MHAPatient.PROVINCE_CODES hinProvince)
+	public MHAPatient getPatientByHin(Integration integration, String hin, MHAPatient.PROVINCE_CODES hinProvince, boolean isNewborn)
 	{
 		if (hin == null || hin.isEmpty())
 		{
@@ -115,8 +116,13 @@ public class PatientService extends BaseService
 		{
 			RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
-			String url = restClient.formatEndpoint("/clinic/" + integration.getRemoteId() +
-											"/patients?search_by=hin&health_number=%s&health_care_province=%s", hin, hinProvince);
+			String url = restClient.formatEndpoint(
+					"/clinic/" + integration.getRemoteId() +
+					"/patients?search_by=hin&health_number=%s&health_care_province=%s&newborn=%s",
+					hin,
+					hinProvince,
+					isNewborn);
+
 			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
 
 			if (response.isSuccess())
@@ -247,7 +253,11 @@ public class PatientService extends BaseService
 		{
 			if (StringUtils.trimToNull(demographic.getHin()) != null)
 			{
-				return getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+				return getPatientByHin(
+						integration,
+						demographic.getHin(),
+						MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()),
+						demographic.isMarkedAsBCNewborn());
 			}
 			else
 			{
@@ -270,7 +280,11 @@ public class PatientService extends BaseService
 			}
 			else
 			{
-				patient = getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+				patient = getPatientByHin(
+						integration,
+						demographic.getHin(),
+						MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()),
+						demographic.isMarkedAsBCNewborn());
 			}
 
 			String action = rejected ? "reject_connection" : "cancel_reject_connection";

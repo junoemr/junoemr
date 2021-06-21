@@ -34,7 +34,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
 import oscar.OscarProperties;
 import oscar.oscarEncounter.data.EctProviderData;
 import oscar.oscarProvider.data.ProviderColourUpdater;
@@ -53,9 +52,6 @@ import java.util.List;
 public class EncounterService
 {
 	Logger logger = MiscUtils.getLogger();
-
-	@Autowired
-	WebApplicationContext appContext;
 
 	@Autowired
 	private EncounterPreventionNoteService encounterPreventionNoteService;
@@ -129,6 +125,9 @@ public class EncounterService
 	@Autowired
 	private EncounterFamilyHistoryService encounterFamilyHistoryService;
 
+	@Autowired
+	private EncounterHRMService encounterHRMService;
+
 	public EncounterSectionService getEncounterSectionServiceByName(String serviceName)
 	{
 		switch(serviceName)
@@ -150,6 +149,7 @@ public class EncounterService
 			case EncounterSection.TYPE_EPISODES: return encounterEpisodeService;
 			case EncounterSection.TYPE_PREGNANCIES: return encounterPregnancyService;
 			case EncounterSection.TYPE_HEALTH_CARE_TEAM: return encounterTeamService;
+			case EncounterSection.TYPE_HRM: return encounterHRMService;
 			/*
 			case encounterSocialHistoryService.SECTION_ID: return encounterSocialHistoryService;
 			case encounterMedicalHistoryService.SECTION_ID: return encounterMedicalHistoryService;

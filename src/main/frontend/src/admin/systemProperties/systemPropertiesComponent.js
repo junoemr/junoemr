@@ -33,17 +33,25 @@ angular.module('Admin').component('systemProperties',
 
             ctrl.tabList = [
                 {
+                  label: "General",
+                  value: "admin.systemProperties.general"
+                },
+                {
                     label: "Rx",
                     value: 'admin.systemProperties.rx',
                 },
+                {
+                    label: "Billing",
+                    value: 'admin.systemProperties.billing'
+                },
             ];
 
-            ctrl.currentTab = "admin.systemProperties.rx";
+            ctrl.currentTab = "admin.systemProperties.general";
             ctrl.componentStyle = JUNO_STYLE.GREY;
 
             ctrl.tabChange = (activeTab) =>
             {
-                $state.go(ctrl.activeTab);
+                $state.go(activeTab);
             }
         }]
     });

@@ -197,10 +197,6 @@
 					<td class="alignRight alignTop smallText">Fax: </td>
 					<td class="alignLeft alignTop smallText"><c:out value="${ not empty dContact.details.fax ? dContact.details.fax : unknown }" /></td>
 				</tr>
-				<tr>
-					<td class="alignRight alignTop smallText">CPSO: </td>
-					<td><c:out value="${ dContact.details.cpso }" /></td>
-				</tr>
 			</table>
 			
 		</c:forEach>

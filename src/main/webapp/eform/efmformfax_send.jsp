@@ -20,12 +20,14 @@
 <%@ page import="oscar.eform.actions.FaxAction" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <html:html locale="true">
 	<%
 
 		String formId = (String) request.getAttribute("fdid");
 		String[] faxRecipients = request.getParameterValues("faxRecipients");
-		String providerId = request.getParameter("efmprovider_no");
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		String providerId = loggedInInfo.getLoggedInProviderNo();
 		FaxAction bean = new FaxAction(request);
 		boolean failed = false;
 		List<String> errorMessages = new ArrayList<String>(faxRecipients.length);

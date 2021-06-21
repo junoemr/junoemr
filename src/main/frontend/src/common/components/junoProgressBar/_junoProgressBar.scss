@@ -1,0 +1,16 @@
+.juno-progress-bar {
+	.progress {
+		background-color: var(--color-primary-lightest);
+		margin-bottom: 0;
+
+		.progress-bar {
+			background-color: var(--color-primary-base);
+		}
+	}
+	.progress-label {
+		padding: 16px 0;
+		p {
+			margin: 0;
+		}
+	}
+}

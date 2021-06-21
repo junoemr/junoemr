@@ -156,10 +156,14 @@
 													 component-style="pageStyle">
 				</care-team-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
-
+				<roster-display-section ng-model="detailsCtrl.page.demo"
+										validations="detailsCtrl.validations"
+										component-style="pageStyle">
+				</roster-display-section>
+				<juno-divider component-style="pageStyle"></juno-divider>
 				<additional-information-section ng-model="detailsCtrl.page.demo"
-																				validations="detailsCtrl.validations"
-																				component-style="pageStyle">
+												validations="detailsCtrl.validations"
+												component-style="pageStyle">
 				</additional-information-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
 			</div>

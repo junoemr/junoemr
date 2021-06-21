@@ -92,6 +92,19 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			controller.pageOptions.dates.end = date;
 		};
 
+		controller.checkDates = function checkDates()
+		{
+			let printType = controller.pageOptions.printType;
+			let checkDates = true;
+
+			if ((printType === "dates") && (controller.pageOptions.dates.start == null || controller.pageOptions.dates.end == null))
+			{
+				alert("Enter a date range.");
+				checkDates = false;
+			}
+			return checkDates;
+		}
+
 		controller.cancelPrint = function cancelPrint()
 		{
 			$uibModalInstance.dismiss('cancel');
@@ -100,6 +113,11 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 		controller.print = function print()
 		{
 			let site = controller.selectedSite;
+			let validDates = controller.checkDates();
+			if (!validDates)
+			{
+				return;
+			}
 
 			if (controller.pageOptions.printType === controller.printTypeEnum.selected
 				&& controller.pageOptions.selectedList.length === 0)

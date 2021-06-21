@@ -7,6 +7,7 @@
 		>
 			<div class="source-item"
 			     ng-repeat="source in $ctrl.sources"
+			     ng-if="source.name"
 			     ng-class="$ctrl.getSourceItemClass(source.id, group)"
 			     ng-click="$ctrl.onSourceClick(source.id, group)"
 			>

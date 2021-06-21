@@ -34,7 +34,7 @@ angular.module('Common.Components').component('junoButton', {
 		buttonColorPattern: "<?",
 		buttonColorOverride: "<?",
 		disabled: "<?",
-		click: "&?"
+		click: "&?",
 	},
 	transclude: true,
 	controller: [ function () {

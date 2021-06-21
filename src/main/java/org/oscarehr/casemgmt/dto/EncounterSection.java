@@ -31,6 +31,7 @@ import org.oscarehr.casemgmt.service.EncounterEFormService;
 import org.oscarehr.casemgmt.service.EncounterEpisodeService;
 import org.oscarehr.casemgmt.service.EncounterFamilyHistoryService;
 import org.oscarehr.casemgmt.service.EncounterFormService;
+import org.oscarehr.casemgmt.service.EncounterHRMService;
 import org.oscarehr.casemgmt.service.EncounterLabResultService;
 import org.oscarehr.casemgmt.service.EncounterMeasurementsService;
 import org.oscarehr.casemgmt.service.EncounterMedicationService;
@@ -69,6 +70,7 @@ public class EncounterSection
 	public static final String TYPE_EPISODES = EncounterEpisodeService.SECTION_ID;
 	public static final String TYPE_PREGNANCIES = EncounterPregnancyService.SECTION_ID;
 	public static final String TYPE_HEALTH_CARE_TEAM = EncounterTeamService.SECTION_ID;
+	public static final String TYPE_HRM = EncounterHRMService.SECTION_ID;
 
 	private String title;
 	private String titleKey;

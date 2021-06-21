@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.4.RELEASE</version>
+        <version>2.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.oscarehr</groupId>
@@ -59,6 +59,8 @@
 		<oscar.dbinit.skip>false</oscar.dbinit.skip>
 		<cxf.version>3.2.12</cxf.version>
 		<memcachedSessionManager.version>2.3.2</memcachedSessionManager.version>
+		<jaxb.version>2.3.1</jaxb.version>
+		<jaxbcore.version>2.3.0.1</jaxbcore.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -113,12 +115,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
 
+<!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
 		</dependency>
+-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -169,6 +177,29 @@
 -->
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>javax.persistence-api</artifactId>
+			<version>2.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.transaction/javax.transaction-api -->
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>javax.transaction-api</artifactId>
+			<version>1.3</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.interceptor/javax.interceptor-api -->
+		<dependency>
+			<groupId>javax.interceptor</groupId>
+			<artifactId>javax.interceptor-api</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
+
+
 		<!-- general libraries -->
 		<dependency>
 			<groupId>net.bull.javamelody</groupId>
@@ -215,7 +246,7 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
-			<version>2.4</version>
+			<version>2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-validator</groupId>
@@ -754,22 +785,38 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-xjc</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxbcore.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.4</version>
+		</dependency>
+		<!-- for xsd generation -->
+		<dependency>
+			<groupId>org.jvnet.jaxb2_commons</groupId>
+			<artifactId>jaxb2-basics-runtime</artifactId>
+			<version>1.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.jaxb2.maven2</groupId>
+			<artifactId>maven-jaxb2-plugin</artifactId>
+			<version>0.14.0</version>
 		</dependency>
 
 		<!-- hsfo -->
@@ -1180,16 +1227,17 @@
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<version>${cxf.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.codehaus.woodstox</groupId>
-			<artifactId>stax2-api</artifactId>
-			<version>4.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.woodstox</groupId>
-			<artifactId>woodstox-core-asl</artifactId>
-			<version>4.4.1</version>
-		</dependency>
+<!--		TODO resolve dependency conflicts before un-commenting -->
+<!--		<dependency>-->
+<!--			<groupId>org.codehaus.woodstox</groupId>-->
+<!--			<artifactId>stax2-api</artifactId>-->
+<!--			<version>4.1</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.codehaus.woodstox</groupId>-->
+<!--			<artifactId>woodstox-core-asl</artifactId>-->
+<!--			<version>4.4.1</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.oscarehr</groupId>
 			<artifactId>myoscar_client_utils</artifactId>
@@ -1719,6 +1767,10 @@
 						<exclude>src/main/webapp/library/bootstrap2-datepicker/**</exclude>
 						<exclude>src/main/webapp/library/ng-table/**</exclude>
 						<exclude>src/main/webapp/web/**</exclude>
+
+						<!-- omit generated models -->
+						<exclude>src/main/java/org/oscarehr/common/xml/**</exclude>
+						<exclude>src/gen/java/**</exclude>
 					</excludes>
 					<strictCheck>true</strictCheck>
 				</configuration>
@@ -1960,6 +2012,48 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+				<groupId>io.leonard.maven.plugins</groupId>
+				<artifactId>jspc-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>jspc</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<phase>process-classes</phase>
+						<configuration>
+							<excludes>
+								<!-- These should already be included by other jsp files -->
+								<exclude>**/*.jspf</exclude>
+							</excludes>
+							<threads>4</threads>
+							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
+							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.tomcat</groupId>
+						<artifactId>tomcat-jasper</artifactId>
+						<version>${tomcat.version}</version>
+						<exclusions>
+							<exclusion>
+								<groupId>org.eclipse.jdt.core.compiler</groupId>
+								<artifactId>ecj</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.jdt.core.compiler</groupId>
+						<artifactId>ecj</artifactId>
+						<version>4.6.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
 			<!-- This plugin creates the openapi.json file for the internal REST api.  It is used -->
 			<!-- below to generate code.  This must be run before the generate-typescpipt-api -->
 			<!-- execution. -->
@@ -1993,7 +2087,11 @@
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
 								org.oscarehr.ws.rest.DocumentWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
-								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
+								org.oscarehr.ws.rest.DemographicService
+                                org.oscarehr.ws.rest.DemographicsService
+                                org.oscarehr.ws.rest.RosterWebService
+                                org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
+								org.oscarehr.ws.rest.ProvidersService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService
@@ -2004,7 +2102,7 @@
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationsWebService
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService
-								org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
+                                org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
 								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
@@ -2037,6 +2135,27 @@
 							<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
 							<generatorName>typescript-angularjs</generatorName>
 							<output>src/main/frontend/generated/</output>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- plugin allows more than one source to be accessed in the project -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<!-- allow imports from these sources -->
+								<source>src/gen/java</source>
+							</sources>
 						</configuration>
 					</execution>
 				</executions>
@@ -2113,18 +2232,14 @@
 						</configuration>
 					</execution>
 					<execution>
-						<!-- We're doing jspc this way because the codehaus jspc seems to be abandonded, it doesn't go beyond jdk 1.5 and the documentation is sparse, and the source code links to a broken page and I can't find the goals it supports. -->
-						<id>jspc</id>
-						<phase>verify</phase>
+						<id>copy_web_xml_for_jsp_precompile</id>
+						<phase>process-classes</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<skip>${antrun.skip.jspc}</skip>
 							<target>
-								<property name="build.compiler" value="extJavac"/>
-								<property name='jspc_target' value="${project.name}-${project.version}"/>
-								<ant antfile="jspc.xml" target="jspc"/>
+								<copy file="${basedir}/target/web.xml" tofile="${basedir}/target/${project.name}-${project.version}/WEB-INF/precompiled-jsp-web.xml"/>
 							</target>
 						</configuration>
 					</execution>
@@ -2455,9 +2570,82 @@
 				</plugins>
 			</build>
 		</profile>
-
-
-
+		<profile>
+			<!-- run maven with -Dregenerate-source=true to re-generate files defined below -->
+			<id>source-regeneration</id>
+			<activation>
+				<property>
+					<name>regenerate-source</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<!-- plugin to generate java files from xsd schema, and allow similar ones to implement a shared interface -->
+					<!-- this is used for CDS and HRM schemas for example -->
+					<plugin>
+						<groupId>org.jvnet.jaxb2.maven2</groupId>
+						<artifactId>maven-jaxb2-plugin</artifactId>
+						<version>0.14.0</version>
+						<executions>
+							<execution>
+								<id>cds5.0-schema-generation</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<phase>generate-resources</phase>
+								<configuration>
+									<extension>true</extension>
+									<!-- no header to prevent all the generated files being changed on automatic re-compile -->
+									<noFileHeader>true</noFileHeader>
+									<args>
+										<arg>-Xinheritance</arg>
+									</args>
+									<bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/cds/v5_0</bindingDirectory>
+									<bindingIncludes>
+										<include>bindings.xjb</include>
+									</bindingIncludes>
+									<schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/cds/v5_0</schemaDirectory>
+									<generateDirectory>${basedir}/src/gen/java</generateDirectory>
+									<generatePackage>xml.cds.v5_0</generatePackage>
+								</configuration>
+							</execution>
+							<execution>
+								<id>hrm4.3-schema-generation</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<phase>generate-resources</phase>
+								<configuration>
+									<extension>true</extension>
+									<!-- no header to prevent all the generated files being changed on automatic re-compile -->
+									<noFileHeader>true</noFileHeader>
+									<args>
+										<arg>-Xinheritance</arg>
+									</args>
+									<bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_3</bindingDirectory>
+									<bindingIncludes>
+										<include>bindings.xjb</include>
+									</bindingIncludes>
+									<schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_3</schemaDirectory>
+									<generateDirectory>${basedir}/src/gen/java</generateDirectory>
+									<generatePackage>xml.hrm.v4_3</generatePackage>
+								</configuration>
+							</execution>
+						</executions>
+						<configuration>
+							<extension>true</extension>
+							<plugins>
+								<plugin>
+									<groupId>org.jvnet.jaxb2_commons</groupId>
+									<artifactId>jaxb2-basics</artifactId>
+									<version>1.11.1</version>
+								</plugin>
+							</plugins>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 
 
 		<profile>

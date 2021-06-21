@@ -36,6 +36,7 @@ angular.module('Common.Components').component('junoInput', {
 		uppercase: "<?",
 		readonly: "<?",
 		characterLimit: "<?",
+		hideCharacterLimit: "<?",
 		// if try only numbers can be entered in to this input
 		onlyNumeric: "<?",
 		// block characters from being entered that do not match this regex
@@ -64,6 +65,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.noBox = ctrl.noBox || false;
 			ctrl.onlyNumeric = ctrl.onlyNumeric || false;
 			ctrl.icon = ctrl.icon || null;
+			ctrl.hideCharacterLimit = ctrl.hideCharacterLimit || true;
 
 			if (ctrl.showInvalidFocus === undefined)
 			{

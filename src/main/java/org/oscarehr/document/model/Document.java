@@ -59,6 +59,7 @@ import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.provider.model.ProviderData;
 
 /**
  *
@@ -118,6 +119,11 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     @Basic(optional = false)
     @Column(name = "doccreator")
     private String doccreator;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "doccreator", insertable = false, updatable = false)
+	private ProviderData createdBy;
+
     @Basic(optional = false)
     @Column(name = "responsible")
     private String responsible;
@@ -168,7 +174,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
 		@Getter
 		@Setter
 		private Demographic demographic;
-    
+
     public Document() {
     }
 
@@ -222,7 +228,21 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     public void setDocCreator(String doccreator) {
         this.doccreator = doccreator;
     }
-    
+
+    public void setCreatedBy(ProviderData providerData)
+    {
+    	this.createdBy = providerData;
+    	if(providerData != null)
+	    {
+	    	this.setDocCreator(providerData.getId());
+	    }
+    }
+
+    public ProviderData getCreatedBy()
+    {
+    	return this.createdBy;
+    }
+
     public Date getContentdatetime() {
         return contentdatetime;
     }
