@@ -1588,7 +1588,12 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			String obxCategory = Terser.get(obr, 4, 0, 1, 1);
 			OLISRequestNomenclatureDao requestDao = (OLISRequestNomenclatureDao) SpringUtils.getBean("OLISRequestNomenclatureDao");
 			OLISRequestNomenclature requestNomenclature = requestDao.findByNameId(obxCategory);
-			return StringUtils.trimToEmpty(requestNomenclature.getCategory());
+			String nomenclatureCategory = "";
+			if (requestNomenclature != null)
+			{
+				nomenclatureCategory = StringUtils.trimToEmpty(requestNomenclature.getCategory());
+			}
+			return nomenclatureCategory;
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
