@@ -103,12 +103,21 @@ angular.module("Messaging.Modals").component('messageCompose', {
 			{
 				const sources = (await ctrl.messagingService.getMessageSources()).filter((source) => !source.isVirtual);
 
-				return sources.map((source) => {
+				const sourceOptions = sources.map((source) => {
 					return {
-						label: source.name,
+						label: source.name ? source.name : "Clinic",
 						value: source.id,
 					}
-				})
+				});
+
+				// if only one source present default to it.
+				if (sources.length === 1)
+				{
+					ctrl.sourceId = sources[0].id;
+					$scope.$apply();
+				}
+
+				return sourceOptions;
 			}
 
 			ctrl.uploadAttachment = async () =>
