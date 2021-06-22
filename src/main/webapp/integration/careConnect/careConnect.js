@@ -27,7 +27,6 @@ Juno.CareConnect.Util.determineCareConnectURL = function determineCareConnectURL
     Juno.CareConnect.Util.checkPPNOverride(function response(result)
     {
         checkPPN = result;
-        console.log(!checkPPN);
         // If we find a setting somewhere somehow indicating we don't care about the PPN, give the external URL
         if (!checkPPN)
         {
