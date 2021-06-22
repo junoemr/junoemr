@@ -571,7 +571,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				}
 			}
 
-			console.log(controller.pref.enableCareConnectPPNCheck);
 			return isValid;
 		};
 
