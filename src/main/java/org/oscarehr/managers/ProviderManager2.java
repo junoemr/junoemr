@@ -979,6 +979,9 @@ public class ProviderManager2
 		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC, providerNo);
 		property.setValue(Boolean.toString(settings.getAppointmentCountIncludeNoDemographic()));
 
+		property = getMappedOrNewProperty(map, UserProperty.CARECONNECT_PPN_CHECK, providerNo);
+		property.setValue(Boolean.toString(settings.isEnableCareConnectPPNCheck()));
+
 		if (map.get("rx_use_rx3") != null)
 		{
 			settings.setUseRx3("yes".equals(map.get("rx_use_rx3").getValue()) ? true : false);

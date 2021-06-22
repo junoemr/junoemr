@@ -66,6 +66,11 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			controller.pref.recentPatients = "8";
 		}
 
+		if (controller.pref.enableCareConnectPPNCheck == null)
+		{
+			controller.pref.enableCareConnectPPNCheck = false;
+		}
+
 		//convert to value/label object list from string array
 		controller.formGroupNames = [
 		{
@@ -566,6 +571,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				}
 			}
 
+			console.log(controller.pref.enableCareConnectPPNCheck);
 			return isValid;
 		};
 

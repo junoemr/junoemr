@@ -23,18 +23,53 @@ Juno.CareConnect.Util = {};
  */
 Juno.CareConnect.Util.determineCareConnectURL = function determineCareConnectURL(callback)
 {
-    jQuery.ajax({
-        url: CARE_CONNECT_PPN_URL,
-        success: function success()
-        {
-            callback(CARE_CONNECT_PPN_URL);
-        },
-        timeout: 5000, // milliseconds
-        complete: function onTimeout()
+    var checkPPN = true;
+    Juno.CareConnect.Util.checkPPNOverride(function response(result)
+    {
+        checkPPN = result;
+        console.log(!checkPPN);
+        // If we find a setting somewhere somehow indicating we don't care about the PPN, give the external URL
+        if (!checkPPN)
         {
             callback(CARE_CONNECT_EXTERNAL_URL);
         }
+        else
+        {
+            jQuery.ajax({
+                url: CARE_CONNECT_PPN_URL,
+                success: function success()
+                {
+                    callback(CARE_CONNECT_PPN_URL);
+                },
+                timeout: 5000, // milliseconds
+                complete: function onTimeout()
+                {
+                    callback(CARE_CONNECT_EXTERNAL_URL);
+                }
+            });
+        }
     });
+
 }
 
-
+/**
+ * Helper function to wrap hitting the internal REST API so we can check for a given user preference.
+ * In this case, we care about whether the user has decided to skip the check for whether they are on BC's PPN
+ * and always use the external domain.
+ */
+Juno.CareConnect.Util.checkPPNOverride = function checkPPNOverride(callback)
+{
+    var endpoint = "../../ws/rs/providerSettings/get"
+    jQuery.ajax({
+        url: endpoint,
+        success: function success(settings)
+        {
+            callback(settings.content[0].enableCareConnectPPNCheck);
+        },
+        error: function error()
+        {
+            // We don't know what happened so just assume we're checking
+            callback(true);
+        }
+    })
+}
