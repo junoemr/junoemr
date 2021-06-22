@@ -22,7 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
-import { PartialDateConverter } from "../../../common/converters/partialDateConverter.ts";
+import PartialDateModel from "../../models/partialDateModel";
 
 angular.module('Common.Components').component('junoPartialDateSelect', {
     templateUrl: 'src/common/components/junoPartialDateSelect/junoPartialDateSelect.jsp',
@@ -70,6 +70,10 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 ctrl.year = ctrl.ngModel._year;
                 ctrl.month = ctrl.ngModel._month;
                 ctrl.day = ctrl.ngModel._day;
+            }
+            else
+            {
+                ctrl.ngModel = new PartialDateModel(null, null, null);
             }
 
             ctrl.fieldsBlank = ctrl.allFieldsBlank();
