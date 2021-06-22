@@ -1,15 +1,18 @@
 START TRANSACTION;
 
-SELECT COALESCE(MAX(id), 0) INTO @provider_billing_count FROM provider_billing;
+ALTER TABLE `provider_billing` ADD COLUMN `tmp_provider_no` VARCHAR(6) DEFAULT NULL;
 
--- This is to get X number of entries linked up
--- i.e. if we have 10 providers but we only need 3 entries, 7 will fail and 3 will insert
-INSERT IGNORE INTO provider_billing(bc_bcp_eligible)
-SELECT FALSE
-FROM provider;
-
-UPDATE provider
-SET provider_billing_id = (@provider_billing_count := @provider_billing_count + 1)
+INSERT IGNORE INTO provider_billing(bc_bcp_eligible, tmp_provider_no)
+SELECT FALSE, provider_no
+FROM provider
 WHERE provider_billing_id IS NULL;
+
+UPDATE provider prov
+JOIN provider_billing bill
+ON prov.provider_no=bill.tmp_provider_no
+SET prov.provider_billing_id = bill.id
+WHERE prov.provider_billing_id IS NULL;
+
+ALTER TABLE `provider_billing` DROP COLUMN `tmp_provider_no`;
 
 COMMIT;
