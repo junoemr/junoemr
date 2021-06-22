@@ -25,6 +25,8 @@ package org.oscarehr.ws.rest;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,8 @@ import org.oscarehr.casemgmt.service.NoteService;
 import org.oscarehr.casemgmt.web.CaseManagementEntryAction;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
@@ -104,6 +108,7 @@ import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
 @Path("/notes")
 @Component("notesService")
+@Tag(name = "notes")
 public class NotesService extends AbstractServiceImpl
 {
 	private static String SUMMARY_CODE_ONGOING_CONCERNS = "ongoingconcerns";
@@ -162,6 +167,8 @@ public class NotesService extends AbstractServiceImpl
 	@Autowired
 	CaseManagementTmpSaveConverter caseManagementTmpSaveConverter;
 
+	@Autowired
+	PartialDateDao partialDateDao;
 	
 	@GET
 	@Path("/{demographicNo}/all")
@@ -446,7 +453,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo ,NoteIssueTo1 noteIssue) {
+	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo, NoteIssueTo1 noteIssue) {
 
 		try {
 			NoteTo1 note = noteIssue.getEncounterNote();
@@ -714,21 +721,26 @@ public class NotesService extends AbstractServiceImpl
 			if (noteExtTo1.getStartDate() != null) {
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.STARTDATE);
-				cme.setDateValue(noteExtTo1.getStartDate());
+				cme.setDateValue(noteExtTo1.getStartDate().toISOString());
+
+				encounterNoteService.saveExtPartialDate(noteExtTo1.getStartDate(), cme.getNoteId());
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
 			if (noteExtTo1.getResolutionDate() != null) {
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.RESOLUTIONDATE);
-				cme.setDateValue(noteExtTo1.getResolutionDate());
+				encounterNoteService.saveExtPartialDate(noteExtTo1.getResolutionDate(), cme.getId());
+				//cme.setDateValue(noteExtTo1.getResolutionDate());
+				cme.setDateValue(new Date());
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
 			if (noteExtTo1.getProcedureDate() != null) {
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.PROCEDUREDATE);
-				cme.setDateValue(noteExtTo1.getProcedureDate());
+				encounterNoteService.saveExtPartialDate(noteExtTo1.getProcedureDate(), cme.getId());
+				//cme.setDateValue(noteExtTo1.getProcedureDate());
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
@@ -906,9 +918,9 @@ public class NotesService extends AbstractServiceImpl
 
 		return cpp;
 	}
-	
-	
-	
+
+
+
 	private String getString(JSONObject jsonobject,String key){
 		if(jsonobject.containsKey(key)){
 			return jsonobject.getString(key); 
@@ -965,6 +977,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/getCurrentNote")
 	@Consumes("application/json")
 	@Produces("application/json")
+	@Hidden
 	public NoteTo1 getCurrentNote(@PathParam("demographicNo") Integer demographicNo ,JSONObject jsonobject){
 		logger.debug("getCurrentNote "+jsonobject);
 		LoggedInInfo loggedInInfo =  getLoggedInInfo(); //LoggedInInfo.loggedInInfo.get();
@@ -1350,6 +1363,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/ticklerSaveNote")
 	@Produces("application/json")
 	@Consumes("application/json")
+	@Hidden
 	public GenericRESTResponse ticklerSaveNote(JSONObject json){
 		
 		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "w", null)) {
@@ -1375,8 +1389,7 @@ public class NotesService extends AbstractServiceImpl
 		Date creationDate = new Date();
 		LoggedInInfo loggedInInfo=this.getLoggedInInfo();
 		Provider loggedInProvider = loggedInInfo.getLoggedInProvider();
-		
-		
+
 		String revision = "1";
 		String history = strNote;
 		String uuid = null;
@@ -1477,6 +1490,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/searchIssues")
 	@Produces("application/json")
 	@Consumes("application/json")
+	@Hidden
 	public AbstractSearchResponse<IssueTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn ) {
 		AbstractSearchResponse<IssueTo1> response = new AbstractSearchResponse<IssueTo1>();
 		
@@ -1648,32 +1662,92 @@ public class NotesService extends AbstractServiceImpl
 		}
 		 */
 	}
-	private void copyToNoteExtTo1(List<CaseManagementNoteExt> lcme, NoteExtTo1 noteExt) {
-		if(lcme == null) return;
-		for(CaseManagementNoteExt l : lcme){
+
+
+	// refactor this to converter
+	private void copyToNoteExtTo1(List<CaseManagementNoteExt> lcme, NoteExtTo1 noteExt)
+	{
+		if(lcme == null)
+		{
+			return;
+		}
+
+		for(CaseManagementNoteExt l : lcme)
+		{
 			logger.debug("NOTE EXT KEY:" +l.getKeyVal() + l.getValue());
 
-			if(l.getKeyVal().equals(CaseManagementNoteExt.STARTDATE)){
-				noteExt.setStartDate(l.getDateValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.RESOLUTIONDATE)){
-				noteExt.setResolutionDate(l.getDateValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROCEDUREDATE)){
-				noteExt.setProcedureDate(l.getDateValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.AGEATONSET)){
+			if(l.getKeyVal().equals(CaseManagementNoteExt.STARTDATE))
+			{
+				org.oscarehr.common.model.PartialDate startDateModel = partialDateDao.getPartialDate(PartialDate.TABLE_CASEMGMT_NOTE_EXT,
+						Integer.parseInt(l.getNoteId().toString()),
+						PartialDate.ALLERGIES_STARTDATE);
+
+				String startDateValue = l.getDateValueStr();
+				String[] dateParts = startDateValue.split("-");
+				String year = dateParts[0];
+				String month = dateParts[1];
+				String day = dateParts[2];
+
+				String startDateFormat = startDateModel.getFormat();
+
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = new org.oscarehr.dataMigration.model.common.PartialDate();
+				if (startDateFormat.equals(PartialDate.FORMAT_YEAR_ONLY))
+				{
+					partialDate = new org.oscarehr.dataMigration.model.common.PartialDate(Integer.parseInt(year));
+				}
+				else if (startDateFormat.equals(PartialDate.FORMAT_YEAR_MONTH))
+				{
+					partialDate = new org.oscarehr.dataMigration.model.common.PartialDate(Integer.parseInt(year), Integer.parseInt(month));
+				}
+				else if (startDateFormat.equals(PartialDate.FORMAT_FULL_DATE))
+				{
+					partialDate = new org.oscarehr.dataMigration.model.common.PartialDate(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+				}
+				noteExt.setStartDate(partialDate);
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.RESOLUTIONDATE))
+			{
+	/*			LocalDate resolutionDate = ConversionUtils.toLocalDateTime(l.getDateValue()).toLocalDate();
+				PartialDate partialDate = partialDateDao.getPartialDate(PartialDate.TABLE_CASEMGMT_NOTE_EXT,
+						Integer.parseInt(l.getId().toString()),
+						PartialDate.ALLERGIES_STARTDATE);
+
+				noteExt.setResolutionDate(org.oscarehr.dataMigration.model.common.PartialDate.from(resolutionDate, partialDate));*/
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.PROCEDUREDATE))
+			{
+				//noteExt.setProcedureDate(l.getDateValue());
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.AGEATONSET))
+			{
 				noteExt.setAgeAtOnset(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.TREATMENT)){
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.TREATMENT))
+			{
 				noteExt.setTreatment(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROBLEMSTATUS)){
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.PROBLEMSTATUS))
+			{
 				noteExt.setProblemStatus(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.EXPOSUREDETAIL)){
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.EXPOSUREDETAIL))
+			{
 				noteExt.setExposureDetail(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.RELATIONSHIP)){
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.RELATIONSHIP))
+			{
 				noteExt.setRelationship(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.LIFESTAGE)){
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.LIFESTAGE))
+			{
 				noteExt.setLifeStage(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.HIDECPP)){
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.HIDECPP))
+			{
 				noteExt.setHideCpp(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROBLEMDESC)){
+			}
+			else if(l.getKeyVal().equals(CaseManagementNoteExt.PROBLEMDESC))
+			{
 				noteExt.setProblemDesc(l.getValue());
 			}
 		}

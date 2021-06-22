@@ -1,3 +1,5 @@
+import { PartialDateConverter } from "../../common/converters/partialDateConverter";
+
 angular.module('Record.Summary').controller('Record.Summary.GroupNotesController', [
 
 	'$scope',
@@ -122,7 +124,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			return controller.working;
 		};
 
-		displayIssueId = function displayIssueId(issueCode)
+		controller.displayIssueId = function displayIssueId(issueCode)
 		{
 			noteService.getIssueId(issueCode).then(
 				function success(results)
@@ -135,9 +137,9 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 		};
 
-		displayIssueId(controller.page.code);
+		controller.displayIssueId(controller.page.code);
 
-		displayGroupNote = function displayGroupNote(item, itemId)
+		controller.displayGroupNote = function displayGroupNote(item, itemId)
 		{
 			if (controller.page.items[itemId].noteId != null)
 			{
@@ -148,11 +150,16 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						controller.groupNotesForm.encounterNote.editorNames = mod.editorNames; // Get editor names.
 						controller.groupNotesForm.groupNoteExt = results.groupNoteExt;
 
-						controller.groupNotesForm.groupNoteExt.startDate = moment(results.groupNoteExt.startDate).toDate();
-						controller.groupNotesForm.groupNoteExt.resolutionDate = moment(results.groupNoteExt.resolutionDate).toDate();
-						controller.groupNotesForm.groupNoteExt.procedureDate = moment(results.groupNoteExt.procedureDate).toDate();
-						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
+						let partialStartDateModel = PartialDateConverter.convertToPartialDateModel(results.groupNoteExt.startDate);
+						controller.groupNotesForm.groupNoteExt.startDate = partialStartDateModel;
 
+						let partialResolutionDateModel = PartialDateConverter.convertToPartialDateModel(results.groupNoteExt.resolutionDate);
+						controller.groupNotesForm.groupNoteExt.resolutionDate = partialResolutionDateModel;
+
+						let partialProcedureDateModel = PartialDateConverter.convertToPartialDateModel(results.groupNoteExt.procedureDate);
+						controller.groupNotesForm.groupNoteExt.procedureDate = partialProcedureDateModel;
+
+						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
 						controller.groupNotesForm.assignedCMIssues = [];
 
 						if (results.assignedCMIssues instanceof Array)
@@ -218,7 +225,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		//action is NULL when new , action is some id when not
 		if (action != null)
 		{
-			displayGroupNote(controller.page.items, action);
+			controller.displayGroupNote(controller.page.items, action);
 		}
 		else
 		{
@@ -275,6 +282,20 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			controller.groupNotesForm.encounterNote.encounterTime = "";
 			controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
 			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code;
+
+			if (controller.groupNotesForm.groupNoteExt.startDate)
+			{
+				let partialStartDate = PartialDateConverter.convertToPartialDate(controller.groupNotesForm.groupNoteExt.startDate);
+				let partialJson  = ({
+					"year": partialStartDate.year.value || "",
+					"month":  parseInt(partialStartDate.month) || "",
+					"day": parseInt(partialStartDate.day) || ""
+				});
+				if (partialJson)
+				{
+					controller.groupNotesForm.groupNoteExt.startDate = partialJson;
+				}
+			}
 
 			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)

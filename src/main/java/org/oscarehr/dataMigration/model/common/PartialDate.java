@@ -47,6 +47,7 @@ public class PartialDate extends AbstractTransientModel
 	public PartialDate()
 	{
 	}
+
 	public PartialDate(Integer year)
 	{
 		this(year, null, null);
