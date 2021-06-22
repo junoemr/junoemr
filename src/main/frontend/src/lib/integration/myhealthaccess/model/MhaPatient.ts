@@ -1,6 +1,7 @@
 import {LinkStatus} from "./LinkStatus";
 import {Province} from "../../../constants/Province";
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
+import {Sex} from "../../../demographic/model/Sex";
 
 export default class MhaPatient
 {
@@ -8,7 +9,8 @@ export default class MhaPatient
 	protected _firstName: string;
 	protected _middleName: string;
 	protected _lastName: string;
-	private _birthDate: Moment;
+	protected _birthDate: Moment;
+	private _sex: Sex;
 
 	protected _healthCareProvinceCode: Province;
 	protected _healthNumber: string;
@@ -52,6 +54,11 @@ export default class MhaPatient
 	set birthDate(value: Moment)
 	{
 		this._birthDate = value;
+	}
+
+	set sex(value: Sex)
+	{
+		this._sex = value;
 	}
 
 	set healthCareProvinceCode(value: Province)
@@ -139,9 +146,30 @@ export default class MhaPatient
 		return this._lastName;
 	}
 
+	get displayName(): string
+	{
+		return `${this.firstName} ${this.lastName}`;
+	}
+
 	get birthDate(): Moment
 	{
 		return this._birthDate;
+	}
+
+	get age(): number
+	{
+		let now = moment();
+		let age = moment.duration(now.diff(this.birthDate)).years();
+		if (isNaN(age))
+		{
+			return null;
+		}
+		return age;
+	}
+
+	get sex(): Sex
+	{
+		return this._sex;
 	}
 
 	get healthCareProvinceCode(): Province
@@ -187,6 +215,11 @@ export default class MhaPatient
 	get province(): Province
 	{
 		return this._province;
+	}
+
+	get fullAddress(): string
+	{
+		return `${this.address ? this._address : ''} ${this.city ? this.city : ''}, ${this.province ? this.province : ''}`
 	}
 
 	get linkStatus(): LinkStatus

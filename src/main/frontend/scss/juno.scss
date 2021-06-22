@@ -49,6 +49,7 @@
 @import "../src/common/components/junoProgressBar/junoProgressBar";
 @import "../src/common/components/junoSelect/junoSelect";
 @import "../src/common/components/junoTab/junoTab";
+@import "../src/common/components/junoTab/components/folderTab/folderTab";
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
 @import "../src/common/components/junoToggle/junoToggle";
 @import "../src/common/components/junoDateSelect/junoDateSelect";
@@ -64,6 +65,8 @@
 @import "../src/common/modals/junoInputModal/junoInputModal";
 @import "../src/common/modals/junoProgressModal/junoProgressModal";
 @import "../src/common/modals/junoSimpleModal/junoSimpleModal";
+@import "../src/common/modals/mhaPatientDetailsModal/components/mhaPatientConnectionDetails/mhaPatientConnectionDetails";
+@import "../src/common/modals/mhaPatientDetailsModal/components/mhaPatientProfileDetails/mhaPatientProfileDetails";
 @import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
 @import "../src/common/modals/appointmentQueueModal/appointmentQueueModal";
 @import "../src/common/modals/bookAppointmentModal/bookAppointmentModal";

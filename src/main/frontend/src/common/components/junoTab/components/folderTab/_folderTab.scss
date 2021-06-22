@@ -1,0 +1,39 @@
+.juno-tab-folder-tab {
+	position: relative;
+
+	// allows us to "break" the border of a container that is positioned below the tab, giving a folder like effect.
+	margin-bottom: -1px;
+	z-index: 1;
+
+
+	> .folder-tab {
+		flex-grow: 1;
+		max-width: 18.285em;
+		min-width: 6em;
+		min-height: 2.285em;
+
+		border-top-left-radius: 8px;
+		border-top-right-radius: 8px;
+
+		cursor: pointer;
+		user-select: none;
+
+		&.active {
+			position: relative;
+			z-index: 2;
+
+			background-color: var(--color-neutral-white);
+			border-top: solid 1px var(--color-neutral-light-grey);
+			border-left: solid 1px var(--color-neutral-light-grey);
+			border-right: solid 1px var(--color-neutral-light-grey);
+			box-shadow: 0 -2px 4px 0 rgba(0, 0, 0, 0.05);
+		}
+
+		&.compact:not(:first-child) {
+			margin-left: -8px;
+		}
+		&.compact {
+			padding: 0 4px;
+		}
+	}
+}

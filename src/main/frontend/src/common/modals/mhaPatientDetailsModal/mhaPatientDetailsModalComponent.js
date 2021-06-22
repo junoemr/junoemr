@@ -21,8 +21,16 @@
  * Canada
  */
 
-import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
+import {
+	LABEL_POSITION,
+	JUNO_BUTTON_COLOR,
+	JUNO_STYLE,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_TAB_TYPE
+} from "../../components/junoComponentConstants";
 import {MhaDemographicApi, MhaIntegrationApi, PatientTo1} from "../../../../generated";
+import {JUNO_SIMPLE_MODAL_FILL_COLOR} from "../junoSimpleModal/junoSimpleModalConstants";
+import MhaConfigService from "../../../lib/integration/myhealthaccess/service/MhaConfigService";
 
 angular.module('Common.Components').component('mhaPatientDetailsModal',
 {
@@ -40,135 +48,50 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		          $httpParamSerializer,
 		          $uibModal)
 	{
-		let ctrl = this;
+		const ctrl = this;
+
+		const mhaConfigService = new MhaConfigService();
 
 		// load apis
-		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
-			'../ws/rs');
 		let mhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
 				'../ws/rs');
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+		$scope.JUNO_SIMPLE_MODAL_FILL_COLOR = JUNO_SIMPLE_MODAL_FILL_COLOR;
+		$scope.JUNO_TAB_TYPE = JUNO_TAB_TYPE;
 
-		ctrl.currentProfile = null;
-		ctrl.connectionStatus = null;
-		ctrl.connectionStatusChanged = false;
+		ctrl.currentProfile = null; // Type MhaPatient
+		ctrl.currentIntegration = null; // Type MhaIntegration
+		ctrl.integrationOptions = []; // Type MhaIntegration[]
 
-		ctrl.integrationTabs = [];
-		ctrl.currentIntegration = null;
-
-		ctrl.$onInit = () =>
+		ctrl.$onInit = async () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 			ctrl.demographic = ctrl.resolve.demographic;
 
-			ctrl.loadMHAPatientProfiles();
+			await ctrl.loadIntegrationOptions();
+		}
 
-			$scope.$watch("$ctrl.currentIntegration", (newValue, oldValue) =>
+		// load integration list and format as options
+		ctrl.loadIntegrationOptions = async () =>
+		{
+			ctrl.integrationOptions = (await mhaConfigService.getMhaIntegrations()).map((integration) =>
 			{
-				if (newValue !== oldValue)
-				{
-					ctrl.currentProfile = ctrl.currentIntegration.patient;
-					ctrl.updateConnectionStatus();
-				}
+				return {label: integration.siteName, value: integration};
 			});
+
+			// ctrl.integrationOptions = ctrl.integrationOptions.map((inter) => [inter, {label: inter.label, value: {...inter.value}}, {label: inter.label, value: {...inter.value}}, {label: inter.label, value: {...inter.value}}]).flat();
+
+			// default to first integration
+			if (ctrl.integrationOptions.length > 0)
+			{
+				ctrl.currentIntegration = ctrl.integrationOptions[0].value;
+			}
+
+			$scope.$apply();
 		}
-
-		ctrl.loadMHAPatientProfiles = async () =>
-		{
-			try
-			{
-				ctrl.currentProfile = null;
-				ctrl.integrationTabs = [];
-				ctrl.currentIntegration = null;
-				ctrl.integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
-				for (let integration of ctrl.integrationsList)
-				{
-					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.demographic.demographicNo)).data.body;
-					if (patient)
-					{
-						if(patient.link_status === PatientTo1.LinkStatusEnum.CONFIRMED ||
-							patient.link_status === PatientTo1.LinkStatusEnum.VERIFIED)
-						{
-							// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
-							let province = patient.address_province_code !== "UNKNOWN" ? patient.address_province_code : "";
-							let city = patient.city != null ? patient.city : "";
-							patient.city_province = `${city} ${province}`;
-						}
-						integration.patient = patient;
-					}
-					integration.inviteSent = false;
-
-					ctrl.integrationTabs.push({
-						label: integration.siteName,
-						value: integration,
-					})
-				}
-
-				if (ctrl.integrationTabs.length > 0)
-				{
-					ctrl.currentIntegration = ctrl.integrationTabs[0].value;
-					ctrl.currentProfile = ctrl.currentIntegration.patient;
-					ctrl.updateConnectionStatus();
-				}
-				else
-				{
-					// close modal
-					ctrl.onCancel();
-				}
-			}
-			catch(err)
-			{
-				console.error(`Failed to load MHA patient profiles with error ${err}`);
-			}
-		};
-
-		ctrl.getLocalPatientName = () =>
-		{
-			return `${ctrl.demographic.lastName}, ${ctrl.demographic.firstName}`;
-		}
-
-		ctrl.getLocalPatientHinAndProv = () =>
-		{
-			return `${ctrl.demographic.hin} ${ctrl.demographic.hcType}`;
-		}
-
-		ctrl.getCurrentPatientName = () =>
-		{
-			if (ctrl.currentProfile)
-			{
-				return `${ctrl.currentProfile.last_name}, ${ctrl.currentProfile.first_name}`;
-			}
-			return "";
-		};
-
-		ctrl.getConnectionStatusHuman = (patientConnectionStatus) =>
-		{
-			if (patientConnectionStatus === PatientTo1.LinkStatusEnum.CONFIRMED ||
-				patientConnectionStatus === PatientTo1.LinkStatusEnum.VERIFIED)
-			{
-				return "Patient is a CONFIRMED user";
-			}
-			else if (patientConnectionStatus === PatientTo1.LinkStatusEnum.CLINICREJECTED)
-			{
-				return "Patient has been REJECTED by clinic";
-			}
-			else
-			{
-				return "Patient is a UNCONFIRMED user";
-			}
-		}
-
-		ctrl.getCurrentPatientHinAndProv = () =>
-		{
-			if (ctrl.currentProfile)
-			{
-				return `${ctrl.currentProfile.health_number} ${ctrl.currentProfile.health_care_province_code}`;
-			}
-			return "";
-		};
 
 		ctrl.openInviteConfirmModal = async () =>
 		{
@@ -219,28 +142,6 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		ctrl.onCancel = () =>
 		{
 			ctrl.modalInstance.close(ctrl.connectionStatusChanged);
-		}
-
-		ctrl.updateConnectionStatus = () =>
-		{
-			if(ctrl.currentProfile)
-			{
-				ctrl.connectionStatus = ctrl.getConnectionStatusHuman(ctrl.currentProfile.link_status);
-			}
-			else
-			{
-				ctrl.connectionStatus = "No Connection";
-			}
-		}
-
-		ctrl.hasActiveConnection = () =>
-		{
-			if(ctrl.currentProfile)
-			{
-				return ctrl.currentProfile.link_status === PatientTo1.LinkStatusEnum.CONFIRMED ||
-					ctrl.currentProfile.link_status === PatientTo1.LinkStatusEnum.VERIFIED;
-			}
-			return false;
 		}
 
 		ctrl.getInviteButtonText = () =>

@@ -209,7 +209,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 					{
 						component: 'mhaPatientDetailsModal',
 						backdrop: 'static',
-						windowClass: "juno-modal",
+						windowClass: "juno-simple-modal-window",
 						resolve: {
 							style: () => ctrl.componentStyle,
 							demographic: () => ctrl.demographic,

@@ -1,161 +1,40 @@
-<juno-modal class="mha-patient-details-modal" component-style="$ctrl.resolve.style">
+<juno-simple-modal class="mha-patient-details-modal"
+                   modal-height="556"
+                   modal-width="1048"
+                   modal-instance="$ctrl.modalInstance"
+                   fill-color="JUNO_SIMPLE_MODAL_FILL_COLOR.GREY"
+                   component-style="$ctrl.resolve.style">
 
-	<modal-ctl-buttons>
-			<i class="icon icon-modal-ctl icon-close" ng-click="$ctrl.onCancel()"></i>
-	</modal-ctl-buttons>
 
-	<modal-title class="patient-title">
-		<div class="header-start">
-			<h3>MHA Profile</h3>
-			<h5> for </h5>
-			<h4>{{$ctrl.getLocalPatientName()}}</h4>
-		</div>
-		<h5>{{$ctrl.getLocalPatientHinAndProv()}}</h5>
-	</modal-title>
+	<div class="flex-col h-100 w-100">
+		<h5 class="m-t-0 m-b-16">Patient Verification & Connection Status</h5>
 
-	<modal-body class="patient-modal-body">
 		<juno-tab ng-model="$ctrl.currentIntegration"
-		          tabs="$ctrl.integrationTabs"
+		          tabs="$ctrl.integrationOptions"
+		          type="JUNO_TAB_TYPE.FOLDER_TAB"
 		          component-style="$ctrl.resolve.style">
+
 		</juno-tab>
-		<div class="content-area">
-			<div class="left-content">
-				<div class="top-content">
-					<div class="flex-row">
-						<juno-input ng-model="$ctrl.currentProfile.last_name"
-						            label="Last Name"
-						            label-position="LABEL_POSITION.TOP"
-						            readonly="true"
-						            no-box="true"
-						            component-style="$ctrl.resolve.style">
-						</juno-input>
-						<juno-input ng-model="$ctrl.currentProfile.first_name"
-						            label="First Name"
-						            label-position="LABEL_POSITION.TOP"
-						            readonly="true"
-						            no-box="true"
-						            component-style="$ctrl.resolve.style">
-						</juno-input>
-					</div>
-					<!-- Email -->
-					<juno-input ng-model="$ctrl.currentProfile.email"
-									label="Email Address"
-									label-position="LABEL_POSITION.TOP"
-									readonly="true"
-									no-box="true"
-									component-style="$ctrl.resolve.style">
-					</juno-input>
-				</div>
 
-				<panel no-header="true" component-style="$ctrl.resolve.style">
-					<panel-body>
-						<div class="panel-content">
-							<div class="panel-left">
-								<!-- Phone -->
-								<juno-input ng-model="$ctrl.currentProfile.cell_phone"
-								            label="Phone Number"
-								            label-position="LABEL_POSITION.TOP"
-								            readonly="true"
-								            no-box="true"
-								            component-style="$ctrl.resolve.style">
-								</juno-input>
-
-								<!-- Address -->
-								<juno-input ng-model="$ctrl.currentProfile.address_1"
-								            label="Street Address"
-								            label-position="LABEL_POSITION.TOP"
-								            readonly="true"
-								            no-box="true"
-								            component-style="$ctrl.resolve.style"
-								            class="no-margin">
-								</juno-input>
-							</div>
-
-							<div class="panel-right">
-								<!-- Birth Date -->
-								<juno-input ng-model="$ctrl.currentProfile.birth_date"
-												label="Date of Birth"
-												label-position="LABEL_POSITION.TOP"
-												readonly="true"
-												no-box="true"
-												component-style="$ctrl.resolve.style">
-								</juno-input>
-
-								<!-- Gender  -->
-								<juno-input ng-model="$ctrl.currentProfile.sex"
-												label="Gender"
-												label-position="LABEL_POSITION.TOP"
-												readonly="true"
-												no-box="true"
-												component-style="$ctrl.resolve.style"
-												class="small">
-								</juno-input>
-
-								<!-- City Province -->
-								<juno-input ng-model="$ctrl.currentProfile.city_province"
-												label="City Province"
-												label-position="LABEL_POSITION.TOP"
-												readonly="true"
-												no-box="true"
-												component-style="$ctrl.resolve.style"
-												class="no-margin">
-								</juno-input>
-
-								<!-- Postal Code -->
-								<juno-input ng-model="$ctrl.currentProfile.postal_code"
-												label="Postal Code"
-												label-position="LABEL_POSITION.TOP"
-												readonly="true"
-												no-box="true"
-												component-style="$ctrl.resolve.style"
-												class="no-margin small">
-								</juno-input>
-							</div>
-						</div>
-					</panel-body>
-				</panel>
+		<div class="patient-details-container grid-column-2 grid-gap-8">
+			<div class="h-100">
+				<mha-patient-profile-details class="d-inline-block h-100 w-100"
+				                             demographic-no="$ctrl.demographic.demographicNo"
+				                             integration-id="$ctrl.currentIntegration.id">
+				</mha-patient-profile-details>
 			</div>
-
-			<juno-divider component-style="$ctrl.resolve.style" horizontal="true"></juno-divider>
-
-			<div class="right-content">
-				<!-- Connection Status -->
-				<div class="connection-status">
-					<juno-input ng-model="$ctrl.connectionStatus"
-					            label="Connection"
-					            label-position="LABEL_POSITION.TOP"
-					            readonly="true"
-					            no-box="true"
-					            component-style="$ctrl.resolve.style"
-					            class="no-margin small">
-					</juno-input>
-					<i ng-if="$ctrl.hasActiveConnection()" class="icon icon-check"></i>
-				</div>
+			<div class="h-100">
+				<mha-patient-connection-details class="d-inline-block h-100 w-100">
+				</mha-patient-connection-details>
 			</div>
 		</div>
-	</modal-body>
 
-	<modal-footer>
-		<panel no-header="true" component-style="$ctrl.resolve.style">
-			<panel-body>
-				<div class="footer-button-wrapper">
-					<juno-button component-style="$ctrl.resolve.style"
-				             button-color="JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-				             disabled="!$ctrl.hasActiveConnection()"ng-click="$ctrl.cancelConnection()"
-				             class="cancel-connection-btn">
-					<div class="cancel-btn-text">
-						Cancel Connection
-					</div>
-				</juno-button><juno-button disabled="$ctrl.hasActiveConnection()"
-					             component-style="$ctrl.resolve.style"
-					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
-					             ng-click="$ctrl.openInviteConfirmModal()"
-					             class="cancel-connection-btn">
-						{{ $ctrl.getInviteButtonText() }}
-					</juno-button>
-				</div>
-			</panel-body>
-		</panel>
-	</modal-footer>
-</juno-modal>
+		<div class="patient-details-button-row flex-row justify-content-end align-items-center">
+			<juno-button class="flex-item-no-grow w-128 m-t-8"
+			             component-style="$ctrl.resolve.style">
+				Close Window
+			</juno-button>
+		</div>
+	</div>
+
+</juno-simple-modal>
