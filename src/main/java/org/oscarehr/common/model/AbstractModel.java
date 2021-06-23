@@ -25,7 +25,6 @@ package org.oscarehr.common.model;
 
 import java.util.List;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.oscarehr.util.MiscUtils;
 
 public abstract class AbstractModel<T> implements java.io.Serializable
@@ -33,12 +32,6 @@ public abstract class AbstractModel<T> implements java.io.Serializable
 	protected static final String OBJECT_NOT_YET_PERISTED="The object is not persisted yet, this operation requires the object to already be persisted.";
 
 	public abstract T getId();
-
-	@Override
-    public String toString()
-	{
-		return(ReflectionToStringBuilder.toString(this));
-	}
 
 	@Override
     public int hashCode()
