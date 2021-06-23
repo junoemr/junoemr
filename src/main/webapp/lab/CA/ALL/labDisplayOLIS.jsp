@@ -266,7 +266,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
         }
 
         function printPDF(){
-            document.acknowledgeForm.action="PrintOLISLab.do";
+            document.acknowledgeForm.action="PrintPDF.do";
             document.acknowledgeForm.submit();
         }
 

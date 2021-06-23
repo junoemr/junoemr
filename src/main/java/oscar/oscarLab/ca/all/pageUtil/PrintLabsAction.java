@@ -70,7 +70,8 @@ public class PrintLabsAction extends Action{
 
         try {
             MessageHandler handler = Factory.getHandler(request.getParameter("segmentID"));
-            if(handler.getHeaders().get(0).equals("CELLPATHR")){//if it is a VIHA RTF lab
+            if("CELLPATHR".equals(handler.getHeaders().get(0)))
+            {//if it is a VIHA RTF lab
                 response.setContentType("text/rtf");  //octet-stream
                 response.setHeader("Content-Disposition", "attachment; filename=\""+handler.getPatientName().replaceAll("\\s", "_")+"_LabReport.rtf\"");
                 LabPDFCreator pdf = new LabPDFCreator(request, response.getOutputStream());
