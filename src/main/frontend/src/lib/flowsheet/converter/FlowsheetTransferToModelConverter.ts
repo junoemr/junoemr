@@ -26,7 +26,9 @@
  */
 
 import FlowsheetModel from "../model/FlowsheetModel";
-import {Flowsheet} from "../../../../generated";
+import {Flowsheet, FlowsheetItem, FlowsheetItemGroup} from "../../../../generated";
+import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
+import FlowsheetItemModel from "../model/FlowsheetItemModel";
 
 export default class FlowsheetTransferToModelConverter
 {
@@ -43,7 +45,7 @@ export default class FlowsheetTransferToModelConverter
 		flowsheetModel.description = flowsheetTransfer.description;
 		flowsheetModel.enabled = flowsheetTransfer.enabled;
 		flowsheetModel.systemManaged = flowsheetTransfer.systemManaged;
-		flowsheetModel.flowsheetItemGroups = flowsheetTransfer.flowsheetItemGroups;
+		flowsheetModel.flowsheetItemGroups = this.convertAllGroups(flowsheetTransfer.flowsheetItemGroups);
 
 		return flowsheetModel;
 	}
@@ -51,6 +53,41 @@ export default class FlowsheetTransferToModelConverter
 	convertAll(flowsheetTransfers: Array<Flowsheet>): Array<FlowsheetModel>
 	{
 		return flowsheetTransfers.map((transfer) => this.convert(transfer));
+	}
+
+	convertAllGroups(itemGroups: Array<FlowsheetItemGroup>): Array<FlowsheetItemGroupModel>
+	{
+		return itemGroups.map(itemGroup =>
+		{
+			const groupModel = new FlowsheetItemGroupModel();
+			groupModel.id = itemGroup.id;
+			groupModel.name = itemGroup.name;
+			groupModel.description = itemGroup.description;
+			groupModel.flowsheetItems = this.convertAllItems(itemGroup.flowsheetItems);
+
+			return groupModel;
+		});
+	}
+
+	convertAllItems(items: Array<FlowsheetItem>): Array<FlowsheetItemModel>
+	{
+		return items.map(item =>
+		{
+			const model = new FlowsheetItemModel();
+			model.id = item.id;
+			model.name = item.name;
+			model.description = item.description;
+			model.guideline = item.guideline;
+			model.type = item.type;
+			model.typeCode = item.typeCode;
+			model.hidden = item.hidden;
+			model.valueType = item.valueType;
+			model.valueLabel = item.valueLabel;
+			model.flowsheetItemAlerts = item.flowsheetItemAlerts;
+			model.data = item.data;
+
+			return model;
+		});
 	}
 
 }

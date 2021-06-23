@@ -26,7 +26,9 @@
  */
 
 import FlowsheetModel from "../model/FlowsheetModel";
-import {Flowsheet} from "../../../../generated";
+import {Flowsheet, FlowsheetItem, FlowsheetItemGroup} from "../../../../generated";
+import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
+import FlowsheetItemModel from "../model/FlowsheetItemModel";
 
 export default class FlowsheetModelToTransferConverter
 {
@@ -41,13 +43,49 @@ export default class FlowsheetModelToTransferConverter
 			name: flowsheetModel.name,
 			description: flowsheetModel.description,
 			enabled: flowsheetModel.enabled,
-			flowsheetItemGroups: flowsheetModel.flowsheetItemGroups,
+			flowsheetItemGroups: this.convertAllGroups(flowsheetModel.flowsheetItemGroups),
 		} as Flowsheet;
 	}
 
 	convertAll(flowsheetTransfers: Array<FlowsheetModel>): Array<Flowsheet>
 	{
 		return flowsheetTransfers.map((transfer) => this.convert(transfer));
+	}
+
+
+	convertAllGroups(itemGroups: Array<FlowsheetItemGroupModel>): Array<FlowsheetItemGroup>
+	{
+		return itemGroups.map(itemGroup =>
+		{
+			const groupModel = {} as FlowsheetItemGroup;
+			groupModel.id = itemGroup.id;
+			groupModel.name = itemGroup.name;
+			groupModel.description = itemGroup.description;
+			groupModel.flowsheetItems = this.convertAllItems(itemGroup.flowsheetItems);
+
+			return groupModel;
+		});
+	}
+
+	convertAllItems(items: Array<FlowsheetItemModel>): Array<FlowsheetItem>
+	{
+		return items.map(item =>
+		{
+			const model = {} as FlowsheetItem;
+			model.id = item.id;
+			model.name = item.name;
+			model.description = item.description;
+			model.guideline = item.guideline;
+			model.type = item.type;
+			model.typeCode = item.typeCode;
+			model.hidden = item.hidden;
+			model.valueType = item.valueType;
+			model.valueLabel = item.valueLabel;
+			model.flowsheetItemAlerts = item.flowsheetItemAlerts;
+			model.data = item.data;
+
+			return model;
+		});
 	}
 
 }

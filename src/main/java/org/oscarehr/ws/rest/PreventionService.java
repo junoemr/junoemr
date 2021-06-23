@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.prevention.dto.PreventionTypeTransfer;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.security.model.Permission;
@@ -52,6 +53,16 @@ public class PreventionService extends AbstractServiceImpl
 {
 	@Autowired
 	private PreventionManager preventionManager;
+
+
+	@GET
+	@Path("/search")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<PreventionTypeTransfer> searchPreventionTypes(@QueryParam("keyword") String searchParam)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.PREVENTION_READ);
+		return RestSearchResponse.successResponseOnePage(preventionManager.searchPreventionTypes(searchParam));
+	}
 
 	@GET
 	@Path("/active")

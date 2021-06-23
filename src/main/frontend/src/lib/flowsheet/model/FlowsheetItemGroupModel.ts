@@ -25,21 +25,18 @@
 
  */
 
-import FlowsheetItemGroupModel from "./FlowsheetItemGroupModel";
+import FlowsheetItemModel from "./FlowsheetItemModel";
 
-export default class FlowsheetModel
+export default class FlowsheetItemGroupModel
 {
 	id?: number;
 	name: string;
 	description: string;
-	enabled: boolean;
-	systemManaged: boolean;
-	flowsheetItemGroups?: Array<FlowsheetItemGroupModel>;
+	flowsheetItems?: Array<FlowsheetItemModel>;
+
 
 	constructor()
 	{
-		this.enabled = true;
-		this.systemManaged = false;
-		this.flowsheetItemGroups = [];
+		this.flowsheetItems = [];
 	}
 }

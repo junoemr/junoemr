@@ -25,6 +25,8 @@ import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../common/components/junoComponentConstants";
 import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
 import {ItemType} from "../lib/flowsheet/FlowsheetConstants";
+import FlowsheetItemModel from "../lib/flowsheet/model/FlowsheetItemModel";
+import {FlowsheetItem} from "../../generated";
 
 angular.module('Flowsheet').component('flowsheetEdit',
 	{
@@ -123,8 +125,9 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onAddNewItem = (itemGroup, type): void =>
 				{
-					const typeLabel = (type === ItemType.MEASUREMENT) ? "measurement" : "prevention";
-					const callback = (type === ItemType.MEASUREMENT) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
+					const isMeasurementType = (type === ItemType.MEASUREMENT);
+					const typeLabel = (isMeasurementType) ? "measurement" : "prevention";
+					const callback = (isMeasurementType) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
 
 					// @ts-ignore
 					Juno.Common.Util.openTypeaheadDialog($uibModal,
@@ -134,12 +137,29 @@ angular.module('Flowsheet').component('flowsheetEdit',
 						ctrl.componentStyle,
 						"Ok",
 						"Search " + typeLabel + "s",
-					).then((newItem) =>
+					).then((selection) =>
 					{
-						// @ts-ignore
-						console.info(newItem);
-						if(newItem)
+						if(selection)
 						{
+							let newItem = new FlowsheetItemModel();
+							if(isMeasurementType)
+							{
+								newItem.name = selection.name;
+								newItem.type = FlowsheetItem.TypeEnum.MEASUREMENT;
+								newItem.typeCode = selection.code;
+								newItem.description = selection.description;
+								newItem.guideline = selection.instructions;
+								newItem.valueType = FlowsheetItem.ValueTypeEnum.STRING;
+							}
+							else
+							{
+								newItem.name = selection.name;
+								newItem.type = FlowsheetItem.TypeEnum.PREVENTION;
+								newItem.typeCode = selection.code;
+								newItem.description = selection.description;
+								newItem.guideline = selection.instructions;
+								newItem.valueType = FlowsheetItem.ValueTypeEnum.STRING;
+							}
 							itemGroup.flowsheetItems.push(newItem);
 						}
 					}).catch((reason) =>
@@ -148,19 +168,28 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					});
 				}
 
-				ctrl.lookupPreventions = async (searchTerm): Promise<void> =>
+				ctrl.lookupPreventions = async (searchTerm): Promise<Array<object>> =>
 				{
-					const searchResults = await flowsheetApiService.getPreventionTypes();
-					return searchResults.map((result) => { return {label: result, value: result, data: result}});
+					const searchResults = await flowsheetApiService.searchPreventionTypes(searchTerm);
+					return searchResults.body.map((result) =>
+					{
+						return {
+							label: result.name = "(" + result.code + ")",
+							value: result,
+						}
+					});
 				}
 
-				ctrl.lookupMeasurements = (searchTerm) =>
+				ctrl.lookupMeasurements = async (searchTerm): Promise<Array<object>> =>
 				{
-					// @ts-ignore
-					console.info(searchTerm);
-					return [
-						{label: "test label", value: 1},
-					]
+					const searchResults = await flowsheetApiService.searchMeasurementTypes(searchTerm);
+					return searchResults.body.map((result) =>
+					{
+						return {
+							label: result.name,
+							value: result,
+						}
+					});
 				}
 
 				ctrl.onCancel = (): void =>

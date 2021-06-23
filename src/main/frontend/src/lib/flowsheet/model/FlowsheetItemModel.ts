@@ -25,21 +25,23 @@
 
  */
 
-import FlowsheetItemGroupModel from "./FlowsheetItemGroupModel";
+import {FlowsheetItem, FlowsheetItemAlert, FlowsheetItemData} from "../../../../generated";
 
-export default class FlowsheetModel
+export default class FlowsheetItemModel
 {
 	id?: number;
 	name: string;
 	description: string;
-	enabled: boolean;
-	systemManaged: boolean;
-	flowsheetItemGroups?: Array<FlowsheetItemGroupModel>;
+	guideline?: string;
+	type?: FlowsheetItem.TypeEnum;
+	typeCode?: string;
+	hidden?: boolean;
+	valueType?: FlowsheetItem.ValueTypeEnum;
+	valueLabel?: string;
+	flowsheetItemAlerts?: Array<FlowsheetItemAlert>;
+	data?: Array<FlowsheetItemData>;
 
 	constructor()
 	{
-		this.enabled = true;
-		this.systemManaged = false;
-		this.flowsheetItemGroups = [];
 	}
 }

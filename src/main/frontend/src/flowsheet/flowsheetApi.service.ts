@@ -24,7 +24,7 @@
     Canada
 
  */
-import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi, PreventionsApi} from "../../generated";
+import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi, MeasurementsApi, PreventionsApi} from "../../generated";
 import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
 import FlowsheetTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetTransferToModelConverter";
 import FlowsheetModelToTransferConverter from "../lib/flowsheet/converter/FlowsheetModelToTransferConverter";
@@ -41,6 +41,7 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 		service.preventionsApi = new PreventionsApi($http, $httpParamSerializer, '../ws/rs');
+		service.measurementsApi = new MeasurementsApi($http, $httpParamSerializer, '../ws/rs');
 		service.flowsheetModelConverter = new FlowsheetTransferToModelConverter();
 		service.flowsheetTransferConverter = new FlowsheetModelToTransferConverter();
 
@@ -76,9 +77,14 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 			return (await service.flowsheetApi.deleteFlowsheet(flowsheetId)).data.body;
 		}
 
-		service.getPreventionTypes = async (): Promise<Array<string>> =>
+		service.searchPreventionTypes = async (keyword: string): Promise<Array<string>> =>
 		{
-			return (await service.preventionsApi.getPreventionTypes()).data.body;
+			return (await service.preventionsApi.searchPreventionTypes(keyword)).data;
+		}
+
+		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<Array<string>> =>
+		{
+			return (await service.measurementsApi.searchMeasurementTypes(keyword, page, perPage)).data;
 		}
 
 		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<FlowsheetModel> =>
