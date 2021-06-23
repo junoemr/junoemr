@@ -55,8 +55,7 @@ public class MammogramReport implements PreventionReport{
     /** Creates a new instance of MammogramReport */
     public MammogramReport() {
     }
-
-    @Override
+    
     public boolean displayNumShots() {
         return false;
     }
