@@ -218,7 +218,7 @@ public class OscarJobService extends AbstractServiceImpl {
 		
 		Integer jobId = null;
 		try {jobId = Integer.parseInt(params.getFirst("scheduleJobId"));}catch(NumberFormatException e){
-			//TODO: log error	
+			//TODO-legacy: log error
 			return null;
 		}	
 		

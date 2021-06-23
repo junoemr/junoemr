@@ -51,7 +51,7 @@ public class RoomDao extends AbstractDao<Room>{
 	 * @return true if room exists
 	 */
     public boolean roomExists(Integer roomId) {
-    	Query query = entityManager.createQuery("select count(*) from Room r where r.id = ?");
+    	Query query = entityManager.createQuery("select count(*) from Room r where r.id = ?1");
 		query.setParameter(1, roomId);
 		
 		Long result = (Long)query.getSingleResult();
@@ -205,74 +205,76 @@ public class RoomDao extends AbstractDao<Room>{
 	String getRoomsQueryString(Integer facilityId, Integer programId, Boolean active) {
 		StringBuilder queryBuilder = new StringBuilder("select r from Room r");
 
-        queryBuilder.append(" where ");
+		queryBuilder.append(" where ");
 
-        boolean andClause = false;
-        if (facilityId != null) {
-            queryBuilder.append("r.facilityId = ?");
-            andClause = true;
-        }
+		int paramCount = 1;
+		boolean andClause = false;
+		if (facilityId != null) {
+			queryBuilder.append("r.facilityId = ?" + paramCount++);
+			andClause = true;
+		}
 
-        if (programId != null) {
-            if (andClause) queryBuilder.append(" and "); else andClause = true;
-            queryBuilder.append("r.programId = ?");
-        }
+		if (programId != null) {
+			if (andClause) queryBuilder.append(" and "); else andClause = true;
+			queryBuilder.append("r.programId = ?" + paramCount++);
+		}
 
 
-        if (active != null) {
-            if (andClause) queryBuilder.append(" and ");
-            queryBuilder.append("r.active = ?");
-        }
+		if (active != null) {
+			if (andClause) queryBuilder.append(" and ");
+			queryBuilder.append("r.active = ?" + paramCount++);
+		}
 
-        return queryBuilder.toString();
+		return queryBuilder.toString();
 	}
 
 	String getAssignedBedRoomsQueryString(Integer facilityId, Integer programId, Boolean active) {
 		StringBuilder queryBuilder = new StringBuilder("select r from Room r");
 
-        queryBuilder.append(" where ");
+		queryBuilder.append(" where ");
 
-        boolean andClause = false;
-        if (facilityId != null) {
-            queryBuilder.append("r.facilityId = ?");
-            andClause = true;
-        }
+		int paramCount = 1;
+		boolean andClause = false;
+		if (facilityId != null) {
+			queryBuilder.append("r.facilityId = ?" + paramCount++);
+			andClause = true;
+		}
 
-        if (programId != null) {
-            if (andClause){
-            	queryBuilder.append(" and "); 
-            }else{
-            	andClause = true;
-            }
-            queryBuilder.append("r.programId = ?");
-        }
+		if (programId != null) {
+			if (andClause){
+				queryBuilder.append(" and ");
+			}else{
+				andClause = true;
+			}
+			queryBuilder.append("r.programId = ?" + paramCount++);
+		}
 
 
-        if (active != null) {
-            if (andClause){
-            	queryBuilder.append(" and ");
-            }else{
-            	andClause = true;
-            }
+		if (active != null) {
+			if (andClause){
+				queryBuilder.append(" and ");
+			}else{
+				andClause = true;
+			}
 
-            queryBuilder.append("r.active = ?");
-        }
-        
-        if (andClause) {
-        	queryBuilder.append(" and ");
-        }
-        
-        queryBuilder.append("r.assignedBed = 1");
+			queryBuilder.append("r.active = ?" + paramCount++);
+		}
 
-        return queryBuilder.toString();
+		if (andClause) {
+			queryBuilder.append(" and ");
+		}
+
+		queryBuilder.append("r.assignedBed = 1");
+
+		return queryBuilder.toString();
 	}
-	
+
 	Object[] getRoomsValues(Integer facilityId, Integer programId, Boolean active) {
 		List<Object> values = new ArrayList<Object>();
 
-        if (facilityId != null) {
-            values.add(facilityId);
-        }
+		if (facilityId != null) {
+			values.add(facilityId);
+		}
 
         if (programId != null) {
 			values.add(programId);
@@ -285,7 +287,7 @@ public class RoomDao extends AbstractDao<Room>{
 	}
 
 	void updateHistory(Room room) {
-		// TODO IC Bedlog Historical - update create and persist historical data
+		// TODO-legacy IC Bedlog Historical - update create and persist historical data
 		// get previous programroom
 		// set end date to today
 		// create new programroom

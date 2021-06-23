@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.LogLetters;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class LogLettersDaoTest extends DaoTestFixtures {
-
-	protected LogLettersDao dao = SpringUtils.getBean(LogLettersDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LogLettersDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected LogLettersDao logLettersDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class LogLettersDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		LogLetters entity = new LogLetters();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		logLettersDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

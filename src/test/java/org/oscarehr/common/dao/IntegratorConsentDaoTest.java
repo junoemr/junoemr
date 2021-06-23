@@ -27,6 +27,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -37,13 +38,25 @@ import org.oscarehr.common.model.IntegratorConsent.ConsentStatus;
 import org.oscarehr.common.model.IntegratorConsent.SignatureStatus;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class IntegratorConsentDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class IntegratorConsentDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected IntegratorConsentDao integratorConsentDao;
 
-	protected IntegratorConsentDao dao = SpringUtils.getBean(IntegratorConsentDao.class);
-	protected FacilityDao facilityDao = SpringUtils.getBean(FacilityDao.class);
-	protected DemographicDao demographicDao  =SpringUtils.getBean(DemographicDao.class);
-	protected ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	@Autowired
+	protected FacilityDao facilityDao;
+
+	@Autowired
+	protected DemographicDao demographicDao;
+
+	@Autowired
+	protected ProviderDao providerDao;
 
 
 	@Before
@@ -90,7 +103,7 @@ public class IntegratorConsentDaoTest extends DaoTestFixtures {
 		entity.setFacilityId(f.getId());
 		entity.setProviderNo(p.getProviderNo());
 		
-		dao.persist(entity);
+		integratorConsentDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

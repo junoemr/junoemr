@@ -27,19 +27,29 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.FacilityDemographicPrimaryKey;
 import org.oscarehr.common.model.IntegratorConsentComplexExitInterview;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class IntegratorConsentComplexExitInterviewDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class IntegratorConsentComplexExitInterviewDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected IntegratorConsentComplexExitInterviewDao integratorConsentComplexExitInterviewDao;
 
-	protected IntegratorConsentComplexExitInterviewDao dao = SpringUtils.getBean(IntegratorConsentComplexExitInterviewDao.class);
-	protected FacilityDao facilityDao = SpringUtils.getBean(FacilityDao.class);
-	protected DemographicDao demographicDao  =SpringUtils.getBean(DemographicDao.class);
+	@Autowired
+	protected FacilityDao facilityDao;
+
+	@Autowired
+	protected DemographicDao demographicDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -72,7 +82,7 @@ public class IntegratorConsentComplexExitInterviewDaoTest extends DaoTestFixture
 		id.setDemographicId(d.getDemographicNo());
 		id.setFacilityId(f.getId());
 		entity.setId(id);
-		dao.persist(entity);
+		integratorConsentComplexExitInterviewDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

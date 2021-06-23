@@ -131,7 +131,7 @@ dojo.declare("dojo.selection.Selection", null,
 				this.items.splice(idx, 1);
 			}
 			// remove from selection
-			// FIXME: do we call deselect? I don't think so because this isn't how
+			// FIXME-legacy: do we call deselect? I don't think so because this isn't how
 			// you usually want to deselect an item. For example, if you deleted an
 			// item, you don't really want to deselect it -- you want it gone. -DS
 			idx = this._find(item, true);

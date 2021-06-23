@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CaisiFormQuestion;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CaisiFormQuestionDaoTest extends DaoTestFixtures {
-
-	public CaisiFormQuestionDao dao = SpringUtils.getBean(CaisiFormQuestionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CaisiFormQuestionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public CaisiFormQuestionDao caisiFormQuestionDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -57,20 +63,20 @@ public class CaisiFormQuestionDaoTest extends DaoTestFixtures {
 		CaisiFormQuestion cFQ1 = new CaisiFormQuestion();
 		EntityDataGenerator.generateTestDataForModelClass(cFQ1);
 		cFQ1.setFormId(formId1);
-		dao.persist(cFQ1);
+		caisiFormQuestionDao.persist(cFQ1);
 		
 		CaisiFormQuestion cFQ2 = new CaisiFormQuestion();
 		EntityDataGenerator.generateTestDataForModelClass(cFQ2);
 		cFQ2.setFormId(formId2);
-		dao.persist(cFQ2);
+		caisiFormQuestionDao.persist(cFQ2);
 		
 		CaisiFormQuestion cFQ3 = new CaisiFormQuestion();
 		EntityDataGenerator.generateTestDataForModelClass(cFQ3);
 		cFQ3.setFormId(formId1);
-		dao.persist(cFQ3);
+		caisiFormQuestionDao.persist(cFQ3);
 		
 		List<CaisiFormQuestion> expectedResult = new ArrayList<CaisiFormQuestion>(Arrays.asList(cFQ1, cFQ3));
-		List<CaisiFormQuestion> result = dao.findByFormId(formId1);
+		List<CaisiFormQuestion> result = caisiFormQuestionDao.findByFormId(formId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

@@ -34,16 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlBillingServicePremium;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlBillingServicePremiumDaoTest extends DaoTestFixtures {
-
-	protected CtlBillingServicePremiumDao dao = SpringUtils.getBean(CtlBillingServicePremiumDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlBillingServicePremiumDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlBillingServicePremiumDao ctlBillingServicePremiumDao;
 
 	@Before
 	public void before() throws Exception {
@@ -54,7 +59,7 @@ public class CtlBillingServicePremiumDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 CtlBillingServicePremium entity = new CtlBillingServicePremium();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                ctlBillingServicePremiumDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -67,25 +72,25 @@ public class CtlBillingServicePremiumDaoTest extends DaoTestFixtures {
 		CtlBillingServicePremium ctlBillingServicePremium1 = new CtlBillingServicePremium();
 		EntityDataGenerator.generateTestDataForModelClass(ctlBillingServicePremium1);
 		ctlBillingServicePremium1.setServiceCode(serviceCode1);
-		dao.persist(ctlBillingServicePremium1);
+		ctlBillingServicePremiumDao.persist(ctlBillingServicePremium1);
 		
 		CtlBillingServicePremium ctlBillingServicePremium2 = new CtlBillingServicePremium();
 		EntityDataGenerator.generateTestDataForModelClass(ctlBillingServicePremium2);
 		ctlBillingServicePremium2.setServiceCode(serviceCode1);
-		dao.persist(ctlBillingServicePremium2);
+		ctlBillingServicePremiumDao.persist(ctlBillingServicePremium2);
 		
 		CtlBillingServicePremium ctlBillingServicePremium3 = new CtlBillingServicePremium();
 		EntityDataGenerator.generateTestDataForModelClass(ctlBillingServicePremium3);
 		ctlBillingServicePremium3.setServiceCode(serviceCode2);
-		dao.persist(ctlBillingServicePremium3);
+		ctlBillingServicePremiumDao.persist(ctlBillingServicePremium3);
 		
 		CtlBillingServicePremium ctlBillingServicePremium4 = new CtlBillingServicePremium();
 		EntityDataGenerator.generateTestDataForModelClass(ctlBillingServicePremium4);
 		ctlBillingServicePremium4.setServiceCode(serviceCode1);
-		dao.persist(ctlBillingServicePremium4);
+		ctlBillingServicePremiumDao.persist(ctlBillingServicePremium4);
 		
 		List<CtlBillingServicePremium> expectedResult = new ArrayList<CtlBillingServicePremium>(Arrays.asList(ctlBillingServicePremium1, ctlBillingServicePremium2, ctlBillingServicePremium4));
-		List<CtlBillingServicePremium> result = dao.findByServiceCode(serviceCode1);
+		List<CtlBillingServicePremium> result = ctlBillingServicePremiumDao.findByServiceCode(serviceCode1);
 
 		Logger logger = MiscUtils.getLogger();
 		

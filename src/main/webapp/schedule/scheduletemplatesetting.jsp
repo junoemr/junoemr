@@ -172,7 +172,7 @@ function go()
 									<%
 										ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 										List<Provider> providers = providerDao.getActiveProviders();
-										//TODO: filter by site/team if necessary
+										//TODO-legacy: filter by site/team if necessary
 
 										for(Provider p : providers)
 										{

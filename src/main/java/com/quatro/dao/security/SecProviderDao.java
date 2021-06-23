@@ -105,7 +105,7 @@ public class SecProviderDao extends HibernateDaoSupport {
 	public SecProvider findById(java.lang.String id,String status) {
 		logger.debug("getting Provider instance with id: " + id);
 		try {
-			String sql ="from SecProvider where id=? and status=?";
+			String sql ="from SecProvider where id=?0 and status=?1";
 			List lst=this.getHibernateTemplate().find(sql,new Object[]{id,status});			
 	        if(lst.size()==0)
 	          return null;

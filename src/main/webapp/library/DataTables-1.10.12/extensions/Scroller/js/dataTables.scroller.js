@@ -213,7 +213,7 @@ var Scroller = function ( dt, opts ) {
 		loaderVisible: false
 	};
 
-	// @todo The defaults should extend a `c` property and the internal settings
+	// @todo-legacy The defaults should extend a `c` property and the internal settings
 	// only held in the `s` property. At the moment they are mixed
 	this.s = $.extend( this.s, Scroller.oDefaults, opts );
 

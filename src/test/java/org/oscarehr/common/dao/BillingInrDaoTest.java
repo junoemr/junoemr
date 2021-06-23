@@ -26,15 +26,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.dao.BillingInrDao;
 import org.oscarehr.billing.CA.model.BillingInr;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingInrDaoTest extends DaoTestFixtures {
-
-	protected BillingInrDao dao = SpringUtils.getBean(BillingInrDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingInrDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingInrDao billingInrDao;
 
 	public BillingInrDaoTest() {
 	}
@@ -48,12 +54,12 @@ public class BillingInrDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BillingInr entity = new BillingInr();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billingInrDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testSearch_inrbilling_dt_billno() {
-		assertNotNull(dao.search_inrbilling_dt_billno(1));
+		assertNotNull(billingInrDao.search_inrbilling_dt_billno(1));
 	}
 }

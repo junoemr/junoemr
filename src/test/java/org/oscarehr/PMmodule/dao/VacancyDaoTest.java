@@ -35,16 +35,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.Vacancy;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class VacancyDaoTest extends DaoTestFixtures {
-
-	public VacancyDao dao = SpringUtils.getBean(VacancyDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class VacancyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public VacancyDao vacancyDao;
 
 	@Before
 	public void before() throws Exception {
@@ -55,7 +61,7 @@ public class VacancyDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Vacancy entity = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		vacancyDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -69,34 +75,34 @@ public class VacancyDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(vacancy1);
 		vacancy1.setName(name);
 		vacancy1.setWlProgramId(wlProgramId1);
-		dao.persist(vacancy1);
+		vacancyDao.persist(vacancy1);
 		
 		Vacancy vacancy2 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy2);
 		vacancy2.setWlProgramId(wlProgramId2);
 		vacancy2.setName(name);
-		dao.persist(vacancy2);
+		vacancyDao.persist(vacancy2);
 		
 		Vacancy vacancy3 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy3);
 		vacancy3.setWlProgramId(wlProgramId1);
 		vacancy3.setName(name);
-		dao.persist(vacancy3);
+		vacancyDao.persist(vacancy3);
 		
 		Vacancy vacancy4 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy4);
 		vacancy4.setWlProgramId(wlProgramId2);
 		vacancy4.setName(name);
-		dao.persist(vacancy4);
+		vacancyDao.persist(vacancy4);
 		
 		Vacancy vacancy5 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy5);
 		vacancy5.setWlProgramId(wlProgramId1);
 		vacancy5.setName(name);
-		dao.persist(vacancy5);
+		vacancyDao.persist(vacancy5);
 		
 		List<Vacancy> expectedResult = new ArrayList<Vacancy>(Arrays.asList(vacancy1, vacancy3, vacancy5));
-		List<Vacancy> result = dao.getVacanciesByWlProgramId(wlProgramId1);
+		List<Vacancy> result = vacancyDao.getVacanciesByWlProgramId(wlProgramId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -121,30 +127,30 @@ public class VacancyDaoTest extends DaoTestFixtures {
 		Vacancy vacancy1 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy1);
 		vacancy1.setName(name1);
-		dao.persist(vacancy1);
+		vacancyDao.persist(vacancy1);
 		
 		Vacancy vacancy2 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy2);
 		vacancy2.setName(name2);
-		dao.persist(vacancy2);
+		vacancyDao.persist(vacancy2);
 		
 		Vacancy vacancy3 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy3);
 		vacancy3.setName(name1);
-		dao.persist(vacancy3);
+		vacancyDao.persist(vacancy3);
 		
 		Vacancy vacancy4 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy4);
 		vacancy4.setName(name2);
-		dao.persist(vacancy4);
+		vacancyDao.persist(vacancy4);
 		
 		Vacancy vacancy5 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy5);
 		vacancy5.setName(name1);
-		dao.persist(vacancy5);
+		vacancyDao.persist(vacancy5);
 		
 		List<Vacancy> expectedResult = new ArrayList<Vacancy>(Arrays.asList(vacancy1, vacancy3, vacancy5));
-		List<Vacancy> result = dao.getVacanciesByName(name1);
+		List<Vacancy> result = vacancyDao.getVacanciesByName(name1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -170,34 +176,34 @@ public class VacancyDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(vacancy1);
 		vacancy1.setWlProgramId(wlProgramId1);
 		vacancy1.setStatus(status1);
-		dao.persist(vacancy1);
+		vacancyDao.persist(vacancy1);
 		
 		Vacancy vacancy2 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy2);
 		vacancy2.setWlProgramId(wlProgramId2);
 		vacancy2.setStatus(status2);
-		dao.persist(vacancy2);
+		vacancyDao.persist(vacancy2);
 		
 		Vacancy vacancy3 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy3);
 		vacancy3.setWlProgramId(wlProgramId1);
 		vacancy3.setStatus(status1);
-		dao.persist(vacancy3);
+		vacancyDao.persist(vacancy3);
 		
 		Vacancy vacancy4 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy4);
 		vacancy4.setWlProgramId(wlProgramId2);
 		vacancy4.setStatus(status1);
-		dao.persist(vacancy4);
+		vacancyDao.persist(vacancy4);
 		
 		Vacancy vacancy5 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy5);
 		vacancy5.setWlProgramId(wlProgramId1);
 		vacancy5.setStatus(status1);
-		dao.persist(vacancy5);
+		vacancyDao.persist(vacancy5);
 		
 		List<Vacancy> expectedResult = new ArrayList<Vacancy>(Arrays.asList(vacancy1, vacancy3, vacancy5));
-		List<Vacancy> result = dao.getVacanciesByWlProgramId(wlProgramId1);
+		List<Vacancy> result = vacancyDao.getVacanciesByWlProgramId(wlProgramId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -219,18 +225,18 @@ public class VacancyDaoTest extends DaoTestFixtures {
 		
 		Vacancy vacancy1 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy1);
-		dao.saveEntity(vacancy1);
+		vacancyDao.saveEntity(vacancy1);
 		
 		Vacancy vacancy2 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy2);
-		dao.saveEntity(vacancy2);
+		vacancyDao.saveEntity(vacancy2);
 		
 		Vacancy vacancy3 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy3);
-		dao.saveEntity(vacancy3);
+		vacancyDao.saveEntity(vacancy3);
 		
 		Vacancy expcetedResult = vacancy2;
-		Vacancy result = dao.getVacancyById(vacancy2.getId());
+		Vacancy result = vacancyDao.getVacancyById(vacancy2.getId());
 		
 		assertEquals(expcetedResult, result);
 	}
@@ -243,30 +249,30 @@ public class VacancyDaoTest extends DaoTestFixtures {
 		Vacancy vacancy1 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy1);
 		vacancy1.setStatus(status1);
-		dao.persist(vacancy1);
+		vacancyDao.persist(vacancy1);
 		
 		Vacancy vacancy2 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy2);
 		vacancy2.setStatus(status2);
-		dao.persist(vacancy2);
+		vacancyDao.persist(vacancy2);
 		
 		Vacancy vacancy3 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy3);
 		vacancy3.setStatus(status1);
-		dao.persist(vacancy3);
+		vacancyDao.persist(vacancy3);
 		
 		Vacancy vacancy4 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy4);
 		vacancy2.setStatus(status2);
-		dao.persist(vacancy4);
+		vacancyDao.persist(vacancy4);
 		
 		Vacancy vacancy5 = new Vacancy();
 		EntityDataGenerator.generateTestDataForModelClass(vacancy5);
 		vacancy5.setStatus(status1);
-		dao.persist(vacancy5);
+		vacancyDao.persist(vacancy5);
 		
 		List<Vacancy> expectedResult = new ArrayList<Vacancy>(Arrays.asList(vacancy1, vacancy3, vacancy5));
-		List<Vacancy> result = dao.findCurrent();
+		List<Vacancy> result = vacancyDao.findCurrent();
 		
 		Logger logger = MiscUtils.getLogger();
 		

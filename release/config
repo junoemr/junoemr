@@ -785,7 +785,7 @@ echo "">> ${PROGRAM}.tmp 2>>$LOG_ERR
 echo "CBI"  >>$LOG_FILE
 echo "### CBI data submission : start ###" >> ${PROGRAM}.tmp 2>>$LOG_ERR
 echo "#to start the scheduler for data submission uncomment this" >> ${PROGRAM}.tmp 2>>$LOG_ERR
-## TODO logic to handle module heterogenity and BC that won't want CBI
+## TODO-legacy logic to handle module heterogenity and BC that won't want CBI
 echo "#ModuleNames=CBI" >> ${PROGRAM}.tmp 2>>$LOG_ERR
 echo ModuleNames=${ModuleNames}>> ${PROGRAM}.tmp 2>>$LOG_ERR
 echo CBI_JOB_INTERVAL=${CBI_JOB_INTERVAL}>> ${PROGRAM}.tmp 2>>$LOG_ERR
@@ -810,7 +810,7 @@ echo "### Sharing Center : end ###">> ${PROGRAM}.tmp 2>>$LOG_ERR
 echo "">> ${PROGRAM}.tmp 2>>$LOG_ERR
 
 echo "MCEDT"  >>$LOG_FILE
-## TODO note that MCEDT has been backported to 12.1.2 so this section may need some logic not to overwrite
+## TODO-legacy note that MCEDT has been backported to 12.1.2 so this section may need some logic not to overwrite
 echo "## MCEDT Settings : start ##">> ${PROGRAM}.tmp 2>>$LOG_ERR
 echo mcedt.enabled=${mcedt_enabled}>> ${PROGRAM}.tmp 2>>$LOG_ERR
 echo "# boolean flag that represents if the SOAP call details are logged">> ${PROGRAM}.tmp 2>>$LOG_ERR

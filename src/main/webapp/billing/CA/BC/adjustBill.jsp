@@ -121,7 +121,7 @@ if(!authed) {
   String corrNote = billingNote.getNote(billNo);
   BillingNote  bNote = new BillingNote();
   String messageNotes = bNote.getNote(billNo);
-  //TODO get note for this record and put it on screen and then be able to save a new note
+  //TODO-legacy get note for this record and put it on screen and then be able to save a new note
 
   GregorianCalendar now=new GregorianCalendar();
   int curYear = now.get(Calendar.YEAR);

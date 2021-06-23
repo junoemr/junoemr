@@ -42,6 +42,5 @@ public class HHSEmrDownloadHandler extends DefaultHandler implements MessageHand
     
     
     
-    //TODO: Process accession Number
-    //TODO: 
+    //TODO-legacy: Process accession Number
 }

@@ -84,7 +84,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 		this._deleted = {}; // deleted items {id: 1}	
 		this._changed = {}; // {id: {attr: [new values]}} // [] if attribute is removed
 		this._added = {};   // {id: 1} list of added items
-		this._results = {}; // {query: [ id1, ]};	// todo: make MRUDict of queries
+		this._results = {}; // {query: [ id1, ]};	// todo-legacy: make MRUDict of queries
 		/* data is a dictionary that conforms to this format: 
 		  { id-string: { attribute-string: [ value1, value2 ] } }
 		  where value is either an atomic JSON data type or 
@@ -92,7 +92,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 		  or 
 		  { 'type': 'name', 'value': 'value' } for user-defined datatypes
 		*/ 
-		this._data = {}; // {id: [values, refcount]} // todo: handle refcount
+		this._data = {}; // {id: [values, refcount]} // todo-legacy: handle refcount
 		this._numItems = 0;
 	},
 	
@@ -163,7 +163,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 				var value = values[i];
 				var type = value.datatype || value.type;
 				if (type) {
-					// todo: better error handling?
+					// todo-legacy: better error handling?
 					var localValue = value.value;
 					if (this._datatypeMap[type]) 
 						localValue = this._datatypeMap[type](value);							
@@ -222,7 +222,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 		// summary: See dojo.data.core.Read.getAttributes()
 		var itemIdentity = this.getIdentity(item);
 		if (!itemIdentity) 
-			return undefined; //todo: raise exception
+			return undefined; //todo-legacy: raise exception
 
 		var atts = [];
 		//var attrDict = item.attrs;
@@ -256,7 +256,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 		var itemIdentity = something;
 		// var id = something.id ? something.id : something; 
 		// if (!id) { return false; }
-		if (this._deleted[itemIdentity]) { return false; } //todo: do this?
+		if (this._deleted[itemIdentity]) { return false; } //todo-legacy: do this?
 		if (this._data[itemIdentity]) { return true; } 
 		if (this._added[itemIdentity]) { return true; }
 		return false; // Boolean
@@ -281,7 +281,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 		}
 		var query = result.query;
 		
-		//todo: use this._results to implement caching
+		//todo-legacy: use this._results to implement caching
 		var self = this;
 		var bindfunc = function(type, data, evt) {
 			var scope = result.scope || dj_global;
@@ -301,7 +301,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 						break;
 					}
 					if (!self._deleted[key]) { //skip deleted items
-						//todo if in _added, remove from _added
+						//todo-legacy if in _added, remove from _added
 						var values = dataDict[key];										
 						var attributeDict = self._remoteToLocalValues(values);
 						var existingValue = self._data[key];
@@ -333,7 +333,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 				}
 			} else if(type == "error" || type == 'timeout') {
 				// here, "data" is our error object
-				//todo: how to handle timeout?
+				//todo-legacy: how to handle timeout?
 				dojo.debug("find error: " + dojo.json.serialize(data));
 				if (result.onerror) {
 					result.onerror.call(scope, data);
@@ -347,7 +347,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 
 		this._setupQueryRequest(result, bindKw);
 		var request = dojo.io.bind(bindKw);
-		//todo: error if not bind success
+		//todo-legacy: error if not bind success
 		//dojo.debug( "bind success " + request.bindSuccess);
 		result._abortFunc = request.abort;	 
 		return result; 
@@ -365,7 +365,7 @@ dojo.lang.declare("dojo.data.core.RemoteStore", [dojo.data.core.Read, dojo.data.
 	findByIdentity: function(id) {
 		var item = this._latestData[id];
 		var idQuery = "/" + "*[.='"+id+"']";
-		//if (!item) item = this.find(idQuery, {async=0}); //todo: support bind(async=0)
+		//if (!item) item = this.find(idQuery, {async=0}); //todo-legacy: support bind(async=0)
 		if (item)
 			return new _Item(id, item, this); 
 		return null;
@@ -381,10 +381,10 @@ Write API
 			delete this._deleted[itemIdentity];
 		} else {
 			this._added[itemIdentity] = 1;
-			//todo? this._numItems++; ?? but its not in this._data
+			//todo-legacy? this._numItems++; ?? but its not in this._data
 		}
 		if (attributes) {
-			// FIXME:
+			// FIXME-legacy:
 			for (var attribute in attributes) {
 				var valueOrArrayOfValues = attributes[attribute];
 				if (dojo.lang.isArray(valueOrArrayOfValues)) {
@@ -407,7 +407,7 @@ Write API
 			delete this._added[identity];
 		} else {
 			this._deleted[identity] = 1; 
-			//todo? this._numItems--; ?? but its still in this._data
+			//todo-legacy? this._numItems--; ?? but its still in this._data
 		}
 			
 		if (this._changed[identity]) {
@@ -419,7 +419,7 @@ Write API
 	setValues: function(/* item */ item, /* attribute || string */ attribute, /* array */ values) {
 		var identity = this.getIdentity(item);
 		if (!identity) {
-			return undefined; //todo: raise exception
+			return undefined; //todo-legacy: raise exception
 		}
 
 		var changes = this._changed[identity];
@@ -512,9 +512,9 @@ Write API
 					}
 				}
 				self._initChanges(); 
-				result.callback(true); //todo: what result to pass?
+				result.callback(true); //todo-legacy: what result to pass?
 			} else if(type == "error" || type == 'timeout'){
-				result.errback(data); //todo: how to handle timeout
+				result.errback(data); //todo-legacy: how to handle timeout
 			}	
 		};
 				

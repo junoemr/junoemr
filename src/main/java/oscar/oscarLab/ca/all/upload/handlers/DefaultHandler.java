@@ -118,7 +118,7 @@ public class DefaultHandler implements MessageHandler {
     }   
     
     
-    //TODO: Dont think this needs to be in this class.  Better as a util method
+    //TODO-legacy: Dont think this needs to be in this class.  Better as a util method
     public String readTextFile(String fullPathFilename) throws IOException {
         StringBuilder sb = new StringBuilder(1024);
         BufferedReader reader = new BufferedReader(new FileReader(fullPathFilename));

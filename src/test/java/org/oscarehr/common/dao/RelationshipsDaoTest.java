@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Relationships;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RelationshipsDaoTest extends DaoTestFixtures {
-
-	protected RelationshipsDao dao = SpringUtils.getBean(RelationshipsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RelationshipsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RelationshipsDao relationshipsDao;
 
 	@Before
 	public void before() throws Exception {
@@ -59,20 +65,20 @@ public class RelationshipsDaoTest extends DaoTestFixtures {
 		Relationships relationships1 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships1);
 		relationships1.setDemographicNo(demographicNo1);
-		dao.persist(relationships1);
+		relationshipsDao.persist(relationships1);
 
 		Relationships relationships2 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships2);
 		relationships2.setDemographicNo(demographicNo2);
-		dao.persist(relationships2);
+		relationshipsDao.persist(relationships2);
 		
 		Relationships relationships3 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships3);
 		relationships3.setDemographicNo(demographicNo3);
-		dao.persist(relationships3);
+		relationshipsDao.persist(relationships3);
 		
 		List<Relationships> expectedResult = new ArrayList<Relationships>(Arrays.asList(relationships2, relationships3, relationships1));
-		List<Relationships> result = dao.findAll();
+		List<Relationships> result = relationshipsDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -95,20 +101,20 @@ public class RelationshipsDaoTest extends DaoTestFixtures {
 		Relationships relationships1 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships1);
 		relationships1.setDeleted(null);
-		dao.persist(relationships1);
+		relationshipsDao.persist(relationships1);
 
 		Relationships relationships2 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships2);
 		relationships2.setDeleted(null);
-		dao.persist(relationships2);
+		relationshipsDao.persist(relationships2);
 		
 		Relationships relationships3 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships3);
 		relationships3.setDeleted("S");
-		dao.persist(relationships3);
+		relationshipsDao.persist(relationships3);
 		
 		Relationships expectedResult = relationships1;
-		Relationships result = dao.findActive(1);
+		Relationships result = relationshipsDao.findActive(1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -123,28 +129,28 @@ public class RelationshipsDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(relationships1);
 		relationships1.setDemographicNo(demographicNo1);
 		relationships1.setDeleted(null);
-		dao.persist(relationships1);
+		relationshipsDao.persist(relationships1);
 
 		Relationships relationships2 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships2);
 		relationships2.setDemographicNo(demographicNo2);
 		relationships2.setDeleted(null);
-		dao.persist(relationships2);
+		relationshipsDao.persist(relationships2);
 		
 		Relationships relationships3 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships3);
 		relationships3.setDemographicNo(demographicNo1);
 		relationships3.setDeleted("S");
-		dao.persist(relationships3);
+		relationshipsDao.persist(relationships3);
 		
 		Relationships relationships4 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships4);
 		relationships4.setDemographicNo(demographicNo1);
 		relationships4.setDeleted(null);
-		dao.persist(relationships4);
+		relationshipsDao.persist(relationships4);
 		
 		List<Relationships> expectedResult = new ArrayList<Relationships>(Arrays.asList(relationships1, relationships4));
-		List<Relationships> result = dao.findByDemographicNumber(demographicNo1);
+		List<Relationships> result = relationshipsDao.findByDemographicNumber(demographicNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -175,31 +181,31 @@ public class RelationshipsDaoTest extends DaoTestFixtures {
 		relationships1.setDemographicNo(demographicNo1);
 		relationships1.setSubDecisionMaker(subDecisionMaker1);
 		relationships1.setDeleted(null);
-		dao.persist(relationships1);
+		relationshipsDao.persist(relationships1);
 
 		Relationships relationships2 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships2);
 		relationships2.setDemographicNo(demographicNo2);
 		relationships2.setSubDecisionMaker(subDecisionMaker2);
 		relationships2.setDeleted(null);
-		dao.persist(relationships2);
+		relationshipsDao.persist(relationships2);
 		
 		Relationships relationships3 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships3);
 		relationships3.setDemographicNo(demographicNo1);
 		relationships3.setSubDecisionMaker(subDecisionMaker1);
 		relationships3.setDeleted("S");
-		dao.persist(relationships3);
+		relationshipsDao.persist(relationships3);
 		
 		Relationships relationships4 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships4);
 		relationships4.setDemographicNo(demographicNo1);
 		relationships4.setSubDecisionMaker(subDecisionMaker1);
 		relationships4.setDeleted(null);
-		dao.persist(relationships4);
+		relationshipsDao.persist(relationships4);
 		
 		List<Relationships> expectedResult = new ArrayList<Relationships>(Arrays.asList(relationships1, relationships4));
-		List<Relationships> result = dao.findActiveSubDecisionMaker(demographicNo1);
+		List<Relationships> result = relationshipsDao.findActiveSubDecisionMaker(demographicNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -230,31 +236,31 @@ public class RelationshipsDaoTest extends DaoTestFixtures {
 		relationships1.setDemographicNo(demographicNo1);
 		relationships1.setFacilityId(facilityId1);
 		relationships1.setDeleted(null);
-		dao.persist(relationships1);
+		relationshipsDao.persist(relationships1);
 
 		Relationships relationships2 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships2);
 		relationships2.setDemographicNo(demographicNo2);
 		relationships2.setFacilityId(facilityId2);
 		relationships2.setDeleted(null);
-		dao.persist(relationships2);
+		relationshipsDao.persist(relationships2);
 		
 		Relationships relationships3 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships3);
 		relationships3.setDemographicNo(demographicNo1);
 		relationships3.setFacilityId(facilityId1);
 		relationships3.setDeleted("S");
-		dao.persist(relationships3);
+		relationshipsDao.persist(relationships3);
 		
 		Relationships relationships4 = new Relationships();
 		EntityDataGenerator.generateTestDataForModelClass(relationships4);
 		relationships4.setDemographicNo(demographicNo1);
 		relationships4.setFacilityId(facilityId1);
 		relationships4.setDeleted(null);
-		dao.persist(relationships4);
+		relationshipsDao.persist(relationships4);
 		
 		List<Relationships> expectedResult = new ArrayList<Relationships>(Arrays.asList(relationships1, relationships4));
-		List<Relationships> result = dao.findActiveByDemographicNumberAndFacility(demographicNo1, facilityId1);
+		List<Relationships> result = relationshipsDao.findActiveByDemographicNumberAndFacility(demographicNo1, facilityId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

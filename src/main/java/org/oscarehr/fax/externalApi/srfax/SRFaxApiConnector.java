@@ -461,7 +461,7 @@ public class SRFaxApiConnector
 				if (ListWrapper.STATUS_SUCCESS.equals(status))
 				{
 					ObjectMapper mapper = new ObjectMapper();
-					result = mapper.readValue(response, typeReference);
+					result = (ListWrapper<T>) mapper.readValue(response, typeReference);
 				} else
 				{
 					logger.warn("API Response Failure: " + response);
@@ -501,7 +501,7 @@ public class SRFaxApiConnector
 				if (SingleWrapper.STATUS_SUCCESS.equals(status))
 				{
 					ObjectMapper mapper = new ObjectMapper();
-					result = mapper.readValue(response, typeReference);
+					result = (SingleWrapper<T>) mapper.readValue(response, typeReference);
 				} else
 				{
 					logger.warn("API Response Failure: " + response);

@@ -55,6 +55,13 @@ public abstract class AbstractModel<T> implements java.io.Serializable
 						&& stack[i].getMethodName().equals("validate")) {
 					return super.hashCode();
 				}
+
+				// hashCode() appears to be called when making ManyToOne joins, but still seems to
+				// work if there is no Id (i.e. there is no child)
+				if(stack[i].getClassName().equals("org.hibernate.type.ManyToOneType")
+						&& stack[i].getMethodName().equals("resolve")) {
+					return super.hashCode();
+				}
 	        }
 			MiscUtils.getLogger().warn(OBJECT_NOT_YET_PERISTED, new Exception());
 			return(super.hashCode());
@@ -82,7 +89,7 @@ public abstract class AbstractModel<T> implements java.io.Serializable
 	 * This method checks to see if there is an entry in the list with the corresponding primary key, it does not check to see that the other values are the
 	 * same or not.
 	 */
-	// TODO Move this to the base DAO instead ??? 
+	// TODO-legacy Move this to the base DAO instead ???
 	public static <X extends AbstractModel<?>> boolean existsId(List<X> list, X searchModel)
 	{
 		Object searchPk = searchModel.getId();

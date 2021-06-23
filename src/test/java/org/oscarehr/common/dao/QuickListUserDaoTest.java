@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.QuickListUser;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class QuickListUserDaoTest extends DaoTestFixtures {
-
-	protected QuickListUserDao dao = SpringUtils.getBean(QuickListUserDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class QuickListUserDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected QuickListUserDao quickListUserDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,7 +51,7 @@ public class QuickListUserDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		QuickListUser ql = new QuickListUser();
 		 EntityDataGenerator.generateTestDataForModelClass(ql);
-		 dao.persist(ql);
+		 quickListUserDao.persist(ql);
 		 assertNotNull(ql.getId());
 	}
 

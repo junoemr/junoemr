@@ -636,7 +636,7 @@ public class XMLTransferUtil
       element.setSystolic( Integer.valueOf(baseLineVd.getSBP()) );
       element.setDiastolic( Integer.valueOf(baseLineVd.getDBP()) );
       element.setAutoOfficeMonitor( toYesNo( baseLineVd.isMonitor() ) );
-      element.setValueDate( visitDate ); // FIXME:???? which value date to set??
+      element.setValueDate( visitDate ); // FIXME-legacy:???? which value date to set??
       element.setSignedWhen( when );
       element.setSignedWho( who );
     }
@@ -1989,7 +1989,7 @@ public class XMLTransferUtil
           if ( pdata != null && pdata.getPatient_Id() != null ) {
         	  Calendar dateOfHmpStatus = Calendar.getInstance();
         	  dateOfHmpStatus.setTime(pdata.getDateOfHmpStatus());
-        	  addPatientToSite( site, pdata, null, dataBeginDate, dataEndDate); // FIXME: add parameter for first visit data        	  
+        	  addPatientToSite( site, pdata, null, dataBeginDate, dataEndDate); // FIXME-legacy: add parameter for first visit data
           }
         }
       if ( patientIdList == null || patientIdList.size() == 0 )
@@ -1999,7 +1999,7 @@ public class XMLTransferUtil
     {
       Hsfo2Patient pdata = getDemographic( demographicNo.toString() );
       if ( pdata != null && pdata.getPatient_Id() != null )
-        addPatientToSite( site, pdata, null, dataBeginDate, dataEndDate ); // FIXME: add parameter for first visit data
+        addPatientToSite( site, pdata, null, dataBeginDate, dataEndDate ); // FIXME-legacy: add parameter for first visit data
       else
         doc = null;
     }

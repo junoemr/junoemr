@@ -52,7 +52,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WaitlistDao {
 
-	@PersistenceContext(unitName = "persistenceUnit")
+	@PersistenceContext
 	protected EntityManager entityManager = null;
 	
 	private List<MatchBO> constructMatchBOList(List<Object[]> results) {
@@ -238,7 +238,7 @@ public class WaitlistDao {
 	public VacancyDisplayBO getDisplayVacancy(int vacancyID) {
 		VacancyDisplayBO bo = new VacancyDisplayBO();
 		String queryString = "SELECT v.vacancyName, t.NAME, " +
-				"v.dateCreated, p.name, v.vacancyName  FROM vacancy v JOIN vacancy_template t ON v.templateId=t.TEMPLATE_ID JOIN program p ON v.wlProgramId=p.id  WHERE v.id=?1";
+				"v.dateCreated, p.name FROM vacancy v JOIN vacancy_template t ON v.templateId=t.TEMPLATE_ID JOIN program p ON v.wlProgramId=p.id  WHERE v.id=?1";
 		
 		Query query = entityManager.createNativeQuery(queryString);
 		query.setParameter(1, vacancyID);
@@ -252,7 +252,6 @@ public class WaitlistDao {
 			bo.setVacancyTemplateName((String)cols[1]);
 			bo.setCreated((Date)cols[2]);
             bo.setProgramName((String)cols[3]);
-            bo.setVacancyName((String)cols[4]);
 		}
 		loadStats(bo);
 		return bo;
@@ -306,7 +305,7 @@ public class WaitlistDao {
 
 	public List<VacancyDisplayBO> listNoOfVacanciesForWaitListProgram() {
 		final List<VacancyDisplayBO> bos = new ArrayList<VacancyDisplayBO>();
-		String queryStr = "SELECT p.id , COUNT(*) vacncyCnt,v.vacancyName,v.dateCreated,v.id FROM vacancy v JOIN program p ON " 
+		String queryStr = "SELECT p.id , COUNT(*) vacncyCnt,v.vacancyName,v.dateCreated,v.id AS vacancyId FROM vacancy v JOIN program p ON "
 			+ "v.wlProgramId=p.id where v.status=?1 GROUP by v.wlProgramId";
 		Query query = entityManager.createNativeQuery(queryStr);
 		query.setParameter(1, "active");

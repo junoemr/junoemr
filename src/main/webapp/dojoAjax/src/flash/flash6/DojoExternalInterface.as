@@ -24,7 +24,7 @@ class DojoExternalInterface{
 
 	public static function initialize(){ 
 		//getURL("javascript:dojo.debug('FLASH:DojoExternalInterface initialize')");
-		// FIXME: Set available variable by testing for capabilities
+		// FIXME-legacy: Set available variable by testing for capabilities
 		DojoExternalInterface.available = true;
 		
 		// extract the dojo base path
@@ -80,7 +80,7 @@ class DojoExternalInterface{
 	
 	public static function call(methodName:String, 
 								resultsCallback:Function) : Void{
-		// FIXME: support full JSON serialization
+		// FIXME-legacy: support full JSON serialization
 		
 		// First, we pack up all of the arguments to this call and set them
 		// as Flash variables, which the JavaScript side will unpack using

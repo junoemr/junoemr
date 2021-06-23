@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.Hl7Obx;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Hl7ObxDaoTest extends DaoTestFixtures {
-
-	public Hl7ObxDao dao = SpringUtils.getBean(Hl7ObxDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Hl7ObxDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public Hl7ObxDao hl7ObxDao;
 
 	@Before
 	public void before() throws Exception {
@@ -46,13 +52,13 @@ public class Hl7ObxDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Hl7Obx entity = new Hl7Obx();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		hl7ObxDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindObxAndObrByObrId() {
-		assertNotNull(dao.findObxAndObrByObrId(100));
+		assertNotNull(hl7ObxDao.findObxAndObrByObrId(100));
 	}
 
 }

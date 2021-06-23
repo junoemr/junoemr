@@ -40,11 +40,11 @@ public class DefaultRoleAccessDAO extends HibernateDaoSupport {
     }
 
     public List<DefaultRoleAccess> getDefaultRoleAccesses() {
-        return this.getHibernateTemplate().find("from DefaultRoleAccess dra ORDER BY role_id");
+        return (List<DefaultRoleAccess>) this.getHibernateTemplate().find("from DefaultRoleAccess dra ORDER BY role_id");
     }
     
     public List<DefaultRoleAccess> findAll() {
-        return this.getHibernateTemplate().find("from DefaultRoleAccess dra");
+        return (List<DefaultRoleAccess>) this.getHibernateTemplate().find("from DefaultRoleAccess dra");
     }
 
     public void saveDefaultRoleAccess(DefaultRoleAccess dra) {
@@ -52,7 +52,7 @@ public class DefaultRoleAccessDAO extends HibernateDaoSupport {
     }
 
     public DefaultRoleAccess find(Long roleId, Long accessTypeId) {
-        List results = this.getHibernateTemplate().find("from DefaultRoleAccess dra where dra.roleId=? and dra.accessTypeId=?", new Object[] {roleId, accessTypeId});
+        List results = this.getHibernateTemplate().find("from DefaultRoleAccess dra where dra.roleId=?0 and dra.accessTypeId=?1", new Object[] {roleId, accessTypeId});
 
         if (!results.isEmpty()) {
             return (DefaultRoleAccess)results.get(0);
@@ -61,7 +61,7 @@ public class DefaultRoleAccessDAO extends HibernateDaoSupport {
     }
     
     public List<Object[]> findAllRolesAndAccessTypes(){
-    	return getHibernateTemplate().find("FROM DefaultRoleAccess a, AccessType b WHERE a.id = b.Id");
+    	return (List<Object[]>) getHibernateTemplate().find("FROM DefaultRoleAccess a, AccessType b WHERE a.id = b.Id");
     }
 
 }

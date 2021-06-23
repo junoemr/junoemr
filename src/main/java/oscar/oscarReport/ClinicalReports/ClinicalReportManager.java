@@ -189,7 +189,7 @@ public class ClinicalReportManager {
                         String type = e.getAttributeValue("type");
                         if (type != null && type.equals("SQL")){
                             SQLNumerator sqlN = new SQLNumerator();
-                            //TODO: What if one of the values is null;
+                            //TODO-legacy: What if one of the values is null;
                             Hashtable<String,String> h = new Hashtable<String,String>();
                             h.put("type",type);
                             h.put("numeratorName",e.getAttributeValue("name"));

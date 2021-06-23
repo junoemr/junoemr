@@ -152,7 +152,7 @@ dojo.widget.html.loader = new (function(){
 
 	// run java function
 	function runHandler(){
-		//FIXME: current behaviour is to return false if handler is there; is that intended?
+		//FIXME-legacy: current behaviour is to return false if handler is there; is that intended?
 		if(dojo.lang.isFunction(this.handler)) {
 			this.handler(this, this.containerNode||this.domNode);
 			refreshed.call(this);
@@ -470,7 +470,7 @@ dojo.widget.html.loader = new (function(){
 			// extract visible content from inside of <body> .... </body>
 			extractContent: undef(widgetProto.extractContent) ? true : widgetProto.extractContent,
 			// construct all widgets that is in content
-			// FIXME: rename to parseWidgets?
+			// FIXME-legacy: rename to parseWidgets?
 			parseContent: 	undef(widgetProto.parseContent) ? true : widgetProto.parseContent,
 			// use io binds javascript cache, or if false, prevent browsercache
 			cacheContent: 	undef(widgetProto.cacheContent) ? true : widgetProto.cacheContent,
@@ -826,7 +826,7 @@ dojo.widget.html.loader = new (function(){
 			widgetProto.setHandler = function(handler) {
 				var fcn = dojo.lang.isFunction(handler) ? handler : window[handler];
 				if(!isFunc(fcn)) {
-					// FIXME: needs testing! somebody with java knowledge needs to try this
+					// FIXME-legacy: needs testing! somebody with java knowledge needs to try this
 					handleDefaults.call(this, "Unable to set handler, '" + handler + "' not a function.", "onExecError", true);
 					return;
 				}

@@ -400,7 +400,7 @@ dojo.widget.defineWidget(
 		setTimerNode: function(node){
 			// summary
 			//	specify into which node to write the remaining # of seconds
-			// TODO: make this a parameter too
+			// TODO-legacy: make this a parameter too
 			this.timerNode = node;
 		},
 
@@ -415,7 +415,7 @@ dojo.widget.defineWidget(
 		setShowControl: function(/*String|DomNode*/ node) {
 			// summary
 			//	when specified node is clicked, show this dialog
-			// TODO: make this a parameter too
+			// TODO-legacy: make this a parameter too
 			node = dojo.byId(node);
 			dojo.event.connect(node, "onclick", this, "show");
 		},
@@ -426,7 +426,7 @@ dojo.widget.defineWidget(
 			if(this.timer){
 				this.timeRemaining -= 100;
 				if(this.lifetime - this.timeRemaining >= this.blockDuration){
-					// TODO: this block of code is executing over and over again, rather than just once
+					// TODO-legacy: this block of code is executing over and over again, rather than just once
 					if(this.closeNode){
 						this.closeNode.style.visibility = "visible";
 					}

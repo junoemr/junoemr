@@ -248,7 +248,7 @@ public ActionForward clearStash(ActionMapping mapping,ActionForm form,HttpServle
         int id = Integer.parseInt(idStr);
 
         String reason = request.getParameter("reason");
-        //String comment = request.getParameter("comment"); //TODO: PUT this in a note
+        //String comment = request.getParameter("comment"); //TODO-legacy: PUT this in a note
 
         String ip = request.getRemoteAddr();
 

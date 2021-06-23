@@ -46,7 +46,7 @@ public class OcanSubmissionLogDao extends AbstractDao<OcanSubmissionLog> {
 	
 		
 	public List<OcanSubmissionLog> findBySubmissionDate(Date submissionDate) {
-		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where date(l.submitDateTime)=?  order by l.submitDateTime DESC");
+		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where date(l.submitDateTime)=?1  order by l.submitDateTime DESC");
 		query.setParameter(1, submissionDate);
 		@SuppressWarnings("unchecked")
 		List<OcanSubmissionLog> results = query.getResultList();
@@ -54,7 +54,7 @@ public class OcanSubmissionLogDao extends AbstractDao<OcanSubmissionLog> {
 	}
 	
 	public List<OcanSubmissionLog> findBySubmissionDateType(Date submissionDate, String type) {
-		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where date(l.submitDateTime)=?  and submissionType=? order by l.submitDateTime DESC");
+		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where date(l.submitDateTime)=?1  and submissionType=?2 order by l.submitDateTime DESC");
 		query.setParameter(1, submissionDate);
 		query.setParameter(2, type);
 		@SuppressWarnings("unchecked")
@@ -63,7 +63,7 @@ public class OcanSubmissionLogDao extends AbstractDao<OcanSubmissionLog> {
 	}
 	
 	public List<OcanSubmissionLog> findBySubmissionDateType(Date submissionStartDate, Date submissionEndDate, String type) {
-		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where submitDateTime>=?  and l.submitDateTime<=? and submissionType=? order by l.submitDateTime DESC");
+		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where submitDateTime>=?1  and l.submitDateTime<=?2 and submissionType=?3 order by l.submitDateTime DESC");
 		query.setParameter(1, submissionStartDate);
 		query.setParameter(2, submissionEndDate);
 		query.setParameter(3, type);
@@ -73,7 +73,7 @@ public class OcanSubmissionLogDao extends AbstractDao<OcanSubmissionLog> {
 	}
 	
 	public List<OcanSubmissionLog> findAllByType(String type) {
-		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where l.submissionType=? order by l.submitDateTime DESC");
+		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where l.submissionType=?1 order by l.submitDateTime DESC");
 		query.setParameter(1, type);
 		@SuppressWarnings("unchecked")
 		List<OcanSubmissionLog> results = query.getResultList();
@@ -81,7 +81,7 @@ public class OcanSubmissionLogDao extends AbstractDao<OcanSubmissionLog> {
 	}
 	
 	public List<OcanSubmissionLog> findFailedSubmissionsByType(String type) {
-		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where l.submissionType=? and l.result=? order by l.submitDateTime DESC");
+		Query query = entityManager.createQuery("select l from OcanSubmissionLog l where l.submissionType=?1 and l.result=?2 order by l.submitDateTime DESC");
 		query.setParameter(1, type);
 		query.setParameter(2, "false");
 		@SuppressWarnings("unchecked")

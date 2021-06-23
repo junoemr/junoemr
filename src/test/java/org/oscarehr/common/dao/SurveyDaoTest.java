@@ -27,14 +27,20 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Survey;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SurveyDaoTest extends DaoTestFixtures {
-
-	protected SurveyDao dao = SpringUtils.getBean(SurveyDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SurveyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SurveyDao surveyDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,7 +51,7 @@ public class SurveyDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Survey entity = new Survey();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		surveyDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -59,20 +65,20 @@ public class SurveyDaoTest extends DaoTestFixtures {
 		Survey survey1 = new Survey();
 		EntityDataGenerator.generateTestDataForModelClass(survey1);
 		survey1.setDescription(description1);
-		dao.persist(survey1);
+		surveyDao.persist(survey1);
 		
 		Survey survey2 = new Survey();
 		EntityDataGenerator.generateTestDataForModelClass(survey2);
 		survey2.setDescription(description2);
-		dao.persist(survey2);
+		surveyDao.persist(survey2);
 		
 		Survey survey3 = new Survey();
 		EntityDataGenerator.generateTestDataForModelClass(survey3);
 		survey3.setDescription(description3);
-		dao.persist(survey3);
+		surveyDao.persist(survey3);
 		
 		Survey expectedReslut = survey2;
-		Survey result = dao.findByName(description2);
+		Survey result = surveyDao.findByName(description2);
 		
 		assertEquals(expectedReslut, result);	
 	}

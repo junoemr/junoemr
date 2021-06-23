@@ -90,7 +90,7 @@ dojo.widget.defineWidget(
 		classNames: {
 		// summary:
 		//	stores a list of class names that may be overriden
-		//	TODO: this is not good; can't be adjusted via markup, etc. since it's an array
+		//	TODO-legacy: this is not good; can't be adjusted via markup, etc. since it's an array
 			previous: "previousMonth",
 			disabledPrevious: "previousMonthDisabled",
 			current: "currentMonth",

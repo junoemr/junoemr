@@ -173,7 +173,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.bubbleUpEditNoteCallback = function bubbleUpEditNoteCallback(note, successCallback, dismissCallback)
 		{
-			//TODO open record controller note edit without emit?
+			//TODO-legacy open record controller note edit without emit?
 			$scope.$emit('loadNoteForEdit', note);
 		};
 
@@ -358,7 +358,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		});
 
-		//TODO I would really like to refactor this out
+		//TODO-legacy I would really like to refactor this out
 		controller.gotoState = function gotoState(item, mod, successCallback, dismissCallback)
 		{
 			if (item == "add")

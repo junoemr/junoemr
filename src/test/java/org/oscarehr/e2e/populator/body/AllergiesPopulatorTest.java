@@ -27,17 +27,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Act;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalStatement;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActClassDocumentEntryAct;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_DocumentActMood;
 import org.oscarehr.e2e.constant.BodyConstants.Allergies;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AllergiesPopulatorTest extends AbstractBodyPopulatorTest {
-	@BeforeClass
-	public static void beforeClass() {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AllergiesPopulatorTest extends AbstractBodyPopulatorTest
+{
+	@Before
+	public void beforeClass()
+	{
 		setupClass(Allergies.getConstants());
 	}
 

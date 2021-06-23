@@ -32,17 +32,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AppointmentStatusDaoTest extends DaoTestFixtures {
-
-	protected AppointmentStatusDao dao = SpringUtils.getBean(AppointmentStatusDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AppointmentStatusDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected AppointmentStatusDao appointmentStatusDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +58,8 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		AppointmentStatus entity = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		entity.setJunoColor("#000000");
+		appointmentStatusDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -62,22 +68,26 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures {
 		
 		AppointmentStatus apptStatus1 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus1);
-		dao.persist(apptStatus1);
+		apptStatus1.setJunoColor("#000000");
+		appointmentStatusDao.persist(apptStatus1);
 		
 		AppointmentStatus apptStatus2 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus2);
-		dao.persist(apptStatus2);
+		apptStatus2.setJunoColor("#000000");
+		appointmentStatusDao.persist(apptStatus2);
 		
 		AppointmentStatus apptStatus3 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus3);
-		dao.persist(apptStatus3);
+		apptStatus3.setJunoColor("#000000");
+		appointmentStatusDao.persist(apptStatus3);
 		
 		AppointmentStatus apptStatus4 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus4);
-		dao.persist(apptStatus4);
+		apptStatus4.setJunoColor("#000000");
+		appointmentStatusDao.persist(apptStatus4);
 		
 		List<AppointmentStatus> expectedResult = new ArrayList<AppointmentStatus>(Arrays.asList(apptStatus1, apptStatus2, apptStatus3, apptStatus4));
-		List<AppointmentStatus> result = dao.findAll();
+		List<AppointmentStatus> result = appointmentStatusDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 				
@@ -93,7 +103,7 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures {
 		}
 		assertTrue(true);		
 	}
-	
+
 	@Test
 	public void testFindByStatus() throws Exception {
 		
@@ -102,20 +112,23 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures {
 		AppointmentStatus apptStatus1 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus1);
 		apptStatus1.setStatus(status1);
-		dao.persist(apptStatus1);
+		apptStatus1.setJunoColor("#000000");
+		appointmentStatusDao.persist(apptStatus1);
 		
 		AppointmentStatus apptStatus2 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus2);
 		apptStatus2.setStatus(status2);
-		dao.persist(apptStatus2);
+		apptStatus2.setJunoColor("#000000");
+		appointmentStatusDao.persist(apptStatus2);
 		
 		AppointmentStatus apptStatus3 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus3);
 		apptStatus3.setStatus(status3);
-		dao.persist(apptStatus3);
+		apptStatus3.setJunoColor("#000000");
+		appointmentStatusDao.persist(apptStatus3);
 		
 		AppointmentStatus expectedResult = apptStatus2;
-		AppointmentStatus result = dao.findByStatus(status2);
+		AppointmentStatus result = appointmentStatusDao.findByStatus(status2);
 		
 		assertEquals(expectedResult, result);
 	}

@@ -37,14 +37,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OscarLogDaoTest extends DaoTestFixtures {
-	protected OscarLogDao dao = (OscarLogDao)SpringUtils.getBean(OscarLogDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OscarLogDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected OscarLogDao oscarLogDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -60,20 +67,20 @@ public class OscarLogDaoTest extends DaoTestFixtures {
 		OscarLog oscarLog1 = new OscarLog();
 		EntityDataGenerator.generateTestDataForModelClass(oscarLog1);
 		oscarLog1.setDemographicId(demographicId1);
-		dao.persist(oscarLog1);
+		oscarLogDao.persist(oscarLog1);
 		
 		OscarLog oscarLog2 = new OscarLog();
 		EntityDataGenerator.generateTestDataForModelClass(oscarLog2);
 		oscarLog2.setDemographicId(demographicId2);
-		dao.persist(oscarLog2);
+		oscarLogDao.persist(oscarLog2);
 		
 		OscarLog oscarLog3 = new OscarLog();
 		EntityDataGenerator.generateTestDataForModelClass(oscarLog3);
 		oscarLog3.setDemographicId(demographicId1);
-		dao.persist(oscarLog3);
+		oscarLogDao.persist(oscarLog3);
 		
 		List<OscarLog> expectedResult = new ArrayList<OscarLog>(Arrays.asList(oscarLog1, oscarLog3));
-		List<OscarLog> result = dao.findByDemographicId(demographicId1);
+		List<OscarLog> result = oscarLogDao.findByDemographicId(demographicId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -111,7 +118,7 @@ public class OscarLogDaoTest extends DaoTestFixtures {
 		oscarLog1.setContent(content1);
 		oscarLog1.setContentId(contentId1);
 		oscarLog1.setAction(action1);
-		dao.persist(oscarLog1);
+		oscarLogDao.persist(oscarLog1);
 		
 		OscarLog oscarLog2 = new OscarLog();
 		EntityDataGenerator.generateTestDataForModelClass(oscarLog2);
@@ -119,7 +126,7 @@ public class OscarLogDaoTest extends DaoTestFixtures {
 		oscarLog2.setContent(content2);
 		oscarLog2.setContentId(contentId2);
 		oscarLog2.setAction(action2);
-		dao.persist(oscarLog2);
+		oscarLogDao.persist(oscarLog2);
 		
 		OscarLog oscarLog3 = new OscarLog();
 		EntityDataGenerator.generateTestDataForModelClass(oscarLog3);
@@ -127,10 +134,10 @@ public class OscarLogDaoTest extends DaoTestFixtures {
 		oscarLog3.setContent(content1);
 		oscarLog3.setContentId(contentId1);
 		oscarLog3.setAction(action2);
-		dao.persist(oscarLog3);
+		oscarLogDao.persist(oscarLog3);
 		
 		boolean expectedResult = true;
-		boolean result = dao.hasRead(providerNo1, content1, contentId1);
+		boolean result = oscarLogDao.hasRead(providerNo1, content1, contentId1);
 
 		assertEquals(expectedResult, result);
 	}

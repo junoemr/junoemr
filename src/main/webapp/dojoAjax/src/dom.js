@@ -137,7 +137,7 @@ dojo.dom.prevElement = dojo.dom.getPreviousSiblingElement = function(/* Node */n
 	return node;	//	Element
 }
 
-// TODO: hmph
+// TODO-legacy: hmph
 /*this.forEachChildTag = function(node, unaryFunc) {
 	var child = this.getFirstChildTag(node);
 	while(child) {
@@ -180,7 +180,7 @@ dojo.dom.replaceChildren = function(/*Element*/node, /*Node*/newChild){
 	//	summary:
 	//		Removes all children of node and appends newChild. All the existing
 	//		children will be destroyed.
-	// FIXME: what if newChild is an array-like object?
+	// FIXME-legacy: what if newChild is an array-like object?
 	var nodes = [];
 	if(dojo.render.html.ie){
 		for(var i=0;i<node.childNodes.length;i++){
@@ -349,7 +349,7 @@ dojo.dom.createDocumentFromText = function(/*string*/str, /*string?*/mimetype){
 		}
 	/*
 	}else if((dojo.render.html.capable)&&(dojo.render.html.safari)){
-		// FIXME: this doesn't appear to work!
+		// FIXME-legacy: this doesn't appear to work!
 		// from: http://web-graphics.com/mtarchive/001606.php
 		// var xml = '<?xml version="1.0"?>'+str;
 		var mtype = "text/xml";
@@ -364,7 +364,7 @@ dojo.dom.createDocumentFromText = function(/*string*/str, /*string?*/mimetype){
 	}else{
 		var _document = dojo.doc();
 		if(_document.createElement){
-			// FIXME: this may change all tags to uppercase!
+			// FIXME-legacy: this may change all tags to uppercase!
 			var tmp = _document.createElement("xml");
 			tmp.innerHTML = str;
 			if(_document.implementation && _document.implementation.createDocument){
@@ -374,8 +374,8 @@ dojo.dom.createDocumentFromText = function(/*string*/str, /*string?*/mimetype){
 				}
 				return xmlDoc;	//	DOMDocument
 			}
-			// FIXME: probably not a good idea to have to return an HTML fragment
-			// FIXME: the tmp.doc.firstChild is as tested from IE, so it may not
+			// FIXME-legacy: probably not a good idea to have to return an HTML fragment
+			// FIXME-legacy: the tmp.doc.firstChild is as tested from IE, so it may not
 			// work that way across the board
 			return ((tmp.document)&&
 				(tmp.document.firstChild ?  tmp.document.firstChild : tmp));	//	DOMDocument

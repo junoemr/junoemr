@@ -2422,7 +2422,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
 
   /**
    * Returns the actual instance of the $tooltip service.
-   * TODO support multiple triggers
+   * TODO-legacy support multiple triggers
    */
   this.$get = [ '$window', '$compile', '$timeout', '$parse', '$document', '$position', '$interpolate', function ( $window, $compile, $timeout, $parse, $document, $position, $interpolate ) {
     return function $tooltip ( type, prefix, defaultTriggerShow ) {
@@ -2490,7 +2490,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             };
 
             // By default, the tooltip is not open.
-            // TODO add ability to start tooltip opened
+            // TODO-legacy add ability to start tooltip opened
             scope.tt_isOpen = false;
 
             function toggleTooltipBind () {
@@ -2576,7 +2576,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
 
               // And now we remove it from the DOM. However, if we have animation, we 
               // need to wait for it to expire beforehand.
-              // FIXME: this is a placeholder for a port of the transitions library.
+              // FIXME-legacy: this is a placeholder for a port of the transitions library.
               if ( scope.tt_animation ) {
                 if (!transitionTimeout) {
                   transitionTimeout = $timeout(removeTooltip, 500);

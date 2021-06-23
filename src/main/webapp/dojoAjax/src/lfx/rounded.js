@@ -73,7 +73,7 @@ dojo.lfx.rounded.applyCorners = function(/* object */options, /* HTMLElement */n
 	var padding = parseInt(dojo.html.getComputedStyle(node, "padding-top"));
 
 	//	formatting details
-	//	TODO: use Dojo equivilents for these if exists.
+	//	TODO-legacy: use Dojo equivilents for these if exists.
 	var format={
 		height : height,
 		width : width,

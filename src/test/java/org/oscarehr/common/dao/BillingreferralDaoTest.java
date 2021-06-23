@@ -28,14 +28,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Billingreferral;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingreferralDaoTest extends DaoTestFixtures {
-
-	protected BillingreferralDao dao = (BillingreferralDao)SpringUtils.getBean("BillingreferralDAO");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingreferralDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingreferralDao billingreferralDao;
 
 	public BillingreferralDaoTest() {
 	}
@@ -50,7 +56,7 @@ public class BillingreferralDaoTest extends DaoTestFixtures {
 		Billingreferral entity = new Billingreferral();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setBillingreferralNo(null);
-		dao.updateBillingreferral(entity);
+		billingreferralDao.updateBillingreferral(entity);
 		assertNotNull(entity.getBillingreferralNo());
 	}
 
@@ -63,9 +69,9 @@ public class BillingreferralDaoTest extends DaoTestFixtures {
 		entity.setLastName("Smith");
 		entity.setFirstName("John");
 		entity.setDeletedAt(null);
-		dao.updateBillingreferral(entity);
+		billingreferralDao.updateBillingreferral(entity);
 
-		assertEquals(1,dao.searchReferralCode("123456", "123456",
+		assertEquals(1, billingreferralDao.searchReferralCode("123456", "123456",
 				"123456", "Smith", "John", "Smith", "John",
 				"Smith", "John").size());
 	}

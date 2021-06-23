@@ -41,7 +41,7 @@ public class BillingDetailDao extends AbstractDao<BillingDetail> {
 	}
 
 	public List<BillingDetail> findByBillingNo(int billingNo) {
-		Query q = entityManager.createQuery("select x from BillingDetail x where x.billingNo=?");
+		Query q = entityManager.createQuery("select x from BillingDetail x where x.billingNo=?1");
 		q.setParameter(1, billingNo);
 		List<BillingDetail> results = q.getResultList();
 		return results;

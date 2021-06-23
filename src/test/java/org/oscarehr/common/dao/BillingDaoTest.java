@@ -32,14 +32,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Billing;
 import org.oscarehr.util.DateRange;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingDaoTest extends DaoTestFixtures {
-
-	protected BillingDao dao = SpringUtils.getBean(BillingDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingDao billingDao;
 
 	@Before
 	public void before() throws Exception {
@@ -48,53 +54,53 @@ public class BillingDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindBillings() {
-		List<Object[]> billings = dao.findBillings(1, new ArrayList<String>());
+		List<Object[]> billings = billingDao.findBillings(1, new ArrayList<String>());
 		assertNotNull(billings);
 
-		billings = dao.findBillings(1, Arrays.asList(new String[] { "BLIYSD", "GVNUIO" }));
+		billings = billingDao.findBillings(1, Arrays.asList(new String[] { "BLIYSD", "GVNUIO" }));
 		assertNotNull(billings);
 	}
 
 	@Test
 	public void testFindOtherBillings() {
-		List<Billing> bs = dao.findBillings(1, "STA", "01", new Date(), new Date());
+		List<Billing> bs = billingDao.findBillings(1, "STA", "01", new Date(), new Date());
 		assertNotNull(bs);
 
-		bs = dao.findBillings(1, "STA", "01", new Date(), new Date());
+		bs = billingDao.findBillings(1, "STA", "01", new Date(), new Date());
 		assertNotNull(bs);
 
-		bs = dao.findBillings(1, "STA", "01", null, new Date());
+		bs = billingDao.findBillings(1, "STA", "01", null, new Date());
 		assertNotNull(bs);
 
-		bs = dao.findBillings(1, "STA", "01", new Date(), null);
+		bs = billingDao.findBillings(1, "STA", "01", new Date(), null);
 		assertNotNull(bs);
 
-		bs = dao.findBillings(1, "STA", null, new Date(), new Date());
+		bs = billingDao.findBillings(1, "STA", null, new Date(), new Date());
 		assertNotNull(bs);
 
-		bs = dao.findBillings(null, "STA", null, null, null);
+		bs = billingDao.findBillings(null, "STA", null, null, null);
 		assertNotNull(bs);
 	}
 
 	@Test
 	public void testFindMoreBillings() {
-		List<Object[]> bs = dao.findBillings(10);
+		List<Object[]> bs = billingDao.findBillings(10);
 		assertNotNull(bs);
 	}
 
 	@Test
 	public void testFindByProviderStatusAndDates() {
-		assertNotNull(dao.findByProviderStatusAndDates("100", new ArrayList<String>(), null));
-		assertNotNull(dao.findByProviderStatusAndDates("100", new ArrayList<String>(), new DateRange(null, null)));
-		assertNotNull(dao.findByProviderStatusAndDates("100", new ArrayList<String>(), new DateRange(new Date(), null)));
-		assertNotNull(dao.findByProviderStatusAndDates("100", new ArrayList<String>(), new DateRange(null, new Date())));
-		assertNotNull(dao.findByProviderStatusAndDates("100", Arrays.asList(new String[] { "A", "B", "C" }), null));
+		assertNotNull(billingDao.findByProviderStatusAndDates("100", new ArrayList<String>(), null));
+		assertNotNull(billingDao.findByProviderStatusAndDates("100", new ArrayList<String>(), new DateRange(null, null)));
+		assertNotNull(billingDao.findByProviderStatusAndDates("100", new ArrayList<String>(), new DateRange(new Date(), null)));
+		assertNotNull(billingDao.findByProviderStatusAndDates("100", new ArrayList<String>(), new DateRange(null, new Date())));
+		assertNotNull(billingDao.findByProviderStatusAndDates("100", Arrays.asList(new String[] { "A", "B", "C" }), null));
 
 	}
 
 	@Test
 	public void testGetMyMagicBillings() {
-		assertNotNull(dao.getMyMagicBillings());
+		assertNotNull(billingDao.getMyMagicBillings());
 	}
 	
 	@Test
@@ -117,36 +123,36 @@ public class BillingDaoTest extends DaoTestFixtures {
 				false,	false,	false,	false};
 		
 		for(int i = 0; i < tt.length; i += 4) {
-			assertNotNull(dao.findByManyThings(null, null, null, null, null, tt[i], tt[i + 1], tt[i + 2], tt[i + 3]));
-			assertNotNull(dao.findByManyThings("STS", "100", "2010-01-01", "2012-12-31", "100", tt[i], tt[i + 1], tt[i + 2], tt[i + 3]));
+			assertNotNull(billingDao.findByManyThings(null, null, null, null, null, tt[i], tt[i + 1], tt[i + 2], tt[i + 3]));
+			assertNotNull(billingDao.findByManyThings("STS", "100", "2010-01-01", "2012-12-31", "100", tt[i], tt[i + 1], tt[i + 2], tt[i + 3]));
 		}
 	} 
 	public void testGetByManyThings() {
-		assertNotNull(dao.findBillingsByManyThings(100, new Date(), "OHIP", "SVC"));
+		assertNotNull(billingDao.findBillingsByManyThings(100, new Date(), "OHIP", "SVC"));
 	}
 	@Test
 	public void testCountBillings() {
-		assertNotNull(dao.countBillings("DAI", "CR", new Date(), new Date()));
+		assertNotNull(billingDao.countBillings("DAI", "CR", new Date(), new Date()));
 	}
         
     @Test
 	public void testCountBillingVisitsByCreator() {
-        assertNotNull(dao.countBillingVisitsByCreator("100", new Date(), new Date()));
+        assertNotNull(billingDao.countBillingVisitsByCreator("100", new Date(), new Date()));
     }
 
     @Test
 	public void testCountBillingVisitsByProvider() {
-        assertNotNull(dao.countBillingVisitsByProvider("100", new Date(), new Date()));
+        assertNotNull(billingDao.countBillingVisitsByProvider("100", new Date(), new Date()));
 	}
 
     @Test
     public void testFindByProviderStatusForTeleplanFileWriter() {
-	    assertNotNull(dao.findByProviderStatusForTeleplanFileWriter("HIN"));
+	    assertNotNull(billingDao.findByProviderStatusForTeleplanFileWriter("HIN"));
     }
 
     @Test
     public void testFindOutstandingBills() {
-	    assertNotNull(dao.findOutstandingBills(10, "BT", new ArrayList<String>()));
-	    assertNotNull(dao.findOutstandingBills(10, "BT", Arrays.asList(new String[] {"S"})));
+	    assertNotNull(billingDao.findOutstandingBills(10, "BT", new ArrayList<String>()));
+	    assertNotNull(billingDao.findOutstandingBills(10, "BT", Arrays.asList(new String[] {"S"})));
     }
 }

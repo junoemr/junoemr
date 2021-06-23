@@ -40,7 +40,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 	}
 
 	public List<DemographicContact> findByDemographicNo(int demographicNo) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=? and x.deleted=false";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1 and x.deleted=false";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		@SuppressWarnings("unchecked")
@@ -49,7 +49,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 	}
 	
 	public List<DemographicContact> findActiveByDemographicNo(int demographicNo) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=? and x.deleted=false and x.active=1";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1 and x.deleted=false and x.active=1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		@SuppressWarnings("unchecked")
@@ -58,7 +58,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 	}
 	
 	public List<DemographicContact> findByDemographicNoAndCategory(int demographicNo,String category) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=? and x.category=? and x.deleted=false";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1 and x.category=?2 and x.deleted=false";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		query.setParameter(2, category);
@@ -75,7 +75,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 	 */
 	public List<DemographicContact> findByDemographicNoAndType(int demographicNo, int type)
 	{
-		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.demographicNo=? AND x.type=? AND x.deleted=false";
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.demographicNo=?1 AND x.type=?2 AND x.deleted=false";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		query.setParameter(2, type);
@@ -85,7 +85,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 	}
 
 	public List<DemographicContact> find(int demographicNo, int contactId) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=? and x.contactId = ? and x.deleted=false";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1 and x.contactId = ?2 and x.deleted=false";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		query.setParameter(2, new Integer(contactId).toString());
@@ -95,7 +95,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 	}
 	
 	public List<DemographicContact> findAllByContactIdAndCategoryAndType(int contactId, String category, int type) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.contactId = ? and x.category = ? and x.type = ?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.contactId = ?1 and x.category = ?2 and x.type = ?3";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, new Integer(contactId).toString());
 		query.setParameter(2, category);

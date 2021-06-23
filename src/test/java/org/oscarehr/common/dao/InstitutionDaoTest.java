@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Institution;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class InstitutionDaoTest extends DaoTestFixtures {
-
-	protected InstitutionDao dao = SpringUtils.getBean(InstitutionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class InstitutionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected InstitutionDao institutionDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -53,18 +59,18 @@ public class InstitutionDaoTest extends DaoTestFixtures {
 		
 		Institution inst1 = new Institution();
 		EntityDataGenerator.generateTestDataForModelClass(inst1);
-		dao.persist(inst1);
+		institutionDao.persist(inst1);
 		
 		Institution inst2 = new Institution();
 		EntityDataGenerator.generateTestDataForModelClass(inst2);
-		dao.persist(inst2);
+		institutionDao.persist(inst2);
 		
 		Institution inst3 = new Institution();
 		EntityDataGenerator.generateTestDataForModelClass(inst3);
-		dao.persist(inst3);
+		institutionDao.persist(inst3);
 		
 		List<Institution> expectedResult = new ArrayList<Institution>(Arrays.asList(inst1, inst2, inst3));
-		List<Institution> result = dao.findAll();
+		List<Institution> result = institutionDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

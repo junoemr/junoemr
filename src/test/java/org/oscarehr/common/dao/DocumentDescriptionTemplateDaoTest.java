@@ -33,15 +33,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DocumentDescriptionTemplate;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
-
-	protected DocumentDescriptionTemplateDao dao = SpringUtils.getBean(DocumentDescriptionTemplateDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DocumentDescriptionTemplateDao documentDescriptionTemplateDao;
 
 	@Before
 	public void before() throws Exception {
@@ -52,7 +58,7 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		DocumentDescriptionTemplate entity = new DocumentDescriptionTemplate();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		documentDescriptionTemplateDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -73,7 +79,7 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
                 documentDescriptionTemplate1.setDescriptionShortcut(descriptionShortcut1);
                 documentDescriptionTemplate1.setDocType(docType1);
                 documentDescriptionTemplate1.setProviderNo(providerNo1);
-		dao.persist(documentDescriptionTemplate1);
+		documentDescriptionTemplateDao.persist(documentDescriptionTemplate1);
                 
                 DocumentDescriptionTemplate documentDescriptionTemplate2 = new DocumentDescriptionTemplate();
 		EntityDataGenerator.generateTestDataForModelClass(documentDescriptionTemplate2);
@@ -81,7 +87,7 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
                 documentDescriptionTemplate2.setDescriptionShortcut(descriptionShortcut2);
                 documentDescriptionTemplate2.setDocType(docType2);
                 documentDescriptionTemplate2.setProviderNo(providerNo2);
-		dao.persist(documentDescriptionTemplate2);
+		documentDescriptionTemplateDao.persist(documentDescriptionTemplate2);
                 
 		id = documentDescriptionTemplate2.getId();
 
@@ -91,10 +97,10 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
                 documentDescriptionTemplate1.setDescriptionShortcut(descriptionShortcut3);
                 documentDescriptionTemplate1.setDocType(docType3);
                 documentDescriptionTemplate1.setProviderNo(providerNo3);
-		dao.persist(documentDescriptionTemplate3);
+		documentDescriptionTemplateDao.persist(documentDescriptionTemplate3);
                 
 		DocumentDescriptionTemplate expectedResult = documentDescriptionTemplate2;
-		DocumentDescriptionTemplate result = dao.find(id);
+		DocumentDescriptionTemplate result = documentDescriptionTemplateDao.find(id);
                 assertEquals(expectedResult, result);
         }                
         
@@ -113,7 +119,7 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
                 documentDescriptionTemplate1.setDescriptionShortcut(descriptionShortcut1);
                 documentDescriptionTemplate1.setDocType(docType1);
                 documentDescriptionTemplate1.setProviderNo(providerNo1);
-		dao.persist(documentDescriptionTemplate1);
+		documentDescriptionTemplateDao.persist(documentDescriptionTemplate1);
                 
                 DocumentDescriptionTemplate documentDescriptionTemplate2 = new DocumentDescriptionTemplate();
 		EntityDataGenerator.generateTestDataForModelClass(documentDescriptionTemplate2);
@@ -121,7 +127,7 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
                 documentDescriptionTemplate2.setDescriptionShortcut(descriptionShortcut2);
                 documentDescriptionTemplate2.setDocType(docType2);
                 documentDescriptionTemplate2.setProviderNo(providerNo2);
-		dao.persist(documentDescriptionTemplate2);
+		documentDescriptionTemplateDao.persist(documentDescriptionTemplate2);
 		
 
                 DocumentDescriptionTemplate documentDescriptionTemplate3 = new DocumentDescriptionTemplate();
@@ -130,10 +136,10 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures {
                 documentDescriptionTemplate3.setDescriptionShortcut(descriptionShortcut3);
                 documentDescriptionTemplate3.setDocType(docType3);
                 documentDescriptionTemplate3.setProviderNo(providerNo3);
-		dao.persist(documentDescriptionTemplate3);
+		documentDescriptionTemplateDao.persist(documentDescriptionTemplate3);
                 
 		List<DocumentDescriptionTemplate> expectedResult = new ArrayList<DocumentDescriptionTemplate>(Arrays.asList(documentDescriptionTemplate1, documentDescriptionTemplate3));
-		List<DocumentDescriptionTemplate> result = dao.findByDocTypeAndProviderNo(docType3, providerNo3);
+		List<DocumentDescriptionTemplate> result = documentDescriptionTemplateDao.findByDocTypeAndProviderNo(docType3, providerNo3);
 
 		Logger logger = MiscUtils.getLogger();
 		

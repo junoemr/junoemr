@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ServiceSpecialists;
 import org.oscarehr.common.model.ServiceSpecialistsPK;
 import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ServiceSpecialistsDaoTest extends DaoTestFixtures {
-
-	protected ServiceSpecialistsDao dao = SpringUtils.getBean(ServiceSpecialistsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ServiceSpecialistsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ServiceSpecialistsDao serviceSpecialistsDao;
 
 	public ServiceSpecialistsDaoTest() {
 	}
@@ -50,14 +56,14 @@ public class ServiceSpecialistsDaoTest extends DaoTestFixtures {
 		ServiceSpecialists entity = new ServiceSpecialists();
 		ServiceSpecialistsPK key = new ServiceSpecialistsPK(1, 1);
 		entity.setId(key);
-		dao.persist(entity);
+		serviceSpecialistsDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindSpecialists() {
-		assertNotNull(dao.findSpecialists(1000));
+		assertNotNull(serviceSpecialistsDao.findSpecialists(1000));
 	}
 
 }

@@ -57,7 +57,7 @@ angular.module("Schedule").service("scheduleService", [
 			{
 				var nextStatusCode = currentStatus;
 
-				//TODO a better way to get these
+				//TODO-legacy a better way to get these
 				for(var i=0; i< service.rotateStatuses.length; i++)
 				{
 					if(service.rotateStatuses[i].displayLetter === currentStatus)

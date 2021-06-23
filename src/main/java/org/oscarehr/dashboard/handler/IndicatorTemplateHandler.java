@@ -259,7 +259,7 @@ public class IndicatorTemplateHandler{
 				setValidXML( Boolean.TRUE );
 			}
 		} catch (Exception e) {			
-			//TODO try to recover from simple validations.  ie: change any offending > or < to &gt; or &lt;
+			//TODO-legacy try to recover from simple validations.  ie: change any offending > or < to &gt; or &lt;
 			setValidationMessage("Failed to parse XML file (could be a validation error): ", e);			
 			logger.error( validationMessage.toString(), e );
 		}

@@ -194,7 +194,7 @@ dojo.widget.attachTemplateNodes = function(rootNode, /*Widget*/ targetObj, event
 	// events: Array
 	//		a list of properties generated from getDojoEventsFromStr.
 
-	// FIXME: this method is still taking WAAAY too long. We need ways of optimizing:
+	// FIXME-legacy: this method is still taking WAAAY too long. We need ways of optimizing:
 	//	a.) what we are looking for on each node
 	//	b.) the nodes that are subject to interrogation (use xpath instead?)
 	//	c.) how expensive event assignment is (less eval(), more connect())
@@ -218,7 +218,7 @@ dojo.widget.attachTemplateNodes = function(rootNode, /*Widget*/ targetObj, event
 	var _this = targetObj;
 	for(var x=-1; x<nodes.length; x++){
 		var baseNode = (x == -1) ? rootNode : nodes[x];
-		// FIXME: is this going to have capitalization problems?  Could use getAttribute(name, 0); to get attributes case-insensitve
+		// FIXME-legacy: is this going to have capitalization problems?  Could use getAttribute(name, 0); to get attributes case-insensitve
 		var attachPoint = [];
 		if(!targetObj.widgetsInTemplate || !baseNode.getAttribute('dojoType')){
 			for(var y=0; y<this.attachProperties.length; y++){
@@ -297,7 +297,7 @@ dojo.widget.attachTemplateNodes = function(rootNode, /*Widget*/ targetObj, event
 		}
 		// continue;
 
-		// FIXME: we need to put this into some kind of lookup structure
+		// FIXME-legacy: we need to put this into some kind of lookup structure
 		// instead of direct assignment
 		var tmpltPoint = baseNode.getAttribute(this.templateProperty);
 		if(tmpltPoint){
@@ -424,7 +424,7 @@ dojo.declare("dojo.widget.DomWidget",
 			//		DOM index, same meaning as in dojo.dom.insertAtIndex()
 			// returns: the widget that was inserted
 
-			// FIXME: should we support addition at an index in the children arr and
+			// FIXME-legacy: should we support addition at an index in the children arr and
 			// order the display accordingly? Right now we always append.
 			if(!this.isContainer){ // we aren't allowed to contain other widgets, it seems
 				dojo.debug("dojo.widget.DomWidget.addChild() attempted on non-container widget");
@@ -469,7 +469,7 @@ dojo.declare("dojo.widget.DomWidget",
 			if(!ref){
 				cn.appendChild(widget.domNode);
 			}else{
-				// FIXME: was this meant to be the (ugly hack) way to support insert @ index?
+				// FIXME-legacy: was this meant to be the (ugly hack) way to support insert @ index?
 				//dojo.dom[pos](widget.domNode, ref, insertIndex);
 
 				// CAL: this appears to be the intended way to insert a node at a given position...
@@ -573,7 +573,7 @@ dojo.declare("dojo.widget.DomWidget",
 
 			// Register myself with my parent, or with the widget manager if
 			// I have no parent
-			// TODO: the code below erroneously adds all programatically generated widgets
+			// TODO-legacy: the code below erroneously adds all programatically generated widgets
 			// to topWidgets (since we don't know who the parent is until after creation finishes)
 			if ( parentComp ) {
 				parentComp.registerChild(this, args.dojoinsertionindex);
@@ -585,7 +585,7 @@ dojo.declare("dojo.widget.DomWidget",
 				var parser = new dojo.xml.Parse();
 
 				var subContainerNode;
-				//TODO: use xpath here?
+				//TODO-legacy: use xpath here?
 				var subnodes = this.domNode.getElementsByTagName("*");
 				for(var i=0;i<subnodes.length;i++){
 					if(subnodes[i].getAttribute('dojoAttachPoint') == 'subContainerWidget'){
@@ -786,14 +786,14 @@ dojo.declare("dojo.widget.DomWidget",
 					// if we do property replacement, don't create a templateNode
 					// to clone from.
 					var hash = this.strings || {};
-					// FIXME: should this hash of default replacements be cached in
+					// FIXME-legacy: should this hash of default replacements be cached in
 					// templateString?
 					for(var key in dojo.widget.defaultStrings) {
 						if(dojo.lang.isUndefined(hash[key])) {
 							hash[key] = dojo.widget.defaultStrings[key];
 						}
 					}
-					// FIXME: this is a lot of string munging. Can we make it faster?
+					// FIXME-legacy: this is a lot of string munging. Can we make it faster?
 					for(var i = 0; i < matches.length; i++) {
 						var key = matches[i];
 						key = key.substring(2, key.length-1);
@@ -813,7 +813,7 @@ dojo.declare("dojo.widget.DomWidget",
 					// otherwise, we are required to instantiate a copy of the template
 					// string if one is provided.
 					
-					// FIXME: need to be able to distinguish here what should be done
+					// FIXME-legacy: need to be able to distinguish here what should be done
 					// or provide a generic interface across all DOM implementations
 					// FIMXE: this breaks if the template has whitespace as its first 
 					// characters

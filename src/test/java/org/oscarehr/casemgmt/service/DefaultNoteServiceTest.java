@@ -34,6 +34,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.utility.ProgramAccessCache;
@@ -47,15 +48,24 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DefaultNoteServiceTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DefaultNoteServiceTest extends DaoTestFixtures
+{
 	private static Logger logger = Logger.getLogger(DefaultNoteServiceTest.class);
 
-	private NoteService service = SpringUtils.getBean(DefaultNoteService.class);
+	@Autowired
+	private NoteService service;
 
-	private CaseManagementManager caseManagementMgr = SpringUtils.getBean(CaseManagementManager.class);
+	@Autowired
+	private CaseManagementManager caseManagementMgr;
 
-	private ProgramProviderDAO programProviderDao = SpringUtils.getBean(ProgramProviderDAO.class);
+	@Autowired
+	private ProgramProviderDAO programProviderDao;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {

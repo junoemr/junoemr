@@ -53,7 +53,7 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
     }
 
     public  List<QueueDocumentLink> getActiveQueueDocLink(){
-    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.status=?");
+    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.status=?1");
     	query.setParameter(1, "A");
 
     	@SuppressWarnings("unchecked")
@@ -63,7 +63,7 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
     }
 
     public  List<QueueDocumentLink> getQueueFromDocument(Integer docId){
-    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.docId=?");
+    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.docId=?1");
     	query.setParameter(1,docId);
 
     	@SuppressWarnings("unchecked")
@@ -73,7 +73,7 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
     }
 
     public  List<QueueDocumentLink> getDocumentFromQueue(Integer qId){
-    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where queueId=?");
+    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where queueId=?1");
     	query.setParameter(1, qId);
 
     	@SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
     }
 
     public boolean hasQueueBeenLinkedWithDocument(Integer dId,Integer qId){
-    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.docId=? and q.queueId=?");
+    	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.docId=?1 and q.queueId=?2");
     	query.setParameter(1, dId);
     	query.setParameter(2, qId);
     	@SuppressWarnings("unchecked")

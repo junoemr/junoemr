@@ -63,9 +63,9 @@ public class SupServiceCodeAssocDAO extends AbstractDao<BillingTrayFee> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> getServiceCodeAssociactions() {
-		// TODO test me
+		// TODO-legacy test me
 		List<Map<String, String>> ret = new ArrayList<Map<String, String>>();
-		// TODO replace with #findAll
+		// TODO-legacy replace with #findAll
 		List<BillingTrayFee> btfs = entityManager.createQuery(getBaseQuery()).getResultList();
 		for (BillingTrayFee btf : btfs) {
 			Map<String, String> map = new HashMap<String, String>();
@@ -87,8 +87,8 @@ public class SupServiceCodeAssocDAO extends AbstractDao<BillingTrayFee> {
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, String> getAssociationKeyValues() {
-		// TODO test me
-		// TODO replace with find all
+		// TODO-legacy test me
+		// TODO-legacy replace with find all
 		List<BillingTrayFee> btfs = entityManager.createQuery("SELECT x FROM BillingTrayFee x").getResultList();
 		Map<String, String> ret = new HashMap<String, String>();
 		for (BillingTrayFee btf : btfs) {

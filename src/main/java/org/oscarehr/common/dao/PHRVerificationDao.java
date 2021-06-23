@@ -39,7 +39,7 @@ public class PHRVerificationDao extends AbstractDao<PHRVerification> {
 	}
 	
 	public PHRVerification findLatestByDemographicId(Integer demographicId){
-        Query query = entityManager.createQuery("SELECT f FROM PHRVerification f WHERE f.demographicNo =? and archived = ? order by createdDate desc");
+        Query query = entityManager.createQuery("SELECT f FROM PHRVerification f WHERE f.demographicNo =?1 and archived = ?2 order by createdDate desc");
         query.setParameter(1,demographicId);
         query.setParameter(2, false);
         
@@ -49,7 +49,7 @@ public class PHRVerificationDao extends AbstractDao<PHRVerification> {
      }
 	
     public List<PHRVerification> findByDemographic(Integer demographicId, boolean active){
-        Query query = entityManager.createQuery("SELECT f FROM PHRVerification f WHERE f.demographicNo =? and archived = ? order by createdDate desc");
+        Query query = entityManager.createQuery("SELECT f FROM PHRVerification f WHERE f.demographicNo =?1 and archived = ?2 order by createdDate desc");
         query.setParameter(1,demographicId);
         query.setParameter(2, !active);
         

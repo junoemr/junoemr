@@ -89,7 +89,7 @@ public class RaDetailDao extends AbstractDao<RaDetail> {
 	}
 
 	public List<RaDetail> getRaDetailByDate(Date startDate, Date endDate, Locale locale) {
-		Query query = entityManager.createQuery("SELECT rad from RaHeader rah, RaDetail rad WHERE rah.paymentDate >= ? and rah.paymentDate < ? and rah.id = rad.raHeaderNo order by rad.raHeaderNo, rad.billingNo, rad.serviceCode");
+		Query query = entityManager.createQuery("SELECT rad from RaHeader rah, RaDetail rad WHERE rah.paymentDate >= ?1 and rah.paymentDate < ?2 and rah.id = rad.raHeaderNo order by rad.raHeaderNo, rad.billingNo, rad.serviceCode");
 		String startDateStr = DateUtils.format("yyyyMMdd", startDate, locale);
 		query.setParameter(1, startDateStr);
 		String endDateStr = DateUtils.format("yyyyMMdd", endDate, locale);
@@ -102,7 +102,7 @@ public class RaDetailDao extends AbstractDao<RaDetail> {
 	}
 
 	public List<RaDetail> getRaDetailByDate(Provider p, Date startDate, Date endDate, Locale locale) {
-		Query query = entityManager.createQuery("SELECT rad from RaHeader rah, RaDetail rad WHERE rah.paymentDate >= ? and rah.paymentDate < ? and rah.id = rad.raHeaderNo and rad.providerOhipNo = ? order by rad.raHeaderNo, rad.billingNo, rad.serviceCode");
+		Query query = entityManager.createQuery("SELECT rad from RaHeader rah, RaDetail rad WHERE rah.paymentDate >= ?1 and rah.paymentDate < ?2 and rah.id = rad.raHeaderNo and rad.providerOhipNo = ?3 order by rad.raHeaderNo, rad.billingNo, rad.serviceCode");
 		String startDateStr = DateUtils.format("yyyyMMdd", startDate, locale);
 		query.setParameter(1, startDateStr);
 		String endDateStr = DateUtils.format("yyyyMMdd", endDate, locale);
@@ -117,7 +117,7 @@ public class RaDetailDao extends AbstractDao<RaDetail> {
 
 	public List<RaDetail> getRaDetailByClaimNo(String claimNo) {
 
-		Query query = entityManager.createQuery("SELECT rad from RaDetail rad where rad.claimNo = ?");
+		Query query = entityManager.createQuery("SELECT rad from RaDetail rad where rad.claimNo = ?1");
 		query.setParameter(1, claimNo);
 
 		

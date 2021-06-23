@@ -29,15 +29,21 @@ import java.math.BigDecimal;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.model.GstControl;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class GstControlDaoTest extends DaoTestFixtures {
-
-	public GstControlDao dao = SpringUtils.getBean(GstControlDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class GstControlDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public GstControlDao gstControlDao;
 
 	public GstControlDaoTest() {
 	}
@@ -52,7 +58,7 @@ public class GstControlDaoTest extends DaoTestFixtures {
 		GstControl entity = new GstControl();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setGstPercent(new BigDecimal("13.00"));
-		dao.persist(entity);
+		gstControlDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

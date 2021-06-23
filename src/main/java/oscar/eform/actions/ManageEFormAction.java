@@ -174,7 +174,7 @@ public class ManageEFormAction extends DispatchAction {
 
 		MiscUtils.getLogger().debug("ST " + statusCode2);
 		MiscUtils.getLogger().debug(new String(responseBody2));
-		//TODO:Need to handle errors
+		//TODO-legacy:Need to handle errors
 
 
 

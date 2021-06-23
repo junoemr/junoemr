@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.IncomingLabRules;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class IncomingLabRulesDaoTest extends DaoTestFixtures {
-
-	protected IncomingLabRulesDao dao = SpringUtils.getBean(IncomingLabRulesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class IncomingLabRulesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected IncomingLabRulesDao incomingLabRulesDao;
 
 
 	@Before
@@ -46,12 +52,12 @@ public class IncomingLabRulesDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		IncomingLabRules entity = new IncomingLabRules();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		incomingLabRulesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testFindRules() {
-		assertNotNull(dao.findRules("123"));
+		assertNotNull(incomingLabRulesDao.findRules("123"));
 	}
 }

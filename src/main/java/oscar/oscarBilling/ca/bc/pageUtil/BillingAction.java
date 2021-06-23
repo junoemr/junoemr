@@ -147,7 +147,7 @@ public final class BillingAction extends Action {
         region = bean.getBillRegion();
       }
       /**
-       * @todo Test this, it looks unnecessary
+       * @todo-legacy Test this, it looks unnecessary
        */
       else {
         bean = (oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean) request.

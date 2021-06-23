@@ -87,7 +87,7 @@ public class OscarOAuthDataProvider implements OAuthDataProvider {
         StringBuilder sb = new StringBuilder();
         List<OAuthPermission> perms = new ArrayList<OAuthPermission>();
         for(String scope:reg.getScopes()) {
-        	//TODO: load permissions from DB
+        	//TODO-legacy: load permissions from DB
         	OAuthPermission p = new OAuthPermission(scope, scope);
         	 perms.add(p);
         	 sb.append(" " + scope);
@@ -133,7 +133,7 @@ public class OscarOAuthDataProvider implements OAuthDataProvider {
 			List<OAuthPermission> perms = new ArrayList<OAuthPermission>();
 			String[] scopes =  serviceToken.getScopes().split(" ");
 	        for(String scope:scopes) {
-	        	//TODO: load permissions from DB
+	        	//TODO-legacy: load permissions from DB
 	        	OAuthPermission p = new OAuthPermission(scope, scope);
 	        	 perms.add(p);
 	        }
@@ -218,7 +218,7 @@ public class OscarOAuthDataProvider implements OAuthDataProvider {
 		List<OAuthPermission> perms = new ArrayList<OAuthPermission>();
 		String[] scopes =  sat.getScopes().split(" ");
         for(String scope:scopes) {
-        	//TODO: load permissions from DB
+        	//TODO-legacy: load permissions from DB
         	OAuthPermission p = new OAuthPermission(scope, scope);
         	perms.add(p);
         }

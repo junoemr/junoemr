@@ -100,7 +100,7 @@ public class Survey {
 			isdeffered = true;
 		}
 		log.debug("Patient deffered: " + isdeffered + " status was " + status);
-		return isdeffered; // true;  //TODO
+		return isdeffered; // true;  //TODO-legacy
 	}
 
 	boolean isPatientSeenInPeriod(String status) {
@@ -109,7 +109,7 @@ public class Survey {
 			patientseen = true;
 		}
 		log.debug("Was patient seen in this period: " + patientseen + " status was " + status);
-		return patientseen;//false;  //TODO    
+		return patientseen;//false;  //TODO-legacy
 	}
 
 	boolean doesPatientMeetCriteria(LoggedInInfo loggedInInfo, String demographic_no) {
@@ -119,7 +119,7 @@ public class Survey {
 			doespatientmeetcriteria = isDemographicSelected(loggedInInfo, demographic_no);
 		}
 		log.debug("Does patient Meet Criteria " + doespatientmeetcriteria);
-		return doespatientmeetcriteria; //TODO
+		return doespatientmeetcriteria; //TODO-legacy
 	}
 
 	public boolean isDemographicSelected(LoggedInInfo loggedInInfo, String demographicNo) {
@@ -129,7 +129,7 @@ public class Survey {
 	}
 
 	boolean isPatientSelected(String demograpic_no) {
-		return true; //TODO
+		return true; //TODO-legacy
 	}
 
 	boolean isPatientRandomlySelected() {
@@ -139,7 +139,7 @@ public class Survey {
 			isPatientSelect = true;
 		}
 		log.debug("Is Patient Randomly Selected :" + isPatientSelect);
-		return isPatientSelect; //true; //TODO
+		return isPatientSelect; //true; //TODO-legacy
 	}
 
 	boolean isInSurvey(LoggedInInfo loggedInInfo, String demographic_no, String provider_no) {

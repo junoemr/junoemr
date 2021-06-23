@@ -33,16 +33,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.dao.DocumentDao.Module;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DocumentDaoTest extends DaoTestFixtures {
-
-	protected DocumentDao dao = SpringUtils.getBean(DocumentDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DocumentDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DocumentDao documentDao;
 
 	public DocumentDaoTest() {
 	}
@@ -59,22 +65,22 @@ public class DocumentDaoTest extends DaoTestFixtures {
 		Document entity = new Document();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDocumentNo(null);
-		dao.persist(entity);
+		documentDao.persist(entity);
 		assertNotNull(entity.getId());
 
 		Calendar cal = new GregorianCalendar();
 		cal.add(Calendar.DAY_OF_YEAR, -1);
-		List<Document> results = dao.findByUpdateDate(cal.getTime(), 99);
+		List<Document> results = documentDao.findByUpdateDate(cal.getTime(), 99);
 		assertTrue(results.size() > 0);
 
 		cal.add(Calendar.DAY_OF_YEAR, 2);
-		results = dao.findByUpdateDate(cal.getTime(), 99);
+		results = documentDao.findByUpdateDate(cal.getTime(), 99);
 		assertEquals(0, results.size());
 	}
 
 	@Test
 	public void testFindConstultDocsDocsAndProvidersByModule() {
-		List<Object[]> docs = dao.findConstultDocsDocsAndProvidersByModule(Module.DEMOGRAPHIC, 0);
+		List<Object[]> docs = documentDao.findConstultDocsDocsAndProvidersByModule(Module.DEMOGRAPHIC, 0);
 		assertNotNull(docs);
 	}
 }

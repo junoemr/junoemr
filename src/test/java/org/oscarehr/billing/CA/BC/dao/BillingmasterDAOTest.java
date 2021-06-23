@@ -33,19 +33,25 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.entities.Billingmaster;
 import oscar.entities.WCB;
 import oscar.oscarBilling.ca.bc.administration.TeleplanCorrectionFormWCB;
 import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 
-public class BillingmasterDAOTest extends DaoTestFixtures {
-
-	public BillingmasterDAO dao =  SpringUtils.getBean(BillingmasterDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingmasterDAOTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingmasterDAO billingmasterDAO;
 
 	@Before
 	public void before() throws Exception {
@@ -57,9 +63,9 @@ public class BillingmasterDAOTest extends DaoTestFixtures {
 		Billingmaster master = new Billingmaster();
 		EntityDataGenerator.generateTestDataForModelClass(master);
 		master.setBillingNo(99999);
-		dao.save(master);
+		billingmasterDAO.save(master);
 
-		int count = dao.updateBillingUnitForBillingNumber("NIHRENASEIBE", 99999);
+		int count = billingmasterDAO.updateBillingUnitForBillingNumber("NIHRENASEIBE", 99999);
 		assertTrue(count == 1);
 	}
 	
@@ -68,9 +74,9 @@ public class BillingmasterDAOTest extends DaoTestFixtures {
 		Billingmaster b = new Billingmaster();
 		b.setBillingUnit("AS");
 		b.setBillingNo(999);
-		dao.save(b);
+		billingmasterDAO.save(b);
 		
-		int i = dao.updateBillingUnitForBillingNumber("BU", 999);
+		int i = billingmasterDAO.updateBillingUnitForBillingNumber("BU", 999);
 		assertTrue(i == 1);
 	}
 	
@@ -79,9 +85,9 @@ public class BillingmasterDAOTest extends DaoTestFixtures {
 		Billingmaster b = new Billingmaster();
 		b.setBillingUnit("AS");
 		b.setBillingNo(999);
-		dao.save(b);
+		billingmasterDAO.save(b);
 		
-		int i = dao.markListAsBilled(Arrays.asList(new String[] {String.valueOf(b.getBillingmasterNo())}));
+		int i = billingmasterDAO.markListAsBilled(Arrays.asList(new String[] {String.valueOf(b.getBillingmasterNo())}));
 		assertTrue(i == 1);
 	}
 	
@@ -90,18 +96,18 @@ public class BillingmasterDAOTest extends DaoTestFixtures {
 		WCB wcb = new WCB();
 		EntityDataGenerator.generateTestDataForModelClass(wcb);
 		wcb.setBilling_no(999);
-		dao.save(wcb);
+		billingmasterDAO.save(wcb);
 		
-		assertNotNull(dao.getWcbByBillingNo(999));
+		assertNotNull(billingmasterDAO.getWcbByBillingNo(999));
 	}
 
 	@Test
 	public void testGetBillingMasterByVariousFields() {
-		dao.getBillingMasterByVariousFields("ST", null, null, null);
-		dao.getBillingMasterByVariousFields("ST", null, null, "01-01-2012");
-		dao.getBillingMasterByVariousFields("ST", null, "01-01-2011", "01-01-2012");
-		dao.getBillingMasterByVariousFields("ST", "01", null, null);
-		dao.getBillingMasterByVariousFields("ST", "01", "01-01-2011", "01-01-2012");
+		billingmasterDAO.getBillingMasterByVariousFields("ST", null, null, null);
+		billingmasterDAO.getBillingMasterByVariousFields("ST", null, null, "01-01-2012");
+		billingmasterDAO.getBillingMasterByVariousFields("ST", null, "01-01-2011", "01-01-2012");
+		billingmasterDAO.getBillingMasterByVariousFields("ST", "01", null, null);
+		billingmasterDAO.getBillingMasterByVariousFields("ST", "01", "01-01-2011", "01-01-2012");
 		
 	}
 	
@@ -109,7 +115,7 @@ public class BillingmasterDAOTest extends DaoTestFixtures {
 	public void testSelect_user_bill_report_wcb2() throws Exception {
 		assertEquals(SchemaUtils.loadFileIntoMySQL(System.getProperty("basedir") + "/src/test/resources/select_user_bill_report_wcb_data.sql"),0);
 		
-		List<Object[]> results = dao.select_user_bill_report_wcb(1);
+		List<Object[]> results = billingmasterDAO.select_user_bill_report_wcb(1);
 		assertNotNull(results);
 		TeleplanCorrectionFormWCB f = new TeleplanCorrectionFormWCB(results);
 		assertNotNull(f);
@@ -118,17 +124,17 @@ public class BillingmasterDAOTest extends DaoTestFixtures {
 	
 	@Test
 	public void testSearch_teleplanbill() {
-		assertNotNull(dao.search_teleplanbill(1));
+		assertNotNull(billingmasterDAO.search_teleplanbill(1));
 	}
 
     @Test
     public void testFindByDemoNoCodeAndStatuses() {
-	    assertNotNull(dao.findByDemoNoCodeAndStatuses(100, "10", Arrays.asList(new String[] {"A"})));
+	    assertNotNull(billingmasterDAO.findByDemoNoCodeAndStatuses(100, "10", Arrays.asList(new String[] {"A"})));
     }
     
     @Test
     public void testCountByDemoNoCodeStatusesAndYear() {
-	    assertNotNull(dao.findByDemoNoCodeStatusesAndYear(100, new Date(), "CODE"));
+	    assertNotNull(billingmasterDAO.findByDemoNoCodeStatusesAndYear(100, new Date(), "CODE"));
     }
 	
 }

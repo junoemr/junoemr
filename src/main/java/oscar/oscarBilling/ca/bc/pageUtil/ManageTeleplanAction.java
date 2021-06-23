@@ -92,7 +92,7 @@ public class ManageTeleplanAction extends DispatchAction {
 
 		log.debug("username " + username + " password " + password);
 
-		//TODO: validate username - make sure url is not null
+		//TODO-legacy: validate username - make sure url is not null
 
 		TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
 		dao.saveUpdateUsername(username);
@@ -291,7 +291,7 @@ public class ManageTeleplanAction extends DispatchAction {
 		String datacenter = prop.getProperty("dataCenterId", "");
 		if(datacenter.length() != 5)
 		{
-			//this.addMessages() //TODO:ADD MESSAGE ABOUT DATA CENTER NOT BEING CORRECT
+			//this.addMessages() //TODO-legacy:ADD MESSAGE ABOUT DATA CENTER NOT BEING CORRECT
 			log.debug("returning because of datacenter #" + datacenter);
 			return mapping.findForward("success");
 		}
@@ -331,13 +331,13 @@ public class ManageTeleplanAction extends DispatchAction {
 		}
 		catch(Exception e)
 		{
-			//TODO: ADDED ERROR MESSAGE ABOUT THE NUMBER NOT BEING A NUMBER!
+			//TODO-legacy: ADDED ERROR MESSAGE ABOUT THE NUMBER NOT BEING A NUMBER!
 			return mapping.findForward("success");
 		}
 
 		if(sequenceNumber < 0 || sequenceNumber > 9999999)
 		{
-			//TODO: ADDED ERROR MESSAGE ABOUT NUMBER BEING OUT OF RANGE
+			//TODO-legacy: ADDED ERROR MESSAGE ABOUT NUMBER BEING OUT OF RANGE
 			return mapping.findForward("success");
 		}
 
@@ -370,7 +370,7 @@ public class ManageTeleplanAction extends DispatchAction {
 		}
 
 
-		//TODO: validate username - make sure url is not null
+		//TODO-legacy: validate username - make sure url is not null
 		BillActivityDAO billActDAO = new BillActivityDAO();
 		List l = billActDAO.getBillactivityByID(id);
 
@@ -473,7 +473,7 @@ public class ManageTeleplanAction extends DispatchAction {
 		String newpass = request.getParameter("newpass");
 		String confpass = request.getParameter("confpass");
 
-		//TODO: validate username - make sure url is not null
+		//TODO-legacy: validate username - make sure url is not null
 
 		if(!newpass.equals(confpass))
 		{

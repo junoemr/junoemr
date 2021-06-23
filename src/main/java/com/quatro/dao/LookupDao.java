@@ -116,11 +116,11 @@ public class LookupDao extends HibernateDaoSupport {
 		sSQL += " s where 1=1";
 		int i = 0;
 		if (activeFieldExists && activeOnly) {
-			sSQL += " and " + fieldNames[2] + "=?";
+			sSQL += " and " + fieldNames[2] + "=?" + i;
 			params[i++] = new DBPreparedHandlerParam(1);
 		}
 		if (!Utility.IsEmpty(parentCode)) {
-			sSQL += " and " + fieldNames[4] + "=?";
+			sSQL += " and " + fieldNames[4] + "=?" + i;
 			params[i++] = new DBPreparedHandlerParam(parentCode);
 		}
 		if (!Utility.IsEmpty(code)) {
@@ -131,25 +131,25 @@ public class LookupDao extends HibernateDaoSupport {
 				sSQL += "?";
 				params[i++] = new DBPreparedHandlerParam(codes[0]);
 				for (int k = 1; k < codes.length; k++) {
-					sSQL += ",?";
+					sSQL += ",?" + i;
 					params[i++] = new DBPreparedHandlerParam(codes[k]);
 				}
 				sSQL += ")";
 			} else {
 				sSQL += " and " + fieldNames[0] + " in (";
 				String[] codes = code.split(",");
-				sSQL += "?";
+				sSQL += "?" + i;
 				params[i++] = new DBPreparedHandlerParam(codes[0]);
 				for (int k = 1; k < codes.length; k++) {
 					if (codes[k].equals("")) continue;
-					sSQL += ",?";
+					sSQL += ",?" + i;
 					params[i++] = new DBPreparedHandlerParam(codes[k]);
 				}
 				sSQL += ")";
 			}
 		}
 		if (!Utility.IsEmpty(codeDesc)) {
-			sSQL += " and upper(" + fieldNames[1] + ") like ?";
+			sSQL += " and upper(" + fieldNames[1] + ") like ?" + i;
 			params[i++] = new DBPreparedHandlerParam("%" + codeDesc.toUpperCase() + "%");
 		}
 
@@ -218,7 +218,7 @@ public class LookupDao extends HibernateDaoSupport {
 	public LookupTableDefValue GetLookupTableDef(String tableId) {
 		ArrayList<String> paramList = new ArrayList<String>();
 
-		String sSQL = "from LookupTableDefValue s where s.tableId= ?";
+		String sSQL = "from LookupTableDefValue s where s.tableId= ?0";
 		paramList.add(tableId);
 		Object params[] = paramList.toArray(new Object[paramList.size()]);
 		try {
@@ -230,7 +230,7 @@ public class LookupDao extends HibernateDaoSupport {
 	}
 
 	public List LoadFieldDefList(String tableId) {
-		String sSql = "from FieldDefValue s where s.tableId=? order by s.fieldIndex ";
+		String sSql = "from FieldDefValue s where s.tableId=?0 order by s.fieldIndex ";
 		ArrayList<String> paramList = new ArrayList<String>();
 		paramList.add(tableId);
 		Object params[] = paramList.toArray(new Object[paramList.size()]);
@@ -432,7 +432,7 @@ public class LookupDao extends HibernateDaoSupport {
 		for (int i = 0; i < fieldDefList.size(); i++) {
 			FieldDefValue fdv = (FieldDefValue) fieldDefList.get(i);
 			sql += fdv.getFieldSQL() + ",";
-			phs += "?,";
+			phs += "?" + (i+1) + ",";
 			if (fdv.getGenericIdx() == 1) {
 				if (fdv.isAuto()) {
 					idFieldVal = String.valueOf(GetNextId(fdv.getFieldSQL(), tableName));
@@ -479,7 +479,7 @@ public class LookupDao extends HibernateDaoSupport {
 				idFieldVal = fdv.getVal();
 			}
 
-			sql += fdv.getFieldSQL() + "=?,";
+			sql += fdv.getFieldSQL() + "=?" + i + ",";
 			if ("S".equals(fdv.getFieldType())) {
 				params[i] = new DBPreparedHandlerParam(fdv.getVal());
 			} else if ("D".equals(fdv.getFieldType())) {
@@ -493,7 +493,7 @@ public class LookupDao extends HibernateDaoSupport {
 			}
 		}
 		sql = sql.substring(0, sql.length() - 1);
-		sql += " where " + idFieldName + "=?";
+		sql += " where " + idFieldName + "=?" + fieldDefList.size();
 		params[fieldDefList.size()] = params[0];
 
 		queryExecuteUpdate(sql, params);
@@ -565,7 +565,7 @@ public class LookupDao extends HibernateDaoSupport {
 		if (!newCd.isActive()) {
 			String oldCsv = oldCd.getCodecsv();
 
-			List<LstOrgcd> o = this.getHibernateTemplate().find("FROM LstOrgcd o WHERE o.codecsv like ?", oldCsv + "_%");
+			List<LstOrgcd> o = (List<LstOrgcd>) this.getHibernateTemplate().find("FROM LstOrgcd o WHERE o.codecsv like ?0", oldCsv + "_%");
 			for (LstOrgcd l : o) {
 				l.setActiveyn(0);
 				this.getHibernateTemplate().update(l);
@@ -575,7 +575,7 @@ public class LookupDao extends HibernateDaoSupport {
 
 	public boolean inOrg(String org1, String org2) {
 		boolean isInString = false;
-		String sql = "From LstOrgcd a where  a.fullcode like '%" + "?'  ";
+		String sql = "From LstOrgcd a where  a.fullcode like '%" + "?0'  ";
 
 		LstOrgcd orgObj1 = (LstOrgcd) getHibernateTemplate().find(sql, new Object[] { org1 });
 		LstOrgcd orgObj2 = (LstOrgcd) getHibernateTemplate().find(sql, new Object[] { org2 });

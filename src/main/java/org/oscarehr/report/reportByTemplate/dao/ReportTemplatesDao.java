@@ -74,7 +74,7 @@ public class ReportTemplatesDao extends AbstractDao<ReportTemplates>
     }
     
     public ReportTemplates findByUuid(String uuid) {
-    	Query query = entityManager.createQuery("SELECT r from ReportTemplates r where r.uuid = ? and r.active = 1");
+    	Query query = entityManager.createQuery("SELECT r from ReportTemplates r where r.uuid = ?1 and r.active = 1");
     	query.setParameter(1, uuid);
     	
         @SuppressWarnings("unchecked")

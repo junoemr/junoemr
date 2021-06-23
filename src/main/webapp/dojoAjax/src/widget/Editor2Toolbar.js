@@ -128,7 +128,7 @@ dojo.lang.mixin(dojo.widget.Editor2ToolbarItemManager,
 			case 'splitcell':
 				dojo.debug(name + " is implemented in dojo.widget.Editor2Plugin.TableOperation, please require it first.");
 				break;
-			//TODO:
+			//TODO-legacy:
 			case 'inserthtml':
 			case 'blockdirltr':
 			case 'blockdirrtl':
@@ -161,7 +161,7 @@ dojo.declare("dojo.widget.Editor2ToolbarButton", null,
 		// toolbar: the Editor2Toolbar widget this toolbar item belonging to
 		// nohover: whether this item in charge of highlight this item
 		this._domNode = node;
-		var cmd = toolbar.parent.getCommand(this._name); //FIXME: maybe an issue if different instance has different language
+		var cmd = toolbar.parent.getCommand(this._name); //FIXME-legacy: maybe an issue if different instance has different language
 		if(cmd){
 			this._domNode.title = cmd.getText();
 		}
@@ -343,7 +343,7 @@ dojo.declare("dojo.widget.Editor2ToolbarFormatBlockPlainSelect", dojo.widget.Edi
 //		dojo.widget.Editor2ToolbarFormatBlockPlainSelect.superclass.create.apply(this, arguments);
 		this._domNode = node;
 		this._parentToolbar = toolbar;
-		//TODO: check node is a select
+		//TODO-legacy: check node is a select
 		this._domNode = node;
 		this.disableSelection(this._domNode);
 		dojo.event.connect(this._domNode, 'onchange', this, 'onChange');

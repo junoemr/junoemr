@@ -777,7 +777,7 @@ public class JdbcBillingClaimImpl {
 		return b.getId();
 	}
 
-	// TODO more update data
+	// TODO-legacy more update data
 	public boolean updateBatchHeaderRecord(BillingBatchHeaderData val) {
 		BillingONHeader b = dao.find(Integer.parseInt(val.getId()));
 		if(b != null) {

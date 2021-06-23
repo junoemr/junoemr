@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MeasurementGroupStyleDaoTest extends DaoTestFixtures {
-
-	protected MeasurementGroupStyleDao dao = SpringUtils.getBean(MeasurementGroupStyleDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MeasurementGroupStyleDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MeasurementGroupStyleDao measurementGroupStyleDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,18 +59,18 @@ public class MeasurementGroupStyleDaoTest extends DaoTestFixtures {
 
 		MeasurementGroupStyle measurementGrpStyle1 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle1);
-		dao.persist(measurementGrpStyle1);
+		measurementGroupStyleDao.persist(measurementGrpStyle1);
 
 		MeasurementGroupStyle measurementGrpStyle2 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle2);
-		dao.persist(measurementGrpStyle2);
+		measurementGroupStyleDao.persist(measurementGrpStyle2);
 
 		MeasurementGroupStyle measurementGrpStyle3 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle3);
-		dao.persist(measurementGrpStyle3);
+		measurementGroupStyleDao.persist(measurementGrpStyle3);
 
 		List<MeasurementGroupStyle> expectedResult = new ArrayList<MeasurementGroupStyle>(Arrays.asList(measurementGrpStyle1, measurementGrpStyle2, measurementGrpStyle3));
-		List<MeasurementGroupStyle> result = dao.findAll();
+		List<MeasurementGroupStyle> result = measurementGroupStyleDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -89,25 +95,25 @@ public class MeasurementGroupStyleDaoTest extends DaoTestFixtures {
 		MeasurementGroupStyle measurementGrpStyle1 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle1);
 		measurementGrpStyle1.setGroupName(groupName1);
-		dao.persist(measurementGrpStyle1);
+		measurementGroupStyleDao.persist(measurementGrpStyle1);
 
 		MeasurementGroupStyle measurementGrpStyle2 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle2);
 		measurementGrpStyle2.setGroupName(groupName1);
-		dao.persist(measurementGrpStyle2);
+		measurementGroupStyleDao.persist(measurementGrpStyle2);
 
 		MeasurementGroupStyle measurementGrpStyle3 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle3);
 		measurementGrpStyle3.setGroupName(groupName2);
-		dao.persist(measurementGrpStyle3);
+		measurementGroupStyleDao.persist(measurementGrpStyle3);
 		
 		MeasurementGroupStyle measurementGrpStyle4 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle4);
 		measurementGrpStyle4.setGroupName(groupName1);
-		dao.persist(measurementGrpStyle4);
+		measurementGroupStyleDao.persist(measurementGrpStyle4);
 
 		List<MeasurementGroupStyle> expectedResult = new ArrayList<MeasurementGroupStyle>(Arrays.asList(measurementGrpStyle1, measurementGrpStyle2, measurementGrpStyle4));
-		List<MeasurementGroupStyle> result = dao.findByGroupName(groupName1);
+		List<MeasurementGroupStyle> result = measurementGroupStyleDao.findByGroupName(groupName1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -132,25 +138,25 @@ public class MeasurementGroupStyleDaoTest extends DaoTestFixtures {
 		MeasurementGroupStyle measurementGrpStyle1 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle1);
 		measurementGrpStyle1.setCssId(cssId1);
-		dao.persist(measurementGrpStyle1);
+		measurementGroupStyleDao.persist(measurementGrpStyle1);
 
 		MeasurementGroupStyle measurementGrpStyle2 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle2);
 		measurementGrpStyle2.setCssId(cssId1);
-		dao.persist(measurementGrpStyle2);
+		measurementGroupStyleDao.persist(measurementGrpStyle2);
 
 		MeasurementGroupStyle measurementGrpStyle3 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle3);
 		measurementGrpStyle3.setCssId(cssId2);
-		dao.persist(measurementGrpStyle3);
+		measurementGroupStyleDao.persist(measurementGrpStyle3);
 		
 		MeasurementGroupStyle measurementGrpStyle4 = new MeasurementGroupStyle();
 		EntityDataGenerator.generateTestDataForModelClass(measurementGrpStyle4);
 		measurementGrpStyle4.setCssId(cssId1);
-		dao.persist(measurementGrpStyle4);
+		measurementGroupStyleDao.persist(measurementGrpStyle4);
 
 		List<MeasurementGroupStyle> expectedResult = new ArrayList<MeasurementGroupStyle>(Arrays.asList(measurementGrpStyle1, measurementGrpStyle2, measurementGrpStyle4));
-		List<MeasurementGroupStyle> result = dao.findByCssId(cssId1);
+		List<MeasurementGroupStyle> result = measurementGroupStyleDao.findByCssId(cssId1);
 
 		Logger logger = MiscUtils.getLogger();
 

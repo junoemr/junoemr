@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderDefaultProgram;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderDefaultProgramDaoTest extends DaoTestFixtures {
-
-	protected ProviderDefaultProgramDao dao = SpringUtils.getBean(ProviderDefaultProgramDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderDefaultProgramDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderDefaultProgramDao providerDefaultProgramDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,12 +51,12 @@ public class ProviderDefaultProgramDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ProviderDefaultProgram entity = new ProviderDefaultProgram();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		providerDefaultProgramDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testFindProgramsByProvider() {
-		assertNotNull(dao.findProgramsByProvider("100"));
+		assertNotNull(providerDefaultProgramDao.findProgramsByProvider("100"));
 	}
 }

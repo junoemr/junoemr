@@ -46,7 +46,7 @@ public class ReportProviderDao extends AbstractDao<ReportProvider>{
 	}
 	
 	public List<ReportProvider> findByAction(String action) {
-    	String sql = "select x from ReportProvider x where x.action=?";
+    	String sql = "select x from ReportProvider x where x.action=?1";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,action);
 
@@ -56,7 +56,7 @@ public class ReportProviderDao extends AbstractDao<ReportProvider>{
     }
 	
 	public List<ReportProvider> findByProviderNoTeamAndAction(String providerNo, String team, String action) {
-    	String sql = "select x from ReportProvider x where x.providerNo=? and x.team=? and x.action=?";
+    	String sql = "select x from ReportProvider x where x.providerNo=?1 and x.team=?2 and x.action=?3";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,providerNo);
     	query.setParameter(2,team);
@@ -68,7 +68,7 @@ public class ReportProviderDao extends AbstractDao<ReportProvider>{
     }
 
 	public List<Object[]> search_reportprovider(String action) {
-		String sql = "from ReportProvider r, Provider p where r.providerNo=p.ProviderNo and r.status<>'D' and r.action=? order by r.team";
+		String sql = "from ReportProvider r, Provider p where r.providerNo=p.ProviderNo and r.status<>'D' and r.action=?1 order by r.team";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,action);
 
@@ -78,7 +78,7 @@ public class ReportProviderDao extends AbstractDao<ReportProvider>{
 	}
 	
 	public List<Object[]> search_reportprovider(String action,String providerNo) {
-		String sql = "from ReportProvider r, Provider p where r.providerNo=p.ProviderNo and r.status<>'D' and r.action=? and p.ProviderNo like ? order by r.team";
+		String sql = "from ReportProvider r, Provider p where r.providerNo=p.ProviderNo and r.status<>'D' and r.action=?1 and p.ProviderNo like ?2 order by r.team";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,action);
     	query.setParameter(2, providerNo);

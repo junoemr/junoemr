@@ -31,8 +31,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ED;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.NullFlavor;
@@ -48,19 +50,27 @@ import org.oscarehr.e2e.model.PatientExport.LabOrganizer;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class LabsModelTest extends AbstractExportModelTest {
-	public static Hl7TextInfoDao dao;
-	public static Hl7TextInfo hl7TextInfo;
-	public static LabsModel labsModel;
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LabsModelTest extends AbstractExportModelTest
+{
+	@Autowired
+	public Hl7TextInfoDao hl7TextInfoDao;
 
-	public static Hl7TextInfo nullHl7TextInfo;
-	public static LabsModel nullLabsModel;
+	public Hl7TextInfo hl7TextInfo;
+	public LabsModel labsModel;
 
-	@BeforeClass
-	public static void beforeClass() {
-		dao = SpringUtils.getBean(Hl7TextInfoDao.class);
-		hl7TextInfo = dao.findLabId(Constants.Runtime.VALID_LAB_NO);
+	public Hl7TextInfo nullHl7TextInfo;
+	public LabsModel nullLabsModel;
+
+	@Before
+	public void beforeClass()
+	{
+		hl7TextInfo = hl7TextInfoDao.findLabId(Constants.Runtime.VALID_LAB_NO);
 		Lab lab = new Lab(hl7TextInfo);
 		lab.getLabOrganizer().add(new LabOrganizer(Constants.Runtime.INVALID_VALUE, null));
 		lab.getLabOrganizer().add(new LabOrganizer(Constants.Runtime.INVALID_VALUE, null));

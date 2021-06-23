@@ -78,7 +78,7 @@ public class IntegratorPushManager {
 		integratorProgressDao.merge(ip);
 		
 		if(verify) {
-			//TODO: check that all the items are complete...want
+			//TODO-legacy: check that all the items are complete...want
 			//to see this in action a bit so see how to handle
 			//problematic records that don't send for example.
 		}

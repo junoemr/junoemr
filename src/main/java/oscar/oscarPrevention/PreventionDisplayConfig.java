@@ -292,6 +292,7 @@ public class PreventionDisplayConfig {
 		log.debug("Display: " + demographic.getDemographicNo());
 		try
 		{
+			// TODO: Speed this up
 			if(preventionManager.hideItem(setHash.get("name"), itemsToHide) && numberOfPrevs==0 )
 			{
 				display = false;

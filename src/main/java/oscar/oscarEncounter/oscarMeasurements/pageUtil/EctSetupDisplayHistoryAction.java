@@ -69,7 +69,7 @@ public final class EctSetupDisplayHistoryAction extends Action {
             if(type!=null){
                 hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo, type);
                 if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
-                	List<EctMeasurementsDataBean> measures = (List<EctMeasurementsDataBean>) hd.getMeasurementsDataVector ();
+                	List<EctMeasurementsDataBean> measures = (List<EctMeasurementsDataBean>) hd.getMeasurementsData();
                 	oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, measures,type,demo);
                 }
                 request.setAttribute("type", type);

@@ -28,7 +28,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-@Entity(name = "model.CaseManagementIssueNote")
+@Entity(name = "model_CaseManagementIssueNote")
 @Table(name = "casemgmt_issue_notes")
 public class CaseManagementIssueNote extends AbstractModel<CaseManagementIssueNotePK>
 {

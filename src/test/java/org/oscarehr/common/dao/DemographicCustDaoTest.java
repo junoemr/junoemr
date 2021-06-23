@@ -32,16 +32,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DemographicCustDaoTest extends DaoTestFixtures {
-
-	protected DemographicCustDao dao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicCustDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicCustDao demographicCustDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class DemographicCustDaoTest extends DaoTestFixtures {
 		DemographicCust entity = new DemographicCust();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(1);
-		dao.persist(entity);
+		demographicCustDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -71,24 +77,24 @@ public class DemographicCustDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(demoCust1);
 		demoCust1.setId(id1);
 		demoCust1.setMidwife(midwife1);
-		dao.persist(demoCust1);
+		demographicCustDao.persist(demoCust1);
 		
 		DemographicCust demoCust2 = new DemographicCust();
 		EntityDataGenerator.generateTestDataForModelClass(demoCust2);
 		demoCust2.setId(id2);
 		demoCust2.setMidwife(midwife2);
-		dao.persist(demoCust2);
+		demographicCustDao.persist(demoCust2);
 		
 		DemographicCust demoCust3 = new DemographicCust();
 		EntityDataGenerator.generateTestDataForModelClass(demoCust3);
 		demoCust3.setId(id3);
 		demoCust3.setMidwife(midwife1);
-		dao.persist(demoCust3);
+		demographicCustDao.persist(demoCust3);
 		
 		List<Integer> demographicNos = new ArrayList<Integer>(Arrays.asList(id1, id2, id3));
 		
 		List<DemographicCust> expectedResult = new ArrayList<DemographicCust>(Arrays.asList(demoCust1, demoCust3));
-		List<DemographicCust> result = dao.findMultipleMidwife(demographicNos, midwife1);
+		List<DemographicCust> result = demographicCustDao.findMultipleMidwife(demographicNos, midwife1);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
@@ -119,24 +125,24 @@ public class DemographicCustDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(demoCust1);
 		demoCust1.setId(id1);
 		demoCust1.setResident(resident1);
-		dao.persist(demoCust1);
+		demographicCustDao.persist(demoCust1);
 		
 		DemographicCust demoCust2 = new DemographicCust();
 		EntityDataGenerator.generateTestDataForModelClass(demoCust2);
 		demoCust2.setId(id2);
 		demoCust2.setResident(resident2);
-		dao.persist(demoCust2);
+		demographicCustDao.persist(demoCust2);
 		
 		DemographicCust demoCust3 = new DemographicCust();
 		EntityDataGenerator.generateTestDataForModelClass(demoCust3);
 		demoCust3.setId(id3);
 		demoCust3.setResident(resident1);
-		dao.persist(demoCust3);
+		demographicCustDao.persist(demoCust3);
 		
 		List<Integer> demographicNos = new ArrayList<Integer>(Arrays.asList(id1, id2, id3));
 		
 		List<DemographicCust> expectedResult = new ArrayList<DemographicCust>(Arrays.asList(demoCust1, demoCust3));
-		List<DemographicCust> result = dao.findMultipleResident(demographicNos, resident1);
+		List<DemographicCust> result = demographicCustDao.findMultipleResident(demographicNos, resident1);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
@@ -167,24 +173,24 @@ public class DemographicCustDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(demoCust1);
 		demoCust1.setId(id1);
 		demoCust1.setNurse(nurse1);
-		dao.persist(demoCust1);
+		demographicCustDao.persist(demoCust1);
 		
 		DemographicCust demoCust2 = new DemographicCust();
 		EntityDataGenerator.generateTestDataForModelClass(demoCust2);
 		demoCust2.setId(id2);
 		demoCust2.setNurse(nurse2);
-		dao.persist(demoCust2);
+		demographicCustDao.persist(demoCust2);
 		
 		DemographicCust demoCust3 = new DemographicCust();
 		EntityDataGenerator.generateTestDataForModelClass(demoCust3);
 		demoCust3.setId(id3);
 		demoCust3.setNurse(nurse1);
-		dao.persist(demoCust3);
+		demographicCustDao.persist(demoCust3);
 		
 		List<Integer> demographicNos = new ArrayList<Integer>(Arrays.asList(id1, id2, id3));
 		
 		List<DemographicCust> expectedResult = new ArrayList<DemographicCust>(Arrays.asList(demoCust1, demoCust3));
-		List<DemographicCust> result = dao.findMultipleNurse(demographicNos, nurse1);
+		List<DemographicCust> result = demographicCustDao.findMultipleNurse(demographicNos, nurse1);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {

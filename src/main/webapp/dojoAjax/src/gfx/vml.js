@@ -182,7 +182,7 @@ dojo.lang.extend(dojo.gfx.Shape, {
 		var s = this.strokeStyle;
 		this.rawNode.stroked = true;
 		this.rawNode.strokecolor = s.color.toCss();
-		this.rawNode.strokeweight = s.width + "px";	// TODO: should we assume that the width is always in pixels?
+		this.rawNode.strokeweight = s.width + "px";	// TODO-legacy: should we assume that the width is always in pixels?
 		if(this.rawNode.stroke) {
 			this.rawNode.stroke.opacity = s.color.a;
 			this.rawNode.stroke.endcap = this._translate(this._capMap, s.cap);

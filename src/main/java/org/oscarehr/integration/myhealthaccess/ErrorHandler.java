@@ -89,7 +89,7 @@ public class ErrorHandler <T> extends DefaultResponseErrorHandler
 		MiscUtils.getLogger().error("HANDLING base exception");
 		if (e.getErrorObject().hasGenericErrors())
 		{
-			// TODO Get the first generic error. I'm thinking for an external API we might want
+			// TODO-legacy Get the first generic error. I'm thinking for an external API we might want
 			// to change this to only ever return one. It gets too complicated when you can have
 			// multiple error messages
 			GenericErrorTo1 genericError = e.getErrorObject().getGenericErrors().get(0);

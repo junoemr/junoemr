@@ -13,7 +13,7 @@ dojo.provide("dojo.io.cometd");
 dojo.require("dojo.AdapterRegistry");
 dojo.require("dojo.json");
 dojo.require("dojo.io.BrowserIO"); // we need XHR for the handshake, etc.
-// FIXME: determine if we can use XMLHTTP to make x-domain posts despite not
+// FIXME-legacy: determine if we can use XMLHTTP to make x-domain posts despite not
 //        being able to hear back about the result
 dojo.require("dojo.io.IframeIO");
 dojo.require("dojo.io.ScriptSrcIO"); // for x-domain long polling
@@ -30,7 +30,7 @@ dojo.require("dojo.lang.func");
  * interface.
  */
 
-// TODO: the auth handling in this file is a *mess*. It should probably live in
+// TODO-legacy: the auth handling in this file is a *mess*. It should probably live in
 // the cometd object with the ability to mix in or call down to an auth-handler
 // object, the prototypical variant of which is a no-op
 
@@ -63,26 +63,26 @@ cometd = new function(){
 	}
 
 	this.init = function(props, root, bargs){
-		// FIXME: if the root isn't from the same host, we should automatically
+		// FIXME-legacy: if the root isn't from the same host, we should automatically
 		// try to select an XD-capable transport
 		props = props||{};
 		// go ask the short bus server what we can support
 		props.version = this.version;
 		props.minimumVersion = this.minimumVersion;
 		props.channel = "/meta/handshake";
-		// FIXME: do we just assume that the props knows
+		// FIXME-legacy: do we just assume that the props knows
 		// everything we care about WRT to auth? Should we be trying to
 		// call back into it for subsequent auth actions? Should we fire
 		// local auth functions to ask for/get auth data?
 
-		// FIXME: what about ScriptSrcIO for x-domain comet?
+		// FIXME-legacy: what about ScriptSrcIO for x-domain comet?
 		this.url = root||djConfig["cometdRoot"];
 		if(!this.url){
 			dojo.debug("no cometd root specified in djConfig and no root passed");
 			return;
 		}
 		
-		// FIXME: we need to select a way to handle JSONP-style stuff
+		// FIXME-legacy: we need to select a way to handle JSONP-style stuff
 		// generically here. We already know if the server is gonna be on
 		// another domain (or can know it), so we should select appropriate
 		// negotiation methods here as well as in final transport type
@@ -101,7 +101,7 @@ cometd = new function(){
 		if(r[4]){
 			var tmp = r[4].split(":");
 			var thisHost = tmp[0];
-			var thisPort = tmp[1]||"80"; // FIXME: match 443
+			var thisPort = tmp[1]||"80"; // FIXME-legacy: match 443
 
 			r = this.url.match(new RegExp(regexp));
 			if(r[4]){
@@ -272,7 +272,7 @@ cometd = new function(){
 			}
 			dojo.event.topic.subscribe(tname, objOrFunc, funcName);
 		}
-		// FIXME: would we handle queuing of the subscription if not connected?
+		// FIXME-legacy: would we handle queuing of the subscription if not connected?
 		// Or should the transport object?
 		return this.currentTransport.sendMessage({
 			channel: "/meta/subscribe",
@@ -311,9 +311,9 @@ cometd = new function(){
 		}
 		//		a callback function to notifiy upon channel message delivery
 		if(objOrFunc){
-			// FIXME: should actual local topic unsubscription be delayed for
+			// FIXME-legacy: should actual local topic unsubscription be delayed for
 			// successful unsubcribe notices from the other end? (guessing "no")
-			// FIXME: if useLocalTopics is false, should we go ahead and
+			// FIXME-legacy: if useLocalTopics is false, should we go ahead and
 			// destroy the local topic?
 			var tname = (useLocalTopics) ? channel : "/cometd"+channel;
 			dojo.event.topic.unsubscribe(tname, objOrFunc, funcName);
@@ -330,7 +330,7 @@ cometd = new function(){
 		dojo.debugShallow(message);
 	}
 
-	// FIXME: add an "addPublisher" function
+	// FIXME-legacy: add an "addPublisher" function
 
 }
 
@@ -366,12 +366,12 @@ cometd.blahTransport = new function(){
 
 	this.startup = function(){
 		if(this.connected){ return; }
-		// FIXME: fill in startup routine here
+		// FIXME-legacy: fill in startup routine here
 		this.connected = true;
 	}
 
 	this.sendMessage = function(message){
-		// FIXME: fill in message sending logic
+		// FIXME-legacy: fill in message sending logic
 	}
 
 	this.deliver = function(message){
@@ -386,7 +386,7 @@ cometd.blahTransport = new function(){
 			// check for various meta topic actions that we need to respond to
 			// switch(message.channel){
 			// 	case "/meta/connect":
-			//		// FIXME: fill in logic here
+			//		// FIXME-legacy: fill in logic here
 			//		break;
 			//	// case ...: ...
 			//	}
@@ -395,7 +395,7 @@ cometd.blahTransport = new function(){
 
 	this.disconnect = function(){
 		if(!this.connected){ return; }
-		// FIXME: fill in shutdown routine here
+		// FIXME-legacy: fill in shutdown routine here
 		this.connected = false;
 	}
 }
@@ -429,7 +429,7 @@ cometd.iframeTransport = new function(){
 					channel:	"/meta/connect",
 					clientId:	cometd.clientId,
 					connectionType: "iframe"
-					// FIXME: auth not passed here!
+					// FIXME-legacy: auth not passed here!
 					// "authToken": this.authToken
 				}
 			])
@@ -449,7 +449,7 @@ cometd.iframeTransport = new function(){
 						connectionId:	this.connectionId,
 						timestamp:	this.lastTimestamp,
 						id:			this.lastId
-						// FIXME: no authToken provision!
+						// FIXME-legacy: no authToken provision!
 					}
 				])
 			});
@@ -517,7 +517,7 @@ cometd.iframeTransport = new function(){
 				dojo.body().appendChild(this.phonyForm);
 			}else{
 				this.phonyForm = document.createElement("form");
-				this.phonyForm.style.display = "none"; // FIXME: will this still work?
+				this.phonyForm.style.display = "none"; // FIXME-legacy: will this still work?
 				dojo.body().appendChild(this.phonyForm);
 				this.phonyForm.enctype = "application/x-www-form-urlencoded";
 				this.phonyForm.method = "POST";
@@ -555,7 +555,7 @@ cometd.iframeTransport = new function(){
 	}
 
 	this.sendMessage = function(message, bypassBacklog){
-		// FIXME: what about auth fields?
+		// FIXME-legacy: what about auth fields?
 		if((bypassBacklog)||(this.connected)){
 			message.connectionId = this.connectionId;
 			message.clientId = cometd.clientId;
@@ -563,7 +563,7 @@ cometd.iframeTransport = new function(){
 				url: cometd.url||djConfig["cometdRoot"],
 				method: "POST",
 				mimetype: "text/json",
-				// FIXME: we should be able to do better than this given that we're sending an array!
+				// FIXME-legacy: we should be able to do better than this given that we're sending an array!
 				content: { message: dojo.json.serialize([ message ]) }
 			};
 			return dojo.io.bind(bindArgs);
@@ -586,7 +586,7 @@ cometd.iframeTransport = new function(){
 		// the "forever frame" approach
 
 		var initUrl = cometd.url+"/?tunnelInit=iframe"; // &domain="+document.domain;
-		if(false && dojo.render.html.ie){ // FIXME: DISALBED FOR NOW
+		if(false && dojo.render.html.ie){ // FIXME-legacy: DISALBED FOR NOW
 			// use the "htmlfile hack" to prevent the background click junk
 			this.rcvNode = new ActiveXObject("htmlfile");
 			this.rcvNode.open();
@@ -626,14 +626,14 @@ cometd.mimeReplaceTransport = new function(){
 
 	this.tunnelInit = function(){
 		if(this.connected){ return; }
-		// FIXME: open up the connection here
+		// FIXME-legacy: open up the connection here
 		this.openTunnelWith({
 			message: dojo.json.serialize([
 				{
 					channel:	"/meta/connect",
 					clientId:	cometd.clientId,
 					connectionType: "mime-message-block"
-					// FIXME: auth not passed here!
+					// FIXME-legacy: auth not passed here!
 					// "authToken": this.authToken
 				}
 			])
@@ -653,7 +653,7 @@ cometd.mimeReplaceTransport = new function(){
 						connectionId:	this.connectionId,
 						timestamp:	this.lastTimestamp,
 						id:			this.lastId
-						// FIXME: no authToken provision!
+						// FIXME-legacy: no authToken provision!
 					}
 				])
 			});
@@ -670,7 +670,7 @@ cometd.mimeReplaceTransport = new function(){
 	this.openTunnelWith = function(content, url){
 		// set up the XHR object and register the multipart callbacks
 		this.xhr = dojo.hostenv.getXmlhttpObject();
-		this.xhr.multipart = true; // FIXME: do Opera and Safari support this flag?
+		this.xhr.multipart = true; // FIXME-legacy: do Opera and Safari support this flag?
 		if(dojo.render.html.mozilla){
 			this.xhr.addEventListener("load", dojo.lang.hitch(this, "handleOnLoad"), false);
 		}else if(dojo.render.html.safari){
@@ -693,7 +693,7 @@ cometd.mimeReplaceTransport = new function(){
 	}
 
 	this.sendMessage = function(message, bypassBacklog){
-		// FIXME: what about auth fields?
+		// FIXME-legacy: what about auth fields?
 		if((bypassBacklog)||(this.connected)){
 			message.connectionId = this.connectionId;
 			message.clientId = cometd.clientId;
@@ -731,14 +731,14 @@ cometd.longPollTransport = new function(){
 
 	this.tunnelInit = function(){
 		if(this.connected){ return; }
-		// FIXME: open up the connection here
+		// FIXME-legacy: open up the connection here
 		this.openTunnelWith({
 			message: dojo.json.serialize([
 				{
 					channel:	"/meta/connect",
 					clientId:	cometd.clientId,
 					connectionType: "long-polling"
-					// FIXME: auth not passed here!
+					// FIXME-legacy: auth not passed here!
 					// "authToken": this.authToken
 				}
 			])
@@ -760,7 +760,7 @@ cometd.longPollTransport = new function(){
 						connectionId:	this.connectionId,
 						timestamp:	this.lastTimestamp,
 						id:			this.lastId
-						// FIXME: no authToken provision!
+						// FIXME-legacy: no authToken provision!
 					}
 				])
 			});
@@ -794,7 +794,7 @@ cometd.longPollTransport = new function(){
 	}
 
 	this.sendMessage = function(message, bypassBacklog){
-		// FIXME: what about auth fields?
+		// FIXME-legacy: what about auth fields?
 		if((bypassBacklog)||(this.connected)){
 			message.connectionId = this.connectionId;
 			message.clientId = cometd.clientId;
@@ -832,14 +832,14 @@ cometd.callbackPollTransport = new function(){
 
 	this.tunnelInit = function(){
 		if(this.connected){ return; }
-		// FIXME: open up the connection here
+		// FIXME-legacy: open up the connection here
 		this.openTunnelWith({
 			message: dojo.json.serialize([
 				{
 					channel:	"/meta/connect",
 					clientId:	cometd.clientId,
 					connectionType: "callback-polling"
-					// FIXME: auth not passed here!
+					// FIXME-legacy: auth not passed here!
 					// "authToken": this.authToken
 				}
 			])
@@ -860,7 +860,7 @@ cometd.callbackPollTransport = new function(){
 						connectionId:	this.connectionId,
 						timestamp:	this.lastTimestamp,
 						id:			this.lastId
-						// FIXME: no authToken provision!
+						// FIXME-legacy: no authToken provision!
 					}
 				])
 			});
@@ -896,7 +896,7 @@ cometd.callbackPollTransport = new function(){
 	}
 
 	this.sendMessage = function(message, bypassBacklog){
-		// FIXME: what about auth fields?
+		// FIXME-legacy: what about auth fields?
 		if((bypassBacklog)||(this.connected)){
 			message.connectionId = this.connectionId;
 			message.clientId = cometd.clientId;
@@ -924,6 +924,6 @@ cometd.connectionTypes.register("long-polling", cometd.longPollTransport.check, 
 cometd.connectionTypes.register("callback-polling", cometd.callbackPollTransport.check, cometd.callbackPollTransport);
 cometd.connectionTypes.register("iframe", cometd.iframeTransport.check, cometd.iframeTransport);
 
-// FIXME: need to implement fallback-polling, IE XML block
+// FIXME-legacy: need to implement fallback-polling, IE XML block
 
 dojo.io.cometd = cometd;

@@ -232,7 +232,7 @@ dojo.widget.defineWidget(
 					tmpFunc();
 				}
 				if(!h.safari){
-					// FIXME: VERY STRANGE safari 2.0.4 behavior here caused by
+					// FIXME-legacy: VERY STRANGE safari 2.0.4 behavior here caused by
 					// moving the textarea. Often crashed the browser!!! Seems
 					// fixed on webkit nightlies.
 					dojo.html.insertBefore(this.domNode, this.textarea);
@@ -241,7 +241,7 @@ dojo.widget.defineWidget(
 
 				if(this.textarea.form){
 					dojo.event.connect('before', this.textarea.form, "onsubmit",
-						// FIXME: should we be calling close() here instead?
+						// FIXME-legacy: should we be calling close() here instead?
 						dojo.lang.hitch(this, function(){
 							this.textarea.value = this.getEditorContent();
 						})
@@ -338,7 +338,7 @@ dojo.widget.defineWidget(
 					}
 				}
 
-				// FIXME: setting contentEditable on switches this element to
+				// FIXME-legacy: setting contentEditable on switches this element to
 				// IE's hasLayout mode, triggering weird margin collapsing
 				// behavior. It's particularly bad if the element you're editing
 				// contains childnodes that don't have margin: defined in local
@@ -394,7 +394,7 @@ dojo.widget.defineWidget(
 				this.editorObject = this.iframe;
 			}
 
-			// TODO: this is a guess at the default line-height, kinda works
+			// TODO-legacy: this is a guess at the default line-height, kinda works
 			if (this.domNode.nodeName == "LI") { this.domNode.lastChild.style.marginTop = "-1.2em"; }
 			dojo.html.addClass(this.domNode, "RichTextEditable");
 
@@ -600,7 +600,7 @@ dojo.widget.defineWidget(
 
 					dojo.html.insertCssText(
 						'body,html{background:transparent;padding:0;margin:0;}' +
-						// TODO: left positioning will case contents to disappear out of view
+						// TODO-legacy: left positioning will case contents to disappear out of view
 						//       if it gets too wide for the visible area
 						'body{top:0;left:0;right:0;' +
 						(((this.height)||(dojo.render.html.opera)) ? '' : 'position:fixed;') +
@@ -608,7 +608,7 @@ dojo.widget.defineWidget(
 						'min-height:' + this.minHeight + ';' +
 						'line-height:' + lineHeight + '}' +
 						'p{margin: 1em 0 !important;}' +
-						'body > *:first-child{padding-top:0 !important;margin-top:' + this._firstChildContributingMargin + 'px !important;}' + // FIXME: test firstChild nodeType
+						'body > *:first-child{padding-top:0 !important;margin-top:' + this._firstChildContributingMargin + 'px !important;}' + // FIXME-legacy: test firstChild nodeType
 						'body > *:last-child{padding-bottom:0 !important;margin-bottom:' + this._lastChildContributingMargin + 'px !important;}' +
 						'li > ul:-moz-first-node, li > ol:-moz-first-node{padding-top:1.2em;}\n' +
 						'li{min-height:1.2em;}' +
@@ -631,7 +631,7 @@ dojo.widget.defineWidget(
 			if(this.editNode){
 				ifrFunc(); // iframe already exists, just set content
 			}else if(dojo.render.html.moz){
-				// FIXME: if we put this on a delay, we get a height of 20px.
+				// FIXME-legacy: if we put this on a delay, we get a height of 20px.
 				// Otherwise we get the correctly specified minHeight value.
 				this.iframe.onload = function(){
 					setTimeout(ifrFunc, 250);
@@ -863,7 +863,7 @@ dojo.widget.defineWidget(
 						}
 					});
 				}
-				// FIXME: when scrollbars appear/disappear this needs to be fired
+				// FIXME-legacy: when scrollbars appear/disappear this needs to be fired
 			}else if(dojo.render.html.ie){
 				// IE contentEditable
 				if(!this.height){
@@ -895,7 +895,7 @@ dojo.widget.defineWidget(
 			if((dojo.render.html.ie)&&(e.keyCode == e.KEY_TAB)){
 				e.preventDefault();
 				e.stopPropagation();
-				// FIXME: this is a poor-man's indent/outdent. It would be
+				// FIXME-legacy: this is a poor-man's indent/outdent. It would be
 				// better if it added 4 "&nbsp;" chars in an undoable way.
 				// Unfortuantly pasteHTML does not prove to be undoable
 				this.execCommand((e.shiftKey ? "outdent" : "indent"));
@@ -968,7 +968,7 @@ dojo.widget.defineWidget(
 			// changes from the users perspective when they hit enter, as the second two
 			// html snippets render the same when margins are set to 0.
 
-			// TODO: doesn't really work; is this really needed?
+			// TODO-legacy: doesn't really work; is this really needed?
 			//if (dojo.render.html.moz) {
 			//	for (var i = 0; i < this.document.getElementsByTagName("p").length; i++) {
 			//		var p = this.document.getElementsByTagName("p")[i];
@@ -995,7 +995,7 @@ dojo.widget.defineWidget(
 				}
 			}
 			/*
-			// FIXME: attempted (but ultimately unworkable) solution for #2066
+			// FIXME-legacy: attempted (but ultimately unworkable) solution for #2066
 			if(dojo.render.html.safari){
 				var sel = this.window.getSelection();
 				dojo.debug(dojo.dom.isDescendantOf(sel.focusNode, this.document.body));
@@ -1668,7 +1668,7 @@ dojo.widget.defineWidget(
 			var changed = (this.savedContent != this._content);
 
 			// line height is squashed for iframes
-			// FIXME: why was this here? if (this.iframe){ this.domNode.style.lineHeight = null; }
+			// FIXME-legacy: why was this here? if (this.iframe){ this.domNode.style.lineHeight = null; }
 
 			if(this.interval){ clearInterval(this.interval); }
 
@@ -1677,7 +1677,7 @@ dojo.widget.defineWidget(
 			}
 
 			if (this.iframe) {
-				// FIXME: should keep iframe around for later re-use
+				// FIXME-legacy: should keep iframe around for later re-use
 				delete this.iframe;
 			}
 
@@ -1714,7 +1714,7 @@ dojo.widget.defineWidget(
 			dojo.html.removeClass(this.domNode, "RichTextEditable");
 			this.isClosed = true;
 			this.isLoaded = false;
-			// FIXME: is this always the right thing to do?
+			// FIXME-legacy: is this always the right thing to do?
 			delete this.editNode;
 
 			if(this.window._frameElement){

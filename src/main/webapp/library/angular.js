@@ -620,7 +620,7 @@ function isBoolean(value) {
 var trim = (function() {
   // native trim is way faster: http://jsperf.com/angular-trim-test
   // but IE doesn't have it... :-(
-  // TODO: we should move this into IE/ES5 polyfill
+  // TODO-legacy: we should move this into IE/ES5 polyfill
   if (!String.prototype.trim) {
     return function(value) {
       return isString(value) ? value.replace(/^\s\s*/, '').replace(/\s\s*$/, '') : value;
@@ -1388,7 +1388,7 @@ function assertNotHasOwnProperty(name, context) {
  * @param {boolean=true} bindFnToScope
  * @returns value as accessible by path
  */
-//TODO(misko): this function needs to be removed
+//TODO-legacy(misko): this function needs to be removed
 function getter(obj, path, bindFnToScope) {
   if (!path) return obj;
   var keys = path.split('.');
@@ -3734,7 +3734,7 @@ function $AnchorScrollProvider() {
     // helper function to get first anchor from a NodeList
     // can't use filter.filter, as it accepts only instances of Array
     // and IE can't convert NodeList to an array using [].slice
-    // TODO(vojta): use filter if we change it to accept lists as well
+    // TODO-legacy(vojta): use filter if we change it to accept lists as well
     function getFirstAnchor(list) {
       var result = null;
       forEach(list, function(element) {
@@ -4013,7 +4013,7 @@ function Browser(window, document, $log, $sniffer) {
   var outstandingRequestCount = 0;
   var outstandingRequestCallbacks = [];
 
-  // TODO(vojta): remove this temporary api
+  // TODO-legacy(vojta): remove this temporary api
   self.$$completeOutstandingRequest = completeOutstandingRequest;
   self.$$incOutstandingRequestCount = function() { outstandingRequestCount++; };
 
@@ -4041,7 +4041,7 @@ function Browser(window, document, $log, $sniffer) {
   /**
    * @private
    * Note: this method is used only by scenario runner
-   * TODO(vojta): prefix this method with $$ ?
+   * TODO-legacy(vojta): prefix this method with $$ ?
    * @param {function()} callback Function that will be called when no outstanding request
    */
   self.notifyWhenNoOutstandingRequests = function(callback) {
@@ -4173,7 +4173,7 @@ function Browser(window, document, $log, $sniffer) {
   /**
    * @name ng.$browser#onUrlChange
    * @methodOf ng.$browser
-   * @TODO(vojta): refactor to use node's syntax for events
+   * @TODO-legacy(vojta): refactor to use node's syntax for events
    *
    * @description
    * Register callback function that will be called, when url changes.
@@ -5310,7 +5310,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
        * @param {string=} attrName Optional none normalized name. Defaults to key.
        */
       $set: function(key, value, writeAttr, attrName) {
-        // TODO: decide whether or not to throw an error if "class"
+        // TODO-legacy: decide whether or not to throw an error if "class"
         //is set through this function since it may cause $updateClass to
         //become unstable.
 
@@ -6429,7 +6429,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
                 // register any observers
                 if (!interpolateFn) return;
 
-                // TODO(i): this should likely be attr.$set(name, iterpolateFn(scope) so that we reset the
+                // TODO-legacy(i): this should likely be attr.$set(name, iterpolateFn(scope) so that we reset the
                 // actual attr value
                 attr[name] = interpolateFn(scope);
                 ($$observers[name] || ($$observers[name] = [])).$$inter = true;
@@ -7820,7 +7820,7 @@ function $HttpBackendProvider() {
 function createHttpBackend($browser, XHR, $browserDefer, callbacks, rawDocument) {
   var ABORTED = -1;
 
-  // TODO(vojta): fix the signature
+  // TODO-legacy(vojta): fix the signature
   return function(method, url, post, callback, headers, timeout, withCredentials, responseType) {
     var status;
     $browser.$$incOutstandingRequestCount();
@@ -8960,7 +8960,7 @@ function $LocationProvider(){
     $location.$$parse($location.$$rewrite(initialUrl));
 
     $rootElement.on('click', function(event) {
-      // TODO(vojta): rewrite link when opening in new tab/window (in legacy browser)
+      // TODO-legacy(vojta): rewrite link when opening in new tab/window (in legacy browser)
       // currently we open nice url link and redirect then
 
       if (event.ctrlKey || event.metaKey || event.which == 2) return;
@@ -9603,7 +9603,7 @@ Parser.prototype = {
   parse: function (text, json) {
     this.text = text;
 
-    //TODO(i): strip all the obsolte json stuff from this file
+    //TODO-legacy(i): strip all the obsolte json stuff from this file
     this.json = json;
 
     this.tokens = this.lexer.lex(text);
@@ -9745,7 +9745,7 @@ Parser.prototype = {
         statements.push(this.filterChain());
       if (!this.expect(';')) {
         // optimize for the common case where there is only one statement.
-        // TODO(size): maybe we should not support multiple statements?
+        // TODO-legacy(size): maybe we should not support multiple statements?
         return (statements.length === 1)
             ? statements[0]
             : function(self, locals) {
@@ -16991,7 +16991,7 @@ var ngBindDirective = ngDirective(function(scope, element, attr) {
  */
 var ngBindTemplateDirective = ['$interpolate', function($interpolate) {
   return function(scope, element, attr) {
-    // TODO: move this to scenario runner
+    // TODO-legacy: move this to scenario runner
     var interpolateFn = $interpolate(element.attr(attr.$attr.ngBindTemplate));
     element.addClass('ng-binding').data('$binding', interpolateFn);
     attr.$observe('ngBindTemplate', function(value) {
@@ -20033,7 +20033,7 @@ var selectDirective = ['$compile', '$parse', function($compile,   $parse) {
 
         ctrl.$render = render;
 
-        // TODO(vojta): can't we optimize this ?
+        // TODO-legacy(vojta): can't we optimize this ?
         scope.$watch(render);
 
         function render() {

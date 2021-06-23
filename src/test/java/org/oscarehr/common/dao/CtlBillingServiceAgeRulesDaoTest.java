@@ -28,16 +28,22 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlBillingServiceAgeRules;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.fail;
 
-public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures {
-
-	protected CtlBillingServiceAgeRulesDao dao = SpringUtils.getBean(CtlBillingServiceAgeRulesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlBillingServiceAgeRulesDao ctlBillingServiceAgeRulesDao;
 
 	@Before
 	public void before() throws Exception {
@@ -46,39 +52,39 @@ public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByServiceCode() throws Exception {
-		
+
 		String serviceCode1 = "foo";
 		String serviceCode2 = "bar";
-		
+
 		CtlBillingServiceAgeRules cBSAR1 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR1);
 		cBSAR1.setServiceCode(serviceCode1);
-		dao.persist(cBSAR1);
-		
+		ctlBillingServiceAgeRulesDao.persist(cBSAR1);
+
 		CtlBillingServiceAgeRules cBSAR2 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR2);
 		cBSAR2.setServiceCode(serviceCode2);
-		dao.persist(cBSAR2);
+		ctlBillingServiceAgeRulesDao.persist(cBSAR2);
 
-		List<CtlBillingServiceAgeRules> result = dao.findByServiceCode(serviceCode1);
+		List<CtlBillingServiceAgeRules> result = ctlBillingServiceAgeRulesDao.findByServiceCode(serviceCode1);
 		Assert.assertEquals("Find by code found more than one entity", 1, result.size());
 
-		List<CtlBillingServiceAgeRules> result2 = dao.findByServiceCode(serviceCode2);
+		List<CtlBillingServiceAgeRules> result2 = ctlBillingServiceAgeRulesDao.findByServiceCode(serviceCode2);
 		Assert.assertEquals("Find by code found more than one entity", 1, result.size());
 	}
 
-	@Test(expected=javax.persistence.PersistenceException.class)
+	@Test(expected=org.springframework.dao.DataIntegrityViolationException.class)
 	public void testUniqueServiceCode()
 	{
 		String serviceCode = "baz";
 
 		CtlBillingServiceAgeRules rules1 = new CtlBillingServiceAgeRules();
 		rules1.setServiceCode(serviceCode);
-		dao.persist(rules1);
+		ctlBillingServiceAgeRulesDao.persist(rules1);
 
 		CtlBillingServiceAgeRules rules2 = new CtlBillingServiceAgeRules();
 		rules2.setServiceCode(serviceCode);
-		dao.persist(rules2);
+		ctlBillingServiceAgeRulesDao.persist(rules2);
 
 		fail("CtlBillingServiceAgeRules must have a unique service code");
 	}

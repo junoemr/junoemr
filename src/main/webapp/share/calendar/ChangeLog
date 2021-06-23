@@ -253,7 +253,7 @@
 
 2004-02-09  Mihai Bazon  <mihai_bazon@yahoo.com>
 
-	* TODO: updated
+	* TODO-legacy: updated
 
 2004-02-06  Mihai Bazon  <mihai_bazon@yahoo.com>
 
@@ -314,7 +314,7 @@
 
 	* img.gif: icon updated
 
-	* TODO: updated TODO list
+	* TODO-legacy: updated TODO-legacy list
 
 2004-01-27  Mihai Bazon  <mihai_bazon@yahoo.com>
 
@@ -326,7 +326,7 @@
 
 2004-01-15  Mihai Bazon  <mihai_bazon@yahoo.com>
 
-	* TODO: updated TODO list
+	* TODO-legacy: updated TODO-legacy list
 
 	* calendar-setup.js: default align changed to "Br"
 
@@ -394,7 +394,7 @@
 
 2003-12-21  Mihai Bazon  <mihai_bazon@yahoo.com>
 
-	* TODO: updated TODO list
+	* TODO-legacy: updated TODO-legacy list
 
 	* lang/calendar-de.js: German translation (thanks to Peter Strotmann)
 
@@ -435,7 +435,7 @@
 
 2003-11-17  Mihai Bazon  <mihai_bazon@yahoo.com>
 
-	* TODO: added TODO list
+	* TODO-legacy: added TODO-legacy list
 
 2003-11-14  Mihai Bazon  <mihai_bazon@yahoo.com>
 

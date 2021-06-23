@@ -96,7 +96,7 @@ public class GenerateEnvelopesAction  extends Action {
            }
            exportPdfJavascript += "this.print(params);";
        }
-    //TODO: Change to be able to use other size envelopes
+    //TODO-legacy: Change to be able to use other size envelopes
     Rectangle _10Envelope = new Rectangle(0,0,684,297);
     float marginLeft   = 252;
     float marginRight  = 0;

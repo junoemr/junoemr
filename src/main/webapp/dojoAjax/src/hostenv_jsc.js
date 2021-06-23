@@ -42,7 +42,7 @@ dojo.hostenv.loadUri = function(uri){
 	if(!contents){
 		dojo.raise("got no back contents from uri '" + uri + "': " + contents);
 	}
-	// TODO: in JScript .NET, eval will not affect the symbol table of the current code?
+	// TODO-legacy: in JScript .NET, eval will not affect the symbol table of the current code?
 	var value = dj_eval(contents);
 	dojo.debug("jsc eval of contents returned: ", value);
 	return 1;

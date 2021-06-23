@@ -33,15 +33,22 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BedCheckTime;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BedCheckTimeDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BedCheckTimeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BedCheckTimeDao bedCheckTimeDao;
 
-	protected BedCheckTimeDao dao = SpringUtils.getBean(BedCheckTimeDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -53,7 +60,7 @@ public class BedCheckTimeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BedCheckTime entity = new BedCheckTime();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		bedCheckTimeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -70,15 +77,15 @@ public class BedCheckTimeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(bct1);
 		bct1.setProgramId(programId1);
 		bct1.setTime(date1);
-		dao.persist(bct1);
+		bedCheckTimeDao.persist(bct1);
 		
 		BedCheckTime bct2 = new BedCheckTime();
 		EntityDataGenerator.generateTestDataForModelClass(bct2);
 		bct2.setProgramId(programId2);
 		bct2.setTime(date2);
-		dao.persist(bct2);
+		bedCheckTimeDao.persist(bct2);
 		
-		boolean result = dao.bedCheckTimeExists(programId1, date1);
+		boolean result = bedCheckTimeDao.bedCheckTimeExists(programId1, date1);
 		boolean expectedResult = true;
 		
 		assertEquals(expectedResult, result);
@@ -94,19 +101,19 @@ public class BedCheckTimeDaoTest extends DaoTestFixtures {
 		BedCheckTime bct1 = new BedCheckTime();
 		EntityDataGenerator.generateTestDataForModelClass(bct1);
 		bct1.setProgramId(programId1);
-		dao.persist(bct1);
+		bedCheckTimeDao.persist(bct1);
 		
 		BedCheckTime bct2 = new BedCheckTime();
 		EntityDataGenerator.generateTestDataForModelClass(bct2);
 		bct2.setProgramId(programId2);
-		dao.persist(bct2);
+		bedCheckTimeDao.persist(bct2);
 		
 		BedCheckTime bct3 = new BedCheckTime();
 		EntityDataGenerator.generateTestDataForModelClass(bct3);
 		bct3.setProgramId(programId3);
-		dao.persist(bct3);
+		bedCheckTimeDao.persist(bct3);
 		
-		BedCheckTime result[] = dao.getBedCheckTimes(programId1);
+		BedCheckTime result[] = bedCheckTimeDao.getBedCheckTimes(programId1);
 		BedCheckTime expectedResult[] = {bct1};
 		
 		Logger logger = MiscUtils.getLogger();
@@ -139,21 +146,21 @@ public class BedCheckTimeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(bct1);
 		bct1.setProgramId(programId1);
 		bct1.setTime(date1);
-		dao.persist(bct1);
+		bedCheckTimeDao.persist(bct1);
 		
 		BedCheckTime bct2 = new BedCheckTime();
 		EntityDataGenerator.generateTestDataForModelClass(bct2);
 		bct2.setProgramId(programId2);
 		bct2.setTime(date2);
-		dao.persist(bct2);
+		bedCheckTimeDao.persist(bct2);
 		
 		BedCheckTime bct3 = new BedCheckTime();
 		EntityDataGenerator.generateTestDataForModelClass(bct3);
 		bct3.setProgramId(303);
 		bct3.setTime(date3);
-		dao.persist(bct3);
+		bedCheckTimeDao.persist(bct3);
 		
-		String result = dao.getBedCheckTimesQuery(programId1);
+		String result = bedCheckTimeDao.getBedCheckTimesQuery(programId1);
 		Logger logger = MiscUtils.getLogger();
 		logger.warn(result);
 		String expectedResult = date3.toString();

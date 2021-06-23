@@ -512,7 +512,7 @@ public class IndicatorTemplateXML {
 
 		parameterValue = parameterValue.trim();
 		
-		//TODO for now only captures one required parameter value
+		//TODO-legacy for now only captures one required parameter value
 		// A switch will be required here to handle more values.
 		if( ! ( ManditoryParameter.provider.name() ).equalsIgnoreCase( parameterId ) ) {			
 			return parameterValue;

@@ -218,7 +218,7 @@ public class CommonLabTestValues {
 
 			String testNam = "Unknown";
 			String labType = String.valueOf(i[0]);
-			String title = "";//TODO:oscar.Misc.getString(rs,"title");
+			String title = "";//TODO-legacy:oscar.Misc.getString(rs,"title");
 
 			String obserIden = String.valueOf(i[1]); //reportname or observationIden
 			int first = obserIden.indexOf('^');
@@ -246,7 +246,7 @@ public class CommonLabTestValues {
 			String testNam = String.valueOf(i[1]);
 			testNam = testNam.substring(1 + testNam.indexOf('^'));
 			String labType = String.valueOf(i[0]);
-			String title = "";//TODO:oscar.Misc.getString(rs,"title");
+			String title = "";//TODO-legacy:oscar.Misc.getString(rs,"title");
 
 			Hashtable<String, Serializable> h = new Hashtable<String, Serializable>();
 			h.put("testName", testNam);
@@ -272,7 +272,7 @@ public class CommonLabTestValues {
 					Hashtable<String, Serializable> t = new Hashtable<String, Serializable>();
 					t.put("testName", h.getOBXName(i, j));
 					t.put("labType", "HL7");
-					t.put("title", "");//TODO... not sure what title should be
+					t.put("title", "");//TODO-legacy... not sure what title should be
 					t.put("identCode", h.getOBXIdentifier(i, j));
 					if (!labList.contains(t)) labList.add(t);
 

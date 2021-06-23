@@ -281,7 +281,7 @@ label.error {
 			 <a href='<%=request.getContextPath()%>/provider/providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
 			 </li>
 			
-			<!-- TODO:mobile version code excluded here re-visit -->
+			<!-- TODO-legacy:mobile version code excluded here re-visit -->
 		
 			 <security:oscarSec roleName="<%=roleName$%>" objectName="_resource" rights="r">
 			 <!-- <li>

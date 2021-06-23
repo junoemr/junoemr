@@ -39,7 +39,7 @@ import javax.persistence.TemporalType;
 public class Flowsheet extends AbstractModel<Integer> implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String name;
 	private boolean enabled;

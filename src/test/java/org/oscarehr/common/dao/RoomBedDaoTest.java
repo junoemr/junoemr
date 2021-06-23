@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.RoomBed;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RoomBedDaoTest extends DaoTestFixtures {
-
-	protected RoomBedDao dao = SpringUtils.getBean(RoomBedDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RoomBedDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RoomBedDao roomBedDao;
 
 
 	@Before
@@ -48,7 +54,7 @@ public class RoomBedDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.getId().setBedId(1);
 		entity.getId().setRoomId(1);
-		dao.persist(entity);
+		roomBedDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

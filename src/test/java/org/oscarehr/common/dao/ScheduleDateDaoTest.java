@@ -38,15 +38,23 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.dao.ScheduleDateDao;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ScheduleDateDaoTest extends DaoTestFixtures {
-	protected ScheduleDateDao dao = SpringUtils.getBean(ScheduleDateDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ScheduleDateDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ScheduleDateDao scheduleDateDao;
+
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	public ScheduleDateDaoTest() {
@@ -62,7 +70,7 @@ public class ScheduleDateDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 ScheduleDate entity = new ScheduleDate();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                scheduleDateDao.persist(entity);
 
                 assertNotNull(entity.getId());
         }
@@ -82,24 +90,24 @@ public class ScheduleDateDaoTest extends DaoTestFixtures {
 		scheduleDate1.setProviderNo(providerNo1);
 		scheduleDate1.setDate(date1);
 		scheduleDate1.setStatus('A');
-		dao.persist(scheduleDate1);
+		scheduleDateDao.persist(scheduleDate1);
 		
 		ScheduleDate scheduleDate2 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate2);
 		scheduleDate2.setProviderNo(providerNo2);
 		scheduleDate2.setDate(date2);
 		scheduleDate2.setStatus('A');
-		dao.persist(scheduleDate2);
+		scheduleDateDao.persist(scheduleDate2);
 		
 		ScheduleDate scheduleDate3 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate3);
 		scheduleDate3.setProviderNo(providerNo2);
 		scheduleDate3.setDate(date1);
 		scheduleDate3.setStatus('B');
-		dao.persist(scheduleDate3);
+		scheduleDateDao.persist(scheduleDate3);
 		
 		ScheduleDate expectedResult = scheduleDate1;
-		ScheduleDate result = dao.findByProviderNoAndDate(providerNo1, date1);
+		ScheduleDate result = scheduleDateDao.findByProviderNoAndDate(providerNo1, date1);
 		
 		assertEquals(expectedResult, result);
 
@@ -127,31 +135,31 @@ public class ScheduleDateDaoTest extends DaoTestFixtures {
 		scheduleDate1.setProviderNo(providerNo1);
 		scheduleDate1.setPriority(priority1);
 		scheduleDate1.setDate(date1);
-		dao.persist(scheduleDate1);
+		scheduleDateDao.persist(scheduleDate1);
 		
 		ScheduleDate scheduleDate2 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate2);
 		scheduleDate2.setProviderNo(providerNo2);
 		scheduleDate2.setPriority(priority2);
 		scheduleDate2.setDate(date2);
-		dao.persist(scheduleDate2);
+		scheduleDateDao.persist(scheduleDate2);
 		
 		ScheduleDate scheduleDate3 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate3);
 		scheduleDate3.setProviderNo(providerNo1);
 		scheduleDate3.setPriority(priority1);
 		scheduleDate3.setDate(date3);
-		dao.persist(scheduleDate3);
+		scheduleDateDao.persist(scheduleDate3);
 		
 		ScheduleDate scheduleDate4 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate4);
 		scheduleDate4.setProviderNo(providerNo2);
 		scheduleDate4.setPriority(priority1);
 		scheduleDate4.setDate(date4);
-		dao.persist(scheduleDate4);
+		scheduleDateDao.persist(scheduleDate4);
 		
 		List<ScheduleDate> expectedResult = new ArrayList<ScheduleDate>(Arrays.asList(scheduleDate1, scheduleDate3));
-		List<ScheduleDate> result = dao.findByProviderAndDateRange(providerNo1, startDate, endDate);
+		List<ScheduleDate> result = scheduleDateDao.findByProviderAndDateRange(providerNo1, startDate, endDate);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -186,28 +194,28 @@ public class ScheduleDateDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate1);
 		scheduleDate1.setProviderNo(providerNo1);
 		scheduleDate1.setDate(date1);
-		dao.persist(scheduleDate1);
+		scheduleDateDao.persist(scheduleDate1);
 		
 		ScheduleDate scheduleDate2 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate2);
 		scheduleDate2.setProviderNo(providerNo2);
 		scheduleDate2.setDate(date2);
-		dao.persist(scheduleDate2);
+		scheduleDateDao.persist(scheduleDate2);
 		
 		ScheduleDate scheduleDate3 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate3);
 		scheduleDate3.setProviderNo(providerNo1);
 		scheduleDate3.setDate(date3);
-		dao.persist(scheduleDate3);
+		scheduleDateDao.persist(scheduleDate3);
 		
 		ScheduleDate scheduleDate4 = new ScheduleDate();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleDate4);
 		scheduleDate4.setProviderNo(providerNo2);
 		scheduleDate4.setDate(date4);
-		dao.persist(scheduleDate4);
+		scheduleDateDao.persist(scheduleDate4);
 		
 		List<ScheduleDate> expectedResult = new ArrayList<ScheduleDate>(Arrays.asList(scheduleDate1, scheduleDate3));
-		List<ScheduleDate> result = dao.findByProviderAndDateRange(providerNo1, startDate, endDate);
+		List<ScheduleDate> result = scheduleDateDao.findByProviderAndDateRange(providerNo1, startDate, endDate);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -226,6 +234,6 @@ public class ScheduleDateDaoTest extends DaoTestFixtures {
 
     @Test
     public void testFindByProviderStartDateAndPriority() {
-	    assertNotNull(dao.findByProviderStartDateAndPriority("100", new Date(), "PRI"));
+	    assertNotNull(scheduleDateDao.findByProviderStartDateAndPriority("100", new Date(), 'P'));
     }
 }

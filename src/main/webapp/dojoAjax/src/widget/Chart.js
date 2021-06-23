@@ -168,7 +168,7 @@ dojo.declare(
 	getVariance: function(len){
 		var range = this.createRange(len);
 		if(range.index < 0){ return 0; }
-		var t = 0; // FIXME: for tom: wtf are t, c, and s?
+		var t = 0; // FIXME-legacy: for tom: wtf are t, c, and s?
 		var s = 0;
 		var c = 0;
 		for(var i=range.index; i>=range.start; i--){

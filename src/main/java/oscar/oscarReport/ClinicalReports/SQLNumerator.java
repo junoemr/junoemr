@@ -84,7 +84,7 @@ public class SQLNumerator implements Numerator {
     }
     
     
-    //TODO:Do i change this to pull fields out of the query?
+    //TODO-legacy:Do i change this to pull fields out of the query?
     public boolean evaluateOLD(String demographicNo) {
         boolean evalTrue = false;
         

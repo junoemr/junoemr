@@ -43,6 +43,8 @@
 <%@page import="java.net.URLEncoder" %>
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
+<%@ page import="org.oscarehr.common.dao.PartialDateDao" %>
+<%@ page import="org.oscarehr.common.model.PartialDate" %>
 <bean:define id="patient" type="oscar.oscarRx.data.RxPatientData.Patient" name="Patient" />
 <logic:notPresent name="RxSessionBean" scope="session">
     <logic:redirect href="error.html" />
@@ -159,7 +161,7 @@ if (heading != null){
                 if (cml!=null) {p_cmn = caseManagementManager.getNote(cml.getNoteId().toString());}
                 if (p_cmn!=null){isPrevAnnotation=true;}
 
-                if (request.getParameter("status") != null) { //TODO: Redo this in a better way
+                if (request.getParameter("status") != null) { //TODO-legacy: Redo this in a better way
                     String stat = request.getParameter("status");
                     if (stat.equals("active") && !prescriptDrug.isLongTerm() && !prescriptDrug.isCurrent()) {
                         continue;
@@ -196,8 +198,18 @@ if (heading != null){
             <td valign="top">
             	<% if(startDateUnknown) { %>
 
-            	<% } else { %>
-            		<a id="rxDate_<%=prescriptIdInt%>"   <%=styleColor%> href="StaticScript2.jsp?regionalIdentifier=<%=prescriptDrug.getRegionalIdentifier()%>&amp;cn=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(prescriptDrug.getCustomName()))%>&amp;bn=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(bn))%>"><%=oscar.util.UtilDateUtilities.DateToString(prescriptDrug.getRxDate())%></a>
+            	<% } else {
+	                PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
+	                String startDate = partialDateDao.getDatePartial(prescriptDrug.getRxDate(), PartialDate.TABLE_DRUGS, prescriptIdInt, PartialDate.DRUGS_STARTDATE);
+	                %>
+            		<a id="rxDate_<%=prescriptIdInt%>"
+				            <%=styleColor%>
+				            href="StaticScript2.jsp?regionalIdentifier=
+								<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(prescriptDrug.getRegionalIdentifier()))%>&amp;
+								cn=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(prescriptDrug.getCustomName()))%>&amp;
+								bn=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(bn))%>">
+			                <%=startDate%>
+		            </a>
             	<% } %>
             </td>
             <td valign="top">

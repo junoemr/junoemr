@@ -243,7 +243,7 @@ public class DrugDao extends AbstractDao<Drug>
 			distinctStr = StringUtils.EMPTY;
 		}
 
-		Query query = entityManager.createNativeQuery("select count(" + distinctStr + " demographic_no)from drugs x where x.provider_no = ? and x.written_date >= ? and x.written_date <= ?");
+		Query query = entityManager.createNativeQuery("select count(" + distinctStr + " demographic_no)from drugs x where x.provider_no = ?1 and x.written_date >= ?2 and x.written_date <= ?3");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, startDate);
 		query.setParameter(3, endDate);
@@ -522,7 +522,7 @@ public class DrugDao extends AbstractDao<Drug>
 	@NativeSql("drugs")
 	public List<Integer> findNewDrugsSinceDemoKey(String keyName) {
 		
-		String sql = "select distinct dr.demographic_no from drugs dr,demographic d,demographicExt e where dr.demographic_no = d.demographic_no and d.demographic_no = e.demographic_no and e.key_val=? and dr.lastUpdateDate > e.value";
+		String sql = "select distinct dr.demographic_no from drugs dr,demographic d,demographicExt e where dr.demographic_no = d.demographic_no and d.demographic_no = e.demographic_no and e.key_val=?1 and dr.lastUpdateDate > e.value";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter(1,keyName);
 		return query.getResultList();

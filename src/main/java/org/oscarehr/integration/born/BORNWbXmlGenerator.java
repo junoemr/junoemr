@@ -248,7 +248,7 @@ public class BORNWbXmlGenerator {
 			return false;
 		}
 
-		//TODO: xml validation - how can we report the problem better??
+		//TODO-legacy: xml validation - how can we report the problem better??
 		XmlOptions m_validationOptions = new XmlOptions();
 		ArrayList<Object> validationErrors = new ArrayList<Object>();
 		m_validationOptions.setErrorListener(validationErrors);
@@ -748,7 +748,7 @@ public class BORNWbXmlGenerator {
 			rbr.setSignature(getRourkeStrValue("signature4m"));
 		}
 
-		//TODO:
+		//TODO-legacy:
 		//problemsPlans4m not in XML??
 
 	}

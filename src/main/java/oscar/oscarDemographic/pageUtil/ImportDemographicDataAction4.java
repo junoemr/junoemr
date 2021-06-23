@@ -705,7 +705,7 @@ import java.util.zip.ZipInputStream;
         if (StringUtils.filled(demographicNo))
         {
         	logger.info("IMPORT FOR DEMOGRAPHIC " + demographicNo);
-            //TODO: Course - Admit to student program
+            //TODO-legacy: Course - Admit to student program
 
             entries.put(PATIENTID+importNo, Integer.valueOf(demographicNo));
 
@@ -1361,8 +1361,8 @@ import java.util.zip.ZipInputStream;
                     addOneEntry(ALLERGY);
 
                     //write partial dates
-                    if (entryDateFormat!=null) partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_ENTRYDATE, entryDateFormat);
-                    if (startDateFormat!=null) partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_STARTDATE, startDateFormat);
+                    if (entryDateFormat!=null) partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_ENTRYDATE, entryDateFormat);
+                    if (startDateFormat!=null) partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_STARTDATE, startDateFormat);
 
                     //annotation
                     String note = StringUtils.noNull(aaReactArray[i].getNotes());
@@ -1523,7 +1523,7 @@ import java.util.zip.ZipInputStream;
                     addOneEntry(MEDICATION);
 
                     //partial date
-                    partialDateDao.setPartialDate(PartialDate.DRUGS, drug.getId(), PartialDate.DRUGS_WRITTENDATE, writtenDateFormat);
+                    partialDateDao.setPartialDate(PartialDate.TABLE_DRUGS, drug.getId(), PartialDate.DRUGS_WRITTENDATE, writtenDateFormat);
 
                     //annotation
                     CaseManagementNote cmNote = prepareCMNote(programId,null);
@@ -1929,13 +1929,13 @@ import java.util.zip.ZipInputStream;
                         hrmDocDao.persist(hrmDoc);
 
                         if (repR[i].getNotes()!=null) {
-                            hrmDocComment.setHrmDocumentId(hrmDoc.getId());
+                            hrmDocComment.setHrmDocument(hrmDoc);
                             hrmDocComment.setComment(repR[i].getNotes());
                             hrmDocCommentDao.persist(hrmDocComment);
                         }
 
-                        hrmDocToDemo.setDemographicNo(demographicNo);
-                        hrmDocToDemo.setHrmDocumentId(hrmDoc.getId().toString());
+                        hrmDocToDemo.setDemographicNo(Integer.parseInt(demographicNo));
+                        hrmDocToDemo.setHrmDocumentId(hrmDoc.getId());
                         hrmDocToDemoDao.persist(hrmDocToDemo);
 
                         ReportsReceived.OBRContent[] obr = repR[i].getOBRContentArray();
@@ -1945,7 +1945,7 @@ import java.util.zip.ZipInputStream;
                             if (obr[j].getAccompanyingDescription()!=null) hrmDocSc.setSubClassDescription(obr[j].getAccompanyingDescription());
                             if (obr[j].getAccompanyingMnemonic()!=null) hrmDocSc.setSubClassMnemonic(obr[j].getAccompanyingMnemonic());
                             if (obr[j].getObservationDateTime()!=null) hrmDocSc.setSubClassDateTime(dateTimeFPtoDate(obr[j].getObservationDateTime(), timeShiftInDays));
-                            hrmDocSc.setHrmDocumentId(hrmDoc.getId());
+                            hrmDocSc.setHrmDocument(hrmDoc);
                             hrmDocSc.setActive(true);
                             hrmDocSubClassDao.persist(hrmDocSc);
                         }
@@ -2439,16 +2439,16 @@ import java.util.zip.ZipInputStream;
     String dateFPGetPartial(cdsDt.DateFullOrPartial dfp) {
 		if (dfp==null) return "";
 
-		if (dfp.getYearMonth()!=null) return PartialDate.YEARMONTH;
-		else if (dfp.getYearOnly()!=null) return PartialDate.YEARONLY;
+		if (dfp.getYearMonth()!=null) return PartialDate.FORMAT_YEAR_MONTH;
+		else if (dfp.getYearOnly()!=null) return PartialDate.FORMAT_YEAR_ONLY;
 		else return "";
     }
 
     String dateFPGetPartial(cdsDt.DateTimeFullOrPartial dfp) {
 		if (dfp==null) return "";
 
-		if (dfp.getYearMonth()!=null) return PartialDate.YEARMONTH;
-		else if (dfp.getYearOnly()!=null) return PartialDate.YEARONLY;
+		if (dfp.getYearMonth()!=null) return PartialDate.FORMAT_YEAR_MONTH;
+		else if (dfp.getYearOnly()!=null) return PartialDate.FORMAT_YEAR_ONLY;
 		else return "";
     }
 

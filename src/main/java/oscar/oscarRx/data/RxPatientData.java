@@ -287,7 +287,7 @@ public class RxPatientData {
 		public Allergy addAllergy(java.util.Date entryDate, Allergy allergy) {
 			allergy.setEntryDate(entryDate);
 			allergyDao.persist(allergy);
-			this.getPartialDateDao().setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+			this.getPartialDateDao().setPartialDate(PartialDate.TABLE_ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
 			return allergy;
 		}
 

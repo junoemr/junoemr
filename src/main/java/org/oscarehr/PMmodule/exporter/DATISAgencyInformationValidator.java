@@ -35,7 +35,7 @@ public class DATISAgencyInformationValidator implements IValidator {
 	 */
 //	@Override
 	public String validate(DATISField field, String value) {
-		//TODO
+		//TODO-legacy
 		
 		return value;
 	}

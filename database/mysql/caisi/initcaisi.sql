@@ -690,7 +690,7 @@ CREATE TABLE `formfollowup` (
   `radio_caredForAnxiety` varchar(24) default NULL,
   `dateLastDoctor1Contact` varchar(24) default NULL,
   PRIMARY KEY  (`ID`)
-);
+) ENGINE=MyISAM;
 
 --
 -- Table structure for table `formreceptionassessment`

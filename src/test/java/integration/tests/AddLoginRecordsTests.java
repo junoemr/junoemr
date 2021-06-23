@@ -27,8 +27,10 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
@@ -36,6 +38,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.Set;
@@ -63,15 +66,18 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	String messageContentExpected =
 			"Password must contain at least 3 of the following: capital chars, lower chars, digits, special chars.";
 
-	@BeforeClass
-	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	@Autowired
+	DatabaseUtil databaseUtil;
+
+	@Before
+	public void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestProvider();
+		databaseUtil.createTestProvider();
 	}
 
-	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
 	}

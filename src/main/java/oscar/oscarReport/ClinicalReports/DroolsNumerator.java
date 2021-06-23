@@ -78,7 +78,7 @@ public class DroolsNumerator implements Numerator{
             RuleBase ruleBase = loadMeasurementRuleBase(file);
             
 //            EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(demographicNo, measurement);
-//           Collection v = ect.getMeasurementsDataVector();
+//           Collection v = ect.getMeasurementsData();
 //           measurementList.add(new ArrayList(v));
 
             MeasurementDSHelper dshelper = new MeasurementDSHelper(loggedInInfo, demographicNo);
@@ -129,7 +129,7 @@ public class DroolsNumerator implements Numerator{
             }
 
             if (!fileFound){                  
-             URL url = MeasurementFlowSheet.class.getResource( "/oscar/oscarEncounter/oscarMeasurements/flowsheets/decisionSupport/"+string );  //TODO: change this so it is configurable;
+             URL url = MeasurementFlowSheet.class.getResource( "/oscar/oscarEncounter/oscarMeasurements/flowsheets/decisionSupport/"+string );  //TODO-legacy: change this so it is configurable;
              MiscUtils.getLogger().debug("loading from URL "+url.getFile());            
              measurementRuleBase = RuleBaseLoader.loadFromUrl( url );
             }

@@ -37,20 +37,29 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SecRoleDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SecRoleDaoTest extends DaoTestFixtures
+{
 	
-	protected SecRoleDao dao = (SecRoleDao)SpringUtils.getBean(SecRoleDao.class);
-	
+	@Autowired
+	protected SecRoleDao dao;
+
 	@Before
-	public void before() throws Exception {
+	public void before() throws Exception
+	{
 		SchemaUtils.restoreTable(false, "secRole");
 	}
+
 	@Test
 	public void testFindAll() throws Exception {
 		

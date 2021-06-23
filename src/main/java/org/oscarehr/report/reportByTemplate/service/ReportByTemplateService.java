@@ -122,7 +122,7 @@ public class ReportByTemplateService
 
 	public List<ReportObject> getReportObjectList(boolean includeParams) throws ReportByTemplateException
 	{
-		//TODO implement paging?
+		//TODO-legacy implement paging?
 		List<ReportTemplates> templateList = reportByTemplateDao.getTemplateList(null,null);
 		List<ReportObject> reportList = new ArrayList<>();
 
@@ -134,7 +134,7 @@ public class ReportByTemplateService
 	}
 	public List<ReportObject> getLegacyReportObjectList(boolean includeParams)
 	{
-		//TODO implement paging?
+		//TODO-legacy implement paging?
 		List<ReportTemplates> templateList = reportByTemplateDao.getTemplateList(null,null);
 		List<ReportObject> reportList = new ArrayList<>();
 
@@ -401,7 +401,7 @@ public class ReportByTemplateService
 
 			// only calendar use for now
 			// add the default parameter
-			//TODO it would be nice to iterate all parameters
+			//TODO-legacy it would be nice to iterate all parameters
 			String paramDefault = param.getAttributeValue("default");
 			if(paramDefault != null) {
 				// cheap and dirty way to always use the current date

@@ -31,15 +31,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CaisiAccessType;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CaisiAccessTypeDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CaisiAccessTypeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CaisiAccessTypeDao caisiAccessTypeDao;
 
-	protected CaisiAccessTypeDao dao = (CaisiAccessTypeDao)SpringUtils.getBean(CaisiAccessTypeDao.class);
-	
 	@Before
 	public void setUp() throws Exception {
 		SchemaUtils.restoreTable("access_type");
@@ -54,11 +60,11 @@ public class CaisiAccessTypeDaoTest extends DaoTestFixtures {
 		CaisiAccessType caisiAccessType3 = new CaisiAccessType();
 		EntityDataGenerator.generateTestDataForModelClass(caisiAccessType3);
 		
-		dao.persist(caisiAccessType1);
-		dao.persist(caisiAccessType2);
-		dao.persist(caisiAccessType3);
+		caisiAccessTypeDao.persist(caisiAccessType1);
+		caisiAccessTypeDao.persist(caisiAccessType2);
+		caisiAccessTypeDao.persist(caisiAccessType3);
 		
-		List<CaisiAccessType> result = dao.findAll();
+		List<CaisiAccessType> result = caisiAccessTypeDao.findAll();
 		List<CaisiAccessType> expectedResult = new ArrayList<CaisiAccessType>(Arrays.asList(
 				caisiAccessType1,
 				caisiAccessType2,

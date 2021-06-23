@@ -25,19 +25,16 @@
 
 package org.oscarehr.phr.dao.hibernate;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.oscarehr.phr.dao.PHRDocumentDAO;
 import org.oscarehr.phr.model.PHRDocument;
 import org.oscarehr.phr.model.PHRMessage;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -50,8 +47,23 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
 	private static Logger log = MiscUtils.getLogger();
 
 
-        public boolean hasIndex(String idx){
-            final String index = idx;
+    public boolean hasIndex(String idx)
+    {
+        final String index = idx;
+
+        Session session = getSession();
+
+        Query q = session.createQuery("select count(*) from PHRDocument p where p.phrIndex= '"+index+"'");
+        q.setCacheable(true);
+        Long num = (Long) q.uniqueResult();
+
+        if (num > 0 )
+        {
+            return true;
+        }
+        return false;
+
+            /*
             Long num =  (Long) getHibernateTemplate().execute(new HibernateCallback() {
             public Object doInHibernate(Session session)
                     throws HibernateException, SQLException {
@@ -65,11 +77,13 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
                return true;
             }
            return false;
-        }
+
+             */
+    }
 
 
-        public boolean hasInde2x(String index){
-            String sql = "select count(*) from PHRDocument p where p.phrClassification= '"+index+"'";
+    public boolean hasInde2x(String index){
+        String sql = "select count(*) from PHRDocument p where p.phrClassification= '"+index+"'";
 
             return   (((Long) getHibernateTemplate().iterate(sql).next()) == 1);
 
@@ -77,46 +91,46 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
 
         public List<PHRDocument> getDocumentsReceived(String docType,String providerNo) {
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrClassification = ? and d.receiverOscar = ? and d.status <= 7 ORDER BY d.dateSent DESC";
+            String sql ="from PHRDocument d where d.phrClassification = ?0 and d.receiverOscar = ?1 and d.status <= 7 ORDER BY d.dateSent DESC";
             String[] f = new String[2];
             f[0] = docType;
             f[1] = providerNo;
-            List<PHRDocument> list = getHibernateTemplate().find(sql,f);
+            List<PHRDocument> list = (List<PHRDocument>) getHibernateTemplate().find(sql,f);
             return list;
         }
 
         public List<PHRDocument> getDocumentsSent(String docType,String providerNo) {
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrClassification = ? and d.senderOscar = ? ORDER BY d.dateSent DESC";
+            String sql ="from PHRDocument d where d.phrClassification = ?0 and d.senderOscar = ?1 ORDER BY d.dateSent DESC";
             String[] f = new String[2];
             f[0] = docType;
             f[1] = providerNo;
-            List<PHRDocument> list = getHibernateTemplate().find(sql,f);
+            List<PHRDocument> list = (List<PHRDocument>) getHibernateTemplate().find(sql,f);
             return list;
         }
 
         public List<PHRDocument> getDocumentsArchived(String docType,String providerNo) {
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrClassification = ? and d.receiverOscar = ? and d.status > 7 ORDER BY d.dateSent DESC";
+            String sql ="from PHRDocument d where d.phrClassification = ?0 and d.receiverOscar = ?1 and d.status > 7 ORDER BY d.dateSent DESC";
             String[] f = new String[2];
             f[0] = docType;
             f[1] = providerNo;
-            List<PHRDocument> list = getHibernateTemplate().find(sql,f);
+            List<PHRDocument> list = (List<PHRDocument>) getHibernateTemplate().find(sql,f);
             return list;
         }
         public List<PHRDocument> getDocumentsByReceiverSenderStatusClassification(Integer receiverType, Integer senderType, String phrClassification, String receiverOscar,Integer status){
 
-            String sql="from PHRDocument d where d.phrClassification=? and d.receiverOscar=? and d.status=? and d.senderType=? and d.receiverType=? order by d.dateSent desc";
+            String sql="from PHRDocument d where d.phrClassification=?0 and d.receiverOscar=?1 and d.status=?2 and d.senderType=?3 and d.receiverType=?4 order by d.dateSent desc";
             Object[] f={phrClassification,receiverOscar,status,senderType,receiverType};
 
-            List<PHRDocument> ret=getHibernateTemplate().find(sql,f);
+            List<PHRDocument> ret= (List<PHRDocument>) getHibernateTemplate().find(sql,f);
             return ret;
         }
         public PHRDocument getDocumentById(String id){
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.id = ? ";
+            String sql ="from PHRDocument d where d.id = ?0 ";
 
-            List<PHRDocument> list = getHibernateTemplate().find(sql,new Integer(id));
+            List<PHRDocument> list = (List<PHRDocument>) getHibernateTemplate().find(sql,new Integer(id));
 
             if (list == null || list.size() == 0){
                 return null;
@@ -127,9 +141,9 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
 
         public PHRDocument getDocumentByIndex(String idx){
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrIndex = ? ";
+            String sql ="from PHRDocument d where d.phrIndex = ?0 ";
 
-            List<PHRDocument> list = getHibernateTemplate().find(sql,idx);
+            List<PHRDocument> list = (List<PHRDocument>) getHibernateTemplate().find(sql,idx);
 
             if (list == null || list.size() == 0){
                 return null;
@@ -148,8 +162,8 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
         }
 
         public PHRMessage getMessageById(String idx){
-            String sql ="from PHRDocument d where d.phrIndex = ? ";
-            List<PHRMessage> list = getHibernateTemplate().find(sql,idx);
+            String sql ="from PHRDocument d where d.phrIndex = ?0 ";
+            List<PHRMessage> list = (List<PHRMessage>) getHibernateTemplate().find(sql,idx);
             if (list == null || list.size() == 0){
                 return null;
             }
@@ -189,7 +203,16 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
         }
 
 
-        public int countUnreadDocuments(final String classification, final String providerNo) {
+    public int countUnreadDocuments(final String classification, final String providerNo)
+    {
+        Session session = getSession();
+
+        Query q = session.createQuery("select count(*) from PHRDocument d where d.phrClassification = '" + classification + "' and d.receiverOscar = '" + providerNo + "' and d.status = " + PHRMessage.STATUS_NEW);
+        q.setCacheable(true);
+        Long num = (Long) q.uniqueResult();
+        return num.intValue();
+
+            /*
             Long num =  (Long) getHibernateTemplate().execute(new HibernateCallback() {
             public Object doInHibernate(Session session)
                     throws HibernateException, SQLException {
@@ -199,7 +222,9 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
                 }
             });
             return num.intValue();
-        }
+
+             */
+    }
 
 
     /**

@@ -36,17 +36,26 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.BillingONItem;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingONItemDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingONItemDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingONItemDao billingONItemDao;
 
-	protected BillingONItemDao dao = SpringUtils.getBean(BillingONItemDao.class);
-	protected BillingONCHeader1Dao bONCH1Dao = SpringUtils.getBean(BillingONCHeader1Dao.class);
+	@Autowired
+	protected BillingONCHeader1Dao bONCH1Dao;
 	
 	@Before
 	public void before() throws Exception {
@@ -61,30 +70,30 @@ public class BillingONItemDaoTest extends DaoTestFixtures {
 		BillingONItem bONI1 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI1);
 		bONI1.setCh1Id(ch1Id2);
-		dao.persist(bONI1);
+		billingONItemDao.persist(bONI1);
 		
 		BillingONItem bONI2 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI2);
 		bONI2.setCh1Id(ch1Id1);
-		dao.persist(bONI2);
+		billingONItemDao.persist(bONI2);
 		
 		BillingONItem bONI3 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI3);
 		bONI3.setCh1Id(ch1Id2);
-		dao.persist(bONI3);
+		billingONItemDao.persist(bONI3);
 		
 		BillingONItem bONI4 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI4);
 		bONI4.setCh1Id(ch1Id1);
-		dao.persist(bONI4);
+		billingONItemDao.persist(bONI4);
 		
 		BillingONItem bONI5 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI5);
 		bONI5.setCh1Id(ch1Id1);
-		dao.persist(bONI5);
+		billingONItemDao.persist(bONI5);
 		
 		List<BillingONItem> expectedResult = new ArrayList<BillingONItem>(Arrays.asList(bONI2, bONI4, bONI5));
-		List<BillingONItem> result = dao.getBillingItemByCh1Id(ch1Id1);
+		List<BillingONItem> result = billingONItemDao.getBillingItemByCh1Id(ch1Id1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -111,40 +120,40 @@ public class BillingONItemDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(bONI1);
 		bONI1.setCh1Id(ch1Id2);
 		bONI1.setStatus(status1);
-		dao.persist(bONI1);
+		billingONItemDao.persist(bONI1);
 		
 		BillingONItem bONI2 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI2);
 		bONI2.setCh1Id(ch1Id1);
 		bONI2.setStatus(status2);
-		dao.persist(bONI2);
+		billingONItemDao.persist(bONI2);
 		
 		BillingONItem bONI3 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI3);
 		bONI3.setCh1Id(ch1Id2);
 		bONI3.setStatus(status2);
-		dao.persist(bONI3);
+		billingONItemDao.persist(bONI3);
 		
 		BillingONItem bONI4 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI4);
 		bONI4.setCh1Id(ch1Id1);
 		bONI4.setStatus(status1);
-		dao.persist(bONI4);
+		billingONItemDao.persist(bONI4);
 		
 		BillingONItem bONI5 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI5);
 		bONI5.setCh1Id(ch1Id1);
 		bONI5.setStatus(status2);
-		dao.persist(bONI5);
+		billingONItemDao.persist(bONI5);
 		
 		BillingONItem bONI6 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI6);
 		bONI6.setCh1Id(ch1Id1);
 		bONI6.setStatus(status2);
-		dao.persist(bONI6);
+		billingONItemDao.persist(bONI6);
 	
 		List<BillingONItem> expectedResult = new ArrayList<BillingONItem>(Arrays.asList(bONI2, bONI5, bONI6));
-		List<BillingONItem> result = dao.getActiveBillingItemByCh1Id(ch1Id1);
+		List<BillingONItem> result = billingONItemDao.getActiveBillingItemByCh1Id(ch1Id1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -192,7 +201,7 @@ public class BillingONItemDaoTest extends DaoTestFixtures {
 		bONCH1Dao.persist(bONCH15);
 		
 		List<BillingONCHeader1> expectedResult = new ArrayList<BillingONCHeader1>(Arrays.asList( bONCH11,  bONCH13,  bONCH14));
-		List<BillingONCHeader1> result = dao.getCh1ByDemographicNo(demographicNo1);
+		List<BillingONCHeader1> result = billingONItemDao.getCh1ByDemographicNo(demographicNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -219,58 +228,58 @@ public class BillingONItemDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(bONI1);
 		bONI1.setCh1Id(ch1Id2);
 		bONI1.setStatus(status1);
-		dao.persist(bONI1);
+		billingONItemDao.persist(bONI1);
 		
 		BillingONItem bONI2 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI2);
 		bONI2.setCh1Id(ch1Id1);
 		bONI2.setStatus(status2);
-		dao.persist(bONI2);
+		billingONItemDao.persist(bONI2);
 		
 		BillingONItem bONI3 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI3);
 		bONI3.setCh1Id(ch1Id2);
 		bONI3.setStatus(status2);
-		dao.persist(bONI3);
+		billingONItemDao.persist(bONI3);
 		
 		BillingONItem bONI4 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI4);
 		bONI4.setCh1Id(ch1Id1);
 		bONI4.setStatus(status1);
-		dao.persist(bONI4);
+		billingONItemDao.persist(bONI4);
 		
 		BillingONItem bONI5 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI5);
 		bONI5.setCh1Id(ch1Id1);
 		bONI5.setStatus(status2);
-		dao.persist(bONI5);
+		billingONItemDao.persist(bONI5);
 		
 		BillingONItem bONI6 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI6);
 		bONI6.setCh1Id(ch1Id1);
 		bONI6.setStatus(status2);
-		dao.persist(bONI6);
+		billingONItemDao.persist(bONI6);
 		
 		BillingONItem bONI7 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI7);
 		bONI7.setCh1Id(ch1Id1);
 		bONI7.setStatus(status3);
-		dao.persist(bONI7);
+		billingONItemDao.persist(bONI7);
 		
 		BillingONItem bONI8 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI8);
 		bONI8.setCh1Id(ch1Id1);
 		bONI8.setStatus(status2);
-		dao.persist(bONI8);
+		billingONItemDao.persist(bONI8);
 		
 		BillingONItem bONI9 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI9);
 		bONI9.setCh1Id(ch1Id2);
 		bONI9.setStatus(status2);
-		dao.persist(bONI9);
+		billingONItemDao.persist(bONI9);
 	
 		List<BillingONItem> expectedResult = new ArrayList<BillingONItem>(Arrays.asList(bONI2, bONI5, bONI6, bONI8));
-		List<BillingONItem> result = dao.findByCh1Id(ch1Id1);
+		List<BillingONItem> result = billingONItemDao.findByCh1Id(ch1Id1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -297,40 +306,40 @@ public class BillingONItemDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(bONI1);
 		bONI1.setCh1Id(ch1Id2);
 		bONI1.setStatus(status1);
-		dao.persist(bONI1);
+		billingONItemDao.persist(bONI1);
 		
 		BillingONItem bONI2 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI2);
 		bONI2.setCh1Id(ch1Id1);
 		bONI2.setStatus(status2);
-		dao.persist(bONI2);
+		billingONItemDao.persist(bONI2);
 		
 		BillingONItem bONI3 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI3);
 		bONI3.setCh1Id(ch1Id2);
 		bONI3.setStatus(status2);
-		dao.persist(bONI3);
+		billingONItemDao.persist(bONI3);
 		
 		BillingONItem bONI4 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI4);
 		bONI4.setCh1Id(ch1Id1);
 		bONI4.setStatus(status1);
-		dao.persist(bONI4);
+		billingONItemDao.persist(bONI4);
 		
 		BillingONItem bONI5 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI5);
 		bONI5.setCh1Id(ch1Id1);
 		bONI5.setStatus(status2);
-		dao.persist(bONI5);
+		billingONItemDao.persist(bONI5);
 		
 		BillingONItem bONI6 = new BillingONItem();
 		EntityDataGenerator.generateTestDataForModelClass(bONI6);
 		bONI6.setCh1Id(ch1Id1);
 		bONI6.setStatus(status2);
-		dao.persist(bONI6);
+		billingONItemDao.persist(bONI6);
 	
 		List<BillingONItem> expectedResult = new ArrayList<BillingONItem>(Arrays.asList(bONI2, bONI5, bONI6));
-		List<BillingONItem> result = dao.findByCh1IdAndStatusNotEqual(ch1Id1, status1);
+		List<BillingONItem> result = billingONItemDao.findByCh1IdAndStatusNotEqual(ch1Id1, status1);
 
 		Logger logger = MiscUtils.getLogger();
 		

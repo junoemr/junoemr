@@ -44,7 +44,7 @@ switch(navigator.platform){
 };
 dojo.render.svg.capable = true;
 dojo.render.svg.support.builtin = true;
-//	FIXME the following two is a big-ass hack for now.
+//	FIXME-legacy the following two is a big-ass hack for now.
 dojo.render.svg.moz = ((navigator.userAgent.indexOf("Gecko") >= 0) && (!((navigator.appVersion.indexOf("Konqueror") >= 0) || (navigator.appVersion.indexOf("Safari") >= 0))));
 dojo.render.svg.adobe = (window.parseXML != null);
 

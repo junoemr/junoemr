@@ -228,7 +228,7 @@ dojo.widget.defineWidget(
 			//		Event hook, is called before old content is cleared
 			this._runStack("_onUnloadStack");
 			delete this.scriptScope;
-			// FIXME: remove for 0.5 along with onUnLoad
+			// FIXME-legacy: remove for 0.5 along with onUnLoad
 			if(this.onUnLoad !== dojo.widget.ContentPane.prototype.onUnLoad){
 				this.onUnLoad.apply(this, arguments);
 			}
@@ -634,7 +634,7 @@ dojo.widget.defineWidget(
 			//		Generate pane content from given java function
 			var fcn = dojo.lang.isFunction(handler) ? handler : window[handler];
 			if(!dojo.lang.isFunction(fcn)) {
-				// FIXME: needs testing! somebody with java knowledge needs to try this
+				// FIXME-legacy: needs testing! somebody with java knowledge needs to try this
 				this._handleDefaults("Unable to set handler, '" + handler + "' not a function.", "onExecError", true);
 				return;
 			}

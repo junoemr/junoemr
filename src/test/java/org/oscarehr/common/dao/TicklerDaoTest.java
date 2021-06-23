@@ -32,6 +32,7 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.model.Program;
@@ -43,14 +44,21 @@ import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerComment;
 import org.oscarehr.common.model.TicklerUpdate;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class TicklerDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TicklerDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected TicklerDao ticklerDao;
 
-	protected TicklerDao dao = SpringUtils.getBean(TicklerDao.class);
 	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
-	
+
 	@Before
 	public void before() throws Exception {
 		SchemaUtils.restoreTable("tickler", "tickler_update","tickler_comments","custom_filter","provider","demographic","program","lst_gender", "admission", "demographic_merged",  
@@ -110,14 +118,14 @@ public class TicklerDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindSomeStuff() {
-		dao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.A, "1"));
-		dao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.C, "2"));
-		dao.persist(this.createTickler(2, "this today", 10015, tomorrow(), Tickler.STATUS.A, "1"));
+		ticklerDao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.A, "1"));
+		ticklerDao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.C, "2"));
+		ticklerDao.persist(this.createTickler(2, "this today", 10015, tomorrow(), Tickler.STATUS.A, "1"));
 		
-		assertTrue(1 == dao.findActiveByMessageForPatients(Arrays.asList(new Integer[] {1}), "hello").size());
-		assertTrue(1 == dao.findActiveByDemographicNoAndMessage(1, "hello there").size());
-		assertTrue(1 == dao.findByDemographicIdTaskAssignedToAndMessage(1, "1", "hello there").size());
-		assertTrue(1 == dao.search_tickler_bydemo(2, "A", tomorrow(), future(2)).size());
+		assertTrue(1 == ticklerDao.findActiveByMessageForPatients(Arrays.asList(new Integer[] {1}), "hello").size());
+		assertTrue(1 == ticklerDao.findActiveByDemographicNoAndMessage(1, "hello there").size());
+		assertTrue(1 == ticklerDao.findByDemographicIdTaskAssignedToAndMessage(1, "1", "hello there").size());
+		assertTrue(1 == ticklerDao.search_tickler_bydemo(2, "A", tomorrow(), future(2)).size());
 	}
 	
 	@Test
@@ -173,17 +181,17 @@ public class TicklerDaoTest extends DaoTestFixtures {
 		tc.setProviderNo("999998");
 		tc.setUpdateDate(new Date());
 		
-		dao.persist(entity);
+		ticklerDao.persist(entity);
 		assertNotNull(entity.getId());
 		
 		tu.setTicklerNo(entity.getId());
-		dao.persist(tu);
+		ticklerDao.persist(tu);
 		
 		tc.setTicklerNo(entity.getId());
-		dao.persist(tc);
+		ticklerDao.persist(tc);
 		
 		
-		Tickler t = dao.find(entity.getId());
+		Tickler t = ticklerDao.find(entity.getId());
 		assertTrue(1 == t.getUpdates().size());
 		assertTrue(1 == t.getComments().size());
 		assertTrue(t.getDemographic() != null);

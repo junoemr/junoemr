@@ -56,7 +56,6 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -74,7 +73,7 @@ public abstract class DaoTestFixtures
 	private static Logger logger=MiscUtils.getLogger();
 	
 	private static LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod();
-	
+
 	public static LoggedInInfo getLoggedInInfo()
 	{
 		return(loggedInInfo);
@@ -91,10 +90,10 @@ public abstract class DaoTestFixtures
 			p.setProperty("db_password_readonly", ConfigUtils.getProperty("db_password_readonly"));
 			p.setProperty("db_uri", ConfigUtils.getProperty("db_url_prefix"));
 			p.setProperty("db_driver", ConfigUtils.getProperty("db_driver"));
-			ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-			context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
-			context.refresh();
-			SpringUtils.beanFactory = context;
+			//ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
+			//context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+			//context.refresh();
+			//SpringUtils.beanFactory = context;
 		}
 	}
 	
@@ -226,7 +225,8 @@ public abstract class DaoTestFixtures
 	{
 	    String[] excludes = {"notify","notifyAll","remove","persist","merge","refresh","saveEntity","wait","equals",
 				"toString","hashCode","getClass","getModelClass","find","getCountAll","findAll",
-			    "runNativeQuery","getExplainResultList", "save","removeAll", "criteriaSearch", "criteriaSearchCount"
+			    "runNativeQuery","getExplainResultList", "save","removeAll", "criteriaSearch", "criteriaSearchCount",
+				"removeProgram", "afterPropertiesSet"
 	    };
 	    return new ArrayList<>(Arrays.asList(excludes));
     }

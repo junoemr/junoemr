@@ -39,7 +39,7 @@ public class EpisodeDao extends AbstractDao<Episode>{
 	}
 
 	public List<Episode> findAll(Integer demographicNo) {
-		Query query = entityManager.createQuery("SELECT e FROM Episode e WHERE e.demographicNo=? ORDER BY e.startDate DESC");
+		Query query = entityManager.createQuery("SELECT e FROM Episode e WHERE e.demographicNo=?1 ORDER BY e.startDate DESC");
 		query.setParameter(1,demographicNo);
 		@SuppressWarnings("unchecked")
         List<Episode> results = query.getResultList();
@@ -47,7 +47,7 @@ public class EpisodeDao extends AbstractDao<Episode>{
 	}
 	
 	public List<Episode> findAllCurrent(Integer demographicNo) {
-		Query query = entityManager.createQuery("SELECT e FROM Episode e WHERE e.status='Current' AND e.demographicNo=? ORDER BY e.startDate DESC");
+		Query query = entityManager.createQuery("SELECT e FROM Episode e WHERE e.status='Current' AND e.demographicNo=?1 ORDER BY e.startDate DESC");
 		query.setParameter(1,demographicNo);
 		@SuppressWarnings("unchecked")
         List<Episode> results = query.getResultList();

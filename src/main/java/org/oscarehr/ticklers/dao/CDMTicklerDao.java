@@ -44,7 +44,8 @@ import java.util.Set;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class CDMTicklerDao
 {
-	@PersistenceContext(unitName = "persistenceUnit")
+    // TODO: SPRINGUPGRADE: make multiple connections work
+	@PersistenceContext
     private EntityManager entityManager;
 
     /**

@@ -15,7 +15,7 @@
 */
 
 /**
- * TODO: use domNode.cloneNode instead of createElement for grid
+ * TODO-legacy: use domNode.cloneNode instead of createElement for grid
  * Should be faster (lyxsus)
  */
 dojo.provide("dojo.widget.Tree");
@@ -293,7 +293,7 @@ dojo.widget.defineWidget("dojo.widget.Tree", dojo.widget.HtmlWidget, function() 
 	// builds child html node if needed
 	// index is "last node" by default
 	/**
-	 * FIXME: Is it possible that removeNode from the tree will cause leaks cause of attached events ?
+	 * FIXME-legacy: Is it possible that removeNode from the tree will cause leaks cause of attached events ?
 	 * if yes, then only attach events in addChild and detach in remove.. Seems all ok yet.
 	*/
 	doAddChild: function(child, index){

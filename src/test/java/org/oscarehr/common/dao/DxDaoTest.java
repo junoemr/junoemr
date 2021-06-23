@@ -34,16 +34,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DxAssociation;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DxDaoTest extends DaoTestFixtures {
-	
-	// TODO Make it protected when test ignores are merged in
-	private DxDao dao = (DxDao)SpringUtils.getBean(DxDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DxDaoTest extends DaoTestFixtures
+{
+	// TODO-legacy Make it protected when test ignores are merged in
+	@Autowired
+	private DxDao dxDao;
 	
 	Logger logger = MiscUtils.getLogger();
 
@@ -79,12 +85,12 @@ public class DxDaoTest extends DaoTestFixtures {
 		dx4.setDxCodeType("B");
 		dx4.setDxCode("B");
 		
-		dao.persist(dx1);
-		dao.persist(dx2);
-		dao.persist(dx3);
-		dao.persist(dx4);
+		dxDao.persist(dx1);
+		dxDao.persist(dx2);
+		dxDao.persist(dx3);
+		dxDao.persist(dx4);
 		
-		assertEquals(4, dao.removeAssociations());
+		assertEquals(4, dxDao.removeAssociations());
 	}
 
 	@Test
@@ -117,10 +123,10 @@ public class DxDaoTest extends DaoTestFixtures {
 		dx4.setDxCodeType(codeType);
 		dx4.setDxCode(code);
 		
-		dao.persist(dx1);
-		dao.persist(dx4);
+		dxDao.persist(dx1);
+		dxDao.persist(dx4);
 		
-		List<DxAssociation> result = dao.findAllAssociations();
+		List<DxAssociation> result = dxDao.findAllAssociations();
 		List<DxAssociation> expectedResult = new ArrayList<DxAssociation>(Arrays.asList(
 				dx1, dx4
 				));
@@ -156,12 +162,12 @@ public class DxDaoTest extends DaoTestFixtures {
 		dx4.setDxCodeType("A");
 		dx4.setDxCode("A");
 		
-		dao.persist(dx1);
-		dao.persist(dx2);
-		dao.persist(dx3);
-		dao.persist(dx4);
+		dxDao.persist(dx1);
+		dxDao.persist(dx2);
+		dxDao.persist(dx3);
+		dxDao.persist(dx4);
 
-		List<DxAssociation> result = dao.findAllAssociations();
+		List<DxAssociation> result = dxDao.findAllAssociations();
 		List<DxAssociation> expectedResult = new ArrayList<DxAssociation>(Arrays.asList(
 				dx4, dx2, dx3, dx1
 				));

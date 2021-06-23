@@ -92,7 +92,7 @@ if(!authed) {
 			LabRequestReportLink.update(id,"formLabReq07",Long.valueOf(linkReqId),req_date);
 	    }
 	    
-		response.sendRedirect("../close.html");
+		response.sendRedirect("../close.jsp");
     }
 %>
 

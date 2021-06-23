@@ -17,7 +17,7 @@ dojo.hostenv._loadedUrisListStart = dojo.hostenv.loadedUris.length;
 function removeComments(contents){
 	contents = new String((!contents) ? "" : contents);
 	// clobber all comments
-	// FIXME broken if // or /* inside quotes or regexp
+	// FIXME-legacy broken if // or /* inside quotes or regexp
 	contents = contents.replace( /^(.*?)\/\/(.*)$/mg , "$1");
 	contents = contents.replace( /(\n)/mg , "__DOJONEWLINE");
 	contents = contents.replace( /\/\*(.*?)\*\//g , "");
@@ -25,7 +25,7 @@ function removeComments(contents){
 }
 
 dojo.hostenv.getRequiresAndProvides = function(contents){
-	// FIXME: should probably memoize this!
+	// FIXME-legacy: should probably memoize this!
 	if(!contents){ return []; }
 	
 
@@ -41,7 +41,7 @@ dojo.hostenv.getRequiresAndProvides = function(contents){
 }
 
 dojo.hostenv.getDelayRequiresAndProvides = function(contents){
-	// FIXME: should probably memoize this!
+	// FIXME-legacy: should probably memoize this!
 	if(!contents){ return []; }
 
 	// check to see if we need to load anything else first. Ugg.

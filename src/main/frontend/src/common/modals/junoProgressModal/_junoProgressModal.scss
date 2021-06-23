@@ -1,0 +1,17 @@
+.juno-progress-modal {
+	@extend .juno-modal;
+	@include juno-font-body-small();
+	padding: 8px 0 0 0;
+
+	.modal-dialog {
+		width: 60%;
+		max-width: 1024px;
+		min-width: 600px;
+		height: unset;
+		margin-top: 30vh;
+
+		.modal-content {
+			background: var(--color-neutral-white) none;
+		}
+	}
+}

@@ -686,7 +686,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return deferred.promise;
 		};
 
-		// TODO: change this, perhaps?  It is getting the resource details from the groups
+		// TODO-legacy: change this, perhaps?  It is getting the resource details from the groups
 		controller.buildSelectedResources = function buildSelectedResources(providerNos)
 		{
 			var selectedResources = [];
@@ -1097,7 +1097,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 
 				// mark self booked appointments
-				// TODO: Can we move this to the template?
+				// TODO-legacy: Can we move this to the template?
 				if(Juno.Common.Util.exists(event.data.tagSelfBooked) && event.data.tagSelfBooked)
 				{
 					let text = bookingStatusBox.attr("title") ? bookingStatusBox.attr("title") : "";
@@ -1484,7 +1484,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				if(momentStart.isValid() && event.start.isValid() && event.end.isValid() &&
 					momentStart.isBefore(event.end) && momentStart.isSameOrAfter(event.start))
 				{
-					//TODO refactor availability type lists
+					//TODO-legacy refactor availability type lists
 					var extendedAvailabilityType = $scope.availabilityTypes[event.scheduleTemplateCode];
 					if(Juno.Common.Util.exists(extendedAvailabilityType))
 					{

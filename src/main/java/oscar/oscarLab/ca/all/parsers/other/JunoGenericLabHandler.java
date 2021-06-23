@@ -27,13 +27,13 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import ca.uhn.hl7v2.model.v24.segment.MSH;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
+import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 public class JunoGenericLabHandler extends ORU_R01MessageHandler
 {
 	public static final String LAB_TYPE_VALUE = "JUNO-LAB";
 	public static final String DEFAULT_OBX_NAME = "Unlabelled Test";
-	public static final String IMPORT_SENDING_APP = "JUNO-LAB-IMPORT";
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -44,10 +44,10 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 			MSH messageHeaderSegment = msh.getMSH();
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getHd1_NamespaceID().getValue();
-			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getHd1_NamespaceID().getValue();
 
-			return sendingApplication.equals(JunoCoPDLabWriter.SENDING_APP)
-					|| sendingApplication.equals(IMPORT_SENDING_APP);
+			return
+				sendingApplication.equals(JunoCoPDLabWriter.SENDING_APP) ||
+				sendingApplication.equals(JunoGenericImportLabWriter.SENDING_APP);
 		}
 		return false;
 	}
@@ -101,7 +101,12 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 	@Override
 	public String getPatientLocation()
 	{
-		return "JUNOGenericLab";
+		String location = getString(get("/.MSH-4")); // sending facility
+		if(location.isEmpty())
+		{
+			location = "JUNOGenericLab"; // default if there is no data
+		}
+		return location;
 	}
 
 	@Override

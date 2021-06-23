@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderLabRoutingDaoTest extends DaoTestFixtures {
-
-	protected ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderLabRoutingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderLabRoutingDao providerLabRoutingDao;
 
 	public ProviderLabRoutingDaoTest() {
 	}
@@ -48,28 +54,28 @@ public class ProviderLabRoutingDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ProviderLabRoutingModel ql = new ProviderLabRoutingModel();
 		EntityDataGenerator.generateTestDataForModelClass(ql);
-		dao.persist(ql);
+		providerLabRoutingDao.persist(ql);
 		assertNotNull(ql.getId());
 	}
 
 	@Test
 	public void testGetProviderLabRoutings() {
-		assertNotNull(dao.getProviderLabRoutings(1, "HL7"));
+		assertNotNull(providerLabRoutingDao.getProviderLabRoutings(1, "HL7"));
 	}
 
 	@Test
 	public void testFindByStatusANDLabNoType() {
-		assertNotNull(dao.findByStatusANDLabNoType(100, "HL7", "A"));
+		assertNotNull(providerLabRoutingDao.findByStatusANDLabNoType(100, "HL7", "A"));
 	}
 
 	@Test
 	public void testFindByProviderNo() {
-		assertNotNull(dao.findByProviderNo("100", "N"));
+		assertNotNull(providerLabRoutingDao.findByProviderNo("100", "N"));
 	}
 
 	@Test
 	public void testFindByLabNoTypeAndStatus() {
-		assertNotNull(dao.findByLabNoTypeAndStatus(100, "BCP", "STS"));
+		assertNotNull(providerLabRoutingDao.findByLabNoTypeAndStatus(100, "BCP", "STS"));
 	}
 	
 }

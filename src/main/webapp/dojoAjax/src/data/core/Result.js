@@ -37,8 +37,8 @@ dojo.declare("dojo.data.core.Result", null, {
 	 */
 	sync: true,
 		
-	//timeout: function(type){ }, todo: support this
-	//timeoutSeconds: 0, todo: support this
+	//timeout: function(type){ }, todo-legacy: support this
+	//timeoutSeconds: 0, todo-legacy: support this
 		
 	// the abort method needs to be filled in by the transport that accepts the
 	// bind() request

@@ -25,14 +25,13 @@
 
 package org.oscarehr.common.dao;
 
+import org.oscarehr.common.model.PharmacyInfo;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Query;
-
-import org.oscarehr.common.model.PharmacyInfo;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class PharmacyInfoDao extends AbstractDao<PharmacyInfo>{
@@ -80,7 +79,7 @@ public class PharmacyInfoDao extends AbstractDao<PharmacyInfo>{
      }
 
     public void deletePharmacy(Integer ID){
-          String sql = "update PharmacyInfo set status = ? where id = ?";
+          String sql = "update PharmacyInfo set status = ?1 where id = ?2";
           Query query = entityManager.createQuery(sql);
           query.setParameter(1, PharmacyInfo.DELETED);
           query.setParameter(2, ID);
@@ -97,12 +96,13 @@ public class PharmacyInfoDao extends AbstractDao<PharmacyInfo>{
     	return query.getResultList();
     }
 
-    public PharmacyInfo getPharmacy(Integer ID){
-    	return find(ID);
-     }
+	public PharmacyInfo getPharmacy(Integer ID)
+	{
+		return find(ID);
+	}
 
     public PharmacyInfo getPharmacyByRecordID(Integer recordID){
-    	String sql = "SELECT x FROM  PharmacyInfo x where x.id = ?";
+    	String sql = "SELECT x FROM  PharmacyInfo x where x.id = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1,recordID);
         @SuppressWarnings("unchecked")
@@ -113,18 +113,19 @@ public class PharmacyInfoDao extends AbstractDao<PharmacyInfo>{
         return null;
      }
 
-    @SuppressWarnings("unchecked")
-    public List<PharmacyInfo> getAllPharmacies(){
-        List<PharmacyInfo>  pharmacyList =  new ArrayList<PharmacyInfo>();
-        String sql = "select x from PharmacyInfo x where x.status = :status order by name";
-        
-        Query query = entityManager.createQuery(sql);
-        query.setParameter("status", PharmacyInfo.ACTIVE);
+	@SuppressWarnings("unchecked")
+	public List<PharmacyInfo> getAllPharmacies()
+	{
+		List<PharmacyInfo> pharmacyList = new ArrayList<PharmacyInfo>();
+		String sql = "select x from PharmacyInfo x where x.status = :status order by x.name";
 
-        pharmacyList = query.getResultList();
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("status", PharmacyInfo.ACTIVE);
 
-        return pharmacyList;
-     }
+		pharmacyList = query.getResultList();
+
+		return pharmacyList;
+	}
     
     @SuppressWarnings("unchecked")
     public List<PharmacyInfo> searchPharmacyByNameAddressCity(String name, String city ) {
@@ -150,5 +151,23 @@ public class PharmacyInfoDao extends AbstractDao<PharmacyInfo>{
     	return query.getResultList();
     	
     }
+
+	public PharmacyInfo findMatchingPharmacy(PharmacyInfo pharmacyInfo)
+	{
+		//TODO is this matching criteria sufficient
+		PharmacyInfo match = null;
+		if(pharmacyInfo != null && pharmacyInfo.getAddress() != null && pharmacyInfo.getPhone1() != null)
+		{
+			String sql = "SELECT x FROM PharmacyInfo x WHERE x.status = :status AND x.name = :name AND x.address = :address AND x.phone1 = :phone";
+			Query query = entityManager.createQuery(sql);
+			query.setParameter("status", PharmacyInfo.ACTIVE);
+			query.setParameter("name", pharmacyInfo.getName());
+			query.setParameter("address", pharmacyInfo.getAddress());
+			query.setParameter("phone", pharmacyInfo.getPhone1());
+
+			match = this.getSingleResultOrNull(query);
+		}
+		return match;
+	}
 
 }

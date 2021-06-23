@@ -40,7 +40,7 @@ public class ReportTableFieldCaptionDao extends AbstractDao<ReportTableFieldCapt
 	}
 	
 	public List<ReportTableFieldCaption> findByTableNameAndName(String tableName, String name) {
-		Query q = entityManager.createQuery("SELECT x FROM ReportTableFieldCaption x WHERE x.tableName=? AND x.name=?");
+		Query q = entityManager.createQuery("SELECT x FROM ReportTableFieldCaption x WHERE x.tableName=?1 AND x.name=?2");
 		q.setParameter(1, tableName);
 		q.setParameter(2, name);
 		

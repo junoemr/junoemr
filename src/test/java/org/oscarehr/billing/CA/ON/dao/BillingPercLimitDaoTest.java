@@ -29,15 +29,21 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.ON.model.BillingPercLimit;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingPercLimitDaoTest extends DaoTestFixtures {
-
-	public BillingPercLimitDao dao = SpringUtils.getBean(BillingPercLimitDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingPercLimitDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingPercLimitDao billingPercLimitDao;
 
 	public BillingPercLimitDaoTest() {
 	}
@@ -51,12 +57,12 @@ public class BillingPercLimitDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BillingPercLimit entity = new BillingPercLimit();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billingPercLimitDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
     @Test
     public void testFindByServiceCodeAndLatestDate() {
-	    assertNotNull(dao.findByServiceCodeAndLatestDate("CD", new Date()));
+	    assertNotNull(billingPercLimitDao.findByServiceCodeAndLatestDate("CD", new Date()));
     }
 }

@@ -9,30 +9,34 @@
 package org.oscarehr.hospitalReportManager.dao;
 
 
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.hospitalReportManager.model.HRMProviderConfidentialityStatement;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class HRMProviderConfidentialityStatementDao extends AbstractDao<HRMProviderConfidentialityStatement> {
+import javax.persistence.Query;
 
-	public HRMProviderConfidentialityStatementDao() {
-		super (HRMProviderConfidentialityStatement.class);
+@Repository
+public class HRMProviderConfidentialityStatementDao extends AbstractDao<HRMProviderConfidentialityStatement>
+{
+
+	public HRMProviderConfidentialityStatementDao()
+	{
+		super(HRMProviderConfidentialityStatement.class);
 	}
 
-	public String getConfidentialityStatementForProvider(String providerNo) {
-		String sql = "select x.statement from " + this.modelClass.getName() + " x where x.providerNo=?";
+	public String getConfidentialityStatementForProvider(String providerNo)
+	{
+		String sql = "SELECT x.statement FROM " + this.modelClass.getName() + " x WHERE x.providerNo=:providerNo";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, providerNo);
-		try {
+		query.setParameter("providerNo", providerNo);
+		try
+		{
 			return (String) query.getSingleResult();
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			// No statement for this provider
 			return "";
 		}
 	}
-
-
 }

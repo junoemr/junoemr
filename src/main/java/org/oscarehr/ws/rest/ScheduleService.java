@@ -323,7 +323,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		return RestSearchResponse.successResponseOnePage(transferList);
 	}
 
-	// TODO: make the services below match the current status quo (logging, limits, etc)
+	// TODO-legacy: make the services below match the current status quo (logging, limits, etc)
 	@GET
 	@Path("/groups")
 	@Produces("application/json")
@@ -331,7 +331,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	{
 		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups();
 
-		// TODO: paginate?
+		// TODO-legacy: paginate?
 		return RestSearchResponse.successResponseOnePage(scheduleGroups);
 	}
 

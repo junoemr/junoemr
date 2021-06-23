@@ -212,7 +212,7 @@ dojo.declare("dojo.dnd.HtmlDragObject",
 					dojo.html.getBorderExtent(this.constrainingContainer, "top");
 			}
 
-			// TODO: should handle left/top/right/bottom margin separately; left/top should affect minX/minY
+			// TODO-legacy: should handle left/top/right/bottom margin separately; left/top should affect minX/minY
 			var mb = dojo.html.getMarginBox(this.domNode);
 			return {
 				minX: x,
@@ -341,7 +341,7 @@ dojo.declare("dojo.dnd.HtmlDropTarget",
 					width: inner.width, node: child});
 			}
 
-			// TODO: use dummy node
+			// TODO-legacy: use dummy node
 
 			return true;
 		},

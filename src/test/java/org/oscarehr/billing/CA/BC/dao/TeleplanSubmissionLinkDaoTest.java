@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.TeleplanSubmissionLink;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class TeleplanSubmissionLinkDaoTest extends DaoTestFixtures {
-
-	public TeleplanSubmissionLinkDao dao = SpringUtils.getBean(TeleplanSubmissionLinkDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TeleplanSubmissionLinkDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public TeleplanSubmissionLinkDao teleplanSubmissionLinkDao;
 
 	public TeleplanSubmissionLinkDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class TeleplanSubmissionLinkDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		TeleplanSubmissionLink entity = new TeleplanSubmissionLink();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		teleplanSubmissionLinkDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

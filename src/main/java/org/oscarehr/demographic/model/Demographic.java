@@ -22,16 +22,33 @@
  */
 package org.oscarehr.demographic.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -44,10 +61,25 @@ import java.util.stream.Collectors;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static oscar.util.StringUtils.filterControlCharacters;
 
+@Data
 @Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {
+	public static final int FIRST_NAME_MAX_LENGTH = 30;
+	public static final int LAST_NAME_MAX_LENGTH = 30;
+
+	public static final String GENDER_MALE = "M";
+	public static final String GENDER_FEMALE = "F";
+	public static final String GENDER_OTHER = "O";
+	public static final String GENDER_TRANSGENDER = "T";
+	public static final String GENDER_UNKNOWN = "U";
+
+	public static final String STATUS_ACTIVE = "AC";
+	public static final String STATUS_DECEASED = "DE";
+	public static final String STATUS_INACTIVE = "IN";
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "demographic_no")
@@ -55,8 +87,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	// base info
 	@Column(name = "first_name")
+	@Size(max = FIRST_NAME_MAX_LENGTH)
 	private String firstName;
 	@Column(name = "last_name")
+	@Size(max = LAST_NAME_MAX_LENGTH)
 	private String lastName;
 	@Column(name = "title")
 	private String title;
@@ -178,8 +212,8 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date electronicMessagingConsentRejectedAt;
 
-	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id")
-	private List<DemographicCust> demographicCust;
+	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic")
+	private DemographicCust demographicCust;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
 	private List<DemographicExt> demographicExtList;
@@ -194,6 +228,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="provider_no", insertable=false, updatable=false)
 	private ProviderData provider;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographic")
+	@OrderBy(value = "addedAt ASC, id ASC")
+	private List<DemographicRoster> rosterHistory;
 
 	public static final String BC_NEWBORN_BILLING_CODE = "66";
 
@@ -811,12 +849,12 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.nameOfFather = father;
 	}
 
-	public List<DemographicCust> getDemographicCust()
+	public DemographicCust getDemographicCust()
 	{
 		return demographicCust;
 	}
 
-	public void setDemographicCust(List<DemographicCust> demographicCust)
+	public void setDemographicCust(DemographicCust demographicCust)
 	{
 		this.demographicCust = demographicCust;
 	}

@@ -42,7 +42,7 @@ public class ReportAgeSexDao extends AbstractDao<ReportAgeSex>{
 	}
 
     public List<ReportAgeSex> findBeforeReportDate(Date reportDate) {
-    	String sql = "select x from ReportAgeSex x where x.reportDate=?";
+    	String sql = "select x from ReportAgeSex x where x.reportDate=?1";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,reportDate);
 
@@ -52,7 +52,7 @@ public class ReportAgeSexDao extends AbstractDao<ReportAgeSex>{
     }
     
     public void deleteAllByDate(Date reportDate) {
-    	String sql = "delete from ReportAgeSex x where x.reportDate <= ?";
+    	String sql = "delete from ReportAgeSex x where x.reportDate <= ?1";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,reportDate);
     	query.executeUpdate();
@@ -78,7 +78,7 @@ public class ReportAgeSexDao extends AbstractDao<ReportAgeSex>{
     }
     
     public Long count_reportagesex_roster(String roster, String sex, String providerNo, int age, Date dateStarted, Date dateEnded) {
-    	String sql = "select count(x) from ReportAgeSex x where (x.status<>'OP' and x.status<>'IN' and x.status<>'DE') and x.roster=? and x.sex like ? and x.providerNo = ? and x.age >= ? and x.dateJoined >= ? and x.dateJoined <= ?";
+    	String sql = "select count(x) from ReportAgeSex x where (x.status<>'OP' and x.status<>'IN' and x.status<>'DE') and x.roster=?1 and x.sex like ?2 and x.providerNo = ?3 and x.age >= ?4 and x.dateJoined >= ?5 and x.dateJoined <= ?6";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,roster);
     	query.setParameter(2,sex);
@@ -92,7 +92,7 @@ public class ReportAgeSexDao extends AbstractDao<ReportAgeSex>{
     }
     
     public Long count_reportagesex_noroster(String roster, String sex, String providerNo,int minAge, int maxAge, Date dateStarted, Date dateEnded) {
-    	String sql = "select count(x)  from ReportAgeSex x  where (x.status<>'OP' and x.status<>'IN' and x.status<>'DE') and x.roster<>? and x.sex like ? and x.providerNo=? and x.age >= ? and x.age <=? and x.dateJoined >=? and x.dateJoined <=?";
+    	String sql = "select count(x)  from ReportAgeSex x  where (x.status<>'OP' and x.status<>'IN' and x.status<>'DE') and x.roster<>?1 and x.sex like ?2 and x.providerNo=?3 and x.age >= ?4 and x.age <=?5 and x.dateJoined >=?6 and x.dateJoined <=?7";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,roster);
     	query.setParameter(2,sex);
@@ -111,13 +111,13 @@ public class ReportAgeSexDao extends AbstractDao<ReportAgeSex>{
     			"select count(x) from ReportAgeSex x " +
     			"where " +
     			"( x.status <> 'OP' and x.status <> 'IN' and x.status <> 'DE') and " +
-    			"x.roster like ? and " +
-    			"x.sex like ? and " +
-    			"x.providerNo=? and " +
-    			"x.age >= ? and " +
-    			"x.age <=? and " +
-    			"x.dateJoined >=? and " +
-    			"x.dateJoined <=?";
+    			"x.roster like ?1 and " +
+    			"x.sex like ?2 and " +
+    			"x.providerNo=?3 and " +
+    			"x.age >= ?4 and " +
+    			"x.age <=?5 and " +
+    			"x.dateJoined >=?6 and " +
+    			"x.dateJoined <=?7";
     	
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,roster);

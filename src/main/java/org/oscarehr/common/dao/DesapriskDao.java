@@ -41,7 +41,7 @@ public class DesapriskDao extends AbstractDao<Desaprisk> {
 
 	public Desaprisk search(Integer formNo, Integer demographicNo) {
 
-    	String sqlCommand = "select x from Desaprisk x where x.formNo <= ? and x.demographicNo=? order by x.formNo DESC, x.desapriskDate DESC, x.desapriskTime DESC";
+    	String sqlCommand = "select x from Desaprisk x where x.formNo <= ?1 and x.demographicNo=?2 order by x.formNo DESC, x.desapriskDate DESC, x.desapriskTime DESC";
 
         Query query = entityManager.createQuery(sqlCommand);
         query.setParameter(1, formNo);

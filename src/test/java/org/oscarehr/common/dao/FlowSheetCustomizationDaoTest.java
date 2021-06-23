@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FlowSheetCustomization;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FlowSheetCustomizationDaoTest extends DaoTestFixtures{
-
-	protected FlowSheetCustomizationDao dao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FlowSheetCustomizationDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FlowSheetCustomizationDao flowSheetCustomizationDao;
 
 	public FlowSheetCustomizationDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class FlowSheetCustomizationDaoTest extends DaoTestFixtures{
 	public void testCreate() throws Exception {
 		FlowSheetCustomization entity = new FlowSheetCustomization();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		flowSheetCustomizationDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}

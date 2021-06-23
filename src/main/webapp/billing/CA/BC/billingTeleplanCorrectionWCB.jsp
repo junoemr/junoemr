@@ -622,7 +622,7 @@ function popFeeItemList(form,field){
                   if ("" != request.getParameter("billing_no")) {
                    
                     String desc = null;
-                    for(TeleplanC12 result : teleplanC12Dao.select_c12_record("O", request.getParameter("billing_no"))) {
+                    for(TeleplanC12 result : teleplanC12Dao.select_c12_record('O', request.getParameter("billing_no"))) {
                     
                       String seqNum = result.getDataSeq();
                       

@@ -42,6 +42,7 @@ import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
@@ -66,6 +67,7 @@ public class MyHealthAccessService
 	ClinicService clinicService;
 
 	@Autowired
+	@Qualifier("myHealthAppointmentService")
 	AppointmentService appointmentService;
 
 	@Autowired

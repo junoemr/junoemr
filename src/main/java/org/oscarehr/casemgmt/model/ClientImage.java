@@ -31,9 +31,12 @@ import java.util.Date;
 import org.apache.commons.codec.binary.Base64;
 import org.caisi.model.BaseObject;
 import org.hibernate.Hibernate;
+import org.hibernate.SessionFactory;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
-public class ClientImage extends BaseObject {
+public class ClientImage extends BaseObject
+{
 	public static final String imageMissingPlaceholderUrl="/images/defaultR_img.jpg";
 	public static final String imagePresentPlaceholderUrl="/images/default_img.jpg";
 	
@@ -42,44 +45,54 @@ public class ClientImage extends BaseObject {
 	private String image_type;
 	private byte[] image_data;
 	private Date update_date;
-	
-	public ClientImage() {
+
+	public ClientImage()
+	{
 		update_date = new Date();
 	}
 
-	public int getDemographic_no() {
+	public int getDemographic_no()
+	{
 		return demographic_no;
 	}
 
-	public void setDemographic_no(int demographic_no) {
+	public void setDemographic_no(int demographic_no)
+	{
 		this.demographic_no = demographic_no;
 	}
 
-	public Long getId() {
+	public Long getId()
+	{
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Long id)
+	{
 		this.id = id;
 	}
 
-	public byte[] getImage_data() {
+	public byte[] getImage_data()
+	{
 		return image_data;
 	}
 
-	public void setImage_data(byte[] image_data) {
+	public void setImage_data(byte[] image_data)
+	{
 		this.image_data = image_data;
 	}
 
-	public String getImage_type() {
+	public String getImage_type()
+	{
 		return image_type;
 	}
 
-	public void setImage_type(String image_type) {
+	public void setImage_type(String image_type)
+	{
 		this.image_type = image_type;
 	}
 
-	public Date getUpdate_date() {
+	public Date getUpdate_date()
+	{
 		return update_date;
 	}
 
@@ -87,14 +100,19 @@ public class ClientImage extends BaseObject {
 		this.update_date = update_date;
 	}
 
-	public Blob getImage_contents() {
+	public Blob getImage_contents()
+	{
 		if(image_data == null) {
 			return null;
 		}
-		return Hibernate.createBlob(Base64.encodeBase64(getImage_data()));
+
+		// I don't condone the use of SpringUtils.getBean(), but that is the only way I could get this to work.
+		SessionFactory sessionFactory = SpringUtils.getBean(SessionFactory.class);
+		return Hibernate.getLobCreator(sessionFactory.getCurrentSession()).createBlob(Base64.encodeBase64(getImage_data()));
 	}
 
-	public void setImage_contents(Blob image_contents) {
+	public void setImage_contents(Blob image_contents)
+	{
 		if(image_contents != null) {
 			try {
 				this.image_data = Base64.decodeBase64(this.blobToByteArray(image_contents));
@@ -105,7 +123,8 @@ public class ClientImage extends BaseObject {
 		}
 	}
 
-	private byte[] blobToByteArray(Blob image_contents) throws Exception {
+	private byte[] blobToByteArray(Blob image_contents) throws Exception
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buf = new byte[4000];
 		InputStream is = null;

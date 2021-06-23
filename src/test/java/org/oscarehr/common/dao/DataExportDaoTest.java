@@ -34,14 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DataExport;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DataExportDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DataExportDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DataExportDao dataExportDao;
 
-	protected DataExportDao dao = (DataExportDao)SpringUtils.getBean(DataExportDao.class);
 	Logger logger = MiscUtils.getLogger();
 
 	@Before
@@ -50,7 +57,8 @@ public class DataExportDaoTest extends DaoTestFixtures {
 	}
 
 	@Test
-	public void testFindAll() {
+	public void testFindAll()
+	{
 		//Date date1 = new Date(dfm.parse("20091231").getTime());
 
 		DataExport de1 = new DataExport();
@@ -65,12 +73,12 @@ public class DataExportDaoTest extends DaoTestFixtures {
 		Timestamp ts3 = new Timestamp(1500);
 		de3.setDaterun(ts3);
 
-		dao.persist(de1);
-		dao.persist(de2);
-		dao.persist(de3);
+		dataExportDao.persist(de1);
+		dataExportDao.persist(de2);
+		dataExportDao.persist(de3);
 		
 		List<DataExport> expectedResult = new ArrayList<DataExport>(Arrays.asList(de1, de3, de2));
-		List<DataExport> result = dao.findAll();
+		List<DataExport> result = dataExportDao.findAll();
 
 		// fail if list sizes aren't the same
 		if (result.size() != expectedResult.size()) {
@@ -87,7 +95,8 @@ public class DataExportDaoTest extends DaoTestFixtures {
 	}
 
 	@Test
-	public void testFindAllByType() {
+	public void testFindAllByType()
+	{
 		String type = "typeA";
 
 		DataExport de1 = new DataExport();
@@ -105,11 +114,11 @@ public class DataExportDaoTest extends DaoTestFixtures {
 		de3.setDaterun(ts3);
 		de3.setType(type);
 
-		dao.persist(de1);
-		dao.persist(de2);
-		dao.persist(de3);
+		dataExportDao.persist(de1);
+		dataExportDao.persist(de2);
+		dataExportDao.persist(de3);
 		
-		List<DataExport> result = dao.findAllByType(type);
+		List<DataExport> result = dataExportDao.findAllByType(type);
 		List<DataExport> expectedResult = new ArrayList<DataExport>(Arrays.asList(de1, de3));
 
 		// fail if list sizes aren't the same

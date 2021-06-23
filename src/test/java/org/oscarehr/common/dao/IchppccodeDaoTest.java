@@ -25,12 +25,18 @@ package org.oscarehr.common.dao;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class IchppccodeDaoTest extends DaoTestFixtures {
-
-	protected IchppccodeDao dao = SpringUtils.getBean(IchppccodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class IchppccodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected IchppccodeDao ichppccodeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -39,6 +45,6 @@ public class IchppccodeDaoTest extends DaoTestFixtures {
 	
 	@Test
 	public void testFindByCodingSystem() {
-		dao.findByCodingSystem("CS");
+		ichppccodeDao.findByCodingSystem("CS");
 	}
 }

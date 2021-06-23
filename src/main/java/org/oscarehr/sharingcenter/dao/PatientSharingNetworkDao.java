@@ -54,7 +54,7 @@ public class PatientSharingNetworkDao extends AbstractDao<PatientSharingNetworkD
     }
 
     public List<PatientSharingNetworkDataObject> findByDemographicId(int demographicId) {
-        String sql = "FROM PatientSharingNetworkDataObject e where e.demographicNo = ?";
+        String sql = "FROM PatientSharingNetworkDataObject e where e.demographicNo = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, demographicId);
 
@@ -62,7 +62,7 @@ public class PatientSharingNetworkDao extends AbstractDao<PatientSharingNetworkD
     }
 
     public PatientSharingNetworkDataObject findPatientSharingNetworkDataObject(int affinityDomain, int demographicId) {
-        String sql = "FROM PatientSharingNetworkDataObject e where e.affinityDomain = ? and e.demographicNo = ?";
+        String sql = "FROM PatientSharingNetworkDataObject e where e.affinityDomain = ?1 and e.demographicNo = ?2";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);
@@ -74,7 +74,7 @@ public class PatientSharingNetworkDao extends AbstractDao<PatientSharingNetworkD
     }
 
     public boolean isSharingEnabled(int affinityDomain, int demographicId) {
-        String sql = "SELECT count(*) FROM PatientSharingNetworkDataObject e where e.affinityDomain = ? and e.demographicNo = ? and e.sharingEnabled = 1";
+        String sql = "SELECT count(*) FROM PatientSharingNetworkDataObject e where e.affinityDomain = ?1 and e.demographicNo = ?2 and e.sharingEnabled = 1";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);

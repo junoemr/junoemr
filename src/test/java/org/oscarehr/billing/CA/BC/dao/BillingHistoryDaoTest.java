@@ -29,15 +29,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.BillingHistory;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingHistoryDaoTest extends DaoTestFixtures {
-
-	public BillingHistoryDao dao = SpringUtils.getBean(BillingHistoryDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingHistoryDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingHistoryDao billingHistoryDao;
 
 	public BillingHistoryDaoTest() {
 	}
@@ -51,23 +57,22 @@ public class BillingHistoryDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BillingHistory entity = new BillingHistory();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billingHistoryDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindByBillingMasterNo() {
-		List<Object[]> bs = dao.findByBillingMasterNo(100);
+		List<Object[]> bs = billingHistoryDao.findByBillingMasterNo(100);
 		assertNotNull(bs);
 	}
 	
 	@Test
 	public void testGetTotalPaidFromHistory() {
-		Double dd = dao.getTotalPaidFromHistory(100, true);
+		Double dd = billingHistoryDao.getTotalPaidFromHistory(100, true);
 		assertNotNull(dd);
 		
-		dd = dao.getTotalPaidFromHistory(100, false);
+		dd = billingHistoryDao.getTotalPaidFromHistory(100, false);
 		assertNotNull(dd);
 	}
-	
 }

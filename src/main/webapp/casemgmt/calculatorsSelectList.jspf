@@ -22,11 +22,11 @@
 		<bean:message key="oscarEncounter.Index.bodyMass" />
 	</option>
 	
-	<option value='../oscarEncounter/calculators/CoronaryArteryDiseaseRiskPrediction.jsp?sex=<%=bean.patientSex%>&age=<%=pAge%>' x_size='525' y_size='775'>
+	<option value='../oscarEncounter/calculators/CoronaryArteryDiseaseRiskPrediction.jsp?sex=<%=patientSex%>&age=<%=patientAge%>' x_size='525' y_size='775'>
 		<bean:message key="oscarEncounter.Index.coronary" />
 	</option>
 	
-	<option value='../oscarEncounter/calculators/riskcalc/index.html?sex=<%=bean.patientSex%>&age=<%=pAge%>' x_size='525' y_size='775'>
+	<option value='../oscarEncounter/calculators/riskcalc/index.html?sex=<%=patientSex%>&age=<%=patientAge%>' x_size='525' y_size='775'>
 		Framingham/UKPDS Risk Calculator
 	</option>
 	
@@ -34,7 +34,7 @@
 		CV Risk
 	</option>
 	
-	<option value='../oscarEncounter/calculators/OsteoporoticFracture.jsp?sex=<%=bean.patientSex%>&age=<%=pAge%>' x_size='525' y_size='775'>
+	<option value='../oscarEncounter/calculators/OsteoporoticFracture.jsp?sex=<%=patientSex%>&age=<%=patientAge%>' x_size='525' y_size='775'>
 		<bean:message key="oscarEncounter.Index.msgOsteoporotic" />
 	</option>
 	

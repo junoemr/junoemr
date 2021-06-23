@@ -33,7 +33,7 @@ dojo.behavior = new function(){
 		}
 	}
 
-	// FIXME: need a better test so we don't exclude nightly Safari's!
+	// FIXME-legacy: need a better test so we don't exclude nightly Safari's!
 	this.behaviors = {};
 	this.add = function(behaviorObj){
 		/*	behavior objects are specified in the following format:

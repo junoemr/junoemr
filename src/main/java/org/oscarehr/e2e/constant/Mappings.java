@@ -305,7 +305,7 @@ public class Mappings {
 		twentyfourhf.setInstitutionSpecified(false);
 
 		EIVL<TS> hourOfSleep = new EIVL<TS>(DomainTimingEvent.HourOfSleep, null, SetOperator.Intersect);
-		// TODO [MARC-HI] Notify about error "When the Event property implies before, after or between meals the Offset property must not be populated"
+		// TODO-legacy [MARC-HI] Notify about error "When the Event property implies before, after or between meals the Offset property must not be populated"
 		hourOfSleep.setOffset(new IVL<PQ>() {{setNullFlavor(NullFlavor.NotApplicable);}});
 
 		EIVL<TS> betweenDinnerAndSleep = new EIVL<TS>(DomainTimingEvent.BetweenDinnerAndSleep, null, SetOperator.Intersect);
@@ -338,12 +338,12 @@ public class Mappings {
 		map.put("Q12H", twelvehf);
 		map.put("Q24H", twentyfourhf);
 
-		// TODO [MARC-HI] Wait on answer about IVL based PIVL_TS implementation
+		// TODO-legacy [MARC-HI] Wait on answer about IVL based PIVL_TS implementation
 		map.put("Q1-2H", onehf);
 		map.put("Q3-4H", threehf);
 		map.put("Q4-6H", fourhf);
 
-		// TODO [E2E] Resolve QAM to EIVL_TS DomainTimingEvent mapping
+		// TODO-legacy [E2E] Resolve QAM to EIVL_TS DomainTimingEvent mapping
 		map.put("QAM", onedt);
 		map.put("QPM", betweenDinnerAndSleep);
 		map.put("QHS", hourOfSleep);

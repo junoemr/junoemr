@@ -39,7 +39,7 @@ public class BillingONHeaderDao extends AbstractDao<BillingONHeader>{
 	}
 	
 	public List<BillingONHeader> findByDiskIdAndProviderRegNum(Integer diskId, String providerRegNum) {
-		Query query = entityManager.createQuery("SELECT b FROM BillingONHeader b where b.diskId = ? AND b.providerRegNum=?");
+		Query query = entityManager.createQuery("SELECT b FROM BillingONHeader b where b.diskId = ?1 AND b.providerRegNum=?2");
 		query.setParameter(1, diskId);
 		query.setParameter(2, providerRegNum);
 		

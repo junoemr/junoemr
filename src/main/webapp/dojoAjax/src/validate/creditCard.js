@@ -40,7 +40,7 @@ dojo.validate.isValidCreditCardNumber = function(/*String|Int*/value,/*String?*/
 		value = String(value);
 	}
 	value = value.replace(/[- ]/g,''); //ignore dashes and whitespaces
-	/* 	FIXME: not sure on all the abbreviations for credit cards,below is what each stands for atleast to my knowledge
+	/* 	FIXME-legacy: not sure on all the abbreviations for credit cards,below is what each stands for atleast to my knowledge
 		mc: Mastercard
 		ec: Eurocard
 		vi: Visa
@@ -94,7 +94,7 @@ dojo.validate.isValidCvv = function(/*String|Int*/value, /*String*/ccType) {
 			return false; //Boolean
 	}
 	var flags = {format:format};
-	//FIXME? Why does isNumberFormat take an object for flags when its only parameter is either a string or an array inside the object?
+	//FIXME-legacy? Why does isNumberFormat take an object for flags when its only parameter is either a string or an array inside the object?
 	if ((value.length == format.length)&&(dojo.validate.isNumberFormat(value, flags))){
 		return true; //Boolean
 	}

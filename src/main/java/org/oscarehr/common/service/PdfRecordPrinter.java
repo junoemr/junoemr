@@ -460,7 +460,7 @@ public class PdfRecordPrinter {
             if (notes != null && notes.size() > 0){
                 p = new Paragraph();
                 p.setAlignment(Paragraph.ALIGN_LEFT);
-                phrase = new Phrase(LEADING, "\nOther Meds\n", obsfont); //TODO:Needs to be i18n
+                phrase = new Phrase(LEADING, "\nOther Meds\n", obsfont); //TODO-legacy:Needs to be i18n
                 p.add(phrase);
                 document.add(p);
                 newPage = false;

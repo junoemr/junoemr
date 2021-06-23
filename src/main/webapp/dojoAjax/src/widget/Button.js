@@ -268,7 +268,7 @@ dojo.widget.defineWidget(
 		},
 
 		_sizeMyselfHelper: function(){
-			// draw the arrow (todo: why is the arror in containerNode rather than outside it?)
+			// draw the arrow (todo-legacy: why is the arror in containerNode rather than outside it?)
 			this.arrow.src = dojo.uri.dojoUri(this.disabled ? this.disabledDownArrow : this.downArrow);
 			this.containerNode.appendChild(this.arrow);
 

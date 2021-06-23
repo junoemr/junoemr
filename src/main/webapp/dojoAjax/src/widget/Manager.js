@@ -42,7 +42,7 @@ dojo.widget.manager = new function(){
 		if(!widget.extraArgs["id"]){
 			widget.extraArgs["id"] = widget.extraArgs["ID"];
 		}
-		// FIXME: the rest of this method is very slow!
+		// FIXME-legacy: the rest of this method is very slow!
 		if(widget.widgetId == ""){
 			if(widget["id"]){
 				widget.widgetId = widget["id"];
@@ -71,7 +71,7 @@ dojo.widget.manager = new function(){
 		}
 	}
 
-	// FIXME: we should never allow removal of the root widget until all others
+	// FIXME-legacy: we should never allow removal of the root widget until all others
 	// are removed!
 	this.remove = function(widgetIndex){
 		if(dojo.lang.isNumber(widgetIndex)){
@@ -83,7 +83,7 @@ dojo.widget.manager = new function(){
 		}
 	}
 	
-	// FIXME: suboptimal performance
+	// FIXME-legacy: suboptimal performance
 	this.removeById = function(id) {
 		if(!dojo.lang.isString(id)){
 			id = id["widgetId"];
@@ -291,7 +291,7 @@ dojo.widget.manager = new function(){
 		throw new Error('Could not locate widget implementation for "' + widgetName + '" in "' + nsObj.module + '" registered to namespace "' + nsObj.name + '"');
 	}
 
-	// FIXME: does it even belong in this module?
+	// FIXME-legacy: does it even belong in this module?
 	// NOTE: this method is implemented by DomWidget.js since not all
 	// hostenv's would have an implementation.
 	/*this.getWidgetFromPrimitive = function(baseRenderType){
@@ -326,7 +326,7 @@ dojo.widget.manager = new function(){
 		dojo.event.connect(window, 'onresize', this, 'onWindowResized');	// window resize
 	}
 
-	// FIXME: what else?
+	// FIXME-legacy: what else?
 };
 
 (function(){

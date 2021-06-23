@@ -37,7 +37,7 @@ import java.util.Date;
 public class BillingONPremium extends AbstractModel<Integer> implements Serializable {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "premium_id", nullable = false)
     private Integer id;
 

@@ -237,7 +237,8 @@ public class SchemaUtils
 		}
 	}
 
-	public static int loadFileIntoMySQL(String filename) throws IOException {
+	public static int loadFileIntoMySQL(String filename) throws IOException
+	{
 		String dir = new File(filename).getParent();
                 String env[] = null;
                 String envStr = null;
@@ -250,7 +251,15 @@ public class SchemaUtils
                     env = new String[]{};
                 }
 
-        String[] commandString={"mysql","--user="+ConfigUtils.getProperty("db_user"),"--password="+ConfigUtils.getProperty("db_password"),"--host="+ConfigUtils.getProperty("db_host"),"-e","source "+filename,ConfigUtils.getProperty("db_schema")};
+        String[] commandString={
+            	"mysql",
+				"--user="+ConfigUtils.getProperty("db_user"),
+				"--password="+ConfigUtils.getProperty("db_password"),
+				"--host="+ConfigUtils.getProperty("db_host"),
+				"-e",
+				"source "+filename,
+				ConfigUtils.getProperty("db_schema")
+                };
         logger.info("Runtime exec command string : "+Arrays.toString(commandString));
 		Process p = Runtime.getRuntime().exec(commandString,env, new File(dir));
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -294,14 +303,46 @@ public class SchemaUtils
 	    return sql.replaceAll("CONSTRAINT `(.*?)`", String.format("CONSTRAINT `$1%s`", "_original"));
 	}
 
+	/**
+	 * When running test in Intellij, "basedir" is not available and returns
+	 * null.
+	 *
+	 * @return
+	 */
+	protected static String getBaseDir()
+	{
+		logger.debug("Get \"basedir\" property (must be set by Maven)");
+		String basedir = System.getProperty("basedir");
+
+		if (basedir == null)
+		{
+			logger.info("Missing \"basedir\" to run tests (normally set by Maven). Assuming Intellij test run, look for env. variable");
+			basedir = System.getenv().get("basedir");
+
+			if (basedir == null)
+			{
+				logger.warn("Missing \"basedir\" to run tests (normally set by Maven). Fallback to \"user.dir\" but if tests fails " +
+						"set env. variable \"basedir=$MODULE_DIR$\" in run configuration");
+				basedir = System.getProperty("user.dir");
+			}
+		}
+
+		return basedir;
+	}
+
 	private static void runCreateTablesScript(Connection c) throws IOException
 	{
 		boolean skipDbInit = false;
-		if(System.getProperty("oscar.skip.dbinit") != null && System.getProperty("oscar.skip.dbinit").equalsIgnoreCase("true"))
-			skipDbInit=true;
+		if(
+				System.getProperty("oscar.skip.dbinit") != null &&
+				System.getProperty("oscar.skip.dbinit").equalsIgnoreCase("true"))
+		{
+			skipDbInit = true;
+		}
 		
-		if(!skipDbInit) {
-			String baseDir=System.getProperty("basedir");
+		if(!skipDbInit)
+		{
+			String baseDir = getBaseDir();
 			logger.info("using baseDir : "+baseDir);
 					
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscarinit.sql"),0);

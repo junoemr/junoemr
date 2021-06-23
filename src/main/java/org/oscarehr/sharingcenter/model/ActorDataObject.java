@@ -49,7 +49,7 @@ public class ActorDataObject extends AbstractModel<Integer> implements Serializa
     @Column(name = "name")
     public String name;
 
-    //TODO: Enumerate this?
+    //TODO-legacy: Enumerate this?
     @Column(name = "actor_type")
     public String actorType;
 

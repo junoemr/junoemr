@@ -1617,7 +1617,7 @@ function calToday(field) {
 						maxlength="10"
 						value="<%= UtilMisc.htmlEscape(props.getProperty("ar2_strep", "")) %>"></td>
 				</tr>
-				<!-- TODO: INPUT TEXT BOX -->
+				<!-- TODO-legacy: INPUT TEXT BOX -->
 				<tr>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>

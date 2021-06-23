@@ -53,6 +53,10 @@
 		java.util.Date, java.util.List"%>
 <%@page import="oscar.log.LogAction, oscar.log.LogConst"%>
 <%@page import="oscar.dms.EDocUtil"%>
+<%@ page import="org.oscarehr.encounterNote.dao.CaseManagementNoteResidualInfoDao" %>
+<%@ page import="org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -81,6 +85,7 @@
 
     WebApplicationContext  ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
     CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
+	CaseManagementNoteResidualInfoDao caseManagementNoteResidualInfoDao = (CaseManagementNoteResidualInfoDao) ctx.getBean("encounterNote.dao.CaseManagementNoteResidualInfoDao");
 
     Integer tableName = cmm.getTableNameByDisplay(display);
     String note = "";
@@ -131,6 +136,14 @@
     if (p_cmn_dump!=null) {
         dump = p_cmn_dump.getNote().substring("imported.cms4.2011.06".length());
     }
+    else if(p_cmn != null && p_cmn.getId() != null)
+    {
+	    List<CaseManagementNoteResidualInfo> residualInfoList = caseManagementNoteResidualInfoDao.findByNoteId(p_cmn.getId());
+	    if(residualInfoList != null && !residualInfoList.isEmpty())
+	    {
+		    dump = residualInfoList.stream().map((residualInfo) -> residualInfo.getContentKey() + ": " + residualInfo.getContentValue()).collect(Collectors.joining("\n"));
+	    }
+    }
     if (saved) {
 	String prog_no = new EctProgram(se).getProgram(user_no);
         //create a note with demo, user_no, prog_no
@@ -140,6 +153,7 @@
 //            if (p_cmn!=null && note !="") { //previous annotation exists
 		cmn.setUuid(uuid); //assign same UUID to new annotation
 	    }
+	    //TODO save residual info with note copy. this is best done with a refactor to note saving.
 	    if (tableName.equals(cml.CASEMGMTNOTE) || tableId.equals(0L)) {
                 //new casemgmt_note may be saved AFTER annotation
 		if (!attrib_name.equals("")) se.setAttribute(attrib_name, cmn);
@@ -155,7 +169,7 @@
                     LogAction.addLog(user_no,LogConst.ANNOTATE, display, String.valueOf(tableId), request.getRemoteAddr(), demo, cmn.getNote());                
 	    }
 	}
-	response.sendRedirect("../close.html");
+	response.sendRedirect("../close.jsp");
     }
 
     //Display revision history

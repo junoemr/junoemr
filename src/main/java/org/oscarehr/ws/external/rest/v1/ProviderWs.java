@@ -50,7 +50,7 @@ public class ProviderWs extends AbstractExternalRestWs
 	@Autowired
 	ProviderDao providerDao;
 
-	//TODO use a custom transfer object
+	//TODO-legacy use a custom transfer object
 	@GET
 	@Path("/{id}")
 	@Operation(summary = "Retrieve an existing provider record by provider id.")

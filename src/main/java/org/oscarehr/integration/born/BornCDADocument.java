@@ -127,7 +127,7 @@ public class BornCDADocument extends Level1Document{
 		 */
 		this.addId(props.getIdCodingSystem(), id);
 		
-		//TODO: For Updates (setId and Version). Not sure yet how this works.
+		//TODO-legacy: For Updates (setId and Version). Not sure yet how this works.
 		//<identifier that is common across all document revisions/versions>
 		//Shall be present if version is populated"
 		getRoot().setSetId(props.getSetIdCodingSystem(),id);
@@ -300,7 +300,7 @@ public class BornCDADocument extends Level1Document{
 		custodian.setAssignedCustodian(assignedCustodian);
 		getRoot().setCustodian(custodian);
 		
-		//TODO: Parents document info also related to updates. Will determine soon.
+		//TODO-legacy: Parents document info also related to updates. Will determine soon.
 		/*
 		ArrayList<RelatedDocument> relatedDocs = new ArrayList<RelatedDocument>();
 		RelatedDocument rd = new RelatedDocument();

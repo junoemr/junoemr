@@ -1300,7 +1300,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                 boolean obrFlag = false;
                                 int obxCount = handler.getOBXCount(obr);
-                                String collectorsComment = handler.getCollectorsComment(obr); // TODO: get collector attribution
+                                String collectorsComment = handler.getCollectorsComment(obr); // TODO-legacy: get collector attribution
                                 if (collectorsComment != null && !collectorsComment.equals("")) {
                                 	 %>
                                      <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">

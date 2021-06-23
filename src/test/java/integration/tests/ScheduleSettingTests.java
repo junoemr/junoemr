@@ -22,20 +22,28 @@
  */
 package integration.tests;
 
+import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.junoUtil.DatabaseUtil;
+import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.AfterClass;
+import java.io.IOException;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.oscarehr.JunoApplication;
+import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -48,29 +56,33 @@ import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
-public class ScheduleSettingTests extends SeleniumTestBase
-{
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class ScheduleSettingTests extends SeleniumTestBase {
+
+	@Autowired
+	private DatabaseUtil databaseUtil;
+
 	public static String templateTitleGeneral = "P:General";
 
-	@BeforeClass
-	public static void setup()
-			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	@Before
+	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
 				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
 		loadSpringBeans();
-		DatabaseUtil.createTestProvider();
-
+		databaseUtil.createTestProvider();
 	}
 
-	@AfterClass
-	public static void cleanup()
-			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
 				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
+		loadSpringBeans();
+		databaseUtil.createTestProvider();
 	}
 
 	public static boolean isTemplateInDropdownOpions(By dropdownpath, String valueExpected)
@@ -144,9 +156,7 @@ public class ScheduleSettingTests extends SeleniumTestBase
 
 	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
 	{
-		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		//webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());
@@ -174,6 +184,16 @@ public class ScheduleSettingTests extends SeleniumTestBase
 			throws Exception
 	{
 		String holidayName = "Happy Monday";
+
+		// login
+		if (!Navigation.isLoggedIn(driver)) {
+			Navigation.doLogin(
+					AuthUtils.TEST_USER_NAME,
+					AuthUtils.TEST_PASSWORD,
+					AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+					driver);
+		}
 
 		// open Schedule Template Setting page
 		accessAdministrationSectionClassicUI(driver, "Schedule Management","Schedule Setting");

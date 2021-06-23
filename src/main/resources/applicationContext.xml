@@ -9,11 +9,15 @@
                 http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd"
        default-autowire="no">
 
+	<!-- Note that this appears to be a separate context from the one configured by -->
+	<!-- action-servlet.xml -->
+
 	<!--
 		load properties from additional property files; oscar.properties is
 		already loaded
 	-->
 	<bean id="propertyConfigurer" class="org.oscarehr.common.OscarPropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="locations">
 			<list>
 				<value>classpath:oscar_mcmaster.properties</value>
@@ -22,20 +26,27 @@
 	</bean>
 
 	<!-- setup JPA -->
+<!--
 	<import resource="classpath:spring_jpa.xml" />
+-->
 
 	<!-- setup hibernate -->
+<!--
 	<import resource="classpath:spring_hibernate.xml" />
+-->
 
 	<!-- setup managers -->
 	<import resource="classpath:spring_managers.xml" />
 
 	<!-- setup CXF -->
+<!--
 	<import resource="classpath:spring_ws.xml" />
+-->
 
 	<bean id="hl7HandlerMSHMappingDao" class="org.oscarehr.common.dao.HL7HandlerMSHMappingDao" autowire="byName" />
+
 	<!-- hibernated DAO -->
-        <bean id="gstControlDao" class="org.oscarehr.billing.CA.dao.GstControlDao" autowire="byName" />
+	<bean id="gstControlDao" class="org.oscarehr.billing.CA.dao.GstControlDao" autowire="byName" />
 	<bean id="programDao" class="org.oscarehr.PMmodule.dao.ProgramDao" autowire="byName" />
 	<bean id="programQueueDao" class="org.oscarehr.PMmodule.dao.ProgramQueueDao" autowire="byName" />
 	<bean id="clientReferralDAO" class="org.oscarehr.PMmodule.dao.ClientReferralDAO" autowire="byName" />
@@ -47,6 +58,9 @@
 
 	<bean id="CaseManagementIssueDAO" class="org.oscarehr.casemgmt.dao.CaseManagementIssueDAO" autowire="byName" />
 	<bean id="caseManagementIssueDAO" class="org.oscarehr.casemgmt.dao.CaseManagementIssueDAO" autowire="byName" />
+	<bean id="caseManagementIssueService" class="org.oscarehr.casemgmt.service.CaseManagementIssueService" autowire="byName">
+		<property name="caseManagementManager" ref="caseManagementManager" />
+	</bean>
 	<bean id="CaseManagementNoteDAO" class="org.oscarehr.casemgmt.dao.CaseManagementNoteDAO" autowire="byName" />
 	<bean id="caseManagementNoteDAO" class="org.oscarehr.casemgmt.dao.CaseManagementNoteDAO" autowire="byName" />
 	<bean id="CaseManagementNoteExtDAO" class="org.oscarehr.casemgmt.dao.CaseManagementNoteExtDAO" autowire="byName" />
@@ -286,6 +300,50 @@
 	<bean id="appointmentService" class="org.oscarehr.appointment.service.Appointment" autowire="byName" />
 	<bean id="appointmentStatusService" class="org.oscarehr.appointment.service.AppointmentStatusService" autowire="byName" />
 	<bean id="scheduleService" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
+	<bean id="vacancyProgramManager" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
+	<bean id="ticklerManager" class="org.oscarehr.managers.TicklerManager" autowire="byName" />
+
+<!--
+	<bean id="encounterCPPNoteService" class="org.oscarehr.casemgmt.service.EncounterCPPSectionService" autowire="byName" />
+-->
+
+	<bean id="encounterService" class="org.oscarehr.casemgmt.service.EncounterService" autowire="byName" />
+
+	<bean id="encounterSocialHistoryService" class="org.oscarehr.casemgmt.service.EncounterSocialHistoryService" autowire="byName" />
+	<bean id="encounterMedicalHistoryService" class="org.oscarehr.casemgmt.service.EncounterMedicalHistoryService" autowire="byName" />
+	<bean id="encounterOngoingConcernsService" class="org.oscarehr.casemgmt.service.EncounterOngoingConcernsService" autowire="byName" />
+	<bean id="encounterRemindersService" class="org.oscarehr.casemgmt.service.EncounterRemindersService" autowire="byName" />
+	<bean id="encounterOtherMedsService" class="org.oscarehr.casemgmt.service.EncounterOtherMedsService" autowire="byName" />
+	<bean id="encounterRiskFactorsService" class="org.oscarehr.casemgmt.service.EncounterRiskFactorsService" autowire="byName" />
+	<bean id="encounterFamilyHistoryService" class="org.oscarehr.casemgmt.service.EncounterFamilyHistoryService" autowire="byName" />
+
+	<bean id="encounterAllergyService" class="org.oscarehr.casemgmt.service.EncounterAllergyService" autowire="byName" />
+	<bean id="encounterConsultationService" class="org.oscarehr.casemgmt.service.EncounterConsultationService" autowire="byName" />
+	<bean id="encounterDiseaseRegistryService" class="org.oscarehr.casemgmt.service.EncounterDiseaseRegistryService" autowire="byName" />
+	<bean id="encounterDocumentService" class="org.oscarehr.casemgmt.service.EncounterDocumentService" autowire="byName" />
+	<bean id="encounterEFormService" class="org.oscarehr.casemgmt.service.EncounterEFormService" autowire="byName" />
+	<bean id="encounterEpisodeService" class="org.oscarehr.casemgmt.service.EncounterEpisodeService" autowire="byName" />
+	<bean id="encounterFormService" class="org.oscarehr.casemgmt.service.EncounterFormService" autowire="byName" />
+	<bean id="encounterLabResultService" class="org.oscarehr.casemgmt.service.EncounterLabResultService" autowire="byName" />
+	<bean id="encounterMeasurementsService" class="org.oscarehr.casemgmt.service.EncounterMeasurementsService" autowire="byName" />
+	<bean id="encounterMedicationService" class="org.oscarehr.casemgmt.service.EncounterMedicationService" autowire="byName" />
+	<bean id="encounterMessengerService" class="org.oscarehr.casemgmt.service.EncounterMessengerService" autowire="byName" />
+	<bean id="encounterPregnancyService" class="org.oscarehr.casemgmt.service.EncounterPregnancyService" autowire="byName" />
+	<bean id="encounterPreventionNoteService" class="org.oscarehr.casemgmt.service.EncounterPreventionNoteService" autowire="byName" />
+	<bean id="encounterResolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterResolvedIssueService" autowire="byName" />
+	<bean id="encounterTeamService" class="org.oscarehr.casemgmt.service.EncounterTeamService" autowire="byName" />
+	<bean id="encounterTicklerService" class="org.oscarehr.casemgmt.service.EncounterTicklerService" autowire="byName" />
+	<bean id="encounterUnresolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService" autowire="byName" />
+	<bean id="encounterHRMService" class="org.oscarehr.casemgmt.service.EncounterHRMService" autowire="byName" />
+
+	<!-- This is from the applicationContextCaisi.xml, but there is a struts action that relies -->
+	<!-- on it existing. -->
+	<bean id="populationReportDao" class="org.oscarehr.common.dao.PopulationReportDao" autowire="byName" />
+	<bean id="populationReportManager" class="org.oscarehr.common.service.PopulationReportManager" autowire="byName">
+		<property name="issueDAO" ref="IssueDAO" />
+		<property name="populationReportDao" ref="populationReportDao" />
+	</bean>
+	<bean id="genericIntakeManager" class="org.oscarehr.PMmodule.service.GenericIntakeManager" autowire="byName" />
 	<bean id="loginService" class="org.oscarehr.login.service.LoginService" autowire="byName" />
 
 	<!--
@@ -295,5 +353,5 @@
 
 	<!-- Enables scheduled tasks annotated with @Scheduled etc. -->
 	<task:annotation-driven/>
-		
+
 </beans>

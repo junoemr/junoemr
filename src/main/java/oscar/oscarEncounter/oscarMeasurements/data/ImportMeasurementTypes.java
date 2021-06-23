@@ -96,8 +96,8 @@ public class ImportMeasurementTypes {
                }else{
                   log.debug("Didn't Need to add"+mtb.getType());
                }
-               //TODO: check about isTrue
-               
+               //TODO-legacy: check about isTrue
+
            }  
            if(measurementReInitNeeded){
                 MeasurementTypes.getInstance().reInit();

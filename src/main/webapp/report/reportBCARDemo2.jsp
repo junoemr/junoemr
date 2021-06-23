@@ -206,7 +206,7 @@ for (int i = 0; i < vecValue.size(); i++) {
 }
 
 //query sub
-//todo: filt out Delivered Clients 
+//todo-legacy: filt out Delivered Clients
 // one table: demographic
 Vector vecFieldCaption = new Vector();
 Vector vecFieldName = new Vector();

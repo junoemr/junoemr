@@ -255,7 +255,7 @@ public class EFormDatabaseTagService
 		logger.debug("SWITCHING TO EFORM_VALUES");
 
 		/*
-		 TODO It looks like oscar tries to allow eforms to pull information from other eforms using a tag in the form of e$_#_
+		 TODO-legacy It looks like oscar tries to allow eforms to pull information from other eforms using a tag in the form of e$_#_
 		 but it also expects other markers on the element in this case, 'eform$name', 'var$value', and 'ref$'
 		 This functionality should be ported here before this service replaces the current EForm parsing.
 
@@ -269,7 +269,7 @@ public class EFormDatabaseTagService
 		logger.debug("SWITCHING TO OTHER_ID");
 
 		/*
-		TODO oscar attempts to allow a generic database tag in the form of o$_#_
+		TODO-legacy oscar attempts to allow a generic database tag in the form of o$_#_
 		You can load values from arbitrary tables.
 		This functionality should be ported here before this service replaces the current EForm parsing.
 

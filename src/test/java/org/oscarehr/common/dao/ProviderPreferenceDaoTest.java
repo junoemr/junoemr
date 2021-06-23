@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderPreference;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderPreferenceDaoTest extends DaoTestFixtures {
-
-	protected ProviderPreferenceDao dao = SpringUtils.getBean(ProviderPreferenceDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderPreferenceDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderPreferenceDao providerPreferenceDao;
 
 
 	@Before
@@ -47,7 +53,7 @@ public class ProviderPreferenceDaoTest extends DaoTestFixtures {
 		ProviderPreference entity = new ProviderPreference();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setProviderNo("999990");
-		dao.persist(entity);
+		providerPreferenceDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

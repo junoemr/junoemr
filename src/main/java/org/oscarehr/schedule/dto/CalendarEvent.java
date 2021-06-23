@@ -38,7 +38,7 @@ public class CalendarEvent
 	private Integer resourceId;
 
 	/* application specific */
-	private String scheduleTemplateCode; //TODO remove? this code exists in availability data
+	private String scheduleTemplateCode; //TODO-legacy remove? this code exists in availability data
 	private AvailabilityType availabilityType; // contains all schedule slot data
 	private CalendarAppointment data; // contains appointment data
 

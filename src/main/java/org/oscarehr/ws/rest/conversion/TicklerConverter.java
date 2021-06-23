@@ -136,7 +136,7 @@ public class TicklerConverter extends AbstractConverter<Tickler, TicklerTo1> {
 		}
 		
 		if(includeProgram && t.getProgramId() != null) {
-			//TODO: this should go through the manager, but I have no LoggedInInfo. Going to have to change the interface and update all the implementors
+			//TODO-legacy: this should go through the manager, but I have no LoggedInInfo. Going to have to change the interface and update all the implementors
 			Program p = programDao.getProgram(t.getProgramId());
 			if(p != null) {
 				d.setProgram(new ProgramConverter().getAsTransferObject(loggedInInfo,p));

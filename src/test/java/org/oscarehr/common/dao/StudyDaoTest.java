@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Study;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class StudyDaoTest extends DaoTestFixtures {
-	
-	protected StudyDao dao = (StudyDao)SpringUtils.getBean(StudyDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class StudyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected StudyDao studyDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -54,18 +60,18 @@ public class StudyDaoTest extends DaoTestFixtures {
 		
 		Study study1 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study1);
-		dao.persist(study1);
+		studyDao.persist(study1);
 		
 		Study study2 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study2);
-		dao.persist(study2);
+		studyDao.persist(study2);
 		
 		Study study3 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study3);
-		dao.persist(study3);
+		studyDao.persist(study3);
 		
 		List<Study> expectedResult = new ArrayList<Study>(Arrays.asList(study1, study2, study3));
-		List<Study> result = dao.findAll();
+		List<Study> result = studyDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -91,15 +97,15 @@ public class StudyDaoTest extends DaoTestFixtures {
 		Study study1 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study1);
 		study1.setStudyName(studyName1);
-		dao.persist(study1);
+		studyDao.persist(study1);
 		
 		Study study2 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study2);
 		study1.setStudyName(studyName2);
-		dao.persist(study2);
+		studyDao.persist(study2);
 		
 		Study expectedResult = study1;		
-		Study result = dao.findByName(studyName1);
+		Study result = studyDao.findByName(studyName1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -111,20 +117,20 @@ public class StudyDaoTest extends DaoTestFixtures {
 		Study study1 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study1);
 		study1.setCurrent1(current11);
-		dao.persist(study1);
+		studyDao.persist(study1);
 		
 		Study study2 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study2);
 		study2.setCurrent1(current12);
-		dao.persist(study2);
+		studyDao.persist(study2);
 		
 		Study study3 = new Study();
 		EntityDataGenerator.generateTestDataForModelClass(study3);
 		study3.setCurrent1(current11);
-		dao.persist(study3);
+		studyDao.persist(study3);
 		
 		List<Study> expectedResult = new ArrayList<Study>(Arrays.asList(study1, study3));
-		List<Study> result = dao.findByCurrent1(current11);
+		List<Study> result = studyDao.findByCurrent1(current11);
 
 		Logger logger = MiscUtils.getLogger();
 		

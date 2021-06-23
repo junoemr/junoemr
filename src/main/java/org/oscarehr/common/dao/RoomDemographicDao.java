@@ -43,7 +43,7 @@ public class RoomDemographicDao extends AbstractDao<RoomDemographic>{
 	}
 	
     public boolean roomDemographicExists(Integer demographicNo) {
-    	Query query = entityManager.createQuery("select count(*) from RoomDemographic rd where rd.id.demographicNo = ?");
+    	Query query = entityManager.createQuery("select count(*) from RoomDemographic rd where rd.id.demographicNo = ?1");
 		query.setParameter(1, demographicNo);
 		
 		Long result = (Long)query.getSingleResult();

@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.VacancyTemplate;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class VacancyTemplateDaoTest extends DaoTestFixtures {
-
-	public VacancyTemplateDao dao = SpringUtils.getBean(VacancyTemplateDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class VacancyTemplateDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public VacancyTemplateDao vacancyTemplateDao;
 
 
 	@Before
@@ -47,18 +53,18 @@ public class VacancyTemplateDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		VacancyTemplate entity = new VacancyTemplate();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		vacancyTemplateDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testGetVacancyTemplateByWlProgramId() {
-		assertNotNull(dao.getVacancyTemplateByWlProgramId(1));
+		assertNotNull(vacancyTemplateDao.getVacancyTemplateByWlProgramId(1));
 	}
 	
 	@Test
 	public void testGetActiveVacancyTemplatesByWlProgramId() {
-		assertNotNull(dao.getActiveVacancyTemplatesByWlProgramId(1));
+		assertNotNull(vacancyTemplateDao.getActiveVacancyTemplatesByWlProgramId(1));
 	}
 	
 }

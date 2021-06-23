@@ -9,8 +9,8 @@
 @import "mixins/junoTab";
 @import "mixins/junoTable";
 @import "mixins/junoPageSizing";
-@import "themes/junoThemeBase";
 @import "mixins/junoToggle";
+@import "themes/junoThemeBase";
 
 // Custom Bootstrap
 @import "bootstrap/bootstrap_variables";
@@ -23,7 +23,7 @@
 @import "bootstrap-timepicker/timepicker";
 // Global stuff
 @import "global";
-// TODO: pre-existing CSS files, need to be reorganized
+// TODO-legacy: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
 @import "forms";
 @import "buttons";
@@ -40,11 +40,12 @@
 @import "../src/common/components/junoButton/junoButton";
 @import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
+@import "../src/common/components/junoFileChooser/junoFileChooser";
 @import "../src/common/components/junoInput/junoInput";
 @import "../src/common/components/junoInputSave/junoInputSave";
 @import "../src/common/components/junoPatientSelect/junoPatientSelect";
+@import "../src/common/components/junoProgressBar/junoProgressBar";
 @import "../src/common/components/junoSelect/junoSelect";
-@import "src/admin/systemProperties/components/junoSelectSave/junoSelectSave";
 @import "../src/common/components/junoTab/junoTab";
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
 @import "../src/common/components/junoToggle/junoToggle";
@@ -58,6 +59,7 @@
 @import "../src/common/components/panel/_panel.scss";
 @import "../src/common/modals/junoAlert/junoAlert";
 @import "../src/common/modals/junoInputModal/junoInputModal";
+@import "../src/common/modals/junoProgressModal/junoProgressModal";
 @import "../src/common/modals/junoSimpleModal/junoSimpleModal";
 @import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
 @import "../src/common/modals/appointmentQueueModal/appointmentQueueModal";
@@ -90,30 +92,34 @@
 @import "../src/record/details/components/careTeamSection/careTeamSection";
 @import "../src/record/details/components/additionalInformationSection/additionalInformationSection";
 @import "../src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModal";
+@import "../src/record/details/components/rosteredHistory/rosteredHistoryModal";
 @import "../src/record/summary/summary";
 @import "../src/record/summary/summaryModule";
 @import "../src/record/summary/encounterNoteList";
 @import "../src/settings/settings";
 @import "../src/tickler/tickler";
 @import "../src/consults/consults";
-@import "src/admin/systemProperties/scss/common";
-@import "../src/admin/integration/know2act/Know2act";
-@import "../src/admin/integration/fax/fax";
-@import "../src/admin/integration/landingPage/landingPage";
-@import "../src/admin/integration/integrationModules/integrationModules";
-@import "../src/admin/integration/panelManagement/panelManagement";
-@import "../src/admin/integration/iceFall/iceFall";
-@import "../src/admin/integration/iceFall/settings/iceFallAdminSettings";
-@import "../src/admin/integration/iceFall/activity/iceFallAdminActivity";
-@import "../src/admin/integration/imdHealth/imdHealthAdmin";
-@import "../src/admin/integration/imdHealth/imdHealthLanding";
-@import "../src/admin/integration/editProviderPage/editProviderAdmin";
-@import "../src/admin/integration/editProviderPage/editProviderAdmin";
-@import "../src/admin/integration/manageUserPage/manageUserAdmin";
-@import "../src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueues";
+@import "../src/admin/systemProperties/scss/common";
+@import "../src/admin/systemProperties/components/junoSelectSave/junoSelectSave";
+@import "../src/admin/section/know2act/Know2act";
+@import "../src/admin/section/fax/fax";
+@import "../src/admin/section/landingPage/landingPage";
+@import "../src/admin/section/integrationModules/integrationModules";
+@import "../src/admin/section/panelManagement/panelManagement";
+@import "../src/admin/section/iceFall/iceFall";
+@import "../src/admin/section/iceFall/settings/iceFallAdminSettings";
+@import "../src/admin/section/iceFall/activity/iceFallAdminActivity";
+@import "../src/admin/section/editProviderPage/editProviderAdmin";
+@import "../src/admin/section/dataManagement/demographicImport/demographicImport";
+@import "../src/admin/section/dataManagement/demographicExport/demographicExport";
+@import "../src/admin/section/manageUserPage/manageUserAdmin";
+@import "../src/admin/section/manageAppointmentQueuesPage/manageAppointmentQueues";
+@import "../src/admin/section/imdHealth/imdHealthAdmin";
+@import "../src/admin/section/imdHealth/imdHealthLanding";
+@import "../src/admin/section/rosterStatus/modals/editRosterStatusModal";
 @import "../src/common/components/junoTypeahead/junoTypeahead";
 @import "../src/admin/admin";
-@import "../src/admin/integration/frameContent/frameContent";
+@import "../src/admin/section/frameContent/frameContent";
 @import "../src/record/forms/forms";
 @import "../src/record/forms/components/groupSelector/groupSelector";
 @import "../src/record/forms/components/modeSelector/modeSelector";

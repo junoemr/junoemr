@@ -11,7 +11,7 @@
 dojo.provide("dojo.widget.FisheyeList");
 
 //
-// TODO
+// TODO-legacy
 // fix SVG support, and turn it on only if the browser supports it
 // fix really long labels in vertical mode
 //
@@ -641,7 +641,7 @@ dojo.widget.defineWidget(
 	fillInTemplate: function() {
 		//
 		// set image
-		// TODO: turn on/off SVG support based on browser version.
+		// TODO-legacy: turn on/off SVG support based on browser version.
 		// this.parent.enableCrappySvgSupport is not available to this function
 		//
 		if (this.svgSrc != ""){

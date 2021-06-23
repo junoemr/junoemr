@@ -37,16 +37,24 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.dao.RScheduleDao;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RScheduleDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RScheduleDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RScheduleDao dao;
 
-	protected RScheduleDao dao = (RScheduleDao) SpringUtils.getBean("rScheduleDao");
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before

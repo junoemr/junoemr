@@ -46,7 +46,7 @@ public class StringValueValidator implements ConstraintValidator<StringValueCons
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext)
 	{
-		//TODO set custom validation error message
+		//TODO-legacy set custom validation error message
 //		String invalidMessage = "Invalid String value. Allowed values: [" + String.join(",", allowedValues) + "]";
 		return (value == null || allowedValues.contains(value));
 	}

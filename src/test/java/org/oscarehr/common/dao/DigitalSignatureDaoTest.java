@@ -27,6 +27,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -35,13 +36,25 @@ import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DigitalSignatureDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DigitalSignatureDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DigitalSignatureDao digitalSignatureDao;
 
-	protected DigitalSignatureDao dao = SpringUtils.getBean(DigitalSignatureDao.class);
-	protected FacilityDao facilityDao = SpringUtils.getBean(FacilityDao.class);
-	protected DemographicDao demographicDao  =SpringUtils.getBean(DemographicDao.class);
-	protected ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	@Autowired
+	protected FacilityDao facilityDao;
+
+	@Autowired
+	protected DemographicDao demographicDao;
+
+	@Autowired
+	protected ProviderDao providerDao;
 
 	@Before
 	public void before() throws Exception {
@@ -88,7 +101,7 @@ public class DigitalSignatureDaoTest extends DaoTestFixtures {
 			b[x] = (byte)0x01;
 		}
 		entity.setSignatureImage(b);
-		dao.persist(entity);
+		digitalSignatureDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

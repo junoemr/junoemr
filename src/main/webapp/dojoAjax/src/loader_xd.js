@@ -10,8 +10,8 @@
 
 //Cross-domain package loader.
 
-//FIXME: How will xd loading work with debugAtAllCosts? Any bad interactions?
-//FIXME: widgets won't work fully (HTML/CSS) and also because of the requireIf() thing.
+//FIXME-legacy: How will xd loading work with debugAtAllCosts? Any bad interactions?
+//FIXME-legacy: widgets won't work fully (HTML/CSS) and also because of the requireIf() thing.
 
 dojo.hostenv.resetXd = function(){
 	//summary: Internal xd loader function. Resets the xd state.

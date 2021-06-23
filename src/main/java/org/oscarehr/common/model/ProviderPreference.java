@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -40,8 +41,6 @@ import javax.persistence.PostLoad;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.CollectionOfElements;
 
 import oscar.OscarProperties;
 
@@ -171,17 +170,17 @@ public class ProviderPreference extends AbstractModel<String> implements Seriali
 	@Enumerated(EnumType.STRING)
 	private AppointmentReasonDisplayLevel appointmentReasonDisplayLevel = AppointmentReasonDisplayLevel.DEFAULT_ALL;
 	
-	@CollectionOfElements(targetElement = String.class)
+	@ElementCollection(targetClass = String.class)
 	@JoinTable(name = "ProviderPreferenceAppointmentScreenForm",joinColumns = @JoinColumn(name = "providerNo"))
 	@Column(name="appointmentScreenForm")
 	private Collection<String> appointmentScreenForms=new HashSet<String>();
 	
-	@CollectionOfElements(targetElement = Integer.class)
+	@ElementCollection(targetClass= Integer.class)
 	@JoinTable(name = "ProviderPreferenceAppointmentScreenEForm",joinColumns = @JoinColumn(name = "providerNo"))
 	@Column(name="appointmentScreenEForm")
 	private Collection<Integer> appointmentScreenEForms=new HashSet<Integer>();
 	
-	@CollectionOfElements(targetElement = QuickLink.class)
+	@ElementCollection(targetClass = QuickLink.class)
 	@JoinTable(name = "ProviderPreferenceAppointmentScreenQuickLink",joinColumns = @JoinColumn(name = "providerNo"))
 	private Collection<QuickLink> appointmentScreenQuickLinks=new HashSet<QuickLink>();
 	

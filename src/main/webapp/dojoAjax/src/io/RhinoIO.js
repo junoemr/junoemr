@@ -43,7 +43,7 @@ dojo.io.RhinoHTTPTransport = new function(){
 		function doLoad(req, conn){
 			var ret;
 			if (req.method.toLowerCase() == "head"){
-				// TODO: return the headers
+				// TODO-legacy: return the headers
 			}else{
 				var stream = conn.getContent();
 				var reader = new java.io.BufferedReader(new java.io.InputStreamReader(stream));

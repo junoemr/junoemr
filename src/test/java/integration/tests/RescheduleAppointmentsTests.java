@@ -26,8 +26,11 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
+import javax.xml.crypto.Data;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -36,6 +39,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
@@ -47,18 +51,20 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class RescheduleAppointmentsTests extends SeleniumTestBase
 {
-    @BeforeClass
-    public static void setup()
+	@Autowired
+    DatabaseUtil databaseUtil;
+
+    @Before
+    public void setup() throws Exception
     {
         loadSpringBeans();
-        DatabaseUtil.createTestDemographic();
-        DatabaseUtil.createTestProvider();
-        DatabaseUtil.createProviderSite();
+        databaseUtil.createTestDemographic();
+        databaseUtil.createTestProvider();
+        databaseUtil.createProviderSite();
     }
 
-    @AfterClass
-    public static void cleanup()
-            throws Exception
+    @After
+    public void cleanup() throws Exception
     {
         SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
                 "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",

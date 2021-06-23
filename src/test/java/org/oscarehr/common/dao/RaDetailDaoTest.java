@@ -38,6 +38,7 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Provider;
@@ -46,11 +47,18 @@ import org.oscarehr.common.model.RaHeader;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.util.ConversionUtils;
 
-public class RaDetailDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RaDetailDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RaDetailDao raDetailDao;
 
-	protected RaDetailDao dao = SpringUtils.getBean(RaDetailDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -62,7 +70,7 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		RaDetail d = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(d);
-		dao.persist(d);
+		raDetailDao.persist(d);
 		assertNotNull(d);
 	}
 
@@ -82,34 +90,34 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(raDetail1);
 		raDetail1.setBillingNo(billingNo1);
 		raDetail1.setRaHeaderNo(raHeaderNo1);
-		dao.persist(raDetail1);
+		raDetailDao.persist(raDetail1);
 
 		RaDetail raDetail2 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail2);
 		raDetail2.setBillingNo(billingNo2);
 		raDetail2.setRaHeaderNo(raHeaderNo2);
-		dao.persist(raDetail2);
+		raDetailDao.persist(raDetail2);
 
 		RaDetail raDetail3 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail3);
 		raDetail3.setBillingNo(billingNo1);
 		raDetail3.setRaHeaderNo(raHeaderNo3);
-		dao.persist(raDetail3);
+		raDetailDao.persist(raDetail3);
 
 		RaDetail raDetail4 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail4);
 		raDetail4.setBillingNo(billingNo2);
 		raDetail4.setRaHeaderNo(raHeaderNo4);
-		dao.persist(raDetail4);
+		raDetailDao.persist(raDetail4);
 
 		RaDetail raDetail5 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail5);
 		raDetail5.setBillingNo(billingNo1);
 		raDetail5.setRaHeaderNo(raHeaderNo5);
-		dao.persist(raDetail5);
+		raDetailDao.persist(raDetail5);
 
 		List<RaDetail> expectedResult = new ArrayList<RaDetail>(Arrays.asList(raDetail5, raDetail3, raDetail1));
-		List<RaDetail> result = dao.findByBillingNo(billingNo1);
+		List<RaDetail> result = raDetailDao.findByBillingNo(billingNo1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -135,30 +143,30 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		RaDetail raDetail1 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail1);
 		raDetail1.setRaHeaderNo(raHeaderNo1);
-		dao.persist(raDetail1);
+		raDetailDao.persist(raDetail1);
 
 		RaDetail raDetail2 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail2);
 		raDetail2.setRaHeaderNo(raHeaderNo2);
-		dao.persist(raDetail2);
+		raDetailDao.persist(raDetail2);
 
 		RaDetail raDetail3 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail3);
 		raDetail3.setRaHeaderNo(raHeaderNo1);
-		dao.persist(raDetail3);
+		raDetailDao.persist(raDetail3);
 
 		RaDetail raDetail4 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail4);
 		raDetail4.setRaHeaderNo(raHeaderNo2);
-		dao.persist(raDetail4);
+		raDetailDao.persist(raDetail4);
 
 		RaDetail raDetail5 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail5);
 		raDetail5.setRaHeaderNo(raHeaderNo1);
-		dao.persist(raDetail5);
+		raDetailDao.persist(raDetail5);
 
 		List<RaDetail> expectedResult = new ArrayList<RaDetail>(Arrays.asList(raDetail1, raDetail3, raDetail5));
-		List<RaDetail> result = dao.findByRaHeaderNo(raHeaderNo1);
+		List<RaDetail> result = raDetailDao.findByRaHeaderNo(raHeaderNo1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -200,7 +208,7 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		raDetail1.setProviderOhipNo(providerOhipNo1);
 		raDetail1.setErrorCode(errorCode1);
 		raDetail1.setBillingNo(billingNo1);
-		dao.persist(raDetail1);
+		raDetailDao.persist(raDetail1);
 
 		RaDetail raDetail2 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail2);
@@ -208,7 +216,7 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		raDetail2.setProviderOhipNo(providerOhipNo1);
 		raDetail2.setErrorCode(errorCode2);
 		raDetail2.setBillingNo(billingNo2);
-		dao.persist(raDetail2);
+		raDetailDao.persist(raDetail2);
 
 		RaDetail raDetail3 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail3);
@@ -216,7 +224,7 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		raDetail3.setProviderOhipNo(providerOhipNo2);
 		raDetail3.setErrorCode(errorCode3);
 		raDetail3.setBillingNo(billingNo3);
-		dao.persist(raDetail3);
+		raDetailDao.persist(raDetail3);
 
 		RaDetail raDetail4 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail4);
@@ -224,7 +232,7 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		raDetail4.setProviderOhipNo(providerOhipNo1);
 		raDetail4.setErrorCode(errorCode3);
 		raDetail4.setBillingNo(billingNo4);
-		dao.persist(raDetail4);
+		raDetailDao.persist(raDetail4);
 
 		RaDetail raDetail5 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail5);
@@ -232,11 +240,11 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		raDetail5.setProviderOhipNo(providerOhipNo1);
 		raDetail5.setErrorCode(errorCode3);
 		raDetail5.setBillingNo(billingNo5);
-		dao.persist(raDetail5);
+		raDetailDao.persist(raDetail5);
 
 		List<Integer> expectedResult = new ArrayList<Integer>(Arrays.asList(billingNo4, billingNo5));
 		String codes = errorCode1 + "," + errorCode2;
-		List<Integer> result = dao.findUniqueBillingNoByRaHeaderNoAndProviderAndNotErrorCode(raHeaderNo1, providerOhipNo1, codes);
+		List<Integer> result = raDetailDao.findUniqueBillingNoByRaHeaderNoAndProviderAndNotErrorCode(raHeaderNo1, providerOhipNo1, codes);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -301,34 +309,34 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(raDetail1);
 		raDetail1.setRaHeaderNo(raHeader1.getId());
 		raDetail1.setBillingNo(billingNo1);
-		dao.persist(raDetail1);
+		raDetailDao.persist(raDetail1);
 
 		RaDetail raDetail2 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail2);
 		raDetail2.setRaHeaderNo(raHeader2.getId());
 		raDetail2.setBillingNo(billingNo2);
-		dao.persist(raDetail2);
+		raDetailDao.persist(raDetail2);
 
 		RaDetail raDetail3 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail3);
 		raDetail3.setRaHeaderNo(raHeader3.getId());
 		raDetail3.setBillingNo(billingNo1);
-		dao.persist(raDetail3);
+		raDetailDao.persist(raDetail3);
 
 		RaDetail raDetail4 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail4);
 		raDetail4.setRaHeaderNo(raHeader4.getId());
 		raDetail4.setBillingNo(billingNo1);
-		dao.persist(raDetail4);
+		raDetailDao.persist(raDetail4);
 
 		RaDetail raDetail5 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail5);
 		raDetail5.setRaHeaderNo(raHeader5.getId());
 		raDetail5.setBillingNo(billingNo1);
-		dao.persist(raDetail5);
+		raDetailDao.persist(raDetail5);
 
 		List<RaDetail> expectedResult = new ArrayList<RaDetail>(Arrays.asList(raDetail2, raDetail3, raDetail4));
-		List<RaDetail> result = dao.getRaDetailByDate(startDate, endDate, locale);
+		List<RaDetail> result = raDetailDao.getRaDetailByDate(startDate, endDate, locale);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -408,45 +416,45 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		raDetail1.setRaHeaderNo(raHeader1.getId());
 		raDetail1.setBillingNo(billingNo1);
 		raDetail1.setProviderOhipNo(provider1.getOhipNo());
-		dao.persist(raDetail1);
+		raDetailDao.persist(raDetail1);
 
 		RaDetail raDetail2 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail2);
 		raDetail2.setRaHeaderNo(raHeader2.getId());
 		raDetail2.setBillingNo(billingNo2);
 		raDetail2.setProviderOhipNo(provider1.getOhipNo());
-		dao.persist(raDetail2);
+		raDetailDao.persist(raDetail2);
 
 		RaDetail raDetail3 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail3);
 		raDetail3.setRaHeaderNo(raHeader3.getId());
 		raDetail3.setBillingNo(billingNo1);
 		raDetail3.setProviderOhipNo(provider1.getOhipNo());
-		dao.persist(raDetail3);
+		raDetailDao.persist(raDetail3);
 
 		RaDetail raDetail4 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail4);
 		raDetail4.setRaHeaderNo(raHeader4.getId());
 		raDetail4.setBillingNo(billingNo1);
 		raDetail4.setProviderOhipNo(provider1.getOhipNo());
-		dao.persist(raDetail4);
+		raDetailDao.persist(raDetail4);
 
 		RaDetail raDetail5 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail5);
 		raDetail5.setRaHeaderNo(raHeader5.getId());
 		raDetail5.setBillingNo(billingNo1);
 		raDetail5.setProviderOhipNo(provider1.getOhipNo());
-		dao.persist(raDetail5);
+		raDetailDao.persist(raDetail5);
 
 		RaDetail raDetail6 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail6);
 		raDetail6.setRaHeaderNo(raHeader6.getId());
 		raDetail6.setBillingNo(billingNo1);
 		raDetail6.setProviderOhipNo(provider2.getOhipNo());
-		dao.persist(raDetail6);
+		raDetailDao.persist(raDetail6);
 
 		List<RaDetail> expectedResult = new ArrayList<RaDetail>(Arrays.asList(raDetail2, raDetail3, raDetail4));
-		List<RaDetail> result = dao.getRaDetailByDate(provider1, startDate, endDate, locale);
+		List<RaDetail> result = raDetailDao.getRaDetailByDate(provider1, startDate, endDate, locale);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -472,25 +480,25 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		RaDetail raDetail1 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail1);
 		raDetail1.setClaimNo(claimNo1);
-		dao.persist(raDetail1);
+		raDetailDao.persist(raDetail1);
 
 		RaDetail raDetail2 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail2);
 		raDetail2.setClaimNo(claimNo2);
-		dao.persist(raDetail2);
+		raDetailDao.persist(raDetail2);
 
 		RaDetail raDetail3 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail3);
 		raDetail3.setClaimNo(claimNo1);
-		dao.persist(raDetail3);
+		raDetailDao.persist(raDetail3);
 
 		RaDetail raDetail4 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail4);
 		raDetail4.setClaimNo(claimNo1);
-		dao.persist(raDetail4);
+		raDetailDao.persist(raDetail4);
 
 		List<RaDetail> expectedResult = new ArrayList<RaDetail>(Arrays.asList(raDetail1, raDetail3, raDetail4));
-		List<RaDetail> result = dao.getRaDetailByClaimNo(claimNo1);
+		List<RaDetail> result = raDetailDao.getRaDetailByClaimNo(claimNo1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -521,28 +529,28 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(raDetail1);
 		raDetail1.setBillingNo(billingNo1);
 		raDetail1.setErrorCode(errorCode1);
-		dao.persist(raDetail1);
+		raDetailDao.persist(raDetail1);
 
 		RaDetail raDetail2 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail2);
 		raDetail2.setBillingNo(billingNo2);
 		raDetail2.setErrorCode(errorCode2);
-		dao.persist(raDetail2);
+		raDetailDao.persist(raDetail2);
 
 		RaDetail raDetail3 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail3);
 		raDetail3.setBillingNo(billingNo1);
 		raDetail3.setErrorCode(errorCode1);
-		dao.persist(raDetail3);
+		raDetailDao.persist(raDetail3);
 
 		RaDetail raDetail4 = new RaDetail();
 		EntityDataGenerator.generateTestDataForModelClass(raDetail4);
 		raDetail4.setBillingNo(billingNo2);
 		raDetail4.setErrorCode(errorCode4);
-		dao.persist(raDetail4);
+		raDetailDao.persist(raDetail4);
 
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(errorCode1));
-		List<String> result = dao.getBillingExplanatoryList(billingNo1);
+		List<String> result = raDetailDao.getBillingExplanatoryList(billingNo1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -561,26 +569,26 @@ public class RaDetailDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByBillingNoServiceDateAndProviderNo() {
-		assertNotNull(dao.findByBillingNoServiceDateAndProviderNo(100, ConversionUtils.toDateString(new Date()), "100"));
+		assertNotNull(raDetailDao.findByBillingNoServiceDateAndProviderNo(100, ConversionUtils.toDateString(new Date()), "100"));
 	}
 
 	@Test
 	public void testFindByBillingNoAndErrorCode() {
-		assertNotNull(dao.findByBillingNoAndErrorCode(100, "CODE"));
+		assertNotNull(raDetailDao.findByBillingNoAndErrorCode(100, "CODE"));
 	}
 
 	@Test
 	public void testFindByHeaderAndBillingNos() {
-		assertNotNull(dao.findByHeaderAndBillingNos(100, 100));
+		assertNotNull(raDetailDao.findByHeaderAndBillingNos(100, 100));
 	}
 
 	@Test
 	public void testFindByRaHeaderNoAndServiceCodes() {
-		assertNotNull(dao.findByRaHeaderNoAndServiceCodes(100, Arrays.asList(new String[] { "CODE" })));
+		assertNotNull(raDetailDao.findByRaHeaderNoAndServiceCodes(100, Arrays.asList(new String[] { "CODE" })));
 	}
 
     @Test
     public void testFindByRaHeaderNoAndProviderOhipNo() {
-	    assertNotNull(dao.findByRaHeaderNoAndProviderOhipNo(100, "10"));
+	    assertNotNull(raDetailDao.findByRaHeaderNoAndProviderOhipNo(100, "10"));
     }
 }

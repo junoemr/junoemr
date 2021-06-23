@@ -46,7 +46,7 @@ public class MeasurementCSSLocationDao extends AbstractDao<MeasurementCSSLocatio
 	}
 	
 	public List<MeasurementCSSLocation> findByLocation(String location) {
-		Query q = entityManager.createQuery("select m from MeasurementCSSLocation m where m.location=?");
+		Query q = entityManager.createQuery("select m from MeasurementCSSLocation m where m.location=?1");
 		q.setParameter(1, location);
 		
 		@SuppressWarnings("unchecked")

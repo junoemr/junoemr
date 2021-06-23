@@ -69,7 +69,7 @@ public class MsgDemoMapDao extends AbstractDao<MsgDemoMap>{
     }
 
 	public List<Object[]> getMapAndMessagesByDemographicNo(Integer demoNo) {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 		String sql = "FROM MsgDemoMap map, MessageTbl m " +
 				"WHERE m.id = map.messageID " +
 				"AND map.demographic_no = :demoNo " +

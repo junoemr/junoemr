@@ -96,7 +96,7 @@ public class BORNWBJob implements OscarRunnable {
 			String pathStr = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + File.separator + "born5";
 
 			
-			//TODO: take into account drafts
+			//TODO-legacy: take into account drafts
 			List<Integer> demographicsToSend = new ArrayList<Integer>();
 			BORNWbXmlGenerator xmlGen = new BORNWbXmlGenerator();
 			for(String name : xmlGen.getEformMap().keySet()) {
@@ -172,7 +172,7 @@ public class BORNWBJob implements OscarRunnable {
 					logger.info("id is " + id);
 
 					BornCDADocument bornCDA = new BornCDADocument(CDAStandard.CCD, BORNCDADocumentType.EighteenMonth, demographic, authorList, props, cal, id);
-					//TODO:need to check if empty
+					//TODO-legacy:need to check if empty
 					byte[] wbXml = generateWBXml(xml, demographicNo);
 					
 					if(wbXml != null) {

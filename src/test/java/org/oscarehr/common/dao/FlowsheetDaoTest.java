@@ -26,19 +26,25 @@ package org.oscarehr.common.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.oscarehr.common.model.Flowsheet;
-import org.oscarehr.util.SpringUtils;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class FlowsheetDaoTest extends DaoTestFixtures
 {
-
-	protected FlowsheetDao dao = SpringUtils.getBean(FlowsheetDao.class);
+	@Autowired
+	protected FlowsheetDao flowsheetDao;
 
 	@Before
 	public void before() throws Exception {
@@ -49,7 +55,7 @@ public class FlowsheetDaoTest extends DaoTestFixtures
         public void testCreate() throws Exception {
                 Flowsheet entity = new Flowsheet();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                flowsheetDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -58,21 +64,21 @@ public class FlowsheetDaoTest extends DaoTestFixtures
 		
 		Flowsheet flowSheet1 = new Flowsheet();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet1);
-		dao.persist(flowSheet1);
+		flowsheetDao.persist(flowSheet1);
 		
 		Flowsheet flowSheet2 = new Flowsheet();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet2);
-		dao.persist(flowSheet2);
+		flowsheetDao.persist(flowSheet2);
 		
 		Flowsheet flowSheet3 = new Flowsheet();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet3);
-		dao.persist(flowSheet3);
+		flowsheetDao.persist(flowSheet3);
 		
 		Flowsheet flowSheet4 = new Flowsheet();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet4);
-		dao.persist(flowSheet4);
+		flowsheetDao.persist(flowSheet4);
 		
-		List<Flowsheet> result = dao.findAll();
+		List<Flowsheet> result = flowsheetDao.findAll();
 
 		assertTrue(result.contains(flowSheet1));
 		assertTrue(result.contains(flowSheet2));
@@ -90,20 +96,20 @@ public class FlowsheetDaoTest extends DaoTestFixtures
 		Flowsheet flowSheet1 = new Flowsheet();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet1);
 		flowSheet1.setName(name1);
-		dao.persist(flowSheet1);
+		flowsheetDao.persist(flowSheet1);
 		
 		Flowsheet flowSheet2 = new Flowsheet();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet2);
 		flowSheet2.setName(name2);
-		dao.persist(flowSheet2);
+		flowsheetDao.persist(flowSheet2);
 		
 		Flowsheet flowSheet3 = new Flowsheet();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheet3);
 		flowSheet3.setName(name3);
-		dao.persist(flowSheet3);
+		flowsheetDao.persist(flowSheet3);
 		
 		Flowsheet expectedResult = flowSheet2;
-		Flowsheet result = dao.findByName(name2);
+		Flowsheet result = flowsheetDao.findByName(name2);
 		
 		assertEquals(expectedResult, result);
 	}

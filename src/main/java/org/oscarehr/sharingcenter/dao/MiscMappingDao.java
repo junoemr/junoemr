@@ -54,7 +54,7 @@ public class MiscMappingDao extends AbstractDao<MiscMapping> {
     }
 
     public List<MiscMapping> findByAffinityDomainId(int affinityDomain) {
-        String sql = "FROM MiscMapping e where e.affinityDomain = ?";
+        String sql = "FROM MiscMapping e where e.affinityDomain = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);
 
@@ -62,7 +62,7 @@ public class MiscMappingDao extends AbstractDao<MiscMapping> {
     }
 
     public MiscMapping findMiscMapping(int affinityDomain, String miscType, String source) {
-        String sql = "FROM MiscMapping e where e.affinityDomain = ? and e.type = ? and e.source = ?";
+        String sql = "FROM MiscMapping e where e.affinityDomain = ?1 and e.type = ?2 and e.source = ?3";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);
@@ -75,7 +75,7 @@ public class MiscMappingDao extends AbstractDao<MiscMapping> {
     }
 
     public MiscMapping findMiscMapping(int affinityDomain, String miscType) {
-        String sql = "FROM MiscMapping e where e.affinityDomain = ? and e.type = ?";
+        String sql = "FROM MiscMapping e where e.affinityDomain = ?1 and e.type = ?2";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);

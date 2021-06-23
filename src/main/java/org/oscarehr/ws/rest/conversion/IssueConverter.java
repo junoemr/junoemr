@@ -44,5 +44,19 @@ public class IssueConverter extends AbstractConverter<Issue, IssueTo1> {
 		return t;
 	}
 
-	
+	public static IssueTo1 getAsTransferObject(org.oscarehr.encounterNote.model.Issue issue)
+	{
+		IssueTo1 issueTo = new IssueTo1();
+
+		issueTo.setId(issue.getId());
+		issueTo.setCode(issue.getCode());
+		issueTo.setDescription(issue.getDescription());
+		issueTo.setPriority(issue.getPriority());
+		issueTo.setRole(issue.getRole());
+		issueTo.setSortOrderId(issue.getSortOrderId());
+		issueTo.setType(issue.getType());
+		issueTo.setUpdate_date(issue.getUpdateDate());
+
+		return issueTo;
+	}
 }

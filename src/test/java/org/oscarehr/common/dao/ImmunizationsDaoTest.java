@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Immunizations;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ImmunizationsDaoTest extends DaoTestFixtures {
-
-	protected ImmunizationsDao dao = SpringUtils.getBean(ImmunizationsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ImmunizationsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ImmunizationsDao immunizationsDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class ImmunizationsDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Immunizations entity = new Immunizations();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		immunizationsDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

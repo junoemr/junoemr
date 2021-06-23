@@ -44,8 +44,8 @@ public class ProgramAccessDAO extends HibernateDaoSupport {
     	List<ProgramAccess> results=programAccessListByProgramIdCache.get(programId);
     	if (results==null)
     	{
-            String q = "select pp from ProgramAccess pp where pp.ProgramId=?";
-    		results=getHibernateTemplate().find(q, new Object[] {programId});
+            String q = "select pp from ProgramAccess pp where pp.ProgramId=?0";
+    		results= (List<ProgramAccess>) getHibernateTemplate().find(q, new Object[] {programId});
     		if (results!=null) programAccessListByProgramIdCache.put(programId, results);
     	}
 
@@ -76,7 +76,7 @@ public class ProgramAccessDAO extends HibernateDaoSupport {
         }
         String accessTypeIdString = accessTypeId.toString();
         ProgramAccess result = null;
-        List results = this.getHibernateTemplate().find("from ProgramAccess pa where pa.ProgramId = ? and pa.AccessTypeId = ?", new Object[] {programId, accessTypeIdString});
+        List results = this.getHibernateTemplate().find("from ProgramAccess pa where pa.ProgramId = ?0 and pa.AccessTypeId = ?1", new Object[] {programId, accessTypeIdString});
         if (results.size() > 0) {
             result = (ProgramAccess)results.get(0);
         }
@@ -90,8 +90,8 @@ public class ProgramAccessDAO extends HibernateDaoSupport {
 
 	@SuppressWarnings("unchecked")
 	public List<ProgramAccess> getProgramAccessListByType(Long programId, String accessType) {
-		String q = "from ProgramAccess pa where pa.ProgramId = ? and pa.AccessType.Name like ?";
-		return this.getHibernateTemplate().find(q, new Object[] { programId, accessType });
+		String q = "from ProgramAccess pa where pa.ProgramId = ?0 and pa.AccessType.Name like ?1";
+		return (List<ProgramAccess>) this.getHibernateTemplate().find(q, new Object[] { programId, accessType });
 	}
 
     public void saveProgramAccess(ProgramAccess pa) {
@@ -123,7 +123,7 @@ public class ProgramAccessDAO extends HibernateDaoSupport {
     }
 
     public List<AccessType> getAccessTypes() {
-        List<AccessType> results = this.getHibernateTemplate().find("from AccessType at");
+        List<AccessType> results = (List<AccessType>) this.getHibernateTemplate().find("from AccessType at");
 
         if (log.isDebugEnabled()) {
             log.debug("getAccessTypes: # of results=" + results.size());

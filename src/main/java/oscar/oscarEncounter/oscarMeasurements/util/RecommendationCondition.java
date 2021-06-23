@@ -182,7 +182,7 @@ public class RecommendationCondition {
                     list.add(new DSCondition("getDataAsDouble", "", ">=", betweenVals[0]));
                     list.add(new DSCondition("getDataAsDouble", "", "<=", betweenVals[1]));
                 }
-//TODO: how to handle = sign in greater than or equal too.
+//TODO-legacy: how to handle = sign in greater than or equal too.
             }else if (toParse.indexOf("&gt;") != -1 ||  toParse.indexOf(">") != -1 ){ // greater than style
                 toParse = toParse.replaceFirst("&gt;","");
                 toParse = toParse.replaceFirst(">","");

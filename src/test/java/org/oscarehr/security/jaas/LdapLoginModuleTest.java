@@ -38,9 +38,12 @@ import javax.security.auth.login.LoginException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.OscarProperties;
 import oscar.login.jaas.LdapLoginModule;
 import oscar.login.jaas.LoginModuleFactory;
@@ -48,8 +51,10 @@ import oscar.login.jaas.OscarCallbackHandler;
 import oscar.login.jaas.OscarConfiguration;
 import oscar.login.jaas.OscarPrincipal;
 
-public class LdapLoginModuleTest extends DaoTestFixtures {
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LdapLoginModuleTest extends DaoTestFixtures
+{
 	@Before
 	public void before() throws Exception {
 		SchemaUtils.restoreTable("security", "provider", "secUserRole");

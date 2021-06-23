@@ -28,16 +28,22 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.Hl7Pid;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @Ignore
-public class Hl7PidDaoTest extends DaoTestFixtures {
-
-	public Hl7PidDao dao = SpringUtils.getBean(Hl7PidDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Hl7PidDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public Hl7PidDao hl7PidDao;
 
 	@Before
 	public void before() throws Exception {
@@ -48,23 +54,23 @@ public class Hl7PidDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Hl7Pid entity = new Hl7Pid();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		hl7PidDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindByMessageId() {
-		assertNotNull(dao.findByMessageId(100));
+		assertNotNull(hl7PidDao.findByMessageId(100));
 	}
 
 	@Test
 	public void testFindPidsByStatus () {
-		assertNotNull(dao.findPidsByStatus("F"));
+		assertNotNull(hl7PidDao.findPidsByStatus("F"));
 	}
 	
 	@Test
 	public void testFindPidsAndMshByMessageId () {
-		assertNotNull(dao.findPidsAndMshByMessageId(100));
+		assertNotNull(hl7PidDao.findPidsAndMshByMessageId(100));
 	}
 		
 }

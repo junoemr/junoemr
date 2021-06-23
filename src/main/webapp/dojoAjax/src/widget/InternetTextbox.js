@@ -131,7 +131,7 @@ dojo.widget.defineWidget(
 	}
 );
 
-//FIXME: DOC: need more consistent explanation on whether attributes are inherited from the parent.  Some make sense, some don't?
+//FIXME-legacy: DOC: need more consistent explanation on whether attributes are inherited from the parent.  Some make sense, some don't?
 
 dojo.widget.defineWidget(
 	"dojo.widget.EmailTextbox",
@@ -164,7 +164,7 @@ dojo.widget.defineWidget(
 	}
 );
 
-//TODO: perhaps combine with EmailTextbox?
+//TODO-legacy: perhaps combine with EmailTextbox?
 dojo.widget.defineWidget(
 	"dojo.widget.EmailListTextbox",
 	dojo.widget.EmailTextbox,

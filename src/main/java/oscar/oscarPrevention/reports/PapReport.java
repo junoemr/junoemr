@@ -33,7 +33,6 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,6 +46,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
+import oscar.util.UtilDateUtilities;
+
 /**
  *
  * @author jay
@@ -56,8 +57,9 @@ public class PapReport implements PreventionReport {
     /** Creates a new instance of PapReport */
     public PapReport() {
     }
-    
-	public boolean displayNumShots() {
+
+	public boolean displayNumShots()
+	{
 		return false;
 	}
 
@@ -129,6 +131,7 @@ public class PapReport implements PreventionReport {
 
 
                 Calendar cal = Calendar.getInstance();
+                cal.setTime(asofDate);
                 cal.add(Calendar.YEAR, -3);
                 Date dueDate = cal.getTime();
                 cal.add(Calendar.MONTH,-6);
@@ -173,31 +176,44 @@ public class PapReport implements PreventionReport {
                 log.debug("due Date "+dueDate.toString()+" cutoffDate "+cutoffDate.toString()+" prevDate "+prevDate.toString());
                 log.debug("due Date  ("+dueDate.toString()+" ) After Prev ("+prevDate.toString() +" ) "+dueDate.after(prevDate));
                 log.debug("cutoff Date  ("+cutoffDate.toString()+" ) before Prev ("+prevDate.toString() +" ) "+cutoffDate.before(prevDate));
-                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate)){ // overdue
+
+                // due
+                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "due";
                    prd.numMonths = numMonths;
                    prd.color = "yellow"; //FF00FF
-                   if (!prd.bonusStatus.equals("Y")){
+                   if (!prd.bonusStatus.equals("Y"))
+                   {
                       prd.bonusStatus = "Y";
                       doneWithGrace++;
                    }
-
-                } else if (!refused && cutoffDate.after(prevDate)){ // overdue
+                }
+                // overdue
+                else if (!refused && cutoffDate.after(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "Overdue";
                    prd.numMonths = numMonths;
                    prd.color = "red"; //FF00FF
 
-                } else if (refused){  // recorded and refused
+                }
+                // recorded and refused
+                else if (refused)
+                {
                    prd.rank = 3;
                    prd.lastDate = prevDateStr;
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
-                } else if (dueDate.before(prevDate)  ){  // recorded done
+
+                }
+                // recorded done
+                else if (dueDate.before(prevDate))
+                {
                    prd.rank = 4;
                    prd.lastDate = prevDateStr;
                    prd.state = "Up to date";
@@ -282,7 +298,7 @@ public class PapReport implements PreventionReport {
    }
 
 
-    //TODO: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
+    //TODO-legacy: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
    //If they don't have a PAP Test with guidelines
                 //Get contact methods
                     //NO contact
@@ -313,7 +329,7 @@ public class PapReport implements PreventionReport {
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
 
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
               //NO Contact
 
               if ( followupData.size() == 0 ){
@@ -401,7 +417,7 @@ public class PapReport implements PreventionReport {
                 //prd.lastDate = "-----";
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();
                   prd.lastFollowup = measurementData.getDateObservedAsDate();
@@ -416,7 +432,7 @@ public class PapReport implements PreventionReport {
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
 
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();
@@ -430,7 +446,6 @@ public class PapReport implements PreventionReport {
        }
        return null;
    }
-
 }
 
 

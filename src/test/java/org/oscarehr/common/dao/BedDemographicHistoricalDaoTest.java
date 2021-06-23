@@ -29,15 +29,20 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BedDemographicHistorical;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BedDemographicHistoricalDaoTest extends DaoTestFixtures {
-
-	protected BedDemographicHistoricalDao dao = SpringUtils.getBean(BedDemographicHistoricalDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BedDemographicHistoricalDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BedDemographicHistoricalDao bedDemographicHistoricalDao;
 
 	@Before
 	public void before() throws Exception {
@@ -52,7 +57,7 @@ public class BedDemographicHistoricalDaoTest extends DaoTestFixtures {
 		entity.getId().setDemographicNo(1);
 		entity.getId().setUsageStart(new Date());
 		
-		dao.persist(entity);
+		bedDemographicHistoricalDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

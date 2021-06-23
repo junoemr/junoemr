@@ -679,7 +679,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.checkEventConflicts = function ()
 			{
-				//TODO a better way to access the modal content window
+				//TODO-legacy a better way to access the modal content window
 				var modalContent = $(".modal-content");
 
 				// Get templates that happen during the time period
@@ -1346,7 +1346,7 @@ angular.module('Schedule').component('eventComponent', {
 			$scope.onPatientModalSave = function onPatientModalSave(demographicNo)
 			{
 				// load the newly created/updated patient
-				controller.demographicModel.loadData(demographicNo); //TODO why?
+				controller.demographicModel.loadData(demographicNo); //TODO-legacy why?
 			};
 
 			$scope.newDemographic = function newDemographic()

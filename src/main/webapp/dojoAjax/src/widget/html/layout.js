@@ -80,7 +80,7 @@ dojo.widget.html.layout = function(/*DomNode*/ container, /*Object[]*/ children,
 
 		// set size && adjust record of remaining space.
 		// note that setting the width of a <div> may affect it's height.
-		// TODO: same is true for widgets but need to implement API to support that
+		// TODO-legacy: same is true for widgets but need to implement API to support that
 		if ( (pos=="top")||(pos=="bottom") ) {
 			dojo.html.setMarginBox(elm, { width: f.width });
 			var h = dojo.html.getMarginBox(elm).height;
@@ -90,7 +90,7 @@ dojo.widget.html.layout = function(/*DomNode*/ container, /*Object[]*/ children,
 			}else{
 				elm.style.top = f.top + f.height + "px";
 			}
-			// TODO: for widgets I want to call resizeTo(), but I can't because
+			// TODO-legacy: for widgets I want to call resizeTo(), but I can't because
 			// I only want to set the width, and have the height determined
 			// dynamically.  (The thinner you make a div, the more height it consumes.)
 			if(child.onResized){
@@ -99,7 +99,7 @@ dojo.widget.html.layout = function(/*DomNode*/ container, /*Object[]*/ children,
 		}else if(pos=="left" || pos=="right"){
 			var w = dojo.html.getMarginBox(elm).width;
 
-			// TODO: I only want to set the height, not the width, but see bug#941 (FF),
+			// TODO-legacy: I only want to set the height, not the width, but see bug#941 (FF),
 			// and also the resizeTo() function demands both height and width arguments
 			if(child.resizeTo){
 				child.resizeTo(w, f.height);

@@ -667,7 +667,7 @@ public class Schedule
 				 */
 				int[] daysWithSchedules = {0, 0, 0, 0, 0, 0, 0};
 
-				//TODO somehow consolidate with regular getCalendarEvents method
+				//TODO-legacy somehow consolidate with regular getCalendarEvents method
 				// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
 				for(LocalDate date : ConversionUtils.getDateList(startDate, endDate))
 				{
@@ -780,7 +780,7 @@ public class Schedule
 
 			if(viewSchedulesOnly)
 			{
-				//TODO refactor similar logic with provider version
+				//TODO-legacy refactor similar logic with provider version
 				calendarEvents = new ArrayList<>();
 
 				// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
@@ -816,13 +816,13 @@ public class Schedule
 		calendarSchedule.setProviderIdList(providerIdList);
 		calendarSchedule.setVisibleSchedules(!providerIdList.isEmpty());
 		calendarSchedule.setEventList(allCalendarEvents);
-		calendarSchedule.setPreferredSlotDuration(5); //TODO calculate based on lowest common slot size
+		calendarSchedule.setPreferredSlotDuration(5); //TODO-legacy calculate based on lowest common slot size
 		calendarSchedule.setHiddenDaysList(new ArrayList<>(0)); // always empty in group view
 
 		return calendarSchedule;
 	}
 
-	// TODO: Generic provider schedule availability lookup shouldn't require booking rules and schedule template transfer
+	// TODO-legacy: Generic provider schedule availability lookup shouldn't require booking rules and schedule template transfer
 	public List<ScheduleSlotDto> getProviderAvailability(
 			String[] providerNos, LocalDate startDate, LocalDate endDate, String demographicNo,
 			String jsonTemplateDurations, String jsonRules) throws org.json.simple.parser.ParseException
@@ -863,7 +863,7 @@ public class Schedule
 					.collect(Collectors.toList());
 	}
 
-	// TODO: See: getProviderAvailability
+	// TODO-legacy: See: getProviderAvailability
 	public ConcurrentHashMap<String, List<ScheduleSlotDto>> getProviderSlotsInRange(
 			String[] providerNos, org.oscarehr.common.model.Appointment appointment,
 			String jsonTemplateDurations, String jsonRules) throws org.json.simple.parser.ParseException

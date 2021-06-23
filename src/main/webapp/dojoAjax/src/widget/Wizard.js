@@ -16,7 +16,7 @@ dojo.require("dojo.widget.ContentPane");
 dojo.require("dojo.event.*");
 dojo.require("dojo.html.style");
 
-// TODO: base this on PageContainer
+// TODO-legacy: base this on PageContainer
 dojo.widget.defineWidget(
 	"dojo.widget.WizardContainer",
 	dojo.widget.LayoutContainer,

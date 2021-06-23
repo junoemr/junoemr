@@ -1,69 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-        "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
-		
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Enable annotations for this spring context.  Note that this appears to be a separate    -->
+	<!-- context from the one configured by applicationContext.xml                               -->
+	<context:annotation-config/>
+
+
 	<bean name="/dms/inboxManage" class="oscar.dms.actions.DmsInboxManageAction">
 		<property name="providerInboxRoutingDAO" ref="providerInboxRoutingDAO" />
 		<property name="queueDocumentLinkDAO" ref="queueDocumentLinkDAO" />
 		<property name="secObjectNameDao" ref="secObjectNameDao" />
 	</bean>
 
-	<bean name="/Tickler" class="org.caisi.tickler.web.TicklerAction" singleton="false">
+	<bean name="/Tickler" class="org.caisi.tickler.web.TicklerAction" scope="singleton">
 		<property name="demographicManager" ref="demographicManagerT" />
 		<property name="providerManager" ref="providerManager" />
 		<property name="preparedTicklerManager" ref="preparedTicklerManagerT" />
 		<property name="programManager" ref="programManager" />
 	</bean>
 
-	<bean name="/CustomFilter" class="org.caisi.tickler.web.CustomFilterAction" singleton="false">
+	<bean name="/CustomFilter" class="org.caisi.tickler.web.CustomFilterAction" scope="singleton">
 		<property name="demographicManager" ref="demographicManagerT" />
 		<property name="providerManager" ref="providerManager" />
 		<property name="programManager" ref="programManager" />
 	</bean>
 
-	<bean name="/SystemMessage" class="org.caisi.core.web.SystemMessageAction" singleton="false" autowire="byName" />
-	<bean name="/FacilityMessage" class="org.caisi.core.web.FacilityMessageAction" singleton="false" autowire="byName" />
-	<bean name="/DefaultEncounterIssue" class="org.caisi.core.web.DefaultEncounterIssueAction" singleton="false" autowire="byName" />
+	<bean name="/SystemMessage" class="org.caisi.core.web.SystemMessageAction" scope="singleton" autowire="byName" />
+	<bean name="/FacilityMessage" class="org.caisi.core.web.FacilityMessageAction" scope="singleton" autowire="byName" />
+	<bean name="/DefaultEncounterIssue" class="org.caisi.core.web.DefaultEncounterIssueAction" scope="singleton" autowire="byName" />
 	
-	<bean name="/PMmodule/ClientSearch2" class="org.oscarehr.PMmodule.web.ClientSearchAction2" singleton="false" autowire="byName" />
+	<bean name="/PMmodule/ClientSearch2" class="org.oscarehr.PMmodule.web.ClientSearchAction2" scope="singleton" autowire="byName" />
 
-	<bean name="/PMmodule/ClientManager" class="org.oscarehr.PMmodule.web.ClientManagerAction" singleton="false" autowire="byName">
+	<bean name="/PMmodule/ClientManager" class="org.oscarehr.PMmodule.web.ClientManagerAction" scope="singleton" autowire="byName">
 		<property name="caseManagementManager" ref="caseManagementManager" />
 		<property name="lookupManager" ref="lookupManager" />
 	</bean>
 
-	<bean name="/PMmodule/ProviderInfo" class="org.oscarehr.PMmodule.web.ProviderInfoAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/ProgramManager" class="org.oscarehr.PMmodule.web.admin.ProgramManagerAction" singleton="false" autowire="byName" />
+	<bean name="/PMmodule/ProviderInfo" class="org.oscarehr.PMmodule.web.ProviderInfoAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/ProgramManager" class="org.oscarehr.PMmodule.web.admin.ProgramManagerAction" scope="singleton" autowire="byName" />
 
-	<bean name="/PMmodule/ProgramManagerView" class="org.oscarehr.PMmodule.web.admin.ProgramManagerViewAction" singleton="false" autowire="byName">
+	<bean name="/PMmodule/ProgramManagerView" class="org.oscarehr.PMmodule.web.admin.ProgramManagerViewAction" scope="singleton" autowire="byName">
 		<property name="caseManagementManager" ref="caseManagementManager" />
 		<property name="programManagerAction" ref="/PMmodule/ProgramManager" />
 	</bean>
 
-	<bean name="/PMmodule/AllVacancies" class="org.oscarehr.PMmodule.web.AllWaitingListAction" singleton="false" autowire="byName"/>
-	<bean name="/PMmodule/VacancyClientMatch" class="org.oscarehr.PMmodule.web.VacancyClientMatchAction" singleton="false" autowire="byName"/>
-	<bean name="/PMmodule/AgencyManager" class="org.oscarehr.PMmodule.web.admin.AgencyManagerAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/FacilityManager" class="org.oscarehr.PMmodule.web.admin.FacilityManagerAction" singleton="false" autowire="byName" />
-	<bean name="/FacilityManager" class="oscar.facility.FacilityManagerAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/BedManager" class="org.oscarehr.PMmodule.web.admin.BedManagerAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/ProviderSearch" class="org.oscarehr.PMmodule.web.ProviderSearchAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/HealthSafety" class="org.oscarehr.PMmodule.web.HealthSafetyAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/StaffManager" class="org.oscarehr.PMmodule.web.admin.StaffManagerAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/Reports/ProgramActivityReport" class="org.oscarehr.PMmodule.web.reports.ActivityReportAction" singleton="false" autowire="byName" />
+	<bean name="/PMmodule/AllVacancies" class="org.oscarehr.PMmodule.web.AllWaitingListAction" scope="singleton" autowire="byName"/>
+	<bean name="/PMmodule/VacancyClientMatch" class="org.oscarehr.PMmodule.web.VacancyClientMatchAction" scope="singleton" autowire="byName"/>
+	<bean name="/PMmodule/AgencyManager" class="org.oscarehr.PMmodule.web.admin.AgencyManagerAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/FacilityManager" class="org.oscarehr.PMmodule.web.admin.FacilityManagerAction" scope="singleton" autowire="byName" />
+	<bean name="/FacilityManager" class="oscar.facility.FacilityManagerAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/BedManager" class="org.oscarehr.PMmodule.web.admin.BedManagerAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/ProviderSearch" class="org.oscarehr.PMmodule.web.ProviderSearchAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/HealthSafety" class="org.oscarehr.PMmodule.web.HealthSafetyAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/StaffManager" class="org.oscarehr.PMmodule.web.admin.StaffManagerAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/Reports/ProgramActivityReport" class="org.oscarehr.PMmodule.web.reports.ActivityReportAction" scope="singleton" autowire="byName" />
 	
-	<bean name="/PMmodule/Reports/BasicReport" class="org.oscarehr.PMmodule.web.reports.BasicReportAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/Reports/ClientListsReport" class="org.oscarehr.PMmodule.web.reports.ClientListsReportAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/Admin/DefaultRoleAccess" class="org.oscarehr.PMmodule.web.admin.DefaultRoleAccessAction" singleton="false" autowire="byName" />
+	<bean name="/PMmodule/Reports/BasicReport" class="org.oscarehr.PMmodule.web.reports.BasicReportAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/Reports/ClientListsReport" class="org.oscarehr.PMmodule.web.reports.ClientListsReportAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/Admin/DefaultRoleAccess" class="org.oscarehr.PMmodule.web.admin.DefaultRoleAccessAction" scope="singleton" autowire="byName" />
 	<!-- Generic Intake -->
-	<bean name="/PMmodule/GenericIntake/Search" class="org.oscarehr.PMmodule.web.GenericIntakeSearchAction" singleton="false" autowire="byName">
+	<bean name="/PMmodule/GenericIntake/Search" class="org.oscarehr.PMmodule.web.GenericIntakeSearchAction" scope="singleton" autowire="byName">
 	</bean>
-	<bean name="/PMmodule/GenericIntake/Edit" class="org.oscarehr.PMmodule.web.GenericIntakeEditAction" singleton="false" autowire="byName" />
-	<bean name="/PMmodule/GenericIntake/Report" class="org.oscarehr.PMmodule.web.GenericIntakeReportAction" singleton="false" autowire="byName" />
+	<bean name="/PMmodule/GenericIntake/Edit" class="org.oscarehr.PMmodule.web.GenericIntakeEditAction" scope="singleton" autowire="byName" />
+	<bean name="/PMmodule/GenericIntake/Report" class="org.oscarehr.PMmodule.web.GenericIntakeReportAction" scope="singleton" autowire="byName" />
 	<!-- Generic Intake -->
 	
 	<!-- Data Export -->
-	<bean name="/demographic/cihiExportOMD4" class="oscar.oscarDemographic.pageUtil.CihiExportAction" singleton="false">
+	<bean name="/demographic/cihiExportOMD4" class="oscar.oscarDemographic.pageUtil.CihiExportAction" scope="singleton">
 		<property name="clinicDAO" ref="clinicDAO"></property>
 		<property name="dataExportDAO" ref="dataExportDAO"></property>
 		<property name="demographicDao" ref="demographicDao"></property>
@@ -75,7 +82,7 @@
 		<property name="preventionDao" ref="preventionDao"/>
 		<property name="preventionExtDao" ref="preventionExtDao"/>
 	</bean>
-	<bean name="/demographic/cihiExportPHC_VRS" class="oscar.oscarDemographic.pageUtil.CihiExportPHC_VRSAction" singleton="false">
+	<bean name="/demographic/cihiExportPHC_VRS" class="oscar.oscarDemographic.pageUtil.CihiExportPHC_VRSAction" scope="singleton">
 		<property name="clinicDAO" ref="clinicDAO"></property>
 		<property name="dataExportDAO" ref="dataExportDAO"></property>
 		<property name="demographicDao" ref="demographicDao"></property>
@@ -89,139 +96,134 @@
 		<property name="dxresearchDAO" ref="dxresearchDAO"></property>
 		<property name="icd9Dao" ref="Icd9DAO"></property>
 	</bean>
-	<bean name="/demographic/eRourkeExport" class="oscar.oscarDemographic.pageUtil.RourkeExportAction" singleton="false">
+	<bean name="/demographic/eRourkeExport" class="oscar.oscarDemographic.pageUtil.RourkeExportAction" scope="singleton">
 		<property name="clinicDAO" ref="clinicDAO"></property>
 		<property name="dataExportDAO" ref="dataExportDAO"></property>
 		<property name="demographicDao" ref="demographicDao"></property>
 		<property name="frmRourke2009DAO" ref="rourke2009Dao"></property>
 	</bean>
 	<!--  ER -->
-	<bean name="/ReceptionistReport" class="org.oscarehr.er.ReceptionistReportAction" singleton="false">
+	<bean name="/ReceptionistReport" class="org.oscarehr.er.ReceptionistReportAction" scope="singleton">
 		<property name="programManager" ref="programManager" />
 		<property name="clientManager" ref="clientManager" />
 		<property name="admissionManager" ref="admissionManager" />
 		<property name="caseManagementManager" ref="caseManagementManager" />
-		<property name="providerManager" ref="providerManager" />
 	</bean>
 	<!--  CASE MANAGEMENT -->
-	<bean name="/CaseManagementView" class="org.oscarehr.casemgmt.web.CaseManagementViewAction" singleton="false" autowire="byName">
+	<bean name="/CaseManagementView" class="org.oscarehr.casemgmt.web.CaseManagementViewAction" scope="singleton" autowire="byName">
 		<property name="clientImageManager" ref="ClientImageManager" />
 	</bean>
-	<bean name="/CaseManagementEntry" class="org.oscarehr.casemgmt.web.CaseManagementEntryAction" singleton="false">
+	<bean name="/CaseManagementEntry" class="org.oscarehr.casemgmt.web.CaseManagementEntryAction" scope="singleton">
 		<property name="clientImageManager" ref="ClientImageManager" />
 		<property name="caseManagementManager" ref="caseManagementManager" />
 		<property name="providerManager" ref="providerManager" />
 	</bean>
-	<bean name="/ClientImage" class="org.oscarehr.casemgmt.web.ClientImageAction" singleton="false">
+	<bean name="/ClientImage" class="org.oscarehr.casemgmt.web.ClientImageAction" scope="singleton">
 		<property name="clientImageManager" ref="ClientImageManager" />
 	</bean>
 	
-	<bean name="/ArchiveView" class="org.oscarehr.casemgmt.web.ArchiveViewAction" singleton="false">
+	<bean name="/ArchiveView" class="org.oscarehr.casemgmt.web.ArchiveViewAction" scope="singleton">
 		<property name="programManager" ref="programManager" />
 	</bean>
-	<bean name="/oscarEncounter/displayIssues" class="oscar.oscarEncounter.pageUtil.EctDisplayIssuesAction" singleton="false">
+	<bean name="/oscarEncounter/displayIssues" class="oscar.oscarEncounter.pageUtil.EctDisplayIssuesAction" scope="singleton">
 		<property name="caseManagementManager" ref="caseManagementManager" />
 	</bean>
-	<bean name="/oscarEncounter/displayResolvedIssues" class="oscar.oscarEncounter.pageUtil.EctDisplayResolvedIssuesAction" singleton="false">
+	<bean name="/oscarEncounter/displayResolvedIssues" class="oscar.oscarEncounter.pageUtil.EctDisplayResolvedIssuesAction" scope="singleton">
 		<property name="caseManagementManager" ref="caseManagementManager" />
 	</bean>
 	<!--  Vaccine -->
-	<bean name="/VaccineProviderReport" class="org.oscarehr.vaccine.VaccineProviderReportAction" singleton="false">
-		<property name="programManager" ref="programManager" />
+	<bean name="/VaccineProviderReport" class="org.oscarehr.vaccine.VaccineProviderReportAction" scope="singleton">
 		<property name="clientManager" ref="clientManager" />
-		<property name="admissionManager" ref="admissionManager" />
-		<property name="caseManagementManager" ref="caseManagementManager" />
-		<property name="providerManager" ref="providerManager" />
 		<property name="genericIntakeManager" ref="genericIntakeManager" />
 	</bean>
+
 	<!-- Population Report -->
-	<bean name="/PopulationReport" class="org.oscarehr.common.web.PopulationReportAction" singleton="false">
+	<bean name="/PopulationReport" class="org.oscarehr.common.web.PopulationReportAction" scope="singleton">
 		<property name="populationReportManager" ref="populationReportManager" />
 	</bean>
 
 	<!--  Lookup and Table Mainteance -->
-	<bean name="/Lookup/LookupList" class="com.quatro.web.lookup.LookupListAction" singleton="false">
+	<bean name="/Lookup/LookupList" class="com.quatro.web.lookup.LookupListAction" scope="singleton">
 		<property name="lookupManager" ref="lookupManager" />
 	</bean>
-	<bean name="/Lookup/LookupTableList" class="com.quatro.web.lookup.LookupTableListAction" singleton="false">
+	<bean name="/Lookup/LookupTableList" class="com.quatro.web.lookup.LookupTableListAction" scope="singleton">
 		<property name="lookupManager" ref="lookupManager" />
 	</bean>
-	<bean name="/Lookup/LookupCodeList" class="com.quatro.web.lookup.LookupCodeListAction" singleton="false">
+	<bean name="/Lookup/LookupCodeList" class="com.quatro.web.lookup.LookupCodeListAction" scope="singleton">
 		<property name="lookupManager" ref="lookupManager" />
 	</bean>
-	<bean name="/Lookup/LookupCodeEdit" class="com.quatro.web.lookup.LookupCodeEditAction" singleton="false">
+	<bean name="/Lookup/LookupCodeEdit" class="com.quatro.web.lookup.LookupCodeEditAction" scope="singleton">
 		<property name="lookupManager" ref="lookupManager" />
 	</bean>
 
 
 	<!-- Admin Start -->
-	<bean name="/PMmodule/Admin/SysAdmin" class="org.oscarehr.PMmodule.web.admin.AdminHomeAction" singleton="false">
+	<bean name="/PMmodule/Admin/SysAdmin" class="org.oscarehr.PMmodule.web.admin.AdminHomeAction" scope="singleton">
 	</bean>
 
 	<!-- admin End -->
 	<!-- Provider Property -->
-	<bean name="/setProviderStaleDate" class="org.oscarehr.provider.web.ProviderPropertyAction" singleton="false">
+	<bean name="/setProviderStaleDate" class="org.oscarehr.provider.web.ProviderPropertyAction" scope="singleton">
 		<property name="userPropertyDAO" ref="UserPropertyDAO" />
 	</bean>
 
-	<bean name="/setAppointmentCountPrefs" class="org.oscarehr.provider.web.ProviderPropertyAction" singleton="false">
+	<bean name="/setAppointmentCountPrefs" class="org.oscarehr.provider.web.ProviderPropertyAction" scope="singleton">
 		<property name="userPropertyDAO" ref="UserPropertyDAO" />
 	</bean>
 
-	<bean name="/saveWorkView" class="org.oscarehr.provider.web.ProviderViewAction" singleton="false">
+	<bean name="/saveWorkView" class="org.oscarehr.provider.web.ProviderViewAction" scope="singleton">
 		<property name="userViewDAO" ref="viewDao" />
 	</bean>
 
-	<bean name="/report/DxresearchReport" class="org.oscarehr.common.web.DxresearchReportAction" singleton="false">
+	<bean name="/report/DxresearchReport" class="org.oscarehr.common.web.DxresearchReportAction" scope="singleton">
 		<property name="dxresearchdao" ref="DxresearchDAO" />
 	</bean>
 
 	<!-- Indivo -->
 
-	<bean name="/phr/PhrMessage" class="org.oscarehr.phr.web.PHRMessageAction" singleton="false"/> 
-	<bean name="/oscarRx/SendToPhr" class="oscar.oscarRx.pageUtil.RxSendToPhrAction" singleton="false"/>
-	<bean name="/oscarEncounter/oscarMeasurements/SendToPhr" class="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctSendMeasurementToPhr" singleton="false"/>
+	<bean name="/phr/PhrMessage" class="org.oscarehr.phr.web.PHRMessageAction" scope="singleton"/>
+	<bean name="/oscarRx/SendToPhr" class="oscar.oscarRx.pageUtil.RxSendToPhrAction" scope="singleton"/>
+	<bean name="/oscarEncounter/oscarMeasurements/SendToPhr" class="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctSendMeasurementToPhr" scope="singleton"/>
 		
-	<bean name="/dms/SendDocToPhr" class="oscar.dms.actions.SendDocToPhrAction" singleton="false" />
-	<bean name="/phr/Login" class="org.oscarehr.phr.web.PHRLoginAction" singleton="false" />
-	<bean name="/phr/Logout" class="org.oscarehr.phr.web.PHRLogoutAction" singleton="false" />
+	<bean name="/dms/SendDocToPhr" class="oscar.dms.actions.SendDocToPhrAction" scope="singleton" />
+	<bean name="/phr/Login" class="org.oscarehr.phr.web.PHRLoginAction" scope="singleton" />
+	<bean name="/phr/Logout" class="org.oscarehr.phr.web.PHRLogoutAction" scope="singleton" />
 
-	<bean name="/phr/UserManagement" class="org.oscarehr.phr.web.PHRUserManagementAction" singleton="false"/>
+	<bean name="/phr/UserManagement" class="org.oscarehr.phr.web.PHRUserManagementAction" scope="singleton"/>
 		
-	<bean name="/SendToPhr" class="org.oscarehr.phr.web.PHRGenericSendToPhrAction" singleton="false"/>
+	<bean name="/SendToPhr" class="org.oscarehr.phr.web.PHRGenericSendToPhrAction" scope="singleton"/>
 		
-	<bean name="/testAction" class="org.oscarehr.decisionSupport.web.TestActionW" singleton="false">
+	<bean name="/testAction" class="org.oscarehr.decisionSupport.web.TestActionW" scope="singleton">
 		<property name="dsService" ref="dsService" />
 	</bean>
-	<bean name="/oscarEncounter/decisionSupport/guidelineAction" class="org.oscarehr.decisionSupport.web.DSGuidelineAction" singleton="false">
+	<bean name="/oscarEncounter/decisionSupport/guidelineAction" class="org.oscarehr.decisionSupport.web.DSGuidelineAction" scope="singleton">
 		<property name="dsService" ref="dsService" />
 	</bean>
-	<bean name="/appointment/apptStatusSetting" class="oscar.appt.status.web.AppointmentStatusAction" singleton="false">
+	<bean name="/appointment/apptStatusSetting" class="oscar.appt.status.web.AppointmentStatusAction" scope="singleton">
 	</bean>
-	<bean name="/oscarRx/copyFavorite" class="oscar.oscarRx.web.CopyFavoritesAction" singleton="false">
-	</bean>
-
-	<bean name="/oscarRx/copyFavorite2" class="oscar.oscarRx.web.CopyFavoritesAction" singleton="false">
+	<bean name="/oscarRx/copyFavorite" class="oscar.oscarRx.web.CopyFavoritesAction" scope="singleton">
 	</bean>
 
-	<bean name="/admin/ManageClinic" class="org.oscarehr.common.web.ClinicManageAction" singleton="false">
+	<bean name="/oscarRx/copyFavorite2" class="oscar.oscarRx.web.CopyFavoritesAction" scope="singleton">
+	</bean>
+
+	<bean name="/admin/ManageClinic" class="org.oscarehr.common.web.ClinicManageAction" scope="singleton">
 		<property name="clinicDAO" ref="clinicDAO" />
 		<property name="clinicBillingAddressDAO" ref="clinicBillingAddressDAO" />
 	</bean>
-	<bean name="/admin/ClinicBillingAddress" class="org.oscarehr.common.web.ClinicBillingAddressAction" singleton="false">
-		<property name="clinicBillingDao" ref="clinicBillingAddressDAO" />
-	</bean>
-	<bean name="/admin/ManageSites" class="org.oscarehr.common.web.SitesManageAction" singleton="false">
+	<bean name="/admin/ManageSites" class="org.oscarehr.common.web.SitesManageAction" scope="singleton">
 		<property name="siteDao" ref="siteDao" />
 	</bean>
 
-	<bean name="/billing/CA/ON/BatchBill" class="org.oscarehr.billing.CA.ON.web.BatchBillAction" singleton="false">
-		<property name="billClaimDAO" ref="billingClaimDAO" />
+	<bean name="/billing/CA/ON/BatchBill" class="org.oscarehr.billing.CA.ON.web.BatchBillAction" scope="singleton">
 	</bean>
 	
-    <bean name="/billing/CA/ON/managePaymentType" class="oscar.oscarBilling.ca.on.pageUtil.PaymentTypeAction" singleton="false" autowire="byName">
+    <bean name="/billing/CA/ON/managePaymentType" class="oscar.oscarBilling.ca.on.pageUtil.PaymentTypeAction" scope="singleton" autowire="byName">
  	<property name="billingPaymentTypeDao" ref="billingPaymentTypeDao" />
  	<property name="billPaymentDao" ref="billingONPaymentDao" />
  	</bean>
-	<bean name="/billing/CA/ON/billingON3rdPayments" class="org.oscarehr.billing.CA.ON.web.BillingONPaymentsAction" singleton="false" autowire="byName"/>
+	<bean name="/billing/CA/ON/billingON3rdPayments" class="org.oscarehr.billing.CA.ON.web.BillingONPaymentsAction" scope="singleton" autowire="byName"/>
+
+	<bean name="/oscarEncounter/junoEncounter" class="org.oscarehr.casemgmt.web.JunoEncounterAction" autowire="byName"></bean>
+
 </beans>

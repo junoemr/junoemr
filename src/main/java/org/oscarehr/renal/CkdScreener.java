@@ -132,7 +132,7 @@ public class CkdScreener {
 	
 	public void screenPopulation(LoggedInInfo loggedInInfo) {
 		logger.debug("beginning screening");
-		//TODO: only ones which havn't been screened, or don't have have active dx for screening
+		//TODO-legacy: only ones which havn't been screened, or don't have have active dx for screening
 		List<Integer> demographicNos = demographicDao.getActiveDemographicIds();
 		for(Integer demographicNo:demographicNos) {
 			List<String> reasons = new ArrayList<String>();

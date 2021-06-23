@@ -293,13 +293,13 @@ public class NoteDisplayNonNote implements NoteDisplay {
 
 	@Override
     public String getEncounterTime() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
 
 	@Override
     public String getEncounterTransportationTime() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
 

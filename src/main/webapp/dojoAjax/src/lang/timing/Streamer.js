@@ -53,7 +53,7 @@ dojo.lang.timing.Streamer = function(
 		
 		//	check to see if the input function needs to be fired
 		//	stop before firing the output function
-		//	TODO: relegate this to the output function?
+		//	TODO-legacy: relegate this to the output function?
 		if(typeof(obj) == "undefined"){
 			self.stop();
 			return;

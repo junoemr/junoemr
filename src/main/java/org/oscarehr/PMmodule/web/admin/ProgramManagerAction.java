@@ -96,7 +96,6 @@ import org.oscarehr.match.MatchManagerException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import oscar.log.LogAction;
@@ -114,7 +113,6 @@ public class ProgramManagerAction extends DispatchAction {
 	private ProgramManager programManager;
 	private ProviderManager providerManager;
 	private ProgramQueueManager programQueueManager;
-	@Autowired
 	private VacancyTemplateManager vacancyTemplateManager;
 	//private RoleManager roleManager;
 	private RolesManager roleManager;
@@ -947,7 +945,7 @@ public class ProgramManagerAction extends DispatchAction {
 			}	
 				
 			//Call Match Manager
-			//TODO do the testing
+			//TODO-legacy do the testing
 			try {
 		        matchManager.processEvent(vacancy, IMatchManager.Event.VACANCY_CREATED);
 	        } catch (MatchManagerException e) {

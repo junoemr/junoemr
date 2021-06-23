@@ -25,16 +25,6 @@
 
 package oscar.oscarPrevention.reports;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import oscar.oscarDemographic.data.DemographicData;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.UtilDateUtilities;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,6 +37,17 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+
+import oscar.oscarDemographic.data.DemographicData;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+import oscar.util.UtilDateUtilities;
+
 /**
  *
  * @author jay
@@ -57,12 +58,12 @@ public class FluReport implements PreventionReport {
     public FluReport() {
     }
 
-    @Override
-    public boolean displayNumShots() {
+    public boolean displayNumShots()
+    {
         return false;
     }
 
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate){
+    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate){
         int inList = 0;
         double done= 0;
         ArrayList<PreventionReportDisplay> returnReport = new ArrayList<PreventionReportDisplay>();
@@ -239,7 +240,7 @@ public class FluReport implements PreventionReport {
              }else{
                 EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
                 log.debug("getting FLUF data for "+prd.demographicNo);
-                Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsDataVector();
+                Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsData();
 
                 if ( fluFollowupData.size() > 0 ){
                       EctMeasurementsDataBean fluData = fluFollowupData.iterator().next();
@@ -405,7 +406,7 @@ public class FluReport implements PreventionReport {
               EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting FLUF data for "+prd.demographicNo);
 
-              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsData();
               //NO Contact
 
               if ( fluFollowupData.size() == 0 ){
@@ -445,7 +446,7 @@ public class FluReport implements PreventionReport {
           }else if ("Refused".equals(prd.state)){  //Not sure what to do about refused
               EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting FLUF data for "+prd.demographicNo);
-              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsData();
 
               if ( fluFollowupData.size() > 0 ){
                   EctMeasurementsDataBean fluData = fluFollowupData.iterator().next();
@@ -462,7 +463,7 @@ public class FluReport implements PreventionReport {
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
 
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = followupData.iterator().next();

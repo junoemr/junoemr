@@ -35,16 +35,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.Criteria;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CriteriaDaoTest extends DaoTestFixtures {
-
-	public CriteriaDao dao = SpringUtils.getBean(CriteriaDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CriteriaDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public CriteriaDao criteriaDao;
 
 
 	@Before
@@ -56,7 +62,7 @@ public class CriteriaDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Criteria entity = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		criteriaDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -68,30 +74,30 @@ public class CriteriaDaoTest extends DaoTestFixtures {
 		Criteria criteria1 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria1);
 		criteria1.setTemplateId(templateId1);
-		dao.persist(criteria1);
+		criteriaDao.persist(criteria1);
 		
 		Criteria criteria2 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria2);
 		criteria2.setTemplateId(templateId2);
-		dao.persist(criteria2);
+		criteriaDao.persist(criteria2);
 		
 		Criteria criteria3 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria3);
 		criteria3.setTemplateId(templateId1);
-		dao.persist(criteria3);
+		criteriaDao.persist(criteria3);
 		
 		Criteria criteria4 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria4);
 		criteria4.setTemplateId(templateId2);
-		dao.persist(criteria4);
+		criteriaDao.persist(criteria4);
 		
 		Criteria criteria5 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria5);
 		criteria5.setTemplateId(templateId1);
-		dao.persist(criteria5);
+		criteriaDao.persist(criteria5);
 		
 		List<Criteria> expectedResult = new ArrayList<Criteria>(Arrays.asList(criteria1, criteria3, criteria5));
-		List<Criteria> result = dao.getCriteriaByTemplateId(templateId1);
+		List<Criteria> result = criteriaDao.getCriteriaByTemplateId(templateId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -120,31 +126,31 @@ public class CriteriaDaoTest extends DaoTestFixtures {
 		criteria1.setTemplateId(templateId1);
 		criteria1.setVacancyId(vacancyId1);
 		criteria1.setCriteriaTypeId(typeId1);
-		dao.persist(criteria1);
+		criteriaDao.persist(criteria1);
 		
 		Criteria criteria2 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria2);
 		criteria2.setTemplateId(templateId2);
 		criteria2.setVacancyId(vacancyId1);
 		criteria2.setCriteriaTypeId(typeId2);
-		dao.persist(criteria2);
+		criteriaDao.persist(criteria2);
 		
 		Criteria criteria3 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria3);
 		criteria3.setTemplateId(templateId1);
 		criteria3.setVacancyId(vacancyId2);
 		criteria3.setCriteriaTypeId(typeId1);
-		dao.persist(criteria3);
+		criteriaDao.persist(criteria3);
 		
 		Criteria criteria4 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria4);
 		criteria4.setTemplateId(templateId2);
 		criteria4.setVacancyId(vacancyId2);
 		criteria4.setCriteriaTypeId(typeId1);
-		dao.persist(criteria4);
+		criteriaDao.persist(criteria4);
 		
 		Criteria expectedResult = criteria1;
-		Criteria result = dao.getCriteriaByTemplateIdVacancyIdTypeId(templateId1, vacancyId1, typeId1);
+		Criteria result = criteriaDao.getCriteriaByTemplateIdVacancyIdTypeId(templateId1, vacancyId1, typeId1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -157,30 +163,30 @@ public class CriteriaDaoTest extends DaoTestFixtures {
 		Criteria criteria1 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria1);
 		criteria1.setVacancyId(vacancyId1);
-		dao.persist(criteria1);
+		criteriaDao.persist(criteria1);
 		
 		Criteria criteria2 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria2);
 		criteria2.setVacancyId(vacancyId2);
-		dao.persist(criteria2);
+		criteriaDao.persist(criteria2);
 		
 		Criteria criteria3 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria3);
 		criteria3.setVacancyId(vacancyId1);
-		dao.persist(criteria3);
+		criteriaDao.persist(criteria3);
 		
 		Criteria criteria4 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria4);
 		criteria4.setVacancyId(vacancyId2);
-		dao.persist(criteria4);
+		criteriaDao.persist(criteria4);
 		
 		Criteria criteria5 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria5);
 		criteria5.setVacancyId(vacancyId1);
-		dao.persist(criteria5);
+		criteriaDao.persist(criteria5);
 		
 		List<Criteria> expectedResult = new ArrayList<Criteria>(Arrays.asList(criteria1, criteria3, criteria5));
-		List<Criteria> result = dao.getCriteriasByVacancyId(vacancyId1);
+		List<Criteria> result = criteriaDao.getCriteriasByVacancyId(vacancyId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -207,34 +213,34 @@ public class CriteriaDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(criteria1);
 		criteria1.setVacancyId(vacancyId1);
 		criteria1.setCanBeAdhoc(canBeAdhoc2);
-		dao.persist(criteria1);
+		criteriaDao.persist(criteria1);
 		
 		Criteria criteria2 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria2);
 		criteria2.setVacancyId(vacancyId2);
 		criteria2.setCanBeAdhoc(canBeAdhoc1);
-		dao.persist(criteria2);
+		criteriaDao.persist(criteria2);
 		
 		Criteria criteria3 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria3);
 		criteria3.setVacancyId(vacancyId1);
 		criteria3.setCanBeAdhoc(canBeAdhoc1);
-		dao.persist(criteria3);
+		criteriaDao.persist(criteria3);
 		
 		Criteria criteria4 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria4);
 		criteria4.setVacancyId(vacancyId2);
 		criteria4.setCanBeAdhoc(canBeAdhoc2);
-		dao.persist(criteria4);
+		criteriaDao.persist(criteria4);
 		
 		Criteria criteria5 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria5);
 		criteria5.setVacancyId(vacancyId1);
 		criteria5.setCanBeAdhoc(canBeAdhoc2);
-		dao.persist(criteria5);
+		criteriaDao.persist(criteria5);
 		
 		List<Criteria> expectedResult = new ArrayList<Criteria>(Arrays.asList(criteria1, criteria5));
-		List<Criteria> result = dao.getRefinedCriteriasByVacancyId(vacancyId1);
+		List<Criteria> result = criteriaDao.getRefinedCriteriasByVacancyId(vacancyId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -261,34 +267,34 @@ public class CriteriaDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(criteria1);
 		criteria1.setTemplateId(templateId1);
 		criteria1.setCanBeAdhoc(canBeAdhoc2);
-		dao.persist(criteria1);
+		criteriaDao.persist(criteria1);
 		
 		Criteria criteria2 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria2);
 		criteria2.setTemplateId(templateId2);
 		criteria2.setCanBeAdhoc(canBeAdhoc1);
-		dao.persist(criteria2);
+		criteriaDao.persist(criteria2);
 		
 		Criteria criteria3 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria3);
 		criteria3.setTemplateId(templateId1);
 		criteria3.setCanBeAdhoc(canBeAdhoc1);
-		dao.persist(criteria3);
+		criteriaDao.persist(criteria3);
 		
 		Criteria criteria4 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria4);
 		criteria4.setTemplateId(templateId2);
 		criteria4.setCanBeAdhoc(canBeAdhoc2);
-		dao.persist(criteria4);
+		criteriaDao.persist(criteria4);
 		
 		Criteria criteria5 = new Criteria();
 		EntityDataGenerator.generateTestDataForModelClass(criteria5);
 		criteria5.setTemplateId(templateId1);
 		criteria5.setCanBeAdhoc(canBeAdhoc2);
-		dao.persist(criteria5);
+		criteriaDao.persist(criteria5);
 		
 		List<Criteria> expectedResult = new ArrayList<Criteria>(Arrays.asList(criteria1, criteria5));
-		List<Criteria> result = dao.getRefinedCriteriasByTemplateId(templateId1);
+		List<Criteria> result = criteriaDao.getRefinedCriteriasByTemplateId(templateId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		

@@ -41,7 +41,7 @@ public class CtlBillingServicePremiumDao extends AbstractDao<CtlBillingServicePr
 	}
 	
 	public List<CtlBillingServicePremium> findByServiceCode(String serviceCode) {
-		Query q = entityManager.createQuery("select x from CtlBillingServicePremium x where x.serviceCode=?");
+		Query q = entityManager.createQuery("select x from CtlBillingServicePremium x where x.serviceCode=?1");
 		q.setParameter(1, serviceCode);
 		
 		
@@ -51,7 +51,7 @@ public class CtlBillingServicePremiumDao extends AbstractDao<CtlBillingServicePr
 	}
 	
 	public List<CtlBillingServicePremium> findByStatus(String status) {
-		Query q = entityManager.createQuery("select x from CtlBillingServicePremium x where x.status=?");
+		Query q = entityManager.createQuery("select x from CtlBillingServicePremium x where x.status=?1");
 		q.setParameter(1, status);
 		
 		
@@ -62,7 +62,7 @@ public class CtlBillingServicePremiumDao extends AbstractDao<CtlBillingServicePr
 	
 	public List<Object[]> search_ctlpremium(String status) {
 		Query q = entityManager.createNativeQuery("SELECT b.service_code, c.description FROM ctl_billingservice_premium b INNER JOIN billingservice c ON b.service_code=c.service_code " +
-									"WHERE b.status=? AND c.billingservice_date = (SELECT MAX(c2.billingservice_date) FROM billingservice c2 " +
+									"WHERE b.status=?1 AND c.billingservice_date = (SELECT MAX(c2.billingservice_date) FROM billingservice c2 " +
 									"WHERE c2.service_code = c.service_code AND c2.billingservice_date <= now())");
 		q.setParameter(1, status);
 		

@@ -46,7 +46,7 @@ public class DisplayInvoiceLogo extends DownloadAction{
 	@Override
 	protected StreamInfo getStreamInfo(ActionMapping arg0, ActionForm arg1,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 		String fileName = getLogoImgAbsPath();
 		if (fileName.isEmpty()) {
 			throw new Exception("Can't open the file: " + fileName);

@@ -42,16 +42,24 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PHRVerificationDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PHRVerificationDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PHRVerificationDao phrVerificationDao;
 
-	protected PHRVerificationDao dao = SpringUtils.getBean(PHRVerificationDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
 
@@ -64,7 +72,7 @@ public class PHRVerificationDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		PHRVerification entity = new PHRVerification();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		phrVerificationDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -82,7 +90,7 @@ public class PHRVerificationDaoTest extends DaoTestFixtures {
 		phrVerification1.setArchived(isNotArchived);
 		Date createdDate1 = new Date(dfm.parse("20110701").getTime());
 		phrVerification1.setCreatedDate(createdDate1);
-		dao.persist(phrVerification1);
+		phrVerificationDao.persist(phrVerification1);
 		
 		PHRVerification phrVerification2 = new PHRVerification();
 		EntityDataGenerator.generateTestDataForModelClass(phrVerification2);
@@ -90,7 +98,7 @@ public class PHRVerificationDaoTest extends DaoTestFixtures {
 		phrVerification2.setArchived(isArchived);
 		Date createdDate2 = new Date(dfm.parse("20100701").getTime());
 		phrVerification2.setCreatedDate(createdDate2);
-		dao.persist(phrVerification2);
+		phrVerificationDao.persist(phrVerification2);
 		
 		PHRVerification phrVerification3 = new PHRVerification();
 		EntityDataGenerator.generateTestDataForModelClass(phrVerification3);
@@ -98,10 +106,10 @@ public class PHRVerificationDaoTest extends DaoTestFixtures {
 		phrVerification3.setArchived(isNotArchived);
 		Date createdDate3 = new Date(dfm.parse("20090701").getTime());
 		phrVerification3.setCreatedDate(createdDate3);
-		dao.persist(phrVerification3);
+		phrVerificationDao.persist(phrVerification3);
 		
 		List<PHRVerification> expectedResult = new ArrayList<PHRVerification>(Arrays.asList(phrVerification1, phrVerification3));
-		List<PHRVerification> result = dao.findByDemographic(demographicNo1, true);
+		List<PHRVerification> result = phrVerificationDao.findByDemographic(demographicNo1, true);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -137,7 +145,7 @@ public class PHRVerificationDaoTest extends DaoTestFixtures {
 		Date createdDate1 = new Date(dfm.parse("20110701").getTime());
 		phrVerification1.setCreatedDate(createdDate1);
 		phrVerification1.setVerificationLevel(authenticationLevel1);
-		dao.persist(phrVerification1);
+		phrVerificationDao.persist(phrVerification1);
 		
 		PHRVerification phrVerification2 = new PHRVerification();
 		EntityDataGenerator.generateTestDataForModelClass(phrVerification2);
@@ -146,7 +154,7 @@ public class PHRVerificationDaoTest extends DaoTestFixtures {
 		Date createdDate2 = new Date(dfm.parse("20100701").getTime());
 		phrVerification2.setCreatedDate(createdDate2);
 		phrVerification2.setVerificationBy(authenticationLevel2);
-		dao.persist(phrVerification2);
+		phrVerificationDao.persist(phrVerification2);
 		
 		String expectedResult = "+1";
 		DemographicManager demographicManager=(DemographicManager) SpringUtils.getBean("demographicManager");

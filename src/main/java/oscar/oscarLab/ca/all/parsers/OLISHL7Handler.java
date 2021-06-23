@@ -1443,7 +1443,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 	@Override
 	public String getMsgPriority() {
-		// TODO: Check if need implementation
+		// TODO-legacy: Check if need implementation
 		return ("");
 	}
 
@@ -2064,7 +2064,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		try {
 			temp = terser.get(ident + "5");
 		} catch (HL7Exception e) {
-			// TODO Auto-generated catch block
+			// TODO-legacy Auto-generated catch block
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
 		if (temp != null) {
@@ -2639,9 +2639,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			return (centered ? "</center>" : "") + "<br/><center>";
 
 		} else if (piece.equals(".FE")) {
-			// TODO: Implement
+			// TODO-legacy: Implement
 		} else if (piece.equals(".NF")) {
-			// TODO: Implement
+			// TODO-legacy: Implement
 		} else if (piece.equals("F")) {
 			return "|";
 		} else if (piece.equals("S")) {
@@ -2689,9 +2689,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 				opInt--;
 			}
 		} else if (operator.equals("IN")) {
-			// TODO: Implement
+			// TODO-legacy: Implement
 		} else if (operator.equals("TI")) {
-			// TODO: Implement
+			// TODO-legacy: Implement
 		} else if (operator.equals("SK")) {
 			while (opInt > 0) {
 				result += "&nbsp;";

@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Specialty;
 import org.oscarehr.common.model.SpecialtyPK;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SpecialtyDaoTest extends DaoTestFixtures {
-
-	protected SpecialtyDao dao = SpringUtils.getBean(SpecialtyDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpecialtyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SpecialtyDao specialtyDao;
 
 	public SpecialtyDaoTest() {
 	}
@@ -50,9 +56,9 @@ public class SpecialtyDaoTest extends DaoTestFixtures {
 		Specialty entity = new Specialty();
 		entity.setId(new SpecialtyPK("TA","00"));
 		entity.setSpecialtydesc("desc");
-		dao.persist(entity);
+		specialtyDao.persist(entity);
 		
-		assertNotNull(dao.find(new SpecialtyPK("TA","00")));
+		assertNotNull(specialtyDao.find(new SpecialtyPK("TA","00")));
 	}
 	
 }

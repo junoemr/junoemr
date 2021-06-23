@@ -60,7 +60,7 @@ public class FrmDischargeSummaryRecord extends FrmRecord {
 			}
 			catch (SQLException e)
 			{
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				logger.error("",e);
 			}
 
@@ -84,7 +84,7 @@ public class FrmDischargeSummaryRecord extends FrmRecord {
 			}
 			catch (SQLException e)
 			{
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				logger.error("",e);
 			}
 
@@ -101,7 +101,7 @@ public class FrmDischargeSummaryRecord extends FrmRecord {
 			}
 			catch (SQLException e)
 			{
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				logger.error("",e);
 			}
 
@@ -124,7 +124,7 @@ public class FrmDischargeSummaryRecord extends FrmRecord {
 			}
 			catch (SQLException e)
 			{
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				logger.error("",e);
 			}
 

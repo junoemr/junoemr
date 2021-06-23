@@ -75,7 +75,7 @@ dojo.math.mean = function() {
 dojo.math.round = function(/* float */number, /* integer */places) {
 	//	summary
 	//	Extends Math.round by adding a second argument specifying the number of decimal places to round to.
-	// TODO: add support for significant figures
+	// TODO-legacy: add support for significant figures
 	if (!places) { var shift = 1; }
 	else { var shift = Math.pow(10, places); }
 	return Math.round(number * shift) / shift;	//	float

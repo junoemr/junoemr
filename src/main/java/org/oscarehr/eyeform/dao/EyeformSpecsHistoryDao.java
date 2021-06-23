@@ -53,7 +53,7 @@ public class EyeformSpecsHistoryDao extends AbstractDao<EyeformSpecsHistory> {
 	}
 	
 	public List<EyeformSpecsHistory> getByDateRange(int demographicNo,Date startDate, Date endDate) {
-		String sql="select x from "+modelClass.getSimpleName()+" x where x.demographicNo=? and x.date >= ? and x.date <=?";
+		String sql="select x from "+modelClass.getSimpleName()+" x where x.demographicNo=?1 and x.date >= ?2 and x.date <=?3";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		query.setParameter(2, startDate);
@@ -67,9 +67,9 @@ public class EyeformSpecsHistoryDao extends AbstractDao<EyeformSpecsHistory> {
 	public List<EyeformSpecsHistory> getHistory(int demographicNo,Date endDate,String status) {
 		String sql=null;
 		if(status != null) {
-			sql = "select x from "+modelClass.getSimpleName()+" x where x.demographicNo = ? and x.date <=? and x.status=? order by x.id desc";
+			sql = "select x from "+modelClass.getSimpleName()+" x where x.demographicNo = ?1 and x.date <=?2 and x.status=?3 order by x.id desc";
 		} else {
-			sql = "select x from "+modelClass.getSimpleName()+" x where x.demographicNo = ? and x.date <=? order by x.id desc";
+			sql = "select x from "+modelClass.getSimpleName()+" x where x.demographicNo = ?1 and x.date <=?2 order by x.id desc";
 		}			
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
@@ -93,7 +93,7 @@ public class EyeformSpecsHistoryDao extends AbstractDao<EyeformSpecsHistory> {
 	}
 	
 	public List<EyeformSpecsHistory> getAllPreviousAndCurrent(int demographicNo, int appointmentNo) {
-		String sql="select x from "+modelClass.getSimpleName()+" x where x.demographicNo = ? and x.appointmentNo<=? order by x.date DESC";
+		String sql="select x from "+modelClass.getSimpleName()+" x where x.demographicNo = ?1 and x.appointmentNo<=?2 order by x.date DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);	    
 		query.setParameter(2, appointmentNo);

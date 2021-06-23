@@ -36,15 +36,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SecPrivilege;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SecPrivilegeDaoTest extends DaoTestFixtures {
-	
-	protected SecPrivilegeDao dao = (SecPrivilegeDao)SpringUtils.getBean(SecPrivilegeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SecPrivilegeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SecPrivilegeDao secPrivilegeDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -57,20 +63,20 @@ public class SecPrivilegeDaoTest extends DaoTestFixtures {
 		SecPrivilege secPrivilege1 = new SecPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secPrivilege1);
 		secPrivilege1.setPrivilege("alpha");
-		dao.persist(secPrivilege1);
+		secPrivilegeDao.persist(secPrivilege1);
 				
 		SecPrivilege secPrivilege2 = new SecPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secPrivilege2);
 		secPrivilege2.setPrivilege("bravo");
-		dao.persist(secPrivilege2);
+		secPrivilegeDao.persist(secPrivilege2);
 		
 		SecPrivilege secPrivilege3 = new SecPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secPrivilege3);
 		secPrivilege3.setPrivilege("charlie");
-		dao.persist(secPrivilege3);
+		secPrivilegeDao.persist(secPrivilege3);
 		
 		List<SecPrivilege> expectedResult = new ArrayList<SecPrivilege>(Arrays.asList(secPrivilege1, secPrivilege2, secPrivilege3));
-		List<SecPrivilege> result = dao.findAll();
+		List<SecPrivilege> result = secPrivilegeDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		for (SecPrivilege item : result) {

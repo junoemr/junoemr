@@ -23,34 +23,47 @@
 
 package integration.tests;
 
+import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EditCPPNotesClassicTests extends SeleniumTestBase
 {
-	@BeforeClass
-	public static void setup()
+	@Autowired
+	DatabaseUtil databaseUtil;
+
+	@Before
+	public void setup()
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
+		databaseUtil.createTestDemographic();
 	}
 
-	@AfterClass
-	public static void cleanup()
+	@After
+	public void cleanup()
 			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",

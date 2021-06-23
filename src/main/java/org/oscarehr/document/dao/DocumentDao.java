@@ -90,7 +90,7 @@ public class DocumentDao extends AbstractDao<Document>
     }
     
     public List<Document> findActiveByDocumentNo(Integer demoId) {
-		String sql = "SELECT d FROM Document d where d.documentNo = ?";
+		String sql = "SELECT d FROM Document d where d.documentNo = ?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demoId);
 		return query.getResultList();
@@ -232,7 +232,7 @@ public class DocumentDao extends AbstractDao<Document>
 			return null;
 		}
 		
-		String q = "select d from Demographic d, CtlDocument c where c.id.module='demographic'" + " and c.id.moduleId!='-1' and c.id.moduleId=d.DemographicNo and c.id.documentNo=? ";
+		String q = "select d from Demographic d, CtlDocument c where c.id.module='demographic'" + " and c.id.moduleId!='-1' and c.id.moduleId=d.DemographicNo and c.id.documentNo=?1 ";
 		
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, id);
@@ -275,7 +275,7 @@ public class DocumentDao extends AbstractDao<Document>
 			//ignore
 			return new ArrayList<Document>();
 		}
-		Query query = entityManager.createQuery("SELECT DISTINCT d FROM Document d, CtlDocument c WHERE d.status = c.status AND d.status != 'D' AND c.id.documentNo=d.documentNo AND " + "c.id.module='demographic' AND c.id.moduleId = ?");
+		Query query = entityManager.createQuery("SELECT DISTINCT d FROM Document d, CtlDocument c WHERE d.status = c.status AND d.status != 'D' AND c.id.documentNo=d.documentNo AND " + "c.id.module='demographic' AND c.id.moduleId = ?1");
 		query.setParameter(1, id);
 		
 		List<Document> result = query.getResultList();

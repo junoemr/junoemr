@@ -48,12 +48,15 @@ import java.util.regex.Pattern;
 public abstract class AbstractDao<T extends AbstractModel<?>> {
 	public static final int MAX_LIST_RETURN_SIZE = 5000;
 
+	public static final String SORT_ASC = "ASC";
+	public static final String SORT_DESC = "DESC";
+
 	protected Class<T> modelClass;
 
-	@PersistenceContext(unitName = "persistenceUnit")
+	@PersistenceContext
 	protected EntityManager entityManager = null;
 
-	@PersistenceContext(unitName = "readOnlyPersistenceUnit")
+	@PersistenceContext
 	protected EntityManager readOnlyEntityManager = null;
 
 	protected AbstractDao(Class<T> modelClass) {
@@ -137,7 +140,10 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		Criteria criteria = session.createCriteria(modelClass);
 		criteria = criteriaSearch.setCriteriaProperties(criteria);
 
-		criteria.setMaxResults(criteriaSearch.getLimit());
+		if(!criteriaSearch.hasNoLimit())
+		{
+			criteria.setMaxResults(criteriaSearch.getLimit());
+		}
 		criteria.setFirstResult(criteriaSearch.getOffset());
 
 		return criteria.list();
@@ -157,7 +163,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			MiscUtils.getLogger().error("Criteria search count returned null result");
 			result = -1;
 		}
-		return ((Integer)result);
+		return ((Long)result).intValue();
 	}
 	
 	protected int getMaxSelectSize() {

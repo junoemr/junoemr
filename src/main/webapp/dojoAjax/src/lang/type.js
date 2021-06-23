@@ -42,7 +42,7 @@ dojo.lang.getType = function(/* anything */ value){
 		if(dojo.lang.isUndefined(value)){ 
 			return "undefined";	//	string 
 		}
-		// FIXME: should this go first?
+		// FIXME-legacy: should this go first?
 		for(var name in dojo.lang.whatAmI.custom){
 			if(dojo.lang.whatAmI.custom[name](value)){
 				return name;	//	string

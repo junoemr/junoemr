@@ -25,10 +25,10 @@ dojo.widget.defineWidget(
 		this.listenedTrees = {};
 	},
 {
-	// TODO: do something with addChild / setChild, so that RpcController become able
+	// TODO-legacy: do something with addChild / setChild, so that RpcController become able
 	// to hook on this and report to server
 	
-	// TODO: make sure keyboard control stuff works when node is moved between trees
+	// TODO-legacy: make sure keyboard control stuff works when node is moved between trees
 	// node should be unfocus()'ed when it its ancestor is moved and tree,lastFocus - cleared
 
 	/**
@@ -470,7 +470,7 @@ dojo.widget.defineWidget(
 	},
 	
 	
-	// -------------------------- TODO: Inline edit node ---------------------
+	// -------------------------- TODO-legacy: Inline edit node ---------------------
 	canEditLabel: function(node) {
 		if (node.actionIsDisabledNow(node.actions.EDIT)) return false;
 

@@ -15,9 +15,9 @@ dojo.provide("dojo.profile");
 //		timing data.
 
 
-// FIXME: need to tie into the event system or provide a closure-based way to
+// FIXME-legacy: need to tie into the event system or provide a closure-based way to
 // watch timings of functions without manually instrumenting them.
-// FIXME: need to make the dump() function work in command line environments
+// FIXME-legacy: need to make the dump() function work in command line environments
 
 dojo.profile = {
 	_profiles: {},

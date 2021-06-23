@@ -47,7 +47,6 @@ import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.LabPatientPhysicianInfoDao;
 import org.oscarehr.common.dao.MdsMSHDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.model.PatientLabRouting;
@@ -59,6 +58,7 @@ import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.labs.LabIdAndType;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.DbConnectionFilter;
@@ -88,10 +88,10 @@ public class CommonLabResultData {
 
 	public static final String NOT_ASSIGNED_PROVIDER_NO = "0";
 	
-	private static PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
-	private static ProviderLabRoutingDao providerLabRoutingDao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-	private static QueueDocumentLinkDao queueDocumentLinkDao = SpringUtils.getBean(QueueDocumentLinkDao.class);
-	
+	private static final PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
+	private static final ProviderLabRoutingDao providerLabRoutingDao = SpringUtils.getBean(ProviderLabRoutingDao.class);
+	private static final QueueDocumentLinkDao queueDocumentLinkDao = SpringUtils.getBean(QueueDocumentLinkDao.class);
+	private static final InboxManager inboxManager = SpringUtils.getBean(InboxManager.class);
 	
 	public CommonLabResultData() {
 
@@ -401,8 +401,7 @@ public class CommonLabResultData {
 			}
 
 			if (!NOT_ASSIGNED_PROVIDER_NO.equals(providerNo)) {
-				ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-				List<ProviderLabRoutingModel> modelRecords = dao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, providerNo);
+				List<ProviderLabRoutingModel> modelRecords = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, providerNo);
 				ArchiveDeletedRecords adr = new ArchiveDeletedRecords();
 				adr.recordRowsToBeDeleted(modelRecords, "" + providerNo, "providerLabRouting");
 				
@@ -415,16 +414,17 @@ public class CommonLabResultData {
 			// If they are then there are no more providers associated with the document, so move the document to the unclaimed inbox
 			if (status.equals(ProviderInboxItem.ARCHIVED))
 			{
-				ProviderInboxRoutingDao providerInboxRoutingDao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 				List<ProviderLabRoutingModel> allDocsWithLabNo = providerLabRoutingDao.getProviderLabRoutingDocuments(labNo);
 				List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, ProviderInboxItem.ARCHIVED);
 
-				if (allDocsWithLabNo.size() == docsWithStatusX.size())
+				if(allDocsWithLabNo.size() == docsWithStatusX.size())
 				{
-					providerInboxRoutingDao.addToProviderInbox(NOT_ASSIGNED_PROVIDER_NO, labNo, labType);
+					inboxManager.addToProviderInbox(labNo, labType, NOT_ASSIGNED_PROVIDER_NO);
 				}
 			}
-		} finally {
+		}
+		finally
+		{
 			DbConnectionFilter.releaseThreadLocalDbConnection();
 		}
 	}
@@ -657,7 +657,7 @@ public class CommonLabResultData {
 		boolean ret = false;
 		try {
 			HRMDocumentToDemographicDao hrmDocumentToDemographicDao = (HRMDocumentToDemographicDao)  SpringUtils.getBean("HRMDocumentToDemographicDao");
-			List<HRMDocumentToDemographic> docToDemo = hrmDocumentToDemographicDao.findByHrmDocumentId(labId);
+			List<HRMDocumentToDemographic> docToDemo = hrmDocumentToDemographicDao.findByHrmDocumentId(Integer.parseInt(labId));
 			if(docToDemo != null && docToDemo.size() > 0){
 				ret = true;
 			}

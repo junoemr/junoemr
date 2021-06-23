@@ -46,7 +46,7 @@ public class CtlRelationshipsDao extends AbstractDao<CtlRelationships>{
 	}
 	
 	public CtlRelationships findByValue(String value) {
-		Query query = entityManager.createQuery("select x from " + this.modelClass.getName() + " x where x.value=? and x.active=true");
+		Query query = entityManager.createQuery("select x from " + this.modelClass.getName() + " x where x.value=?1 and x.active=true");
 		query.setParameter(1, value);
 		
 		return this.getSingleResultOrNull(query);

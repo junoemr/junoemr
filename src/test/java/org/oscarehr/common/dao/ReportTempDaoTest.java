@@ -37,15 +37,23 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ReportTemp;
 import org.oscarehr.common.model.ReportTempPK;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ReportTempDaoTest extends DaoTestFixtures {
-	protected ReportTempDao dao = (ReportTempDao)SpringUtils.getBean(ReportTempDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ReportTempDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ReportTempDao reportTempDao;
+
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
 	@Before
@@ -79,20 +87,20 @@ public class ReportTempDaoTest extends DaoTestFixtures {
 		ReportTemp reportTemp1 = new ReportTemp();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp1);
 		reportTemp1.setId(reportTempPK1);
-		dao.persist(reportTemp1);
+		reportTempDao.persist(reportTemp1);
 		
 		ReportTemp reportTemp2 = new ReportTemp();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp2);
 		reportTemp2.setId(reportTempPK2);
-		dao.persist(reportTemp2);
+		reportTempDao.persist(reportTemp2);
 		
 		ReportTemp reportTemp3 = new ReportTemp();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp3);
 		reportTemp3.setId(reportTempPK3);
-		dao.persist(reportTemp3);	
+		reportTempDao.persist(reportTemp3);
 		
 		List<ReportTemp> expectedResult = new ArrayList<ReportTemp>(Arrays.asList(reportTemp1, reportTemp2, reportTemp3));
-		List<ReportTemp> result = dao.findAll();
+		List<ReportTemp> result = reportTempDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

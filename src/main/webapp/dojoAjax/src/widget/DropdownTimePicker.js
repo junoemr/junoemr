@@ -60,7 +60,7 @@ dojo.widget.defineWidget(
 
 		timeFormat: "", // deprecated, will be removed for 0.5
 
-//FIXME: need saveFormat attribute support
+//FIXME-legacy: need saveFormat attribute support
 		// saveFormat: String
 		//	Formatting scheme used when submitting the form element.  This formatting is used in a hidden
 		//  field (name) intended for server use, and is therefore typically locale-independent.
@@ -83,7 +83,7 @@ dojo.widget.defineWidget(
 			var messages = dojo.i18n.getLocalization("dojo.widget", "DropdownTimePicker", this.lang);
 			this.iconAlt = messages.selectTime;
 
-			//FIXME: should this be if/else/else?
+			//FIXME-legacy: should this be if/else/else?
 			if(typeof(this.value)=='string'&&this.value.toLowerCase()=='today'){
 				this.value = new Date();
 			}
@@ -212,7 +212,7 @@ dojo.widget.defineWidget(
 				}
 			}
 			// If the time entered didn't parse, reset to the old time.  KISS, for now.
-			//TODO: usability?  should we provide more feedback somehow? an error notice?
+			//TODO-legacy: usability?  should we provide more feedback somehow? an error notice?
 			// seems redundant to do this if the parse failed, but at least until we have validation,
 			// this will fix up the display of entries like 01/32/2006
 			if(input){ this._updateText(); }

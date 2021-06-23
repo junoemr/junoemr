@@ -98,7 +98,7 @@
 
     if (network != null) {
 
-        // TODO: figure out if we are using codes or valuesets (use SharingCenterUtil)
+        // TODO-legacy: figure out if we are using codes or valuesets (use SharingCenterUtil)
         mappingType = "codes"; // or "svs"
 
         // prepare the code/svs sets
@@ -136,7 +136,7 @@
             }
 
         } else if (mappingType.equals("svs")) {
-            // TODO: populate svs code sets
+            // TODO-legacy: populate svs code sets
         }
 
         // get current site mapping

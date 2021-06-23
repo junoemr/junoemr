@@ -29,17 +29,23 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.BillingPrivateTransactions;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.entities.PrivateBillTransaction;
 import oscar.oscarBilling.ca.bc.data.PrivateBillTransactionsDAO;
 
-public class PrivateBillTransactionsDaoTest extends DaoTestFixtures {;
-
-	public PrivateBillTransactionsDAO dao = SpringUtils.getBean(PrivateBillTransactionsDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PrivateBillTransactionsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public PrivateBillTransactionsDAO privateBillTransactionsDAO;
 
 	@Before
 	public void before() throws Exception {
@@ -48,10 +54,10 @@ public class PrivateBillTransactionsDaoTest extends DaoTestFixtures {;
 
 	@Test
 	public void testAllAtOnce() {
-		BillingPrivateTransactions tx = dao.savePrivateBillTransaction(99999, 100.00, 5);
+		BillingPrivateTransactions tx = privateBillTransactionsDAO.savePrivateBillTransaction(99999, 100.00, 5);
 		assertTrue(tx.isPersistent());
 		
-		List<PrivateBillTransaction> txCheck = dao.getPrivateBillTransactions(String.valueOf(tx.getBillingmasterNo()));
+		List<PrivateBillTransaction> txCheck = privateBillTransactionsDAO.getPrivateBillTransactions(String.valueOf(tx.getBillingmasterNo()));
 		boolean match = false;
 		for(PrivateBillTransaction pbt : txCheck) {
 			if (pbt.getId() == tx.getId()) {

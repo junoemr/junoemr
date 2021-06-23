@@ -43,16 +43,23 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PreventionDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PreventionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PreventionDao preventionDao;
 
-	protected PreventionDao dao = (PreventionDao) SpringUtils.getBean(PreventionDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -70,20 +77,20 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		Prevention prevention1 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention1);
 		prevention1.setDemographicId(demographicId1);
-		dao.persist(prevention1);
+		preventionDao.persist(prevention1);
 
 		Prevention prevention2 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention2);
 		prevention2.setDemographicId(demographicId2);
-		dao.persist(prevention2);
+		preventionDao.persist(prevention2);
 
 		Prevention prevention3 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention3);
 		prevention3.setDemographicId(demographicId1);
-		dao.persist(prevention3);
+		preventionDao.persist(prevention3);
 
 		List<Prevention> expectedResult = new ArrayList<Prevention>(Arrays.asList(prevention1, prevention3));
-		List<Prevention> result = dao.findByDemographicId(demographicId1);
+		List<Prevention> result = preventionDao.findByDemographicId(demographicId1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -101,11 +108,11 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		
 		Calendar cal=new GregorianCalendar();
 		cal.add(Calendar.DAY_OF_YEAR, -1);
-		List<Prevention> results=dao.findByUpdateDate(cal.getTime(), 99);
+		List<Prevention> results= preventionDao.findByUpdateDate(cal.getTime(), 99);
 		assertTrue(results.size()>0);
 
 		cal.add(Calendar.DAY_OF_YEAR, 2);
-		results=dao.findByUpdateDate(cal.getTime(), 99);
+		results= preventionDao.findByUpdateDate(cal.getTime(), 99);
 		assertEquals(0, results.size());
 
 	}
@@ -123,28 +130,28 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(prevention1);
 		prevention1.setDemographicId(demographicId1);
 		prevention1.setDeleted(!isDeleted);
-		dao.persist(prevention1);
+		preventionDao.persist(prevention1);
 
 		Prevention prevention2 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention2);
 		prevention2.setDemographicId(demographicId2);
 		prevention2.setDeleted(isDeleted);
-		dao.persist(prevention2);
+		preventionDao.persist(prevention2);
 
 		Prevention prevention3 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention3);
 		prevention3.setDemographicId(demographicId1);
 		prevention3.setDeleted(!isDeleted);
-		dao.persist(prevention3);
+		preventionDao.persist(prevention3);
 
 		Prevention prevention4 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention4);
 		prevention4.setDemographicId(demographicId2);
 		prevention4.setDeleted(!isDeleted);
-		dao.persist(prevention4);
+		preventionDao.persist(prevention4);
 
 		List<Prevention> expectedResult = new ArrayList<Prevention>(Arrays.asList(prevention1, prevention3));
-		List<Prevention> result = dao.findNotDeletedByDemographicId(demographicId1);
+		List<Prevention> result = preventionDao.findNotDeletedByDemographicId(demographicId1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -185,7 +192,7 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention1.setPreventionDate(preventionDate1);//not in
 		prevention1.setDeleted(!isDeleted);//in
 		prevention1.setRefused(isRefused);//not in
-		dao.persist(prevention1);
+		preventionDao.persist(prevention1);
 
 		Prevention prevention2 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention2);
@@ -193,7 +200,7 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention2.setPreventionDate(preventionDate2);//in
 		prevention2.setDeleted(isDeleted);//not in
 		prevention2.setRefused(!isRefused);//in
-		dao.persist(prevention2);
+		preventionDao.persist(prevention2);
 
 		Prevention prevention3 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention3);
@@ -201,7 +208,7 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention3.setPreventionDate(preventionDate3);//in
 		prevention3.setDeleted(!isDeleted);//in
 		prevention3.setRefused(!isRefused);//in
-		dao.persist(prevention3);
+		preventionDao.persist(prevention3);
 
 		Prevention prevention4 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention4);
@@ -209,7 +216,7 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention4.setPreventionDate(preventionDate4);//not in
 		prevention4.setDeleted(isDeleted);//not in
 		prevention4.setRefused(!isRefused);//in
-		dao.persist(prevention4);
+		preventionDao.persist(prevention4);
 
 		Prevention prevention5 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention5);
@@ -217,10 +224,10 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention5.setPreventionDate(preventionDate5);//in
 		prevention5.setDeleted(!isDeleted);//in
 		prevention5.setRefused(!isRefused);//in
-		dao.persist(prevention5);
+		preventionDao.persist(prevention5);
 
 		List<Prevention> expectedResult = new ArrayList<Prevention>(Arrays.asList(prevention5, prevention3));
-		List<Prevention> result = dao.findByTypeAndDate(preventionType1, preventionStartDate, preventionEndDate);
+		List<Prevention> result = preventionDao.findByTypeAndDate(preventionType1, preventionStartDate, preventionEndDate);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -258,7 +265,7 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention1.setDemographicId(demographicId1);
 		prevention1.setDeleted(!isDeleted);
 		prevention1.setPreventionDate(preventionDate1);
-		dao.persist(prevention1);
+		preventionDao.persist(prevention1);
 
 		Prevention prevention2 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention2);
@@ -266,7 +273,7 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention2.setDemographicId(demographicId2);
 		prevention2.setDeleted(isDeleted);
 		prevention2.setPreventionDate(preventionDate2);
-		dao.persist(prevention2);
+		preventionDao.persist(prevention2);
 
 		Prevention prevention3 = new Prevention();
 		EntityDataGenerator.generateTestDataForModelClass(prevention3);
@@ -274,10 +281,10 @@ public class PreventionDaoTest extends DaoTestFixtures {
 		prevention3.setDemographicId(demographicId1);
 		prevention3.setDeleted(!isDeleted);
 		prevention3.setPreventionDate(preventionDate3);
-		dao.persist(prevention3);
+		preventionDao.persist(prevention3);
 
 		List<Prevention> expectedResult = new ArrayList<Prevention>(Arrays.asList(prevention3, prevention1));
-		List<Prevention> result = dao.findByTypeAndDemoNo(preventionType1, demographicId1);
+		List<Prevention> result = preventionDao.findByTypeAndDemoNo(preventionType1, demographicId1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -296,7 +303,7 @@ public class PreventionDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindActiveByDemoId() {
-		assertNotNull(dao.findActiveByDemoId(199));
+		assertNotNull(preventionDao.findActiveByDemoId(199));
 	}
 
 }

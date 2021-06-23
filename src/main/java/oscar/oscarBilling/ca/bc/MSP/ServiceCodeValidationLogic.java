@@ -30,7 +30,7 @@ import oscar.util.UtilMisc;
  *
  * <p>Title:ServiceCodeValidationLogic </p>
  * 
- * @todo Should be renamed to something more appropriate eg ServiceCodeDAO
+ * @todo-legacy Should be renamed to something more appropriate eg ServiceCodeDAO
  * <p>Description: </p>
  * <p>Responsible for service code validation
  * @author Joel Legris

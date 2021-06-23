@@ -423,7 +423,7 @@ public class MeasurementFormatter {
 		return sb.toString();
 	}
 	
-	//TODO: No ADD HERE?
+	//TODO-legacy: No ADD HERE?
 	public String getCycloplegicRefraction() {
 		StringBuilder sb = new StringBuilder();
 		if(isPresent("od_cycloplegic_refraction_sph")) {

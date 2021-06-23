@@ -35,7 +35,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class FileFactory
 {
@@ -96,6 +103,30 @@ public class FileFactory
 	}
 
 	/**
+	 * save and load a new log with the given name and input stream
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the file to be saved and opened
+	 * @return - the file
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
+	 */
+	public static GenericFile createImportLogFile(InputStream fileInputStream, String fileName, String identifier) throws IOException, InterruptedException
+	{
+		return createNewFormattedFile(fileInputStream, fileName, Paths.get(GenericFile.LOG_IMPORT_DIR, identifier).toString(), false);
+	}
+
+	/**
+	 * save and load a new log with the given name and input stream
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the file to be saved and opened
+	 * @return - the file
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
+	 */
+	public static GenericFile createExportLogFile(InputStream fileInputStream, String fileName, String identifier) throws IOException, InterruptedException
+	{
+		return createNewFormattedFile(fileInputStream, fileName, Paths.get(GenericFile.LOG_EXPORT_DIR, identifier).toString(), false);
+	}
+
+	/**
 	 * create a new temp file
 	 * @param suffix - suffix of filename, usually the desired extension
 	 * @return the file
@@ -107,6 +138,25 @@ public class FileFactory
 		logger.info("Created tempfile: " + file.getPath());
 		return getExistingFile(file);
 	}
+
+	/**
+	 * Write the input stream to a tempfile
+	 * @param directory - the directory to create the tempFile in
+	 * @param suffix - suffix of filename, usually the desired extension
+	 * @return the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile createTempFile(Path directory, String suffix) throws IOException
+	{
+		if(directory == null)
+		{
+			return createTempFile(suffix);
+		}
+		File file = Files.createTempFile(directory, "juno", suffix).toFile();
+		logger.info("Created tempfile: " + file.getPath());
+		return getExistingFile(file);
+	}
+
 	/**
 	 * Write the input stream to a tempfile
 	 * @param fileInputStream - input stream of the new file
@@ -117,6 +167,21 @@ public class FileFactory
 	public static GenericFile createTempFile(InputStream fileInputStream, String suffix) throws IOException, InterruptedException
 	{
 		File file = File.createTempFile("juno", suffix);
+		logger.info("Created tempfile: " + file.getPath());
+		return writeInputStream(fileInputStream, file, true, true);
+	}
+
+	/**
+	 * Write the input stream to a tempfile
+	 * @param fileInputStream - input stream of the new file
+	 * @param directory - the directory to create the tempFile in
+	 * @param suffix - suffix of filename, usually the desired extension
+	 * @return the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile createTempFile(InputStream fileInputStream, Path directory, String suffix) throws IOException, InterruptedException
+	{
+		File file = Files.createTempFile(directory, "juno", suffix).toFile();
 		logger.info("Created tempfile: " + file.getPath());
 		return writeInputStream(fileInputStream, file, true, true);
 	}
@@ -132,6 +197,34 @@ public class FileFactory
 		File file = File.createTempFile("juno", suffix);
 		logger.info("Created tempfile: " + file.getPath());
 		return writeOutputStream(outputStream, file);
+	}
+
+	/**
+	 * create a temp directory
+	 * @return - the directory path
+	 * @throws IOException
+	 */
+	public static Path createTempDirectory() throws IOException
+	{
+		Path tempDir = Files.createTempDirectory("juno");
+		logger.info("Created temp directory: " + tempDir.toString());
+		return tempDir;
+	}
+
+	/**
+	 * create a sub directory within the base directory
+	 * @return - the directory path
+	 * @throws IOException
+	 */
+	public static Path createSubDirectoryIfNotExists(Path baseDirectory, String subDirectory) throws IOException
+	{
+		Path subDir = Paths.get(baseDirectory.toString(), subDirectory);
+		if(!subDir.toFile().exists())
+		{
+			Files.createDirectory(subDir);
+			logger.info("Created sub directory: " + subDir.toString());
+		}
+		return subDir;
 	}
 
 	/**
@@ -154,6 +247,24 @@ public class FileFactory
 	public static GenericFile getDocumentFile(String fileName) throws IOException
 	{
 		return getExistingFile(GenericFile.DOCUMENT_BASE_DIR, fileName);
+	}
+
+	/**
+	 * load an existing hrm file with the given name
+	 * checks the hrm directory with a fallback to the main document location
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getHrmFile(String fileName) throws IOException
+	{
+		if(fileExists(GenericFile.HRM_BASE_DIR, fileName))
+		{
+			return getExistingFile(GenericFile.HRM_BASE_DIR, fileName);
+		}
+		else
+		{
+			return getDocumentFile(fileName);
+		}
 	}
 
 	/**
@@ -232,6 +343,26 @@ public class FileFactory
 	}
 
 	/**
+	 * load an existing log file
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getImportLogFile(String identifier, String fileName) throws IOException
+	{
+		return getExistingFile(Paths.get(GenericFile.LOG_IMPORT_DIR, identifier).toString(), fileName);
+	}
+
+	/**
+	 * load an existing log file
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getExportLogFile(String identifier, String fileName) throws IOException
+	{
+		return getExistingFile(Paths.get(GenericFile.LOG_EXPORT_DIR, identifier).toString(), fileName);
+	}
+
+	/**
 	 * overwrite a resource file
 	 * @param newFileContent the content to overwrite the file with
 	 * @param fileName the name of the file to overwrite
@@ -286,6 +417,64 @@ public class FileFactory
 	}
 
 	/**
+	 * unpacks a zip file to the same directory as the zip file. does not attempt to modify, rename, or reprocess contained files.
+	 * preserves sub directory structure within the zip
+	 * @param zip - the zip file
+	 * @return - the list of files within the zip
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static List<GenericFile> unpackZipFile(ZIPFile zip) throws IOException, InterruptedException
+	{
+		return unpackZipFile(zip, zip.getDirectory());
+	}
+
+	/**
+	 * unpacks a zip file to the specified directory. does not attempt to modify, rename, or reprocess contained files.
+	 * preserves sub directory structure within the zip
+	 * @param zip - the zip file
+	 * @param directory - the output directory
+	 * @return - the list of files within the zip
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static List<GenericFile> unpackZipFile(ZIPFile zip, String directory) throws IOException, InterruptedException
+	{
+		List<GenericFile> unzippedFiles = new ArrayList<>();
+
+		ZipFile zipFile = new ZipFile(zip.getFileObject());
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+		try
+		{
+			while(entries.hasMoreElements())
+			{
+				ZipEntry entry = entries.nextElement();
+
+				String entryName = FilenameUtils.getName(entry.getName());
+				String entryDirectory = FilenameUtils.getFullPath(entry.getName());
+				String fullPath = Paths.get(directory, entryDirectory).toString();
+
+				if(!entry.isDirectory())
+				{
+					unzippedFiles.add(createNewFile(zipFile.getInputStream(entry), entryName, fullPath, false));
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			// clean up files in the event of an error
+			for(GenericFile file : unzippedFiles)
+			{
+				file.deleteFile();
+			}
+			throw e;
+		}
+
+		return unzippedFiles;
+	}
+
+	/**
 	 * creates a new file with the given name an content. NOTE a datatime string is prepended to the file name.
 	 * @param fileInputStream content to be placed in the file
 	 * @param fileName the file name to use for the file
@@ -330,11 +519,7 @@ public class FileFactory
 		}
 
 		File file = new File(directory.getPath(), fileName);
-		if (!reprocess)
-		{
-			return writeInputStream(fileInputStream, file, false, false);
-		}
-		return writeInputStream(fileInputStream, file, false, true);
+		return writeInputStream(fileInputStream, file, false, reprocess);
 	}
 
 	private static GenericFile writeInputStream(InputStream fileInputStream, File file, boolean allowOverwrite, boolean reprocess) throws IOException, InterruptedException
@@ -418,9 +603,13 @@ public class FileFactory
 			{
 				genFile = new PDFFile(file);
 			}
-			else if("application/xml".equals(fileContent))
+			else if("application/xml".equals(fileContent) || "text/xml".equals(fileContent))
 			{
 				genFile = new XMLFile(file);
+			}
+			else if("application/zip".equals(fileContent))
+			{
+				genFile = new ZIPFile(file);
 			}
 			else
 			{

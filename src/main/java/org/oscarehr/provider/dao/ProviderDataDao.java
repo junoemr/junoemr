@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static java.util.Collections.EMPTY_LIST;
+
 @Repository
 @Transactional
 public class ProviderDataDao extends AbstractDao<ProviderData>
@@ -53,7 +55,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 	public ProviderData findByOhipNumber(String ohipNumber) {
 		Query query;
 		List<ProviderData> results;
-		String sqlCommand = "SELECT x FROM ProviderData x WHERE x.ohipNo=?";
+		String sqlCommand = "SELECT x FROM ProviderData x WHERE x.ohipNo=?1";
 
 		query = this.entityManager.createQuery(sqlCommand);
 		query.setParameter(1, ohipNumber);
@@ -88,7 +90,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 
 	public List<ProviderData> findByProviderNo(String providerNo, String status, int limit, int offset) {
 
-		String sqlCommand = "From ProviderData p where p.id like ?";
+		String sqlCommand = "From ProviderData p where p.id like ?1";
 
 		if(status != null) 
 			sqlCommand += " and p.status = :status ";
@@ -148,7 +150,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
     public List<ProviderData> findByProviderSite(String providerNo)
     {
 	    String queryStr = "select * from provider p inner join providersite s on s.provider_no = p.provider_no " +
-			    "WHERE s.site_id in (select site_id from providersite where provider_no=?) " +
+			    "WHERE s.site_id in (select site_id from providersite where provider_no=?1) " +
 			    "ORDER BY p.last_name, p.first_name";
 
 		Query query = entityManager.createNativeQuery(queryStr, modelClass);
@@ -205,7 +207,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
     public List<ProviderData> findByProviderTeam(String providerNo) {
     	
 		String queryStr = "select * from provider p  " +
-				"where team in (select team from provider where team is not null and team <> '' and provider_no=?)";
+				"where team in (select team from provider where team is not null and team <> '' and provider_no=?1)";
 
 		Query query = entityManager.createNativeQuery(queryStr, modelClass);
         query.setParameter(1, providerNo);
@@ -251,10 +253,24 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 	 * 		Returns all the active matching providers.
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ProviderData> findByType(String providerType) {
-		Query query = createQuery("p", "p.providerType = :pt and p.status = '1' order by p.lastName, p.firstName");
-		query.setParameter("pt", providerType);
+	public List<ProviderData> findByType(String providerType)
+	{
+		Query query = createQuery("p", "p.providerType = :providerType and p.status = '1' order by p.lastName, p.firstName");
+		query.setParameter("providerType", providerType);
 		return query.getResultList();
+	}
+
+	public List<ProviderData> findAllByType(List<String> providerTypes)
+	{
+		if (providerTypes == null || providerTypes.isEmpty())
+		{
+			return (List<ProviderData>)EMPTY_LIST;
+		}
+		Query query = createQuery("p", "p.providerType IN (:providerTypes) AND p.status = '1' ORDER BY p.lastName, p.firstName");
+		query.setParameter("providerTypes", providerTypes);
+
+		List<ProviderData> resultList = query.getResultList();
+		return resultList;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -345,5 +361,12 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		}
 		String result = resultList.get(0);
 		return (ConversionUtils.fromIntString(result)) + 1;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ProviderData> findNoteEditors(String noteUuid) {
+		Query query = entityManager.createQuery("SELECT distinct p FROM ProviderData p INNER JOIN p.caseManagementNotes cmn WHERE cmn.uuid = :uuid");
+		query.setParameter("uuid", noteUuid);
+		return query.getResultList();
 	}
 }

@@ -12,7 +12,7 @@ dojo.provide("dojo.lang.array");
 
 dojo.require("dojo.lang.common");
 
-// FIXME: Is this worthless since you can do: if(name in obj)
+// FIXME-legacy: Is this worthless since you can do: if(name in obj)
 // is this the right place for this?
 
 dojo.lang.mixin(dojo.lang, {
@@ -116,7 +116,7 @@ dojo.lang.mixin(dojo.lang, {
 			}
 		}else{
 			// un-fsck the default order
-			// FIXME:
+			// FIXME-legacy:
 			//		could be wrong for some strange function object cases. Not
 			//		sure how to test for them.
 			if(dojo.lang.isFunction(obj)){
@@ -149,7 +149,7 @@ dojo.lang.mixin(dojo.lang, {
 		if(Array.forEach){
 			Array.forEach(anArray, callback, thisObject);
 		}else{
-			// FIXME: there are several ways of handilng thisObject. Is dj_global always the default context?
+			// FIXME-legacy: there are several ways of handilng thisObject. Is dj_global always the default context?
 			if(!thisObject){
 				thisObject=dj_global;
 			}

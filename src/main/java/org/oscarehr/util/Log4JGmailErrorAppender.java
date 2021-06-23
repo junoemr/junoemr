@@ -22,15 +22,11 @@
  */
 package org.oscarehr.util;
 
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Priority;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
 
 /**
  * This appender is very specific in that it is meant
@@ -67,13 +63,14 @@ public class Log4JGmailErrorAppender extends AppenderSkeleton implements ThreadF
 	private String smtpSslPort="465";
 	private String subject="Server Error";
 	private String recipientEmailAddress=null;
-	
+
+	/*
 	@Override
 	protected void append(LoggingEvent event)
 	{
 		try
 		{
-			int level=event.getLevel().toInt();
+			int level = event.getLevel().toInt();
 			if (level>=Priority.ERROR_INT && level<=Priority.FATAL_INT)
 			{
 				StringBuilder sb=new StringBuilder();
@@ -119,6 +116,8 @@ public class Log4JGmailErrorAppender extends AppenderSkeleton implements ThreadF
 	{
 		return false;
 	}
+
+	 */
 
 //	@Override
 	public Thread newThread(Runnable runnable)

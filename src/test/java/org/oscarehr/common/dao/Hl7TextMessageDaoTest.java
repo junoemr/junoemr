@@ -36,15 +36,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Hl7TextMessageDaoTest extends DaoTestFixtures {
-	
-	protected Hl7TextMessageDao dao = (Hl7TextMessageDao)SpringUtils.getBean(Hl7TextMessageDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Hl7TextMessageDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected Hl7TextMessageDao hl7TextMessageDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -60,20 +66,20 @@ public class Hl7TextMessageDaoTest extends DaoTestFixtures {
 		Hl7TextMessage hl7TextMessage1 = new Hl7TextMessage();
 		EntityDataGenerator.generateTestDataForModelClass(hl7TextMessage1);
 		hl7TextMessage1.setFileUploadCheckId(fileUploadCheckId1);
-		dao.persist(hl7TextMessage1);
+		hl7TextMessageDao.persist(hl7TextMessage1);
 		
 		Hl7TextMessage hl7TextMessage2 = new Hl7TextMessage();
 		EntityDataGenerator.generateTestDataForModelClass(hl7TextMessage2);
 		hl7TextMessage2.setFileUploadCheckId(fileUploadCheckId2);
-		dao.persist(hl7TextMessage2);
+		hl7TextMessageDao.persist(hl7TextMessage2);
 		
 		Hl7TextMessage hl7TextMessage3 = new Hl7TextMessage();
 		EntityDataGenerator.generateTestDataForModelClass(hl7TextMessage3);
 		hl7TextMessage3.setFileUploadCheckId(fileUploadCheckId1);
-		dao.persist(hl7TextMessage3);
+		hl7TextMessageDao.persist(hl7TextMessage3);
 		
 		List<Hl7TextMessage> expectedResult = new ArrayList<Hl7TextMessage>(Arrays.asList(hl7TextMessage1, hl7TextMessage3));
-		List<Hl7TextMessage> result = dao.findByFileUploadCheckId(fileUploadCheckId1);
+		List<Hl7TextMessage> result = hl7TextMessageDao.findByFileUploadCheckId(fileUploadCheckId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

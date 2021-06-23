@@ -53,7 +53,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 	}
 	
 	public Long search_rschedule_overlaps(String providerNo, Date d1, Date d2, Date d3, Date d4, Date d5, Date d6, Date d7, Date d8, Date d9, Date d10, Date d11, Date d12,Date d13,Date d14) {
-		Query query = entityManager.createQuery("select count(r.id) from RSchedule r where r.providerNo=? and ((r.sDate <? and r.eDate >=?) or (? < r.sDate and r.sDate < ?) or (? < r.eDate and r.eDate <= ?) or ( ? < r.sDate and r.eDate <= ?) or (r.sDate = ? and r.sDate = ?) or (r.eDate = ? and r.eDate <= ?) or (r.sDate = ? and r.eDate != ?)) and r.status = 'A'");
+		Query query = entityManager.createQuery("select count(r.id) from RSchedule r where r.providerNo=?1 and ((r.sDate <?2 and r.eDate >=?3) or (?4 < r.sDate and r.sDate < ?5) or (?6 < r.eDate and r.eDate <= ?7) or ( ?8 < r.sDate and r.eDate <= ?9) or (r.sDate = ?10 and r.sDate = ?11) or (r.eDate = ?12 and r.eDate <= ?13) or (r.sDate = ?14 and r.eDate != ?15)) and r.status = 'A'");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, d1);
 		query.setParameter(3, d2);
@@ -86,7 +86,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 	}
 	
 	public RSchedule search_rschedule_current(String providerNo, String available, Date sdate) {
-		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=? and s.available=? and s.sDate <= ? and s.status='A' order by s.sDate desc");
+		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=?1 and s.available=?2 and s.sDate <= ?3 and s.status='A' order by s.sDate desc");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, available);
 		query.setParameter(3, sdate);
@@ -97,7 +97,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 	}
 	
 	public List<RSchedule> search_rschedule_future(String providerNo, String available, Date sdate) {
-		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=? and s.available=? and s.sDate > ? and s.status='A' order by s.sDate");
+		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=?1 and s.available=?2 and s.sDate > ?3 and s.status='A' order by s.sDate");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, available);
 		query.setParameter(3, sdate);
@@ -108,7 +108,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 	}
 	
 	public RSchedule search_rschedule_current1(String providerNo, Date sdate) {
-		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=? and s.sDate <= ? and s.status='A' order by s.sDate desc");
+		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=?1 and s.sDate <= ?2 and s.status='A' order by s.sDate desc");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, sdate);
 		query.setMaxResults(1);
@@ -118,7 +118,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 	}
 	
 	public RSchedule search_rschedule_current2(String providerNo, Date sdate) {
-		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=? and s.sDate >= ? and s.status='A' order by s.sDate");
+		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=?1 and s.sDate >= ?2 and s.status='A' order by s.sDate");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, sdate);
 		query.setMaxResults(1);

@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ReportByExamplesFavorite;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ReportByExamplesFavoriteDaoTest extends DaoTestFixtures {
-
-	protected ReportByExamplesFavoriteDao dao = SpringUtils.getBean(ReportByExamplesFavoriteDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ReportByExamplesFavoriteDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ReportByExamplesFavoriteDao reportByExamplesFavoriteDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,22 +51,22 @@ public class ReportByExamplesFavoriteDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ReportByExamplesFavorite entity = new ReportByExamplesFavorite();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		reportByExamplesFavoriteDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindByQuery() {
-		assertNotNull(dao.findByQuery("QUERY"));
+		assertNotNull(reportByExamplesFavoriteDao.findByQuery("QUERY"));
 	}
 
 	@Test
 	public void testFindByEverything() {
-		assertNotNull(dao.findByEverything("100", "FAV", "QR"));
+		assertNotNull(reportByExamplesFavoriteDao.findByEverything("100", "FAV", "QR"));
 	}
 
     @Test
     public void testFindByProvider() {
-	    assertNotNull(dao.findByProvider("100"));
+	    assertNotNull(reportByExamplesFavoriteDao.findByProvider("100"));
     }
 }

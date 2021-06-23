@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FunctionalCentre;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FunctionalCentreDaoTest extends DaoTestFixtures {
-
-	protected FunctionalCentreDao dao = SpringUtils.getBean(FunctionalCentreDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FunctionalCentreDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FunctionalCentreDao functionalCentreDao;
 
 
 	@Before
@@ -47,7 +53,7 @@ public class FunctionalCentreDaoTest extends DaoTestFixtures {
 		FunctionalCentre entity = new FunctionalCentre();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setAccountId("test");
-		dao.persist(entity);
+		functionalCentreDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

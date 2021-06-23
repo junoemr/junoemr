@@ -12,7 +12,7 @@ dojo.provide("dojo.gfx.color");
 dojo.require("dojo.lang.common");
 dojo.require("dojo.lang.array");
 
-// TODO: rewrite the "x2y" methods to take advantage of the parsing
+// TODO-legacy: rewrite the "x2y" methods to take advantage of the parsing
 //       abilities of the Color object. Also, beef up the Color
 //       object (as possible) to parse most common formats
 

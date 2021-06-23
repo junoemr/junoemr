@@ -29,7 +29,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.generic.CE;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
@@ -45,27 +47,30 @@ import org.oscarehr.e2e.constant.BodyConstants.AbstractBodyConstants;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.director.E2ECreator;
 
-public abstract class AbstractBodyPopulatorTest extends DaoTestFixtures {
+public abstract class AbstractBodyPopulatorTest extends DaoTestFixtures
+{
 	private static ClinicalDocument clinicalDocument;
 	private static ArrayList<Component3> components;
 
 	protected static Component3 component;
 	protected static AbstractBodyConstants bodyConstants;
 
-	@BeforeClass
-	public static void abstractBeforeClass() throws Exception {
+	@Before
+	public void abstractBeforeClass() throws Exception
+	{
 		SchemaUtils.restoreTable(Constants.Runtime.TABLES);
 		assertEquals(0, SchemaUtils.loadFileIntoMySQL(Constants.Runtime.E2E_SETUP));
 	}
 
 	// This must be called in the BeforeClass or things will break
-	protected static void setupClass(AbstractBodyConstants constants) {
+	protected void setupClass(AbstractBodyConstants constants)
+	{
 		clinicalDocument = E2ECreator.createEmrConversionDocument(Constants.Runtime.VALID_DEMOGRAPHIC);
 		components = clinicalDocument.getComponent().getBodyChoiceIfStructuredBody().getComponent();
 		bodyConstants = constants;
 
-		for(Component3 value : components) {
-			if(value.getSection().getTemplateId().contains(new II(bodyConstants.WITH_ENTRIES_TEMPLATE_ID)) ||
+		for (Component3 value : components) {
+			if (value.getSection().getTemplateId().contains(new II(bodyConstants.WITH_ENTRIES_TEMPLATE_ID)) ||
 					value.getSection().getTemplateId().contains(new II(bodyConstants.WITHOUT_ENTRIES_TEMPLATE_ID))) {
 				component = value;
 				break;

@@ -27,13 +27,19 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FormDaoTest extends DaoTestFixtures {
-
-	protected FormsDao dao = SpringUtils.getBean(FormsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FormDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FormsDao formsDao;
 
 	@Before
 	public void before() throws Exception {
@@ -42,11 +48,11 @@ public class FormDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindIdFormCreatedAndPatientNameFromFormLabReq07() {
-		assertNotNull(dao.findIdFormCreatedAndPatientNameFromFormLabReq07());
+		assertNotNull(formsDao.findIdFormCreatedAndPatientNameFromFormLabReq07());
 	}
 
 	@Test
 	public void testFindFormCreatedFromFormLabReq07ById() {
-		assertNotNull(dao.findFormCreatedFromFormLabReq07ById(100));
+		assertNotNull(formsDao.findFormCreatedFromFormLabReq07ById(100));
 	}
 }

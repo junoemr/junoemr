@@ -35,7 +35,7 @@ import javax.persistence.Table;
 public class FormLabReq07 extends AbstractModel<Integer> {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="ID")
 	private Integer id;
 

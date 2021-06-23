@@ -229,7 +229,7 @@ public class EctDisplayIssuesAction extends EctDisplayAction {
 	public String getCmd() {
 		return cmd;
 	}
-	
+
 	public boolean containsIssue(String[]  issues, String issueCode) {
 		for (String caseManagementIssue : issues) {
 			if (caseManagementIssue.equals(issueCode)) {

@@ -69,7 +69,7 @@ public class EyeformConsultationReportDao extends AbstractDao<EyeformConsultatio
 				sql += " AND ";
 				pos++;
 			}
-			sql += "x.status = ?";
+			sql += "x.status = ?" + pos;
 			params.put(pos, queryBean.getStatus());
 		}
 		if(queryBean.getProviderNo() != null) {
@@ -80,7 +80,7 @@ public class EyeformConsultationReportDao extends AbstractDao<EyeformConsultatio
 				sql += " AND ";
 				pos++;
 			}
-			sql += "x.providerNo = ?";
+			sql += "x.providerNo = ?" + pos;
 			params.put(pos, queryBean.getProviderNo());
 		}
 		if(queryBean.getDemographicNo() > 0) {
@@ -91,10 +91,10 @@ public class EyeformConsultationReportDao extends AbstractDao<EyeformConsultatio
 				sql += " AND ";
 				pos++;
 			}
-			sql += "x.demographicNo = ?";
+			sql += "x.demographicNo = ?" + pos;
 			params.put(pos, queryBean.getDemographicNo());
 		}
-		
+
 		if(startDate != null) {
 			if(pos == 0) {
 				sql += "WHERE ";
@@ -103,10 +103,10 @@ public class EyeformConsultationReportDao extends AbstractDao<EyeformConsultatio
 				sql += " AND ";
 				pos++;
 			}
-			sql += "x.date >=?";
+			sql += "x.date >=?" + pos;
 			params.put(pos, startDate);
 		}
-		
+
 		if(endDate != null) {
 			if(pos == 0) {
 				sql += "WHERE ";
@@ -115,19 +115,19 @@ public class EyeformConsultationReportDao extends AbstractDao<EyeformConsultatio
 				sql += " AND ";
 				pos++;
 			}
-			sql += "x.date <=?";
+			sql += "x.date <=?" + pos;
 			params.put(pos, endDate);
 		}
-		
-		
+
+
 		Query query = entityManager.createQuery(sql);
 		for(Integer p:params.keySet()) {
 			query.setParameter(p,params.get(p));
 		}
-		 
+
 		@SuppressWarnings("unchecked")
-	    List<EyeformConsultationReport> results=query.getResultList();
-	    return(results);
+		List<EyeformConsultationReport> results=query.getResultList();
+		return(results);
 	}
 
 }

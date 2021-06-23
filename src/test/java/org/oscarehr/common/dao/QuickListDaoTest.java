@@ -34,16 +34,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.QuickList;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class QuickListDaoTest extends DaoTestFixtures {
-
-	// TODO Make it protected when test ignores are merged in
-	private QuickListDao dao = SpringUtils.getBean(QuickListDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class QuickListDaoTest extends DaoTestFixtures
+{
+	// TODO-legacy Make it protected when test ignores are merged in
+	@Autowired
+	private QuickListDao quickListDao;
 
 	public QuickListDaoTest() {
 	}
@@ -57,7 +63,7 @@ public class QuickListDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                  QuickList ql = new QuickList();
                  EntityDataGenerator.generateTestDataForModelClass(ql);
-                 dao.persist(ql);
+                 quickListDao.persist(ql);
                  assertNotNull(ql.getId());
         }
 
@@ -78,24 +84,24 @@ public class QuickListDaoTest extends DaoTestFixtures {
 		quickList1.setQuickListName(quickListName1);
 		quickList1.setDxResearchCode(dxResearchCode1);
 		quickList1.setCodingSystem(codingSystem1);
-		dao.persist(quickList1);
+		quickListDao.persist(quickList1);
 		
 		QuickList quickList2 = new QuickList();
 		EntityDataGenerator.generateTestDataForModelClass(quickList2);
 		quickList2.setQuickListName(quickListName2);
 		quickList2.setDxResearchCode(dxResearchCode2);
 		quickList2.setCodingSystem(codingSystem2);
-		dao.persist(quickList2);
+		quickListDao.persist(quickList2);
 		
 		QuickList quickList3 = new QuickList();
 		EntityDataGenerator.generateTestDataForModelClass(quickList3);
 		quickList3.setQuickListName(quickListName1);
 		quickList3.setDxResearchCode(dxResearchCode1);
 		quickList3.setCodingSystem(codingSystem1);
-		dao.persist(quickList3);
+		quickListDao.persist(quickList3);
 		
 		List<QuickList> expectedResult = new ArrayList<QuickList>(Arrays.asList(quickList1, quickList3));
-		List<QuickList> result = dao.findByNameResearchCodeAndCodingSystem(quickListName1, dxResearchCode1, codingSystem1);
+		List<QuickList> result = quickListDao.findByNameResearchCodeAndCodingSystem(quickListName1, dxResearchCode1, codingSystem1);
 
 		Logger logger = MiscUtils.getLogger();
 		

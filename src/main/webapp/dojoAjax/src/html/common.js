@@ -19,7 +19,7 @@ dojo.html.body = function(){
 	return dojo.body();
 }
 
-// FIXME: we are going to assume that we can throw any and every rendering
+// FIXME-legacy: we are going to assume that we can throw any and every rendering
 // engine into the IE 5.x box model. In Mozilla, we do this w/ CSS.
 // Need to investigate for KHTML and Opera
 
@@ -99,7 +99,7 @@ dojo.html.getAttribute = function(/* HTMLElement */node, /* string */attr){
 	//	summary
 	//	Returns the value of attribute attr from node.
 	node = dojo.byId(node);
-	// FIXME: need to add support for attr-specific accessors
+	// FIXME-legacy: need to add support for attr-specific accessors
 	if((!node)||(!node.getAttribute)){
 		// if(attr !== 'nwType'){
 		//	alert("getAttr of '" + attr + "' with bad node"); 
@@ -179,7 +179,7 @@ if(dojo.render.html.ie && !dojo.render.html.ie70){
 	//only define createExternalElement for IE in none https to avoid "mixed content" warning dialog
 	if(window.location.href.substr(0,6).toLowerCase() != "https:"){
 		(function(){
-			// FIXME: this seems not to work correctly on IE 7!!
+			// FIXME-legacy: this seems not to work correctly on IE 7!!
 
 			//The trick is to define a function in a script.src property:
 			// <script src="javascript:'function createExternalElement(){...}'"></script>,

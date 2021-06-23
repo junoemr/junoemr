@@ -39,7 +39,7 @@ public class CaisiFormDataDao extends AbstractDao<CaisiFormData>{
 	}
 	
 	   public List<CaisiFormData> findByInstanceId(Integer instanceId) {
-	        Query query = entityManager.createQuery("SELECT f FROM CaisiFormData f where f.instanceId = ?");
+	        Query query = entityManager.createQuery("SELECT f FROM CaisiFormData f where f.instanceId = ?1");
 			query.setParameter(1,instanceId);
 			
 			@SuppressWarnings("unchecked")
@@ -50,7 +50,7 @@ public class CaisiFormDataDao extends AbstractDao<CaisiFormData>{
 	   
 	   
 	   public List<CaisiFormData> find(Integer instanceId, Integer pageNumber, Integer sectionId, Integer questionId) {
-	        Query query = entityManager.createQuery("SELECT f FROM CaisiFormData f where f.instanceId = ? and f.pageNumber = ? and f.sectionId = ? and f.questionId = ?");
+	        Query query = entityManager.createQuery("SELECT f FROM CaisiFormData f where f.instanceId = ?1 and f.pageNumber = ?2 and f.sectionId = ?3 and f.questionId = ?4");
 			query.setParameter(1,instanceId);
 			query.setParameter(2,pageNumber);
 			query.setParameter(3,sectionId);

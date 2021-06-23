@@ -78,7 +78,7 @@ dojo.lang.extend(dojo.html.BackgroundIframe, {
 		//		Call this function if the iframe is connected to dojo.body()
 		//		rather than the node being shadowed 
 
-		//	(TODO: erase)
+		//	(TODO-legacy: erase)
 		if(!this.iframe){ return; }
 		var coords = dojo.html.toCoordinateObject(node, true, dojo.html.boxSizing.BORDER_BOX);
 		with(this.iframe.style){

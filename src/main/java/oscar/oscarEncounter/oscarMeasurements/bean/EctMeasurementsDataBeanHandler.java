@@ -27,7 +27,6 @@ package oscar.oscarEncounter.oscarMeasurements.bean;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -136,8 +135,8 @@ public class EctMeasurementsDataBeanHandler {
         return true;
     }
 
-    public Collection<EctMeasurementsDataBean> getMeasurementsDataVector(){
-        return measurementsDataVector;
+	public List<EctMeasurementsDataBean> getMeasurementsData(){
+			return measurementsDataVector;
     }
 
     public static Hashtable<String,String> getMeasurementDataById(String id){

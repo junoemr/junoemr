@@ -20,7 +20,7 @@ dojo.widget.defineWidget(
 	"dojo.widget.TreeRpcControllerV3",
 	dojo.widget.TreeLoadingControllerV3,
 {
-	// TODO: do something with addChild / setChild, so that RpcController become able
+	// TODO-legacy: do something with addChild / setChild, so that RpcController become able
 	// to hook on this and report to server
 
 	extraRpcOnEdit: false,
@@ -254,7 +254,7 @@ dojo.widget.defineWidget(
 			
 	
 	/**
-	 * TODO: merge server-side info
+	 * TODO-legacy: merge server-side info
 	 */
 	createAndEdit: function(parent, index, sync) {
 		var data = {title:parent.tree.defaultChildTitle};
@@ -393,7 +393,7 @@ dojo.widget.defineWidget(
 		return deferred;
 	},
 	
-	// TODO: merge server data into cloned node, like in createChild	
+	// TODO-legacy: merge server data into cloned node, like in createChild	
 	doClone: function(child, newParent, index, deep, sync) {
 		
 		var params = {

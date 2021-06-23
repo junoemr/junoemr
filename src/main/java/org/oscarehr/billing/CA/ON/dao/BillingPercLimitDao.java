@@ -53,7 +53,7 @@ public class BillingPercLimitDao extends AbstractDao<BillingPercLimit>{
     }
 
     public BillingPercLimit findByServiceCodeAndEffectiveDate(String serviceCode,Date effectiveDate) {
-    	String sql = "select x from BillingPercLimit x where x.service_code=? and x.effective_date=?";
+    	String sql = "select x from BillingPercLimit x where x.service_code=?1 and x.effective_date=?2";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,serviceCode);
     	query.setParameter(2, effectiveDate);

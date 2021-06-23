@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.ON.model.BillingONDiskName;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingONDiskNameDaoTest extends DaoTestFixtures{
-
-	public BillingONDiskNameDao dao = SpringUtils.getBean(BillingONDiskNameDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingONDiskNameDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingONDiskNameDao billingONDiskNameDao;
 
 	public BillingONDiskNameDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class BillingONDiskNameDaoTest extends DaoTestFixtures{
 	public void testCreate() throws Exception {
 		BillingONDiskName entity = new BillingONDiskName();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billingONDiskNameDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

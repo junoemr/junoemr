@@ -32,15 +32,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SecurityDaoTest extends DaoTestFixtures {
-	
-	protected SecurityDao dao = SpringUtils.getBean(SecurityDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SecurityDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SecurityDao securityDao;
 	
 	@Override
 	@Test
@@ -66,25 +72,25 @@ public class SecurityDaoTest extends DaoTestFixtures {
 		Security security1 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security1);
 		security1.setUserName(userName1);
-		dao.persist(security1);
+		securityDao.persist(security1);
 		
 		Security security2 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security2);
 		security2.setUserName(userName2);
-		dao.persist(security2);
+		securityDao.persist(security2);
 		
 		Security security3 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security3);
 		security3.setUserName(userName3);
-		dao.persist(security3);
+		securityDao.persist(security3);
 		
 		Security security4 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security4);
 		security4.setUserName(userName4);
-		dao.persist(security4);
+		securityDao.persist(security4);
 		
 		List<Security> expectedResult = new ArrayList<Security>(Arrays.asList(security2, security1, security4, security3));
-		List<Security> result = dao.findAllOrderBy(columnName);
+		List<Security> result = securityDao.findAllOrderBy(columnName);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -111,25 +117,25 @@ public class SecurityDaoTest extends DaoTestFixtures {
 		Security security1 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security1);
 		security1.setProviderNo(providerNo1);
-		dao.persist(security1);
+		securityDao.persist(security1);
 		
 		Security security2 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security2);
 		security2.setProviderNo(providerNo2);
-		dao.persist(security2);
+		securityDao.persist(security2);
 		
 		Security security3 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security3);
 		security3.setProviderNo(providerNo3);
-		dao.persist(security3);
+		securityDao.persist(security3);
 		
 		Security security4 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security4);
 		security4.setProviderNo(providerNo1);
-		dao.persist(security4);
+		securityDao.persist(security4);
 		
 		List<Security> expectedResult = new ArrayList<Security>(Arrays.asList(security1, security4));
-		List<Security> result = dao.findByProviderNo(providerNo1);
+		List<Security> result = securityDao.findByProviderNo(providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -159,25 +165,25 @@ public class SecurityDaoTest extends DaoTestFixtures {
 		Security security1 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security1);
 		security1.setProviderNo(providerNo1);
-		dao.persist(security1);
+		securityDao.persist(security1);
 		
 		Security security2 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security2);
 		security2.setProviderNo(providerNo2);
-		dao.persist(security2);
+		securityDao.persist(security2);
 		
 		Security security3 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security3);
 		security3.setProviderNo(providerNo3);
-		dao.persist(security3);
+		securityDao.persist(security3);
 		
 		Security security4 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security4);
 		security4.setProviderNo(providerNo4);
-		dao.persist(security4);
+		securityDao.persist(security4);
 		
 		List<Security> expectedResult = new ArrayList<Security>(Arrays.asList(security1, security3, security4));
-		List<Security> result = dao.findByLikeProviderNo(likeProvider);
+		List<Security> result = securityDao.findByLikeProviderNo(likeProvider);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -204,19 +210,19 @@ public class SecurityDaoTest extends DaoTestFixtures {
 		Security security1 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security1);
 		security1.setUserName(userName1);
-		dao.persist(security1);
+		securityDao.persist(security1);
 		
 		Security security2 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security2);
 		security2.setUserName(userName2);
-		dao.persist(security2);
+		securityDao.persist(security2);
 		
 		Security security3 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security3);
 		security3.setUserName(userName3);
-		dao.persist(security3);
+		securityDao.persist(security3);
 		
-		Security result = dao.findByUserName(userName1);
+		Security result = securityDao.findByUserName(userName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -240,25 +246,25 @@ public class SecurityDaoTest extends DaoTestFixtures {
 		Security security1 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security1);
 		security1.setUserName(userName1);
-		dao.persist(security1);
+		securityDao.persist(security1);
 		
 		Security security2 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security2);
 		security2.setUserName(userName2);
-		dao.persist(security2);
+		securityDao.persist(security2);
 		
 		Security security3 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security3);
 		security3.setUserName(userName3);
-		dao.persist(security3);
+		securityDao.persist(security3);
 		
 		Security security4 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security4);
 		security4.setUserName(userName4);
-		dao.persist(security4);
+		securityDao.persist(security4);
 		
 		List<Security> expectedResult = new ArrayList<Security>(Arrays.asList(security2, security4));
-		List<Security> result = dao.findByLikeUserName(likeUserName);
+		List<Security> result = securityDao.findByLikeUserName(likeUserName);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -286,25 +292,25 @@ public class SecurityDaoTest extends DaoTestFixtures {
 		Security security1 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security1);
 		security1.setProviderNo(providerNo1);
-		dao.persist(security1);
+		securityDao.persist(security1);
 		
 		Security security2 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security2);
 		security2.setProviderNo(providerNo2);
-		dao.persist(security2);
+		securityDao.persist(security2);
 		
 		Security security3 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security3);
 		security3.setProviderNo(providerNo3);
-		dao.persist(security3);
+		securityDao.persist(security3);
 		
 		Security security4 = new Security();
 		EntityDataGenerator.generateTestDataForModelClass(security4);
 		security4.setProviderNo(providerNo4);
-		dao.persist(security4);
+		securityDao.persist(security4);
 		
 		Security expectedResult = security3;
-		Security result = dao.getByProviderNo(providerNo3);
+		Security result = securityDao.getByProviderNo(providerNo3);
 		
 		assertEquals(expectedResult, result);
 	}

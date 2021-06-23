@@ -81,8 +81,8 @@ public class OLISHL7Handler implements MessageHandler {
 	public int getLastSegmentId() {
 		return this.lastSegmentId;
 	}
-	//TODO: check HIN
-	//TODO: check # of results
+	//TODO-legacy: check HIN
+	//TODO-legacy: check # of results
 	
 	private String getLastUpdateInOLIS(String msg) {
 		oscar.oscarLab.ca.all.parsers.OLISHL7Handler h = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler("OLIS_HL7", msg);

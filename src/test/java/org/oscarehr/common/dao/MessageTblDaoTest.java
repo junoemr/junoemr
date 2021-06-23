@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MessageTbl;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MessageTblDaoTest extends DaoTestFixtures {
-
-	protected MessageTblDao dao = SpringUtils.getBean(MessageTblDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MessageTblDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MessageTblDao messageTblDao;
 
 	public MessageTblDaoTest() {
 	}
@@ -50,7 +56,7 @@ public class MessageTblDaoTest extends DaoTestFixtures {
 		MessageTbl entity = new MessageTbl();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		
-		dao.persist(entity);
+		messageTblDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}

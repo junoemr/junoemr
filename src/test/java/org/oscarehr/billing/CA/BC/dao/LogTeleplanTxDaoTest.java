@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.LogTeleplanTx;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class LogTeleplanTxDaoTest extends DaoTestFixtures {
-
-	public LogTeleplanTxDao dao = SpringUtils.getBean(LogTeleplanTxDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LogTeleplanTxDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public LogTeleplanTxDao logTeleplanTxDao;
 
 	public LogTeleplanTxDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class LogTeleplanTxDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		LogTeleplanTx entity = new LogTeleplanTx();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		logTeleplanTxDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

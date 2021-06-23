@@ -35,6 +35,7 @@ import org.apache.struts.util.MessageResources;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicDrug;
+import org.oscarehr.casemgmt.service.EncounterMedicationService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
@@ -148,7 +149,7 @@ public class EctDisplayRxAction extends EctDisplayAction {
             if (drug.getFullOutLine()!=null) tmp=drug.getFullOutLine().replaceAll(";", " ");
             String strTitle = StringUtils.maxLenString(tmp, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
            // strTitle = "<span " + styleColor + ">" + strTitle + "</span>";
-            strTitle = "<span " + getClassColour(drug, now, month) + ">" + strTitle + "</span>";
+            strTitle = "<span " + EncounterMedicationService.getClassColour(drug, now, month) + ">" + strTitle + "</span>";
             item.setTitle(strTitle);
             item.setLinkTitle(tmp + " " + serviceDateStr + " - " + drug.getEndDate());
             item.setURL("return false;");
@@ -160,49 +161,6 @@ public class EctDisplayRxAction extends EctDisplayAction {
         }
     }
 
-    String getClassColour(Prescription drug, long referenceTime, long durationToSoon){
-        StringBuilder sb = new StringBuilder("class=\"");
-
-        if (drug.isCurrent() && drug.getEndDate() != null && (drug.getEndDate().getTime() - referenceTime <= durationToSoon)) {
-            sb.append("expireInReference ");
-        }
-
-        if ((drug.isCurrent() && !drug.isArchived()) || drug.isLongTerm()) {
-            sb.append("currentDrug ");
-        }
-
-        if (drug.isArchived()) {
-            sb.append("archivedDrug ");
-        }
-
-        if(drug.isExpired()) {
-            sb.append("expiredDrug ");
-        }
-
-        if(drug.isLongTerm()){
-            sb.append("longTermMed ");
-        }
-
-        if(drug.isDiscontinued()){
-            sb.append("discontinued ");
-        }
-
-        if(drug.getOutsideProviderName() !=null && !drug.getOutsideProviderName().equals("")  ) {
-        	sb = new StringBuilder("class=\"");
-        	sb.append("external ");
-        }
-
-        String retval = sb.toString();
-
-        if(retval.equals("class=\"")){
-            return "";
-        }
-
-        return retval.substring(0,retval.length())+"\"";
-
-    }
-
-    
     public String getCmd() {
       return cmd;
     }

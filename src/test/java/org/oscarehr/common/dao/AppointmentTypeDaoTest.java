@@ -34,14 +34,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.AppointmentType;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AppointmentTypeDaoTest extends DaoTestFixtures {
-
-	protected AppointmentTypeDao dao = (AppointmentTypeDao)SpringUtils.getBean(AppointmentTypeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AppointmentTypeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected AppointmentTypeDao appointmentTypeDao;
 
 	@Before
 	public void setup() throws Exception {
@@ -52,7 +58,7 @@ public class AppointmentTypeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		AppointmentType entity = new AppointmentType();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		appointmentTypeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -70,11 +76,11 @@ public class AppointmentTypeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(appointmentType3);
 		appointmentType3.setName("B");
 		
-		dao.persist(appointmentType1);
-		dao.persist(appointmentType2);
-		dao.persist(appointmentType3);
+		appointmentTypeDao.persist(appointmentType1);
+		appointmentTypeDao.persist(appointmentType2);
+		appointmentTypeDao.persist(appointmentType3);
 		
-		List<AppointmentType> result = dao.listAll();
+		List<AppointmentType> result = appointmentTypeDao.listAll();
 		List<AppointmentType> expectedResult = new ArrayList<AppointmentType>(Arrays.asList(
 				appointmentType2, appointmentType3, appointmentType1 ));
 		
@@ -101,11 +107,11 @@ public class AppointmentTypeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(appointmentType3);
 		appointmentType3.setName("B");
 		
-		dao.persist(appointmentType1);
-		dao.persist(appointmentType2);
-		dao.persist(appointmentType3);
+		appointmentTypeDao.persist(appointmentType1);
+		appointmentTypeDao.persist(appointmentType2);
+		appointmentTypeDao.persist(appointmentType3);
 		
-		AppointmentType result = dao.findByAppointmentTypeByName(name);
+		AppointmentType result = appointmentTypeDao.findByAppointmentTypeByName(name);
 		AppointmentType expectedResult = appointmentType1;
 		
 		assertEquals(expectedResult, result);

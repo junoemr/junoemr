@@ -35,7 +35,7 @@ public class DATISGamingFormValidator implements IValidator {
 	 */
 //	@Override
 	public String validate(DATISField field, String value) {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 		
 		return value;
 	}

@@ -25,8 +25,13 @@ package oscar.util;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.dataMigration.model.common.PartialDate;
+import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.util.MiscUtils;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
@@ -65,7 +70,7 @@ public class ConversionUtils {
 	public static final String DATE_PATTERN_YEAR = "yyyy";
 	public static final String DATE_PATTERN_MONTH = "MM";
 	public static final String DATE_PATTERN_DAY = "dd";
-	
+
 	public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 	public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
@@ -78,6 +83,7 @@ public class ConversionUtils {
 
 	public static final String HL7_V2_DATE_TIME_OFFICIAL_PATTERN = "yyyyMMddHHmmssX";
 	public static final String HL7_DATE_TIME_DEFAULT_IN_PATTERN = "yyyyMMddHHmmss";
+	public static final String HL7_DATE_FORMAT = "yyyyMMdd";
 
 	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd HH:mm";
 
@@ -261,6 +267,13 @@ public class ConversionUtils {
 		return date.format(format);
 	}
 
+	public static String toDateString(LocalDateTime dateTime, String formatPattern) {
+		if (dateTime == null) {
+			return "";
+		}
+		return toDateString(dateTime.toLocalDate(), formatPattern);
+	}
+
 	public static String toDateTimeString(LocalDateTime date, String formatPattern) {
 		if (date == null) {
 			return "";
@@ -320,6 +333,19 @@ public class ConversionUtils {
 		return toDateString(date, DEFAULT_DATE_PATTERN);
 	}
 
+	/**
+	 * Formats the local datetime instance into a date string.
+	 *
+	 * @param date
+	 * 		LocalDateTime to be formatted using {@link #DEFAULT_DATE_PATTERN}
+	 * @return
+	 * 		Returns the formatted string
+	 */
+	public static String toDateString(LocalDateTime date)
+	{
+		return toDateTimeString(date, DEFAULT_DATE_PATTERN);
+	}
+
 	public static String toDateTimeString(LocalDateTime date)
 	{
 		return toDateTimeString(date, DEFAULT_TS_PATTERN);
@@ -328,6 +354,16 @@ public class ConversionUtils {
 	public static String toDateTimeNoSecString(LocalDateTime date)
 	{
 		return toDateTimeString(date, TS_NO_SEC_PATTERN);
+	}
+
+	public static String toDateTimeString(ZonedDateTime zonedDateTime)
+	{
+		return toDateTimeString(zonedDateTime, DateTimeFormatter.ISO_DATE_TIME);
+	}
+
+	public static String toDateTimeString(ZonedDateTime zonedDateTime, DateTimeFormatter formatter)
+	{
+		return zonedDateTime.format(formatter);
 	}
 
 	/**
@@ -670,6 +706,15 @@ public class ConversionUtils {
 	{
 		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
+	public static Date toNullableLegacyDate(PartialDate partialDate)
+	{
+		return (partialDate != null) ? toLegacyDate(partialDate.toLocalDate()) : null;
+	}
+
+	public static Date toNullableLegacyDateTime(PartialDateTime partialDateTime)
+	{
+		return (partialDateTime != null) ? toLegacyDateTime(partialDateTime.toLocalDateTime()) : null;
+	}
 
 	public static Date toNullableLegacyDateTime(LocalDateTime localDateTime)
 	{
@@ -694,6 +739,12 @@ public class ConversionUtils {
 		return toZonedLocalDate(legacyDate);
 	}
 
+	public static LocalDate toNullableLocalDate(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		if(xmlGregorianCalendar == null) return null;
+		return toLocalDate(xmlGregorianCalendar);
+	}
+
 	public static LocalDate toLocalDate(String dateString)
 	{
 		return toLocalDate(dateString, DateTimeFormatter.ISO_DATE);
@@ -704,9 +755,56 @@ public class ConversionUtils {
 		return LocalDate.parse(dateString, dateTimeFormatter);
 	}
 
+	public static LocalDate toLocalDate(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		// TODO raise custom non-nullable exception if null?
+		return LocalDate.of(
+				xmlGregorianCalendar.getYear(),
+				xmlGregorianCalendar.getMonth(),
+				xmlGregorianCalendar.getDay());
+	}
+
+	public static LocalDateTime toLocalDateTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		// TODO raise custom non-nullable exception if null?
+		return LocalDateTime.of(
+				xmlGregorianCalendar.getYear(),
+				xmlGregorianCalendar.getMonth(),
+				xmlGregorianCalendar.getDay(),
+				xmlGregorianCalendar.getHour(),
+				xmlGregorianCalendar.getMinute(),
+				xmlGregorianCalendar.getSecond());
+	}
+
+	public static LocalTime toNullableLocalTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		if(xmlGregorianCalendar == null) return null;
+		return toLocalTime(xmlGregorianCalendar);
+	}
+
+	public static LocalTime toLocalTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		// TODO raise custom non-nullable exception if null?
+		return LocalTime.of(
+				xmlGregorianCalendar.getHour(),
+				xmlGregorianCalendar.getMinute(),
+				xmlGregorianCalendar.getSecond());
+	}
+
+	public static LocalDateTime toNullableLocalDateTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		if(xmlGregorianCalendar == null) return null;
+		return toLocalDateTime(xmlGregorianCalendar);
+	}
+
 	public static LocalDate toNullableZonedLocalDate(String dateString)
 	{
 		if(dateString == null) return null;
+		return toZonedLocalDate(dateString);
+	}
+
+	public static LocalDate toZonedLocalDate(String dateString)
+	{
 		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
 	}
 
@@ -738,10 +836,26 @@ public class ConversionUtils {
 		if(legacyDate == null) return null;
 		return toLocalDateTime(legacyDate);
 	}
+	public static LocalDateTime toNullableLocalDateTime(String dateString)
+	{
+		if(dateString == null) return null;
+		return toLocalDateTime(dateString, DEFAULT_TS_PATTERN);
+	}
 
 	public static LocalDateTime toLocalDateTime(Date legacyDate)
 	{
 		return new java.sql.Timestamp(legacyDate.getTime()).toLocalDateTime();
+	}
+
+	public static LocalDateTime toLocalDateTime(String dateString)
+	{
+		return toLocalDateTime(dateString, DEFAULT_TS_PATTERN);
+	}
+
+	public static LocalDateTime toLocalDateTime(String dateString, String dateTimeFormat)
+	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat);
+		return LocalDateTime.parse(dateString, formatter);
 	}
 
 
@@ -814,5 +928,87 @@ public class ConversionUtils {
 	public static java.sql.Timestamp toTimestamp(LocalDateTime dateTime)
 	{
 		return java.sql.Timestamp.from(dateTime.toInstant(TimeZone.getDefault().toZoneId().getRules().getOffset(dateTime)));
+	}
+
+	public static XMLGregorianCalendar toNullableXmlGregorianCalendar(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+		return toXmlGregorianCalendar(localDate);
+	}
+
+	public static XMLGregorianCalendar toXmlGregorianCalendar(LocalDate localDate)
+	{
+		if(localDate == null) throw new RuntimeException("LocalDate cannot be null");
+		try
+		{
+			return DatatypeFactory.newInstance().newXMLGregorianCalendar(localDate.toString());
+		}
+		catch(DatatypeConfigurationException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static XMLGregorianCalendar toNullableXmlGregorianCalendar(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) return null;
+		return toXmlGregorianCalendar(localDateTime);
+	}
+
+	public static XMLGregorianCalendar toXmlGregorianCalendar(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) throw new RuntimeException("LocalDateTime cannot be null");
+		XMLGregorianCalendar calendar = toXmlGregorianCalendar(localDateTime.toLocalDate());
+		calendar.setHour(localDateTime.getHour());
+		calendar.setMinute(localDateTime.getMinute());
+		calendar.setSecond(localDateTime.getSecond());
+		return calendar;
+	}
+
+
+	public static LocalDateTime fillPartialCalendar(
+			XMLGregorianCalendar fullDateTime,
+			XMLGregorianCalendar fullDate,
+			XMLGregorianCalendar yearMonth,
+			XMLGregorianCalendar yearOnly)
+	{
+		if(fullDateTime != null)
+		{
+			return ConversionUtils.toNullableLocalDateTime(fullDateTime);
+		}
+		else
+		{
+			return fillPartialCalendar(fullDate, yearMonth, yearOnly);
+		}
+	}
+	public static LocalDateTime fillPartialCalendar(
+			XMLGregorianCalendar fullDate,
+			XMLGregorianCalendar yearMonth,
+			XMLGregorianCalendar yearOnly)
+	{
+		XMLGregorianCalendar xmlGregorianCalendar = null;
+		if(fullDate != null)
+		{
+			xmlGregorianCalendar = fullDate;
+		}
+		else if(yearMonth != null)
+		{
+			xmlGregorianCalendar = yearMonth;
+			xmlGregorianCalendar.setDay(1);
+		}
+		else if(yearOnly != null)
+		{
+			xmlGregorianCalendar = yearOnly;
+			xmlGregorianCalendar.setMonth(1);
+			xmlGregorianCalendar.setDay(1);
+		}
+
+		if(xmlGregorianCalendar != null)
+		{
+			xmlGregorianCalendar.setHour(0);
+			xmlGregorianCalendar.setMinute(0);
+			xmlGregorianCalendar.setSecond(0);
+		}
+		return ConversionUtils.toNullableLocalDateTime(xmlGregorianCalendar);
 	}
 }

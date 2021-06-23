@@ -58,7 +58,7 @@ dojo.svg.animations=dojo.svg.anim=new function(/* DOMDocument */ d){
 	};
 }(document);
 
-//	fixme: these functions should be mixed in from dojo.style, but dojo.style is HTML-centric and needs to change.
+//	fixme-legacy: these functions should be mixed in from dojo.style, but dojo.style is HTML-centric and needs to change.
 dojo.svg.toCamelCase=function(/* string */ selector){
 	//	summary
 	//	converts a CSS-style selector to a camelCased one
@@ -84,7 +84,7 @@ dojo.svg.getNumericStyle=function(/* SVGElement */ node, /* string */ cssSelecto
 	return parseFloat(dojo.svg.getStyle(node, cssSelector));
 };
 
-//	fixme: there are different ways of doing the following, need to take into account
+//	fixme-legacy: there are different ways of doing the following, need to take into account
 dojo.svg.getOpacity=function(/* SVGElement */node){
 	//	summary
 	//	Return the opacity of the passed element
@@ -107,7 +107,7 @@ dojo.svg.clearOpacity=function(/* SVGElement */ node){
  *	Coordinates and dimensions.
  */
 
-// TODO ////////////////////////////////////////////////////////// TODO
+// TODO-legacy ////////////////////////////////////////////////////////// TODO-legacy
 dojo.svg.getCoords=function(/* SVGElement */ node){
 	//	summary
 	//	Returns the x/y coordinates of the passed node, if available.
@@ -285,7 +285,7 @@ dojo.svg.sendToBack=function(/* SVGElement */node){
 	n.ownerSVGElement.insertBefore(n, n.ownerSVGElement.firstChild);
 };
 
-//	TODO: possibly push node up a level in the DOM if it's at the beginning or end of the childNodes list.
+//	TODO-legacy: possibly push node up a level in the DOM if it's at the beginning or end of the childNodes list.
 dojo.svg.bringForward=function(/* SVGElement */node){
 	//	summary
 	//	move the passed node up one in the child node chain
@@ -302,7 +302,7 @@ dojo.svg.sendBackward=function(/* SVGElement */node){
 		this.insertBefore(n, this.getPreviousSiblingElement(n), true);
 	}
 };
-// END TODO ////////////////////////////////////////////////////// TODO
+// END TODO-legacy ////////////////////////////////////////////////////// TODO-legacy
 
 dojo.svg.createNodesFromText=function(/* string */ txt, /* bool? */ wrap){
 	//	summary

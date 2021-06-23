@@ -1,0 +1,44 @@
+<b>\${title}</b>
+<table class="setIssueList" id="setIssueList">
+    <tbody id="setIssueListBody">
+    <tr>
+        {{each(i, cmIssue) issueArray}}
+            {{if i % 2 == 0}}
+    </tr><tr>
+            {{/if}}
+        <td id="issueListWidgetContainer\${cmIssue.issue.id}">
+            <input
+                    type='checkbox'
+                    id='issueId\${cmIssue.issue.id}'
+                    name='issue_id'
+                    value='\${cmIssue.issue.id}'
+                    {{if jQuery.inArray(cmIssue.issue.id, assignedIssueArray) >= 0 }}
+                        checked='checked'
+                    {{/if}}
+            >
+            <a href="#" onclick="caseManagementIssue.toggleIssueWidget('\${cmIssue.issue.id}'); return false;">
+                \${cmIssue.issue.description}
+            </a>
+            &nbsp;
+            <!-- <a href="#" onclick="">Delete</a> -->
+            <a href="#" onclick="caseManagementIssue.enableChangeMode('\${cmIssue.issue.id}', \${resolved}); return false;">Change</a>
+            <div class="setIssueListWidget" id="setIssueListWidget\${cmIssue.issue.id}"><div>
+                {{each(j, property) propertyArray}}
+                    <div class="setIssueListControl \${cmIssue.class}">
+                        <input
+                                type="radio"
+                                name="issueCheckList\${cmIssue.issue.id}\${property.fieldName}"
+                                id="issueCheckList\${cmIssue.issue.id}.\${property.name}"
+                                onclick="caseManagementIssue.saveIssueProperty({junoJQuery: junoJQuery}, '\${cmIssue.issue.id}', '\${property.fieldName}', \${property.fieldValue})"
+                        >\${property.label}</input>
+                    </div>
+                {{/each}}
+                <div class="setIssueListRole">
+                    <input type="text" name="issueCheckListRole" value="\${cmIssue.issue.role}" onchange=""></input>
+                </div>
+            </div></div>
+        </td>
+        {{/each}}
+    </tr>
+    </tbody>
+</table>

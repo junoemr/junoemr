@@ -133,7 +133,7 @@ dojo.html.renderedTextContent = function(/* HTMLElement */node){
 					case "table": case "table-row-group": case "table-header-group":
 					case "table-footer-group": case "table-row": case "table-column-group":
 					case "table-column": case "table-cell": case "table-caption":
-						// TODO: this shouldn't insert double spaces on aligning blocks
+						// TODO-legacy: this shouldn't insert double spaces on aligning blocks
 						result += "\n";
 						result += dojo.html.renderedTextContent(node.childNodes[i]);
 						result += "\n";
@@ -170,7 +170,7 @@ dojo.html.renderedTextContent = function(/* HTMLElement */node){
 					case "lowercase": text = text.toLowerCase(); break;
 					default: break; // leave as is
 				}
-				// TODO: implement
+				// TODO-legacy: implement
 				switch (textTransform){
 					case "nowrap": break;
 					case "pre-wrap": break;
@@ -248,7 +248,7 @@ dojo.html.createNodesFromText = function(/* string */txt, /* boolean? */trim){
 	for(var x=0; x<parent.childNodes.length; x++){
 		nodes.push(parent.childNodes[x].cloneNode(true));
 	}
-	tn.style.display = "none"; // FIXME: why do we do this?
+	tn.style.display = "none"; // FIXME-legacy: why do we do this?
 	dojo.html.destroyNode(tn);
 	return nodes;	//	array
 }
@@ -291,7 +291,7 @@ dojo.html.placeOnScreen = function(
 	//	 placeOnScreen("myId", [800, 623], 5)
 	//	 placeOnScreen(node, 234, 3284, [2, 5], true)
 
-	// TODO: make this function have variable call sigs
+	// TODO-legacy: make this function have variable call sigs
 	//	kes(node, ptArray, cornerArray, padding, hasScroll)
 	//	kes(node, ptX, ptY, cornerA, cornerB, cornerC, paddingArray, hasScroll)
 	if(desiredX instanceof Array || typeof desiredX == "array") {

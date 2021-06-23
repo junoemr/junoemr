@@ -34,6 +34,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.drools.FactException;
 import org.drools.RuleBase;
 import org.drools.WorkingMemory;
 import org.drools.io.RuleBaseLoader;
@@ -117,7 +118,7 @@ public class PreventionDS {
         
         
         if (!fileFound){                  
-         URL url = PreventionDS.class.getResource( "/oscar/oscarPrevention/prevention.drl" );  //TODO: change this so it is configurable;
+         URL url = PreventionDS.class.getResource( "/oscar/oscarPrevention/prevention.drl" );  //TODO-legacy: change this so it is configurable;
          log.debug("loading from URL "+url.getFile());            
          ruleBase = RuleBaseLoader.loadFromUrl( url );
         }
@@ -128,13 +129,22 @@ public class PreventionDS {
    }
    
    
-   public Prevention getMessages(Prevention p) throws Exception{
-      try{
-         WorkingMemory workingMemory = ruleBase.newWorkingMemory();
-         workingMemory.assertObject(p);
-         workingMemory.fireAllRules();
-      }catch(Exception e){MiscUtils.getLogger().error("Error", e); throw new Exception("ERROR: Drools ",e);}
-         return p;
+   public Prevention getMessages(Prevention p) throws FactException
+   {
+	   WorkingMemory workingMemory = ruleBase.newWorkingMemory();
+	   workingMemory.assertObject(p);
+	   workingMemory.fireAllRules();
+
+/*	   try
+	   {
+	   }
+	   catch(Exception e)
+	   {
+		   MiscUtils.getLogger().error("Error", e);
+		   throw new Exception("ERROR: Drools ",e);
+	   }*/
+
+	   return p;
    }
 
    

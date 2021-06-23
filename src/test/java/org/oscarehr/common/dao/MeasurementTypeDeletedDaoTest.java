@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MeasurementTypeDeleted;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MeasurementTypeDeletedDaoTest extends DaoTestFixtures {
-
-	protected MeasurementTypeDeletedDao dao = SpringUtils.getBean(MeasurementTypeDeletedDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MeasurementTypeDeletedDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MeasurementTypeDeletedDao measurementTypeDeletedDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class MeasurementTypeDeletedDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		MeasurementTypeDeleted entity = new MeasurementTypeDeleted();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		measurementTypeDeletedDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

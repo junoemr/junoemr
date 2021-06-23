@@ -126,7 +126,7 @@ public class PlaceholderPersonComprehensivePlacer extends BasePlacer implements 
 
 		person.setBirthTime(demo.getBirthDay());
 		
-		// FIXME assume we only deal with alive patients
+		// FIXME-legacy assume we only deal with alive patients
 		person.setDeceasedInd(new BL(false));
 		
 		LIST<AD> addr = new LIST<AD>();
@@ -139,18 +139,18 @@ public class PlaceholderPersonComprehensivePlacer extends BasePlacer implements 
 		person.setAddr(addr);
 		
 		org.marc.everest.rmim.ca.r020403.prpa_mt101104ca.OtherIDs otherId = new org.marc.everest.rmim.ca.r020403.prpa_mt101104ca.OtherIDs();
-		// FIXME get proper root for this ID - will be based on "per clinic" approach
+		// FIXME-legacy get proper root for this ID - will be based on "per clinic" approach
 		if (demo.getDemographicNo() != null) {
 			otherId.setId(new II("2.16.840.1.113883.4.50", demo.getDemographicNo().toString()));
 		}
 		otherId.setCode(new CV<String>("DL", "2.16.840.1.113883.2.20.5.2"));
 		IdOrganization idOrganization = new IdOrganization();
-		// FIXME set proper clinic name
+		// FIXME-legacy set proper clinic name
 		idOrganization.setName("OSCAR");
 		otherId.setAssigningIdOrganization(idOrganization);
 		person.getAsOtherIDs().add(otherId);
 
-		// FIXME add proper personal relationship handling
+		// FIXME-legacy add proper personal relationship handling
 		/*
 		org.marc.everest.rmim.ca.r020403.prpa_mt101102ca.PersonalRelationship personalRelationship = new org.marc.everest.rmim.ca.r020403.prpa_mt101102ca.PersonalRelationship();
 		personalRelationship.setCode("FTH", "2.16.840.1.113883.5.111");
@@ -222,7 +222,7 @@ public class PlaceholderPersonComprehensivePlacer extends BasePlacer implements 
 		addr.add(ad);
 		person.setAddr(addr);
 
-		// FIXME - Update to provide the correct info - incl. root and clinic name
+		// FIXME-legacy - Update to provide the correct info - incl. root and clinic name
 		org.marc.everest.rmim.ca.r020403.prpa_mt101104ca.OtherIDs otherId = new org.marc.everest.rmim.ca.r020403.prpa_mt101104ca.OtherIDs();
 		otherId.setId(new II("2.16.840.1.113883.4.50", "" + demo.getDemographicNo()));
 		otherId.setCode(new CV<String>("DL", "2.16.840.1.113883.2.20.5.2"));
@@ -233,7 +233,7 @@ public class PlaceholderPersonComprehensivePlacer extends BasePlacer implements 
 
 		
 		/*
-		// FIXME provide proper relationships
+		// FIXME-legacy provide proper relationships
 		org.marc.everest.rmim.ca.r020403.prpa_mt101102ca.PersonalRelationship personalRelationship = new org.marc.everest.rmim.ca.r020403.prpa_mt101102ca.PersonalRelationship();
 		personalRelationship.setCode("FTH", "2.16.840.1.113883.5.111");
 		org.marc.everest.rmim.ca.r020403.prpa_mt101102ca.ParentPerson parentPerson = new org.marc.everest.rmim.ca.r020403.prpa_mt101102ca.ParentPerson();

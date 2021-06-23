@@ -53,7 +53,7 @@ public class ConfigImmunizationDao extends AbstractDao<ConfigImmunization>{
 		if(orderByName) {
 			orderBy=" ORDER BY x.name";
 		}
-    	String sql = "select x from ConfigImmunization x where x.archived=?" + orderBy;
+    	String sql = "select x from ConfigImmunization x where x.archived=?1" + orderBy;
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1, archived);
 

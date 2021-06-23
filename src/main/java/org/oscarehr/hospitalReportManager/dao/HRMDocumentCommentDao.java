@@ -24,19 +24,22 @@ public class HRMDocumentCommentDao extends AbstractDao<HRMDocumentComment> {
     }
 	
 	@SuppressWarnings("unchecked")
-    public List<HRMDocumentComment> getCommentsForDocument(Integer documentId) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=? and x.deleted=0 order by commentTime desc";
+	public List<HRMDocumentComment> getCommentsForDocument(Integer documentId)
+	{
+		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.hrmDocument.id=:documentId AND x.deleted=:deleted ORDER BY x.commentTime DESC";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, documentId);
+		query.setParameter("documentId", documentId);
+		query.setParameter("deleted", false);
 		return query.getResultList();
 	}
-	
-	public void deleteComment(Integer commentId) {
+
+	public void deleteComment(Integer commentId)
+	{
 		HRMDocumentComment comment = this.find(commentId);
-		if(comment != null) {
+		if(comment != null)
+		{
 			comment.setDeleted(true);
 			this.merge(comment);
 		}
 	}
-
 }

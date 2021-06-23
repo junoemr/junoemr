@@ -29,15 +29,21 @@ import static org.junit.Assert.*;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BedType;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BedTypeDaoTest extends DaoTestFixtures {
-
-	protected BedTypeDao dao = SpringUtils.getBean(BedTypeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BedTypeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BedTypeDao bedTypeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -48,7 +54,7 @@ public class BedTypeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BedType entity = new BedType();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		bedTypeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -57,13 +63,13 @@ public class BedTypeDaoTest extends DaoTestFixtures {
 				
 		BedType bedType1 = new BedType();
 		EntityDataGenerator.generateTestDataForModelClass(bedType1);
-		dao.saveEntity(bedType1);
+		bedTypeDao.saveEntity(bedType1);
 		
 		BedType bedType2 = new BedType();
 		EntityDataGenerator.generateTestDataForModelClass(bedType2);
-		dao.saveEntity(bedType2);
+		bedTypeDao.saveEntity(bedType2);
 		
-		boolean result = dao.bedTypeExists(bedType1.getId());
+		boolean result = bedTypeDao.bedTypeExists(bedType1.getId());
 		boolean expectedResult = true;
 		
 		assertEquals(expectedResult, result);
@@ -74,22 +80,22 @@ public class BedTypeDaoTest extends DaoTestFixtures {
 		
 		BedType bedType1 = new BedType();
 		EntityDataGenerator.generateTestDataForModelClass(bedType1);
-		dao.saveEntity(bedType1);
+		bedTypeDao.saveEntity(bedType1);
 		
 		BedType bedType2 = new BedType();
 		EntityDataGenerator.generateTestDataForModelClass(bedType2);
-		dao.saveEntity(bedType2);
+		bedTypeDao.saveEntity(bedType2);
 		
 		BedType bedType3 = new BedType();
 		EntityDataGenerator.generateTestDataForModelClass(bedType3);
-		dao.saveEntity(bedType3);
+		bedTypeDao.saveEntity(bedType3);
 		
 		BedType bedType4 = new BedType();
 		EntityDataGenerator.generateTestDataForModelClass(bedType4);
-		dao.saveEntity(bedType4);
+		bedTypeDao.saveEntity(bedType4);
 		
 		BedType expectedResult[] = {bedType1, bedType2, bedType3, bedType4};
-		BedType result[] = dao.getBedTypes();
+		BedType result[] = bedTypeDao.getBedTypes();
 		
 		Logger logger = MiscUtils.getLogger();
 		

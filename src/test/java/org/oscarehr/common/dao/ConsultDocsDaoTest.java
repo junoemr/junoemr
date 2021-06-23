@@ -34,16 +34,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.consultations.dao.ConsultDocsDao;
 import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ConsultDocsDaoTest extends DaoTestFixtures {
-
-	protected ConsultDocsDao dao = (ConsultDocsDao)SpringUtils.getBean(ConsultDocsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ConsultDocsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ConsultDocsDao consultDocsDao;
 
 	@Before
 	public void before() throws Exception {
@@ -54,7 +60,7 @@ public class ConsultDocsDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 ConsultDocs entity = new ConsultDocs();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                consultDocsDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -76,7 +82,7 @@ public class ConsultDocsDaoTest extends DaoTestFixtures {
 		consultDocs1.setDocumentNo(documentNo1);
 		consultDocs1.setDocType(docType1);
 		consultDocs1.setDeleted(null);
-		dao.persist(consultDocs1);
+		consultDocsDao.persist(consultDocs1);
 		
 		ConsultDocs consultDocs2 = new ConsultDocs();
 		EntityDataGenerator.generateTestDataForModelClass(consultDocs2);
@@ -84,7 +90,7 @@ public class ConsultDocsDaoTest extends DaoTestFixtures {
 		consultDocs2.setDocumentNo(documentNo1);
 		consultDocs2.setDocType(docType1);
 		consultDocs2.setDeleted(null);
-		dao.persist(consultDocs2);
+		consultDocsDao.persist(consultDocs2);
 		
 		ConsultDocs consultDocs3 = new ConsultDocs();
 		EntityDataGenerator.generateTestDataForModelClass(consultDocs3);
@@ -92,14 +98,14 @@ public class ConsultDocsDaoTest extends DaoTestFixtures {
 		consultDocs3.setDocumentNo(documentNo2);
 		consultDocs3.setDocType(docType1);
 		consultDocs3.setDeleted(null);
-		dao.persist(consultDocs3);
+		consultDocsDao.persist(consultDocs3);
 		
 		ConsultDocs consultDocs4 = new ConsultDocs();
 		EntityDataGenerator.generateTestDataForModelClass(consultDocs4);
 		consultDocs4.setRequestId(requestId1);
 		consultDocs4.setDocumentNo(documentNo1);
 		consultDocs4.setDocType(docType2);
-		dao.persist(consultDocs4);
+		consultDocsDao.persist(consultDocs4);
 		
 		ConsultDocs consultDocs5 = new ConsultDocs();
 		EntityDataGenerator.generateTestDataForModelClass(consultDocs5);
@@ -107,7 +113,7 @@ public class ConsultDocsDaoTest extends DaoTestFixtures {
 		consultDocs5.setDocumentNo(documentNo1);
 		consultDocs5.setDocType(docType1);
 		consultDocs5.setDeleted(null);
-		dao.persist(consultDocs5);
+		consultDocsDao.persist(consultDocs5);
 		
 		ConsultDocs consultDocs6 = new ConsultDocs();
 		EntityDataGenerator.generateTestDataForModelClass(consultDocs6);
@@ -115,10 +121,10 @@ public class ConsultDocsDaoTest extends DaoTestFixtures {
 		consultDocs6.setDocumentNo(documentNo1);
 		consultDocs6.setDocType(docType1);
 		consultDocs6.setDeleted("Y");
-		dao.persist(consultDocs6);
+		consultDocsDao.persist(consultDocs6);
 		
 		List<ConsultDocs> expectedResult = new ArrayList<ConsultDocs>(Arrays.asList(consultDocs1, consultDocs5));
-		List<ConsultDocs> result = dao.findByRequestIdDocNoDocType(requestId1, documentNo1, docType1);
+		List<ConsultDocs> result = consultDocsDao.findByRequestIdDocNoDocType(requestId1, documentNo1, docType1);
 
 		Logger logger = MiscUtils.getLogger();
 		

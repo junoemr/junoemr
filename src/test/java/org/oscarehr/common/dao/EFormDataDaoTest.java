@@ -36,15 +36,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EFormDataDaoTest extends DaoTestFixtures {
-
-	protected EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EFormDataDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EFormDataDao eFormDataDao;
 
 	public EFormDataDaoTest() {
 	}

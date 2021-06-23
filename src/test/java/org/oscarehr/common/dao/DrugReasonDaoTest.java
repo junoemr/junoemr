@@ -33,16 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DrugReason;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DrugReasonDaoTest extends DaoTestFixtures {
-	
-	protected DrugReasonDao dao = (DrugReasonDao)SpringUtils.getBean(DrugReasonDao.class);
-	Logger logger = MiscUtils.getLogger();
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DrugReasonDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DrugReasonDao drugReasonDao;
 
 	@Before
 	public void setUp() throws Exception {
@@ -68,7 +73,7 @@ public class DrugReasonDaoTest extends DaoTestFixtures {
 		reason1.setCode(code);
 		reason1.setArchivedFlag(archivedFlag);
 		
-		assertTrue(dao.addNewDrugReason(reason1));
+		assertTrue(drugReasonDao.addNewDrugReason(reason1));
 	}
 	
 	
@@ -99,10 +104,10 @@ public class DrugReasonDaoTest extends DaoTestFixtures {
 		reason2.setCode(code);
 		reason2.setArchivedFlag(false);
 		
-		dao.persist(reason1);
-		dao.persist(reason2);
+		drugReasonDao.persist(reason1);
+		drugReasonDao.persist(reason2);
 		
-		assertTrue(dao.hasReason(drugId, codingSystem, code, archivedFlag));
+		assertTrue(drugReasonDao.hasReason(drugId, codingSystem, code, archivedFlag));
 	}
 
 	@Test
@@ -132,11 +137,11 @@ public class DrugReasonDaoTest extends DaoTestFixtures {
 		reason3.setDrugId(drugId);
 		reason3.setArchivedFlag(false);
 		
-		dao.persist(reason1);
-		dao.persist(reason2);
-		dao.persist(reason3);
+		drugReasonDao.persist(reason1);
+		drugReasonDao.persist(reason2);
+		drugReasonDao.persist(reason3);
 		
-		List<DrugReason> result = dao.getReasonsForDrugID(drugId, archivedFlag);
+		List<DrugReason> result = drugReasonDao.getReasonsForDrugID(drugId, archivedFlag);
 		List<DrugReason> expectedResult = new ArrayList<DrugReason>(Arrays.asList(
 				reason3
 				));

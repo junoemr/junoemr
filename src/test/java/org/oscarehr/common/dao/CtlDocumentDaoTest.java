@@ -29,14 +29,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.model.CtlDocument;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlDocumentDaoTest extends DaoTestFixtures {
-
-	protected CtlDocumentDao dao = SpringUtils.getBean(CtlDocumentDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlDocumentDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlDocumentDao ctlDocumentDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,7 +51,7 @@ public class CtlDocumentDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByDocumentNoAndModule() {
-		List<CtlDocument> result = dao.findByDocumentNoAndModule(100, "demo");
+		List<CtlDocument> result = ctlDocumentDao.findByDocumentNoAndModule(100, "demo");
 		assertNotNull(result);
 	}
 }

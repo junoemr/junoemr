@@ -51,17 +51,24 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.RemoteIntegratedDataCopy;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.ObjectMarshalUtil;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
-public class RemoteIntegratedDataCopyDaoTest extends DaoTestFixtures {
-	
-	RemoteIntegratedDataCopyDao  remoteIntegratedDataCopyDao = SpringUtils.getBean(RemoteIntegratedDataCopyDao.class);  
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RemoteIntegratedDataCopyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	RemoteIntegratedDataCopyDao  remoteIntegratedDataCopyDao;
 
 	@Before
 	public void before() throws Exception {

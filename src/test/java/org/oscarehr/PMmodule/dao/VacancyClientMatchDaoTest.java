@@ -36,16 +36,22 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.VacancyClientMatch;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class VacancyClientMatchDaoTest extends DaoTestFixtures {
-
-	public VacancyClientMatchDao dao = SpringUtils.getBean(VacancyClientMatchDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class VacancyClientMatchDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public VacancyClientMatchDao vacancyClientMatchDao;
 
 
 	@Before
@@ -57,7 +63,7 @@ public class VacancyClientMatchDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		VacancyClientMatch entity = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		vacancyClientMatchDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -72,40 +78,40 @@ public class VacancyClientMatchDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(vCM1);
 		vCM1.setClient_id(clientId1);
 		vCM1.setVacancy_id(vacancyId1);
-		dao.persist(vCM1);
+		vacancyClientMatchDao.persist(vCM1);
 		
 		VacancyClientMatch vCM2 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM2);
 		vCM2.setClient_id(clientId2);
 		vCM2.setVacancy_id(vacancyId1);
-		dao.persist(vCM2);
+		vacancyClientMatchDao.persist(vCM2);
 		
 		VacancyClientMatch vCM3 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM3);
 		vCM3.setClient_id(clientId1);
 		vCM3.setVacancy_id(vacancyId2);
-		dao.persist(vCM3);
+		vacancyClientMatchDao.persist(vCM3);
 		
 		VacancyClientMatch vCM4 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM4);
 		vCM4.setClient_id(clientId2);
 		vCM4.setVacancy_id(vacancyId1);
-		dao.persist(vCM4);
+		vacancyClientMatchDao.persist(vCM4);
 		
 		VacancyClientMatch vCM5 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM5);
 		vCM5.setClient_id(clientId2);
 		vCM5.setVacancy_id(vacancyId2);
-		dao.persist(vCM5);
+		vacancyClientMatchDao.persist(vCM5);
 		
 		VacancyClientMatch vCM6 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM6);
 		vCM6.setClient_id(clientId2);
 		vCM6.setVacancy_id(vacancyId1);
-		dao.persist(vCM6);
+		vacancyClientMatchDao.persist(vCM6);
 		
 		List<VacancyClientMatch> expectedResult = new ArrayList<VacancyClientMatch>(Arrays.asList(vCM2, vCM4, vCM6));
-		List<VacancyClientMatch> result = dao.findByClientIdAndVacancyId(clientId2, vacancyId1);
+		List<VacancyClientMatch> result = vacancyClientMatchDao.findByClientIdAndVacancyId(clientId2, vacancyId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -130,30 +136,30 @@ public class VacancyClientMatchDaoTest extends DaoTestFixtures {
 		VacancyClientMatch vCM1 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM1);
 		vCM1.setClient_id(clientId1);
-		dao.persist(vCM1);
+		vacancyClientMatchDao.persist(vCM1);
 		
 		VacancyClientMatch vCM2 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM2);
 		vCM2.setClient_id(clientId2);
-		dao.persist(vCM2);
+		vacancyClientMatchDao.persist(vCM2);
 		
 		VacancyClientMatch vCM3 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM3);
 		vCM3.setClient_id(clientId1);
-		dao.persist(vCM3);
+		vacancyClientMatchDao.persist(vCM3);
 		
 		VacancyClientMatch vCM4 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM4);
 		vCM4.setClient_id(clientId2);
-		dao.persist(vCM4);
+		vacancyClientMatchDao.persist(vCM4);
 		
 		VacancyClientMatch vCM5 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM5);
 		vCM5.setClient_id(clientId2);
-		dao.persist(vCM5);
+		vacancyClientMatchDao.persist(vCM5);
 		
 		List<VacancyClientMatch> expectedResult = new ArrayList<VacancyClientMatch>(Arrays.asList(vCM2, vCM4, vCM5));
-		List<VacancyClientMatch> result = dao.findByClientId(clientId2);
+		List<VacancyClientMatch> result = vacancyClientMatchDao.findByClientId(clientId2);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -178,30 +184,30 @@ public class VacancyClientMatchDaoTest extends DaoTestFixtures {
 		VacancyClientMatch vCM1 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM1);
 		vCM1.setClient_id(clientId1);
-		dao.persist(vCM1);
+		vacancyClientMatchDao.persist(vCM1);
 		
 		VacancyClientMatch vCM2 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM2);
 		vCM2.setClient_id(clientId2);
-		dao.persist(vCM2);
+		vacancyClientMatchDao.persist(vCM2);
 		
 		VacancyClientMatch vCM3 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM3);
 		vCM3.setClient_id(clientId1);
-		dao.persist(vCM3);
+		vacancyClientMatchDao.persist(vCM3);
 		
 		VacancyClientMatch vCM4 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM4);
 		vCM4.setClient_id(clientId2);
-		dao.persist(vCM4);
+		vacancyClientMatchDao.persist(vCM4);
 		
 		VacancyClientMatch vCM5 = new VacancyClientMatch();
 		EntityDataGenerator.generateTestDataForModelClass(vCM5);
 		vCM5.setClient_id(clientId2);
-		dao.persist(vCM5);
+		vacancyClientMatchDao.persist(vCM5);
 		
 		List<VacancyClientMatch> expectedResult = new ArrayList<VacancyClientMatch>(Arrays.asList(vCM2, vCM4, vCM5));
-		List<VacancyClientMatch> result = dao.findByClientId(clientId2);
+		List<VacancyClientMatch> result = vacancyClientMatchDao.findByClientId(clientId2);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -228,10 +234,10 @@ public class VacancyClientMatchDaoTest extends DaoTestFixtures {
 		v.setLast_contact_date(new java.util.Date());
 		v.setMatchPercentage(0);
 		v.setStatus(VacancyClientMatch.ACCEPTED);
-		dao.persist(v);
+		vacancyClientMatchDao.persist(v);
 		
-		dao.updateStatus(VacancyClientMatch.REJECTED, 1, 1);
+		vacancyClientMatchDao.updateStatus(VacancyClientMatch.REJECTED, 1, 1);
 		
-		assertEquals(1,dao.findBystatus(VacancyClientMatch.REJECTED).size());
+		assertEquals(1, vacancyClientMatchDao.findBystatus(VacancyClientMatch.REJECTED).size());
 	}	
 }

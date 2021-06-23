@@ -9,53 +9,42 @@
 
 package org.oscarehr.hospitalReportManager.model;
 
-import java.util.Date;
+import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographic.model.Demographic;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.util.Date;
 
-import org.oscarehr.common.model.AbstractModel;
-
+@Data
 @Entity
-public class HRMDocumentToDemographic extends AbstractModel<Integer> {
-
+public class HRMDocumentToDemographic extends AbstractModel<Integer>
+{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	private String demographicNo;
-	private String hrmDocumentId;
+	private Integer demographicNo;
+	private Integer hrmDocumentId;
 	private Date timeAssigned;
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "hrmDocumentId", insertable = false, updatable = false)
+	private HRMDocument hrmDocument;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "demographicNo", insertable = false, updatable = false)
+	private Demographic demographic;
+
 	@Override
-    public Integer getId() {
-	    return id;
-    }
-
-	public String getDemographicNo() {
-    	return demographicNo;
-    }
-
-	public void setDemographicNo(String demographicNo) {
-    	this.demographicNo = demographicNo;
-    }
-
-	public Date getTimeAssigned() {
-    	return timeAssigned;
-    }
-
-	public void setTimeAssigned(Date timeAssigned) {
-    	this.timeAssigned = timeAssigned;
-    }
-
-	public String getHrmDocumentId() {
-    	return hrmDocumentId;
-    }
-
-	public void setHrmDocumentId(String hrmDocumentId) {
-    	this.hrmDocumentId = hrmDocumentId;
-    }
-
+	public Integer getId()
+	{
+		return id;
+	}
 }

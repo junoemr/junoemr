@@ -50,6 +50,7 @@ public class DrugMergedDemographicDao extends DrugDao
 		return template.findMerged(demographicId, result);
 	}
 
+	// TODO-legacy: speed this up
 	@Override
 	public List<Drug> findByDemographicId(Integer demographicId, final Boolean archived) {
 		List<Drug> result = super.findByDemographicId(demographicId, archived);

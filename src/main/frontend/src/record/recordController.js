@@ -88,7 +88,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.itvSet = null;
 		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
-		controller.page.isNoteSaved = false; // Track save state of note TODO: Potentially add this to the encounterNote object on the backend
+		controller.page.isNoteSaved = false; // Track save state of note TODO-legacy: Potentially add this to the encounterNote object on the backend
 
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
@@ -250,7 +250,7 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 			skipTmpSave = false; // only skip once
 		};
-		$scope.$watch('controller.page.encounterNote.note', delayTmpSave);
+		$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
 
 		//////
 
@@ -341,7 +341,7 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		// TODO
+		// TODO-legacy
 		controller.cancelNoteEdit = function cancelNoteEdit()
 		{
 			console.log('CANCELLING EDIT');

@@ -46,7 +46,7 @@ public class BillingONPayment extends AbstractModel<Integer> implements Serializ
 	
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "payment_id", nullable = false)
 	private Integer id;
     

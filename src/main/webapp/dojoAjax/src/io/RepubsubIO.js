@@ -26,7 +26,7 @@ dojo.io.repubsubTranport = new function(){
 			// open up our tunnel, queue up requests anyway
 			rps.init();
 		}
-		// FIXME: we need to turn this into a topic subscription
+		// FIXME-legacy: we need to turn this into a topic subscription
 		// var tgtURL = kwArgs.url+"?"+dojo.io.argsFromMap(kwArgs.content);
 		// sampleTransport.sendRequest(tgtURL, hdlrFunc);
 
@@ -106,7 +106,7 @@ dojo.io.repubsub = new function(){
 			var opts = [];
 			for(var x in pairs){
 				var sp = pairs[x].split("=");
-				// FIXME: is this eval dangerous?
+				// FIXME-legacy: is this eval dangerous?
 				try{
 					opts[sp[0]]=eval(sp[1]);
 				}catch(e){
@@ -122,7 +122,7 @@ dojo.io.repubsub = new function(){
 	// parse URL params and use them as default vals
 	var getOpts = this.parseGetStr();
 	for(var x in getOpts){
-		// FIXME: should I be checking for undefined here before setting? Does
+		// FIXME-legacy: should I be checking for undefined here before setting? Does
 		//        that buy me anything?
 		this[x] = getOpts[x];
 	}
@@ -173,7 +173,7 @@ dojo.io.repubsub = new function(){
 		for(var i=0; i<evt.elements.length; i++){
 			var ee = evt.elements[i];
 			e[ee.name||ee.nameU] = (ee.value||ee.valueU);
-			// FIXME: need to enable this only in some extreme debugging mode!
+			// FIXME-legacy: need to enable this only in some extreme debugging mode!
 			this.log("[event]: "+(ee.name||ee.nameU)+": "+e[ee.name||ee.nameU]);
 		}
 
@@ -185,7 +185,7 @@ dojo.io.repubsub = new function(){
 		// and with THAT out of the way, dispatch it!
 		this.dispatch(e);
 
-		// TODO: remove the script block that created the event obj to save
+		// TODO-legacy: remove the script block that created the event obj to save
 		// memory, etc.
 	}
 
@@ -200,7 +200,7 @@ dojo.io.repubsub = new function(){
 		document.domain = dps.join(".");
 	}
 
-	// FIXME: parseCookie and setCookie should be methods that are more broadly
+	// FIXME-legacy: parseCookie and setCookie should be methods that are more broadly
 	// available. Perhaps in htmlUtils?
 
 	this.parseCookie = function(){
@@ -225,7 +225,7 @@ dojo.io.repubsub = new function(){
 		document.cookie = cs;
 	}
 
-	// FIXME: need to replace w/ dojo.log.*
+	// FIXME-legacy: need to replace w/ dojo.log.*
 	this.log = function(str, lvl){
 		if(!this.debug){ return; } // we of course only care if we're in debug mode
 		while(this.logBacklog.length>0){
@@ -245,7 +245,7 @@ dojo.io.repubsub = new function(){
 		// this.findPeers();
 		this.openTunnel();
 		this.isInitialized = true;
-		// FIXME: this seems like entirely the wrong place to replay the backlog
+		// FIXME-legacy: this seems like entirely the wrong place to replay the backlog
 		while(this.subscriptionBacklog.length){
 			this.subscribe.apply(this, this.subscriptionBacklog.shift());
 		}
@@ -274,32 +274,32 @@ dojo.io.repubsub = new function(){
 		);
 
 		this.rcvNode = dojo.io.createIFrame(this.rcvNodeName);
-		// FIXME: set the src attribute here to the initialization URL
+		// FIXME-legacy: set the src attribute here to the initialization URL
 		dojo.io.setIFrameSrc(this.rcvNode, this.initDoc+"?callback=repubsub.rcvNodeReady&domain="+document.domain);
 
 		// the other for posting data in reply
 
 		this.sndNodeName = "sndIFrame_"+this.getRandStr();
 		this.sndNode = dojo.io.createIFrame(this.sndNodeName);
-		// FIXME: set the src attribute here to the initialization URL
+		// FIXME-legacy: set the src attribute here to the initialization URL
 		dojo.io.setIFrameSrc(this.sndNode, this.initDoc+"?callback=repubsub.sndNodeReady&domain="+document.domain);
 
 	}
 
 	this.rcvNodeReady = function(){
-		// FIXME: why is this sequence number needed? Why isn't the UID gen
+		// FIXME-legacy: why is this sequence number needed? Why isn't the UID gen
 		// 		  function enough?
         var statusURI = [this.tunnelURI, '/kn_status/', this.getRandStr(), '_', 
 						 String(this.tunnelInitCount++)].join(""); 
-            // (kn._seqNum++); // FIXME: !!!!
+            // (kn._seqNum++); // FIXME-legacy: !!!!
 		// this.canRcv = true;
 		this.log("rcvNodeReady");
-		// FIXME: initialize receiver and request the base topic
+		// FIXME-legacy: initialize receiver and request the base topic
 		// dojo.io.setIFrameSrc(this.rcvNode, this.serverBaseURL+"/kn?do_method=blank");
 		var initURIArr = [	this.serverBaseURL, "/kn?kn_from=", escape(this.tunnelURI),
 							"&kn_id=", escape(this.tunnelID), "&kn_status_from=", 
 							escape(statusURI)];
-		// FIXME: does the above really need a kn_response_flush? won't the
+		// FIXME-legacy: does the above really need a kn_response_flush? won't the
 		// 		  server already know? If not, what good is it anyway?
 		dojo.io.setIFrameSrc(this.rcvNode, initURIArr.join(""));
 
@@ -314,7 +314,7 @@ dojo.io.repubsub = new function(){
 		this.canSnd = true;
 		this.log("sndNodeReady");
 		this.log(this.backlog.length);
-		// FIXME: handle any pent-up send commands
+		// FIXME-legacy: handle any pent-up send commands
 		if(this.backlog.length > 0){
 			this.dequeueEvent();
 		}
@@ -333,7 +333,7 @@ dojo.io.repubsub = new function(){
 			// split off the base server URL
 			var topic = rf.split(this.serverBaseURL, 2)[1];
 			if(!topic){
-				// FIXME: how do we recover when we don't get a sane "from"? Do
+				// FIXME-legacy: how do we recover when we don't get a sane "from"? Do
 				// we try to route to it anyway?
 				topic = rf;
 			}
@@ -382,7 +382,7 @@ dojo.io.repubsub = new function(){
 		// create a subscription event object and give it all the props we need
 		// to updates on the specified topic
 
-		// FIXME: we should only enqueue if this is our first subscription!
+		// FIXME-legacy: we should only enqueue if this is our first subscription!
 		this.sendTopicSubToServer(topic, rstr);
 	}
 
@@ -403,7 +403,7 @@ dojo.io.repubsub = new function(){
 			adviceFunc: toFunc
 		});
 		
-		// FIXME: figure out if there are any remaining listeners to the topic,
+		// FIXME-legacy: figure out if there are any remaining listeners to the topic,
 		// 		  and if not, inform the server of our desire not to be
 		// 		  notified of updates to the topic
 	}
@@ -414,7 +414,7 @@ dojo.io.repubsub = new function(){
 	// of a real event router without having to swallow all of the complexity.
 	this.publish = function(topic, event){
 		var evt = dojo.io.repubsubEvent.initFromProperties(event);
-		// FIXME: need to make sure we have from and to set correctly
+		// FIXME-legacy: need to make sure we have from and to set correctly
 		// 		  before we serialize and send off to the great blue
 		// 		  younder.
 		evt.to = topic;
@@ -484,7 +484,7 @@ dojo.io.repubsubEvent = function(to, from, method, id, routeURI, payload, dispna
 			if(this[tp[0]]){
 				qs.push(tp[1]+"="+encodeURIComponent(String(this[tp[0]])));
 			}
-			// FIXME: we need to be able to serialize non-stock properties!!!
+			// FIXME-legacy: we need to be able to serialize non-stock properties!!!
 		}
 		return qs.join("&");
 	}

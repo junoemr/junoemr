@@ -63,6 +63,16 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		
 		return results;
 	}
+	
+	public List<DemographicMerged> findCurrentByDemographicNo(int demographicNo) {
+		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=?1 and d.deleted=0");
+		q.setParameter(1, demographicNo);
+		
+		@SuppressWarnings("unchecked")
+		List<DemographicMerged> results = q.getResultList();
+		
+		return results;
+	}
 
 	public List<DemographicMerged> findByDemographicNo(int demographicNo)
 	{

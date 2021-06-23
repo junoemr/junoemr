@@ -158,7 +158,7 @@ window.Juno.Common.DisplayMessages = function DisplayMessages(messages_hash, opt
 
 	me.add_generic_fatal_error = function add_generic_fatal_error()
 	{
-		// TODO: change this
+		// TODO-legacy: change this
 		me.add_standard_error("Fatal Error");
 		//		Juno.Context.Settings.interface_preferences.generic_fatal_error_message);
 	};

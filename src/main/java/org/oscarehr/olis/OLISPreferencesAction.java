@@ -8,8 +8,6 @@
  */
 package org.oscarehr.olis;
 
-import java.util.TimerTask;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +24,6 @@ import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.scheduling.timer.ScheduledTimerTask;
 
 public class OLISPreferencesAction extends DispatchAction  {
 
@@ -67,10 +64,13 @@ public class OLISPreferencesAction extends DispatchAction  {
 	     		request.setAttribute("success", true);
 	     		
 	     		if (restartTimer) {
+	     			// TODO: SPRINGUPGRADE: Make timers work (or not?)
+					/*
 	     			ScheduledTimerTask task = (ScheduledTimerTask)SpringUtils.getBean("olisScheduledPullTask");		
 	     			TimerTask tt = task.getTimerTask();
 	     			Thread t = new Thread(tt);
 	     			t.start();
+					 */
 		     	}
 	     		
 	     	} catch (Exception e){

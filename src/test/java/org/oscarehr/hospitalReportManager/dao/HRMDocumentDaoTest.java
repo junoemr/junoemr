@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class HRMDocumentDaoTest extends DaoTestFixtures {
-
-	public HRMDocumentDao dao = SpringUtils.getBean(HRMDocumentDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class HRMDocumentDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public HRMDocumentDao hrmDocumentDao;
 
 
 	@Before
@@ -47,7 +53,7 @@ public class HRMDocumentDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		HRMDocument entity = new HRMDocument();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		hrmDocumentDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

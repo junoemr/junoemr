@@ -72,11 +72,11 @@ public class dxResearchBeanHandler {
 		return verdict;
 	}
 
-	public Vector<dxResearchBean> getDxResearchBeanVector() {
+	public Vector<dxResearchBean> getDxResearchBeans() {
 		return dxResearchBeanVector;
 	}
 
-	public Vector<String> getActiveCodeList() { //TODO: NEED TO CHECK STATUS
+	public Vector<String> getActiveCodeList() { //TODO-legacy: NEED TO CHECK STATUS
 		Vector<String> v = new Vector<String>();
 		for (int i = 0; i < dxResearchBeanVector.size(); i++) {
 			dxResearchBean dx = dxResearchBeanVector.get(i);
@@ -87,7 +87,7 @@ public class dxResearchBeanHandler {
 		return v;
 	}
 
-	public Vector<String> getActiveCodeListWithCodingSystem() { //TODO: NEED TO CHECK STATUS
+	public Vector<String> getActiveCodeListWithCodingSystem() { //TODO-legacy: NEED TO CHECK STATUS
 		Vector<String> v = new Vector<String>();
 		for (int i = 0; i < dxResearchBeanVector.size(); i++) {
 			dxResearchBean dx = dxResearchBeanVector.get(i);

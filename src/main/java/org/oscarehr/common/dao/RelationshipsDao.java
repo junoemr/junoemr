@@ -58,7 +58,7 @@ public class RelationshipsDao extends AbstractDao<Relationships> {
 	 * 		Returns the non-deleted rel'p with the specified ID or null if it can't be found
 	 */
 	public Relationships findActive(Integer id) {
-		// TODO replace by getBaseQuery(), when becomes available
+		// TODO-legacy replace by getBaseQuery(), when becomes available
 		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " r WHERE r.id = :id AND (r.deleted IS NULL OR r.deleted = '0')");
 		query.setParameter("id", id);
 		// query.setParameter("deleted", ConversionUtils.toBoolString(Boolean.TRUE));
@@ -75,7 +75,7 @@ public class RelationshipsDao extends AbstractDao<Relationships> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Relationships> findByDemographicNumber(Integer demographicNumber) {
-		// TODO replace by getBaseQuery(), when becomes available
+		// TODO-legacy replace by getBaseQuery(), when becomes available
 		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " r WHERE r.demographicNo = :dN AND (r.deleted IS NULL OR r.deleted = '0')");
 		query.setParameter("dN", demographicNumber);
 		return query.getResultList();

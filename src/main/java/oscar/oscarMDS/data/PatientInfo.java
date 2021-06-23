@@ -34,8 +34,8 @@ public class PatientInfo implements Comparable<PatientInfo> {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return lastName + ("".equals(lastName) ? "" : ", ") + firstName;			
+		// TODO-legacy Auto-generated method stub
+		return lastName + ("".equals(lastName) ? "" : ", ") + firstName;
 	}
 	@Override
 	public boolean equals(Object obj) {			

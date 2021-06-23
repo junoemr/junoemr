@@ -80,7 +80,7 @@ dojo.declare(
 		displayMaximizeAction: false,
 
 		// Related to connecting to taskbar
-		// TODO: use topics rather than repeated connect attempts?
+		// TODO-legacy: use topics rather than repeated connect attempts?
 		_max_taskBarConnectAttempts: 5,
 		_taskBarConnectAttempts: 0,
 
@@ -377,7 +377,7 @@ dojo.declare(
 			//	checkSize() is called when the user has resized the browser window,
 			// 	but that doesn't affect this widget (or this widget's children)
 			// 	so it can be safely ignored...
-			// TODO: unless we are maximized.  then we should resize ourself.
+			// TODO-legacy: unless we are maximized.  then we should resize ourself.
 		},
 		destroyFloatingPane: function() {
 			if(this.resizeHandle){

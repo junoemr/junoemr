@@ -92,7 +92,7 @@ public class QuickListDao extends AbstractDao<QuickList>{
 			Query query = entityManager.createNativeQuery(sql);
 			return query.getResultList();
 		} catch (Exception e) {
-			// TODO replace when test ignores are merged
+			// TODO-legacy replace when test ignores are merged
 			return new ArrayList<Object[]>();
 		}
 		

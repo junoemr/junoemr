@@ -31,14 +31,21 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Desaprisk;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DesapriskDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DesapriskDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DesapriskDao desapriskDao;
 
-	protected DesapriskDao dao = SpringUtils.getBean(DesapriskDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	public DesapriskDaoTest() {
@@ -54,7 +61,7 @@ public class DesapriskDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Desaprisk entity = new Desaprisk();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		desapriskDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
@@ -82,7 +89,7 @@ public class DesapriskDaoTest extends DaoTestFixtures {
 		desaprisk1.setDemographicNo(demographicNo1);
 		desaprisk1.setDesapriskDate(desapriskDate1);
 		desaprisk1.setDesapriskTime(desapriskTime1);
-		dao.persist(desaprisk1);
+		desapriskDao.persist(desaprisk1);
 		
 		Desaprisk desaprisk2 = new Desaprisk();
 		EntityDataGenerator.generateTestDataForModelClass(desaprisk2);
@@ -90,7 +97,7 @@ public class DesapriskDaoTest extends DaoTestFixtures {
 		desaprisk2.setDemographicNo(demographicNo2);
 		desaprisk2.setDesapriskDate(desapriskDate2);
 		desaprisk2.setDesapriskTime(desapriskTime2);
-		dao.persist(desaprisk2);
+		desapriskDao.persist(desaprisk2);
 		
 		Desaprisk desaprisk3 = new Desaprisk();
 		EntityDataGenerator.generateTestDataForModelClass(desaprisk3);
@@ -98,10 +105,10 @@ public class DesapriskDaoTest extends DaoTestFixtures {
 		desaprisk3.setDemographicNo(demographicNo1);
 		desaprisk3.setDesapriskDate(desapriskDate3);
 		desaprisk3.setDesapriskTime(desapriskTime3);
-		dao.persist(desaprisk3);
+		desapriskDao.persist(desaprisk3);
 		
 		Desaprisk expectedResult = desaprisk3;
-		Desaprisk result = dao.search(formNo1, demographicNo1);
+		Desaprisk result = desapriskDao.search(formNo1, demographicNo1);
 		
 		assertEquals(expectedResult, result);
 	}

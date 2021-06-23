@@ -26,19 +26,26 @@ import org.apache.commons.lang.WordUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds utilities used to work with spring.
  * The main usage is probably the beanFactory singleton.
  */
-public class SpringUtils {
-	
-    /**
-     * This variable is populated by one of the context listeners.
-     */
+@Component
+public class SpringUtils
+{
     public static BeanFactory beanFactory = null;
 
-    public static Object getBean(String beanName)
+	@Autowired
+	public SpringUtils(ApplicationContext applicationContext)
+	{
+		SpringUtils.beanFactory = applicationContext;
+	}
+
+	public static Object getBean(String beanName)
     {
         return(beanFactory.getBean(beanName));
     }

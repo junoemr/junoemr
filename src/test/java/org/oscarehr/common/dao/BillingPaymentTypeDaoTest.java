@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillingPaymentType;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingPaymentTypeDaoTest extends DaoTestFixtures {
-
-	protected BillingPaymentTypeDao dao = SpringUtils.getBean(BillingPaymentTypeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingPaymentTypeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingPaymentTypeDao billingPaymentTypeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class BillingPaymentTypeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BillingPaymentType entity = new BillingPaymentType();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billingPaymentTypeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -62,18 +68,18 @@ public class BillingPaymentTypeDaoTest extends DaoTestFixtures {
 		
 		BillingPaymentType bPT1 = new BillingPaymentType();
 		EntityDataGenerator.generateTestDataForModelClass(bPT1);
-		dao.persist(bPT1);
+		billingPaymentTypeDao.persist(bPT1);
 		
 		BillingPaymentType bPT2 = new BillingPaymentType();
 		EntityDataGenerator.generateTestDataForModelClass(bPT2);
-		dao.persist(bPT2);
+		billingPaymentTypeDao.persist(bPT2);
 		
 		BillingPaymentType bPT3 = new BillingPaymentType();
 		EntityDataGenerator.generateTestDataForModelClass(bPT3);
-		dao.persist(bPT3);
+		billingPaymentTypeDao.persist(bPT3);
 		
 		List<BillingPaymentType> expectedResult = new ArrayList<BillingPaymentType>(Arrays.asList(bPT1, bPT2, bPT3));
-		List<BillingPaymentType> result = dao.findAll();
+		List<BillingPaymentType> result = billingPaymentTypeDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

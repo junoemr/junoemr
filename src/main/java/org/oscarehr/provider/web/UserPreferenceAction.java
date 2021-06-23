@@ -154,7 +154,7 @@ public class UserPreferenceAction extends DispatchAction {
 			}
 		}
 		
-		Iterator<Object> iter = request.getParameterMap().keySet().iterator();
+		Iterator<String> iter = request.getParameterMap().keySet().iterator();
 		while(iter.hasNext()) {			
 			String key = (String)iter.next();
 			if(!key.startsWith("pref.")) continue;

@@ -31,13 +31,19 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.TS;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.AssignedAuthor;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ContextControl;
 import org.oscarehr.e2e.populator.AbstractPopulatorTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AuthorPopulatorTest extends AbstractPopulatorTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AuthorPopulatorTest extends AbstractPopulatorTest
+{
 	@Test
 	public void authorTest() {
 		ArrayList<Author> authors = clinicalDocument.getAuthor();

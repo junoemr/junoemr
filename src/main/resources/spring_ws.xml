@@ -258,6 +258,9 @@
 		<jaxws:features>
 			<ref bean="soapLoggingPackage"/>
 		</jaxws:features>
+		<jaxws:properties>
+			<entry key="org.apache.cxf.stax.maxTextLength" value="268435456" />
+		</jaxws:properties>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#integrationWs" address="/IntegrationService" >
@@ -368,6 +371,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.EncounterSectionsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxAccountWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxInboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>
@@ -404,6 +408,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReportByTemplateService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReportingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ResourceService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.RosterWebService" />
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RSSFeedService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ScheduleService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SitesService"/>

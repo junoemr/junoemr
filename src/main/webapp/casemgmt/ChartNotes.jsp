@@ -387,7 +387,8 @@ try
 				<input type="button" value="<bean:message key="oscarEncounter.Filter.title"/>" onclick="showFilter();" />
 				<%
 					String roleName = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-					String pAge = Integer.toString(UtilDateUtilities.calcAge(bean.yearOfBirth,bean.monthOfBirth,bean.dateOfBirth));
+					String patientAge = Integer.toString(UtilDateUtilities.calcAge(bean.yearOfBirth,bean.monthOfBirth,bean.dateOfBirth));
+					String patientSex = bean.getPatientSex();
 				%>
 				<security:oscarSec roleName="<%=roleName%>" objectName="_newCasemgmt.calculators" rights="r" reverse="false">
 					<%@include file="calculatorsSelectList.jspf" %>

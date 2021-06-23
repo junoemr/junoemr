@@ -149,7 +149,7 @@ public class AddEFormAction extends Action {
 						//}
 
 						// Run the SQL query against the database
-						//TODO: do this a different way.
+						//TODO-legacy: do this a different way.
 						MiscUtils.getLogger().error("Error",new Exception("EForm is using disabled functionality for updating fields..update not performed"));
 					}
 				}

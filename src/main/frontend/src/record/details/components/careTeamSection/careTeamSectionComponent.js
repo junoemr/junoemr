@@ -22,7 +22,6 @@
 */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {SystemPreferenceApi} from "../../../../../generated/"
 import {ProvidersServiceApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('careTeamSection', {
@@ -48,8 +47,6 @@ angular.module('Record.Details').component('careTeamSection', {
                   referralDoctorsService)
 	{
 		let ctrl = this;
-        let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
-            '../ws/rs');
         let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
@@ -57,26 +54,20 @@ angular.module('Record.Details').component('careTeamSection', {
 		ctrl.numberRegex=/^\d*$/
 		ctrl.patientStatusList = [];
 		ctrl.referralDoctors = [{value: "", label: "--"}];
-		ctrl.rosterTermReasons = staticDataService.getRosterTerminationReasons();
 
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-		ctrl.rosterDateValid = true;
 		ctrl.patientStatusDateValid = true;
 		ctrl.endDateValid = true;
 		ctrl.dateJoinedValid = true;
-		ctrl.terminationDateValid = true;
-        ctrl.familyDoctorEnabled = false;
 
 		ctrl.$onInit = () =>
 		{
 			// add date validations
-			ctrl.validations["rosterDate"] = Juno.Validations.validationCustom(() => ctrl.rosterDateValid);
 			ctrl.validations["patientStatusDate"] = Juno.Validations.validationCustom(() => ctrl.patientStatusDateValid);
 			ctrl.validations["endDate"] = Juno.Validations.validationCustom(() => ctrl.endDateValid);
 			ctrl.validations["dateJoined"] = Juno.Validations.validationCustom(() => ctrl.dateJoinedValid);
-			ctrl.validations["terminationDate"] = Juno.Validations.validationCustom(() => ctrl.terminationDateValid);
 
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
@@ -101,27 +92,12 @@ angular.module('Record.Details').component('careTeamSection', {
 					}
 			);
 
-			demographicsService.getStatusList("roster").then(
-					function success(data)
-					{
-						ctrl.rosterStatusList = data;
-					}
-			);
-
 			demographicsService.getStatusList("patient").then(
 					function success(data)
 					{
 						ctrl.patientStatusList = data;
 					}
 			);
-
-			systemPreferenceApi.getPropertyEnabled("demographic_family_doctor").then(
-                (response) =>
-                {
-                    ctrl.familyDoctorEnabled = response.data.body;
-                }
-            )
-
 		}
 
 		ctrl.updateReferralDoctors = (docSearchString, docReferralNo) =>
@@ -157,11 +133,6 @@ angular.module('Record.Details').component('careTeamSection', {
 			ctrl.ngModel.scrReferralDocNo = value.referralNo;
 		}
 
-		ctrl.updateFamilyDocNo = (value) =>
-        {
-            ctrl.ngModel.scrFamilyDocNo = value.referralNo;
-        }
-
 		ctrl.openAddPatientStatusModal = async () =>
 		{
 			try
@@ -184,30 +155,6 @@ angular.module('Record.Details').component('careTeamSection', {
 		ctrl.addNewPatientStatus = (status) =>
 		{
 			this.patientStatusList.push({"label": status, "value": status});
-		}
-
-		ctrl.openAddRosterStatusModal = async () =>
-		{
-			try
-			{
-				let newStatus = await Juno.Common.Util.openInputDialog($uibModal, "Add Roster Status",
-						"Input the new roster status", ctrl.componentStyle)
-
-				if (newStatus)
-				{
-					ctrl.addNewRosterStatus(newStatus);
-					ctrl.ngModel.rosterStatus = newStatus;
-				}
-			}
-			catch (e)
-			{
-				//user abort (Esc key)
-			}
-		}
-
-		ctrl.addNewRosterStatus = (newStatus) =>
-		{
-			ctrl.rosterStatusList.push({"label": newStatus, "value": newStatus});
 		}
 
 		ctrl.updatePatientStatusDate = () =>

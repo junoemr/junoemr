@@ -39,7 +39,7 @@ public class JointAdmissionDao extends AbstractDao<JointAdmission> {
 	}
 	
     public List<JointAdmission> getSpouseAndDependents(Integer clientId){
-		Query query = entityManager.createQuery("SELECT x FROM JointAdmission x WHERE x.archived=0 and x.headClientId=?");
+		Query query = entityManager.createQuery("SELECT x FROM JointAdmission x WHERE x.archived=0 and x.headClientId=?1");
 		query.setParameter(1,clientId);
 		@SuppressWarnings("unchecked")
         List<JointAdmission> results = query.getResultList();
@@ -47,7 +47,7 @@ public class JointAdmissionDao extends AbstractDao<JointAdmission> {
     }
     
     public JointAdmission getJointAdmission(Integer clientId){
-    	Query query = entityManager.createQuery("SELECT x FROM JointAdmission x WHERE x.archived=0 and x.clientId=?");
+    	Query query = entityManager.createQuery("SELECT x FROM JointAdmission x WHERE x.archived=0 and x.clientId=?1");
 		query.setParameter(1,clientId);
 		@SuppressWarnings("unchecked")
         List<JointAdmission> results = query.getResultList();

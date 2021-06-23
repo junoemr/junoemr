@@ -27,6 +27,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -35,12 +36,24 @@ import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.HnrDataValidation;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class HnrDataValidationDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class HnrDataValidationDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected HnrDataValidationDao hnrDataValidationDao = SpringUtils.getBean(HnrDataValidationDao.class);
 
-	protected HnrDataValidationDao dao = SpringUtils.getBean(HnrDataValidationDao.class);
+	@Autowired
 	protected FacilityDao facilityDao = SpringUtils.getBean(FacilityDao.class);
+
+	@Autowired
 	protected DemographicDao demographicDao  =SpringUtils.getBean(DemographicDao.class);
+
+	@Autowired
 	protected ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 
 
@@ -85,7 +98,7 @@ public class HnrDataValidationDaoTest extends DaoTestFixtures {
 		entity.setClientId(d.getDemographicNo());
 		entity.setValidatorProviderNo(p.getProviderNo());
 		entity.setValidationType(HnrDataValidation.Type.HC_INFO);
-		dao.persist(entity);
+		hnrDataValidationDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

@@ -60,7 +60,7 @@ dojo.json = {
 		// return:
 		//		the result of the evaluation
 
-		// FIXME: should this accept mozilla's optional second arg?
+		// FIXME-legacy: should this accept mozilla's optional second arg?
 		try {
 			return eval("(" + json + ")");
 		}catch(e){

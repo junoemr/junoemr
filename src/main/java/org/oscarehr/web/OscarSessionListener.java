@@ -32,7 +32,7 @@ public class OscarSessionListener implements HttpSessionListener {
 
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 
 	}
 

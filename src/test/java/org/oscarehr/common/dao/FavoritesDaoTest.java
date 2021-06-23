@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Favorites;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FavoritesDaoTest extends DaoTestFixtures {
-
-	protected FavoritesDao dao = SpringUtils.getBean(FavoritesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FavoritesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FavoritesDao favoritesDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class FavoritesDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Favorites entity = new Favorites();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		favoritesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

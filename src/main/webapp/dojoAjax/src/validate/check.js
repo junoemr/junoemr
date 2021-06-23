@@ -151,9 +151,9 @@ dojo.validate.check = function(/*HTMLFormElement*/form, /*Object*/profile){
 	}
 
 	// Dependent fields are required when the target field is present (not blank).
-	// Todo: Support dependent and target fields that are radio button groups, or select drop-down lists.
-	// Todo: Make the dependency based on a specific value of the target field.
-	// Todo: allow dependent fields to have several required values, like {checkboxgroup: 3}.
+	// Todo-legacy: Support dependent and target fields that are radio button groups, or select drop-down lists.
+	// Todo-legacy: Make the dependency based on a specific value of the target field.
+	// Todo-legacy: allow dependent fields to have several required values, like {checkboxgroup: 3}.
 	if(dojo.lang.isObject(profile.dependencies) || dojo.lang.isObject(profile.dependancies)){
 		if(profile["dependancies"]){
 			dojo.deprecated("dojo.validate.check", "profile 'dependancies' is deprecated, please use "
@@ -235,7 +235,7 @@ dojo.validate.check = function(/*HTMLFormElement*/form, /*Object*/profile){
 	return results; // Object
 };
 
-//TODO: evaluateConstraint doesn't use profile or fieldName args?
+//TODO-legacy: evaluateConstraint doesn't use profile or fieldName args?
 dojo.validate.evaluateConstraint=function(profile, /*Array*/constraint, fieldName, elem){
 	// summary:
 	//	Evaluates dojo.validate.check() constraints that are specified as array

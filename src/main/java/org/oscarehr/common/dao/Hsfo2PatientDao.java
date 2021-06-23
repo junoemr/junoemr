@@ -40,7 +40,7 @@ public class Hsfo2PatientDao extends AbstractDao<Hsfo2Patient>
 	
 
 	public Hsfo2Patient getHsfoPatientByPatientId(String patientId) {
-		String sqlCommand = "select x from Hsfo2Patient x where x.Patient_Id=? order by x.id desc ";
+		String sqlCommand = "select x from Hsfo2Patient x where x.Patient_Id=?1 order by x.id desc ";
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter(1, patientId);
 		List<Hsfo2Patient> results=query.getResultList();

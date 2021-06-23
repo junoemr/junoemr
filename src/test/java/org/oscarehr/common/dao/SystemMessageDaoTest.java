@@ -40,19 +40,27 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SystemMessage;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
 /**
  * @author Shazib
  */
 
 @SuppressWarnings("unused")
-public class SystemMessageDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SystemMessageDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SystemMessageDao systemMessageDao;
 
-	protected SystemMessageDao dao = SpringUtils.getBean(SystemMessageDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 
@@ -65,7 +73,7 @@ public class SystemMessageDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		SystemMessage entity = new SystemMessage();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		systemMessageDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -77,21 +85,21 @@ public class SystemMessageDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(sysMessage1);
 		Date date1 = new Date(dfm.parse("20110701").getTime());
 		sysMessage1.setExpiryDate(date1);
-		dao.persist(sysMessage1);
+		systemMessageDao.persist(sysMessage1);
 		
 		SystemMessage sysMessage2 = new SystemMessage();
 		EntityDataGenerator.generateTestDataForModelClass(sysMessage2);
 		Date date2 = new Date(dfm.parse("20100701").getTime());
 		sysMessage2.setExpiryDate(date2);
-		dao.persist(sysMessage2);
+		systemMessageDao.persist(sysMessage2);
 		
 		SystemMessage sysMessage3 = new SystemMessage();
 		EntityDataGenerator.generateTestDataForModelClass(sysMessage3);
 		Date date3 = new Date(dfm.parse("20120701").getTime());
 		sysMessage3.setExpiryDate(date3);
-		dao.persist(sysMessage3);
+		systemMessageDao.persist(sysMessage3);
 		
-		List<SystemMessage> result = dao.findAll();
+		List<SystemMessage> result = systemMessageDao.findAll();
 		List<SystemMessage> expectedResult = new ArrayList<SystemMessage>(Arrays.asList(sysMessage3,sysMessage1,sysMessage2));
 			
 		Logger logger = MiscUtils.getLogger();

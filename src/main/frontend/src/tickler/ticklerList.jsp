@@ -27,7 +27,7 @@
 
 <div class="tickler-page-header"
      ng-if="!ticklerListCtrl.inDemographicView()">
-	<!-- TODO -->
+	<!-- TODO-legacy -->
 </div>
 <div ng-show="ticklerListCtrl.ticklerReadAccess" class="col-xs-12" id="tickler-list-page">
 	<form name="searchForm" id="search-form" class="noprint">

@@ -39,15 +39,23 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ReportAgeSex;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ReportAgeSexDaoTest extends DaoTestFixtures {
-	
-	protected ReportAgeSexDao dao = (ReportAgeSexDao)SpringUtils.getBean(ReportAgeSexDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ReportAgeSexDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ReportAgeSexDao dao;
+
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
 	@Before

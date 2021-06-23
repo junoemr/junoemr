@@ -128,7 +128,7 @@ public class WorkFlowInfo {
     }
 
     public int getGestationAge(){
-        //TODO: WHAT HAPPENS WITH NO EDD???
+        //TODO-legacy: WHAT HAPPENS WITH NO EDD???
         int ret = -1;
         MiscUtils.getLogger().debug("GEST "+this.completionDate);
         if(this.completionDate != null){

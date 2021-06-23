@@ -396,7 +396,7 @@ if(currentFacility.isEnableEncounterTransportationTime() || (currentProgram != n
 		</nested:equal>
 		<!--  change diagnosis button -->
 		<%
-		String submitChange = "return changeDiagnosisUnresolved('" +ind.intValue() + "');";
+		String submitChange = "return changeDiagnosisUnresolved('" + ind.intValue() + "');";
 		%>
 	 	&nbsp;
  		<a href="#"     onclick="<%=submitChange%>">Change</a>

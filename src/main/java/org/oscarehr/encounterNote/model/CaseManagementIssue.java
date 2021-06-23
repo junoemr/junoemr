@@ -44,6 +44,10 @@ import java.util.List;
 @Table(name = "casemgmt_issue")
 public class CaseManagementIssue extends AbstractModel<Long>
 {
+	public static final String ISSUE_FILTER_ALL = "all";
+	public static final String ISSUE_FILTER_RESOLVED = "resolved";
+	public static final String ISSUE_FILTER_UNRESOLVED = "unresolved";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")

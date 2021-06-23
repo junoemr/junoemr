@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderBillCenter;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderBillCenterDaoTest extends DaoTestFixtures {
-
-	protected ProviderBillCenterDao dao = SpringUtils.getBean(ProviderBillCenterDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderBillCenterDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderBillCenterDao providerBillCenterDao;
 
 	public ProviderBillCenterDaoTest() {
 	}
@@ -50,7 +56,7 @@ public class ProviderBillCenterDaoTest extends DaoTestFixtures {
 		ProviderBillCenter entity = new ProviderBillCenter();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setProviderNo("999998");
-		dao.persist(entity);
+		providerBillCenterDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}

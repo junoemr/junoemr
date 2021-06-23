@@ -24,15 +24,18 @@
 package org.oscarehr.common.dao;
 
 
-import java.util.Date;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import org.apache.commons.lang.math.NumberUtils;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
+
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import java.util.Date;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class PartialDateDao extends AbstractDao<PartialDate> {
@@ -43,11 +46,12 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	
 	public PartialDate getPartialDate(Integer tableName, Integer tableId, Integer fieldName) {
 
-		String sqlCommand = "select x from PartialDate x where x.tableName=?1 and x.tableId=?2 and x.fieldName=?3 order by x.id desc limit 1";
+		String sqlCommand = "select x from PartialDate x where x.tableName=?1 and x.tableId=?2 and x.fieldName=?3 order by x.id desc";
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter(1, tableName);
 		query.setParameter(2, tableId);
 		query.setParameter(3, fieldName);
+		query.setMaxResults(1); // limit
 
 		@SuppressWarnings("unchecked")
 		PartialDate result = null;
@@ -58,6 +62,30 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 		}
 
 		return result;
+	}
+
+	/**
+	 * fetch all the partial date entries for a specified table/entity combination. This returns a map keyed on the fieldName
+	 * @param tableName - the table 'name'
+	 * @param tableId - the entity id
+	 * @return -  a map containing all entries for the entity, keyed on the fieldName
+	 */
+	public Map<Integer, PartialDate> getAllForTableEntry(Integer tableName, Integer tableId)
+	{
+		String jpql = "SELECT x \n" +
+				"FROM PartialDate x \n" +
+				"WHERE x.tableName = :tableName \n" +
+				"AND x.tableId = :tableId";
+		return entityManager.createQuery(jpql, PartialDate.class)
+				.setParameter("tableName", tableName)
+				.setParameter("tableId", tableId)
+				.getResultStream()
+				.collect(
+						Collectors.toMap(
+								PartialDate::getFieldName,
+								partialDate -> (partialDate)
+						)
+				);
 	}
 	
 	public String getDatePartial(Date fieldDate, Integer tableName, Integer tableId, Integer fieldName) {
@@ -77,10 +105,10 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	public String getDatePartial(String dateString, String format) {
 		if (dateString==null || dateString.length()<10) return dateString;
 		
-		if (PartialDate.YEARONLY.equals(format)) {
+		if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) {
 			dateString = dateString.substring(0,4);
 		}
-		else if (PartialDate.YEARMONTH.equals(format)) {
+		else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) {
 			dateString = dateString.substring(0,7);
 		}
 		return dateString;
@@ -103,6 +131,28 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 		if (partialDate!=null) persist(partialDate);
 	}
 
+	public void setPartialDate(org.oscarehr.dataMigration.model.common.PartialDate partialDateModel,
+	                           PartialDate.TABLE table, Integer tableId, Integer field)
+	{
+		String format = partialDateModel.getFormatString();
+		if(format != null)
+		{
+			setPartialDate(table.getValue(), tableId, field, format);
+		}
+	}
+	public void setPartialDateTime(org.oscarehr.dataMigration.model.common.PartialDateTime partialDateModel,
+	                           PartialDate.TABLE table, Integer tableId, Integer field)
+	{
+		if(partialDateModel.isFullDateTime())
+		{
+			setPartialDate(table.getValue(), tableId, field, PartialDate.FORMAT_FULL_DATE);
+		}
+		else
+		{
+			setPartialDate(partialDateModel, table, tableId, field);
+		}
+	}
+
 	public String getFormat(Integer tableName, Integer tableId, Integer fieldName) {
 		PartialDate partialDate = getPartialDate(tableName, tableId, fieldName);
 		if (partialDate!=null) return partialDate.getFormat();
@@ -115,12 +165,12 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 
 		dateValue = dateValue.trim();
 		dateValue = dateValue.replace("/", "-");
-		if (dateValue.length()==4 && NumberUtils.isDigits(dateValue)) return PartialDate.YEARONLY;
+		if (dateValue.length()==4 && NumberUtils.isDigits(dateValue)) return PartialDate.FORMAT_YEAR_ONLY;
 
 		String[] dateParts = dateValue.split("-");
 		if (dateParts.length==2 && NumberUtils.isDigits(dateParts[0]) && NumberUtils.isDigits(dateParts[1])) {
 			if (dateParts[0].length()==4 && dateParts[1].length()>=1 && dateParts[1].length()<=2)
-					return PartialDate.YEARMONTH;
+					return PartialDate.FORMAT_YEAR_MONTH;
 		}
 		return null;
     }
@@ -128,8 +178,8 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	public String getFullDate(String partialDate) {
 		String format = getFormat(partialDate);
 		
-		if (PartialDate.YEARONLY.equals(format)) partialDate += "-01-01";
-		else if (PartialDate.YEARMONTH.equals(format)) partialDate += "-01";
+		if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) partialDate += "-01-01";
+		else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) partialDate += "-01";
 		
 		return partialDate;
 	}

@@ -27,12 +27,14 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.AfterClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 
@@ -49,16 +51,18 @@ public class AddGroupTests extends SeleniumTestBase
 	public static final String valueOfDrBerry = groupName + drBerry.providerNo;
 	public static final String valueOfDrCherry = groupName + drCherry.providerNo;
 
-	@BeforeClass
-	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+	@Autowired
+	DatabaseUtil databaseUtil;
 
-		SchemaUtils.restoreTable("admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter");
+	@Before
+	public void setup()
+	{
 		loadSpringBeans();
-		DatabaseUtil.createTestProvider();
+		databaseUtil.createTestProvider();
 	}
 
-	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter");
 	}

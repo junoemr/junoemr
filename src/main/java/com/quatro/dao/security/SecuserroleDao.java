@@ -120,7 +120,7 @@ public class SecuserroleDao extends HibernateDaoSupport {
 		logger.debug("deleting Secuserrole by orgcd");
 		try {
 
-			return getHibernateTemplate().bulkUpdate("delete Secuserrole as model where model.orgcd =?", orgcd);
+			return getHibernateTemplate().bulkUpdate("delete Secuserrole as model where model.orgcd =?0", orgcd);
 
 		} catch (RuntimeException re) {
 			logger.error("delete failed", re);
@@ -131,7 +131,7 @@ public class SecuserroleDao extends HibernateDaoSupport {
 		logger.debug("deleting Secuserrole by providerNo");
 		try {
 
-			return getHibernateTemplate().bulkUpdate("delete Secuserrole as model where model.providerNo =?", providerNo);
+			return getHibernateTemplate().bulkUpdate("delete Secuserrole as model where model.providerNo =?0", providerNo);
 
 		} catch (RuntimeException re) {
 			logger.error("delete failed", re);
@@ -143,7 +143,7 @@ public class SecuserroleDao extends HibernateDaoSupport {
 		logger.debug("deleting Secuserrole by ID");
 		try {
 
-			return getHibernateTemplate().bulkUpdate("delete Secuserrole as model where model.id =?", id);
+			return getHibernateTemplate().bulkUpdate("delete Secuserrole as model where model.id =?0", id);
 
 		} catch (RuntimeException re) {
 			logger.error("delete failed", re);
@@ -207,7 +207,7 @@ public class SecuserroleDao extends HibernateDaoSupport {
 		Session session = getSession();
 		try {
 			String queryString = "from Secuserrole as model where model."
-					+ propertyName + "= ?";
+					+ propertyName + "= ?0";
 			Query queryObject = session.createQuery(queryString);
 			queryObject.setParameter(0, value);
 			return queryObject.list();

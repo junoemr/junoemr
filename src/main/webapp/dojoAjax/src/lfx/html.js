@@ -62,7 +62,7 @@ dojo.lfx.html.propertyAnimation = function(	/*DOMNode[]*/ nodes,
 	
 	var setEmUp = function(args){
 		if(args.nodes.length==1){
-			// FIXME: we're only supporting start-value filling when one node is
+			// FIXME-legacy: we're only supporting start-value filling when one node is
 			// passed
 			
 			var pm = args.propertyMap;
@@ -138,7 +138,7 @@ dojo.lfx.html.propertyAnimation = function(	/*DOMNode[]*/ nodes,
 			dojo.lang.forEach(this._properties, function(prop, i){
 				var value = null;
 				if(dojo.lang.isArray(prop.start)){
-					// FIXME: what to do here?
+					// FIXME-legacy: what to do here?
 				}else if(prop.start instanceof dojo.gfx.color.Color){
 					value = (prop.units||"rgb") + "(";
 					for(var j = 0 ; j < prop.startRgb.length ; j++){
@@ -319,7 +319,7 @@ dojo.lfx.html.wipeIn = function(/*DOMNode[]*/ nodes, /*int?*/ duration, /*Functi
 		
 		// get node height, either it's natural height or it's height specified via style or class attributes
 		// (for FF, the node has to be (temporarily) rendered to measure height)
-		// TODO: should this offscreen code be part of dojo.html, so that getBorderBox() works on hidden nodes?
+		// TODO-legacy: should this offscreen code be part of dojo.html, so that getBorderBox() works on hidden nodes?
 		var origTop, origLeft, origPosition;
 		with(node.style){
 			origTop=top; origLeft=left; origPosition=position;

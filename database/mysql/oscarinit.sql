@@ -1702,7 +1702,7 @@ CREATE TABLE formAR (
   pg2_formDate date default NULL,
   pg3_formDate date default NULL,
   PRIMARY KEY  (ID)
-) ;
+) ENGINE=MyISAM ;
 
 --
 -- Table structure for table `formAdf`
@@ -3807,7 +3807,7 @@ CREATE TABLE formPalliativeCare (
   signature3 varchar(50) default NULL,
   signature4 varchar(50) default NULL,
   PRIMARY KEY  (ID)
-) ;
+) ENGINE=MyISAM ;
 
 --
 -- Table structure for table `formPeriMenopausal`
@@ -4031,7 +4031,7 @@ CREATE TABLE formPeriMenopausal (
   other33 varchar(100) default NULL,
   other34 varchar(100) default NULL,
   PRIMARY KEY  (ID)
-) ;
+) ENGINE=MyISAM ;
 
 --
 -- Table structure for table `formRourke2006`
@@ -5100,7 +5100,7 @@ CREATE TABLE `formRourke` (
   `p3_signature2y` varchar(50) default NULL,
   `p3_signature4y` varchar(50) default NULL,
   PRIMARY KEY  (`ID`)
-) ;
+) ENGINE=MyISAM ;
 
 --
 -- Table structure for table formSF36
@@ -5317,7 +5317,7 @@ CREATE TABLE formSF36(
   Q12aMuch tinyint(1),
   Q12aCmt varchar(255),
   PRIMARY KEY  (ID)
-) ;
+) ENGINE=MyISAM ;
 
 --
 -- Table structure for table formSF36Caregiver
@@ -5535,7 +5535,7 @@ CREATE TABLE formSF36Caregiver(
   Q12aMuch tinyint(1),
   Q12aCmt varchar(255),
   PRIMARY KEY  (ID)
-) ;
+) ENGINE=MyISAM ;
 
 --
 -- Table structure for table formSelfAdministered
@@ -6027,7 +6027,7 @@ CREATE TABLE formVTForm(
   INDEX (ID),
   INDEX (demographic_no)
 
-) ;
+) ENGINE=MyISAM ;
 
 CREATE TABLE `formGrowth0_36` (
   `ID` int(10) NOT NULL auto_increment,
@@ -6582,7 +6582,7 @@ CREATE TABLE formIntakeHx (
   `immunizationDiseaseYearHepatitisB` text,
   `immunizationDiseaseHepatitisB` text,
    PRIMARY KEY (`ID`)
-);
+) ENGINE=MyISAM;
 
 --
 -- Table structure for table `groupMembers_tbl`

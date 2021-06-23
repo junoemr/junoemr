@@ -23,6 +23,8 @@
  */
 package org.oscarehr.appointment.dao;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -44,14 +46,14 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
 		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " x ORDER BY x.id");
 		return query.getResultList();
 	}
-	
+
 	@SuppressWarnings("unchecked")
     public List<AppointmentStatus> findByActive(boolean isActive)
     {
     	int active = isActive? 1 : 0;
 	    Query query = entityManager.createQuery("SELECT a FROM AppointmentStatus a WHERE a.active = :active");
 	    query.setParameter("active", active);
-	    
+
 	    return query.getResultList();
     }
     
@@ -91,7 +93,7 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
     		appts.setActive(iActive);
     	}
     }
-	
+
 	/**
 	 * Get a list of all status codes which are currently in use.  Statuses which have been modified
 	 * (ie: Verified V, Signed S) are considered separate from their unmodified version
@@ -104,7 +106,42 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
 	{
 		String sql = "SELECT DISTINCT status FROM appointment ORDER BY status";
 		Query query = entityManager.createNativeQuery(sql);
-		
+
 		return query.getResultList();
+	}
+
+	/**
+	 * Find all inactive statuses that are currently used in any appointment. Return a list of these statuses.
+	 *
+	 * @param allStatus
+	 * @return int
+	 */
+	public List<String> checkStatusUsuage(List<AppointmentStatus> allStatus)
+	{
+		int inactiveUseCount = 0;
+		List<String> inactiveUsedStatuses = new ArrayList<String>();
+		AppointmentStatus apptStatus = null;
+		String sql = null;
+		for (int i = 0; i < allStatus.size(); i++)
+		{
+			apptStatus = allStatus.get(i);
+			if (apptStatus.getActive() == 1)
+			{
+				continue;
+			}
+			sql = "select count(*) as total from appointment a where a.status like ?1 ";
+			// sql = sql + "collate latin1_general_cs";
+
+			Query q = entityManager.createNativeQuery(sql);
+			q.setParameter(1, apptStatus.getStatus() + "%");
+			Object result = q.getSingleResult();
+
+			inactiveUseCount = ((BigInteger) result).intValue();
+			if (inactiveUseCount > 0)
+			{
+				inactiveUsedStatuses.add(apptStatus.getStatus());
+			}
+		}
+		return inactiveUsedStatuses;
 	}
 }

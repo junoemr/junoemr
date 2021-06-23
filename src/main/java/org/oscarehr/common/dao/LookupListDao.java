@@ -39,7 +39,7 @@ public class LookupListDao extends AbstractDao<LookupList>{
 	}
 	
 	public List<LookupList> findAllActive() {
-		Query q = entityManager.createQuery("select l from LookupList l where l.active=? order by l.name asc");
+		Query q = entityManager.createQuery("select l from LookupList l where l.active=?1 order by l.name asc");
 		q.setParameter(1,true);
 		
 		@SuppressWarnings("unchecked")
@@ -49,7 +49,7 @@ public class LookupListDao extends AbstractDao<LookupList>{
 	}
 	
 	public LookupList findByName(String name) {
-		Query q = entityManager.createQuery("select l from LookupList l where l.name=?");
+		Query q = entityManager.createQuery("select l from LookupList l where l.name=?1");
 		q.setParameter(1,name);
 		
 		LookupList ll = this.getSingleResultOrNull(q);

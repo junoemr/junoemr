@@ -60,6 +60,8 @@ public class NoteTo1 implements Serializable{
 	private boolean isDocument;
 	private boolean isDeleted;
 	private boolean isRxAnnotation;
+	private String regionalIdentifier;
+	private String customName;
 	private boolean isEformData;
 	private boolean isEncounterForm;
 	private boolean isInvoice;
@@ -80,7 +82,10 @@ public class NoteTo1 implements Serializable{
 	private String encounterTransportationTime;
 	
 	private Integer position;
-	
+
+	private String documentStatus;
+	private String documentFilename;
+
 	private List<CaseManagementIssueTo1> assignedIssues = new ArrayList<CaseManagementIssueTo1>();
 	
 	public Integer getNoteId() {
@@ -263,6 +268,26 @@ public class NoteTo1 implements Serializable{
 		this.isRxAnnotation = isRxAnnotation;
 	}
 
+	public String getRegionalIdentifier()
+	{
+		return regionalIdentifier;
+	}
+
+	public void setRegionalIdentifier(String regionalIdentifier)
+	{
+		this.regionalIdentifier = regionalIdentifier;
+	}
+
+	public String getCustomName()
+	{
+		return customName;
+	}
+
+	public void setCustomName(String customName)
+	{
+		this.customName = customName;
+	}
+
 	public boolean isEformData() {
 		return isEformData;
 	}
@@ -425,5 +450,25 @@ public class NoteTo1 implements Serializable{
 	public void setEncounterFormId(Integer encounterFormId)
 	{
 		this.encounterFormId = encounterFormId;
+	}
+
+	public String getDocumentStatus()
+	{
+		return documentStatus;
+	}
+
+	public void setDocumentStatus(String documentStatus)
+	{
+		this.documentStatus = documentStatus;
+	}
+
+	public String getDocumentFilename()
+	{
+		return documentFilename;
+	}
+
+	public void setDocumentFilename(String documentFilename)
+	{
+		this.documentFilename = documentFilename;
 	}
 }

@@ -38,7 +38,7 @@ public class InstitutitionDepartmentDao extends AbstractDao<InstitutionDepartmen
 	}
 	
 	public List<InstitutionDepartment> findByInstitutionId(int institutionId) {
-		Query q = entityManager.createQuery("select x from InstitutionDepartment x where x.id.institutionId = ?");
+		Query q = entityManager.createQuery("select x from InstitutionDepartment x where x.id.institutionId = ?1");
 		q.setParameter(1, institutionId);
 		
 		@SuppressWarnings("unchecked")

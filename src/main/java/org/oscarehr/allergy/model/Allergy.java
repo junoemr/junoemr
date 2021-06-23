@@ -508,7 +508,7 @@ public class Allergy extends AbstractModel<Integer>
 		return Allergy.getSeverityOfReactionDesc(severityOfReaction);
 	}
 
-	//TODO: NEEDS I18N
+	//TODO-legacy: NEEDS I18N
 	public static String getSeverityOfReactionDesc(String severityCode)
 	{
 		if (SEVERITY_CODE_MILD.equals(severityCode))

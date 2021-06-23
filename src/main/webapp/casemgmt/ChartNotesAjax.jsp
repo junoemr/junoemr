@@ -82,6 +82,7 @@ String provNo = bean.providerNo;
 
 String dateFormat = "dd-MMM-yyyy H:mm";
 long savedId = 0;
+String caseNote_note = "";
 boolean found = false;
 String bgColour = "color:#000000;background-color:#CCCCFF;";
 ArrayList<Integer> lockedNotes = new ArrayList<Integer>();
@@ -117,16 +118,17 @@ int maxId = 0;
 
 		//if we're editing a note, check to see if it is locked
 		//
-		if (cform.getCaseNote().getId() != null)
+		if (cform != null && cform.getCaseNote().getId() != null)
 		{		    
 			savedId = cform.getCaseNote().getId();
+			caseNote_note = cform.getCaseNote_note();
 		}
 
 		//Check user property for stale date and show appropriately
 		UserProperty uProp = (UserProperty) session.getAttribute(UserProperty.STALE_NOTEDATE);
 
 		Date dStaleDate;
-		int numToDisplay = 5;
+		int numToDisplay = 1;
 		int numDisplayed = 0;
 		Calendar cal = Calendar.getInstance();
 		if (uProp != null)
@@ -346,7 +348,7 @@ int maxId = 0;
 			 
 			<input type="hidden" id="signed<%=globalNoteId%>" value="<%=note.isSigned()%>" />
 			<input type="hidden" id="full<%=globalNoteId%>" value="<%=fulltxt || (note.getNoteId() !=null && note.getNoteId().equals(savedId))%>" />
-			<input type="hidden" id="bgColour<%=globalNoteId%>" value="<%=bgColour%>" /> 
+			<input type="hidden" id="bgColour<%=globalNoteId%>" value="<%=bgColour%>" />
 			<input type="hidden" id="editWarn<%=globalNoteId%>" value="<%=editWarn%>" />
 
 	  		<div id="n<%=globalNoteId%>">
@@ -368,7 +370,7 @@ int maxId = 0;
  						<% } %>
 
 						<img title="<bean:message key="oscarEncounter.print.title"/>" id='print<%=globalNoteId%>' alt="<bean:message key="oscarEncounter.togglePrintNote.title"/>" onclick="togglePrint(<%=globalNoteId%>, event)" style='float: right; margin-right: 5px;' src='<%=ctx %>/oscarEncounter/graphics/printer.png' />
-						<textarea tabindex="7" cols="84" rows="10" class="txtArea" wrap="soft" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=cform.getCaseNote_note()%></textarea>
+						<textarea tabindex="7" cols="84" rows="10" class="txtArea" wrap="soft" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=caseNote_note%></textarea>
 						
 						<div class="sig" style="display:inline;<%=bgColour%>" id="sig<%=globalNoteId%>">
 							<%@ include file="noteIssueList.jsp"%>
@@ -802,7 +804,7 @@ int maxId = 0;
 		<input type="hidden" id="bgColour<%=savedId%>" value="color:#000000;background-color:#CCCCFF;" />
 		<input type="hidden" id="editWarn<%=savedId%>" value="false" />
 		<div id="n<%=savedId%>" style="line-height: 1.1em;">
-			 <textarea tabindex="7" cols="84" rows="10" class="txtArea" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=cform.getCaseNote_note() %></textarea>
+			 <textarea tabindex="7" cols="84" rows="10" class="txtArea" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=caseNote_note %></textarea>
 			<div class="sig" id="sig<%=savedId%>">
 				<%@ include file="noteIssueList.jsp"%>
 			</div> <!-- end of div sig<%=savedId%> -->

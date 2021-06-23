@@ -28,19 +28,24 @@ import static org.junit.Assert.fail;
 
 import javax.persistence.PersistenceException;
 
-import org.hibernate.HibernateException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderInboxItem;
-import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.oscarLab.ca.on.LabResultData;
 
-public class ProviderInboxRoutingDaoTest extends DaoTestFixtures {
-
-	protected ProviderInboxRoutingDao dao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderInboxRoutingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderInboxRoutingDao providerInboxRoutingDao;
 
 	public ProviderInboxRoutingDaoTest() {
 	}
@@ -54,22 +59,8 @@ public class ProviderInboxRoutingDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ProviderInboxItem entity = new ProviderInboxItem();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		providerInboxRoutingDao.persist(entity);
 
 		assertNotNull(entity.getId());
-	}
-
-	@Test
-	public void testAddToProviderRoutingBox() {
-		try {
-			dao.addToProviderInbox("1", 1, LabResultData.DOCUMENT);
-		} catch (PersistenceException e) {
-			fail("Error related to JPA configuration");
-		} catch (HibernateException e) {
-			fail("Error related to Hibernate configuration");
-		} catch (Exception e) {
-			// TODO add proper pre-initialization populate lab routing rules, result data, provider data and make sure that the routing works   
-			// just swallow for now
-		}
 	}
 }

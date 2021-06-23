@@ -230,7 +230,7 @@ public class MSPReconcile {
 	}
 
 	/**
-	 * @todo This needs to go , the data is defined in the database
+	 * @todo-legacy This needs to go , the data is defined in the database
 	 * @param stat String
 	 * @return String
 	 */
@@ -1420,7 +1420,7 @@ public class MSPReconcile {
 
 				double dblAmount = new Double(b.amount).doubleValue();
 				/**
-				 * @todo Get rid of hard coded strings
+				 * @todo-legacy Get rid of hard coded strings
 				 */
 				b.type = dblAmount > 0 ? "PMT" : "RFD";
 				/**
@@ -1533,7 +1533,7 @@ public class MSPReconcile {
 
 	/**
 	 * Returns a string description of a billing payment method
-	 * @todo This should actually be a cached lookup map to improve performance
+	 * @todo-legacy This should actually be a cached lookup map to improve performance
 	 * @param string
 	 * @return String
 	 */
@@ -1631,7 +1631,7 @@ public class MSPReconcile {
 	/**
 	 * Returns the count of distinct values for the specified Bill field
 	 * Really just a convenience method for selecting distinct values without hitting the database multiple times
-	 * @todo This method should be generalized to count the fields of a collection of arbitrary beans
+	 * @todo-legacy This method should be generalized to count the fields of a collection of arbitrary beans
 	 * @param bills List
 	 * @param fieldName String
 	 * @return int
@@ -1673,7 +1673,7 @@ public class MSPReconcile {
 	/**
 	 * Returns the count of distinct values for the specified Bill field
 	 * Really just a convenience method for selecting distinct values without hitting the database multiple times
-	 * @todo This method should be generalized to count the fields of a collection of arbitrary beans
+	 * @todo-legqcy This method should be generalized to count the fields of a collection of arbitrary beans
 	 * @param bills List
 	 * @param status String
 	 * @return int
@@ -1747,7 +1747,7 @@ public class MSPReconcile {
 
 	/**
 	 * Returns a Provider instance according to the supplied provider number
-	 * @todo This method belongs in a ProviderDAO type class
+	 * @todo-legacy This method belongs in a ProviderDAO type class
 	 * @param providerNo String - The UID of the provider in question
 	 * @param criteria int - If criteria == 1, retrieve Provider by ohip_no else by provider_no
 	 * @return Provider
@@ -1787,7 +1787,7 @@ public class MSPReconcile {
 
 	/**
 	 * Returns an ArrayList of all Provider instances with a provider_type == 'doctor'
-	 * @todo This belongs in a ProviderDAO class
+	 * @todo-legacy This belongs in a ProviderDAO class
 	 * @return ArrayList
 	 */
 	public List<oscar.entities.Provider> getAllProviders() {
@@ -1842,7 +1842,7 @@ public class MSPReconcile {
 	 * If the supplied value doesn't represent a negative number it is simply returned
 	 * @param value String
 	 * @return String
-	 * @todo complete documentation
+	 * @todo-legacy complete documentation
 	 *oscar.oscarBilling.ca.bc.MSP.MSPReconcile.convCurValue(
 	 */
 	public static String convCurValue(String value) {

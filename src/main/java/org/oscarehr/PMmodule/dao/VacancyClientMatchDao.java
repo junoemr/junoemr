@@ -39,7 +39,7 @@ public class VacancyClientMatchDao extends AbstractDao<VacancyClientMatch> {
 	}
 	
 	public List<VacancyClientMatch> findByClientIdAndVacancyId(int clientId, int vacancyId){
-		Query q = entityManager.createQuery("select x from VacancyClientMatch x where x.client_id = ? and x.vacancy_id = ?");
+		Query q = entityManager.createQuery("select x from VacancyClientMatch x where x.client_id = ?1 and x.vacancy_id = ?2");
 		q.setParameter(1, clientId);
 		q.setParameter(2, vacancyId);
 		
@@ -50,7 +50,7 @@ public class VacancyClientMatchDao extends AbstractDao<VacancyClientMatch> {
 	}
 	
 	public List<VacancyClientMatch> findByClientId(int clientId){
-		Query q = entityManager.createQuery("select x from VacancyClientMatch x where x.client_id = ?");
+		Query q = entityManager.createQuery("select x from VacancyClientMatch x where x.client_id = ?1");
 		q.setParameter(1, clientId);
 		
 		@SuppressWarnings("unchecked")
@@ -60,7 +60,7 @@ public class VacancyClientMatchDao extends AbstractDao<VacancyClientMatch> {
 	}
 	
 	public List<VacancyClientMatch> findBystatus(String status){
-		Query q = entityManager.createQuery("select x from VacancyClientMatch x where x.status = ?");
+		Query q = entityManager.createQuery("select x from VacancyClientMatch x where x.status = ?1");
 		q.setParameter(1, status);
 		
 		@SuppressWarnings("unchecked")

@@ -11,7 +11,7 @@
 dojo.provide("dojo.widget.SplitContainer");
 
 //
-// TODO
+// TODO-legacy
 // make it prettier
 // active dragging upwards doesn't always shift other bars (direction calculation is wrong in this case)
 //

@@ -24,12 +24,19 @@
 package org.oscarehr.common.dao;
 
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MdsZMCDaoTest extends DaoTestFixtures {
-
-	protected MdsZMCDao dao = SpringUtils.getBean(MdsZMCDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MdsZMCDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MdsZMCDao mdsZMCDao;
 
 	@Before
 	public void before() throws Exception {

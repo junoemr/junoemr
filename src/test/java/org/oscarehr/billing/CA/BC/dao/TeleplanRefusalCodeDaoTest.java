@@ -27,13 +27,19 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class TeleplanRefusalCodeDaoTest extends DaoTestFixtures {
-
-	public TeleplanRefusalCodeDao dao = SpringUtils.getBean(TeleplanRefusalCodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TeleplanRefusalCodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public TeleplanRefusalCodeDao teleplanRefusalCodeDao;
 
 	public TeleplanRefusalCodeDaoTest() {
 	}
@@ -45,6 +51,6 @@ public class TeleplanRefusalCodeDaoTest extends DaoTestFixtures {
 	
 	@Test
 	public void testFindByCode() {
-		assertNotNull(dao.findByCode("CODE"));
+		assertNotNull(teleplanRefusalCodeDao.findByCode("CODE"));
 	}
 }

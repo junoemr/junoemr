@@ -12,7 +12,7 @@ dojo.provide("dojo.io.IframeIO");
 dojo.require("dojo.io.BrowserIO");
 dojo.require("dojo.uri.*");
 
-// FIXME: is it possible to use the Google htmlfile hack to prevent the
+// FIXME-legacy: is it possible to use the Google htmlfile hack to prevent the
 // background click with this transport?
 
 dojo.io.createIFrame = function(/*String*/fname, /*String*/onloadstr, /*String?*/uri){
@@ -249,13 +249,13 @@ dojo.io.IframeTransport = new function(){
 		}else{
 			var ifd = contentDoc(_this.iframe);
 			// handle successful returns
-			// FIXME: how do we determine success for iframes? Is there an equiv of
+			// FIXME-legacy: how do we determine success for iframes? Is there an equiv of
 			// the "status" property?
 	
 			try{
 				var cmt = req.mimetype;
 				if((cmt == "text/javascript")||(cmt == "text/json")||(cmt == "application/json")){
-					// FIXME: not sure what to do here? try to pull some evalulable
+					// FIXME-legacy: not sure what to do here? try to pull some evalulable
 					// text from a textarea or cdata section? 
 					// how should we set up the contract for that?
 					var js = ifd.getElementsByTagName("textarea")[0].value;

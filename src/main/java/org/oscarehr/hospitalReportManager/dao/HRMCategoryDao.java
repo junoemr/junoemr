@@ -26,7 +26,7 @@ public class HRMCategoryDao extends AbstractDao<HRMCategory> {
     }
 
 	public List<HRMCategory> findById(int id) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);
 		@SuppressWarnings("unchecked")

@@ -644,7 +644,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	
 	private void getEformsForResponse(List<EFormData> eforms, boolean attached, List<ConsultationAttachmentTo1> attachments, Integer consultId)
 	{
-		//TODO move this logic to a consultation response attachment service
+		//TODO-legacy move this logic to a consultation response attachment service
 		List<ConsultResponseDoc> docs = consultationManager.getConsultResponseDocs(getLoggedInInfo(), consultId);
 		List<Integer> docNos = new ArrayList<Integer>();
 		if (docs!=null) {

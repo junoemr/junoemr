@@ -28,14 +28,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DemographicAccessory;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DemographicAccessoryDaoTest extends DaoTestFixtures {
-
-	protected DemographicAccessoryDao dao = (DemographicAccessoryDao)SpringUtils.getBean("demographicAccessoryDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicAccessoryDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicAccessoryDao demographicAccessoryDao;
 
 	@Before
 	public void before() throws Exception {
@@ -47,7 +53,7 @@ public class DemographicAccessoryDaoTest extends DaoTestFixtures {
 		DemographicAccessory entity = new DemographicAccessory();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographicNo(1);
-		dao.persist(entity);
+		demographicAccessoryDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -56,10 +62,10 @@ public class DemographicAccessoryDaoTest extends DaoTestFixtures {
 		DemographicAccessory entity = new DemographicAccessory();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographicNo(100);
-		dao.persist(entity);
+		demographicAccessoryDao.persist(entity);
 		assertNotNull(entity.getId());
 
-		assertEquals(dao.findCount(100),1);
+		assertEquals(demographicAccessoryDao.findCount(100),1);
 	}
 
 

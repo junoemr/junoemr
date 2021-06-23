@@ -41,7 +41,7 @@ public class SecUserRoleDao extends HibernateDaoSupport {
         }
 
         @SuppressWarnings("unchecked")
-        List<SecUserRole> results = getHibernateTemplate().find("from SecUserRole s where s.ProviderNo = ?", providerNo);
+        List<SecUserRole> results = (List<SecUserRole>) getHibernateTemplate().find("from SecUserRole s where s.ProviderNo = ?0", providerNo);
 
         if (log.isDebugEnabled()) {
             log.debug("getUserRoles: providerNo=" + providerNo + ",# of results=" + results.size());
@@ -52,14 +52,14 @@ public class SecUserRoleDao extends HibernateDaoSupport {
 
     public List<SecUserRole> getSecUserRolesByRoleName(String roleName) {
         @SuppressWarnings("unchecked")
-        List<SecUserRole> results = getHibernateTemplate().find("from SecUserRole s where s.RoleName = ?", roleName);
+        List<SecUserRole> results = (List<SecUserRole>) getHibernateTemplate().find("from SecUserRole s where s.RoleName = ?0", roleName);
 
         return results;
     }
     
     public List<SecUserRole> findByRoleNameAndProviderNo(String roleName, String providerNo) {
         @SuppressWarnings("unchecked")
-        List<SecUserRole> results = getHibernateTemplate().find("from SecUserRole s where s.RoleName = ? and s.ProviderNo=?", new Object[]{roleName,providerNo});
+        List<SecUserRole> results = (List<SecUserRole>) getHibernateTemplate().find("from SecUserRole s where s.RoleName = ?0 and s.ProviderNo=?1", new Object[]{roleName,providerNo});
 
         return results;
     }
@@ -71,7 +71,7 @@ public class SecUserRoleDao extends HibernateDaoSupport {
 
         boolean result = false;
         @SuppressWarnings("unchecked")
-        List<SecUserRole> results = this.getHibernateTemplate().find("from SecUserRole s where s.ProviderNo = ? and s.RoleName = 'admin'", providerNo);
+        List<SecUserRole> results = (List<SecUserRole>) this.getHibernateTemplate().find("from SecUserRole s where s.ProviderNo = ?0 and s.RoleName = 'admin'", providerNo);
         if (!results.isEmpty()) {
             result = true;
         }
@@ -94,7 +94,7 @@ public class SecUserRoleDao extends HibernateDaoSupport {
     
     public List<String> getRecordsAddedAndUpdatedSinceTime(Date date) {
 		@SuppressWarnings("unchecked")
-		List<String> records = getHibernateTemplate().find("select p.ProviderNo From SecUserRole p WHERE p.lastUpdateDate > ?",date);
+		List<String> records = (List<String>) getHibernateTemplate().find("select p.ProviderNo From SecUserRole p WHERE p.lastUpdateDate > ?0",date);
 		
 		return records;
 	}

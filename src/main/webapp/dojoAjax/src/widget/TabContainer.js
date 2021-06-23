@@ -79,7 +79,7 @@ dojo.widget.defineWidget("dojo.widget.TabContainer", dojo.widget.PageContainer, 
 
 	_setupChild: function(tab){
 		if(this.closeButton=="tab" || this.closeButton=="pane"){
-			// TODO: remove in 0.5
+			// TODO-legacy: remove in 0.5
 			tab.closable=true;
 		}
 		dojo.html.addClass(tab.domNode, "dojoTabPane");

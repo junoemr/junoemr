@@ -34,15 +34,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.oscarehr.common.dao.DaoTestFixtures;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FlowSheetUserCreated;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures {
-
-	protected FlowSheetUserCreatedDao dao = SpringUtils.getBean(FlowSheetUserCreatedDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FlowSheetUserCreatedDao flowSheetUserCreatedDao;
 
 
 	@Before
@@ -54,7 +61,7 @@ public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 FlowSheetUserCreated entity = new FlowSheetUserCreated();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                flowSheetUserCreatedDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -66,20 +73,20 @@ public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures {
 		FlowSheetUserCreated flowSheetUserCreated1 = new FlowSheetUserCreated();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheetUserCreated1);
 		flowSheetUserCreated1.setArchived(!isArchived);
-		dao.persist(flowSheetUserCreated1);
+		flowSheetUserCreatedDao.persist(flowSheetUserCreated1);
 		
 		FlowSheetUserCreated flowSheetUserCreated2 = new FlowSheetUserCreated();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheetUserCreated2);
 		flowSheetUserCreated2.setArchived(isArchived);
-		dao.persist(flowSheetUserCreated2);
+		flowSheetUserCreatedDao.persist(flowSheetUserCreated2);
 		
 		FlowSheetUserCreated flowSheetUserCreated3 = new FlowSheetUserCreated();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheetUserCreated3);
 		flowSheetUserCreated3.setArchived(!isArchived);
-		dao.persist(flowSheetUserCreated3);
+		flowSheetUserCreatedDao.persist(flowSheetUserCreated3);
 		
 		List<FlowSheetUserCreated> expectedResult = new ArrayList<FlowSheetUserCreated>(Arrays.asList(flowSheetUserCreated1, flowSheetUserCreated3));
-		List<FlowSheetUserCreated> result = dao.getAllUserCreatedFlowSheets();
+		List<FlowSheetUserCreated> result = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
 
 		Logger logger = MiscUtils.getLogger();
 		

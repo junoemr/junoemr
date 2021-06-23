@@ -48,7 +48,7 @@ public class ResidentOscarMsg extends AbstractModel<Long>implements Serializable
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String supervisor_no;
@@ -87,7 +87,7 @@ public class ResidentOscarMsg extends AbstractModel<Long>implements Serializable
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO-legacy: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof ResidentOscarMsg)) {
             return false;
         }

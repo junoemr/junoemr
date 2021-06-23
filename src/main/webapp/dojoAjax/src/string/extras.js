@@ -14,7 +14,7 @@ dojo.require("dojo.string.common");
 dojo.require("dojo.lang.common");
 dojo.require("dojo.lang.array");
 
-//TODO: should we use ${} substitution syntax instead, like widgets do?
+//TODO-legacy: should we use ${} substitution syntax instead, like widgets do?
 dojo.string.substituteParams = function(/*string*/template, /* object - optional or ... */hash){
 // summary:
 //	Performs parameterized substitutions on a string. Throws an exception if any parameter is unmatched.
@@ -61,7 +61,7 @@ dojo.string.isBlank = function(/*string*/str){
 	return (dojo.string.trim(str).length == 0); // boolean
 }
 
-//FIXME: not sure exactly what encodeAscii is trying to do, or if it's working right
+//FIXME-legacy: not sure exactly what encodeAscii is trying to do, or if it's working right
 dojo.string.encodeAscii = function(/*string*/str){
 	if(!dojo.lang.isString(str)){ return str; } // unknown
 	var ret = "";
@@ -132,7 +132,7 @@ dojo.string.escapeRegExp = function(/*string*/str){
 	return str.replace(/\\/gm, "\\\\").replace(/([\f\b\n\t\r[\^$|?*+(){}])/gm, "\\$1"); // string
 }
 
-//FIXME: should this one also escape backslash?
+//FIXME-legacy: should this one also escape backslash?
 dojo.string.escapeJavaScript = function(/*string*/str){
 //summary:
 //	Adds escape sequences for single and double quotes as well
@@ -141,7 +141,7 @@ dojo.string.escapeJavaScript = function(/*string*/str){
 	return str.replace(/(["'\f\b\n\t\r])/gm, "\\$1"); // string
 }
 
-//FIXME: looks a lot like escapeJavaScript, just adds quotes? deprecate one?
+//FIXME-legacy: looks a lot like escapeJavaScript, just adds quotes? deprecate one?
 dojo.string.escapeString = function(/*string*/str){
 //summary:
 //	Adds escape sequences for non-visual characters, double quote and backslash
@@ -154,7 +154,7 @@ dojo.string.escapeString = function(/*string*/str){
 		).replace(/[\r]/g, "\\r"); // string
 }
 
-// TODO: make an HTML version
+// TODO-legacy: make an HTML version
 dojo.string.summary = function(/*string*/str, /*number*/len){
 // summary:
 //	Truncates 'str' after 'len' characters and appends periods as necessary so that it ends with "..."

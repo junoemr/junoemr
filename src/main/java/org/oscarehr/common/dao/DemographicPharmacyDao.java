@@ -42,14 +42,14 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 
 	public DemographicPharmacy addPharmacyToDemographic(Integer pharmacyId, Integer demographicNo, Integer preferredOrder) {
 		// If there is an existing pharmacy entry existing that we want to modify, grab it
-		String sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ? AND x.pharmacyId = ?";
+		String sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ?1 AND x.demographicNo = ?2 AND x.pharmacyId = ?3";
 		Query query = entityManager.createQuery(sql);		
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
 		query.setParameter(2, demographicNo);
 		query.setParameter(3, pharmacyId);
 		DemographicPharmacy demographicPharmacy = getSingleResultOrNull(query);
 
-		sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ? ORDER BY x.preferredOrder";
+		sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ?1 AND x.demographicNo = ?2 ORDER BY x.preferredOrder";
 		query = entityManager.createQuery(sql);
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
 		query.setParameter(2, demographicNo);
@@ -98,7 +98,7 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 	}
 	
 	public void unlinkPharmacy(Integer pharmacyId, Integer demographicNo ) {
-		String sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.pharmacyId = ?";
+		String sql = "select x from DemographicPharmacy x where x.status = ?1 and x.demographicNo = ?2 and x.pharmacyId = ?3";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
 		query.setParameter(2, demographicNo);
@@ -110,7 +110,7 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 			demographicPharmacy.setStatus(DemographicPharmacy.INACTIVE);
 		    merge(demographicPharmacy);
 		    
-			sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.preferredOrder > ?";
+			sql = "select x from DemographicPharmacy x where x.status = ?1 and x.demographicNo = ?2 and x.preferredOrder > ?3";
 			query = entityManager.createQuery(sql);
 			query.setParameter(1, DemographicPharmacy.ACTIVE);
 			query.setParameter(2, demographicNo);
@@ -134,7 +134,7 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 	}
 
 	public List<DemographicPharmacy> findByDemographicId(Integer demographicNo) {
-		String sql = "select x from DemographicPharmacy x where x.status=? and x.demographicNo=? order by x.preferredOrder";
+		String sql = "select x from DemographicPharmacy x where x.status=?1 and x.demographicNo=?2 order by x.preferredOrder";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
 		query.setParameter(2, demographicNo);
@@ -153,7 +153,7 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 	@SuppressWarnings("unchecked")
     public List<DemographicPharmacy> findAllByPharmacyId(Integer pharmacyId) {
 		
-		String sql = "select x from DemographicPharmacy x where x.pharmacyId = ?";
+		String sql = "select x from DemographicPharmacy x where x.pharmacyId = ?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, pharmacyId);
 		

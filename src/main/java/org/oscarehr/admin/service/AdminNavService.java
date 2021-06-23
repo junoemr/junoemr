@@ -223,7 +223,7 @@ public class AdminNavService
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.gstReport"), "frame?frameUrl=" + contextPath + "/admin/gstreport.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddBillingLocation"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/manageBillingLocation.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnManageBillingForm"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/manageBillingform.jsp"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSimulationOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPsimulation.jsp&useCompat=true"));// TODO Fix
+			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSimulationOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPsimulation.jsp&useCompat=true"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGenerateOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPreport.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnBillingCorrection"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingCorrection.jsp?admin&billing_no="));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnBatchBilling"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/batchBilling.jsp?service_code=all"));
@@ -537,6 +537,7 @@ public class AdminNavService
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobtypes.title"), "frame?frameUrl=" + contextPath + "/admin/jobTypes.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1("Roster Status Settings", "rosterStatus"));
 		}
 
 		if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())
@@ -688,8 +689,8 @@ public class AdminNavService
 
 		dataManagementGroup.setName(resourceBundle.getString("admin.admin.DataManagement"));
 
-		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DemoExport"), "frame?frameUrl=" + contextPath + "/demographic/demographicExport.jsp"));
-		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DemoImport"), "frame?frameUrl=" + contextPath + "/demographic/demographicImport.jsp"));
+		dataManagementItems.add(new AdminNavItemTo1("Demographic Export", "demographicExport"));
+		dataManagementItems.add(new AdminNavItemTo1("Demographic Import", "demographicImport"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.mergeRec"), "frame?frameUrl=" + contextPath + "/admin/demographicmergerecord.jsp"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnUpdatePatientProvider"), "frame?frameUrl=" + contextPath + "/admin/updatedemographicprovider.jsp"));
 		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnInventory"), "frame?frameUrl=" + contextPath + "/admin/productDispensing/products.jsp"));

@@ -304,7 +304,7 @@ dojo.declare("dojo.data.core.Read", null, {
 		 *   findByIdentity() will block until the findByIdentity() implementation 
 		 *   has the item to return.
 		 * description:
-		 * FIXME - 
+		 * FIXME-legacy -
 		 *   In our meeting on 2006-10-03 we resolved to move the findByIdentity()
 		 *   method out of the Read.js API and into the Identity.js API, as soon
 		 *   as we have an Identity.js API.

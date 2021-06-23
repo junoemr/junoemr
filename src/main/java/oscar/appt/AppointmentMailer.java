@@ -100,7 +100,7 @@ public class AppointmentMailer implements MessageMailer{
                     this.message = new SimpleMailMessage();
                 }
                 else {
-                    //TODO
+                    //TODO-legacy
                 }
 
 

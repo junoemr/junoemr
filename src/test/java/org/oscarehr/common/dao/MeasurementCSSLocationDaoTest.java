@@ -31,15 +31,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MeasurementCSSLocation;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MeasurementCSSLocationDaoTest extends DaoTestFixtures {
-
-	protected MeasurementCSSLocationDao dao = SpringUtils.getBean(MeasurementCSSLocationDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MeasurementCSSLocationDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MeasurementCSSLocationDao measurementCSSLocationDao;
 
 	@Before
 	public void before() throws Exception {
@@ -50,7 +56,7 @@ public class MeasurementCSSLocationDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		MeasurementCSSLocation entity = new MeasurementCSSLocation();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		measurementCSSLocationDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -62,30 +68,30 @@ public class MeasurementCSSLocationDaoTest extends DaoTestFixtures {
 		MeasurementCSSLocation mCSSL1 = new MeasurementCSSLocation();
 		EntityDataGenerator.generateTestDataForModelClass(mCSSL1);
 		mCSSL1.setLocation(location2);
-		dao.persist(mCSSL1);
+		measurementCSSLocationDao.persist(mCSSL1);
 		
 		MeasurementCSSLocation mCSSL2 = new MeasurementCSSLocation();
 		EntityDataGenerator.generateTestDataForModelClass(mCSSL2);
 		mCSSL2.setLocation(location1);
-		dao.persist(mCSSL2);
+		measurementCSSLocationDao.persist(mCSSL2);
 		
 		MeasurementCSSLocation mCSSL3 = new MeasurementCSSLocation();
 		EntityDataGenerator.generateTestDataForModelClass(mCSSL3);
 		mCSSL3.setLocation(location1);
-		dao.persist(mCSSL3);
+		measurementCSSLocationDao.persist(mCSSL3);
 		
 		MeasurementCSSLocation mCSSL4 = new MeasurementCSSLocation();
 		EntityDataGenerator.generateTestDataForModelClass(mCSSL4);
 		mCSSL4.setLocation(location2);
-		dao.persist(mCSSL4);
+		measurementCSSLocationDao.persist(mCSSL4);
 		
 		MeasurementCSSLocation mCSSL5 = new MeasurementCSSLocation();
 		EntityDataGenerator.generateTestDataForModelClass(mCSSL5);
 		mCSSL5.setLocation(location1);
-		dao.persist(mCSSL5);
+		measurementCSSLocationDao.persist(mCSSL5);
 		
 		List<MeasurementCSSLocation> expectedResult = new ArrayList<MeasurementCSSLocation>(Arrays.asList(mCSSL2, mCSSL3, mCSSL5));
-		List<MeasurementCSSLocation> result = dao.findByLocation(location1);
+		List<MeasurementCSSLocation> result = measurementCSSLocationDao.findByLocation(location1);
 
 		Logger logger = MiscUtils.getLogger();
 		

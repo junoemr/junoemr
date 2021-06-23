@@ -132,7 +132,7 @@ if (ageb & weightb & sCrb){
 ArrayList list = rd.getDose();
 
 
-//Todo: create Struts Action for above
+//Todo-legacy: create Struts Action for above
 %>
 <!--
   CIPRO : 	J01MA02 S01AX13 S03AA07

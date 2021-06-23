@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name = "model.CaseManagementNote")
+@Entity(name = "model_CaseManagementNote")
 @Table(name = "casemgmt_note")
 public class CaseManagementNote extends AbstractModel<Long>
 {
@@ -144,6 +144,10 @@ public class CaseManagementNote extends AbstractModel<Long>
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id.caseManagementNote", cascade = CascadeType.PERSIST)
 	private List<CaseManagementIssueNote> issueNoteList;
 
+	// with cascade, these entities will be persisted/merged/deleted when this class is.
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
+	private List<CaseManagementNoteResidualInfo> residualInfoList;
+
 	public CaseManagementNote() {}
 
 	/** construct a copy of the given note */
@@ -199,6 +203,15 @@ public class CaseManagementNote extends AbstractModel<Long>
 			for(CaseManagementIssueNote issueNoteToCopy : noteToCopy.issueNoteList)
 			{
 				issueNoteList.add(new CaseManagementIssueNote(issueNoteToCopy, this));
+			}
+		}
+
+		if(noteToCopy.residualInfoList != null)
+		{
+			this.residualInfoList = new ArrayList<>(noteToCopy.residualInfoList.size());
+			for(CaseManagementNoteResidualInfo noteResidualInfo : noteToCopy.residualInfoList)
+			{
+				residualInfoList.add(new CaseManagementNoteResidualInfo(noteResidualInfo, this));
 			}
 		}
 	}
@@ -468,6 +481,16 @@ public class CaseManagementNote extends AbstractModel<Long>
 		this.noteExtensionList = noteExtensionList;
 	}
 
+	public List<CaseManagementNoteResidualInfo> getResidualInfoList()
+	{
+		return residualInfoList;
+	}
+
+	public void setResidualInfoList(List<CaseManagementNoteResidualInfo> residualInfoList)
+	{
+		this.residualInfoList = residualInfoList;
+	}
+
 	public void addExtension(CaseManagementNoteExt ext)
 	{
 		if(noteExtensionList == null)
@@ -513,5 +536,94 @@ public class CaseManagementNote extends AbstractModel<Long>
 			issueNoteList = new ArrayList<>(1);
 		}
 		issueNoteList.add(issueNote);
+	}
+
+	public String getStatus()
+	{
+		String status = "";
+		if (getSigned())
+		{
+			status = "Signed";
+		}
+		else
+		{
+			status = "Unsigned";
+		}
+
+		if (getPassword() != null && getPassword().length() > 0)
+		{
+			// locked note - can be temporarily unlocked
+			if (locked)
+			{
+				status += "/Locked";
+			}
+			else
+			{
+				status += "/Unlocked";
+			}
+		}
+
+		return status;
+	}
+
+	public boolean getHasHistory()
+	{
+		if(getHistory() != null)
+		{
+			if(getHistory().indexOf("----------------History Record----------------") != -1)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public ArrayList<String> getIssueDescriptions()
+	{
+		ArrayList<String> issueDescriptions = new ArrayList<String>();
+
+		for (CaseManagementIssueNote issue : getIssueNoteList())
+		{
+			issueDescriptions.add(issue.getId().getCaseManagementIssue().getIssue().getDescription());
+		}
+
+		return (issueDescriptions);
+	}
+
+	public String getEncounterTime()
+	{
+		StringBuilder et = new StringBuilder();
+
+		if(getHourOfEncounterTime()!=null)
+		{
+			et.append(getHourOfEncounterTime());
+			et.append(":");
+		}
+
+		if(getMinuteOfEncounterTime()!=null)
+		{
+			et.append(getMinuteOfEncounterTime());
+		}
+
+		return et.toString();
+	}
+
+	public String getEncounterTransportationTime()
+	{
+		StringBuilder et = new StringBuilder();
+
+		if(getHourOfEncTransportationTime()!=null)
+		{
+			et.append(getHourOfEncTransportationTime());
+			et.append(":");
+		}
+
+		if(getMinuteOfEncTransportationTime()!=null)
+		{
+			et.append(getMinuteOfEncTransportationTime());
+		}
+
+		return et.toString();
 	}
 }

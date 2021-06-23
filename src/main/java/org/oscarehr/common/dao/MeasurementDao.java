@@ -399,7 +399,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	}
 
 	public List<Measurement> findByDemographicIdObservedDate(Integer demographicId, Date startDate, Date endDate) {
-		String sqlCommand = "select x from Measurement x where x.demographicId=? and x.type!='' and x.dateObserved >? and x.dateObserved <? order by x.dateObserved desc, x.createDate desc";
+		String sqlCommand = "select x from Measurement x where x.demographicId=?1 and x.type!='' and x.dateObserved >?2 and x.dateObserved <?3 order by x.dateObserved desc, x.createDate desc";
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter(1, demographicId);
 		query.setParameter(2, startDate);
@@ -411,7 +411,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	}
 
 	public List<Measurement> findByDemographicId(Integer demographicId) {
-		String sqlCommand = "select x from Measurement x where x.demographicId=? and x.type!='' order by x.dateObserved desc";
+		String sqlCommand = "select x from Measurement x where x.demographicId=?1 and x.type!='' order by x.dateObserved desc";
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter(1, demographicId);
 
@@ -584,7 +584,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	public Set<Integer> getAppointmentNosByDemographicNoAndType(int demographicNo, String type, Date startDate, Date endDate) {
 		Map<Integer, Boolean> results = new HashMap<Integer, Boolean>();
 
-		String queryStr = "select m from  Measurement m WHERE m.demographicId = ? and m.type=? and m.dateObserved>=? and m.dateObserved<=? ORDER BY m.dateObserved DESC";
+		String queryStr = "select m from  Measurement m WHERE m.demographicId = ?1 and m.type=?2 and m.dateObserved>=?3 and m.dateObserved<=?4 ORDER BY m.dateObserved DESC";
 		Query query = entityManager.createQuery(queryStr);
 		query.setParameter(1, demographicNo);
 		query.setParameter(2, type);
@@ -600,7 +600,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	}
 
 	public HashMap<String, Measurement> getMeasurementsPriorToDate(Integer demographicNo, Date d) {
-		String queryStr = "select m From Measurement m WHERE m.demographicId = ? AND m.dateObserved <= ?";
+		String queryStr = "select m From Measurement m WHERE m.demographicId = ?1 AND m.dateObserved <= ?2";
 		Query query = entityManager.createQuery(queryStr);
 		query.setParameter(1, demographicNo);
 		query.setParameter(2, d);
@@ -997,7 +997,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 	@NativeSql("measurements")
 	public List<Integer> findNewMeasurementsSinceDemoKey(String keyName) {
 		
-		String sql = "select distinct m.demographicNo from measurements m,demographic d,demographicExt e where m.demographicNo = d.demographic_no and d.demographic_no = e.demographic_no and e.key_val=? and m.type in ('HT','WT') and m.dateEntered > e.value";
+		String sql = "select distinct m.demographicNo from measurements m,demographic d,demographicExt e where m.demographicNo = d.demographic_no and d.demographic_no = e.demographic_no and e.key_val=?1 and m.type in ('HT','WT') and m.dateEntered > e.value";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter(1, keyName);
 		

@@ -69,7 +69,7 @@ dojo.widget.defineWidget(
 		
 		// showDelay: Integer
 		//		Number of milliseconds to show message
-		// TODO: this is a strange name.  "duration" makes more sense
+		// TODO-legacy: this is a strange name.  "duration" makes more sense
 		showDelay: 2000,
 
 		postCreate: function(){
@@ -185,7 +185,7 @@ dojo.widget.defineWidget(
 				dojo.lang.hitch(this, function(nodes, anim){
 					dojo.lang.setTimeout(dojo.lang.hitch(this, function(evt){
 						// we must hide the iframe in order to fade
-						// TODO: figure out how to fade with a BackgroundIframe
+						// TODO-legacy: figure out how to fade with a BackgroundIframe
 						if(this.bgIframe){
 							this.bgIframe.hide();
 						}

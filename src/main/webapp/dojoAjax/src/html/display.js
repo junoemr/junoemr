@@ -49,7 +49,7 @@ dojo.html.setShowing = function(/* HTMLElement */node, /* boolean? */showing){
 dojo.html.isShowing = function(/* HTMLElement */node){
 	//	summary
 	//	Returns whether the element is displayed or not.
-	// FIXME: returns true if node is bad, isHidden would be easier to make correct
+	// FIXME-legacy: returns true if node is bad, isHidden would be easier to make correct
 	return (dojo.html.getStyleProperty(node, 'display') != 'none');	//	boolean
 }
 
@@ -60,7 +60,7 @@ dojo.html.toggleShowing = function(/* HTMLElement */node){
 }
 
 // Simple mapping of tag names to display values
-// FIXME: simplistic 
+// FIXME-legacy: simplistic 
 dojo.html.displayMap = { tr: '', td: '', th: '', img: 'inline', span: 'inline', input: 'inline', button: 'inline' };
 
 dojo.html.suggestDisplayByTagName = function(/* HTMLElement */node){
@@ -84,7 +84,7 @@ dojo.html.setDisplay = function(/* HTMLElement */node, /* string */display){
 dojo.html.isDisplayed = function(/* HTMLElement */node){
 	//	summary
 	// 	Is true if the the computed display style for node is not 'none'
-	// 	FIXME: returns true if node is bad, isNotDisplayed would be easier to make correct
+	// 	FIXME-legacy: returns true if node is bad, isNotDisplayed would be easier to make correct
 	return (dojo.html.getComputedStyle(node, 'display') != 'none');	//	boolean
 }
 
@@ -105,7 +105,7 @@ dojo.html.setVisibility = function(/* HTMLElement */node, /* string */visibility
 dojo.html.isVisible = function(/* HTMLElement */node){
 	//	summary
 	// 	Returns true if the the computed visibility style for node is not 'hidden'
-	// 	FIXME: returns true if node is bad, isInvisible would be easier to make correct
+	// 	FIXME-legacy: returns true if node is bad, isInvisible would be easier to make correct
 	return (dojo.html.getComputedStyle(node, 'visibility') != 'hidden');	//	boolean
 }
 
@@ -133,7 +133,7 @@ dojo.html.setOpacity = function(/* HTMLElement */node, /* float */opacity, /* bo
 	}
 	if(h.ie){
 		if(node.nodeName.toLowerCase() == "tr"){
-			// FIXME: is this too naive? will we get more than we want?
+			// FIXME-legacy: is this too naive? will we get more than we want?
 			var tds = node.getElementsByTagName("td");
 			for(var x=0; x<tds.length; x++){
 				tds[x].style.filter = "Alpha(Opacity="+opacity*100+")";
@@ -160,7 +160,7 @@ dojo.html.clearOpacity = function(/* HTMLElement */node){
 	if(h.ie){
 		try {
 			if( node.filters && node.filters.alpha ){
-				ns.filter = ""; // FIXME: may get rid of other filter effects
+				ns.filter = ""; // FIXME-legacy: may get rid of other filter effects
 			}
 		} catch(e) {
 			/*

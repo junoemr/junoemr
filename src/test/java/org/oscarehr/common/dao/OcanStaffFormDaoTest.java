@@ -37,15 +37,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.OcanStaffForm;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OcanStaffFormDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OcanStaffFormDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected OcanStaffFormDao ocanStaffFormDao;
 
-	protected OcanStaffFormDao dao = (OcanStaffFormDao)SpringUtils.getBean(OcanStaffFormDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -75,7 +82,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm1.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -84,7 +91,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm2.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -93,18 +100,18 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm3.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		OcanStaffForm expectedResult = ocanStaffForm2;
-		OcanStaffForm result = dao.findLatestCompletedInitialOcan(facilityId1, clientId1);
+		OcanStaffForm result = ocanStaffFormDao.findLatestCompletedInitialOcan(facilityId1, clientId1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -131,7 +138,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm1.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -140,7 +147,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm2.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -149,18 +156,18 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm3.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		OcanStaffForm expectedResult = ocanStaffForm2;
-		OcanStaffForm result = dao.findLatestCompletedReassessment(facilityId1, clientId1);
+		OcanStaffForm result = ocanStaffFormDao.findLatestCompletedReassessment(facilityId1, clientId1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -187,7 +194,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm1.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -196,7 +203,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm2.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -205,18 +212,18 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm3.setReasonForAssessment(reasonForAssessment1);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		OcanStaffForm expectedResult = ocanStaffForm2;
-		OcanStaffForm result = dao.findLatestCompletedDischargedAssessment(facilityId1, clientId1);
+		OcanStaffForm result = ocanStaffFormDao.findLatestCompletedDischargedAssessment(facilityId1, clientId1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -238,32 +245,32 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setFacilityId(facilityId1);
 		ocanStaffForm1.setClientId(clientId1);
 		ocanStaffForm1.setOcanType(ocanType1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
 		ocanStaffForm2.setFacilityId(facilityId2);
 		ocanStaffForm2.setClientId(clientId2);
 		ocanStaffForm2.setOcanType(ocanType2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
 		ocanStaffForm3.setFacilityId(facilityId2);
 		ocanStaffForm3.setClientId(clientId2);
 		ocanStaffForm3.setOcanType(ocanType2);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		OcanStaffForm expectedResult = ocanStaffForm3;
-		OcanStaffForm result = dao.findLatestByFacilityClient(facilityId2, clientId2, ocanType2);
+		OcanStaffForm result = ocanStaffFormDao.findLatestByFacilityClient(facilityId2, clientId2, ocanType2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -290,7 +297,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setClientId(clientId1);
 		ocanStaffForm1.setAssessmentStatus(assessmentStatus2);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -298,7 +305,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setClientId(clientId2);
 		ocanStaffForm2.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm2.setCreated(created3);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -306,18 +313,18 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setClientId(clientId2);
 		ocanStaffForm3.setCreated(created2);
 		ocanStaffForm3.setAssessmentStatus(assessmentStatus1);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		OcanStaffForm expectedResult = ocanStaffForm3;
-		OcanStaffForm result = dao.getLastCompletedOcanForm(facilityId2, clientId2);
+		OcanStaffForm result = ocanStaffFormDao.getLastCompletedOcanForm(facilityId2, clientId2);
 		assertEquals(expectedResult, result);
 	}
 
@@ -347,7 +354,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setOcanType(ocanType2);
 		ocanStaffForm1.setAssessmentStatus(assessmentStatus2);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -356,7 +363,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setOcanType(ocanType1);
 		ocanStaffForm2.setAssessmentStatus(assessmentStatus1);
 		ocanStaffForm2.setCreated(created3);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -365,18 +372,18 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setOcanType(ocanType2);
 		ocanStaffForm3.setCreated(created2);
 		ocanStaffForm3.setAssessmentStatus(assessmentStatus1);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		OcanStaffForm expectedResult = ocanStaffForm3;
-		OcanStaffForm result = dao.getLastCompletedOcanFormByOcanType(facilityId2, clientId2, ocanType2);
+		OcanStaffForm result = ocanStaffFormDao.getLastCompletedOcanFormByOcanType(facilityId2, clientId2, ocanType2);
 		assertEquals(expectedResult, result);
 	}
 
@@ -407,7 +414,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setOcanType(ocanType1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -416,7 +423,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setOcanType(ocanType2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -425,18 +432,18 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setOcanType(ocanType1);
 		ocanStaffForm3.setCreated(created3);
 		ocanStaffForm3.setAssessmentId(assessmentId3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3, ocanStaffForm1));
-		List<OcanStaffForm> result = dao.findByFacilityClient(facilityId1, clientId1, ocanType1);	
+		List<OcanStaffForm> result = ocanStaffFormDao.findByFacilityClient(facilityId1, clientId1, ocanType1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -459,18 +466,18 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		
 		OcanStaffForm ocanStaffForm1 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		OcanStaffForm expectedResult = ocanStaffForm2;
-		OcanStaffForm result = dao.findOcanStaffFormById(2);
+		OcanStaffForm result = ocanStaffFormDao.findOcanStaffFormById(2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -514,7 +521,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setOcanType(ocanType1);
 		ocanStaffForm1.setClientId(clientId1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -525,7 +532,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setOcanType(ocanType2);
 		ocanStaffForm2.setClientId(clientId2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -536,7 +543,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setOcanType(ocanType1);
 		ocanStaffForm3.setClientId(clientId1);
 		ocanStaffForm3.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
@@ -547,7 +554,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm4.setOcanType(ocanType1);
 		ocanStaffForm4.setClientId(clientId1);
 		ocanStaffForm4.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		OcanStaffForm ocanStaffForm5 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm5);
@@ -558,10 +565,10 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm5.setOcanType(ocanType1);
 		ocanStaffForm5.setClientId(clientId1);
 		ocanStaffForm5.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm5);
+		ocanStaffFormDao.persist(ocanStaffForm5);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3));
-		List<OcanStaffForm> result = dao.findLatestSignedOcanForms(facilityId1, cdsFormVersion1, startDate, endDate, ocanType1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findLatestSignedOcanForms(facilityId1, cdsFormVersion1, startDate, endDate, ocanType1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -606,7 +613,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setCreated(created1);
 		ocanStaffForm1.setClientId(clientId1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -615,7 +622,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setCreated(created2);
 		ocanStaffForm2.setClientId(clientId2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -624,7 +631,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setCreated(created3);
 		ocanStaffForm3.setClientId(clientId1);
 		ocanStaffForm3.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
@@ -633,10 +640,10 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm4.setCreated(created4);
 		ocanStaffForm4.setClientId(clientId1);
 		ocanStaffForm4.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3));
-		List<OcanStaffForm> result = dao.findLatestSignedOcanForms(facilityId1, clientId1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findLatestSignedOcanForms(facilityId1, clientId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -693,7 +700,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setClientId(clientId1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -704,7 +711,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setClientId(clientId2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -715,7 +722,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setClientId(clientId1);
 		ocanStaffForm3.setAssessmentId(assessmentId3);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
@@ -726,10 +733,10 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm4.setClientId(clientId1);
 		ocanStaffForm4.setAssessmentId(assessmentId4);
 		ocanStaffForm4.setCreated(created4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3, ocanStaffForm1));
-		List<OcanStaffForm> result = dao.findUnsubmittedOcanFormsByOcanType(facilityId1, ocanType1, assessmentIds);
+		List<OcanStaffForm> result = ocanStaffFormDao.findUnsubmittedOcanFormsByOcanType(facilityId1, ocanType1, assessmentIds);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -780,7 +787,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setClientId(clientId1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -790,7 +797,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setClientId(clientId2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -800,7 +807,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setClientId(clientId1);
 		ocanStaffForm3.setAssessmentId(assessmentId3);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 					
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
@@ -810,10 +817,10 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm4.setClientId(clientId1);
 		ocanStaffForm4.setAssessmentId(assessmentId4);
 		ocanStaffForm4.setCreated(created4);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3, ocanStaffForm1));
-		List<OcanStaffForm> result = dao.findUnsubmittedOcanForms(facilityId1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findUnsubmittedOcanForms(facilityId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -844,22 +851,22 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
 		ocanStaffForm1.setSubmissionId(submissionId1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
 		ocanStaffForm2.setSubmissionId(submissionId2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
 		ocanStaffForm3.setAssessmentId(assessmentId1);
 		ocanStaffForm3.setSubmissionId(submissionId1);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm1, ocanStaffForm3));
-		List<OcanStaffForm> result = dao.findSubmittedOcanFormsByAssessmentId(assessmentId1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findSubmittedOcanFormsByAssessmentId(assessmentId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -890,22 +897,22 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm1);
 		ocanStaffForm1.setFacilityId(facilityId1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
 		ocanStaffForm2.setFacilityId(facilityId2);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
 		ocanStaffForm3.setFacilityId(facilityId1);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3, ocanStaffForm1));
-		List<OcanStaffForm> result = dao.findAllByFacility(facilityId1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findAllByFacility(facilityId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -940,24 +947,24 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setFacilityId(facilityId1);
 		ocanStaffForm1.setSubmissionId(submissionId1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
 		ocanStaffForm2.setFacilityId(facilityId2);
 		ocanStaffForm2.setSubmissionId(submissionId2);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
 		ocanStaffForm3.setFacilityId(facilityId1);
 		ocanStaffForm3.setSubmissionId(submissionId1);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3, ocanStaffForm1));
-		List<OcanStaffForm> result = dao.findBySubmissionId(facilityId1, submissionId1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findBySubmissionId(facilityId1, submissionId1);
 		Logger logger = MiscUtils.getLogger();
 		
 		if (result.size() != expectedResult.size()) {
@@ -991,24 +998,24 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setFacilityId(facilityId1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
 		ocanStaffForm1.setCreated(created1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
 		ocanStaffForm2.setFacilityId(facilityId2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
 		ocanStaffForm3.setFacilityId(facilityId1);
 		ocanStaffForm3.setAssessmentId(assessmentId1);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		OcanStaffForm expectedResult = ocanStaffForm3;
-		OcanStaffForm result = dao.findLatestByAssessmentId(facilityId1, assessmentId1);
+		OcanStaffForm result = ocanStaffFormDao.findLatestByAssessmentId(facilityId1, assessmentId1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -1026,28 +1033,28 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm1);
 		ocanStaffForm1.setFacilityId(facilityId1);
 		ocanStaffForm1.setClientId(clientId1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
 		ocanStaffForm2.setFacilityId(facilityId2);
 		ocanStaffForm2.setClientId(clientId2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
 		ocanStaffForm3.setFacilityId(facilityId1);
 		ocanStaffForm3.setClientId(clientId1);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		OcanStaffForm ocanStaffForm4 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm4);
 		ocanStaffForm4.setFacilityId(facilityId1);
 		ocanStaffForm4.setClientId(clientId2);
-		dao.persist(ocanStaffForm4);
+		ocanStaffFormDao.persist(ocanStaffForm4);
 		
 		List<Integer> expectedResult = new ArrayList<Integer>(Arrays.asList(clientId1, clientId2));
-		List<Integer> result = dao.getAllOcanClients(facilityId1);
+		List<Integer> result = ocanStaffFormDao.getAllOcanClients(facilityId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -1091,7 +1098,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setAssessmentId(assessmentId1);
 		ocanStaffForm1.setCreated(created1);
 		ocanStaffForm1.setClientId(clientId1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -1100,7 +1107,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setAssessmentId(assessmentId2);
 		ocanStaffForm2.setCreated(created2);
 		ocanStaffForm2.setClientId(clientId2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -1109,10 +1116,10 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setAssessmentId(assessmentId1);
 		ocanStaffForm3.setCreated(created3);
 		ocanStaffForm3.setClientId(clientId1);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3));
-		List<OcanStaffForm> result = dao.findLatestOcanFormsByStaff(facilityId1, providerNo1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findLatestOcanFormsByStaff(facilityId1, providerNo1);
 		Logger logger = MiscUtils.getLogger();
 		
 		if (result.size() != expectedResult.size()) {
@@ -1150,7 +1157,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm1.setClientId(clientId1);
 		ocanStaffForm1.setCreated(created1);
 		ocanStaffForm1.setAssessmentId(assessmentId1);
-		dao.persist(ocanStaffForm1);
+		ocanStaffFormDao.persist(ocanStaffForm1);
 		
 		OcanStaffForm ocanStaffForm2 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm2);
@@ -1158,7 +1165,7 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm2.setClientId(clientId2);
 		ocanStaffForm2.setAssessmentId(assessmentId2);
 		ocanStaffForm2.setCreated(created2);
-		dao.persist(ocanStaffForm2);
+		ocanStaffFormDao.persist(ocanStaffForm2);
 		
 		OcanStaffForm ocanStaffForm3 = new OcanStaffForm();
 		EntityDataGenerator.generateTestDataForModelClass(ocanStaffForm3);
@@ -1166,10 +1173,10 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures {
 		ocanStaffForm3.setClientId(clientId1);
 		ocanStaffForm3.setAssessmentId(assessmentId1);
 		ocanStaffForm3.setCreated(created3);
-		dao.persist(ocanStaffForm3);
+		ocanStaffFormDao.persist(ocanStaffForm3);
 		
 		List<OcanStaffForm> expectedResult = new ArrayList<OcanStaffForm>(Arrays.asList(ocanStaffForm3));
-		List<OcanStaffForm> result = dao.findLatestByConsumer(facilityId1, clientId1);
+		List<OcanStaffForm> result = ocanStaffFormDao.findLatestByConsumer(facilityId1, clientId1);
 		Logger logger = MiscUtils.getLogger();
 		
 		if (result.size() != expectedResult.size()) {

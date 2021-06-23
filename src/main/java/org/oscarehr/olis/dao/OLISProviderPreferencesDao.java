@@ -26,7 +26,7 @@ public class OLISProviderPreferencesDao extends AbstractDao<OLISProviderPreferen
 
 	public OLISProviderPreferences findById(String id) {
 		try {
-			String sql = "select x from "+ this.modelClass.getName() + " x where x.providerId=?";
+			String sql = "select x from "+ this.modelClass.getName() + " x where x.providerId=?1";
 			Query query = entityManager.createQuery(sql);
 			query.setParameter(1, id);		
 			return (OLISProviderPreferences)query.getSingleResult();

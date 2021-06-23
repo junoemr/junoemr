@@ -54,7 +54,7 @@ public class SiteMappingDao extends AbstractDao<SiteMapping> {
     }
 
     public SiteMapping findSiteMapping(int affinityDomain) {
-        String sql = "FROM SiteMapping e where e.affinityDomain = ?";
+        String sql = "FROM SiteMapping e where e.affinityDomain = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);
 
@@ -64,7 +64,7 @@ public class SiteMappingDao extends AbstractDao<SiteMapping> {
     }
 
     public SiteMapping findSiteMapping(int affinityDomain, String source) {
-        String sql = "FROM SiteMapping e where e.affinityDomain = ? and e.source = ?";
+        String sql = "FROM SiteMapping e where e.affinityDomain = ?1 and e.source = ?2";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);

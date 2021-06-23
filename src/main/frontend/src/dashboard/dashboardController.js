@@ -317,7 +317,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         controller.updateReports = function updateReports()
         {
-            //TODO: changed to return 5 since that is all we are using at the moment
+            //TODO-legacy: changed to return 5 since that is all we are using at the moment
             inboxService.getDashboardItems(5).then(
                 function success(results)
                 {

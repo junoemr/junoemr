@@ -26,17 +26,23 @@ package org.oscarehr.e2e.populator.body;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalStatement;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ActClassObservation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActMoodDocumentObservation;
 import org.oscarehr.e2e.constant.BodyConstants.Alerts;
 import org.oscarehr.e2e.extension.ObservationWithConfidentialityCode;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AlertsPopulatorTest extends AbstractBodyPopulatorTest {
-	@BeforeClass
-	public static void beforeClass() {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AlertsPopulatorTest extends AbstractBodyPopulatorTest
+{
+	@Before
+	public void beforeClass() {
 		setupClass(Alerts.getConstants());
 	}
 

@@ -272,7 +272,7 @@ public class BillingReProcessBillAction extends Action {
     bill.setProviderOhipNo(practitionerNo);
     bill.setBillingDate(MyDateFormat.getSysDate(serviceDate));
     billingmaster.setDatacenter(dataCenterId);
-        //TODO
+        //TODO-legacy
         billingmaster.setPayeeNo(billingGroupNo);
         billingmaster.setPractitionerNo(practitionerNo);
         billingmaster.setPhn(hcNo);
@@ -419,7 +419,7 @@ public class BillingReProcessBillAction extends Action {
   }
 
   /**
-   * @todo THis belongs in a utility class
+   * @todo-legacy THis belongs in a utility class
    * @param s String
    * @return String
    */

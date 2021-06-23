@@ -63,7 +63,7 @@ public class TicklerHandler {
 	 *	String ticklerCategoryId
 	 *  
 	 */
-	public void createMasterTickler( Map<String,Object[]> ticklerParameters ) {
+	public void createMasterTickler( Map<String,String[]> ticklerParameters ) {
 
 		Tickler tickler = new Tickler();
 		Date serviceDate = null;

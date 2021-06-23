@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CaseManagementIssueNotesDao {
     
-    @PersistenceContext(unitName = "persistenceUnit")
+    @PersistenceContext
     protected EntityManager entityManager = null;
     
     public List<CaseManagementIssue> getNoteIssues(Integer noteId)

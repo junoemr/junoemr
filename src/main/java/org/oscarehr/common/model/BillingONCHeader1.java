@@ -52,7 +52,7 @@ public class BillingONCHeader1 extends AbstractModel<Integer> implements Seriali
         public static final String DELETED = "D";
         
 	@Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Integer id;
 	@Column(name = "header_id", nullable = false)
 	private Integer headerId;
@@ -385,7 +385,7 @@ public class BillingONCHeader1 extends AbstractModel<Integer> implements Seriali
 		try {
 	        return (new SimpleDateFormat("yyyy-MM-dd")).parse(this.billingDate);
         } catch (ParseException e) {
-	        // TODO Auto-generated catch block
+	        // TODO-legacy Auto-generated catch block
 	        return null;
         }
 	}
@@ -398,7 +398,7 @@ public class BillingONCHeader1 extends AbstractModel<Integer> implements Seriali
 		try {
 	        return (new SimpleDateFormat("HH:mm:ss")).parse(this.billingTime);
         } catch (ParseException e) {
-	        // TODO Auto-generated catch block
+	        // TODO-legacy Auto-generated catch block
 	        return null;
         }
 	}

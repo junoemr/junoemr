@@ -118,7 +118,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.checkAccess();
 
 					// retrieve provider types for dropdown selection
-					//TODO - are roles determined by security role or provider type?
+					//TODO-legacy - are roles determined by security role or provider type?
 					providersServiceApi.getBySecurityRole("doctor").then(
 						function success(results) {
 							controller.page.doctors = results.data.body;
@@ -295,7 +295,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				},
 				function error(errors)
 				{
-					alert('Error loading demographic: ', errors) // TODO: Display actual error message
+					alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
 				}
 			);
 
@@ -475,11 +475,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					demographicService.getDemographic($stateParams.demographicNo).then(
 						function success(results)
 						{
-							// TODO: Celebrate
+							// TODO-legacy: Celebrate
 						},
 						function error(errors)
 						{
-							alert('Error loading demographic: ', errors) // TODO: Display actual error message
+							alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
 						}
 					);
 				
@@ -707,7 +707,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
 				return true;
 			}else {
-				alert("Invalid/Incomplete Postal Code"); // TODO: Display proper error message
+				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
 				return false;
 			}
 		};
@@ -1112,7 +1112,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (!controller.checkPatientStatus()) return;
 			if (!controller.isPostalComplete()) return;
-			if (!controller.validateSin()) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 
@@ -1181,7 +1180,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				{
 					controller.page.saving = false;
 					alert('Failed to save demographic');
-					// TODO: handle error
+					// TODO-legacy: handle error
 				}
 			);
 		};

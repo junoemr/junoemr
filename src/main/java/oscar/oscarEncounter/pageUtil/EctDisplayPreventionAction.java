@@ -178,7 +178,7 @@ public class EctDisplayPreventionAction extends EctDisplayAction
 			}
 
 
-			// TODO: add a flag to use the old code
+			// TODO-legacy: add a flag to use the old code
 			/*
 			Date date = null;
 			String result;

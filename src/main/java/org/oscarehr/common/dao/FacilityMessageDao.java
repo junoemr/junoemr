@@ -48,7 +48,7 @@ public class FacilityMessageDao extends AbstractDao<FacilityMessage>{
 	
 	@SuppressWarnings("unchecked")
 	public List<FacilityMessage> getMessagesByFacilityId(Integer facilityId) {
-		String sql = "select fm from FacilityMessage fm where fm.facilityId=? order by fm.expiryDate desc";
+		String sql = "select fm from FacilityMessage fm where fm.facilityId=?1 order by fm.expiryDate desc";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, facilityId);
 		
@@ -57,7 +57,7 @@ public class FacilityMessageDao extends AbstractDao<FacilityMessage>{
 	
 	@SuppressWarnings("unchecked")
 	public List<FacilityMessage> getMessagesByFacilityIdOrNull(Integer facilityId) {
-		String sql = "select fm from FacilityMessage fm where (fm.facilityId=? or fm.facilityId IS NULL or fm.facilityId=0) order by fm.expiryDate desc";
+		String sql = "select fm from FacilityMessage fm where (fm.facilityId=?1 or fm.facilityId IS NULL or fm.facilityId=0) order by fm.expiryDate desc";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, facilityId);
 		
@@ -66,7 +66,7 @@ public class FacilityMessageDao extends AbstractDao<FacilityMessage>{
 	
 	@SuppressWarnings("unchecked")
 	public List<FacilityMessage> getMessagesByFacilityIdAndProgramId(Integer facilityId, Integer programId) {
-		String sql = "select fm from FacilityMessage fm where fm.facilityId=? and fm.programId = ? order by fm.expiryDate desc";
+		String sql = "select fm from FacilityMessage fm where fm.facilityId=?1 and fm.programId = ?2 order by fm.expiryDate desc";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, facilityId);
 		query.setParameter(2, programId);
@@ -76,7 +76,7 @@ public class FacilityMessageDao extends AbstractDao<FacilityMessage>{
 	
 	@SuppressWarnings("unchecked")
 	public List<FacilityMessage> getMessagesByFacilityIdOrNullAndProgramIdOrNull(Integer facilityId, Integer programId) {
-		String sql = "select fm from FacilityMessage fm where (fm.facilityId=? or fm.facilityId IS NULL or fm.facilityId=0) and (fm.programId = ? or fm.programId IS NULL) order by fm.expiryDate desc";
+		String sql = "select fm from FacilityMessage fm where (fm.facilityId=?1 or fm.facilityId IS NULL or fm.facilityId=0) and (fm.programId = ?2 or fm.programId IS NULL) order by fm.expiryDate desc";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, facilityId);
 		query.setParameter(2, programId);

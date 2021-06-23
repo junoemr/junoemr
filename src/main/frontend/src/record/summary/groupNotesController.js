@@ -270,7 +270,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			controller.groupNotesForm.encounterNote.editable = true;
 			controller.groupNotesForm.encounterNote.isSigned = true;
 			controller.groupNotesForm.encounterNote.observationDate = new Date();
-			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
+			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO-legacy: make this dynamic so it changes on edit
 			controller.groupNotesForm.encounterNote.encounterType = "";
 			controller.groupNotesForm.encounterNote.encounterTime = "";
 			controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
@@ -407,6 +407,20 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + encounterNote.noteId;
 			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 		};
+
+		controller.openAnnotation = () =>
+		{
+			const tableId = controller.groupNotesForm.encounterNote.noteId;
+			if(tableId)
+			{
+				const win = "Annotation" + tableId;
+				const url = "../annotation/annotation.jsp?" +
+					"display=" + 1 + // notes module - from casemgmt_note_link
+					"&table_id=" + tableId +
+					"&demo=" + $stateParams.demographicNo;
+				window.open(url, win, "scrollbars=yes, location=no, width=647, height=600");
+			}
+		}
 
 		controller.searchIssues = function searchIssues(term)
 		{

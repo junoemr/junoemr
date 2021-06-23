@@ -289,7 +289,7 @@ dojo.widget.defineWidget(
 		onButtonClick: function(/*Widget*/ page){
 			// summary
 			//   Called whenever one of my child buttons is pressed in an attempt to select a page
-			var container = dojo.widget.byId(this.containerId);	// TODO: do this via topics?
+			var container = dojo.widget.byId(this.containerId);	// TODO-legacy: do this via topics?
 			container.selectChild(page, false, this);
 		},
 

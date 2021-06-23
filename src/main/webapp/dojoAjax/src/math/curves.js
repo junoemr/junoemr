@@ -111,7 +111,7 @@ dojo.math.curves = {
 		return this;	//	dojo.math.curves.CatmullRom
 	},
 
-	// FIXME: This is the bad way to do a partial-arc with 2 points. We need to have the user
+	// FIXME-legacy: This is the bad way to do a partial-arc with 2 points. We need to have the user
 	// supply the radius, otherwise we always get a half-circle between the two points.
 	Arc : function(/* array */start, /* array */end, /* boolean? */ccw) {
 		//	summary
@@ -216,7 +216,7 @@ dojo.math.curves = {
 				}
 			}
 
-			// FIXME: Do we want to assume we're at the end?
+			// FIXME-legacy: Do we want to assume we're at the end?
 			if( !found ) {
 				value = curves[curves.length-1].getValue(1);
 			}

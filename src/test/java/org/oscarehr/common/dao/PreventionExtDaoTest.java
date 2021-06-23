@@ -38,6 +38,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.prevention.dao.PreventionDao;
@@ -45,12 +46,19 @@ import org.oscarehr.prevention.dao.PreventionExtDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PreventionExtDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PreventionExtDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PreventionDao preventionDao;
 
-	protected PreventionDao preventionDao = (PreventionDao)SpringUtils.getBean(PreventionDao.class);
-	protected PreventionExtDao dao = (PreventionExtDao)SpringUtils.getBean(PreventionExtDao.class);
+	@Autowired
+	protected PreventionExtDao preventionExtDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -72,20 +80,20 @@ public class PreventionExtDaoTest extends DaoTestFixtures {
 		PreventionExt prevenExt1 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt1);
 		prevenExt1.setPrevention(prevention1);
-		dao.persist(prevenExt1);
+		preventionExtDao.persist(prevenExt1);
 		
 		PreventionExt prevenExt2 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt2);
 		prevenExt2.setPrevention(prevention2);
-		dao.persist(prevenExt2);
+		preventionExtDao.persist(prevenExt2);
 		
 		PreventionExt prevenExt3 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt3);
 		prevenExt3.setPrevention(prevention1);
-		dao.persist(prevenExt3);
+		preventionExtDao.persist(prevenExt3);
 		
 		List<PreventionExt> expectedResult = new ArrayList<PreventionExt>(Arrays.asList(prevenExt1, prevenExt3));
-		List<PreventionExt> result = dao.findByPreventionId(prevention1.getId());
+		List<PreventionExt> result = preventionExtDao.findByPreventionId(prevention1.getId());
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -115,22 +123,22 @@ public class PreventionExtDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt1);
 		prevenExt1.setVal(val1);
 		prevenExt1.setKeyval(keyVal1);
-		dao.persist(prevenExt1);
+		preventionExtDao.persist(prevenExt1);
 		
 		PreventionExt prevenExt2 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt2);
 		prevenExt2.setVal(val2);
 		prevenExt2.setKeyval(keyVal2);
-		dao.persist(prevenExt2);
+		preventionExtDao.persist(prevenExt2);
 		
 		PreventionExt prevenExt3 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt3);
 		prevenExt3.setVal(val1);
 		prevenExt3.setKeyval(keyVal1);
-		dao.persist(prevenExt3);
+		preventionExtDao.persist(prevenExt3);
 		
 		List<PreventionExt> expectedResult = new ArrayList<PreventionExt>(Arrays.asList(prevenExt1, prevenExt3));
-		List<PreventionExt> result = dao.findByKeyAndValue(keyVal1, val1);
+		List<PreventionExt> result = preventionExtDao.findByKeyAndValue(keyVal1, val1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -165,22 +173,22 @@ public class PreventionExtDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt1);
 		prevenExt1.setPrevention(prevention1);
 		prevenExt1.setKeyval(keyVal1);
-		dao.persist(prevenExt1);
+		preventionExtDao.persist(prevenExt1);
 		
 		PreventionExt prevenExt2 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt2);
 		prevenExt2.setPrevention(prevention2);
 		prevenExt2.setKeyval(keyVal2);
-		dao.persist(prevenExt2);
+		preventionExtDao.persist(prevenExt2);
 		
 		PreventionExt prevenExt3 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt3);
 		prevenExt3.setPrevention(prevention1);
 		prevenExt3.setKeyval(keyVal1);
-		dao.persist(prevenExt3);
+		preventionExtDao.persist(prevenExt3);
 		
 		List<PreventionExt> expectedResult = new ArrayList<PreventionExt>(Arrays.asList(prevenExt1, prevenExt3));
-		List<PreventionExt> result = dao.findByPreventionIdAndKey(prevention1.getId(), keyVal1);
+		List<PreventionExt> result = preventionExtDao.findByPreventionIdAndKey(prevention1.getId(), keyVal1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -219,18 +227,18 @@ public class PreventionExtDaoTest extends DaoTestFixtures {
 		prevenExt1.setPrevention(prevention1);
 		prevenExt1.setVal(val1);
 		prevenExt1.setKeyval(keyVal1);
-		dao.persist(prevenExt1);
+		preventionExtDao.persist(prevenExt1);
 		
 		PreventionExt prevenExt2 = new PreventionExt();
 		EntityDataGenerator.generateTestDataForModelClass(prevenExt2);
 		prevenExt2.setPrevention(prevention2);
 		prevenExt2.setVal(val2);
 		prevenExt2.setKeyval(keyVal2);
-		dao.persist(prevenExt2);
+		preventionExtDao.persist(prevenExt2);
 		
 		HashMap<String, String> expectedResult = new HashMap<String, String>();
 		expectedResult.put(keyVal1, val1);
-		HashMap<String, String> result = dao.getPreventionExt(prevention1.getId());
+		HashMap<String, String> result = preventionExtDao.getPreventionExt(prevention1.getId());
 		
 		assertEquals(expectedResult, result);
 	}

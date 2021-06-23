@@ -32,15 +32,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlBillingServiceSexRules;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlBillingServiceSexRulesDaoTest extends DaoTestFixtures {
-
-	protected CtlBillingServiceSexRulesDao dao = SpringUtils.getBean(CtlBillingServiceSexRulesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlBillingServiceSexRulesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlBillingServiceSexRulesDao ctlBillingServiceSexRulesDao;
 
 	@Before
 	public void before() throws Exception {
@@ -52,7 +58,7 @@ public class CtlBillingServiceSexRulesDaoTest extends DaoTestFixtures {
 		CtlBillingServiceSexRules entity = new CtlBillingServiceSexRules();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(null);
-		dao.persist(entity);
+		ctlBillingServiceSexRulesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -64,25 +70,25 @@ public class CtlBillingServiceSexRulesDaoTest extends DaoTestFixtures {
 		CtlBillingServiceSexRules cBSSR1 = new CtlBillingServiceSexRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSSR1);
 		cBSSR1.setServiceCode(serviceCode1);
-		dao.persist(cBSSR1);
+		ctlBillingServiceSexRulesDao.persist(cBSSR1);
 		
 		CtlBillingServiceSexRules cBSSR2 = new CtlBillingServiceSexRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSSR2);
 		cBSSR2.setServiceCode(serviceCode1);
-		dao.persist(cBSSR2);
+		ctlBillingServiceSexRulesDao.persist(cBSSR2);
 		
 		CtlBillingServiceSexRules cBSSR3 = new CtlBillingServiceSexRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSSR3);
 		cBSSR3.setServiceCode(serviceCode2);
-		dao.persist(cBSSR3);
+		ctlBillingServiceSexRulesDao.persist(cBSSR3);
 		
 		CtlBillingServiceSexRules cBSSR4 = new CtlBillingServiceSexRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSSR4);
 		cBSSR4.setServiceCode(serviceCode1);
-		dao.persist(cBSSR4);
+		ctlBillingServiceSexRulesDao.persist(cBSSR4);
 		
 		List<CtlBillingServiceSexRules> expectedResult = new ArrayList<CtlBillingServiceSexRules>(Arrays.asList(cBSSR1, cBSSR2, cBSSR4));
-		List<CtlBillingServiceSexRules> result = dao.findByServiceCode(serviceCode1);
+		List<CtlBillingServiceSexRules> result = ctlBillingServiceSexRulesDao.findByServiceCode(serviceCode1);
 
 		Logger logger = MiscUtils.getLogger();
 		

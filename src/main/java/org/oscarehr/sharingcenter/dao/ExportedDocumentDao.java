@@ -60,7 +60,7 @@ public class ExportedDocumentDao extends AbstractDao<ExportedDocument> {
      * @return ExportedDocument objects for a patient
      */
     public List<ExportedDocument> findByPatient(int demographicId) {
-        String sql = "FROM ExportedDocument e where e.demographicNo = ? ORDER BY id DESC";
+        String sql = "FROM ExportedDocument e where e.demographicNo = ?1 ORDER BY id DESC";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, demographicId);
 
@@ -77,7 +77,7 @@ public class ExportedDocumentDao extends AbstractDao<ExportedDocument> {
      * @return ExportedDocument objects for a patient in an affinty domain
      */
     public List<ExportedDocument> findByPatientInDomain(int affinityDomain, int demographicId) {
-        String sql = "FROM ExportedDocument e where e.affinityDomain = ? and e.demographicNo = ? ORDER BY id DESC";
+        String sql = "FROM ExportedDocument e where e.affinityDomain = ?1 and e.demographicNo = ?2 ORDER BY id DESC";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);
@@ -98,7 +98,7 @@ public class ExportedDocumentDao extends AbstractDao<ExportedDocument> {
      * @return ExportedDocument documents of a specific type for a patient in an affinity domain
      */
     public List<ExportedDocument> findByTypeForPatientInDomain(int affinityDomain, int demographicId, String documentType) {
-        String sql = "FROM ExportedDocument e where e.affinityDomain = ? and e.demographicNo = ? and e.documentType = ? ORDER BY id DESC";
+        String sql = "FROM ExportedDocument e where e.affinityDomain = ?1 and e.demographicNo = ?2 and e.documentType = ?3 ORDER BY id DESC";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);

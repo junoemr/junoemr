@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SurveyTestData;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SurveyTestDataDaoTest extends DaoTestFixtures {
-
-	protected SurveyTestDataDao dao = SpringUtils.getBean(SurveyTestDataDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SurveyTestDataDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SurveyTestDataDao surveyTestDataDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class SurveyTestDataDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		SurveyTestData entity = new SurveyTestData();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		surveyTestDataDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

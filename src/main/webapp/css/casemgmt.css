@@ -1,5 +1,5 @@
 BODY {
-	FONT-SIZE: Normal;
+	font-size: Normal;
 	FONT-FAMILY: Verdana, Tahoma, Arial, sans-serif;
 }
 
@@ -37,7 +37,7 @@ TH {
 	color: #FFFFFF;
 	font-size: 14pt;
 	font-weight: bold;
-	text-align: centre;
+	text-align: center;
 }
 
 .searchTitle {
@@ -45,8 +45,7 @@ TH {
 	color: #000000;
 	font-weight: bold;
 	text-align: left;
-	height
-	="20px"
+	height: 20px;
 }
 
 .title {
@@ -54,8 +53,7 @@ TH {
 	color: #000000;
 	font-weight: bold;
 	text-align: center;
-	height
-	="20px"
+	height: 20px;
 }
 
 .fieldTitle {
@@ -72,6 +70,11 @@ TH {
 	color: #FF0000;
 	background-color: #EEEEFF;
 	text-align: left;
+}
+
+div.editNoteError {
+	margin-left: 10px;
+	margin-right: 10px;
 }
 
 .message {
@@ -135,4 +138,457 @@ div.tabs th,div.tabs td,s,#rightcol div.help,.colbar,.tasknav,body.docs div#toc,
 
 .tabs td,.tabs th {
 	padding: 3px 9px;
+}
+
+
+
+
+
+/*CPP Format */
+li.cpp {
+	color: #000000;
+	font-family: arial, sans-serif;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+/*Note format */
+div.newNote {
+	color: #000000;
+	font-family: arial, sans-serif;
+	font-size: 0.8em;
+	margin: 5px 0px 5px 5px;
+	float: left;
+	width: 98%;
+}
+
+div.newNote pre {
+	color: #000000;
+	font-family: arial, sans-serif;
+	margin: 0px 3px 0px 3px;
+	width: 100%;
+	clear: left;
+}
+
+div.note {
+	color: #000000;
+	font-family: arial, sans-serif;
+	margin: 3px 0px 3px 5px;
+	float: left;
+	width: 98%;
+	display: block;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+div.note pre {
+	color: #000000;
+	font-family: arial, sans-serif;
+	margin: 0px 3px 0px 3px;
+	width: 100%;
+	clear: left;
+}
+
+div.note div.noteStatus {
+	text-align: center;
+}
+
+.sig {
+	background-color: #CCCCFF;
+	color: #000000;
+	width: 100%;
+	font-size: 9px;
+}
+
+.txtArea {
+	font-family: arial, sans-serif;
+	font-size: 1.0em;
+	width: 99%;
+	rows: 10;
+	overflow: hidden;
+	border: none;
+	font-family: arial, sans-serif;
+	margin: 0px 3px 0px 3px;
+}
+
+p.passwd {
+	margin: 0px 3px 0px 3px;
+}
+
+/* span formatting for measurements div found in ajax call */
+span.measureCol1 {
+	float: left;
+	width: 50px;
+}
+
+span.measureCol2 {
+	float: left;
+	width: 55px;
+}
+
+span.measureCol3 {
+	float: left;
+}
+
+.topLinks {
+	color: black;
+	text-decoration: none;
+	font-size: 9px;
+}
+
+.topLinkhover {
+	color: blue;
+	text-decoration: underline;
+}
+
+/* formatting for navbar */
+.links {
+	color: blue;
+	text-decoration: none;
+	font-size: 9px;
+}
+
+.linkhover {
+	color: black;
+	text-decoration: underline;
+}
+
+/* template styles*/
+.enTemplate_name_auto_complete {
+	width: 350px;
+	background: #fff;
+	font-size: 9px;
+	text-align: left;
+}
+
+.enTemplate_name_auto_complete ul {
+	border: 1px solid #888;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	list-style-type: square;
+	list-style-position: inside;
+}
+
+.enTemplate_name_auto_complete ul li {
+	margin: 0;
+	padding: 3px;
+}
+
+.enTemplate_name_auto_complete ul li.selected {
+	background-color: #ffb;
+	text-decoration: underline;
+}
+
+.enTemplate_name_auto_complete ul strong.highlight {
+	color: #800;
+	margin: 0;
+	padding: 0;
+}
+
+/* CPP textareas */
+.rowOne {
+	height: 10px;
+	width: 97%;
+	overflow: auto;
+}
+
+.rowTwo {
+	height: 10px;
+	width: 97%;
+	margin-left: 4px;
+	overflow: auto;
+}
+
+/* Encounter type select box */
+div.autocomplete {
+	position: absolute;
+	width: 400px;
+	background-color: white;
+	border: 1px solid #ccc;
+	margin: 0px;
+	padding: 0px;
+	font-size: 9px;
+	text-align: left;
+	max-height: 200px;
+	overflow: auto;
+}
+
+div.autocomplete ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+div.autocomplete ul li.selected {
+	background-color: #EAF2FB;
+}
+
+div.autocomplete ul li {
+	list-style-type: none;
+	display: block;
+	margin: 0;
+	padding: 2px;
+	cursor: pointer;
+}
+
+.printOps {
+	background-color: #CCCCFF;
+	font-size: 9px;
+	position: absolute;
+	display: none;
+	z-index: 1;
+	width: 200px;
+	right: 100px;
+	bottom: 200px;
+}
+
+.showEdContainer {
+	position: absolute;
+	display: none;
+	z-index: 100;
+	right: 100px;
+	bottom: 200px;
+	background-color: transparent;
+	font-size: 8px;
+	/*border: thin ridge black;*/
+	text-align: center;
+}
+
+.showEdPosition {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.showEdContent { /*border: thin ridge black;*/
+	background-color: #CCCCFF;
+	font-size: 9px;
+	position: absolute;
+	display: none;
+	z-index: 200;
+	right: 100px;
+	bottom: 200px;
+	text-align: center;
+}
+
+.showResident {
+	left: 0;
+	top: 0;
+	/*transform: translate(100%, 100%);*/
+	min-width: 100%;
+	min-height: 100%;
+	background: rgba(239,250,250,0.6);
+
+	position: absolute;
+	display: none;
+	z-index: 300;
+	text-align: center;
+	border-style: ridge;
+}
+
+.showResidentBorder {
+	background: rgba(239,250,250,1);
+	border-style: ridge;
+	text-align: center;
+	width: 45%;
+	height:auto;
+	margin: 40% auto;
+	position:relative;
+}
+
+.showResidentContent {
+	background: rgba(13,117,173,1);
+	text-align: center;
+	width:auto;
+	height: auto;
+	margin: 2% auto;
+	border-style: inset;
+	position: relative;
+}
+
+.residentText {
+	font-family: "Times New Roman", Times, serif;
+	font-style: italic;
+}
+
+.supervisor {
+}
+
+.reviewer {
+}
+
+a.expandCasemgmtSidebar {
+	text-decoration:none;
+	width:7px;
+	z-index: 100;
+	position:relative;
+	margin: 0px;
+	padding-bottom: 0px;
+	vertical-align: bottom;
+	display: inline;
+	float: right;
+	clear:both;
+}
+
+div.encounterNavBar li.encounterNote {
+	overflow: hidden;
+	clear:both;
+	position:relative;
+	display:block;
+	white-space:nowrap;
+}
+
+div.encounterNavBar li.encounterNoteEven, div.encounterNavBar li.encounterNoteEven span.encounterNoteEven, div.topBox li.encounterNoteEven {
+	background-color: #f3f3f3;
+}
+
+div.encounterNavBar li.encounterNoteOdd, div.encounterNavBar li.encounterNoteOdd span.encounterNoteOdd, div.topBox li.encounterNoteOdd {
+	background-color: white;
+}
+
+div.encounterNavBar span.encounterNoteTitle {
+	z-index: 1;
+	position:absolute;
+	margin-right:10px;
+	width:90%;
+	overflow:hidden;
+	height:1.2em;
+	white-space:nowrap;
+	float:left;
+	text-align:left;
+}
+
+div.encounterNavBar a.encounterNoteTitle {
+	text-decoration: none;
+	width: 7px;
+	z-index: 100;
+	position: relative;
+	margin: 0px;
+	padding-bottom: 0px;
+	vertical-align: bottom;
+	display: inline;
+	float: right;
+	clear: both;
+}
+
+div.encounterNavBar span.encounterNoteDate {
+	z-index: 100;
+	overflow:hidden;
+	position:relative;
+	height:1.2em;
+	white-space:nowrap;
+	float:right;
+	text-align:right;
+}
+
+div.encMainDiv input.observationDate {
+	border: none;
+	width: 140px;
+	color: #000000;
+	background-color: inherit;
+}
+
+.encounter_timer_container {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	background-color: transparent;
+	vertical-align: bottom;
+	border: none;
+	top: 0px;
+	padding: 3px;
+}
+
+.encounter_timer_container div {
+	border-style: none;
+}
+
+.encounter_timer_container .fa {
+	position: relative;
+	color: #222222;
+	left: 0px;
+	top: 0px;
+}
+
+#encounter_timer {
+	cursor: pointer;
+	display: inline-block;
+	position: relative;
+	min-width: 60px;
+}
+
+.encounter_timer_control {
+	cursor: pointer;
+	position:relative;
+
+}
+
+#encounter_timer_pause {
+	display: inline-block;
+}
+
+#encounter_timer_play {
+	display: none;
+}
+
+div.junoEncounterNote .collapse {
+	height: 1.1em;
+	overflow: hidden;
+}
+
+div.junoEncounterNote div.hideNote {
+	display: none;
+}
+
+div.junoEncounterNote div.minimizedNoteText {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+table.setIssueList {
+	font-size: 11px;
+}
+
+table.setIssueList td {
+	width: 50%;
+	font-size: 11px;
+	background-color: #CCCCFF;
+}
+
+table.setIssueList div.setIssueListWidget {
+	margin-left: 20px;
+	display: none;
+}
+
+table.setIssueList div.setIssueListWidget div.setIssueListControl {
+	width: 50%;
+	float: left;
+	display: inline;
+}
+table.setIssueList div.setIssueListWidget div.setIssueListControlRight {
+	clear: right;
+}
+
+table.setIssueList div.setIssueListWidget div.setIssueListRole {
+	text-align: center;
+}
+
+ul.ui-menu {
+	width: 350px;
+	background: #fff;
+	font-size: 9px;
+	text-align: left;
+	border: 1px solid #888;
+	margin: 0;
+	padding: 0;
+}
+
+ul.ui-menu li.ui-menu-item {
+	margin: 0;
+}
+
+ul.ui-menu a.ui-state-focus {
+	background: #ffb;
+	text-decoration: underline;
 }

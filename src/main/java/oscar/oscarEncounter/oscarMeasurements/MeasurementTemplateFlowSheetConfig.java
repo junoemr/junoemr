@@ -27,8 +27,6 @@ package oscar.oscarEncounter.oscarMeasurements;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -74,7 +72,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
     private static Logger log = MiscUtils.getLogger();
 
-    private List<File> flowSheets;
+    private List<InputStream> flowSheets;
 
     ArrayList<String> dxTriggers = new ArrayList<String>();
     ArrayList<String> programTriggers = new ArrayList<String>();
@@ -255,12 +253,10 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
         //TODO: Will change this when there are more flowsheets
         log.debug("LOADING FLOWSSHEETS");
-        for (File flowSheet : flowSheets)
+        for (InputStream is : flowSheets)
         {
-            InputStream is = null;
             try
             {
-                is = new FileInputStream(flowSheet);
                 MeasurementFlowSheet measurementFlowsheet = createflowsheet(is);
 
                 //If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
@@ -282,17 +278,20 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
                     flowsheetDisplayNames.put(measurementFlowsheet.getName(), measurementFlowsheet.getDisplayName());
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 MiscUtils.getLogger().error("Flowsheet error: ", e);
-            } finally
+            }
+            finally
             {
                 if (is != null)
                 {
                     try
                     {
                         is.close();
-                    } catch (IOException e)
+                    }
+                    catch (IOException e)
                     {
                         MiscUtils.getLogger().error("Error Closing the Input Stream: ", e);
                     }
@@ -893,11 +892,13 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         return flowsheets.get(flowsheetName);
     }
 
-    public List<File> getFlowSheets() {
+    public List<InputStream> getFlowSheets()
+    {
         return flowSheets;
     }
 
-    public void setFlowSheets(List<File> flowSheets) {
+    public void setFlowSheets(List<InputStream> flowSheets)
+    {
         log.debug("SETTING FLOWSHEETS");
         this.flowSheets = flowSheets;
     }

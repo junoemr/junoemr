@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 /**
  * Defines service contract for create/read/update/delete operations on pharmacies.
  * 
- * TODO: switch DAOs to PharmacyManager
+ * TODO-legacy: switch DAOs to PharmacyManager
  */
 @Path("/pharmacies/")
 @Component("pharmacyService")

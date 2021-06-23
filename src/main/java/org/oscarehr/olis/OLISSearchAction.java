@@ -336,7 +336,7 @@ public class OLISSearchAction extends DispatchAction {
 				}
 
 
-				// TODO: Add placer group number
+				// TODO-legacy: Add placer group number
 
 				String[] testRequestStatusList = request.getParameterValues("testRequestStatus");
 
@@ -450,7 +450,7 @@ public class OLISSearchAction extends DispatchAction {
 				}
 
 
-				// TODO: Add placer group number
+				// TODO-legacy: Add placer group number
 
 
 				String blockedInfoConsent = request.getParameter("blockedInformationConsent");

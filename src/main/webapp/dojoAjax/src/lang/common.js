@@ -233,7 +233,7 @@ dojo.lang.isNumber = function(/*anything*/ it){
 }
 
 /*
- * FIXME: Should isUndefined go away since it is error prone?
+ * FIXME-legacy: Should isUndefined go away since it is error prone?
  */
 dojo.lang.isUndefined = function(/*anything*/ it){
 	// summary: Return true if it is not defined.

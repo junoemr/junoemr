@@ -341,7 +341,7 @@
 									String styleColor = "";
 
 									if (request.getParameter("status") != null)
-									{ //TODO: Redo this in a better way
+									{ //TODO-legacy: Redo this in a better way
 										String stat = request.getParameter("status");
 										if (stat != null && (stat.equals("active") && prescriptDrug.isExpired()))
 										{

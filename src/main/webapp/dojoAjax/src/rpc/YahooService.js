@@ -47,7 +47,7 @@ dojo.lang.extend(dojo.rpc.YahooService, {
 		dojo.io.bind({
 			url: url||this.serviceUrl,
 			transport: "ScriptSrcTransport",
-			// FIXME: need to get content interpolation fixed
+			// FIXME-legacy: need to get content interpolation fixed
 			content: params,
 			jsonParamName: "callback",
 			mimetype: "text/json",

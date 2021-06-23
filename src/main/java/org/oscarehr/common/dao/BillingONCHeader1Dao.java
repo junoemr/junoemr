@@ -81,7 +81,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     }
     
     public List<BillingONCHeader1> getBillCheader1ByDemographicNo(int demographic_no){
-    	Query query = entityManager.createQuery("select ch from BillingONCHeader1 ch where ch.demographicNo=? AND ch.status!='D'");
+    	Query query = entityManager.createQuery("select ch from BillingONCHeader1 ch where ch.demographicNo=?1 AND ch.status!='D'");
     	query.setParameter(1, demographic_no);
     	return query.getResultList();
     }
@@ -92,7 +92,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
                 distinctStr = StringUtils.EMPTY;
         }
 
-        Query query = entityManager.createNativeQuery("select count("+distinctStr+" demographic_no) from billing_on_cheader1 ch where ch.provider_no = ? and billing_date >= ? and billing_date <= ?");
+        Query query = entityManager.createNativeQuery("select count("+distinctStr+" demographic_no) from billing_on_cheader1 ch where ch.provider_no = ?1 and billing_date >= ?2 and billing_date <= ?3");
         query.setParameter(1, providerNo);
                 query.setParameter(2,startDate);
                 query.setParameter(3,endDate);
@@ -298,10 +298,11 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
 
     public int getDaysSinceBilled(String serviceCode, Integer demographicNo) {
         String sql = "select b from BillingONCHeader1 h1, BillingONItem b where b.ch1Id = h1.id and b.serviceCode = :code and" +
-                " h1.demographicNo = :demo and h1.status != 'D' order by h1.billingDate desc limit 1";
+                " h1.demographicNo = :demo and h1.status != 'D' order by h1.billingDate desc";
         Query q = entityManager.createQuery(sql);
         q.setParameter("code", serviceCode);
         q.setParameter("demo", demographicNo);
+        q.setMaxResults(1);
         List<BillingONItem> billingClaims = q.getResultList();
         int numDays = -1;
 
@@ -321,10 +322,11 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     
     public int getDaysSincePaid(String serviceCode, Integer demographic_no) {
         String sql = "select b from BillingONCHeader1 h1, BillingONItem b where b.ch1Id = h1.id and b.serviceCode = :code and" +
-                " h1.demographicNo = :demo and h1.status = 'S' order by h1.billingDate desc limit 1";
+                " h1.demographicNo = :demo and h1.status = 'S' order by h1.billingDate desc";
         Query q = entityManager.createQuery(sql);
         q.setParameter("code", serviceCode);
         q.setParameter("demo", demographic_no);
+        q.setMaxResults(1);
         List<BillingONItem> billingClaims = q.getResultList();
         int numDays = -1;
 
@@ -418,7 +420,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     }
      
      public List<BillingONCHeader1> get3rdPartyInvoiceByProvider(Provider p, Date start, Date end, Locale locale) {
-         String sql = "select distinct bCh1 from BillingONPayment bPay, BillingONCHeader1 bCh1 where bPay.billingNo=bCh1.id and bCh1.providerNo=? and bPay.paymentdate >= ? and bPay.paymentdate <= ? order by bCh1.id";
+         String sql = "select distinct bCh1 from BillingONPayment bPay, BillingONCHeader1 bCh1 where bPay.billingNo=bCh1.id and bCh1.providerNo=?1 and bPay.paymentdate >= ?2 and bPay.paymentdate <= ?3 order by bCh1.id";
          Query query = entityManager.createQuery(sql);        
          query.setParameter(1, p.getProviderNo());  
          query.setParameter(2, start);
@@ -431,7 +433,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     }
      
      public List<BillingONCHeader1> get3rdPartyInvoiceByDate(Date start, Date end, Locale locale) {
-         String sql = "select distinct bCh1 from BillingONPayment bPay, BillingONCHeader1 bCh1 where bPay.billingNo=bCh1.id and bPay.paymentdate >= ? and bPay.paymentdate <= ? order by bCh1.id";
+         String sql = "select distinct bCh1 from BillingONPayment bPay, BillingONCHeader1 bCh1 where bPay.billingNo=bCh1.id and bPay.paymentdate >= ?1 and bPay.paymentdate <= ?2 order by bCh1.id";
          Query query = entityManager.createQuery(sql);               
          query.setParameter(1, start);
          query.setParameter(2, end);
@@ -443,7 +445,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     }
 
     public BillingONCHeader1 getLastOHIPBillingDateForServiceCode (Integer demographicNo, String serviceCode) {            
-        String sql = "select b from BillingONItem i, BillingONCHeader1 b where i.ch1Id=b.id and i.status!='D' and i.serviceCode=? and b.demographicNo=?  and (b.payProgram='HCP' or b.payProgram='RMB' or b.payProgram='WCB') and (b.status='S' or b.status='O' or b.status='B') order by b.billingDate desc";
+        String sql = "select b from BillingONItem i, BillingONCHeader1 b where i.ch1Id=b.id and i.status!='D' and i.serviceCode=?1 and b.demographicNo=?2  and (b.payProgram='HCP' or b.payProgram='RMB' or b.payProgram='WCB') and (b.status='S' or b.status='O' or b.status='B') order by b.billingDate desc";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1,serviceCode);
         query.setParameter(2,demographicNo);
@@ -458,7 +460,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     
     
     public List<BillingONCHeader1> findByAppointmentNo(Integer appointmentNo) {
-    	String sql = "select h1 from BillingONCHeader1 h1 where h1.appointmentNo=?";
+    	String sql = "select h1 from BillingONCHeader1 h1 where h1.appointmentNo=?1";
         Query q = entityManager.createQuery(sql);
         
         q.setParameter(1,appointmentNo);
@@ -500,7 +502,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     
     
     public List<Long> count_larrykain_clinic(String facilityNum, Date startDate, Date endDate) {
-    	Query q = entityManager.createQuery("select count(b) from BillingONCHeader1 b where b.visitType = '00' and b.faciltyNum = ? and b.status <> 'D' and b.billingDate >=? and b.billingDate <=?");
+    	Query q = entityManager.createQuery("select count(b) from BillingONCHeader1 b where b.visitType = '00' and b.faciltyNum = ?1 and b.status <> 'D' and b.billingDate >=?2 and b.billingDate <=?3");
     	
     	 q.setParameter(1, facilityNum);
          q.setParameter(2, (new SimpleDateFormat("yyyy-MM-dd")).format(startDate));
@@ -511,7 +513,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     
     
     public List<Long> count_larrykain_hospital(String facilityNum1, String facilityNum2, String facilityNum3, String facilityNum4, Date startDate, Date endDate) {
-    	Query q = entityManager.createQuery("select count(b) from BillingONCHeader1 b where b.visitType<>'00' and (b.faciltyNum=? or b.faciltyNum=? or b.faciltyNum=? or b.faciltyNum=?) and status<>'D' and b.billingDate >=? and b.billingDate <=?");
+    	Query q = entityManager.createQuery("select count(b) from BillingONCHeader1 b where b.visitType<>'00' and (b.faciltyNum=?1 or b.faciltyNum=?2 or b.faciltyNum=?3 or b.faciltyNum=?4) and status<>'D' and b.billingDate >=?5 and b.billingDate <=?6");
     	
     	 q.setParameter(1, facilityNum1);
     	 q.setParameter(2, facilityNum2);
@@ -525,7 +527,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     
     
     public List<Long> count_larrykain_other(String facilityNum1, String facilityNum2, String facilityNum3, String facilityNum4, String facilityNum5, Date startDate, Date endDate) {
-    	Query q = entityManager.createQuery("select count(b) from BillingONCHeader1 b where b.visitType<>'00' and status<>'D' and  (b.faciltyNum<>? and b.faciltyNum<>? and b.faciltyNum<>? and b.faciltyNum<>? and b.faciltyNum<>?) and b.billingDate >=? and b.billingDate<=?");
+    	Query q = entityManager.createQuery("select count(b) from BillingONCHeader1 b where b.visitType<>'00' and status<>'D' and  (b.faciltyNum<>?1 and b.faciltyNum<>?2 and b.faciltyNum<>?3 and b.faciltyNum<>?4 and b.faciltyNum<>?5) and b.billingDate >=?6 and b.billingDate<=?7");
     	
     	 q.setParameter(1, facilityNum1);
     	 q.setParameter(2, facilityNum2);
@@ -637,7 +639,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
 	}
 
     public List<BillingONCHeader1> getBillingItemByDxCode(Integer demographicNo, String dxCode) {
-        String queryStr = "select h FROM BillingONItem b, BillingONCHeader1 h WHERE h.id = b.ch1Id and h.demographicNo=? and (b.dx =? or b.dx1 = ? or b.dx2=?)";
+        String queryStr = "select h FROM BillingONItem b, BillingONCHeader1 h WHERE h.id = b.ch1Id and h.demographicNo=?1 and (b.dx =?2 or b.dx1 = ?3 or b.dx2=?4)";
         Query query = entityManager.createQuery(queryStr);
         query.setParameter(1, demographicNo);
         query.setParameter(2, dxCode);
@@ -796,7 +798,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
 	
 	
 	public List<BillingONCHeader1> findAllByPayProgram (String payProgram, int startIndex, int limit) {            
-        String sql = "select b FROM BillingONCHeader1 b where b.payProgram=? order by b.id ASC";
+        String sql = "select b FROM BillingONCHeader1 b where b.payProgram=?1 order by b.id ASC";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1,payProgram);
         query.setFirstResult(startIndex);

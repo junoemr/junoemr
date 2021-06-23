@@ -14,7 +14,7 @@ dojo.require("dojo.lang.array");
 dojo.require("dojo.lang.extras");
 dojo.require("dojo.lang.func");
 
-// TODO: connection filter functions
+// TODO-legacy: connection filter functions
 //			these are functions that accept a method invocation (like around
 //			advice) and return a boolean based on it. That value determines
 //			whether or not the connection proceeds. It could "feel" like around
@@ -22,17 +22,17 @@ dojo.require("dojo.lang.func");
 //			but I think presenting it as a "filter" and/or calling it with the
 //			function args and not the MethodInvocation might make it more
 //			palletable to "normal" users than around-advice currently is
-// TODO: execution scope mangling
+// TODO-legacy: execution scope mangling
 //			YUI's event facility by default executes listeners in the context
 //			of the source object. This is very odd, but should probably be
 //			supported as an option (both for the source and for the dest). It
 //			can be thought of as a connection-specific hitch().
-// TODO: more resiliency for 4+ arguments to connect()
+// TODO-legacy: more resiliency for 4+ arguments to connect()
 
 dojo.event = new function(){
 	this._canTimeout = dojo.lang.isFunction(dj_global["setTimeout"])||dojo.lang.isAlien(dj_global["setTimeout"]);
 
-	// FIXME: where should we put this method (not here!)?
+	// FIXME-legacy: where should we put this method (not here!)?
 	function interpolateArgs(args, searchForNames){
 		var dl = dojo.lang;
 		var ao = {
@@ -220,7 +220,7 @@ dojo.event = new function(){
 		//											scope3, "aroundFunctionName", null, null, 10);
 		// adviceType: 
 		//		Optional. String. One of "before", "after", "around",
-		//		"before-around", or "after-around". FIXME
+		//		"before-around", or "after-around". FIXME-legacy
 		// srcObj:
 		//		the scope in which to locate/execute the named srcFunc. Along
 		//		with srcFunc, this creates a way to dereference the function to
@@ -312,7 +312,7 @@ dojo.event = new function(){
 			return mjps;
 		}
 
-		// FIXME: just doing a "getForMethod()" seems to be enough to put this into infinite recursion!!
+		// FIXME-legacy: just doing a "getForMethod()" seems to be enough to put this into infinite recursion!!
 		var mjp = dojo.event.MethodJoinPoint.getForMethod(ao.srcObj, ao.srcFunc);
 		if(ao.adviceFunc){
 			var mjp2 = dojo.event.MethodJoinPoint.getForMethod(ao.adviceObj, ao.adviceFunc);
@@ -530,7 +530,7 @@ dojo.event.MethodJoinPoint.getForMethod = function(/*Object*/obj, /*String*/func
 			dojo.raise("Cannot set do-nothing method on that object "+funcName);
 		}
 	}else if((!dojo.lang.isFunction(obj[funcName]))&&(!dojo.lang.isAlien(obj[funcName]))){
-		// FIXME: should we throw an exception here instead?
+		// FIXME-legacy: should we throw an exception here instead?
 		return null; 
 	}
 	// we hide our joinpoint instance in obj[funcName + '$joinpoint']
@@ -660,7 +660,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 						var tod = parseInt(rate*2); // is rate*2 naive?
 						var mcpy = dojo.lang.shallowCopy(marr);
 						marr.delayTimer = setTimeout(function(){
-							// FIXME: on IE at least, event objects from the
+							// FIXME-legacy: on IE at least, event objects from the
 							// browser can go out of scope. How (or should?) we
 							// deal with it?
 							mcpy[5] = 0;
@@ -673,7 +673,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 				}
 			}
 
-			// FIXME: need to enforce rates for a connection here!
+			// FIXME-legacy: need to enforce rates for a connection here!
 
 			if(aroundFunc){
 				// NOTE: around advice can't delay since we might otherwise depend
@@ -681,7 +681,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 				aroundObj[aroundFunc].call(aroundObj, to);
 			}else{
 				// var tmjp = dojo.event.MethodJoinPoint.getForMethod(obj, methname);
-				if((hasDelay)&&((dojo.render.html)||(dojo.render.svg))){  // FIXME: the render checks are grotty!
+				if((hasDelay)&&((dojo.render.html)||(dojo.render.svg))){  // FIXME-legacy: the render checks are grotty!
 					dj_global["setTimeout"](function(){
 						if(msg){
 							callObj[callFunc].call(callObj, to); 
@@ -745,7 +745,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 		//		can be one of: "before", "after", "around", "before-around", or
 		//		"after-around"
 		var type = "after";
-		// FIXME: we should be able to do this through props or Array.in()
+		// FIXME-legacy: we should be able to do this through props or Array.in()
 		if((typeof kind == "string")&&(kind.indexOf("before")!=-1)){
 			type = "before";
 		}else if(kind=="around"){
@@ -793,7 +793,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 		//		advice call.
 		// adviceType: 
 		//		Optional. String. One of "before", "after", "around",
-		//		"before-around", or "after-around". FIXME
+		//		"before-around", or "after-around". FIXME-legacy
 		// once:
 		//		boolean that determines whether or not this advice will create
 		//		a new connection if an identical advice set has already been
@@ -839,7 +839,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 		//		the name of the function being conected
 		// adviceType: 
 		//		Optional. String. One of "before", "after", "around",
-		//		"before-around", or "after-around". FIXME
+		//		"before-around", or "after-around". FIXME-legacy
 		// arr:
 		//		Optional. The list of advices to search. Will be found via
 		//		adviceType if not passed
@@ -866,7 +866,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 		//		the name of the function being conected
 		// adviceType: 
 		//		Optional. String. One of "before", "after", "around",
-		//		"before-around", or "after-around". FIXME
+		//		"before-around", or "after-around". FIXME-legacy
 		// once:
 		//		Optional. Should this only remove the first occurance of the
 		//		connection?

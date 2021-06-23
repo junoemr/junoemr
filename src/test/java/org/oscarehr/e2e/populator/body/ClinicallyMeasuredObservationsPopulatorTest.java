@@ -28,8 +28,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalStatement;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Organizer;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ActMoodEventOccurrence;
@@ -37,10 +39,15 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActClassDocumentEntryOrganize
 import org.oscarehr.e2e.constant.BodyConstants.ClinicallyMeasuredObservations;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.PatientExport;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ClinicallyMeasuredObservationsPopulatorTest extends AbstractBodyPopulatorTest {
-	@BeforeClass
-	public static void beforeClass() {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ClinicallyMeasuredObservationsPopulatorTest extends AbstractBodyPopulatorTest
+{
+	@Before
+	public void beforeClass() {
 		setupClass(ClinicallyMeasuredObservations.getConstants());
 	}
 

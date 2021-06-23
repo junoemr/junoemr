@@ -26,15 +26,16 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -58,17 +59,21 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 
 public class AddAppointmentsTests extends SeleniumTestBase
 {
-	@BeforeClass
-	public static void setup()
+	@Autowired
+	DatabaseUtil databaseUtil;
+
+	//static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	@Before
+	public void setup() throws Exception
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
-		DatabaseUtil.createTestProvider();
-		DatabaseUtil.createProviderSite();
+		databaseUtil.createTestDemographic();
+		databaseUtil.createTestProvider();
+		databaseUtil.createProviderSite();
 	}
 
-	@AfterClass
-	public static void cleanup() throws Exception
+	@After
+	public void cleanup() throws Exception
 	{
 		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
 				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",

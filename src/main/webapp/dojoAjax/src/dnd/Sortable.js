@@ -20,8 +20,8 @@ dojo.lang.extend(dojo.dnd.Sortable, {
 		while (dragObject.parentNode && dragObject.parentNode != this) {
 			dragObject = dragObject.parentNode;
 		}
-		// TODO: should apply HtmlDropTarget interface to self
-		// TODO: should apply HtmlDragObject interface?
+		// TODO-legacy: should apply HtmlDropTarget interface to self
+		// TODO-legacy: should apply HtmlDragObject interface?
 		return dragObject;
 	}
 

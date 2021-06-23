@@ -25,6 +25,8 @@
 
 package oscar.log;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -259,5 +261,12 @@ public class LogAction {
 			logger.error("Could not save SOAP service log");
 		}
 
+	}
+
+	public static Instant printDuration(Instant start, String what)
+	{
+		Instant now = Instant.now();
+		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
+		return now;
 	}
 }

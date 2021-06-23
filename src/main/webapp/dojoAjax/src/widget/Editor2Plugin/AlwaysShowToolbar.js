@@ -62,7 +62,7 @@ dojo.declare("dojo.widget.Editor2Plugin.AlwaysShowToolbar", null,
 
 		var scrollPos = (window["pageYOffset"]) ? window["pageYOffset"] : (document["documentElement"]||document["body"]).scrollTop;
 
-		// FIXME: need to have top and bottom thresholds so toolbar doesn't keep scrolling past the bottom
+		// FIXME-legacy: need to have top and bottom thresholds so toolbar doesn't keep scrolling past the bottom
 		if(scrollPos > this._scrollThreshold){
 			// dojo.debug(scrollPos);
 			if(!this._fixEnabled){
@@ -70,7 +70,7 @@ dojo.declare("dojo.widget.Editor2Plugin.AlwaysShowToolbar", null,
 				this.editor.editorObject.style.marginTop = tdnbox.height+"px";
 
 				if(isIE){
-					// FIXME: should we just use setBehvior() here instead?
+					// FIXME-legacy: should we just use setBehvior() here instead?
 					tdn.style.left = dojo.html.abs(tdn, dojo.html.boxSizing.MARGIN_BOX).x;
 					if(tdn.previousSibling){
 						this._IEOriginalPos = ['after',tdn.previousSibling];
@@ -97,7 +97,7 @@ dojo.declare("dojo.widget.Editor2Plugin.AlwaysShowToolbar", null,
 			// we've scrolled past the bottom of the editor that we hide
 			// the toolbar for this instance of the editor.
 
-			// TODO: when we get multiple editor toolbar support working
+			// TODO-legacy: when we get multiple editor toolbar support working
 			// correctly, ensure that we check this against the scroll
 			// position of the bottom-most editor instance.
 			if(!dojo.render.html.safari){

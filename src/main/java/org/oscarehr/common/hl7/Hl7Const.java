@@ -54,6 +54,9 @@ public class Hl7Const
 
 	public static final String HL7_SEGMENT_SCH_11 = "SCH.11";
 
+	public static final String ABNORMAL_FLAG_NO = "N";
+	public static final String ABNORMAL_FLAG_YES = "A";
+
 	public static String getReadableSegmentName(String segment, String segmentField)
 	{
 		String segmentReadableName = "";

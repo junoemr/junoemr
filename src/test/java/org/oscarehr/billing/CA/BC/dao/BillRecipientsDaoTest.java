@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.BillRecipients;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillRecipientsDaoTest extends DaoTestFixtures {
-
-	public BillRecipientsDao dao = SpringUtils.getBean(BillRecipientsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillRecipientsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillRecipientsDao billRecipientsDao;
 
 	@Before
 	public void before() throws Exception {
@@ -46,7 +52,7 @@ public class BillRecipientsDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BillRecipients entity = new BillRecipients();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billRecipientsDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

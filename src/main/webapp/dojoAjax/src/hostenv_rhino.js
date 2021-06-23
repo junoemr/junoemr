@@ -62,7 +62,7 @@ dojo.hostenv.loadUri = function(uri, cb){
 				return false;
 			}
 		}
-//FIXME: Use Rhino 1.6 native readFile/readUrl if available?
+//FIXME-legacy: Use Rhino 1.6 native readFile/readUrl if available?
 		if(cb){
 			var contents = (local ? readText : readUri)(uri, "UTF-8");
 			cb(eval('('+contents+')'));

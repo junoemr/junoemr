@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CssStyle;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CSSStylesDAOTest extends DaoTestFixtures {
-
-	protected CSSStylesDAO dao = (CSSStylesDAO)SpringUtils.getBean(CSSStylesDAO.class);
-	Logger logger = MiscUtils.getLogger();
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CSSStylesDAOTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CSSStylesDAO dao;
 
 	@Before
 	public void setUp() throws Exception { 

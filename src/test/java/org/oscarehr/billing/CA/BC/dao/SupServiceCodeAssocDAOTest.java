@@ -31,17 +31,23 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.BillingTrayFee;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.oscarBilling.ca.bc.data.SupServiceCodeAssocDAO;
 
-public class SupServiceCodeAssocDAOTest extends DaoTestFixtures {
-
-	public SupServiceCodeAssocDAO dao = SpringUtils.getBean(SupServiceCodeAssocDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SupServiceCodeAssocDAOTest extends DaoTestFixtures
+{
+	@Autowired
+	public SupServiceCodeAssocDAO supServiceCodeAssocDAO;
 
 	@Before
 	public void before() throws Exception {
@@ -56,20 +62,20 @@ public class SupServiceCodeAssocDAOTest extends DaoTestFixtures {
 		fee.setBillingServiceTrayNo("0000000");
 		fee.setId(null);
 		
-		dao.persist(fee);
+		supServiceCodeAssocDAO.persist(fee);
 		
-		List<?> list = dao.getServiceCodeAssociactions();
+		List<?> list = supServiceCodeAssocDAO.getServiceCodeAssociactions();
 		assertFalse(list.isEmpty());
 		
-		Map<?, ?> map = dao.getAssociationKeyValues();
+		Map<?, ?> map = supServiceCodeAssocDAO.getAssociationKeyValues();
 		assertFalse(map.isEmpty());
 		
-		dao.saveOrUpdateServiceCodeAssociation(fee.getId().toString(), "888888");
-		dao.saveOrUpdateServiceCodeAssociation("77777777", "888888");
+		supServiceCodeAssocDAO.saveOrUpdateServiceCodeAssociation(fee.getId().toString(), "888888");
+		supServiceCodeAssocDAO.saveOrUpdateServiceCodeAssociation("77777777", "888888");
 		
-		dao.deleteServiceCodeAssociation(fee.getId().toString());
+		supServiceCodeAssocDAO.deleteServiceCodeAssociation(fee.getId().toString());
 		
-		fee = dao.find(fee.getId());
+		fee = supServiceCodeAssocDAO.find(fee.getId());
 		assertTrue(fee == null);
 	}
 }

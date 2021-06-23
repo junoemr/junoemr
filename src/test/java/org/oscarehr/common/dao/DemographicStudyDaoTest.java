@@ -28,15 +28,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DemographicStudy;
 import org.oscarehr.common.model.DemographicStudyPK;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DemographicStudyDaoTest extends DaoTestFixtures {
-
-	protected DemographicStudyDao dao = SpringUtils.getBean(DemographicStudyDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicStudyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicStudyDao demographicStudyDao;
 
 	public DemographicStudyDaoTest() {
 	}
@@ -54,7 +60,7 @@ public class DemographicStudyDaoTest extends DaoTestFixtures {
 		entity.setId(new DemographicStudyPK());
 		entity.getId().setDemographicNo(1);
 		entity.getId().setStudyNo(1);
-		dao.persist(entity);
+		demographicStudyDao.persist(entity);
 
 	}
 
@@ -65,12 +71,12 @@ public class DemographicStudyDaoTest extends DaoTestFixtures {
 		entity.setId(new DemographicStudyPK());
 		entity.getId().setDemographicNo(1);
 		entity.getId().setStudyNo(1);
-		dao.persist(entity);
+		demographicStudyDao.persist(entity);
 
 		DemographicStudyPK pk = new DemographicStudyPK();
 		pk.setDemographicNo(1);
 		pk.setStudyNo(1);
-		assertNotNull(dao.find(pk));
+		assertNotNull(demographicStudyDao.find(pk));
 	}
 
 	public void testRemoveByDemographicNo() throws Exception {
@@ -79,23 +85,23 @@ public class DemographicStudyDaoTest extends DaoTestFixtures {
 		entity.setId(new DemographicStudyPK());
 		entity.getId().setDemographicNo(1);
 		entity.getId().setStudyNo(1);
-		dao.persist(entity);
+		demographicStudyDao.persist(entity);
 
 		entity = new DemographicStudy();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(new DemographicStudyPK());
 		entity.getId().setDemographicNo(1);
 		entity.getId().setStudyNo(2);
-		dao.persist(entity);
+		demographicStudyDao.persist(entity);
 
 		entity = new DemographicStudy();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(new DemographicStudyPK());
 		entity.getId().setDemographicNo(2);
 		entity.getId().setStudyNo(1);
-		dao.persist(entity);
+		demographicStudyDao.persist(entity);
 
-		assertEquals(2,dao.removeByDemographicNo(1));
+		assertEquals(2, demographicStudyDao.removeByDemographicNo(1));
 	}
 
 	@Test
@@ -105,9 +111,9 @@ public class DemographicStudyDaoTest extends DaoTestFixtures {
 		entity.setId(new DemographicStudyPK());
 		entity.getId().setDemographicNo(1);
 		entity.getId().setStudyNo(1);
-		dao.persist(entity);
+		demographicStudyDao.persist(entity);
 
-		assertNotNull(dao.findByDemographicNoAndStudyNo(1,1));
+		assertNotNull(demographicStudyDao.findByDemographicNoAndStudyNo(1,1));
 	}
 
 }

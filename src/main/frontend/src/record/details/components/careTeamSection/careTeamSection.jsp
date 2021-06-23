@@ -19,20 +19,6 @@
 							component-style="$ctrl.componentStyle">
 			</juno-select>
 
-            <!-- Family Doctor -->
-            <juno-typeahead ng-if="$ctrl.familyDoctorEnabled"
-                            model="$ctrl.ngModel.scrFamilyDoc"
-                            options="$ctrl.referralDoctors"
-                            filter-options="false"
-                            name="FamilyDoctor"
-                            title="Family Doctor"
-                            placeholder="Family Doctor"
-                            label-position="LABEL_POSITION.LEFT"
-                            on-change="$ctrl.updateReferralDoctors(value)"
-                            on-selected="$ctrl.updateFamilyDocNo(value)"
-                            component-style="$ctrl.componentStyle">
-            </juno-typeahead>
-
 			<!-- Referral Doctor -->
 			<juno-typeahead model="$ctrl.ngModel.scrReferralDoc"
 							options="$ctrl.referralDoctors"
@@ -45,30 +31,6 @@
 							on-selected="$ctrl.updateReferralNo(value)"
 							component-style="$ctrl.componentStyle">
 			</juno-typeahead>
-
-			<!-- Roster Status -->
-			<div class="select-with-button">
-				<juno-select ng-model="$ctrl.ngModel.rosterStatus"
-								options="$ctrl.rosterStatusList"
-								label="Roster Status"
-								component-style="$ctrl.componentStyle">
-				</juno-select>
-
-				<juno-button ng-click="$ctrl.openAddRosterStatusModal()"
-				             button-color="JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
-					Add
-				</juno-button>
-
-			</div>
-
-			<!-- Termination Date -->
-			<juno-date-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
-							ng-model="$ctrl.ngModel.rosterTerminationDate"
-							label="Termination Date"
-							on-validity-change="$ctrl.terminationDateValid = valid"
-							component-style="$ctrl.componentStyle">
-			</juno-date-select>
 
 			<!--- Patient Status -->
 			<div class="select-with-button">
@@ -120,14 +82,6 @@
 							component-style="$ctrl.componentStyle">
 			</juno-select>
 
-            <!-- Family Doctor Number -->
-            <juno-input ng-if="$ctrl.familyDoctorEnabled"
-                        ng-model="$ctrl.ngModel.scrFamilyDocNo"
-                        label="Family Doctor #"
-                        placeholder="Family Doctor #"
-                        valid-regex="$ctrl.numberRegex"
-                        component-style="$ctrl.componentStyle">
-            </juno-input>
 
 			<!-- Referral Doctor Number -->
 			<juno-input ng-model="$ctrl.ngModel.scrReferralDocNo"
@@ -136,21 +90,6 @@
 							valid-regex="$ctrl.numberRegex"
 							component-style="$ctrl.componentStyle">
 			</juno-input>
-
-			<!-- Date Rostered -->
-			<juno-date-select ng-model="$ctrl.ngModel.rosterDate"
-							label="Roster Date"
-							on-validity-change="$ctrl.rosterDateValid = valid"
-							component-style="$ctrl.componentStyle">
-			</juno-date-select>
-
-			<!-- Termination Reason -->
-			<juno-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
-							ng-model="$ctrl.ngModel.rosterTerminationReason"
-							options="$ctrl.rosterTermReasons"
-							label="Termination Reason"
-							component-style="$ctrl.componentStyle">
-			</juno-select>
 
 			<!-- Patient Status Date -->
 			<juno-date-select ng-model="$ctrl.ngModel.patientStatusDate"

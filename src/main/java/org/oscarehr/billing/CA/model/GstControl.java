@@ -43,7 +43,7 @@ import org.oscarehr.common.model.AbstractModel;
 public class GstControl extends AbstractModel<Integer> implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Boolean gstFlag;
     private BigDecimal gstPercent;

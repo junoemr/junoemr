@@ -29,10 +29,15 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.InformationRecipient;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.IntendedRecipient;
 import org.oscarehr.e2e.populator.AbstractPopulatorTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class InformationRecipientPopulatorTest extends AbstractPopulatorTest {
 	@Test
 	public void informationRecipientTest() {

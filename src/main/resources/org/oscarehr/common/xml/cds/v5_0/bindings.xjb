@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="2.1"
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
+              jxb:extensionBindingPrefixes="xjc">
+
+	<jxb:bindings
+			schemaLocation="cds-schema.xsd"
+			node="/xs:schema/xs:element[@name='Demographics']/xs:complexType">
+		<inheritance:implements>org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface</inheritance:implements>
+	</jxb:bindings>
+	<jxb:bindings
+			schemaLocation="cds-schema.xsd"
+			node="/xs:schema/xs:element[@name='Reports']/xs:complexType">
+		<inheritance:implements>org.oscarehr.dataMigration.mapper.cds.CDSReportInterface</inheritance:implements>
+	</jxb:bindings>
+</jxb:bindings>

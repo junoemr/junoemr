@@ -392,7 +392,7 @@ dojo.widget.defineWidget(
 				}
 			}
 
-			//	TODO: set up filtering mechanisms here.
+			//	TODO-legacy: set up filtering mechanisms here.
 			if(dojo.html.hasAttribute(cells[i], "filterusing")){
 				var trans = dojo.html.getAttribute(cells[i],"filterusing");
 				var f = this.getTypeFromString(trans);
@@ -659,7 +659,7 @@ dojo.widget.defineWidget(
 				if(dojo.html.hasAttribute(rowA,"emptyRow")){ return 1; }
 				if(dojo.html.hasAttribute(rowB,"emptyRow")){ return -1; }
 
-				//	TODO: check for markup and compare by rendered text.
+				//	TODO-legacy: check for markup and compare by rendered text.
 				var a = self.store.getField(self.getDataByRow(rowA), field);
 				var b = self.store.getField(self.getDataByRow(rowB), field);
 				var ret = 0;
@@ -731,12 +731,12 @@ dojo.widget.defineWidget(
 					cell.innerHTML = val;
 				}
 			} else if ("Number number int Integer float Float".indexOf(meta.getType())>-1){
-				//	TODO: number formatting
+				//	TODO-legacy: number formatting
 				if(val.length == 0){
 					val="0";
 				}
 				var n = parseFloat(val, 10) + "";
-				//	TODO: numeric formatting + rounding :)
+				//	TODO-legacy: numeric formatting + rounding :)
 				if(n.indexOf(".")>-1){
 					n = dojo.math.round(parseFloat(val,10),2);
 				}

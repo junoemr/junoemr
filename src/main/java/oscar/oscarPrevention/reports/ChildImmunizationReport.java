@@ -188,6 +188,7 @@ public class ChildImmunizationReport implements PreventionReport {
         reportParams.put("followUpType","CIMF");
         reportParams.put("BillCode", contactBillingCode);
 
+
         return reportParams;
     }
 	
@@ -306,7 +307,7 @@ public class ChildImmunizationReport implements PreventionReport {
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
 
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
               //NO Contact
               if ( followupData.size() == 0 ){
                   prd.nextSuggestedProcedure = this.LETTER1;
@@ -401,7 +402,7 @@ public class ChildImmunizationReport implements PreventionReport {
 
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("2getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
 
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();

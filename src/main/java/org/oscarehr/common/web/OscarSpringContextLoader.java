@@ -35,7 +35,7 @@ import oscar.OscarProperties;
 import javax.servlet.ServletContext;
 import java.util.ArrayList;
 
-
+// TODO: SPRINGUPGRADE: Not used anymore
 public final class OscarSpringContextLoader extends ContextLoader
 {
 	private static final Logger log = MiscUtils.getLogger();

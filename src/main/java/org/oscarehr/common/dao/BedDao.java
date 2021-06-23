@@ -49,7 +49,7 @@ public class BedDao extends AbstractDao<Bed>{
 	 * @return boolean
 	 */
 	public boolean bedExists(Integer bedId) {
-		Query query = entityManager.createQuery("select count(*) from Bed b where b.id = ?");
+		Query query = entityManager.createQuery("select count(*) from Bed b where b.id = ?1");
 		query.setParameter(1, bedId);
 		
 		Long result = (Long)query.getSingleResult();
@@ -144,32 +144,33 @@ public class BedDao extends AbstractDao<Bed>{
 
 
     String getBedsQuery(Integer facilityId, Integer roomId, Boolean active) {
-        StringBuilder queryBuilder = new StringBuilder("select b from Bed b");
+		StringBuilder queryBuilder = new StringBuilder("select b from Bed b");
 
-        queryBuilder.append(" where ");
+		queryBuilder.append(" where ");
 
-        boolean andClause = false;
-        if (facilityId != null) {
-            queryBuilder.append("b.facilityId = ?");
-            andClause = true;
-        }
+		boolean andClause = false;
+		int paramCount = 1;
+		if (facilityId != null) {
+			queryBuilder.append("b.facilityId = ?" + paramCount++);
+			andClause = true;
+		}
 
-        if (roomId!= null) {
-            if (andClause) queryBuilder.append(" and "); else andClause = true;
-            queryBuilder.append("b.roomId = ?");
-        }
+		if (roomId!= null) {
+			if (andClause) queryBuilder.append(" and "); else andClause = true;
+			queryBuilder.append("b.roomId = ?" + paramCount++);
+		}
 
-        if (active != null) {
-            if (andClause) queryBuilder.append(" and ");
-            queryBuilder.append("b.active = ?");
-        }
+		if (active != null) {
+			if (andClause) queryBuilder.append(" and ");
+			queryBuilder.append("b.active = ?" + paramCount++);
+		}
 
-        return queryBuilder.toString();
-    }
+		return queryBuilder.toString();
+	}
 
-    
-    Object[] getBedsValues(Integer facilityId, Integer roomId, Boolean active) {
-        List<Object> values = new ArrayList<Object>();
+
+	Object[] getBedsValues(Integer facilityId, Integer roomId, Boolean active) {
+		List<Object> values = new ArrayList<Object>();
 
         if (facilityId != null) {
             values.add(facilityId);
@@ -200,6 +201,6 @@ public class BedDao extends AbstractDao<Bed>{
 	    }
 
 	    void updateHistory(Bed bed) {
-	        // TODO IC Bedlog Historical - if room to bed association has changed, create historical record
+	        // TODO-legacy IC Bedlog Historical - if room to bed association has changed, create historical record
 	    }
 }

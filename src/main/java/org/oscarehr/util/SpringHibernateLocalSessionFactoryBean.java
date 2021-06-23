@@ -23,6 +23,7 @@
 
 package org.oscarehr.util;
 
+/*
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.Collections;
@@ -44,9 +45,12 @@ import org.hibernate.engine.FilterDefinition;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.metadata.CollectionMetadata;
 import org.hibernate.stat.Statistics;
+*/
 
-public class SpringHibernateLocalSessionFactoryBean extends org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean {
+public class SpringHibernateLocalSessionFactoryBean //extends org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean {
+{
 
+/*
 	private static final Logger logger=MiscUtils.getLogger();
 	
     public static final Map<Session, StackTraceElement[]> debugMap = Collections.synchronizedMap(new WeakHashMap<Session, StackTraceElement[]>());
@@ -221,4 +225,5 @@ public class SpringHibernateLocalSessionFactoryBean extends org.springframework.
 		
 		return(new TrackingSessionFactory(sf));
 	}
+*/
 }

@@ -222,7 +222,7 @@ public class ManageHSFOAction extends Action
       }
       
       request.setAttribute( "EmrHCPId1", user );
-      request.setAttribute( "EmrHCPId2", de.getProviderNo() ); // TODO: may need to convert to provider name
+      request.setAttribute( "EmrHCPId2", de.getProviderNo() ); // TODO-legacy: may need to convert to provider name
       
       forwardToForm = FORM.registration;
     }

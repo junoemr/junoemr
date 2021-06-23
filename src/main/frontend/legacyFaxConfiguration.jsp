@@ -43,7 +43,7 @@
 
 <html lang="en" ng-app="oscarProviderViewModule">
 <head></head>
-<body ng-controller="Admin.Integration.Fax.FaxConfigurationController as faxController">
+<body ng-controller="Admin.Section.Fax.FaxConfigurationController as faxController">
 
 <!--
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
@@ -51,7 +51,7 @@
 -->
 <!-- Hide the main program nav as a fix for having angular in an iframe -->
 <!--
-<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
+<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/section/know2act/Know2actHideNavBars.css">
 -->
 
 <title><bean:message bundle="ui" key="admin.fax.acct.window-title"/></title>
@@ -122,7 +122,7 @@
 					<h4>{{faxAccount.coverLetterOption}}</h4>
 				</div>
 				<button type="button" class="btn btn-default"
-				        <%-- TODO disable button for non-admin users? --%>
+				        <%-- TODO-legacy disable button for non-admin users? --%>
 				        ng-click="faxController.editFaxAccount(faxAccount)"
 						ng-disabled="faxController.masterFaxDisabled">
 					<bean:message bundle="ui" key="admin.fax.acct.btn-EditAccount"/>

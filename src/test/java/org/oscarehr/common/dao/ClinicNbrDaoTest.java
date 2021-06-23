@@ -28,15 +28,22 @@ import static org.junit.Assert.assertEquals;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ClinicNbr;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ClinicNbrDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ClinicNbrDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ClinicNbrDao clinicNbrDao;
 
-	protected ClinicNbrDao dao = (ClinicNbrDao)SpringUtils.getBean(ClinicNbrDao.class);
 	Logger logger = MiscUtils.getLogger();
 
 	@Before
@@ -110,10 +117,10 @@ public class ClinicNbrDaoTest extends DaoTestFixtures {
 		ClinicNbr nbr1 = new ClinicNbr();
 		EntityDataGenerator.generateTestDataForModelClass(nbr1);
 		nbr1.setNbrStatus("A");
-		dao.persist(nbr1);
+		clinicNbrDao.persist(nbr1);
 		
-		dao.removeEntry(1);
-		nbr1 = dao.find(1);
+		clinicNbrDao.removeEntry(1);
+		nbr1 = clinicNbrDao.find(1);
 		assertEquals("D", nbr1.getNbrStatus());
 	}
 
@@ -132,7 +139,7 @@ public class ClinicNbrDaoTest extends DaoTestFixtures {
 		nbr1.setNbrString(nbrString);
 		nbr1.setNbrValue(nbrValue);
 		
-		dao.addEntry(nbrValue, nbrString);
+		clinicNbrDao.addEntry(nbrValue, nbrString);
 		
 		assertEquals("RMA", nbr1.getNbrString());
 		assertEquals("A", nbr1.getNbrValue());

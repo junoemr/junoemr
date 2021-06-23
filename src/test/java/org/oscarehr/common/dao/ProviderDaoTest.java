@@ -29,14 +29,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderDaoTest extends DaoTestFixtures {
-
-	protected ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderDao providerDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,47 +51,47 @@ public class ProviderDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindOhip() {
-		List<Provider> providers = dao.getProvidersWithNonEmptyOhip();
+		List<Provider> providers = providerDao.getProvidersWithNonEmptyOhip();
 		assertNotNull(providers);
 	}
 	
 	@Test
 	public void testGetCurrentTeamProviders() {
-		dao.getCurrentTeamProviders("999998");
+		providerDao.getCurrentTeamProviders("999998");
 	}
 	
 	@Test
 	public void testActiveProviders() {
-		assertNotNull(dao.getActiveProviders());
+		assertNotNull(providerDao.getActiveProviders());
 	}
 	
 	@Test
 	public void testGetActiveTeamsViaSites() {
-		assertNotNull(dao.getActiveTeamsViaSites("100"));
+		assertNotNull(providerDao.getActiveTeamsViaSites("100"));
 	}
 	
 	@Test
 	public void testGetProviderByPatientId() {
-		assertNotNull(dao.getProviderByPatientId(100));
+		assertNotNull(providerDao.getProviderByPatientId(100));
 	}
 
 	@Test
 	public void test () {
-		assertNotNull(dao.getProvidersByTypePattern("%nurse%"));
+		assertNotNull(providerDao.getProvidersByTypePattern("%nurse%"));
 	}
 	
 	@Test
 	public void testGetProviderIds () {
-		assertNotNull(dao.getProviderIds(1));
+		assertNotNull(providerDao.getProviderIds(1));
 	}
 	
 	@Test
 	public void testGetFacilityIds () {
-		assertNotNull(dao.getFacilityIds("999998"));
+		assertNotNull(providerDao.getFacilityIds("999998"));
 	}
 
     @Test
     public void testDetDoctorsWithNonEmptyCredentials() {
-	    assertNotNull(dao.getDoctorsWithNonEmptyCredentials());
+	    assertNotNull(providerDao.getDoctorsWithNonEmptyCredentials());
     }
 }

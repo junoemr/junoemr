@@ -112,7 +112,7 @@ public class BORNWBCSDJob implements OscarRunnable {
 			//1) get all the patients under 7 where we've never sent a record
 
 			DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-			//TODO: need to cull out the ones over the age
+			//TODO-legacy: need to cull out the ones over the age
 			List<Integer> demographicsToPossiblySend = demographicDao.getBORNKidsMissingExtKey("uploaded_to_BORN");
 
 			for (Integer demographicNo : demographicsToPossiblySend) {

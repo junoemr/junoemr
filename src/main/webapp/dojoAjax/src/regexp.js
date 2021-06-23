@@ -9,7 +9,7 @@
 */
 
 dojo.provide("dojo.regexp");
-dojo.evalObjPath("dojo.regexp.us", true);	// this file also defines stuff in the dojo.regexp.us module (TODO: move to separate file?)
+dojo.evalObjPath("dojo.regexp.us", true);	// this file also defines stuff in the dojo.regexp.us module (TODO-legacy: move to separate file?)
 
 // *** Regular Expression Generators ***
 
@@ -389,7 +389,7 @@ dojo.regexp.currency = function(/*Object?*/flags){
 	}
 
 	// number RE
-	var flagsCopy = flags; //TODO: copy by value?
+	var flagsCopy = flags; //TODO-legacy: copy by value?
 	flagsCopy.signed = false; flagsCopy.exponent = false;
 	var numberRE = dojo.regexp.realNumber(flagsCopy);
 

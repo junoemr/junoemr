@@ -30,6 +30,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.ST;
 import org.marc.everest.datatypes.TS;
@@ -42,7 +43,11 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.x_BasicConfidentialityKind;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.populator.AbstractPopulatorTest;
 import org.oscarehr.e2e.util.EverestUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class HeaderPopulatorTest extends AbstractPopulatorTest {
 	@Test
 	public void realmCodeTest() {

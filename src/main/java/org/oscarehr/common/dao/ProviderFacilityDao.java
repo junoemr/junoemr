@@ -40,7 +40,7 @@ public class ProviderFacilityDao extends AbstractDao<ProviderFacility>{
 	}
 	
 	public List<ProviderFacility> findByProviderNoAndFacilityId(String providerNo, int facilityId) {
-		Query q = entityManager.createQuery("SELECT x FROM ProviderFacility x WHERE x.id.providerNo=? AND x.id.facilityId=?");
+		Query q = entityManager.createQuery("SELECT x FROM ProviderFacility x WHERE x.id.providerNo=?1 AND x.id.facilityId=?2");
 		q.setParameter(1, providerNo);
 		q.setParameter(2, facilityId);
 		

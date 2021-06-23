@@ -30,15 +30,23 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DxresearchDAOTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DxresearchDAOTest extends DaoTestFixtures
+{
 
-	// TODO Make it protected when test ignores are merged in
-	private DxresearchDAO dao = (DxresearchDAO)SpringUtils.getBean("DxresearchDAO");
+	// TODO-legacy Make it protected when test ignores are merged in
+	@Autowired
+	private DxresearchDAO dxresearchDAO;
 
 	public DxresearchDAOTest() {
 	}
@@ -55,30 +63,30 @@ public class DxresearchDAOTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Dxresearch dr = new Dxresearch();
 		EntityDataGenerator.generateTestDataForModelClass(dr);
-		dao.persist(dr);
+		dxresearchDAO.persist(dr);
 		assertNotNull(dr.getId());
 	}
 
 	@Test
 	public void testFindByDemographicNoResearchCodeAndCodingSystem() {
-		List<Dxresearch> list = dao.findByDemographicNoResearchCodeAndCodingSystem(1, "CODE", "SYS");
+		List<Dxresearch> list = dxresearchDAO.findByDemographicNoResearchCodeAndCodingSystem(1, "CODE", "SYS");
 		assertNotNull(list);
 	}
 	
 	@Test
 	public void testGetDataForInrReport() {
-		List<Object[]> list = dao.getDataForInrReport(new Date(), new Date());
+		List<Object[]> list = dxresearchDAO.getDataForInrReport(new Date(), new Date());
 		assertNotNull(list);
 	}
 
 
 	@Test
 	public void testCountResearches() {
-		assertNotNull(dao.countResearches("CDE", new Date(), new Date()));
+		assertNotNull(dxresearchDAO.countResearches("CDE", new Date(), new Date()));
 	}
 
 	@Test
 	public void testCountBillingResearches() {
-		assertNotNull(dao.countBillingResearches("CDE", "DIAG", "CREATOR", new Date(), new Date()));
+		assertNotNull(dxresearchDAO.countBillingResearches("CDE", "DIAG", "CREATOR", new Date(), new Date()));
 	}
 }

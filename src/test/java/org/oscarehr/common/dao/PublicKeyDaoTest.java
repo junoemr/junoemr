@@ -36,15 +36,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.PublicKey;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PublicKeyDaoTest extends DaoTestFixtures {
-	
-	protected PublicKeyDao dao =(PublicKeyDao)SpringUtils.getBean(PublicKeyDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PublicKeyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PublicKeyDao publicKeyDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -57,20 +63,20 @@ public class PublicKeyDaoTest extends DaoTestFixtures {
 		PublicKey publicKey1 = new PublicKey();
 		EntityDataGenerator.generateTestDataForModelClass(publicKey1);
 		publicKey1.setService("100");
-		dao.persist(publicKey1);
+		publicKeyDao.persist(publicKey1);
 		
 		PublicKey publicKey2 = new PublicKey();
 		EntityDataGenerator.generateTestDataForModelClass(publicKey2);
 		publicKey2.setService("200");
-		dao.persist(publicKey2);
+		publicKeyDao.persist(publicKey2);
 		
 		PublicKey publicKey3 = new PublicKey();
 		EntityDataGenerator.generateTestDataForModelClass(publicKey3);
 		publicKey3.setService("300");
-		dao.persist(publicKey3);
+		publicKeyDao.persist(publicKey3);
 		
 		List<PublicKey> expectedResult = new ArrayList<PublicKey>(Arrays.asList(publicKey1, publicKey2, publicKey3));
-		List<PublicKey> result = dao.findAll();
+		List<PublicKey> result = publicKeyDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

@@ -37,16 +37,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MyGroupAccessRestriction;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
-public class MyGroupAccessRestrictionDaoTest extends DaoTestFixtures {
-
-	protected MyGroupAccessRestrictionDao dao = SpringUtils.getBean(MyGroupAccessRestrictionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MyGroupAccessRestrictionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MyGroupAccessRestrictionDao myGroupAccessRestrictionDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -57,7 +63,7 @@ public class MyGroupAccessRestrictionDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		MyGroupAccessRestriction entity = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		myGroupAccessRestrictionDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -69,20 +75,20 @@ public class MyGroupAccessRestrictionDaoTest extends DaoTestFixtures {
 		MyGroupAccessRestriction myGrpAccessRestriction1 = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction1);
 		myGrpAccessRestriction1.setMyGroupNo(myGroupNo1);
-		dao.persist(myGrpAccessRestriction1);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction1);
 		
 		MyGroupAccessRestriction myGrpAccessRestriction2 = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction2);
 		myGrpAccessRestriction2.setMyGroupNo(myGroupNo2);
-		dao.persist(myGrpAccessRestriction2);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction2);
 		
 		MyGroupAccessRestriction myGrpAccessRestriction3 = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction3);
 		myGrpAccessRestriction3.setMyGroupNo(myGroupNo1);
-		dao.persist(myGrpAccessRestriction3);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction3);
 		
 		List<MyGroupAccessRestriction> expectedResult = new ArrayList<MyGroupAccessRestriction>(Arrays.asList(myGrpAccessRestriction1, myGrpAccessRestriction3));
-		List<MyGroupAccessRestriction> result = dao.findByGroupId(myGroupNo1);
+		List<MyGroupAccessRestriction> result = myGroupAccessRestrictionDao.findByGroupId(myGroupNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -108,20 +114,20 @@ public class MyGroupAccessRestrictionDaoTest extends DaoTestFixtures {
 		MyGroupAccessRestriction myGrpAccessRestriction1 = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction1);
 		myGrpAccessRestriction1.setProviderNo(providerNo1);
-		dao.persist(myGrpAccessRestriction1);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction1);
 		
 		MyGroupAccessRestriction myGrpAccessRestriction2 = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction2);
 		myGrpAccessRestriction2.setProviderNo(providerNo2);
-		dao.persist(myGrpAccessRestriction2);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction2);
 		
 		MyGroupAccessRestriction myGrpAccessRestriction3 = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction3);
 		myGrpAccessRestriction3.setProviderNo(providerNo1);
-		dao.persist(myGrpAccessRestriction3);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction3);
 		
 		List<MyGroupAccessRestriction> expectedResult = new ArrayList<MyGroupAccessRestriction>(Arrays.asList(myGrpAccessRestriction1, myGrpAccessRestriction3));
-		List<MyGroupAccessRestriction> result = dao.findByProviderNo(providerNo1);
+		List<MyGroupAccessRestriction> result = myGroupAccessRestrictionDao.findByProviderNo(providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -151,16 +157,16 @@ public class MyGroupAccessRestrictionDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction1);
 		myGrpAccessRestriction1.setProviderNo(providerNo1);
 		myGrpAccessRestriction1.setMyGroupNo(myGroupNo1);
-		dao.persist(myGrpAccessRestriction1);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction1);
 		
 		MyGroupAccessRestriction myGrpAccessRestriction2 = new MyGroupAccessRestriction();
 		EntityDataGenerator.generateTestDataForModelClass(myGrpAccessRestriction2);
 		myGrpAccessRestriction2.setProviderNo(providerNo2);
 		myGrpAccessRestriction1.setMyGroupNo(myGroupNo2);
-		dao.persist(myGrpAccessRestriction2);
+		myGroupAccessRestrictionDao.persist(myGrpAccessRestriction2);
 		
 		MyGroupAccessRestriction expectedResult = myGrpAccessRestriction1;
-		MyGroupAccessRestriction result = dao.findByGroupNoAndProvider(myGroupNo1, providerNo1);
+		MyGroupAccessRestriction result = myGroupAccessRestrictionDao.findByGroupNoAndProvider(myGroupNo1, providerNo1);
 
 		assertEquals(expectedResult, result);
 	}

@@ -41,9 +41,9 @@ with(dojo.render){
 
 dojo.hostenv.println = function(s){
 	try{
-    // FIXME: this may not work with adobe's viewer, as we may first need a 
+    // FIXME-legacy: this may not work with adobe's viewer, as we may first need a 
 		// reference to the svgDocument
-		// FIXME: need a way to determine where to position the text for this
+		// FIXME-legacy: need a way to determine where to position the text for this
     var ti = document.createElement("text");
     ti.setAttribute("x","50");
 		var yPos = 25 + 15*document.getElementsByTagName("text").length;
@@ -291,7 +291,7 @@ dojo.hostenv.loadModule = function(modulename, exact_only, omit_module_check){
 
 	var syms = modulename.split(".");
 	var nsyms = modulename.split(".");
-	if(syms[0]=="dojo"){ // FIXME: need a smarter way to do this!
+	if(syms[0]=="dojo"){ // FIXME-legacy: need a smarter way to do this!
 		syms[0] = "src"; 
 	}
 	var last = syms.pop();
@@ -374,7 +374,7 @@ dojo.hostenv.loadModule = function(modulename, exact_only, omit_module_check){
 /**
  * Read the contents of the specified uri and return those contents.
  *
- * FIXME: Make sure this is consistent with other implementations of getText
+ * FIXME-legacy: Make sure this is consistent with other implementations of getText
  * @param uri A relative or absolute uri. If absolute, it still must be in the same "domain" as we are.
  * @param async_cb If not specified, returns false as synchronous is not
  * supported. If specified, load asynchronously, and use async_cb as the handler which receives the result of the request.
@@ -423,7 +423,7 @@ dojo.hostenv.getText = function(uri, async_cb, fail_ok){
 /**
  * Makes an async post to the specified uri.
  *
- * FIXME: Not sure that we need this, but adding for completeness.
+ * FIXME-legacy: Not sure that we need this, but adding for completeness.
  * More details about the implementation of this are available at 
  * http://wiki.svg.org/index.php/PostUrl
  * @param uri A relative or absolute uri. If absolute, it still must be in the same "domain" as we are.
@@ -446,7 +446,7 @@ dojo.hostenv.postText = function(uri, async_cb, text, fail_ok, mime_type, encodi
 			if (!fail_ok) dojo.raise("Request for uri '" + uri + "' resulted in no content");
 			return null;
 		}
-		// FIXME: wtf, I'm losing a reference to async_cb
+		// FIXME-legacy: wtf, I'm losing a reference to async_cb
 		async_cb(httpResponse.content);
 	}
 	
@@ -494,7 +494,7 @@ if(!dojo.hostenv["library_script_uri_"]){
 }
 
 // dojo.hostenv.loadUri = function(uri){
-	/* FIXME: adding a script element doesn't seem to be synchronous, and so
+	/* FIXME-legacy: adding a script element doesn't seem to be synchronous, and so
 	 * checking for namespace or object existance after loadUri using this
 	 * method will error out. Need to figure out some other way of handling
 	 * this!

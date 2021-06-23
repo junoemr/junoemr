@@ -46,7 +46,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	}
 	
 	public List<Billing> findActive(int billingNo) {
-		Query q = entityManager.createQuery("select x from Billing x where x.id=? and x.status <> ?");
+		Query q = entityManager.createQuery("select x from Billing x where x.id=?1 and x.status <> ?2");
 		q.setParameter(1, billingNo);
 		q.setParameter(2, "D");
 		
@@ -57,7 +57,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	}
 	
 	public List<Billing> findByBillingType(String type) {
-		Query q = entityManager.createQuery("select x from Billing x where x.billingtype=?");
+		Query q = entityManager.createQuery("select x from Billing x where x.billingtype=?1");
 		q.setParameter(1, type);
 		
 		
@@ -67,7 +67,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	}
 	
 	public List<Billing> findByAppointmentNo(int apptNo) {
-		Query q = entityManager.createQuery("select x from Billing x where x.appointmentNo=?");
+		Query q = entityManager.createQuery("select x from Billing x where x.appointmentNo=?1");
 		q.setParameter(1, apptNo);
 		
 		
@@ -438,7 +438,7 @@ public class BillingDao extends AbstractDao<Billing> {
     }
 
 	public Integer search_billing_no_by_appt(int demographicNo, int appointmentNo) {
-		Query q = entityManager.createQuery("select x from Billing x where x.demographicNo=? and x.appointmentNo = ? and x.status <> ? order by x.updateDate desc, x.updateTime desc");
+		Query q = entityManager.createQuery("select x from Billing x where x.demographicNo=?1 and x.appointmentNo = ?2 and x.status <> ?3 order by x.updateDate desc, x.updateTime desc");
 		q.setParameter(1, demographicNo);
 		q.setParameter(2, appointmentNo);
 		q.setParameter(3, "D");
@@ -453,7 +453,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	}
 	
 	public Integer search_billing_no(int demographicNo) {
-		Query q = entityManager.createQuery("select x from Billing x where x.demographicNo=? order by x.updateDate desc, x.updateTime desc");
+		Query q = entityManager.createQuery("select x from Billing x where x.demographicNo=?1 order by x.updateDate desc, x.updateTime desc");
 		q.setParameter(1, demographicNo);
 		
 		
@@ -468,7 +468,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	public List<Object[]> search_bill_generic(int billingNo) {
 		Query query = entityManager.createQuery("select distinct d.LastName, d.FirstName, p.LastName, p.FirstName, b.id, b.billingDate, b.billingTime, b.status, b.appointmentNo, b.hin"
 				+ " from Billing b, Provider p, Appointment a, Demographic d "
-				+ "where p.ProviderNo=a.providerNo and d.DemographicNo= b.demographicNo and b.appointmentNo=a.id and b.status <> 'D' and b.id=?");
+				+ "where p.ProviderNo=a.providerNo and d.DemographicNo= b.demographicNo and b.appointmentNo=a.id and b.status <> 'D' and b.id=?1");
 		query.setParameter(1, billingNo);
 		
 		
@@ -487,7 +487,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	
 	
 	public List<Billing> search_bill_history_daterange(String providerNo, Date startBillingDate, Date endBillingDate ) {
-		Query q = entityManager.createQuery("select b from Billing b where b.providerNo=? and b.billingDate >=? and b.billingDate<=? and b.status<>'D' and b.status<>'S' and b.status<>'B' and b.demographicNo <> 0 order by b.billingDate desc, b.billingTime desc");
+		Query q = entityManager.createQuery("select b from Billing b where b.providerNo=?1 and b.billingDate >=?2 and b.billingDate<=?3 and b.status<>'D' and b.status<>'S' and b.status<>'B' and b.demographicNo <> 0 order by b.billingDate desc, b.billingTime desc");
 		q.setParameter(1, providerNo);
 		q.setParameter(2, startBillingDate);
 		q.setParameter(3, endBillingDate);

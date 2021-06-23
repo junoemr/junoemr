@@ -187,7 +187,7 @@ dojo.xml.XslTransform = function(/*String*/xsltUri){
 		//		results to
 		// parentDoc: The HTML docuemnt to transform the subdocument "under"
 
-		// FIXME: do we need this function?
+		// FIXME-legacy: do we need this function?
 		var content = this.getResultString(xmlDoc, params, parentDoc);
 		contentPane.setContent(content);
 	};

@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
+
 public class AR2005Form2XMLTest extends DaoTestFixtures {
 
 	@Before

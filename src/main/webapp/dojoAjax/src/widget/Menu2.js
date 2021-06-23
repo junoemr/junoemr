@@ -34,7 +34,7 @@ dojo.widget.defineWidget(
 
 	// eventNaming: String
 	//	if "default" event names are based on widget id, otherwise user must define
-	//	TODO: write real documentation about the events
+	//	TODO-legacy: write real documentation about the events
 	eventNaming: "default",
 
 	templateString: '<table class="dojoPopupMenu2" border=0 cellspacing=0 cellpadding=0 style="display: none;"><tbody dojoAttachPoint="containerNode"></tbody></table>',
@@ -551,7 +551,7 @@ dojo.widget.defineWidget(
 
 	menuOpen: function(message) {
 		// summary: callback when menu is opened
-		// TODO: I don't see anyone calling this menu item
+		// TODO-legacy: I don't see anyone calling this menu item
 	}
 
 });

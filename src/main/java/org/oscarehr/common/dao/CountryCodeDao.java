@@ -56,7 +56,7 @@ public class CountryCodeDao extends AbstractDao<CountryCode> {
 
     //NOT USED YET
     public List<CountryCode> getAllCountryCodes(String locale){
-    	Query query = entityManager.createQuery("SELECT cc from CountryCode cc where cc.clocale = ?");
+    	Query query = entityManager.createQuery("SELECT cc from CountryCode cc where cc.clocale = ?1");
     	query.setParameter(1, locale);
         @SuppressWarnings("unchecked")
         List<CountryCode> codeList = query.getResultList();
@@ -64,7 +64,7 @@ public class CountryCodeDao extends AbstractDao<CountryCode> {
     }
 
     public CountryCode getCountryCode(String countryCode){
-    	Query query = entityManager.createQuery("SELECT cc from CountryCode  cc where cc.countryId = ?");
+    	Query query = entityManager.createQuery("SELECT cc from CountryCode  cc where cc.countryId = ?1");
     	query.setParameter(1, countryCode);
         @SuppressWarnings("unchecked")
         List<CountryCode> codeList = query.getResultList();
@@ -77,7 +77,7 @@ public class CountryCodeDao extends AbstractDao<CountryCode> {
 
     //NOT USED YET
     public CountryCode getCountryCode(String countryCode,String locale){
-    	Query query = entityManager.createQuery("SELECT cc from CountryCode cc where cc.countryId = ? and cc.clocale=?");
+    	Query query = entityManager.createQuery("SELECT cc from CountryCode cc where cc.countryId = ?1 and cc.clocale=?2");
     	query.setParameter(1, countryCode);
         query.setParameter(2, locale);
         @SuppressWarnings("unchecked")

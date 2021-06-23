@@ -194,7 +194,7 @@ dojo.lang.extend(dojo.io.Request, {
 		//				was called.	
 	},
 
-	//FIXME: change IframeIO.js to use timeouts?
+	//FIXME-legacy: change IframeIO.js to use timeouts?
 	// The number of seconds to wait until firing a timeout callback.
 	// If it is zero, that means, don't do a timeout check.
 	timeoutSeconds: 0,
@@ -258,7 +258,7 @@ dojo.io.transports.addTransport = function(/*String*/name){
 	// summary:
 	//		Used to register transports that can support bind calls.
 	this.push(name);
-	// FIXME: do we need to handle things that aren't direct children of the
+	// FIXME-legacy: do we need to handle things that aren't direct children of the
 	// dojo.io module? (say, dojo.io.foo.fooTransport?)
 	this[name] = dojo.io[name];
 }
@@ -406,7 +406,7 @@ dojo.io.argsFromMap = function(/*Object*/map, /*String?*/encoding, /*String?*/la
 		}
 		if(!control[name]){
 			var value = map[name];
-			// FIXME: should be isArrayLike?
+			// FIXME-legacy: should be isArrayLike?
 			if (dojo.lang.isArray(value)){
 				dojo.lang.forEach(value, domap);
 			}else{

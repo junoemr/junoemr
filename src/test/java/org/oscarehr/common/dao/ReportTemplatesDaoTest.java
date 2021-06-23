@@ -31,16 +31,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
 import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ReportTemplatesDaoTest extends DaoTestFixtures {
-
-	protected ReportTemplatesDao dao = SpringUtils.getBean(ReportTemplatesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ReportTemplatesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ReportTemplatesDao reportTemplatesDao;
 
 	@Before
 	public void before() throws Exception {
@@ -51,7 +57,7 @@ public class ReportTemplatesDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ReportTemplates entity = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		reportTemplatesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -60,22 +66,22 @@ public class ReportTemplatesDaoTest extends DaoTestFixtures {
 		
 		ReportTemplates reportTemp1 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp1);
-		dao.persist(reportTemp1);
+		reportTemplatesDao.persist(reportTemp1);
 		
 		ReportTemplates reportTemp2 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp2);
-		dao.persist(reportTemp2);
+		reportTemplatesDao.persist(reportTemp2);
 		
 		ReportTemplates reportTemp3 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp3);
-		dao.persist(reportTemp3);
+		reportTemplatesDao.persist(reportTemp3);
 		
 		ReportTemplates reportTemp4 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp4);
-		dao.persist(reportTemp4);
+		reportTemplatesDao.persist(reportTemp4);
 		
 		List<ReportTemplates> expectedResult = new ArrayList<ReportTemplates>(Arrays.asList(reportTemp1, reportTemp2, reportTemp3, reportTemp4));
-		List<ReportTemplates> result = dao.findAll();
+		List<ReportTemplates> result = reportTemplatesDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -100,25 +106,25 @@ public class ReportTemplatesDaoTest extends DaoTestFixtures {
 		ReportTemplates reportTemp1 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp1);
 		reportTemp1.setActive(active1);
-		dao.persist(reportTemp1);
+		reportTemplatesDao.persist(reportTemp1);
 		
 		ReportTemplates reportTemp2 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp2);
 		reportTemp2.setActive(active2);
-		dao.persist(reportTemp2);
+		reportTemplatesDao.persist(reportTemp2);
 		
 		ReportTemplates reportTemp3 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp3);
 		reportTemp3.setActive(active1);
-		dao.persist(reportTemp3);
+		reportTemplatesDao.persist(reportTemp3);
 		
 		ReportTemplates reportTemp4 = new ReportTemplates();
 		EntityDataGenerator.generateTestDataForModelClass(reportTemp4);
 		reportTemp4.setActive(active1);
-		dao.persist(reportTemp4);
+		reportTemplatesDao.persist(reportTemp4);
 		
 		List<ReportTemplates> expectedResult = new ArrayList<ReportTemplates>(Arrays.asList(reportTemp1, reportTemp3, reportTemp4));
-		List<ReportTemplates> result = dao.findActive();
+		List<ReportTemplates> result = reportTemplatesDao.findActive();
 
 		Logger logger = MiscUtils.getLogger();
 		

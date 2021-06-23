@@ -23,18 +23,19 @@
 
 package org.oscarehr.common.model;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "hl7TextMessage")
@@ -57,6 +58,9 @@ public class Hl7TextMessage extends AbstractModel<Integer> implements Serializab
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created = new Date();
+
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "hl7TextMessage")
+	private Hl7TextInfo hl7TextInfo;
 
 	/* Apperantly we can delete them, and an entry goes into RecycleBin
 	 * 
@@ -112,4 +116,13 @@ public class Hl7TextMessage extends AbstractModel<Integer> implements Serializab
 		return created;
 	}
 
+	public Hl7TextInfo getHl7TextInfo()
+	{
+		return hl7TextInfo;
+	}
+
+	public void setHl7TextInfo(Hl7TextInfo hl7TextInfo)
+	{
+		this.hl7TextInfo = hl7TextInfo;
+	}
 }

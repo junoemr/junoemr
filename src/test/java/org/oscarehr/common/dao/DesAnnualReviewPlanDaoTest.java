@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DesAnnualReviewPlan;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DesAnnualReviewPlanDaoTest extends DaoTestFixtures {
-
-	protected DesAnnualReviewPlanDao dao = SpringUtils.getBean(DesAnnualReviewPlanDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DesAnnualReviewPlanDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DesAnnualReviewPlanDao desAnnualReviewPlanDao;
 
 	public DesAnnualReviewPlanDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class DesAnnualReviewPlanDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		DesAnnualReviewPlan entity = new DesAnnualReviewPlan();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		desAnnualReviewPlanDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
@@ -60,15 +66,15 @@ public class DesAnnualReviewPlanDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographicNo(1);
 		entity.setFormNo(1);
-		dao.persist(entity);
+		desAnnualReviewPlanDao.persist(entity);
 
 		entity = new DesAnnualReviewPlan();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographicNo(1);
 		entity.setFormNo(2);
-		dao.persist(entity);
+		desAnnualReviewPlanDao.persist(entity);
 
-		DesAnnualReviewPlan darp = dao.search(2, 1);
+		DesAnnualReviewPlan darp = desAnnualReviewPlanDao.search(2, 1);
 		assertNotNull(darp);
 
 

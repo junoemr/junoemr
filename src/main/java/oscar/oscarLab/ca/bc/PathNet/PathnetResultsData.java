@@ -187,7 +187,7 @@ public class PathnetResultsData {
 					lbData.patientName = lbData.patientName.replaceAll("\\^", " ");
 				}
 				lbData.sex = pid.getSex();
-				lbData.resultStatus = "0"; //TODO
+				lbData.resultStatus = "0"; //TODO-legacy
 				// solve lbData.resultStatus.add(oscar.Misc.getString(rs,"abnormalFlag"));
 				lbData.dateTime = ConversionUtils.toTimestampString(msh.getDateTime());
 

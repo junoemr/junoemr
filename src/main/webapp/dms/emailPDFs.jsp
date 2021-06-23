@@ -324,7 +324,7 @@ $(function() {
 						 String  phone      = (String) displayServiceUtil.phoneVec.elementAt(i);
 						 String  fax        = (String) displayServiceUtil.faxVec.elementAt(i);
 						 String  email      = (String) displayServiceUtil.emailVec.elementAt(i);
-						 String  referralNo = ""; // TODO: add referal number to specialists ((String) displayServiceUtil.referralNoList.get(i)).trim();
+						 String  referralNo = ""; // TODO-legacy: add referal number to specialists ((String) displayServiceUtil.referralNoList.get(i)).trim();
 						 if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) 
 						 {
 							 rdName = String.format("%s, %s", lName, fName);

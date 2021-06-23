@@ -35,7 +35,7 @@ import javax.persistence.Table;
 public class Favorites extends AbstractModel<Integer> {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="favoriteid")
 	private Integer id;
 	

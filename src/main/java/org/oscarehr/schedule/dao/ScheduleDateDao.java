@@ -45,7 +45,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 
 	public ScheduleDate findByProviderNoAndDate(String providerNo, Date date) {
-		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=? and s.date=? and s.status=?");
+		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=?1 and s.date=?2 and s.status=?3");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, date);
 		query.setParameter(3, 'A');
@@ -64,7 +64,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 
 	public List<ScheduleDate> findByProviderPriorityAndDateRange(String providerNo, char priority, Date date, Date date2) {
-		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=? and s.priority=? and s.date>=? and s.date <=?");
+		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=?1 and s.priority=?2 and s.date>=?3 and s.date <=?4");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, priority);
 		query.setParameter(3, date);
@@ -76,7 +76,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 
 	public List<ScheduleDate> findByProviderAndDateRange(String providerNo, Date date, Date date2) {
-		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=? and s.date>=? and s.date <=?");
+		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=?1 and s.date>=?2 and s.date <=?3");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, date);
 		query.setParameter(3, date2);
@@ -87,7 +87,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 
 	public List<ScheduleDate> search_scheduledate_c(String providerNo) {
-		Query query = entityManager.createQuery("select s from ScheduleDate s where s.priority='c' and s.status = 'A' and s.providerNo=?");
+		Query query = entityManager.createQuery("select s from ScheduleDate s where s.priority='c' and s.status = 'A' and s.providerNo=?1");
 		query.setParameter(1, providerNo);
 		
 		@SuppressWarnings("unchecked")
@@ -96,7 +96,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 	
 	public List<ScheduleDate> search_numgrpscheduledate(String myGroupNo, Date sDate) {
-		Query query = entityManager.createQuery("select s from MyGroup m, ScheduleDate s where m.id.myGroupNo = ? and s.date=? and m.id.providerNo = s.providerNo and s.available = '1' and s.status='A'");
+		Query query = entityManager.createQuery("select s from MyGroup m, ScheduleDate s where m.id.myGroupNo = ?1 and s.date=?2 and m.id.providerNo = s.providerNo and s.available = '1' and s.status='A'");
 		query.setParameter(1, myGroupNo);
 		query.setParameter(2, sDate);
 		
@@ -107,7 +107,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 	
 	public List<Object[]> search_appttimecode(Date sDate, String providerNo) {
-		Query query = entityManager.createQuery("FROM ScheduleTemplate st, ScheduleDate sd WHERE st.id.name=sd.hour and sd.date=? and sd.providerNo=? and sd.status='A' and (st.id.providerNo = sd.providerNo or st.id.providerNo='Public')");
+		Query query = entityManager.createQuery("FROM ScheduleTemplate st, ScheduleDate sd WHERE st.id.name=sd.hour and sd.date=?1 and sd.providerNo=?2 and sd.status='A' and (st.id.providerNo = sd.providerNo or st.id.providerNo='Public')");
 		query.setParameter(1, sDate);
 		query.setParameter(2, providerNo);
 		
@@ -117,7 +117,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 		return results;
 	}
 	
-	public List<ScheduleDate> search_scheduledate_teamp(Date date, Date date2, String status, List<String> providerNos) {
+	public List<ScheduleDate> search_scheduledate_teamp(Date date, Date date2, Character status, List<String> providerNos) {
 		Query query = entityManager.createQuery("select s from ScheduleDate s where s.date>=:sdate and s.date <=:edate and s.status=:status and s.providerNo in (:providers) order by s.date");
 		query.setParameter("sdate", date);
 		query.setParameter("edate", date2);
@@ -129,7 +129,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 		return results;
 	}
 	
-	public List<ScheduleDate> search_scheduledate_datep(Date date, Date date2, String status) {
+	public List<ScheduleDate> search_scheduledate_datep(Date date, Date date2, Character status) {
 		Query query = entityManager.createQuery("select s from ScheduleDate s where s.date>=:sdate and s.date <=:edate and s.status=:status  order by s.date");
 		query.setParameter("sdate", date);
 		query.setParameter("edate", date2);
@@ -141,7 +141,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 	
 
-	public List<ScheduleDate> findByProviderStartDateAndPriority(String providerNo, Date apptDate, String priority) {
+	public List<ScheduleDate> findByProviderStartDateAndPriority(String providerNo, Date apptDate, Character priority) {
 		Query query = createQuery("sd", "sd.date = :apptDate AND sd.providerNo = :providerNo AND sd.priority = :priority");
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("apptDate", apptDate);
@@ -166,10 +166,11 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 		
 		/* build the query */
 		String queryString = "SELECT s FROM ScheduleDate s "
-			+ "WHERE status = ? AND s.date >= ? AND s.date <= ? AND s.providerNo IN ( ";
-		
+			+ "WHERE status = ?1 AND s.date >= ?2 AND s.date <= ?3 AND s.providerNo IN ( ";
+
+		int paramCount = 4;
 		for(int i=0; i< providerNos.size(); i++) {
-			queryString += "?";
+			queryString += "?" + paramCount++;
 			if ( i != providerNos.size()-1) {
 				queryString += ", ";
 			}
@@ -178,7 +179,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 		if(daysOfWeek != null && !daysOfWeek.isEmpty()) {
 			queryString += "AND DAYOFWEEK(s.date) IN ( ";
 			for(int i=0; i< daysOfWeek.size(); i++) {
-				queryString += "?";
+				queryString += "?" + paramCount++;
 				if ( i != daysOfWeek.size()-1) {
 					queryString += ", ";
 				}

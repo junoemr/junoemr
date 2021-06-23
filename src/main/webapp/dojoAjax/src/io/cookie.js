@@ -33,7 +33,7 @@ dojo.io.cookie.set = dojo.io.cookie.setCookie;
 dojo.io.cookie.getCookie = function(/*String*/name){
 	//summary: Gets a cookie with the given name.
 
-	// FIXME: Which cookie should we return?
+	// FIXME-legacy: Which cookie should we return?
 	//        If there are cookies set for different sub domains in the current
 	//        scope there could be more than one cookie with the same name.
 	//        I think taking the last one in the list takes the one from the
@@ -119,7 +119,7 @@ dojo.io.cookie.isSupported = function(){
 		var cookieVal = dojo.io.cookie.getCookie("__TestingYourBrowserForCookieSupport__");
 		navigator.cookieEnabled = (cookieVal == "CookiesAllowed");
 		if(navigator.cookieEnabled){
-			// FIXME: should we leave this around?
+			// FIXME-legacy: should we leave this around?
 			this.deleteCookie("__TestingYourBrowserForCookieSupport__");
 		}
 	}

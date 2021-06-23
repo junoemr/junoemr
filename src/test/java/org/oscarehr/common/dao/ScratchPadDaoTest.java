@@ -28,14 +28,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ScratchPad;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ScratchPadDaoTest extends DaoTestFixtures {
-
-	protected ScratchPadDao dao = SpringUtils.getBean(ScratchPadDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ScratchPadDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ScratchPadDao scratchPadDao;
 
 	public ScratchPadDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class ScratchPadDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 ScratchPad entity = new ScratchPad();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                scratchPadDao.persist(entity);
 
                 assertNotNull(entity.getId());
         }
@@ -63,15 +69,15 @@ public class ScratchPadDaoTest extends DaoTestFixtures {
 		ScratchPad scratchPad1 = new ScratchPad();
 		EntityDataGenerator.generateTestDataForModelClass(scratchPad1);
 		scratchPad1.setProviderNo(providerNo1);
-		dao.persist(scratchPad1);
+		scratchPadDao.persist(scratchPad1);
 		
 		ScratchPad scratchPad2 = new ScratchPad();
 		EntityDataGenerator.generateTestDataForModelClass(scratchPad2);
 		scratchPad2.setProviderNo(providerNo2);
-		dao.persist(scratchPad2);
+		scratchPadDao.persist(scratchPad2);
 		
 		boolean expectedResult = true;
-		boolean result = dao.isScratchFilled(providerNo1);
+		boolean result = scratchPadDao.isScratchFilled(providerNo1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -85,15 +91,15 @@ public class ScratchPadDaoTest extends DaoTestFixtures {
 		ScratchPad scratchPad1 = new ScratchPad();
 		EntityDataGenerator.generateTestDataForModelClass(scratchPad1);
 		scratchPad1.setProviderNo(providerNo1);
-		dao.persist(scratchPad1);
+		scratchPadDao.persist(scratchPad1);
 		
 		ScratchPad scratchPad2 = new ScratchPad();
 		EntityDataGenerator.generateTestDataForModelClass(scratchPad2);
 		scratchPad2.setProviderNo(providerNo2);
-		dao.persist(scratchPad2);
+		scratchPadDao.persist(scratchPad2);
 		
 		ScratchPad expectedResult = scratchPad1;
-		ScratchPad result = dao.findByProviderNo(providerNo1);
+		ScratchPad result = scratchPadDao.findByProviderNo(providerNo1);
 		
 		assertEquals(expectedResult, result);
 	}

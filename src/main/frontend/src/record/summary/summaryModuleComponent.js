@@ -90,7 +90,7 @@ angular.module('Record.Summary').component('summaryModule', {
 				'item': item,
 				successCallback: function (newItem)
 				{
-					//TODO could update to the item list here instead of refresh in parent controller
+					//TODO-legacy could update to the item list here instead of refresh in parent controller
 				},
 				dismissCallback: function (reason)
 				{
@@ -104,7 +104,7 @@ angular.module('Record.Summary').component('summaryModule', {
 				'module': ctrl.module,
 				successCallback: function (newItem)
 				{
-					//TODO could add to the item list here instead of refresh in parent controller
+					//TODO-legacy could add to the item list here instead of refresh in parent controller
 				},
 				dismissCallback: function (reason)
 				{

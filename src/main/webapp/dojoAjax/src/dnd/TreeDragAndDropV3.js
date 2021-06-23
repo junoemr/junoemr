@@ -25,7 +25,7 @@ dojo.require("dojo.lang.extras");
 dojo.require("dojo.Deferred");
 dojo.require("dojo.html.layout");
 
-// FIXME: if controller can't move then skip node on move start
+// FIXME-legacy: if controller can't move then skip node on move start
 dojo.dnd.TreeDragSourceV3 = function(node, syncController, type, treeNode){
 	//dojo.profile.start("TreeDragSourceV3 "+treeNode);
 	this.controller = syncController;
@@ -81,7 +81,7 @@ dojo.lang.extend(dojo.dnd.TreeDropTargetV3, {
 		if (position == "onto") {					
 			node.contentNode.style.border = this.indicatorStyle;
 		} else {
-			// FIXME: bottom-top or highlight should cover ONLY top/bottom or div itself,
+			// FIXME-legacy: bottom-top or highlight should cover ONLY top/bottom or div itself,
 			// not span whole line (try Dnd)
 			// FAILURE: Can't put span inside div: multiline bottom-top will span multiple lines
 			if (position == "before") {

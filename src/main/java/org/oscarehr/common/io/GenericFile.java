@@ -24,6 +24,9 @@
 package org.oscarehr.common.io;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -36,10 +39,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 public class GenericFile
@@ -54,9 +62,11 @@ public class GenericFile
 			"application/image",
 			"application/doc",
 			"application/msword",
+			"application/zip",
 			"application/octet-stream",
 			"text/csv",
 			"text/plain",
+			"text/xml",
 			"image/tiff",
 			"image/jpeg",
 			"image/png",
@@ -77,8 +87,15 @@ public class GenericFile
 	public static final String BILLING_REMITTANCE_FAILED_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_FAILED_DIR")).getPath();
 
 	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
+	public static final String HRM_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("HRM_BASE_DIR")).getPath();
+
+	public static final String LOG_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("LOG_BASE_DIR")).getPath();
+	public static final String LOG_IMPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_IMPORT_DIR")).getPath();
+	public static final String LOG_EXPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_EXPORT_DIR")).getPath();
 
 	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
+
+	public static final String TEMP_DIRECTORY = System.getProperty("java.io.tmpdir");
 
 	// file info
 	protected File javaFile;
@@ -132,6 +149,18 @@ public class GenericFile
 	{
 		return moveFile(DOCUMENT_ORIGINAL_DIR);
 	}
+	public boolean moveToLogImport(String identifier) throws IOException
+	{
+		return moveFile(Paths.get(LOG_IMPORT_DIR, identifier).toString());
+	}
+	public boolean moveToLogExport(String identifier) throws IOException
+	{
+		return moveFile(Paths.get(LOG_EXPORT_DIR, identifier).toString());
+	}
+	public boolean moveToHRMDocuments() throws IOException
+	{
+		return moveFile(HRM_BASE_DIR);
+	}
 
 	public boolean moveFile(String directory) throws IOException
 	{
@@ -164,6 +193,7 @@ public class GenericFile
 
 	public boolean deleteFile() throws IOException
 	{
+		logger.info("delete file: " + this.javaFile.toPath());
 		return Files.deleteIfExists(this.javaFile.toPath());
 	}
 
@@ -205,6 +235,21 @@ public class GenericFile
 		this.isValid = replacementFile.isValid();
 		this.reasonInvalid = replacementFile.getReasonInvalid();
 		this.invalidContentType = replacementFile.getInvalidContentType();
+	}
+
+	/**
+	 * append the contents of the give file(s) to this file
+	 * modifies the file referenced by this generic file
+	 * @param contentFiles - file(s) with content to append
+	 * @throws IOException
+	 */
+	public void appendContents(GenericFile ... contentFiles) throws IOException
+	{
+		for(GenericFile contentFile : contentFiles)
+		{
+			List<String> lines = Files.readAllLines(Paths.get(contentFile.getPath()), StandardCharsets.UTF_8);
+			Files.write(Paths.get(javaFile.getPath()), lines, StandardOpenOption.APPEND);
+		}
 	}
 
 	public void process() throws IOException, InterruptedException
@@ -293,10 +338,43 @@ public class GenericFile
 		return javaFile.getName();
 	}
 
+	public String getPath()
+	{
+		return javaFile.getPath();
+	}
+
+	public String getDirectory()
+	{
+		return javaFile.getAbsoluteFile().getParent();
+	}
+
+	public String getExtension()
+	{
+		return FilenameUtils.getExtension(javaFile.getName());
+	}
+
 	public FileInputStream toFileInputStream() throws FileNotFoundException
 	{
 		return new FileInputStream(javaFile);
 	}
+
+	public String toBase64() throws IOException
+	{
+		return toBase64(StandardCharsets.UTF_8);
+	}
+	public String toBase64(Charset charset) throws IOException
+	{
+		return new String(toBase64ByteArray(), charset);
+	}
+	public byte[] toBase64ByteArray() throws IOException
+	{
+		return Base64.encodeBase64(toByteArray());
+	}
+	public byte[] toByteArray() throws IOException
+	{
+		return FileUtils.readFileToByteArray(javaFile);
+	}
+
 	/**
 	 * returns the file content type, or null if it cannot be determined
 	 * @param f - the file to read

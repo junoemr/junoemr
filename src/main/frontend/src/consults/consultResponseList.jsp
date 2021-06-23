@@ -30,7 +30,7 @@
 
 <div class="consult-page-header"
 ng-if="consultResponseListCtrl.hideSearchPatient != true">
-	<!-- TODO -->
+	<!-- TODO-legacy -->
 </div>
 <div ng-show="consultResponseListCtrl.consultReadAccess" class="col-lg-12">
 

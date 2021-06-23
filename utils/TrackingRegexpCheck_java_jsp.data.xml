@@ -1079,6 +1079,9 @@
         <ViolationValue>/src/main/webapp/report/reportonbilledvisitprovider.jsp:&lt;%@page import="oscar.oscarDB.DBPreparedHandler"%&gt;</ViolationValue>
         <ViolationValue>/src/main/webapp/report/reportonbilledvisitprovider.jsp:DBPreparedHandler dbObj = new DBPreparedHandler();</ViolationValue>
         <ViolationValue>/src/main/webapp/system/dbcpMonitor.jsp:ResultSet rsProcessList = DBHandler.GetSQL("show processlist");</ViolationValue>
+        <ViolationValue>/src/main/java/org/springframework/orm/hibernate3/support/HibernateDaoSupport.java:public class HibernateDaoSupport extends org.springframework.orm.hibernate5.support.HibernateDaoSupport</ViolationValue>
+        <ViolationValue>/src/main/java/org/springframework/orm/hibernate3/support/HibernateDaoSupport.java:public HibernateDaoSupport()</ViolationValue>
+        <ViolationValue>/src/main/java/org/springframework/orm/hibernate3/support/HibernateDaoSupport.java:public HibernateDaoSupport(SessionFactory sessionFactory)</ViolationValue>
     </ViolationSet>
     <ViolationSet>
         <ViolationKey>.*StringBuffer.*|.*Hashtable.*|.*Vector.*</ViolationKey>

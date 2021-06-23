@@ -26,14 +26,17 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 
@@ -47,16 +50,18 @@ public class AssignRolesTests extends SeleniumTestBase
     public static String xpathOption = "//following-sibling::td/select[@name='roleNew']";
     public static String xpathDropdown = xpathProvider + xpathOption;
 
-    @BeforeClass
-    public static void setup()
+    @Autowired
+    private DatabaseUtil databaseUtil;
+
+    @Before
+    public void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
     {
         loadSpringBeans();
-        DatabaseUtil.createTestProvider();
+        databaseUtil.createTestProvider();
     }
 
-    @AfterClass
-    public static void cleanup()
-            throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+    @After
+    public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
     {
         SchemaUtils.restoreTable("admission", "log", "property", "program_provider", "provider", "providerbillcenter", "secUserRole");
     }

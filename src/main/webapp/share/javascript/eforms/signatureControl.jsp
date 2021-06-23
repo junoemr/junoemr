@@ -31,7 +31,7 @@ var signatureControl = {
 			element.signatureDisplay = "#signatureDisplay";
 			element.signatureInput = "#signatureInput";
 			element.signatureValue = "#signatureValue"
-			element.demographicNo = 0; //TODO: Keep on trucking
+			element.demographicNo = 0; //TODO-legacy: Keep on trucking
 			element.imgAttributes = "";
 			
 			var placeholder = jQuery(element.signatureInput);

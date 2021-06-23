@@ -74,13 +74,63 @@ public class TicklerDao extends AbstractDao<Tickler>{
 		
 		return results;
 	}
-	
+
+	public int getActiveByDemographicNoCount(Integer demographicNo)
+	{
+		String sql =
+				"select count(t) " +
+						"from Tickler t " +
+						"where t.demographicNo = ?1 " +
+						"and t.status = 'A' ";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter(1, demographicNo);
+
+		Long result = (Long)query.getSingleResult();
+
+		return result.intValue();
+	}
+
 	@SuppressWarnings("unchecked")
-    public List<Tickler> findActiveByDemographicNo(Integer demoNo) {
-		
-		Query query = entityManager.createQuery("select t from Tickler t where t.demographicNo = ?1 and t.status = 'A' order by t.serviceDate desc");
-		query.setParameter(1, demoNo);
-		
+	public List<Tickler> findActiveByDemographicNo(
+			Integer demographicNo,
+			Integer limit,
+			Integer offset,
+			String sortOrder)
+	{
+
+		String sql =
+			"select t " +
+				"from Tickler t " +
+				"where t.demographicNo = ?1 " +
+				"and t.status = 'A' " +
+				"order by t.serviceDate ";
+
+		if(AbstractDao.SORT_DESC.equals(sortOrder))
+		{
+			sql += "desc";
+		}
+		else
+		{
+			sql += "asc";
+		}
+
+		sql += ", t.message";
+
+		Query query = entityManager.createQuery(sql);
+
+		query.setParameter(1, demographicNo);
+
+		if(limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+
+		if(offset != null)
+		{
+			query.setFirstResult(offset);
+		}
+
 		List<Tickler> results = query.getResultList();
 		
 		return results;
@@ -267,9 +317,9 @@ public class TicklerDao extends AbstractDao<Tickler>{
 	 */
 	private String getTicklerQueryString(String selectQuery, List<Object> paramList, CustomFilter filter) {
 //		String tickler_date_order = filter.getSort_order();
-        
+
 		// Equivalent to an inner join between Ticker and Demographic on demoNo
-		String query = selectQuery + " FROM Tickler as t INNER JOIN t.demographic as d where 1 = 1 "; 
+		String query = selectQuery + " FROM Tickler as t INNER JOIN t.demographic as d where 1 = 1 ";
 		boolean includeMRPClause = true;
 		boolean includeProviderClause = true;
 		boolean includeAssigneeClause = true;
@@ -281,14 +331,14 @@ public class TicklerDao extends AbstractDao<Tickler>{
 		boolean includePriorityClause = true;
 		boolean includeServiceStartDateClause = false;
 		boolean includeServiceEndDateClause = false;
-		 
+
 		if(filter.getStartDate() != null) {
 			includeServiceStartDateClause=true;
 		}
 		if(filter.getEndDate() != null) {
 			includeServiceEndDateClause=true;
 		}
-		
+
 		if (filter.getProgramId() == null || "".equals(filter.getProgramId()) || filter.getProgramId().equals("All Programs")) {
 			includeProgramClause = false;
 		}
@@ -314,87 +364,88 @@ public class TicklerDao extends AbstractDao<Tickler>{
 			includeMRPClause = false;
 		}
 		if (filter.getMessage() == null || filter.getMessage().trim().isEmpty()) {
-        	includeMessage = false;
-        }
+			includeMessage = false;
+		}
 
 		if (includeMRPClause) {
 			query = selectQuery + " FROM Tickler t, Demographic d where d.DemographicNo = t.demographicNo and d.ProviderNo = '" + filter.getMrp() + "' ";
 		}
-		
+
 		if (includeServiceStartDateClause) {
-			query = query + " and t.serviceDate >= ?";
 			paramList.add(filter.getStartDate());
+			query = query + " and t.serviceDate >= ?" + paramList.size();
 		}
-		
+
 		if (includeServiceEndDateClause) {
-			query = query + " and t.serviceDate <= ?";
-			
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(filter.getEndDate());
-			
+
 			cal.set(Calendar.HOUR_OF_DAY, 23);
 			cal.set(Calendar.MINUTE, 59);
 			cal.set(Calendar.SECOND, 59);
-			
+
 			paramList.add(new Date(cal.getTime().getTime()));
+
+			query = query + " and t.serviceDate <= ?" + paramList.size();
 		}
 
-		//TODO: IN clause
+		//TODO-legacy: IN clause
 		if (includeProviderClause) {
 			query = query + " and t.creator IN (";
 			Set<Provider> pset = filter.getProviders();
 			Provider[] providers = pset.toArray(new Provider[pset.size()]);
 			for (int x = 0; x < providers.length; x++) {
+				paramList.add(providers[x].getProviderNo());
 				if (x > 0) {
 					query += ",";
 				}
-				query += "?";
-				paramList.add(providers[x].getProviderNo());
+				query += "?" + paramList.size();
 			}
 			query += ")";
 		}
 
-		//TODO: IN clause
+		//TODO-legacy: IN clause
 		if (includeAssigneeClause) {
 			query = query + " and t.taskAssignedTo IN (";
 			Set<Provider> pset = filter.getAssignees();
 			Provider[] providers = pset.toArray(new Provider[pset.size()]);
 			for (int x = 0; x < providers.length; x++) {
+				paramList.add(providers[x].getProviderNo());
+
 				if (x > 0) {
 					query += ",";
 				}
-				query += "?";
-				paramList.add(providers[x].getProviderNo());
+				query += "?" + paramList.size();
 			}
 			query += ")";
 		}
 
 		if (includeProgramClause) {
-			query = query + " and t.programId = ?";
 			paramList.add(Integer.valueOf(filter.getProgramId()));
+			query = query + " and t.programId = ?" + paramList.size();
 		}
 		if (includeStatusClause) {
-			query = query + " and t.status = ?";
 			paramList.add(convertStatus(filter.getStatus()));
+			query = query + " and t.status = ?" + paramList.size();
 		}
-		
+
 		if (includePriorityClause) {
-			query = query + " and t.priority = ?";
 			paramList.add(convertPriority(filter.getPriority()));
+			query = query + " and t.priority = ?" + paramList.size();
 		}
-		
+
 		if (includeClientClause) {
-			query = query + " and t.demographicNo = ?";
 			paramList.add(Integer.parseInt(filter.getClient()));
+			query = query + " and t.demographicNo = ?" + paramList.size();
 		}
 		if (includeDemographicClause) {
-			query = query + " and t.demographicNo = ?";
 			paramList.add(Integer.parseInt(filter.getDemographicNo()));
+			query = query + " and t.demographicNo = ?" + paramList.size();
 		}
 		if (includeMessage) {
-        	query = query + " and t.message = ? ";
-        	paramList.add(filter.getMessage());
-        }
+			paramList.add(filter.getMessage());
+			query = query + " and t.message = ?" + paramList.size() + " ";
+		}
 
 		String orderDir = "desc";
 		if (SORTDIR.asc.equals(filter.getSortDir())) {

@@ -850,7 +850,7 @@ UrlMatcher.prototype.format = function (values) {
 
   for (i=0; i<nPath; i++) {
     value = values[params[i]];
-    // TODO: Maybe we should throw on null here? It's not really good style to use '' and null interchangeabley
+    // TODO-legacy: Maybe we should throw on null here? It's not really good style to use '' and null interchangeabley
     if (value != null) result += encodeURIComponent(value);
     result += segments[i+1];
   }
@@ -1133,7 +1133,7 @@ function $UrlRouterProvider(  $urlMatcherFactory) {
   this.$get =
     [        '$location', '$rootScope', '$injector',
     function ($location,   $rootScope,   $injector) {
-      // TODO: Optimize groups of rules with non-empty prefix into some sort of decision tree
+      // TODO-legacy: Optimize groups of rules with non-empty prefix into some sort of decision tree
       function update(evt) {
         if (evt && evt.defaultPrevented) return;
         function check(rule) {
@@ -1988,7 +1988,7 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory,           $
 
       // If we're going to the same state and all locals are kept, we've got nothing to do.
       // But clear 'transition', as we still want to cancel any other pending transitions.
-      // TODO: We may not want to bump 'transition' if we're called from a location change that we've initiated ourselves,
+      // TODO-legacy: We may not want to bump 'transition' if we're called from a location change that we've initiated ourselves,
       // because we might accidentally abort a legitimate transition initiated from code?
       if (shouldTriggerReload(to, from, locals, options) ) {
         if ( to.self.reloadOnSearch !== false )

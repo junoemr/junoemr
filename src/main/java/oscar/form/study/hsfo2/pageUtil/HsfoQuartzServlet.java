@@ -30,12 +30,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hsfo2RecommitScheduleDao;
 import org.oscarehr.common.model.Hsfo2RecommitSchedule;
 import org.oscarehr.util.SpringUtils;
-import org.quartz.CronTrigger;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import oscar.OscarProperties;
 
-import oscar.form.study.hsfo2.pageUtil.RecommitHSFOAction.ResubmitJob;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -43,6 +40,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import org.quartz.impl.StdSchedulerFactory;
 
+// TODO: SPRINGUPGRADE: is this ever used?
 public class HsfoQuartzServlet implements Servlet
 {
 	public static final String RESUBMIT_JOB = "hsfoResubmitJob";
@@ -77,8 +75,11 @@ public class HsfoQuartzServlet implements Servlet
 		//this is just for testing every 5 minutes: 
 		//String cronExpression = "0 0,5,10,15,20,25,30,35,40,45,50,55 " + hour + "-23 * * ?";
 		
-		logger.info("quartz schedule cron expression:" + cronExpression);		
-		
+		logger.info("quartz schedule cron expression:" + cronExpression);
+
+		// TODO: SPRINGUPGRADE: make this do something
+
+/*
 		CronTrigger trigger = new CronTrigger(RESUBMIT_TRIGGER, Scheduler.DEFAULT_GROUP, cronExpression);
 		
 		//trigger.setCronExpression("0 42 10 * * ?"); //Build a trigger that will fire daily at 10:42 am
@@ -97,7 +98,8 @@ public class HsfoQuartzServlet implements Servlet
 			//Start new job.			
 			scheduler.scheduleJob(jobDetail, trigger);
 		}
-		
+*/
+
 	}
 
 	public ServletConfig getServletConfig()

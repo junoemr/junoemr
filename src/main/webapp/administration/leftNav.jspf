@@ -713,7 +713,7 @@ OscarProperties props = OscarProperties.getInstance();
 	</security:oscarSec>
 <!-- #Schedule Management END-->
 
-<!-- #CAISI - TODO: Should this move under system management?-->
+<!-- #CAISI - TODO-legacy: Should this move under system management?-->
 <caisi:isModuleLoad moduleName="caisi">
 	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin.caisi" 	rights="r" reverse="<%=false%>">
 				<div class="accordion-heading">

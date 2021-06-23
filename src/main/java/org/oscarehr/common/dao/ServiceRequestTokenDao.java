@@ -44,7 +44,7 @@ public class ServiceRequestTokenDao extends AbstractDao<ServiceRequestToken>{
 	}
 	
 	public ServiceRequestToken findByTokenId(String token) {
-		Query query = entityManager.createQuery("SELECT x FROM ServiceRequestToken x WHERE x.tokenId=?");
+		Query query = entityManager.createQuery("SELECT x FROM ServiceRequestToken x WHERE x.tokenId=?1");
 		query.setParameter(1,token);
 		
 		return this.getSingleResultOrNull(query);

@@ -28,14 +28,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DemographicQueryFavourite;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DemographicQueryFavouritesDaoTest extends DaoTestFixtures {
-
-	protected DemographicQueryFavouritesDao dao = (DemographicQueryFavouritesDao)SpringUtils.getBean(DemographicQueryFavouritesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicQueryFavouritesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicQueryFavouritesDao demographicQueryFavouritesDao;
 
 	public DemographicQueryFavouritesDaoTest() {
 	}
@@ -50,7 +56,7 @@ public class DemographicQueryFavouritesDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		DemographicQueryFavourite entity = new DemographicQueryFavourite();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		demographicQueryFavouritesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -59,16 +65,16 @@ public class DemographicQueryFavouritesDaoTest extends DaoTestFixtures {
 		DemographicQueryFavourite entity = new DemographicQueryFavourite();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setArchived("1");
-		dao.persist(entity);
+		demographicQueryFavouritesDao.persist(entity);
 		entity = new DemographicQueryFavourite();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setArchived("1");
-		dao.persist(entity);
+		demographicQueryFavouritesDao.persist(entity);
 		entity = new DemographicQueryFavourite();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setArchived("0");
-		dao.persist(entity);
+		demographicQueryFavouritesDao.persist(entity);
 
-		assertEquals(2,dao.findByArchived("1").size());
+		assertEquals(2, demographicQueryFavouritesDao.findByArchived("1").size());
 	}
 }

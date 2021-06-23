@@ -96,7 +96,7 @@ dojo.widget.defineWidget(
 	getTreeNode: function() {
 		var menu = this;
 
-		// FIXME: change to dojo.widget[this.widgetType]
+		// FIXME-legacy: change to dojo.widget[this.widgetType]
 		while (! (menu instanceof dojo.widget.TreeContextMenuV3) ) {
 				menu = menu.parent;
 		}

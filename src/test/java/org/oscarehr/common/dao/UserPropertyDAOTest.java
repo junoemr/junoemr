@@ -39,15 +39,21 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class UserPropertyDAOTest extends DaoTestFixtures{
-	
-	protected UserPropertyDAO dao = (UserPropertyDAO)SpringUtils.getBean(UserPropertyDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class UserPropertyDAOTest extends DaoTestFixtures
+{
+	@Autowired
+	protected UserPropertyDAO userPropertyDAO;
 	
 	@Before
 	public void before() throws Exception {
@@ -66,16 +72,16 @@ public class UserPropertyDAOTest extends DaoTestFixtures{
 		EntityDataGenerator.generateTestDataForModelClass(userProperty1);
 		userProperty1.setName(name1);
 		userProperty1.setProviderNo(providerNo1);
-		dao.persist(userProperty1);
+		userPropertyDAO.persist(userProperty1);
 		
 		UserProperty userProperty2 = new UserProperty();
 		EntityDataGenerator.generateTestDataForModelClass(userProperty2);
 		userProperty2.setProviderNo(name2);
 		userProperty2.setProviderNo(providerNo2);
-		dao.persist(userProperty2);
+		userPropertyDAO.persist(userProperty2);
 		
 		UserProperty expectedResult = userProperty1;
-		UserProperty result = dao.getProp(providerNo1, name1);
+		UserProperty result = userPropertyDAO.getProp(providerNo1, name1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -89,15 +95,15 @@ public class UserPropertyDAOTest extends DaoTestFixtures{
 		UserProperty userProperty1 = new UserProperty();
 		EntityDataGenerator.generateTestDataForModelClass(userProperty1);
 		userProperty1.setName(name1);
-		dao.persist(userProperty1);
+		userPropertyDAO.persist(userProperty1);
 		
 		UserProperty userProperty2 = new UserProperty();
 		EntityDataGenerator.generateTestDataForModelClass(userProperty2);
 		userProperty2.setProviderNo(name2);
-		dao.persist(userProperty2);
+		userPropertyDAO.persist(userProperty2);
 		
 		UserProperty expectedResult = userProperty1;
-		UserProperty result = dao.getProp(name1);
+		UserProperty result = userPropertyDAO.getProp(name1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -111,20 +117,20 @@ public class UserPropertyDAOTest extends DaoTestFixtures{
 		UserProperty userProperty1 = new UserProperty();
 		EntityDataGenerator.generateTestDataForModelClass(userProperty1);
 		userProperty1.setProviderNo(providerNo1);
-		dao.persist(userProperty1);
+		userPropertyDAO.persist(userProperty1);
 		
 		UserProperty userProperty2 = new UserProperty();
 		EntityDataGenerator.generateTestDataForModelClass(userProperty2);
 		userProperty2.setProviderNo(providerNo2);
-		dao.persist(userProperty2);
+		userPropertyDAO.persist(userProperty2);
 		
 		UserProperty userProperty3 = new UserProperty();
 		EntityDataGenerator.generateTestDataForModelClass(userProperty3);
 		userProperty3.setProviderNo(providerNo1);
-		dao.persist(userProperty3);
+		userPropertyDAO.persist(userProperty3);
 		
 		List<UserProperty> expectedResult = new ArrayList<UserProperty>(Arrays.asList(userProperty1, userProperty3));
-		List<UserProperty> result = dao.getDemographicProperties(providerNo1);
+		List<UserProperty> result = userPropertyDAO.getDemographicProperties(providerNo1);
 		
 		Logger logger = MiscUtils.getLogger();
 
@@ -158,17 +164,17 @@ public class UserPropertyDAOTest extends DaoTestFixtures{
 		userProperty1.setProviderNo(providerNo1);
 		userProperty1.setName(name1);
 		userProperty1.setValue(value1);
-		dao.persist(userProperty1);
+		userPropertyDAO.persist(userProperty1);
 		
 		UserProperty userProperty2 = new UserProperty();
 		EntityDataGenerator.generateTestDataForModelClass(userProperty2);
 		userProperty2.setProviderNo(providerNo2);
 		userProperty1.setName(name2);
 		userProperty1.setValue(value2);
-		dao.persist(userProperty2);
+		userPropertyDAO.persist(userProperty2);
 		
 		Map<String,String> expectedResult = new HashMap<String,String>();
-		Map<String,String> result = dao.getProviderPropertiesAsMap(providerNo1);
+		Map<String,String> result = userPropertyDAO.getProviderPropertiesAsMap(providerNo1);
 		
 		expectedResult.put(name1, value1);
 		

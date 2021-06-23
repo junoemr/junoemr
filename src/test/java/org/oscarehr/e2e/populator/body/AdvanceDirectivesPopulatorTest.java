@@ -23,13 +23,18 @@
  */
 package org.oscarehr.e2e.populator.body;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.e2e.constant.BodyConstants.AdvanceDirectives;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class AdvanceDirectivesPopulatorTest extends AbstractBodyPopulatorTest {
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void beforeClass() {
 		setupClass(AdvanceDirectives.getConstants());
 	}
 

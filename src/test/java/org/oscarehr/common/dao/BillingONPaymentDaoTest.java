@@ -39,15 +39,24 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.BillingONPayment;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingONPaymentDaoTest extends DaoTestFixtures {
-	protected BillingONPaymentDao dao = (BillingONPaymentDao)SpringUtils.getBean(BillingONPaymentDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingONPaymentDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingONPaymentDao billingONPaymentDao;
+
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
 	@Before
@@ -84,11 +93,11 @@ public class BillingONPaymentDaoTest extends DaoTestFixtures {
 		bONPayment3.setPaymentDate(date3);
 		
 		daoBONCH.persist(bONCHeader1);
-		dao.persist(bONPayment1);
-		dao.persist(bONPayment2);
-		dao.persist(bONPayment3);	
+		billingONPaymentDao.persist(bONPayment1);
+		billingONPaymentDao.persist(bONPayment2);
+		billingONPaymentDao.persist(bONPayment3);
 		
-		List<BillingONPayment> result = dao.find3rdPartyPayRecordsByBill(bONCHeader1);
+		List<BillingONPayment> result = billingONPaymentDao.find3rdPartyPayRecordsByBill(bONCHeader1);
 		List<BillingONPayment> expectedResult = new ArrayList<BillingONPayment>(Arrays.asList(
 				bONPayment1,
 				bONPayment3,
@@ -153,11 +162,11 @@ public class BillingONPaymentDaoTest extends DaoTestFixtures {
 		bONPayment5.setPaymentDate(Date5);
 		
 		daoBONCH.persist(bONCHeader1);
-		dao.persist(bONPayment1);
-		dao.persist(bONPayment2);
-		dao.persist(bONPayment3);
+		billingONPaymentDao.persist(bONPayment1);
+		billingONPaymentDao.persist(bONPayment2);
+		billingONPaymentDao.persist(bONPayment3);
 		
-		List<BillingONPayment> result = dao.find3rdPartyPayRecordsByBill(bONCHeader1, startDate, endDate);
+		List<BillingONPayment> result = billingONPaymentDao.find3rdPartyPayRecordsByBill(bONCHeader1, startDate, endDate);
 		List<BillingONPayment> expectedResult = new ArrayList<BillingONPayment>(Arrays.asList(
 				bONPayment1,
 				bONPayment2,

@@ -28,13 +28,19 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.EFormGroup;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EFormGroupDaoTest extends DaoTestFixtures {
-
-	protected EFormGroupDao dao = (EFormGroupDao) SpringUtils.getBean("EFormGroupDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EFormGroupDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EFormGroupDao eFormGroupDao;
 
 	@Before
 	public void initSchema() throws Exception {
@@ -46,19 +52,19 @@ public class EFormGroupDaoTest extends DaoTestFixtures {
 		EFormGroup negativeCheck = new EFormGroup();
 		negativeCheck.setGroupName("WOTTERASS");
 		negativeCheck.setFormId(99999);
-		dao.persist(negativeCheck);
+		eFormGroupDao.persist(negativeCheck);
 		
 		populate();
 
-		int count = dao.deleteByName("BLAHAMUHA");
+		int count = eFormGroupDao.deleteByName("BLAHAMUHA");
 		assertTrue(count == 1);
 
 		populate();
 
-		count = dao.deleteByNameAndFormId("BLAHAMUHA", 10);
+		count = eFormGroupDao.deleteByNameAndFormId("BLAHAMUHA", 10);
 		assertTrue(count == 1);
 		
-		negativeCheck = dao.find(negativeCheck.getId());
+		negativeCheck = eFormGroupDao.find(negativeCheck.getId());
 		assertNotNull(negativeCheck);
 	}
 
@@ -66,7 +72,7 @@ public class EFormGroupDaoTest extends DaoTestFixtures {
 		EFormGroup group = new EFormGroup();
 		group.setGroupName("BLAHAMUHA");
 		group.setFormId(10);
-		dao.persist(group);
+		eFormGroupDao.persist(group);
 	}
 
 }

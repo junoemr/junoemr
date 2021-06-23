@@ -30,7 +30,7 @@
 	
 		inFlightCount: 0,
 	
-		// FIXME: it should be possible to pull module prefixes in from djConfig
+		// FIXME-legacy: it should be possible to pull module prefixes in from djConfig
 		modulePrefixes_: {
 			dojo: {name: "dojo", value: "src"}
 		},
@@ -135,7 +135,7 @@ dojo.hostenv.loadUri = function(/*String (URL)*/uri, /*Function?*/cb){
 	return true; // Boolean
 }
 
-// FIXME: probably need to add logging to this method
+// FIXME-legacy: probably need to add logging to this method
 dojo.hostenv.loadUriAndCheck = function(/*String (URL)*/uri, /*String*/moduleName, /*Function?*/cb){
 	// summary: calls loadUri then findModule and returns true if both succeed
 	var ok = true;

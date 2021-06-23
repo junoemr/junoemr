@@ -124,7 +124,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				String.valueOf(document.getDocumentNo()), request.getRemoteAddr(), fileName);
 		String providerId = request.getParameter("provider");
 
-		if (providerId != null) // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
+		if (providerId != null) // TODO-legacy: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 		{
 			documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 		}

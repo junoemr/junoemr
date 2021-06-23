@@ -104,7 +104,7 @@ public class SaveRegistrationAction extends DispatchAction{
 
 //    public ActionForward registration(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response){
 //
-//        // TODO Auto-generated method stub
+//        // TODO-legacy Auto-generated method stub
 //        //HttpSession session = request.getSession();
 //
 //        //grab values of the form fields

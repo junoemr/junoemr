@@ -33,14 +33,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.rx.dao.PrescriptionDao;
 import org.oscarehr.rx.model.Prescription;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PrescriptionDaoTest extends DaoTestFixtures {
-
-	protected PrescriptionDao dao = SpringUtils.getBean(PrescriptionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PrescriptionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PrescriptionDao prescriptionDao;
 
 	@Before
 	public void before() throws Exception {
@@ -49,23 +55,23 @@ public class PrescriptionDaoTest extends DaoTestFixtures {
 	
 	@Test
 	public void testAll() {
-		dao.findByDemographicIdUpdatedAfterDate(999, new Date());
-		dao.updatePrescriptionsByScriptNo(100, "comment");
+		prescriptionDao.findByDemographicIdUpdatedAfterDate(999, new Date());
+		prescriptionDao.updatePrescriptionsByScriptNo(100, "comment");
 	}
 	
 	@Test
 	public void testFind()
 	{
 		Prescription prescription=new Prescription();
-		dao.persist(prescription);
+		prescriptionDao.persist(prescription);
 		
 		Calendar cal=new GregorianCalendar();
 		cal.add(Calendar.DAY_OF_YEAR, -1);
-		List<Prescription> results=dao.findByUpdateDate(cal.getTime(), 99);
+		List<Prescription> results= prescriptionDao.findByUpdateDate(cal.getTime(), 99);
 		assertTrue(results.size()>0);
 
 		cal.add(Calendar.DAY_OF_YEAR, 2);
-		results=dao.findByUpdateDate(cal.getTime(), 99);
+		results= prescriptionDao.findByUpdateDate(cal.getTime(), 99);
 		assertEquals(0, results.size());
 	}
 }

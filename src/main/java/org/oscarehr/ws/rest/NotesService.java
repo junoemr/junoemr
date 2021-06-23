@@ -23,6 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +44,6 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.casemgmt.service.NoteSelectionCriteria;
-import org.oscarehr.casemgmt.service.NoteSelectionResult;
 import org.oscarehr.casemgmt.service.NoteService;
 import org.oscarehr.casemgmt.web.CaseManagementEntryAction;
 import org.oscarehr.casemgmt.web.NoteDisplay;
@@ -50,7 +51,10 @@ import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.encounterNote.converter.CaseManagementTmpSaveConverter;
+import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.EncounterUtil;
@@ -64,6 +68,7 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.TicklerNoteResponse;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
+import org.oscarehr.ws.rest.to.model.CaseManagementTmpSaveTo1;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
 import org.oscarehr.ws.rest.to.model.NoteExtTo1;
 import org.oscarehr.ws.rest.to.model.NoteIssueTo1;
@@ -99,7 +104,24 @@ import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
 @Path("/notes")
 @Component("notesService")
-public class NotesService extends AbstractServiceImpl {
+public class NotesService extends AbstractServiceImpl
+{
+	private static String SUMMARY_CODE_ONGOING_CONCERNS = "ongoingconcerns";
+	private static String SUMMARY_CODE_MEDICAL_HISTORY = "medhx";
+	private static String SUMMARY_CODE_REMINDERS = "reminders";
+	private static String SUMMARY_CODE_OTHER_MEDS = "othermeds";
+	private static String SUMMARY_CODE_SOCIAL_HISTORY = "sochx";
+	private static String SUMMARY_CODE_FAMILY_HISTORY = "famhx";
+	private static String SUMMARY_CODE_RISK_FACTORS = "riskfactors";
+
+	private static String SYSTEM_CODE_ONGOING_CONCERNS = "Concerns";
+	private static String SYSTEM_CODE_MEDICAL_HISTORY = "MedHistory";
+	private static String SYSTEM_CODE_REMINDERS = "Reminders";
+	private static String SYSTEM_CODE_OTHER_MEDS = "OMeds";
+	private static String SYSTEM_CODE_SOCIAL_HISTORY = "SocHistory";
+	private static String SYSTEM_CODE_FAMILY_HISTORY = "FamHistory";
+	private static String SYSTEM_CODE_RISK_FACTORS = "RiskFactors";
+
 
 //	public static String cppCodes[] = {"OMeds", "SocHistory", "MedHistory", "Concerns", "FamHistory", "Reminders", "RiskFactors","OcularMedication","TicklerNote"};
 	
@@ -118,7 +140,7 @@ public class NotesService extends AbstractServiceImpl {
 	
 	@Autowired
 	private CaseManagementManager caseManagementMgr;
-	
+
 	@Autowired
 	private ProviderManager providerMgr;
 	
@@ -130,16 +152,28 @@ public class NotesService extends AbstractServiceImpl {
 
 	@Autowired
 	private DocumentDao documentDao;
-	
+
+	@Autowired
+	private EncounterNoteService encounterNoteService;
+
+	@Autowired
+	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
+
+	@Autowired
+	CaseManagementTmpSaveConverter caseManagementTmpSaveConverter;
+
 	
 	@GET
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
 	public RestResponse<NoteSelectionTo1> getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
+	                                                         @QueryParam("providerNoFilter") List<String> providerNos,
+	                                                         @QueryParam("roleNoFilter") List<String> roleNos,
+															 @QueryParam("issueFilter") List<String> issues,
+															 @QueryParam("sortType") String sortType,
 	                                                         @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
 	                                                         @QueryParam("offset") @DefaultValue("0") Integer offset)
 	{
-		NoteSelectionTo1 returnResult = new NoteSelectionTo1();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 
 		HttpSession se = loggedInInfo.getSession();
@@ -157,8 +191,11 @@ public class NotesService extends AbstractServiceImpl {
 		{
 			logger.info("skipping domain check..provider is a moderator");
 		}
-		else if(!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)
-				&& !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
+		else if(
+			// TODO-legacy: speed this up
+			!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) &&
+			!caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)
+		)
 		{
 			return RestResponse.errorResponse("Domain Error");
 		}
@@ -173,86 +210,20 @@ public class NotesService extends AbstractServiceImpl {
 		criteria.setUserRole((String) se.getAttribute("userrole"));
 		criteria.setUserName((String) se.getAttribute("user"));
 
-		// Note order is not user selectable in this version yet
-		criteria.setNoteSort("observation_date_desc");
+		criteria.setProviders(providerNos);
+		criteria.setRoles(roleNos);
+		criteria.setIssues(issues);
+
+		criteria.setNoteSort(sortType);
+
 		criteria.setSliceFromEndOfList(false);
 
 		if(programId != null && !programId.trim().isEmpty())
 		{
 			criteria.setProgramId(programId);
 		}
-//
-//		processJsonArray(jsonobject, "filterRoles", criteria.getRoles());
-//		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
-//		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
 
-		NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
-
-		returnResult.setMoreNotes(result.isMoreNotes());
-		List<NoteTo1> noteList = returnResult.getNotelist();
-		for(NoteDisplay nd : result.getNotes())
-		{
-			NoteTo1 note = new NoteTo1();
-			note.setNoteId(nd.getNoteId());
-
-			boolean isDeleted = false;
-			if(nd.isDocument()) {
-				Document doc = getDocumentByNoteId(nd.getNoteId().longValue());
-				if(doc != null) {
-					isDeleted = (Document.STATUS_DELETED == doc.getStatus());
-					note.setDocumentId(doc.getId());
-				}
-			}
-
-			if(nd.isEformData())
-			{
-				//TODO why is the note id fake and also the eform id???
-				note.setEformDataId(nd.getNoteId());
-				note.setNoteId(null);
-			}
-			else if (nd.isEncounterForm())
-			{
-				//TODO why is the note id fake and also the encounter form id???
-				note.setEncounterFormId(nd.getNoteId());
-				note.setNoteId(null);
-			}
-
-			note.setArchived(nd.isArchived());
-			note.setIsSigned(nd.isSigned());
-			note.setIsEditable(nd.isEditable());
-			note.setObservationDate(nd.getObservationDate());
-			note.setRevision(nd.getRevision());
-			note.setUpdateDate(nd.getUpdateDate());
-			note.setProviderName(nd.getProviderName());
-			note.setProviderNo(nd.getProviderNo());
-			note.setStatus(nd.getStatus());
-			note.setProgramName(nd.getProgramName());
-			note.setLocation(nd.getLocation());
-			note.setRoleName(nd.getRoleName());
-			note.setRemoteFacilityId(nd.getRemoteFacilityId());
-			note.setUuid(nd.getUuid());
-			note.setHasHistory(nd.getHasHistory());
-			note.setLocked(nd.isLocked());
-			note.setNote(nd.getNote());
-			note.setDocument(nd.isDocument());
-			note.setDeleted(isDeleted);
-			note.setRxAnnotation(nd.isRxAnnotation());
-			note.setEformData(nd.isEformData());
-			note.setEncounterForm(nd.isEncounterForm());
-			note.setInvoice(nd.isInvoice());
-			note.setTicklerNote(nd.isTicklerNote());
-			note.setEncounterType(nd.getEncounterType());
-			note.setEditorNames(nd.getEditorNames());
-			note.setIssueDescriptions(nd.getIssueDescriptions());
-			note.setReadOnly(nd.isReadOnly());
-			note.setGroupNote(nd.isGroupNote());
-			note.setCpp(nd.isCpp());
-			note.setEncounterTime(nd.getEncounterTime());
-			note.setEncounterTransportationTime(nd.getEncounterTransportationTime());
-
-			noteList.add(note);
-		}
-		logger.debug("returning note list size " + noteList.size() + "  numToReturn was " + numToReturn + " offset " + offset);
+		NoteSelectionTo1 returnResult  = noteService.searchEncounterNotes(loggedInInfo, criteria);
 
 		return RestResponse.successResponse(returnResult);
 	}
@@ -295,7 +266,7 @@ public class NotesService extends AbstractServiceImpl {
 		return note;
 	}
 
-	//TODO -- POST shouldn't return a transfer object
+	//TODO-legacy -- POST shouldn't return a transfer object
 	/**
 	 * Save a new note
 	 * @param demographicNo
@@ -306,8 +277,18 @@ public class NotesService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/save")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteTo1> saveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note) {
+	public RestResponse<NoteTo1> saveNote(
+			@PathParam("demographicNo") Integer demographicNo,
+			@QueryParam("deleteTmpSave") @DefaultValue("false") String deleteTmpSaveString,
+			NoteTo1 note)
+	{
 		logger.debug("saveNote "+note);
+
+		boolean deleteTmpSave = false;
+		if(deleteTmpSaveString.toLowerCase().equals("true"))
+		{
+			deleteTmpSave = true;
+		}
 
 		try {
 
@@ -402,15 +383,26 @@ public class NotesService extends AbstractServiceImpl {
 				cpp.setDemographic_no(demographicNoStr);
 			}
 
-			// Save annotation
+			// Load annotation if it exists
+			org.oscarehr.encounterNote.model.CaseManagementNote annotationNoteJPA =
+					encounterNoteService.getAnnotation(note.getNoteId());
+
 			CaseManagementNote annotationNote = null;
+			if(annotationNoteJPA != null)
+			{
+				// XXX: Loading the note using the Hibernate model to be compatible with the save
+				// method in caseManagementMgr.  Change this if replacing the save method.
+				annotationNote = caseManagementMgr.getNote(annotationNoteJPA.getId().toString());
+			}
 
 			//String ongoing = null; // figure out this
 			String ongoing = new String();
 			String lastSavedNoteString = null;
 			String remoteAddr = ""; // Not sure how to get this
-			caseMangementNote = caseManagementMgr.saveCaseManagementNote(loggedInInfo, caseMangementNote, issuelist,
-					cpp, ongoing, verify, loggedInInfo.getLocale(), now, annotationNote, userName, providerNo, remoteAddr, lastSavedNoteString);
+			caseMangementNote = caseManagementMgr.saveCaseManagementNote(
+					loggedInInfo, caseMangementNote, issuelist, cpp, ongoing, verify,
+					loggedInInfo.getLocale(), now, annotationNote, userName, providerNo,
+					remoteAddr, lastSavedNoteString);
 
 			caseManagementMgr.getEditors(caseMangementNote);
 
@@ -424,16 +416,32 @@ public class NotesService extends AbstractServiceImpl {
 			String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
 			LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus,
 					String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(), caseMangementNote.getAuditString());
+
+			if(deleteTmpSave)
+			{
+				try
+				{
+					String programId = getProgram(loggedInInfo, providerNo);
+					caseManagementMgr.deleteTmpSave(note.getProviderNo(), demographicNo.toString(), programId);
+				}
+				catch (Exception e)
+				{
+					logger.warn("Error deleting tmpSave", e);
+				}
+			}
 		}
-		catch(Exception e) {
+		catch(Exception e)
+		{
 			logger.error("Error saving Note", e);
 			return RestResponse.errorResponse("Failed to save Note");
 		}
+
+
 		return RestResponse.successResponse(note);
 	}
 
 
-	//TODO -- POST shouldn't return a transfer object
+	//TODO-legacy -- POST shouldn't return a transfer object
 	@POST
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")
@@ -445,6 +453,7 @@ public class NotesService extends AbstractServiceImpl {
 			NoteExtTo1 noteExtTo1 = noteIssue.getGroupNoteExt();
 			IssueTo1 issueTo1 = noteIssue.getIssue();
 			List<CaseManagementIssueTo1> assignedCMIssues = noteIssue.getAssignedCMIssues();
+			String annotationAttribute = noteIssue.getAnnotation_attrib();
 
 			String noteTxt = StringUtils.trimToNull(note.getNote());
 			// if there is not a note to save, exit immediately
@@ -457,6 +466,7 @@ public class NotesService extends AbstractServiceImpl {
 			Provider provider = loggedInInfo.getLoggedInProvider();
 			String providerName = provider != null ? provider.getFullName() : "";
 
+			Integer oldNoteId = note.getNoteId();
 			String demographicNoStr = "" + demographicNo;
 			String noteIdStr = String.valueOf(note.getNoteId());
 			String uuid = note.getUuid();
@@ -517,10 +527,9 @@ public class NotesService extends AbstractServiceImpl {
 				if (note.getNote().equals(note.getNote()) && issueTo1.isIssueChange() && !extChanged && note.isArchived()) return null;
 			}
 
+			caseMangementNote.setArchived(note.isArchived());
+
 			if (!newNote) {
-				if (note.isArchived()) {
-					caseMangementNote.setArchived(true);
-				}
 				note.setRevision(Integer.parseInt(note.getRevision()) + 1 + "");
 			}
 
@@ -794,6 +803,46 @@ public class NotesService extends AbstractServiceImpl {
 			String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
 			LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus,
 					String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(), caseMangementNote.getAuditString());
+
+
+			// Save Annotation
+			if (newNote)
+			{
+				if (annotationAttribute != null)
+				{
+					HttpSession session = loggedInInfo.getSession();
+
+					CaseManagementNote annotationNote = (CaseManagementNote) session.getAttribute(annotationAttribute);
+
+					if (annotationNote != null)
+					{
+						// new annotation created and got it in session attribute
+						caseManagementMgr.saveNoteSimple(annotationNote);
+						CaseManagementNoteLink cml = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE,
+								newNoteId, annotationNote.getId());
+
+						caseManagementMgr.saveNoteLink(cml);
+
+						String annotationSaveStatus = (annotationNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
+						LogAction.addLogEntry(
+								providerNo,
+								demographicNo,
+								LogConst.ANNOTATE,
+								LogConst.CON_CME_NOTE,
+								annotationSaveStatus,
+								String.valueOf(annotationNote.getId()),
+								getLoggedInInfo().getIp(),
+								caseMangementNote.getAuditString()
+						);
+
+						session.removeAttribute(annotationAttribute);
+					}
+				}
+			}
+			else
+			{
+				caseManagementMgr.addExistingAnnotation(oldNoteId.longValue(), newNoteId);
+			}
 		}
 		catch(Exception e) {
 			logger.error("Error saving Issue Note", e);
@@ -801,11 +850,11 @@ public class NotesService extends AbstractServiceImpl {
 		}
 		return RestResponse.successResponse(noteIssue);
 	}
-	
-	
-	
+
+
+
 	protected CaseManagementCPP copyNote2cpp(CaseManagementCPP cpp, String note, String code) {
-		//TODO: change this back to a loop
+		//TODO-legacy: change this back to a loop
 		StringBuilder text = new StringBuilder();
 		Date d = new Date();
 		String separator = "\n-----[[" + d + "]]-----\n";
@@ -866,7 +915,52 @@ public class NotesService extends AbstractServiceImpl {
 		}
 		return null;
 	}
-	
+
+	@GET
+	@Path("/{demographicNo}/noteToEdit/latest")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<NoteIssueTo1> getLatestNoteToEdit(@PathParam("demographicNo") Integer demographicNo)
+	{
+		LoggedInInfo loggedInInfo =  getLoggedInInfo();
+
+		NoteIssueTo1 returnNote = encounterNoteService.getLatestUnsignedNote(
+				demographicNo,
+				Integer.parseInt(loggedInInfo.getLoggedInProviderNo())
+		);
+
+		return RestResponse.successResponse(returnNote);
+	}
+
+	@GET
+	@Path("/{demographicNo}/tmpSave")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<CaseManagementTmpSaveTo1> getTmpSave(@PathParam("demographicNo") Integer demographicNo)
+	{
+		LoggedInInfo loggedInInfo =  getLoggedInInfo();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		Integer programId = getProgramId(loggedInInfo, providerNo);
+
+		CaseManagementTmpSave tmpSave = caseManagementTmpSaveDao.find(providerNo, demographicNo, programId);
+
+		CaseManagementTmpSaveTo1 note = caseManagementTmpSaveConverter.convertCasemanagementTmpSaveToCaseManagementTmpSaveTo1(tmpSave);
+
+		return RestResponse.successResponse(note);
+	}
+
+	@GET
+	@Path("/{demographicNo}/getNoteToEdit/{noteId}")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<NoteIssueTo1> getNoteToEdit(@PathParam("demographicNo") Integer demographicNo,
+											   @PathParam("noteId") Integer noteId)
+	{
+		NoteIssueTo1 returnNote = encounterNoteService.getNoteToEdit(demographicNo, noteId);
+
+		return RestResponse.successResponse(returnNote);
+	}
+
 	@POST
 	@Path("/{demographicNo}/getCurrentNote")
 	@Consumes("application/json")
@@ -1190,7 +1284,7 @@ public class NotesService extends AbstractServiceImpl {
 		return noteExt;
 	}
 	
-	//TODO
+	//TODO-legacy
 	@GET
 	@Path("/getIssueId/{issueCode}")	
 	@Produces("application/json")
@@ -1504,7 +1598,44 @@ public class NotesService extends AbstractServiceImpl {
 		else editList.put(noteUUID, noteList);
 	}
 
-	private String translateSystemCode(String summaryCode) {
+	private static BiMap<String, String> getSummaryCodeToSystemCodeBiMap()
+	{
+		BiMap<String, String> lookupMap = HashBiMap.create();
+
+		lookupMap.put(SUMMARY_CODE_ONGOING_CONCERNS, SYSTEM_CODE_ONGOING_CONCERNS);
+		lookupMap.put(SUMMARY_CODE_MEDICAL_HISTORY, SYSTEM_CODE_MEDICAL_HISTORY);
+		lookupMap.put(SUMMARY_CODE_REMINDERS, SYSTEM_CODE_REMINDERS);
+		lookupMap.put(SUMMARY_CODE_OTHER_MEDS, SYSTEM_CODE_OTHER_MEDS);
+		lookupMap.put(SUMMARY_CODE_SOCIAL_HISTORY, SYSTEM_CODE_SOCIAL_HISTORY);
+		lookupMap.put(SUMMARY_CODE_FAMILY_HISTORY, SYSTEM_CODE_FAMILY_HISTORY);
+		lookupMap.put(SUMMARY_CODE_RISK_FACTORS, SYSTEM_CODE_RISK_FACTORS);
+
+		return lookupMap;
+	}
+
+	public static String getSummaryCodeFromSystemCode(String systemCode)
+	{
+		BiMap<String, String> lookupMap = getSummaryCodeToSystemCodeBiMap().inverse();
+
+		if (lookupMap.containsKey(systemCode))
+		{
+			return lookupMap.get(systemCode);
+		}
+
+		return systemCode;
+	}
+
+	private String translateSystemCode(String summaryCode)
+	{
+		BiMap<String, String> lookupMap = getSummaryCodeToSystemCodeBiMap();
+
+		if (lookupMap.containsKey(summaryCode))
+		{
+			return lookupMap.get(summaryCode);
+		}
+
+		return summaryCode;
+		/*
 		switch(summaryCode) {
 			case "ongoingconcerns": return "Concerns";
 			case "medhx": return "MedHistory";
@@ -1515,6 +1646,7 @@ public class NotesService extends AbstractServiceImpl {
 			case "riskfactors": return "RiskFactors";
 			default: return summaryCode;
 		}
+		 */
 	}
 	private void copyToNoteExtTo1(List<CaseManagementNoteExt> lcme, NoteExtTo1 noteExt) {
 		if(lcme == null) return;
@@ -1569,11 +1701,13 @@ public class NotesService extends AbstractServiceImpl {
 				cmi.setProgram_id(getProgramId(getLoggedInInfo(), providerNo));
 				cmi.setType(is.getRole());
 				cmi.setDemographic_no(demographicNoStr);
+
+				// Only set properties with new notes
+				cmi.setAcute(i.isAcute());
+				cmi.setCertain(i.isCertain());
+				cmi.setMajor(i.isMajor());
+				cmi.setResolved(i.isResolved());
 			}
-			cmi.setAcute(i.isAcute());
-			cmi.setCertain(i.isCertain());
-			cmi.setMajor(i.isMajor());
-			cmi.setResolved(i.isResolved());
 			cmi.setUpdate_date(new Date());
 
 			issuelist.add(cmi);

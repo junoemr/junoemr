@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 
 import javax.persistence.CascadeType;
@@ -37,6 +38,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -67,6 +69,15 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 
 	public static final String PROVIDER_STATUS_ACTIVE		= "1";
 	public static final String PROVIDER_STATUS_INACTIVE = "0";
+
+
+	// providerTypes
+	public static final String PROVIDER_TYPE_DOCTOR 		= "doctor";
+	public static final String PROVIDER_TYPE_RECEPTIONIST 	= "receptionist";
+	public static final String PROVIDER_TYPE_NURSE			= "nurse";
+	public static final String PROVIDER_TYPE_RESIDENT 		= "resident";
+	public static final String PROVIDER_TYPE_MIDWIFE		= "midwife";
+	public static final String PROVIDER_TYPE_ADMIN			= "admin";
 
 	/**
 	 * default serial version id for serializable
@@ -161,6 +172,10 @@ public class ProviderData extends AbstractModel<String> implements Serializable
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
 
+    // this mapping allows jpa relational query joins in the dao
+	@OneToMany(fetch=FetchType.LAZY , mappedBy="provider")
+	private List<CaseManagementNote> caseManagementNotes;
+
 	/* -- Province specific -- */
 	/* AB */
 	@Column(name = "alberta_tak_no")
@@ -186,15 +201,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	@Column(name = "imd_health_uuid")
 	private String imdHealthUuid = null;
 
-	public Integer getProviderNo()
-	{
-		return Integer.parseInt(getId());
-	}
-	public void setProviderNo(Integer providerNo)
-	{
-		set(String.valueOf(providerNo));
-	}
-
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()
 	{
@@ -215,6 +221,25 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	public void set(String providerNo)
 	{
 		id = providerNo;
+	}
+
+	public Integer getProviderNo()
+	{
+		return Integer.parseInt(getId());
+	}
+	public void setProviderNo(Integer providerNo) {
+		set(String.valueOf(providerNo));
+	}
+
+	public String getCellPhone()
+	{
+		String comments = getComments();
+		String cellNo = null;
+		if(comments != null && comments.contains("<xml_p_cell>"))
+		{
+			cellNo = StringUtils.substringBetween(getComments(), "<xml_p_cell>", "</xml_p_cell>");
+		}
+		return cellNo;
 	}
 
 	public String getFaxNumber()

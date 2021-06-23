@@ -29,14 +29,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.BillingBCDao;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingBCDaoTest extends DaoTestFixtures {
-
-	public BillingBCDao dao = SpringUtils.getBean(BillingBCDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingBCDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingBCDao dao;
 
 	@Before
 	public void before() throws Exception {

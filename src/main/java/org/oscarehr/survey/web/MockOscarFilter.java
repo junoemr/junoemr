@@ -37,7 +37,7 @@ import javax.servlet.http.HttpSession;
 public class MockOscarFilter implements Filter {
 
 	public void init(FilterConfig arg0) throws ServletException {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 
 	}
 
@@ -58,7 +58,7 @@ public class MockOscarFilter implements Filter {
 	}
 
 	public void destroy() {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 
 	}
 

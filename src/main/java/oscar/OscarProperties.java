@@ -57,6 +57,34 @@ public class OscarProperties extends Properties {
 	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 	private static final String DEFAULT_DATETIME_FORMAT = DEFAULT_DATE_FORMAT + " HH:mm:ss";
 
+	private static final String MODULE_PROPERTY_NAME = "ModuleNames";
+
+
+	public enum Module
+	{
+		MODULE_BORN18M("BORN18M"),
+		MODULE_BORN("BORN"),
+		MODULE_CAISI("Caisi"),
+		MODULE_CBI("CBI"),
+		MODULE_E2E("E2E"),
+		MODULE_EMERALDA04("EmeraldA04"),
+		MODULE_ERX("ERx"),
+		MODULE_HRM("HRM"),
+		MODULE_INDIVO("Indivo"),
+		MODULE_JOBS("Jobs"),
+		MODULE_OLIS("OLIS"),
+		MODULE_ORN("ORN"),
+		REST("REST"),
+		MODULE_SPIRE("Spire");
+
+		public final String moduleName;
+
+		Module(String moduleName)
+		{
+			this.moduleName = moduleName;
+		}
+	}
+
 	/* Do not use this constructor. Use getInstance instead */
 	private OscarProperties() {
 		MiscUtils.getLogger().debug("OSCAR PROPS CONSTRUCTOR");
@@ -95,7 +123,7 @@ public class OscarProperties extends Properties {
 	
 	// =========================================================================
 	// Methods for accessing general properties in various ways
-	// TODO: make these private and access all properties through the specific 
+	// TODO-legacy: make these private and access all properties through the specific
 	//       methods below
 	// =========================================================================
 	
@@ -187,6 +215,14 @@ public class OscarProperties extends Properties {
 		}
 		
 		return getProperty(key, "").trim().equalsIgnoreCase(val);
+	}
+
+	public Integer getIntegerProperty(String key, Integer defaultValue) {
+		key = key==null ? null : key.trim();
+
+		String propertyValue = getProperty(key, defaultValue.toString());
+
+		return Integer.parseInt(propertyValue);
 	}
 
 	/**
@@ -356,6 +392,11 @@ public class OscarProperties extends Properties {
 
 	public String getDbType() {
 		return getProperty("db_type");
+	}
+
+	public String getDbName()
+	{
+		return getProperty("db_name");
 	}
 
 	public String getDbUserName() {
@@ -534,6 +575,40 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("has_hrm_documents");
 	}
 
+	public boolean isModuleEnabled(Module module)
+	{
+		// Get the module string from the config
+		// separate it by commas
+		// See if the module is included
+
+		String moduleNames = getProperty(MODULE_PROPERTY_NAME);
+		if(moduleNames == null || moduleNames.trim().length() == 0)
+		{
+			return false;
+		}
+
+		String[] moduleList = moduleNames.split(",");
+		for (String selectedModule : moduleList)
+		{
+			if(module.moduleName.equals(selectedModule))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public String getProjectHome()
+	{
+		return getProperty("project_home");
+	}
+
+	public String getCmeJs()
+	{
+		return getProperty("cme_js");
+	}
+
 	// Methods for Google OAuth
 	public String getGoogleClientID()
 	{
@@ -583,6 +658,26 @@ public class OscarProperties extends Properties {
 	public boolean isEChartAdditionalPatientInfoEnabled()
 	{
 		return isPropertyActive("echart_additional_patient_info");
+	}
+
+	public boolean isJunoEncounterEnabled()
+	{
+		return isPropertyActive("juno_encounter.enabled");
+	}
+
+	public boolean isJunoEncounterLinkToOldEncounterPageEnabled()
+	{
+		return isPropertyActive("juno_encounter.link_to_old_encounter_page");
+	}
+
+	public boolean isHealthcareTeamEnabled()
+	{
+		return isPropertyActive("DEMOGRAPHIC_PATIENT_HEALTH_CARE_TEAM");
+	}
+
+	public static Integer getNumLoadedNotes(int defaultValue) 
+	{
+		return oscarProperties.getIntegerProperty("num_loaded_notes", defaultValue);
 	}
 
 	public boolean isOptimizeSmallSchedulesEnabled()

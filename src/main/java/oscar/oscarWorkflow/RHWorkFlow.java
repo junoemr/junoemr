@@ -44,7 +44,7 @@ public class RHWorkFlow implements WorkFlow {
     static ArrayList<WFState> stateList = null;
     public RHWorkFlow() {
         states = new Hashtable<String,WFState>();
-        //TODO: CLEAN THIS UP WHEN THIS IS PROCESSED IN A XML FILE
+        //TODO-legacy: CLEAN THIS UP WHEN THIS IS PROCESSED IN A XML FILE
 
         WFState wf1 = new WFState("1","No Appt made","");
         WFState wf2 = new WFState("2","Appt Booked","");

@@ -32,15 +32,25 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicSets;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DemographicSetsDaoTest extends DaoTestFixtures {
-	protected DemographicSetsDao dao = SpringUtils.getBean(DemographicSetsDao.class);
-	protected DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicSetsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicSetsDao demographicSetsDao;
+
+	@Autowired
+	protected DemographicDao demographicDao;
 
 	public DemographicSetsDaoTest() {
 	}
@@ -63,7 +73,7 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 		DemographicSets entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographic(demographic);
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -74,16 +84,16 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setArchive("0");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setArchive("0");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
-		assertEquals(2,dao.findBySetName("a").size());
+		assertEquals(2, demographicSetsDao.findBySetName("a").size());
 
 	}
 
@@ -94,20 +104,20 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setArchive("0");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographic(demographic);
 		entity.setName("b");
 		entity.setArchive("0");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
 		List<String> names = new ArrayList<String>();
 		names.add("a");
 		names.add("b");
 
-		assertEquals(2,dao.findBySetNames(names).size());
+		assertEquals(2, demographicSetsDao.findBySetNames(names).size());
 
 	}
 
@@ -118,17 +128,17 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setEligibility("0");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setEligibility("1");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
-		assertEquals(1,dao.findBySetNameAndEligibility("a","0").size());
-		assertEquals(1,dao.findBySetNameAndEligibility("a","1").size());
+		assertEquals(1, demographicSetsDao.findBySetNameAndEligibility("a","0").size());
+		assertEquals(1, demographicSetsDao.findBySetNameAndEligibility("a","1").size());
 
 	}
 
@@ -140,7 +150,7 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 		entity.setName("a");
 		entity.setDemographic(demographic);
 		entity.setArchive("0");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
@@ -148,9 +158,9 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 		entity.setName("b");
 		entity.setDemographic(demographic);
 		entity.setArchive("0");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
-		List<String> names = dao.findSetNamesByDemographicNo(demographic.getDemographicNo());
+		List<String> names = demographicSetsDao.findSetNamesByDemographicNo(demographic.getDemographicNo());
 		assertEquals(2,names.size());
 		assertTrue(names.contains("a"));
 		assertTrue(names.contains("b"));
@@ -162,20 +172,20 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographic(demographic);
 		entity.setName("a");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographic(demographic);
 		entity.setName("b");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographic(demographic);
 		entity.setName("b");
-		dao.persist(entity);
+		demographicSetsDao.persist(entity);
 
-		assertEquals(2,dao.findSetNames().size());
+		assertEquals(2, demographicSetsDao.findSetNames().size());
 	}
 }

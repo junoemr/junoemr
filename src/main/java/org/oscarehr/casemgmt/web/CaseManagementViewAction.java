@@ -1389,15 +1389,27 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 	public ActionForward listNotes(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("List Notes start");
 
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
+
+		// ===================================================================
+		// Gather Information
+		// ===================================================================
+
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo = getProviderNo(request);
 		String demoNo = getDemographicNo(request);
-		Collection<CaseManagementNote> notes = null;
-
 		String appointmentNo = request.getParameter("appointment_no");
-
 		String[] codes = request.getParameterValues("issue_code");
+		String roleName = (String) request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
+		String programId = (String) request.getSession().getAttribute("case_program_id");
+
+
+
+
+		// ===================================================================
+		// Check permissions
+		// ===================================================================
+
 		com.quatro.service.security.SecurityManager securityManager = new com.quatro.service.security.SecurityManager();
 		//these are the ones on the right nav bar. - generic implementation of view access
 		if (codes != null && codes.length > 0) {
@@ -1405,8 +1417,6 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 				return null;
 			}
 		}
-
-		String roleName = (String) request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
 
 		boolean a = true;
 		if (codes[0].equalsIgnoreCase("OMeds")) {
@@ -1431,9 +1441,10 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 			}
 		}
 
-		// set save url to be used by ajax editor
-		String identUrl = request.getQueryString();
-		request.setAttribute("identUrl", identUrl);
+
+		// ===================================================================
+		// Build the list
+		// ===================================================================
 
 		// filter the notes by the checked issues
 		// UserProperty userProp = caseManagementMgr.getUserProperty(providerNo, UserProperty.STALE_NOTEDATE);
@@ -1453,22 +1464,12 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 			idx++;
 		}
 
-		// set save Url
-		String addUrl = request.getContextPath() + "/CaseManagementEntry.do?method=issueNoteSave&providerNo=" + providerNo + "&demographicNo=" + demoNo + "&appointmentNo=" + appointmentNo + "&noteId=";
-		request.setAttribute("addUrl", addUrl);
-		request.setAttribute("cppIssue", cppIssues.toString());
-
-		// set issueIds for retrieving history
-		request.setAttribute("issueIds", StringUtils.join(issueIds, ","));
-
 		// need to apply issue filter
-		notes = caseManagementMgr.getActiveNotes(demoNo, issueIds);
+		Collection<CaseManagementNote> notes = caseManagementMgr.getActiveNotes(demoNo, issueIds);
 		notes = manageLockedNotes(notes, true, this.getUnlockedNotesMap(request));
 
 		logger.debug("FETCHED " + notes.size() + " NOTES filtered by " + StringUtils.join(issueIds, ","));
 		logger.debug("REFERER " + request.getRequestURL().toString() + "?" + request.getQueryString());
-
-		String programId = (String) request.getSession().getAttribute("case_program_id");
 
 		if (programId == null || programId.length() == 0) {
 			programId = "0";
@@ -1482,21 +1483,12 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 			CaseManagementNote cmn = (CaseManagementNote) obj;
 			lcme.addAll(caseManagementMgr.getExtByNote(cmn.getId()));
 		}
-		request.setAttribute("NoteExts", lcme);
-		request.setAttribute("Notes", notes);
 
-		ArrayList<NoteDisplay> remoteNotes = new ArrayList<NoteDisplay>();
-		ArrayList<String> issueCodes = new ArrayList<String>(Arrays.asList(codes));
-		addRemoteNotes(loggedInInfo,remoteNotes, Integer.parseInt(demoNo), issues, programId);
+		String addUrl = request.getContextPath() + "/CaseManagementEntry.do?method=issueNoteSave&providerNo=" + providerNo + "&demographicNo=" + demoNo + "&appointmentNo=" + appointmentNo + "&noteId=";
 
-		if (remoteNotes.size() > 0) {
-			request.setAttribute("remoteNotes", remoteNotes);
-		}
-
-		/*
-		 * oscar.OscarProperties p = oscar.OscarProperties.getInstance(); String noteSort = p.getProperty("CMESort", ""); if (noteSort.trim().equalsIgnoreCase("UP")) request.setAttribute("Notes", sortNotes(notes, "observation_date_asc")); else
-		 * request.setAttribute("Notes", sortNotes(notes, "observation_date_desc"));
-		 */
+		// ===================================================================
+		// Redirect to JSON if requested
+		// ===================================================================
 
 		boolean isJsonRequest = request.getParameter("json") != null && request.getParameter("json").equalsIgnoreCase("true");
 		if (isJsonRequest) {
@@ -1516,6 +1508,36 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 			response.getOutputStream().write(json.toString().getBytes());
 			return null;
 		}
+
+
+		// ===================================================================
+		// Create side effects (output)
+		// ===================================================================
+
+		// set save url to be used by ajax editor
+		String identUrl = request.getQueryString();
+		request.setAttribute("identUrl", identUrl);
+
+
+		// set save Url
+		request.setAttribute("addUrl", addUrl);
+		request.setAttribute("cppIssue", cppIssues.toString());
+
+		// set issueIds for retrieving history
+		request.setAttribute("issueIds", StringUtils.join(issueIds, ","));
+
+		request.setAttribute("NoteExts", lcme);
+		request.setAttribute("Notes", notes);
+
+		ArrayList<NoteDisplay> remoteNotes = new ArrayList<NoteDisplay>();
+		ArrayList<String> issueCodes = new ArrayList<String>(Arrays.asList(codes));
+		addRemoteNotes(loggedInInfo,remoteNotes, Integer.parseInt(demoNo), issues, programId);
+
+
+		if (remoteNotes.size() > 0) {
+			request.setAttribute("remoteNotes", remoteNotes);
+		}
+
 
 		return mapping.findForward("listNotes");
 	}

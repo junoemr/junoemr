@@ -29,14 +29,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.LabTestResults;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class LabTestResultsDaoTest extends DaoTestFixtures {
-
-	protected LabTestResultsDao dao = SpringUtils.getBean(LabTestResultsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LabTestResultsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected LabTestResultsDao labTestResultsDao;
 
 	public LabTestResultsDaoTest() {
 	}
@@ -50,43 +56,43 @@ public class LabTestResultsDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		LabTestResults entity = new LabTestResults();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		labTestResultsDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindByTitleAndLabInfoId() {
-		List<LabTestResults> results = dao.findByTitleAndLabInfoId(100);
+		List<LabTestResults> results = labTestResultsDao.findByTitleAndLabInfoId(100);
 		assertNotNull(results);
 	}
 
 	@Test
 	public void testFindByLabInfoId() {
-		List<LabTestResults> results = dao.findByLabInfoId(100);
+		List<LabTestResults> results = labTestResultsDao.findByLabInfoId(100);
 		assertNotNull(results);
 	}
 
 	@Test
 	public void testFindByAbnAndLabInfoId() {
-		List<LabTestResults> results = dao.findByAbnAndLabInfoId("A", 100);
+		List<LabTestResults> results = labTestResultsDao.findByAbnAndLabInfoId("A", 100);
 		assertNotNull(results);
 	}
 	
 	@Test
 	public void testFindUniqueTestNames() {
-		List<Object[]> results = dao.findUniqueTestNames(100, "CML");
+		List<Object[]> results = labTestResultsDao.findUniqueTestNames(100, "CML");
 		assertNotNull(results);
 	}
 	
 	@Test
 	public void testFindByAbnAndPhysicianId() {
-		assertNotNull(dao.findByAbnAndPhysicianId("ABN", 199));
+		assertNotNull(labTestResultsDao.findByAbnAndPhysicianId("ABN", 199));
 	}
 
     @Test
     public void testFindByLabPatientPhysicialInfoId() {
-	    assertNotNull(dao.findByLabPatientPhysicialInfoId(199));
+	    assertNotNull(labTestResultsDao.findByLabPatientPhysicialInfoId(199));
     }
 
 }

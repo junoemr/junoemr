@@ -25,8 +25,8 @@ package org.caisi.dao;
 
 import java.util.List;
 
-import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
+import org.hibernate.type.StringType;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class BedProgramDao extends HibernateDaoSupport {
@@ -74,10 +74,10 @@ public class BedProgramDao extends HibernateDaoSupport {
         String[] result = new String[3];
 
         SQLQuery query = getSession().createSQLQuery("SELECT name,address,phone,fax from program where id=" + programId);
-        query.addScalar("name", Hibernate.STRING);
-        query.addScalar("address", Hibernate.STRING);
-        query.addScalar("phone", Hibernate.STRING);
-        query.addScalar("fax", Hibernate.STRING);
+        query.addScalar("name", new StringType());
+        query.addScalar("address", new StringType());
+        query.addScalar("phone", new StringType());
+        query.addScalar("fax", new StringType());
         Object[] o = (Object[])query.uniqueResult();
         if (o != null) {
             result[0] = new String(o[0] + "\n" + o[1]);

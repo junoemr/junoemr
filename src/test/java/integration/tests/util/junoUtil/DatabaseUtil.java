@@ -36,7 +36,8 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,11 +49,23 @@ import static integration.tests.util.data.SiteTestCollection.siteNames;
 import static integration.tests.util.data.SiteTestCollection.themeColors;
 import static org.oscarehr.common.dao.utils.AuthUtils.TEST_PROVIDER_ID;
 
+@TestComponent
 public class DatabaseUtil
 {
-	public static void createTestDemographic()
+	@Autowired
+	DemographicService demoService;
+
+	@Autowired
+	ProviderService providerService;
+
+	@Autowired
+	SiteDao siteDao;
+
+	@Autowired
+	ProviderSiteDao providerSiteDao;
+
+	public void createTestDemographic()
 	{
-		DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
 		for (String patientLName : patientLNames)
 		{
 			Demographic demo = new Demographic();
@@ -66,9 +79,8 @@ public class DatabaseUtil
 			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
 		}
 	}
-	public static void createTestProvider()
+	public void createTestProvider()
 	{
-		ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
 		for (String provider : providerLNames)
 		{
 			ProviderData demoProvider = new ProviderData();
@@ -79,9 +91,8 @@ public class DatabaseUtil
 			providerService.addNewProvider(TEST_PROVIDER_ID, demoProvider, "");
 		}
 	}
-	public static void createProviderSite()
+	public void createProviderSite()
 	{
-		SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
 		Site newSite = new Site();
 		newSite.setName(siteNames[0]);
 		newSite.setBgColor(themeColors[0]);
@@ -90,7 +101,7 @@ public class DatabaseUtil
 		newSite.setProvince("BC");
 		siteDao.persist(newSite);
 		Integer siteAddedId = newSite.getId();
-		ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
+
 		ProviderSite providerAssignSite = new ProviderSite();
 		providerAssignSite.setId(new ProviderSitePK());
 		providerAssignSite.getId().setProviderNo(TEST_PROVIDER_ID);

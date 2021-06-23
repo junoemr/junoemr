@@ -277,7 +277,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setDemographicName(displayName);
 		calendarAppointment.setDemographicPhone(phone);
 		calendarAppointment.setDemographicNo(demographicNo);
-		calendarAppointment.setProviderNo(Integer.parseInt(appointment.getProviderNo())); //TODO make this a string
+		calendarAppointment.setProviderNo(Integer.parseInt(appointment.getProviderNo())); //TODO-legacy make this a string
 		calendarAppointment.setStartTime(ConversionUtils.toLocalDateTime(appointment.getStartTime()));
 		calendarAppointment.setEndTime(ConversionUtils.toLocalDateTime(appointment.getEndTime()).plusMinutes(1));
 		calendarAppointment.setEventStatusCode(appointment.getStatus());

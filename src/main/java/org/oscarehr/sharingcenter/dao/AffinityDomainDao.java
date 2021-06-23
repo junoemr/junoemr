@@ -45,7 +45,7 @@ public class AffinityDomainDao extends AbstractDao<AffinityDomainDataObject> {
      * @return AffinityDomain
      */
     public AffinityDomainDataObject getAffinityDomain(int id) {
-        String sql = "FROM AffinityDomainDataObject a where a.id = ?";
+        String sql = "FROM AffinityDomainDataObject a where a.id = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, id);
 

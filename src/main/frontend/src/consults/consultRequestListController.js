@@ -1,5 +1,8 @@
-angular.module('Consults').controller('Consults.ConsultRequestListController', [
+import {ProviderPreferenceApi} from "../../generated";
 
+angular.module('Consults').controller('Consults.ConsultRequestListController', [
+	'$http',
+	'$httpParamSerializer',
 	'$scope',
 	'$timeout',
 	'$state',
@@ -14,6 +17,8 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 	'staticDataService',
 
 	function(
+		$http,
+		$httpParamSerializer,
 		$scope,
 		$timeout,
 		$state,
@@ -29,6 +34,8 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 	{
 
 		var controller = this;
+		let providerPreferenceApi = new ProviderPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+
 
 		//get access rights
 		securityService.hasRight("_con", "r").then(
@@ -305,7 +312,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				var page = params.url().page;
 
 				// shouldn't need these anymore
-				//TODO refactor out of all uses here (I think these are used elsewhere).
+				//TODO-legacy refactor out of all uses here (I think these are used elsewhere).
 				controller.search.startIndex = ((page - 1) * count);
 				controller.search.numToReturn = parseInt(count);
 
@@ -332,9 +339,23 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				}
 
 				return consultService.searchRequests(search1).then(
-					function success(result)
+					async function success(result)
 					{
+
 						params.total(parseInt(result.meta.total));
+						let numMonthsOutstanding = 1;
+						let providerPreferences = await providerPreferenceApi.getProviderSettings();
+
+						if (providerPreferences.data.content[0].consultationTimePeriodWarning
+							&& Juno.Common.Util.isIntegerString(providerPreferences.data.content[0].consultationTimePeriodWarning))
+						{
+							numMonthsOutstanding = parseInt(providerPreferences.data.content[0].consultationTimePeriodWarning);
+						}
+						else
+						{
+							console.warn("Following is set as consultationTimePeriodWarning but cannot be parsed: "
+								+ providerPreferences.data.content[0].consultationTimePeriodWarning);
+						}
 
 						for (var i = 0; i < result.data.length; i++)
 						{
@@ -369,8 +390,8 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							//add notification if outstanding (incomplete requests > 1 month)
 							if (consult.status != 4 && consult.status != 5 && consult.status != 7)
 							{
-								var refDate = moment(consult.referralDate).toDate();
-								refDate.setMonth(refDate.getMonth() + 1);
+								let refDate = moment(consult.referralDate).toDate();
+								refDate.setMonth(refDate.getMonth() + numMonthsOutstanding);
 								if ((new Date()) >= refDate)
 								{
 									consult.outstanding = true;

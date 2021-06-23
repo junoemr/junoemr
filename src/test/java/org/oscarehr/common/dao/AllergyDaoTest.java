@@ -31,15 +31,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AllergyDaoTest extends DaoTestFixtures {
-
-	protected AllergyDao dao = (AllergyDao) SpringUtils.getBean("AllergyDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AllergyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected AllergyDao allergyDao;
 
 	public AllergyDaoTest() {
 	}
@@ -53,7 +59,7 @@ public class AllergyDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Allergy allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 		assertNotNull(allergy.getId());
 	}
 
@@ -61,8 +67,8 @@ public class AllergyDaoTest extends DaoTestFixtures {
 	public void testCount() throws Exception {
 		Allergy allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
-		dao.persist(allergy);
-		assertEquals(dao.getCountAll(), 1);
+		allergyDao.persist(allergy);
+		assertEquals(allergyDao.getCountAll(), 1);
 
 	}
 
@@ -71,28 +77,28 @@ public class AllergyDaoTest extends DaoTestFixtures {
 		Allergy allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
 		allergy.setDemographicNo(1);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 
 		allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
 		allergy.setDemographicNo(1);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 
 		allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
 		allergy.setDemographicNo(2);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 
-		assertEquals(dao.findAllergies(1).size(), 2);
-		assertEquals(dao.findAllergies(2).size(), 1);
+		assertEquals(allergyDao.findAllergies(1).size(), 2);
+		assertEquals(allergyDao.findAllergies(2).size(), 1);
 		
 		Calendar cal=new GregorianCalendar();
 		cal.add(Calendar.DAY_OF_YEAR, -1);
-		List<Allergy> results=dao.findByUpdateDate(cal.getTime(), 99);
+		List<Allergy> results= allergyDao.findByUpdateDate(cal.getTime(), 99);
 		assertTrue(results.size()>0);
 
 		cal.add(Calendar.DAY_OF_YEAR, 2);
-		results=dao.findByUpdateDate(cal.getTime(), 99);
+		results= allergyDao.findByUpdateDate(cal.getTime(), 99);
 		assertEquals(0, results.size());
 	}
 
@@ -102,30 +108,30 @@ public class AllergyDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
 		allergy.setDemographicNo(3);
 		allergy.setArchived(false);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 
 		allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
 		allergy.setDemographicNo(3);
 		allergy.setArchived(false);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 
 		allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
 		allergy.setDemographicNo(3);
 		allergy.setArchived(true);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 
-		assertEquals(dao.findActiveAllergies(3).size(), 2);
+		assertEquals(allergyDao.findActiveAllergies(3).size(), 2);
 
 	}
 
 	public void testFind() throws Exception {
 		Allergy allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
-		dao.persist(allergy);
+		allergyDao.persist(allergy);
 		Integer id = allergy.getId();
-		allergy = dao.find(allergy.getId());
+		allergy = allergyDao.find(allergy.getId());
 		assertNotNull(allergy);
 		assertEquals(id, allergy.getId());
 	}
@@ -134,9 +140,9 @@ public class AllergyDaoTest extends DaoTestFixtures {
 	public void testDelete() throws Exception {
 		Allergy allergy = new Allergy();
 		EntityDataGenerator.generateTestDataForModelClass(allergy);
-		dao.persist(allergy);
-		dao.remove(allergy.getId());
-		assertEquals(dao.getCountAll(), 0);
+		allergyDao.persist(allergy);
+		allergyDao.remove(allergy.getId());
+		assertEquals(allergyDao.getCountAll(), 0);
 
 	}
 }

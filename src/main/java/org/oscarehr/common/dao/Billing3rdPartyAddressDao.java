@@ -53,7 +53,7 @@ public class Billing3rdPartyAddressDao extends AbstractDao<Billing3rdPartyAddres
 	}
 	
 	public List<Billing3rdPartyAddress> findByCompanyName(String companyName) {
-		Query q = entityManager.createQuery("select b from Billing3rdPartyAddress b where b.companyName = ?");
+		Query q = entityManager.createQuery("select b from Billing3rdPartyAddress b where b.companyName = ?1");
 		q.setParameter(1, companyName);
 		
 		List<Billing3rdPartyAddress> results = q.getResultList();

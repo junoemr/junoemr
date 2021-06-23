@@ -45,7 +45,7 @@ public class InfrastructureDao extends AbstractDao<InfrastructureDataObject> {
      * @return Infrastructure or null if nothing found
      */
     public InfrastructureDataObject getInfrastructure(int id) {
-        String sql = "FROM InfrastructureDataObject i where i.id = ?";
+        String sql = "FROM InfrastructureDataObject i where i.id = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, id);
 
@@ -63,7 +63,7 @@ public class InfrastructureDao extends AbstractDao<InfrastructureDataObject> {
     }
 
     public boolean aliasExists(String alias) {
-        String sql = "SELECT count(alias) FROM InfrastructureDataObject WHERE alias = ?";
+        String sql = "SELECT count(alias) FROM InfrastructureDataObject WHERE alias = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, alias);
 

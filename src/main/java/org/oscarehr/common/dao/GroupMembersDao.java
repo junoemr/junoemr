@@ -40,7 +40,7 @@ public class GroupMembersDao extends AbstractDao<GroupMembers>{
 	}
 	
 	public List<GroupMembers> findByGroupId(int groupId) {
-		Query q = entityManager.createQuery("SELECT x FROM GroupMembers x WHERE x.groupId=?");
+		Query q = entityManager.createQuery("SELECT x FROM GroupMembers x WHERE x.groupId=?1");
 		q.setParameter(1, groupId);
 		
 		@SuppressWarnings("unchecked")

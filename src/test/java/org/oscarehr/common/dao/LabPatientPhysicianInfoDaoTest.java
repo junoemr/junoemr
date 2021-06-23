@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.LabPatientPhysicianInfo;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class LabPatientPhysicianInfoDaoTest extends DaoTestFixtures {
-
-	protected LabPatientPhysicianInfoDao dao = SpringUtils.getBean(LabPatientPhysicianInfoDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LabPatientPhysicianInfoDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected LabPatientPhysicianInfoDao labPatientPhysicianInfoDao;
 
 	public LabPatientPhysicianInfoDaoTest() {
 	}
@@ -48,23 +54,23 @@ public class LabPatientPhysicianInfoDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		LabPatientPhysicianInfo entity = new LabPatientPhysicianInfo();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		labPatientPhysicianInfoDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindRoutings() {
-		assertNotNull(dao.findRoutings(100, "T"));
+		assertNotNull(labPatientPhysicianInfoDao.findRoutings(100, "T"));
 	}
 
 	@Test
 	public void testFindByPatientName() {
-		assertNotNull(dao.findByPatientName("ST", "LAB", "100", "LNAME", "FNAME", "HIN"));
+		assertNotNull(labPatientPhysicianInfoDao.findByPatientName("ST", "LAB", "100", "LNAME", "FNAME", "HIN"));
 	}
 
 	@Test
 	public void testFindByDemographic() {
-		assertNotNull(dao.findByDemographic(199, "D"));
+		assertNotNull(labPatientPhysicianInfoDao.findByDemographic(199, "D"));
 	}
 }

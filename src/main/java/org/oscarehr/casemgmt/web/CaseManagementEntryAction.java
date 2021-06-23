@@ -41,6 +41,7 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
 import org.oscarehr.casemgmt.dao.CaseManagementNoteDAO;
 import org.oscarehr.casemgmt.dao.CaseManagementNoteExtDAO;
@@ -56,17 +57,13 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementPrint;
 import org.oscarehr.casemgmt.web.CaseManagementViewAction.IssueDisplay;
 import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
-import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderDefaultProgramDao;
-import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.dao.ResidentOscarMsgDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderDefaultProgram;
-import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.common.model.ResidentOscarMsg;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.eyeform.web.FollowUpAction;
@@ -1848,88 +1845,34 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		}
 
 		String toBill = request.getParameter("toBill");
-		if (toBill != null && toBill.equalsIgnoreCase("true")) {
+		if (toBill != null && toBill.equalsIgnoreCase("true"))
+		{
+			BillingUrlService billingUrlService = SpringUtils.getBean(BillingUrlService.class);
+
 			String region = cform.getBillRegion();
 			String appointmentNo = cform.getAppointmentNo();
 			String name = caseManagementMgr.getDemoDisplayName(demoNo);
 			String date = cform.getAppointmentDate();
 			String start_time = cform.getStart_time();
 			String apptProvider = cform.getApptProvider();
-			String providerview = null;
-			if( reviewerNo != null ) {
-				Provider p = providerMgr.getProvider(reviewerNo);
-				if( p.getProviderType().equalsIgnoreCase("nurse") ) {
-					providerview = "000000";
-				}
-				else {
-					providerview = reviewerNo;
-				}
-			}
-			else {
-				providerview = loggedInInfo.getLoggedInProviderNo();
-			}
-			String defaultView = oscar.OscarProperties.getInstance().getProperty("default_view", "");
+			CaseManagementNote caseNote = cform.getCaseNote();
 
-			ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
-			DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-			Demographic demographic = demographicDao.getDemographic(demoNo);
-			//Should we get the billform based on the appointment provider or the demographic's provider?
-			ProviderPreference providerPreference = null;
-			if (demographic.getProviderNo() != null)
-			{
-				providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
-			}
+			String billingUrl = billingUrlService.buildUrl(
+					loggedInInfo.getLoggedInProviderNo(),
+					demoNo,
+					region,
+					appointmentNo,
+					name,
+					date,
+					start_time,
+					apptProvider,
+					reviewerNo,
+					caseNote
+			);
 
-			if (providerPreference != null &&
-					providerPreference.getDefaultServiceType() != null &&
-					!providerPreference.getDefaultServiceType().equals("no"))
-			{
-				defaultView = providerPreference.getDefaultServiceType();
-			}
-
-			Set setIssues = cform.getCaseNote().getIssues();
-			Iterator iter = setIssues.iterator();
-			StringBuilder dxCodes = new StringBuilder();
-			String strDxCode;
-			int dxNum = 0;
-			while (iter.hasNext()) {
-				CaseManagementIssue cIssue = (CaseManagementIssue) iter.next();
-				dxCodes.append("&dxCode");
-				strDxCode = String.valueOf(cIssue.getIssue().getCode());
-				if (strDxCode.length() > 3) {
-					strDxCode = strDxCode.substring(0, 3);
-				}
-
-				if (dxNum > 0) {
-					dxCodes.append(String.valueOf(dxNum));
-				}
-
-				dxCodes.append("=" + strDxCode);
-				++dxNum;
-			}
-
-			String url = "/billing.do?billRegion=" + region
-					+ "&billForm=" + defaultView
-					+ "&hotclick=&appointment_no="
-					+ appointmentNo
-					+ "&demographic_name=" + java.net.URLEncoder.encode(name, "utf-8")
-					+ "&amp;status=t&demographic_no=" + demoNo
-					+ "&providerview=" + providerview
-					+ "&user_no=" + providerNo
-					+ "&apptProvider_no=" + apptProvider
-					+ "&appointment_date=" + date
-					+ "&start_time=" + start_time
-					+ "&bNewForm=1" + dxCodes.toString();
-
-			if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc")
-					&& demographic.getFamilyDoctor() != null)
-			{
-				url += "&referral_no_1=" + getRefNo(demographic.getFamilyDoctor());
-			}
-
-			logger.debug("BILLING URL " + url);
+			logger.debug("BILLING URL " + billingUrl);
 			ActionForward forward = new ActionForward();
-			forward.setPath(url);
+			forward.setPath(billingUrl);
 			return forward;
 		}
 
@@ -2785,22 +2728,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		return null;
 	}
 
-	public String getRefNo(String referal) {
-		if (referal == null) return "";
-		int start = referal.indexOf("<rdohip>");
-		int end = referal.indexOf("</rdohip>");
-		String ref = new String();
-
-		if (start >= 0 && end >= 0) {
-			String subreferal = referal.substring(start + 8, end);
-			if (!"".equalsIgnoreCase(subreferal.trim())) {
-				ref = subreferal;
-
-			}
-		}
-		return ref;
-	}
-
 	public String getMacroTicklerText(int appointmentNo) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(FollowUpAction.getTicklerText(appointmentNo));
@@ -2982,11 +2909,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		dateValue = dateValue.trim();
 		dateValue = dateValue.replace("/", "-");
-		if (dateValue.length() == 4 && NumberUtils.isDigits(dateValue)) return PartialDate.YEARONLY;
+		if (dateValue.length() == 4 && NumberUtils.isDigits(dateValue)) return PartialDate.FORMAT_YEAR_ONLY;
 
 		String[] dateParts = dateValue.split("-");
 		if (dateParts.length == 2 && NumberUtils.isDigits(dateParts[0]) && NumberUtils.isDigits(dateParts[1])) {
-			if (dateParts[0].length() == 4 && dateParts[1].length() >= 1 && dateParts[1].length() <= 2) return PartialDate.YEARMONTH;
+			if (dateParts[0].length() == 4 && dateParts[1].length() >= 1 && dateParts[1].length() <= 2) return PartialDate.FORMAT_YEAR_MONTH;
 		}
 		if (dateParts.length == 3 && NumberUtils.isDigits(dateParts[0]) && NumberUtils.isDigits(dateParts[1]) && NumberUtils.isDigits(dateParts[2])) {
 			if (dateParts[0].length() == 4 && dateParts[1].length() >= 1 && dateParts[1].length() <= 2 && dateParts[2].length() >= 1 && dateParts[2].length() <= 2) return ""; // full date
@@ -2998,8 +2925,8 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		if (type == null) return null;
 
 		dateValue = dateValue.replace("/", "-");
-		if (type.equals(PartialDate.YEARONLY)) return dateValue + "-01-01";
-		if (type.equals(PartialDate.YEARMONTH)) return dateValue + "-01";
+		if (type.equals(PartialDate.FORMAT_YEAR_ONLY)) return dateValue + "-01-01";
+		if (type.equals(PartialDate.FORMAT_YEAR_MONTH)) return dateValue + "-01";
 		return dateValue;
 	}
 

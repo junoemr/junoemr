@@ -255,7 +255,7 @@ dojo.widget.defineWidget("dojo.widget.Form", dojo.widget.HtmlWidget,
 			var obj = { };
 
 			for(var i=0,len=this.formElements.length; i<len; i++) {
-				// FIXME: would be better to give it an attachPoint:
+				// FIXME-legacy: would be better to give it an attachPoint:
 				var elm = this.formElements[i];
 				var namePath = [];
 				if (elm.name == '') { continue;}

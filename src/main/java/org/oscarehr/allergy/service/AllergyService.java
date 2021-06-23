@@ -26,21 +26,75 @@ import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.PartialDate;
+import org.oscarehr.dataMigration.converter.in.AllergyModelToDbConverter;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service("allergy.service.AllergyService")
 @Transactional
 public class AllergyService
 {
 	@Autowired
-	AllergyDao allergyDao;
+	private AllergyDao allergyDao;
 
 	@Autowired
-	PartialDateDao partialDateDao;
+	private PartialDateDao partialDateDao;
+
+	@Autowired
+	private ProviderService providerService;
+
+	@Autowired
+	private AllergyModelToDbConverter allergyModelToDbConverter;
+
+	@Autowired
+	private EncounterNoteService encounterNoteService;
+
+	public void saveNewAllergy(org.oscarehr.dataMigration.model.allergy.Allergy allergy, Demographic dbDemographic)
+	{
+		Allergy dbAllergy = allergyModelToDbConverter.convert(allergy);
+		dbAllergy.setDemographicNo(dbDemographic.getId());
+
+		if(allergy.getStartDate() != null)
+		{
+			dbAllergy.setStartDateFormat(allergy.getStartDate().getFormatString());
+		}
+		addNewAllergy(dbAllergy);
+
+		String annotation = allergy.getAnnotation();
+		List<ResidualInfo> residualInfoList = allergy.getResidualInfo();
+
+		Optional<CaseManagementNote> allergyNoteOptional = encounterNoteService.buildBaseAnnotationNote(annotation, residualInfoList);
+		if(allergyNoteOptional.isPresent())
+		{
+			CaseManagementNote allergyNote = allergyNoteOptional.get();
+			ProviderData providerData = providerService.getProvider(dbAllergy.getProviderNo());
+			allergyNote.setProvider(providerData);
+			allergyNote.setSigningProvider(providerData);
+			allergyNote.setDemographic(dbDemographic);
+			allergyNote.setObservationDate(ConversionUtils.toLegacyDate(allergy.getStartDate().toLocalDate()));
+			encounterNoteService.saveAllergyNote(allergyNote, dbAllergy);
+		}
+	}
+
+	public void saveNewAllergies(List<org.oscarehr.dataMigration.model.allergy.Allergy> allergyList, Demographic dbDemographic)
+	{
+		for(org.oscarehr.dataMigration.model.allergy.Allergy allergy : allergyList)
+		{
+			saveNewAllergy(allergy, dbDemographic);
+		}
+	}
 
 	public Allergy addNewAllergy(Allergy allergy)
 	{
@@ -51,7 +105,7 @@ public class AllergyService
 		}
 
 		allergyDao.persist(allergy);
-		partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+		partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
 
 		return allergy;
 	}
@@ -64,6 +118,6 @@ public class AllergyService
 	public void update(Allergy allergy)
 	{
 		allergyDao.merge(allergy);
-		partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+		partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
 	}
 }

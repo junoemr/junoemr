@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/** use <org.oscarehr.appointment.service.Appointment> instead */
 @Deprecated
 @Service
 @Transactional
@@ -367,7 +368,7 @@ public class AppointmentManager {
 		Appointment currentRecord = appointmentDao.find(appointmentNo);
 		AppointmentEditRecord editRecord = new AppointmentEditRecord();
 
-		editRecord.setId(0); // no archive id //TODO ???
+		editRecord.setId(0); // no archive id //TODO-legacy ???
 		editRecord.setAppointmentNo(currentRecord.getId());
 		editRecord.setDemographicNo(currentRecord.getDemographicNo());
 		editRecord.setCreator(currentRecord.getCreator());

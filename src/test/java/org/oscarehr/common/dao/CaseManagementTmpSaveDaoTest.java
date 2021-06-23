@@ -32,15 +32,21 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures {
-
-	protected CaseManagementTmpSaveDao dao = SpringUtils.getBean(CaseManagementTmpSaveDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CaseManagementTmpSaveDao caseManagementTmpSaveDao;
 
 
 	@Before
@@ -52,7 +58,7 @@ public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		CaseManagementTmpSave entity = new CaseManagementTmpSave();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		caseManagementTmpSaveDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -68,24 +74,24 @@ public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures {
 		cMTS1.setProviderNo(providerNo1);
 		cMTS1.setDemographicNo(demographicNo1);
 		cMTS1.setProgramId(programId2);
-		dao.persist(cMTS1);
+		caseManagementTmpSaveDao.persist(cMTS1);
 		
 		CaseManagementTmpSave cMTS2 = new CaseManagementTmpSave();
 		EntityDataGenerator.generateTestDataForModelClass(cMTS2);
 		cMTS2.setProviderNo(providerNo1);
 		cMTS2.setDemographicNo(demographicNo2);
 		cMTS2.setProgramId(programId1);
-		dao.persist(cMTS2);
+		caseManagementTmpSaveDao.persist(cMTS2);
 		
 		CaseManagementTmpSave cMTS3 = new CaseManagementTmpSave();
 		EntityDataGenerator.generateTestDataForModelClass(cMTS3);
 		cMTS3.setProviderNo(providerNo1);
 		cMTS3.setDemographicNo(demographicNo1);
 		cMTS3.setProgramId(programId1);
-		dao.persist(cMTS3);
+		caseManagementTmpSaveDao.persist(cMTS3);
 		
 		CaseManagementTmpSave expectedResult = cMTS3;
-		CaseManagementTmpSave result = dao.find(providerNo1, demographicNo1, programId1);
+		CaseManagementTmpSave result = caseManagementTmpSaveDao.find(providerNo1, demographicNo1, programId1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -109,7 +115,7 @@ public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures {
 		cMTS1.setDemographicNo(demographicNo1);
 		cMTS1.setProgramId(programId2);
 		cMTS1.setUpdateDate(date1);
-		dao.persist(cMTS1);
+		caseManagementTmpSaveDao.persist(cMTS1);
 		
 		CaseManagementTmpSave cMTS2 = new CaseManagementTmpSave();
 		EntityDataGenerator.generateTestDataForModelClass(cMTS2);
@@ -117,7 +123,7 @@ public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures {
 		cMTS2.setDemographicNo(demographicNo2);
 		cMTS2.setProgramId(programId1);
 		cMTS2.setUpdateDate(date2);
-		dao.persist(cMTS2);
+		caseManagementTmpSaveDao.persist(cMTS2);
 		
 		CaseManagementTmpSave cMTS3 = new CaseManagementTmpSave();
 		EntityDataGenerator.generateTestDataForModelClass(cMTS3);
@@ -125,10 +131,10 @@ public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures {
 		cMTS3.setDemographicNo(demographicNo1);
 		cMTS3.setProgramId(programId1);
 		cMTS3.setUpdateDate(date3);
-		dao.persist(cMTS3);
+		caseManagementTmpSaveDao.persist(cMTS3);
 		
 		CaseManagementTmpSave expectedResult = cMTS3;
-		CaseManagementTmpSave result = dao.find(providerNo1, demographicNo1, programId1, date3);
+		CaseManagementTmpSave result = caseManagementTmpSaveDao.find(providerNo1, demographicNo1, programId1, date3);
 				
 		assertEquals(expectedResult, result);
 	}	

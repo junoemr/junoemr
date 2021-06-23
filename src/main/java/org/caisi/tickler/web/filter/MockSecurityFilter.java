@@ -42,11 +42,11 @@ public class MockSecurityFilter implements Filter {
 	private static Logger log = MiscUtils.getLogger();
 
 	   public void init(FilterConfig config) throws ServletException {
-	        // TODO Auto-generated method stub
+	        // TODO-legacy Auto-generated method stub
 	    }
 	    
 	    public void destroy() {
-	        // TODO Auto-generated method stub
+	        // TODO-legacy Auto-generated method stub
 	    }
 
 	    public void doFilter(ServletRequest request, ServletResponse response,

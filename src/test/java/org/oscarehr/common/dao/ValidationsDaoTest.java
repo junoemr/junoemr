@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Validations;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ValidationsDaoTest extends DaoTestFixtures {
-
-	protected ValidationsDao dao = SpringUtils.getBean(ValidationsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ValidationsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ValidationsDao validationsDao;
 
 
 	@Before
@@ -46,30 +52,30 @@ public class ValidationsDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Validations entity = new Validations();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		validationsDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testFindByAll() {
-		assertNotNull(dao.findByAll(null, null, null, null, null, null, null));
-		assertNotNull(dao.findByAll("RE", null, null, null, null, null, null));
-		assertNotNull(dao.findByAll(null, 2.0, null, null, null, null, null));
-		assertNotNull(dao.findByAll(null, null, 1.0, null, null, null, null));
-		assertNotNull(dao.findByAll(null, null, null, 100, null, null, null));
-		assertNotNull(dao.findByAll(null, null, null, null, 200, null, null));
-		assertNotNull(dao.findByAll(null, null, null, null, null, true, null));
-		assertNotNull(dao.findByAll(null, null, null, null, null, null, false));
-		assertNotNull(dao.findByAll("BR", 1.0, 2.0, 199, 0, false, false));
+		assertNotNull(validationsDao.findByAll(null, null, null, null, null, null, null));
+		assertNotNull(validationsDao.findByAll("RE", null, null, null, null, null, null));
+		assertNotNull(validationsDao.findByAll(null, 2.0, null, null, null, null, null));
+		assertNotNull(validationsDao.findByAll(null, null, 1.0, null, null, null, null));
+		assertNotNull(validationsDao.findByAll(null, null, null, 100, null, null, null));
+		assertNotNull(validationsDao.findByAll(null, null, null, null, 200, null, null));
+		assertNotNull(validationsDao.findByAll(null, null, null, null, null, true, null));
+		assertNotNull(validationsDao.findByAll(null, null, null, null, null, null, false));
+		assertNotNull(validationsDao.findByAll("BR", 1.0, 2.0, 199, 0, false, false));
 	}
 	
 	@Test
 	public void testFindValidationsBy() {
-		assertNotNull(dao.findValidationsBy(10, "type", 10));
+		assertNotNull(validationsDao.findValidationsBy(10, "type", 10));
 	}
 	
 	@Test
 	public void testFindByName() {
-		assertNotNull(dao.findByName("NM"));
+		assertNotNull(validationsDao.findByName("NM"));
 	}
 }

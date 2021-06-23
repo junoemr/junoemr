@@ -32,16 +32,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlBillingType;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlBillingTypeDaoTest extends DaoTestFixtures {
-
-	protected CtlBillingTypeDao dao = SpringUtils.getBean(CtlBillingTypeDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlBillingTypeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlBillingTypeDao ctlBillingTypeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +58,7 @@ public class CtlBillingTypeDaoTest extends DaoTestFixtures {
 		CtlBillingType entity = new CtlBillingType();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId("test");
-		dao.persist(entity);
+		ctlBillingTypeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -65,15 +70,15 @@ public class CtlBillingTypeDaoTest extends DaoTestFixtures {
 		CtlBillingType cBT1 = new CtlBillingType();
 		EntityDataGenerator.generateTestDataForModelClass(cBT1);
 		cBT1.setId(id1);
-		dao.persist(cBT1);
+		ctlBillingTypeDao.persist(cBT1);
 		
 		CtlBillingType cBT2 = new CtlBillingType();
 		EntityDataGenerator.generateTestDataForModelClass(cBT2);
 		cBT2.setId(id2);
-		dao.persist(cBT2);
+		ctlBillingTypeDao.persist(cBT2);
 		
 		List<CtlBillingType> expectedResult = new ArrayList<CtlBillingType>(Arrays.asList(cBT1));
-		List<CtlBillingType> result = dao.findByServiceType(id1);
+		List<CtlBillingType> result = ctlBillingTypeDao.findByServiceType(id1);
 
 		Logger logger = MiscUtils.getLogger();
 		

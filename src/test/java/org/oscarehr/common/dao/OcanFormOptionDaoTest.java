@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.OcanFormOption;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OcanFormOptionDaoTest extends DaoTestFixtures {
-
-	protected OcanFormOptionDao dao = SpringUtils.getBean(OcanFormOptionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OcanFormOptionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected OcanFormOptionDao ocanFormOptionDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class OcanFormOptionDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		OcanFormOption entity = new OcanFormOption();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ocanFormOptionDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

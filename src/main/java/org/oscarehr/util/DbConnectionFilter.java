@@ -38,7 +38,8 @@ import org.apache.log4j.Logger;
 
 import oscar.util.SqlUtils;
 
-public class DbConnectionFilter implements javax.servlet.Filter {
+public class DbConnectionFilter implements javax.servlet.Filter
+{
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private static ThreadLocal<Connection> dbConnection = new ThreadLocal<Connection>();
@@ -84,8 +85,8 @@ public class DbConnectionFilter implements javax.servlet.Filter {
 
 	public static void releaseAllThreadDbResources() {
 		releaseThreadLocalDbConnection();
-		SpringHibernateLocalSessionFactoryBean.releaseThreadSessions();
-		TrackingBasicDataSource.releaseThreadConnections();
+		//SpringHibernateLocalSessionFactoryBean.releaseThreadSessions();
+		//TrackingBasicDataSource.releaseThreadConnections();
 	}
 
 	/**

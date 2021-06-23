@@ -37,14 +37,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.GroupNoteLink;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class GroupNoteDaoTest extends DaoTestFixtures {
-	protected GroupNoteDao dao = (GroupNoteDao)SpringUtils.getBean(GroupNoteDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class GroupNoteDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected GroupNoteDao groupNoteDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -63,28 +70,28 @@ public class GroupNoteDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink1);
 		groupNoteLink1.setDemographicNo(demographicNo1);
 		groupNoteLink1.setActive(isActive);
-		dao.persist(groupNoteLink1);
+		groupNoteDao.persist(groupNoteLink1);
 		
 		GroupNoteLink groupNoteLink2 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink2);
 		groupNoteLink2.setDemographicNo(demographicNo2);
 		groupNoteLink2.setActive(isActive);
-		dao.persist(groupNoteLink2);
+		groupNoteDao.persist(groupNoteLink2);
 		
 		GroupNoteLink groupNoteLink3 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink3);
 		groupNoteLink3.setDemographicNo(demographicNo1);
 		groupNoteLink3.setActive(isActive);
-		dao.persist(groupNoteLink3);
+		groupNoteDao.persist(groupNoteLink3);
 		
 		GroupNoteLink groupNoteLink4 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink4);
 		groupNoteLink4.setDemographicNo(demographicNo1);
 		groupNoteLink4.setActive(!isActive);
-		dao.persist(groupNoteLink4);
+		groupNoteDao.persist(groupNoteLink4);
 		
 		List<GroupNoteLink> expectedResult = new ArrayList<GroupNoteLink>(Arrays.asList(groupNoteLink1, groupNoteLink3));
-		List<GroupNoteLink> result = dao.findLinksByDemographic(demographicNo1);
+		List<GroupNoteLink> result = groupNoteDao.findLinksByDemographic(demographicNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -113,28 +120,28 @@ public class GroupNoteDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink1);
 		groupNoteLink1.setNoteId(noteId1);
 		groupNoteLink1.setActive(isActive);
-		dao.persist(groupNoteLink1);
+		groupNoteDao.persist(groupNoteLink1);
 		
 		GroupNoteLink groupNoteLink2 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink2);
 		groupNoteLink2.setNoteId(noteId2);
 		groupNoteLink2.setActive(isActive);
-		dao.persist(groupNoteLink2);
+		groupNoteDao.persist(groupNoteLink2);
 		
 		GroupNoteLink groupNoteLink3 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink3);
 		groupNoteLink3.setNoteId(noteId1);
 		groupNoteLink3.setActive(isActive);
-		dao.persist(groupNoteLink3);
+		groupNoteDao.persist(groupNoteLink3);
 		
 		GroupNoteLink groupNoteLink4 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink4);
 		groupNoteLink4.setNoteId(noteId1);
 		groupNoteLink4.setActive(!isActive);
-		dao.persist(groupNoteLink4);
+		groupNoteDao.persist(groupNoteLink4);
 		
 		List<GroupNoteLink> expectedResult = new ArrayList<GroupNoteLink>(Arrays.asList(groupNoteLink1, groupNoteLink3));
-		List<GroupNoteLink> result = dao.findLinksByNoteId(noteId1);
+		List<GroupNoteLink> result = groupNoteDao.findLinksByNoteId(noteId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -160,25 +167,25 @@ public class GroupNoteDaoTest extends DaoTestFixtures {
 		GroupNoteLink groupNoteLink1 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink1);
 		groupNoteLink1.setNoteId(noteId1);
-		dao.persist(groupNoteLink1);
+		groupNoteDao.persist(groupNoteLink1);
 		
 		GroupNoteLink groupNoteLink2 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink2);
 		groupNoteLink2.setNoteId(noteId2);
-		dao.persist(groupNoteLink2);
+		groupNoteDao.persist(groupNoteLink2);
 		
 		GroupNoteLink groupNoteLink3 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink3);
 		groupNoteLink3.setNoteId(noteId1);
-		dao.persist(groupNoteLink3);
+		groupNoteDao.persist(groupNoteLink3);
 		
 		GroupNoteLink groupNoteLink4 = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(groupNoteLink4);
 		groupNoteLink4.setNoteId(noteId1);
-		dao.persist(groupNoteLink4);
+		groupNoteDao.persist(groupNoteLink4);
 		
 		int expectedResult = 3;
-		int result = dao.getNumberOfLinksByNoteId(noteId1);
+		int result = groupNoteDao.getNumberOfLinksByNoteId(noteId1);
 		
 		assertEquals(expectedResult, result);
 	}

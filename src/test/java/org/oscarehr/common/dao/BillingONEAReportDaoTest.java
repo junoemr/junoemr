@@ -37,16 +37,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillingONEAReport;
-import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.oscarBilling.ca.on.data.BillingProviderData;
 
-public class BillingONEAReportDaoTest extends DaoTestFixtures {
-
-	protected BillingONEAReportDao dao = (BillingONEAReportDao)SpringUtils.getBean(BillingONEAReportDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingONEAReportDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingONEAReportDao billingONEAReportDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -63,9 +69,9 @@ public class BillingONEAReportDaoTest extends DaoTestFixtures {
 		BillingONEAReport eaRpt = createReport(1);
 		eaRpt.setClaimError("error01");
 		eaRpt.setCodeError("error02");
-		dao.persist(eaRpt);
+		billingONEAReportDao.persist(eaRpt);
 		
-		List<String> eaReportErrors = dao.getBillingErrorList(eaRpt.getBillingNo());
+		List<String> eaReportErrors = billingONEAReportDao.getBillingErrorList(eaRpt.getBillingNo());
 		if (eaReportErrors.get(0).equals("error01") 
 				&& eaReportErrors.get(1).equals("error02"))
 		{
@@ -102,9 +108,9 @@ public class BillingONEAReportDaoTest extends DaoTestFixtures {
 		BillingONEAReport eaRpt = createReport(1);
 		eaRpt.setClaimError("   ");
 		eaRpt.setCodeError("   error02    ");
-		dao.persist(eaRpt);
+		billingONEAReportDao.persist(eaRpt);
 		
-		List<String> eaReportErrors = dao.getBillingErrorList(eaRpt.getBillingNo());
+		List<String> eaReportErrors = billingONEAReportDao.getBillingErrorList(eaRpt.getBillingNo());
 		List<String> expectedList = new ArrayList<String>(Arrays.asList("error02"));
 		
 		// This one comparison validates that errors are trimmed,
@@ -145,11 +151,11 @@ public class BillingONEAReportDaoTest extends DaoTestFixtures {
 		eaRpt3.setClaimError("error03");
 		eaRpt3.setCodeError("error03");
 		
-		dao.persist(eaRpt1);
-		dao.persist(eaRpt2);
-		dao.persist(eaRpt3);
+		billingONEAReportDao.persist(eaRpt1);
+		billingONEAReportDao.persist(eaRpt2);
+		billingONEAReportDao.persist(eaRpt3);
 		
-		List<String> eaReportErrors = dao.getBillingErrorList(eaRpt1.getBillingNo());
+		List<String> eaReportErrors = billingONEAReportDao.getBillingErrorList(eaRpt1.getBillingNo());
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(
 				"error03",
 				"error03",
@@ -186,7 +192,7 @@ public class BillingONEAReportDaoTest extends DaoTestFixtures {
 	
     @Test
     public void testFindByMagic() throws Exception {
-	    assertNotNull(dao.findByMagic("OHIP", "BGNO", "SPEC CODE", new Date(), new Date(), "REPORT"));
+	    assertNotNull(billingONEAReportDao.findByMagic("OHIP", "BGNO", "SPEC CODE", new Date(), new Date(), "REPORT"));
 	    
 	    List<BillingProviderData> data = new ArrayList<BillingProviderData>();
 	    BillingProviderData d = new BillingProviderData();
@@ -195,6 +201,6 @@ public class BillingONEAReportDaoTest extends DaoTestFixtures {
 	    d = new BillingProviderData();
 	    EntityDataGenerator.generateTestDataForModelClass(d);
 	    data.add(d);
-	    assertNotNull(dao.findByMagic(data, new Date(), new Date(), "REPORT"));
+	    assertNotNull(billingONEAReportDao.findByMagic(data, new Date(), new Date(), "REPORT"));
     }
 }

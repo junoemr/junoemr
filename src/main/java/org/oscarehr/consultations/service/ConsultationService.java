@@ -66,7 +66,7 @@ public class ConsultationService
 		LetterheadTo1 clinicLetterhead = getClinicLetterhead();
 		letterheadList.add(clinicLetterhead);
 
-		//TODO add multi-site letterheads
+		//TODO-legacy add multi-site letterheads
 
 		//provider letterheads
 		//- find non-empty phone/address in the following priority:

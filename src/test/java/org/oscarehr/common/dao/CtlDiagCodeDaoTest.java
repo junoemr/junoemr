@@ -30,12 +30,18 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlDiagCodeDaoTest extends DaoTestFixtures {
-
-	protected CtlDiagCodeDao dao = SpringUtils.getBean(CtlDiagCodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlDiagCodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlDiagCodeDao ctlDiagCodeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -44,7 +50,7 @@ public class CtlDiagCodeDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testAllServiceTypes() {
-		List<Object[]> serviceTypes = dao.getDiagnostics("ON", "MFP");
+		List<Object[]> serviceTypes = ctlDiagCodeDao.getDiagnostics("ON", "MFP");
 		assertNotNull(serviceTypes);
 		assertFalse(serviceTypes.isEmpty());
 	}

@@ -23,8 +23,12 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.casemgmt.model.CaseManagementIssue;
+import org.oscarehr.casemgmt.service.CaseManagementIssueService;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
@@ -34,22 +38,31 @@ import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
+import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.HinValidationService;
+import org.oscarehr.demographicRoster.service.DemographicRosterService;
+import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
+import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.conversion.DemographicToDomainConverter;
+import org.oscarehr.ws.conversion.DemographicToTransferConverter;
+import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
+import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
@@ -57,8 +70,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarWaitingList.util.WLWaitingListUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -68,6 +84,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,10 +95,17 @@ import java.util.List;
  */
 @Path("/demographic")
 @Component("demographicService")
+@Tag(name = "demographic")
 public class DemographicService extends AbstractServiceImpl {
 
 	private static Logger logger = MiscUtils.getLogger();
-	
+
+	@Autowired
+	CaseManagementIssueService caseManagementIssueService;
+
+	@Autowired
+	CaseManagementIssueDao caseManagementIssueDao;
+
 	@Autowired
 	private DemographicManager demographicManager;
 
@@ -107,8 +131,25 @@ public class DemographicService extends AbstractServiceImpl {
 	private RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
+	private DemographicRosterService demographicRosterService;
+
+	@Autowired
+	private DemographicToDomainConverter demographicToDomainConverter;
+
+	@Autowired
+	private DemographicToTransferConverter demographicToTransferConverter;
+
+	private CaseManagementManager caseManagementMgr;
+
+	public void setCaseManagementManager(CaseManagementManager caseManagementMgr)
+	{
+		this.caseManagementMgr = caseManagementMgr;
+	}
+
+	@Autowired
 	private HinValidationService hinValidationService;
 
+	@Deprecated // use ToTransfer/ToDomain + JPA demographic model
 	private DemographicConverter demoConverter = new DemographicConverter();
 	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
 	private WaitingListNameConverter waitingListNameConverter = new WaitingListNameConverter();
@@ -252,7 +293,7 @@ public class DemographicService extends AbstractServiceImpl {
 						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
 						if (demoContactTo1.getPhone() == null || demoContactTo1.getPhone().equals(""))
 						{
-							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), demographicNo, DemographicExt.KEY_DEMO_CELL);
+							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_CELL);
 							if (ext != null) demoContactTo1.setPhone(ext.getValue());
 						}
 					}
@@ -325,7 +366,10 @@ public class DemographicService extends AbstractServiceImpl {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data) {
+	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.UPDATE, data.getDemographicNo(), "_demographic");
 
 		try
 		{
@@ -352,16 +396,20 @@ public class DemographicService extends AbstractServiceImpl {
 				WLWaitingListUtil.updateWaitingListRecord(data.getWaitingListID().toString(), data.getWaitingListNote(), data.getDemographicNo().toString(), null);
 			}
 
-			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
-			demographicManager.updateDemographic(getLoggedInInfo(), demographic);
+			org.oscarehr.demographic.model.Demographic demographic = demographicToDomainConverter.convert(data);
+			demographicManager.updateDemographic(loggedInInfo, demographic);
 
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographic.getDemographicId(),
+					LogConst.ACTION_UPDATE,
+					LogConst.CON_DEMOGRAPHIC,
+					LogConst.STATUS_SUCCESS,
+					null,
+					loggedInInfo.getIp());
 
-			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+			Integer providerNo = Integer.parseInt(loggedInInfo.getLoggedInProviderNo());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getId());
 
-			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
+			return RestResponse.successResponse(demographicToTransferConverter.convert(demographic));
 		}
 		catch (Exception e)
 		{
@@ -405,5 +453,173 @@ public class DemographicService extends AbstractServiceImpl {
 			logger.error("Error",e);
 		}
 		return RestResponse.errorResponse("Error");
+	}
+
+	@GET
+	@Path("/{demographicNo}/caseManagementIssue/{issueId}")
+	@Produces("application/json")
+	public RestResponse<CaseManagementIssueTo1> getCaseManagementIssue(
+			@PathParam("demographicNo") Integer demographicNo,
+			@PathParam("issueId") Long issueId
+	)
+	{
+		CaseManagementIssueTo1 issue = caseManagementIssueService.getIssueById(demographicNo, issueId);
+
+		return RestResponse.successResponse(issue);
+	}
+
+	@POST
+	@Path("/{demographicNo}/caseManagementIssue/{issueId}/updateProperty")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/json")
+	public RestResponse<CaseManagementIssueTo1> setCaseManagementIssueProperty(
+			@PathParam("demographicNo") int demographicNo,
+			@PathParam("issueId") int issueId,
+			PropertyData propertyData
+	)
+	{
+		CaseManagementIssueTo1 issue = caseManagementIssueService.updateProperty(
+				demographicNo,
+				issueId,
+				propertyData.getPropertyName(),
+				propertyData.isPropertyValue()
+		);
+
+		return RestResponse.successResponse(issue);
+	}
+
+	@POST
+	@Path("/{demographicNo}/caseManagementIssue/{issueId}/updateIssue")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/json")
+	public RestResponse<CaseManagementIssueTo1> setCaseManagementIssue(
+			@PathParam("demographicNo") int demographicNo,
+			@PathParam("issueId") int issueId,
+			IssueData issueData
+	)
+	{
+		CaseManagementIssueTo1 issue = caseManagementIssueService.updateIssue(
+				demographicNo,
+				issueId,
+				issueData.getNewIssueId()
+		);
+
+		return RestResponse.successResponse(issue);
+	}
+
+	@GET
+	@Path("/{demographicNo}/issues")
+	@Produces("application/json")
+	public RestResponse<List<CaseManagementIssueTo1>> getAllIssues(
+			@Context HttpServletRequest request,
+			@PathParam("demographicNo") int demographicNo
+	)
+	{
+		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_ALL);
+		return RestResponse.successResponse(issues);
+	}
+
+	@GET
+	@Path("/{demographicNo}/resolvedIssues")
+	@Produces("application/json")
+	public RestResponse<List<CaseManagementIssueTo1>> getResolvedIssues(
+			@Context HttpServletRequest request,
+			@PathParam("demographicNo") int demographicNo
+	)
+	{
+		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED);
+		return RestResponse.successResponse(issues);
+	}
+
+	@GET
+	@Path("/{demographicNo}/unresolvedIssues")
+	@Produces("application/json")
+	public RestResponse<List<CaseManagementIssueTo1>> getUnresolvedIssues(
+			@Context HttpServletRequest request,
+			@PathParam("demographicNo") int demographicNo
+	)
+	{
+		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
+
+		return RestResponse.successResponse(issues);
+	}
+
+	@GET
+	@Path("/{demographicNo}/rosterHistory")
+	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(
+			@PathParam("demographicNo") Integer demographicNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_demographic");
+		List<DemographicRosterTransfer> rosteredHistory = demographicRosterService.getRosteredHistory(demographicNo);
+		return RestSearchResponse.successResponseOnePage(rosteredHistory);
+	}
+
+	private List<CaseManagementIssueTo1> getIssues(HttpServletRequest request, int demographicNo, String filter)
+	{
+		HttpSession session = request.getSession();
+
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String providerNo = (String) session.getAttribute("user");
+
+		EctProgram prgrmMgr = new EctProgram(session);
+		String programId = prgrmMgr.getProgram(providerNo);
+
+		List<CaseManagementIssue> issues;
+		issues = caseManagementIssueService.getIssues(
+				loggedInInfo, Integer.toString(demographicNo), providerNo, programId, filter);
+
+		List<CaseManagementIssueTo1> issuesOutput = new ArrayList<>();
+		CaseManagementIssueConverter convertor = new CaseManagementIssueConverter();
+
+		for(CaseManagementIssue issue: issues)
+		{
+			issuesOutput.add(convertor.getAsTransferObject(loggedInInfo, issue));
+		}
+
+		return issuesOutput;
+	}
+
+	private static class PropertyData
+	{
+		private String propertyName;
+		private boolean propertyValue;
+
+		public String getPropertyName()
+		{
+			return propertyName;
+		}
+
+		public void setPropertyName(String propertyName)
+		{
+			this.propertyName = propertyName;
+		}
+
+		public boolean isPropertyValue()
+		{
+			return propertyValue;
+		}
+
+		public void setPropertyValue(boolean propertyValue)
+		{
+			this.propertyValue = propertyValue;
+		}
+	}
+
+	private static class IssueData
+	{
+		private int newIssueId;
+
+		public int getNewIssueId()
+		{
+			return newIssueId;
+		}
+
+		public void setNewIssueId(int newIssueId)
+		{
+			this.newIssueId = newIssueId;
+		}
 	}
 }

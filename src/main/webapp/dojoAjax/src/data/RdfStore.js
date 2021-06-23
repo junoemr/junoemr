@@ -79,7 +79,7 @@ dojo.declare("dojo.data.RdfStore", dojo.data.core.RemoteStore, {
 		'http://www.w3.org/2001/XMLSchema#boolean': function(value) { 
 			return !value || value == "false" || value == "0" ? false : true; 
 		}
-		//todo: more datatypes: 
+		//todo-legacy: more datatypes:
 		//integer subtypes, string types, XMLiteral
 		//,'http://www.w3.org/2001/XMLSchema#... : function(value) { return parseInt(value.value); }
 	},
@@ -129,12 +129,12 @@ dojo.declare("dojo.data.RdfStore", dojo.data.core.RemoteStore, {
 					"type": "typed-literal",
 					"datatype": datatype.uri,
 					"value": value.toString()
-					//todo: datatype.serialize(value) causes
+					//todo-legacy: datatype.serialize(value) causes
 					//Error: Function.prototype.toString called on incompatible number
 				};
 			} else {
 				//treat it as a string 
-				//todo: warn?
+				//todo-legacy: warn?
 				rdfvalue = { 
 					"type": "literal", 
 				 	"value": value.toString() };

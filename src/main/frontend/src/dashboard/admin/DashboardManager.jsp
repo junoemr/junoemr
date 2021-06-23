@@ -25,7 +25,7 @@
 --%>
 
 <%--
-	TODO: This template must be refactored to not use security or jstl taglibs,
+	TODO-legacy: This template must be refactored to not use security or jstl taglibs,
 	e.g. security:oscarSec c:forEach c:set c:redirect c:out fn:containsIgnoreCase.
 	Replace with angular
 --%>

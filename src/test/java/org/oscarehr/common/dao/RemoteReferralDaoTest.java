@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.RemoteReferral;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RemoteReferralDaoTest extends DaoTestFixtures {
-
-	protected RemoteReferralDao dao = (RemoteReferralDao)SpringUtils.getBean("remoteReferralDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RemoteReferralDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RemoteReferralDao remoteReferralDao;
 
 	public RemoteReferralDaoTest() {
 	}
@@ -57,7 +63,7 @@ public class RemoteReferralDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 RemoteReferral entity = new RemoteReferral();
                  EntityDataGenerator.generateTestDataForModelClass(entity);
-                 dao.persist(entity);
+                 remoteReferralDao.persist(entity);
                  assertNotNull(entity.getId());
         }
 
@@ -73,22 +79,22 @@ public class RemoteReferralDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(remoteReferral1);
 		remoteReferral1.setDemographicId(demographicId1);
 		remoteReferral1.setFacilityId(facilityId1);
-		dao.persist(remoteReferral1);
+		remoteReferralDao.persist(remoteReferral1);
 		
 		RemoteReferral remoteReferral2 = new RemoteReferral();
 		EntityDataGenerator.generateTestDataForModelClass(remoteReferral2);
 		remoteReferral2.setDemographicId(demographicId2);
 		remoteReferral2.setFacilityId(facilityId1);
-		dao.persist(remoteReferral2);
+		remoteReferralDao.persist(remoteReferral2);
 		
 		RemoteReferral remoteReferral3 = new RemoteReferral();
 		EntityDataGenerator.generateTestDataForModelClass(remoteReferral3);
 		remoteReferral3.setDemographicId(demographicId1);
 		remoteReferral3.setFacilityId(facilityId1);
-		dao.persist(remoteReferral3);
+		remoteReferralDao.persist(remoteReferral3);
 		
 		List<RemoteReferral> expectedResult = new ArrayList<RemoteReferral>(Arrays.asList(remoteReferral1, remoteReferral3));
-		List<RemoteReferral> result = dao.findByFacilityIdDemogprahicId(facilityId1, demographicId1);
+		List<RemoteReferral> result = remoteReferralDao.findByFacilityIdDemogprahicId(facilityId1, demographicId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

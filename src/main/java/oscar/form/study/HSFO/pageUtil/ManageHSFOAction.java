@@ -309,7 +309,7 @@ public class ManageHSFOAction extends Action{
 
         //send provider_no and family_doctor to form for processing
         request.setAttribute("EmrHCPId1", user);
-        request.setAttribute("EmrHCPId2", de.getProviderNo()); //TODO: may need to convert to provider name
+        request.setAttribute("EmrHCPId2", de.getProviderNo()); //TODO-legacy: may need to convert to provider name
 
         //set request attributes to forward to jsp
         request.setAttribute("patientData", patientData);

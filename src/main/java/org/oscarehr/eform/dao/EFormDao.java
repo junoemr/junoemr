@@ -46,7 +46,7 @@ public class EFormDao extends AbstractDao<EForm>
 	
     public EForm findByName(String name)
     {
-    	Query query = entityManager.createQuery("SELECT e from EForm e where e.formName = ? and e.current=?");
+    	Query query = entityManager.createQuery("SELECT e from EForm e where e.formName = ?1 and e.current=?2");
     	query.setParameter(1, name);
     	query.setParameter(2, true);
     	
@@ -64,7 +64,7 @@ public class EFormDao extends AbstractDao<EForm>
     		return new ArrayList<EForm>();
     	}
     	
-    	Query query = entityManager.createQuery("SELECT e from EForm e where e.formName like ? and e.current=?");
+    	Query query = entityManager.createQuery("SELECT e from EForm e where e.formName like ?1 and e.current=?2");
     	query.setParameter(1, "%"+name+"%");
     	query.setParameter(2, true);
     	
@@ -217,7 +217,7 @@ public class EFormDao extends AbstractDao<EForm>
 	 * 		Returns the number of all active forms with the forms with the specified ID 
 	 */
 	public Long countFormsOtherThanSpecified(String formName, Integer id) {
-	    // TODO test me
+	    // TODO-legacy test me
 		Query query = entityManager.createQuery("SELECT COUNT(ef) FROM " + modelClass.getSimpleName() + " ef WHERE ef.current = TRUE AND ef.formName = :formName AND ef.id != :id");
 	    query.setParameter("formName", formName);
 	    query.setParameter("id", id);

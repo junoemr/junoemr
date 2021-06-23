@@ -43,7 +43,7 @@ public class BillingOnItemPayment extends AbstractModel<Integer> implements Seri
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(unique=true, nullable=false)
 	private int id;
 
@@ -136,7 +136,7 @@ public class BillingOnItemPayment extends AbstractModel<Integer> implements Seri
 	
 	@Override
 	public Integer getId() {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 		return this.id;
 	}
 

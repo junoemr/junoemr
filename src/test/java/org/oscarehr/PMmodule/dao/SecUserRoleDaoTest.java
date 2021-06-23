@@ -31,16 +31,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SecUserRoleDaoTest extends DaoTestFixtures {
-
-	protected SecUserRoleDao dao = SpringUtils.getBean(SecUserRoleDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SecUserRoleDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SecUserRoleDao secUserRoleDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -56,25 +62,25 @@ public class SecUserRoleDaoTest extends DaoTestFixtures {
 		SecUserRole sUR1 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR1);
 		sUR1.setProviderNo(providerNo1);
-		dao.save(sUR1);
+		secUserRoleDao.save(sUR1);
 		
 		SecUserRole sUR2 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR2);
 		sUR2.setProviderNo(providerNo2);
-		dao.save(sUR2);
+		secUserRoleDao.save(sUR2);
 		
 		SecUserRole sUR3 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR3);
 		sUR3.setProviderNo(providerNo1);
-		dao.save(sUR3);
+		secUserRoleDao.save(sUR3);
 		
 		SecUserRole sUR4 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR4);
 		sUR4.setProviderNo(providerNo1);
-		dao.save(sUR4);
+		secUserRoleDao.save(sUR4);
 		
 		List<SecUserRole> expectedResult = new ArrayList<SecUserRole>(Arrays.asList(sUR1, sUR3, sUR4));
-		List<SecUserRole> result = dao.getUserRoles(providerNo1);
+		List<SecUserRole> result = secUserRoleDao.getUserRoles(providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -101,28 +107,28 @@ public class SecUserRoleDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(sUR1);
 		sUR1.setRoleName(roleName1);
 		sUR1.setProviderNo(providerNo1);
-		dao.save(sUR1);
+		secUserRoleDao.save(sUR1);
 		
 		SecUserRole sUR2 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR2);
 		sUR2.setRoleName(roleName2);
 		sUR2.setProviderNo(providerNo2);
-		dao.save(sUR2);
+		secUserRoleDao.save(sUR2);
 		
 		SecUserRole sUR3 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR3);
 		sUR3.setRoleName(roleName1);
 		sUR3.setProviderNo(providerNo1);
-		dao.save(sUR3);
+		secUserRoleDao.save(sUR3);
 		
 		SecUserRole sUR4 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR4);
 		sUR4.setRoleName(roleName1);
 		sUR4.setProviderNo(providerNo1);
-		dao.save(sUR4);
+		secUserRoleDao.save(sUR4);
 		
 		List<SecUserRole> expectedResult = new ArrayList<SecUserRole>(Arrays.asList(sUR1, sUR3, sUR4));
-		List<SecUserRole> result = dao.getSecUserRolesByRoleName(roleName1);
+		List<SecUserRole> result = secUserRoleDao.getSecUserRolesByRoleName(roleName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -149,28 +155,28 @@ public class SecUserRoleDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(sUR1);
 		sUR1.setRoleName(roleName1);
 		sUR1.setProviderNo(providerNo1);
-		dao.save(sUR1);
+		secUserRoleDao.save(sUR1);
 		
 		SecUserRole sUR2 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR2);
 		sUR2.setRoleName(roleName2);
 		sUR2.setProviderNo(providerNo2);
-		dao.save(sUR2);
+		secUserRoleDao.save(sUR2);
 		
 		SecUserRole sUR3 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR3);
 		sUR3.setRoleName(roleName1);
 		sUR3.setProviderNo(providerNo1);
-		dao.save(sUR3);
+		secUserRoleDao.save(sUR3);
 		
 		SecUserRole sUR4 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR4);
 		sUR4.setRoleName(roleName1);
 		sUR4.setProviderNo(providerNo1);
-		dao.save(sUR4);
+		secUserRoleDao.save(sUR4);
 		
 		List<SecUserRole> expectedResult = new ArrayList<SecUserRole>(Arrays.asList(sUR1, sUR3, sUR4));
-		List<SecUserRole> result = dao.findByRoleNameAndProviderNo(roleName1, providerNo1);
+		List<SecUserRole> result = secUserRoleDao.findByRoleNameAndProviderNo(roleName1, providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 			
@@ -197,28 +203,28 @@ public class SecUserRoleDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(sUR1);
 		sUR1.setRoleName(roleName1);
 		sUR1.setProviderNo(providerNo1);
-		dao.save(sUR1);
+		secUserRoleDao.save(sUR1);
 		
 		SecUserRole sUR2 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR2);
 		sUR2.setRoleName(roleName2);
 		sUR2.setProviderNo(providerNo2);
-		dao.save(sUR2);
+		secUserRoleDao.save(sUR2);
 		
 		SecUserRole sUR3 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR3);
 		sUR3.setRoleName(roleName1);
 		sUR3.setProviderNo(providerNo1);
-		dao.save(sUR3);
+		secUserRoleDao.save(sUR3);
 		
 		SecUserRole sUR4 = new SecUserRole();
 		EntityDataGenerator.generateTestDataForModelClass(sUR4);
 		sUR4.setRoleName(roleName2);
 		sUR4.setProviderNo(providerNo1);
-		dao.save(sUR4);
+		secUserRoleDao.save(sUR4);
 		
 		boolean expectedResult = true;
-		boolean result = dao.hasAdminRole(providerNo1);
+		boolean result = secUserRoleDao.hasAdminRole(providerNo1);
 		
 		assertEquals(expectedResult, result);
 	}

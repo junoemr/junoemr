@@ -18,7 +18,7 @@ dojo.html.sumAncestorProperties = function(/* HTMLElement */node, /* string */pr
 	//	summary
 	//	Returns the sum of the passed property on all ancestors of node.
 	node = dojo.byId(node);
-	if(!node){ return 0; } // FIXME: throw an error?
+	if(!node){ return 0; } // FIXME-legacy: throw an error?
 	
 	var retVal = 0;
 	while(node){
@@ -135,7 +135,7 @@ dojo.html.getAbsolutePosition = dojo.html.abs = function(/* HTMLElement */node, 
 				endNode = db.parentNode;
 			}
 
-			//TODO: set correct nativeBoxType for safari/konqueror
+			//TODO-legacy: set correct nativeBoxType for safari/konqueror
 
 			if(node.parentNode != db){
 				var nd = node;
@@ -146,7 +146,7 @@ dojo.html.getAbsolutePosition = dojo.html.abs = function(/* HTMLElement */node, 
 			var curnode = node;
 			do{
 				var n = curnode["offsetLeft"];
-				//FIXME: ugly hack to workaround the submenu in 
+				//FIXME-legacy: ugly hack to workaround the submenu in 
 				//popupmenu2 does not shown up correctly in opera. 
 				//Someone have a better workaround?
 				if(!h.opera || n>0){

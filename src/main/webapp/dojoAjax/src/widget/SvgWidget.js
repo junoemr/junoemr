@@ -33,7 +33,7 @@ dojo.widget.SVGWidget = dojo.widget.SvgWidget;
 try{
 (function(){
 	var tf = function(){
-		// FIXME: fill this in!!!
+		// FIXME-legacy: fill this in!!!
 		var rw = new function(){
 			dojo.widget.SvgWidget.call(this);
 			this.buildRendering = function(){ return; }

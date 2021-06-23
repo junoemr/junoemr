@@ -26,9 +26,9 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -37,6 +37,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static integration.tests.AddPatientsTests.dad;
 import static integration.tests.AddPatientsTests.dadFullName;
@@ -46,6 +47,9 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class EditAppointmentsTests extends SeleniumTestBase
 {
+	@Autowired
+	DatabaseUtil databaseUtil;
+
 	String apptDurationUpdated = "30";
 	String nameUpdated = dadFullName;
 	String reasonCodeUpdated = "Counselling";
@@ -54,18 +58,17 @@ public class EditAppointmentsTests extends SeleniumTestBase
 	String notesUpdated = "Appointment Notes Updated";
 	String resourcesUpdated = "Appointment Resources Updated";
 
-	@BeforeClass
-	public static void setup()
+	@Before
+	public void setup() throws Exception
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
-		DatabaseUtil.createTestProvider();
-		DatabaseUtil.createProviderSite();
+		databaseUtil.createTestDemographic();
+		databaseUtil.createTestProvider();
+		databaseUtil.createProviderSite();
 	}
 
-	@AfterClass
-	public static void cleanup()
-			throws Exception
+	@After
+	public void cleanup() throws Exception
 	{
 		SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "caisi_role",  "demographic",
 				"documentDescriptionTemplate", "issue", "log", "log_ws_rest", "LookupList", "LookupListItem",

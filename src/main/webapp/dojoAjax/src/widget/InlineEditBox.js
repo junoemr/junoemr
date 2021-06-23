@@ -87,7 +87,7 @@ dojo.widget.defineWidget(
 	postCreate: function(args, frag){
 		// put original node back in the document, and attach handlers
 		// which hide it and display the editor
-		// TODO: this has a number of issues including breaking programatic creation
+		// TODO-legacy: this has a number of issues including breaking programatic creation
 		this.editable = this.getFragNodeRef(frag);
 		dojo.html.insertAfter(this.editable, this.form);
 		dojo.event.connect(this.editable, "onmouseover", this, "onMouseOver");

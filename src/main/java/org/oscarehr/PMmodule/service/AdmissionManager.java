@@ -262,7 +262,7 @@ public class AdmissionManager {
 		
 		
 		//if they are in a service program linked to this bed program, discharge them from that service program
-		//TODO:
+		//TODO-legacy:
 		if(program.getType().equalsIgnoreCase("Bed")) {
 			List<Program> programs = programDao.getLinkedServicePrograms(newAdmission.getProgramId(),demographicNo);
 			for(Program p:programs) {
