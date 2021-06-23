@@ -23,17 +23,18 @@
 
 package oscar.oscarPrevention.reports;
 
+import lombok.Data;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
 public class ReportPatientInfo {
-
-	public Integer demographicNo;
-	public String lastName;
-	public String firstName;
+	private Integer demographicNo;
+	private String lastName;
+	private String firstName;
 	
 	private ReportPatientInfo(ArrayList<String> patientListTuple)
 	{
