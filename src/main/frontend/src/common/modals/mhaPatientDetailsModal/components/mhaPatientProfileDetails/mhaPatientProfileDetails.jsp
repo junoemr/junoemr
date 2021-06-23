@@ -17,7 +17,7 @@
 
 			<!-- Phone -->
 			<div>
-				{{$ctrl.profile.cellPhone}}
+				{{$ctrl.formatPhoneNumber($ctrl.profile)}}
 			</div>
 
 			<!-- Address -->

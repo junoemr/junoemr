@@ -2103,6 +2103,7 @@
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService
                                 org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
+								org.oscarehr.ws.rest.myhealthaccess.patient.AccessWebService
 								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService

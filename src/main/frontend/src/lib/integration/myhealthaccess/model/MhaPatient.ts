@@ -2,6 +2,9 @@ import {LinkStatus} from "./LinkStatus";
 import {Province} from "../../../constants/Province";
 import moment, {Moment} from "moment";
 import {Sex} from "../../../demographic/model/Sex";
+import MhaPatientAccess from "./MhaPatientAccess";
+import MhaPatientAccessService from "../service/MhaPatientAccessService";
+import MhaIntegration from "./MhaIntegration";
 
 export default class MhaPatient
 {
@@ -10,7 +13,7 @@ export default class MhaPatient
 	protected _middleName: string;
 	protected _lastName: string;
 	protected _birthDate: Moment;
-	private _sex: Sex;
+	protected _sex: Sex;
 
 	protected _healthCareProvinceCode: Province;
 	protected _healthNumber: string;
@@ -26,6 +29,31 @@ export default class MhaPatient
 	protected _linkStatus: LinkStatus;
 	protected _canMessage: boolean;
 	protected _demographicNo: string;
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	/**
+	 * get all patient access records for this patient across all MHA integrations
+	 * @return promise that resolves to a list of access records
+	 */
+	public async getPatientAccessRecords(): Promise<MhaPatientAccess[]>
+	{
+		const accessService = new MhaPatientAccessService();
+		return await accessService.getPatientAccesses(this.id);
+	}
+
+	/**
+	 * get a specific access record for this patient
+	 * @param integration - the integration to get the record from
+	 * @return promise that resolves to an access record or null
+	 */
+	public async getPatientAccessRecord(integration: MhaIntegration): Promise<MhaPatientAccess>
+	{
+		const accessService = new MhaPatientAccessService();
+		return await accessService.getPatientAccess(integration.id, this.id);
+	}
 
 	// ==========================================================================
 	// Setters
@@ -121,10 +149,9 @@ export default class MhaPatient
 		this._demographicNo = value;
 	}
 
-// ==========================================================================
+	// ==========================================================================
 	// Getters
 	// ==========================================================================
-
 
 	get id(): string
 	{

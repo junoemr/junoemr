@@ -21,15 +21,45 @@
  * Canada
  */
 
+import {JUNO_BUTTON_COLOR_PATTERN} from "../../../../components/junoComponentConstants";
+
 angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatientConnectionDetails',
 	{
 		templateUrl: 'src/common/modals/mhaPatientDetailsModal/components/mhaPatientConnectionDetails/mhaPatientConnectionDetails.jsp',
 		bindings: {
+			profile: "<", // Type MhaPatient
+			integration: "<", // Type MhaIntegration
 		},
 		controller: [
 			'$scope',
 			function ($scope)
 			{
 				const ctrl = this;
+				const STATUS_DATE_FORMAT = "LL";
+
+				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
+				ctrl.patientAccess = null; // Type MhaPatientAccess
+
+				ctrl.formatStatusDate = (date) =>
+				{
+					if (date)
+					{
+						return date.format(Juno.Common.Util.settings.month_name_day_year);
+					}
+					return null;
+				}
+
+				ctrl.loadPatientAccess = async () =>
+				{
+					if (ctrl.profile && ctrl.integration)
+					{
+						ctrl.patientAccess = await ctrl.profile.getPatientAccessRecord(ctrl.integration);
+						$scope.$apply();
+					}
+				}
+
+				$scope.$watch("$ctrl.profile", ctrl.loadPatientAccess);
+				$scope.$watch("$ctrl.integration", ctrl.loadPatientAccess);
 			}]
 	});

@@ -31,6 +31,7 @@ import {
 import {MhaDemographicApi, MhaIntegrationApi, PatientTo1} from "../../../../generated";
 import {JUNO_SIMPLE_MODAL_FILL_COLOR} from "../junoSimpleModal/junoSimpleModalConstants";
 import MhaConfigService from "../../../lib/integration/myhealthaccess/service/MhaConfigService";
+import MhaPatientService from "../../../lib/integration/myhealthaccess/service/MhaPatientService";
 
 angular.module('Common.Components').component('mhaPatientDetailsModal',
 {
@@ -51,6 +52,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		const ctrl = this;
 
 		const mhaConfigService = new MhaConfigService();
+		const mhaPatientService = new MhaPatientService();
 
 		// load apis
 		let mhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
@@ -92,6 +94,18 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 			$scope.$apply();
 		}
+
+		ctrl.loadMhaProfile = async () =>
+		{
+			if (ctrl.currentIntegration && ctrl.demographic)
+			{
+				ctrl.currentProfile = await mhaPatientService.profileForDemographic(ctrl.currentIntegration.id, ctrl.demographic.demographicNo);
+				$scope.$apply();
+			}
+		}
+
+		$scope.$watch("$ctrl.currentIntegration", ctrl.loadMhaProfile);
+		$scope.$watch("$ctrl.demographic", ctrl.loadMhaProfile);
 
 		ctrl.openInviteConfirmModal = async () =>
 		{

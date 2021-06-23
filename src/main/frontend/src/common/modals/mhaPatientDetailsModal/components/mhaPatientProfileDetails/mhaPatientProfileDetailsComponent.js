@@ -23,11 +23,13 @@
 
 import MhaPatientService from "../../../../../lib/integration/myhealthaccess/service/MhaPatientService";
 import {sexToHuman} from "../../../../../lib/demographic/model/Sex";
+import PhoneFormatUtils from "../../../../../lib/util/PhoneFormatUtil";
 
 angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatientProfileDetails',
 {
 	templateUrl: 'src/common/modals/mhaPatientDetailsModal/components/mhaPatientProfileDetails/mhaPatientProfileDetails.jsp',
 	bindings: {
+		profile: "<", // Type MhaPatient
 		demographicNo: "<",
 		integrationId: "<?"
 	},
@@ -35,18 +37,23 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 		'$scope',
 		function ($scope)
 		{
-			const BIRTHDATE_FORMAT_STRING = "LL"
 
 			const ctrl = this;
-			const mhaPatientService = new MhaPatientService();
 
-			ctrl.profile = null; // Type MhaPatient
+			ctrl.formatPhoneNumber = (mhaPatient) =>
+			{
+				if (mhaPatient)
+				{
+					return PhoneFormatUtils.formatPhoneNumber(mhaPatient.cellPhone);
+				}
+				return "";
+			}
 
 			ctrl.formatBirthdate = (mhaPatient) =>
 			{
 				if (mhaPatient)
 				{
-					return mhaPatient.birthDate.format(BIRTHDATE_FORMAT_STRING);
+					return mhaPatient.birthDate.format(Juno.Common.Util.settings.month_name_day_year);
 				}
 				return null;
 			}
@@ -59,17 +66,5 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				}
 				return null;
 			}
-
-			ctrl.loadMhaProfile = async () =>
-			{
-				if (ctrl.demographicNo && ctrl.integrationId)
-				{
-					ctrl.profile = await mhaPatientService.profileForDemographic(ctrl.integrationId, ctrl.demographicNo);
-					$scope.$apply();
-				}
-			}
-
-			$scope.$watch("$ctrl.integrationId", ctrl.loadMhaProfile);
-			$scope.$watch("$ctrl.demographicNo", ctrl.loadMhaProfile);
 		}]
 });
