@@ -13,5 +13,27 @@
 		grid-template-columns: 152px 1fr 160px;
 		grid-auto-flow: row;
 		align-items: center;
+
+		.verification-code-area {
+			grid-area: 2 / 1 / 3 / 4;
+			overflow: hidden;
+
+			background-color: red;
+
+			> div {
+
+				@keyframes slide-in {
+					0% {
+						transform: translateX(-250px);
+					}
+
+					100% {
+						transform: translateX(0);
+					}
+				}
+
+				animation: slide-in 1s linear;
+			}
+		}
 	}
 }

@@ -40,10 +40,16 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.patientAccess = null; // Type MhaPatientAccess
+				ctrl.verifying = false;
+
+				ctrl.startVerification = () =>
+				{
+					ctrl.verifying = true;
+				}
 
 				ctrl.formatStatusDate = (date) =>
 				{
-					if (date)
+					if (date && date.isValid())
 					{
 						return date.format(Juno.Common.Util.settings.month_name_day_year);
 					}

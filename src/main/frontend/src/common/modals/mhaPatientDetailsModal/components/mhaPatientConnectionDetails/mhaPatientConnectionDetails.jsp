@@ -33,23 +33,32 @@
 			<div class="text-grey text-right">Verification Status:</div>
 			<div class="p-l-24">{{$ctrl.profile.isVerified ? "Patient Has Been Verified" : "Patient Has Not Been Verified"}}</div>
 			<div class="m-r-8">
-				<juno-button ng-if="!$ctrl.profile.isVerified" button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
+				<juno-button ng-if="!$ctrl.profile.isVerified"
+				             click="$ctrl.startVerification()"
+				             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
 					Verify Patient
 				</juno-button>
 				<juno-button ng-if="$ctrl.profile.isVerified">
-					Cancel Verifacation
+					Cancel Verification
 				</juno-button>
 			</div>
 
 			<!-- Verified On -->
-			<div class="text-grey text-right">Verified On:</div>
-			<div class="p-l-24">{{$ctrl.formatStatusDate($ctrl.patientAccess.verifiedAt)}}</div>
-			<div></div>
+			<div ng-if="!$ctrl.verifying" class="text-grey text-right">Verified On:</div>
+			<div ng-if="!$ctrl.verifying" class="p-l-24">{{$ctrl.formatStatusDate($ctrl.patientAccess.verifiedAt)}}</div>
+			<div ng-if="!$ctrl.verifying"></div>
 
 			<!-- Verified By -->
-			<div class="text-grey text-right">Verified By:</div>
-			<div class="p-l-24">{{$ctrl.patientAccess.verifierUserName}}</div>
-			<div></div>
+			<div ng-if="!$ctrl.verifying" class="text-grey text-right">Verified By:</div>
+			<div ng-if="!$ctrl.verifying" class="p-l-24">{{$ctrl.patientAccess.verifierUserName}}</div>
+			<div ng-if="!$ctrl.verifying"></div>
+
+			<!-- Verification Code -->
+			<div ng-if="$ctrl.verifying" class="verification-code-area">
+				<div>
+					<h5>hello world</h5>
+				</div>
+			</div>
 		</div>
 	</div>
 
