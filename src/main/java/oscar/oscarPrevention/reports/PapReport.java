@@ -56,6 +56,10 @@ public class PapReport implements PreventionReport {
     /** Creates a new instance of PapReport */
     public PapReport() {
     }
+    
+	public boolean displayNumShots() {
+		return false;
+	}
 
     public Hashtable runReport(LoggedInInfo loggedInInfo,ArrayList list,Date asofDate){
         int inList = 0;
@@ -427,10 +431,6 @@ public class PapReport implements PreventionReport {
        return null;
    }
 
-    @Override
-    public boolean displayNumShots() {
-        return false;
-    }
 }
 
 

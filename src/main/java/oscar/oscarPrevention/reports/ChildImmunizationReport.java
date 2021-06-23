@@ -94,7 +94,7 @@ public class ChildImmunizationReport implements PreventionReport {
         
         for (ReportPatientInfo patientInfo : patientInfoList)
         {
-        	Demographic demographic = demographicManager.getDemographic(loggedInInfo, patientInfo.demographicNo);
+        	Demographic demographic = demographicManager.getDemographic(loggedInInfo, patientInfo.getDemographicNo());
             //  Each Map<String,Object> is a prevention item, with field names as keys... this is ridiculous.
             ArrayList<Map<String, Object>> preventions = PreventionData.getPreventionData(loggedInInfo, demographic.getDemographicNo());
 
