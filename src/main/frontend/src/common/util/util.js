@@ -485,6 +485,39 @@ Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, m
 	).result;
 };
 
+/**
+ * display a typeahead dialog to the user
+ * @param uibModal - the uib modal instance
+ * @param title - title of the modal
+ * @param message - message inside the modal
+ * @param options - an array of predefined options, or the callback function to call when searching for typeahead results
+ * @param style - style of the modal
+ * @param okText - the text to display on the "ok" button. Leave blank for "Ok"
+ * @param placeholder - the input placeholder text
+ * @param typeaheadMinLength - the minimum typeahead search length
+ * @returns {*} - user selection
+ */
+Juno.Common.Util.openTypeaheadDialog = function openTypeaheadDialog(uibModal, title, message, options, style, okText, placeholder, typeaheadMinLength)
+{
+	return uibModal.open(
+		{
+			component: 'junoInputModal',
+			backdrop: 'static',
+			windowClass: "juno-simple-modal-window",
+			resolve: {
+				title: () => title,
+				message: () => message,
+				style: () => style,
+				okText: () => okText,
+				placeholder: () => placeholder,
+				options: () => options,
+				type: () => JUNO_INPUT_MODAL_TYPE.TYPEAHEAD,
+				typeaheadMinLength: () => typeaheadMinLength,
+			}
+		}
+	).result;
+};
+
 Juno.Common.Util.showProgressBar = function showProgressBar($uibModal, $q, deferral, title, style)
 {
 	let deferred = $q.defer();

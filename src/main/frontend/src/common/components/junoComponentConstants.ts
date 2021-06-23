@@ -76,4 +76,5 @@ export enum JUNO_INPUT_MODAL_TYPE
 {
 	TEXT = "text",
 	SELECT = "select",
+	TYPEAHEAD = "typeahead",
 }

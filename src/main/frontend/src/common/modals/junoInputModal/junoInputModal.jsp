@@ -26,6 +26,17 @@
 							 component-style="$ctrl.resolve.style"
 	>
 	</juno-select>
+
+	<juno-typeahead ng-if="$ctrl.inputModalType === $ctrl.JUNO_INPUT_MODAL_TYPE.TYPEAHEAD"
+							 class="modal-input"
+							 model="$ctrl.value"
+							 options="$ctrl.typeaheadOptions"
+                             on-change="$ctrl.typeaheadSearch(value)"
+							 placeholder="{{$ctrl.placeholder}}"
+							 component-style="$ctrl.resolve.style"
+	                         typeahead-min-length="{{$ctrl.resolve.typeaheadMinLength}}"
+	>
+	</juno-typeahead>
 	
 	<juno-divider component-style="$ctrl.resolve.style"
 	              slim="true">

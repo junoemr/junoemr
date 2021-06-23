@@ -123,23 +123,44 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onAddNewItem = (itemGroup, type): void =>
 				{
-					$uibModal.open(
-						{
-							component: 'flowsheetItemModal',
-							backdrop: 'static',
-							windowClass: "juno-modal",
-							resolve: {
-								itemType: () => type,
-								style: () => ctrl.componentStyle,
-							},
-						}
-					).result.then((newItem) =>
+					const typeLabel = (type === ItemType.MEASUREMENT) ? "measurement" : "prevention";
+					const callback = (type === ItemType.MEASUREMENT) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
+
+					// @ts-ignore
+					Juno.Common.Util.openTypeaheadDialog($uibModal,
+						"Add flowsheet " + typeLabel,
+						"Search for a " + typeLabel + " within the system",
+						callback,
+						ctrl.componentStyle,
+						"Ok",
+						"Search " + typeLabel + "s",
+					).then((newItem) =>
 					{
-						itemGroup.flowsheetItems.push(newItem);
+						// @ts-ignore
+						console.info(newItem);
+						if(newItem)
+						{
+							itemGroup.flowsheetItems.push(newItem);
+						}
 					}).catch((reason) =>
 					{
-
+						// cancelled modal
 					});
+				}
+
+				ctrl.lookupPreventions = async (searchTerm): Promise<void> =>
+				{
+					const searchResults = await flowsheetApiService.getPreventionTypes();
+					return searchResults.map((result) => { return {label: result, value: result, data: result}});
+				}
+
+				ctrl.lookupMeasurements = (searchTerm) =>
+				{
+					// @ts-ignore
+					console.info(searchTerm);
+					return [
+						{label: "test label", value: 1},
+					]
 				}
 
 				ctrl.onCancel = (): void =>

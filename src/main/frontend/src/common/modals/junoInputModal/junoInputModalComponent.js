@@ -46,6 +46,8 @@ angular.module('Common.Components').component('junoInputModal',
 			value: Juno.Validations.validationFieldRequired(ctrl, "value"),
 		};
 
+		ctrl.typeaheadOptions = [];
+
 		ctrl.$onInit = () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
@@ -56,7 +58,25 @@ angular.module('Common.Components').component('junoInputModal',
 				ctrl.value = null;
 				ctrl.placeholder = ctrl.resolve.placeholder || "Please Select an Option";
 			}
+			if (ctrl.inputModalType === JUNO_INPUT_MODAL_TYPE.TYPEAHEAD)
+			{
+				ctrl.value = null;
+				ctrl.placeholder = ctrl.resolve.placeholder || "Search";
+			}
 			ctrl.placeholder = ctrl.resolve.placeholder || "Enter text here";
+		}
+
+		ctrl.typeaheadSearch = async (value) =>
+		{
+			ctrl.typeaheadOptions = [];
+			if(ctrl.resolve.options && ctrl.resolve.options instanceof Function)
+			{
+				ctrl.typeaheadOptions = await ctrl.resolve.options(value);
+			}
+			else
+			{
+				ctrl.typeaheadOptions = ctrl.resolve.options;
+			}
 		}
 
 		ctrl.onKeyDown = (event) =>
@@ -70,6 +90,7 @@ angular.module('Common.Components').component('junoInputModal',
 
 		ctrl.onCancel = () =>
 		{
+			// TODO should be a dismiss, but all uses of it need to change to handle promise rejection
 			ctrl.modalInstance.close();
 		};
 
