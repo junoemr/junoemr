@@ -153,7 +153,7 @@ public class ChildImmunizationReport implements PreventionReport {
 	        // Ideally this would use a hard coded sql query with the only parameter being the rostered provider.
 	        
             PreventionReportDisplay entry = createReportEntry(demographic, immunizationsCompleted, latestPrevention, asOfDate, atLeastOneRefused, atLeastOneIneligible);
-	        letterProcessing(entry,"CIMF",asOfDate);
+	        letterProcessing(entry, "CIMF", asOfDate);
          
 	        childhoodImmunizationReport.add(entry);
 
