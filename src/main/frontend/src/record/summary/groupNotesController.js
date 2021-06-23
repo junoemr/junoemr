@@ -29,9 +29,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		securityService,
 		diseaseRegistryService)
 	{
-
 		var controller = this;
-
 
 		controller.page = {};
 		controller.page.title = mod.displayName;
@@ -49,7 +47,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		};
 
 		controller.working = false;
-
 
 		//set hidden which can can move out of hidden to $scope values
 		var now = new Date();
@@ -105,8 +102,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				{
 					console.log(errors);
 				});
-
-
 		};
 
 		//disable click and keypress if user only has read-access
@@ -287,16 +282,34 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			{
 				let partialStartDate = PartialDateConverter.convertToPartialDate(controller.groupNotesForm.groupNoteExt.startDate);
 				let partialJson  = ({
-					"year": partialStartDate.year.value || "",
-					"month":  parseInt(partialStartDate.month) || "",
-					"day": parseInt(partialStartDate.day) || ""
+					"year": partialStartDate.year.value || null,
+					"month":  parseInt(partialStartDate.month) || null,
+					"day": parseInt(partialStartDate.day) || null
 				});
-				if (partialJson)
-				{
-					controller.groupNotesForm.groupNoteExt.startDate = partialJson;
-				}
+				controller.groupNotesForm.groupNoteExt.startDate = partialJson;
 			}
 
+			if (controller.groupNotesForm.groupNoteExt.resolutionDate)
+			{
+				let partialResolutionDate = PartialDateConverter.convertToPartialDate(controller.groupNotesForm.groupNoteExt.resolutionDate);
+				let partialJson  = ({
+					"year": partialResolutionDate.year.value || null,
+					"month":  parseInt(partialResolutionDate.month) || null,
+					"day": parseInt(partialResolutionDate.day) || null
+				});
+				controller.groupNotesForm.groupNoteExt.resolutionDate = partialJson;
+			}
+
+			if (controller.groupNotesForm.groupNoteExt.procedureDate)
+			{
+				let partialProcedureDate = PartialDateConverter.convertToPartialDate(controller.groupNotesForm.groupNoteExt.procedureDate);
+				let partialJson  = ({
+					"year": partialProcedureDate.year.value || null,
+					"month":  parseInt(partialProcedureDate.month) || null,
+					"day": parseInt(partialProcedureDate.day) || null
+				});
+				controller.groupNotesForm.groupNoteExt.procedureDate = partialJson;
+			}
 			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)
 				{

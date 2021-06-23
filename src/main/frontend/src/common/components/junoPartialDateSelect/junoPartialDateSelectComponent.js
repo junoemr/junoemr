@@ -44,6 +44,7 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
         ctrl.yearValid = true;
         ctrl.monthValid = true;
         ctrl.dayValid = true;
+
         ctrl.fieldsBlank = false;
 
         $scope.$watch("$ctrl.ngModel", (newNgModal) =>
@@ -74,6 +75,9 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
             else
             {
                 ctrl.ngModel = new PartialDateModel(null, null, null);
+                ctrl.ngModel.setYear("");
+                ctrl.ngModel.setMonth("")
+                ctrl.ngModel.setDay("");
             }
 
             ctrl.fieldsBlank = ctrl.allFieldsBlank();

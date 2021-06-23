@@ -153,28 +153,16 @@
 				
 					<div class="form-group col-xs-6">		    
 						<label class="control-label"><bean:message key="oscarEncounter.startdate.title" /></label>
-						<juno-partial-date-select ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate">
-
+						<juno-partial-date-select
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate">
 						</juno-partial-date-select>
-<%--						<juno-datepicker-popup juno-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate"
-							show-icon="true"
-							placeholder="Start Date"
-							type="Input"> 
-						</juno-datepicker-popup>--%>
 					</div>	
 							
 					<div class="form-group col-xs-6">
 						<label class="control-label"><bean:message key="oscarEncounter.resolutionDate.title" /></label>
-							<juno-input
-								title="Resolution Date"
+						<juno-partial-date-select
 								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.resolutionDate">
-							</juno-input>
-
-						<%--<juno-datepicker-popup juno-model="groupNotesCtrl.groupNotesForm.groupNoteExt.resolutionDate"
-							show-icon="true"
-							placeholder="Resolution Date"
-							type="Input"> 
-						</juno-datepicker-popup>--%>
+						</juno-partial-date-select>
 					</div>		    
 
 					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'famhx' || groupNotesCtrl.page.code == 'riskfactors'">
@@ -208,16 +196,9 @@
 
 					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'medhx'" >	
 						<label class="control-label"><bean:message key="oscarEncounter.procedureDate.title" /></label>
-						<juno-input
-							title="Procedure Date"
-							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.procedureDate">
-						</juno-input>
-			<%--			<juno-datepicker-popup juno-model="groupNotesCtrl.groupNotesForm.groupNoteExt.procedureDate"
-							show-icon="true"
-							placeholder="Procedure Date"
-							type="Input"> 
-						</juno-datepicker-popup>--%>
-							
+						<juno-partial-date-select
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.procedureDate">
+						</juno-partial-date-select>
 					</div>
 
 					<div class="form-group col-xs-6"  ng-if="groupNotesCtrl.page.code == 'riskfactors' ">
