@@ -24,6 +24,8 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.allergy.Allergy;
+import org.oscarehr.dataMigration.service.context.PatientImportContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.AdverseReactionSeverity;
 import xml.cds.v5_0.AllergiesAndAdverseReactions;
@@ -36,6 +38,9 @@ import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_D
 @Component
 public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAndAdverseReactions, Allergy>
 {
+	@Autowired
+	protected PatientImportContextService patientImportContextService;
+
 	public CDSAllergyImportMapper()
 	{
 		super();
@@ -54,7 +59,17 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		allergy.setLifeStage(getLifeStage(importStructure.getLifeStage()));
 		allergy.setSeverityOfReaction(getSeverity(importStructure.getSeverity()));
 		allergy.setReaction(importStructure.getReaction());
-		allergy.setEntryDateTime(toNullableLocalDateTime(importStructure.getRecordedDate()));
+
+		if (toNullableLocalDateTime(importStructure.getRecordedDate()) != null)
+		{
+
+			allergy.setEntryDateTime(toNullableLocalDateTime(importStructure.getRecordedDate()));
+		}
+		else
+		{
+			allergy.setEntryDateTime(patientImportContextService.getContext().getDefaultDate().atStartOfDay());
+		}
+
 		allergy.setAnnotation(importStructure.getNotes());
 
 		allergy.setAgeOfOnset(getResidualDataElementAsLong(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET));
