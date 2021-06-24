@@ -1,0 +1,75 @@
+.juno-code-input {
+	// customization variables
+	--input-font-size: 48px;
+	--overlay-color: var(--color-neutral-lightest);
+
+	position: relative;
+	background-color: var(--color-neutral-white);
+
+	font-size: var(--input-font-size);
+	padding: 8px 0 8px 0.25ch;
+
+	> input {
+		padding: 0;
+		font-size: var(--input-font-size);
+		letter-spacing: 1ch;
+
+		color: var(--color-neutral-darkest);
+		background-color: transparent;
+		border: none;
+
+		&:focus {
+			outline: none;
+		}
+
+		&::selection {
+			background-color: transparent;
+		}
+	}
+
+	.hole-punch-overlay {
+		font-size: var(--input-font-size);
+
+		position: absolute;
+		top: 0;
+		left: -0.25ch;
+		right: 0;
+		bottom: 0;
+
+		pointer-events: none;
+
+		display: flex;
+		flex-direction: row;
+
+		> .punch-out {
+			position: relative;
+			background-color: transparent;
+
+			border-left: 0.25ch solid var(--overlay-color);
+			border-right: 0.25ch solid var(--overlay-color);
+
+			width: 2ch;
+
+			&:last-child {
+				width: 2.5ch;
+				border-right: 0.75ch solid var(--overlay-color);
+			}
+
+			> .inner-punch {
+				position: absolute;
+				inset: -8px;
+
+				border: 8px solid var(--overlay-color);
+				border-radius: 16px;
+
+				> .inner-border {
+					height: 100%;
+					width: 100%;
+
+					border: solid 1px var(--color-neutral-light-grey);
+					border-radius: 8px;
+				}
+			}
+		}
+	}
+}

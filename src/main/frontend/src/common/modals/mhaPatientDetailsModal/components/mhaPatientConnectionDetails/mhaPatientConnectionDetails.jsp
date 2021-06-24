@@ -55,8 +55,8 @@
 
 			<!-- Verification Code -->
 			<div ng-if="$ctrl.verifying" class="verification-code-area">
-				<div>
-					<h5>hello world</h5>
+				<div class="flex-row justify-content-center align-items-center">
+					<juno-code-input code-length="6"></juno-code-input>
 				</div>
 			</div>
 		</div>

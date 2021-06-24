@@ -238,6 +238,7 @@ module.exports = {
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
+			'./src/common/components/junoCodeInput/junoCodeInputComponent.js',
 			'./src/common/components/junoFileChooser/junoFileChooserComponent.js',
 			'./src/common/components/junoCollapseArea/junoCollapseAreaComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
