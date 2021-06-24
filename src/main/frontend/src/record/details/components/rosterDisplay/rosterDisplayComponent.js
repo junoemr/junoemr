@@ -1,5 +1,5 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {RosterServiceApi} from "../../../../../generated";
+import {ProvidersServiceApi, RosterServiceApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('rosterDisplaySection', {
     templateUrl: 'src/record/details/components/rosterDisplay/rosterDisplay.jsp',
@@ -23,6 +23,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
         {
             let ctrl = this;
             let rosterApi = new RosterServiceApi($http, $httpParamSerializer, '../ws/rs');
+            let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
             $scope.LABEL_POSITION = LABEL_POSITION;
             $scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -60,7 +61,6 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                 );
             }
 
-            // TODO Currently duplicated from careTeamSectionComponent - should this be its own component?
             ctrl.updateFamilyDoctors = (docSearchString, docReferralNo) =>
             {
                 referralDoctorsService.searchReferralDoctors(docSearchString, docReferralNo, 1, 10).then(
@@ -88,6 +88,30 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                     {
                         console.log(errors);
                     }
+                ).then(
+                    providersServiceApi.getActive().then(
+                        function success(results)
+                        {
+                            for (let provider of results.data.body)
+                            {
+                                let fullName = provider.lastName + ", " + provider.firstName;
+                                let displayName = provider.lastName + ", " + provider.firstName;
+                                if (provider.ohipNo !== "")
+                                {
+                                    displayName += " [" + provider.ohipNo + "]";
+                                }
+                                ctrl.familyDoctors.push({
+                                    label: displayName,
+                                    value: fullName,
+                                    referralNo: provider.ohipNo
+                                });
+                            }
+                        },
+                        function failure(errors)
+                        {
+                            console.error(errors);
+                        }
+                    )
                 );
             }
 
