@@ -39,6 +39,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -82,6 +84,18 @@ public class Flowsheet extends AbstractModel<Integer>
 	@JoinTable(name = "flowsheet_triggers_icd9", joinColumns = @JoinColumn(name="flowsheet_id"), inverseJoinColumns = @JoinColumn(name="icd9_id"))
 	private Set<Icd9> icd9Triggers = new HashSet<>();
 
+	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime createdAt;
+
+	@Column(name = "created_by")
+	private String createdBy;
+
+	@Column(name = "updated_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime updatedAt;
+
+	@Column(name = "updated_by")
+	private String updatedBy;
+
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime deletedAt;
 
@@ -96,4 +110,31 @@ public class Flowsheet extends AbstractModel<Integer>
 	{
 		return id;
 	}
+
+	@PrePersist
+	private void prePersist()
+	{
+		this.setCreatedAt(LocalDateTime.now());
+		this.setUpdatedAt(LocalDateTime.now());
+
+		if(getCreatedBy() == null)
+		{
+			throw new IllegalStateException("CreatedBy can not be null");
+		}
+		if(getUpdatedBy() == null)
+		{
+			setUpdatedBy(getCreatedBy());
+		}
+	}
+
+	@PreUpdate
+	private void preUpdate()
+	{
+		this.setUpdatedAt(LocalDateTime.now());
+		if(getUpdatedBy() == null)
+		{
+			throw new IllegalStateException("UpdatedBy can not be null");
+		}
+	}
+
 }

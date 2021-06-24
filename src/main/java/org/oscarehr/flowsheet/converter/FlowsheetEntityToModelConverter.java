@@ -30,7 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,7 +60,7 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 		{
 			FlowsheetItemGroup groupModel = new FlowsheetItemGroup();
 			groupModel.setId(group.getId());
-			groupModel.setName(group.getDescription());
+			groupModel.setName(group.getName());
 			groupModel.setDescription(group.getDescription());
 			groupModel.setFlowsheetItems(flowsheetItemEntityToModelConverter.convert(group.getFlowsheetItems()));
 			groups.add(groupModel);
@@ -71,8 +71,10 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 		{
 			if(item.getFlowsheetItemGroup() == null)
 			{
+				List<org.oscarehr.flowsheet.model.FlowsheetItem> items = new ArrayList<>(1);
+				items.add(flowsheetItemEntityToModelConverter.convert(item));
 				FlowsheetItemGroup groupModel = new FlowsheetItemGroup();
-				groupModel.setFlowsheetItems(Arrays.asList(flowsheetItemEntityToModelConverter.convert(item)));
+				groupModel.setFlowsheetItems(items);
 				groups.add(groupModel);
 			}
 		}

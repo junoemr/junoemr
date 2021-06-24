@@ -35,7 +35,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -60,4 +63,53 @@ public class FlowsheetItemGroup extends AbstractModel<Integer>
 
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "flowsheetItemGroup", cascade = CascadeType.ALL)
 	private List<FlowsheetItem> flowsheetItems;
+
+	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime createdAt;
+
+	@Column(name = "created_by")
+	private String createdBy;
+
+	@Column(name = "updated_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime updatedAt;
+
+	@Column(name = "updated_by")
+	private String updatedBy;
+
+	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime deletedAt;
+
+	@Column(name = "deleted_by")
+	private String deletedBy;
+
+	public void addItem(FlowsheetItem flowsheetItem)
+	{
+		this.flowsheetItems.add(flowsheetItem);
+	}
+
+	@PrePersist
+	private void prePersist()
+	{
+		this.setCreatedAt(LocalDateTime.now());
+		this.setUpdatedAt(LocalDateTime.now());
+
+		if(getCreatedBy() == null)
+		{
+			setCreatedBy(getFlowsheet().getCreatedBy());
+		}
+		if(getUpdatedBy() == null)
+		{
+			setUpdatedBy(getCreatedBy());
+		}
+	}
+
+	@PreUpdate
+	private void preUpdate()
+	{
+		this.setUpdatedAt(LocalDateTime.now());
+		if(getUpdatedBy() == null)
+		{
+			setUpdatedBy(getFlowsheet().getUpdatedBy());
+		}
+	}
 }

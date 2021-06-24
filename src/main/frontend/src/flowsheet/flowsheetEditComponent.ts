@@ -27,6 +27,7 @@ import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
 import {ItemType} from "../lib/flowsheet/FlowsheetConstants";
 import FlowsheetItemModel from "../lib/flowsheet/model/FlowsheetItemModel";
 import {FlowsheetItem} from "../../generated";
+import FlowsheetItemGroupModel from "../lib/flowsheet/model/FlowsheetItemGroupModel";
 
 angular.module('Flowsheet').component('flowsheetEdit',
 	{
@@ -88,10 +89,8 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 					if(groupName)
 					{
-						const newGroup = {
-							name: groupName,
-							description: null,
-						}
+						const newGroup = new FlowsheetItemGroupModel();
+						newGroup.name = groupName;
 						ctrl.flowsheet.flowsheetItemGroups.push(newGroup);
 					}
 				}
@@ -165,6 +164,8 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}).catch((reason) =>
 					{
 						// cancelled modal
+						// @ts-ignore
+						console.warn(reason);
 					});
 				}
 

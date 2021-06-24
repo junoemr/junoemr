@@ -39,7 +39,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -82,11 +85,29 @@ public class FlowsheetItem extends AbstractModel<Integer>
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "flowsheet_item_group_id")
-	private Flowsheet flowsheetItemGroup;
+	private FlowsheetItemGroup flowsheetItemGroup;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_item_ds_rule", joinColumns = @JoinColumn(name="flowsheet_item_id"), inverseJoinColumns = @JoinColumn(name="ds_rule_id"))
 	private Set<DsRule> dsRules = new HashSet<>();
+
+	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime createdAt;
+
+	@Column(name = "created_by")
+	private String createdBy;
+
+	@Column(name = "updated_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime updatedAt;
+
+	@Column(name = "updated_by")
+	private String updatedBy;
+
+	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
+	private LocalDateTime deletedAt;
+
+	@Column(name = "deleted_by")
+	private String deletedBy;
 
 	/**
 	 * must be overridden to prevent default impl from infinite loading jpa links
@@ -104,5 +125,31 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	public boolean isPreventionType()
 	{
 		return ItemType.PREVENTION.equals(this.type);
+	}
+
+	@PrePersist
+	private void prePersist()
+	{
+		this.setCreatedAt(LocalDateTime.now());
+		this.setUpdatedAt(LocalDateTime.now());
+
+		if(getCreatedBy() == null)
+		{
+			setCreatedBy(getFlowsheet().getCreatedBy());
+		}
+		if(getUpdatedBy() == null)
+		{
+			setUpdatedBy(getCreatedBy());
+		}
+	}
+
+	@PreUpdate
+	private void preUpdate()
+	{
+		this.setUpdatedAt(LocalDateTime.now());
+		if(getUpdatedBy() == null)
+		{
+			setUpdatedBy(getFlowsheet().getUpdatedBy());
+		}
 	}
 }

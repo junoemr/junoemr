@@ -22,23 +22,39 @@
  */
 package org.oscarehr.flowsheet.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.oscarehr.flowsheet.entity.ItemType;
+import org.oscarehr.flowsheet.entity.ValueType;
 
 @Data
-public class FlowsheetInboundTransfer extends AbstractTransientModel
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class FlowsheetItemCreateUpdateTransfer extends AbstractTransientModel
 {
+	private Integer id;
 	private String name;
 	private String description;
-	private boolean enabled;
-	private List<FlowsheetItemGroup> flowsheetItemGroups;
+	private String guideline;
 
-	public FlowsheetInboundTransfer()
+	private ItemType type;
+	private String typeCode;
+	private boolean hidden;
+
+	private ValueType valueType;
+	private String valueLabel;
+
+	public FlowsheetItemCreateUpdateTransfer()
 	{
-		flowsheetItemGroups = new ArrayList<>();
+	}
+
+	public boolean isMeasurementType()
+	{
+		return ItemType.MEASUREMENT.equals(this.type);
+	}
+
+	public boolean isPreventionType()
+	{
+		return ItemType.PREVENTION.equals(this.type);
 	}
 }

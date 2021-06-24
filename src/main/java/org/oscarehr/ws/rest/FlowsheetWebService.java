@@ -25,7 +25,8 @@ package org.oscarehr.ws.rest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.service.FlowsheetService;
-import org.oscarehr.flowsheet.transfer.FlowsheetInboundTransfer;
+import org.oscarehr.flowsheet.transfer.FlowsheetCreateTransfer;
+import org.oscarehr.flowsheet.transfer.FlowsheetUpdateTransfer;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +56,10 @@ public class FlowsheetWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/")
-	public RestResponse<Flowsheet> createFlowsheet(FlowsheetInboundTransfer flowsheet)
+	public RestResponse<Flowsheet> createFlowsheet(FlowsheetCreateTransfer flowsheet)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_CREATE);
-		return RestResponse.successResponse(flowsheetService.addNewFlowsheet(flowsheet));
+		return RestResponse.successResponse(flowsheetService.addNewFlowsheet(getLoggedInProviderId(), flowsheet));
 	}
 
 	@GET
@@ -71,10 +72,10 @@ public class FlowsheetWebService extends AbstractServiceImpl
 
 	@PUT
 	@Path("/{id}")
-	public RestResponse<Flowsheet> updateFlowsheet(@PathParam("id") Integer flowsheetId, FlowsheetInboundTransfer flowsheet)
+	public RestResponse<Flowsheet> updateFlowsheet(@PathParam("id") Integer flowsheetId, FlowsheetUpdateTransfer flowsheet)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_UPDATE);
-		return RestResponse.successResponse(flowsheetService.updateFlowsheet(flowsheetId, flowsheet));
+		return RestResponse.successResponse(flowsheetService.updateFlowsheet(getLoggedInProviderId(), flowsheetId, flowsheet));
 	}
 
 	@PATCH
@@ -82,7 +83,7 @@ public class FlowsheetWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> setFlowsheetEnabledState(@PathParam("id") Integer flowsheetId, @QueryParam("state") boolean enabled)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_UPDATE);
-		return RestResponse.successResponse(flowsheetService.setFlowsheetEnabled(flowsheetId, enabled));
+		return RestResponse.successResponse(flowsheetService.setFlowsheetEnabled(getLoggedInProviderId(), flowsheetId, enabled));
 	}
 
 	@DELETE

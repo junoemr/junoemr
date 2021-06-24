@@ -40,6 +40,7 @@ export default class FlowsheetModelToTransferConverter
 		}
 
 		return {
+			id: flowsheetModel.id,
 			name: flowsheetModel.name,
 			description: flowsheetModel.description,
 			enabled: flowsheetModel.enabled,

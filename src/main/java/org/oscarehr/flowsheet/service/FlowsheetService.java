@@ -24,9 +24,11 @@ package org.oscarehr.flowsheet.service;
 
 
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
+import org.oscarehr.flowsheet.converter.FlowsheetTransferToEntityConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.model.Flowsheet;
-import org.oscarehr.flowsheet.transfer.FlowsheetInboundTransfer;
+import org.oscarehr.flowsheet.transfer.FlowsheetCreateTransfer;
+import org.oscarehr.flowsheet.transfer.FlowsheetUpdateTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,19 +47,28 @@ public class FlowsheetService
 	@Autowired
 	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
 
+	@Autowired
+	private FlowsheetTransferToEntityConverter flowsheetTransferToEntityConverter;
+
 	public List<Flowsheet> getFlowsheets(int offset, int perPage)
 	{
 		return flowsheetEntityToModelConverter.convert(flowsheetDao.findAll(offset, perPage));
 	}
 
-	public Flowsheet addNewFlowsheet(FlowsheetInboundTransfer flowsheetTransfer)
+	public Flowsheet addNewFlowsheet(String creatingProviderId, FlowsheetCreateTransfer creationTransfer)
 	{
-		return null; //TODO
+		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetTransferToEntityConverter.convert(creationTransfer);
+		entity.setCreatedBy(creatingProviderId);
+		flowsheetDao.persist(entity);
+		return flowsheetEntityToModelConverter.convert(entity);
 	}
 
-	public Flowsheet updateFlowsheet(Integer flowsheetId, FlowsheetInboundTransfer flowsheetTransfer)
+	public Flowsheet updateFlowsheet(String updatingProviderId, Integer flowsheetId, FlowsheetUpdateTransfer updateTransfer)
 	{
-		return flowsheetEntityToModelConverter.convert(flowsheetDao.find(flowsheetId)); //TODO
+		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetTransferToEntityConverter.convert(updateTransfer);
+		entity.setUpdatedBy(updatingProviderId);
+		flowsheetDao.merge(entity);
+		return flowsheetEntityToModelConverter.convert(entity);
 	}
 
 	public Flowsheet getFlowsheet(Integer flowsheetId)
@@ -70,13 +81,27 @@ public class FlowsheetService
 		org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity = flowsheetDao.find(flowsheetId);
 		flowsheetEntity.setDeletedAt(LocalDateTime.now());
 		flowsheetEntity.setDeletedBy(deletingProviderId);
+		flowsheetEntity.setUpdatedBy(deletingProviderId);
+
+		flowsheetEntity.getFlowsheetItemGroups().forEach((group) ->
+		{
+			group.setDeletedAt(LocalDateTime.now());
+			group.setDeletedBy(deletingProviderId);
+		});
+		flowsheetEntity.getFlowsheetItems().forEach((item) ->
+		{
+			item.setDeletedAt(LocalDateTime.now());
+			item.setDeletedBy(deletingProviderId);
+		});
+
 		flowsheetDao.merge(flowsheetEntity);
 	}
 
-	public boolean setFlowsheetEnabled(Integer flowsheetId, boolean enabled)
+	public boolean setFlowsheetEnabled(String updatingProviderId, Integer flowsheetId, boolean enabled)
 	{
 		org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity = flowsheetDao.find(flowsheetId);
 		flowsheetEntity.setEnabled(enabled);
+		flowsheetEntity.setUpdatedBy(updatingProviderId);
 		flowsheetDao.merge(flowsheetEntity);
 		return flowsheetEntity.isEnabled();
 	}
