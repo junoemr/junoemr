@@ -670,14 +670,24 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalComplete = function isPostalComplete()
+		controller.isPostalComplete = function isPostalComplete(whichAddress)
 		{
-			var province = controller.page.demo.address.province;
-			var postal = controller.page.demo.address.postal;
+			var address;
+			if (whichAddress == 1)
+			{
+				address = controller.page.demo.address;
+			}
+			if (whichAddress == 2)
+			{
+				address = controller.page.demo.address2;
+			}
+			var province= address.province;
+			var postal = address.postal;
+
 			// If Canadian province is selected, proceed with validation
 			if (postal !== null && province !== null && province !== "OT" && province.indexOf("US") !== 0)
 			{
-				if (controller.isPostalValid())
+				if (controller.isPostalValid(whichAddress))
 				{
 					return true;
 				}
@@ -689,10 +699,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalValid = function isPostalValid()
+		controller.isPostalValid = function isPostalValid(whichAddress)
 		{
-			var postal = controller.page.demo.address.postal.replace(/\s/g, ""); // Trim whitespace
 
+			var address;
+			if (whichAddress == 1)
+			{
+				address = controller.page.demo.address;
+			}
+			if (whichAddress == 2)
+			{
+				address = controller.page.demo.address2;
+			}
+			var postal = address.postal.replace(/\s/g, ""); // Trim whitespace
 			// If postal code is an empty string, set it to null and continue
 			if(postal.length === 0)
 			{
@@ -1111,7 +1130,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				return;
 			}
 			if (!controller.checkPatientStatus()) return;
-			if (!controller.isPostalComplete()) return;
+			if (!controller.isPostalComplete(1)) return;
+			if (!controller.isPostalComplete(2)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 

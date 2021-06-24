@@ -58,6 +58,9 @@ import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
+import org.oscarehr.ws.rest.to.model.AddressTo1;
+import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
+import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -67,6 +70,7 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -115,6 +119,12 @@ public class DemographicManager {
 			"or semicolons are allowed.";
 	public static final String FIELD_UNSAFE = "No html tags and no quotes, line breaks " +
 			"or semicolons are allowed.";
+
+	public static final String ADDRESS = "address";
+	public static final String CITY = "city";
+	public static final String POSTAL = "postal";
+	public static final String PROVINCE = "province";
+
 	//endregion
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -1268,5 +1278,66 @@ public class DemographicManager {
 			MiscUtils.getLogger().warn("Looked up HIN=" + healthNumber + " and got " + demographics.size() + " result(s), expected 1");
 		}
 		return null;
+	}
+
+	public AddressTo1 getExtraAddress(DemographicTo1 demographic)
+	{
+		List<DemographicExtTo1> extrasList = demographic.getExtras();
+			AddressTo1 extraAddress = new AddressTo1();
+
+			for (DemographicExtTo1 extra: extrasList)
+			{
+				String key = extra.getKey();
+				String value = extra.getValue();
+				switch (key)
+				{
+					case ADDRESS:
+						extraAddress.setAddress(value);
+						break;
+					case CITY:
+						extraAddress.setCity(value);
+						break;
+					case POSTAL:
+						extraAddress.setPostal(value);
+						break;
+					case PROVINCE:
+						extraAddress.setProvince(value);
+				}
+			}
+			return extraAddress;
+	}
+
+	public List<DemographicExtTo1> setExtraAddress(DemographicTo1 demographic)
+	{
+		List<DemographicExtTo1> extrasList = new ArrayList<>();
+
+		DemographicExtTo1 extraAddress = new DemographicExtTo1();
+		extraAddress.setDemographicNo(demographic.getDemographicNo());
+		extraAddress.setKey(ADDRESS);
+		extraAddress.setValue(demographic.getAddress2().getAddress());
+		extraAddress.setDateCreated(new Date());
+		extrasList.add(extraAddress);
+
+		DemographicExtTo1 extraCity = new DemographicExtTo1();
+		extraCity.setDemographicNo(demographic.getDemographicNo());
+		extraCity.setKey(CITY);
+		extraCity.setValue(demographic.getAddress2().getCity());
+		extraCity.setDateCreated(new Date());
+		extrasList.add(extraCity);
+
+		DemographicExtTo1 extraPostal = new DemographicExtTo1();
+		extraPostal.setDemographicNo(demographic.getDemographicNo());
+		extraPostal.setKey(POSTAL);
+		extraPostal.setValue(demographic.getAddress2().getPostal());
+		extraPostal.setDateCreated(new Date());
+		extrasList.add(extraPostal);
+
+		DemographicExtTo1 extraProvince = new DemographicExtTo1();
+		extraProvince.setDemographicNo(demographic.getDemographicNo());
+		extraProvince.setKey(PROVINCE);
+		extraProvince.setValue(demographic.getAddress2().getProvince());
+		extraProvince.setDateCreated(new Date());
+		extrasList.add(extraProvince);
+		return extrasList;
 	}
 }

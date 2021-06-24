@@ -55,6 +55,19 @@
 							component-style="$ctrl.componentStyle">
 			</juno-input>
 
+			<juno-input ng-model="$ctrl.ngModel.address2.address"
+							label="Address 2"
+							placeholder="Enter patient street address"
+							component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-select ng-model="$ctrl.ngModel.address2.province"
+							placeholder="Select province"
+							options="$ctrl.provinces"
+							label="Province 2"
+							component-style="$ctrl.componentStyle">
+			</juno-select>
+
 		</div>
 
 		<div class="divider"></div>
@@ -124,6 +137,18 @@
 					{{$ctrl.getElectronicMessagingConsentStatusText()}}
 				</span>
 			</div>
+
+			<juno-input ng-model="$ctrl.ngModel.address2.city"
+							label="City 2"
+							placeholder="Enter city here"
+							component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input ng-model="$ctrl.ngModel.address2.postal"
+							label="Postal code 2"
+							placeholder="Enter postal code"
+							component-style="$ctrl.componentStyle">
+			</juno-input>
 		</div>
 	</div>
 </div>
