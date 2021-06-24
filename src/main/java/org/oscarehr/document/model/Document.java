@@ -43,6 +43,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -53,8 +54,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.provider.model.ProviderData;
 
 /**
@@ -160,7 +164,17 @@ public class Document extends AbstractModel<Integer> implements Serializable {
 
     @Column(name = "encoding_error")
     private Boolean encodingError = false;
-    
+
+		@ManyToOne(fetch = FetchType.LAZY)
+		@JoinTable(
+				name="ctl_document",
+				joinColumns = @JoinColumn(name="document_no"),
+				inverseJoinColumns = @JoinColumn(name="module_id")
+		)
+		@Getter
+		@Setter
+		private Demographic demographic;
+
     public Document() {
     }
 
@@ -228,7 +242,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     {
     	return this.createdBy;
     }
-    
+
     public Date getContentdatetime() {
         return contentdatetime;
     }

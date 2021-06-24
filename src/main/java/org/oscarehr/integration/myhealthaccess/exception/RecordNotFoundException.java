@@ -23,13 +23,8 @@
 
 package org.oscarehr.integration.myhealthaccess.exception;
 
-public class RecordNotFoundException extends IllegalArgumentException
+public class RecordNotFoundException extends BaseException
 {
-	public RecordNotFoundException()
-	{
-		super();
-	}
-
 	public RecordNotFoundException(String s)
 	{
 		super(s);

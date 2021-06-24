@@ -1,0 +1,37 @@
+.inbox-header-bar {
+	height: 56px;
+
+	background-color: var(--color-neutral-lightest);
+	border: solid 1px var(--color-neutral-light-grey);
+
+	.search-input {
+		width: 344px;
+		min-width: 128px;
+	}
+
+	.header-button {
+		flex-grow: 0;
+
+		.icon {
+			margin: 8px;
+			font-size: 16px;
+		}
+	}
+
+	@media only screen and (max-width: 800px) {
+		flex-wrap: wrap;
+		height: auto;
+
+		.right-buttons {
+			justify-content: flex-start;
+		}
+
+		.search-input {
+			width: 256px;
+		}
+
+		.inbox-title {
+			width: auto;
+		}
+	}
+}

@@ -40,9 +40,13 @@ import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("myHealthPatientService")
 public class PatientService extends BaseService
@@ -56,10 +60,7 @@ public class PatientService extends BaseService
 
 	public boolean isPatientConfirmed(Integer demographicNo, Integration integration)
 	{
-		return isPatientConfirmed(
-				demographicNo,
-				integration,
-				Arrays.asList(MHAPatient.LINK_STATUS.CONFIRMED, MHAPatient.LINK_STATUS.VERIFIED));
+		return isPatientConfirmed(demographicNo, integration, Arrays.asList(MHAPatient.LINK_STATUS.CONFIRMED, MHAPatient.LINK_STATUS.VERIFIED));
 	}
 
 	/**
@@ -146,6 +147,44 @@ public class PatientService extends BaseService
 	}
 
 	/**
+	 * search MHA patients connected to the integration by keyword
+	 * @param integration - the integration to search
+	 * @param keyword - the keyword to search by. matches first_name OR last_name OR email. MUST be 3 + characters.
+	 * @return list of MHA patients.
+	 * @throws IllegalArgumentException - if the provided keyword is less than 3 characters long
+	 */
+	public List<MHAPatient> searchPatientsByKeyword(Integration integration, String keyword)
+	{
+		if (keyword == null || keyword.length() < 3)
+		{
+			throw new IllegalArgumentException("Keyword must be at least 3 characters long");
+		}
+
+		try
+		{
+			RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+			MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+			queryParams.add("search_by", "keyword");
+			queryParams.add("keyword", keyword);
+
+			String url = restClient.formatEndpointFull("/clinic/%s/patients", Arrays.asList(integration.getRemoteId()), queryParams);
+			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
+
+			if (response.isSuccess())
+			{
+				return response.getPatientTo1s().stream().map(MHAPatient::new).collect(Collectors.toList());
+			}
+		}
+		catch (InvalidIntegrationException e)
+		{
+			logInvalidIntegrationWarn(e);
+		}
+
+		return new ArrayList<>();
+	}
+
+	/**
 	 * get a confirmed MHA patient by demographic number
 	 * @param integration - the integration to search
 	 * @param demographicNo - the demographic number to look up.
@@ -183,6 +222,23 @@ public class PatientService extends BaseService
 	}
 
 	/**
+	 * get at remote patient from MHA by remote id
+	 * @param integration - the integration to fetch the patient from
+	 * @param remotePatientId - the remote patient id to fetch
+	 * @return - the remote patient
+	 * @throws RecordNotFoundException - if no patient exits with the provided id.
+	 * @throws InvalidAccessException - if you do not have access to the requested patient record.
+	 */
+	public MHAPatient getRemotePatient(Integration integration, String remotePatientId)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		String url = restClient.formatEndpoint("/clinic/%s/patient/%s/", integration.getRemoteId(), remotePatientId);
+
+		return (new MHAPatient(restClient.doGet(url, PatientTo1.class)));
+	}
+
+	/**
 	 * get a remote MHA patient
 	 * @param demographic - the demographic who's remote MHA patient will be fetched
 	 * @return - the remote MHA patient.
@@ -217,9 +273,7 @@ public class PatientService extends BaseService
 			// lookup MHA patient
 			MHAPatient patient = null;
 			// we must consider CLINIC_REJECTED as confirmed to deal with edge case around un_rejecting confirmed patient who's HIN does not match in MHA.
-			if (isPatientConfirmed(
-					demographic.getId(),
-					integration,
+			if (isPatientConfirmed(demographic.getId(), integration,
 					Arrays.asList(MHAPatient.LINK_STATUS.CONFIRMED, MHAPatient.LINK_STATUS.VERIFIED, MHAPatient.LINK_STATUS.CLINIC_REJECTED)))
 			{
 				patient = getConfirmedPatientByDemographicNo(integration, demographic.getId());

@@ -24,6 +24,10 @@
 package org.oscarehr.integration.myhealthaccess.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
 
 public class PatientSingleSearchResponseTo1
 {
@@ -31,11 +35,15 @@ public class PatientSingleSearchResponseTo1
 	{
 		SUCCESS,
 		NOT_FOUND,
-		NON_UNIQUE
+		NOT_UNIQUE
 	}
 
 	@JsonProperty("patient")
 	private PatientTo1 patientTo1;
+	@JsonProperty("patients")
+	@Getter
+	@Setter
+	private List<PatientTo1> patientTo1s;
 	private STATUS_CODE status;
 
 	public boolean isSuccess()
@@ -50,7 +58,13 @@ public class PatientSingleSearchResponseTo1
 
 	public boolean isNotUnique()
 	{
-		return status == STATUS_CODE.NON_UNIQUE;
+		return status == STATUS_CODE.NOT_UNIQUE;
+	}
+
+	// true if this transfer contains a list of patients
+	public boolean hasPatientListResult()
+	{
+		return this.patientTo1s != null;
 	}
 
 	public PatientTo1 getPatientTo1()

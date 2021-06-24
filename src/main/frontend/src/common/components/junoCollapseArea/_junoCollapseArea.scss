@@ -1,0 +1,12 @@
+.juno-collapse-area {
+	--label-left-indent: 0px;
+
+	.header {
+		margin-left: var(--label-left-indent);
+		cursor: pointer;
+	}
+
+	.icon {
+		font-size: 16px;
+	}
+}

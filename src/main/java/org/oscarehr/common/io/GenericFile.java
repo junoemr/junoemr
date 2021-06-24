@@ -52,6 +52,8 @@ import java.util.Set;
 
 public class GenericFile
 {
+	public static final String FILE_TIMESTAMP_PATTERN = "yyyyMMddHHmmss";
+
 	protected static final Logger logger = MiscUtils.getLogger();
 	protected static final OscarProperties props = oscar.OscarProperties.getInstance();
 
@@ -399,9 +401,15 @@ public class GenericFile
 	{
 		return StringUtils.trimToEmpty(originalName).replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
 	}
+
+	/**
+	 * get a document file name with the current datetime pre-pended
+	 * @param originalName - original file name
+	 * @return - new file name with a datetime added to the front.
+	 */
 	public static String getFormattedFileName(String originalName)
 	{
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILE_TIMESTAMP_PATTERN);
 		LocalDateTime now = LocalDateTime.now();
 
 		return formatter.format(now) + getSanitizedFileName(originalName);
