@@ -370,12 +370,12 @@ public class DemographicManager {
 		Date previousStatusDate = previousDemographic.getPatientStatusDate();
 		String currentStatus = demographic.getPatientStatus();
 		Date currentStatusDate = demographic.getPatientStatusDate();
-
+		
 		if (previousStatusDate == null || !currentStatus.equals(previousStatus))
 		{
 			demographic.setPatientStatusDate(new Date());
 		}
-		else if (previousStatusDate.compareTo(currentStatusDate) != 0)
+		else if (!previousStatusDate.equals(currentStatusDate))
 		{
 			demographic.setPatientStatusDate(currentStatusDate);
 		}
