@@ -23,6 +23,7 @@
 package org.oscarehr.flowsheet.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.decisionSupport2.dao.DsRuleDao;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.dao.FlowsheetItemDao;
 import org.oscarehr.flowsheet.entity.Flowsheet;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<FlowsheetCreateTransfer, Flowsheet>
@@ -48,6 +50,9 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 
 	@Autowired
 	private FlowsheetItemDao flowsheetItemDao;
+
+	@Autowired
+	private DsRuleDao dsRuleDao;
 
 	@Override
 	public Flowsheet convert(FlowsheetCreateTransfer input)
@@ -123,6 +128,7 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 			item.setFlowsheetItemGroup(groupEntity);
 		}
 		BeanUtils.copyProperties(itemInput, item, "id");
+		item.setDsRules(itemInput.getRules().stream().map((rule) -> dsRuleDao.find(rule.getId())).collect(Collectors.toSet()));
 
 		return item;
 	}

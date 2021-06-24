@@ -23,18 +23,19 @@
 
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import {ValueType} from "../../lib/flowsheet/FlowsheetConstants";
 
-angular.module('Flowsheet').component('flowsheetEditItem',
+angular.module('Flowsheet').component('flowsheetItemRule',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetEditItem.jsp',
+		templateUrl: 'src/flowsheet/components/flowsheetItemRule.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
 		},
 		controller: [
-			'$uibModal',
-			function ($uibModal)
+			'flowsheetApiService',
+			function (
+				flowsheetApiService,
+			)
 			{
 				const ctrl = this;
 
@@ -43,36 +44,11 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.valueTypeOptions = [
-					{label: "Text", value: ValueType.STRING},
-					{label: "Numeric", value: ValueType.NUMERIC},
-					{label: "Checkbox", value: ValueType.BOOLEAN},
-				];
-
 				ctrl.isLoading = true;
+
 				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.isLoading = false;
-				}
-
-				ctrl.addNewRule = () =>
-				{
-					$uibModal.open(
-						{
-							component: 'dsRuleEditModal',
-							backdrop: 'static',
-							windowClass: "juno-modal",
-							resolve: {
-							}
-						}
-					).result.then((response) =>
-					{
-						ctrl.model.rules.push(response);
-
-					}).catch((reason) =>
-					{
-						// do nothing on cancel
-					});
 				}
 			}]
 	});

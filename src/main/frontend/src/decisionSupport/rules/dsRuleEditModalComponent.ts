@@ -25,12 +25,12 @@ import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
 import {ValueType} from "../../lib/flowsheet/FlowsheetConstants";
 
-angular.module('Flowsheet').component('flowsheetEditItem',
+angular.module('DecisionSupport').component('dsRuleEditModal',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetEditItem.jsp',
+		templateUrl: 'src/decisionSupport/rules/dsRuleEditModal.jsp',
 		bindings: {
-			componentStyle: "<?",
-			model: "<",
+			modalInstance: "<",
+			resolve: "<",
 		},
 		controller: [
 			'$uibModal',
@@ -43,36 +43,17 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.valueTypeOptions = [
-					{label: "Text", value: ValueType.STRING},
-					{label: "Numeric", value: ValueType.NUMERIC},
-					{label: "Checkbox", value: ValueType.BOOLEAN},
-				];
-
 				ctrl.isLoading = true;
+
 				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.isLoading = false;
 				}
 
-				ctrl.addNewRule = () =>
+				ctrl.onCancel = () =>
 				{
-					$uibModal.open(
-						{
-							component: 'dsRuleEditModal',
-							backdrop: 'static',
-							windowClass: "juno-modal",
-							resolve: {
-							}
-						}
-					).result.then((response) =>
-					{
-						ctrl.model.rules.push(response);
-
-					}).catch((reason) =>
-					{
-						// do nothing on cancel
-					});
+					ctrl.modalInstance.dismiss("cancelled");
 				}
+
 			}]
 	});

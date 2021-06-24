@@ -20,29 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.flowsheet.converter;
+package org.oscarehr.decisionSupport2.dao;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
-import org.oscarehr.flowsheet.model.FlowsheetItem;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.decisionSupport2.entity.DsRule;
+import org.springframework.stereotype.Repository;
 
-@Component
-public class FlowsheetItemEntityToModelConverter extends AbstractModelConverter<org.oscarehr.flowsheet.entity.FlowsheetItem, FlowsheetItem>
+@Repository
+public class DsRuleDao extends AbstractDao<DsRule>
 {
-	@Autowired
-	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
-
-	@Override
-	public FlowsheetItem convert(org.oscarehr.flowsheet.entity.FlowsheetItem input)
+	protected DsRuleDao()
 	{
-		FlowsheetItem flowsheetItemModel = new FlowsheetItem();
-		BeanUtils.copyProperties(input, flowsheetItemModel, "flowsheetItemGroup", "dsRules");
-
-		flowsheetItemModel.setRules(dsRuleDbToModelConverter.convert(input.getDsRules()));
-
-		return flowsheetItemModel;
+		super(DsRule.class);
 	}
 }

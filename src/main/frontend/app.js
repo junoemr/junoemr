@@ -43,6 +43,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngTable',
 	'ngStorage',
 	'Common',
+	'DecisionSupport',
 	'Flowsheet',
 	'Layout',
 	'Tickler',

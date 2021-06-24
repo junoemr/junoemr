@@ -25,6 +25,7 @@ package org.oscarehr.flowsheet.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.decisionSupport2.model.DsRule;
 import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.entity.ValueType;
 
@@ -46,11 +47,13 @@ public class FlowsheetItem extends AbstractTransientModel
 
 	private ValueType valueType;
 	private String valueLabel;
+	private List<DsRule> rules;
 	private List<FlowsheetItemAlert> flowsheetItemAlerts;
 	private List<FlowsheetItemData> data;
 
 	public FlowsheetItem()
 	{
+		rules = new ArrayList<>();
 		flowsheetItemAlerts = new ArrayList<>();
 		data = new ArrayList<>();
 	}

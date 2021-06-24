@@ -26,4 +26,20 @@
 			</div>
 		</div>
 	</div>
+	<div class="flex-column">
+		<flowsheet-item-rule ng-repeat="rule in $ctrl.model.rules" model="rule">
+		</flowsheet-item-rule>
+	</div>
+	<div class="flex-row flex-grow">
+		<div class="add-button-wrapper">
+			<juno-button component-style="$ctrl.componentStyle"
+			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+			             disabled="$ctrl.isLoading"
+			             click="$ctrl.addNewRule()">
+				<i class="icon icon-add"></i>
+				<span>Add Rule</span>
+			</juno-button>
+		</div>
+	</div>
 </div>

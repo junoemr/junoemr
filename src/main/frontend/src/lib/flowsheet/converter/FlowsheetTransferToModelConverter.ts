@@ -85,6 +85,7 @@ export default class FlowsheetTransferToModelConverter
 			model.valueLabel = item.valueLabel;
 			model.flowsheetItemAlerts = item.flowsheetItemAlerts;
 			model.data = item.data;
+			model.rules = item.rules;
 
 			return model;
 		});

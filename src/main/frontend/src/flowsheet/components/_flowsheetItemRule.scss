@@ -1,0 +1,11 @@
+.flowsheet-item-rule {
+	margin: 4px 0;
+	border: 1px solid var(--color-neutral-light);
+	border-radius: 4px;
+	padding: 4px;
+	background-color: var(--color-neutral-lighter);
+
+	.row-padding {
+		padding: 0 2px;
+	}
+}
