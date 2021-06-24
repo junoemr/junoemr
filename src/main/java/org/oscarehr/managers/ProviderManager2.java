@@ -661,6 +661,11 @@ public class ProviderManager2
 			settings.setAppointmentCountIncludeNoDemographic("true".equals(map.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue()));
 		}
 
+		if (map.get(UserProperty.CARECONNECT_PPN_CHECK) != null)
+		{
+			settings.setEnableCareConnectPPNCheck(ConversionUtils.fromBoolString(map.get(UserProperty.CARECONNECT_PPN_CHECK).getValue()));
+		}
+
 
 		settings.setNewTicklerWarningWindow(pp.getNewTicklerWarningWindow());
 
