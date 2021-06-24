@@ -371,13 +371,10 @@ public class DemographicManager {
 		String currentStatus = demographic.getPatientStatus();
 		Date currentStatusDate = demographic.getPatientStatusDate();
 		
-		if (previousStatusDate == null || !currentStatus.equals(previousStatus))
+		// fill in a default patient status date if the status changes and no date is given
+		if (!currentStatus.equals(previousStatus) && currentStatusDate == null)
 		{
 			demographic.setPatientStatusDate(new Date());
-		}
-		else if (!previousStatusDate.equals(currentStatusDate))
-		{
-			demographic.setPatientStatusDate(currentStatusDate);
 		}
 
 		//save current demo
