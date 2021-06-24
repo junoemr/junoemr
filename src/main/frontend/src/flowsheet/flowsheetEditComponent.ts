@@ -141,23 +141,23 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					{
 						if(selection)
 						{
+							const data = selection.data;
 							let newItem = new FlowsheetItemModel();
 							if(isMeasurementType)
 							{
-								newItem.name = selection.name;
+								newItem.name = data.name;
 								newItem.type = FlowsheetItem.TypeEnum.MEASUREMENT;
-								newItem.typeCode = selection.code;
-								newItem.description = selection.description;
-								newItem.guideline = selection.instructions;
+								newItem.typeCode = data.code;
+								newItem.description = data.description;
+								newItem.guideline = data.instructions;
 								newItem.valueType = FlowsheetItem.ValueTypeEnum.STRING;
 							}
 							else
 							{
-								newItem.name = selection.name;
+								newItem.name = data.name;
 								newItem.type = FlowsheetItem.TypeEnum.PREVENTION;
-								newItem.typeCode = selection.code;
-								newItem.description = selection.description;
-								newItem.guideline = selection.instructions;
+								newItem.typeCode = data.code;
+								newItem.description = data.description;
 								newItem.valueType = FlowsheetItem.ValueTypeEnum.STRING;
 							}
 							itemGroup.flowsheetItems.push(newItem);
@@ -174,8 +174,9 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					return searchResults.body.map((result) =>
 					{
 						return {
-							label: result.name = "(" + result.code + ")",
-							value: result,
+							label: result.name,
+							value: result.code,
+							data: result,
 						}
 					});
 				}
@@ -186,8 +187,9 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					return searchResults.body.map((result) =>
 					{
 						return {
-							label: result.name,
-							value: result,
+							label: result.name + "(" + result.code + ")",
+							value: result.code,
+							data: result,
 						}
 					});
 				}

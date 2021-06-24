@@ -79,6 +79,11 @@ angular.module('Common.Components').component('junoInputModal',
 			}
 		}
 
+		ctrl.setTypeahedValue = (value) =>
+		{
+			this.typeaheadValue = value;
+		}
+
 		ctrl.onKeyDown = (event) =>
 		{
 			if (event.key === "Enter")
@@ -98,7 +103,14 @@ angular.module('Common.Components').component('junoInputModal',
 		{
 			if (Juno.Validations.allValidationsValid(ctrl.validations))
 			{
-				ctrl.modalInstance.close(ctrl.value);
+				if (ctrl.inputModalType === JUNO_INPUT_MODAL_TYPE.TYPEAHEAD)
+				{
+					ctrl.modalInstance.close(ctrl.typeaheadValue);
+				}
+				else
+				{
+					ctrl.modalInstance.close(ctrl.value);
+				}
 			}
 			ctrl.hasSubmitted = true;
 		}
