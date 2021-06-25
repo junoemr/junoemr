@@ -26,9 +26,6 @@ package org.oscarehr.demographic.model;
 
 import org.oscarehr.common.model.AbstractModel;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,6 +37,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import java.io.Serializable;
+import java.util.Date;
 
 import static oscar.util.StringUtils.filterControlCharacters;
 
@@ -50,6 +49,10 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	public static final String KEY_DEMO_CELL = "demo_cell";
 	public static final String KEY_DEMO_H_PHONE_EXT = "hPhoneExt";
 	public static final String KEY_DEMO_W_PHONE_EXT = "wPhoneExt";
+	public static final String ALTERNATE_ADDRESS = "address";
+	public static final String CITY = "city";
+	public static final String POSTAL = "postal";
+	public static final String PROVINCE = "province";
 
 	@Transient
     private int hashCode = Integer.MIN_VALUE;// primary key

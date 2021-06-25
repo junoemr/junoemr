@@ -120,11 +120,6 @@ public class DemographicManager {
 	public static final String FIELD_UNSAFE = "No html tags and no quotes, line breaks " +
 			"or semicolons are allowed.";
 
-	public static final String ALTERNATE_ADDRESS = "address";
-	public static final String CITY = "city";
-	public static final String POSTAL = "postal";
-	public static final String PROVINCE = "province";
-
 	//endregion
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -1291,16 +1286,16 @@ public class DemographicManager {
 				String value = extra.getValue();
 				switch (key)
 				{
-					case ALTERNATE_ADDRESS:
+					case DemographicExt.ALTERNATE_ADDRESS:
 						extraAddress.setAddress(value);
 						break;
-					case CITY:
+					case DemographicExt.CITY:
 						extraAddress.setCity(value);
 						break;
-					case POSTAL:
+					case DemographicExt.POSTAL:
 						extraAddress.setPostal(value);
 						break;
-					case PROVINCE:
+					case DemographicExt.PROVINCE:
 						extraAddress.setProvince(value);
 				}
 			}
@@ -1313,28 +1308,28 @@ public class DemographicManager {
 
 		DemographicExtTo1 extraAddress = new DemographicExtTo1();
 		extraAddress.setDemographicNo(demographic.getDemographicNo());
-		extraAddress.setKey(ALTERNATE_ADDRESS);
+		extraAddress.setKey(DemographicExt.ALTERNATE_ADDRESS);
 		extraAddress.setValue(demographic.getAddress2().getAddress());
 		extraAddress.setDateCreated(new Date());
 		extrasList.add(extraAddress);
 
 		DemographicExtTo1 extraCity = new DemographicExtTo1();
 		extraCity.setDemographicNo(demographic.getDemographicNo());
-		extraCity.setKey(CITY);
+		extraCity.setKey(DemographicExt.CITY);
 		extraCity.setValue(demographic.getAddress2().getCity());
 		extraCity.setDateCreated(new Date());
 		extrasList.add(extraCity);
 
 		DemographicExtTo1 extraPostal = new DemographicExtTo1();
 		extraPostal.setDemographicNo(demographic.getDemographicNo());
-		extraPostal.setKey(POSTAL);
+		extraPostal.setKey(DemographicExt.POSTAL);
 		extraPostal.setValue(demographic.getAddress2().getPostal());
 		extraPostal.setDateCreated(new Date());
 		extrasList.add(extraPostal);
 
 		DemographicExtTo1 extraProvince = new DemographicExtTo1();
 		extraProvince.setDemographicNo(demographic.getDemographicNo());
-		extraProvince.setKey(PROVINCE);
+		extraProvince.setKey(DemographicExt.PROVINCE);
 		extraProvince.setValue(demographic.getAddress2().getProvince());
 		extraProvince.setDateCreated(new Date());
 		extrasList.add(extraProvince);
