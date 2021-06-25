@@ -25,7 +25,10 @@
 			<div class="h-100">
 				<mha-patient-connection-details class="d-inline-block h-100 w-100"
 				                                profile="$ctrl.currentProfile"
-				                                integration="$ctrl.currentIntegration">
+				                                integration="$ctrl.currentIntegration"
+				                                demographic-no="$ctrl.demographic.demographicNo"
+				                                disabled="$ctrl.isLoadingProfile"
+				                                on-connection-updated="$ctrl.onConnectionStatusUpdated()">
 				</mha-patient-connection-details>
 			</div>
 		</div>

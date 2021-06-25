@@ -22,6 +22,8 @@
  */
 
 import {JUNO_BUTTON_COLOR_PATTERN} from "../../../../components/junoComponentConstants";
+import MhaPatientService from "../../../../../lib/integration/myhealthaccess/service/MhaPatientService";
+import MhaPatientAccessService from "../../../../../lib/integration/myhealthaccess/service/MhaPatientAccessService";
 
 angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatientConnectionDetails',
 	{
@@ -29,18 +31,33 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 		bindings: {
 			profile: "<", // Type MhaPatient
 			integration: "<", // Type MhaIntegration
+			demographicNo: "<",
+			disabled: "<?",
+			onConnectionUpdated: "&?",
 		},
 		controller: [
 			'$scope',
-			function ($scope)
+			'$uibModal',
+			function ($scope, $uibModal)
 			{
 				const ctrl = this;
-				const STATUS_DATE_FORMAT = "LL";
+				const patientService = new MhaPatientService();
+				const patientAccessService = new MhaPatientAccessService();
 
 				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				$scope.VERIFICATION_CODE_LENGTH = 6;
 
 				ctrl.patientAccess = null; // Type MhaPatientAccess
+
+				// verification
 				ctrl.verifying = false;
+				ctrl.verificationCode = "";
+				ctrl.verificationProfile = null; // Type MhaPatient
+
+				ctrl.$onInit = () =>
+				{
+					ctrl.disabled = ctrl.disabled || false;
+				}
 
 				ctrl.startVerification = () =>
 				{
@@ -56,11 +73,113 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 					return null;
 				}
 
+				ctrl.onCodeChange = async (code) =>
+				{
+					if (ctrl.integration && code && code.length >= $scope.VERIFICATION_CODE_LENGTH)
+					{
+						ctrl.verificationProfile = await patientService.getProfileByAccountIdCode(ctrl.integration.id, code);
+						$scope.$apply();
+					}
+				}
+
+				ctrl.stopVerifying = () =>
+				{
+					ctrl.verifying = false;
+					ctrl.verificationProfile = null;
+					ctrl.verificationCode = "";
+				}
+
+				ctrl.confirmVerification = async () =>
+				{
+					try
+					{
+						await patientAccessService.verifyPatientByAccountIdCode(
+							ctrl.integration.id,
+							ctrl.verificationProfile,
+							ctrl.demographicNo,
+							ctrl.verificationCode);
+
+						ctrl.notifyListenerOfConnectionUpdate();
+					}
+					catch(error)
+					{
+						console.error(error);
+
+						Juno.Common.Util.errorAlert(
+							$uibModal,
+							"Some Thing Went Wrong.",
+							"Patient verification failed. The code may have expired. Please try again. Please contact support if the problem persists.");
+					}
+				}
+
+				ctrl.cancelVerification = async () =>
+				{
+					try
+					{
+						await patientAccessService.cancelPatientVerification(ctrl.integration.id, ctrl.profile.id);
+						ctrl.notifyListenerOfConnectionUpdate();
+					}
+					catch(error)
+					{
+						console.error(error);
+
+						Juno.Common.Util.errorAlert(
+							$uibModal,
+							"Some Thing Went Wrong.",
+							"Could not cancel patient verification. Please contact support if the problem persists.");
+					}
+				}
+
+				ctrl.confirm = async () =>
+				{
+					try
+					{
+						await patientAccessService.confirmPatient(ctrl.integration.id, ctrl.profile.id, ctrl.demographicNo);
+						ctrl.notifyListenerOfConnectionUpdate();
+					}
+					catch(error)
+					{
+						console.error(error);
+
+						Juno.Common.Util.errorAlert(
+							$uibModal,
+							"Some Thing Went Wrong.",
+							"Could not confirm patient. Please contact support if the problem persists.");
+					}
+				}
+
+				ctrl.cancelConfirmation = async () =>
+				{
+					try
+					{
+						await patientAccessService.cancelPatientConfirmation(ctrl.integration.id, ctrl.profile.id);
+						ctrl.notifyListenerOfConnectionUpdate();
+					}
+					catch(error)
+					{
+						console.error(error);
+
+						Juno.Common.Util.errorAlert(
+							$uibModal,
+							"Some Thing Went Wrong.",
+							"Could not cancel the patients confirmation. Please contact support if the problem persists.");
+					}
+				}
+
+				ctrl.notifyListenerOfConnectionUpdate = () =>
+				{
+					if (ctrl.onConnectionUpdated)
+					{
+						ctrl.onConnectionUpdated({});
+					}
+				}
+
 				ctrl.loadPatientAccess = async () =>
 				{
 					if (ctrl.profile && ctrl.integration)
 					{
 						ctrl.patientAccess = await ctrl.profile.getPatientAccessRecord(ctrl.integration);
+						ctrl.stopVerifying();
 						$scope.$apply();
 					}
 				}

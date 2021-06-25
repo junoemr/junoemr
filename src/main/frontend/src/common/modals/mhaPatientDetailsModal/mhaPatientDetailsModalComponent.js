@@ -64,6 +64,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		$scope.JUNO_SIMPLE_MODAL_FILL_COLOR = JUNO_SIMPLE_MODAL_FILL_COLOR;
 		$scope.JUNO_TAB_TYPE = JUNO_TAB_TYPE;
 
+		ctrl.isLoadingProfile = false;
 		ctrl.currentProfile = null; // Type MhaPatient
 		ctrl.currentIntegration = null; // Type MhaIntegration
 		ctrl.integrationOptions = []; // Type MhaIntegration[]
@@ -84,8 +85,6 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				return {label: integration.siteName, value: integration};
 			});
 
-			// ctrl.integrationOptions = ctrl.integrationOptions.map((inter) => [inter, {label: inter.label, value: {...inter.value}}, {label: inter.label, value: {...inter.value}}, {label: inter.label, value: {...inter.value}}]).flat();
-
 			// default to first integration
 			if (ctrl.integrationOptions.length > 0)
 			{
@@ -95,12 +94,26 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			$scope.$apply();
 		}
 
+		ctrl.onConnectionStatusUpdated = async () =>
+		{
+			ctrl.connectionStatusChanged = true;
+			await ctrl.loadMhaProfile();
+		}
+
 		ctrl.loadMhaProfile = async () =>
 		{
 			if (ctrl.currentIntegration && ctrl.demographic)
 			{
-				ctrl.currentProfile = await mhaPatientService.profileForDemographic(ctrl.currentIntegration.id, ctrl.demographic.demographicNo);
-				$scope.$apply();
+				try
+				{
+					ctrl.isLoadingProfile = true;
+					ctrl.currentProfile = await mhaPatientService.profileForDemographic(ctrl.currentIntegration.id, ctrl.demographic.demographicNo);
+					$scope.$apply();
+				}
+				finally
+				{
+					ctrl.isLoadingProfile = false;
+				}
 			}
 		}
 
@@ -129,27 +142,6 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			catch(err)
 			{
 				// user pressed ESC key
-			}
-		}
-
-		ctrl.cancelConnection = async () =>
-		{
-			if(ctrl.currentIntegration)
-			{
-				let userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Cancel Connection?",
-					"Are you sure you want to cancel this patients MyHealthAccess connection?", ctrl.resolve.style);
-
-				if (userOk)
-				{
-					ctrl.connectionStatusChanged = true;
-					let integrationId = ctrl.currentIntegration.id;
-
-					if (integrationId)
-					{
-						await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.demographic.demographicNo);
-						ctrl.loadMHAPatientProfiles();
-					}
-				}
 			}
 		}
 

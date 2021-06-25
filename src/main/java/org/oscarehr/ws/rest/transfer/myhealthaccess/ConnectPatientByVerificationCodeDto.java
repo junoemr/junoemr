@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -20,50 +21,13 @@
  * Victoria, British Columbia
  * Canada
  */
+ 
+package org.oscarehr.ws.rest.transfer.myhealthaccess;
 
-angular.module('Common.Components').component('junoCodeInput',
+import lombok.Data;
+
+@Data
+public class ConnectPatientByVerificationCodeDto
 {
-	templateUrl: 'src/common/components/junoCodeInput/junoCodeInput.jsp',
-	bindings: {
-		ngModel: "=",
-		codeLength: "<",
-		onChange: "&?",
-		// for style settings see _junoCodeInput.scss
-	},
-	controller: [
-		'$scope',
-		function ($scope)
-		{
-			const ctrl = this;
-
-			ctrl.oldNgModel = null;
-
-			ctrl.onInputChange = () =>
-			{
-				if (ctrl.ngModel)
-				{
-					// make sure only numbers are entered
-					if (!((/^\d+$/).test(ctrl.ngModel)))
-					{
-						// reset to old value
-						ctrl.ngModel = ctrl.oldNgModel;
-					}
-				}
-
-				// update the old value
-				ctrl.oldNgModel = ctrl.ngModel;
-
-				if (ctrl.onChange)
-				{
-					ctrl.onChange({value: ctrl.ngModel});
-				}
-			}
-
-			ctrl.inputStyles = () =>
-			{
-				return {
-					width: ctrl.codeLength ? `${ctrl.codeLength*3.5}ch` : "unset",
-				};
-			}
-		}],
-});
+	protected String verificationCode;
+}
