@@ -670,61 +670,65 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalComplete = function isPostalComplete(whichAddress)
+		controller.isPostalComplete = function isPostalComplete()
 		{
-			var address;
-			if (whichAddress == 1)
-			{
-				address = controller.page.demo.address;
-			}
-			if (whichAddress == 2)
-			{
-				address = controller.page.demo.address2;
-			}
-			var province= address.province;
-			var postal = address.postal;
+            var address = controller.page.demo.address;
+            var address2 = controller.page.demo.address2;
+            var addresses = [address, address2];
+
 
 			// If Canadian province is selected, proceed with validation
-			if (postal !== null && province !== null && province !== "OT" && province.indexOf("US") !== 0)
+			addresses.forEach(checkPostal);
+			function checkPostal(addresses)
 			{
-				if (controller.isPostalValid(whichAddress))
+				if (addresses.postal !== null && addresses.province !== null && addresses.province !== "OT" && addresses.province.indexOf("US") !== 0)
 				{
-					return true;
-				}
+					if (controller.isPostalValid(addresses))
+					{
+						return true;
+					}
 
-				controller.resetEditState();
-				return false;
+					controller.resetEditState();
+					return false;
+				}
 			}
+
 
 			return true;
 		};
 
-		controller.isPostalValid = function isPostalValid(whichAddress)
+		controller.isPostalValid = function isPostalValid(addresses)
 		{
 
-			var address;
-			if (whichAddress == 1)
-			{
-				address = controller.page.demo.address;
-			}
-			if (whichAddress == 2)
-			{
-				address = controller.page.demo.address2;
-			}
-			var postal = address.postal.replace(/\s/g, ""); // Trim whitespace
+			var additionalAddress = addresses === controller.page.demo.address2;
+			var postal = addresses.postal.replace(/\s/g, ""); // Trim whitespace
+
 			// If postal code is an empty string, set it to null and continue
 			if(postal.length === 0)
 			{
 				controller.page.demo.address.postal = null;
 				return true;
 			}
+			else if(postal.length === 0 && additionalAddress)
+            {
+                controller.page.demo.address2.postal = null;
+                return true;
+            }
 
 			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/); // Match to Canadian postal code standard (minus the space)
 			if (regex.test(postal))
 			{
 				// Format postal code to Canadian standard
-				controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
-				return true;
+				if(!additionalAddress)
+                {
+                    controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
+                }
+				else
+				{
+					controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
+					return true;
+				}
+
 			}else {
 				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
 				return false;
@@ -1130,8 +1134,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				return;
 			}
 			if (!controller.checkPatientStatus()) return;
-			if (!controller.isPostalComplete(1)) return;
-			if (!controller.isPostalComplete(2)) return;
+			if (!controller.isPostalComplete()) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 

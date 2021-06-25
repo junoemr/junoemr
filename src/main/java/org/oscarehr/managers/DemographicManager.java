@@ -120,7 +120,7 @@ public class DemographicManager {
 	public static final String FIELD_UNSAFE = "No html tags and no quotes, line breaks " +
 			"or semicolons are allowed.";
 
-	public static final String ADDRESS = "address";
+	public static final String ALTERNATE_ADDRESS = "address";
 	public static final String CITY = "city";
 	public static final String POSTAL = "postal";
 	public static final String PROVINCE = "province";
@@ -1291,7 +1291,7 @@ public class DemographicManager {
 				String value = extra.getValue();
 				switch (key)
 				{
-					case ADDRESS:
+					case ALTERNATE_ADDRESS:
 						extraAddress.setAddress(value);
 						break;
 					case CITY:
@@ -1313,7 +1313,7 @@ public class DemographicManager {
 
 		DemographicExtTo1 extraAddress = new DemographicExtTo1();
 		extraAddress.setDemographicNo(demographic.getDemographicNo());
-		extraAddress.setKey(ADDRESS);
+		extraAddress.setKey(ALTERNATE_ADDRESS);
 		extraAddress.setValue(demographic.getAddress2().getAddress());
 		extraAddress.setDateCreated(new Date());
 		extrasList.add(extraAddress);

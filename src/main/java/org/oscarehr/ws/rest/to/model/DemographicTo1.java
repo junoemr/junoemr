@@ -143,11 +143,13 @@ public class DemographicTo1 implements Serializable {
 		this.address = address;
 	}
 
-		public AddressTo1 getAddress2() {
+	public AddressTo1 getAddress2()
+	{
 		return address2;
 	}
 
-	public void setAddress2(AddressTo1 address2) {
+	public void setAddress2(AddressTo1 address2)
+	{
 		this.address2 = address2;
 	}
 
