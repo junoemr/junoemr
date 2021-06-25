@@ -277,6 +277,7 @@ module.exports = {
 			'./src/common/security/securityService.js',
 
 			'./src/decisionSupport/module.js',
+			'./src/decisionSupport/decisionSupportApi.service.ts',
 			'./src/decisionSupport/rules/dsRuleEditModalComponent.ts',
 
 			'./src/interceptor/module.js',

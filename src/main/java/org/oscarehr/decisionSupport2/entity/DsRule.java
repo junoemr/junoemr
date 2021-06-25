@@ -58,6 +58,9 @@ public class DsRule extends AbstractModel<Integer>
 	@Column(name = "description")
 	private String description;
 
+	@Column(name = "system_managed")
+	private boolean systemManaged;
+
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "dsRule", cascade = CascadeType.ALL)
 	private List<DsRuleCondition> conditions;
 

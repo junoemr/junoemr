@@ -2086,6 +2086,7 @@
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
 								org.oscarehr.ws.rest.ProviderService
 								org.oscarehr.ws.rest.ProvidersService
+								org.oscarehr.ws.rest.DecisionSupportWebService
                                 org.oscarehr.ws.rest.DemographicService
                                 org.oscarehr.ws.rest.DemographicsService
 								org.oscarehr.ws.rest.DemographicFlowsheetWebService

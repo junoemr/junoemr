@@ -68,7 +68,8 @@ angular.module('Common.Components').component('junoSelect', {
 		{
 			if (ctrl.onChange)
 			{
-				ctrl.onChange({value: value});
+				const option = (ctrl.options) ? ctrl.options.find((entry) => entry.value === value) : null;
+				ctrl.onChange({value: value, option: option});
 			}
 		}
 	}]

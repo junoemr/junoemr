@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS ds_rule
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
     rule_name       VARCHAR(255) NOT NULL,
     description     TEXT,
+    system_managed  BOOLEAN NOT NULL DEFAULT false,
 
     created_at      DATETIME NOT NULL,
     created_by      VARCHAR(6) DEFAULT NULL,

@@ -1,21 +1,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:context="http://www.springframework.org/schema/context"
-	   xmlns:aop="http://www.springframework.org/schema/aop"
-	   xmlns:cxf="http://cxf.apache.org/core"
-	   xmlns:jaxws="http://cxf.apache.org/jaxws"
-	   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	   xmlns:util="http://www.springframework.org/schema/util"
-	   xsi:schemaLocation="
-		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+
 		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 		http://cxf.apache.org/jaxws	http://cxf.apache.org/schemas/jaxws.xsd
-		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
-
-	">
+		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
@@ -365,6 +361,7 @@
             <bean autowire="byName" class="org.oscarehr.ws.rest.BillingService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.ClinicService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.DecisionSupportWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicMergeService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>

@@ -26,9 +26,13 @@ package org.oscarehr.decisionSupport2.service;
 import org.drools.FactException;
 import org.drools.RuleBase;
 import org.drools.WorkingMemory;
+import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
+import org.oscarehr.decisionSupport2.dao.DsRuleDao;
 import org.oscarehr.decisionSupport2.model.DsInfoCache;
 import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 import org.oscarehr.decisionSupport2.model.DsRule;
+import org.oscarehr.decisionSupport2.transfer.DsRuleCreateInput;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +45,12 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DsRuleService
 {
+	@Autowired
+	private DsRuleDao dsRuleDao;
+
+	@Autowired
+	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
+
 	/** filter out rules that do not meet all conditions, and apply consequences for rules where all conditions are met.
 	 * @param dsInfoLookup the object where conditions can look up facts. facts determine if a condition is met
 	 * @param dsInfoCache the object where changes are made by consequences. Ex: a consequence will add an alert to the dsInfoCache
@@ -82,5 +92,16 @@ public class DsRuleService
 		WorkingMemory workingMemory = ruleBase.newWorkingMemory();
 		workingMemory.assertObject(prevention);
 		workingMemory.fireAllRules();
+	}
+
+	public List<DsRule> getAllRules()
+	{
+		return dsRuleDbToModelConverter.convert(dsRuleDao.findAll());
+	}
+
+	public DsRule createRule(DsRuleCreateInput input)
+	{
+		org.oscarehr.decisionSupport2.entity.DsRule entity = null;
+		return dsRuleDbToModelConverter.convert(entity); //TODO
 	}
 }

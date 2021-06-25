@@ -23,7 +23,6 @@
 
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import {ValueType} from "../../lib/flowsheet/FlowsheetConstants";
 
 angular.module('DecisionSupport').component('dsRuleEditModal',
 	{
@@ -34,7 +33,9 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 		},
 		controller: [
 			'$uibModal',
-			function ($uibModal)
+			'decisionSupportApiService',
+			function ($uibModal,
+			          decisionSupportApiService)
 			{
 				const ctrl = this;
 
@@ -43,16 +44,77 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
+				ctrl.ruleSelectionOptions = [];
+				ctrl.selectedRule = null;
+
+				ctrl.rule = null;
+				ctrl.checkUseExisting = true;
+				ctrl.checkCreateNew = false;
+				ctrl.isLoading = false;
+
 				ctrl.isLoading = true;
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
+					const rules = await decisionSupportApiService.getRules();
+					ctrl.ruleSelectionOptions = rules.map((rule) =>
+					{
+						return {
+							label: rule.name,
+							value: rule.id,
+							data: rule,
+						};
+					});
 					ctrl.isLoading = false;
 				}
 
-				ctrl.onCancel = () =>
+				ctrl.toggleRuleSelectionMode = (value): void =>
+				{
+					ctrl.checkUseExisting = !ctrl.checkUseExisting;
+					ctrl.checkCreateNew = !ctrl.checkCreateNew;
+				}
+
+				ctrl.selectionModeExisting = (): boolean =>
+				{
+					return ctrl.checkUseExisting;
+				}
+
+				ctrl.selectionModeNewRule = (): boolean =>
+				{
+					return ctrl.checkCreateNew;
+				}
+
+				ctrl.selectRole = (value, option): void =>
+				{
+					ctrl.rule = option.data;
+				}
+
+				ctrl.onCancel = (): void =>
 				{
 					ctrl.modalInstance.dismiss("cancelled");
+				}
+
+				ctrl.onSubmit = (): void =>
+				{
+					if(ctrl.selectionModeExisting())
+					{
+						ctrl.onSelectExisting();
+					}
+					else
+					{
+						ctrl.onSaveAndSelectNew();
+					}
+				}
+
+				ctrl.onSelectExisting = (): void =>
+				{
+
+					ctrl.modalInstance.close(ctrl.rule);
+				}
+
+				ctrl.onSaveAndSelectNew = (): void =>
+				{
+					ctrl.modalInstance.close(ctrl.rule);
 				}
 
 			}]

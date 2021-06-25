@@ -67,8 +67,11 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 						}
 					).result.then((response) =>
 					{
-						ctrl.model.rules.push(response);
-
+						// don't add duplicates
+						if(!response.id || ctrl.model.rules.filter((rule) => rule.id === response.id).length === 0)
+						{
+							ctrl.model.rules.push(response);
+						}
 					}).catch((reason) =>
 					{
 						// do nothing on cancel

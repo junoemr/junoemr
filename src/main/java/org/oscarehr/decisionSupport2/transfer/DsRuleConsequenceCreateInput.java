@@ -20,22 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.decisionSupport2.model;
+package org.oscarehr.decisionSupport2.transfer;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.model.condition.DsCondition;
-import org.oscarehr.decisionSupport2.model.consequence.DsConsequence;
-
-import java.util.List;
+import org.oscarehr.decisionSupport2.entity.DsRuleConsequence;
+import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 
 @Data
-public class DsRule extends AbstractTransientModel
+public class DsRuleConsequenceCreateInput extends AbstractTransientModel
 {
-	private Integer id;
 	private String name;
-	private String description;
-	private boolean systemManaged;
-	private List<DsCondition> conditions;
-	private List<DsConsequence> consequences;
+	private DsRuleConsequence.ConsequenceType type;
+	private SeverityLevel severityLevel;
+	private String message;
 }
