@@ -670,20 +670,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalComplete = function isPostalComplete()
+		controller.isPostalComplete = function isPostalComplete(address)
 		{
-            var address = controller.page.demo.address;
-            var address2 = controller.page.demo.address2;
-            var addresses = [address, address2];
-
-
 			// If Canadian province is selected, proceed with validation
-			addresses.forEach(checkPostal);
-			function checkPostal(addresses)
-			{
-				if (addresses.postal !== null && addresses.province !== null && addresses.province !== "OT" && addresses.province.indexOf("US") !== 0)
+				if (address.postal !== null && address.province !== null && address.province !== "OT" && address.province.indexOf("US") !== 0)
 				{
-					if (controller.isPostalValid(addresses))
+					if (controller.isPostalValid(address))
 					{
 						return true;
 					}
@@ -691,20 +683,17 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.resetEditState();
 					return false;
 				}
-			}
-
-
 			return true;
 		};
 
-		controller.isPostalValid = function isPostalValid(addresses)
+		controller.isPostalValid = function isPostalValid(address)
 		{
 
-			var additionalAddress = addresses === controller.page.demo.address2;
-			var postal = addresses.postal.replace(/\s/g, ""); // Trim whitespace
+			var additionalAddress = address === controller.page.demo.address2;
+			var postal = address.postal.replace(/\s/g, ""); // Trim whitespace
 
 			// If postal code is an empty string, set it to null and continue
-			if(postal.length === 0)
+			if(postal.length === 0 && !additionalAddress)
 			{
 				controller.page.demo.address.postal = null;
 				return true;
@@ -722,10 +711,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				if(!additionalAddress)
                 {
                     controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
+                    return true;
                 }
 				else
 				{
-					controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
+					controller.page.demo.address2.postal = postal.substring(0, 3) + " " + postal.substring(3);
 					return true;
 				}
 
@@ -1134,7 +1124,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				return;
 			}
 			if (!controller.checkPatientStatus()) return;
-			if (!controller.isPostalComplete()) return;
+			if (!controller.isPostalComplete(controller.page.demo.address)) return;
+			if (!controller.isPostalComplete(controller.page.demo.address2)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 
