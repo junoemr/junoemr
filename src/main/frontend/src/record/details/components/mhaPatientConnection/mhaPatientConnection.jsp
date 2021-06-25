@@ -7,10 +7,9 @@
 	             button-color-pattern="$ctrl.getButtonColorPattern()"
 	             component-style="$ctrl.componentStyle">
 		<div class="button-content">
-			<i ng-if="$ctrl.isConfirmed || $ctrl.hasEmail()" class="icon icon-mha text-left" ng-class="$ctrl.iconClasses()"></i>
+			<i class="icon icon-mha text-left"></i>
 			<div>{{ $ctrl.getButtonText() }}</div>
-			<i ng-if="$ctrl.isConfirmed" class="icon icon-check text-right" ng-class="$ctrl.iconClasses()"></i>
-			<i ng-if="!$ctrl.isConfirmed && $ctrl.hasEmail()" class="icon icon-send text-right" ng-class="$ctrl.iconClasses()"></i>
+			<i class="icon icon-check text-right"></i>
 		</div>
 	</juno-button>
 </div>

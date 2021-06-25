@@ -23,14 +23,8 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.integration.dao.IntegrationDao;
-import org.oscarehr.integration.dao.UserIntegrationAccessDao;
 import org.oscarehr.integration.model.Integration;
-import org.oscarehr.integration.model.IntegrationData;
-import org.oscarehr.integration.model.UserIntegrationAccess;
-import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.service.IntegrationService;
-import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.myhealthaccess.IntegrationTo1;
@@ -38,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;

@@ -33,12 +33,32 @@
 			</div>
 		</div>
 
-		<div class="patient-details-button-row flex-row justify-content-end align-items-center">
-			<juno-button class="flex-item-no-grow w-128 m-t-8"
-			             ng-click="$ctrl.onCancel()"
-			             component-style="$ctrl.resolve.style">
-				Close Window
-			</juno-button>
+		<div class="patient-details-button-row flex-row justify-content-space-between">
+			<div class="flex-row justify-content-start align-items-center">
+				<juno-button ng-if="!$ctrl.currentProfile.isRejected"
+				             class="flex-item-no-grow w-128 m-t-8"
+				             button-color="JUNO_BUTTON_COLOR.DANGER"
+				             click="$ctrl.rejectConnection()"
+				             disabled="!$ctrl.currentProfile"
+				             component-style="$ctrl.resolve.style">
+					Reject Connection
+				</juno-button>
+				<juno-button ng-if="$ctrl.currentProfile.isRejected"
+				             class="cancel-reject-button flex-item-no-grow m-t-8"
+				             click="$ctrl.cancelRejectConnection()"
+				             disabled="!$ctrl.currentProfile"
+				             component-style="$ctrl.resolve.style">
+					Cancel Reject Connection
+				</juno-button>
+			</div>
+			<div class="flex-row justify-content-end align-items-center">
+				<juno-button class="flex-item-no-grow w-128 m-t-8"
+				             click="$ctrl.openInviteConfirmModal()"
+				             disabled="$ctrl.currentProfile || $ctrl.isLoadingProfile"
+				             component-style="$ctrl.resolve.style">
+					{{$ctrl.getInviteButtonText()}}
+				</juno-button>
+			</div>
 		</div>
 	</div>
 

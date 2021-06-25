@@ -264,6 +264,12 @@ export default class MhaPatient
 		return this._linkStatus === LinkStatus.VERIFIED;
 	}
 
+	get isRejected(): boolean
+	{
+		return this._linkStatus === LinkStatus.CLINIC_REJECTED ||
+			this._linkStatus === LinkStatus.PATIENT_REJECTED;
+	}
+
 	get canMessage(): boolean
 	{
 		return this._canMessage;

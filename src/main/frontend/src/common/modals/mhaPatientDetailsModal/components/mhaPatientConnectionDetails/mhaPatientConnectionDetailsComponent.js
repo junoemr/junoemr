@@ -50,6 +50,7 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				ctrl.patientAccess = null; // Type MhaPatientAccess
 
 				// verification
+				ctrl.loadingVerificationProfile = false;
 				ctrl.verifying = false;
 				ctrl.verificationCode = "";
 				ctrl.verificationProfile = null; // Type MhaPatient
@@ -77,8 +78,16 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				{
 					if (ctrl.integration && code && code.length >= $scope.VERIFICATION_CODE_LENGTH)
 					{
-						ctrl.verificationProfile = await patientService.getProfileByAccountIdCode(ctrl.integration.id, code);
-						$scope.$apply();
+						try
+						{
+							ctrl.loadingVerificationProfile = true;
+							ctrl.verificationProfile = await patientService.getProfileByAccountIdCode(ctrl.integration.id, code);
+						}
+						finally
+						{
+							ctrl.loadingVerificationProfile = false;
+							$scope.$apply();
+						}
 					}
 				}
 

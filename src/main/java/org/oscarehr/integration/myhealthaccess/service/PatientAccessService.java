@@ -31,8 +31,6 @@ import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.dto.EmrLinkDto;
 import org.oscarehr.integration.myhealthaccess.dto.PatientAccessDto;
 import org.oscarehr.integration.myhealthaccess.dto.PatientConnectByAccountIdCodeDto;
-import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
-import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.oscarehr.integration.myhealthaccess.model.MhaPatientAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,6 +179,39 @@ public class PatientAccessService extends BaseService
 		restClient.doPostWithToken(url, getLoginToken(integration, loggedInInfo), null, Void.class);
 	}
 
+	/**
+	 * reject a patients connection to this clinic
+	 * @param integration - integration to perform the rejection in
+	 * @param loggedInInfo - the currently logged in user's info
+	 * @param remoteId - the remoteId to reject from the clinic.
+	 */
+	public void rejectConnection(Integration integration, LoggedInInfo loggedInInfo, String remoteId)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		String url = restClient.formatEndpoint(
+				"/clinic_user/self/clinic/patient/%s/connection/reject",
+				remoteId);
+
+		restClient.doPostWithToken(url, getLoginToken(integration, loggedInInfo), null, Void.class);
+	}
+
+	/**
+	 * cancel the rejection of a patients connection to this clinic
+	 * @param integration - integration to cancel the rejection in.
+	 * @param loggedInInfo - the currently logged in user's info
+	 * @param remoteId - the remoteId to cancel the rejection for.
+	 */
+	public void cancelRejectConnection(Integration integration, LoggedInInfo loggedInInfo, String remoteId)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		String url = restClient.formatEndpoint(
+				"/clinic_user/self/clinic/patient/%s/connection/cancel_reject",
+				remoteId);
+
+		restClient.doPostWithToken(url, getLoginToken(integration, loggedInInfo), null, Void.class);
+	}
 
 	// ==========================================================================
 	// Protected Methods

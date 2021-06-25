@@ -32,6 +32,7 @@ import {MhaDemographicApi, MhaIntegrationApi, PatientTo1} from "../../../../gene
 import {JUNO_SIMPLE_MODAL_FILL_COLOR} from "../junoSimpleModal/junoSimpleModalConstants";
 import MhaConfigService from "../../../lib/integration/myhealthaccess/service/MhaConfigService";
 import MhaPatientService from "../../../lib/integration/myhealthaccess/service/MhaPatientService";
+import MhaPatientAccessService from "../../../lib/integration/myhealthaccess/service/MhaPatientAccessService";
 
 angular.module('Common.Components').component('mhaPatientDetailsModal',
 {
@@ -53,6 +54,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 		const mhaConfigService = new MhaConfigService();
 		const mhaPatientService = new MhaPatientService();
+		const mhaPatientAccessService = new MhaPatientAccessService();
 
 		// load apis
 		let mhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
@@ -67,7 +69,8 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		ctrl.isLoadingProfile = false;
 		ctrl.currentProfile = null; // Type MhaPatient
 		ctrl.currentIntegration = null; // Type MhaIntegration
-		ctrl.integrationOptions = []; // Type MhaIntegration[]
+		ctrl.integrationList = []; // Type MhaIntegration[]
+		ctrl.integrationOptions = []; // Type {label: string, value: MhaIntegration}
 
 		ctrl.$onInit = async () =>
 		{
@@ -77,10 +80,32 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			await ctrl.loadIntegrationOptions();
 		}
 
+		ctrl.rejectConnection = async () =>
+		{
+			const ok = await Juno.Common.Util.confirmationDialog(
+				$uibModal,
+				"Are you sure?",
+				"Rejecting this patient will disconnect them from your clinic. They will be unable to reconnect until you un-reject them.",
+				ctrl.resolve.style);
+
+			if (ok)
+			{
+				await mhaPatientAccessService.rejectPatient(ctrl.currentIntegration.id, ctrl.currentProfile.id);
+				await ctrl.onConnectionStatusUpdated();
+			}
+		}
+
+		ctrl.cancelRejectConnection = async () =>
+		{
+			await mhaPatientAccessService.cancelPatientRejection(ctrl.currentIntegration.id, ctrl.currentProfile.id);
+			await ctrl.onConnectionStatusUpdated();
+		}
+
 		// load integration list and format as options
 		ctrl.loadIntegrationOptions = async () =>
 		{
-			ctrl.integrationOptions = (await mhaConfigService.getMhaIntegrations()).map((integration) =>
+			ctrl.integrationList = await mhaConfigService.getMhaIntegrations();
+			ctrl.integrationOptions = ctrl.integrationList.map((integration) =>
 			{
 				return {label: integration.siteName, value: integration};
 			});
@@ -108,11 +133,11 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				{
 					ctrl.isLoadingProfile = true;
 					ctrl.currentProfile = await mhaPatientService.profileForDemographic(ctrl.currentIntegration.id, ctrl.demographic.demographicNo);
-					$scope.$apply();
 				}
 				finally
 				{
 					ctrl.isLoadingProfile = false;
+					$scope.$apply();
 				}
 			}
 		}
@@ -133,11 +158,14 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 							style: () => JUNO_STYLE.GREY, //TODO regular style use when it doesn't break button/text colours
 							demographicNo: () => ctrl.demographic.demographicNo,
 							demographicEmail: () => ctrl.demographic.email,
-							integrationsList: () => ctrl.integrationsList,
+							integrationsList: () => ctrl.integrationList,
 							selectedIntegration: () => ctrl.currentIntegration,
+							hideIntegrationSelect: () => true,
 						}
 					}
 				).result;
+
+				await ctrl.onConnectionStatusUpdated();
 			}
 			catch(err)
 			{

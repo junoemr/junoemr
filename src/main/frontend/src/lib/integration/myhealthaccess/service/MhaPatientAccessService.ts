@@ -101,4 +101,23 @@ export default class MhaPatientAccessService
 		await this._mhaPatientApi.cancelPatientConfirmation(integrationId, remoteId);
 	}
 
+	/**
+	 * reject a patient from the cinic
+	 * @param integrationId - the clinic to reject from
+	 * @param remoteId - the patient to reject
+	 */
+	public async rejectPatient(integrationId: string, remoteId: string): Promise<void>
+	{
+		await this._mhaPatientApi.rejectPatient(integrationId, remoteId);
+	}
+
+	/**
+	 * cancel the rejection of a patient
+	 * @param integrationId
+	 * @param remoteId
+	 */
+	public async cancelPatientRejection(integrationId: string, remoteId: string): Promise<void>
+	{
+		await this._mhaPatientApi.cancelRejectPatient(integrationId, remoteId);
+	}
 }

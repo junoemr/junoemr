@@ -41,6 +41,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("myhealthaccess/integration/{integrationId}/sso/")
+@Component("mhaSSOWebService")
 @Tag(name = "mhaSSO")
 public class SSOWebService extends AbstractServiceImpl
 {

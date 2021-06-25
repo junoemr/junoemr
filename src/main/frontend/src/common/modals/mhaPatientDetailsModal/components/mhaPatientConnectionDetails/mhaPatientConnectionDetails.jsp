@@ -9,7 +9,8 @@
 				<div class="m-r-8">
 					<juno-button ng-if="!$ctrl.profile.isConfirmed"
 					             click="$ctrl.confirm()"
-					             disabled="$ctrl.disabled"
+					             disabled="$ctrl.disabled || !$ctrl.profile"
+					             title="{{!$ctrl.profile ? 'No MHA patient connected to this demographic.' : ''}}"
 					             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
 						Confirm Patient
 					</juno-button>
@@ -85,11 +86,11 @@
 						</juno-code-input>
 
 						<!-- code status icons -->
-						<div ng-if="$ctrl.verificationCode.length !== VERIFICATION_CODE_LENGTH" class="spacing-div"></div>
-						<i ng-if="$ctrl.verificationProfile && $ctrl.verificationCode.length === VERIFICATION_CODE_LENGTH"
+						<div ng-if="$ctrl.verificationCode.length !== VERIFICATION_CODE_LENGTH || $ctrl.loadingVerificationProfile" class="spacing-div"></div>
+						<i ng-if="$ctrl.verificationProfile && !$ctrl.loadingVerificationProfile && $ctrl.verificationCode.length === VERIFICATION_CODE_LENGTH"
 						   title="Code valid"
 						   class="icon help primary icon-check"></i>
-						<i ng-if="!$ctrl.verificationProfile && $ctrl.verificationCode.length === VERIFICATION_CODE_LENGTH"
+						<i ng-if="!$ctrl.verificationProfile && !$ctrl.loadingVerificationProfile && $ctrl.verificationCode.length === VERIFICATION_CODE_LENGTH"
 						   title="Code invalid or expired"
 						   class="icon help danger icon-delete"></i>
 					</div>

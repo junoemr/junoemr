@@ -184,4 +184,32 @@ public class AccessWebService extends AbstractServiceImpl
 		return null;
 	}
 
+	@PATCH
+	@Path("/reject")
+	public RestResponse<Void> rejectPatient(
+			@PathParam("integrationId") String integrationId,
+			@PathParam("remoteId") String remoteId
+	)
+	{
+		Integration integration = this.integrationDao.findOrThrow(Integer.parseInt(integrationId));
+
+		this.patientAccessService.rejectConnection(integration, getLoggedInInfo(), remoteId);
+
+		return null;
+	}
+
+	@PATCH
+	@Path("/cancelReject")
+	public RestResponse<Void> cancelRejectPatient(
+			@PathParam("integrationId") String integrationId,
+			@PathParam("remoteId") String remoteId
+	)
+	{
+		Integration integration = this.integrationDao.findOrThrow(Integer.parseInt(integrationId));
+
+		this.patientAccessService.cancelRejectConnection(integration, getLoggedInInfo(), remoteId);
+
+		return null;
+	}
+
 }
