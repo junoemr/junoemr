@@ -38,16 +38,15 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
     {
         let ctrl = this;
 
-        ctrl.year = "";
-        ctrl.month = "";
-        ctrl.day = "";
+        ctrl.year = null;
+        ctrl.month = null;
+        ctrl.day = null;
 
         ctrl.yearValid = true;
         ctrl.monthValid = true;
         ctrl.dayValid = true;
 
         ctrl.fieldsBlank = false;
-        ctrl.allFieldsValid = true;
 
         $scope.$watch("$ctrl.ngModel", (newNgModal) =>
         {
@@ -123,53 +122,50 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 field = Juno.Common.Util.padDateWithZero(field);
             }
 
-            ctrl.fieldsBlank = ctrl.allFieldsBlank();
-
             if (ctrl.ngModel)
             {
-                if (ctrl.fieldsBlank && ctrl.ngModel)
+                if (ctrl.fieldsBlank)
                 {
+                    ctrl.year = null;
+                    ctrl.month = null;
+                    ctrl.day = null;
+
                     ctrl.ngModel.setYear(null);
                     ctrl.ngModel.setMonth(null);
                     ctrl.ngModel.setDay(null);
 
+                    ctrl.yearValid = true;
+                    ctrl.monthValid = true;
+                    ctrl.dayValid = true;
+
                     return;
                 }
 
-                if (ctrl.checkField(field, isYear, isMonth, isDay))
-                {
-                    if (ctrl.validatePartialDate())
-                    {
-                        if (ctrl.year !== null && isYear)
-                        {
-                            ctrl.ngModel.setYear(ctrl.year);
-                        }
-                        if (ctrl.month !== null && isMonth)
-                        {
-                            ctrl.ngModel.setMonth(ctrl.month);
-                        }
-                        if (ctrl.day !== null && isDay)
-                        {
-                            ctrl.ngModel.setDay(ctrl.day);
-                        }
-                    }
-                }
+                let validDates = ctrl.checkField(field, isYear, isMonth, isDay)
+                ctrl.validYear = validDates[0];
+                ctrl.validMonth = validDates[1];
+                ctrl.validDay = validDates[2];
 
-                if (ctrl.ngBlur)
+                ctrl.allFieldsValid = ctrl.validatePartialDate();
+
+                if (isYear)
                 {
-                    console.log("ngBlur");
-                    ctrl.ngBlur({
-                        date: ctrl.ngModel
-                    })
+                    ctrl.ngModel.setYear(field);
+                }
+                else if (isMonth)
+                {
+                    ctrl.ngModel.setMonth(field)
+                }
+                else if (isDay)
+                {
+                    ctrl.ngModel.setDay(field);
                 }
             }
         }
 
         ctrl.allFieldsBlank = () =>
         {
-            return ((ctrl.day === null || ctrl.day === "") &&
-                (ctrl.month === null || ctrl.month === "") &&
-                (ctrl.year === null || ctrl.year === ""));
+            return (!ctrl.year && !ctrl.month && !ctrl.day);
         }
 
         ctrl.getInvalidClass = (isInvalid) =>
@@ -185,6 +181,10 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
         {
             if (ctrl.allFieldsBlank())
             {
+                ctrl.yearValid = true;
+                ctrl.monthValid = true;
+                ctrl.dayValid = true;
+
                 return true;
             }
 
@@ -192,7 +192,6 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
             if (ctrl.year && !ctrl.month && ctrl.day)
             {
                 ctrl.monthValid = false;
-                return false;
             }
             // MM-DD/MM/DD
             else if (!ctrl.year && (ctrl.month || ctrl.day))
@@ -201,6 +200,11 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 {
                     ctrl.monthValid = false;
                 }
+                if (!ctrl.day)
+                {
+                    ctrl.dayValid = false;
+                }
+
                 ctrl.yearValid = false;
             }
 
@@ -209,71 +213,36 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
 
         ctrl.checkField = (field, isYear, isMonth, isDay) =>
         {
-            let regexp;
+            let partialDate = new PartialDateModel(null, null, null);
+            partialDate.setYear(ctrl.year);
+            partialDate.setMonth(ctrl.month);
+            partialDate.setDay(ctrl.day);
+
             if (isYear)
             {
-                regexp = new RegExp('[1-2][0-9][0-9][0-9]');
-            }
-            else
-            {
-                regexp = new RegExp('[0-3][0-9]');
-            }
+                ctrl.year = field;
+                partialDate.setYear(field);
 
-            if (field === null || field === "")
-            {
-                if (isYear)
-                {
-                    ctrl.year = "";
-                    ctrl.yearValid = true;
-                }
-                else if (isMonth)
-                {
-                    ctrl.month = "";
-                    ctrl.monthValid = true;
-                }
-                else if (isDay)
-                {
-                    ctrl.day = "";
-                    ctrl.dayValid = true;
-                }
-                return true;
-            }
-
-            if (field && field.toString().match(regexp))
-            {
-                if (isYear && field >= 999 && ctrl.year <= 9999)
-                {
-                    ctrl.year = field;
-                    ctrl.yearValid = true;
-                    return true;
-                }
-                else if (isMonth && field >= 1 && field <= 12)
-                {
-                    ctrl.month = field;
-                    ctrl.monthValid = true;
-                    return true;
-                }
-                else if (isDay && field >= 1 && field <= 31)
-                {
-                    ctrl.day = field;
-                    ctrl.dayValid = true;
-                    return true;
-                }
-            }
-            // Failed validation, set the field as invalid
-            if (isYear)
-            {
-                ctrl.yearValid = false;
+                ctrl.yearValid = partialDate.isValidYear();
+                ctrl.monthValid = partialDate.isValidMonth();
+                ctrl.dayValid = partialDate.isValidDay();
             }
             else if (isMonth)
             {
-                ctrl.monthValid = false;
+                ctrl.month = field;
+                partialDate.setMonth(field);
+
+                ctrl.monthValid = partialDate.isValidMonth();
+                ctrl.dayValid = partialDate.isValidDay();
             }
             else if (isDay)
             {
-                ctrl.dayValid = false;
+                ctrl.day = field;
+                partialDate.setDay(field);
+
+                ctrl.dayValid = partialDate.isValidDay();
             }
-            return false;
+            return ctrl.yearValid, ctrl.monthValid, ctrl.dayValid;
         }
     }]
 });

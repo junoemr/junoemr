@@ -265,6 +265,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			if(!controller.allDatesValid())
 			{
 				controller.working = false;
+				window.alert("Please fix highlighted fields");
 				return;
 			}
 			controller.working = true;
@@ -550,23 +551,39 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		controller.onPartialDateChange = (date) =>
 		{
-			if (controller.allDatesValid())
+			if (!controller.allDatesValid())
 			{
-				console.log("All dates valid");
-			}
-			else
-			{
-				console.log("Dates are invalid");
 			}
 		}
 
 		controller.allDatesValid = () =>
 		{
-			let partialStartDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.startDate._year, controller.groupNotesForm.groupNoteExt.startDate._month, controller.groupNotesForm.groupNoteExt.startDate._day);
-			let partialResolutionDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.resolutionDate._year, controller.groupNotesForm.groupNoteExt.resolutionDate._month, controller.groupNotesForm.groupNoteExt.resolutionDate._day);
-			let partialProcedureDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.procedureDate._year, controller.groupNotesForm.groupNoteExt.procedureDate._month, controller.groupNotesForm.groupNoteExt.procedureDate._day);
+			let startDateValid = true;
+			let resolutionDateValid = true;
+			let procedureDateValid = true;
 
-			if (partialStartDate.isValidPartialDate() && partialResolutionDate.isValidPartialDate() && partialProcedureDate.isValidPartialDate())
+			let partialStartDate;
+			if (controller.groupNotesForm.groupNoteExt.startDate)
+			{
+				partialStartDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.startDate._year, controller.groupNotesForm.groupNoteExt.startDate._month, controller.groupNotesForm.groupNoteExt.startDate._day);
+				startDateValid = partialStartDate.isValidPartialDate();
+			}
+
+			let partialResolutionDate;
+			if (controller.groupNotesForm.groupNoteExt.resolutionDate)
+			{
+				partialResolutionDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.resolutionDate._year, controller.groupNotesForm.groupNoteExt.resolutionDate._month, controller.groupNotesForm.groupNoteExt.resolutionDate._day);
+				resolutionDateValid = partialResolutionDate.isValidPartialDate()
+			}
+
+			let partialProcedureDate;
+			if (controller.groupNotesForm.groupNoteExt.procedureDate)
+			{
+				partialProcedureDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.procedureDate._year, controller.groupNotesForm.groupNoteExt.procedureDate._month, controller.groupNotesForm.groupNoteExt.procedureDate._day);
+				procedureDateValid = partialProcedureDate.isValidPartialDate();
+			}
+
+			if (startDateValid && resolutionDateValid && procedureDateValid)
 			{
 				console.log("date valid 1");
 				return true;

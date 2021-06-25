@@ -67,53 +67,72 @@ export default class PartialDateModel
         return false;
     }
 
-    public isValidPartialDate()
+    public isValidYear()
     {
-        let validYear = false;
-        let validMonth = false;
-        let validDay = false;
-
         let yearRegex = new RegExp("[1-2][0-9][0-9][0-9]");
-        let monthRegex = new RegExp("[0-1][0-9]");
-        let dayRegex = new RegExp("[0-3][0-9]");
 
-        if (this.allFieldsEmpty)
+        if (!this._year)
         {
             return true;
         }
 
-        if (this._year)
+        if (this._year.toString().match(yearRegex))
         {
-            if (this._year.toString().match(yearRegex))
+            return true;
+        }
+
+        return false;
+    }
+
+    public isValidMonth()
+    {
+        let monthRegex = new RegExp("[0-1][0-9]");
+
+        if (!this._month)
+        {
+            return true;
+        }
+
+        if (this._year && this.isValidYear() && this._month)
+        {
+            if (this._month.toString().match(monthRegex) && this._month >= 1 && this._month <= 12)
             {
-                validYear = true;
+                return true;
             }
         }
-        if (this._year && this._month)
+
+        return false;
+    }
+
+    public isValidDay()
+    {
+        let dayRegex = new RegExp("[0-3][0-9]");
+
+        if (!this._day)
         {
-            if (this._year.toString().match(yearRegex))
+            return true;
+        }
+
+        if (this._year && this.isValidYear() && this._month && this.isValidMonth() && this._day)
+        {
+            if (this._day.toString().match(dayRegex) && this._day >= 1 && this._day <= 31)
             {
-                validYear = true;
-            }
-            if (this._month.toString().match(monthRegex))
-            {
-                validMonth = true;
+                return true;
             }
         }
-        if (this._year && this._month && this._day)
+
+        return false;
+    }
+
+    public isValidPartialDate()
+    {
+        let validYear = this.isValidYear();
+        let validMonth = this.isValidMonth();
+        let validDay = this.isValidDay();
+
+        if (this.allFieldsEmpty())
         {
-            if (this._year.toString().match(yearRegex))
-            {
-                validYear = true;
-            }
-            if (this._month.toString().match(monthRegex))
-            {
-                validMonth = true;
-            }
-            if (this._day.toString().match(dayRegex))
-            {
-                validDay = true;
-            }
+            return true;
         }
 
         if (validYear)
@@ -143,8 +162,3 @@ export default class PartialDateModel
         return !(this._year) && !(this._month) && !(this._day);
     }
 }
-
-
-
-
-
