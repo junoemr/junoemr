@@ -187,13 +187,19 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				{
 					if (ctrl.profile && ctrl.integration)
 					{
-						ctrl.patientAccess = await ctrl.profile.getPatientAccessRecord(ctrl.integration);
-						ctrl.stopVerifying();
-						$scope.$apply();
+						const requestProfileId = ctrl.profile.id;
+						const patientAccess = await ctrl.profile.getPatientAccessRecord(ctrl.integration);
+
+						// make sure the access record is for the currently selected profile.
+						if (requestProfileId === ctrl.profile.id)
+						{
+							ctrl.patientAccess = patientAccess;
+							ctrl.stopVerifying();
+							$scope.$apply();
+						}
 					}
 				}
 
 				$scope.$watch("$ctrl.profile", ctrl.loadPatientAccess);
-				$scope.$watch("$ctrl.integration", ctrl.loadPatientAccess);
 			}]
 	});

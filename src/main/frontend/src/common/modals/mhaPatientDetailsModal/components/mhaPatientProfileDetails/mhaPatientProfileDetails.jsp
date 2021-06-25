@@ -37,8 +37,4 @@
 			<h6 class="patient-rejected-text m-t-0">Patient Rejected.</h6>
 		</div>
 	</div>
-
-	<div class="bottom-box">
-
-	</div>
 </div>

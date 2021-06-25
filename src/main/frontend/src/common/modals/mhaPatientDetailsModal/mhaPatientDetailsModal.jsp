@@ -7,7 +7,7 @@
 
 
 	<div class="flex-col h-100 w-100">
-		<h5 class="m-t-0 m-b-16">Patient Verification & Connection Status</h5>
+		<h5 class="m-t-0 m-b-16 m-l-8">Patient Verification & Connection Status</h5>
 
 		<juno-tab ng-model="$ctrl.currentIntegration"
 		          tabs="$ctrl.integrationOptions"
@@ -22,7 +22,7 @@
 				                             profile="$ctrl.currentProfile">
 				</mha-patient-profile-details>
 			</div>
-			<div class="h-100">
+			<div class="grey-box h-100">
 				<mha-patient-connection-details class="d-inline-block h-100 w-100"
 				                                profile="$ctrl.currentProfile"
 				                                integration="$ctrl.currentIntegration"
