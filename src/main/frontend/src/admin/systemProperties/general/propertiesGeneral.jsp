@@ -23,9 +23,10 @@
 
 
 <div class="admin-system-properties-body system-properties-general">
-    <h3 class="title">Change Phone Prefix</h3>
+    <h3 class="title">General Properties</h3>
     <div class="content">
-        <div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
+<%--
+        <div class="property flex-row">
             <div class="property-toggle flex-column" >
                 <juno-input-save
                         ng-model="$ctrl.phonePrefixValue"
@@ -38,5 +39,25 @@
                 <div class="description">{{ property.description }}</div>
             </div>
         </div>
+--%>
+
+            <div class="property flex-row" ng-repeat="property in $ctrl.propertiesList">
+                <div class="property-toggle">
+                    <juno-toggle ng-if="property.type === PROPERTY_TYPES.toggle"
+                            ng-model="property.value"
+                            change="$ctrl.updateProperty(property, checked)"
+                            round="true">
+                    </juno-toggle>
+                    <juno-input-save ng-if="property.type == PROPERTY_TYPES.text"
+                            ng-model="property.value"
+                            click="$ctrl.updateProperty(property, value)"
+                            invalid="!property.validation">
+                    </juno-input-save>
+                </div>
+                <div class="property-text flex-column">
+                    <div class="name">{{ property.name }}</div>
+                    <div class="description">{{ property.description }}</div>
+                </div>
+            </div>
     </div>
 </div>

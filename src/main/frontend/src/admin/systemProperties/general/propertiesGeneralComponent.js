@@ -35,48 +35,50 @@ angular.module('Admin').component('systemPropertiesGeneral',
                 let propertyTypes =
                 {
                     text: "string",
+	                toggle: "boolean",
                 }
-
+	
+	            $scope.PROPERTY_TYPES = propertyTypes;
+                
                 let ctrl = this;
                 let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
-                ctrl.phonePrefixValue = "";
-
-                ctrl.propertiesList =
-                [
+                ctrl.properties = [
                     {
                         name: "Phone Prefix",
                         description: "Change the default phone number prefix",
                         propertyName: "phone_prefix",
-                        type: propertyTypes.text,
-                        value: ""
-                    }
+	                    type: propertyTypes.text,
+	                    value: "",
+	                    validation: ctrl.validations.phonePrefixValid
+                    },
+	                {
+	                	name: "Ontario CNO Number",
+		                description: "Enable CNO field for nurse providers",
+		                propertyName: "enable_ontario_cno_field",
+		                type: propertyTypes.toggle,
+		                value: false,
+		                validation: false,
+	                }
                 ];
 
                ctrl.$onInit = () =>
                 {
                     for (let property of ctrl.propertiesList)
                     {
-                        switch (property.type)
-                        {
-                            case propertyTypes.text:
-                            {
-                                ctrl.loadTextType(property);
-                                break;
-                            }
-                        }
+                    	ctrl.loadProperty(property);
                     }
                 };
-
-                ctrl.loadTextType = (property) =>
+               
+                ctrl.loadProperty = (property) =>
                 {
                     systemPreferenceApi.getPreferenceValue(property.propertyName)
                     .then((response) =>
                     {
-                        ctrl.phonePrefixValue = response.data.body;
+                        property.value = response.data.body;
                     })
                 };
-
+                
                 ctrl.validations =
                 {
                     phonePrefixValid: Juno.Validations.validationCustom(() =>
@@ -86,7 +88,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
                         const MIN_PREFIX_LENGTH = 3;
                         const MAX_PREFIX_LENGTH = 4;
 
-                        if (prefix == null || prefix == "" ||
+                        if (prefix == null || prefix === "" ||
                                 (prefix.match(reg) != null &&
                                 (prefix.length >= MIN_PREFIX_LENGTH && prefix.length <= MAX_PREFIX_LENGTH)))
                         {
