@@ -31,6 +31,7 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
+			deleteCallback: "&?",
 		},
 		controller: [
 			'$uibModal',
@@ -55,7 +56,7 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 					ctrl.isLoading = false;
 				}
 
-				ctrl.addNewRule = () =>
+				ctrl.addNewRule = (): void =>
 				{
 					$uibModal.open(
 						{
@@ -76,6 +77,20 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 					{
 						// do nothing on cancel
 					});
+				}
+
+				ctrl.removeRule = async (rule): Promise<void> =>
+				{
+					// @ts-ignore
+					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
+						"Remove decision support rule",
+						"Are you sure you want to remove this rule from the flowsheet item?",
+						ctrl.componentStyle);
+
+					if(confirmation)
+					{
+						ctrl.model.rules = ctrl.model.rules.filter((entry) => entry.id !== rule.id);
+					}
 				}
 			}]
 	});

@@ -169,6 +169,20 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					});
 				}
 
+				ctrl.onRemoveItem = async (itemGroup, item): Promise<void> =>
+				{
+					// @ts-ignore
+					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
+						"Remove flowsheet item",
+						"Are you sure you want to remove this item from the flowsheet?",
+						ctrl.componentStyle);
+
+					if(confirmation)
+					{
+						itemGroup.flowsheetItems = itemGroup.flowsheetItems.filter((entry) => !(entry.type === item.type && entry.typeCode === item.typeCode));
+					}
+				}
+
 				ctrl.lookupPreventions = async (searchTerm): Promise<Array<object>> =>
 				{
 					const searchResults = await flowsheetApiService.searchPreventionTypes(searchTerm);

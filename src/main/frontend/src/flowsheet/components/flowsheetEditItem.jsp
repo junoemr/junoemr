@@ -27,8 +27,19 @@
 		</div>
 	</div>
 	<div class="flex-column">
-		<flowsheet-item-rule ng-repeat="rule in $ctrl.model.rules" model="rule">
-		</flowsheet-item-rule>
+		<div class="flex-row fex-grow align-items-center" ng-repeat="rule in $ctrl.model.rules">
+			<flowsheet-item-rule model="rule" class="flex-grow">
+			</flowsheet-item-rule>
+			<div class="delete-button-wrapper">
+				<juno-button component-style="$ctrl.componentStyle"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+				             disabled="$ctrl.isLoading"
+				             click="$ctrl.removeRule(rule)">
+					<i class="icon icon-delete"></i>
+				</juno-button>
+			</div>
+		</div>
 	</div>
 	<div class="flex-row flex-grow">
 		<div class="add-button-wrapper">

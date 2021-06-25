@@ -83,9 +83,21 @@
 						</juno-button>
 					</div>
 				</div>
-				<div class="width-100" ng-repeat="item in itemGroup.flowsheetItems">
-					<flowsheet-edit-item model="item">
-					</flowsheet-edit-item>
+				<div ng-repeat="item in itemGroup.flowsheetItems" class="flex-row flex-grow align-items-center">
+<%--					<div class="flex flex-grow">--%>
+<%--				<div class="width-100" ng-repeat="item in itemGroup.flowsheetItems">--%>
+						<flowsheet-edit-item model="item" class="flex-grow">
+						</flowsheet-edit-item>
+<%--					</div>--%>
+					<div class="icon-only-button-wrapper">
+						<juno-button component-style="$ctrl.componentStyle"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+						             disabled="$ctrl.isLoading"
+						             click="$ctrl.onRemoveItem(itemGroup, item)">
+							<i class="icon icon-delete"></i>
+						</juno-button>
+					</div>
 				</div>
 				<div class="flex-row flex-grow">
 					<div class="add-button-wrapper">
