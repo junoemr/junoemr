@@ -1,4 +1,5 @@
 import { PartialDateConverter } from "../../common/converters/partialDateConverter";
+import PartialDateModel from "../../common/models/partialDateModel"
 
 angular.module('Record.Summary').controller('Record.Summary.GroupNotesController', [
 
@@ -35,7 +36,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		controller.page.title = mod.displayName;
 		controller.page.items = mod.summaryItem;
 		controller.page.quickLists = [];
-		
+
 		//controller.action = action;
 		controller.page.code = mod.summaryCode;
 
@@ -261,6 +262,11 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			{
 				return;
 			}
+			if(!controller.allDatesValid())
+			{
+				controller.working = false;
+				return;
+			}
 			controller.working = true;
 
 			if (controller.groupNotesForm.encounterNote.noteId == null)
@@ -281,34 +287,22 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			if (controller.groupNotesForm.groupNoteExt.startDate)
 			{
 				let partialStartDate = PartialDateConverter.convertToPartialDate(controller.groupNotesForm.groupNoteExt.startDate);
-				let partialJson  = ({
-					"year": partialStartDate.year.value || null,
-					"month":  parseInt(partialStartDate.month) || null,
-					"day": parseInt(partialStartDate.day) || null
-				});
-				controller.groupNotesForm.groupNoteExt.startDate = partialJson;
+				let partialDateJson  = controller.getPartialDateJSON(partialStartDate.year.value, partialStartDate.month, partialStartDate.day);
+				controller.groupNotesForm.groupNoteExt.startDate = partialDateJson;
 			}
 
 			if (controller.groupNotesForm.groupNoteExt.resolutionDate)
 			{
 				let partialResolutionDate = PartialDateConverter.convertToPartialDate(controller.groupNotesForm.groupNoteExt.resolutionDate);
-				let partialJson  = ({
-					"year": partialResolutionDate.year.value || null,
-					"month":  parseInt(partialResolutionDate.month) || null,
-					"day": parseInt(partialResolutionDate.day) || null
-				});
-				controller.groupNotesForm.groupNoteExt.resolutionDate = partialJson;
+				let partialDateJson  = controller.getPartialDateJSON(partialResolutionDate.year.value, partialResolutionDate.month, partialResolutionDate.day);
+				controller.groupNotesForm.groupNoteExt.resolutionDate = partialDateJson;
 			}
 
 			if (controller.groupNotesForm.groupNoteExt.procedureDate)
 			{
 				let partialProcedureDate = PartialDateConverter.convertToPartialDate(controller.groupNotesForm.groupNoteExt.procedureDate);
-				let partialJson  = ({
-					"year": partialProcedureDate.year.value || null,
-					"month":  parseInt(partialProcedureDate.month) || null,
-					"day": parseInt(partialProcedureDate.day) || null
-				});
-				controller.groupNotesForm.groupNoteExt.procedureDate = partialJson;
+				let partialDateJson  = controller.getPartialDateJSON(partialProcedureDate.year.value, partialProcedureDate.month, partialProcedureDate.day);
+				controller.groupNotesForm.groupNoteExt.procedureDate = partialDateJson;
 			}
 			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)
@@ -536,5 +530,49 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		};
 
+		controller.getPartialDateJSON = (yearValue, monthValue, dayValue) =>
+		{
+			if (!monthValue)
+			{
+				monthValue = null;
+			}
+			else
+			{
+				monthValue -= 1; // java and javascript months are 0 indexed
+			}
+
+			return ({
+				"year": yearValue || null,
+				"month":  monthValue,
+				"day": parseInt(dayValue) || null
+			});
+		}
+
+		controller.onPartialDateChange = (date) =>
+		{
+			if (controller.allDatesValid())
+			{
+				console.log("All dates valid");
+			}
+			else
+			{
+				console.log("Dates are invalid");
+			}
+		}
+
+		controller.allDatesValid = () =>
+		{
+			let partialStartDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.startDate._year, controller.groupNotesForm.groupNoteExt.startDate._month, controller.groupNotesForm.groupNoteExt.startDate._day);
+			let partialResolutionDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.resolutionDate._year, controller.groupNotesForm.groupNoteExt.resolutionDate._month, controller.groupNotesForm.groupNoteExt.resolutionDate._day);
+			let partialProcedureDate = new PartialDateModel(controller.groupNotesForm.groupNoteExt.procedureDate._year, controller.groupNotesForm.groupNoteExt.procedureDate._month, controller.groupNotesForm.groupNoteExt.procedureDate._day);
+
+			if (partialStartDate.isValidPartialDate() && partialResolutionDate.isValidPartialDate() && partialProcedureDate.isValidPartialDate())
+			{
+				console.log("date valid 1");
+				return true;
+			}
+			console.log("date invalid 2");
+			return false;
+		}
 	}
 ]);

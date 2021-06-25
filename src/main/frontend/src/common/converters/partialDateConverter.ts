@@ -11,11 +11,7 @@ export abstract class PartialDateConverter
         }
 
         const partialDate = from as any;
-        const partialDateModel = new PartialDateModel(1940,1,1);
-
-        partialDateModel.setYear("");
-        partialDateModel.setMonth("");
-        partialDateModel.setDay("");
+        const partialDateModel = new PartialDateModel(null,null,null);
 
         if (partialDate.year)
         {
@@ -68,7 +64,11 @@ export abstract class PartialDateConverter
 
         if (partialDate.day)
         {
-            partialDateModel.setDay(parseInt(partialDate.day));
+            if (partialDate.day >= 1 && partialDate.day <= 9)
+            {
+                partialDate.day = "0" + partialDate.day.toString();
+            }
+            partialDateModel.setDay(partialDate.day);
         }
 
         return partialDateModel;
@@ -89,9 +89,9 @@ export abstract class PartialDateConverter
         };
 
         partialDate.year.leap = this.isLeapYear(partialDateModel.getYear());
-        partialDate.year.value = partialDateModel.getYear();
-        partialDate.month = partialDateModel.getMonth();
-        partialDate.day = partialDateModel.getDay();
+        partialDate.year.value = parseInt(partialDateModel.getYear());
+        partialDate.month = parseInt(partialDateModel.getMonth());
+        partialDate.day = parseInt(partialDateModel.getDay());
 
         return partialDate;
     }

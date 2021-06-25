@@ -189,6 +189,4 @@ public class NoteExtTo1 implements Serializable{
 	public void setProblemDesc(String problemDesc) {
 	    this.problemDesc = problemDesc;
     }
-	
-		
 }

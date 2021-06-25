@@ -66,6 +66,82 @@ export default class PartialDateModel
         }
         return false;
     }
+
+    public isValidPartialDate()
+    {
+        let validYear = false;
+        let validMonth = false;
+        let validDay = false;
+
+        let yearRegex = new RegExp("[1-2][0-9][0-9][0-9]");
+        let monthRegex = new RegExp("[0-1][0-9]");
+        let dayRegex = new RegExp("[0-3][0-9]");
+
+        if (this.allFieldsEmpty)
+        {
+            return true;
+        }
+
+        if (this._year)
+        {
+            if (this._year.toString().match(yearRegex))
+            {
+                validYear = true;
+            }
+        }
+        if (this._year && this._month)
+        {
+            if (this._year.toString().match(yearRegex))
+            {
+                validYear = true;
+            }
+            if (this._month.toString().match(monthRegex))
+            {
+                validMonth = true;
+            }
+        }
+        if (this._year && this._month && this._day)
+        {
+            if (this._year.toString().match(yearRegex))
+            {
+                validYear = true;
+            }
+            if (this._month.toString().match(monthRegex))
+            {
+                validMonth = true;
+            }
+            if (this._day.toString().match(dayRegex))
+            {
+                validDay = true;
+            }
+        }
+
+        if (validYear)
+        {
+            if (!(this._month))
+            {
+                validMonth = true;
+            }
+            if (!this._day)
+            {
+                validDay = true;
+            }
+        }
+        if (validYear && validMonth)
+        {
+            if (!(this._day))
+            {
+                validDay = true;
+            }
+        }
+
+        return validYear && validMonth && validDay;
+    }
+
+    public allFieldsEmpty()
+    {
+        return !(this._year) && !(this._month) && !(this._day);
+    }
 }
 
 

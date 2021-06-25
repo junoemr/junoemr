@@ -101,6 +101,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
@@ -718,7 +719,7 @@ public class NotesService extends AbstractServiceImpl
 			/* save extra fields */
 			CaseManagementNoteExt cme = new CaseManagementNoteExt();
 
-			if (noteExtTo1.getStartDate() != null)
+			if (noteExtTo1.getStartDate() != null && noteExtTo1.getStartDate().toISOString() != null)
 			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.STARTDATE);
@@ -727,7 +728,7 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getResolutionDate() != null)
+			if (noteExtTo1.getResolutionDate() != null && noteExtTo1.getResolutionDate().toISOString() != null)
 			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.RESOLUTIONDATE);
@@ -736,7 +737,7 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getProcedureDate() != null)
+			if (noteExtTo1.getProcedureDate() != null && noteExtTo1.getProcedureDate().toISOString() != null)
 			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.PROCEDUREDATE);
@@ -1687,51 +1688,27 @@ public class NotesService extends AbstractServiceImpl
 
 			if(l.getKeyVal().equals(CaseManagementNoteExt.STARTDATE))
 			{
-				org.oscarehr.common.model.PartialDate startDateModel = partialDateDao.getPartialDate(PartialDate.TABLE_CASEMGMT_NOTE_EXT,
-						Integer.parseInt(l.getNoteId().toString()),
-						PartialDate.CASEMGMT_NOTE_EXT_START_DATE);
+				Integer noteId = Integer.parseInt(l.getNoteId().toString());
+				String fullDateValue = l.getDateValueStr();
 
-				String startDateValue = l.getDateValueStr();
-				String startDateFormat = startDateModel.getFormat();
-
-				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getPartialDateFromFormat(startDateValue, startDateFormat);
-
-				if (partialDate != null)
-				{
-					noteExt.setStartDate(partialDate);
-				}
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getExtPartialDate(noteId, PartialDate.CASEMGMT_NOTE_EXT_START_DATE, fullDateValue);
+				noteExt.setStartDate(partialDate);
 			}
 			else if(l.getKeyVal().equals(CaseManagementNoteExt.RESOLUTIONDATE))
 			{
-				org.oscarehr.common.model.PartialDate resolutionDateModel = partialDateDao.getPartialDate(PartialDate.TABLE_CASEMGMT_NOTE_EXT,
-						Integer.parseInt(l.getNoteId().toString()),
-						PartialDate.CASEMGMT_NOTE_EXT_RESOLUTION_DATE);
+				Integer noteId = Integer.parseInt(l.getNoteId().toString());
+				String fullDateValue = l.getDateValueStr();
 
-				String resolutionDateValue = l.getDateValueStr();
-				String resolutionDateFormat = resolutionDateModel.getFormat();
-
-				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getPartialDateFromFormat(resolutionDateValue, resolutionDateFormat);
-
-				if (partialDate != null)
-				{
-					noteExt.setResolutionDate(partialDate);
-				}
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getExtPartialDate(noteId, PartialDate.CASEMGMT_NOTE_EXT_RESOLUTION_DATE, fullDateValue);
+				noteExt.setResolutionDate(partialDate);
 			}
 			else if(l.getKeyVal().equals(CaseManagementNoteExt.PROCEDUREDATE))
 			{
-				org.oscarehr.common.model.PartialDate procedureDateModel = partialDateDao.getPartialDate(PartialDate.TABLE_CASEMGMT_NOTE_EXT,
-						Integer.parseInt(l.getNoteId().toString()),
-						PartialDate.CASEMGMT_NOTE_EXT_PROCEDURE_DATE);
+				Integer noteId = Integer.parseInt(l.getNoteId().toString());
+				String fullDateValue = l.getDateValueStr();
 
-				String procedureDateValue = l.getDateValueStr();
-				String procedureDateFormat = procedureDateModel.getFormat();
-
-				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getPartialDateFromFormat(procedureDateValue, procedureDateFormat);
-
-				if (partialDate != null)
-				{
-					noteExt.setProcedureDate(partialDate);
-				}
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getExtPartialDate(noteId, PartialDate.CASEMGMT_NOTE_EXT_PROCEDURE_DATE, fullDateValue);
+				noteExt.setProcedureDate(partialDate);
 			}
 			else if(l.getKeyVal().equals(CaseManagementNoteExt.AGEATONSET))
 			{
@@ -1853,6 +1830,24 @@ public class NotesService extends AbstractServiceImpl
 		else if (format.equals(PartialDate.FORMAT_FULL_DATE))
 		{
 			return new org.oscarehr.dataMigration.model.common.PartialDate(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+		}
+		return null;
+	}
+
+	private org.oscarehr.dataMigration.model.common.PartialDate getExtPartialDate(Integer noteId, Integer partialDateType, String fullDateValue)
+	{
+		org.oscarehr.common.model.PartialDate partialDateModel = partialDateDao.getPartialDate(PartialDate.TABLE_CASEMGMT_NOTE_EXT,
+				noteId,
+				partialDateType);
+
+		if (partialDateModel != null)
+		{
+			String partialDateFormat = partialDateModel.getFormat();
+			if (fullDateValue != null && partialDateFormat != null)
+			{
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getPartialDateFromFormat(fullDateValue, partialDateFormat);
+				return partialDate;
+			}
 		}
 		return null;
 	}
