@@ -9,17 +9,21 @@
 	<modal-body>
 		<div class="flex-column">
 			<div class="flex-row">
-				<juno-check-box label="Use Existing Rule"
-				                label-position="$ctrl.LABEL_POSITION.LEFT"
-				                change="$ctrl.toggleRuleSelectionMode(value)"
-				                ng-model="$ctrl.checkUseExisting">
-				</juno-check-box>
-				<juno-select placeholder="Select Rule"
-				             options="$ctrl.ruleSelectionOptions"
-				             disabled="!$ctrl.selectionModeExisting()"
-				             on-change="$ctrl.selectRole(value, option)"
-				             ng-model="$ctrl.selectedRule">
-				</juno-select>
+				<div class="row-item">
+					<juno-check-box label="Use Existing Rule"
+					                label-position="$ctrl.LABEL_POSITION.LEFT"
+					                change="$ctrl.toggleRuleSelectionMode(value)"
+					                ng-model="$ctrl.checkUseExisting">
+					</juno-check-box>
+				</div>
+				<div class="row-item flex-grow">
+					<juno-select placeholder="Select Rule"
+					             options="$ctrl.ruleSelectionOptions"
+					             disabled="!$ctrl.selectionModeExisting()"
+					             on-change="$ctrl.selectRole(value, option)"
+					             ng-model="$ctrl.selectedRule">
+					</juno-select>
+				</div>
 			</div>
 			<div class="flex-row">
 				<juno-check-box label="Create New Rule"
@@ -43,6 +47,7 @@
 			<div class="footer-button-wrapper">
 				<juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+				             disabled="!$ctrl.canSubmit()"
 				             click="$ctrl.onSubmit()">
 					Submit
 				</juno-button>

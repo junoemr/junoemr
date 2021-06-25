@@ -25,7 +25,8 @@
 
  */
 
-import {DsRule, FlowsheetItem, FlowsheetItemAlert, FlowsheetItemData} from "../../../../generated";
+import {FlowsheetItem, FlowsheetItemAlert, FlowsheetItemData} from "../../../../generated";
+import DsRuleModel from "../../decisionSupport/model/DsRuleModel";
 
 export default class FlowsheetItemModel
 {
@@ -40,7 +41,7 @@ export default class FlowsheetItemModel
 	valueLabel?: string;
 	flowsheetItemAlerts?: Array<FlowsheetItemAlert>;
 	data?: Array<FlowsheetItemData>;
-	rules?: Array<DsRule>;
+	rules?: Array<DsRuleModel>;
 
 	constructor()
 	{

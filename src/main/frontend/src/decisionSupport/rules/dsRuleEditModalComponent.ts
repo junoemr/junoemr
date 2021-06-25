@@ -94,6 +94,11 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 					ctrl.modalInstance.dismiss("cancelled");
 				}
 
+				ctrl.canSubmit = (): boolean =>
+				{
+					return Boolean(ctrl.rule);
+				}
+
 				ctrl.onSubmit = (): void =>
 				{
 					if(ctrl.selectionModeExisting())

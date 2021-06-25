@@ -22,12 +22,14 @@
  */
 package org.oscarehr.decisionSupport2.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DsRuleCreateInput extends AbstractTransientModel
 {
 	private String name;

@@ -25,7 +25,7 @@ package org.oscarehr.flowsheet.transfer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.model.DsRule;
+import org.oscarehr.decisionSupport2.transfer.DsRuleUpdateInput;
 import org.oscarehr.flowsheet.entity.ItemType;
 import org.oscarehr.flowsheet.entity.ValueType;
 
@@ -47,7 +47,7 @@ public class FlowsheetItemCreateUpdateTransfer extends AbstractTransientModel
 	private ValueType valueType;
 	private String valueLabel;
 
-	private List<DsRule> rules;
+	private List<DsRuleUpdateInput> rules;
 
 	public FlowsheetItemCreateUpdateTransfer()
 	{

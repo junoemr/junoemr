@@ -29,6 +29,7 @@ import FlowsheetModel from "../model/FlowsheetModel";
 import {Flowsheet, FlowsheetItem, FlowsheetItemGroup} from "../../../../generated";
 import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
 import FlowsheetItemModel from "../model/FlowsheetItemModel";
+import DsRuleTransferToModelConverter from "../../decisionSupport/converter/DsRuleTransferToModelConverter";
 
 export default class FlowsheetTransferToModelConverter
 {
@@ -71,6 +72,7 @@ export default class FlowsheetTransferToModelConverter
 
 	convertAllItems(items: Array<FlowsheetItem>): Array<FlowsheetItemModel>
 	{
+		const ruleToModelConverter = new DsRuleTransferToModelConverter();
 		return items.map(item =>
 		{
 			const model = new FlowsheetItemModel();
@@ -85,7 +87,7 @@ export default class FlowsheetTransferToModelConverter
 			model.valueLabel = item.valueLabel;
 			model.flowsheetItemAlerts = item.flowsheetItemAlerts;
 			model.data = item.data;
-			model.rules = item.rules;
+			model.rules = ruleToModelConverter.convertAll(item.rules);
 
 			return model;
 		});
