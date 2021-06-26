@@ -71,6 +71,11 @@ export default class PartialDateModel
     {
         let yearRegex = new RegExp("[1-2][0-9][0-9][0-9]");
 
+        if (!this._year && (this._month || this._day))
+        {
+            return false;
+        }
+
         if (!this._year)
         {
             return true;
@@ -88,17 +93,19 @@ export default class PartialDateModel
     {
         let monthRegex = new RegExp("[0-1][0-9]");
 
+        if (this._year && !this._month && this._day)
+        {
+            return false;
+        }
+
         if (!this._month)
         {
             return true;
         }
 
-        if (this._year && this.isValidYear() && this._month)
+        if (this._month.toString().match(monthRegex) && this._month >= 1 && this._month <= 12)
         {
-            if (this._month.toString().match(monthRegex) && this._month >= 1 && this._month <= 12)
-            {
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -113,12 +120,9 @@ export default class PartialDateModel
             return true;
         }
 
-        if (this._year && this.isValidYear() && this._month && this.isValidMonth() && this._day)
+        if (this._day.toString().match(dayRegex) && this._day >= 1 && this._day <= 31)
         {
-            if (this._day.toString().match(dayRegex) && this._day >= 1 && this._day <= 31)
-            {
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -126,34 +130,14 @@ export default class PartialDateModel
 
     public isValidPartialDate()
     {
-        let validYear = this.isValidYear();
-        let validMonth = this.isValidMonth();
         let validDay = this.isValidDay();
+        let validMonth = this.isValidMonth();
+        let validYear = this.isValidYear();
 
         if (this.allFieldsEmpty())
         {
             return true;
         }
-
-        if (validYear)
-        {
-            if (!(this._month))
-            {
-                validMonth = true;
-            }
-            if (!this._day)
-            {
-                validDay = true;
-            }
-        }
-        if (validYear && validMonth)
-        {
-            if (!(this._day))
-            {
-                validDay = true;
-            }
-        }
-
         return validYear && validMonth && validDay;
     }
 

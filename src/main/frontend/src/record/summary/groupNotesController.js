@@ -549,13 +549,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			});
 		}
 
-		controller.onPartialDateChange = (date) =>
-		{
-			if (!controller.allDatesValid())
-			{
-			}
-		}
-
 		controller.allDatesValid = () =>
 		{
 			let startDateValid = true;
@@ -585,10 +578,8 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 			if (startDateValid && resolutionDateValid && procedureDateValid)
 			{
-				console.log("date valid 1");
 				return true;
 			}
-			console.log("date invalid 2");
 			return false;
 		}
 	}

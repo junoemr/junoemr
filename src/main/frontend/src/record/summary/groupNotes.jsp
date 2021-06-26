@@ -154,10 +154,7 @@
 					<div class="form-group col-xs-6">		    
 						<label class="control-label"><bean:message key="oscarEncounter.startdate.title" /></label>
 						<juno-partial-date-select
-								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate"
-								ng-change="groupNotesCtrl.onPartialDateChange(date)"
-								valid
-						>
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate">
 						</juno-partial-date-select>
 					</div>	
 							

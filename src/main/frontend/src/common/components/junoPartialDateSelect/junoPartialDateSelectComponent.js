@@ -124,29 +124,12 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
 
             if (ctrl.ngModel)
             {
-                if (ctrl.fieldsBlank)
-                {
-                    ctrl.year = null;
-                    ctrl.month = null;
-                    ctrl.day = null;
-
-                    ctrl.ngModel.setYear(null);
-                    ctrl.ngModel.setMonth(null);
-                    ctrl.ngModel.setDay(null);
-
-                    ctrl.yearValid = true;
-                    ctrl.monthValid = true;
-                    ctrl.dayValid = true;
-
-                    return;
-                }
-
                 let validDates = ctrl.checkField(field, isYear, isMonth, isDay)
                 ctrl.validYear = validDates[0];
                 ctrl.validMonth = validDates[1];
                 ctrl.validDay = validDates[2];
 
-                ctrl.allFieldsValid = ctrl.validatePartialDate();
+                ctrl.allFieldsValid = ctrl.checkAllFields();
 
                 if (isYear)
                 {
@@ -163,11 +146,6 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
             }
         }
 
-        ctrl.allFieldsBlank = () =>
-        {
-            return (!ctrl.year && !ctrl.month && !ctrl.day);
-        }
-
         ctrl.getInvalidClass = (isInvalid) =>
         {
             if (isInvalid)
@@ -175,40 +153,6 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 return ["field-invalid"];
             }
             return [];
-        }
-
-        ctrl.validatePartialDate = () =>
-        {
-            if (ctrl.allFieldsBlank())
-            {
-                ctrl.yearValid = true;
-                ctrl.monthValid = true;
-                ctrl.dayValid = true;
-
-                return true;
-            }
-
-            // YYYY-DD
-            if (ctrl.year && !ctrl.month && ctrl.day)
-            {
-                ctrl.monthValid = false;
-            }
-            // MM-DD/MM/DD
-            else if (!ctrl.year && (ctrl.month || ctrl.day))
-            {
-                if (!ctrl.month)
-                {
-                    ctrl.monthValid = false;
-                }
-                if (!ctrl.day)
-                {
-                    ctrl.dayValid = false;
-                }
-
-                ctrl.yearValid = false;
-            }
-
-            return ctrl.yearValid && ctrl.monthValid && ctrl.dayValid;
         }
 
         ctrl.checkField = (field, isYear, isMonth, isDay) =>
@@ -222,27 +166,41 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
             {
                 ctrl.year = field;
                 partialDate.setYear(field);
-
-                ctrl.yearValid = partialDate.isValidYear();
-                ctrl.monthValid = partialDate.isValidMonth();
-                ctrl.dayValid = partialDate.isValidDay();
             }
             else if (isMonth)
             {
                 ctrl.month = field;
                 partialDate.setMonth(field);
-
-                ctrl.monthValid = partialDate.isValidMonth();
-                ctrl.dayValid = partialDate.isValidDay();
             }
             else if (isDay)
             {
                 ctrl.day = field;
                 partialDate.setDay(field);
-
-                ctrl.dayValid = partialDate.isValidDay();
             }
+
+            ctrl.yearValid = partialDate.isValidYear();
+            ctrl.monthValid = partialDate.isValidMonth();
+            ctrl.dayValid = partialDate.isValidDay();
+
             return ctrl.yearValid, ctrl.monthValid, ctrl.dayValid;
+        }
+
+        ctrl.checkAllFields = () =>
+        {
+            if (ctrl.allFieldsBlank())
+            {
+                ctrl.yearValid = true;
+                ctrl.monthValid = true;
+                ctrl.dayValid = true;
+
+                return true;
+            }
+            return ctrl.yearValid && ctrl.monthValid && ctrl.dayValid;
+        }
+
+        ctrl.allFieldsBlank = () =>
+        {
+            return (!ctrl.year && !ctrl.month && !ctrl.day);
         }
     }]
 });
