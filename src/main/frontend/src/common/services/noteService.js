@@ -88,7 +88,6 @@ angular.module("Common.Services").service("noteService", [
 		{
 			var deferred = $q.defer();
 
-			console.log(note);
 			$http.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/saveIssueNote', note).then(
 				function success(results)
