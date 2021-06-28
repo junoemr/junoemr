@@ -130,14 +130,15 @@ export default class PartialDateModel
 
     public isValidPartialDate()
     {
-        let validDay = this.isValidDay();
-        let validMonth = this.isValidMonth();
-        let validYear = this.isValidYear();
-
         if (this.allFieldsEmpty())
         {
             return true;
         }
+
+        let validDay = this.isValidDay();
+        let validMonth = this.isValidMonth();
+        let validYear = this.isValidYear();
+
         return validYear && validMonth && validDay;
     }
 

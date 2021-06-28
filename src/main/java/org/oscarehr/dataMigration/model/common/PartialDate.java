@@ -25,12 +25,15 @@ package org.oscarehr.dataMigration.model.common;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.util.MiscUtils;
 
+import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.format.TextStyle;
+import java.util.Date;
 import java.util.Locale;
 
 import static org.oscarehr.common.model.PartialDate.FORMAT_FULL_DATE;
@@ -243,5 +246,30 @@ public class PartialDate extends AbstractTransientModel
 			return parseDate(year + "-" + month + "-" + day);
 		}
 		return null;
+	}
+
+	public static Date toFullDate(PartialDate partialDate)
+	{
+		if (partialDate != null && !partialDate.allFieldsEmpty())
+		{
+			String localDateString = partialDate.toLocalDate().toString();
+			SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+
+			try
+			{
+				Date fullDate = parser.parse(localDateString);
+				return fullDate;
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().error("error",e);
+			}
+		}
+		return null;
+	}
+
+	public boolean allFieldsEmpty()
+	{
+		return this.year == null && this.month == null && this.day == null;
 	}
 }
