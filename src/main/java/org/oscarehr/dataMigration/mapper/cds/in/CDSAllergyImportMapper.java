@@ -29,8 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.AdverseReactionSeverity;
 import xml.cds.v5_0.AllergiesAndAdverseReactions;
+import xml.cds.v5_0.DateTimeFullOrPartial;
 import xml.cds.v5_0.DrugCode;
 import xml.cds.v5_0.PropertyOfOffendingAgent;
+
+import java.time.LocalDateTime;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ONSET_REACTION;
@@ -59,16 +62,7 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		allergy.setLifeStage(getLifeStage(importStructure.getLifeStage()));
 		allergy.setSeverityOfReaction(getSeverity(importStructure.getSeverity()));
 		allergy.setReaction(importStructure.getReaction());
-
-		if (toNullableLocalDateTime(importStructure.getRecordedDate()) != null)
-		{
-
-			allergy.setEntryDateTime(toNullableLocalDateTime(importStructure.getRecordedDate()));
-		}
-		else
-		{
-			allergy.setEntryDateTime(patientImportContextService.getContext().getDefaultDate().atStartOfDay());
-		}
+		allergy.setEntryDateTime(getEntryDateTimeWithDefault(importStructure.getRecordedDate()));
 
 		allergy.setAnnotation(importStructure.getNotes());
 
@@ -138,5 +132,14 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		}
 
 		return severity;
+	}
+
+	protected LocalDateTime getEntryDateTimeWithDefault(DateTimeFullOrPartial recordedDate)
+	{
+		if (recordedDate == null)
+		{
+			return patientImportContextService.getContext().getDefaultDate().atStartOfDay();
+		}
+		return toNullableLocalDateTime(recordedDate);
 	}
 }
