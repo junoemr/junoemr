@@ -222,4 +222,26 @@ public class PartialDate extends AbstractTransientModel
 		}
 		return partialDate;
 	}
+
+	public static PartialDate parseDate(String dateValueString, String format)
+	{
+		String[] dateParts = dateValueString.split("-");
+		String year = dateParts[0];
+		String month = dateParts[1];
+		String day = dateParts[2];
+
+		if (format.equals(org.oscarehr.common.model.PartialDate.FORMAT_YEAR_ONLY))
+		{
+			return parseDate(year);
+		}
+		else if (format.equals(org.oscarehr.common.model.PartialDate.FORMAT_YEAR_MONTH))
+		{
+			return parseDate(year + "-" + month);
+		}
+		else if (format.equals(org.oscarehr.common.model.PartialDate.FORMAT_FULL_DATE))
+		{
+			return parseDate(year + "-" + month + "-" + day);
+		}
+		return null;
+	}
 }
