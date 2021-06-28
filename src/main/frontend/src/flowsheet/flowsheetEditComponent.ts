@@ -169,17 +169,31 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					});
 				}
 
-				ctrl.onRemoveItem = async (itemGroup, item): Promise<void> =>
+				ctrl.onRemoveItem = async (item, itemGroup): Promise<void> =>
 				{
 					// @ts-ignore
 					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Remove flowsheet item",
-						"Are you sure you want to remove this item from the flowsheet?",
+						"Are you sure you want to remove this item from the flowsheet group?",
 						ctrl.componentStyle);
 
 					if(confirmation)
 					{
 						itemGroup.flowsheetItems = itemGroup.flowsheetItems.filter((entry) => !(entry.type === item.type && entry.typeCode === item.typeCode));
+					}
+				}
+
+				ctrl.onRemoveGroup = async (group): Promise<void> =>
+				{
+					// @ts-ignore
+					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
+						"Remove flowsheet group",
+						"Are you sure you want to remove this group (and all items within it) from the flowsheet?",
+						ctrl.componentStyle);
+
+					if(confirmation)
+					{
+						ctrl.flowsheet.flowsheetItemGroups = ctrl.flowsheet.flowsheetItemGroups.filter((entry) => !(entry.name === group.name));
 					}
 				}
 

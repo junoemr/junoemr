@@ -62,7 +62,10 @@
 	</div>
 
 	<div class="flex-column">
-		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups" model="itemGroup">
+		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups"
+		                      model="itemGroup"
+		                      show-delete="true"
+		                      on-delete="$ctrl.onRemoveGroup(group)">
 			<div class="flex-column flex-grow">
 				<div class="flex-row flex-grow justify-content-between">
 					<div class="flex flex-grow">
@@ -84,20 +87,10 @@
 					</div>
 				</div>
 				<div ng-repeat="item in itemGroup.flowsheetItems" class="flex-row flex-grow align-items-center">
-<%--					<div class="flex flex-grow">--%>
-<%--				<div class="width-100" ng-repeat="item in itemGroup.flowsheetItems">--%>
-						<flowsheet-edit-item model="item" class="flex-grow">
-						</flowsheet-edit-item>
-<%--					</div>--%>
-					<div class="icon-only-button-wrapper">
-						<juno-button component-style="$ctrl.componentStyle"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-						             disabled="$ctrl.isLoading"
-						             click="$ctrl.onRemoveItem(itemGroup, item)">
-							<i class="icon icon-delete"></i>
-						</juno-button>
-					</div>
+					<flowsheet-edit-item model="item"
+					                     on-delete="$ctrl.onRemoveItem(item, itemGroup)"
+					                     class="flex-grow">
+					</flowsheet-edit-item>
 				</div>
 				<div class="flex-row flex-grow">
 					<div class="add-button-wrapper">

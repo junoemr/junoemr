@@ -1,4 +1,7 @@
 <div class="flowsheet-edit-item">
+	<juno-modal-close-button click="$ctrl.onClose()" class="item-close-button">
+	</juno-modal-close-button>
+
 	<div class="flex-row justify-content-between align-items-center">
 		<div class="flex-column flex-grow">
 			<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
@@ -27,19 +30,12 @@
 		</div>
 	</div>
 	<div class="flex-column">
-		<div class="flex-row fex-grow align-items-center" ng-repeat="rule in $ctrl.model.rules">
-			<flowsheet-item-rule model="rule" class="flex-grow">
+<%--		<div class="flex-row fex-grow align-items-center" ng-repeat="rule in $ctrl.model.rules">--%>
+			<flowsheet-item-rule ng-repeat="rule in $ctrl.model.rules"
+			                     model="rule" class="flex-grow"
+			                     on-delete="$ctrl.removeRule(rule)">
 			</flowsheet-item-rule>
-			<div class="delete-button-wrapper">
-				<juno-button component-style="$ctrl.componentStyle"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
-				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-				             disabled="$ctrl.isLoading"
-				             click="$ctrl.removeRule(rule)">
-					<i class="icon icon-delete"></i>
-				</juno-button>
-			</div>
-		</div>
+<%--		</div>--%>
 	</div>
 	<div class="flex-row flex-grow">
 		<div class="add-button-wrapper">

@@ -23,6 +23,7 @@
 
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
+import DsRuleModel from "../../lib/decisionSupport/model/DsRuleModel";
 
 angular.module('DecisionSupport').component('dsRuleEditModal',
 	{
@@ -45,12 +46,12 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.ruleSelectionOptions = [];
+				ctrl.selectedRuleId = null;
 				ctrl.selectedRule = null;
 
 				ctrl.rule = null;
 				ctrl.checkUseExisting = true;
 				ctrl.checkCreateNew = false;
-				ctrl.isLoading = false;
 
 				ctrl.isLoading = true;
 
@@ -84,9 +85,21 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 					return ctrl.checkCreateNew;
 				}
 
-				ctrl.selectRole = (value, option): void =>
+				ctrl.onRuleSelect = (value, option): void =>
 				{
-					ctrl.rule = option.data;
+					ctrl.selectedRule = option.data;
+				}
+
+				ctrl.getRule = (): DsRuleModel =>
+				{
+					if(ctrl.selectionModeExisting())
+					{
+						return ctrl.selectedRule;
+					}
+					else
+					{
+						return ctrl.rule;
+					}
 				}
 
 				ctrl.onCancel = (): void =>
@@ -96,7 +109,7 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 
 				ctrl.canSubmit = (): boolean =>
 				{
-					return Boolean(ctrl.rule);
+					return Boolean(ctrl.getRule());
 				}
 
 				ctrl.onSubmit = (): void =>
@@ -114,12 +127,13 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 				ctrl.onSelectExisting = (): void =>
 				{
 
-					ctrl.modalInstance.close(ctrl.rule);
+					ctrl.modalInstance.close(ctrl.getRule());
 				}
 
 				ctrl.onSaveAndSelectNew = (): void =>
 				{
-					ctrl.modalInstance.close(ctrl.rule);
+					// TODO save new rule
+					ctrl.modalInstance.close(ctrl.getRule());
 				}
 
 			}]

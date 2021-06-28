@@ -21,7 +21,6 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
 import {ValueType} from "../../lib/flowsheet/FlowsheetConstants";
 
@@ -31,7 +30,7 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
-			deleteCallback: "&?",
+			onDelete: "&?",
 		},
 		controller: [
 			'$uibModal',
@@ -39,7 +38,6 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 			{
 				const ctrl = this;
 
-				ctrl.SecurityPermissions = SecurityPermissions;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -90,6 +88,14 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 					if(confirmation)
 					{
 						ctrl.model.rules = ctrl.model.rules.filter((entry) => entry.id !== rule.id);
+					}
+				}
+
+				ctrl.onClose = () =>
+				{
+					if(ctrl.onDelete)
+					{
+						ctrl.onDelete({item: ctrl.model});
 					}
 				}
 			}]

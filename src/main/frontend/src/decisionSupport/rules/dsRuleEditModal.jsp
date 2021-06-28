@@ -20,8 +20,8 @@
 					<juno-select placeholder="Select Rule"
 					             options="$ctrl.ruleSelectionOptions"
 					             disabled="!$ctrl.selectionModeExisting()"
-					             on-change="$ctrl.selectRole(value, option)"
-					             ng-model="$ctrl.selectedRule">
+					             on-change="$ctrl.onRuleSelect(value, option)"
+					             ng-model="$ctrl.selectedRuleId">
 					</juno-select>
 				</div>
 			</div>

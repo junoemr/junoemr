@@ -21,20 +21,32 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-
 angular.module('Flowsheet').component('flowsheetItemGroup',
 	{
 		templateUrl: 'src/flowsheet/components/flowsheetItemGroup.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
+			showDelete: "<?",
+			onDelete: "&?",
 		},
 		transclude: true,
 		controller: [
 			function ()
 			{
 				const ctrl = this;
+
+				ctrl.$onInit = (): void =>
+				{
+					ctrl.showDelete = ctrl.showDelete || false;
+				}
+
+				ctrl.onClose = () =>
+				{
+					if(ctrl.onDelete)
+					{
+						ctrl.onDelete({group: ctrl.model});
+					}
+				}
 			}]
 	});
