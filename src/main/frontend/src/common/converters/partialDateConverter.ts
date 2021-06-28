@@ -86,7 +86,7 @@ export abstract class PartialDateConverter
             "year": {leap: false, value: 1},
             "month": 1,
             "day": 1
-        };
+        } as PartialDate;
 
         partialDate.year.leap = this.isLeapYear(partialDateModel.getYear());
         partialDate.year.value = parseInt(partialDateModel.getYear());

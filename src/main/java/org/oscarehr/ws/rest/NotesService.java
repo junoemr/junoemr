@@ -103,7 +103,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.oscarehr.common.model.PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE;
 import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
 
