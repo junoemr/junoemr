@@ -23,13 +23,8 @@
 
 package org.oscarehr.integration.myhealthaccess.exception;
 
-public class RecordNotUniqueException extends RuntimeException
+public class RecordNotUniqueException extends BaseException
 {
-	public RecordNotUniqueException()
-	{
-		super();
-	}
-
 	public RecordNotUniqueException(String msg)
 	{
 		super(msg);

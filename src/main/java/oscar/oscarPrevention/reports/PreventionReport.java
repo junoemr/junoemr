@@ -25,17 +25,18 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.oscarehr.util.LoggedInInfo;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
-
-import org.oscarehr.util.LoggedInInfo;
 
 /**
  *
  * @author jay
  */
 public interface PreventionReport {
+    public boolean displayNumShots();
+
     public Hashtable runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate);
-    boolean displayNumShots();
 }

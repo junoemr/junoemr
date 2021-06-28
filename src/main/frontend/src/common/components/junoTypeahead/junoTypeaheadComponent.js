@@ -33,6 +33,7 @@ angular.module('Common.Components').component('junoTypeahead',
 		model: '=',
 		options: "<",
 		placeholder: "@?",
+		icon: "@?",
 		onEnterKey: '&?',
 		onChange: "&?",
 		onSelected: "&?",
@@ -102,9 +103,6 @@ angular.module('Common.Components').component('junoTypeahead',
 					ctrl.onChange({value: ctrl.selectedValue});
 				}
 			}
-
-			ctrl.model = null;
-			lastModel = null;
 		}
 
 		ctrl.getOptions = async (viewValue) =>
@@ -135,6 +133,8 @@ angular.module('Common.Components').component('junoTypeahead',
 			{
 				ctrl.onSelected({value: ctrl.selectedValue});
 			}
+
+			ctrl.doOnChange();
 		}
 
 		ctrl.onKeyPress = function (event)
@@ -156,6 +156,13 @@ angular.module('Common.Components').component('junoTypeahead',
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
+		}
+
+		ctrl.inputClasses = () =>
+		{
+			return {
+				"shift-right-for-icon": !!ctrl.icon,
+			}
 		}
 
 	}]

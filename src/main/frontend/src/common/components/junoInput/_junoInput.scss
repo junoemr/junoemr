@@ -18,6 +18,14 @@ juno-input {
 			}
 		}
 
+		.icon {
+			font-size: 16px;
+
+			position: absolute;
+			top: calc(50% - 8px);
+			left: 8px;
+		}
+
 		input {
 			width: 100%;
 
@@ -37,6 +45,10 @@ juno-input {
 
 			&.field-disabled {
 				cursor: not-allowed;
+			}
+
+			&.shift-right-for-icon {
+				padding-left: 32px;
 			}
 		}
 	}
