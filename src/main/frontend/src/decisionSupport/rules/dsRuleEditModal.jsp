@@ -4,7 +4,7 @@
 		<h3>Decision Rules</h3>
 	</modal-title>
 	<modal-ctl-buttons>
-		<juno-modal-close-button click="$ctrl.onCancel()"></juno-modal-close-button>
+		<juno-simple-close-button click="$ctrl.onCancel()"></juno-simple-close-button>
 	</modal-ctl-buttons>
 	<modal-body>
 		<div class="flex-column height-100">

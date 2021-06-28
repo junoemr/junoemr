@@ -237,7 +237,7 @@ module.exports = {
 			'./src/common/components/filterPanel/filterPanelController.ts',
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
-			'./src/common/components/junoModalCloseButton/junoModalCloseButtonComponent.ts',
+			'./src/common/components/junoSimpleCloseButton/junoSimpleCloseButtonComponent.ts',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoFileChooser/junoFileChooserComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',

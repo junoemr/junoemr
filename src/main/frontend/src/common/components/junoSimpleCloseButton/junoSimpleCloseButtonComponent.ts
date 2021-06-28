@@ -21,8 +21,8 @@
 * Canada
 */
 
-angular.module('Common.Components').component('junoModalCloseButton', {
-	templateUrl: 'src/common/components/junoModalCloseButton/junoModalCloseButton.jsp',
+angular.module('Common.Components').component('junoSimpleCloseButton', {
+	templateUrl: 'src/common/components/junoSimpleCloseButton/junoSimpleCloseButton.jsp',
 	bindings: {
 		click: "&",
 		tooltip: "@?",

@@ -1,6 +1,6 @@
 <div class="flowsheet-edit-item">
-	<juno-modal-close-button click="$ctrl.onClose()" class="item-close-button">
-	</juno-modal-close-button>
+	<juno-simple-close-button click="$ctrl.onClose()" class="item-close-button">
+	</juno-simple-close-button>
 
 	<div class="flex-row justify-content-between align-items-center">
 		<div class="flex-column flex-grow">
