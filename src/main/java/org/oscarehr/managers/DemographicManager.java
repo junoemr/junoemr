@@ -71,6 +71,7 @@ import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -1304,35 +1305,38 @@ public class DemographicManager {
 
 	public List<DemographicExtTo1> setExtraAddress(DemographicTo1 demographic)
 	{
+		List<String> alternateAddress = Arrays.asList(DemographicExt.ALTERNATE_ADDRESS, DemographicExt.CITY, DemographicExt.POSTAL, DemographicExt.PROVINCE);
 		List<DemographicExtTo1> extrasList = new ArrayList<>();
+		for(String address: alternateAddress)
+		{
+			DemographicExtTo1 extraAddress = new DemographicExtTo1();
 
-		DemographicExtTo1 extraAddress = new DemographicExtTo1();
-		extraAddress.setDemographicNo(demographic.getDemographicNo());
-		extraAddress.setKey(DemographicExt.ALTERNATE_ADDRESS);
-		extraAddress.setValue(demographic.getAddress2().getAddress());
-		extraAddress.setDateCreated(new Date());
-		extrasList.add(extraAddress);
+			extraAddress.setDemographicNo(demographic.getDemographicNo());
+			extraAddress.setDateCreated(new Date());
 
-		DemographicExtTo1 extraCity = new DemographicExtTo1();
-		extraCity.setDemographicNo(demographic.getDemographicNo());
-		extraCity.setKey(DemographicExt.CITY);
-		extraCity.setValue(demographic.getAddress2().getCity());
-		extraCity.setDateCreated(new Date());
-		extrasList.add(extraCity);
 
-		DemographicExtTo1 extraPostal = new DemographicExtTo1();
-		extraPostal.setDemographicNo(demographic.getDemographicNo());
-		extraPostal.setKey(DemographicExt.POSTAL);
-		extraPostal.setValue(demographic.getAddress2().getPostal());
-		extraPostal.setDateCreated(new Date());
-		extrasList.add(extraPostal);
+			switch (address)
+			{
+				case DemographicExt.ALTERNATE_ADDRESS:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getAddress());
+					break;
+				case DemographicExt.CITY:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getCity());
+					break;
+				case DemographicExt.POSTAL:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getPostal());
+					break;
+				case DemographicExt.PROVINCE:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getProvince());
+					break;
+			}
 
-		DemographicExtTo1 extraProvince = new DemographicExtTo1();
-		extraProvince.setDemographicNo(demographic.getDemographicNo());
-		extraProvince.setKey(DemographicExt.PROVINCE);
-		extraProvince.setValue(demographic.getAddress2().getProvince());
-		extraProvince.setDateCreated(new Date());
-		extrasList.add(extraProvince);
+			extrasList.add(extraAddress);
+		}
 		return extrasList;
 	}
 }
