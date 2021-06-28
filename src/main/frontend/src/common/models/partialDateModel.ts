@@ -78,7 +78,7 @@ export default class PartialDateModel
 
         if (!this._year)
         {
-            return true;
+            return false;
         }
 
         if (this._year.toString().match(yearRegex))
@@ -130,11 +130,6 @@ export default class PartialDateModel
 
     public isValidPartialDate()
     {
-        if (this.allFieldsEmpty())
-        {
-            return true;
-        }
-
         let validDay = this.isValidDay();
         let validMonth = this.isValidMonth();
         let validYear = this.isValidYear();
