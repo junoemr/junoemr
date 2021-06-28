@@ -24,6 +24,7 @@ package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.decisionSupport2.model.condition.ConditionType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,16 +43,6 @@ import javax.persistence.Table;
 @Table(name = "ds_rule_condition")
 public class DsRuleCondition extends AbstractModel<Integer>
 {
-	public enum ConditionType {
-		VALUE_GT,
-		VALUE_GE,
-		VALUE_LT,
-		VALUE_LE,
-		MONTHS_SINCE,
-		NEVER_GIVEN,
-		IS_GENDER,
-		NOT_GENDER,
-	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

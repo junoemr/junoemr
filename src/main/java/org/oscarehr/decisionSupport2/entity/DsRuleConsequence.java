@@ -24,6 +24,7 @@ package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.decisionSupport2.model.consequence.ConsequenceType;
 import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 
 import javax.persistence.Column;
@@ -43,10 +44,6 @@ import javax.persistence.Table;
 @Table(name = "ds_rule_consequence")
 public class DsRuleConsequence extends AbstractModel<Integer>
 {
-	public enum ConsequenceType {
-		ALERT,
-		HIDDEN
-	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

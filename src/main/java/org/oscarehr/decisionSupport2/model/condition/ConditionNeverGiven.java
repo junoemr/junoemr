@@ -28,6 +28,11 @@ import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 @Data
 public class ConditionNeverGiven extends DsCondition
 {
+	public ConditionNeverGiven()
+	{
+		super(ConditionType.NEVER_GIVEN);
+	}
+
 	@Override
 	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{

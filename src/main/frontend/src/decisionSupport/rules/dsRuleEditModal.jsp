@@ -7,7 +7,7 @@
 		<juno-modal-close-button click="$ctrl.onCancel()"></juno-modal-close-button>
 	</modal-ctl-buttons>
 	<modal-body>
-		<div class="flex-column">
+		<div class="flex-column height-100">
 			<div class="flex-row">
 				<div class="row-item">
 					<juno-check-box label="Use Existing Rule"
@@ -25,12 +25,17 @@
 					</juno-select>
 				</div>
 			</div>
-			<div class="flex-row">
+			<div class="flex-row overflow-auto">
 				<juno-check-box label="Create New Rule"
 				                label-position="$ctrl.LABEL_POSITION.LEFT"
 				                change="$ctrl.toggleRuleSelectionMode(value)"
 				                ng-model="$ctrl.checkCreateNew">
 				</juno-check-box>
+				<ds-rule-builder ng-if="$ctrl.selectionModeNewRule()"
+				                 model="$ctrl.newRule"
+				                 disabled="!$ctrl.selectionModeNewRule()"
+				                 class="width-100">
+				</ds-rule-builder>
 			</div>
 		</div>
 

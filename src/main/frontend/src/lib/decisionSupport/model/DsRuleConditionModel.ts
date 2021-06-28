@@ -24,27 +24,18 @@
     Canada
 
  */
-import DsRuleConsequenceModel from "./DsRuleConsequenceModel";
-import DsRuleConditionModel from "./DsRuleConditionModel";
 
-export default class DsRuleModel {
+import {DsCondition} from "../../../../generated";
+
+export default class DsRuleConditionModel {
     id?: number;
     name: string;
-    description?: string;
-    systemManaged?: boolean;
-    conditions?: Array<DsRuleConditionModel>;
-    consequences?: Array<DsRuleConsequenceModel>;
+    value: string;
+    type: DsCondition.TypeEnum;
 
     constructor()
     {
-        this.systemManaged = false;
-        this.conditions = [];
-        this.consequences = [];
-    }
-
-    public isValid = (): boolean =>
-    {
-        return ((this.conditions && this.conditions.length > 0) && (this.consequences && this.consequences.length > 0));
+        this.type = DsCondition.TypeEnum.NEVER_GIVEN; // default type
     }
 }
 

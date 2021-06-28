@@ -25,8 +25,10 @@
 
  */
 
-import {DsRule} from "../../../../generated";
+import {DsCondition, DsConsequence, DsRule} from "../../../../generated";
 import DsRuleModel from "../model/DsRuleModel";
+import DsRuleConditionModel from "../model/DsRuleConditionModel";
+import DsRuleConsequenceModel from "../model/DsRuleConsequenceModel";
 
 export default class DsRuleTransferToModelConverter
 {
@@ -37,8 +39,8 @@ export default class DsRuleTransferToModelConverter
 		model.name = transfer.name;
 		model.description = transfer.description;
 		model.systemManaged = transfer.systemManaged;
-		model.conditions = transfer.conditions;
-		model.consequences = transfer.consequences;
+		model.conditions = this.convertConditions(transfer.conditions);
+		model.consequences = this.convertConsequences(transfer.consequences);
 
 		return model;
 	}
@@ -46,5 +48,32 @@ export default class DsRuleTransferToModelConverter
 	convertAll(transferList: Array<DsRule>): Array<DsRuleModel>
 	{
 		return transferList.map((transfer) => this.convert(transfer));
+	}
+
+	convertConditions(transfers: Array<DsCondition>): Array<DsRuleConditionModel>
+	{
+		return transfers.map((transfer) =>
+		{
+			const model = new DsRuleConditionModel();
+			model.id = transfer.id;
+			model.name = transfer.name;
+			model.type = transfer.type;
+			model.value = transfer.value;
+			return model;
+		});
+	}
+
+	convertConsequences(transfers: Array<DsConsequence>): Array<DsRuleConsequenceModel>
+	{
+		return transfers.map((transfer) =>
+		{
+			const model = new DsRuleConsequenceModel();
+			model.id = transfer.id;
+			model.name = transfer.name;
+			model.type = transfer.type;
+			model.severityLevel = transfer.severityLevel;
+			model.message = transfer.message;
+			return model;
+		});
 	}
 }

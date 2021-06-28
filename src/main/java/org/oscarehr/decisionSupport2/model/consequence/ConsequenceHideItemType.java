@@ -28,6 +28,11 @@ import org.oscarehr.decisionSupport2.model.DsInfoCache;
 @Data
 public class ConsequenceHideItemType extends DsConsequence
 {
+	public ConsequenceHideItemType()
+	{
+		super(ConsequenceType.HIDDEN);
+	}
+
 	@Override
 	public void apply(String typeCode, DsInfoCache dsInfoCache)
 	{

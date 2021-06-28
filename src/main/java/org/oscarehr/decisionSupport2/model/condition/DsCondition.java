@@ -32,6 +32,12 @@ public abstract class DsCondition extends AbstractTransientModel
 	private Integer id;
 	private String name;
 	private String value;
+	private ConditionType type;
+
+	public DsCondition(ConditionType type)
+	{
+		this.type = type;
+	}
 
 	public abstract boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup);
 }

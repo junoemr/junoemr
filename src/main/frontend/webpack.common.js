@@ -279,6 +279,7 @@ module.exports = {
 			'./src/decisionSupport/module.js',
 			'./src/decisionSupport/decisionSupportApi.service.ts',
 			'./src/decisionSupport/rules/dsRuleEditModalComponent.ts',
+			'./src/decisionSupport/rules/dsRuleBuilderComponent.ts',
 
 			'./src/interceptor/module.js',
 			'./src/interceptor/errorInterceptor.js',

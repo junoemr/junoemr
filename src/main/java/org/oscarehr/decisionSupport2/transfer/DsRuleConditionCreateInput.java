@@ -25,13 +25,13 @@ package org.oscarehr.decisionSupport2.transfer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.entity.DsRuleCondition;
+import org.oscarehr.decisionSupport2.model.condition.ConditionType;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DsRuleConditionCreateInput extends AbstractTransientModel
 {
 	private String name;
-	private DsRuleCondition.ConditionType type;
+	private ConditionType type;
 	private String value;
 }

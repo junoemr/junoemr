@@ -25,7 +25,7 @@ package org.oscarehr.decisionSupport2.transfer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.entity.DsRuleConsequence;
+import org.oscarehr.decisionSupport2.model.consequence.ConsequenceType;
 import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 
 @Data
@@ -33,7 +33,7 @@ import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 public class DsRuleConsequenceCreateInput extends AbstractTransientModel
 {
 	private String name;
-	private DsRuleConsequence.ConsequenceType type;
+	private ConsequenceType type;
 	private SeverityLevel severityLevel;
 	private String message;
 }

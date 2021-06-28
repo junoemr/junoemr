@@ -49,7 +49,7 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 				ctrl.selectedRuleId = null;
 				ctrl.selectedRule = null;
 
-				ctrl.rule = null;
+				ctrl.newRule = null;
 				ctrl.checkUseExisting = true;
 				ctrl.checkCreateNew = false;
 
@@ -98,7 +98,7 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 					}
 					else
 					{
-						return ctrl.rule;
+						return ctrl.newRule;
 					}
 				}
 
@@ -109,31 +109,25 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 
 				ctrl.canSubmit = (): boolean =>
 				{
-					return Boolean(ctrl.getRule());
+					const rule = ctrl.getRule();
+					return Boolean(rule && rule.isValid());
 				}
 
-				ctrl.onSubmit = (): void =>
+				ctrl.onSubmit = async (): Promise<void> =>
 				{
-					if(ctrl.selectionModeExisting())
+					try
 					{
-						ctrl.onSelectExisting();
+						if (ctrl.selectionModeNewRule())
+						{
+							ctrl.newRule = await decisionSupportApiService.createRule(ctrl.newRule);
+						}
+						ctrl.modalInstance.close(ctrl.getRule());
 					}
-					else
+					catch (error)
 					{
-						ctrl.onSaveAndSelectNew();
+						// @ts-ignore
+						console.error(error);
 					}
-				}
-
-				ctrl.onSelectExisting = (): void =>
-				{
-
-					ctrl.modalInstance.close(ctrl.getRule());
-				}
-
-				ctrl.onSaveAndSelectNew = (): void =>
-				{
-					// TODO save new rule
-					ctrl.modalInstance.close(ctrl.getRule());
 				}
 
 			}]

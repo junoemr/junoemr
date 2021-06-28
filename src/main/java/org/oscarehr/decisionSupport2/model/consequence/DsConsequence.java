@@ -33,6 +33,12 @@ public abstract class DsConsequence extends AbstractTransientModel
 	private String name;
 	private String message;
 	private SeverityLevel severityLevel;
+	private ConsequenceType type;
+
+	public DsConsequence(ConsequenceType type)
+	{
+		this.type = type;
+	}
 
 	public abstract void apply(String typeCode, DsInfoCache dsInfoCache);
 }

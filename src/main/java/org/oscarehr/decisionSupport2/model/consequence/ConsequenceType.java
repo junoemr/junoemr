@@ -22,33 +22,8 @@
  */
 package org.oscarehr.decisionSupport2.model.consequence;
 
-import lombok.Data;
-import org.oscarehr.decisionSupport2.model.DsInfoCache;
-
-@Data
-public class ConsequenceAlert extends DsConsequence
+public enum ConsequenceType
 {
-	public ConsequenceAlert()
-	{
-		super(ConsequenceType.ALERT);
-	}
-
-	@Override
-	public void apply(String typeCode, DsInfoCache dsInfoCache)
-	{
-		switch(getSeverityLevel())
-		{
-			case RECOMMENDATION:
-			{
-				dsInfoCache.addRecommendation(typeCode, getMessage());
-				break;
-			}
-			case WARNING:
-			case DANGER:
-			{
-				dsInfoCache.addWarning(typeCode, getMessage());
-				break;
-			}
-		}
-	}
+	ALERT,
+	HIDDEN
 }

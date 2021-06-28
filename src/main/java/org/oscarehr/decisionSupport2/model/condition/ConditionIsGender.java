@@ -28,6 +28,11 @@ import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 @Data
 public class ConditionIsGender extends DsCondition
 {
+	public ConditionIsGender()
+	{
+		super(ConditionType.IS_GENDER);
+	}
+
 	@Override
 	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{

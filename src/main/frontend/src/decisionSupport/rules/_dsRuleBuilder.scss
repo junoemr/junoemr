@@ -1,0 +1,12 @@
+.ds-rule-builder {
+	background-color: var(--color-neutral-lightest);
+	border-color: var(--color-neutral-lighter);
+	border-radius: 8px;
+
+	.add-button-wrapper {
+		width: 32px;
+		i {
+			font-size: 16px;
+		}
+	}
+}
