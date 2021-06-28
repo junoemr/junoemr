@@ -670,38 +670,58 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalComplete = async function isPostalComplete(postalCode, province)
+		controller.isPostalComplete = function isPostalComplete(address)
 		{
 			// If Canadian province is selected, proceed with validation
-			if (postalCode !== null && province !== null && province !== "OT" && province.indexOf("US") !== 0)
-			{
-				postalCode = await controller.isPostalValid(postalCode)
-				controller.resetEditState();
-			}
-			return postalCode;
+				if (address.postal !== null && address.province !== null && address.province !== "OT" && address.province.indexOf("US") !== 0)
+				{
+					if (controller.isPostalValid(address))
+					{
+						return true;
+					}
+
+					controller.resetEditState();
+					return false;
+				}
+			return true;
 		};
 
-		controller.isPostalValid = function isPostalValid(postalCode)
+		controller.isPostalValid = function isPostalValid(address)
 		{
-			let postal = postalCode.replace(/\s/g, ""); // Trim whitespace
+
+			var additionalAddress = address === controller.page.demo.address2;
+			var postal = address.postal.replace(/\s/g, ""); // Trim whitespace
 
 			// If postal code is an empty string, set it to null and continue
-			if(postal.length === 0)
+			if(postal.length === 0 && !additionalAddress)
 			{
-				postal = null;
+				controller.page.demo.address.postal = null;
+				return true;
 			}
+			else if(postal.length === 0 && additionalAddress)
+            {
+                controller.page.demo.address2.postal = null;
+                return true;
+            }
 
 			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/); // Match to Canadian postal code standard (minus the space)
 			if (regex.test(postal))
 			{
 				// Format postal code to Canadian standard
-				postal = postal.substring(0, 3) + " " + postal.substring(3);
-				return postal;
-			}
-			else
-			{
+				if(!additionalAddress)
+                {
+                    controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
+                    return true;
+                }
+				else
+				{
+					controller.page.demo.address2.postal = postal.substring(0, 3) + " " + postal.substring(3);
+					return true;
+				}
+
+			}else {
 				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
-				return "";
+				return false;
 			}
 		};
 
@@ -1064,7 +1084,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//-----------------//
 		// save operations //
 		//-----------------//
-		controller.save = async function save()
+		controller.save = function save()
 		{
 			if (!Juno.Validations.allValidationsValid(controller.validations))
 			{
@@ -1080,15 +1100,18 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				alert("Last Name is required");
 				return;
-			} else if (controller.page.demo.firstName == null || controller.page.demo.firstName == "")
+			}
+			else if (controller.page.demo.firstName == null || controller.page.demo.firstName == "")
 			{
 				alert("First Name is required");
 				return;
-			} else if (controller.page.demo.sex == null || controller.page.demo.sex == "")
+			}
+			else if (controller.page.demo.sex == null || controller.page.demo.sex == "")
 			{
 				alert("Sex is required");
 				return;
-			} else if (dateEmpty(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay))
+			}
+			else if (dateEmpty(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay))
 			{
 				alert("Date of Birth is required");
 				return;
@@ -1101,17 +1124,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				return;
 			}
 			if (!controller.checkPatientStatus()) return;
-			controller.page.demo.address.postal = await controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province);
-			controller.page.demo.address2.postal = await controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province);
-			if (controller.page.demo.address.postal === null || controller.page.demo.address2.postal === null) return;
-			//if (!controller.isPostalComplete(controller.page.demo.address2)) return;
+			if (!controller.isPostalComplete(controller.page.demo.address)) return;
+			if (!controller.isPostalComplete(controller.page.demo.address2)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 
 			if (Juno.Common.Util.exists(controller.page.demo.hin))
-			{
-				controller.page.demo.hin = controller.page.demo.hin.replace(/[\W_]/gi, '');
-			}
+            {
+                controller.page.demo.hin = controller.page.demo.hin.replace(/[\W_]/gi, '');
+            }
 
 			//save notes
 			if (controller.page.demo.scrNotes != null)
