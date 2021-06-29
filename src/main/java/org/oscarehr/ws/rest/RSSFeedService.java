@@ -33,12 +33,15 @@ import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.RSSResponse;
 import org.oscarehr.ws.rest.to.model.RssItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +69,9 @@ public class RSSFeedService extends AbstractServiceImpl {
 
 	Logger logger = MiscUtils.getLogger();
 	
+	@Autowired
+	SystemPreferenceService systemPreferenceService;
+
 	@GET
 	@Path("/rss")
 	@Produces("application/json")
@@ -78,9 +84,8 @@ public class RSSFeedService extends AbstractServiceImpl {
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {
-			if(key.equals("k2a")) {
+			if(key.equals("k2a") && systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false)) {
 				securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_READ);
-
 				AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	    		AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
 	    		

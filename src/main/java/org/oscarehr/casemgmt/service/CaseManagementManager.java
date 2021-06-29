@@ -2141,8 +2141,7 @@ private String updateApptStatus(String status, String type) {
 		}catch(Exception e){
 			logger.debug("Appointment number error",e);
 		}
-		logger.debug("note.getAppointmentNo() "+note.getAppointmentNo()+" --- "+appointment);
-		
+
 		
 		if (verify) {
 			String message = getSignature(note.getProviderNo(), userName, roleName, locale, SIGNATURE_VERIFY);

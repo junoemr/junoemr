@@ -367,8 +367,11 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicMergeService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EncounterSectionsService"/>
@@ -389,8 +392,14 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MessagingService"/>
 			<!-- MHA -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.message.AttachmentWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.MessagesWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.DemographicWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService"/>
 			<!-- MHA -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.NotesService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.OscarJobService"/>

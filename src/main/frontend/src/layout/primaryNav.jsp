@@ -225,15 +225,34 @@
 						</li>
 						<li>
 							<juno-security-check permissions="$ctrl.SecurityPermissions.MESSAGE_READ">
-								<a class="flex-row justify-content-center align-items-center"
-								   title="<bean:message key="navbar.messenger" bundle="ui"/>"
-								   ng-click="$ctrl.openMessenger()">
+								<a href="javascript:void(0)"
+								   class="dropdown-toggle"
+								   data-toggle="dropdown">
 									<i class="icon icon-chat"></i>
-									<span ng-show="$ctrl.unreadMessageTotal > 0"
-									      class="badge badge-danger">
-										{{$ctrl.unreadMessageTotal}}
+									<span class="caret"></span>
+									<span ng-show="($ctrl.unreadMessageTotal + $ctrl.mhaUnreadMessageTotal) > 0" class="badge badge-danger flex-row align-items-center">
+												{{$ctrl.unreadMessageTotal + $ctrl.mhaUnreadMessageTotal}}
 									</span>
 								</a>
+								<ul class="dropdown-menu"
+								    role="menu">
+									<li ng-if="$ctrl.mhaEnabled">
+										<a href="javascript:void(0)" ng-click="$ctrl.openMhaInbox()">
+											<span> Patient Messenger </span>
+											<span ng-show="$ctrl.mhaUnreadMessageTotal > 0" class="badge badge-danger flex-row align-items-center m-r-8 m-l-8">
+												{{$ctrl.mhaUnreadMessageTotal}}
+											</span>
+										</a>
+									</li>
+									<li>
+										<a href="javascript:void(0)" ng-click="$ctrl.openMessenger()">
+											<span> Internal Messenger </span>
+											<span ng-show="$ctrl.unreadMessageTotal > 0" class="badge badge-danger flex-row align-items-center m-r-8 m-l-8">
+												{{$ctrl.unreadMessageTotal}}
+											</span>
+										</a>
+									</li>
+								</ul>
 							</juno-security-check>
 						</li>
 						<li>

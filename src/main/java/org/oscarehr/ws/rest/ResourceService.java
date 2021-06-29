@@ -33,9 +33,11 @@ import org.oscarehr.common.dao.ResourceStorageDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.common.model.ResourceStorage;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -81,6 +83,9 @@ public class ResourceService extends AbstractServiceImpl {
 	@Autowired
 	private PreventionDS preventionDS;
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+
 	// this is duplicated in AppService for some reason.
 	@GET
 	@Path("/K2AActive/")
@@ -88,7 +93,11 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<Boolean> isK2AActive(@Context HttpServletRequest request)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_READ);
-		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
+
+    	boolean k2aEnabled = systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
+    	boolean k2aInit = appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null;
+
+		return RestResponse.successResponse(k2aEnabled && k2aInit);
 	}
 
 	private String getK2aResource(LoggedInInfo loggedInInfo, String requestURI, String baseRequestURI) {
@@ -181,7 +190,7 @@ public class ResourceService extends AbstractServiceImpl {
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_CREATE, Permission.PREVENTION_CREATE);
-    	
+
 		try {
 
 			//Log agreement

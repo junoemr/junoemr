@@ -24,6 +24,11 @@
 
 */
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
+import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
+import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPatientService";
+import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
+import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
+import {MessageGroup} from "../lib/messaging/model/MessageGroup";
 import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Record').controller('Record.RecordController', [
@@ -74,6 +79,8 @@ angular.module('Record').controller('Record.RecordController', [
 
 		var controller = this;
 
+		const PATIENT_MESSENGER_NAV_ID = 432543;
+
 		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 			'../ws/rs');
 
@@ -96,6 +103,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.recordtabs2 = [];
 		controller.working = false;
 		controller.page.cannotChange = true;
+
 
 		controller.$onInit = () =>
 		{
@@ -195,12 +203,72 @@ angular.module('Record').controller('Record.RecordController', [
 				function success(results)
 				{
 					controller.recordtabs2 = results;
+					controller.addMessengerToMenu(controller.recordtabs2);
 				},
 				function error(errors)
 				{
 					console.log(errors);
 				});
 		};
+
+		/**
+		 * load messenger nav item & add it to the menu.
+		 * Cannot be done on the backend because checking MHA status in a blocking manner (on the backend)
+		 * will slow page load.
+		 * @param navItems - the nav item array
+		 */
+		controller.addMessengerToMenu = async (navItems) =>
+		{
+			const mhaConfigService = new MhaConfigService();
+			const mhaPatientService = new MhaPatientService();
+
+			const navItem = {
+				id: navItems[navItems.length - 1].id + 1,
+				label: "Messenger",
+				dropdown: true,
+				dropdownItems: []
+			};
+
+			// TODO Robert's security check here
+			// add patient messenger item only if the patient is verified.
+			if (await mhaConfigService.MhaEnabled())
+			{
+				const mhaProfiles = await mhaPatientService.profilesForDemographic($stateParams.demographicNo);
+				const verified = mhaProfiles.reduce((verified, profile) => verified || profile.isVerified, false);
+
+				if (verified)
+				{
+					const verifiedProfile = mhaProfiles.find((profile) => profile.isVerified);
+					const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);
+
+					navItem.dropdownItems.push({
+						id: PATIENT_MESSENGER_NAV_ID,
+						label: "Patient Messenger",
+						popup: false,
+						openNewWindow: false,
+						custom_state: {
+							state: "messaging.view",
+							params: {
+								backend: MessagingServiceType.MHA_CLINIC,
+								source: (await messagingService.getDefaultMessageSource()).id,
+								group: MessageGroup.Received,
+								messageableId: verifiedProfile.id,
+							}
+						},
+					})
+				}
+			}
+
+			// TODO Robert's security check here
+			navItem.dropdownItems.push({
+				id: 1,
+				label: "Internal Messenger",
+				url: `../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no=${$stateParams.demographicNo}`
+			});
+
+			navItems.push(navItem);
+			$scope.$apply();
+		}
 
 		controller.changeTab = function changeTab(temp)
 		{
@@ -219,19 +287,30 @@ angular.module('Record').controller('Record.RecordController', [
 					$state.go(temp.state[0]);
 				}
 			}
-			else if (angular.isDefined(temp.url))
+			else
 			{
-				var win;
-				if (temp.label == "Rx")
+				switch (temp.id)
 				{
-					win = temp.label + controller.demographicNo;
+					case PATIENT_MESSENGER_NAV_ID:
+						$state.go(temp.custom_state.state, temp.custom_state.params);
+						break;
+					default:
+						if (angular.isDefined(temp.url))
+						{
+							var win;
+							if (temp.label === "Rx")
+							{
+								win = temp.label + controller.demographicNo;
+							}
+							else
+							{
+								var rnd = Math.round(Math.random() * 1000);
+								win = "win" + rnd;
+							}
+							window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600");
+						}
+						break;
 				}
-				else
-				{
-					var rnd = Math.round(Math.random() * 1000);
-					win = "win" + rnd;
-				}
-				window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600");
 			}
 		};
 

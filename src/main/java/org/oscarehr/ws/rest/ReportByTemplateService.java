@@ -33,8 +33,10 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
 import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.security.model.Permission;
@@ -73,6 +75,9 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@Autowired
 	private ReportTemplatesDao reportTemplatesDao;
 	
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
@@ -80,17 +85,13 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_READ);
 
-		GenericRESTResponse response = null;
-		AppDefinition appDef = appDefinitionDao.findByName("K2A");
-		if(appDef == null)
-		{
-			response = new GenericRESTResponse(false, "K2A active");
-		}
-		else
-		{
-			response = new GenericRESTResponse(true, "K2A not active");
-		}
-		return response;
+		boolean k2aEnabled = systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
+		boolean k2aInit = appDefinitionDao.findByName("K2A") != null;
+
+		boolean k2aActive = k2aEnabled && k2aInit;
+
+		String message = k2aActive? "K2A Active" : "K2A not active";
+		return new GenericRESTResponse(k2aActive, message);
 	}
 	
 	@GET

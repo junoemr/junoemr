@@ -1,5 +1,11 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {BILLING_REGION} from "../billing/billingConstants";
+import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
+import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
+import {MessageGroup} from "../lib/messaging/model/MessageGroup";
+import {MhaIntegrationApi} from "../../generated";
+import {API_BASE_PATH} from "../lib/constants/ApiConstants";
+import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 
 angular.module('Layout').component("primaryNavigation", {
 	bindings: {},
@@ -13,6 +19,8 @@ angular.module('Layout').component("primaryNavigation", {
 		"$state",
 		"$uibModal",
 		"$interval",
+		"$http",
+		"$httpParamSerializer",
 		"securityService",
 		"securityRolesService",
 		"personaService",
@@ -30,6 +38,8 @@ angular.module('Layout').component("primaryNavigation", {
 		          $state,
 		          $uibModal,
 		          $interval,
+		          $http,
+		          $httpParamSerializer,
 		          securityService,
 		          securityRolesService,
 		          personaService,
@@ -62,8 +72,11 @@ angular.module('Layout').component("primaryNavigation", {
 			ctrl.unAckLabDocTotal = 0;
 			ctrl.unclaimedCount = 0;
 			ctrl.unreadMessageTotal = 0;
+			ctrl.mhaUnreadMessageTotal = 0;
 			ctrl.demographicSearch = null;
 			ctrl.consultationTeamWarning = "";
+			ctrl.mhaConfigService = new MhaConfigService();
+			ctrl.mhaEnabled = false;
 			// measured in months
 			ctrl.consultationLookbackPeriod = 1;
 			ctrl.SecurityPermissions = SecurityPermissions;
@@ -148,7 +161,18 @@ angular.module('Layout').component("primaryNavigation", {
 					console.log(errors);
 				});
 
+			ctrl.checkIfMhaEnabled();
 		};
+
+		/**
+		 * check for MHA integrations.
+		 */
+		ctrl.checkIfMhaEnabled = async () =>
+		{
+			ctrl.mhaEnabled = await ctrl.mhaConfigService.MhaEnabled();
+
+			$scope.$apply();
+		}
 
 		//=========================================================================
 		// Watches
@@ -282,10 +306,24 @@ angular.module('Layout').component("primaryNavigation", {
 			}
 		};
 
-		ctrl.getUnreadMessageCount = function getUnreadMessageCount()
+		ctrl.updateMhaPatientMessagesCount = async () =>
+		{
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MESSAGE_UPDATE))
+			{
+				if (await ctrl.mhaConfigService.MhaEnabled())
+				{
+					// MHA message count
+					const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);
+					ctrl.mhaUnreadMessageTotal = await messagingService.countMessages(await messagingService.getDefaultMessageSource(), MessageGroup.Received, true);
+				}
+			}
+		}
+
+		ctrl.getUnreadMessageCount = async function getUnreadMessageCount()
 		{
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MESSAGE_READ))
 			{
+				// oscar message count
 				messageService.getUnreadCount().then(
 					function success(results)
 					{
@@ -295,6 +333,10 @@ angular.module('Layout').component("primaryNavigation", {
 					{
 						console.log(errors);
 					});
+
+				await ctrl.updateMhaPatientMessagesCount();
+
+				$scope.$apply();
 			}
 		};
 
@@ -532,6 +574,15 @@ angular.module('Layout').component("primaryNavigation", {
 		{
 			window.location = "../provider/providercontrol.jsp";
 		};
+
+		ctrl.openMhaInbox = async () =>
+		{
+			$state.go("messaging.view", {
+				backend: MessagingServiceType.MHA_CLINIC,
+				source: (await MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC).getDefaultMessageSource()).id,
+				group: MessageGroup.Received,
+			});
+		}
 
 		ctrl.openMessenger = function(item)
 		{

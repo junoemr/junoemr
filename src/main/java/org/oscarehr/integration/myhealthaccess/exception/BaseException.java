@@ -23,13 +23,8 @@
 
 package org.oscarehr.integration.myhealthaccess.exception;
 
-import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
-import org.springframework.web.client.RestClientException;
-
-public class BaseException extends RestClientException
+public class BaseException extends RuntimeException
 {
-	private BaseErrorTo1 errorObject;
-
 	public BaseException(String msg)
 	{
 		super(msg);
@@ -39,15 +34,4 @@ public class BaseException extends RestClientException
 	{
 		super(msg, ex);
 	}
-
-	public BaseErrorTo1 getErrorObject()
-	{
-		return errorObject;
-	}
-
-	public void setErrorObject(BaseErrorTo1 errorObject)
-	{
-		this.errorObject = errorObject;
-	}
-
 }

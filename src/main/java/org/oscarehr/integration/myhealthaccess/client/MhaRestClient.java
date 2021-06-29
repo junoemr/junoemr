@@ -53,7 +53,25 @@ public class MhaRestClient extends RestClientBase
 		}
 		catch(URISyntaxException e)
 		{
-			throw new RuntimeException("Error building CloudMD API URL", e);
+			throw new RuntimeException("Error building MHA API URL", e);
+		}
+	}
+
+	@Override
+	public URI getRootURI()
+	{
+		OscarProperties oscarProps = OscarProperties.getInstance();
+		try
+		{
+			return new URI(
+					oscarProps.getProperty("myhealthaccess_protocol"),
+					oscarProps.getProperty("myhealthaccess_domain"),
+					null,
+					null);
+		}
+		catch(URISyntaxException e)
+		{
+			throw new RuntimeException("Error building MHA root uri", e);
 		}
 	}
 }

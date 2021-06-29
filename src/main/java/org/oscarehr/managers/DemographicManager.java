@@ -1214,16 +1214,39 @@ public class DemographicManager {
 		return true;
 	}
 
+	/**
+	 *  Lookup demographic by health number
+	 * @param healthNumber - The HIN to lookup
+	 * @return The matched demographic or null if none match
+	 */
 	public org.oscarehr.demographic.model.Demographic getDemographicByHealthNumber(String healthNumber)
+	{
+		return getDemographicByHealthNumber(healthNumber, null);
+	}
+
+	/**
+	 * Lookup demographic by health number and optionally versionCode
+	 * @param healthNumber - The HIN to lookup
+	 * @param versionCode - [optional] The version code to lookup
+	 * @return The matched demographic or null if none match
+	 */
+	public org.oscarehr.demographic.model.Demographic getDemographicByHealthNumber(String healthNumber, String versionCode)
 	{
 		DemographicCriteriaSearch search = new DemographicCriteriaSearch();
 		search.setHin(healthNumber);
 		search.setStatusMode(DemographicCriteriaSearch.STATUS_MODE.all);
 
-		// Exclude demographics that would otherwise be guaranteed duplicates
-		if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
+		if (versionCode != null && !versionCode.isEmpty())
 		{
-			search.setNotHealthCardVersion(HinValidationService.BC_NEWBORN_CODE);
+			search.setHealthCardVersion(versionCode);
+		}
+		else
+		{
+			// Exclude demographics that would otherwise be guaranteed duplicates
+			if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
+			{
+				search.setNotHealthCardVersion(HinValidationService.BC_NEWBORN_CODE);
+			}
 		}
 
 		List<org.oscarehr.demographic.model.Demographic> demographics = newDemographicDao.criteriaSearch(search);
