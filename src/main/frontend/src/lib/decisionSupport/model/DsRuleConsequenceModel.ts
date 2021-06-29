@@ -29,7 +29,6 @@ import {DsConsequence} from "../../../../generated";
 
 export default class DsRuleConsequenceModel {
     id?: number;
-    name: string;
     message?: string;
     severityLevel: DsConsequence.SeverityLevelEnum;
     type: DsConsequence.TypeEnum;

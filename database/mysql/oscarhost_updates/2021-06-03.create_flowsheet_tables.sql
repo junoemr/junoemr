@@ -77,7 +77,6 @@ CREATE TABLE IF NOT EXISTS ds_rule_condition
 (
     id                  INTEGER PRIMARY KEY AUTO_INCREMENT,
     ds_rule_id   INTEGER(10) NOT NULL,
-    condition_name      VARCHAR(255) NOT NULL,
     condition_type      VARCHAR(255) NOT NULL,
     condition_value     VARCHAR(255),
 
@@ -94,8 +93,7 @@ CREATE TABLE IF NOT EXISTS ds_rule_condition
 CREATE TABLE IF NOT EXISTS ds_rule_consequence
 (
     id                      INTEGER PRIMARY KEY AUTO_INCREMENT,
-    ds_rule_id       INTEGER(10) NOT NULL,
-    consequence_name        VARCHAR(255) NOT NULL,
+    ds_rule_id              INTEGER(10) NOT NULL,
     consequence_type        VARCHAR(255) NOT NULL,
     consequence_severity    VARCHAR(255) NOT NULL,
     consequence_message     TEXT,

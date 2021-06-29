@@ -31,7 +31,6 @@ import org.oscarehr.decisionSupport2.model.condition.ConditionType;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DsRuleConditionCreateInput extends AbstractTransientModel
 {
-	private String name;
 	private ConditionType type;
 	private String value;
 }

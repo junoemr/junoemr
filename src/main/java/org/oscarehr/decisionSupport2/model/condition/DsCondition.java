@@ -30,7 +30,6 @@ import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 public abstract class DsCondition extends AbstractTransientModel
 {
 	private Integer id;
-	private String name;
 	private String value;
 	private ConditionType type;
 

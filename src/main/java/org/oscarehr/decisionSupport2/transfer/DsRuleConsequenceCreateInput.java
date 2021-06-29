@@ -32,7 +32,6 @@ import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DsRuleConsequenceCreateInput extends AbstractTransientModel
 {
-	private String name;
 	private ConsequenceType type;
 	private SeverityLevel severityLevel;
 	private String message;

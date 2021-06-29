@@ -1,11 +1,15 @@
 .ds-rule-edit-modal {
+	.rule-edit-modal-body {
+		padding: 8px;
+
+		.row-item {
+			margin: 0 4px;
+		}
+	}
 
 	.footer-button-wrapper {
 		width: 128px;
 		margin: 0 2px;
 	}
 
-	.row-item {
-		margin: 0 4px;
-	}
 }

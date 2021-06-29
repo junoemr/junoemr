@@ -103,9 +103,10 @@ public class DsRuleService
 		return dsRuleDbToModelConverter.convert(dsRuleDao.findAll());
 	}
 
-	public DsRule createRule(DsRuleCreateInput input)
+	public DsRule createRule(String creatingProviderId, DsRuleCreateInput input)
 	{
 		org.oscarehr.decisionSupport2.entity.DsRule entity = dsRuleTransferToEntityConverter.convert(input);
+		entity.setCreatedBy(creatingProviderId);
 		dsRuleDao.persist(entity);
 		return dsRuleDbToModelConverter.convert(entity);
 	}

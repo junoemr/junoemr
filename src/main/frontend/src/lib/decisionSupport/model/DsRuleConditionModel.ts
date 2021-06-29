@@ -29,7 +29,6 @@ import {DsCondition} from "../../../../generated";
 
 export default class DsRuleConditionModel {
     id?: number;
-    name: string;
     value: string;
     type: DsCondition.TypeEnum;
 

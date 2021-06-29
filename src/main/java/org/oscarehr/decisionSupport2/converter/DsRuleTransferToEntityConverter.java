@@ -62,7 +62,6 @@ public class DsRuleTransferToEntityConverter extends AbstractModelConverter<DsRu
 			DsRuleCondition condition = new DsRuleCondition();
 			BeanUtils.copyProperties(transfer, condition);
 			condition.setDsRule(dsRule);
-			condition.setName("might not need");
 			conditions.add(condition);
 		}
 		return conditions;
@@ -76,7 +75,6 @@ public class DsRuleTransferToEntityConverter extends AbstractModelConverter<DsRu
 			DsRuleConsequence consequence = new DsRuleConsequence();
 			BeanUtils.copyProperties(transfer, consequence);
 			consequence.setDsRule(dsRule);
-			consequence.setName("might not need");
 			consequences.add(consequence);
 		}
 		return consequences;

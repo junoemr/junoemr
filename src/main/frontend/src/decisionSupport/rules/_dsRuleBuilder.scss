@@ -2,6 +2,7 @@
 	background-color: var(--color-neutral-lightest);
 	border-color: var(--color-neutral-lighter);
 	border-radius: 8px;
+	padding: 8px;
 
 	.add-button-wrapper {
 		width: 32px;
@@ -11,6 +12,11 @@
 	}
 	.rule-condition, .rule-consequence {
 		position: relative;
+		padding: 4px 0;
+
+		.row-padding {
+			padding: 2px 0;
+		}
 
 		.close-button {
 			position: absolute;

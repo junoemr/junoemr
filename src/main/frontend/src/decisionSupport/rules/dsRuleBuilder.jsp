@@ -5,6 +5,11 @@
 		            disabled="$ctrl.disabled"
 		            ng-model="$ctrl.model.name">
 		</juno-input>
+		<juno-input label="Description"
+		            label-position="$ctrl.LABEL_POSITION.TOP"
+		            disabled="$ctrl.disabled"
+		            ng-model="$ctrl.model.description">
+		</juno-input>
 		<div class="flex-column">
 			<h6>Conditions</h6>
 			<div class="flex-row rule-condition" ng-repeat="condition in $ctrl.model.conditions">
@@ -48,7 +53,7 @@
 				<juno-simple-close-button class="close-button"
 				                          click="$ctrl.removeConsequence(consequence)">
 				</juno-simple-close-button>
-				<div class="flex-row">
+				<div class="flex-row row-padding">
 					<juno-select label="{{$first ? 'Then' : 'and'}}"
 					             label-position="$ctrl.LABEL_POSITION.LEFT"
 					             options="$ctrl.consequenceTypeOptions"
@@ -64,7 +69,7 @@
 					             ng-model="consequence.severityLevel">
 					</juno-select>
 				</div>
-				<div class="flex-row">
+				<div class="flex-row row-padding">
 					<juno-input ng-if="$ctrl.showConsequenceValueInput(consequence)"
 					            class="width-100"
 					            label="{{$ctrl.getConsequenceValueInputLabel(consequence)}}"

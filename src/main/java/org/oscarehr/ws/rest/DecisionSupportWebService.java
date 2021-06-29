@@ -62,6 +62,6 @@ public class DecisionSupportWebService extends AbstractServiceImpl
 	public RestResponse<DsRule> createRule(DsRuleCreateInput input)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DECISION_SUPPORT_CREATE);
-		return RestResponse.successResponse(dsRuleService.createRule(input));
+		return RestResponse.successResponse(dsRuleService.createRule(getLoggedInProviderId(), input));
 	}
 }

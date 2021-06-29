@@ -30,7 +30,6 @@ import org.oscarehr.decisionSupport2.model.DsInfoCache;
 public abstract class DsConsequence extends AbstractTransientModel
 {
 	private Integer id;
-	private String name;
 	private String message;
 	private SeverityLevel severityLevel;
 	private ConsequenceType type;

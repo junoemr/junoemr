@@ -56,7 +56,6 @@ export default class DsRuleModelToTransferConverter
 		{
 			const transfer = {} as DsCondition;
 			transfer.id = model.id;
-			transfer.name = model.name;
 			transfer.type = model.type;
 			transfer.value = model.value;
 			return transfer;
@@ -69,7 +68,6 @@ export default class DsRuleModelToTransferConverter
 		{
 			const transfer = {} as DsConsequence;
 			transfer.id = model.id;
-			transfer.name = model.name;
 			transfer.type = model.type;
 			transfer.severityLevel = model.severityLevel;
 			transfer.message = model.message;
