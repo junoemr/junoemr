@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.managers.PreferenceManager;
@@ -135,7 +136,7 @@ public class IssueNoteSummary implements Summary {
 			count++;
 		}
 	}
-	
+
 	public static String[] getIssueIds(List<Issue> issues) {
 		String[] issueIds = new String[issues.size()];
 		int idx = 0;

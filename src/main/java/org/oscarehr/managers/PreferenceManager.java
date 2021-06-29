@@ -125,65 +125,42 @@ public class PreferenceManager {
 		return true;
 	}
 
-	public String getCppExtsItem(LoggedInInfo loggedInInfo, List<CaseManagementNoteExt> noteExtList, String issueCode){
-
-		StringBuilder sb = new StringBuilder();
-	
-		if(issueCode.equals(CONCERNS)){
-			if(isCustomCppItemOn(loggedInInfo, ONGOING_START_DATE)){
-				sb.append("Start Date:" + getNoteExt("Start Date", noteExtList));
-			}	
-			
-			if(isCustomCppItemOn(loggedInInfo, ONGOING_RES_DATE)){
-				sb.append(" Resolution Date:" + getNoteExt("Resolution Date", noteExtList));
-			}
-			
-			if(isCustomCppItemOn(loggedInInfo, ONGOING_PROBLEM_STATUS)){
-				sb.append(" Problem Status:" + getNoteExt("Problem Status", noteExtList));
-			}
-			
-		}else if(issueCode.equals(MEDHX)){
-			if(isCustomCppItemOn(loggedInInfo, MED_HX_START_DATE)){
-				sb.append("Start Date:" + getNoteExt("Start Date", noteExtList));
-			}
-			
-			if(isCustomCppItemOn(loggedInInfo, MED_HX_RES_DATE)){
-				sb.append(" Resolution Date:" + getNoteExt("Resolution Date", noteExtList));
-			}
-			
-			if(isCustomCppItemOn(loggedInInfo, MED_HX_TREATMENT)){
-				sb.append(" Treatment:" + getNoteExt("Treatment", noteExtList));
-			}
-			
-			if(isCustomCppItemOn(loggedInInfo, MED_HX_PROCEDURE_DATE)){
-				sb.append(" Procedure Date:" + getNoteExt("Procedure Date", noteExtList));
-			}
-			
-		}else if(issueCode.equals(SOCHX)){
-			if(isCustomCppItemOn(loggedInInfo, SOC_HX_START_DATE)){
-				sb.append("Start Date:" + getNoteExt("Start Date", noteExtList));
-			}
-			
-			if(isCustomCppItemOn(loggedInInfo, SOC_HX_RES_DATE)){
-				sb.append(" Resolution Date:" + getNoteExt("Resolution Date", noteExtList));
-			}
-			
-		}else if(issueCode.equals(REMINDERS)){
-			if(isCustomCppItemOn(loggedInInfo, REMINDERS_START_DATE)){
-				sb.append("Start Date:" + getNoteExt("Start Date", noteExtList));
-			}
-			
-			if(isCustomCppItemOn(loggedInInfo, REMINDERS_RES_DATE)){
-				sb.append(" Resolution Date:" + getNoteExt("Resolution Date", noteExtList));
-			}
+	/**
+	 * Build CPP note extension for the given issue code and any augmenting information for a CPP note.
+	 * @param loggedInInfo provider whose preferences we need to take into consideration
+	 * @param noteExtList augmenting information for whatever note we're building a summary for
+	 * @param issueCode the issue in question
+	 * @return a String to append to a CPP note for displaying
+	 */
+	public String getCppExtsItem(LoggedInInfo loggedInInfo, List<CaseManagementNoteExt> noteExtList, String issueCode)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		// Append any relevant bits of info depending on the issue in question
+		if(issueCode.contains(CONCERNS))
+		{
+			stringBuilder = getConcernsExtItems(loggedInInfo, noteExtList);
+		}
+		else if(issueCode.contains(MEDHX))
+		{
+			stringBuilder = getMedHistoryExtItems(loggedInInfo, noteExtList);
+		}
+		else if(issueCode.contains(SOCHX))
+		{
+			stringBuilder = getSocHistoryExtItems(loggedInInfo, noteExtList);
+		}
+		else if(issueCode.contains(REMINDERS))
+		{
+			stringBuilder = getRemindersExtItems(loggedInInfo, noteExtList);
 		}
 
-		if (sb.length() > 0) {
-			sb.insert(0, " (");
-			sb.append(")");
+		// If we got something back, finish building the string
+		if (stringBuilder.length() > 0)
+		{
+			stringBuilder.insert(0, " (");
+			stringBuilder.append(")");
 		}
 		
-		return sb.toString();
+		return stringBuilder.toString();
 	}
 	
 	static String getNoteExt(String key, List<CaseManagementNoteExt> lcme) {
@@ -202,16 +179,130 @@ public class PreferenceManager {
 		}
 		return "";
 	}
-	
 
-	public boolean isCppItem(String issueCode){
-		if(issueCode.equals(SOCHX) || issueCode.equals(MEDHX) || issueCode.equals(CONCERNS) || issueCode.equals(REMINDERS)){
-			return true;
+
+	/**
+	 * Build MedHistory note extension according to logged in provider's preferences.
+	 * @param loggedInInfo provider who is asking for CPP notes
+	 * @param noteExtList any additional info the note may have with it
+	 * @return an in-progress StringBuilder object with whichever sections the logged in provider wants.
+	 */
+	protected StringBuilder getMedHistoryExtItems(LoggedInInfo loggedInInfo, List<CaseManagementNoteExt> noteExtList)
+	{
+		StringBuilder cppExtendedNote = new StringBuilder();
+
+		if(isCustomCppItemOn(loggedInInfo, MED_HX_START_DATE))
+		{
+			cppExtendedNote.append("Start Date:").append(getNoteExt("Start Date", noteExtList));
 		}
-		return false;
+
+		if(isCustomCppItemOn(loggedInInfo, MED_HX_RES_DATE))
+		{
+			cppExtendedNote.append(" Resolution Date:").append(getNoteExt("Resolution Date", noteExtList));
+		}
+
+		if(isCustomCppItemOn(loggedInInfo, MED_HX_TREATMENT))
+		{
+			cppExtendedNote.append(" Treatment:").append(getNoteExt("Treatment", noteExtList));
+		}
+
+		if(isCustomCppItemOn(loggedInInfo, MED_HX_PROCEDURE_DATE))
+		{
+			cppExtendedNote.append(" Procedure Date:").append(getNoteExt("Procedure Date", noteExtList));
+		}
+
+		return cppExtendedNote;
 	}
-	
-	
+
+	/**
+	 * Build SocHistory note extension according to logged in provider's preferences.
+	 * @param loggedInInfo provider who is asking for CPP notes
+	 * @param noteExtList any additional info the note may have with it
+	 * @return an in-progress StringBuilder object with whichever sections the logged in provider wants.
+	 */
+	protected StringBuilder getSocHistoryExtItems(LoggedInInfo loggedInInfo, List<CaseManagementNoteExt> noteExtList)
+	{
+		StringBuilder cppExtendedNote = new StringBuilder();
+		if(isCustomCppItemOn(loggedInInfo, SOC_HX_START_DATE))
+		{
+			cppExtendedNote.append("Start Date:").append(getNoteExt("Start Date", noteExtList));
+		}
+
+		if(isCustomCppItemOn(loggedInInfo, SOC_HX_RES_DATE))
+		{
+			cppExtendedNote.append(" Resolution Date:").append(getNoteExt("Resolution Date", noteExtList));
+		}
+
+		return cppExtendedNote;
+	}
+
+	/**
+	 * Build Reminders note extension according to logged in provider's preferences.
+	 * @param loggedInInfo provider who is asking for CPP notes
+	 * @param noteExtList any additional info the note may have with it
+	 * @return an in-progress StringBuilder object with whichever sections the logged in provider wants.
+	 */
+	protected StringBuilder getRemindersExtItems(LoggedInInfo loggedInInfo, List<CaseManagementNoteExt> noteExtList)
+	{
+		StringBuilder cppExtendedNote = new StringBuilder();
+
+		if(isCustomCppItemOn(loggedInInfo, REMINDERS_START_DATE))
+		{
+			cppExtendedNote.append("Start Date:").append(getNoteExt("Start Date", noteExtList));
+		}
+
+		if(isCustomCppItemOn(loggedInInfo, REMINDERS_RES_DATE))
+		{
+			cppExtendedNote.append(" Resolution Date:").append(getNoteExt("Resolution Date", noteExtList));
+		}
+
+		return cppExtendedNote;
+	}
+
+	/**
+	 * Build Concerns note extension according to logged in provider's preferences.
+	 * @param loggedInInfo provider who is asking for CPP notes
+	 * @param noteExtList any additional info the note may have with it
+	 * @return an in-progress StringBuilder object with whichever sections the logged in provider wants.
+	 */
+	protected StringBuilder getConcernsExtItems(LoggedInInfo loggedInInfo, List<CaseManagementNoteExt> noteExtList)
+	{
+		StringBuilder cppExtendedNote = new StringBuilder();
+		if(isCustomCppItemOn(loggedInInfo, ONGOING_START_DATE))
+		{
+			cppExtendedNote.append("Start Date:").append(getNoteExt("Start Date", noteExtList));
+		}
+
+		if(isCustomCppItemOn(loggedInInfo, ONGOING_RES_DATE))
+		{
+			cppExtendedNote.append(" Resolution Date:").append(getNoteExt("Resolution Date", noteExtList));
+		}
+
+		if(isCustomCppItemOn(loggedInInfo, ONGOING_PROBLEM_STATUS))
+		{
+			cppExtendedNote.append(" Problem Status:").append(getNoteExt("Problem Status", noteExtList));
+		}
+
+		return cppExtendedNote;
+	}
+
+	/**
+	 * Given a string that looks like an issue code, check to see whether our base issue code exists in there.
+	 *
+	 * Strings may take either of these forms: "{ISSUEID}{ISSUECODE}" or "ISSUECODE" and we want to check both.
+	 * @param issueCode string representing a potential issue item
+	 * @return true if it contains text relating to any of the given identified issues, false otherwise
+	 */
+	public boolean isCppItem(String issueCode)
+	{
+		return (issueCode.contains(SOCHX)
+				|| issueCode.contains(MEDHX)
+				|| issueCode.contains(CONCERNS)
+				|| issueCode.contains(REMINDERS));
+
+	}
+
+
 	public boolean isCustomSummaryEnabled(LoggedInInfo loggedInInfo){
 		Property results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), CUSTOM_SUMMARY_ENABLE);
 		
