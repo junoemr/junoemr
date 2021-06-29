@@ -63,9 +63,6 @@
 		height: $primary-navbar-height;
 		@include juno-tab-xxs(24px);
 
-		.badge {
-			margin-left: 0;
-		}
 		.icon {
 			font-size: 20px;
 			color: $color-neutral-white;

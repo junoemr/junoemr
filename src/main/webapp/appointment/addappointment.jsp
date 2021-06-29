@@ -209,6 +209,8 @@
 		<script type="text/javascript">
 			function validateForm()
 			{
+				jQuery('#add-appt-and-send-confirmation').attr('disabled', true);
+
 				if (Oscar.Util.Common.getLengthWithLineBreaks(document.ADDAPPT.notes) > 255)
 				{
 					window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
@@ -1305,8 +1307,7 @@
 									value="Create & Notify"
 									title="Add a new appointment and send a confirmation email to the patient"
 									onclick="document.forms.ADDAPPT.sendBookingNotification.value='true';
-													 document.forms.ADDAPPT.displaymode.value='Add Appointment';
-													 jQuery('#add-appt-and-send-confirmation').attr('disabled', true);"
+													 document.forms.ADDAPPT.displaymode.value='Add Appointment';"
 									style="display: none;"
 					>
 				</td>

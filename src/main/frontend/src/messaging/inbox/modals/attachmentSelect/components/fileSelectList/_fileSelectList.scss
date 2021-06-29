@@ -1,0 +1,35 @@
+.file-list {
+	overflow-y: auto;
+
+	.file-row {
+		height: 2.66em;
+		cursor: pointer;
+
+		&:hover {
+			background-color: var(--color-neutral-lighter);
+		}
+
+		&:active {
+			background-color: var(--color-primary-base);
+			color: var(--color-neutral-white);
+		}
+
+		.file-date {
+			width: 128px;
+		}
+
+		.file-type,
+		.file-check,
+		.loading-indicator {
+			width: 72px;
+		}
+	}
+
+	.loading-indicator {
+		.loading-spinner-container {
+			width: 2em;
+			height: 2em;
+		}
+	}
+
+}

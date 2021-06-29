@@ -1,0 +1,33 @@
+.inbox-select {
+	background-color: var(--color-neutral-lightest);
+	border: solid 1px var(--color-neutral-light-grey);
+	border-top: none;
+
+	.message-group-container {
+		border-bottom: solid 1px var(--color-neutral-light-grey);
+
+		.juno-collapse-area {
+			--label-left-indent: 32px;
+		}
+
+		.source-item {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+
+			height: 40px;
+			padding-left: 56px;
+
+			cursor: pointer;
+			user-select: none;
+
+			&:hover {
+				background-color: var(--color-neutral-lighter);
+			}
+
+			&.selected {
+				background-color: var(--color-neutral-light);
+			}
+		}
+	}
+}

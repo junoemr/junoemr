@@ -166,6 +166,12 @@ Juno.Validations.validationFieldsEqual = function(obj0, field0, obj1, field1, ..
 	}
 };
 
+// validates that the provided field is truthy
+Juno.Validations.validationFieldTrue = function(obj, field, ...validationFunc)
+{
+	return Juno.Validations.validationCustom(() => !!Juno.Validations.getAttribute(obj, field), ...validationFunc);
+}
+
 /**
  * get the value of the attribute from object, denoted by attributeString
  * @param obj - the object containing the attribute you wish to access

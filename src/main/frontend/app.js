@@ -49,6 +49,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Common.Components',
 	'Common.Util',
 	'Layout',
+	'Messaging',
 	'Tickler',
 	'Record',
 	'Record.Summary',
@@ -309,6 +310,34 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		{
 			url: "/billingRedirect?appointmentNo&demographicNo&providerNo",
 			component: 'billingRedirect'
+		})
+		.state("messaging",
+		{
+			url: "/messaging"
+		})
+		.state('messaging.view',
+		{
+			url: "/view/:backend/source/:source/group/:group?messageableId",
+			component: "messagingInbox",
+			params: {
+				backend: {
+					dynamic: true,
+				},
+				source: {
+					dynamic: true,
+				},
+				group: {
+					dynamic: true,
+				},
+				messageableId: {
+					dynamic: true,
+				},
+			}
+		})
+		.state('messaging.view.message',
+		{
+			url: "/message/:messageId/view",
+			component: "messageView",
 		})
 		.state('settings',
 		{

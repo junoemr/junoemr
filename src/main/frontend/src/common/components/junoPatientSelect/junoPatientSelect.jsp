@@ -1,5 +1,5 @@
 <div class="juno-patient-select" ng-class="$ctrl.componentClasses()">
-	<div class="flex-row align-items-end header-row">
+	<div class="flex-row align-items-end header-row" ng-class="$ctrl.headerRowClasses()">
 		<juno-typeahead
 						model="$ctrl.demographicNo"
 						options="$ctrl.patientOptions"
@@ -8,9 +8,9 @@
 						typeahead-min-length="3"
 						name="patient"
 						on-selected="$ctrl.onDemographicSelected(value)"
-						on-change="$ctrl.loadPatientOptions(value)"
 						filter-options="false"
 						get-options-callback="$ctrl.getPatientOptions(value)"
+						component-style="$ctrl.componentStyle"
 		>
 		</juno-typeahead>
 
@@ -20,13 +20,13 @@
 						button-color="JUNO_BUTTON_COLOR.PRIMARY"
 						title="New Demographic"
 						ng-click="$ctrl.openNewDemographicModal()"
-						component-style="$ctrl.resolve.style">
+						component-style="$ctrl.componentStyle">
 			<i class="icon icon-plus"></i>
 		</juno-button>
 	</div>
-	<div>
+	<div ng-if="$ctrl.showPatientCard">
 		<label>Demographic</label>
-		<demographic-card ng-if="$ctrl.showPatientCard" demographic-model="$ctrl.ngModel">
+		<demographic-card demographic-model="$ctrl.ngModel">
 	</div>
 	</demographic-card>
 </div>

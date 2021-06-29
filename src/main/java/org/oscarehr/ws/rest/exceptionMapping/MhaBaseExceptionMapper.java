@@ -23,6 +23,7 @@
 package org.oscarehr.ws.rest.exceptionMapping;
 
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.ws.rest.response.RestResponse;
 
 import javax.ws.rs.core.MediaType;
@@ -40,9 +41,16 @@ public class MhaBaseExceptionMapper implements ExceptionMapper<BaseException>
 	@Override
 	public Response toResponse(BaseException exception)
 	{
-		RestResponse<String> response = RestResponse.errorResponse("MyHealthAccess Integration Error");
-
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(response)
-						.type(MediaType.APPLICATION_JSON).build();
+		if (exception instanceof RecordNotFoundException)
+		{
+			return Response.status(Response.Status.NOT_FOUND).entity(RestResponse.errorResponse(exception.getMessage()))
+					.type(MediaType.APPLICATION_JSON).build();
+		}
+		else
+		{
+			RestResponse<String> response = RestResponse.errorResponse("MyHealthAccess Integration Error");
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(response)
+					.type(MediaType.APPLICATION_JSON).build();
+		}
 	}
 }

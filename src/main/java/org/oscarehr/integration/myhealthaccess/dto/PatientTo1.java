@@ -28,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.springframework.beans.BeanUtils;
@@ -78,6 +80,14 @@ public class PatientTo1
 	private String primaryFax;
 	@JsonProperty("link_status")
 	private MHAPatient.LINK_STATUS linkStatus;
+	@JsonProperty("can_message_clinic")
+	@Getter
+	@Setter
+	private boolean canMessage;
+	@JsonProperty("remote_id")
+	@Getter
+	@Setter
+	private String demographicNo;
 
 	public PatientTo1()
 	{
@@ -85,10 +95,11 @@ public class PatientTo1
 
 	public PatientTo1(MHAPatient mhaPatient)
 	{
-		BeanUtils.copyProperties(mhaPatient, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
+		BeanUtils.copyProperties(mhaPatient, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus", "demographicNo");
 		this.healthCareProvinceCode = mhaPatient.getHealthCareProvinceCode().name();
 		this.addressProvinceCode = mhaPatient.getAddressProvinceCode().name();
 		this.linkStatus = mhaPatient.getLinkStatus();
+		this.demographicNo = mhaPatient.getDemographicNo().orElse(null);
 	}
 
 	public PatientTo1(Demographic demographic, String cellPhone)
@@ -114,6 +125,7 @@ public class PatientTo1
 		this.cellPhone = cellPhone;
 		this.primaryFax = null;
 		this.linkStatus = MHAPatient.LINK_STATUS.NO_LINK;
+		this.demographicNo = demographic.getId().toString();
 	}
 
 	public String getId()

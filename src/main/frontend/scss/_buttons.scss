@@ -139,6 +139,10 @@
 		@include juno-button-pattern(var(--color-neutral-grey), var(--color-neutral-dark), var(--color-neutral-darker),
 				var(--color-neutral-darkest), var(--color-neutral-darker));
 	}
+	&.greyscale-darkest {
+		@include juno-button-pattern(var(--color-neutral-darkest), var(--color-neutral-darker), var(--color-neutral-dark),
+			var(--color-neutral-grey), var(--color-neutral-grey));
+	}
 	&.danger {
 		@include juno-button-pattern(var(--color-red-base), var(--color-red-dark), var(--color-red-darker),
 				var(--color-red-darkest), var(--color-neutral-darker));

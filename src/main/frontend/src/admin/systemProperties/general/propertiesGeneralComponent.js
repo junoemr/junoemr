@@ -31,70 +31,75 @@ angular.module('Admin').component('systemPropertiesGeneral',
             '$scope',
             '$http',
             '$httpParamSerializer',
-            function ($scope, $http, $httpParamSerializer) {
+	        '$uibModal',
+            function ($scope, $http, $httpParamSerializer, $uibModal) {
                 let propertyTypes =
                 {
                     text: "string",
+	                toggle: "boolean",
                 }
-
+	
+	            $scope.PROPERTY_TYPES = propertyTypes;
+                
                 let ctrl = this;
                 let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
-
-                ctrl.phonePrefixValue = "";
-
-                ctrl.propertiesList =
-                [
+                
+	            ctrl.validations =
+		            {
+			            phonePrefixValid: (prefix) =>
+			            {
+				            const reg = new RegExp(/^[0-9]{3}-?$/);
+				            const MIN_LENGTH = 3;
+				            const MAX_LENGTH = 4;
+				            
+				            if (prefix)
+				            {
+				            	const valid2 = prefix.match(reg) != null && (prefix.length >= MIN_LENGTH && prefix.length <= MAX_LENGTH)
+					            console.log(valid2);
+				            }
+				            
+				            
+				            return prefix === "" || !prefix ||
+					            (prefix.match(reg) != null && (prefix.length >= MIN_LENGTH && prefix.length <= MAX_LENGTH));
+			            }
+		            };
+	            
+                ctrl.properties = [
                     {
                         name: "Phone Prefix",
-                        description: "Change the default phone number prefix",
+                        description: "Change the default phone number prefix (XXX or XXX-)",
                         propertyName: "phone_prefix",
-                        type: propertyTypes.text,
-                        value: ""
-                    }
+	                    type: propertyTypes.text,
+	                    value: "",
+	                    validation: ctrl.validations.phonePrefixValid,
+                    },
+	                {
+	                	name: "Ontario CNO Number",
+		                description: "Enable CNO field for nurse providers",
+		                propertyName: "enable_ontario_cno_field",
+		                type: propertyTypes.toggle,
+		                value: false,
+		                validation: false,
+	                }
                 ];
 
                ctrl.$onInit = () =>
                 {
-                    for (let property of ctrl.propertiesList)
+                    for (let property of ctrl.properties)
                     {
-                        switch (property.type)
-                        {
-                            case propertyTypes.text:
-                            {
-                                ctrl.loadTextType(property);
-                                break;
-                            }
-                        }
+                    	ctrl.loadProperty(property);
                     }
                 };
-
-                ctrl.loadTextType = (property) =>
+               
+                ctrl.loadProperty = (property) =>
                 {
                     systemPreferenceApi.getPreferenceValue(property.propertyName)
                     .then((response) =>
                     {
-                        ctrl.phonePrefixValue = response.data.body;
+                        property.value = response.data.body;
                     })
                 };
-
-                ctrl.validations =
-                {
-                    phonePrefixValid: Juno.Validations.validationCustom(() =>
-                    {
-                        const prefix = ctrl.phonePrefixValue;
-                        const reg = new RegExp(/^[0-9]{3}-?$/);
-                        const MIN_PREFIX_LENGTH = 3;
-                        const MAX_PREFIX_LENGTH = 4;
-
-                        if (prefix == null || prefix == "" ||
-                                (prefix.match(reg) != null &&
-                                (prefix.length >= MIN_PREFIX_LENGTH && prefix.length <= MAX_PREFIX_LENGTH)))
-                        {
-                            return true;
-                        }
-                        return false;
-                    })
-                };
+                
 
                 /**
                  * Persist new property value
@@ -103,7 +108,26 @@ angular.module('Admin').component('systemPropertiesGeneral',
                  */
                 ctrl.updateProperty = (property, value) =>
                 {
-                    systemPreferenceApi.putPreferenceValue(property.propertyName, value)
+                	if (property.validation && !property.validation(value))
+                	{
+		                return;
+	                }
+                	
+                	systemPreferenceApi.putPreferenceValue(property.propertyName, value)
+		                .then((response) =>
+		                {
+		                	if (property.type === propertyTypes.text)
+			                {
+				                Juno.Common.Util.successAlert($uibModal, "Success", property.name + " was updated");
+			                }
+		                })
+		                .catch((error)=>
+		                {
+			                if (property.type === propertyTypes.text)
+			                {
+				                Juno.Common.Util.errorAlert($uibModal, "Error", property.name + " could not be updated");
+			                }
+		                })
                 };
             }
         ]

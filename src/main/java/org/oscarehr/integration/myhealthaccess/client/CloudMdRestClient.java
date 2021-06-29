@@ -56,4 +56,22 @@ public class CloudMdRestClient extends RestClientBase
 			throw new RuntimeException("Error building CloudMD API URL", e);
 		}
 	}
+
+	@Override
+	public URI getRootURI()
+	{
+		OscarProperties oscarProps = OscarProperties.getInstance();
+		try
+		{
+			return new URI(
+					oscarProps.getProperty("myhealthaccess_protocol"),
+					oscarProps.getProperty("cloudmd_domain"),
+					null,
+					null);
+		}
+		catch(URISyntaxException e)
+		{
+			throw new RuntimeException("Error building CloudMD root uri", e);
+		}
+	}
 }

@@ -41,5 +41,5 @@ public interface ListModelConverter<T, K> extends ModelConverter<T, K>
 	 * @param entities the entities to convert
 	 * @return a list of converted entities
 	 */
-	List<K> convert(Collection<T> entities);
+	List<K> convert(Collection<? extends T> entities);
 }
