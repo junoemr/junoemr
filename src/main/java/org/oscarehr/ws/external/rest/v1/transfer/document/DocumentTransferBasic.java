@@ -24,6 +24,8 @@ package org.oscarehr.ws.external.rest.v1.transfer.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.ws.validator.DocumentClassConstraint;
 import org.oscarehr.ws.validator.DocumentTypeConstraint;
 import org.oscarehr.ws.validator.ProviderNoConstraint;
@@ -44,6 +46,11 @@ public class DocumentTransferBasic implements Serializable
 	// important document info
 	@Schema(description = "document record identifier")
 	private Integer documentNo;
+
+	@Schema(description = "Document file name")
+	@Getter
+	@Setter
+	private String fileName;
 
 	@NotNull
 	@StringValueConstraint(allows = {"A","D"})

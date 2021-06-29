@@ -70,7 +70,7 @@ public class DxDbToModelConverter extends BaseDbToModelConverter<Dxresearch, DxR
 
 	// override to filter null values
 	@Override
-	public List<DxRecord> convert(Collection<Dxresearch> entities)
+	public List<DxRecord> convert(Collection<? extends Dxresearch> entities)
 	{
 		return entities.stream().map(this::convert).filter(Objects::nonNull).collect(Collectors.toList());
 	}

@@ -262,6 +262,7 @@ public class FlowsheetDataService
 				providerId,
 				demographicId,
 				ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()),
+				null,
 				providerId,
 				null,
 				flowsheetItem.getTypeCode(),

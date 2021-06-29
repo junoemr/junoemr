@@ -676,8 +676,12 @@ public class AdminNavService
 		{
 			integrationItems.add(new AdminNavItemTo1("schedule HSFO2 XML resubmit", "frame?frameUrl=" + contextPath + URLEncoder.encode("/admin/RecommitHSFO2.do?method=showSchedule")));
 		}
-
-		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.Know2ActConfig"), "frame?frameUrl=" + contextPath + "/web/Know2actConfiguration.jsp"));
+		
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false))
+		{
+			integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.Know2ActConfig"), "frame?frameUrl=" + contextPath + "/web/Know2actConfiguration.jsp"));
+		}
+		
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.integratorPush"), "frame?frameUrl=" + contextPath + "/admin/integratorPushStatus.jsp"));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.born"), "frame?frameUrl=" + contextPath + "/admin/born.jsp"));
 

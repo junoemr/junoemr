@@ -218,11 +218,7 @@ public class RecordUxService extends AbstractServiceImpl {
 
 		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.MESSAGE_READ))
 		{
-			menulist.add(new MenuItemTo1(idCounter++, "Messenger", "../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no=" + demographicNo));
-			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.MESSAGE_CREATE))
-			{
-				menulist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no=" + demographicNo));
-			}
+			menulist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no="+demographicNo));
 		}
 
 		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DOCUMENT_READ))
@@ -375,7 +371,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		
         return Collections.unmodifiableMap(result);
     }
-	
+
 	@GET
 	@Path("/{demographicNo}/fullSummary/{summaryCode}")
 	@Produces("application/json")
@@ -390,7 +386,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		logger.debug("outgoing summary object:" + summary);
 		return summary;
 	}
-	
+
 	@GET
 	@Path("/{demographicNo}/getFamilyHistory")
 	@Produces(MediaType.APPLICATION_JSON)

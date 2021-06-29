@@ -76,12 +76,12 @@ public class DocumentConverter
 		return document;
 	}
 
-	public static DocumentTransferOutbound getAsTransferObject(Document document) throws IOException
+	public static DocumentTransferOutbound getAsTransferObject(Document document, Boolean includeData) throws IOException
 	{
 		DocumentTransferOutbound transfer = new DocumentTransferOutbound();
 
 		transfer.setDocumentNo(document.getDocumentNo());
-//		transfer.setFileName(document.getDocfilename());
+		transfer.setFileName(document.getDocfilename());
 		transfer.setContentType(document.getContenttype());
 		transfer.setNumberOfPages(document.getNumberofpages());
 		transfer.setStatus(String.valueOf(document.getStatus()));
@@ -103,15 +103,18 @@ public class DocumentConverter
 		transfer.setResponsible(document.getResponsible());
 		transfer.setReviewDateTime(ConversionUtils.toNullableLocalDateTime(document.getReviewdatetime()));
 
-		// convert file contents to base64 encoded string
-		GenericFile genericFile = FileFactory.getDocumentFile(document.getDocfilename());
-		File file = genericFile.getFileObject();
+		if (includeData)
+		{
+			// convert file contents to base64 encoded string
+			GenericFile genericFile = FileFactory.getDocumentFile(document.getDocfilename());
+			File file = genericFile.getFileObject();
 
-		FileInputStream imageInFile = new FileInputStream(file);
-		byte fileData[] = new byte[(int) file.length()];
-		imageInFile.read(fileData);
-		String base64File = Base64.getEncoder().encodeToString(fileData);
-		transfer.setBase64EncodedFile(base64File);
+			FileInputStream imageInFile = new FileInputStream(file);
+			byte fileData[] = new byte[(int) file.length()];
+			imageInFile.read(fileData);
+			String base64File = Base64.getEncoder().encodeToString(fileData);
+			transfer.setBase64EncodedFile(base64File);
+		}
 
 		return transfer;
 	}

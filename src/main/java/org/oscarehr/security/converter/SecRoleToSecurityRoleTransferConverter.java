@@ -50,12 +50,12 @@ public class SecRoleToSecurityRoleTransferConverter extends AbstractModelConvert
 	}
 
 	@Override
-	public List<SecurityRoleTransfer> convert(Collection<SecRole> entities)
+	public List<SecurityRoleTransfer> convert(Collection<? extends SecRole> entities)
 	{
 		return this.convert(entities, true);
 	}
 
-	public List<SecurityRoleTransfer> convert(Collection<SecRole> entities, boolean includePrivileges)
+	public List<SecurityRoleTransfer> convert(Collection<? extends SecRole> entities, boolean includePrivileges)
 	{
 		return entities.stream().map((entity) -> convert(entity, includePrivileges)).collect(Collectors.toList());
 	}

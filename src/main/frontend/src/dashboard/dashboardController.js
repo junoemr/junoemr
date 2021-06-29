@@ -124,19 +124,14 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             }
         };
 
-
-	    controller.updateK2aActive = function ()
+	    controller.updateK2aActive = async () =>
 	    {
 	    	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2A_READ))
 		    {
-			    k2aService.isK2AInit().then(
-				    function success(data)
-				    {
-					    controller.k2aActive = data;
-				    }
-			    );
+			    controller.k2aActive = await k2aService.isK2AInit();
 		    }
 	    };
+
 	    controller.loadMoreK2aFeed = function ()
 	    {
 		    controller.updateFeed(controller.k2afeed.length, 10);
@@ -344,7 +339,9 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         controller.updateFeed = function updateFeed(startPoint, numberOfRows)
         {
-            if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2A_READ) || controller.busyLoadingData) return;
+	        if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2A_READ)
+		        || !controller.k2aActive
+		        || controller.busyLoadingData) return;
             controller.busyLoadingData = true;
             k2aService.getK2aFeed(startPoint, numberOfRows).then(
                 function(response)
@@ -399,8 +396,12 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
         {
             controller.updateTicklers();
             controller.updateReports();
-            controller.updateFeed(0, 10);
-            controller.updateK2aActive();
+	        controller.updateK2aActive();
+
+	        if (controller.k2aActive)
+	        {
+		        controller.updateFeed(0, 10);
+	        }
         };
 
         $scope.$watch(function()

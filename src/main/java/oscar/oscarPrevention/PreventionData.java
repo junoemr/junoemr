@@ -31,7 +31,9 @@ import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.PMmodule.caisi_integrator.RemotePreventionHelper;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicPrevention;
 import org.oscarehr.caisi_integrator.ws.CachedFacility;
+import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dao.PreventionExtDao;
@@ -59,6 +61,7 @@ public class PreventionData {
 	private static Logger log = MiscUtils.getLogger();
 	private static PreventionDao preventionDao = (PreventionDao) SpringUtils.getBean("preventionDao");
 	private static PreventionExtDao preventionExtDao = (PreventionExtDao) SpringUtils.getBean("preventionExtDao");
+	private static final PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
 
 	private PreventionData() {
 		// prevent instantiation
@@ -77,10 +80,14 @@ public class PreventionData {
 			String neverWarn,
 			ArrayList<Map<String, String>> list)
 	{
+		String preventionDateFormat = partialDateDao.getFormat(date);
+		date = makeFullDate(preventionDateFormat, date);
+
 		return insertPreventionData(
 				creator,
 				Integer.parseInt(demoNo),
-				ConversionUtils.fromDateString(date, ConversionUtils.TS_NO_SEC_PATTERN),
+				ConversionUtils.fromDateString(date),
+				preventionDateFormat,
 				providerNo,
 				providerName,
 				preventionType,
@@ -94,6 +101,7 @@ public class PreventionData {
 			String creator,
 			Integer demoNo,
 			Date date,
+			String preventionDateFormat,
 			String providerNo,
 			String providerName,
 			String preventionType,
@@ -120,6 +128,7 @@ public class PreventionData {
 
 			preventionDao.persist(prevention);
 			if (prevention.getId() == null) return insertId;
+			partialDateDao.setPartialDate(PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE, preventionDateFormat);
 
 			insertId = prevention.getId();
 			for (int i = 0; i < list.size(); i++) {
@@ -571,7 +580,9 @@ public class PreventionData {
 				addToHashIfNotNull(h, "never", prevention.isNever() ? "1" : "0");
 				addToHashIfNotNull(h, "creator", prevention.getCreatorProviderNo());
 
-				String summary = "Prevention " + prevention.getPreventionType() + " provided by " + providerName + " on " + preventionDate;
+				String formattedPreventionDate = partialDateDao.getDatePartial(preventionDate, PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE);
+
+				String summary = "Prevention " + prevention.getPreventionType() + " provided by " + providerName + " on " + formattedPreventionDate;
 				summary = summary + " entered by " + creatorName + " on " + lastUpdateDate;
 				Map<String, String> ext = getPreventionKeyValues(prevention.getId().toString());
 
@@ -621,6 +632,19 @@ public class PreventionData {
 			log.error(e.getMessage(), e);
 		}
 		return h;
+	}
+
+
+	private static String makeFullDate(String dateFormat, String date) {
+		if(dateFormat == "YYYY")
+		{
+			date += "-01-01";
+		}
+		if (dateFormat == "YYYY-MM")
+		{
+			date += "-01";
+		}
+		return date;
 	}
 
 	private static void addToHashIfNotNull(Map<String, Object> h, String key, String val) {

@@ -23,6 +23,7 @@
 @import "bootstrap-timepicker/timepicker";
 // Global stuff
 @import "global";
+@import "layout";
 // TODO-legacy: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
 @import "forms";
@@ -41,6 +42,7 @@
 @import "../src/common/components/junoButton/junoButton";
 @import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
+@import "../src/common/components/junoCollapseArea/junoCollapseArea";
 @import "../src/common/components/junoFileChooser/junoFileChooser";
 @import "../src/common/components/junoInput/junoInput";
 @import "../src/common/components/junoInputSave/junoInputSave";
@@ -60,6 +62,7 @@
 @import "../src/common/components/accordionList/accordionList";
 @import "../src/common/components/iconCard/iconCard";
 @import "../src/common/components/panel/_panel.scss";
+@import "../src/common/layout/pageWrapper/pageWrapper";
 @import "../src/common/modals/junoAlert/junoAlert";
 @import "../src/common/modals/junoInputModal/junoInputModal";
 @import "../src/common/modals/junoProgressModal/junoProgressModal";
@@ -75,6 +78,19 @@
 @import "../src/layout/components/appointmentQueue/appointmentQueue";
 @import "../src/layout/components/appointmentQueue/components/appointmentCard/appointmentCard";
 @import "../src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModal";
+@import "../src/messaging/inbox/components/attachmentList/attachmentList";
+@import "../src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBar";
+@import "../src/messaging/inbox/components/inboxSelect/inboxSelect";
+@import "../src/messaging/inbox/components/messageableSearch/messageableSearch";
+@import "../src/messaging/inbox/components/messageCard/messageCard";
+@import "../src/messaging/inbox/components/messageList/messageList";
+@import "../src/messaging/inbox/components/messageView/components/message/message";
+@import "../src/messaging/inbox/components/messageView/messageView";
+@import "../src/messaging/inbox/messagingInbox";
+@import "../src/messaging/inbox/modals/attachmentSelect/attachmentSelect";
+@import "../src/messaging/inbox/modals/attachmentSelect/components/fileSelectList/fileSelectList";
+@import "../src/messaging/inbox/modals/attachmentSelect/components/fileSourceSelect/fileSourceSelect";
+@import "../src/messaging/inbox/modals/messageCompose/messageCompose";
 @import "../src/help/support";
 @import "../src/schedule/schedule";
 @import "../src/schedule/eventModal";

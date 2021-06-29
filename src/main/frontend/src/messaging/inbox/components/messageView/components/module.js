@@ -1,0 +1,1 @@
+angular.module("Messaging.Components.View.Components", [ "Common.Services", "Common.Components"]);

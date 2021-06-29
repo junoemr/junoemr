@@ -5,6 +5,7 @@
 	</label>
 
 	<div>
+		<i ng-if="$ctrl.icon" class="icon" ng-class="$ctrl.icon"></i>
 		<input type="{{$ctrl.type}}"
 						ng-model="$ctrl.ngModel"
 						ng-change="$ctrl.onChange()"

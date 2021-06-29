@@ -50,7 +50,7 @@ public class PermissionToSecurityPermissionTransferConverter extends AbstractMod
 	}
 
 	@Override
-	public List<SecurityPermissionTransfer> convert(Collection<Permission> entities)
+	public List<SecurityPermissionTransfer> convert(Collection<? extends Permission> entities)
 	{
 		Map<String, SecObjectName> nameEntityMap = secObjectNameDao.findAllMappedById();
 		return entities.stream().map((permission) -> this.convert(permission, nameEntityMap)).collect(Collectors.toList());

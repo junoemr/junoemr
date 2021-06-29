@@ -245,10 +245,11 @@ public class DemographicWs extends AbstractWs
 	/**
 	 * Given a demographic health insurance number, attempt to locate the associated demographic
 	 * @param healthNumber HIN for a demographic that may be in the system
+	 * @param versionCode [optional] HIN version number
 	 * @return a single Demographic if we can find one, null otherwise
 	 * @throws Exception if health number is clearly incorrect
 	 */
-	public DemographicTransfer getDemographicByHealthNumber(String healthNumber) throws Exception
+	public DemographicTransfer getDemographicByHealthNumber(String healthNumber, String versionCode) throws Exception
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
@@ -257,7 +258,7 @@ public class DemographicWs extends AbstractWs
 			throw new Exception("null or empty health numbers are not permitted");
 		}
 
-		org.oscarehr.demographic.model.Demographic demographic = demographicManager.getDemographicByHealthNumber(healthNumber);
+		org.oscarehr.demographic.model.Demographic demographic = demographicManager.getDemographicByHealthNumber(healthNumber, versionCode);
 
 		if (demographic != null)
 		{

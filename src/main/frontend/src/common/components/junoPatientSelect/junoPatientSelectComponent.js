@@ -47,7 +47,7 @@ angular.module('Common.Components').component('junoPatientSelect', {
 			ctrl.label = ctrl.label || "";
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.showPatientCard = ctrl.showPatientCard || false;
-			ctrl.showDemographicAdd = ctrl.showDemographicAdd || true;
+			ctrl.showDemographicAdd = ctrl.showDemographicAdd == null ? true : ctrl.showDemographicAdd;
 		}
 
 		$scope.$watch('ngModel', (newDemo) =>
@@ -124,6 +124,11 @@ angular.module('Common.Components').component('junoPatientSelect', {
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
+		}
+
+		ctrl.headerRowClasses = () =>
+		{
+			return ctrl.showPatientCard ? "" : "no-patient-card";
 		}
 	}],
 });

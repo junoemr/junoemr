@@ -76,7 +76,7 @@ public class ErrorHandler extends DefaultResponseErrorHandler
 			case GenericErrorTo1.ERROR_AUTHENTICATION:
 				throw new InvalidAccessException("Authentication Failure");
 			case GenericErrorTo1.ERROR_ACCESS:
-				throw new InvalidAccessException("Invalid Email/Password");
+				throw new InvalidAccessException("Invalid Access");
 			default:
 				throw new CommunicationException("MHA server responded with error.", genericErrorTo1);
 		}
