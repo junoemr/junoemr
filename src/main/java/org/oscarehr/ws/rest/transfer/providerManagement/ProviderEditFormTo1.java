@@ -258,7 +258,7 @@ public class ProviderEditFormTo1 implements Serializable
 		// AB
 		this.setAbSourceCode(providerBilling.getAbSourceCode());
 		this.setAbSkillCode(providerBilling.getAbSkillCode());
-		this.setAbLocationC2312ode(providerBilling.getAbLocationCode());
+		this.setAbLocationCode(providerBilling.getAbLocationCode());
 		this.setAbBANumber(providerBilling.getAbBANumber());
 		this.setAbFacilityNumber(providerBilling.getAbFacilityNumber());
 		this.setAbFunctionalCenter(providerBilling.getAbFunctionalCenter());
