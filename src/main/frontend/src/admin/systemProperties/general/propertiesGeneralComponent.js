@@ -52,13 +52,6 @@ angular.module('Admin').component('systemPropertiesGeneral',
 				            const MIN_LENGTH = 3;
 				            const MAX_LENGTH = 4;
 				            
-				            if (prefix)
-				            {
-				            	const valid2 = prefix.match(reg) != null && (prefix.length >= MIN_LENGTH && prefix.length <= MAX_LENGTH)
-					            console.log(valid2);
-				            }
-				            
-				            
 				            return prefix === "" || !prefix ||
 					            (prefix.match(reg) != null && (prefix.length >= MIN_LENGTH && prefix.length <= MAX_LENGTH));
 			            }
