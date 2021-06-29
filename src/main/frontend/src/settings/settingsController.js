@@ -66,6 +66,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			controller.pref.recentPatients = "8";
 		}
 
+
 		//convert to value/label object list from string array
 		controller.formGroupNames = [
 		{

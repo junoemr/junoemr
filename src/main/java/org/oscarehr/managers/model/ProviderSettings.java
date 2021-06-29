@@ -23,6 +23,8 @@
  */
 package org.oscarehr.managers.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.eform.service.EFormTemplateService;
 
 import java.util.ArrayList;
@@ -157,6 +159,10 @@ public class ProviderSettings
 	private boolean appointmentCountIncludeCancelled;
 	private boolean appointmentCountIncludeNoShow;
 	private boolean appointmentCountIncludeNoDemographic;
+
+	@Getter
+	@Setter
+	private boolean enableCareConnectPPNCheck;
 
 	public String getRecentPatients()
 	{
