@@ -23,12 +23,12 @@
 
 package org.oscarehr.rx.model;
 
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.oscarehr.common.model.AbstractModel;
+import oscar.oscarRx.data.RxPrescriptionData;
+import oscar.oscarRx.util.RxUtil;
+import oscar.util.UtilDateUtilities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,14 +41,12 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import org.oscarehr.common.model.AbstractModel;
-import oscar.oscarRx.data.RxPrescriptionData;
-import oscar.oscarRx.util.RxUtil;
-import oscar.util.UtilDateUtilities;
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 @Entity
 @Table(name = "drugs")
@@ -523,6 +521,15 @@ public class Drug extends AbstractModel<Integer> implements Serializable {
 
 	public void setSpecial(String special) {
 		this.special = StringUtils.trimToNull(special);
+	}
+
+	public String getInstruction()
+	{
+		String specialInstr = StringUtils.trimToNull(this.getSpecialInstruction());
+		String endString = (specialInstr != null ? specialInstr : "Qty");
+		String startString = StringUtils.trimToNull(this.getDrugName());
+		String instruction = StringUtils.substringBetween(this.special, startString, endString);
+		return StringUtils.trimToNull(instruction);
 	}
 
 	public String getSpecialInstruction() {
