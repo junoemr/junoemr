@@ -1812,10 +1812,6 @@ public class NotesService extends AbstractServiceImpl
 				noteId,
 				partialDateType);
 
-		if (partialDateEntity != null)
-		{
-			return org.oscarehr.dataMigration.model.common.PartialDate.from(ConversionUtils.toNullableLocalDate(fullDateValue), partialDateEntity);
-		}
-		return null;
+		return org.oscarehr.dataMigration.model.common.PartialDate.from(ConversionUtils.toNullableLocalDate(fullDateValue), partialDateEntity);
 	}
 }
