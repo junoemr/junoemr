@@ -115,6 +115,7 @@ public class ProviderEditFormTo1 implements Serializable
 
 	//3rd Party Identifiers
 	private String cpsid;
+	private String onCnoNumber;
 	private String ihaProviderMnemonic;
 	private String connectCareProviderId;
 	private String takNumber;
@@ -161,6 +162,7 @@ public class ProviderEditFormTo1 implements Serializable
 
 		// 3rd party identifiers
 		this.setIhaProviderMnemonic(providerData.getAlbertaEDeliveryIds());
+		this.setOnCnoNumber(providerData.getOntarioCnoNumber());
 		this.setEDeliveryIds(providerData.getAlbertaEDeliveryIds());
 		this.setTakNumber(providerData.getAlbertaTakNo());
 		this.setConnectCareProviderId(providerData.getAlbertaConnectCareId());
@@ -229,6 +231,7 @@ public class ProviderEditFormTo1 implements Serializable
 		providerData.setAlbertaConnectCareId(this.getConnectCareProviderId());
 		providerData.setPractitionerNo(this.getCpsid());
 		providerData.setOntarioLifeLabsId(this.getLifeLabsClientId());
+		providerData.setOntarioCnoNumber(this.getOnCnoNumber());
 		providerData.setImdHealthUuid(this.getImdHealthUuid());
 
 		return providerData;
@@ -255,7 +258,7 @@ public class ProviderEditFormTo1 implements Serializable
 		// AB
 		this.setAbSourceCode(providerBilling.getAbSourceCode());
 		this.setAbSkillCode(providerBilling.getAbSkillCode());
-		this.setAbLocationCode(providerBilling.getAbLocationCode());
+		this.setAbLocationC2312ode(providerBilling.getAbLocationCode());
 		this.setAbBANumber(providerBilling.getAbBANumber());
 		this.setAbFacilityNumber(providerBilling.getAbFacilityNumber());
 		this.setAbFunctionalCenter(providerBilling.getAbFunctionalCenter());

@@ -888,7 +888,16 @@
 										ca-rows="1"
 										ca-disabled="$ctrl.fieldsDisabled"
 						>
-						</ca-field-text>
+                        			</ca-field-text>
+                        			<ca-field-text
+                                        					ng-if="$ctrl.ontarioCNOFieldEnabled && $ctrl.provider.type === 'nurse'"
+                                        					ca-name="cno"
+                                        					ca-title="CNO Number"
+                                        					ca-model="$ctrl.provider.onCnoNumber"
+                                        					ca-rows="1"
+                                        					ca-disabled="$ctrl.fieldsDisabled"
+                        			>
+                        			</ca-field-text>
 						<ca-field-text
 										ca-name="lifeLabsClientId"
 										ca-title="Life Labs Client Id"
