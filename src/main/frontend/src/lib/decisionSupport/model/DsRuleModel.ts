@@ -44,7 +44,12 @@ export default class DsRuleModel {
 
     public isValid = (): boolean =>
     {
-        return ((this.conditions && this.conditions.length > 0) && (this.consequences && this.consequences.length > 0));
+
+        return ((this.conditions && this.conditions.length > 0)
+            && (this.consequences && this.consequences.length > 0)
+            // @ts-ignore
+            && (!Juno.Common.Util.isBlank(this.name))
+        );
     }
 }
 

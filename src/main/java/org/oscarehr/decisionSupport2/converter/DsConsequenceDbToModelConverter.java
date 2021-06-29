@@ -36,6 +36,10 @@ public class DsConsequenceDbToModelConverter extends AbstractModelConverter<DsRu
 	@Override
 	public DsConsequence convert(DsRuleConsequence input)
 	{
+		if(input == null)
+		{
+			return null;
+		}
 		DsConsequence consequence;
 		switch(input.getType())
 		{

@@ -7,7 +7,10 @@
 		</juno-input>
 		<div class="flex-column">
 			<h6>Conditions</h6>
-			<div class="flex-row" ng-repeat="condition in $ctrl.model.conditions">
+			<div class="flex-row rule-condition" ng-repeat="condition in $ctrl.model.conditions">
+				<juno-simple-close-button class="close-button"
+				                          click="$ctrl.removeCondition(condition)">
+				</juno-simple-close-button>
 				<juno-select label="{{$first ? 'If' : 'and'}}"
 				             label-position="$ctrl.LABEL_POSITION.LEFT"
 				             options="$ctrl.conditionTypeOptions"
@@ -41,7 +44,10 @@
 		</div>
 		<div class="flex-column">
 			<h6>Consequences</h6>
-			<div class="flex-column" ng-repeat="consequence in $ctrl.model.consequences">
+			<div class="flex-column rule-consequence" ng-repeat="consequence in $ctrl.model.consequences">
+				<juno-simple-close-button class="close-button"
+				                          click="$ctrl.removeConsequence(consequence)">
+				</juno-simple-close-button>
 				<div class="flex-row">
 					<juno-select label="{{$first ? 'Then' : 'and'}}"
 					             label-position="$ctrl.LABEL_POSITION.LEFT"

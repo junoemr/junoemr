@@ -22,7 +22,6 @@
  */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import DsRuleModel from "../../lib/decisionSupport/model/DsRuleModel";
 import {DsCondition, DsConsequence} from "../../../generated";
 import DsRuleConditionModel from "../../lib/decisionSupport/model/DsRuleConditionModel";
 import DsRuleConsequenceModel from "../../lib/decisionSupport/model/DsRuleConsequenceModel";
@@ -68,12 +67,11 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 						{label:"Male", value: "M"},
 						{label:"Female", value: "F"},
 					],
-				}
+				};
 
 				ctrl.$onInit = (): void =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-					ctrl.model = ctrl.model || new DsRuleModel();
 					ctrl.disabled = ctrl.disabled || false;
 				}
 
@@ -117,6 +115,10 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 						}
 					}
 				}
+				ctrl.removeCondition = (condition: DsRuleConditionModel): void =>
+				{
+					ctrl.model.conditions = ctrl.model.conditions.filter((entry) => entry != condition);
+				}
 
 				ctrl.showConsequenceValueInput = (consequence: DsRuleConsequenceModel): boolean =>
 				{
@@ -133,6 +135,10 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 				ctrl.showConsequenceSeveritySelect = (consequence: DsRuleConsequenceModel): boolean =>
 				{
 					return (consequence.type === DsConsequence.TypeEnum.ALERT);
+				}
+				ctrl.removeConsequence = (consequence: DsRuleConsequenceModel): void =>
+				{
+					ctrl.model.consequences = ctrl.model.consequences.filter((entry) => entry != consequence);
 				}
 			}]
 	});

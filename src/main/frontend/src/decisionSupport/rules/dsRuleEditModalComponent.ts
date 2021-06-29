@@ -57,16 +57,23 @@ angular.module('DecisionSupport').component('dsRuleEditModal',
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
-					const rules = await decisionSupportApiService.getRules();
-					ctrl.ruleSelectionOptions = rules.map((rule) =>
+					try
 					{
-						return {
-							label: rule.name,
-							value: rule.id,
-							data: rule,
-						};
-					});
-					ctrl.isLoading = false;
+						const rules = await decisionSupportApiService.getRules();
+						ctrl.ruleSelectionOptions = rules.map((rule) =>
+						{
+							return {
+								label: rule.name,
+								value: rule.id,
+								data: rule,
+							};
+						});
+						ctrl.newRule = new DsRuleModel();
+					}
+					finally
+					{
+						ctrl.isLoading = false;
+					}
 				}
 
 				ctrl.toggleRuleSelectionMode = (value): void =>

@@ -54,7 +54,7 @@ export default class DsRuleModelToTransferConverter
 	{
 		return models.map((model) =>
 		{
-			const transfer = new DsCondition();
+			const transfer = {} as DsCondition;
 			transfer.id = model.id;
 			transfer.name = model.name;
 			transfer.type = model.type;
@@ -67,7 +67,7 @@ export default class DsRuleModelToTransferConverter
 	{
 		return models.map((model) =>
 		{
-			const transfer = new DsConsequence();
+			const transfer = {} as DsConsequence;
 			transfer.id = model.id;
 			transfer.name = model.name;
 			transfer.type = model.type;

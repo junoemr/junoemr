@@ -38,6 +38,10 @@ public class DsConditionDbToModelConverter extends AbstractModelConverter<DsRule
 	@Override
 	public DsCondition convert(DsRuleCondition input)
 	{
+		if(input == null)
+		{
+			return null;
+		}
 		DsCondition condition;
 		switch(input.getType())
 		{

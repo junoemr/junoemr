@@ -40,6 +40,10 @@ public class DsRuleDbToModelConverter extends AbstractModelConverter<org.oscareh
 	@Override
 	public DsRule convert(org.oscarehr.decisionSupport2.entity.DsRule input)
 	{
+		if(input == null)
+		{
+			return null;
+		}
 		DsRule dsRule = new DsRule();
 		BeanUtils.copyProperties(input, dsRule, "conditions" ,"consequences");
 
