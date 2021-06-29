@@ -394,14 +394,6 @@ public abstract class BaseNoteService
 				PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
 	}
 
-	public void saveExtPartialDate(org.oscarehr.dataMigration.model.common.PartialDate dateToSave, Long extensionId, Integer partialDateType)
-	{
-		partialDateDao.setPartialDate(dateToSave,
-				PartialDate.TABLE.CASEMGMT_NOTE_EXT,
-				Math.toIntExact(extensionId),
-				partialDateType);
-	}
-
 	/**
 	 * load program ID outside of loop to prevent excess queries
 	 */
