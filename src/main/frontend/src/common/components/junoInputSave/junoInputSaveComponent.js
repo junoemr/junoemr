@@ -42,7 +42,7 @@ angular.module('Common.Components').component('junoInputSave',
             $scope.LABEL_POSITION = LABEL_POSITION;
             ctrl.oldNgModel = null;
             ctrl.value = "";
-
+            
             ctrl.$onInit = () =>
             {
                 ctrl.invalid = ctrl.invalid || false;
@@ -52,18 +52,9 @@ angular.module('Common.Components').component('junoInputSave',
             {
                 if (ctrl.click)
                 {
-                    if (!ctrl.invalid)
-                    {
-                        ctrl.click({
-                            value: ctrl.ngModel
-                        })
-
-                        Juno.Common.Util.successAlert($uibModal, "Success", "Phone Prefix saved");
-                    }
-                    else
-                    {
-                        Juno.Common.Util.errorAlert($uibModal, "Error", "Phone Prefix must be exactly three digits");
-                    }
+	        	ctrl.click({
+				value: ctrl.ngModel
+	                })
                 }
             };
         }]
