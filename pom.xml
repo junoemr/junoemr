@@ -2092,6 +2092,7 @@
                                 org.oscarehr.ws.rest.RosterWebService
                                 org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
 								org.oscarehr.ws.rest.ProvidersService
+								org.oscarehr.ws.rest.ReferralDoctorsService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService

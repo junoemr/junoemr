@@ -1,5 +1,5 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {ProvidersServiceApi, RosterServiceApi} from "../../../../../generated";
+import {ReferralDoctorsApi, RosterServiceApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('rosterDisplaySection', {
     templateUrl: 'src/record/details/components/rosterDisplay/rosterDisplay.jsp',
@@ -13,17 +13,15 @@ angular.module('Record.Details').component('rosterDisplaySection', {
         "$http",
         "$httpParamSerializer",
         "staticDataService",
-        "referralDoctorsService",
         function($scope,
                  $uibModal,
                  $http,
                  $httpParamSerializer,
-                 staticDataService,
-                 referralDoctorsService)
+                 staticDataService)
         {
             let ctrl = this;
             let rosterApi = new RosterServiceApi($http, $httpParamSerializer, '../ws/rs');
-            let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
+            let referralDoctorsApi = new ReferralDoctorsApi($http, $httpParamSerializer, "../ws/rs");
 
             $scope.LABEL_POSITION = LABEL_POSITION;
             $scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -61,57 +59,40 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                 );
             }
 
-            ctrl.updateFamilyDoctors = (docSearchString, docReferralNo) =>
+            ctrl.updateFamilyDoctors = async (docSearchString, docReferralNo) =>
             {
-                referralDoctorsService.searchReferralDoctors(docSearchString, docReferralNo, 1, 10).then(
+                referralDoctorsApi.searchEnrolledDoctors(docSearchString, docReferralNo, 1, 10).then(
                     function success(results)
                     {
-                        let familyDoctors = new Array(results.length);
-
-                        for (let i = 0; i < results.length; i++)
+                        let familyDoctors = [];
+                        if (!results.data.body || results.data.body.length === 0)
                         {
-                            let displayName = results[i].lastName + ', ' + results[i].firstName;
-                            familyDoctors[i] = {
-                                label: displayName,
-                                value: displayName,
-                                referralNo: results[i].referralNo
-                            };
-                            if (results[i].specialtyType != null && results[i].specialtyType !== "")
-                            {
-                                familyDoctors[i].label += " [" + results[i].referralNo + "]";
-                            }
+                            familyDoctors.push({value: "", label: "--"})
                         }
 
+                        for (let i = 0; i < results.data.body.length; i++)
+                        {
+                            let familyDoctor = results.data.body[i];
+                            let displayName = familyDoctor.lastName + ', ' + familyDoctor.firstName;
+                            let label = familyDoctor.lastName + ', ' + familyDoctor.firstName;
+
+                            if (familyDoctor.referralNo != null && familyDoctor.referralNo !== "")
+                            {
+                                label += "[" + familyDoctor.referralNo + "]";
+                            }
+
+                            familyDoctors.push({
+                                label: label,
+                                value: displayName,
+                                referralNo: familyDoctor.referralNo
+                            });
+                        }
                         ctrl.familyDoctors = familyDoctors;
                     },
                     function failure(errors)
                     {
-                        console.log(errors);
+                        console.error(errors);
                     }
-                ).then(
-                    providersServiceApi.getActive().then(
-                        function success(results)
-                        {
-                            for (let provider of results.data.body)
-                            {
-                                let fullName = provider.lastName + ", " + provider.firstName;
-                                let displayName = provider.lastName + ", " + provider.firstName;
-                                if (provider.ohipNo !== "")
-                                {
-                                    displayName += " [" + provider.ohipNo + "]";
-                                }
-                                ctrl.familyDoctors.push({
-                                    label: displayName,
-                                    value: fullName,
-                                    referralNo: provider.ohipNo
-                                });
-                            }
-                        },
-                        function failure(errors)
-                        {
-                            console.error(errors);
-                        }
-                    )
                 );
             }
 
