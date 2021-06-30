@@ -29,10 +29,11 @@ import {DsCondition, DsConsequence, DsRule} from "../../../../generated";
 import DsRuleModel from "../model/DsRuleModel";
 import DsRuleConditionModel from "../model/DsRuleConditionModel";
 import DsRuleConsequenceModel from "../model/DsRuleConsequenceModel";
+import AbstractConverter from "../../conversion/AbstractConverter";
 
-export default class DsRuleTransferToModelConverter
+export default class DsRuleTransferToModelConverter extends AbstractConverter<DsRule, DsRuleModel>
 {
-	convert(transfer: DsRule): DsRuleModel
+	public convert(transfer: DsRule): DsRuleModel
 	{
 		let model = new DsRuleModel();
 		model.id = transfer.id;
@@ -45,12 +46,7 @@ export default class DsRuleTransferToModelConverter
 		return model;
 	}
 
-	convertAll(transferList: Array<DsRule>): Array<DsRuleModel>
-	{
-		return transferList.map((transfer) => this.convert(transfer));
-	}
-
-	convertConditions(transfers: Array<DsCondition>): Array<DsRuleConditionModel>
+	private convertConditions(transfers: Array<DsCondition>): Array<DsRuleConditionModel>
 	{
 		return transfers.map((transfer) =>
 		{
@@ -62,7 +58,7 @@ export default class DsRuleTransferToModelConverter
 		});
 	}
 
-	convertConsequences(transfers: Array<DsConsequence>): Array<DsRuleConsequenceModel>
+	private convertConsequences(transfers: Array<DsConsequence>): Array<DsRuleConsequenceModel>
 	{
 		return transfers.map((transfer) =>
 		{

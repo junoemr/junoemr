@@ -29,14 +29,14 @@ import FlowsheetItemGroupModel from "./FlowsheetItemGroupModel";
 
 export default class FlowsheetModel
 {
-	id?: number;
+	id: number;
 	name: string;
 	description: string;
 	enabled: boolean;
 	systemManaged: boolean;
-	flowsheetItemGroups?: Array<FlowsheetItemGroupModel>;
+	flowsheetItemGroups: FlowsheetItemGroupModel[];
 
-	constructor()
+	public constructor()
 	{
 		this.enabled = true;
 		this.systemManaged = false;

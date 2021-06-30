@@ -83,7 +83,6 @@ angular.module('Flowsheet').component('flowsheetManager',
 
 				ctrl.onFlowsheetDelete = async (flowsheet): Promise<void> =>
 				{
-					// @ts-ignore
 					const userOk : boolean = await Juno.Common.Util.confirmationDialog($uibModal, "Confirm Delete",
 						"You are about to delete flowsheet " + flowsheet.name + "." +
 						"Are you sure you want to delete this flowsheet?");

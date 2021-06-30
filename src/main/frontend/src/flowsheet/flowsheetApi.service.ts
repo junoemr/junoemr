@@ -47,7 +47,7 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 
 		service.getAllFlowsheets = async (): Promise<Array<FlowsheetModel>> =>
 		{
-			return service.flowsheetModelConverter.convertAll((await service.flowsheetsApi.getFlowsheets()).data.body);
+			return service.flowsheetModelConverter.convertList((await service.flowsheetsApi.getFlowsheets()).data.body);
 		}
 
 		service.getFlowsheet = async (flowsheetId: number): Promise<FlowsheetModel> =>

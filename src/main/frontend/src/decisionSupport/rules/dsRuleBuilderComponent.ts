@@ -25,6 +25,7 @@ import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION
 import {DsCondition, DsConsequence} from "../../../generated";
 import DsRuleConditionModel from "../../lib/decisionSupport/model/DsRuleConditionModel";
 import DsRuleConsequenceModel from "../../lib/decisionSupport/model/DsRuleConsequenceModel";
+import {Sex, sexToHuman} from "../../lib/demographic/model/Sex";
 
 angular.module('DecisionSupport').component('dsRuleBuilder',
 	{
@@ -63,9 +64,11 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 
 				ctrl.conditionValueOptions = {
 					gender: [
-						//TODO use general gender type object
-						{label:"Male", value: "M"},
-						{label:"Female", value: "F"},
+						{label: sexToHuman(Sex.Male), value: Sex.Male},
+						{label: sexToHuman(Sex.Female), value: Sex.Female},
+						{label: sexToHuman(Sex.Transgender), value: Sex.Transgender},
+						{label: sexToHuman(Sex.Other), value: Sex.Other},
+						{label: sexToHuman(Sex.Undefined), value: Sex.Undefined},
 					],
 				};
 

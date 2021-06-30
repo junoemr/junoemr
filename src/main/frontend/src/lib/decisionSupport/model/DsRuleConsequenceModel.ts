@@ -27,13 +27,14 @@
 
 import {DsConsequence} from "../../../../generated";
 
-export default class DsRuleConsequenceModel {
-    id?: number;
-    message?: string;
+export default class DsRuleConsequenceModel
+{
+    id: number;
+    message: string;
     severityLevel: DsConsequence.SeverityLevelEnum;
     type: DsConsequence.TypeEnum;
 
-    constructor()
+    public constructor()
     {
         this.type = DsConsequence.TypeEnum.ALERT; // default type
         this.severityLevel = DsConsequence.SeverityLevelEnum.RECOMMENDATION;

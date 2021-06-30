@@ -30,20 +30,20 @@ import DsRuleModel from "../../decisionSupport/model/DsRuleModel";
 
 export default class FlowsheetItemModel
 {
-	id?: number;
+	id: number;
 	name: string;
 	description: string;
-	guideline?: string;
-	type?: FlowsheetItem.TypeEnum;
-	typeCode?: string;
-	hidden?: boolean;
-	valueType?: FlowsheetItem.ValueTypeEnum;
-	valueLabel?: string;
-	flowsheetItemAlerts?: Array<FlowsheetItemAlert>;
-	data?: Array<FlowsheetItemData>;
-	rules?: Array<DsRuleModel>;
+	guideline: string;
+	type: FlowsheetItem.TypeEnum;
+	typeCode: string;
+	hidden: boolean;
+	valueType: FlowsheetItem.ValueTypeEnum;
+	valueLabel: string;
+	flowsheetItemAlerts: FlowsheetItemAlert[];
+	data: FlowsheetItemData[];
+	rules: DsRuleModel[];
 
-	constructor()
+	public constructor()
 	{
 	}
 }

@@ -29,13 +29,13 @@ import FlowsheetItemModel from "./FlowsheetItemModel";
 
 export default class FlowsheetItemGroupModel
 {
-	id?: number;
+	id: number;
 	name: string;
 	description: string;
-	flowsheetItems?: Array<FlowsheetItemModel>;
+	flowsheetItems: FlowsheetItemModel[];
 
 
-	constructor()
+	public constructor()
 	{
 		this.flowsheetItems = [];
 	}

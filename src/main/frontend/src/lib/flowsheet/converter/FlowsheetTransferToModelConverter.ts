@@ -30,10 +30,11 @@ import {Flowsheet, FlowsheetItem, FlowsheetItemGroup} from "../../../../generate
 import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
 import FlowsheetItemModel from "../model/FlowsheetItemModel";
 import DsRuleTransferToModelConverter from "../../decisionSupport/converter/DsRuleTransferToModelConverter";
+import AbstractConverter from "../../conversion/AbstractConverter";
 
-export default class FlowsheetTransferToModelConverter
+export default class FlowsheetTransferToModelConverter extends AbstractConverter<Flowsheet, FlowsheetModel>
 {
-	convert(flowsheetTransfer: Flowsheet): FlowsheetModel
+	public convert(flowsheetTransfer: Flowsheet): FlowsheetModel
 	{
 		if (!flowsheetTransfer)
 		{
@@ -51,12 +52,7 @@ export default class FlowsheetTransferToModelConverter
 		return flowsheetModel;
 	}
 
-	convertAll(flowsheetTransfers: Array<Flowsheet>): Array<FlowsheetModel>
-	{
-		return flowsheetTransfers.map((transfer) => this.convert(transfer));
-	}
-
-	convertAllGroups(itemGroups: Array<FlowsheetItemGroup>): Array<FlowsheetItemGroupModel>
+	private convertAllGroups(itemGroups: Array<FlowsheetItemGroup>): Array<FlowsheetItemGroupModel>
 	{
 		return itemGroups.map(itemGroup =>
 		{
@@ -70,7 +66,7 @@ export default class FlowsheetTransferToModelConverter
 		});
 	}
 
-	convertAllItems(items: Array<FlowsheetItem>): Array<FlowsheetItemModel>
+	private convertAllItems(items: Array<FlowsheetItem>): Array<FlowsheetItemModel>
 	{
 		const ruleToModelConverter = new DsRuleTransferToModelConverter();
 		return items.map(item =>
@@ -87,7 +83,7 @@ export default class FlowsheetTransferToModelConverter
 			model.valueLabel = item.valueLabel;
 			model.flowsheetItemAlerts = item.flowsheetItemAlerts;
 			model.data = item.data;
-			model.rules = ruleToModelConverter.convertAll(item.rules);
+			model.rules = ruleToModelConverter.convertList(item.rules);
 
 			return model;
 		});

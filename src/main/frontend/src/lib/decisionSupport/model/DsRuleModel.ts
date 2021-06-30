@@ -27,15 +27,16 @@
 import DsRuleConsequenceModel from "./DsRuleConsequenceModel";
 import DsRuleConditionModel from "./DsRuleConditionModel";
 
-export default class DsRuleModel {
-    id?: number;
+export default class DsRuleModel
+{
+    id: number;
     name: string;
-    description?: string;
-    systemManaged?: boolean;
-    conditions?: Array<DsRuleConditionModel>;
-    consequences?: Array<DsRuleConsequenceModel>;
+    description: string;
+    systemManaged: boolean;
+    conditions: DsRuleConditionModel[];
+    consequences: DsRuleConsequenceModel[];
 
-    constructor()
+    public constructor()
     {
         this.systemManaged = false;
         this.conditions = [];
@@ -47,7 +48,6 @@ export default class DsRuleModel {
 
         return ((this.conditions && this.conditions.length > 0)
             && (this.consequences && this.consequences.length > 0)
-            // @ts-ignore
             && (!Juno.Common.Util.isBlank(this.name))
         );
     }

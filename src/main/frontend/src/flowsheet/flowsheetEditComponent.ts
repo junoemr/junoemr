@@ -72,13 +72,11 @@ angular.module('Flowsheet').component('flowsheetEdit',
 				}
 				ctrl.isNewFlowsheet = (): boolean =>
 				{
-					// @ts-ignore
 					return Juno.Common.Util.isBlank(ctrl.flowsheet.id);
 				}
 
 				ctrl.onAddNewGroup = async (): Promise<void> =>
 				{
-					// @ts-ignore
 					let groupName = await Juno.Common.Util.openInputDialog($uibModal,
 						"Add Flowsheet Group",
 						"Please enter a name for this group",
@@ -97,7 +95,6 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onRenameGroup = async (itemGroup): Promise<void> =>
 				{
-					// @ts-ignore
 					let groupName = await Juno.Common.Util.openInputDialog($uibModal,
 						"Rename Flowsheet Group",
 						"Please enter a new name for this group",
@@ -128,7 +125,6 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					const typeLabel = (isMeasurementType) ? "measurement" : "prevention";
 					const callback = (isMeasurementType) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
 
-					// @ts-ignore
 					Juno.Common.Util.openTypeaheadDialog($uibModal,
 						"Add flowsheet " + typeLabel,
 						"Search for a " + typeLabel + " within the system",
@@ -171,7 +167,6 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onRemoveItem = async (item, itemGroup): Promise<void> =>
 				{
-					// @ts-ignore
 					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Remove flowsheet item",
 						"Are you sure you want to remove this item from the flowsheet group?",
@@ -185,7 +180,6 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onRemoveGroup = async (group): Promise<void> =>
 				{
-					// @ts-ignore
 					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Remove flowsheet group",
 						"Are you sure you want to remove this group (and all items within it) from the flowsheet?",

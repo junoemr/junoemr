@@ -27,12 +27,13 @@
 
 import {DsCondition} from "../../../../generated";
 
-export default class DsRuleConditionModel {
-    id?: number;
+export default class DsRuleConditionModel
+{
+    id: number;
     value: string;
     type: DsCondition.TypeEnum;
 
-    constructor()
+    public constructor()
     {
         this.type = DsCondition.TypeEnum.NEVER_GIVEN; // default type
     }

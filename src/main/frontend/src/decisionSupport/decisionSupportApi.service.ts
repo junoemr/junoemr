@@ -43,7 +43,7 @@ angular.module("DecisionSupport").service("decisionSupportApiService", [
 
 		service.getRules = async (): Promise<Array<DsRuleModel>> =>
 		{
-			return service.ruleToModelConverter.convertAll((await service.decisonSupportApi.getRules()).data.body);
+			return service.ruleToModelConverter.convertList((await service.decisonSupportApi.getRules()).data.body);
 		}
 
 		service.createRule = async (model: DsRuleModel): Promise<DsRuleModel> =>
