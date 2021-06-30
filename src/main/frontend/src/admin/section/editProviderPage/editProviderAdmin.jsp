@@ -882,6 +882,7 @@
 					</div>
 					<div ng-if="$ctrl.billingRegion === 'ON'">
 						<ca-field-text
+                                						ng-if="!$ctrl.ontarioCNOFieldEnabled || $ctrl.provider.type !== 'nurse'"
 										ca-name="cpsid"
 										ca-title="CPSID"
 										ca-model="$ctrl.provider.cpsid"
