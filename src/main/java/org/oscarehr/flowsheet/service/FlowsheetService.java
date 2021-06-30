@@ -66,8 +66,23 @@ public class FlowsheetService
 	public Flowsheet updateFlowsheet(String updatingProviderId, Integer flowsheetId, FlowsheetUpdateTransfer updateTransfer)
 	{
 		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetTransferToEntityConverter.convert(updateTransfer);
+
+		// set provider updated/deleted by states
+		// this can be moved to the converter logic once the logged in provider can be accessed globally
 		entity.setUpdatedBy(updatingProviderId);
+		entity.getFlowsheetItemGroups()
+				.stream()
+				.filter((group) -> group.getDeletedAt() != null)
+				.forEach((group) -> group.setDeletedBy(updatingProviderId));
+		entity.getFlowsheetItems()
+				.stream()
+				.filter((item) -> item.getDeletedAt() != null)
+				.forEach((item) -> item.setDeletedBy(updatingProviderId));
+
 		flowsheetDao.merge(entity);
+
+		// reload the entity so that deleted items are no longer present
+		flowsheetDao.refresh(entity);
 		return flowsheetEntityToModelConverter.convert(entity);
 	}
 

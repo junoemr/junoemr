@@ -23,6 +23,7 @@
 package org.oscarehr.flowsheet.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.CascadeType;
@@ -39,11 +40,13 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity(name = "entity.FlowsheetItemGroup")
 @Table(name = "flowsheet_item_group")
+@Where(clause = "deleted_at IS NULL")
 public class FlowsheetItemGroup extends AbstractModel<Integer>
 {
 	@Id
@@ -82,6 +85,11 @@ public class FlowsheetItemGroup extends AbstractModel<Integer>
 	@Column(name = "deleted_by")
 	private String deletedBy;
 
+	public FlowsheetItemGroup()
+	{
+		this.flowsheetItems = new ArrayList<>();
+	}
+
 	public void addItem(FlowsheetItem flowsheetItem)
 	{
 		this.flowsheetItems.add(flowsheetItem);
@@ -107,9 +115,6 @@ public class FlowsheetItemGroup extends AbstractModel<Integer>
 	private void preUpdate()
 	{
 		this.setUpdatedAt(LocalDateTime.now());
-		if(getUpdatedBy() == null)
-		{
-			setUpdatedBy(getFlowsheet().getUpdatedBy());
-		}
+		setUpdatedBy(getFlowsheet().getUpdatedBy());
 	}
 }

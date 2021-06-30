@@ -23,6 +23,7 @@
 package org.oscarehr.flowsheet.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.decisionSupport2.entity.DsRule;
 
@@ -49,6 +50,7 @@ import java.util.Set;
 @Data
 @Entity(name = "entity.FlowsheetItem")
 @Table(name = "flowsheet_item")
+@Where(clause = "deleted_at IS NULL")
 public class FlowsheetItem extends AbstractModel<Integer>
 {
 	@Id
@@ -147,9 +149,6 @@ public class FlowsheetItem extends AbstractModel<Integer>
 	private void preUpdate()
 	{
 		this.setUpdatedAt(LocalDateTime.now());
-		if(getUpdatedBy() == null)
-		{
-			setUpdatedBy(getFlowsheet().getUpdatedBy());
-		}
+		setUpdatedBy(getFlowsheet().getUpdatedBy());
 	}
 }

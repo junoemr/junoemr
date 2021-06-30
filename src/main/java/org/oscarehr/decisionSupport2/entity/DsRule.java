@@ -23,6 +23,7 @@
 package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
 
@@ -48,6 +49,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "ds_rule")
+@Where(clause = "deleted_at IS NULL")
 public class DsRule extends AbstractModel<Integer>
 {
 	@Id

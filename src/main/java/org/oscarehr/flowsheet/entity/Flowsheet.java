@@ -50,7 +50,7 @@ import java.util.Set;
 @Data
 @Entity(name = "entity.Flowsheet")
 @Table(name = "flowsheet")
-@Where(clause="deleted_at IS NULL")
+@Where(clause = "deleted_at IS NULL")
 public class Flowsheet extends AbstractModel<Integer>
 {
 	@Id

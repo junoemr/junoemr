@@ -23,6 +23,7 @@
 package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.decisionSupport2.model.consequence.ConsequenceType;
 import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
@@ -45,6 +46,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "ds_rule_consequence")
+@Where(clause = "deleted_at IS NULL")
 public class DsRuleConsequence extends AbstractModel<Integer>
 {
 
