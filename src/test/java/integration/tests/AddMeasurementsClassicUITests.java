@@ -27,7 +27,6 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import integration.tests.util.seleniumUtil.SectionAccessUtil;
 import org.apache.commons.lang.StringUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -90,9 +89,6 @@ public class AddMeasurementsClassicUITests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		// ** Add flowsheets to Disease Registry. **
-		/*SectionAccessUtil.accessAdministrationSectionClassicUI(driver, "System Management", "Manage Flowsheets");
-		PageUtil.switchToLastWindow(driver);*/
-
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		Thread.sleep(5000);
 		String currWindowHandle = driver.getWindowHandle();
