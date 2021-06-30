@@ -36,7 +36,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.ws.rest.conversion.referralDoctor.ReferralDoctorBCToTransferConverter;
 import org.oscarehr.ws.rest.conversion.referralDoctor.ReferralDoctorONToTransferConverter;
 import org.oscarehr.ws.rest.conversion.referralDoctor.ReferralDoctorProviderToTransferConverter;
-import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.ReferralDoctorTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -80,7 +80,7 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ReferralDoctorTo1>> searchSpecialists(@QueryParam("searchName") String searchName,
+	public RestSearchResponse<ReferralDoctorTo1> searchSpecialists(@QueryParam("searchName") String searchName,
 	                                                                       @QueryParam("searchRefNo") String searchRefNo,
 	                                                                       @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                                       @QueryParam("perPage") @DefaultValue("10") Integer perPage)
@@ -88,8 +88,9 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 		logger.debug("SEARCH REFERRAL DOCS: '" + searchName + "', '" + searchRefNo + "', " + page + ", " + perPage);
 		try
 		{
-			if(page < 1) page = 1;
-			int offset = perPage * (page-1);
+			page = validPageNo(page);
+			perPage = limitedResultCount(perPage);
+			int offset = calculatedOffset(page, perPage);
 
 			searchName = StringUtils.trimToNull(searchName);
 			searchRefNo = StringUtils.trimToNull(searchRefNo);
@@ -111,28 +112,26 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 					break;
 				}
 			}
-			return RestResponse.successResponse(referralDocList);
+			return RestSearchResponse.successResponse(referralDocList, page, perPage, referralDocList.size());
 		}
 		catch (Exception e)
 		{
 			logger.error("Error", e);
-			return RestResponse.errorResponse("Unexpected Error");
+			return RestSearchResponse.errorResponse("Unexpected Error");
 		}
 	}
 
 	@GET
 	@Path("/enrolled")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ReferralDoctorTo1>> searchEnrolledDoctors(@QueryParam("searchName") String searchName,
-																	   @QueryParam("searchRefNo") String searchRefNo,
-																	   @QueryParam("page") @DefaultValue("1") Integer page,
-																	   @QueryParam("perPage") @DefaultValue("10") Integer perPage)
+	public RestSearchResponse<ReferralDoctorTo1> searchEnrolledDoctors(@QueryParam("searchName") String searchName,
+																			 @QueryParam("searchRefNo") String searchRefNo,
+																			 @QueryParam("page") @DefaultValue("1") Integer page,
+																			 @QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
-		if (page < 1)
-		{
-			page = 1;
-		}
-		int offset = perPage * (page - 1);
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
 		searchName = StringUtils.trimToNull(searchName);
 		searchRefNo = StringUtils.trimToNull(searchRefNo);
 
@@ -162,7 +161,7 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 						&& provider.getFullName().toUpperCase().contains(finalSearchName.toUpperCase()))
 				.collect(Collectors.toList());
 		referralDocList.addAll(referralDoctorProviderToTransferConverter.convert(activeProviders));
-		return RestResponse.successResponse(referralDocList);
+		return RestSearchResponse.successResponse(referralDocList, page, perPage, referralDocList.size());
 }
 
 	private List<ReferralDoctorTo1> searchReferralDocsBC(String searchName, String referralNo, int offset, int limit)
