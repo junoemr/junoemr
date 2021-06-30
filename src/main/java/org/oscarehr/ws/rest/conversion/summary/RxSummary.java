@@ -69,12 +69,11 @@ public class RxSummary implements Summary{
 		long now = System.currentTimeMillis();
         long month = 1000L * 60L * 60L * 24L * 30L;
         for( Drug drug :drugList ) {
-            if( drug.isArchived() )
-                continue;
-            if(drug.isHideFromDrugProfile()) {
-            	continue;
+            if(drug.isArchived() || drug.getHideFromCpp())
+            {
+	            continue;
             }
-
+            
             String styleColor = "";
             if (drug.isCurrent() && (drug.getEndDate().getTime() - now <= month)) {
                 styleColor="style=\"color:orange;font-weight:bold;\"";

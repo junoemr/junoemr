@@ -53,18 +53,18 @@ import java.util.Map;
  */
 public class FOBTReport implements PreventionReport{
     private static Logger log = MiscUtils.getLogger();
-
-
+    
     /** Creates a new instance of MammogramReport */
     public FOBTReport() {
     }
-
-    public boolean displayNumShots()
-    {
-        return false;
-    }
-
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo,ArrayList<ArrayList<String>> list,Date asofDate){
+	
+	@Override
+	public boolean displayNumShots()
+	{
+		return false;
+	}
+	
+	public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate){
 
         int inList = 0;
         double done= 0,doneWithGrace = 0;
@@ -170,37 +170,28 @@ public class FOBTReport implements PreventionReport{
                    prd.numMonths = numMonths;
                    prd.color = "yellow"; //FF00FF
                    doneWithGrace++;
-                }
-                // overdue
-                else if (!refused && cutoffDate.after(prevDate))
-                {
+
+                } else if (!refused && cutoffDate.after(prevDate)){ // overdue
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "Overdue";
                    prd.numMonths = numMonths;
                    prd.color = "red"; //FF00FF
-                }
-                // recorded and refused
-                else if (refused)
-                {
+
+                } else if (refused){  // recorded and refused
                    prd.rank = 3;
                    prd.lastDate = "-----";
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
-                }
-                // pending
-                else if( dueDate.before(prevDate) && result.equalsIgnoreCase("pending") )
-                {
+                } else if( dueDate.before(prevDate) && result.equalsIgnoreCase("pending") ) {
                     prd.rank = 4;
                     prd.lastDate = prevDateStr;
                     prd.state = "Pending";
                     prd.numMonths = numMonths;
                     prd.color = "pink";
-                }
-                // recorded done
-                else if (dueDate.before(prevDate))
-                {
+
+                } else if (dueDate.before(prevDate)  ){  // recorded done
                    prd.rank = 4;
                    prd.lastDate = prevDateStr;
                    prd.state = "Up to date";

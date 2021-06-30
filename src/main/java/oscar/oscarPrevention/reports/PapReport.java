@@ -33,11 +33,9 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.ConversionUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -48,25 +46,22 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
+import oscar.util.UtilDateUtilities;
+
 /**
  *
  * @author jay
  */
-public class PapReport implements PreventionReport
-{
+public class PapReport implements PreventionReport {
     private static Logger log = MiscUtils.getLogger();
-
-    /**
-     * Creates a new instance of PapReport
-     */
-    public PapReport()
-    {
+    /** Creates a new instance of PapReport */
+    public PapReport() {
     }
 
-    public boolean displayNumShots()
-    {
-        return false;
-    }
+	public boolean displayNumShots()
+	{
+		return false;
+	}
 
     public Hashtable runReport(LoggedInInfo loggedInInfo,ArrayList list,Date asofDate){
         int inList = 0;
@@ -153,9 +148,8 @@ public class PapReport implements PreventionReport
 
 
                 String numMonths = "------";
-                if (prevDate != null){
-                    long num = ChronoUnit.MONTHS.between(ConversionUtils.toLocalDate(ConversionUtils.toDateString(prevDate)),
-                            ConversionUtils.toLocalDate(ConversionUtils.toDateString(asofDate)));
+                if ( prevDate != null){
+                   int num = UtilDateUtilities.getNumMonths(prevDate,asofDate);
                    numMonths = ""+num+" months";
                 }
 
@@ -452,7 +446,6 @@ public class PapReport implements PreventionReport
        }
        return null;
    }
-
 }
 
 
