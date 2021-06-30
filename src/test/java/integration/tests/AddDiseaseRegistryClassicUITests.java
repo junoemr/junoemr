@@ -58,8 +58,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		);
 	}
 
-	@Test
-	public void addDiseaseRegistryClassicUITest()
+	public void addDiseaseRegistry()
 			throws InterruptedException
 	{
 		String heartFailure = "428";
@@ -72,7 +71,42 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		String hiv = "042";
 		String inr = "42731";
 
+		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
+		Thread.sleep(10000);
+		PageUtil.switchToLastWindow(driver);
+		Thread.sleep(2000);
+		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
+		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
+		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(painAssistant);
+		driver.findElement(By.xpath("//input[@name='xml_research4']")).sendKeys(asthma);
+		driver.findElement(By.xpath("//input[@name='xml_research5']")).sendKeys(hypertension);
+		driver.findElement(By.xpath("//input[@value='Add']")).click();
+		textEdit(driver, By.xpath("//input[@name='xml_research1']"), chronicObstructivePulmonary);
+		textEdit(driver, By.xpath("//input[@name='xml_research2']"), ckd);
+		textEdit(driver, By.xpath("//input[@name='xml_research3']"), hiv);
+		textEdit(driver, By.xpath("//input[@name='xml_research4']"), inr);
+		driver.findElement(By.xpath("//input[@name='xml_research5']")).clear();
+		driver.findElement(By.xpath("//input[@value='Add']")).click();
+
+	}
+
+	@Test
+	public void addDiseaseRegistryClassicUITest()
+			throws InterruptedException
+	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		String currWindowHandle = driver.getWindowHandle();
+		addDiseaseRegistry();
+		/*String heartFailure = "428";
+		String diabetes = "250";
+		String painAssistant = "7194";
+		String asthma = "493";
+		String hypertension = "401";
+		String chronicObstructivePulmonary = "416";
+		String ckd = "585";
+		String hiv = "042";
+		String inr = "42731";
+
 		Thread.sleep(20000);
 		String currWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
@@ -90,7 +124,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		textEdit(driver, By.xpath("//input[@name='xml_research3']"), hiv);
 		textEdit(driver, By.xpath("//input[@name='xml_research4']"), inr);
 		driver.findElement(By.xpath("//input[@name='xml_research5']")).clear();
-		driver.findElement(By.xpath("//input[@value='Add']")).click();
+		driver.findElement(By.xpath("//input[@value='Add']")).click();*/
 
 		//** Verify from Disease Registry **
 		PageUtil.switchToWindow(currWindowHandle, driver);
