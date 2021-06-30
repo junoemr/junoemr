@@ -112,7 +112,7 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 					break;
 				}
 			}
-			return RestSearchResponse.successResponse(referralDocList, page, perPage, referralDocList.size());
+			return RestSearchResponse.successResponseOnePage(referralDocList);
 		}
 		catch (Exception e)
 		{
@@ -161,7 +161,7 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 						&& provider.getFullName().toUpperCase().contains(finalSearchName.toUpperCase()))
 				.collect(Collectors.toList());
 		referralDocList.addAll(referralDoctorProviderToTransferConverter.convert(activeProviders));
-		return RestSearchResponse.successResponse(referralDocList, page, perPage, referralDocList.size());
+		return RestSearchResponse.successResponseOnePage(referralDocList);
 }
 
 	private List<ReferralDoctorTo1> searchReferralDocsBC(String searchName, String referralNo, int offset, int limit)
