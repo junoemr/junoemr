@@ -21,11 +21,11 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
 angular.module('Flowsheet').component('flowsheetItemRule',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetItemRule.jsp',
+		templateUrl: 'src/flowsheet/components/flowsheetItemRule/flowsheetItemRule.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
@@ -42,7 +42,7 @@ angular.module('Flowsheet').component('flowsheetItemRule',
 
 				ctrl.isLoading = true;
 
-				ctrl.$onInit = async (): Promise<void> =>
+				ctrl.$onInit = (): void =>
 				{
 					ctrl.isLoading = false;
 				}

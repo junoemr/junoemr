@@ -96,16 +96,16 @@
 @import "../src/schedule/eventModal";
 @import "../src/schedule/scheduleSearchModal";
 @import "../src/dashboard/dashboard";
-@import "../src/decisionSupport/rules/dsRuleEditModal";
-@import "../src/decisionSupport/rules/dsRuleBuilder";
+@import "../src/decisionSupport/rules/dsRuleEditModal/dsRuleEditModal";
+@import "../src/decisionSupport/rules/dsRuleBuilder/dsRuleBuilder";
 @import "../src/patient/addDemographicModal/addDemographicModal";
 @import "../src/patient/demographicCard";
 @import "../src/patient/search/patientSearch";
 @import "../src/report/reports";
 @import "../src/flowsheet/flowsheetEdit";
-@import "../src/flowsheet/components/flowsheetItemGroup";
-@import "../src/flowsheet/components/flowsheetEditItem";
-@import "../src/flowsheet/components/flowsheetItemRule";
+@import "../src/flowsheet/components/flowsheetItemGroup/flowsheetItemGroup";
+@import "../src/flowsheet/components/flowsheetEditItem/flowsheetEditItem";
+@import "../src/flowsheet/components/flowsheetItemRule/flowsheetItemRule";
 
 // patient record
 @import "../src/record/record";

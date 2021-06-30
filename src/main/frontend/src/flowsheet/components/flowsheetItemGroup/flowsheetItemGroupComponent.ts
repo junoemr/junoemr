@@ -23,7 +23,7 @@
 
 angular.module('Flowsheet').component('flowsheetItemGroup',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetItemGroup.jsp',
+		templateUrl: 'src/flowsheet/components/flowsheetItemGroup/flowsheetItemGroup.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",

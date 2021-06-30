@@ -21,15 +21,15 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import {DsCondition, DsConsequence} from "../../../generated";
-import DsRuleConditionModel from "../../lib/decisionSupport/model/DsRuleConditionModel";
-import DsRuleConsequenceModel from "../../lib/decisionSupport/model/DsRuleConsequenceModel";
-import {Sex, sexToHuman} from "../../lib/demographic/model/Sex";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import {DsCondition, DsConsequence} from "../../../../generated";
+import DsRuleConditionModel from "../../../lib/decisionSupport/model/DsRuleConditionModel";
+import DsRuleConsequenceModel from "../../../lib/decisionSupport/model/DsRuleConsequenceModel";
+import {Sex, sexToHuman} from "../../../lib/demographic/model/Sex";
 
 angular.module('DecisionSupport').component('dsRuleBuilder',
 	{
-		templateUrl: 'src/decisionSupport/rules/dsRuleBuilder.jsp',
+		templateUrl: 'src/decisionSupport/rules/dsRuleBuilder/dsRuleBuilder.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",

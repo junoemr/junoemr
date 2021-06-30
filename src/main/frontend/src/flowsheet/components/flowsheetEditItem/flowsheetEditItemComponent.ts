@@ -21,12 +21,12 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import {ValueType} from "../../lib/flowsheet/FlowsheetConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import {ValueType} from "../../../lib/flowsheet/FlowsheetConstants";
 
 angular.module('Flowsheet').component('flowsheetEditItem',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetEditItem.jsp',
+		templateUrl: 'src/flowsheet/components/flowsheetEditItem/flowsheetEditItem.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
@@ -49,7 +49,7 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 				];
 
 				ctrl.isLoading = true;
-				ctrl.$onInit = async (): Promise<void> =>
+				ctrl.$onInit = (): void =>
 				{
 					ctrl.isLoading = false;
 				}

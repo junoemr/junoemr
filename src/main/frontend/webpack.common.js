@@ -282,8 +282,8 @@ module.exports = {
 
 			'./src/decisionSupport/module.js',
 			'./src/decisionSupport/decisionSupportApi.service.ts',
-			'./src/decisionSupport/rules/dsRuleEditModalComponent.ts',
-			'./src/decisionSupport/rules/dsRuleBuilderComponent.ts',
+			'./src/decisionSupport/rules/dsRuleEditModal/dsRuleEditModalComponent.ts',
+			'./src/decisionSupport/rules/dsRuleBuilder/dsRuleBuilderComponent.ts',
 
 			'./src/interceptor/module.js',
 			'./src/interceptor/errorInterceptor.js',
@@ -292,9 +292,9 @@ module.exports = {
 			'./src/flowsheet/flowsheetManagerComponent.ts',
 			'./src/flowsheet/flowsheetEditComponent.ts',
 			'./src/flowsheet/flowsheetApi.service.ts',
-			'./src/flowsheet/components/flowsheetEditItemComponent.ts',
-			'./src/flowsheet/components/flowsheetItemGroupComponent.ts',
-			'./src/flowsheet/components/flowsheetItemRuleComponent.ts',
+			'./src/flowsheet/components/flowsheetEditItem/flowsheetEditItemComponent.ts',
+			'./src/flowsheet/components/flowsheetItemGroup/flowsheetItemGroupComponent.ts',
+			'./src/flowsheet/components/flowsheetItemRule/flowsheetItemRuleComponent.ts',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',

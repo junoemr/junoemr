@@ -21,13 +21,13 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import DsRuleModel from "../../lib/decisionSupport/model/DsRuleModel";
+import {SecurityPermissions} from "../../../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import DsRuleModel from "../../../lib/decisionSupport/model/DsRuleModel";
 
 angular.module('DecisionSupport').component('dsRuleEditModal',
 	{
-		templateUrl: 'src/decisionSupport/rules/dsRuleEditModal.jsp',
+		templateUrl: 'src/decisionSupport/rules/dsRuleEditModal/dsRuleEditModal.jsp',
 		bindings: {
 			modalInstance: "<",
 			resolve: "<",
