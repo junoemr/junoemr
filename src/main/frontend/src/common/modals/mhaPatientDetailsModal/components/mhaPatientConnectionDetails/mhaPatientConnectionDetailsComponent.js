@@ -125,8 +125,16 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				{
 					try
 					{
-						await patientAccessService.cancelPatientVerification(ctrl.integration.id, ctrl.profile.id);
-						ctrl.notifyListenerOfConnectionUpdate();
+						const ok = await Juno.Common.Util.confirmationDialog(
+							$uibModal,
+							"Are you sure?",
+							"Cancel this patients verification?");
+
+						if (ok)
+						{
+							await patientAccessService.cancelPatientVerification(ctrl.integration.id, ctrl.profile.id);
+							ctrl.notifyListenerOfConnectionUpdate();
+						}
 					}
 					catch(error)
 					{
@@ -161,8 +169,17 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				{
 					try
 					{
-						await patientAccessService.cancelPatientConfirmation(ctrl.integration.id, ctrl.profile.id);
-						ctrl.notifyListenerOfConnectionUpdate();
+
+						const ok = await Juno.Common.Util.confirmationDialog(
+							$uibModal,
+							"Are you sure?",
+							"Cancel this patients confirmation?");
+
+						if (ok)
+						{
+							await patientAccessService.cancelPatientConfirmation(ctrl.integration.id, ctrl.profile.id);
+							ctrl.notifyListenerOfConnectionUpdate();
+						}
 					}
 					catch(error)
 					{
