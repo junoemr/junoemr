@@ -147,6 +147,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						}
 					);
 
+
 					//show notes
 					if (controller.page.demo.notes != null)
 					{

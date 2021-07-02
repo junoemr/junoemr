@@ -129,8 +129,8 @@
 	</div>
 </div>
 
-<juno-divider component-style="pageStyle"></juno-divider>
-<div class="demographic-details-section contact-section">
+<div class="demographic-details-section contact-section" ng-if="$ctrl.showAdditionalAddress">
+	<juno-divider component-style="pageStyle"></juno-divider>
 	<h4 class="title">
 		Additional Contact Information
 	</h4>
@@ -167,4 +167,5 @@
 			</juno-input>
 		</div>
 	</div>
+</div>
 </div>

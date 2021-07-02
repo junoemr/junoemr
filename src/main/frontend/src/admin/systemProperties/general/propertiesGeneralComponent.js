@@ -80,6 +80,14 @@ angular.module('Admin').component('systemPropertiesGeneral',
 		                type: propertyTypes.toggle,
 		                value: false,
 		                validation: false,
+	                },
+					{
+	                	name: "Additional Demographic Address",
+		                description: "Enable an additional demographic address",
+		                propertyName: "enable_additional_address",
+		                type: propertyTypes.toggle,
+		                value: false,
+		                validation: false,
 	                }
                 ];
 
@@ -93,11 +101,23 @@ angular.module('Admin').component('systemPropertiesGeneral',
                
                 ctrl.loadProperty = (property) =>
                 {
-                    systemPreferenceApi.getPreferenceValue(property.propertyName)
-                    .then((response) =>
-                    {
-                        property.value = response.data.body;
-                    })
+						systemPreferenceApi.getPreferenceValue(property.propertyName)
+							.then((response) =>
+							{
+								if (response.data.body === "true")
+								{
+									property.value = true;
+								}
+								else if (response.data.body === "false")
+								{
+									property.value = false;
+								}
+								else
+								{
+									property.value = response.data.body;
+								}
+							})
+
                 };
                 
 
