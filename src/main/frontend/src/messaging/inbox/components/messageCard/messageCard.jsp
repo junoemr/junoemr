@@ -6,11 +6,13 @@
 		<!-- Sender / To -->
 		<div ng-if="!$ctrl.sentView"
 		     class="text-ellipsis"
+		     ng-class="{'bold': !$ctrl.message.isRead}"
 		     title="{{$ctrl.message.sender.name}}">
 			From: {{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
 		</div>
 		<div ng-if="$ctrl.sentView"
 		     class="text-ellipsis"
+		     ng-class="{'bold': !$ctrl.message.isRead}"
 		     title="{{$ctrl.recipientNames()}}">
 			To: {{$ctrl.recipientNames()}}
 		</div>
@@ -24,6 +26,7 @@
 
 	<!-- Subject row -->
 	<div class="message-subject body-small m-l-48 m-r-16 m-b-4"
+	     ng-class="{'bold': !$ctrl.message.isRead}"
 	     title="{{$ctrl.message.subject}}">
 		{{$ctrl.message.subject}}
 	</div>
