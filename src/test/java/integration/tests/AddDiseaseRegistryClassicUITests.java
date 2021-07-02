@@ -58,8 +58,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		);
 	}
 
-	@Test
-	public void addDiseaseRegistryClassicUITest()
+	public void addDiseaseRegistry()
 			throws InterruptedException
 	{
 		String heartFailure = "428";
@@ -72,11 +71,8 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		String hiv = "042";
 		String inr = "42731";
 
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
-		Thread.sleep(20000);
-		String currWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(20000);
+		Thread.sleep(10000);
 		PageUtil.switchToLastWindow(driver);
 		Thread.sleep(2000);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
@@ -91,6 +87,15 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		textEdit(driver, By.xpath("//input[@name='xml_research4']"), inr);
 		driver.findElement(By.xpath("//input[@name='xml_research5']")).clear();
 		driver.findElement(By.xpath("//input[@value='Add']")).click();
+	}
+
+	@Test
+	public void addDiseaseRegistryClassicUITest()
+			throws InterruptedException
+	{
+		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		String currWindowHandle = driver.getWindowHandle();
+		addDiseaseRegistry();
 
 		//** Verify from Disease Registry **
 		PageUtil.switchToWindow(currWindowHandle, driver);
