@@ -27,8 +27,18 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.data.*,oscar.oscarPrevention.pageUtil.*,java.net.*,oscar.eform.*"%>
-<%@page import="oscar.OscarProperties, org.oscarehr.util.SpringUtils, org.oscarehr.common.dao.BillingONCHeader1Dao" %>
+<%@page import="oscar.OscarProperties"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.common.dao.BillingONCHeader1Dao" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicNameAgeString" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="oscar.oscarPrevention.pageUtil.PreventionReportDisplay" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
+<%@ page import="org.oscarehr.PMmodule.utility.UtilDateUtilities" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="oscar.oscarReport.data.RptSearchData" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -525,7 +535,8 @@ table.ele thead {
                        </tr>
                        </thead>
                        <tbody>
-                       <%DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
+                       <%
+                           DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
                          DemographicData demoData= new DemographicData();
                          boolean setBill;
                          String enabled = "";

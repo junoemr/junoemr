@@ -42,10 +42,9 @@ public class ReportPatientInfo {
 		// These could be totally random things depending on what "Search For" boxes happen to be checked.  Since all the reports require
 		// this information anyways, AND they all naively assume that it's there, I've put it into a semi-readable format.
 		// ... BUT, this whole prevention reports needs to be redone, because it's totally awful.
-		
 		this.demographicNo = NumberUtils.toInt(patientListTuple.get(0));
-		this.lastName = patientListTuple.get(1);
-		this.firstName = patientListTuple.get(2);
+		this.lastName = "";
+		this.firstName = "";
 	}
 
 	protected static List<ReportPatientInfo> fromList(ArrayList<ArrayList<String>> listOfPatientTuples)
