@@ -34,7 +34,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 	bindings: {
 		componentStyle: "<?",
 		messageableFilter: "=?",
-		selectedMessageId: "<",
+		selectedMessageId: "=",
 		messageStream: "<",
 		messagingBackendId: "<",
 		sourceId: "<",
@@ -80,10 +80,13 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				message.archive();
 				await ctrl.messagingService.updateMessage(message);
 
-				// delete message from message stream
 				if (ctrl.messageStream)
 				{
+					ctrl.selectNextMessage(message);
+
+					// delete message from message stream
 					ctrl.messageStream.remove(message);
+					await ctrl.messageStream.load(1);
 				}
 
 				$scope.$apply();
@@ -96,10 +99,13 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				message.unarchive();
 				await ctrl.messagingService.updateMessage(message);
 
-				// delete message from message stream
 				if (ctrl.messageStream)
 				{
+					ctrl.selectNextMessage(message);
+
+					// delete message from message stream
 					ctrl.messageStream.remove(message);
+					await ctrl.messageStream.load(1);
 				}
 
 				$scope.$apply();
@@ -130,6 +136,23 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 						}
 					}
 				).result;
+			}
+
+			/**
+			 * select the message after the given message
+			 * @param message - the message to select the message after
+			 */
+			ctrl.selectNextMessage = (message) =>
+			{
+				if (ctrl.messageStream)
+				{
+					// select message below the message we just deleted
+					const messageIndex = ctrl.messageStream.indexOf(message);
+					if (messageIndex !== -1 && messageIndex + 1 < ctrl.messageStream.length)
+					{
+						ctrl.selectedMessageId = ctrl.messageStream[messageIndex + 1].id;
+					}
+				}
 			}
 
 			/**

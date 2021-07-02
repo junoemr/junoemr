@@ -114,25 +114,43 @@ angular.module("Messaging.Components").component('messageList', {
 			 */
 			ctrl.onSelectMessage = (message) =>
 			{
-				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
+				ctrl.selectedMessageId = message.id;
+			}
 
-				// mark message as read
-				if (!message.read)
+			ctrl.updateMessageView = () =>
+			{
+				// display the selected message
+				$state.go("messaging.view.message",
+					{
+						backend: ctrl.messagingBackend,
+						source: ctrl.sourceId,
+						group: ctrl.groupId,
+						messageId: ctrl.selectedMessageId,
+					}, {location: "replace"});
+			}
+
+			ctrl.onMessageSelectionChange = async (messageId) =>
+			{
+				if (ctrl.messageStream)
 				{
-					message.read = true;
-					messagingService.updateMessage(message);
+					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
+					const message = ctrl.messageStream.find((msg) => msg.id === messageId );
+
+					if (message)
+					{
+						// mark message as read
+						if (!message.read)
+						{
+							message.read = true;
+							await messagingService.updateMessage(message);
+						}
+					}
 				}
 
-				// display the selected message
-				ctrl.selectedMessageId = message.id;
-				$state.go("messaging.view.message",
-				{
-					backend: ctrl.messagingBackend,
-					source: ctrl.sourceId,
-					group: ctrl.groupId,
-					messageId: message.id,
-				}, {location: "replace"});
+				ctrl.updateMessageView();
 			}
+
+			$scope.$watch("$ctrl.selectedMessageId", ctrl.onMessageSelectionChange);
 
 			/**
 			 * fetch more messages for the message list as the user scrolls
