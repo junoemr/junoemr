@@ -29,8 +29,10 @@ angular.module("Messaging.Components").component('messageCard', {
 		componentStyle: "<?",
 		message: "<",
 		selected: "<?",
+		inMassEditList: "<?",
 		sentView: "<?",
-		click: "&?"
+		click: "&?",
+		onGroupSelectChange: "&?",
 	},
 	controller: [
 		function ()
@@ -47,6 +49,14 @@ angular.module("Messaging.Components").component('messageCard', {
 			ctrl.formatMessageDate = (date) =>
 			{
 				return date.format(Juno.Common.Util.settings.message_date_format);
+			}
+
+			ctrl.onCheckedChange = (selected) =>
+			{
+				if (ctrl.onGroupSelectChange)
+				{
+					ctrl.onGroupSelectChange({value: selected})
+				}
 			}
 
 			ctrl.recipientNames = () =>

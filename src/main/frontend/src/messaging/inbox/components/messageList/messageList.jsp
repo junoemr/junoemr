@@ -18,6 +18,8 @@
 			              selected="message.id === $ctrl.selectedMessageId"
 			              component-style="$ctrl.componentStyle"
 			              sent-view="$ctrl.groupId === MessageGroup.Sent"
+			              in-mass-edit-list="$ctrl.inMassEditList(message)"
+			              on-group-select-change="$ctrl.onMessageGroupSelectionChange(message, value)"
 			              click="$ctrl.onSelectMessage(message)">
 			</message-card>
 		</div>

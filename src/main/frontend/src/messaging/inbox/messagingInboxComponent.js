@@ -50,6 +50,9 @@ angular.module("Messaging").component('messagingInbox', {
 		ctrl.messageStream = null;
 		ctrl.selectedMessageId = $stateParams.messageId;
 
+		// a list of all messages currently selected for "group editing"
+		ctrl.massEditList = []; // Type Message[]
+
 		ctrl.$onInit = async () =>
 		{
 			const messagingService = MessagingServiceFactory.build($stateParams.backend);

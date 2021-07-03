@@ -6,6 +6,7 @@
 		<inbox-header-bar ng-if="$ctrl.backend"
 		                  component-style="$ctrl.componentStyle"
 		                  selected-message-id="$ctrl.selectedMessageId"
+		                  mass-edit-list="$ctrl.massEditList"
 		                  message-stream="$ctrl.messageStream"
 		                  messaging-backend-id="$ctrl.backend"
 		                  messageable-filter="$ctrl.messageableFilter"
@@ -25,6 +26,7 @@
 			</inbox-select>
 			<message-list class="message-list-pane h-min-100 overflow-y-auto"
 			              selected-message-id="$ctrl.selectedMessageId"
+			              mass-edit-list="$ctrl.massEditList"
 			              messaging-backend="$ctrl.backend"
 			              source-id="$ctrl.selectedSourceId"
 			              group-id="$ctrl.selectedGroupId"

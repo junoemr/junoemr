@@ -35,6 +35,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 		componentStyle: "<?",
 		messageableFilter: "=?",
 		selectedMessageId: "=",
+		massEditList: "=",
 		messageStream: "<",
 		messagingBackendId: "<",
 		sourceId: "<",
@@ -57,58 +58,112 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 			$scope.MessageGroup = MessageGroup;
 
+			ctrl.massSelectActive = false;
+			ctrl.isLoading = false;
+
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				ctrl.messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
 			};
 
-			ctrl.markSelectedMessageAsUnread = async () =>
+			/**
+			 * mark all selected messages as read / un-read
+			 * @param read - true / false. read / unread
+			 */
+			ctrl.updateSelectedMessageReadFlag = async (read) =>
 			{
-				const message = await ctrl.getSelectedMessage();
+				const messages = await ctrl.getSelectedMessages();
 
-				message.read = false;
-				await ctrl.messagingService.updateMessage(message);
+				// mark messages as un read.
+				const promiseList = [];
+				for (let message of messages)
+				{
+					message.read = read;
+					promiseList.push(ctrl.messagingService.updateMessage(message));
+				}
+
+				// wait for completion
+				try
+				{
+					ctrl.isLoading = true;
+					$scope.$apply();
+
+					await Promise.all(promiseList);
+				}
+				finally
+				{
+					ctrl.isLoading = false;
+				}
 
 				$scope.$apply();
 			};
 
-			ctrl.archiveSelectedMessage = async () =>
+			/**
+			 * archive or unarchive message
+			 * @param archive true / false. archive / unarchive
+			 * @returns {Promise<void>}
+			 */
+			ctrl.archiveSelectedMessages = async (archive) =>
 			{
-				const message = await ctrl.getSelectedMessage();
+				const messages = await ctrl.getSelectedMessages();
 
-				message.archive();
-				await ctrl.messagingService.updateMessage(message);
-
-				if (ctrl.messageStream)
+				const promiseList = [];
+				for (let message of messages)
 				{
-					ctrl.selectNextMessage(message);
+					promiseList.push(new Promise(async (resolve) => {
+						if (archive)
+						{
+							message.archive();
+						}
+						else
+						{
+							message.unarchive();
+						}
+						await ctrl.messagingService.updateMessage(message);
 
-					// delete message from message stream
-					ctrl.messageStream.remove(message);
-					await ctrl.messageStream.load(1);
+						if (ctrl.messageStream)
+						{
+							ctrl.selectNextMessage(message);
+
+							// delete message from message stream
+							ctrl.messageStream.remove(message);
+						}
+
+						resolve();
+					}));
 				}
+
+				// wait for completion
+				try
+				{
+					ctrl.isLoading = true;
+					$scope.$apply();
+
+					await Promise.all(promiseList);
+					await ctrl.messageStream.load(messages.length*2);
+				}
+				finally
+				{
+					ctrl.isLoading = false;
+				}
+
+				// clear mass edit list
+				ctrl.massEditList = [];
 
 				$scope.$apply();
 			}
 
-			ctrl.unarchiveSelectedMessage = async () =>
+			ctrl.selectUnselectAll = () =>
 			{
-				const message = await ctrl.getSelectedMessage();
-
-				message.unarchive();
-				await ctrl.messagingService.updateMessage(message);
-
-				if (ctrl.messageStream)
+				if (ctrl.massEditList.length === 0)
 				{
-					ctrl.selectNextMessage(message);
-
-					// delete message from message stream
-					ctrl.messageStream.remove(message);
-					await ctrl.messageStream.load(1);
+					ctrl.massEditList = ctrl.massEditList.concat(ctrl.messageStream);
 				}
-
-				$scope.$apply();
+				else
+				{
+					ctrl.massEditList = [];
+				}
 			}
 
 			ctrl.openComposeModal = async (reply = false) =>
@@ -156,6 +211,25 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 			}
 
 			/**
+			 * get the currently selected message or messages depending on if the user has done a group select or not.
+			 * @returns Message[]
+			 */
+			ctrl.getSelectedMessages = async () =>
+			{
+				let messages = [];
+				if (ctrl.massEditList.length > 0)
+				{
+					messages = messages.concat(ctrl.massEditList);
+				}
+				else
+				{
+					messages.push(await ctrl.getSelectedMessage());
+				}
+
+				return messages;
+			}
+
+			/**
 			 * get the currently selected message object
 			 * @returns promise that resolves to the selected message
 			 */
@@ -178,6 +252,8 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 					return await ctrl.messagingService.getMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
 				}
 			}
+
+			$scope.$watch("$ctrl.massEditList.length", (newList) => ctrl.massSelectActive = ctrl.massEditList.length > 0)
 
 		}],
 });

@@ -4,8 +4,12 @@
 	background-color: var(--color-neutral-lightest);
 	border: solid 1px var(--color-neutral-light-grey);
 
+	.inbox-title {
+		width: 255px;
+	}
+
 	.search-input {
-		width: 344px;
+		width: 295px;
 		min-width: 128px;
 	}
 
@@ -15,6 +19,13 @@
 		.icon {
 			margin: 8px;
 			font-size: 16px;
+		}
+	}
+
+	.loading-indicator {
+		.loading-spinner-container {
+			width: 2em;
+			height: 2em;
 		}
 	}
 

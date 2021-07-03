@@ -31,6 +31,7 @@ angular.module("Messaging.Components").component('messageList', {
 	bindings: {
 		componentStyle: "<?",
 		selectedMessageId: "=",
+		massEditList: "=?", // list of messages selected for group operation "mass actions"
 		messagingBackend: "<",
 		messageableFilter: "<?",
 		sourceId: "<",
@@ -62,6 +63,9 @@ angular.module("Messaging.Components").component('messageList', {
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				// a list of all messages currently selected for "group editing"
+				ctrl.massEditList = ctrl.massEditList || []; // Type Message[]
+
 				ctrl.setupNewMessageCheck();
 			};
 
@@ -117,6 +121,26 @@ angular.module("Messaging.Components").component('messageList', {
 				ctrl.selectedMessageId = message.id;
 			}
 
+			/**
+			 * called when a message is added / removed from the message group
+			 * @param message - the message that has changed
+			 * @param selected - the new state
+			 */
+			ctrl.onMessageGroupSelectionChange = (message, selected) =>
+			{
+				const existingMessage = ctrl.massEditList.find((msg) => msg.id === message.id);
+				if (selected && !existingMessage)
+				{
+					// add
+					ctrl.massEditList.push(message);
+				}
+				else if (!selected && existingMessage)
+				{
+					// remove
+					ctrl.massEditList = ctrl.massEditList.filter((msg) => msg.id !== existingMessage.id);
+				}
+			}
+
 			ctrl.updateMessageView = () =>
 			{
 				// display the selected message
@@ -151,6 +175,16 @@ angular.module("Messaging.Components").component('messageList', {
 			}
 
 			$scope.$watch("$ctrl.selectedMessageId", ctrl.onMessageSelectionChange);
+
+			/**
+			 * check if the passed massage is in the mass edit list
+			 * @param message - message to check
+			 * @return true or false
+			 */
+			ctrl.inMassEditList = (message) =>
+			{
+				return !!(ctrl.massEditList.find((msg) => msg.id === message.id));
+			}
 
 			/**
 			 * fetch more messages for the message list as the user scrolls
@@ -232,6 +266,7 @@ angular.module("Messaging.Components").component('messageList', {
 				}
 
 				ctrl.messageStream = null;
+				ctrl.massEditList = [];
 				ctrl.debounceTimeout = window.setTimeout(ctrl.reloadMessages, ctrl.DEBOUNCE_TIME_MS);
 			}
 

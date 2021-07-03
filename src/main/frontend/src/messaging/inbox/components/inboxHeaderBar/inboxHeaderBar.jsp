@@ -1,7 +1,15 @@
 <div class="inbox-header-bar flex-row align-items-center">
-	<div class="inbox-title w-256">
+	<div class="inbox-title">
 		<h6 class="m-l-32 m-r-8">Inbox</h6>
 	</div>
+
+	<!-- check / un check all -->
+	<juno-check-box ng-model="$ctrl.massSelectActive"
+	                class="m-l-16 m-r-16"
+	                title="select / un-select all visible messages"
+	                change="$ctrl.selectUnselectAll()"
+	                dummy="true">
+	</juno-check-box>
 
 	<!-- Inbox search -->
 	<messageable-search class="search-input"
@@ -18,10 +26,24 @@
 		<juno-button class="header-button"
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             disabled="$ctrl.isLoading"
 		             component-style="$ctrl.componentStyle"
-		             click="$ctrl.markSelectedMessageAsUnread()">
+		             click="$ctrl.updateSelectedMessageReadFlag(false)">
 			<div class="flex-row align-items-center">
 				<span>Mark as Unread</span>
+				<i class="icon icon-dot"></i>
+			</div>
+		</juno-button>
+
+		<!-- Mark as Read -->
+		<juno-button class="header-button m-l-24"
+		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
+		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             disabled="$ctrl.isLoading"
+		             component-style="$ctrl.componentStyle"
+		             click="$ctrl.updateSelectedMessageReadFlag(true)">
+			<div class="flex-row align-items-center">
+				<span>Mark as Read</span>
 				<i class="icon icon-dot"></i>
 			</div>
 		</juno-button>
@@ -31,8 +53,9 @@
 		             class="header-button m-l-24"
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             disabled="$ctrl.isLoading"
 		             component-style="$ctrl.componentStyle"
-		             click="$ctrl.archiveSelectedMessage()">
+		             click="$ctrl.archiveSelectedMessages(true)">
 			<div class="flex-row align-items-center">
 				<span>Archive</span>
 				<i class="icon icon-delete"></i>
@@ -44,8 +67,9 @@
 		             class="header-button m-l-24"
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             disabled="$ctrl.isLoading"
 		             component-style="$ctrl.componentStyle"
-		             click="$ctrl.unarchiveSelectedMessage()">
+		             click="$ctrl.archiveSelectedMessages(false)">
 			<div class="flex-row align-items-center">
 				<span>Unarchive</span>
 				<i class="icon icon-delete"></i>
@@ -57,13 +81,19 @@
 		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
 		             click="$ctrl.openComposeModal(true)"
-		             disabled="!$ctrl.selectedMessageId"
+		             disabled="!$ctrl.selectedMessageId || $ctrl.isLoading"
 		             component-style="$ctrl.componentStyle">
 			<div class="flex-row align-items-center">
 				<span>Reply</span>
 				<i class="icon icon-reply"></i>
 			</div>
 		</juno-button>
+
+		<!-- Action in progress indicator -->
+		<div ng-if="$ctrl.isLoading" class="loading-indicator m-t-4">
+			<juno-loading-indicator indicator-type="spinner" title="Processing...">
+			</juno-loading-indicator>
+		</div>
 	</div>
 
 	<div class="right-buttons flex-item-grow flex-row justify-content-end">
