@@ -141,7 +141,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 					$scope.$apply();
 
 					await Promise.all(promiseList);
-					await ctrl.messageStream.load(messages.length*2);
+					await ctrl.messageStream.load(messages.length);
 				}
 				finally
 				{

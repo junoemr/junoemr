@@ -4,7 +4,7 @@ import Message from "../../../model/Message";
 import {API_BASE_PATH} from "../../../../constants/ApiConstants";
 import MessagingError from "../../../../error/MessagingError";
 import {MessageDto, MhaClinicMessagingApi, MhaIntegrationApi, MhaPatientApi} from "../../../../../../generated";
-import StreamingList, {StreamSource} from "../../../../util/StreamingList";
+import StreamingList from "../../../../util/StreamingList";
 import ClinicMailboxStreamSource from "../model/ClinicMailboxStreamSource";
 import Conversation from "../../../model/Conversation";
 import IntegrationTo1ToMessageSourceConverter from "../../../converter/IntegrationTo1ToMessageSourceConverter";
@@ -21,6 +21,7 @@ import PatientTo1ToMhaPatientConverter
 import MhaPatientToMessageableConverter from "../../converter/MhaPatientToMessageableConverter";
 import MhaMessage from "../model/MhaMessage";
 import MhaAttachment from "../model/MhaAttachment";
+import {StreamSource} from "../../../../util/StreamSource";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
