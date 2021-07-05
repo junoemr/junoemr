@@ -86,11 +86,23 @@ angular.module('Admin').component('systemPropertiesGeneral',
                
                 ctrl.loadProperty = (property) =>
                 {
-                    systemPreferenceApi.getPreferenceValue(property.propertyName)
-                    .then((response) =>
-                    {
-                        property.value = response.data.body;
-                    })
+                	if (property.type === propertyTypes.toggle)
+	                {
+		                systemPreferenceApi.getPreferenceEnabled(property.propertyName)
+			                .then((response) =>
+			                {
+				                property.value = response.data.body;
+			                })
+	                }
+                	else
+	                {
+	                	systemPreferenceApi.getPreferenceValue(property.propertyName)
+			                .then((response) =>
+		                    {
+			                    property.value = response.data.body;
+		                    })
+	                }
+   
                 };
                 
 
