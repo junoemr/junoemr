@@ -1,4 +1,12 @@
 .juno-select {
+	--juno-select-label-padding: 0;
+	--juno-select-label-width: unset;
+
+	.label-style {
+		padding: var(--juno-select-label-padding);
+		width: var(--juno-select-label-width);
+	}
+
 	.select-container {
 		@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
 		@include juno-form-inputs-colors-default();

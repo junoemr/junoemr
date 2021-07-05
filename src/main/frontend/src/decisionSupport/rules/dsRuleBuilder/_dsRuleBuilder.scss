@@ -4,18 +4,52 @@
 	border-radius: 8px;
 	padding: 8px;
 
+	$indent-offset-margin: 16px;
+
 	.add-button-wrapper {
+		margin-left: $indent-offset-margin;
+		margin-right: $indent-offset-margin;
 		width: 32px;
 		i {
 			font-size: 16px;
 		}
 	}
+	.text-input {
+		margin-bottom: 8px;
+
+		// fix some css overflow issues with the label position
+		label {
+			text-align: left;
+		}
+	}
+	.section-header {
+		padding-top: 8px;
+	}
 	.rule-condition, .rule-consequence {
 		position: relative;
 		padding: 4px 0;
+		margin-left: $indent-offset-margin;
+		margin-right: $indent-offset-margin;
 
 		.row-padding {
 			padding: 2px 0;
+		}
+
+		.first-row-input {
+			.juno-input {
+				--juno-input-label-width: 48px;
+			}
+			.juno-select {
+				--juno-select-label-width: 48px;
+			}
+		}
+		.row-input {
+			.juno-input {
+				--juno-input-label-padding: 0 0 0 16px;
+			}
+			.juno-select {
+				--juno-select-label-padding: 0 0 0 16px;
+			}
 		}
 
 		.close-button {
@@ -23,5 +57,12 @@
 			top: 4px;
 			right: 4px;
 		}
+	}
+	.divider {
+		height: 2px;
+		margin-bottom: 4px;
+		margin-left: $indent-offset-margin;
+		margin-right: $indent-offset-margin;
+		background-color: var(--color-neutral-light);
 	}
 }

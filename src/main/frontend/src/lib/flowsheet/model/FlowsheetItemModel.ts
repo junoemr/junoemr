@@ -45,5 +45,8 @@ export default class FlowsheetItemModel
 
 	public constructor()
 	{
+		this.flowsheetItemAlerts = [];
+		this.data = [];
+		this.rules = [];
 	}
 }

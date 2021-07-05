@@ -26,6 +26,7 @@ angular.module('Common.Components').component('junoSimpleCloseButton', {
 	bindings: {
 		click: "&",
 		tooltip: "@?",
+		disabled: "<?"
 	},
 	transclude: true,
 	controller: [ function () {
@@ -34,6 +35,7 @@ angular.module('Common.Components').component('junoSimpleCloseButton', {
 		ctrl.$onInit = (): void =>
 		{
 			ctrl.tooltip = ctrl.tooltip || "Close";
+			ctrl.disabled = ctrl.disabled || false;
 		}
 		ctrl.onClick = (): void =>
 		{

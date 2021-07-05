@@ -23,6 +23,7 @@
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import {ValueType} from "../../../lib/flowsheet/FlowsheetConstants";
+import DsRuleModel from "../../../lib/decisionSupport/model/DsRuleModel";
 
 angular.module('Flowsheet').component('flowsheetEditItem',
 	{
@@ -62,9 +63,10 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 							backdrop: 'static',
 							windowClass: "juno-modal",
 							resolve: {
+								style: ctrl.componentStyle,
 							}
 						}
-					).result.then((response) =>
+					).result.then((response: DsRuleModel) =>
 					{
 						// don't add duplicates
 						if(!response.id || ctrl.model.rules.filter((rule) => rule.id === response.id).length === 0)
@@ -73,6 +75,7 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 						}
 					}).catch((reason) =>
 					{
+						console.warn(reason);
 						// do nothing on cancel
 					});
 				}

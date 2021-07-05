@@ -8,8 +8,15 @@
 	</modal-ctl-buttons>
 	<modal-body>
 		<div class="rule-edit-modal-body flex-column height-100">
-			<div class="flex-row">
-				<div class="row-item width-33">
+			<div class="flex-row align-items-center first-selection">
+				<div class="row-item">
+					<juno-check-box label="Create New Rule"
+					                label-position="$ctrl.LABEL_POSITION.LEFT"
+					                change="$ctrl.toggleRuleSelectionMode(value)"
+					                ng-model="$ctrl.checkCreateNew">
+					</juno-check-box>
+				</div>
+				<div class="row-item">
 					<juno-check-box label="Use Existing Rule"
 					                label-position="$ctrl.LABEL_POSITION.LEFT"
 					                change="$ctrl.toggleRuleSelectionMode(value)"
@@ -26,16 +33,9 @@
 				</div>
 			</div>
 			<div class="flex-column overflow-auto">
-				<div class="row-item width-33">
-					<juno-check-box label="Create New Rule"
-					                label-position="$ctrl.LABEL_POSITION.LEFT"
-					                change="$ctrl.toggleRuleSelectionMode(value)"
-					                ng-model="$ctrl.checkCreateNew">
-					</juno-check-box>
-				</div>
 				<div class="row-item flex-grow">
-					<ds-rule-builder ng-if="$ctrl.selectionModeNewRule()"
-					                 model="$ctrl.newRule"
+					<ds-rule-builder ng-if="$ctrl.getRule()"
+					                 model="$ctrl.getRule()"
 					                 disabled="!$ctrl.selectionModeNewRule()"
 					                 class="width-100">
 					</ds-rule-builder>

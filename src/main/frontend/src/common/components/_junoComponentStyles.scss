@@ -6,7 +6,7 @@
 }
 
 .juno-input-label-left {
-	margin-right: 16px;
+	margin-right: var(--juno-form-input-label-padding-left);
 	text-align: right;
 }
 
