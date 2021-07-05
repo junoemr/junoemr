@@ -228,7 +228,6 @@ angular.module("Messaging.Components").component('messageList', {
 					if (ctrl.messageStream)
 					{
 						await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
-						$scope.$apply();
 					}
 
 					// notify parent of stream change.
@@ -236,6 +235,8 @@ angular.module("Messaging.Components").component('messageList', {
 					{
 						ctrl.messageStreamChange({stream: ctrl.messageStream});
 					}
+
+					$scope.$apply();
 
 					// get initial message count
 					ctrl.currentMessageCount = await messagingService.countMessages(

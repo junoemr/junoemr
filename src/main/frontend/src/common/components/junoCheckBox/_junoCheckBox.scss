@@ -1,12 +1,16 @@
 .juno-check-box {
 
-	button {
+	// customization variables.
+	--box-shadow: 0 2px 2px rgba(var(--color-neutral-black-alpha), 0.1);
+
+	> button {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 
 		padding: 0;
 		border-radius: 4px;
+		box-shadow: var(--box-shadow);
 
 		width: 16px;
 		height: 16px;

@@ -5,8 +5,8 @@
 
 	<!-- check / un check all -->
 	<juno-check-box ng-model="$ctrl.massSelectActive"
-	                class="m-l-16 m-r-16"
-	                title="select / un-select all visible messages"
+	                class="check-all m-l-16 m-r-16"
+	                title="{{$ctrl.massSelectActive ? 'clear selection' : 'select all'}}"
 	                change="$ctrl.selectUnselectAll()"
 	                dummy="true">
 	</juno-check-box>

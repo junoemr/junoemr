@@ -1,7 +1,8 @@
-<div class="message-card flex-col" ng-class="$ctrl.selected ? 'selected' : ''" ng-click="$ctrl.onClick()">
+<div class="message-card flex-col"
+     ng-class="{'selected': $ctrl.selected, 'group-selected': $ctrl.inMassEditList, 'read': $ctrl.message.isRead}"
+     ng-click="$ctrl.onClick()">
 	<!-- Header row -->
 	<div class="flex-row align-items-center m-t-8 m-b-4 m-r-16">
-<%--		<div class="message-circle" ng-class="{'read': $ctrl.message.isRead}"></div>--%>
 		<juno-check-box class="m-r-16 m-l-16" ng-model="$ctrl.inMassEditList" change="$ctrl.onCheckedChange(value)" dummy="true"></juno-check-box>
 
 		<!-- Sender / To -->

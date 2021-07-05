@@ -8,6 +8,12 @@
 		width: 255px;
 	}
 
+	.check-all {
+		.juno-check-box {
+			--box-shadow: none;
+		}
+	}
+
 	.search-input {
 		width: 295px;
 		min-width: 128px;

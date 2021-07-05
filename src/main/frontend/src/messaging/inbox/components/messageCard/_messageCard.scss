@@ -8,33 +8,22 @@
 		background-color: var(--color-neutral-lightest);
 	}
 
+	&.read {
+		background-color: var(--color-neutral-lightest);
+	}
 	&.selected {
-		background-color: var(--color-primary-base);
-		color: var(--color-neutral-white);
-
-		.message-circle {
-			background-color: var(--color-neutral-white);
-		}
-
-		.timestamp-text {
-			color: var(--color-neutral-white);
-		}
+		background-color: var(--color-neutral-lighter);
+	}
+	&.group-selected {
+		background-color: var(--color-primary-lightest);
 	}
 
 	.bold {
 		font-weight: bold;
 	}
 
-	.message-circle {
-		width: 8px;
-		height: 8px;
-		margin: 0 20px 0 20px;
-		border-radius: 100%;
-		background-color: var(--color-primary-base);
-
-		&.read {
-			background-color: var(--color-neutral-lighter);
-		}
+	.juno-check-box {
+		--box-shadow: none;
 	}
 
 	.timestamp-text {
