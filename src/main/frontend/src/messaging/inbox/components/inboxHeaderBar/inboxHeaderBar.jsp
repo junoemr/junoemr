@@ -104,7 +104,7 @@
 		             click="$ctrl.openComposeModal()"
 		             component-style="$ctrl.componentStyle">
 			<div class="flex-row align-items-center">
-				<span>Create New Message</span>
+				<span>Compose Message</span>
 				<i class="icon icon-mail"></i>
 			</div>
 		</juno-button>
