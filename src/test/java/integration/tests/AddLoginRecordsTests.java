@@ -66,6 +66,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	@BeforeClass
 	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
+		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
 		loadSpringBeans();
 		DatabaseUtil.createTestProvider();
 	}

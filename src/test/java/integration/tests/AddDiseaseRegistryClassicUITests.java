@@ -95,6 +95,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 	{
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
+		Thread.sleep(2000);
 		addDiseaseRegistry();
 
 		//** Verify from Disease Registry **
