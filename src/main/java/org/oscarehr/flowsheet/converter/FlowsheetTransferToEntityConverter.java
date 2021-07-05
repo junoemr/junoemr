@@ -5,16 +5,16 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * <p>
+ *
  * This software was written for
  * CloudPractice Inc.
  * Victoria, British Columbia
@@ -24,6 +24,7 @@ package org.oscarehr.flowsheet.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.decisionSupport2.dao.DsRuleDao;
+import org.oscarehr.decisionSupport2.transfer.DsRuleUpdateInput;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.entity.Flowsheet;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,6 +55,10 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 	@Override
 	public Flowsheet convert(FlowsheetCreateTransfer input)
 	{
+		if(input == null)
+		{
+			return null;
+		}
 		// find existing flowsheet entity or create a new one based on transfer type
 		Flowsheet flowsheet;
 		if(input instanceof FlowsheetUpdateTransfer)
@@ -67,18 +73,26 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 		BeanUtils.copyProperties(input, flowsheet, "id", "flowsheetItemGroups");
 
 		// diff the groups and items within the flowsheet
-		flowsheet.getFlowsheetItemGroups().forEach((group) -> mergeExistingGroup(group, input.getFlowsheetItemGroups()));
-		flowsheet.getFlowsheetItemGroups().addAll(
-				input.getFlowsheetItemGroups()
-						.stream()
-						.filter((group) -> (group.getId() == null))
-						.map((group) -> createNewGroup(group, flowsheet))
-						.collect(Collectors.toList())
-		);
+		List<FlowsheetItemGroup> flowsheetItemGroups = Optional.ofNullable(flowsheet.getFlowsheetItemGroups()).orElse(new ArrayList<>());
 
+		if(input.getFlowsheetItemGroups() != null)
+		{
+			flowsheetItemGroups.forEach((group) -> mergeExistingGroup(group, input.getFlowsheetItemGroups()));
+			flowsheetItemGroups.addAll(
+					input.getFlowsheetItemGroups()
+							.stream()
+							.filter((group) -> (group.getId() == null))
+							.map((group) -> createNewGroup(group, flowsheet))
+							.collect(Collectors.toList())
+			);
+		}
+
+		flowsheet.setFlowsheetItemGroups(flowsheetItemGroups);
 		flowsheet.setFlowsheetItems(
 				flowsheet.getFlowsheetItemGroups()
-						.stream().flatMap((group) -> group.getFlowsheetItems().stream())
+						.stream()
+						.filter((group) -> group.getFlowsheetItems() != null)
+						.flatMap((group) -> group.getFlowsheetItems().stream())
 						.collect(Collectors.toList()));
 		return flowsheet;
 	}
@@ -90,23 +104,26 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 				.filter((input) -> existingGroupEntity.getId().equals(input.getId()))
 				.findFirst();
 
+		List<FlowsheetItem> flowsheetItems = Optional.ofNullable(existingGroupEntity.getFlowsheetItems()).orElse(new ArrayList<>());
 		if(matchingInput.isPresent())
 		{
 			FlowsheetItemGroupCreateUpdateTransfer input = matchingInput.get();
 			BeanUtils.copyProperties(input, existingGroupEntity, "id", "flowsheetItems");
-			existingGroupEntity.getFlowsheetItems().forEach((item) -> mergeExistingItem(item, input.getFlowsheetItems()));
-			existingGroupEntity.getFlowsheetItems().addAll(
+
+			flowsheetItems.forEach((item) -> mergeExistingItem(item, input.getFlowsheetItems()));
+			flowsheetItems.addAll(
 					input.getFlowsheetItems()
 							.stream()
 							.filter((item) -> (item.getId() == null))
 							.map((item) -> createNewItem(item, existingGroupEntity.getFlowsheet(), existingGroupEntity))
 							.collect(Collectors.toList())
 			);
+			existingGroupEntity.setFlowsheetItems(flowsheetItems);
 		}
 		else
 		{
 			existingGroupEntity.setDeletedAt(LocalDateTime.now());
-			existingGroupEntity.getFlowsheetItems().forEach((item) -> item.setDeletedAt(LocalDateTime.now()));
+			flowsheetItems.forEach((item) -> item.setDeletedAt(LocalDateTime.now()));
 		}
 		return existingGroupEntity;
 	}
@@ -117,8 +134,9 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 		BeanUtils.copyProperties(groupInput, group, "id", "flowsheetItems");
 
 		// all items in a new group will be new
+		List<FlowsheetItemCreateUpdateTransfer> inputItems = Optional.ofNullable(groupInput.getFlowsheetItems()).orElse(new ArrayList<>());
 		group.setFlowsheetItems(
-				groupInput.getFlowsheetItems()
+				inputItems
 				.stream()
 				.map((item) -> createNewItem(item, flowsheetEntity, group))
 				.collect(Collectors.toList())
@@ -153,7 +171,9 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 		item.setFlowsheetItemGroup(groupEntity);
 		BeanUtils.copyProperties(itemInput, item);
 
-		item.setDsRules(itemInput.getRules().stream().map((rule) -> dsRuleDao.find(rule.getId())).collect(Collectors.toSet()));
+		List<DsRuleUpdateInput> itemRules = Optional.ofNullable(itemInput.getRules()).orElse(new ArrayList<>());
+		item.setDsRules(itemRules.stream().map((rule) -> dsRuleDao.find(rule.getId())).collect(Collectors.toSet()));
+
 		return item;
 	}
 }
