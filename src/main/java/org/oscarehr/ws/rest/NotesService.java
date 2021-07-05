@@ -459,6 +459,22 @@ public class NotesService extends AbstractServiceImpl
 		try {
 			NoteTo1 note = noteIssue.getEncounterNote();
 			NoteExtTo1 noteExtTo1 = noteIssue.getGroupNoteExt();
+
+			if (noteExtTo1.getStartDate() != null && org.oscarehr.dataMigration.model.common.PartialDate.allFieldsEmpty(noteExtTo1.getStartDate()))
+			{
+				noteExtTo1.setStartDate(null);
+			}
+
+			if (noteExtTo1.getResolutionDate() != null && org.oscarehr.dataMigration.model.common.PartialDate.allFieldsEmpty(noteExtTo1.getResolutionDate()))
+			{
+				noteExtTo1.setResolutionDate(null);
+			}
+
+			if (noteExtTo1.getProcedureDate() != null && org.oscarehr.dataMigration.model.common.PartialDate.allFieldsEmpty(noteExtTo1.getProcedureDate()))
+			{
+				noteExtTo1.setProcedureDate(null);
+			}
+
 			IssueTo1 issueTo1 = noteIssue.getIssue();
 			List<CaseManagementIssueTo1> assignedCMIssues = noteIssue.getAssignedCMIssues();
 			String annotationAttribute = noteIssue.getAnnotation_attrib();
@@ -719,7 +735,7 @@ public class NotesService extends AbstractServiceImpl
 			/* save extra fields */
 			CaseManagementNoteExt cme = new CaseManagementNoteExt();
 
-			if (noteExtTo1.getStartDate() != null && noteExtTo1.getStartDate().toLocalDate() != null)
+			if (noteExtTo1.getStartDate() != null)
 			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.STARTDATE);
@@ -728,7 +744,7 @@ public class NotesService extends AbstractServiceImpl
 				encounterNoteService.saveExtPartialDate(noteExtTo1.getStartDate(), cme.getId());
 			}
 
-			if (noteExtTo1.getResolutionDate() != null && noteExtTo1.getResolutionDate().toLocalDate() != null)
+			if (noteExtTo1.getResolutionDate() != null)
 			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.RESOLUTIONDATE);
@@ -737,7 +753,7 @@ public class NotesService extends AbstractServiceImpl
 				encounterNoteService.saveExtPartialDate(noteExtTo1.getResolutionDate(), cme.getId());
 			}
 
-			if (noteExtTo1.getProcedureDate() != null && noteExtTo1.getProcedureDate().toLocalDate() != null)
+			if (noteExtTo1.getProcedureDate() != null)
 			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.PROCEDUREDATE);

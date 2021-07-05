@@ -24,12 +24,8 @@
 package org.oscarehr.ws.rest.to.model;
 
 import org.oscarehr.dataMigration.model.common.PartialDate;
-
 import java.io.Serializable;
-
-
 import javax.xml.bind.annotation.XmlRootElement;
-
 
 @XmlRootElement(name="groupNoteExt")
 public class NoteExtTo1 implements Serializable{
@@ -47,7 +43,6 @@ public class NoteExtTo1 implements Serializable{
 	public static String LIFESTAGE	    = "Life Stage"	;
 	public static String HIDECPP	    = "Hide Cpp"	;
 	public static String PROBLEMDESC    = "Problem Description";
-        
 		
 	//Class fields
 	private Long id;

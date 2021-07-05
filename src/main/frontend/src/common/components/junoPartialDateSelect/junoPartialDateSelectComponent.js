@@ -97,16 +97,19 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
 
         ctrl.onYearBlur = (field) =>
         {
+            ctrl.year = field;
             ctrl.onDateBlur(field, true);
         }
 
         ctrl.onMonthBlur = (field) =>
         {
+            ctrl.month = field;
             ctrl.onDateBlur(field, false, true);
         }
 
         ctrl.onDayBlur = (field) =>
         {
+            ctrl.day = field;
             ctrl.onDateBlur(field, false, false, true);
         }
 
@@ -124,25 +127,30 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
 
             if (ctrl.ngModel)
             {
-                let validDates = ctrl.checkField(field, isYear, isMonth, isDay)
+           /*     let validDates = ctrl.checkField(field, isYear, isMonth, isDay)
                 ctrl.validYear = validDates[0];
                 ctrl.validMonth = validDates[1];
-                ctrl.validDay = validDates[2];
+                ctrl.validDay = validDates[2];*/
 
                 ctrl.allFieldsValid = ctrl.checkAllFields();
 
                 if (isYear)
                 {
                     ctrl.ngModel.setYear(field);
+                    ctrl.yearValid = Juno.Validations.validationYear(ctrl.ngModel, field);
+                    console.log(ctrl.yearValid);
                 }
                 else if (isMonth)
                 {
                     ctrl.ngModel.setMonth(field)
+                    ctrl.monthValid = Juno.Validations.validationMonth(ctrl.ngModel, field);
                 }
                 else if (isDay)
                 {
                     ctrl.ngModel.setDay(field);
+                    ctrl.dayValid = Juno.Validations.validationDay(ctrl.ngModel, field);
                 }
+                ctrl.checkAllFields();
             }
         }
 
@@ -155,7 +163,7 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
             return [];
         }
 
-        ctrl.checkField = (field, isYear, isMonth, isDay) =>
+/*        ctrl.checkField = (field, isYear, isMonth, isDay) =>
         {
             let partialDate = new PartialDateModel(null, null, null);
             partialDate.setYear(ctrl.year);
@@ -178,12 +186,13 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 partialDate.setDay(field);
             }
 
+
             ctrl.yearValid = partialDate.isValidYear();
             ctrl.monthValid = partialDate.isValidMonth();
             ctrl.dayValid = partialDate.isValidDay();
 
             return ctrl.yearValid, ctrl.monthValid, ctrl.dayValid;
-        }
+        }*/
 
         ctrl.checkAllFields = () =>
         {
@@ -201,6 +210,16 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
         ctrl.allFieldsBlank = () =>
         {
             return (!ctrl.year && !ctrl.month && !ctrl.day);
+        }
+
+        ctrl.setupDateValidations = () =>
+        {
+            ctrl.dateValidations =
+            {
+                yearValid: Juno.Validations.validationYear(ctrl.ngModel, "_year"),
+                monthValid: Juno.Validations.validationMonth(ctrl.ngModel, ctrl.month),
+                dayValid: Juno.Validations.validationDay(ctrl.ngModel, ctrl.day),
+            };
         }
     }]
 });

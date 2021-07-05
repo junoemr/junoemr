@@ -44,8 +44,9 @@ public class PartialDate extends AbstractTransientModel
 	private Month month;
 	private Integer day;
 
-	public PartialDate()
+	protected PartialDate()
 	{
+		this((Year)null, null, null);
 	}
 
 	public PartialDate(Integer year)
@@ -66,9 +67,9 @@ public class PartialDate extends AbstractTransientModel
 		this.month = month;
 		this.day = day;
 
-		if(month != null && year == null)
+		if(year == null)
 		{
-			throw new DateTimeException("Year must be set if Month is set");
+			throw new DateTimeException("Year must be set");
 		}
 
 		if(day != null && month == null)
@@ -221,5 +222,14 @@ public class PartialDate extends AbstractTransientModel
 			}
 		}
 		return partialDate;
+	}
+
+	public static boolean allFieldsEmpty(PartialDate partialDate)
+	{
+		if (partialDate.getYear() == null && partialDate.getMonth() == null && partialDate.getDay() == null)
+		{
+			return true;
+		}
+		return false;
 	}
 }

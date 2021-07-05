@@ -11,7 +11,7 @@ export abstract class PartialDateConverter
         }
 
         const partialDate = from as any;
-        const partialDateModel = new PartialDateModel(null,null,null);
+        const partialDateModel = new PartialDateModel(null, null, null);
 
         if (partialDate.year)
         {
@@ -98,12 +98,8 @@ export abstract class PartialDateConverter
 
     public static isLeapYear(year)
     {
-        if (year % 4 == 0 &&
+        return (year % 4 == 0 &&
             year % 100 == 0 &&
-            year % 400 == 0)
-        {
-            return true;
-        }
-        return false;
+            year % 400 == 0);
     }
 }

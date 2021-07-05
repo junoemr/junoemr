@@ -240,3 +240,63 @@ Juno.Validations.validationPhone = function (obj, field, ...validationFunc)
 		return Juno.Validations.validationFieldsChain(...validationFunc);
 	}
 };
+
+Juno.Validations.validationYear = (obj, field, ...validationFunc) =>
+{
+	return function validationFunction ()
+	{
+		if (!field)
+		{
+			return false;
+		}
+
+		let currentMoment = moment(field + "-" + "01" + "-" + "01", "YYYY-MM-DD", true);
+
+		if (!currentMoment.isValid())
+		{
+			return false;
+		}
+
+		return Juno.Validations.validationFieldsChain(...validationFunc);
+	}
+};
+
+Juno.Validations.validationMonth = (obj, field, ...validationFunc) =>
+{
+	return function validationFunction ()
+	{
+		if (!field)
+		{
+			return false;
+		}
+
+		let currentMoment = moment(obj._year + "-" + field + "-" + "01", "YYYY-MM-DD", true);
+
+		if (!currentMoment.isValid())
+		{
+			return false;
+		}
+
+		return Juno.Validations.validationFieldsChain(...validationFunc);
+	}
+};
+
+Juno.Validations.validationDay = (obj, field, ...validationFunc) =>
+{
+	return function validationFunction ()
+	{
+		if (!field)
+		{
+			return false;
+		}
+
+		let currentMoment = moment(obj._year + "-" + obj._month + "-" + field, "YYYY-MM-DD", true);
+
+		if (!currentMoment.isValid())
+		{
+			return false;
+		}
+
+		return Juno.Validations.validationFieldsChain(...validationFunc);
+	}
+};
