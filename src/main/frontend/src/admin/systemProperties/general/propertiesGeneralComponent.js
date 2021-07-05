@@ -66,14 +66,6 @@ angular.module('Admin').component('systemPropertiesGeneral',
 	                    value: "",
 	                    validation: ctrl.validations.phonePrefixValid,
                     },
-	                {
-	                	name: "Ontario CNO Number",
-		                description: "Enable CNO field for nurse providers",
-		                propertyName: "enable_ontario_cno_field",
-		                type: propertyTypes.toggle,
-		                value: false,
-		                validation: false,
-	                }
                 ];
 
                ctrl.$onInit = () =>
@@ -86,11 +78,23 @@ angular.module('Admin').component('systemPropertiesGeneral',
                
                 ctrl.loadProperty = (property) =>
                 {
-                    systemPreferenceApi.getPreferenceValue(property.propertyName)
-                    .then((response) =>
-                    {
-                        property.value = response.data.body;
-                    })
+                	if (property.type === propertyTypes.toggle)
+	                {
+		                systemPreferenceApi.getPreferenceEnabled(property.propertyName)
+			                .then((response) =>
+			                {
+				                property.value = response.data.body;
+			                })
+	                }
+                	else
+	                {
+	                	systemPreferenceApi.getPreferenceValue(property.propertyName)
+			                .then((response) =>
+		                    {
+			                    property.value = response.data.body;
+		                    })
+	                }
+   
                 };
                 
 
