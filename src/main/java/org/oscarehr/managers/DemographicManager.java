@@ -520,7 +520,7 @@ public class DemographicManager {
 
 	public void archiveExtension(DemographicExt ext) {
 		//TODO-legacy: this needs a loggedInInfo
-		if (ext != null && ext.getId() != null) {
+		if (ext != null && ext.getId() != null && ext.getValue() != null) {
 			DemographicExt prevExt = demographicExtDao.find(ext.getId());
 			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {
 				demographicExtArchiveDao.archiveDemographicExt(prevExt);
@@ -1318,52 +1318,23 @@ public class DemographicManager {
 			extraAddress.setDemographicNo(demographic.getDemographicNo());
 			extraAddress.setDateCreated(new Date());
 
-
 			switch (address)
 			{
 				case DemographicExt.ALTERNATE_ADDRESS:
 					extraAddress.setKey(address);
-					if (demographic.getAddress2().getAddress() == null)
-					{
-						extraAddress.setValue("");
-					}
-					else
-					{
-						extraAddress.setValue(demographic.getAddress2().getAddress());
-					}
+					extraAddress.setValue(demographic.getAddress2().getAddress());
 					break;
 				case DemographicExt.ALTERNATE_CITY:
 					extraAddress.setKey(address);
-					if (demographic.getAddress2().getCity() == null)
-					{
-						extraAddress.setValue("");
-					}
-					else
-					{
-						extraAddress.setValue(demographic.getAddress2().getCity());
-					}
+					extraAddress.setValue(demographic.getAddress2().getCity());
 					break;
 				case DemographicExt.ALTERNATE_POSTAL:
 					extraAddress.setKey(address);
-					if (demographic.getAddress2().getPostal() == null)
-					{
-						extraAddress.setValue("");
-					}
-					else
-					{
-						extraAddress.setValue(demographic.getAddress2().getPostal());
-					}
+					extraAddress.setValue(demographic.getAddress2().getPostal());
 					break;
 				case DemographicExt.ALTERNATE_PROVINCE:
 					extraAddress.setKey(address);
-					if (demographic.getAddress2().getProvince() == null)
-					{
-						extraAddress.setValue("");
-					}
-					else
-					{
-						extraAddress.setValue(demographic.getAddress2().getProvince());
-					}
+					extraAddress.setValue(demographic.getAddress2().getProvince());
 					break;
 			}
 			extrasList.add(extraAddress);
