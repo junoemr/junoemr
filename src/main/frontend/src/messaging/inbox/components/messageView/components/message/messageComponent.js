@@ -23,6 +23,7 @@
 import {saveAs} from "file-saver";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../../common/components/junoComponentConstants";
 import {MessageableLocalType} from "../../../../../../lib/messaging/model/MessageableLocalType";
+import RoutingUtil from "../../../../../../lib/util/RoutingUtil";
 
 angular.module("Messaging.Components.View.Components").component('message', {
 	templateUrl: 'src/messaging/inbox/components/messageView/components/message/message.jsp',
@@ -79,10 +80,9 @@ angular.module("Messaging.Components.View.Components").component('message', {
 
 			ctrl.toDemographicSummary = (demographicNo) =>
 			{
-				$state.go("record.summary", {
-					demographicNo: demographicNo
+				RoutingUtil.goNewTab($state, "record.summary", {
+					demographicNo: demographicNo,
 				});
 			};
-
 		}],
 });
