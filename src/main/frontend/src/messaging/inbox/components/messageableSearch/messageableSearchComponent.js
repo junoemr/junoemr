@@ -62,12 +62,12 @@ angular.module("Messaging.Components").component('messageableSearch', {
 				{
 					await this.loadSearchOptions(newVal.name);
 					ctrl.selectedMessageableId = newVal.id
-					ctrl.updateCheckmarkVisibility();
 				}
 				else
 				{
 					ctrl.selectedMessageableId = null;
 				}
+				ctrl.updateCheckmarkVisibility();
 			});
 
 			ctrl.checkMessageableSelection = (selection) =>

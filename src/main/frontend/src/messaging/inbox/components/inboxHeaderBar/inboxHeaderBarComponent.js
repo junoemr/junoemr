@@ -186,6 +186,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 							messagingService: () => ctrl.messagingService,
 							sourceId: () => reply ? selectedMessage.source.id : ctrl.sourceId,
 							isReply: () => reply,
+							recipient: () => ctrl.messageableFilter,
 							subject: () => reply ? selectedMessage.subject : "",
 							conversation: () => reply ? selectedConversation : null,
 						}
