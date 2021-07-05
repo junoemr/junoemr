@@ -2,4 +2,9 @@
 	.text-grey {
 		color: var(--color-neutral-dark-grey);
 	}
+
+	.chart-link {
+		color: var(--color-primary-base);
+		text-decoration: underline;
+	}
 }
