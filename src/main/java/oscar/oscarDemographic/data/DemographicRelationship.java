@@ -30,9 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.RelationshipsDao;
-import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.Relationships;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -121,27 +119,6 @@ public class DemographicRelationship {
 		list.add(h);
 
 		return list;
-	}
-
-	/**
-	 * Get ID of the substitute decision maker for a given demographic.
-	 * @param demographic demographic no who we think may have someone else making decisions for them
-	 * @return ID as a string if we can find it, null otherwise
-	 */
-	public String getSDM(String demographic)
-	{
-		DemographicContactDao demographicContactDao = SpringUtils.getBean(DemographicContactDao.class);
-		List<DemographicContact> contacts = demographicContactDao.findActiveByDemographicNo(ConversionUtils.fromIntString(demographic));
-		String result = null;
-		for (DemographicContact contact : contacts)
-		{
-			if (ConversionUtils.fromBoolString(contact.getSdm()))
-			{
-				result = contact.getContactId();
-				break;
-			}
-		}
-		return result;
 	}
 
 	public List<Map<String, Object>> getDemographicRelationshipsWithNamePhone(LoggedInInfo loggedInInfo, String demographic_no) {

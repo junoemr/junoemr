@@ -39,6 +39,8 @@
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="oscar.oscarReport.data.RptSearchData" %>
+<%@ page import="org.oscarehr.common.model.DemographicContact" %>
+<%@ page import="org.oscarehr.common.model.Contact" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -595,15 +597,45 @@ table.ele thead {
 
 
                           <% }else {
-                              org.oscarehr.common.model.Demographic demoSDM = demoData.getSubstituteDecisionMaker(LoggedInInfo.getLoggedInInfoFromSession(request), dis.demographicNo.toString());%>
+                              LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+                              DemographicContact demographicContact = demoData.getSubstituteDecisionMaker(dis.demographicNo.toString());
+                              // internal
+                              String contactFullName = "";
+                              String contactPhone = "";
+                              String contactAddress = "";
+                              if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
+                              {
+                                  org.oscarehr.common.model.Demographic demographic = demoData.getInternalContact(loggedInInfo, demographicContact);
+                                  if (demographic != null)
+                                  {
+                                      contactFullName = demographic.getFullName();
+                                      contactPhone = demographic.getPhone();
+                                      contactAddress = StringUtils.trimToEmpty(demographic.getAddress()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getCity()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getProvince()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getPostal());
+                                  }
+                              }
+                              // external
+                              else if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_CONTACT)
+                              {
+                                  Contact contact = demoData.getExternalContact(demographicContact);
+                                  if (contact != null)
+                                  {
+                                      contactFullName = contact.getFormattedName();
+                                      contactPhone = contact.getCellPhone();
+                                      contactAddress = contact.getAddress();
+                                  }
+                              }
+                          %>
                           <td><%=demo.getAgeAsOf(asDate)%></td>
                           <td><%=h.get("sex")%></td>
                           <td><%=h.get("lastName")%></td>
                           <td><%=h.get("firstName")%></td>
                           <td><%=demo.getHin()+demo.getVer()%></td>
-                          <td><%=demoSDM==null?"":demoSDM.getLastName()%><%=demoSDM==null?"":","%> <%= demoSDM==null?"":demoSDM.getFirstName() %>&nbsp;</td>
-                          <td><%=demoSDM==null?"":demoSDM.getPhone()%> &nbsp;</td>
-                          <td><%=demoSDM==null?"":demoSDM.getAddress()+" "+demoSDM==null?"":demoSDM.getCity()+" "+demoSDM==null?"":demoSDM.getProvince()+" "+demoSDM==null?"":demoSDM.getPostal()%> &nbsp;</td>
+                          <td><%=contactFullName %>&nbsp;</td>
+                          <td><%=contactPhone%> &nbsp;</td>
+                          <td><%=contactAddress%> &nbsp;</td>
                           <td><oscar:nextAppt demographicNo="<%=demo.getDemographicNo().toString()%>"/></td>
                           <td bgcolor="<%=dis.color%>"><%=dis.state%></td>
                           <td bgcolor="<%=dis.color%>"><%=dis.numShots%></td>                          
