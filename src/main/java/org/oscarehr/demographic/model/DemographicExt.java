@@ -50,9 +50,9 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	public static final String KEY_DEMO_H_PHONE_EXT = "hPhoneExt";
 	public static final String KEY_DEMO_W_PHONE_EXT = "wPhoneExt";
 	public static final String ALTERNATE_ADDRESS = "address";
-	public static final String CITY = "city";
-	public static final String POSTAL = "postal";
-	public static final String PROVINCE = "province";
+	public static final String ALTERNATE_CITY = "city";
+	public static final String ALTERNATE_POSTAL = "postal";
+	public static final String ALTERNATE_PROVINCE = "province";
 
 	@Transient
     private int hashCode = Integer.MIN_VALUE;// primary key

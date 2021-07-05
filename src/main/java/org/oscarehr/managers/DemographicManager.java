@@ -381,7 +381,7 @@ public class DemographicManager {
 		{
 			demographic.setPatientStatusDate(new Date());
 		}
-		else if (previousStatusDate.compareTo(currentStatusDate) != 0)
+		else if (previousStatusDate != null && previousStatusDate.compareTo(currentStatusDate) != 0)
 		{
 			demographic.setPatientStatusDate(currentStatusDate);
 		}
@@ -1288,16 +1288,20 @@ public class DemographicManager {
 				switch (key)
 				{
 					case DemographicExt.ALTERNATE_ADDRESS:
-						extraAddress.setAddress(value);
+							extraAddress.setAddress(value);
+
 						break;
-					case DemographicExt.CITY:
-						extraAddress.setCity(value);
+					case DemographicExt.ALTERNATE_CITY:
+							extraAddress.setCity(value);
+
 						break;
-					case DemographicExt.POSTAL:
-						extraAddress.setPostal(value);
+					case DemographicExt.ALTERNATE_POSTAL:
+							extraAddress.setPostal(value);
+
 						break;
-					case DemographicExt.PROVINCE:
-						extraAddress.setProvince(value);
+					case DemographicExt.ALTERNATE_PROVINCE:
+							extraAddress.setProvince(value);
+
 				}
 			}
 			return extraAddress;
@@ -1305,7 +1309,7 @@ public class DemographicManager {
 
 	public List<DemographicExtTo1> setExtraAddress(DemographicTo1 demographic)
 	{
-		List<String> alternateAddress = Arrays.asList(DemographicExt.ALTERNATE_ADDRESS, DemographicExt.CITY, DemographicExt.POSTAL, DemographicExt.PROVINCE);
+		List<String> alternateAddress = Arrays.asList(DemographicExt.ALTERNATE_ADDRESS, DemographicExt.ALTERNATE_CITY, DemographicExt.ALTERNATE_POSTAL, DemographicExt.ALTERNATE_PROVINCE);
 		List<DemographicExtTo1> extrasList = new ArrayList<>();
 		for(String address: alternateAddress)
 		{
@@ -1319,22 +1323,49 @@ public class DemographicManager {
 			{
 				case DemographicExt.ALTERNATE_ADDRESS:
 					extraAddress.setKey(address);
-					extraAddress.setValue(demographic.getAddress2().getAddress());
+					if (demographic.getAddress2().getAddress() == null)
+					{
+						extraAddress.setValue("");
+					}
+					else
+					{
+						extraAddress.setValue(demographic.getAddress2().getAddress());
+					}
 					break;
-				case DemographicExt.CITY:
+				case DemographicExt.ALTERNATE_CITY:
 					extraAddress.setKey(address);
-					extraAddress.setValue(demographic.getAddress2().getCity());
+					if (demographic.getAddress2().getCity() == null)
+					{
+						extraAddress.setValue("");
+					}
+					else
+					{
+						extraAddress.setValue(demographic.getAddress2().getCity());
+					}
 					break;
-				case DemographicExt.POSTAL:
+				case DemographicExt.ALTERNATE_POSTAL:
 					extraAddress.setKey(address);
-					extraAddress.setValue(demographic.getAddress2().getPostal());
+					if (demographic.getAddress2().getPostal() == null)
+					{
+						extraAddress.setValue("");
+					}
+					else
+					{
+						extraAddress.setValue(demographic.getAddress2().getPostal());
+					}
 					break;
-				case DemographicExt.PROVINCE:
+				case DemographicExt.ALTERNATE_PROVINCE:
 					extraAddress.setKey(address);
-					extraAddress.setValue(demographic.getAddress2().getProvince());
+					if (demographic.getAddress2().getProvince() == null)
+					{
+						extraAddress.setValue("");
+					}
+					else
+					{
+						extraAddress.setValue(demographic.getAddress2().getProvince());
+					}
 					break;
 			}
-
 			extrasList.add(extraAddress);
 		}
 		return extrasList;
