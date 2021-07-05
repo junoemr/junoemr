@@ -123,9 +123,6 @@ angular.module('Admin.Section').component('editProviderAdmin',
 		// options for the ON service location indicator
 		ctrl.onServiceLocationIndicatorOptions = staticDataService.getOntarioServiceLocationIndicators();
 		
-		// enable the ontario CNO number field
-		ctrl.ontarioCNOFieldEnabled = false;
-
 		// options for the BC service location field
 		ctrl.bcServiceLocationOptions = [];
 
@@ -302,11 +299,6 @@ angular.module('Admin.Section').component('editProviderAdmin',
 
 		ctrl.$onInit = async function()
 		{
-			systemPreferenceApi.getPreferenceEnabled("enable_ontario_cno_field", false).then((result) =>
-			{
-				ctrl.ontarioCNOFieldEnabled = result.data.body;
-			});
-			
 			providersServiceApi.getProviderRoles().then(
 					function success(result)
 					{

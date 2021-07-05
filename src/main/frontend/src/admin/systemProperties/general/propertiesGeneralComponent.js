@@ -66,14 +66,6 @@ angular.module('Admin').component('systemPropertiesGeneral',
 	                    value: "",
 	                    validation: ctrl.validations.phonePrefixValid,
                     },
-	                {
-	                	name: "Ontario CNO Number",
-		                description: "Enable CNO field for nurse providers",
-		                propertyName: "enable_ontario_cno_field",
-		                type: propertyTypes.toggle,
-		                value: false,
-		                validation: false,
-	                }
                 ];
 
                ctrl.$onInit = () =>
