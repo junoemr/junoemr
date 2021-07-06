@@ -72,7 +72,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		String inr = "42731";
 
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(20000);
+		Thread.sleep(30000);
 		PageUtil.switchToLastWindow(driver);
 		Thread.sleep(4000);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
