@@ -610,11 +610,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				procedureDateValid = partialProcedureDate.isValidPartialDate();
 			}
 
-			if (startDateValid && resolutionDateValid && procedureDateValid)
-			{
-				return true;
-			}
-			return false;
+			return startDateValid && resolutionDateValid && procedureDateValid;
 		}
 	}
 ]);
