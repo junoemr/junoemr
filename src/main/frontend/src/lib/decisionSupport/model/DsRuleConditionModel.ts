@@ -29,13 +29,43 @@ import {ConditionType} from "./DsConditionType";
 
 export default class DsRuleConditionModel
 {
-    id: number;
-    value: string;
-    type: ConditionType;
+    private _id: number;
+    private _value: string;
+    private _type: ConditionType;
 
     public constructor()
     {
         this.type = ConditionType.NEVER_GIVEN; // default type
+    }
+
+    get id(): number
+    {
+        return this._id;
+    }
+
+    set id(value: number)
+    {
+        this._id = value;
+    }
+
+    get value(): string
+    {
+        return this._value;
+    }
+
+    set value(value: string)
+    {
+        this._value = value;
+    }
+
+    get type(): ConditionType
+    {
+        return this._type;
+    }
+
+    set type(value: ConditionType)
+    {
+        this._type = value;
     }
 }
 

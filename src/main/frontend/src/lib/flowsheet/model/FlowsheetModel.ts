@@ -29,17 +29,77 @@ import FlowsheetItemGroupModel from "./FlowsheetItemGroupModel";
 
 export default class FlowsheetModel
 {
-	id: number;
-	name: string;
-	description: string;
-	enabled: boolean;
-	systemManaged: boolean;
-	flowsheetItemGroups: FlowsheetItemGroupModel[];
+	private _id: number;
+	private _name: string;
+	private _description: string;
+	private _enabled: boolean;
+	private _systemManaged: boolean;
+	private _flowsheetItemGroups: FlowsheetItemGroupModel[];
 
 	public constructor()
 	{
 		this.enabled = true;
 		this.systemManaged = false;
 		this.flowsheetItemGroups = [];
+	}
+
+	get id(): number
+	{
+		return this._id;
+	}
+
+	set id(value: number)
+	{
+		this._id = value;
+	}
+
+	get name(): string
+	{
+		return this._name;
+	}
+
+	set name(value: string)
+	{
+		this._name = value;
+	}
+
+	get description(): string
+	{
+		return this._description;
+	}
+
+	set description(value: string)
+	{
+		this._description = value;
+	}
+
+	get enabled(): boolean
+	{
+		return this._enabled;
+	}
+
+	set enabled(value: boolean)
+	{
+		this._enabled = value;
+	}
+
+	get systemManaged(): boolean
+	{
+		return this._systemManaged;
+	}
+
+	set systemManaged(value: boolean)
+	{
+		this._systemManaged = value;
+	}
+
+	get flowsheetItemGroups(): FlowsheetItemGroupModel[]
+	{
+		return this._flowsheetItemGroups;
+	}
+
+	set flowsheetItemGroups(value: FlowsheetItemGroupModel[])
+	{
+		this._flowsheetItemGroups = value;
 	}
 }

@@ -30,15 +30,55 @@ import {ConsequenceSeverity} from "./DsConsequenceSeverity";
 
 export default class DsRuleConsequenceModel
 {
-    id: number;
-    message: string;
-    severityLevel: ConsequenceSeverity;
-    type: ConsequenceType;
+    private _id: number;
+    private _message: string;
+    private _severityLevel: ConsequenceSeverity;
+    private _type: ConsequenceType;
 
     public constructor()
     {
         this.type = ConsequenceType.ALERT; // default type
         this.severityLevel = ConsequenceSeverity.RECOMMENDATION;
+    }
+
+    get id(): number
+    {
+        return this._id;
+    }
+
+    set id(value: number)
+    {
+        this._id = value;
+    }
+
+    get message(): string
+    {
+        return this._message;
+    }
+
+    set message(value: string)
+    {
+        this._message = value;
+    }
+
+    get severityLevel(): ConsequenceSeverity
+    {
+        return this._severityLevel;
+    }
+
+    set severityLevel(value: ConsequenceSeverity)
+    {
+        this._severityLevel = value;
+    }
+
+    get type(): ConsequenceType
+    {
+        return this._type;
+    }
+
+    set type(value: ConsequenceType)
+    {
+        this._type = value;
     }
 }
 

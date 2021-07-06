@@ -32,23 +32,144 @@ import {FlowsheetItemValueType} from "./FlowsheetItemValueType";
 
 export default class FlowsheetItemModel
 {
-	id: number;
-	name: string;
-	description: string;
-	guideline: string;
-	type: FlowsheetItemType;
-	typeCode: string;
-	hidden: boolean;
-	valueType: FlowsheetItemValueType;
-	valueLabel: string;
-	flowsheetItemAlerts: FlowsheetItemAlert[];
-	data: FlowsheetItemData[];
-	rules: DsRuleModel[];
+	private _id: number;
+	private _name: string;
+	private _description: string;
+	private _guideline: string;
+	private _type: FlowsheetItemType;
+	private _typeCode: string;
+	private _hidden: boolean;
+	private _valueType: FlowsheetItemValueType;
+	private _valueLabel: string;
+	private _flowsheetItemAlerts: FlowsheetItemAlert[];
+	private _data: FlowsheetItemData[];
+	private _rules: DsRuleModel[];
 
 	public constructor()
 	{
 		this.flowsheetItemAlerts = [];
 		this.data = [];
 		this.rules = [];
+	}
+
+
+	get id(): number
+	{
+		return this._id;
+	}
+
+	set id(value: number)
+	{
+		this._id = value;
+	}
+
+	get name(): string
+	{
+		return this._name;
+	}
+
+	set name(value: string)
+	{
+		this._name = value;
+	}
+
+	get description(): string
+	{
+		return this._description;
+	}
+
+	set description(value: string)
+	{
+		this._description = value;
+	}
+
+	get guideline(): string
+	{
+		return this._guideline;
+	}
+
+	set guideline(value: string)
+	{
+		this._guideline = value;
+	}
+
+	get type(): FlowsheetItemType
+	{
+		return this._type;
+	}
+
+	set type(value: FlowsheetItemType)
+	{
+		this._type = value;
+	}
+
+	get typeCode(): string
+	{
+		return this._typeCode;
+	}
+
+	set typeCode(value: string)
+	{
+		this._typeCode = value;
+	}
+
+	get hidden(): boolean
+	{
+		return this._hidden;
+	}
+
+	set hidden(value: boolean)
+	{
+		this._hidden = value;
+	}
+
+	get valueType(): FlowsheetItemValueType
+	{
+		return this._valueType;
+	}
+
+	set valueType(value: FlowsheetItemValueType)
+	{
+		this._valueType = value;
+	}
+
+	get valueLabel(): string
+	{
+		return this._valueLabel;
+	}
+
+	set valueLabel(value: string)
+	{
+		this._valueLabel = value;
+	}
+
+	get flowsheetItemAlerts(): FlowsheetItemAlert[]
+	{
+		return this._flowsheetItemAlerts;
+	}
+
+	set flowsheetItemAlerts(value: FlowsheetItemAlert[])
+	{
+		this._flowsheetItemAlerts = value;
+	}
+
+	get data(): FlowsheetItemData[]
+	{
+		return this._data;
+	}
+
+	set data(value: FlowsheetItemData[])
+	{
+		this._data = value;
+	}
+
+	get rules(): DsRuleModel[]
+	{
+		return this._rules;
+	}
+
+	set rules(value: DsRuleModel[])
+	{
+		this._rules = value;
 	}
 }

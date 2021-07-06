@@ -29,12 +29,12 @@ import DsRuleConditionModel from "./DsRuleConditionModel";
 
 export default class DsRuleModel
 {
-    id: number;
-    name: string;
-    description: string;
-    systemManaged: boolean;
-    conditions: DsRuleConditionModel[];
-    consequences: DsRuleConsequenceModel[];
+    private _id: number;
+    private _name: string;
+    private _description: string;
+    private _systemManaged: boolean;
+    private _conditions: DsRuleConditionModel[];
+    private _consequences: DsRuleConsequenceModel[];
 
     public constructor()
     {
@@ -43,13 +43,82 @@ export default class DsRuleModel
         this.consequences = [];
     }
 
-    public isValid = (): boolean =>
+    private _isValid = (): boolean =>
     {
-
         return ((this.conditions && this.conditions.length > 0)
             && (this.consequences && this.consequences.length > 0)
             && (!Juno.Common.Util.isBlank(this.name))
         );
+    }
+
+    get id(): number
+    {
+        return this._id;
+    }
+
+    set id(value: number)
+    {
+        this._id = value;
+    }
+
+    get name(): string
+    {
+        return this._name;
+    }
+
+    set name(value: string)
+    {
+        this._name = value;
+    }
+
+    get description(): string
+    {
+        return this._description;
+    }
+
+    set description(value: string)
+    {
+        this._description = value;
+    }
+
+    get systemManaged(): boolean
+    {
+        return this._systemManaged;
+    }
+
+    set systemManaged(value: boolean)
+    {
+        this._systemManaged = value;
+    }
+
+    get conditions(): DsRuleConditionModel[]
+    {
+        return this._conditions;
+    }
+
+    set conditions(value: DsRuleConditionModel[])
+    {
+        this._conditions = value;
+    }
+
+    get consequences(): DsRuleConsequenceModel[]
+    {
+        return this._consequences;
+    }
+
+    set consequences(value: DsRuleConsequenceModel[])
+    {
+        this._consequences = value;
+    }
+
+    get isValid(): () => boolean
+    {
+        return this._isValid;
+    }
+
+    set isValid(value: () => boolean)
+    {
+        this._isValid = value;
     }
 }
 
