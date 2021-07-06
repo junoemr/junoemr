@@ -26,7 +26,8 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.decisionSupport2.entity.DsRuleCondition;
 import org.oscarehr.decisionSupport2.model.condition.ConditionIsGender;
 import org.oscarehr.decisionSupport2.model.condition.ConditionIsNotGender;
-import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSince;
+import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSinceGreater;
+import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSinceLess;
 import org.oscarehr.decisionSupport2.model.condition.ConditionNeverGiven;
 import org.oscarehr.decisionSupport2.model.condition.DsCondition;
 import org.springframework.beans.BeanUtils;
@@ -46,9 +47,10 @@ public class DsConditionDbToModelConverter extends AbstractModelConverter<DsRule
 		switch(input.getType())
 		{
 			case NEVER_GIVEN: condition = new ConditionNeverGiven(); break;
-			case MONTHS_SINCE: condition = new ConditionMonthsSince(); break;
-			case IS_GENDER: condition = new ConditionIsGender(); break;
-			case NOT_GENDER: condition = new ConditionIsNotGender(); break;
+			case MONTHS_SINCE_GT: condition = new ConditionMonthsSinceGreater(); break;
+			case MONTHS_SINCE_LT: condition = new ConditionMonthsSinceLess(); break;
+			case PATIENT_GENDER_EQ: condition = new ConditionIsGender(); break;
+			case PATIENT_GENDER_NE: condition = new ConditionIsNotGender(); break;
 			default: throw new IllegalStateException("condition type " + input.getType() + " is not defined");
 		}
 

@@ -25,17 +25,5 @@
 
  */
 
-import {ConditionType} from "./DsConditionType";
-
-export default class DsRuleConditionModel
-{
-    id: number;
-    value: string;
-    type: ConditionType;
-
-    public constructor()
-    {
-        this.type = ConditionType.NEVER_GIVEN; // default type
-    }
-}
-
+import {DsCondition} from "../../../../generated";
+export import ConditionType = DsCondition.TypeEnum;

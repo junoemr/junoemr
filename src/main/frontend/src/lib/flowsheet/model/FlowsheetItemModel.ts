@@ -25,8 +25,10 @@
 
  */
 
-import {FlowsheetItem, FlowsheetItemAlert, FlowsheetItemData} from "../../../../generated";
+import {FlowsheetItemAlert, FlowsheetItemData} from "../../../../generated";
 import DsRuleModel from "../../decisionSupport/model/DsRuleModel";
+import {FlowsheetItemType} from "./FlowsheetItemType";
+import {FlowsheetItemValueType} from "./FlowsheetItemValueType";
 
 export default class FlowsheetItemModel
 {
@@ -34,10 +36,10 @@ export default class FlowsheetItemModel
 	name: string;
 	description: string;
 	guideline: string;
-	type: FlowsheetItem.TypeEnum;
+	type: FlowsheetItemType;
 	typeCode: string;
 	hidden: boolean;
-	valueType: FlowsheetItem.ValueTypeEnum;
+	valueType: FlowsheetItemValueType;
 	valueLabel: string;
 	flowsheetItemAlerts: FlowsheetItemAlert[];
 	data: FlowsheetItemData[];

@@ -24,10 +24,10 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../common/components/junoComponentConstants";
 import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
-import {ItemType} from "../lib/flowsheet/FlowsheetConstants";
 import FlowsheetItemModel from "../lib/flowsheet/model/FlowsheetItemModel";
-import {FlowsheetItem} from "../../generated";
 import FlowsheetItemGroupModel from "../lib/flowsheet/model/FlowsheetItemGroupModel";
+import {FlowsheetItemType} from "../lib/flowsheet/model/FlowsheetItemType";
+import {FlowsheetItemValueType} from "../lib/flowsheet/model/FlowsheetItemValueType";
 
 angular.module('Flowsheet').component('flowsheetEdit',
 	{
@@ -50,7 +50,6 @@ angular.module('Flowsheet').component('flowsheetEdit',
 				const ctrl = this;
 
 				ctrl.SecurityPermissions = SecurityPermissions;
-				ctrl.ItemType = ItemType;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -111,17 +110,17 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onAddNewMeasurementItem = (itemGroup): void =>
 				{
-					ctrl.onAddNewItem(itemGroup, ItemType.MEASUREMENT);
+					ctrl.onAddNewItem(itemGroup, FlowsheetItemType.MEASUREMENT);
 				}
 
 				ctrl.onAddNewPreventionItem = (itemGroup): void =>
 				{
-					ctrl.onAddNewItem(itemGroup, ItemType.PREVENTION);
+					ctrl.onAddNewItem(itemGroup, FlowsheetItemType.PREVENTION);
 				}
 
 				ctrl.onAddNewItem = (itemGroup, type): void =>
 				{
-					const isMeasurementType = (type === ItemType.MEASUREMENT);
+					const isMeasurementType = (type === FlowsheetItemType.MEASUREMENT);
 					const typeLabel = (isMeasurementType) ? "measurement" : "prevention";
 					const callback = (isMeasurementType) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
 
@@ -141,19 +140,19 @@ angular.module('Flowsheet').component('flowsheetEdit',
 							if(isMeasurementType)
 							{
 								newItem.name = data.name;
-								newItem.type = FlowsheetItem.TypeEnum.MEASUREMENT;
+								newItem.type = FlowsheetItemType.MEASUREMENT;
 								newItem.typeCode = data.code;
 								newItem.description = data.description;
 								newItem.guideline = data.instructions;
-								newItem.valueType = FlowsheetItem.ValueTypeEnum.STRING;
+								newItem.valueType = FlowsheetItemValueType.STRING;
 							}
 							else
 							{
 								newItem.name = data.name;
-								newItem.type = FlowsheetItem.TypeEnum.PREVENTION;
+								newItem.type = FlowsheetItemType.PREVENTION;
 								newItem.typeCode = data.code;
 								newItem.description = data.description;
-								newItem.valueType = FlowsheetItem.ValueTypeEnum.STRING;
+								newItem.valueType = FlowsheetItemValueType.STRING;
 							}
 							itemGroup.flowsheetItems.push(newItem);
 						}

@@ -26,17 +26,17 @@ import lombok.Data;
 import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 
 @Data
-public class ConditionIsGender extends DsCondition
+public class ConditionMonthsSinceGreater extends DsCondition
 {
-	public ConditionIsGender()
+	public ConditionMonthsSinceGreater()
 	{
-		super(ConditionType.PATIENT_GENDER_EQ);
+		super(ConditionType.MONTHS_SINCE_GT);
 	}
 
 	@Override
 	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
-		String genderCode = dsInfoLookup.getGender();
-		return (getValue().equalsIgnoreCase(genderCode));
+		int monthsSince = dsInfoLookup.getLastDateRecordedInMonths(typeCode);
+		return (monthsSince > Double.parseDouble(getValue()));
 	}
 }

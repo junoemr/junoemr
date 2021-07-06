@@ -26,17 +26,17 @@ import lombok.Data;
 import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 
 @Data
-public class ConditionMonthsSince extends DsCondition
+public class ConditionMonthsSinceLess extends DsCondition
 {
-	public ConditionMonthsSince()
+	public ConditionMonthsSinceLess()
 	{
-		super(ConditionType.MONTHS_SINCE);
+		super(ConditionType.MONTHS_SINCE_LT);
 	}
 
 	@Override
 	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
 		int monthsSince = dsInfoLookup.getLastDateRecordedInMonths(typeCode);
-		return (monthsSince > Double.parseDouble(getValue()));
+		return (monthsSince < Double.parseDouble(getValue()));
 	}
 }

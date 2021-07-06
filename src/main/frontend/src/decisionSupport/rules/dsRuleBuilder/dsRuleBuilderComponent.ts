@@ -22,10 +22,12 @@
  */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
-import {DsCondition, DsConsequence} from "../../../../generated";
+import {DsConsequence} from "../../../../generated";
 import DsRuleConditionModel from "../../../lib/decisionSupport/model/DsRuleConditionModel";
 import DsRuleConsequenceModel from "../../../lib/decisionSupport/model/DsRuleConsequenceModel";
 import {Sex, sexToHuman} from "../../../lib/demographic/model/Sex";
+import {ConditionType} from "../../../lib/decisionSupport/model/DsConditionType";
+import {ConsequenceType} from "../../../lib/decisionSupport/model/DsConsequenceType";
 
 angular.module('DecisionSupport').component('dsRuleBuilder',
 	{
@@ -45,15 +47,16 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.conditionTypeOptions = [
-					{label: "Months Since", value: DsCondition.TypeEnum.MONTHS_SINCE},
-					{label: "Never Given", value: DsCondition.TypeEnum.NEVER_GIVEN},
-					{label: "Patient gender matches", value: DsCondition.TypeEnum.IS_GENDER},
-					{label: "Patient gender does not match", value: DsCondition.TypeEnum.NOT_GENDER},
+					{label: "Months Since is more than", value: ConditionType.MONTHS_SINCE_GT},
+					{label: "Months Since is less than", value: ConditionType.MONTHS_SINCE_LT},
+					{label: "Never Given", value: ConditionType.NEVER_GIVEN},
+					{label: "Patient gender matches", value: ConditionType.PATIENT_GENDER_EQ},
+					{label: "Patient gender does not match", value: ConditionType.PATIENT_GENDER_NE},
 				];
 
 				ctrl.consequenceTypeOptions = [
-					{label: "Display Alert", value: DsConsequence.TypeEnum.ALERT},
-					{label: "Hide Item", value: DsConsequence.TypeEnum.HIDDEN},
+					{label: "Display Alert", value: ConsequenceType.ALERT},
+					{label: "Hide Item", value: ConsequenceType.HIDDEN},
 				];
 
 				ctrl.consequenceSeverityOptions = [
@@ -90,20 +93,22 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 
 				ctrl.showConditionValueInput = (condition: DsRuleConditionModel): boolean =>
 				{
-					return (condition.type === DsCondition.TypeEnum.MONTHS_SINCE);
+					return (condition.type === ConditionType.MONTHS_SINCE_GT
+						|| condition.type === ConditionType.MONTHS_SINCE_LT);
 				}
 
 				ctrl.showConditionValueSelect = (condition: DsRuleConditionModel): boolean =>
 				{
-					return (condition.type === DsCondition.TypeEnum.IS_GENDER
-						|| condition.type === DsCondition.TypeEnum.NOT_GENDER
+					return (condition.type === ConditionType.PATIENT_GENDER_EQ
+						|| condition.type === ConditionType.PATIENT_GENDER_NE
 					);
 				}
 				ctrl.getConditionValueInputLabel = (condition: DsRuleConditionModel): string =>
 				{
 					switch (condition.type)
 					{
-						case DsCondition.TypeEnum.MONTHS_SINCE: return "greater than";
+						case ConditionType.MONTHS_SINCE_LT:
+						case ConditionType.MONTHS_SINCE_GT: return "";
 					}
 					return "value";
 				}
@@ -111,8 +116,8 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 				{
 					switch (condition.type)
 					{
-						case DsCondition.TypeEnum.IS_GENDER:
-						case DsCondition.TypeEnum.NOT_GENDER:
+						case ConditionType.PATIENT_GENDER_EQ:
+						case ConditionType.PATIENT_GENDER_NE:
 						{
 							return ctrl.conditionValueOptions.gender;
 						}
@@ -125,19 +130,19 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 
 				ctrl.showConsequenceValueInput = (consequence: DsRuleConsequenceModel): boolean =>
 				{
-					return (consequence.type === DsConsequence.TypeEnum.ALERT);
+					return (consequence.type === ConsequenceType.ALERT);
 				}
 				ctrl.getConsequenceValueInputLabel = (consequence: DsRuleConsequenceModel): string =>
 				{
 					switch (consequence.type)
 					{
-						case DsConsequence.TypeEnum.ALERT: return "with message";
+						case ConsequenceType.ALERT: return "with message";
 					}
 					return "value";
 				}
 				ctrl.showConsequenceSeveritySelect = (consequence: DsRuleConsequenceModel): boolean =>
 				{
-					return (consequence.type === DsConsequence.TypeEnum.ALERT);
+					return (consequence.type === ConsequenceType.ALERT);
 				}
 				ctrl.removeConsequence = (consequence: DsRuleConsequenceModel): void =>
 				{

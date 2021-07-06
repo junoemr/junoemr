@@ -25,7 +25,5 @@
 
  */
 
-import {FlowsheetItem} from "../../../generated";
-
-export const ItemType = FlowsheetItem.TypeEnum;
-export const ValueType = FlowsheetItem.ValueTypeEnum;
+import {FlowsheetItem} from "../../../../generated";
+export import FlowsheetItemValueType = FlowsheetItem.ValueTypeEnum;

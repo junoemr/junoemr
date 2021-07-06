@@ -22,8 +22,8 @@
  */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
-import {ValueType} from "../../../lib/flowsheet/FlowsheetConstants";
 import DsRuleModel from "../../../lib/decisionSupport/model/DsRuleModel";
+import {FlowsheetItemValueType} from "../../../lib/flowsheet/model/FlowsheetItemValueType";
 
 angular.module('Flowsheet').component('flowsheetEditItem',
 	{
@@ -44,9 +44,9 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.valueTypeOptions = [
-					{label: "Text", value: ValueType.STRING},
-					{label: "Numeric", value: ValueType.NUMERIC},
-					{label: "Checkbox", value: ValueType.BOOLEAN},
+					{label: "Text", value: FlowsheetItemValueType.STRING},
+					{label: "Numeric", value: FlowsheetItemValueType.NUMERIC},
+					{label: "Checkbox", value: FlowsheetItemValueType.BOOLEAN},
 				];
 
 				ctrl.isLoading = true;

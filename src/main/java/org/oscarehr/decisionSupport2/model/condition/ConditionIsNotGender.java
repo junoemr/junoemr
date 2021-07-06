@@ -30,7 +30,7 @@ public class ConditionIsNotGender extends DsCondition
 {
 	public ConditionIsNotGender()
 	{
-		super(ConditionType.NOT_GENDER);
+		super(ConditionType.PATIENT_GENDER_NE);
 	}
 
 	@Override
