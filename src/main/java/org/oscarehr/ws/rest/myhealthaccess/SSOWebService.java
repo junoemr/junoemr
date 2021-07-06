@@ -27,77 +27,49 @@ package org.oscarehr.ws.rest.myhealthaccess;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
-import org.oscarehr.integration.myhealthaccess.service.ClinicService;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.integration.model.IntegrationData;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("myhealthaccess/integration/{integrationId}/")
-@Component("mhaIntegrationWebService")
-@Tag(name = "mhaIntegration")
-public class IntegrationWebService extends AbstractServiceImpl
+@Path("myhealthaccess/integration/{integrationId}/sso/")
+@Tag(name = "mhaSSO")
+public class SSOWebService extends AbstractServiceImpl
 {
 	protected IntegrationDao integrationDao;
-	protected ClinicService clinicService;
-	protected SecurityInfoManager securityInfoManager;
+	protected MyHealthAccessService myHealthAccessService;
 
 	// ==========================================================================
 	// Public Methods
 	// ==========================================================================
 
 	@Autowired
-	public IntegrationWebService(IntegrationDao integrationDao, ClinicService clinicService, SecurityInfoManager securityInfoManager)
+	public SSOWebService(MyHealthAccessService myHealthAccessService, IntegrationDao integrationDao)
 	{
+		this.myHealthAccessService = myHealthAccessService;
 		this.integrationDao = integrationDao;
-		this.clinicService = clinicService;
-		this.securityInfoManager = securityInfoManager;
 	}
 
 	// ==========================================================================
 	// Endpoints
 	// ==========================================================================
 
-	@DELETE
-	@Path("/")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> deleteMhaIntegration(@PathParam("integrationId") String integrationId)
-	{
-		securityInfoManager.requireSuperAdminFlag(getLoggedInInfo().getLoggedInProviderNo());
-
-		Integration integration = this.integrationDao.findOrThrow(Integer.parseInt(integrationId));
-		this.integrationDao.remove(integration);
-
-		return RestResponse.successResponse(true);
-	}
-
 	@GET
-	@Path("/testConnection")
+	@Path("/clinicAdmin")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(@PathParam("integrationId") String integrationId)
+	public RestResponse<String> getClinicAdminSSOLink(@PathParam("integrationId") String integrationId)
 	{
-		try
-		{
-			Integration integration = this.integrationDao.findOrThrow(Integer.parseInt(integrationId));
-			ClinicStatusResponseTo1 clinicStatusResponseTo1 = this.clinicService.testConnection(integration);
+		Integration integration = integrationDao.findOrThrow(Integer.parseInt(integrationId));
+		IntegrationData integrationData = new IntegrationData(integration);
 
-			return RestResponse.successResponse(
-					clinicStatusResponseTo1.getStatusIdentifier().equals(ClinicStatusResponseTo1.STATUS_IDENTIFIER_CONNECTED));
-		}
-		catch(RuntimeException e)
-		{
-			MiscUtils.getLogger().info("MHA test connection failed for integration [" + integrationId + "]", e);
-			return RestResponse.successResponse(false);
-		}
+		integrationData = myHealthAccessService.createOrGetUserIntegrationData(integrationData, getLoggedInInfo().getLoggedInSecurity());
+		return RestResponse.successResponse(myHealthAccessService.getTelehealthUrl(integrationData, null, null));
 	}
 }
