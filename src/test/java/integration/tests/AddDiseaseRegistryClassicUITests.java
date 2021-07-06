@@ -74,7 +74,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
 		Thread.sleep(20000);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
+		Thread.sleep(4000);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
 		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
 		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(painAssistant);
