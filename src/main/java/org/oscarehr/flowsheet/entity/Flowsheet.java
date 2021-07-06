@@ -111,6 +111,12 @@ public class Flowsheet extends AbstractModel<Integer>
 		return id;
 	}
 
+	@Override
+	public String toString()
+	{
+		return this.getClass().getName() + "{id: " + id + ", name: " + name + "}";
+	}
+
 	@PrePersist
 	private void prePersist()
 	{

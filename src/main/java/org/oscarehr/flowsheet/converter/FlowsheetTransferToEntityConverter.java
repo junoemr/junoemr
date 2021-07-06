@@ -73,12 +73,12 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 		BeanUtils.copyProperties(input, flowsheet, "id", "flowsheetItemGroups");
 
 		// diff the groups and items within the flowsheet
-		List<FlowsheetItemGroup> flowsheetItemGroups = Optional.ofNullable(flowsheet.getFlowsheetItemGroups()).orElse(new ArrayList<>());
+		List<FlowsheetItemGroup> currentFlowsheetItemGroups = Optional.ofNullable(flowsheet.getFlowsheetItemGroups()).orElse(new ArrayList<>());
 
 		if(input.getFlowsheetItemGroups() != null)
 		{
-			flowsheetItemGroups.forEach((group) -> mergeExistingGroup(group, input.getFlowsheetItemGroups()));
-			flowsheetItemGroups.addAll(
+			currentFlowsheetItemGroups.forEach((group) -> mergeExistingGroup(group, input.getFlowsheetItemGroups()));
+			currentFlowsheetItemGroups.addAll(
 					input.getFlowsheetItemGroups()
 							.stream()
 							.filter((group) -> (group.getId() == null))
@@ -87,13 +87,12 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 			);
 		}
 
-		flowsheet.setFlowsheetItemGroups(flowsheetItemGroups);
-		flowsheet.setFlowsheetItems(
-				flowsheet.getFlowsheetItemGroups()
-						.stream()
-						.filter((group) -> group.getFlowsheetItems() != null)
-						.flatMap((group) -> group.getFlowsheetItems().stream())
-						.collect(Collectors.toList()));
+		flowsheet.setFlowsheetItemGroups(currentFlowsheetItemGroups);
+		flowsheet.setFlowsheetItems(currentFlowsheetItemGroups
+				.stream()
+				.filter((group) -> group.getFlowsheetItems() != null)
+				.flatMap((group) -> group.getFlowsheetItems().stream())
+				.collect(Collectors.toList()));
 		return flowsheet;
 	}
 
@@ -124,6 +123,7 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 		{
 			existingGroupEntity.setDeletedAt(LocalDateTime.now());
 			flowsheetItems.forEach((item) -> item.setDeletedAt(LocalDateTime.now()));
+			existingGroupEntity.setFlowsheetItems(flowsheetItems);
 		}
 		return existingGroupEntity;
 	}

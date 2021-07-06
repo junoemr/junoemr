@@ -120,6 +120,12 @@ public class FlowsheetItem extends AbstractModel<Integer>
 		return id;
 	}
 
+	@Override
+	public String toString()
+	{
+		return this.getClass().getName() + "{id: " + id + ", name: " + name + "}";
+	}
+
 	public boolean isMeasurementType()
 	{
 		return ItemType.MEASUREMENT.equals(this.type);

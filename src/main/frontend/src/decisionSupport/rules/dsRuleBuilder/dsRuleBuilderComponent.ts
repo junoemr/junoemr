@@ -22,12 +22,12 @@
  */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
-import {DsConsequence} from "../../../../generated";
 import DsRuleConditionModel from "../../../lib/decisionSupport/model/DsRuleConditionModel";
 import DsRuleConsequenceModel from "../../../lib/decisionSupport/model/DsRuleConsequenceModel";
 import {Sex, sexToHuman} from "../../../lib/demographic/model/Sex";
 import {ConditionType} from "../../../lib/decisionSupport/model/DsConditionType";
 import {ConsequenceType} from "../../../lib/decisionSupport/model/DsConsequenceType";
+import {ConsequenceSeverity} from "../../../lib/decisionSupport/model/DsConsequenceSeverity";
 
 angular.module('DecisionSupport').component('dsRuleBuilder',
 	{
@@ -60,9 +60,9 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 				];
 
 				ctrl.consequenceSeverityOptions = [
-					{label: "Recommendation", value: DsConsequence.SeverityLevelEnum.RECOMMENDATION},
-					{label: "Warning", value: DsConsequence.SeverityLevelEnum.WARNING},
-					{label: "Critical", value: DsConsequence.SeverityLevelEnum.DANGER},
+					{label: "Recommendation", value: ConsequenceSeverity.RECOMMENDATION},
+					{label: "Warning", value: ConsequenceSeverity.WARNING},
+					{label: "Critical", value: ConsequenceSeverity.DANGER},
 				];
 
 				ctrl.conditionValueOptions = {

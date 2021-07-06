@@ -25,20 +25,5 @@
 
  */
 
-import {ConsequenceType} from "./DsConsequenceType";
-import {ConsequenceSeverity} from "./DsConsequenceSeverity";
-
-export default class DsRuleConsequenceModel
-{
-    id: number;
-    message: string;
-    severityLevel: ConsequenceSeverity;
-    type: ConsequenceType;
-
-    public constructor()
-    {
-        this.type = ConsequenceType.ALERT; // default type
-        this.severityLevel = ConsequenceSeverity.RECOMMENDATION;
-    }
-}
-
+import {DsConsequence} from "../../../../generated";
+export import ConsequenceSeverity = DsConsequence.SeverityLevelEnum;

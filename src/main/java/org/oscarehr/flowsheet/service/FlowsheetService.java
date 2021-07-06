@@ -81,8 +81,6 @@ public class FlowsheetService
 
 		flowsheetDao.merge(entity);
 
-		// reload the entity so that deleted items are no longer present
-		flowsheetDao.refresh(entity);
 		return flowsheetEntityToModelConverter.convert(entity);
 	}
 

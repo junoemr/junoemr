@@ -322,6 +322,8 @@ public class FlowsheetTransferToEntityConverterTest
 		existingFlowsheet.setFlowsheetItemGroups(mockExistingGroups);
 		Mockito.when(flowsheetDao.find(Mockito.anyInt())).thenReturn(existingFlowsheet);
 
+		existingGroup.setFlowsheet(existingFlowsheet);
+
 		// build transfers
 		List<DsRuleUpdateInput> ruleList = new ArrayList<>();
 		ruleList.add(buildSampleDsRuleInput(sampleRuleId, sampleRuleName, sampleRuleDescription));
@@ -403,6 +405,10 @@ public class FlowsheetTransferToEntityConverterTest
 		existingFlowsheet.setDescription("Old flowsheet description");
 		existingFlowsheet.setFlowsheetItemGroups(mockExistingGroups);
 		Mockito.when(flowsheetDao.find(Mockito.anyInt())).thenReturn(existingFlowsheet);
+
+		existingItem.setFlowsheetItemGroup(existingGroup);
+		existingItem.setFlowsheet(existingFlowsheet);
+		existingGroup.setFlowsheet(existingFlowsheet);
 
 		// build transfer
 		List<DsRuleUpdateInput> ruleList = new ArrayList<>();
@@ -503,6 +509,10 @@ public class FlowsheetTransferToEntityConverterTest
 		existingFlowsheet.setFlowsheetItemGroups(mockExistingGroups);
 		Mockito.when(flowsheetDao.find(Mockito.anyInt())).thenReturn(existingFlowsheet);
 
+		existingItem.setFlowsheetItemGroup(existingGroup);
+		existingItem.setFlowsheet(existingFlowsheet);
+		existingGroup.setFlowsheet(existingFlowsheet);
+
 		// build transfer
 		List<DsRuleUpdateInput> ruleList = new ArrayList<>();
 		ruleList.add(buildSampleDsRuleInput(sampleRuleId, sampleRuleName, sampleRuleDescription));
@@ -543,6 +553,92 @@ public class FlowsheetTransferToEntityConverterTest
 		assertEquals(expectedItemName, newItem.getName());
 		assertEquals(expectedItemDescription, newItem.getDescription());
 		assertEquals(expectedItemGuideline, newItem.getGuideline());
+	}
+
+	@Test
+	public void testConverter_UpdateFlowsheet_MergeOldGroupAndItems_EntityCheck()
+	{
+		Integer expectedFlowsheetId = 100;
+		String expectedName = "flowsheetName";
+		String expectedDescription = "flowsheetDescription";
+
+		Integer expectedGroupId = 200;
+		String expectedGroupName = "groupName";
+		String expectedGroupDescription = "groupDescription";
+
+		Integer expectedItemId = 300;
+		String expectedItemName = "itemName";
+		String expectedItemDescription = "itemDescription";
+		String expectedItemGuideline = "itemGuideline";
+
+		Integer sampleRuleId = 1;
+		String sampleRuleName = "rule name";
+		String sampleRuleDescription = "rule description";
+
+		// build rules
+		DsRule dsRuleMock = Mockito.mock(DsRule.class);
+		Mockito.when(dsRuleDao.find(Mockito.anyInt())).thenReturn(dsRuleMock);
+		Mockito.when(dsRuleMock.getId()).thenReturn(sampleRuleId);
+
+		// build item
+		FlowsheetItem existingItem = new FlowsheetItem();
+		existingItem.setId(expectedItemId);
+		List<FlowsheetItem> mockExistingItems = new ArrayList<>();
+		mockExistingItems.add(existingItem);
+
+		// build group
+		FlowsheetItemGroup existingGroup = new FlowsheetItemGroup();
+		existingGroup.setId(expectedGroupId);
+		existingGroup.setFlowsheetItems(mockExistingItems);
+		List<FlowsheetItemGroup> mockExistingGroups = new ArrayList<>();
+		mockExistingGroups.add(existingGroup);
+
+		// build flowsheet
+		Flowsheet existingFlowsheet = new Flowsheet();
+		existingFlowsheet.setId(expectedFlowsheetId);
+		existingFlowsheet.setFlowsheetItemGroups(mockExistingGroups);
+		Mockito.when(flowsheetDao.find(Mockito.anyInt())).thenReturn(existingFlowsheet);
+
+		existingItem.setFlowsheetItemGroup(existingGroup);
+		existingItem.setFlowsheet(existingFlowsheet);
+		existingGroup.setFlowsheet(existingFlowsheet);
+
+		// build transfer
+		List<DsRuleUpdateInput> ruleList = new ArrayList<>();
+		ruleList.add(buildSampleDsRuleInput(sampleRuleId, sampleRuleName, sampleRuleDescription));
+
+		List<FlowsheetItemCreateUpdateTransfer> flowsheetGroupItems = new ArrayList<>();
+		FlowsheetItemCreateUpdateTransfer itemUpdateTransfer = buildSimpleFlowsheetItemTransfer(expectedItemName, expectedItemDescription, expectedItemGuideline, ruleList);
+		itemUpdateTransfer.setId(expectedItemId);
+		flowsheetGroupItems.add(itemUpdateTransfer);
+
+		List<FlowsheetItemGroupCreateUpdateTransfer> flowsheetGroups = new ArrayList<>();
+		FlowsheetItemGroupCreateUpdateTransfer groupUpdateTransfer = buildSimpleFlowsheetGroupTransfer(expectedGroupName, expectedGroupDescription, flowsheetGroupItems);
+		groupUpdateTransfer.setId(expectedGroupId);
+		flowsheetGroups.add(groupUpdateTransfer);
+
+		FlowsheetCreateTransfer transfer = buildSimpleUpdateFlowsheetTransfer(expectedFlowsheetId, expectedName, expectedDescription, flowsheetGroups);
+
+		Flowsheet flowsheet = converter.convert(transfer);
+
+		assertSame(existingFlowsheet, flowsheet);
+
+		// group entity relations match
+		assertEquals(1, flowsheet.getFlowsheetItemGroups().size());
+		FlowsheetItemGroup itemGroup = flowsheet.getFlowsheetItemGroups().get(0);
+		assertSame(flowsheet, itemGroup.getFlowsheet());
+
+		// item entity relations match
+		assertEquals(1, itemGroup.getFlowsheetItems().size());
+		FlowsheetItem updatedItem = itemGroup.getFlowsheetItems().get(0);
+		assertSame(flowsheet, updatedItem.getFlowsheet());
+		assertSame(itemGroup, updatedItem.getFlowsheetItemGroup());
+
+		// rule entity relations match
+		assertEquals(1, updatedItem.getDsRules().size());
+		Optional<DsRule> ruleOptional = updatedItem.getDsRules().stream().findFirst();
+		assertTrue(ruleOptional.isPresent());
+		assertSame(dsRuleMock, ruleOptional.get());
 	}
 
 	private FlowsheetCreateTransfer buildSimpleCreateFlowsheetTransfer(String name, String description, List<FlowsheetItemGroupCreateUpdateTransfer> groups)

@@ -89,6 +89,21 @@ public class FlowsheetItemGroup extends AbstractModel<Integer>
 		this.flowsheetItems.add(flowsheetItem);
 	}
 
+	/**
+	 * must be overridden to prevent default impl from infinite loading jpa links
+	 */
+	@Override
+	public int hashCode()
+	{
+		return id;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.getClass().getName() + "{id: " + id + ", name: " + name + "}";
+	}
+
 	@PrePersist
 	private void prePersist()
 	{
