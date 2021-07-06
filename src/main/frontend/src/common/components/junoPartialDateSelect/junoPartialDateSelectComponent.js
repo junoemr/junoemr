@@ -122,21 +122,21 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
             {
                 if (isYear)
                 {
-                    ctrl.ngModel.year = field;
+                    ctrl.ngModel.year = field || null;
                     ctrl.ngModel.yearValid = ctrl.dateValidations.yearValid();
                 }
                 else if (isMonth)
                 {
-                    ctrl.ngModel.month = field;
+                    ctrl.ngModel.month = field || null;
                     ctrl.ngModel.monthValid = ctrl.dateValidations.monthValid();
                 }
                 else if (isDay)
                 {
-                    ctrl.ngModel.day = field;
+                    ctrl.ngModel.day = field || null;
                     ctrl.ngModel.dayValid = ctrl.dateValidations.dayValid();
                 }
 
-                return field;
+                return field || null;
             }
         }
 
@@ -153,10 +153,22 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
         {
             ctrl.dateValidations =
             {
-                yearValid: Juno.Validations.validationYear(ctrl, "ngModel.year"),
-                monthValid: Juno.Validations.validationMonth(ctrl, "ngModel.month"),
-                dayValid: Juno.Validations.validationDay(ctrl, "ngModel.day"),
+                allFieldsBlank: Juno.Validations.validationFieldBlank(ctrl, "ngModel.year",
+                    Juno.Validations.validationFieldBlank(ctrl, "ngModel.month"),
+                    Juno.Validations.validationFieldBlank(ctrl, "ngModel.day"))
             };
+
+            ctrl.dateValidations.yearValid = Juno.Validations.validationFieldOr(
+                Juno.Validations.PartialDate.validationYear(ctrl, "ngModel.year"),
+                ctrl.dateValidations.allFieldsBlank);
+
+            ctrl.dateValidations.monthValid = Juno.Validations.validationFieldOr(
+                Juno.Validations.PartialDate.validationMonth(ctrl, "ngModel.month"),
+                Juno.Validations.validationFieldBlank(ctrl, "ngModel.day"));
+
+            ctrl.dateValidations.dayValid = Juno.Validations.validationFieldOr(
+                Juno.Validations.PartialDate.validationDay(ctrl, "ngModel.year","ngModel.month", "ngModel.day"),
+                Juno.Validations.validationFieldBlank(ctrl, "ngModel.day"));
         }
 
         ctrl.checkUnsetValidationFields = () =>

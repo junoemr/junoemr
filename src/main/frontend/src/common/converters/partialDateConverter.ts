@@ -1,27 +1,23 @@
 import { PartialDate } from "../../../generated";
 import PartialDateModel from "../models/partialDateModel"
+import AbstractConverter from "../../lib/conversion/AbstractConverter";
 
-export abstract class PartialDateConverter
+export default class PartialDateConverter extends AbstractConverter<PartialDate, PartialDateModel>
 {
-    public static convertToPartialDateModel(from: PartialDate): PartialDateModel
+    convert(from: PartialDate): PartialDateModel
     {
-        if (!from)
+        if (!from || !from.year)
         {
             return null;
         }
 
-        const partialDate = from as any;
         const partialDateModel = new PartialDateModel(null, null, null);
+        partialDateModel.year = parseInt(from.year.toString());
 
-        if (partialDate.year)
-        {
-            partialDateModel.year = parseInt(partialDate.year);
-        }
-
-        if (partialDate.month)
+        if (from.month)
         {
             let monthValue = 1;
-            switch (partialDate.month)
+            switch (from.month)
             {
                 case PartialDate.MonthEnum.JANUARY:
                     break;
@@ -62,50 +58,11 @@ export abstract class PartialDateConverter
             partialDateModel.month = monthValue;
         }
 
-        if (partialDate.day)
+        if (from.day)
         {
-            partialDateModel.day = parseInt(partialDate.day);
+            partialDateModel.day = from.day;
         }
 
         return partialDateModel;
-    }
-
-    public static convertToPartialDate(from: PartialDateModel): PartialDate
-    {
-        if (!from)
-        {
-            return null;
-        }
-
-        const partialDateModel = from as any;
-        const partialDate = {
-            "year": {leap: false, value: 1},
-            "month": 1,
-            "day": 1
-        } as PartialDate;
-
-        partialDate.year.leap = this.isLeapYear(partialDateModel.year);
-        partialDate.year.value = parseInt(partialDateModel.year);
-
-        partialDate.month = null;
-        if (partialDateModel.month)
-        {
-            partialDate.month = partialDateModel.month;
-        }
-
-        partialDate.day = null;
-        if (partialDateModel.day)
-        {
-            partialDate.day = partialDateModel.day;
-        }
-
-        return partialDate;
-    }
-
-    public static isLeapYear(year)
-    {
-        return (year % 4 == 0 &&
-            year % 100 == 0 &&
-            year % 400 == 0);
     }
 }

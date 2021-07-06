@@ -104,6 +104,24 @@ Juno.Validations.validationFieldRequired = function(obj, field, ...validationFun
 	}
 };
 
+Juno.Validations.validationFieldBlank = function(obj, field, ...validationFunc)
+{
+	return function validationFunction ()
+	{
+		let value = Juno.Validations.getAttribute(obj, field);
+		let fieldBlank = false;
+		if (!value)
+		{
+			 fieldBlank = true;
+		}
+		if (typeof (value) === "string" && value.length === 0)
+		{
+			fieldBlank = true;
+		}
+
+		return fieldBlank && Juno.Validations.validationFieldsChain(...validationFunc);
+	}
+}
 /**
  * valid if the field is (blank / undefined / null) or ( if validationFunction(s) is true)
  * @param obj - object to check
@@ -247,88 +265,99 @@ Juno.Validations.validationPhone = function (obj, field, ...validationFunc)
 	}
 };
 
-Juno.Validations.validationYear = (obj, field, ...validationFunc) =>
+Juno.Validations.PartialDate =
 {
-	return function validationFunction ()
+	validationYear: function (obj, field, ...validationFunc)
 	{
-		let yearValue = Juno.Validations.getAttribute(obj, field);
-		let monthValue = Juno.Validations.getAttribute(obj, "ngModel.month");
-		let dayValue = Juno.Validations.getAttribute(obj, "ngModel.day");
-
-		if ((!yearValue && monthValue) || (!yearValue && !monthValue && dayValue))
+		return function validationFunction ()
 		{
-			return false;
-		}
+			let yearValue = Juno.Validations.getAttribute(obj, field);
 
-		if (yearValue)
-		{
-			let currentMoment = moment(yearValue + "-" + "01" + "-" + "01", "YYYY-MM-DD", true);
+			if (!yearValue)
+			{
+				return false;
+			}
+
+			let currentMoment = moment({year: yearValue, month: 1, day: 1});
 
 			if (!currentMoment.isValid() || yearValue < 1900)
 			{
 				return false;
 			}
+
+			return Juno.Validations.validationFieldsChain(...validationFunc);
 		}
+	},
 
-		return Juno.Validations.validationFieldsChain(...validationFunc);
-	}
-};
-
-Juno.Validations.validationMonth = (obj, field, ...validationFunc) =>
-{
-	return function validationFunction ()
+	validationMonth: function (obj, field, ...validationFunc)
 	{
-		let yearValue = Juno.Validations.getAttribute(obj, "ngModel.year");
-		let monthValue = Juno.Validations.getAttribute(obj, field);
-		let dayValue = Juno.Validations.getAttribute(obj, "ngModel.day");
-
-		if (!monthValue && dayValue)
+		return function validationFunction ()
 		{
-			return false;
-		}
+			let monthValue = Juno.Validations.getAttribute(obj, field);
 
-		if (monthValue)
-		{
-			let currentMoment = moment("1900" + "-" + monthValue + "-" + "01", "YYYY-MM-DD", true);
+			if (!monthValue || monthValue === 0)
+			{
+				return false;
+			}
+
+			if (typeof monthValue !== "number")
+			{
+				monthValue = parseInt(monthValue);
+				if (Number.isNaN(monthValue))
+				{
+					return false;
+				}
+			}
+			monthValue -= 1; // Moment uses 0 indexed months
+
+			let currentMoment = moment({year: 1900, month: monthValue, day: 1});
 
 			if (!currentMoment.isValid())
 			{
 				return false;
 			}
+
+			return Juno.Validations.validationFieldsChain(...validationFunc);
 		}
+	},
 
-		return Juno.Validations.validationFieldsChain(...validationFunc);
-	}
-};
-
-Juno.Validations.validationDay = (obj, field, ...validationFunc) =>
-{
-	return function validationFunction ()
+	validationDay: function (obj, year, month, day, ...validationFunc)
 	{
-		let yearValue = Juno.Validations.getAttribute(obj, "ngModel.year");
-		let monthValue = Juno.Validations.getAttribute(obj, "ngModel.month");
-		let dayValue = Juno.Validations.getAttribute(obj, field);
-
-		if (!yearValue)
+		return function validationFunction ()
 		{
-			yearValue = "1900";
-		}
+			let yearValue = Juno.Validations.getAttribute(obj, year);
+			let monthValue = Juno.Validations.getAttribute(obj, month);
+			let dayValue = Juno.Validations.getAttribute(obj, day);
 
-		if (!monthValue)
-		{
-			monthValue = "01";
-		}
+			if (!dayValue)
+			{
+				return false
+			}
 
-		if (dayValue)
-		{
-			let currentMoment = moment(yearValue + "-" + monthValue + "-" + dayValue, "YYYY-MM-DD", true);
+			if (!yearValue)
+			{
+				yearValue = 1900;
+			}
+
+			if (monthValue && monthValue > 0 && monthValue < 13)
+			{
+				monthValue -= 1; // Moment uses 0 indexed months
+			}
+			else
+			{
+				monthValue = 0;
+			}
+
+			dayValue = parseInt(dayValue.toString());
+
+			let currentMoment = moment({year: yearValue, month: monthValue, day: dayValue});
 
 			if (!currentMoment.isValid())
 			{
 				return false;
 			}
-		}
 
-		return Juno.Validations.validationFieldsChain(...validationFunc);
+			return Juno.Validations.validationFieldsChain(...validationFunc);
+		}
 	}
 };

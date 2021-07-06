@@ -461,21 +461,6 @@ public class NotesService extends AbstractServiceImpl
 			NoteTo1 note = noteIssue.getEncounterNote();
 			NoteExtTo1 noteExtTo1 = noteIssue.getGroupNoteExt();
 
-			if (noteExtTo1.getStartDate() != null && org.oscarehr.dataMigration.model.common.PartialDate.allFieldsEmpty(noteExtTo1.getStartDate()))
-			{
-				noteExtTo1.setStartDate(null);
-			}
-
-			if (noteExtTo1.getResolutionDate() != null && org.oscarehr.dataMigration.model.common.PartialDate.allFieldsEmpty(noteExtTo1.getResolutionDate()))
-			{
-				noteExtTo1.setResolutionDate(null);
-			}
-
-			if (noteExtTo1.getProcedureDate() != null && org.oscarehr.dataMigration.model.common.PartialDate.allFieldsEmpty(noteExtTo1.getProcedureDate()))
-			{
-				noteExtTo1.setProcedureDate(null);
-			}
-
 			IssueTo1 issueTo1 = noteIssue.getIssue();
 			List<CaseManagementIssueTo1> assignedCMIssues = noteIssue.getAssignedCMIssues();
 			String annotationAttribute = noteIssue.getAnnotation_attrib();

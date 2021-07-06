@@ -225,13 +225,4 @@ public class PartialDate extends AbstractTransientModel
 		}
 		return partialDate;
 	}
-
-	public static boolean allFieldsEmpty(PartialDate partialDate)
-	{
-		if (partialDate.getYear() == null && partialDate.getMonth() == null && partialDate.getDay() == null)
-		{
-			return true;
-		}
-		return false;
-	}
 }
