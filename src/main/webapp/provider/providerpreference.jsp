@@ -688,7 +688,7 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 						<% for (ProviderPreference.AppointmentReasonDisplayLevel displayLevel : ProviderPreference.AppointmentReasonDisplayLevel.values())
 						{
 							// There is already an option to toggle this on and off, so allowing none as an option is redundant.
-                            				// None is meant for the Juno UI, where no such toggle exists.
+                            // AppointmentDisplayLevel.NONE is meant for the Juno UI, where no such toggle exists.
 							if (displayLevel != ProviderPreference.AppointmentReasonDisplayLevel.NONE)
 							{
 						%>
