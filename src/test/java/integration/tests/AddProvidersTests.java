@@ -65,6 +65,7 @@ public class AddProvidersTests extends SeleniumTestBase
 		// Add a provider record page
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//h5[contains(.,'Add a Provider Record')]")));
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
+		Thread.sleep(2000);
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).clear();
