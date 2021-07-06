@@ -30,6 +30,7 @@ angular.module("Messaging.Components.View.Components").component('message', {
 	bindings: {
 		message: "<",
 		messagingService: "<",
+		compact: "<",
 	},
 	controller: [
 		"$scope",
@@ -44,6 +45,8 @@ angular.module("Messaging.Components.View.Components").component('message', {
 
 			ctrl.$onInit = async () =>
 			{
+				ctrl.compact = ctrl.compact || false;
+
 				try
 				{
 					ctrl.loading = true;

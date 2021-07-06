@@ -7,4 +7,20 @@
 		color: var(--color-primary-base);
 		text-decoration: underline;
 	}
+
+	&.compact {
+
+		.message-container {
+			margin-top: 8px;
+		}
+
+		.recipients-container, .subject-container {
+			margin-top: 8px;
+
+			> div {
+				display: inline-block;
+				margin: 0;
+			}
+		}
+	}
 }

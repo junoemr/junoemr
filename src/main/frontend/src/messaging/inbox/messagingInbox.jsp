@@ -1,6 +1,6 @@
 <page-wrapper class="messaging-inbox" no-header="$ctrl.recordPageEmbedded" dont-set-height="$ctrl.recordPageEmbedded">
 	<page-header class="flex-row align-items-center h-100">
-		<h6>Patient Messenger</h6>
+		<h6>{{stringResources.getString("inbox.pageTitle")}}</h6>
 	</page-header>
 	<page-body class="flex-item-grow flex-col messaging-inbox" ng-class="{'record-page-embedded': $ctrl.recordPageEmbedded}">
 		<inbox-header-bar ng-if="$ctrl.backend"

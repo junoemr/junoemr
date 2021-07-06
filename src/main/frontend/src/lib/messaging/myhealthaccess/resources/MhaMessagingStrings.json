@@ -1,0 +1,13 @@
+{
+  "inbox":
+  {
+    "pageTitle": "Patient Messenger",
+    "messageCompose":
+    {
+      "attachmentSelect":
+      {
+        "eChartNotAvailableTooltip": "This patient has not been verified. Documents from the patients chart cannot be shared until their MyHealthAccess account has been verified."
+      }
+    }
+  }
+}

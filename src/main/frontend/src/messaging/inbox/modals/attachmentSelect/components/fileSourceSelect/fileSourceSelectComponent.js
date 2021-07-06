@@ -23,6 +23,7 @@
 
 import {FileSource} from "./FileSource";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../../common/components/junoComponentConstants";
+import MessagingStringResourceSetFactory from "../../../../../../lib/messaging/factory/MessagingStringResourceSetFactory";
 
 angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSourceSelect', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/components/fileSourceSelect/fileSourceSelect.jsp',
@@ -31,6 +32,7 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 		onSourceSelected: "&?",
 		hideChartSources: "<?",
 		messageable: "<?",
+		backend: "<",
 	},
 	controller: [
 		"$scope",
@@ -46,6 +48,7 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 				ctrl.selectedSource = ctrl.selectedSource || FileSource.DOCUMENTS;
 				ctrl.hideChartSources = ctrl.hideChartSources || false;
 				ctrl.confidenceLevelMessage = await ctrl.messageable.localMappingConfidenceExplanationString();
+				$scope.stringResources = MessagingStringResourceSetFactory.build(ctrl.backend);
 			}
 
 			ctrl.selectSource = (source) =>

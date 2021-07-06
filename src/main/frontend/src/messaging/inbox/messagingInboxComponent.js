@@ -25,6 +25,7 @@ import MessagingServiceFactory from "../../lib/messaging/factory/MessagingServic
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import StreamingList from "../../lib/util/StreamingList";
 import {MessageGroup} from "../../lib/messaging/model/MessageGroup";
+import MessagingStringResourceSetFactory from "../../lib/messaging/factory/MessagingStringResourceSetFactory";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',
@@ -41,6 +42,9 @@ angular.module("Messaging").component('messagingInbox', {
 		)
 	{
 		const ctrl = this;
+
+		$scope.stringResources = MessagingStringResourceSetFactory.build($stateParams.backend);
+
 		ctrl.backend = $stateParams.backend;
 		ctrl.selectedSourceId = $stateParams.source;
 		ctrl.selectedGroupId = $stateParams.group;

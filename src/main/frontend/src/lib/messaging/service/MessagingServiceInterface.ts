@@ -6,12 +6,18 @@ import Messageable from "../model/Messageable";
 import StreamingList from "../../util/StreamingList";
 import Conversation from "../model/Conversation";
 import Attachment from "../model/Attachment";
+import {MessagingServiceType} from "../model/MessagingServiceType";
 
 export default interface MessagingServiceInterface
 {
 	// ==========================================================================
 	// Interface Methods
 	// ==========================================================================
+
+	/**
+	 * @return the type of this messaging service.
+	 */
+	getType(): MessagingServiceType
 
 	/**
 	 * get a message

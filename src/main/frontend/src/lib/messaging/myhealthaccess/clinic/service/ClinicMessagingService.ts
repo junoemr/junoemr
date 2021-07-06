@@ -16,12 +16,12 @@ import {message} from "gulp-typescript/release/utils";
 import MessageDtoToMhaMessageConverter from "../../converter/MessageDtoToMhaMessageConverter";
 import ConversationDtoToMhaConversationConverter from "../../converter/ConversationDtoToMhaConversationConverter";
 import Messageable from "../../../model/Messageable";
-import PatientTo1ToMhaPatientConverter
-	from "../../../../integration/myhealthaccess/converter/PatientTo1ToMhaPatientConverter";
+import PatientTo1ToMhaPatientConverter from "../../../../integration/myhealthaccess/converter/PatientTo1ToMhaPatientConverter";
 import MhaPatientToMessageableConverter from "../../converter/MhaPatientToMessageableConverter";
 import MhaMessage from "../model/MhaMessage";
 import MhaAttachment from "../model/MhaAttachment";
 import {StreamSource} from "../../../../util/StreamSource";
+import {MessagingServiceType} from "../../../model/MessagingServiceType";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
@@ -59,6 +59,14 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	// ==========================================================================
 	// MessagingServiceInterface Implementation
 	// ==========================================================================
+
+	/**
+	 * @return the type of this messaging service.
+	 */
+	getType(): MessagingServiceType
+	{
+		return MessagingServiceType.MHA_CLINIC;
+	}
 
 	/**
 	 * get a message
