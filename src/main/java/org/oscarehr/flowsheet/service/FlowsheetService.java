@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -80,6 +81,26 @@ public class FlowsheetService
 				.forEach((item) -> item.setDeletedBy(updatingProviderId));
 
 		flowsheetDao.merge(entity);
+
+		//TODO figure out how to return the new version of the entity correctly.
+		// reload seems to prevent the merge cascade from updating entities properly
+		// so for now we must remove deleted items from the returned entity
+		entity.setFlowsheetItemGroups(
+				entity.getFlowsheetItemGroups()
+						.stream()
+						.filter((group) -> group.getDeletedAt() == null)
+						.collect(Collectors.toList()));
+		entity.getFlowsheetItemGroups().forEach(
+				(group) -> group.setFlowsheetItems(
+						group.getFlowsheetItems()
+								.stream()
+								.filter((item) -> item.getDeletedAt() == null)
+								.collect(Collectors.toList())));
+		entity.setFlowsheetItems(
+				entity.getFlowsheetItems()
+						.stream()
+						.filter((item) -> item.getDeletedAt() == null)
+						.collect(Collectors.toList()));
 
 		return flowsheetEntityToModelConverter.convert(entity);
 	}
