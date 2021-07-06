@@ -90,8 +90,10 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 				
 			}
 			String issueString = issueBuilder.toString();
-			
+
+			// Note: This statement won't ever get hit because isCppItem checks for a specific list of issues
 			if( preferenceManager.isCppItem(issueString) && preferenceManager.isCustomSummaryEnabled(loggedInInfo) ){
+				// Note: This statement won't ever get hit because getCppExtsItem checks for a specific list of issues
 				cppExts = preferenceManager.getCppExtsItem(loggedInInfo, caseManagementMgr.getExtByNote(note.getId()), issueString);
 			}
 			logger.debug("IssueString "+issueString+" ccpExts "+cppExts);

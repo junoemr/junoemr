@@ -5,7 +5,7 @@
 	<button ng-class="$ctrl.buttonClasses()"
 	        ng-style="$ctrl.buttonStyle();"
 	        ng-disabled="$ctrl.disabled"
-			ng-click="$ctrl.clickHandler()">
+			ng-click="$ctrl.clickHandler($event)">
 		<ng-transclude>
 		</ng-transclude>
 	</button>

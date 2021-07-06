@@ -120,7 +120,6 @@ public class DemographicManager {
 			"or semicolons are allowed.";
 	public static final String FIELD_UNSAFE = "No html tags and no quotes, line breaks " +
 			"or semicolons are allowed.";
-
 	//endregion
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -377,13 +376,10 @@ public class DemographicManager {
 		String currentStatus = demographic.getPatientStatus();
 		Date currentStatusDate = demographic.getPatientStatusDate();
 
-		if (!(previousStatus.equals(currentStatus)))
+		// fill in a default patient status date if the status changes and no date is given
+		if (!currentStatus.equals(previousStatus) && currentStatusDate == null)
 		{
 			demographic.setPatientStatusDate(new Date());
-		}
-		else if (previousStatusDate != null && previousStatusDate.compareTo(currentStatusDate) != 0)
-		{
-			demographic.setPatientStatusDate(currentStatusDate);
 		}
 
 		//save current demo
