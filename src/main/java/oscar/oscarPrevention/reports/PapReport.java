@@ -26,6 +26,14 @@
 package oscar.oscarPrevention.reports;
 
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,35 +46,22 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
 import oscar.util.UtilDateUtilities;
 
 /**
  *
  * @author jay
  */
-public class PapReport implements PreventionReport
-{
+public class PapReport implements PreventionReport {
     private static Logger log = MiscUtils.getLogger();
-
-    /**
-     * Creates a new instance of PapReport
-     */
-    public PapReport()
-    {
+    /** Creates a new instance of PapReport */
+    public PapReport() {
     }
 
-    public boolean displayNumShots()
-    {
-        return false;
-    }
+	public boolean displayNumShots()
+	{
+		return false;
+	}
 
     public Hashtable runReport(LoggedInInfo loggedInInfo,ArrayList list,Date asofDate){
         int inList = 0;
@@ -136,6 +131,7 @@ public class PapReport implements PreventionReport
 
 
                 Calendar cal = Calendar.getInstance();
+                cal.setTime(asofDate);
                 cal.add(Calendar.YEAR, -3);
                 Date dueDate = cal.getTime();
                 cal.add(Calendar.MONTH,-6);
@@ -180,31 +176,44 @@ public class PapReport implements PreventionReport
                 log.debug("due Date "+dueDate.toString()+" cutoffDate "+cutoffDate.toString()+" prevDate "+prevDate.toString());
                 log.debug("due Date  ("+dueDate.toString()+" ) After Prev ("+prevDate.toString() +" ) "+dueDate.after(prevDate));
                 log.debug("cutoff Date  ("+cutoffDate.toString()+" ) before Prev ("+prevDate.toString() +" ) "+cutoffDate.before(prevDate));
-                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate)){ // overdue
+
+                // due
+                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "due";
                    prd.numMonths = numMonths;
                    prd.color = "yellow"; //FF00FF
-                   if (!prd.bonusStatus.equals("Y")){
+                   if (!prd.bonusStatus.equals("Y"))
+                   {
                       prd.bonusStatus = "Y";
                       doneWithGrace++;
                    }
-
-                } else if (!refused && cutoffDate.after(prevDate)){ // overdue
+                }
+                // overdue
+                else if (!refused && cutoffDate.after(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "Overdue";
                    prd.numMonths = numMonths;
                    prd.color = "red"; //FF00FF
 
-                } else if (refused){  // recorded and refused
+                }
+                // recorded and refused
+                else if (refused)
+                {
                    prd.rank = 3;
                    prd.lastDate = prevDateStr;
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
-                } else if (dueDate.before(prevDate)  ){  // recorded done
+
+                }
+                // recorded done
+                else if (dueDate.before(prevDate))
+                {
                    prd.rank = 4;
                    prd.lastDate = prevDateStr;
                    prd.state = "Up to date";
@@ -437,7 +446,6 @@ public class PapReport implements PreventionReport
        }
        return null;
    }
-
 }
 
 

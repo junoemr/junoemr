@@ -1,3 +1,8 @@
+:root {
+	--juno-form-input-default-padding-left: 16px;
+	--juno-form-input-default-padding-right: 16px;
+}
+
 @mixin juno-form-inputs-colors($text-color, $background-color, $border-color,
 			$active-text-color, $active-background-color, $active-border-color,
 			$disabled-text-color, $disabled-background-color, $disabled-border-color) {
@@ -47,7 +52,7 @@
 	input, select {
 		@include juno-font-body-smallest;
 		height: 32px;
-		padding: 0 16px 0 16px;
+		padding: 0 var(--juno-form-input-default-padding-right) 0 var(--juno-form-input-default-padding-left);
 
 		border-radius: $border-radius;
 		border: solid $border-width;

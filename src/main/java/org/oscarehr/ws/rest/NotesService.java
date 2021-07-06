@@ -88,6 +88,7 @@ import oscar.oscarEncounter.pageUtil.EctSessionBean;
 import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -454,7 +455,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo, NoteIssueTo1 noteIssue) {
+	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo, @Valid NoteIssueTo1 noteIssue) {
 
 		try {
 			NoteTo1 note = noteIssue.getEncounterNote();

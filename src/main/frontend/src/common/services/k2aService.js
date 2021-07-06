@@ -26,15 +26,31 @@
 
  */
 
+import {SystemPreferenceApi} from "../../../generated";
+
 angular.module("Common.Services").service("k2aService", [
 	'$q',
 	'junoHttp',
-	function($q, junoHttp)
+	'$http',
+	'$httpParamSerializer',
+	
+	function($q, junoHttp, $http, $httpParamSerializer)
 	{
 		var service = {};
-
+		
 		service.apiPath = '../ws/rs';
-
+		service.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, service.apiPath);
+		
+		/**
+		 * Determine if the know2Act integration is enabled.  This is the not the same as "isActive or isInit"
+		 * @returns Promise
+		 */
+		service.isK2AEnabled = async () =>
+		{
+			const response = await service.systemPreferenceApi.getPreferenceEnabled("integration.know2Act.enabled");
+			return response.data.body;
+		}
+		
 		service.getK2aFeed = function getK2aFeed(startPoint, numberOfRows)
 		{
 			var deferred = $q.defer();
@@ -55,12 +71,19 @@ angular.module("Common.Services").service("k2aService", [
 				});
 			return deferred.promise;
 		};
-
+		
+		/**
+		 * Determine if K2A is Active.  For it to be active, it must satisfy both conditions:
+		 * 1) enabled via super admin integration
+		 * 2) set up by the user
+		 *
+		 * @returns Promise{boolean}
+		 */
 		service.isK2AInit = function isK2AInit()
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
-
+			
 			junoHttp.get(service.apiPath + '/app/K2AActive', config).then(
 				function success(response)
 				{
@@ -68,10 +91,10 @@ angular.module("Common.Services").service("k2aService", [
 				},
 				function error(error)
 				{
-					console.log("k2aService::isK2AInit error", error);
+					console.error("k2aService::isK2AInit error", error);
 					deferred.reject("An error occured while getting k2a content");
 				});
-
+			
 			return deferred.promise;
 		};
 
@@ -89,7 +112,7 @@ angular.module("Common.Services").service("k2aService", [
 				},
 				function error(error)
 				{
-					console.log("k2aService::initK2A error", error);
+					console.error("k2aService::initK2A error", error);
 					deferred.reject("An error occured while trying to initialize k2a");
 				});
 

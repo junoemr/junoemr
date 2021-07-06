@@ -62,7 +62,13 @@ angular.module('Admin.Section').component('integrationModules',
 				name: "Ocean ToolBar",
 				enabled: false,
 				propertyName: "integration.OceanToolBar.enabled",
-				configUrl:""
+				configUrl: ""
+			},
+			{
+				name: "Know2Act",
+				enabled: false,
+				propertyName: "integration.know2Act.enabled",
+				configUrl: ""
 			}
 		];
 

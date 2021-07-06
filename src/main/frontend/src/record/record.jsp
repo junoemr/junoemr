@@ -149,22 +149,12 @@
 							</a>
 
 							<a href="javascript:void(0)"
-							   ng-if="tab.dropdown">
-								{{tab.label}}
-								<span class="caret"></span>
+							   ng-if="tab.dropdown"
+							   ng-repeat="dropdownItem in tab.dropdownItems"
+							   ng-class="{'active': recordCtrl.isActive(dropdownItem) }"
+							   ng-click="recordCtrl.changeTab(dropdownItem)">
+								{{dropdownItem.label}}
 							</a>
-							<ul ng-if="tab.dropdown"
-								class="dropdown-menu"
-								role="menu">
-								<li ng-repeat="dropDownItem in tab.dropdownItems"
-									ng-class="{'active': recordCtrl.isActive(dropDownItem) }">
-									<a href="javascript:void(0)"
-									   ng-click="recordCtrl.changeTab(dropDownItem)">
-										{{dropDownItem.label}}
-									</a>
-								</li>
-							</ul>
-
 						</li>
 					</ul>
 				</li>

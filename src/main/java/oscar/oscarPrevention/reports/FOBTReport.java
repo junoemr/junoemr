@@ -25,8 +25,18 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+import oscar.util.ConversionUtils;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -37,34 +47,24 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
-import oscar.util.UtilDateUtilities;
-
 /**
  *
  * @author jay
  */
 public class FOBTReport implements PreventionReport{
     private static Logger log = MiscUtils.getLogger();
-
-
+    
     /** Creates a new instance of MammogramReport */
     public FOBTReport() {
     }
-
-    public boolean displayNumShots()
-    {
-        return false;
-    }
-
-    public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo,ArrayList<ArrayList<String>> list,Date asofDate){
+	
+	@Override
+	public boolean displayNumShots()
+	{
+		return false;
+	}
+	
+	public Hashtable<String,Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate){
 
         int inList = 0;
         double done= 0,doneWithGrace = 0;
@@ -113,8 +113,10 @@ public class FOBTReport implements PreventionReport{
                 }
 
                 Calendar cal = Calendar.getInstance();
+                cal.setTime(asofDate);
                 cal.add(Calendar.YEAR, -2);
                 Date dueDate = cal.getTime();
+                cal.setTime((dueDate));
                 cal.add(Calendar.MONTH,-6);
                 Date cutoffDate = cal.getTime();
 
@@ -147,8 +149,9 @@ public class FOBTReport implements PreventionReport{
                 //Calendar today = Calendar.getInstance();
                 //change as of date to run the report for a different year
                 String numMonths = "------";
-                if ( prevDate != null){
-                   int num = UtilDateUtilities.getNumMonths(prevDate,asofDate);
+                if (prevDate != null){
+                    long num = ChronoUnit.MONTHS.between(ConversionUtils.toLocalDate(ConversionUtils.toDateString(prevDate)),
+                            ConversionUtils.toLocalDate(ConversionUtils.toDateString(asofDate)));
                    numMonths = ""+num+" months";
                 }
 
@@ -157,7 +160,10 @@ public class FOBTReport implements PreventionReport{
                 log.debug("due Date "+dueDate.toString()+" cutoffDate "+cutoffDate.toString()+" prevDate "+prevDate.toString());
                 log.debug("due Date  ("+dueDate.toString()+" ) After Prev ("+prevDate.toString() +" ) "+dueDate.after(prevDate));
                 log.debug("cutoff Date  ("+cutoffDate.toString()+" ) before Prev ("+prevDate.toString() +" ) "+cutoffDate.before(prevDate));
-                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate)){ // overdue
+
+                // due
+                if (!refused && dueDate.after(prevDate) && cutoffDate.before(prevDate))
+                {
                    prd.rank = 2;
                    prd.lastDate = prevDateStr;
                    prd.state = "due";

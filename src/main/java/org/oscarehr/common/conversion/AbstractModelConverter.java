@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractModelConverter<T, K> implements ListModelConverter<T, K>
 {
 	@Override
-	public List<K> convert(Collection<T> entities)
+	public List<K> convert(Collection<? extends T> entities)
 	{
 		return entities.stream().map(this::convert).collect(Collectors.toList());
 	}

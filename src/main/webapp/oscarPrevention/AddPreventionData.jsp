@@ -29,24 +29,33 @@
 <%@ page import="org.oscarehr.common.dao.PreventionsLotNrsDao"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
 <%@ page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@ page import="org.oscarehr.prevention.model.Prevention" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@ page import="oscar.oscarPrevention.PreventionData" %>
 <%@ page import="oscar.oscarPrevention.PreventionDisplayConfig" %>
-<%@ page import="oscar.oscarProvider.data.ProviderData"%>
-<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.prevention.model.Prevention" %>
+<%@ page import="org.oscarehr.common.dao.PartialDateDao" %>
+<%@ page import="org.oscarehr.common.model.PartialDate" %>
+<%@ page import="javassist.compiler.ast.StringL" %>
+<%@ page import="java.util.Arrays" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	  boolean authed=true;
@@ -55,6 +64,7 @@
 	<%authed=false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_prevention");%>
 </security:oscarSec>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
 
     if(!authed)
@@ -68,12 +78,16 @@
     }
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
+    ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
     String demographic_no = request.getParameter("demographic_no");
+    PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
     String id = request.getParameter("id");
     Map<String, Object> existingPrevention = null;
 
     String providerName = "";
     String lot = "";
+    String din = "";
     String provider = (String) session.getValue("user");
     Date currentDate = new Date();
     String prevDate = ConversionUtils.toDateString(currentDate, ConversionUtils.TS_NO_SEC_PATTERN);
@@ -92,7 +106,11 @@
     {
         existingPrevention = PreventionData.getPreventionById(id);
 
-        prevDate = (String) existingPrevention.get("preventionDate");
+
+
+        String prevDate1 = (String) existingPrevention.get("preventionDate");
+        prevDate = partialDateDao.getDatePartial(prevDate1, PartialDate.TABLE_PREVENTIONS, Integer.parseInt(id), PartialDate.PREVENTION_DATE);
+
         providerName = (String) existingPrevention.get("providerName");
         provider = (String) existingPrevention.get("provider_no");
         creatorProviderNo = (String) existingPrevention.get("creator");
@@ -117,8 +135,7 @@
         }
         summary = (String) existingPrevention.get("summary");
         extraData = PreventionData.getPreventionKeyValues(id);
-        lot = extraData.get("lot");
-     
+
 	    CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	    List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.PREVENTIONS, Long.valueOf(id));
 	    hasImportExtra = (cml.size()>0);
@@ -144,17 +161,19 @@
         layoutType = "default";
     }
 
-    List<Map<String, String>>  providers = ProviderData.getProviderList();
+    List<String> providerTypes = Arrays.asList(ProviderData.PROVIDER_TYPE_DOCTOR, ProviderData.PROVIDER_TYPE_NURSE);
+    List<ProviderData> providerList = providerDataDao.findAllByType(providerTypes);
+
     if (creatorProviderNo.isEmpty())
     {
 	    creatorProviderNo = provider;
     }
 
-    for (Map<String, String> providerMap : providers)
+    for (ProviderData currentProvider : providerList)
     {
-        if (providerMap.get("providerNo").equals(creatorProviderNo))
+        if (currentProvider.getProviderNo().toString().equals(creatorProviderNo))
         {
-            creatorName = providerMap.get("lastName") + " " + providerMap.get("firstName");
+            creatorName = currentProvider.getDisplayName();
         }
     }
   
@@ -187,9 +206,18 @@
 <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css">
 <link rel="stylesheet" type="text/css" media="all" href="../share/calendar/calendar.css" title="win2k-cold-1" />
 
+
+    <script type="text/javascript" src="${ ctx }/js/jquery-1.7.1.min.js" ></script>
+    <script type="text/javascript" src="${ ctx }/js/jquery-ui-1.8.18.custom.min.js" ></script>
+
 <script type="text/javascript" src="../share/calendar/calendar.js" ></script>
 <script type="text/javascript" src="../share/calendar/lang/<bean:message key="global.javascript.calendar"/>" ></script>
 <script type="text/javascript" src="../share/calendar/calendar-setup.js" ></script>
+
+
+    <script>
+        jQuery.noConflict();
+    </script>
 
 <style type="text/css">
   div.ImmSet h2 {  }
@@ -397,7 +425,7 @@ clear: left;
 	  {
 	   		hideItem('lot');
 	  }
-	  }
+  }
 
 
 var warnOnWindowClose=true;
@@ -486,12 +514,12 @@ function displayCloseWarning(){
                             <input name="given" type="radio" value="ineligible" <%=checked(completed,"2")%>>Ineligible</input>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Date:</label>    <input readonly='readonly' type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
+                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -501,12 +529,12 @@ function displayCloseWarning(){
                    </fieldset>
                    <fieldset >
                       <legend >Result</legend>
-             			 <label for="name">Name:</label> <input type="text" name="name" value="<%=str((extraData.get("name")),"")%>"/> <br/>
-                         <label for="location">Location:</label> <input type="text" name="location" value="<%=str((extraData.get("location")),"")%>"/> <br/>
-                         <label for="route">Route:</label> <input type="text" name="route"   value="<%=str((extraData.get("route")),"")%>"/><br/>
-                         <label for="dose">Dose:</label> <input type="text" name="dose"  value="<%=str((extraData.get("dose")),"")%>"/><br/>
-                         <label for="lot">Lot:</label>  <input type="text" name="lot" id="lot" value="<%=str(lot,"")%>" />
-                        <select onchange="javascript:updateLotNr(this);" id="lotDrop" name="lotItem" >
+             			 <label for="name">Name:</label> <input type="text" name="name" id="name" value="<%=str((extraData.get("name")),"")%>"/> <br/>
+                         <label for="location">Location:</label> <input type="text" name="location" id="location" value="<%=str((extraData.get("location")),"")%>"/> <br/>
+                         <label for="route">Route:</label> <input type="text" name="route" id="route" value="<%=str((extraData.get("route")),"")%>"/><br/>
+                         <label for="dose">Dose:</label> <input type="text" name="dose" id="dose" value="<%=str((extraData.get("dose")),"")%>"/><br/>
+                         <label for="lot">Lot:</label>  <input type="text" name="lot" id="lot" value="<%=str((extraData.get("lot")),"")%>" />
+                         <select onchange="javascript:updateLotNr(this);" id="lotDrop" name="lotItem" >
                             <%
                                 boolean isLotNumberACustomLot = false;
                             %>
@@ -520,6 +548,7 @@ function displayCloseWarning(){
                             <%}%>
                             <option value="-1" <%=isLotNumberACustomLot ? "" : "selected" %>selected >Other</option>
                          </select><br/>
+                         <label for="din">DIN:</label>  <input type="text" name="din" id="din" value="<%=str((extraData.get("din")), "")%>" /><br/>
                          <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture" id="manufacture"  value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
                    </fieldset>
                    <fieldset >
@@ -543,12 +572,12 @@ function displayCloseWarning(){
                             <input name="given" type="radio" value="ineligible" <%=checked(completed,"2")%>>Ineligible</input>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" readonly='readonly' name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
+                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -561,10 +590,11 @@ function displayCloseWarning(){
                          <label for="location">Location:</label> <input type="text" name="location" value="<%=str((extraData.get("location")),"")%>"/> <br/>
                          <label for="route">Route:</label> <input type="text" name="route"   value="<%=str((extraData.get("route")),"")%>"/><br/>
                          <label for="dose">Dose:</label> <input type="text" name="dose"  value="<%=str((extraData.get("dose")),"")%>"/><br/>
-			 <label for="dose1">Dose 1:</label> <input type="checkbox" name="dose1" value="true" <%=checked(str((extraData.get("dose1")),""),"true")%>/><br/>
+                         <label for="dose1">Dose 1:</label> <input type="checkbox" name="dose1" value="true" <%=checked(str((extraData.get("dose1")),""),"true")%>/><br/>
                          <label for="dose2">Dose 2:</label> <input type="checkbox" name="dose2"  value="true" <%=checked(str((extraData.get("dose2")),""),"true")%>/><br/>
                          <label for="lot">Lot:</label> <input type="text" name="lot"  value="<%=str((extraData.get("lot")),"")%>"/><br/>
-                         <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture"   value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
+                         <label for="din">DIN:</label> <input type="text" name="din" value="<%=str((extraData.get("din")),"")%>"/><br/>
+                       <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture"   value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
                    </fieldset>
                    <fieldset>
                        <legend>Info</legend>
@@ -638,12 +668,12 @@ function displayCloseWarning(){
                             <input name="given" type="radio" value="ineligible" <%=checked(completed,"2")%>>Ineligible</input><br/>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" readonly='readonly' name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
+                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName() %></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -678,12 +708,12 @@ function displayCloseWarning(){
                             <input name="given" type="radio" value="previous" <%=checked(completed,"2")%>>Previous</input>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" readonly='readonly' name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
+                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="15" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="hidden" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
-                                      <%for (int i=0; i < providers.size(); i++) {
-                                           Map<String,String> h = providers.get(i);%>
-                                        <option value="<%= h.get("providerNo")%>" <%= ( h.get("providerNo").equals(provider) ? " selected" : "" ) %>><%= h.get("lastName") %> <%= h.get("firstName") %></option>
+                                      <%for (int i = 0; i < providerList.size(); i++) {
+                                           ProviderData providerData = providerList.get(i);%>
+                                        <option value="<%= providerData.getProviderNo().toString()%>" <%= ( providerData.getProviderNo().toString().equals(provider) ? " selected" : "" ) %>><%= providerData.getDisplayName()%></option>
                                       <%}%>
                                       <option value="-1" <%= ( "-1".equals(provider) ? " selected" : "" ) %> >Other</option>
                                   </select>
@@ -711,7 +741,7 @@ function displayCloseWarning(){
                    </fieldset>
                </div>
                <br/>
-               <input type="submit" value="Save">
+               <input type="submit" value="Save" onclick=" return validatePreventionDate()">
                <% if ( id != null ) { %>
                <input type="submit" name="delete" value="Delete"/>
                <% } %>
@@ -728,12 +758,93 @@ function displayCloseWarning(){
         </tr>
     </table>
 <script type="text/javascript">
-Calendar.setup( { inputField : "prevDate", ifFormat : "%Y-%m-%d %H:%M", showsTime :true, button : "date", singleClick : true, step : 1 } );
+Calendar.setup( { inputField : "prevDate", ifFormat : "%Y-%m-%d", showsTime :true, button : "date", singleClick : true, step : 1 } );
 Calendar.setup( { inputField : "nextDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "nextDateCal", singleClick : true, step : 1 } );
 </script>
 </body>
 </html:html>
+
+<script>
+function validatePreventionDate()
+{
+    var x = true;
+
+    jQuery('input[name="prevDate"]').each(function()
+    {
+        var startDate = jQuery(this).val();
+        if (startDate.length > 10)
+        {
+            startDate = startDate.slice(0, 10);
+        }
+        var match = startDate.match(/^(\d+-?)+\d+$/);
+        var splitStartDate = startDate.split("-");
+        var notJustYear = splitStartDate[0].length > 4;
+
+
+        if ((notJustYear && !startDate.includes("-")) || !match)
+        {
+            jQuery(this).focus();
+            alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
+            x = false;
+            return;
+        }
+
+        if (splitStartDate.length > 3)
+        {
+            jQuery(this).focus();
+            alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd.");
+            x = false;
+            return;
+        }
+
+        var dt1 = 1, mon1 = 0, yr1 = parseInt(splitStartDate[0], 10);
+        if (isNaN(yr1) || yr1 < 1900 || yr1 > 9999)
+        {
+            jQuery(this).focus();
+            alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the year.");
+            x = false;
+            return;
+        }
+        if (splitStartDate.length > 1)
+        {
+            mon1 = parseInt(splitStartDate[1], 10) - 1;
+            if (isNaN(mon1) || mon1 < 0 || mon1 > 11)
+            {
+                jQuery(this).focus();
+                alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the month.");
+                x = false;
+                return;
+            }
+        }
+        if (splitStartDate.length > 2)
+        {
+            dt1 = parseInt(splitStartDate[2], 10);
+            if (isNaN(dt1) || dt1 < 1 || dt1 > 31)
+            {
+                jQuery(this).focus();
+                alert("Start Date must be yyyy or yyyy-mm or yyyy-mm-dd. Please check the day.");
+                x = false;
+                return;
+            }
+        }
+        var date1 = new Date(yr1, mon1, dt1);
+        var now = new Date();
+
+        if (date1 > now)
+        {
+            jQuery(this).focus();
+            alert('Start Date cannot be in the future. (' + startDate + ')');
+            x = false;
+            return;
+        }
+    });
+    return x;
+}
+</script>
 <%!
+
+
+
 
 String completed(boolean b){
     String ret ="";

@@ -26,6 +26,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
+import javax.validation.constraints.NotNull;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;
@@ -40,13 +41,14 @@ import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_ONLY;
 @Data
 public class PartialDate extends AbstractTransientModel
 {
+	@NotNull
 	private Year year;
 	private Month month;
 	private Integer day;
 
 	protected PartialDate()
 	{
-		this((Year)null, null, null);
+		// javax needs an empty constructor
 	}
 
 	public PartialDate(Integer year)

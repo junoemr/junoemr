@@ -60,6 +60,7 @@ export enum JUNO_BUTTON_COLOR
 	SECONDARY = "secondary",
 	GREYSCALE_LIGHT = "greyscale-light",
 	GREYSCALE_DARK = "greyscale-dark",
+	GREYSCALE_DARKEST = "greyscale-darkest",
 	INFO = "info",
 	SUCCESS = "success",
 	WARNING = "warning",

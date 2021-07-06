@@ -70,6 +70,15 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	public static final String PROVIDER_STATUS_ACTIVE		= "1";
 	public static final String PROVIDER_STATUS_INACTIVE = "0";
 
+
+	// providerTypes
+	public static final String PROVIDER_TYPE_DOCTOR 		= "doctor";
+	public static final String PROVIDER_TYPE_RECEPTIONIST 	= "receptionist";
+	public static final String PROVIDER_TYPE_NURSE			= "nurse";
+	public static final String PROVIDER_TYPE_RESIDENT 		= "resident";
+	public static final String PROVIDER_TYPE_MIDWIFE		= "midwife";
+	public static final String PROVIDER_TYPE_ADMIN			= "admin";
+
 	/**
 	 * default serial version id for serializable
 	 */
@@ -191,6 +200,9 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 
 	@Column(name = "imd_health_uuid")
 	private String imdHealthUuid = null;
+	
+	@Column(name = "ontario_cno_number")
+	private String ontarioCnoNumber;
 
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()
@@ -222,77 +234,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 		set(String.valueOf(providerNo));
 	}
 
-
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String s) {
-		lastName = s;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String s) {
-		firstName = s;
-	}
-
-	public String getProviderType() {
-		return providerType;
-	}
-	public void setProviderType(String s) {
-		providerType = s;
-	}
-
-	public String getSpecialty() {
-		return specialty;
-	}
-	public void setSpecialty(String s) {
-		specialty = s;
-	}
-
-	public String getTeam() {
-		return team;
-	}
-	public void setTeam(String s) {
-		team = s;
-	}
-
-	public String getSex() {
-		return sex;
-	}
-	public void setSex(String s) {
-		sex = s;
-	}
-
-	public Date getDob() {
-		return dob;
-	}
-	public void setDob(Date d) {
-		dob = d;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-	public void setAddress(String s) {
-		address = s;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-	public void setPhone(String s) {
-		phone = s;
-	}
-
-	public String getWorkPhone() {
-		return workPhone;
-	}
-	public void setWorkPhone(String s) {
-		workPhone = s;
-	}
-
 	public String getCellPhone()
 	{
 		String comments = getComments();
@@ -302,49 +243,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 			cellNo = StringUtils.substringBetween(getComments(), "<xml_p_cell>", "</xml_p_cell>");
 		}
 		return cellNo;
-	}
-
-	public String getOhipNo() {
-		return ohipNo;
-	}
-	
-	public void setOhipNo(String s) {
-		ohipNo = s;
-	}
-
-	public String getRmaNo() {
-		return rmaNo;
-	}
-	public void setRmaNo(String s) {
-		rmaNo = s;
-	}
-
-	public String getBillingNo() {
-		return billingNo;
-	}
-	public void setBillingNo(String s) {
-		billingNo = s;
-	}
-
-	public String getHsoNo() {
-		return hsoNo;
-	}
-	public void setHsoNo(String s) {
-		hsoNo = s;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String s) {
-		status = s;
-	}
-
-	public String getComments() {
-		return comments;
-	}
-	public void setComments(String s) {
-		comments = s;
 	}
 
 	public String getFaxNumber()

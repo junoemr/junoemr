@@ -29,13 +29,17 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 import oscar.OscarProperties;
 import oscar.util.RESTClient;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public abstract class RestClientBase extends RESTClient
@@ -50,6 +54,9 @@ public abstract class RestClientBase extends RESTClient
 	// return base REST endpoint
 	public abstract URI baseEndpoint();
 
+	// get the root uri aka, https://myhealthaccess.ca
+	public abstract URI getRootURI();
+
 	//==========================================================================
 	// Public Methods
 	//==========================================================================
@@ -62,10 +69,41 @@ public abstract class RestClientBase extends RESTClient
 
 	public String formatEndpoint(String endpoint, Object... args)
 	{
+		return formatEndpointFull(endpoint, Arrays.asList(args), null);
+	}
+
+	/**
+	 * generate a url.
+	 * @param endpoint - the rest endpoint to hit.
+	 * @param pathParams - [optional] path parameters for substitution in to the endpoint path.
+	 * @param queryParams - [optional] query parameters
+	 * @return - the url
+	 */
+	public String formatEndpointFull(String endpoint, @Nullable List<Object> pathParams, @Nullable MultiValueMap<String, String> queryParams)
+	{
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseEndpoint());
-		uriBuilder.path(String.format(endpoint, args));
+		if (pathParams != null)
+		{
+			uriBuilder.path(String.format(endpoint, pathParams.toArray()));
+		}
+		else
+		{
+			uriBuilder.path(endpoint);
+		}
+
+		if (queryParams != null)
+		{
+			uriBuilder.queryParams(queryParams);
+		}
 		uriBuilder.fragment(null);
 		return uriBuilder.build().toUriString();
+	}
+
+	public <T> T doGetWithToken(String url, String token, Class<T> responseClass)
+	{
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("X-Auth-Token", token);
+		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass);
 	}
 
 	public <U, T> T doPostWithToken(String url, String token, U body, Class<T> responseClass)
@@ -75,11 +113,11 @@ public abstract class RestClientBase extends RESTClient
 		return executeRequest(url, HttpMethod.POST, headers, null, body, responseClass);
 	}
 
-	public <T> T doGetWithToken(String url, String token, Class<T> responseClass)
+	public <U, T> T doPutWithToken(String url, String token, U body, Class<T> responseClass)
 	{
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("X-Auth-Token", token);
-		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass);
+		return executeRequest(url, HttpMethod.PUT, headers, null, body, responseClass);
 	}
 
 	//==========================================================================
