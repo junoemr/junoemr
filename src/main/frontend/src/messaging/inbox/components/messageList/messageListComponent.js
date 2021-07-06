@@ -143,14 +143,23 @@ angular.module("Messaging.Components").component('messageList', {
 
 			ctrl.updateMessageView = () =>
 			{
-				// display the selected message
-				$state.go("messaging.view.message",
+				if (ctrl.selectedMessageId)
+				{
+					let targetState = ".message"
+					if ($state.is("record.messaging.view.message") || $state.is("messaging.view.message"))
 					{
-						backend: ctrl.messagingBackend,
-						source: ctrl.sourceId,
-						group: ctrl.groupId,
-						messageId: ctrl.selectedMessageId,
-					}, {location: "replace"});
+						targetState = "^.message";
+					}
+
+					// display the selected message
+					$state.go(targetState,
+						{
+							backend: ctrl.messagingBackend,
+							source: ctrl.sourceId,
+							group: ctrl.groupId,
+							messageId: ctrl.selectedMessageId,
+						}, {location: "replace"});
+				}
 			}
 
 			ctrl.onMessageSelectionChange = async (messageId) =>

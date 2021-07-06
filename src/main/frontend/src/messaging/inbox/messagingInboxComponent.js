@@ -44,6 +44,7 @@ angular.module("Messaging").component('messagingInbox', {
 		ctrl.backend = $stateParams.backend;
 		ctrl.selectedSourceId = $stateParams.source;
 		ctrl.selectedGroupId = $stateParams.group;
+		ctrl.recordPageEmbedded = $stateParams.recordPageEmbedded ? Juno.Common.Util.parseBoolean($stateParams.recordPageEmbedded) : false;
 		ctrl.componentStyle = JUNO_STYLE.GREY;
 		ctrl.messageSources = [];
 		ctrl.groups = [];

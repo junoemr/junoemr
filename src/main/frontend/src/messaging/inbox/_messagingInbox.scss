@@ -3,6 +3,10 @@
 	color: var(--color-neutral-darkest);
 
 	max-height: calc(max(100vh, 800px) - #{$primary-navbar-height} - #{$page-header-height});
+	&.record-page-embedded {
+		min-height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height} - #{$page-tabs-height} - 12px);
+		max-height:calc(max(100vh, 800px) - #{$primary-navbar-height} - #{$page-header-height} - #{$page-tabs-height} - 12px);
+	}
 
 	.message-list-pane {
 		width: 344px;

@@ -162,8 +162,9 @@ angular.module('Record').controller('Record.RecordController', [
 			const navItem = {
 				id: navItems[navItems.length - 1].id + 1,
 				label: "Messenger",
+				state: ["record.messaging.view", "record.messaging.view.message"],
 				dropdown: true,
-				dropdownItems: []
+				dropdownItems: [],
 			};
 
 			// TODO Robert's security check here
@@ -184,12 +185,13 @@ angular.module('Record').controller('Record.RecordController', [
 						popup: false,
 						openNewWindow: false,
 						custom_state: {
-							state: "messaging.view",
+							state: "record.messaging.view",
 							params: {
 								backend: MessagingServiceType.MHA_CLINIC,
 								source: (await messagingService.getDefaultMessageSource()).id,
 								group: MessageGroup.Received,
 								messageableId: verifiedProfile.id,
+								recordPageEmbedded: true,
 							}
 						},
 					})
