@@ -217,12 +217,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				controller.loadResourceHash(),
 				$scope.loadSiteOptions(),
 				controller.loadAppointmentReasons(),
-				controller.loadTelehealthEnabled()
+				controller.loadTelehealthEnabled(),
+				controller.loadExtraLinkData()
 			])
 				.then((result) =>
 			{
-				controller.loadExtraLinkData(),     // this might be able to be moved up into the
-				
 				$scope.loadDefaultSelections();
 				$scope.setEventSources();
 				
@@ -233,33 +232,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				controller.loadWatches();
 				$scope.initialized = true;
 			});
-					
-					
-					/*$scope.loadAvailabilityTypes().then(function ()
-					{
-						scheduleService.loadEventStatuses().then(function ()
-						{
-							$scope.loadScheduleOptions().then(function ()
-							{
-								$scope.scheduleApi.getAppointmentReasons().then(function ()
-								{
-								controller.loadResourceHash().then(function ()
-								{
-									$scope.loadSiteOptions().then(function ()
-									{
-										controller.loadExtraLinkData().then(function ()
-										{
-											controller.loadTelehealthEnabled().then(function()
-											{
-											
-											});
-										});
-									});
-								});
-								});
-							});
-						});
-					});*/
 		};
 
 
