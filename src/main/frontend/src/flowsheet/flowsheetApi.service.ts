@@ -24,10 +24,13 @@
     Canada
 
  */
-import {DemographicApi, FlowsheetServiceApi, FlowsheetsServiceApi, MeasurementsApi, PreventionsApi} from "../../generated";
+import {DemographicApi, DiseaseRegistryApi, FlowsheetServiceApi, FlowsheetsServiceApi, MeasurementsApi, PreventionsApi} from "../../generated";
 import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
 import FlowsheetTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetTransferToModelConverter";
 import FlowsheetModelToTransferConverter from "../lib/flowsheet/converter/FlowsheetModelToTransferConverter";
+import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
+import DxCodeTransferToModelConverter from "../lib/dx/converter/DxCodeTransferToModelConverter";
+import DxCodeModel from "../lib/dx/model/DxCodeModel";
 
 angular.module("Flowsheet").service("flowsheetApiService", [
 	'$http',
@@ -42,8 +45,11 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 		service.preventionsApi = new PreventionsApi($http, $httpParamSerializer, '../ws/rs');
 		service.measurementsApi = new MeasurementsApi($http, $httpParamSerializer, '../ws/rs');
+		service.diseaseRegistryApi = new DiseaseRegistryApi($http, $httpParamSerializer, '../ws/rs');
+
 		service.flowsheetModelConverter = new FlowsheetTransferToModelConverter();
 		service.flowsheetTransferConverter = new FlowsheetModelToTransferConverter();
+		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
 
 		service.getAllFlowsheets = async (): Promise<Array<FlowsheetModel>> =>
 		{
@@ -85,6 +91,11 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<Array<string>> =>
 		{
 			return (await service.measurementsApi.searchMeasurementTypes(keyword, page, perPage)).data;
+		}
+
+		service.searchDxCodes = async (codingSystem: DxCodingSystem, keyword: string, page?: number, perPage?: number): Promise<Array<DxCodeModel>> =>
+		{
+			return service.dxCodeTransferToModelConverter.convertList((await service.diseaseRegistryApi.searchDxCodes(codingSystem, keyword, page, perPage)).data.body);
 		}
 
 		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<FlowsheetModel> =>

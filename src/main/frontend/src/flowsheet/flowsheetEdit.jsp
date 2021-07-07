@@ -73,7 +73,7 @@
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 				             disabled="$ctrl.isLoading"
-				             click="$ctrl.onAddTriggerCode()">
+				             click="$ctrl.onAddIcd9TriggerCode()">
 					<i class="icon icon-add"></i>
 				</juno-button>
 			</div>

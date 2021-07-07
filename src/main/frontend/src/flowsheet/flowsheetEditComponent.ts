@@ -29,6 +29,7 @@ import FlowsheetItemGroupModel from "../lib/flowsheet/model/FlowsheetItemGroupMo
 import {FlowsheetItemType} from "../lib/flowsheet/model/FlowsheetItemType";
 import {FlowsheetItemValueType} from "../lib/flowsheet/model/FlowsheetItemValueType";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
+import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
 
 angular.module('Flowsheet').component('flowsheetEdit',
 	{
@@ -109,9 +110,27 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 				}
 
-				ctrl.onAddTriggerCode = () =>
+				ctrl.onAddIcd9TriggerCode = (): void =>
 				{
+					ctrl.onAddTriggerCode(DxCodingSystem.ICD9);
+				}
 
+				ctrl.onAddTriggerCode = async (codingSystem: DxCodingSystem): Promise<void> =>
+				{
+					const typeLabel = codingSystem + "";
+					const callback = ctrl.lookupIcd9Codes;
+
+					const selection = await Juno.Common.Util.openTypeaheadDialog($uibModal,
+						"Add " + typeLabel + " trigger",
+						"Search for a code within the system",
+						callback,
+						ctrl.componentStyle,
+						"Ok",
+						"Search codes");
+					if(selection)
+					{
+						ctrl.flowsheet.triggerCodes.push(selection.data);
+					}
 				}
 
 				ctrl.onDeleteTriggerCode = async (triggerCode: DxCodeModel): Promise<void> =>
@@ -137,50 +156,42 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					ctrl.onAddNewItem(itemGroup, FlowsheetItemType.PREVENTION);
 				}
 
-				ctrl.onAddNewItem = (itemGroup, type): void =>
+				ctrl.onAddNewItem = async (itemGroup, type): Promise<void> =>
 				{
 					const isMeasurementType = (type === FlowsheetItemType.MEASUREMENT);
 					const typeLabel = (isMeasurementType) ? "measurement" : "prevention";
 					const callback = (isMeasurementType) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
 
-					Juno.Common.Util.openTypeaheadDialog($uibModal,
+					const selection = await Juno.Common.Util.openTypeaheadDialog($uibModal,
 						"Add flowsheet " + typeLabel,
 						"Search for a " + typeLabel + " within the system",
 						callback,
 						ctrl.componentStyle,
 						"Ok",
-						"Search " + typeLabel + "s",
-					).then((selection) =>
+						"Search " + typeLabel + "s");
+					if(selection)
 					{
-						if(selection)
+						const data = selection.data;
+						let newItem = new FlowsheetItemModel();
+						if(isMeasurementType)
 						{
-							const data = selection.data;
-							let newItem = new FlowsheetItemModel();
-							if(isMeasurementType)
-							{
-								newItem.name = data.name;
-								newItem.type = FlowsheetItemType.MEASUREMENT;
-								newItem.typeCode = data.code;
-								newItem.description = data.description;
-								newItem.guideline = data.instructions;
-								newItem.valueType = FlowsheetItemValueType.STRING;
-							}
-							else
-							{
-								newItem.name = data.name;
-								newItem.type = FlowsheetItemType.PREVENTION;
-								newItem.typeCode = data.code;
-								newItem.description = data.description;
-								newItem.valueType = FlowsheetItemValueType.STRING;
-							}
-							itemGroup.flowsheetItems.push(newItem);
+							newItem.name = data.name;
+							newItem.type = FlowsheetItemType.MEASUREMENT;
+							newItem.typeCode = data.code;
+							newItem.description = data.description;
+							newItem.guideline = data.instructions;
+							newItem.valueType = FlowsheetItemValueType.STRING;
 						}
-					}).catch((reason) =>
-					{
-						// cancelled modal
-						// @ts-ignore
-						console.warn(reason);
-					});
+						else
+						{
+							newItem.name = data.name;
+							newItem.type = FlowsheetItemType.PREVENTION;
+							newItem.typeCode = data.code;
+							newItem.description = data.description;
+							newItem.valueType = FlowsheetItemValueType.STRING;
+						}
+						itemGroup.flowsheetItems.push(newItem);
+					}
 				}
 
 				ctrl.onRemoveItem = async (item, itemGroup): Promise<void> =>
@@ -229,6 +240,19 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					{
 						return {
 							label: result.name + "(" + result.code + ")",
+							value: result.code,
+							data: result,
+						}
+					});
+				}
+
+				ctrl.lookupIcd9Codes = async (searchTerm): Promise<Array<object>> =>
+				{
+					const searchResults: DxCodeModel[] = await flowsheetApiService.searchDxCodes(DxCodingSystem.ICD9, searchTerm);
+					return searchResults.map((result) =>
+					{
+						return {
+							label: result.code + " (" + result.description + ")",
 							value: result.code,
 							data: result,
 						}

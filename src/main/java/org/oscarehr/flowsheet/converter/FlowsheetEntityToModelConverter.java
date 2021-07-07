@@ -25,7 +25,7 @@ package org.oscarehr.flowsheet.converter;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.dataMigration.model.dx.DxCode;
-import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
+import org.oscarehr.dx.converter.Icd9EntityToDxCodeConverter;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
@@ -43,6 +43,9 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 {
 	@Autowired
 	private FlowsheetItemEntityToModelConverter flowsheetItemEntityToModelConverter;
+
+	@Autowired
+	private Icd9EntityToDxCodeConverter icd9EntityToDxCodeConverter;
 
 	@Override
 	public Flowsheet convert(org.oscarehr.flowsheet.entity.Flowsheet input)
@@ -88,17 +91,6 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 	private List<DxCode> buildTriggers(org.oscarehr.flowsheet.entity.Flowsheet input)
 	{
 		Set<Icd9> icd9TriggerCodes = input.getIcd9Triggers();
-
-		List<DxCode> triggerCodes = new LinkedList<>();
-		for(Icd9 icd9 : icd9TriggerCodes)
-		{
-			DxCode triggerCode = new DxCode();
-			triggerCode.setCode(icd9.getCode());
-			triggerCode.setCodingSystem(DxCodingSystem.ICD9);
-			triggerCode.setDescription(icd9.getDescription());
-
-			triggerCodes.add(triggerCode);
-		}
-		return triggerCodes;
+		return icd9EntityToDxCodeConverter.convert(icd9TriggerCodes);
 	}
 }
