@@ -31,6 +31,7 @@ import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
 import FlowsheetItemModel from "../model/FlowsheetItemModel";
 import DsRuleTransferToModelConverter from "../../decisionSupport/converter/DsRuleTransferToModelConverter";
 import AbstractConverter from "../../conversion/AbstractConverter";
+import DxCodeTransferToModelConverter from "../../dx/converter/DxCodeTransferToModelConverter";
 
 export default class FlowsheetTransferToModelConverter extends AbstractConverter<Flowsheet, FlowsheetModel>
 {
@@ -48,6 +49,7 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 		flowsheetModel.enabled = flowsheetTransfer.enabled;
 		flowsheetModel.systemManaged = flowsheetTransfer.systemManaged;
 		flowsheetModel.flowsheetItemGroups = this.convertAllGroups(flowsheetTransfer.flowsheetItemGroups);
+		flowsheetModel.triggerCodes = new DxCodeTransferToModelConverter().convertList(flowsheetTransfer.triggerCodes);
 
 		return flowsheetModel;
 	}

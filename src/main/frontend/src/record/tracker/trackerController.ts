@@ -24,6 +24,8 @@
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
 import FlowsheetModel from "../../lib/flowsheet/model/FlowsheetModel";
+import DxRecordModel from "../../lib/dx/model/DxRecordModel";
+import DxCodeModel from "../../lib/dx/model/DxCodeModel";
 
 angular.module('Record.Tracker').component('healthTracker',
 	{
@@ -34,10 +36,12 @@ angular.module('Record.Tracker').component('healthTracker',
 		controller: [
 			'$state',
 			'$stateParams',
+			'demographicApiService',
 			'flowsheetApiService',
 			function (
 				$state,
 				$stateParams,
+				demographicApiService,
 				flowsheetApiService)
 			{
 				const ctrl = this;
@@ -47,17 +51,50 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.flowsheets = [] as FlowsheetModel[];
+				ctrl.triggerdFlowsheets = [] as FlowsheetModel[];
 				ctrl.selectedFlowsheet = null as FlowsheetModel;
+				ctrl.activeDxRecords = [];
+
+				ctrl.accordianListItems = [
+					{
+						name: "All Flowsheets",
+						expanded: false,
+						items: [], // will be the list of flowsheets
+					}
+				];
 
 				ctrl.$onInit = async () =>
 				{
 					ctrl.demographicNo = $stateParams.demographicNo;
 					ctrl.flowsheets = await flowsheetApiService.getAllFlowsheets();
+					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicNo);
+					ctrl.accordianListItems[0].items = ctrl.flowsheets;
 
 					if($stateParams.flowsheetId)
 					{
 						ctrl.selectedFlowsheet = ctrl.flowsheets.find((flowsheet) => flowsheet.id === Number($stateParams.flowsheetId));
 					}
+
+					ctrl.findTriggeredFlowsheets();
+				}
+
+				ctrl.findTriggeredFlowsheets = (): void =>
+				{
+					const activeCodes: DxCodeModel[] = ctrl.activeDxRecords.map((dxRecord: DxRecordModel) => dxRecord.dxCode);
+					ctrl.triggerdFlowsheets = ctrl.flowsheets.filter((flowsheet: FlowsheetModel) =>
+					{
+						for(let activeCode of activeCodes)
+						{
+							for (let triggerCode of flowsheet.triggerCodes)
+							{
+								if (triggerCode.codingSystem === activeCode.codingSystem && triggerCode.code === activeCode.code)
+								{
+									return true;
+								}
+							}
+						}
+						return false;
+					});
 				}
 
 				ctrl.onFlowsheetSelect = (flowsheet) =>

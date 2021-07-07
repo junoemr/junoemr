@@ -28,6 +28,7 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
 import org.oscarehr.dataMigration.model.encounterNote.BaseNote;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
@@ -101,7 +102,7 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 				{
 					DxCode dxCode = new DxCode();
 					dxCode.setCode(issue.getCode());
-					dxCode.setCodingSystem(DxCode.DxCodingSystem.fromValue(issue.getType()));
+					dxCode.setCodingSystem(DxCodingSystem.fromValue(issue.getType()));
 					dxCode.setDescription(issue.getDescription());
 					exportNote.addIssueCode(dxCode);
 				});

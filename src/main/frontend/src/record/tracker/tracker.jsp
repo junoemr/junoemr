@@ -26,14 +26,21 @@
 
     <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.FLOWSHEET_READ">
         <div class="flex-row">
-            <div class="list-group">
-                <button ng-repeat="flowsheet in $ctrl.flowsheets"
-                        type="button"
-                        class="list-group-item list-group-item-action"
-                        ng-class="{'active': flowsheet === $ctrl.selectedFlowsheet}"
-                        ng-click="$ctrl.onFlowsheetSelect(flowsheet)">
-                    {{flowsheet.name}}
-                </button>
+            <div class="flex-column">
+                <div class="list-group">
+                    <button ng-repeat="flowsheet in $ctrl.triggerdFlowsheets"
+                            type="button"
+                            class="list-group-item list-group-item-action"
+                            ng-class="{'active': flowsheet === $ctrl.selectedFlowsheet}"
+                            ng-click="$ctrl.onFlowsheetSelect(flowsheet)">
+                        {{flowsheet.name}}
+                    </button>
+                    <span ng-if="$ctrl.triggerdFlowsheets.length === 0" class="list-group-item">
+                        No Active Flowsheets
+                    </span>
+                </div>
+                <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onFlowsheetSelect(item)">
+                </accordion-list>
             </div>
             <div class="ui-view-wrapper flex-grow">
                 <ui-view></ui-view>

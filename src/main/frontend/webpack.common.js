@@ -329,6 +329,7 @@ module.exports = {
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
 			'./src/patient/demographicCardComponent.js',
+			'./src/patient/demographicApi.service.ts',
 
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',

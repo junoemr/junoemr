@@ -23,6 +23,9 @@
 package org.oscarehr.flowsheet.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.model.Icd9;
+import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.oscarehr.flowsheet.entity.Flowsheet, org.oscarehr.flowsheet.model.Flowsheet>
@@ -44,10 +48,10 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 	public Flowsheet convert(org.oscarehr.flowsheet.entity.Flowsheet input)
 	{
 		Flowsheet flowsheetModel = new Flowsheet();
-		BeanUtils.copyProperties(input, flowsheetModel, "flowsheetItems", "flowsheetItemGroups");
+		BeanUtils.copyProperties(input, flowsheetModel, "flowsheetItems", "flowsheetItemGroups", "icd9Triggers");
 
 		flowsheetModel.setFlowsheetItemGroups(buildGroups(input));
-
+		flowsheetModel.setTriggerCodes(buildTriggers(input));
 
 		return flowsheetModel;
 	}
@@ -79,5 +83,22 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 			}
 		}
 		return groups;
+	}
+
+	private List<DxCode> buildTriggers(org.oscarehr.flowsheet.entity.Flowsheet input)
+	{
+		Set<Icd9> icd9TriggerCodes = input.getIcd9Triggers();
+
+		List<DxCode> triggerCodes = new LinkedList<>();
+		for(Icd9 icd9 : icd9TriggerCodes)
+		{
+			DxCode triggerCode = new DxCode();
+			triggerCode.setCode(icd9.getCode());
+			triggerCode.setCodingSystem(DxCodingSystem.ICD9);
+			triggerCode.setDescription(icd9.getDescription());
+
+			triggerCodes.add(triggerCode);
+		}
+		return triggerCodes;
 	}
 }

@@ -33,6 +33,11 @@ public abstract class DsCondition extends AbstractTransientModel
 	private String value;
 	private ConditionType type;
 
+	protected DsCondition()
+	{
+		this(ConditionType.NEVER_GIVEN);
+	}
+
 	public DsCondition(ConditionType type)
 	{
 		this.type = type;

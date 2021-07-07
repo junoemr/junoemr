@@ -22,13 +22,41 @@
  */
 package org.oscarehr.dataMigration.model.dx;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 
-@Data
-public class DxCode extends AbstractTransientModel
+public enum DxCodingSystem
 {
-	private String code;
-	private DxCodingSystem codingSystem;
-	private String description;
+	ICD9("ICD9", CDSConstants.CodingSystem.ICD9),
+	OSCAR_CODE("OscarCode", null);
+
+	private final String value;
+	private final CDSConstants.CodingSystem cdsCodingSystem;
+
+	DxCodingSystem(String value, CDSConstants.CodingSystem cdsCodingSystem)
+	{
+		this.value = value;
+		this.cdsCodingSystem = cdsCodingSystem;
+	}
+
+	public String getValue()
+	{
+		return this.value;
+	}
+
+	public CDSConstants.CodingSystem getCdsCodingSystem()
+	{
+		return this.cdsCodingSystem;
+	}
+
+	public static DxCodingSystem fromValue(String value)
+	{
+		for(DxCodingSystem status : DxCodingSystem.values())
+		{
+			if(status.getValue().equalsIgnoreCase(value))
+			{
+				return status;
+			}
+		}
+		return null;
+	}
 }

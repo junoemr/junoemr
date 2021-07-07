@@ -34,6 +34,11 @@ public abstract class DsConsequence extends AbstractTransientModel
 	private SeverityLevel severityLevel;
 	private ConsequenceType type;
 
+	protected DsConsequence()
+	{
+		this(ConsequenceType.ALERT);
+	}
+
 	public DsConsequence(ConsequenceType type)
 	{
 		this.type = type;

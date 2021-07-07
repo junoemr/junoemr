@@ -26,6 +26,7 @@
  */
 
 import FlowsheetItemGroupModel from "./FlowsheetItemGroupModel";
+import DxCodeModel from "../../dx/model/DxCodeModel";
 
 export default class FlowsheetModel
 {
@@ -35,6 +36,7 @@ export default class FlowsheetModel
 	private _enabled: boolean;
 	private _systemManaged: boolean;
 	private _flowsheetItemGroups: FlowsheetItemGroupModel[];
+	private _triggerCodes: DxCodeModel[];
 
 	public constructor()
 	{
@@ -101,5 +103,15 @@ export default class FlowsheetModel
 	set flowsheetItemGroups(value: FlowsheetItemGroupModel[])
 	{
 		this._flowsheetItemGroups = value;
+	}
+
+	get triggerCodes(): DxCodeModel[]
+	{
+		return this._triggerCodes;
+	}
+
+	set triggerCodes(value: DxCodeModel[])
+	{
+		this._triggerCodes = value;
 	}
 }

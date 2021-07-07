@@ -24,6 +24,7 @@ package org.oscarehr.flowsheet.transfer;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +36,11 @@ public class FlowsheetCreateTransfer extends AbstractTransientModel
 	private String description;
 	private boolean enabled;
 	private List<FlowsheetItemGroupCreateUpdateTransfer> flowsheetItemGroups;
+	private List<DxCode> triggerCodes;
 
 	public FlowsheetCreateTransfer()
 	{
 		flowsheetItemGroups = new ArrayList<>();
+		triggerCodes = new ArrayList<>();
 	}
 }

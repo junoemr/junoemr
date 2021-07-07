@@ -26,22 +26,35 @@ import org.oscarehr.common.dao.AbstractCodeSystemDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.model.AbstractCodeSystemModel;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.dataMigration.converter.out.DxDbToModelConverter;
+import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
 import java.util.Date;
 import java.util.List;
 
-@Component
+@Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DxResearchService
 {
 	@Autowired
-	DxresearchDAO dxresearchDAO;
+	private DxresearchDAO dxresearchDAO;
 
-	@Transactional
+	@Autowired
+	private DxDbToModelConverter dxDbToModelConverter;
+
+	public List<DxRecord> getAssignedDxRecords(Integer demographicNo)
+	{
+		//TODO filter active. probably in query
+		List<Dxresearch> dxresearchList = dxresearchDAO.getDxResearchItemsByPatient(demographicNo);
+		return dxDbToModelConverter.convert(dxresearchList);
+	}
+
 	public void assignDxCodeToDemographic(Integer demographicNo, Integer providerNo, String dxCode, String codingSystem)
 	{
 		if (dxCode.compareTo("") != 0) {
