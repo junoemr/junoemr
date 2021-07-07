@@ -54,7 +54,7 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'WHEEZING - yes/
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'WHEEZING - LOCATION' AS type, 'Wheezing location' AS typeDisplayName, 'Indicate where' AS typeDescription, 'location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'WHEEZING - LOCATION' AS type, 'Wheezing location' AS typeDisplayName, 'Indicate location' AS typeDescription, 'location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'WHEEZING - LOCATION') LIMIT 1;
 
@@ -74,7 +74,7 @@ INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringIn
 SELECT * FROM
 (SELECT 'PITTING EDEMA - location' AS type, 'Pitting Edema - location' AS typeDisplayName, 'Records location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'PITTING EDEMA') LIMIT 1;
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'PITTING EDEMA - location') LIMIT 1;
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
@@ -110,15 +110,15 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'NYHA - CLASS IV
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'LUNG CRACKLES' AS type, 'Lung Crackles' AS typeDisplayName, 'Lung Crackles location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'LUNG CRACKLES - location)' AS type, 'Lung Crackles' AS typeDisplayName, 'Lung Crackles location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'LUNG CRACKLES'  AND typeDescription = 'Lung Crackles location') LIMIT 1;
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'LUNG CRACKLES - location') LIMIT 1;
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FOOT EXAM' AS type, 'Foot Exam' AS typeDisplayName, 'Record Foot Exam findings' AS typeDescription, 'Indicate findings' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FOOT EXAM - findings' AS type, 'Foot Exam' AS typeDisplayName, 'Record Foot Exam findings' AS typeDescription, 'Indicate findings' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FOOT EXAM') LIMIT 1;
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FOOT EXAM - findings') LIMIT 1;
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
