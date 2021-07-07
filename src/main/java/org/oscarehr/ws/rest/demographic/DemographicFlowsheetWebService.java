@@ -20,13 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItemData;
 import org.oscarehr.flowsheet.service.FlowsheetDataService;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

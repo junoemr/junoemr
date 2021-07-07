@@ -1,3 +1,5 @@
 .health-tracker-component {
-	@include juno-table-default;
+	.ui-view-wrapper {
+		padding: 0 16px;
+	}
 }

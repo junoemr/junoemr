@@ -25,15 +25,6 @@
 	<h3>{{$ctrl.flowsheet.name}} flowsheet</h3>
 
 	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.FLOWSHEET_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ]">
-		<div>
-			<juno-button component-style="$ctrl.componentStyle"
-			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-			             click="$ctrl.toHealthTracker()">
-				<< Health Tracker
-			</juno-button>
-		</div>
-
 		<filter-panel initial-state-expanded="false">
 			<div class="filter-wrapper">
 				<h6>Filter Items</h6>

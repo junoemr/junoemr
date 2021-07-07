@@ -758,7 +758,7 @@ oscarApp.config([
 				},
 			},
 		})
-		.state('record.flowsheet',
+		.state('record.tracker.flowsheet',
 		{
 			url: '/flowsheet/:flowsheetId',
 			component: 'flowsheet',

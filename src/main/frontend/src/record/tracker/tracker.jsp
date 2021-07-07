@@ -24,26 +24,20 @@
 <div class="health-tracker-component">
     <h1>Patient Health Tracker</h1>
 
-    <juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.FLOWSHEET_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ]">
-        <table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
-            <tbody>
-            <tr ng-repeat="flowsheet in $ctrl.flowsheets">
-                <td data-title="'Flowsheet'">
+    <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.FLOWSHEET_READ">
+        <div class="flex-row">
+            <div class="list-group">
+                <button ng-repeat="flowsheet in $ctrl.flowsheets"
+                        type="button"
+                        class="list-group-item list-group-item-action"
+                        ng-class="{'active': flowsheet === $ctrl.selectedFlowsheet}"
+                        ng-click="$ctrl.onFlowsheetSelect(flowsheet)">
                     {{flowsheet.name}}
-                </td>
-                <td data-title="'Description'">
-                    {{flowsheet.description}}
-                </td>
-                <td>
-                    <juno-button component-style="$ctrl.componentStyle"
-                                 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                                 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-                                 click="$ctrl.onFlowsheetSelect(flowsheet)">
-                        Open Flowsheet
-                    </juno-button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                </button>
+            </div>
+            <div class="ui-view-wrapper flex-grow">
+                <ui-view></ui-view>
+            </div>
+        </div>
     </juno-security-check>
 </div>

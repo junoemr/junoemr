@@ -371,7 +371,7 @@ module.exports = {
 			'./src/record/phr/phrController.js',
 
 			'./src/record/tracker/module.js',
-			'./src/record/tracker/trackerController.js',
+			'./src/record/tracker/trackerController.ts',
 
 			'./src/tickler/module.js',
 			'./src/tickler/ticklerListController.js',

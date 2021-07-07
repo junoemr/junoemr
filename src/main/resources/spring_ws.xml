@@ -367,7 +367,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicFlowsheetWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicFlowsheetWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>

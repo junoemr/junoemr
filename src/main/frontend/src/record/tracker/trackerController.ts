@@ -23,6 +23,7 @@
 
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
+import FlowsheetModel from "../../lib/flowsheet/model/FlowsheetModel";
 
 angular.module('Record.Tracker').component('healthTracker',
 	{
@@ -45,17 +46,24 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.flowsheets = [];
+				ctrl.flowsheets = [] as FlowsheetModel[];
+				ctrl.selectedFlowsheet = null as FlowsheetModel;
 
 				ctrl.$onInit = async () =>
 				{
 					ctrl.demographicNo = $stateParams.demographicNo;
 					ctrl.flowsheets = await flowsheetApiService.getAllFlowsheets();
+
+					if($stateParams.flowsheetId)
+					{
+						ctrl.selectedFlowsheet = ctrl.flowsheets.find((flowsheet) => flowsheet.id === Number($stateParams.flowsheetId));
+					}
 				}
 
 				ctrl.onFlowsheetSelect = (flowsheet) =>
 				{
-					$state.transitionTo('record.flowsheet',
+					ctrl.selectedFlowsheet = flowsheet;
+					$state.transitionTo('record.tracker.flowsheet',
 						{
 							demographicNo: ctrl.demographicNo,
 							flowsheetId: flowsheet.id,
