@@ -123,18 +123,19 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 if (isYear)
                 {
                     ctrl.ngModel.year = field || null;
-                    ctrl.ngModel.yearValid = ctrl.dateValidations.yearValid();
                 }
                 else if (isMonth)
                 {
                     ctrl.ngModel.month = field || null;
-                    ctrl.ngModel.monthValid = ctrl.dateValidations.monthValid();
                 }
                 else if (isDay)
                 {
                     ctrl.ngModel.day = field || null;
-                    ctrl.ngModel.dayValid = ctrl.dateValidations.dayValid();
                 }
+
+                ctrl.ngModel.yearValid = ctrl.dateValidations.yearValid();
+                ctrl.ngModel.monthValid = ctrl.dateValidations.monthValid();
+                ctrl.ngModel.dayValid = ctrl.dateValidations.dayValid();
 
                 return field || null;
             }
@@ -163,11 +164,13 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 ctrl.dateValidations.allFieldsBlank);
 
             ctrl.dateValidations.monthValid = Juno.Validations.validationFieldOr(
-                Juno.Validations.PartialDate.validationMonth(ctrl, "ngModel.month"),
-                Juno.Validations.validationFieldBlank(ctrl, "ngModel.day"));
+                    Juno.Validations.PartialDate.validationMonth(ctrl, "ngModel.month"),
+                    Juno.Validations.validationFieldBlank(ctrl, "ngModel.month",
+                        Juno.Validations.validationFieldBlank(ctrl, "ngModel.day"))
+                );
 
             ctrl.dateValidations.dayValid = Juno.Validations.validationFieldOr(
-                Juno.Validations.PartialDate.validationDay(ctrl, "ngModel.year","ngModel.month", "ngModel.day"),
+                Juno.Validations.PartialDate.validationDay(ctrl, "ngModel.year", "ngModel.month", "ngModel.day"),
                 Juno.Validations.validationFieldBlank(ctrl, "ngModel.day"));
         }
 

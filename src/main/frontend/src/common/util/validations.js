@@ -267,11 +267,11 @@ Juno.Validations.validationPhone = function (obj, field, ...validationFunc)
 
 Juno.Validations.PartialDate =
 {
-	validationYear: function (obj, field, ...validationFunc)
+	validationYear: function (obj, year, ...validationFunc)
 	{
 		return function validationFunction ()
 		{
-			let yearValue = Juno.Validations.getAttribute(obj, field);
+			let yearValue = Juno.Validations.getAttribute(obj, year);
 
 			if (!yearValue)
 			{
@@ -289,13 +289,13 @@ Juno.Validations.PartialDate =
 		}
 	},
 
-	validationMonth: function (obj, field, ...validationFunc)
+	validationMonth: function (obj, month, ...validationFunc)
 	{
 		return function validationFunction ()
 		{
-			let monthValue = Juno.Validations.getAttribute(obj, field);
+			let monthValue = Juno.Validations.getAttribute(obj, month);
 
-			if (!monthValue || monthValue === 0)
+			if (!monthValue || monthValue === 0 || monthValue === "0")
 			{
 				return false;
 			}

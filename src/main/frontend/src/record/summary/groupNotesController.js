@@ -579,7 +579,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			let startDate = controller.groupNotesForm.groupNoteExt.startDate;
 			if (startDate)
 			{
-				let partialStartDate = new PartialDateModel(startDate.year, startDate.month, startDate.day);
+				let partialStartDate = new PartialDateModel(startDate.year.value, startDate.month, startDate.day);
 				partialStartDate.yearValid = startDate.yearValid;
 				partialStartDate.monthValid = startDate.monthValid;
 				partialStartDate.dayValid = startDate.dayValid;
@@ -591,7 +591,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 			if (resolutionDate)
 			{
-				let partialResolutionDate = new PartialDateModel(resolutionDate.year, resolutionDate.month, resolutionDate.day);
+				let partialResolutionDate = new PartialDateModel(resolutionDate.year.value, resolutionDate.month, resolutionDate.day);
 				partialResolutionDate.yearValid = resolutionDate.yearValid;
 				partialResolutionDate.monthValid = resolutionDate.monthValid;
 				partialResolutionDate.dayValid = resolutionDate.dayValid;
@@ -602,7 +602,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			let procedureDate = controller.groupNotesForm.groupNoteExt.procedureDate;
 			if (procedureDate)
 			{
-				let partialProcedureDate = new PartialDateModel(procedureDate.year, procedureDate.month, procedureDate.day);
+				let partialProcedureDate = new PartialDateModel(procedureDate.year.value, procedureDate.month, procedureDate.day);
 				partialProcedureDate.yearValid = procedureDate.yearValid;
 				partialProcedureDate.monthValid = procedureDate.monthValid;
 				partialProcedureDate.dayValid = procedureDate.dayValid;
