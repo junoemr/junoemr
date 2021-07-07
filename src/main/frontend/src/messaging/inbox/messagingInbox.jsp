@@ -13,7 +13,8 @@
 		                  only-unread="$ctrl.onlyUnread"
 		                  search-keyword="$ctrl.searchKeyword"
 		                  source-id="$ctrl.selectedSourceId"
-		                  group-id="$ctrl.selectedGroupId">
+		                  group-id="$ctrl.selectedGroupId"
+		                  disable-search="$ctrl.recordPageEmbedded">
 		</inbox-header-bar>
 
 		<div class="flex-item-grow flex-row overflow-hidden overflow-x-auto">

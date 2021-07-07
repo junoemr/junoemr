@@ -42,6 +42,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 		messagingBackendId: "<",
 		sourceId: "<",
 		groupId: "<",
+		disableSearch: "<?"
 	},
 	controller: [
 		"$scope",
@@ -69,6 +70,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				ctrl.messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
 				ctrl.onlyUnread = ctrl.onlyUnread || false;
 				ctrl.searchKeyword = ctrl.searchKeyword || "";
+				ctrl.disableSearch = ctrl.disableSearch || false;
 			};
 
 			/**

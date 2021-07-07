@@ -29,6 +29,7 @@
 	                    on-text-change="$ctrl.updateKeywordFilter(value)"
 	                    initial-text="$ctrl.searchKeyword"
 	                    icon="icon-search"
+	                    disabled="$ctrl.disableSearch"
 	                    component-style="JUNO_STYLE.DEFAULT">
 	</messageable-search>
 
