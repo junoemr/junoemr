@@ -36,6 +36,7 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 
+import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
@@ -63,9 +64,6 @@ public class AddConsultationsClassicUITests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		String serviceName = "Cardiology";
-		String homeWindowHandle = driver.getWindowHandle();
-		driver.findElement(By.id("oscar_aged_consults")).click();
-		PageUtil.switchToLastWindow(driver);
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		Thread.sleep(5000);
 		String eChartWindowHandle = driver.getWindowHandle();
@@ -84,8 +82,8 @@ public class AddConsultationsClassicUITests extends SeleniumTestBase
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 
 		//** Verify from Consultations top menu. **
-		PageUtil.switchToWindow(homeWindowHandle, driver);
-		driver.findElement(By.id("oscar_aged_consults")).click();
+		driver.get(Navigation.OSCAR_URL + Consultation_URL);
+		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
