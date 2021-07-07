@@ -28,6 +28,7 @@ import FlowsheetItemModel from "../lib/flowsheet/model/FlowsheetItemModel";
 import FlowsheetItemGroupModel from "../lib/flowsheet/model/FlowsheetItemGroupModel";
 import {FlowsheetItemType} from "../lib/flowsheet/model/FlowsheetItemType";
 import {FlowsheetItemValueType} from "../lib/flowsheet/model/FlowsheetItemValueType";
+import DxCodeModel from "../lib/dx/model/DxCodeModel";
 
 angular.module('Flowsheet').component('flowsheetEdit',
 	{
@@ -105,6 +106,24 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					if(groupName)
 					{
 						itemGroup.name = groupName;
+					}
+				}
+
+				ctrl.onAddTriggerCode = () =>
+				{
+
+				}
+
+				ctrl.onDeleteTriggerCode = async (triggerCode: DxCodeModel): Promise<void> =>
+				{
+					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
+						"Remove flowsheet trigger",
+						"Are you sure you want to remove this trigger code from the flowsheet?",
+						ctrl.componentStyle);
+
+					if(confirmation)
+					{
+						ctrl.flowsheet.triggerCodes = ctrl.flowsheet.triggerCodes.filter((entry) => entry !== triggerCode);
 					}
 				}
 

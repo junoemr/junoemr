@@ -295,6 +295,7 @@ module.exports = {
 			'./src/flowsheet/components/flowsheetEditItem/flowsheetEditItemComponent.ts',
 			'./src/flowsheet/components/flowsheetItemGroup/flowsheetItemGroupComponent.ts',
 			'./src/flowsheet/components/flowsheetItemRule/flowsheetItemRuleComponent.ts',
+			'./src/flowsheet/components/flowsheetTrigger/flowsheetTriggerComponent.ts',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',

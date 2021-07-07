@@ -60,6 +60,25 @@
 			</juno-input>
 		</div>
 	</div>
+	<div class="flex-column trigger-code-list">
+		<span class="row-padding">Trigger Codes</span>
+		<div class="flex-row flex-grow">
+			<flowsheet-trigger ng-repeat="triggerCode in $ctrl.flowsheet.triggerCodes"
+			                   model="triggerCode"
+			                   class="row-padding"
+			                   on-delete="$ctrl.onDeleteTriggerCode(triggerCode)">
+			</flowsheet-trigger>
+			<div class="icon-only-button-wrapper">
+				<juno-button component-style="$ctrl.componentStyle"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+				             disabled="$ctrl.isLoading"
+				             click="$ctrl.onAddTriggerCode()">
+					<i class="icon icon-add"></i>
+				</juno-button>
+			</div>
+		</div>
+	</div>
 
 	<div class="flex-column">
 		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups"
