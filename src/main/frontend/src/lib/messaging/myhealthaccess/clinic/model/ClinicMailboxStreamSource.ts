@@ -103,7 +103,7 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 
 	protected async countMessages(): Promise<void>
 	{
-		this._totalMessageCount = (await this._messagingService.countMessages(this._source, this._searchParams.group));
+		this._totalMessageCount = (await this._messagingService.countMessages(this._source, this._searchParams));
 	}
 
 	/**
@@ -115,7 +115,7 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 	{
 		if (this._totalMessageCount && !this._exhausted)
 		{
-			const currCount = (await this._messagingService.countMessages(this._source, this._searchParams.group));
+			const currCount = (await this._messagingService.countMessages(this._source, this._searchParams));
 
 			if (currCount > this._totalMessageCount)
 			{

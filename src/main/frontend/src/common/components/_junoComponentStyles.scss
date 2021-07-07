@@ -7,6 +7,7 @@
 
 .juno-input-label-left {
 	margin-right: 16px;
+	margin-bottom: 0 !important;/// _forms.scss is a little baby and will add a margin to the bottom!
 	text-align: right;
 }
 

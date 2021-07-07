@@ -10,6 +10,8 @@
 		                  message-stream="$ctrl.messageStream"
 		                  messaging-backend-id="$ctrl.backend"
 		                  messageable-filter="$ctrl.messageableFilter"
+		                  only-unread="$ctrl.onlyUnread"
+		                  search-keyword="$ctrl.searchKeyword"
 		                  source-id="$ctrl.selectedSourceId"
 		                  group-id="$ctrl.selectedGroupId">
 		</inbox-header-bar>
@@ -31,6 +33,8 @@
 			              source-id="$ctrl.selectedSourceId"
 			              group-id="$ctrl.selectedGroupId"
 			              messageable-filter="$ctrl.messageableFilter"
+			              only-unread="$ctrl.onlyUnread"
+			              search-keyword="$ctrl.searchKeyword"
 			              message-stream-change="$ctrl.onMessageStreamChange(stream)"
 			              component-style="$ctrl.componentStyle">
 			</message-list>

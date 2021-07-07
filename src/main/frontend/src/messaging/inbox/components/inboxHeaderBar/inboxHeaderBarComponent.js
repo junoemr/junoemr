@@ -35,6 +35,8 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 		componentStyle: "<?",
 		messageableFilter: "=?",
 		selectedMessageId: "=",
+		onlyUnread: "=?",
+		searchKeyword: "=?",
 		massEditList: "=",
 		messageStream: "<",
 		messagingBackendId: "<",
@@ -65,6 +67,8 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				ctrl.messagingService = MessagingServiceFactory.build(ctrl.messagingBackendId);
+				ctrl.onlyUnread = ctrl.onlyUnread || false;
+				ctrl.searchKeyword = ctrl.searchKeyword || "";
 			};
 
 			/**
@@ -253,6 +257,21 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 					return await ctrl.messagingService.getMessage(await ctrl.messagingService.getMessageSourceById(ctrl.sourceId), ctrl.selectedMessageId);
 				}
 			}
+
+			ctrl.onUnreadFilterChange = (checked) =>
+			{
+				// update url
+				$state.go(".", {onlyUnread: checked}, {location: "replace"});
+			}
+
+			ctrl.updateKeywordFilter = (keyword) =>
+			{
+				ctrl.searchKeyword = keyword;
+
+				// update url
+				$state.go(".", {keyword}, {location: "replace"});
+			}
+
 
 			$scope.$watch("$ctrl.massEditList.length", (newList) => ctrl.massSelectActive = ctrl.massEditList.length > 0)
 

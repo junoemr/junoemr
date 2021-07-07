@@ -34,8 +34,10 @@ angular.module("Messaging.Components").component('messageableSearch', {
 		messagingService: "<",
 		sourceId: "<",
 		disabled: "<?",
+		initialText: "<?",// initial text to fill the input with
 		icon: "@?",
 		onSelected: "&?",
+		onTextChange: "&?", // called when the entered text changes. raw text provided in value variable
 		componentStyle: "<?"
 	},
 	controller: [
@@ -77,6 +79,11 @@ angular.module("Messaging.Components").component('messageableSearch', {
 					// clear selection if id no longer matches
 					ctrl.ngModel = null;
 					ctrl.updateCheckmarkVisibility();
+				}
+
+				if (ctrl.onTextChange)
+				{
+					ctrl.onTextChange({value: selection});
 				}
 			}
 

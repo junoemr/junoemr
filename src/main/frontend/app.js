@@ -317,7 +317,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		})
 		.state('messaging.view',
 		{
-			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded",
+			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded?onlyUnread?keyword",
 			component: "messagingInbox",
 			params: {
 				backend: {
@@ -335,6 +335,14 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				recordPageEmbedded: {
 					value: "false",
 				},
+				onlyUnread: {
+					dynamic: true,
+					value: "false",
+				},
+				keyword: {
+					dynamic: true,
+					value: null,
+				}
 			}
 		})
 		.state('messaging.view.message',
@@ -684,7 +692,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		})
 		.state('record.messaging.view',
 		{
-			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded",
+			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded?onlyUnread?keyword",
 			component: "messagingInbox",
 			params: {
 				backend: {
@@ -703,6 +711,14 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				recordPageEmbedded: {
 					value: "false",
 				},
+				onlyUnread: {
+					dynamic: true,
+					value: "false",
+				},
+				keyword: {
+					dynamic: true,
+					value: null,
+				}
 			}
 		})
 		.state('record.messaging.view.message',

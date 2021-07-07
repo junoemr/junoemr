@@ -3,9 +3,18 @@
 		<h6 class="m-l-32 m-r-8">Inbox</h6>
 	</div>
 
+	<!-- Only unread -->
+	<juno-check-box ng-model="$ctrl.onlyUnread"
+	                class="checkbox-no-drop-shadow unread-checkbox m-l-16 m-r-16"
+	                title="only show unread messages"
+	                label="Unread"
+	                change="$ctrl.onUnreadFilterChange(value)"
+	>
+	</juno-check-box>
+
 	<!-- check / un check all -->
 	<juno-check-box ng-model="$ctrl.massSelectActive"
-	                class="check-all m-l-16 m-r-16"
+	                class="checkbox-no-drop-shadow m-l-16 m-r-16"
 	                title="{{$ctrl.massSelectActive ? 'clear selection' : 'select all'}}"
 	                change="$ctrl.selectUnselectAll()"
 	                dummy="true">
@@ -14,9 +23,11 @@
 	<!-- Inbox search -->
 	<messageable-search class="search-input"
 	                    ng-model="$ctrl.messageableFilter"
-	                    placeholder="Filter by {{$ctrl.groupId === MessageGroup.Sent ? 'Recipient' : 'Sender'}}"
+	                    placeholder="Search"
 	                    messaging-service="$ctrl.messagingService"
 	                    source-id="$ctrl.sourceId"
+	                    on-text-change="$ctrl.updateKeywordFilter(value)"
+	                    initial-text="$ctrl.searchKeyword"
 	                    icon="icon-search"
 	                    component-style="JUNO_STYLE.DEFAULT">
 	</messageable-search>

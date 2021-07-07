@@ -193,6 +193,8 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 					searchOptions.group?.toString(),
 					searchOptions.limit,
 					searchOptions.offset,
+					searchOptions.onlyUnread,
+					searchOptions.keyword,
 					searchOptions.sender?.id,
 					searchOptions.sender?.type.toString(),
 					searchOptions.recipient?.id,
@@ -237,20 +239,32 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	/**
 	 * count messages.
 	 * @param source - source to count messages in
-	 * @param group - [optional] group to count messages in
-	 * @param onlyUnread - [optional] if true only count unread messages
+	 * @param searchOptions - filters to narrow the count.
 	 * @return the count of messages
 	 */
-	public async countMessages(source: MessageSource, group = MessageGroup.All, onlyUnread = false): Promise<number>
+	public async countMessages(source: MessageSource, searchOptions: MessageSearchParams): Promise<number>
 	{
 		if (source.isVirtual)
 		{
 			return await this.getPhysicalMessagingSources().reduce(async (total: Promise<number>, physicalSource) => {
-				return (await total) + (await this.countMessages(physicalSource, group, onlyUnread));
+				return (await total) + (await this.countMessages(physicalSource, searchOptions));
 			}, new Promise((resolve) => resolve(0))) as number;
 		}
 
-		return (await this._mhaClinicMessagingApi.countMessages(source.id, group.toString(), onlyUnread)).data.body;
+		if (!searchOptions.group)
+		{
+			searchOptions.group = MessageGroup.All;
+		}
+
+		return (await this._mhaClinicMessagingApi.countMessages(
+			source.id,
+			searchOptions.group.toString(),
+			searchOptions.onlyUnread,
+			searchOptions.keyword,
+			searchOptions.sender?.id,
+			searchOptions.sender?.type.toString(),
+			searchOptions.recipient?.id,
+			searchOptions.recipient?.type.toString())).data.body;
 	}
 
 	/**

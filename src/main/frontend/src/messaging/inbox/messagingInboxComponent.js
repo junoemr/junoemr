@@ -54,6 +54,8 @@ angular.module("Messaging").component('messagingInbox', {
 		ctrl.groups = [];
 		ctrl.messageStream = null;
 		ctrl.selectedMessageId = $stateParams.messageId;
+		ctrl.onlyUnread = $stateParams.onlyUnread ? Juno.Common.Util.parseBoolean($stateParams.onlyUnread) : false; // only show unread messages
+		ctrl.searchKeyword = $stateParams.keyword || null;
 
 		// a list of all messages currently selected for "group editing"
 		ctrl.massEditList = []; // Type Message[]
