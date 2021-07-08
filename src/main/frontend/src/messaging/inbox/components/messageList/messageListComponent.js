@@ -56,7 +56,7 @@ angular.module("Messaging.Components").component('messageList', {
 
 			ctrl.messageStream = null;
 			ctrl.debounceTimeout = null;
-			ctrl.DEBOUNCE_TIME_MS = 1000; // 1 second
+			ctrl.DEBOUNCE_TIME_MS = 60000; // 1 second
 			ctrl.MESSAGE_FETCH_COUNT = 10;
 
 			ctrl.newMessagesCheckInterval = null;
@@ -95,12 +95,17 @@ angular.module("Messaging.Components").component('messageList', {
 
 						if (count > ctrl.currentMessageCount)
 						{
-							const diff = count - ctrl.currentMessageCount;
-							const newMessages = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId),
-								ctrl.getMessageSearchParams(diff, 0));
-							ctrl.messageStream.unshift(...newMessages);
+							const firstMessage = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.getMessageSearchParams(1, 0));
 
-							$scope.$apply();
+							if (firstMessage.length === 0 || firstMessage[0].id !== ctrl.messageStream[0].id)
+							{
+								const diff = count - ctrl.currentMessageCount;
+								const newMessages = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId),
+									ctrl.getMessageSearchParams(diff, 0));
+								ctrl.messageStream.unshift(...newMessages);
+
+								$scope.$apply();
+							}
 						}
 						ctrl.currentMessageCount = count;
 					}

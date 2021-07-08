@@ -11,6 +11,7 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 	protected _offset: number;
 	protected readonly _bucketSize = 25;
 	protected _bucket: Message[];
+	protected _lastLoadBucket: Message[]; // contains the last loaded bucket (items aren't removed on popNext())
 	protected _totalMessageCount: number = null;
 	protected _exhausted: boolean;
 
@@ -96,6 +97,7 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 
 		this.countMessages();// intentional no await
 		this._bucket = (await this._messagingService.searchMessages(this._source, this._searchParams)).reverse();
+		this._lastLoadBucket = [...this._bucket];
 
 		this._exhausted = this._bucket.length == 0;
 		this._offset += this._bucket.length;
@@ -117,15 +119,31 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 		{
 			const currCount = (await this._messagingService.countMessages(this._source, this._searchParams));
 
-			if (currCount > this._totalMessageCount)
+			if (currCount !== this._totalMessageCount && (await this.haveMessagesShifted()))
 			{
-				this.fastForward(currCount - this._totalMessageCount);
-			}
-			else if (currCount < this._totalMessageCount)
-			{
-				this.rewind(this._totalMessageCount - currCount);
+				if (currCount > this._totalMessageCount)
+				{
+					this.fastForward(currCount - this._totalMessageCount);
+				}
+				else if (currCount < this._totalMessageCount)
+				{
+					this.rewind(this._totalMessageCount - currCount);
+				}
 			}
 		}
+	}
+
+	/**
+	 * check if the messages on the server have shifted when compared to what we have loaded
+	 * @return true / false indicating if messages have shifted or no
+	 * @protected
+	 */
+	protected async haveMessagesShifted(): Promise<boolean>
+	{
+		this._searchParams.limit = 1;
+		this._searchParams.offset = this._offset -1;
+		const lastKnownMessage: Message[] = (await this._messagingService.searchMessages(this._source, this._searchParams));
+		return lastKnownMessage.length === 0 || lastKnownMessage[0].id !== this._lastLoadBucket[0].id;
 	}
 
 }
