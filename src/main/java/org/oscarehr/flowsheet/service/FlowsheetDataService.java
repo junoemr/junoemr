@@ -141,7 +141,7 @@ public class FlowsheetDataService
 		String typeCode = item.getTypeCode();
 		if(dsInfoCache.hasRecommendation(typeCode))
 		{
-			dsInfoCache.getWarnings(typeCode).forEach((recommendation) -> {
+			dsInfoCache.getRecommendations(typeCode).forEach((recommendation) -> {
 				FlowsheetItemAlert alert = new FlowsheetItemAlert(recommendation, SeverityLevel.RECOMMENDATION);
 				item.addFlowsheetItemAlert(alert);
 			});

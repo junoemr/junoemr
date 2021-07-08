@@ -61,6 +61,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 						value: "",
 						observationDateTime: moment(),
 					};
+					ctrl.checkboxValue = false;
 				}
 
 				ctrl.valueIsBoolean = () =>
@@ -116,6 +117,11 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 						return false;
 					}
 					return true;
+				}
+
+				ctrl.onBooleanValueChange = (value) =>
+				{
+					ctrl.newEntry.value = value ? "Yes" : "No";
 				}
 
 				ctrl.canSubmitItem = () =>
