@@ -199,23 +199,20 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     }
 
     @Override
+    public int getMonthsSinceLastRecordedDate(String measurement)
+    {
+        return getLastDateRecordedInMonths(measurement);
+    }
+
     public int getLastDateRecordedInMonths(String measurement)
     {
         int numMonths = -1;
-        ArrayList list = getMeasurementData(measurement);
-        Hashtable h =  null;
+        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if ( list != null && list.size() > 0){
-            //h = (Hashtable) list.get(0);
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
+            EctMeasurementsDataBean mdata = list.get(0);
             Date date = mdata.getDateObservedAsDate();
             numMonths = getNumMonths(date, Calendar.getInstance().getTime());
         }
-
-        //EctMeasurementsDataBeanHandler.getLast(demographicNo, measurement);
-        //if (h != null ){
-        //   Date date = ConversionUtils.fromTimestampString(h.get("dateObserved");
-        //   numMonths = getNumMonths(date, Calendar.getInstance().getTime());
-        //}
         log.debug("Returning the number of months "+numMonths);
         return numMonths;
     }
@@ -223,11 +220,11 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public String getLastDateRecordedInMonthsMsg (String measurement){
         String message = "";
         int numMonths = -1;
-        ArrayList list = getMeasurementData(measurement);
+        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
 
         if ( list != null && list.size() > 0){
            
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
+            EctMeasurementsDataBean mdata = list.get(0);
             Date date = mdata.getDateObservedAsDate();
             numMonths = getNumMonths(date, Calendar.getInstance().getTime());
         }
@@ -244,32 +241,54 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     }
 
     @Override
+    public Double getLatestValueNumeric(String measurement)
+    {
+       int intVal = getLastValueAsInt(measurement);
+       if(intVal < 0)
+       {
+           return null;
+       }
+       return (double) intVal;
+    }
+
     public int getLastValueAsInt(String measurement)
     {
-
         int value = -1; //TODO-legacy not sure how to handle a non int value.
-        ArrayList list = getMeasurementData(measurement);
-        Hashtable h =  null;
-        if ( list != null && list.size() > 0){
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
-            try{
-             value = Integer.parseInt(mdata.getDataField());
-            }catch (Exception e ){
-               MiscUtils.getLogger().error("Error", e);
+        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        if(list != null && list.size() > 0)
+        {
+            EctMeasurementsDataBean mdata = list.get(0);
+            try
+            {
+                value = Integer.parseInt(mdata.getDataField());
+            }
+            catch(Exception e)
+            {
+                MiscUtils.getLogger().error("Error", e);
             }
         }
-        log.debug("Returning the number of months "+value);
         return value;
     }
 
     @Override
-    public int isDataEqualToYes(String measurement){   	
+    public String getLatestValue(String measurement)
+    {
+        String value = null;
+        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        if(list != null && list.size() > 0)
+        {
+            EctMeasurementsDataBean mdata = list.get(0);
+            value = mdata.getDataField();
+        }
+        return value;
+    }
+
+    public int isDataEqualToYes(String measurement){
         int v = 0;
         String str="";
-        ArrayList list = getMeasurementData(measurement);
-        Hashtable h =  null;
+        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if ( list != null && list.size() > 0){
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
+            EctMeasurementsDataBean mdata = list.get(0);
             try{
             	str = mdata.getDataField();
             }catch (Exception e ){
@@ -309,6 +328,12 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
     	Demographic d = demographicDao.getDemographic(demographicNo);
     	return d.getAgeInYears();
+    }
+
+    @Override
+    public int getAgeInYears()
+    {
+        return getAge();
     }
     
 

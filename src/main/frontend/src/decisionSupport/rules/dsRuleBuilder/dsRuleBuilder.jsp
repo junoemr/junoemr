@@ -24,6 +24,7 @@
 				             class="first-row-input"
 				             options="$ctrl.conditionTypeOptions"
 				             disabled="$ctrl.disabled"
+				             on-change="$ctrl.onConditionTypeChange(condition)"
 				             ng-model="condition.type">
 				</juno-select>
 				<juno-input ng-if="$ctrl.showConditionValueInput(condition)"

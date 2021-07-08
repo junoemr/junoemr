@@ -23,42 +23,20 @@
 package org.oscarehr.decisionSupport2.model.condition;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.decisionSupport2.model.DsInfoLookup;
-import org.oscarehr.util.MiscUtils;
-
-import java.util.Optional;
 
 @Data
-public abstract class DsCondition extends AbstractTransientModel
+public class ConditionLatestValueEqual extends DsCondition
 {
-	private Integer id;
-	private String value;
-	private ConditionType type;
-
-	protected DsCondition()
+	public ConditionLatestValueEqual()
 	{
-		this(ConditionType.NEVER_GIVEN);
+		super(ConditionType.VALUE_EQ);
 	}
 
-	public DsCondition(ConditionType type)
+	@Override
+	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
-		this.type = type;
+		String latestValue = dsInfoLookup.getLatestValue(typeCode);
+		return (getValue().equalsIgnoreCase(latestValue));
 	}
-
-	protected Optional<Double> getNumericValue()
-	{
-		Double numericValue = null;
-		try
-		{
-			numericValue = Double.parseDouble(this.getValue());
-		}
-		catch(NumberFormatException e)
-		{
-			MiscUtils.getLogger().warn("invalid ds rule condition value: '" + getValue() + "' is not numeric");
-		}
-		return Optional.ofNullable(numericValue);
-	}
-
-	public abstract boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup);
 }

@@ -24,10 +24,16 @@ package org.oscarehr.decisionSupport2.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.decisionSupport2.entity.DsRuleCondition;
+import org.oscarehr.decisionSupport2.model.condition.ConditionAgeInYearsGreaterThan;
+import org.oscarehr.decisionSupport2.model.condition.ConditionAgeInYearsLessThan;
 import org.oscarehr.decisionSupport2.model.condition.ConditionIsGender;
 import org.oscarehr.decisionSupport2.model.condition.ConditionIsNotGender;
-import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSinceGreater;
-import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSinceLess;
+import org.oscarehr.decisionSupport2.model.condition.ConditionLatestValueEqual;
+import org.oscarehr.decisionSupport2.model.condition.ConditionLatestValueGreaterThan;
+import org.oscarehr.decisionSupport2.model.condition.ConditionLatestValueLessThan;
+import org.oscarehr.decisionSupport2.model.condition.ConditionLatestValueNotEqual;
+import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSinceGreaterThan;
+import org.oscarehr.decisionSupport2.model.condition.ConditionMonthsSinceLessThan;
 import org.oscarehr.decisionSupport2.model.condition.ConditionNeverGiven;
 import org.oscarehr.decisionSupport2.model.condition.DsCondition;
 import org.springframework.beans.BeanUtils;
@@ -47,10 +53,16 @@ public class DsConditionDbToModelConverter extends AbstractModelConverter<DsRule
 		switch(input.getType())
 		{
 			case NEVER_GIVEN: condition = new ConditionNeverGiven(); break;
-			case MONTHS_SINCE_GT: condition = new ConditionMonthsSinceGreater(); break;
-			case MONTHS_SINCE_LT: condition = new ConditionMonthsSinceLess(); break;
+			case MONTHS_SINCE_GT: condition = new ConditionMonthsSinceGreaterThan(); break;
+			case MONTHS_SINCE_LT: condition = new ConditionMonthsSinceLessThan(); break;
 			case PATIENT_GENDER_EQ: condition = new ConditionIsGender(); break;
 			case PATIENT_GENDER_NE: condition = new ConditionIsNotGender(); break;
+			case PATIENT_AGE_GT: condition = new ConditionAgeInYearsGreaterThan(); break;
+			case PATIENT_AGE_LT: condition = new ConditionAgeInYearsLessThan(); break;
+			case VALUE_EQ: condition = new ConditionLatestValueEqual(); break;
+			case VALUE_NE: condition = new ConditionLatestValueNotEqual(); break;
+			case VALUE_GT: condition = new ConditionLatestValueGreaterThan(); break;
+			case VALUE_LT: condition = new ConditionLatestValueLessThan(); break;
 			default: throw new IllegalStateException("condition type " + input.getType() + " is not defined");
 		}
 

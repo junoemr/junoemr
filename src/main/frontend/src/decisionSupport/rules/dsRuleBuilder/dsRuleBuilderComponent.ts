@@ -50,6 +50,12 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 					{label: "Months Since is more than", value: ConditionType.MONTHS_SINCE_GT},
 					{label: "Months Since is less than", value: ConditionType.MONTHS_SINCE_LT},
 					{label: "Never Given", value: ConditionType.NEVER_GIVEN},
+					{label: "Last record is exactly", value: ConditionType.VALUE_EQ},
+					{label: "Last record is not", value: ConditionType.VALUE_NE},
+					{label: "Last record is more than", value: ConditionType.VALUE_GT},
+					{label: "Last record is less than", value: ConditionType.VALUE_LT},
+					{label: "Patient age (years) more than", value: ConditionType.PATIENT_AGE_GT},
+					{label: "Patient age (years) less than", value: ConditionType.PATIENT_AGE_LT},
 					{label: "Patient gender matches", value: ConditionType.PATIENT_GENDER_EQ},
 					{label: "Patient gender does not match", value: ConditionType.PATIENT_GENDER_NE},
 				];
@@ -91,10 +97,22 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 					ctrl.model.consequences.push(new DsRuleConsequenceModel());
 				}
 
+				ctrl.onConditionTypeChange = (condition: DsRuleConditionModel): void =>
+				{
+					condition.value = null;
+				}
+
 				ctrl.showConditionValueInput = (condition: DsRuleConditionModel): boolean =>
 				{
 					return (condition.type === ConditionType.MONTHS_SINCE_GT
-						|| condition.type === ConditionType.MONTHS_SINCE_LT);
+						|| condition.type === ConditionType.MONTHS_SINCE_LT
+						|| condition.type === ConditionType.VALUE_LT
+						|| condition.type === ConditionType.VALUE_GT
+						|| condition.type === ConditionType.VALUE_EQ
+						|| condition.type === ConditionType.VALUE_NE
+						|| condition.type === ConditionType.PATIENT_AGE_GT
+						|| condition.type === ConditionType.PATIENT_AGE_LT
+					);
 				}
 
 				ctrl.showConditionValueSelect = (condition: DsRuleConditionModel): boolean =>

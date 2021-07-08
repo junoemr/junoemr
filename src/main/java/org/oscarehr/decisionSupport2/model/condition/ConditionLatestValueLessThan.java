@@ -25,18 +25,25 @@ package org.oscarehr.decisionSupport2.model.condition;
 import lombok.Data;
 import org.oscarehr.decisionSupport2.model.DsInfoLookup;
 
+import java.util.Optional;
+
 @Data
-public class ConditionMonthsSinceLess extends DsCondition
+public class ConditionLatestValueLessThan extends DsCondition
 {
-	public ConditionMonthsSinceLess()
+	public ConditionLatestValueLessThan()
 	{
-		super(ConditionType.MONTHS_SINCE_LT);
+		super(ConditionType.VALUE_LT);
 	}
 
 	@Override
 	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
-		int monthsSince = dsInfoLookup.getLastDateRecordedInMonths(typeCode);
-		return (monthsSince < Double.parseDouble(getValue()));
+		Optional<Double> latestValueOption = Optional.ofNullable(dsInfoLookup.getLatestValueNumeric(typeCode));
+		Optional<Double> numericValue = getNumericValue();
+		if(latestValueOption.isPresent() && numericValue.isPresent())
+		{
+			return latestValueOption.get() < numericValue.get();
+		}
+		return false;
 	}
 }

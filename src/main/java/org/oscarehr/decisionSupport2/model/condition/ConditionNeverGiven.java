@@ -36,7 +36,7 @@ public class ConditionNeverGiven extends DsCondition
 	@Override
 	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
-		int monthsSince = dsInfoLookup.getLastDateRecordedInMonths(typeCode);
+		int monthsSince = dsInfoLookup.getMonthsSinceLastRecordedDate(typeCode);
 		return (monthsSince < 0);
 	}
 }

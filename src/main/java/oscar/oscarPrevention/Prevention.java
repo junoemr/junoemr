@@ -227,6 +227,7 @@ public class Prevention implements DsInfoCache, DsInfoLookup
       return ageInMonths;
    }
 
+   @Override
    public int getAgeInYears(){
 	   if(DOB !=null)
 		   return getNumYears(DOB,Calendar.getInstance().getTime());
@@ -475,21 +476,21 @@ public class Prevention implements DsInfoCache, DsInfoLookup
    }
 
     @Override
-    public int getLastDateRecordedInMonths(String typeCode)
+    public int getMonthsSinceLastRecordedDate(String typeCode)
     {
         return getHowManyMonthsSinceLast(typeCode);
     }
 
     @Override
-    public int getLastValueAsInt(String typeCode)
+    public Double getLatestValueNumeric(String typeCode)
     {
-        return -1;
+        return null;
     }
 
     @Override
-    public int isDataEqualToYes(String typeCode)
+    public String getLatestValue(String typeCode)
     {
-        return -1;
+        return null;
     }
 
     @Override

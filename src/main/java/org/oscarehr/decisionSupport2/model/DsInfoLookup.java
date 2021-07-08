@@ -24,8 +24,34 @@ package org.oscarehr.decisionSupport2.model;
 
 public interface DsInfoLookup
 {
-	int getLastDateRecordedInMonths(String typeCode);
-	int getLastValueAsInt(String typeCode);
-	int isDataEqualToYes(String typeCode);
+	/**
+	 * get the number of months since the last recorded case
+	 * @param typeCode the type of item
+	 * @return the number of months since the last recorded data, or -1 if never recorded
+	 */
+	int getMonthsSinceLastRecordedDate(String typeCode);
+
+	/**
+	 * gets a numeric representation of the last recorded data, or null if never recorded / is not a number
+	 * @return the numeric value, or null
+	 */
+	Double getLatestValueNumeric(String typeCode);
+
+	/**
+	 * gets a string representation of the last recorded data, or null if never recorded
+	 * @return the string value, or null
+	 */
+	String getLatestValue(String typeCode);
+
+	/**
+	 * gets the gender assigned to the patient record, as a string
+	 * @return the gender string representation
+	 */
 	String getGender();
+
+	/**
+	 * get the patient age in years
+	 * @return the age value
+	 */
+	int getAgeInYears();
 }

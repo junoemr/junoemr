@@ -25,10 +25,9 @@ package org.oscarehr.decisionSupport2.model.condition;
 public enum ConditionType
 {
 	VALUE_GT,
-	VALUE_GE,
 	VALUE_LT,
-	VALUE_LE,
 	VALUE_EQ,
+	VALUE_NE,
 	MONTHS_SINCE_GT,
 	MONTHS_SINCE_LT,
 	NEVER_GIVEN,
