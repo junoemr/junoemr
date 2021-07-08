@@ -55,7 +55,7 @@ public class AddMeasurementsClassicUITests extends SeleniumTestBase
 	{
 		SchemaUtils.restoreTable(
 				"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
-				"eChart", "Facility", "issue","log",  "LookupList", "LookupListItem", "measurementType", "measurements",
+				"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
 				"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
 				"secUserRole", "tickler_text_suggest", "validations"
 
