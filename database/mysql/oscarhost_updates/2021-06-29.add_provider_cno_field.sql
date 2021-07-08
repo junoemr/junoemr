@@ -1,1 +1,1 @@
-ALTER TABLE provider ADD COLUMN ontario_cno_number VARCHAR(20) AFTER alberta_connect_care_id;
+ALTER TABLE provider ADD COLUMN IF NOT EXISTS ontario_cno_number VARCHAR(20) AFTER alberta_connect_care_id;
