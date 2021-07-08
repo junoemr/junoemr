@@ -21,8 +21,11 @@
 * Canada
 --%>
 <div class="flowsheet-item">
-	<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
-	<div>{{$ctrl.model.description}}</div>
+	<div class="flex-row align-items-center">
+		<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
+		<div class="item-description">{{$ctrl.model.description}}</div>
+	</div>
+	<div class="item-guideline">Guideline: {{$ctrl.model.guideline}}</div>
 
 	<div ng-repeat="alert in $ctrl.validationAlerts">
 		<div class="alert alert-danger" role="alert">
