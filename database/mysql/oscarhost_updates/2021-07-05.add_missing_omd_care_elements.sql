@@ -60,8 +60,8 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'WHEEZING - LOCA
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'URINARY MICROALBUMIN SCREEN' AS type, 'Urinary Microalbumin Screen' AS typeDisplayName, 'Urinary Microalbumin Screen' AS typeDescription, '' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
-FROM validations v WHERE v.name = 'No Validations') AS temp
+(SELECT 'URINARY MICROALBUMIN SCREEN' AS type, 'Urinary Microalbumin Screen' AS typeDisplayName, 'Urinary Microalbumin Screen' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'URINARY MICROALBUMIN SCREEN');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
@@ -110,7 +110,7 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'NYHA - CLASS IV
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'LUNG CRACKLES - location)' AS type, 'Lung Crackles' AS typeDisplayName, 'Lung Crackles location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'LUNG CRACKLES - location' AS type, 'Lung Crackles' AS typeDisplayName, 'Lung Crackles location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'LUNG CRACKLES - location');
 
