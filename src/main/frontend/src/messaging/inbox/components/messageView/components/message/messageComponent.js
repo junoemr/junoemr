@@ -78,7 +78,7 @@ angular.module("Messaging.Components.View.Components").component('message', {
 
 			ctrl.formattedMessageDate = () =>
 			{
-				return ctrl.message.createdAtDateTime.format(Juno.Common.Util.settings.message_date_format);
+				return ctrl.message.createdAtDateTime.format(Juno.Common.Util.settings.message_date_long_format);
 			};
 
 			ctrl.toDemographicSummary = (demographicNo) =>

@@ -48,7 +48,14 @@ angular.module("Messaging.Components").component('messageCard', {
 
 			ctrl.formatMessageDate = (date) =>
 			{
-				return date.format(Juno.Common.Util.settings.message_date_format);
+				if (date.year() === moment().year())
+				{
+					return date.format(Juno.Common.Util.settings.message_date_short_format);
+				}
+				else
+				{
+					return date.format(Juno.Common.Util.settings.message_date_long_format);
+				}
 			}
 
 			ctrl.onCheckedChange = (selected) =>
