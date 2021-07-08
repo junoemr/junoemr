@@ -52,6 +52,7 @@ import org.oscarehr.dataMigration.model.lab.Lab;
 import org.oscarehr.dataMigration.model.lab.LabObservation;
 import org.oscarehr.dataMigration.model.lab.LabObservationResult;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
+import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
@@ -90,7 +91,7 @@ import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -346,17 +347,24 @@ public class PatientImportService
 			// check if the lab has passed validation and can be saved
 			if(parser.canUpload())
 			{
-				List<ProviderData> reviewers = reviewerModelToDbConverter.convert(lab.getReviewers());
+				//List<ProviderData> reviewers = reviewerModelToDbConverter.convert(lab.getReviewers());
+
+				List<Reviewer> reviewers = lab.getReviewers();
 
 				// remove provider duplicates
-				Map<String, ProviderData> duplicateMap = new HashMap<>();
-				for(ProviderData provider : reviewers)
+				Map<ProviderData, LocalDateTime> filteredReviewers = new HashMap<>();
+				for(Reviewer reviewer : reviewers)
 				{
-					duplicateMap.put(provider.getId(), provider);
-				}
-				List<ProviderData> filteredReviewers = new ArrayList<>(duplicateMap.values());
+					if (!filteredReviewers.containsKey(reviewerModelToDbConverter.convert(reviewer)))
+					{
+						filteredReviewers.put(reviewerModelToDbConverter.convert(reviewer), reviewer.getReviewDateTime().toLocalDateTime());
+					}
 
-				Hl7TextMessage hl7TextMessage = labService.persistNewHL7Lab(parser, labHl7, "Juno-Import", 0, dbDemographic, filteredReviewers, ProviderInboxItem.FILE);
+				}
+				logger.error(filteredReviewers.toString());
+
+				Hl7TextMessage hl7TextMessage = labService.persistNewHL7Lab(parser, labHl7, "Juno-Import",
+						0, dbDemographic, filteredReviewers, ProviderInboxItem.ACK);
 				parser.postUpload();
 
 				// indexes are assumed to line up since this is the same iteration happening in the JunoGenericImportLabWriter

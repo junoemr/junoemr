@@ -227,15 +227,17 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	private String getOBXName(LaboratoryResults importLabResults)
 	{
 		String name = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
-		if(name == null)
+		String testCode = StringUtils.trimToNull(importLabResults.getLabTestCode());
+
+		if (name != null && testCode != null)
 		{
-			name = StringUtils.trimToNull(importLabResults.getLabTestCode());
+			return testCode + " : " + name;
 		}
-		if(name == null)
+		else if (name == null && testCode != null)
 		{
-			name = UNKNOWN_OBX_NAME;
+			return testCode;
 		}
-		return name;
+		return UNKNOWN_OBX_NAME;
 	}
 
 	private String getOBXId(LaboratoryResults importLabResults)
@@ -268,7 +270,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		if(referenceRange != null)
 		{
 			String lowLimit = referenceRange.getLowLimit();
-			String highLimit = referenceRange.getLowLimit();
+			String highLimit = referenceRange.getHighLimit();
 			if(lowLimit != null || highLimit != null)
 			{
 				rangeText = StringUtils.trimToEmpty(lowLimit) + "-" + StringUtils.trimToEmpty(highLimit);

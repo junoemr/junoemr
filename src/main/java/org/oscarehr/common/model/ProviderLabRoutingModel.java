@@ -109,8 +109,15 @@ public class ProviderLabRoutingModel extends AbstractModel<Integer> implements S
 	}
 	
 	@PrePersist
-	@PreUpdate
 	protected void jpa_setTimestamp() {
+		if (this.timestamp == null)
+		{
+			this.timestamp = new Date();
+		}
+	}
+
+	@PreUpdate
+	protected void jpa_updateTimestamp() {
 		this.timestamp = new Date();
 	}
 	

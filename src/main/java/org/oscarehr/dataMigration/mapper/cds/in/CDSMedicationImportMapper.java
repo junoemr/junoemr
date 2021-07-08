@@ -28,6 +28,7 @@ import org.oscarehr.dataMigration.exception.InvalidFrequencyCodeException;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
@@ -38,6 +39,8 @@ import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
@@ -80,17 +83,26 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 			medication = customMedication;
 		}
 
+		// "dosage" in CDS == takemin/takemax
+		medication.setTakeMax(Float.parseFloat(importStructure.getDosage()));
+		medication.setTakeMin(Float.parseFloat(importStructure.getDosage()));
+
+
 		medication.setWrittenDate(getWrittenDate(importStructure));
 		medication.setRxStartDate(getStartDate(importStructure));
+
+		// Medication refills
+		medication.setRepeat(toIntOrNull(importStructure.getNumberOfRefills()));
 		medication.setRefillQuantity(toIntOrNull(importStructure.getRefillQuantity()));
+		medication.setRefillDuration(toIntOrNull(importStructure.getRefillDuration()));
+
 		medication.setDrugForm(importStructure.getForm());
 		medication.setRoute(importStructure.getRoute());
 		medication.setFrequencyCode(getFormattedFrequency(importStructure));
 		medication.setDuration(importStructure.getDuration());
 		medication.setDurationUnit(null); //TODO - is there a cds default?
-		medication.setRefillDuration(toIntOrNull(importStructure.getRefillDuration()));
+
 		medication.setQuantity(importStructure.getQuantity());
-		medication.setRefillQuantity(toIntOrNull(importStructure.getRefillQuantity()));
 		medication.setLongTerm(getYIndicator(importStructure.getLongTermMedication()));
 		medication.setPastMed(getYIndicator(importStructure.getPastMedications()));
 		medication.setPrescribingProvider(getPrescribingProvider(importStructure));
@@ -100,17 +112,97 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		medication.setETreatmentType(CDSConstants.TreatmentType.fromValue(importStructure.getTreatmentType()));
 		medication.setRxStatus(CDSConstants.PrescriptionStatus.fromValue(importStructure.getPrescriptionStatus()));
 		medication.setNonAuthoritative(toBooleanOrNull(importStructure.getNonAuthoritativeIndicator()));
-		// TODO importStructure.getPriorPrescriptionReferenceIdentifier();
 		medication.setDispenseInterval(toIntOrNull(importStructure.getDispenseInterval()));
+		medication.setRxEndDate(getEndDate(importStructure));
+		// medication.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
+		medication.setResidualInfo(generateResidualInfo(importStructure));
+
+		// TODO WHAT TO DO WITH THESE?
+		// TODO importStructure.getPriorPrescriptionReferenceIdentifier();
 		// TODO importStructure.getDrugDescription();
 		// TODO importStructure.getProblemCode();
 		// TODO importStructure.getProtocolIdentifier();
 
-		medication.setRxEndDate(getEndDate(importStructure));
-
-		medication.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
-
 		return medication;
+	}
+
+	protected List<ResidualInfo> generateResidualInfo(MedicationsAndTreatments importStructure)
+	{
+		List<ResidualInfo> residualInfoList = importAllResidualInfo(importStructure.getResidualInfo());
+		if (residualInfoList == null)
+		{
+			residualInfoList = new ArrayList<>(4); // If residualInfoList is null, max item count is 4
+		}
+
+		// No other place to put the following items.
+		if (importStructure.getPrescriptionIdentifier() != null)
+		{
+			ResidualInfo prescriptionIdentifier = new ResidualInfo();
+			prescriptionIdentifier.setContentKey("PrescriptionIdentifier");
+			prescriptionIdentifier.setContentType("String");
+			prescriptionIdentifier.setContentValue(importStructure.getPrescriptionIdentifier());
+			residualInfoList.add(prescriptionIdentifier);
+		}
+
+		if (importStructure.getPriorPrescriptionReferenceIdentifier() != null)
+		{
+			ResidualInfo priorPrescriptionReferenceIdentifier = new ResidualInfo();
+			priorPrescriptionReferenceIdentifier.setContentKey("PriorPrescriptionReferenceIdentifier");
+			priorPrescriptionReferenceIdentifier.setContentType("String");
+			priorPrescriptionReferenceIdentifier.setContentValue(importStructure.getPriorPrescriptionReferenceIdentifier());
+			residualInfoList.add(priorPrescriptionReferenceIdentifier);
+		}
+
+		if (importStructure.getDrugDescription() != null)
+		{
+			ResidualInfo drugDescription = new ResidualInfo();
+			drugDescription.setContentKey("DrugDescription");
+			drugDescription.setContentType("String");
+			drugDescription.setContentValue(importStructure.getDrugDescription());
+			residualInfoList.add(drugDescription);
+		}
+
+		if (importStructure.getProblemCode() != null)
+		{
+			ResidualInfo problemCode = new ResidualInfo();
+			problemCode.setContentKey("ProblemCode");
+			problemCode.setContentType("String");
+			problemCode.setContentValue(importStructure.getProblemCode());
+			residualInfoList.add(problemCode);
+		}
+
+		if (importStructure.getProtocolIdentifier() != null)
+		{
+			ResidualInfo protocolIdentifier = new ResidualInfo();
+			protocolIdentifier.setContentKey("ProtocolIdentifier");
+			protocolIdentifier.setContentType("String");
+			protocolIdentifier.setContentValue(importStructure.getProtocolIdentifier());
+			residualInfoList.add(protocolIdentifier);
+		}
+
+		if (residualInfoList.isEmpty())
+		{
+			return null;
+		}
+		return residualInfoList;
+	}
+
+	protected String getOutsideProviderName(MedicationsAndTreatments.PrescribedBy prescribedBy)
+	{
+		if (prescribedBy == null || prescribedBy.getName() == null)
+		{
+			return null;
+		}
+		return prescribedBy.getName().getFirstName() + " " + prescribedBy.getName().getLastName();
+	}
+
+	protected String getOutsideProviderOhip(MedicationsAndTreatments.PrescribedBy prescribedBy)
+	{
+		if (prescribedBy == null || prescribedBy.getOHIPPhysicianId() == null)
+		{
+			return null;
+		}
+		return prescribedBy.getOHIPPhysicianId();
 	}
 
 	protected FrequencyCode getFormattedFrequency(MedicationsAndTreatments importStructure)
@@ -191,9 +283,17 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		indicator = StringUtils.trimToNull(indicator);
 		if(indicator != null)
 		{
-			if(StringUtils.isNumeric(indicator))
+			if (StringUtils.isNumeric(indicator))
 			{
 				return !"0".equals(indicator);
+			}
+			else if (indicator.equals("Y"))
+			{
+				return true;
+			}
+			else if (indicator.equals("N"))
+			{
+				return false;
 			}
 			else
 			{

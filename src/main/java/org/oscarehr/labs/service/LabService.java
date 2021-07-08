@@ -43,9 +43,10 @@ import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.util.ConversionUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 /**
  * TODO This service should replace the MessageUploader routing eventually
@@ -76,13 +77,13 @@ public class LabService
 	}
 
 	public Hl7TextMessage persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
-	                             Demographic demographic, List<ProviderData> providerList) throws UnsupportedEncodingException
+	                             Demographic demographic,Map<ProviderData, LocalDateTime> providerList) throws UnsupportedEncodingException
 	{
 		return persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, demographic, providerList, null);
 	}
 
 	public Hl7TextMessage persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
-	                             Demographic demographic, List<ProviderData> providerList, String inboxRouteStatus) throws UnsupportedEncodingException
+	                                       Demographic demographic, Map<ProviderData, LocalDateTime> providerList, String inboxRouteStatus) throws UnsupportedEncodingException
 	{
 		String labType = messageHandler.getMsgType();
 		String firstName = messageHandler.getFirstName();
@@ -164,7 +165,7 @@ public class LabService
 		return discipline;
 	}
 
-	private Hl7TextMessage persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, List<ProviderData> providerList, String inboxRouteStatus)
+	private Hl7TextMessage persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, Map<ProviderData, LocalDateTime> providerList, String inboxRouteStatus)
 	{
 		hl7TextMessageDao.persist(hl7TextMessage);
 
@@ -180,14 +181,14 @@ public class LabService
 		// route to the providers inbox
 		if(providerList != null && !providerList.isEmpty())
 		{
-			for(ProviderData provider : providerList)
+			for(ProviderData provider : providerList.keySet())
 			{
-				routeToProvider(hl7TextMessage.getId(), provider.getProviderNo(), inboxRouteStatus);
+				routeToProvider(hl7TextMessage.getId(), provider.getProviderNo(), inboxRouteStatus, providerList.get(provider));
 			}
 		}
 		else
 		{
-			routeToProvider(hl7TextMessage.getId(), ProviderLabRoutingDao.PROVIDER_UNMATCHED, inboxRouteStatus);
+			routeToProvider(hl7TextMessage.getId(), ProviderLabRoutingDao.PROVIDER_UNMATCHED, inboxRouteStatus, null);
 		}
 		return hl7TextMessage;
 	}
@@ -209,7 +210,7 @@ public class LabService
 		Hl7textResultsData.populateMeasurementsTable(String.valueOf(labId), String.valueOf(demographicNo));
 	}
 
-	private void routeToProvider(int labId, Integer providerNo, String inboxRouteStatus)
+	private void routeToProvider(int labId, Integer providerNo, String inboxRouteStatus, LocalDateTime timestamp)
 	{
 		String providerNoStr = String.valueOf(providerNo);
 		if(inboxRouteStatus == null)
@@ -223,6 +224,11 @@ public class LabService
 		newRoute.setLabNo(labId);
 		newRoute.setLabType(ProviderLabRoutingDao.LAB_TYPE_HL7);
 		newRoute.setStatus(inboxRouteStatus);
+
+		if (timestamp != null)
+		{
+			newRoute.setTimestamp(ConversionUtils.toLegacyDateTime(timestamp));
+		}
 
 		providerLabRoutingDao.persist(newRoute);
 	}

@@ -44,13 +44,10 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<Fa
 		note.setStartDate(toNullablePartialDate(importStructure.getStartDate()));
 		note.setAgeAtOnset(getAgeAtOnset(importStructure.getAgeAtOnset()));
 		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));
-		note.setTreatment(importStructure.getProblemDiagnosisProcedureDescription());
+		note.setTreatment(importStructure.getTreatment());
 		note.setRelationship(importStructure.getRelationship());
 
-		String noteText = StringUtils.trimToEmpty(
-				StringUtils.trimToEmpty(importStructure.getProblemDiagnosisProcedureDescription()) + "\n" +
-						StringUtils.trimToEmpty(importStructure.getNotes())
-		);
+		String noteText = StringUtils.trimToEmpty(generateNoteText(importStructure));
 
 		if(noteText.isEmpty())
 		{
@@ -58,8 +55,27 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<Fa
 		}
 		note.setNoteText(noteText);
 
+		note.setAnnotation(generateNoteText(importStructure));
+		note.setAnnotation(StringUtils.trimToEmpty(importStructure.getNotes()));
+
 		note.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
 
 		return note;
+	}
+
+	protected String generateNoteText(FamilyHistory importStructure)
+	{
+		String note = "";
+		if (StringUtils.trimToNull(importStructure.getProblemDiagnosisProcedureDescription()) != null)
+		{
+			note += "ProblemDiagnosisProcedureDescription: " + importStructure.getProblemDiagnosisProcedureDescription() + "\n";
+		}
+		if (importStructure.getDiagnosisProcedureCode() != null)
+		{
+			note += "\nStandard Coding System: " + importStructure.getDiagnosisProcedureCode().getStandardCodingSystem() + "\n";
+			note += "Standard Code: " + importStructure.getDiagnosisProcedureCode().getStandardCode() + "\n";
+			note += "Standard Coding Description: " + importStructure.getDiagnosisProcedureCode().getStandardCodeDescription() + "\n";
+		}
+		return StringUtils.trimToEmpty(note);
 	}
 }

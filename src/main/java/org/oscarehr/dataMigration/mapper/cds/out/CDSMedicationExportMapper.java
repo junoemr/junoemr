@@ -48,14 +48,17 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setDrugName(medication.getDrugName());
 		medicationsAndTreatments.setPrescriptionWrittenDate(toNullableDateTimeFullOrPartial(medication.getWrittenDate()));
 		medicationsAndTreatments.setStartDate(toNullableDateFullOrPartial(medication.getRxStartDate()));
-		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRefillQuantity()));
+		// Medication Refills
+		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRepeat()));
+		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
+		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
+
 		medicationsAndTreatments.setForm(medication.getDrugForm());
 		medicationsAndTreatments.setRoute(medication.getRoute());
 
 		FrequencyCode frequencyCode = medication.getFrequencyCode();
 		medicationsAndTreatments.setFrequency((frequencyCode != null) ? frequencyCode.getCode() : null);
 		medicationsAndTreatments.setDuration(medication.getDuration());
-		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
 		medicationsAndTreatments.setQuantity(medication.getQuantity());
 		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
 		medicationsAndTreatments.setLongTermMedication(toYnIndicator(medication.getLongTerm()));
