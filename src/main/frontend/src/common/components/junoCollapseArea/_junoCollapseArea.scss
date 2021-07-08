@@ -1,8 +1,10 @@
 .juno-collapse-area {
 	--label-left-indent: 0px;
+	--label-font-weight: normal;
 
 	.header {
 		margin-left: var(--label-left-indent);
+		font-weight: var(--label-font-weight);
 		cursor: pointer;
 	}
 
