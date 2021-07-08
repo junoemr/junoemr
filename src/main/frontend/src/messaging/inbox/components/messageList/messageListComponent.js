@@ -50,13 +50,13 @@ angular.module("Messaging.Components").component('messageList', {
 		{
 			const ctrl = this;
 
-			const NEW_MESSAGE_CHECK_INTERVAL_MS = 10000; // 1 minute;
+			const NEW_MESSAGE_CHECK_INTERVAL_MS = 60000; // 1 minute;
 
 			$scope.MessageGroup = MessageGroup;
 
 			ctrl.messageStream = null;
 			ctrl.debounceTimeout = null;
-			ctrl.DEBOUNCE_TIME_MS = 60000; // 1 second
+			ctrl.DEBOUNCE_TIME_MS = 1000; // 1 second
 			ctrl.MESSAGE_FETCH_COUNT = 10;
 
 			ctrl.newMessagesCheckInterval = null;
