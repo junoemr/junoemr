@@ -548,10 +548,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			let startDate = controller.groupNotesForm.groupNoteExt.startDate;
 			if (startDate)
 			{
-				startDate.yearValid = startDate.yearValid;
-				startDate.monthValid = startDate.monthValid;
-				startDate.dayValid = startDate.dayValid;
-
 				startDateValid = startDate.isValidPartialDate();
 			}
 
@@ -559,20 +555,12 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 			if (resolutionDate)
 			{
-				resolutionDate.yearValid = resolutionDate.yearValid;
-				resolutionDate.monthValid = resolutionDate.monthValid;
-				resolutionDate.dayValid = resolutionDate.dayValid;
-
 				resolutionDateValid = resolutionDate.isValidPartialDate();
 			}
 
 			let procedureDate = controller.groupNotesForm.groupNoteExt.procedureDate;
 			if (procedureDate)
 			{
-				procedureDate.yearValid = procedureDate.yearValid;
-				procedureDate.monthValid = procedureDate.monthValid;
-				procedureDate.dayValid = procedureDate.dayValid;
-
 				procedureDateValid = procedureDate.isValidPartialDate();
 			}
 
