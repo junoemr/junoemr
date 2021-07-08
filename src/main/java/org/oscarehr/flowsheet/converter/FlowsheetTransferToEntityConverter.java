@@ -23,6 +23,9 @@
 package org.oscarehr.flowsheet.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.dao.Icd9Dao;
+import org.oscarehr.common.model.Icd9;
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.decisionSupport2.dao.DsRuleDao;
 import org.oscarehr.decisionSupport2.transfer.DsRuleUpdateInput;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
@@ -41,6 +44,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -51,6 +55,9 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 
 	@Autowired
 	private DsRuleDao dsRuleDao;
+
+	@Autowired
+	private Icd9Dao icd9Dao;
 
 	@Override
 	public Flowsheet convert(FlowsheetCreateTransfer input)
@@ -93,7 +100,14 @@ public class FlowsheetTransferToEntityConverter extends AbstractModelConverter<F
 				.filter((group) -> group.getFlowsheetItems() != null)
 				.flatMap((group) -> group.getFlowsheetItems().stream())
 				.collect(Collectors.toList()));
+
+		flowsheet.setIcd9Triggers(convertIcd9Triggers(input.getTriggerCodes()));
 		return flowsheet;
+	}
+
+	protected Set<Icd9> convertIcd9Triggers(List<DxCode> triggerCodes)
+	{
+		return triggerCodes.stream().map((input) -> icd9Dao.findByCode(input.getCode())).collect(Collectors.toSet());
 	}
 
 	protected FlowsheetItemGroup mergeExistingGroup(FlowsheetItemGroup existingGroupEntity, List<FlowsheetItemGroupCreateUpdateTransfer> groupInputList)

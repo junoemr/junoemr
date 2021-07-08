@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -31,6 +29,7 @@ import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
 import FlowsheetItemModel from "../model/FlowsheetItemModel";
 import DsRuleModelToTransferConverter from "../../decisionSupport/converter/DsRuleModelToTransferConverter";
 import AbstractConverter from "../../conversion/AbstractConverter";
+import DxCodeModelToTransferConverter from "../../dx/converter/DxCodeModelToTransferConverter";
 
 export default class FlowsheetModelToTransferConverter extends AbstractConverter<FlowsheetModel, Flowsheet>
 {
@@ -47,6 +46,7 @@ export default class FlowsheetModelToTransferConverter extends AbstractConverter
 			description: flowsheetModel.description,
 			enabled: flowsheetModel.enabled,
 			flowsheetItemGroups: this.convertAllGroups(flowsheetModel.flowsheetItemGroups),
+			triggerCodes: new DxCodeModelToTransferConverter().convertList(flowsheetModel.triggerCodes),
 		} as Flowsheet;
 	}
 

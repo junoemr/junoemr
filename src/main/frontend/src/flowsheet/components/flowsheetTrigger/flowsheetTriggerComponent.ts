@@ -22,7 +22,6 @@
  */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
-import DxCodeModel from "../../../lib/dx/model/DxCodeModel";
 
 angular.module('Flowsheet').component('flowsheetTrigger',
 	{

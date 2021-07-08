@@ -23,28 +23,23 @@
 
  */
 
-import {DxRecord} from "../../../../generated";
+import {DxCode} from "../../../../generated";
 import AbstractConverter from "../../conversion/AbstractConverter";
-import DxRecordModel from "../model/DxRecordModel";
-import DxCodeTransferToModelConverter from "./DxCodeTransferToModelConverter";
+import DxCodeModel from "../model/DxCodeModel";
 
-export default class DxRecordTransferToModelConverter extends AbstractConverter<DxRecord, DxRecordModel>
+export default class DxCodeModelToTransferConverter extends AbstractConverter<DxCodeModel, DxCode>
 {
-	public convert(recordTransfer: DxRecord): DxRecordModel
+	public convert(model: DxCodeModel): DxCode
 	{
-		if (!recordTransfer)
+		if (!model)
 		{
 			return null;
 		}
 
-		const model = new DxRecordModel();
-		model.id = recordTransfer.id;
-		model.status = recordTransfer.status;
-		model.dxCode = new DxCodeTransferToModelConverter().convert(recordTransfer.dxCode);
-		model.providerId = recordTransfer.provider?.providerNo;
-		model.startDate = recordTransfer.startDate;
-		model.updateDate = recordTransfer.updateDate;
-
-		return model;
+		return {
+			code: model.code,
+			codingSystem: model.codingSystem,
+			description: model.description,
+		} as DxCode;
 	}
 }
