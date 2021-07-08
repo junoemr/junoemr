@@ -22,7 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
-import PartialDateModel from "../../models/partialDateModel";
+import PartialDateModel from "../../../lib/common/partialDate/model/partialDateModel";
 
 angular.module('Common.Components').component('junoPartialDateSelect', {
     templateUrl: 'src/common/components/junoPartialDateSelect/junoPartialDateSelect.jsp',
@@ -37,9 +37,9 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
     {
         let ctrl = this;
 
-        ctrl.year = null;
-        ctrl.month = null;
-        ctrl.day = null;
+        ctrl.year = "";
+        ctrl.month = "";
+        ctrl.day = "";
 
         $scope.$watch("$ctrl.ngModel", (newNgModal) =>
         {
@@ -64,7 +64,7 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 {
                     ctrl.year = ctrl.ngModel.year;
                 }
-                if (ctrl.ngModel.month && typeof (ctrl.ngModel.month) === "string")
+                if (ctrl.ngModel.month)
                 {
                     ctrl.month = ctrl.ngModel.month;
                 }
@@ -76,13 +76,13 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 if (ctrl.month && ctrl.month >= 1 && ctrl.month <= 9)
                 {
                     ctrl.month = Juno.Common.Util.padDateWithZero(ctrl.month);
-                    ctrl.ngModel.month = ctrl.month;
+                    ctrl.ngModel.month = parseInt(ctrl.month);
                 }
 
                 if (ctrl.day && ctrl.day >= 1 && ctrl.day <= 9)
                 {
                     ctrl.day = Juno.Common.Util.padDateWithZero(ctrl.day);
-                    ctrl.ngModel.day = ctrl.day;
+                    ctrl.ngModel.day = parseInt(ctrl.day);
                 }
             }
             else
@@ -122,15 +122,15 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
             {
                 if (isYear)
                 {
-                    ctrl.ngModel.year = field || null;
+                    ctrl.ngModel.year = parseInt(field) || field;
                 }
                 else if (isMonth)
                 {
-                    ctrl.ngModel.month = field || null;
+                    ctrl.ngModel.month = parseInt(field) || field;
                 }
                 else if (isDay)
                 {
-                    ctrl.ngModel.day = field || null;
+                    ctrl.ngModel.day = parseInt(field) || field;
                 }
 
                 ctrl.ngModel.yearValid = ctrl.dateValidations.yearValid();

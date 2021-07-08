@@ -1,6 +1,6 @@
-import PartialDateModel from "../../common/models/partialDateModel";
-import PartialDateConverter from "../../common/converters/partialDateConverter";
-import PartialDateModelConverter from "../../common/converters/partialDateModelConverter";
+import PartialDateModel from "../../lib/common/partialDate/model/partialDateModel";
+import PartialDateConverter from "../../lib/common/partialDate/converter/partialDateConverter";
+import PartialDateModelConverter from "../../lib/common/partialDate/converter/partialDateModelConverter";
 
 angular.module('Record.Summary').controller('Record.Summary.GroupNotesController', [
 
@@ -273,60 +273,47 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			}
 			controller.working = true;
 
-			if (controller.groupNotesForm.encounterNote.noteId == null)
+			let groupNotesFormTransfer = angular.copy(controller.groupNotesForm);
+
+			if (groupNotesFormTransfer.encounterNote.noteId == null)
 			{
-				controller.groupNotesForm.encounterNote.noteId = 0;
+				groupNotesFormTransfer.encounterNote.noteId = 0;
 			}
 
-			controller.groupNotesForm.encounterNote.cpp = true;
-			controller.groupNotesForm.encounterNote.editable = true;
-			controller.groupNotesForm.encounterNote.isSigned = true;
-			controller.groupNotesForm.encounterNote.observationDate = new Date();
-			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO-legacy: make this dynamic so it changes on edit
-			controller.groupNotesForm.encounterNote.encounterType = "";
-			controller.groupNotesForm.encounterNote.encounterTime = "";
-			controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
-			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code;
+			groupNotesFormTransfer.encounterNote.cpp = true;
+			groupNotesFormTransfer.encounterNote.editable = true;
+			groupNotesFormTransfer.encounterNote.isSigned = true;
+			groupNotesFormTransfer.encounterNote.observationDate = new Date();
+			groupNotesFormTransfer.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO-legacy: make this dynamic so it changes on edit
+			groupNotesFormTransfer.encounterNote.encounterType = "";
+			groupNotesFormTransfer.encounterNote.encounterTime = "";
+			groupNotesFormTransfer.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
+			groupNotesFormTransfer.encounterNote.summaryCode = controller.page.code;
 
 			let partialDateModelConverter = new PartialDateModelConverter();
 
-			let startDate = controller.groupNotesForm.groupNoteExt.startDate;
-			if (startDate && startDate.year)
+			let startDate = groupNotesFormTransfer.groupNoteExt.startDate;
+			if (startDate)
 			{
 				let partialStartDate = partialDateModelConverter.convert(startDate);
-				let partialDateJson  = controller.getPartialDateJSON(partialStartDate.year.value, partialStartDate.month, partialStartDate.day);
-				controller.groupNotesForm.groupNoteExt.startDate = partialDateJson;
-			}
-			else
-			{
-				controller.groupNotesForm.groupNoteExt.startDate = null;
+				groupNotesFormTransfer.groupNoteExt.startDate = partialStartDate;
 			}
 
-			let resolutionDate = controller.groupNotesForm.groupNoteExt.resolutionDate;
-			if (resolutionDate && resolutionDate.year)
+			let resolutionDate = groupNotesFormTransfer.groupNoteExt.resolutionDate;
+			if (resolutionDate)
 			{
 				let partialResolutionDate = partialDateModelConverter.convert(resolutionDate);
-				let partialDateJson  = controller.getPartialDateJSON(partialResolutionDate.year.value, partialResolutionDate.month, partialResolutionDate.day);
-				controller.groupNotesForm.groupNoteExt.resolutionDate = partialDateJson;
-			}
-			else
-			{
-				controller.groupNotesForm.groupNoteExt.resolutionDate = null;
+				groupNotesFormTransfer.groupNoteExt.resolutionDate = partialResolutionDate;
 			}
 
-			let procedureDate = controller.groupNotesForm.groupNoteExt.procedureDate;
-			if (procedureDate && procedureDate.year)
+			let procedureDate = groupNotesFormTransfer.groupNoteExt.procedureDate;
+			if (procedureDate)
 			{
 				let partialProcedureDate = partialDateModelConverter.convert(procedureDate);
-				let partialDateJson  = controller.getPartialDateJSON(partialProcedureDate.year.value, partialProcedureDate.month, partialProcedureDate.day);
-				controller.groupNotesForm.groupNoteExt.procedureDate = partialDateJson;
-			}
-			else
-			{
-				controller.groupNotesForm.groupNoteExt.procedureDate = null;
+				groupNotesFormTransfer.groupNoteExt.procedureDate = partialProcedureDate;
 			}
 
-			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
+			noteService.saveIssueNote($stateParams.demographicNo, groupNotesFormTransfer).then(
 				function success(results)
 				{
 					$uibModalInstance.close(results.body);
@@ -551,24 +538,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 
 		};
-
-		controller.getPartialDateJSON = (yearValue, monthValue, dayValue) =>
-		{
-			if (!monthValue)
-			{
-				monthValue = null;
-			}
-			else
-			{
-				monthValue -= 1; // java and javascript months are 0 indexed
-			}
-
-			return ({
-				"year": yearValue || null,
-				"month":  monthValue,
-				"day": dayValue || null
-			});
-		}
 
 		controller.allDatesValid = () =>
 		{

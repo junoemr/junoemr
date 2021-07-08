@@ -1,15 +1,15 @@
 export default class PartialDateModel
 {
-    private _year: string;
+    private _year: number;
     private _yearValid: boolean;
 
-    private _month?: string;
+    private _month?: number;
     private _monthValid?: boolean;
 
-    private _day?: string;
+    private _day?: number;
     private _dayValid?: boolean;
 
-    constructor(year: string, month?: string, day?: string)
+    constructor(year: number, month?: number, day?: number)
     {
         this._year = year;
 
@@ -24,32 +24,32 @@ export default class PartialDateModel
         }
     }
 
-    get year(): string
+    get year(): number
     {
         return this._year;
     }
 
-    set year(value: string)
+    set year(value: number)
     {
         this._year = value;
     }
 
-    get month(): string
+    get month(): number
     {
         return this._month;
     }
 
-    set month(value: string)
+    set month(value: number)
     {
         this._month = value;
     }
 
-    get day(): string
+    get day(): number
     {
         return this._day;
     }
 
-    set day(value: string)
+    set day(value: number)
     {
         this._day = value;
     }
