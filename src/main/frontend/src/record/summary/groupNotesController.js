@@ -579,35 +579,32 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			let startDate = controller.groupNotesForm.groupNoteExt.startDate;
 			if (startDate)
 			{
-				let partialStartDate = new PartialDateModel(startDate.year.value, startDate.month, startDate.day);
-				partialStartDate.yearValid = startDate.yearValid;
-				partialStartDate.monthValid = startDate.monthValid;
-				partialStartDate.dayValid = startDate.dayValid;
+				startDate.yearValid = startDate.yearValid;
+				startDate.monthValid = startDate.monthValid;
+				startDate.dayValid = startDate.dayValid;
 
-				startDateValid = partialStartDate.isValidPartialDate();
+				startDateValid = startDate.isValidPartialDate();
 			}
 
 			let resolutionDate = controller.groupNotesForm.groupNoteExt.resolutionDate;
 
 			if (resolutionDate)
 			{
-				let partialResolutionDate = new PartialDateModel(resolutionDate.year.value, resolutionDate.month, resolutionDate.day);
-				partialResolutionDate.yearValid = resolutionDate.yearValid;
-				partialResolutionDate.monthValid = resolutionDate.monthValid;
-				partialResolutionDate.dayValid = resolutionDate.dayValid;
+				resolutionDate.yearValid = resolutionDate.yearValid;
+				resolutionDate.monthValid = resolutionDate.monthValid;
+				resolutionDate.dayValid = resolutionDate.dayValid;
 
-				resolutionDateValid = partialResolutionDate.isValidPartialDate();
+				resolutionDateValid = resolutionDate.isValidPartialDate();
 			}
 
 			let procedureDate = controller.groupNotesForm.groupNoteExt.procedureDate;
 			if (procedureDate)
 			{
-				let partialProcedureDate = new PartialDateModel(procedureDate.year.value, procedureDate.month, procedureDate.day);
-				partialProcedureDate.yearValid = procedureDate.yearValid;
-				partialProcedureDate.monthValid = procedureDate.monthValid;
-				partialProcedureDate.dayValid = procedureDate.dayValid;
+				procedureDate.yearValid = procedureDate.yearValid;
+				procedureDate.monthValid = procedureDate.monthValid;
+				procedureDate.dayValid = procedureDate.dayValid;
 
-				procedureDateValid = partialProcedureDate.isValidPartialDate();
+				procedureDateValid = procedureDate.isValidPartialDate();
 			}
 
 			return startDateValid && resolutionDateValid && procedureDateValid;

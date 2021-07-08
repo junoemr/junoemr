@@ -12,47 +12,47 @@ export default class PartialDateConverter extends AbstractConverter<PartialDate,
         }
 
         const partialDateModel = new PartialDateModel(null, null, null);
-        partialDateModel.year = parseInt(from.year.toString());
+        partialDateModel.year = from.year.toString();
 
         if (from.month)
         {
-            let monthValue = 1;
+            let monthValue = "01";
             switch (from.month)
             {
                 case PartialDate.MonthEnum.JANUARY:
                     break;
                 case PartialDate.MonthEnum.FEBRUARY:
-                    monthValue = 2;
+                    monthValue = "02";
                     break;
                 case PartialDate.MonthEnum.MARCH:
-                    monthValue = 3;
+                    monthValue = "03";
                     break;
                 case PartialDate.MonthEnum.APRIL:
-                    monthValue = 4;
+                    monthValue = "04";
                     break;
                 case PartialDate.MonthEnum.MAY:
-                    monthValue = 5;
+                    monthValue = "05";
                     break;
                 case PartialDate.MonthEnum.JUNE:
-                    monthValue = 6;
+                    monthValue = "06";
                     break;
                 case PartialDate.MonthEnum.JULY:
-                    monthValue = 7;
+                    monthValue = "07";
                     break;
                 case PartialDate.MonthEnum.AUGUST:
-                    monthValue = 8;
+                    monthValue = "08";
                     break;
                 case PartialDate.MonthEnum.SEPTEMBER:
-                    monthValue = 9;
+                    monthValue = "09";
                     break;
                 case PartialDate.MonthEnum.OCTOBER:
-                    monthValue = 10;
+                    monthValue = "10";
                     break;
                 case PartialDate.MonthEnum.NOVEMBER:
-                    monthValue = 11;
+                    monthValue = "11";
                     break;
                 case PartialDate.MonthEnum.DECEMBER:
-                    monthValue = 12;
+                    monthValue = "12";
                     break;
             }
             partialDateModel.month = monthValue;
@@ -60,7 +60,7 @@ export default class PartialDateConverter extends AbstractConverter<PartialDate,
 
         if (from.day)
         {
-            partialDateModel.day = from.day;
+            partialDateModel.day = from.day.toString();
         }
 
         return partialDateModel;

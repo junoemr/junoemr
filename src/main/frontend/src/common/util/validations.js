@@ -300,15 +300,15 @@ Juno.Validations.PartialDate =
 				return false;
 			}
 
-			if (typeof monthValue !== "number")
+			monthValue = parseInt(monthValue);
+			if (monthValue > 0 && monthValue < 13)
 			{
-				monthValue = parseInt(monthValue);
-				if (Number.isNaN(monthValue))
-				{
-					return false;
-				}
+				monthValue -= 1; // Moment uses 0 indexed months
 			}
-			monthValue -= 1; // Moment uses 0 indexed months
+			else
+			{
+				return false;
+			}
 
 			let currentMoment = moment({year: 1900, month: monthValue, day: 1});
 
@@ -348,7 +348,7 @@ Juno.Validations.PartialDate =
 				monthValue = 0;
 			}
 
-			dayValue = parseInt(dayValue.toString());
+			dayValue = parseInt(dayValue);
 
 			let currentMoment = moment({year: yearValue, month: monthValue, day: dayValue});
 

@@ -64,7 +64,7 @@ angular.module('Common.Components').component('junoPartialDateSelect', {
                 {
                     ctrl.year = ctrl.ngModel.year;
                 }
-                if (ctrl.ngModel.month)
+                if (ctrl.ngModel.month && typeof (ctrl.ngModel.month) === "string")
                 {
                     ctrl.month = ctrl.ngModel.month;
                 }
