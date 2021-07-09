@@ -84,8 +84,12 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		}
 
 		// "dosage" in CDS == takemin/takemax
-		medication.setTakeMax(Float.parseFloat(importStructure.getDosage()));
-		medication.setTakeMin(Float.parseFloat(importStructure.getDosage()));
+		if (importStructure.getDosage() != null)
+		{
+			medication.setTakeMax(Float.parseFloat(importStructure.getDosage()));
+			medication.setTakeMin(Float.parseFloat(importStructure.getDosage()));
+		}
+
 
 
 		medication.setWrittenDate(getWrittenDate(importStructure));
