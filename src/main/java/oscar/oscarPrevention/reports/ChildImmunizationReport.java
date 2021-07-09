@@ -25,6 +25,7 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
@@ -90,8 +91,16 @@ public class ChildImmunizationReport implements PreventionReport {
         int qualifiesForBonusCount  = 0;
         int ineligiblePatientCount = 0;
 
-        List<ReportPatientInfo> patientInfoList = ReportPatientInfo.fromList(list);
-        
+		List<Integer> demographicNos = new ArrayList<>();
+
+		// This can be condensed when all reports give a list of demographic #s instead of maps about demographics
+		for (List<String> demographicMap : list)
+		{
+			// Assumes demographic # is the first thing in the list
+			demographicNos.add(NumberUtils.toInt(demographicMap.get(0)));
+		}
+		List<ReportPatientInfo> patientInfoList = ReportPatientInfo.fromList(demographicNos);
+
         for (ReportPatientInfo patientInfo : patientInfoList)
         {
         	Demographic demographic = demographicManager.getDemographic(loggedInInfo, patientInfo.getDemographicNo());

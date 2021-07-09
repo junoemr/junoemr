@@ -1,0 +1,1 @@
+angular.module('Admin.Section.MhaConfig', ['Common', 'Common.Services']);

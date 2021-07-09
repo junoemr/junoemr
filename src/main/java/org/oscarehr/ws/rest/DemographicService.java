@@ -62,8 +62,10 @@ import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
+import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
+import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -225,6 +227,8 @@ public class DemographicService extends AbstractServiceImpl {
 			}
 
 			DemographicTo1 result = demoConverter.getAsTransferObject(getLoggedInInfo(), demo);
+			AddressTo1 extraAddress = demographicManager.getExtraAddress(result);
+			result.setAddress2(extraAddress);
 
 			DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), id);
 			if (demoCust != null)
@@ -383,6 +387,12 @@ public class DemographicService extends AbstractServiceImpl {
 
 		try
 		{
+			if (data.getAddress2().getAddress() != null || data.getAddress2().getCity() != null ||
+					 data.getAddress2().getPostal() != null || data.getAddress2().getProvince() != null)
+			{
+				List<DemographicExtTo1> extraAddress = demographicManager.setExtraAddress(data);
+				data.setExtras(extraAddress);
+			}
 			//update demographiccust
 			if (data.getNurse() != null || data.getResident() != null || data.getAlert() != null || data.getMidwife() != null || data.getNotes() != null)
 			{

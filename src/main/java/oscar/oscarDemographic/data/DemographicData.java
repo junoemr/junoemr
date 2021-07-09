@@ -34,6 +34,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.dao.ContactDao;
+import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.common.model.Contact;
+import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -41,6 +45,7 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class DemographicData {
@@ -168,14 +173,57 @@ public class DemographicData {
 		return "";
 	}
 
-	public Demographic getSubstituteDecisionMaker(LoggedInInfo loggedInInfo, String DemographicNo) {
+	/**
+	 * Get contact info of the substitute decision maker for a given demographic.
+	 * @param demographicNo demographic no who we think may have someone else making decisions for them
+	 * @return DemographicContact corresponding to their substitute decision maker if one exists, null otherwise
+	 */
+	public DemographicContact getSubstituteDecisionMaker(String demographicNo)
+	{
+		DemographicContactDao demographicContactDao = SpringUtils.getBean(DemographicContactDao.class);
+		List<DemographicContact> contacts = demographicContactDao.findActiveByDemographicNo(ConversionUtils.fromIntString(demographicNo));
+		DemographicContact result = null;
+		for (DemographicContact contact : contacts)
+		{
+			if (ConversionUtils.fromBoolString(contact.getSdm()))
+			{
+				result = contact;
+				break;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Given a DemographicContact object, get the corresponding demographic.
+	 * @param loggedInInfo whoever is currently logged in
+	 * @param demographicContact demo contact who is possibly a demographic in the system
+	 * @return the demographic if we find it, null otherwise
+	 */
+	public Demographic getInternalContact(LoggedInInfo loggedInInfo, DemographicContact demographicContact)
+	{
 		Demographic demographic = null;
-		DemographicRelationship dr = new DemographicRelationship();
-		String demoNo = dr.getSDM(DemographicNo);
-		if (demoNo != null) {
-			demographic = getDemographic(loggedInInfo, demoNo);
+		if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
+		{
+			demographic = getDemographic(loggedInInfo, demographicContact.getContactId());
 		}
 		return demographic;
+	}
+
+	/**
+	 * Given a DemographicContact, find the direct Contact entry.
+	 * @param demographicContact demographicContact who might be an external contact
+	 * @return Contact object if we find it, null otherwise
+	 */
+	public Contact getExternalContact(DemographicContact demographicContact)
+	{
+		Contact contact = null;
+		if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_CONTACT)
+		{
+			ContactDao contactDao = SpringUtils.getBean(ContactDao.class);
+			contact = contactDao.find(Integer.parseInt(demographicContact.getContactId()));
+		}
+		return contact;
 	}
 
 	public String getDemographicNotes(String demographicNo) {
