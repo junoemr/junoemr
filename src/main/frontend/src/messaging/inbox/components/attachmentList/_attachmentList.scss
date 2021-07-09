@@ -7,10 +7,6 @@
 	.single-column {
 		flex-direction: column;
 		flex-wrap: nowrap;
-
-		.attachment {
-			margin-top: 8px;
-		}
 	}
 
 	.attachment {
@@ -27,7 +23,9 @@
 			font-size: 24px;
 			color: var(--color-primary-base);
 		}
+	}
 
+	.remove-button, .attach-button {
 		.juno-button {
 			.icon {
 				font-size: 20px;
