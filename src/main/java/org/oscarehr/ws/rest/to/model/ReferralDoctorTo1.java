@@ -25,13 +25,18 @@
 package org.oscarehr.ws.rest.to.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
+@Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown=true) // Ignore properties that are not defined in this class
+@Tag(name = "referralDoctor")
 public class ReferralDoctorTo1 implements Serializable
 {
-
 	private Integer id;
 	private String firstName;
 	private String lastName;
@@ -40,84 +45,4 @@ public class ReferralDoctorTo1 implements Serializable
 	private String phoneNumber;
 	private String faxNumber;
 	private String specialtyType;
-
-	public Integer getId()
-	{
-		return id;
-	}
-
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
-
-	public String getFirstName()
-	{
-		return firstName;
-	}
-
-	public void setFirstName(String firstName)
-	{
-		this.firstName = firstName;
-	}
-
-	public String getLastName()
-	{
-		return lastName;
-	}
-
-	public void setLastName(String lastName)
-	{
-		this.lastName = lastName;
-	}
-
-	public String getReferralNo()
-	{
-		return referralNo;
-	}
-
-	public void setReferralNo(String referralNo)
-	{
-		this.referralNo = referralNo;
-	}
-
-	public String getStreetAddress()
-	{
-		return streetAddress;
-	}
-
-	public void setStreetAddress(String streetAddress)
-	{
-		this.streetAddress = streetAddress;
-	}
-
-	public String getPhoneNumber()
-	{
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber)
-	{
-		this.phoneNumber = phoneNumber;
-	}
-
-	public String getFaxNumber()
-	{
-		return faxNumber;
-	}
-
-	public void setFaxNumber(String faxNumber)
-	{
-		this.faxNumber = faxNumber;
-	}
-
-	public String getSpecialtyType()
-	{
-		return specialtyType;
-	}
-
-	public void setSpecialtyType(String specialtyType)
-	{
-		this.specialtyType = specialtyType;
-	}
 }

@@ -4528,152 +4528,152 @@ angular.module("Common.Services").service("staticDataService", [
 			reasons.push(
 			{
 				"value": "39",
-				"label": "Assigned member status ended; roster transferred per physician request"
+				"label": "(39) Assigned member status ended; roster transferred per physician request"
 			});
 			reasons.push(
 			{
 				"value": "59",
-				"label": "Enrolment ended; patient out of geographic area"
+				"label": "(59) Enrolment ended; patient out of geographic area"
 			});
 			reasons.push(
 			{
 				"value": "57",
-				"label": "Enrolment terminated by patient"
+				"label": "(57) Enrolment terminated by patient"
 			});
 			reasons.push(
 			{
 				"value": "12",
-				"label": "Health Number error"
+				"label": "(12) Health Number error"
 			});
 			reasons.push(
 			{
 				"value": "38",
-				"label": "Long Term Care enrolment ended; patient has left Long Term Care"
+				"label": "(38) Long Term Care enrolment ended; patient has left Long Term Care"
 			});
 			reasons.push(
 			{
 				"value": "82",
-				"label": "Ministry has not received enrolment/ Consent form"
+				"label": "(82) Ministry has not received enrolment/ Consent form"
 			});
 			reasons.push(
 			{
 				"value": "60",
-				"label": "No current eligibility"
+				"label": "(60) No current eligibility"
 			});
 			reasons.push(
 			{
 				"value": "73",
-				"label": "No current eligibility"
+				"label": "(73) No current eligibility"
 			});
 			reasons.push(
 			{
 				"value": "74",
-				"label": "No current eligibility"
+				"label": "(74) No current eligibility"
 			});
 			reasons.push(
 			{
 				"value": "37",
-				"label": "Original enrolment ended; patient now enrolled as Long Term Care"
+				"label": "(37) Original enrolment ended; patient now enrolled as Long Term Care"
 			});
 			reasons.push(
 			{
 				"value": "36",
-				"label": "Original enrolment ended; patient now re-enroled"
+				"label": "(36) Original enrolment ended; patient now re-enroled"
 			});
 			reasons.push(
 			{
 				"value": "24",
-				"label": "Patient added to roster in error"
+				"label": "(24) Patient added to roster in error"
 			});
 			reasons.push(
 			{
 				"value": "14",
-				"label": "Patient identified as deceased on ministry database"
+				"label": "(14) Patient identified as deceased on ministry database"
 			});
 			reasons.push(
 			{
 				"value": "51",
-				"label": "Patient no longer meets selection criteria for your roster"
+				"label": "(51) Patient no longer meets selection criteria for your roster"
 			});
 			reasons.push(
 			{
 				"value": "41",
-				"label": "Patient no longer meets selection criteria for your roster - assigned to another physician"
+				"label": "(41) Patient no longer meets selection criteria for your roster - assigned to another physician"
 			});
 			reasons.push(
 			{
 				"value": "61",
-				"label": "Patient out of geographic area; address over-ride applied"
+				"label": "(61) Patient out of geographic area; address over-ride applied"
 			});
 			reasons.push(
 			{
 				"value": "62",
-				"label": "Patient out of geographic area; address over-ride removed"
+				"label": "(62) Patient out of geographic area; address over-ride removed"
 			});
 			reasons.push(
 			{
 				"value": "35",
-				"label": "Patient transferred from roster per physician request"
+				"label": "(35) Patient transferred from roster per physician request"
 			});
 			reasons.push(
 			{
 				"value": "42",
-				"label": "Physician ended enrolment; patient entered Long Term Care facility"
+				"label": "(42) Physician ended enrolment; patient entered Long Term Care facility"
 			});
 			reasons.push(
 			{
 				"value": "54",
-				"label": "Physician ended enrolment; patient left province"
+				"label": "(54) Physician ended enrolment; patient left province"
 			});
 			reasons.push(
 			{
 				"value": "53",
-				"label": "Physician ended enrolment; patient moved out of geographic area"
+				"label": "(53) Physician ended enrolment; patient moved out of geographic area"
 			});
 			reasons.push(
 			{
 				"value": "56",
-				"label": "Physician ended enrolment; per patient request"
+				"label": "(56) Physician ended enrolment; per patient request"
 			});
 			reasons.push(
 			{
 				"value": "44",
-				"label": "Physician ended patient enrolment"
+				"label": "(44) Physician ended patient enrolment"
 			});
 			reasons.push(
 			{
 				"value": "40",
-				"label": "Physician reported member as deceased"
+				"label": "(40) Physician reported member as deceased"
 			});
 			reasons.push(
 			{
 				"value": "32",
-				"label": "Pre-member/ Assigned member ended; now enrolled or registered with photo health card"
+				"label": "(32) Pre-member/ Assigned member ended; now enrolled or registered with photo health card"
 			});
 			reasons.push(
 			{
 				"value": "30",
-				"label": "Pre-member/ Assigned member ended; now enrolled or registered with red and white health card"
+				"label": "(30) Pre-member/ Assigned member ended; now enrolled or registered with red and white health card"
 			});
 			reasons.push(
 			{
 				"value": "33",
-				"label": "Termination reason cannot be released (due to patient confidentiality)"
+				"label": "(33) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			reasons.push(
 			{
 				"value": "84",
-				"label": "Termination reason cannot be released (due to patient confidentiality)"
+				"label": "(84) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			reasons.push(
 			{
 				"value": "90",
-				"label": "Termination reason cannot be released (due to patient confidentiality)"
+				"label": "(90) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			reasons.push(
 			{
 				"value": "91",
-				"label": "Termination reason cannot be released (due to patient confidentiality)"
+				"label": "(91) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			return reasons;
 		};

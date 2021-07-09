@@ -1,0 +1,14 @@
+.integration-settings {
+	.connection-status {
+		&.success {
+			color: var(--color-primary-base);
+		}
+		&.error {
+			color: var(--color-red-base);
+		}
+
+		.icon {
+			font-size: 1.3em;
+		}
+	}
+}

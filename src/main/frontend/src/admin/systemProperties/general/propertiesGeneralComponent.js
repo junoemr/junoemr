@@ -51,7 +51,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
 				            const reg = new RegExp(/^[0-9]{3}-?$/);
 				            const MIN_LENGTH = 3;
 				            const MAX_LENGTH = 4;
-				            
+
 				            return prefix === "" || !prefix ||
 					            (prefix.match(reg) != null && (prefix.length >= MIN_LENGTH && prefix.length <= MAX_LENGTH));
 			            }
@@ -66,10 +66,10 @@ angular.module('Admin').component('systemPropertiesGeneral',
 	                    value: "",
 	                    validation: ctrl.validations.phonePrefixValid,
                     },
-	                {
-	                	name: "Ontario CNO Number",
-		                description: "Enable CNO field for nurse providers",
-		                propertyName: "enable_ontario_cno_field",
+					{
+	                	name: "Additional Demographic Address",
+		                description: "Enable an additional demographic address",
+		                propertyName: "enable_additional_address",
 		                type: propertyTypes.toggle,
 		                value: false,
 		                validation: false,
@@ -86,11 +86,23 @@ angular.module('Admin').component('systemPropertiesGeneral',
                
                 ctrl.loadProperty = (property) =>
                 {
-                    systemPreferenceApi.getPreferenceValue(property.propertyName)
-                    .then((response) =>
-                    {
-                        property.value = response.data.body;
-                    })
+                	if (property.type === propertyTypes.toggle)
+	                {
+		                systemPreferenceApi.getPreferenceEnabled(property.propertyName)
+			                .then((response) =>
+			                {
+				                property.value = response.data.body;
+			                })
+	                }
+                	else
+	                {
+	                	systemPreferenceApi.getPreferenceValue(property.propertyName)
+			                .then((response) =>
+		                    {
+			                    property.value = response.data.body;
+		                    })
+	                }
+
                 };
                 
 
