@@ -50,7 +50,7 @@ public final class WCBForm
     }
 
     /**
-     * @todo-legacy This seems to be a duplicate field but I am loathe to remove it until further testing - Joel
+     * todo-legacy This seems to be a duplicate field but I am loathe to remove it until further testing - Joel
      */
     private String demographic_no;
 
@@ -108,7 +108,7 @@ public final class WCBForm
   private List injuryLocations;
 
   /**
-   * @todo-legacy Database code should be moved out of the model and into an appropriate persistence class
+   * todo-legacy Database code should be moved out of the model and into an appropriate persistence class
    */
   private String demographic;
   private String w_demographic;
@@ -948,7 +948,7 @@ public final class WCBForm
    *
    * @param mapping The mapping used to select this instance
    * @param request The servlet request we are processing
-   * @todo-legacy Implement this org.apache.struts.action.ActionForm method
+   * todo-legacy Implement this org.apache.struts.action.ActionForm method
    */
   public void reset(ActionMapping mapping, HttpServletRequest request) {
 
@@ -962,7 +962,7 @@ public final class WCBForm
    * @param mapping The mapping used to select this instance
    * @param request The servlet request we are processing
    * @return ActionErrors
-   * @todo-legacy Implement this org.apache.struts.action.ActionForm method
+   * todo-legacy Implement this org.apache.struts.action.ActionForm method
    */
  
   public ActionErrors validate2(ActionMapping mapping,

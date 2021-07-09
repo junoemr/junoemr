@@ -84,13 +84,13 @@ public class TomcatConfig
 
 				// Use extracting root because it was too slow otherwise (this extracts jars to the
 				// work directory, instead of reading them from the war)
-				ExtractingRoot r = new ExtractingRoot();
+				ExtractingRoot root = new ExtractingRoot();
 
 				// Allow linking to get around this bug when running in docker:
 				//  https://github.com/spring-projects/spring-boot/issues/27075
-				r.setAllowLinking(true);
+				root.setAllowLinking(true);
 
-				context.setResources(r);
+				context.setResources(root);
 
 				// Set up redis session management
 				if(junoProperties.getRedisSessionStore().isEnabled())

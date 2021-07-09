@@ -127,7 +127,7 @@ public class BedManager {
 	    }
 
 	    /**
-	     * Get beds by available rooms & assigned program
+	     * Get beds by available rooms &amp; assigned program
 	     *
 	     * @param availableRooms
 	     * @param programId

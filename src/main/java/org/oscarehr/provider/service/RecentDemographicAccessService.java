@@ -42,8 +42,8 @@ public class RecentDemographicAccessService
 	/**
 	 * retrieve a list of recent demographics for a given provider
 	 * @param providerNo provider id
-	 * @param offset offset results. ignored if offset < 1
-	 * @param limit limit results. ignored if limit < 1
+	 * @param offset offset results. ignored if offset &lt; 1
+	 * @param limit limit results. ignored if limit &lt; 1
 	 * @return list of recent access results
 	 */
 	public List<RecentDemographicAccess> getRecentAccessList(Integer providerNo, int offset, int limit)

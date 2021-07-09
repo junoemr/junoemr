@@ -23,7 +23,6 @@
 
 package org.oscarehr.login.service;
 
-import com.quatro.model.security.LdapSecurity;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -331,8 +330,6 @@ public class LoginService
 
 		if (security == null) {
 			return null;
-		} else if (OscarProperties.isLdapAuthenticationEnabled()) {
-			security = new LdapSecurity(security);
 		}
 
 		return security;
