@@ -31,6 +31,7 @@ angular.module("Messaging.Components.View.Components").component('message', {
 		message: "<",
 		messagingService: "<",
 		compact: "<",
+		indentLevel: "<?"
 	},
 	controller: [
 		"$scope",
@@ -46,6 +47,7 @@ angular.module("Messaging.Components.View.Components").component('message', {
 			ctrl.$onInit = async () =>
 			{
 				ctrl.compact = ctrl.compact || false;
+				ctrl.indentLevel = ctrl.indentLevel || 0;
 
 				try
 				{
@@ -58,6 +60,16 @@ angular.module("Messaging.Components.View.Components").component('message', {
 					$scope.$apply();
 				}
 			};
+
+			ctrl.getComponentClasses = () =>
+			{
+				return {
+					'compact': ctrl.compact,
+					'indent-level-1': ctrl.indentLevel === 1,
+					'indent-level-2': ctrl.indentLevel === 2,
+					'indent-level-3': ctrl.indentLevel >= 3,
+				}
+			}
 
 			/**
 			 * setup the messageable id to demographic id mapping.

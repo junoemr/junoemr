@@ -1,9 +1,7 @@
 <div class="message-list h-100 w-100">
 	<!-- Loading indicator -->
 	<div ng-if="!$ctrl.messageStream">
-		<juno-loading-indicator message-alignment="vertical"
-		                        indicator-type="dot-pulse">
-		</juno-loading-indicator>
+		<div class="zero-sate-text text-center body-normal m-t-32">Mailbox is loading</div>
 	</div>
 
 	<!-- Message list -->

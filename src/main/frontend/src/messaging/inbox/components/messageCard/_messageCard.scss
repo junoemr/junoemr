@@ -5,14 +5,22 @@
 	user-select: none;
 
 	&:hover {
-		background-color: var(--color-neutral-lightest);
+		&.read {
+			background-color: var(--color-neutral-lighter);
+		}
+		&.selected {
+			background-color: var(--color-neutral-light);
+		}
+		&.group-selected {
+			background-color: var(--color-primary-lighter);
+		}
+		background-color: var(--color-neutral-lighter);
 	}
-
 	&.read {
 		background-color: var(--color-neutral-lightest);
 	}
 	&.selected {
-		background-color: var(--color-neutral-lighter);
+		background-color: var(--color-neutral-light);
 	}
 	&.group-selected {
 		background-color: var(--color-primary-lightest);

@@ -13,10 +13,20 @@
 		min-width: 344px;
 	}
 
+	.inbox-select-pane {
+		width: 224px;
+		min-width: 224px;
+	}
+
 	@media only screen and (max-width: 1080px) {
 		.inbox-select-pane {
 			width: 128px;
 			min-width: 128px;
+		}
+
+		.message-list-pane {
+			width: 256px;
+			min-width: 256px;
 		}
 	}
 }

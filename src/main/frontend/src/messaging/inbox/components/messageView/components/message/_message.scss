@@ -10,6 +10,16 @@
 
 	&.compact {
 
+		&.indent-level-1 {
+			margin-left: 16px;
+		}
+		&.indent-level-2 {
+			margin-left: 32px;
+		}
+		&.indent-level-3 {
+			margin-left: 48px;
+		}
+
 		.message-container {
 			margin-top: 8px;
 		}

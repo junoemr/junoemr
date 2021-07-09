@@ -1,4 +1,4 @@
-<div class="message" ng-class="{'compact': $ctrl.compact}">
+<div class="message" ng-class="$ctrl.getComponentClasses()">
 
 	<!-- Message -->
 	<div class="flex-col">
