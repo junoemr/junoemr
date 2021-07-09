@@ -262,6 +262,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 
 			ctrl.onUnreadFilterChange = (checked) =>
 			{
+				ctrl.onlyUnread = checked;
 				// update url
 				$state.go(".", {onlyUnread: checked}, {location: "replace"});
 			}

@@ -154,11 +154,7 @@ angular.module("Messaging.Components").component('messageList', {
 			{
 				if (ctrl.selectedMessageId)
 				{
-					let targetState = ".message"
-					if ($state.is("record.messaging.view.message") || $state.is("messaging.view.message"))
-					{
-						targetState = "^.message";
-					}
+					const targetState = $state.includes("**.message") ? "." : ".message";
 
 					// display the selected message
 					$state.go(targetState,

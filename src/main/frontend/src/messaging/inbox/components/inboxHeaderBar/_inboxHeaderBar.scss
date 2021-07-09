@@ -3,9 +3,12 @@
 
 	background-color: var(--color-neutral-lightest);
 	border: solid 1px var(--color-neutral-light-grey);
-
-	.inbox-title {
-		width: 146px;
+	
+	.item-divider {
+		height: 32px;
+		.juno-divider {
+			//--divider-color: red;
+		}
 	}
 
 	.unread-checkbox {
@@ -19,7 +22,7 @@
 	}
 
 	.search-input {
-		width: 295px;
+		width: 344px;
 		min-width: 128px;
 	}
 
@@ -27,8 +30,11 @@
 		flex-grow: 0;
 
 		.icon {
-			margin: 8px;
-			font-size: 16px;
+			font-size: 24px;
+
+			&.icon-blue {
+				color: var(--color-primary-base);
+			}
 		}
 	}
 
