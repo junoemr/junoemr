@@ -135,7 +135,7 @@ public class IssueNoteSummary implements Summary {
 			count++;
 		}
 	}
-	
+
 	public static String[] getIssueIds(List<Issue> issues) {
 		String[] issueIds = new String[issues.size()];
 		int idx = 0;

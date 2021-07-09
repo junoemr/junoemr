@@ -698,6 +698,11 @@ public class AdminNavService
 			}
 		}
 
+		if (securityInfoManager.isSuperAdmin(providerNo))
+		{
+			integrationItems.add(new AdminNavItemTo1("MHA Configuration", "mhaConfig"));
+		}
+
 		integrationGroup.setItems(integrationItems);
 		return integrationGroup;
 	}

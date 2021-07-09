@@ -1925,11 +1925,14 @@
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService
 								org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
+								org.oscarehr.ws.rest.myhealthaccess.IntegrationsWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
+								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
 								org.oscarehr.ws.rest.ProviderService
 								org.oscarehr.ws.rest.ProvidersService
+								org.oscarehr.ws.rest.ReferralDoctorsService
 								org.oscarehr.ws.rest.RosterWebService
 								org.oscarehr.ws.rest.ScheduleService
 								org.oscarehr.ws.rest.SecurityRolesWebService

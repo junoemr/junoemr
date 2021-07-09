@@ -256,6 +256,11 @@ oscarApp.config([
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.mhaConfig',
+		{
+			url: "/mhaConfig",
+			component: "mhaConfig",
+		})
 		.state('admin.rosterStatus',
 		{
 			url: '/rosterStatus',

@@ -222,6 +222,7 @@ $(function() {
 	  $('#pharmacyPhone1').val(json["phone1"]);
 	  $('#pharmacyPhone2').val(json["phone2"]);
 	  $('#pharmacyFax').val(json["fax"]);
+	  $('#pharmacyEmail').val(json["email"]);
 	  $('#pharmacyServiceLocationId').val(json["serviceLocationIdentifier"]);
 	  $('#pharmacyNotes').val(json["notes"]);
 	  

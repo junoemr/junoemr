@@ -16,6 +16,7 @@
                      button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
                      component-style="$ctrl.componentStyle"
                      click="$ctrl.onClick()"
+                     disabled="$ctrl.invalid"
                      title="Save Phone Prefix">
             <i class="icon-logout fa-lg"></i>
         </juno-button>

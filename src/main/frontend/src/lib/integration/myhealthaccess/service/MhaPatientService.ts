@@ -50,9 +50,9 @@ export default class MhaPatientService
 	 * @param remoteId - the remote id of the profile
 	 * @return mha profile or null if profile cannot be found.
 	 */
-	public async getProfile(integrationId: number, remoteId: string): Promise<MhaPatient>
+	public async getProfile(integrationId: string, remoteId: string): Promise<MhaPatient>
 	{
-		return (new PatientTo1ToMhaPatientConverter()).convert((await this._mhaPatientApi.getRemotePatient(integrationId.toString(), remoteId)).data.body);
+		return (new PatientTo1ToMhaPatientConverter()).convert((await this._mhaPatientApi.getRemotePatient(integrationId, remoteId)).data.body);
 	}
 
 	/**
@@ -61,9 +61,9 @@ export default class MhaPatientService
 	 * @param demographicNo - the demographicNo who's MHA profile is to be fetched.
 	 * @return promise that resolves to a MHAPatient profile or null if none found.
 	 */
-	public async profileForDemographic(integrationId: number, demographicNo: string): Promise<MhaPatient>
+	public async profileForDemographic(integrationId: string, demographicNo: string): Promise<MhaPatient>
 	{
-		return (new PatientTo1ToMhaPatientConverter()).convert((await this._mhaDemographicApi.getMHAPatient(integrationId, demographicNo)).data.body);
+		return (new PatientTo1ToMhaPatientConverter()).convert((await this._mhaDemographicApi.getMHAPatient(parseInt(integrationId), demographicNo)).data.body);
 	}
 
 	/**

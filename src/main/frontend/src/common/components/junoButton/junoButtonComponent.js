@@ -48,11 +48,11 @@ angular.module('Common.Components').component('junoButton', {
 			ctrl.buttonColorPattern = ctrl.buttonColorPattern || JUNO_BUTTON_COLOR_PATTERN.DEFAULT;
 		};
 
-		ctrl.clickHandler = () =>
+		ctrl.clickHandler = ($event) =>
 		{
 			if (!ctrl.disabled && ctrl.click)
 			{
-				ctrl.click({});
+				ctrl.click({$event});
 			}
 		};
 

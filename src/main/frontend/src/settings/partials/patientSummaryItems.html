@@ -132,18 +132,27 @@
 				</label>
 
 				<br>
-				<!-- ngIf: pref.cppDisplayReminders -->
+
 				<small ng-if="$ctrl.pref.cppDisplayReminders" class="ng-scope">
 					<label class="checkbox-inline">
-						<input type="checkbox" name="check-enc-10" id="check-enc-10"
-							   ng-model="pref.cppRemindersStartDate" value="true" class="$ctrl.ng-pristine ng-valid"> Show
-						Start Date
+						<input type="checkbox"
+							   name="check-enc-10"
+							   id="check-enc-10"
+							   ng-model="$ctrl.pref.cppRemindersStartDate"
+							   value="true"
+							   class="ng-pristine ng-valid">
+						Show Start Date
 					</label>
 					<label class="checkbox-inline">
-						<input type="checkbox" name="check-enc-11" id="check-enc-11" ng-model="$ctrl.pref.cppRemindersResDate"
-							   value="true" class="ng-pristine ng-valid"> Show Resolution Date
+						<input type="checkbox"
+							   name="check-enc-11"
+							   id="check-enc-11"
+							   ng-model="$ctrl.pref.cppRemindersResDate"
+							   value="true"
+							   class="ng-pristine ng-valid">
+						Show Resolution Date
 					</label>
-				</small><!-- end ngIf: pref.cppDisplayReminders -->
+				</small>
 			</div>
 		</td>
 	</tr><!-- CPP Display -->
