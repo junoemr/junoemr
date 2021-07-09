@@ -147,6 +147,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						}
 					);
 
+
 					//show notes
 					if (controller.page.demo.notes != null)
 					{
@@ -670,14 +671,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalComplete = function isPostalComplete()
+		controller.isPostalComplete = function isPostalComplete(postal, province)
 		{
-			var province = controller.page.demo.address.province;
-			var postal = controller.page.demo.address.postal;
 			// If Canadian province is selected, proceed with validation
-			if (postal !== null && province !== null && province !== "OT" && province.indexOf("US") !== 0)
+			if (postal && province && province !== "OT" && province.indexOf("US") !== 0)
 			{
-				if (controller.isPostalValid())
+				if (controller.isPostalValidCanadian(postal))
 				{
 					return true;
 				}
@@ -689,24 +688,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalValid = function isPostalValid()
+		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
 		{
-			var postal = controller.page.demo.address.postal.replace(/\s/g, ""); // Trim whitespace
-
-			// If postal code is an empty string, set it to null and continue
-			if(postal.length === 0)
+			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]\d[A-Za-z]\d$/); // Match to Canadian postal code standard
+			if (regex.test(postalCode))
 			{
-				controller.page.demo.address.postal = null;
 				return true;
 			}
-
-			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/); // Match to Canadian postal code standard (minus the space)
-			if (regex.test(postal))
+			else
 			{
-				// Format postal code to Canadian standard
-				controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
-				return true;
-			}else {
 				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
 				return false;
 			}
@@ -1111,7 +1101,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				return;
 			}
 			if (!controller.checkPatientStatus()) return;
-			if (!controller.isPostalComplete()) return;
+			if (!controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province)) return;
+			if (!controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 

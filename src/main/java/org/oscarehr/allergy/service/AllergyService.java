@@ -83,7 +83,7 @@ public class AllergyService
 			allergyNote.setProvider(providerData);
 			allergyNote.setSigningProvider(providerData);
 			allergyNote.setDemographic(dbDemographic);
-			allergyNote.setObservationDate(ConversionUtils.toLegacyDate(allergy.getStartDate().toLocalDate()));
+			allergyNote.setObservationDate(ConversionUtils.toLegacyDate(allergy.getEntryDateTime().toLocalDate()));
 			encounterNoteService.saveAllergyNote(allergyNote, dbAllergy);
 		}
 	}

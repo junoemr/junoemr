@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -20,50 +21,83 @@
  * Victoria, British Columbia
  * Canada
  */
+ 
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
-import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.myhealthaccess.IntegrationTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-@Path("myhealthaccess/integrations")
-@Component("IntegrationWebService")
+@Path("myhealthaccess/integration/{integrationId}/")
+@Component("mhaIntegrationWebService")
 @Tag(name = "mhaIntegration")
 public class IntegrationWebService extends AbstractServiceImpl
 {
-	@Autowired
-	IntegrationService integrationService;
+	protected IntegrationDao integrationDao;
+	protected ClinicService clinicService;
+	protected SecurityInfoManager securityInfoManager;
 
-	@GET
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	@Autowired
+	public IntegrationWebService(IntegrationDao integrationDao, ClinicService clinicService, SecurityInfoManager securityInfoManager)
+	{
+		this.integrationDao = integrationDao;
+		this.clinicService = clinicService;
+		this.securityInfoManager = securityInfoManager;
+	}
+
+	// ==========================================================================
+	// Endpoints
+	// ==========================================================================
+
+	@DELETE
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<IntegrationTo1>> searchIntegrations(@QueryParam("site") String siteName, @QueryParam("all") Boolean allSites)
+	public RestResponse<Boolean> deleteMhaIntegration(@PathParam("integrationId") String integrationId)
 	{
-		if (allSites != null && allSites)
+		securityInfoManager.requireSuperAdminFlag(getLoggedInInfo().getLoggedInProviderNo());
+
+		Integration integration = this.integrationDao.findOrThrow(Integer.parseInt(integrationId));
+		this.integrationDao.remove(integration);
+
+		return RestResponse.successResponse(true);
+	}
+
+	@GET
+	@Path("/testConnection")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> testConnection(@PathParam("integrationId") String integrationId)
+	{
+		try
 		{
-			return RestResponse.successResponse(IntegrationTo1.fromIntegrationList(integrationService.getMyHealthAccessIntegrations()));
+			Integration integration = this.integrationDao.findOrThrow(Integer.parseInt(integrationId));
+			ClinicStatusResponseTo1 clinicStatusResponseTo1 = this.clinicService.testConnection(integration);
+
+			return RestResponse.successResponse(
+					clinicStatusResponseTo1.getStatusIdentifier().equals(ClinicStatusResponseTo1.STATUS_IDENTIFIER_CONNECTED));
 		}
-		else
+		catch(RuntimeException e)
 		{
-			Integration integration = integrationService.findMhaIntegration(siteName);
-			if (integration != null)
-			{
-				return RestResponse.successResponse(Arrays.asList(new IntegrationTo1(integration)));
-			}
+			MiscUtils.getLogger().info("MHA test connection failed for integration [" + integrationId + "]", e);
+			return RestResponse.successResponse(false);
 		}
-		return RestResponse.successResponse(new ArrayList<>());
 	}
 }

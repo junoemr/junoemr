@@ -23,6 +23,7 @@
 
 import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 import {ElectronicMessagingConsentStatus} from "../../../../lib/demographic/ElectronicMessagingConsentStatus";
+import {SystemPreferenceApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('contactSection', {
 	templateUrl: 'src/record/details/components/contactSection/contactSection.jsp',
@@ -31,18 +32,34 @@ angular.module('Record.Details').component('contactSection', {
 		validations: "=",
 		componentStyle: "<?"
 	},
-	controller: [ "staticDataService", "$scope", function (staticDataService, $scope)
+	controller: [ "staticDataService", "$scope", "$http", "$httpParamSerializer", function (staticDataService, $scope, $http, $httpParamSerializer)
 	{
 		let ctrl = this;
-
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.provinces = staticDataService.getProvinces();
 		ctrl.phoneNumberRegex = /^[\d-\s()]*$/;
 		ctrl.electronicMessagingConsentOptions = [];
+		ctrl.showAdditionalAddress = false;
 
 		ctrl.$onInit = () =>
 		{
+			systemPreferenceApi.getPreferenceValue("enable_additional_address").then(
+				function success(result)
+				{
+					if(result.data.body == "true")
+					{
+						ctrl.showAdditionalAddress = true;
+					}
+				},
+				function error(result)
+				{
+					console.error("Failed to property: " + result);
+				}
+			);
+
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
 			ctrl.validations = Object.assign(ctrl.validations, {
