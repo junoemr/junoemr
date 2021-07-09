@@ -534,8 +534,9 @@ public class DemographicManager {
 									  org.oscarehr.demographic.model.Demographic previousDemo)
 	{
 		boolean hasChanged = false;
-		// check if any fields changed from last time we edited
-		if (currentDemo.getRosterStatus() != null)
+		
+		// If the roster status is valid, check if any fields changed from last time we edited
+		if (ConversionUtils.hasContent(currentDemo.getRosterStatus()))
 		{
 			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
 			hasChanged |= currentDemo.getRosterDate() != null && currentDemo.getRosterDate() != previousDemo.getRosterDate();
