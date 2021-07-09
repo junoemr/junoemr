@@ -53,14 +53,18 @@
 					 ng-keypress="summaryCtrl.checkAction($event)">
 					<ul class="nav nav-tabs round-top">
 						<li class="active">
-							<a data-target="#all" data-toggle="tab" class="hand-hover">Notes</a>
+							<a ng-click="summaryCtrl.onOpenNotesTab()"
+							   data-target="#all"
+							   data-toggle="tab"
+							   class="hand-hover">
+								Notes
+							</a>
 						</li>
 						<li>
-							<a ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)"
+							<a ng-click="summaryCtrl.onOpenTrackerTab()"
 							   data-target="#tracker"
 							   role="tab"
-							   data-toggle="tab" >
-								Tracker
+							   data-toggle="tab">
 							</a>
 						</li>
 						<li class="pull-right">
@@ -88,15 +92,8 @@
 						</div>
 
 						<div class="tab-pane" id="tracker">
-							<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.MEASUREMENT_READ">
-								<iframe
-										id="trackerSlim"
-										scrolling="No"
-										frameborder="0"
-										ng-src="{{ summaryCtrl.trackerUrl }}"
-										width="100%"
-										style="min-height:820px"
-								></iframe>
+							<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.FLOWSHEET_READ">
+								<ui-view></ui-view>
 							</juno-security-check>
 						</div>
 					</div><!-- tab content -->

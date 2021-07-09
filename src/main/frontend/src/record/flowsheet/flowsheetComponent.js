@@ -79,17 +79,6 @@ angular.module('Record.Flowsheet').component('flowsheet',
 					ctrl.flowsheet = await flowsheetApiService.getDemographicFlowsheet(ctrl.demographicId, $stateParams.flowsheetId);
 				}
 
-				ctrl.toHealthTracker = () =>
-				{
-					$state.transitionTo('record.tracker',
-						{
-							demographicNo: $stateParams.demographicNo,
-						},
-						{
-							notify: false
-						});
-				}
-
 				ctrl.clearFilters = () =>
 				{
 					ctrl.filter.item.textFilter = null;

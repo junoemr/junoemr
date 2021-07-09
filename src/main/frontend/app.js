@@ -582,6 +582,28 @@ oscarApp.config([
 				},
 			},
 		})
+		.state('record.summary.tracker',
+		{
+			url: '/tracker',
+			component: 'healthTracker',
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
+		})
+		.state('record.summary.tracker.flowsheet',
+		{
+			url: '/flowsheet/:flowsheetId',
+			component: 'flowsheet',
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
+		})
 		.state('record.forms',
 		{
 			url: '/forms',

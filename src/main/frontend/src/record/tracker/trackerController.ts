@@ -32,6 +32,7 @@ angular.module('Record.Tracker').component('healthTracker',
 		templateUrl: 'src/record/tracker/tracker.jsp',
 		bindings: {
 			componentStyle: "<?",
+			embeddedMode: "<?",
 		},
 		controller: [
 			'$state',
@@ -69,6 +70,7 @@ angular.module('Record.Tracker').component('healthTracker',
 					ctrl.flowsheets = await flowsheetApiService.getAllFlowsheets();
 					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicNo);
 					ctrl.accordianListItems[0].items = ctrl.flowsheets;
+					ctrl.embeddedMode = ctrl.embeddedMode || false;
 
 					if($stateParams.flowsheetId)
 					{
@@ -100,13 +102,12 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.onFlowsheetSelect = (flowsheet) =>
 				{
 					ctrl.selectedFlowsheet = flowsheet;
-					$state.transitionTo('record.tracker.flowsheet',
+
+					const state = $state.includes("**.flowsheet") ? "." : ".flowsheet";
+					$state.go(state,
 						{
 							demographicNo: ctrl.demographicNo,
 							flowsheetId: flowsheet.id,
-						},
-						{
-							notify: false
 						});
 				}
 			}]
