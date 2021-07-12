@@ -102,6 +102,20 @@ public class FlowsheetWebService extends AbstractServiceImpl
 	                                            @QueryParam("demographicId") Integer demographicId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_CREATE);
-		return RestResponse.successResponse(flowsheetService.addNewFlowsheetCopy(getLoggedInProviderId(), flowsheetId).getId());
+
+		Flowsheet clone;
+		if(demographicId != null)
+		{
+			clone = flowsheetService.addNewDemographicFlowsheetCopy(getLoggedInProviderId(), flowsheetId, demographicId);
+		}
+		else if (providerId != null)
+		{
+			clone = flowsheetService.addNewProviderFlowsheetCopy(getLoggedInProviderId(), flowsheetId, providerId);
+		}
+		else
+		{
+			clone = flowsheetService.addNewFlowsheetCopy(getLoggedInProviderId(), flowsheetId);
+		}
+		return RestResponse.successResponse(clone.getId());
 	}
 }

@@ -27,6 +27,8 @@ import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.decisionSupport2.entity.Drools;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,6 +40,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -45,6 +48,7 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,6 +89,18 @@ public class Flowsheet extends AbstractModel<Integer>
 	@JoinTable(name = "flowsheet_triggers_icd9", joinColumns = @JoinColumn(name="flowsheet_id"), inverseJoinColumns = @JoinColumn(name="icd9_id"))
 	private Set<Icd9> icd9Triggers = new HashSet<>();
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_flowsheet_id", referencedColumnName = "id")
+	private Flowsheet parentFlowsheet;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner_provider_id", referencedColumnName = "provider_no")
+	private ProviderData ownerProvider;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner_demographic_id", referencedColumnName = "demographic_no")
+	private Demographic ownerDemographic;
+
 	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime createdAt;
 
@@ -110,10 +126,10 @@ public class Flowsheet extends AbstractModel<Integer>
 	public Flowsheet(Flowsheet toCopy)
 	{
 		this.id = null;
-		this.name = toCopy.name + " (Copy)";
+		this.name = toCopy.name;
 		this.description = toCopy.description;
 		this.enabled = toCopy.enabled;
-		this.systemManaged = false;
+		this.systemManaged = toCopy.systemManaged;
 
 		// copy item groups (and contained items)
 		this.flowsheetItemGroups = toCopy.flowsheetItemGroups
@@ -139,6 +155,10 @@ public class Flowsheet extends AbstractModel<Integer>
 		this.icd9Triggers = new HashSet<>(toCopy.icd9Triggers);
 		this.drools = new HashSet<>(toCopy.drools);
 
+		this.parentFlowsheet = toCopy;
+		this.ownerProvider = toCopy.getOwnerProvider();
+		this.ownerDemographic = toCopy.getOwnerDemographic();
+
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();
 		this.deletedAt = null;
@@ -162,9 +182,25 @@ public class Flowsheet extends AbstractModel<Integer>
 		return this.getClass().getName() + "{id: " + id + ", name: " + name + "}";
 	}
 
+	public Optional<Flowsheet> getOptionalParentFlowsheet()
+	{
+		return Optional.ofNullable(getParentFlowsheet());
+	}
+
+	public Optional<Demographic> getOptionalOwnerDemographic()
+	{
+		return Optional.ofNullable(getOwnerDemographic());
+	}
+
+	public Optional<ProviderData> getOptionalOwnerProvider()
+	{
+		return Optional.ofNullable(getOwnerProvider());
+	}
+
 	@PrePersist
 	private void prePersist()
 	{
+		this.checkOwnerState();
 		this.setCreatedAt(LocalDateTime.now());
 		this.setUpdatedAt(LocalDateTime.now());
 
@@ -181,10 +217,19 @@ public class Flowsheet extends AbstractModel<Integer>
 	@PreUpdate
 	private void preUpdate()
 	{
+		this.checkOwnerState();
 		this.setUpdatedAt(LocalDateTime.now());
 		if(getUpdatedBy() == null)
 		{
 			throw new IllegalStateException("UpdatedBy can not be null");
+		}
+	}
+
+	private void checkOwnerState()
+	{
+		if(this.getOwnerDemographic() != null && this.getOwnerProvider() != null)
+		{
+			throw new IllegalStateException("Flowsheet can not be owned by both a provider and demographic");
 		}
 	}
 

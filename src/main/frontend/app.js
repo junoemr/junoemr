@@ -586,6 +586,13 @@ oscarApp.config([
 		{
 			url: '/tracker',
 			component: 'healthTracker',
+			resolve:
+			{
+				user: ['providerService', function (providerService)
+				{
+					return providerService.getMe();
+				}],
+			},
 			meta:
 				{
 					auth: {
@@ -778,6 +785,13 @@ oscarApp.config([
 		{
 			url: '/tracker',
 			component: 'healthTracker',
+			resolve:
+			{
+				user: ['providerService', function (providerService)
+				{
+					return providerService.getMe();
+				}],
+			},
 			meta:
 			{
 				auth: {

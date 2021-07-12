@@ -23,13 +23,17 @@
 package org.oscarehr.flowsheet.service;
 
 
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.converter.FlowsheetModelToEntityConverter;
 import org.oscarehr.flowsheet.converter.FlowsheetTransferToEntityConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.model.Flowsheet;
+import org.oscarehr.flowsheet.search.FlowsheetCriteriaSearch;
 import org.oscarehr.flowsheet.transfer.FlowsheetCreateTransfer;
 import org.oscarehr.flowsheet.transfer.FlowsheetUpdateTransfer;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +52,12 @@ public class FlowsheetService
 	private FlowsheetDao flowsheetDao;
 
 	@Autowired
+	private ProviderDataDao providerDao;
+
+	@Autowired
+	private DemographicDao demographicDao;
+
+	@Autowired
 	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
 
 	@Autowired
@@ -55,9 +66,12 @@ public class FlowsheetService
 	@Autowired
 	private FlowsheetModelToEntityConverter flowsheetModelToEntityConverter;
 
-	public List<Flowsheet> getFlowsheets(int offset, int perPage)
+	public RestSearchResponse<Flowsheet> executeCriteriaSearch(FlowsheetCriteriaSearch criteriaSearch, int page, int perPage)
 	{
-		return flowsheetEntityToModelConverter.convert(flowsheetDao.findAll(offset, perPage));
+		List<org.oscarehr.flowsheet.entity.Flowsheet> flowsheets = flowsheetDao.criteriaSearch(criteriaSearch);
+		int total = flowsheetDao.criteriaSearchCount(criteriaSearch);
+
+		return RestSearchResponse.successResponse(flowsheetEntityToModelConverter.convert(flowsheets), page, perPage, total);
 	}
 
 	public Flowsheet addNewFlowsheet(String creatingProviderId, FlowsheetCreateTransfer creationTransfer)
@@ -70,11 +84,17 @@ public class FlowsheetService
 
 	public Flowsheet addNewFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy)
 	{
-		org.oscarehr.flowsheet.entity.Flowsheet flowsheetToCopy = flowsheetDao.find(flowsheetIdToCopy);
-		org.oscarehr.flowsheet.entity.Flowsheet entity = new org.oscarehr.flowsheet.entity.Flowsheet(flowsheetToCopy); // copy constructor
-		entity.setCreatedBy(creatingProviderId);
-		flowsheetDao.persist(entity);
-		return flowsheetEntityToModelConverter.convert(entity);
+		return addNewFlowsheetCopy(creatingProviderId, flowsheetIdToCopy, Optional.empty(), Optional.empty());
+	}
+
+	public Flowsheet addNewProviderFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy, String ownerProviderId)
+	{
+		return addNewFlowsheetCopy(creatingProviderId, flowsheetIdToCopy, Optional.ofNullable(ownerProviderId), Optional.empty());
+	}
+
+	public Flowsheet addNewDemographicFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy, Integer ownerDemographicId)
+	{
+		return addNewFlowsheetCopy(creatingProviderId, flowsheetIdToCopy, Optional.empty(), Optional.ofNullable(ownerDemographicId));
 	}
 
 	public Flowsheet updateFlowsheet(String updatingProviderId, Integer flowsheetId, FlowsheetUpdateTransfer updateTransfer)
@@ -151,5 +171,22 @@ public class FlowsheetService
 		flowsheetEntity.setUpdatedBy(updatingProviderId);
 		flowsheetDao.merge(flowsheetEntity);
 		return flowsheetEntity.isEnabled();
+	}
+
+	private Flowsheet addNewFlowsheetCopy(String creatingProviderId,
+	                                      Integer flowsheetIdToCopy,
+	                                      Optional<String> providerOwnerId,
+	                                      Optional<Integer> demographicOwnerId)
+	{
+		org.oscarehr.flowsheet.entity.Flowsheet flowsheetToCopy = flowsheetDao.find(flowsheetIdToCopy);
+		org.oscarehr.flowsheet.entity.Flowsheet entity = new org.oscarehr.flowsheet.entity.Flowsheet(flowsheetToCopy); // copy constructor
+		entity.setCreatedBy(creatingProviderId);
+		entity.setSystemManaged(false); // copies are never system managed
+
+		entity.setOwnerProvider(providerOwnerId.map((id) -> providerDao.find(id)).orElse(null));
+		entity.setOwnerDemographic(demographicOwnerId.map((id) -> demographicDao.find(id)).orElse(null));
+
+		flowsheetDao.persist(entity);
+		return flowsheetEntityToModelConverter.convert(entity);
 	}
 }

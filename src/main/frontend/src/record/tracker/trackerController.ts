@@ -32,7 +32,7 @@ angular.module('Record.Tracker').component('healthTracker',
 		templateUrl: 'src/record/tracker/tracker.jsp',
 		bindings: {
 			componentStyle: "<?",
-			embeddedMode: "<?",
+			user: "<",
 		},
 		controller: [
 			'$state',
@@ -67,10 +67,9 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.$onInit = async () =>
 				{
 					ctrl.demographicNo = $stateParams.demographicNo;
-					ctrl.flowsheets = await flowsheetApiService.getAllFlowsheets();
+					ctrl.flowsheets = await flowsheetApiService.searchFlowsheets(true, true, true, ctrl.user.providerNo, true, ctrl.demographicNo, 1, 100);
 					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicNo);
 					ctrl.accordianListItems[0].items = ctrl.flowsheets;
-					ctrl.embeddedMode = ctrl.embeddedMode || false;
 
 					if($stateParams.flowsheetId)
 					{

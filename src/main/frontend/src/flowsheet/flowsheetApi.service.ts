@@ -51,9 +51,19 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.flowsheetTransferConverter = new FlowsheetModelToTransferConverter();
 		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
 
-		service.getAllFlowsheets = async (): Promise<Array<FlowsheetModel>> =>
+		service.searchFlowsheets = async (
+			enabled: boolean,
+			includeClinicLevel: boolean,
+			includeProviderLevel: boolean,
+			providerId: string,
+			includeDemographicLevel: boolean,
+			demographicId: number,
+			page: number,
+			perPage: number): Promise<Array<FlowsheetModel>> =>
 		{
-			return service.flowsheetModelConverter.convertList((await service.flowsheetsApi.getFlowsheets()).data.body);
+			return service.flowsheetModelConverter.convertList(
+				(await service.flowsheetsApi.searchFlowsheets(
+					enabled, includeClinicLevel, includeProviderLevel, providerId, includeDemographicLevel, demographicId, page, perPage)).data.body);
 		}
 
 		service.getFlowsheet = async (flowsheetId: number): Promise<FlowsheetModel> =>

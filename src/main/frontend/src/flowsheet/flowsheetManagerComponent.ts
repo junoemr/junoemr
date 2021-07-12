@@ -54,7 +54,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
-					ctrl.flowsheets = await flowsheetApiService.getAllFlowsheets();
+					ctrl.flowsheets = await flowsheetApiService.searchFlowsheets(null, true, false, null, false, null, 1, 100);
 					ctrl.isLoading = false;
 				}
 
