@@ -105,7 +105,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "ASYM"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -131,7 +131,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "ASWA"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -157,7 +157,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "ANSY"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -209,7 +209,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "AELV"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -235,7 +235,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "SPIR"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -261,7 +261,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "PEFR"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -288,7 +288,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "ARAD"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -314,7 +314,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "ARMA"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -366,7 +366,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "SMCS"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -444,7 +444,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "ACOS"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -470,7 +470,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "AACP"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -496,7 +496,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "AEDR"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -574,7 +574,7 @@ FROM flowsheet sheet
 JOIN flowsheet_item_group item_group ON sheet.id = item_group.flowsheet_id
 JOIN measurementType type ON type.type = "OUTR"
 WHERE item_group.group_name = "Asthma Measurements"
-  AND type.type NOT IN (
+AND type.type NOT IN (
     SELECT item_type_code
     FROM flowsheet_item
     WHERE flowsheet_id=sheet.id AND flowsheet_item_group_id=item_group.id
@@ -679,9 +679,9 @@ FROM flowsheet_item items
 JOIN flowsheet sheet ON items.flowsheet_id = sheet.id
 JOIN ds_rule rules ON rules.rule_name = "Not Entered in Over 6 mo" AND rules.system_managed IS TRUE
 WHERE sheet.flowsheet_name = "Asthma"
-  AND sheet.system_managed IS TRUE
-  AND items.item_type_code IN ("SPIR")
-  AND items.id NOT IN (
+AND sheet.system_managed IS TRUE
+AND items.item_type_code IN ("SPIR")
+AND items.id NOT IN (
     SELECT flowsheet_item_id
     FROM flowsheet_item_ds_rule
     JOIN ds_rule rules_inner ON rules_inner.rule_name = "Not Entered in Over 6 mo" AND rules_inner.system_managed IS TRUE

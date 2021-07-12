@@ -97,8 +97,8 @@ AND id NOT IN (
     SELECT ds_rule_id
     FROM ds_rule_condition
     WHERE condition_type = "VALUE_EQ"
-      AND condition_value = "Yes/No"
-      AND created_by = "-1"
+    AND condition_value = "Yes/No"
+    AND created_by = "-1"
 );
 
 INSERT INTO ds_rule_condition(ds_rule_id, condition_type, condition_value, created_at, created_by, updated_at, updated_by)
@@ -112,13 +112,13 @@ SELECT
     "-1" AS updated_by
 FROM ds_rule
 WHERE rule_name = "Never Entered"
-  AND system_managed IS TRUE
-  AND id NOT IN (
+AND system_managed IS TRUE
+AND id NOT IN (
     SELECT ds_rule_id
     FROM ds_rule_condition
     WHERE condition_type = "NEVER_GIVEN"
-      AND condition_value IS NULL
-      AND created_by = "-1"
+    AND condition_value IS NULL
+    AND created_by = "-1"
 );
 
 INSERT INTO ds_rule_condition(ds_rule_id, condition_type, condition_value, created_at, created_by, updated_at, updated_by)
