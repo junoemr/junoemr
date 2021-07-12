@@ -553,10 +553,12 @@ public class AppointmentDisplayController
 		String out_string = "";
 
 		ProviderPreference prefs = ProviderPreferencesUIBean.getProviderPreference(this.sessionProviderNo);
+		
 		// Not all providers will have a ProviderPreference, or an AppointmentReasonDisplayLevel until they save one to their profile.
 		// So we will consider nulls for each to be equivalent to the default value.
-		
-		if (prefs == null || prefs.getAppointmentReasonDisplayLevel() == null || prefs.getAppointmentReasonDisplayLevel() != ProviderPreference.AppointmentReasonDisplayLevel.REASON_ONLY)
+		if (prefs == null ||
+				    prefs.getAppointmentReasonDisplayLevel() == null || 
+				    prefs.getAppointmentReasonDisplayLevel() != ProviderPreference.AppointmentReasonDisplayLevel.REASON_ONLY)
 		{
 			String reasonCodeName = getReasonCodeName();
 			if (reasonCodeName != null && !reasonCodeName.isEmpty())
