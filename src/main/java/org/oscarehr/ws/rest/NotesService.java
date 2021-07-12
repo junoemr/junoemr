@@ -25,6 +25,8 @@ package org.oscarehr.ws.rest;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,8 @@ import org.oscarehr.casemgmt.service.NoteService;
 import org.oscarehr.casemgmt.web.CaseManagementEntryAction;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
@@ -81,8 +85,10 @@ import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -104,6 +110,7 @@ import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
 @Path("/notes")
 @Component("notesService")
+@Tag(name = "notes")
 public class NotesService extends AbstractServiceImpl
 {
 	private static String SUMMARY_CODE_ONGOING_CONCERNS = "ongoingconcerns";
@@ -162,6 +169,8 @@ public class NotesService extends AbstractServiceImpl
 	@Autowired
 	CaseManagementTmpSaveConverter caseManagementTmpSaveConverter;
 
+	@Autowired
+	private PartialDateDao partialDateDao;
 	
 	@GET
 	@Path("/{demographicNo}/all")
@@ -446,11 +455,12 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo ,NoteIssueTo1 noteIssue) {
+	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo, @Valid NoteIssueTo1 noteIssue) {
 
 		try {
 			NoteTo1 note = noteIssue.getEncounterNote();
 			NoteExtTo1 noteExtTo1 = noteIssue.getGroupNoteExt();
+
 			IssueTo1 issueTo1 = noteIssue.getIssue();
 			List<CaseManagementIssueTo1> assignedCMIssues = noteIssue.getAssignedCMIssues();
 			String annotationAttribute = noteIssue.getAnnotation_attrib();
@@ -711,28 +721,35 @@ public class NotesService extends AbstractServiceImpl
 			/* save extra fields */
 			CaseManagementNoteExt cme = new CaseManagementNoteExt();
 
-			if (noteExtTo1.getStartDate() != null) {
+			if (noteExtTo1.getStartDate() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.STARTDATE);
-				cme.setDateValue(noteExtTo1.getStartDate());
+				cme.setDateValue(ConversionUtils.toLegacyDate(noteExtTo1.getStartDate().toLocalDate()));
 				caseManagementMgr.saveNoteExt(cme);
+				encounterNoteService.saveExtPartialDate(noteExtTo1.getStartDate(), cme.getId());
 			}
 
-			if (noteExtTo1.getResolutionDate() != null) {
+			if (noteExtTo1.getResolutionDate() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.RESOLUTIONDATE);
-				cme.setDateValue(noteExtTo1.getResolutionDate());
+				cme.setDateValue(ConversionUtils.toLegacyDate(noteExtTo1.getResolutionDate().toLocalDate()));
 				caseManagementMgr.saveNoteExt(cme);
+				encounterNoteService.saveExtPartialDate(noteExtTo1.getResolutionDate(), cme.getId());
 			}
 
-			if (noteExtTo1.getProcedureDate() != null) {
+			if (noteExtTo1.getProcedureDate() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.PROCEDUREDATE);
-				cme.setDateValue(noteExtTo1.getProcedureDate());
+				cme.setDateValue(ConversionUtils.toLegacyDate(noteExtTo1.getProcedureDate().toLocalDate()));
 				caseManagementMgr.saveNoteExt(cme);
+				encounterNoteService.saveExtPartialDate(noteExtTo1.getProcedureDate(), cme.getId());
 			}
 
-			if (noteExtTo1.getAgeAtOnset() != null) {
+			if (noteExtTo1.getAgeAtOnset() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.AGEATONSET);
 				cme.setDateValue((Date) null);
@@ -740,7 +757,8 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getTreatment() != null) {
+			if (noteExtTo1.getTreatment() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.TREATMENT);
 				cme.setDateValue((Date) null);
@@ -748,7 +766,8 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getProblemStatus() != null) {
+			if (noteExtTo1.getProblemStatus() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.PROBLEMSTATUS);
 				cme.setDateValue((Date) null);
@@ -756,7 +775,8 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getExposureDetail() != null) {
+			if (noteExtTo1.getExposureDetail() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.EXPOSUREDETAIL);
 				cme.setDateValue((Date) null);
@@ -764,7 +784,8 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getRelationship() != null) {
+			if (noteExtTo1.getRelationship() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.RELATIONSHIP);
 				cme.setDateValue((Date) null);
@@ -772,7 +793,8 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getLifeStage() != null) {
+			if (noteExtTo1.getLifeStage() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.LIFESTAGE);
 				cme.setDateValue((Date) null);
@@ -780,7 +802,8 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getHideCpp() != null) {
+			if (noteExtTo1.getHideCpp() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.HIDECPP);
 				cme.setDateValue((Date) null);
@@ -788,7 +811,8 @@ public class NotesService extends AbstractServiceImpl
 				caseManagementMgr.saveNoteExt(cme);
 			}
 
-			if (noteExtTo1.getProblemDesc() != null) {
+			if (noteExtTo1.getProblemDesc() != null)
+			{
 				cme.setNoteId(newNoteId);
 				cme.setKeyVal(NoteExtTo1.PROBLEMDESC);
 				cme.setDateValue((Date) null);
@@ -906,9 +930,9 @@ public class NotesService extends AbstractServiceImpl
 
 		return cpp;
 	}
-	
-	
-	
+
+
+
 	private String getString(JSONObject jsonobject,String key){
 		if(jsonobject.containsKey(key)){
 			return jsonobject.getString(key); 
@@ -965,6 +989,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/getCurrentNote")
 	@Consumes("application/json")
 	@Produces("application/json")
+	@Hidden
 	public NoteTo1 getCurrentNote(@PathParam("demographicNo") Integer demographicNo ,JSONObject jsonobject){
 		logger.debug("getCurrentNote "+jsonobject);
 		LoggedInInfo loggedInInfo =  getLoggedInInfo(); //LoggedInInfo.loggedInInfo.get();
@@ -1236,12 +1261,12 @@ public class NotesService extends AbstractServiceImpl
 
 
 			//get all note extra values
-			List<CaseManagementNoteExt> lcme = caseManagementMgr.getExtByNote(Long.valueOf(noteId));
+			List<CaseManagementNoteExt> extNoteList = caseManagementMgr.getExtByNote(Long.valueOf(noteId));
 
 			NoteExtTo1 noteExt = new NoteExtTo1();
 			noteExt.setNoteId(Long.valueOf(noteId));
 
-			copyToNoteExtTo1(lcme, noteExt);
+			copyToNoteExtTo1(extNoteList, noteExt);
 
 			//assigned issues..remove the CPP one.
 			List<CaseManagementIssue> rawCmeIssues = new ArrayList<CaseManagementIssue>(casemgmtNote.getIssues());
@@ -1274,13 +1299,13 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	public NoteExtTo1 getGroupNoteExt(@PathParam("noteId") Long noteId){
 		
-		List<CaseManagementNoteExt> lcme = new ArrayList<CaseManagementNoteExt>();
-		lcme.addAll(caseManagementMgr.getExtByNote(noteId));
+		List<CaseManagementNoteExt> extNoteList = new ArrayList<CaseManagementNoteExt>();
+		extNoteList.addAll(caseManagementMgr.getExtByNote(noteId));
 
 		NoteExtTo1 noteExt = new NoteExtTo1();
 		noteExt.setNoteId(noteId);
 
-		copyToNoteExtTo1(lcme, noteExt);
+		copyToNoteExtTo1(extNoteList, noteExt);
 		return noteExt;
 	}
 	
@@ -1350,6 +1375,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/ticklerSaveNote")
 	@Produces("application/json")
 	@Consumes("application/json")
+	@Hidden
 	public GenericRESTResponse ticklerSaveNote(JSONObject json){
 		
 		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "w", null)) {
@@ -1375,8 +1401,7 @@ public class NotesService extends AbstractServiceImpl
 		Date creationDate = new Date();
 		LoggedInInfo loggedInInfo=this.getLoggedInInfo();
 		Provider loggedInProvider = loggedInInfo.getLoggedInProvider();
-		
-		
+
 		String revision = "1";
 		String history = strNote;
 		String uuid = null;
@@ -1477,6 +1502,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/searchIssues")
 	@Produces("application/json")
 	@Consumes("application/json")
+	@Hidden
 	public AbstractSearchResponse<IssueTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn ) {
 		AbstractSearchResponse<IssueTo1> response = new AbstractSearchResponse<IssueTo1>();
 		
@@ -1648,33 +1674,69 @@ public class NotesService extends AbstractServiceImpl
 		}
 		 */
 	}
-	private void copyToNoteExtTo1(List<CaseManagementNoteExt> lcme, NoteExtTo1 noteExt) {
-		if(lcme == null) return;
-		for(CaseManagementNoteExt l : lcme){
-			logger.debug("NOTE EXT KEY:" +l.getKeyVal() + l.getValue());
 
-			if(l.getKeyVal().equals(CaseManagementNoteExt.STARTDATE)){
-				noteExt.setStartDate(l.getDateValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.RESOLUTIONDATE)){
-				noteExt.setResolutionDate(l.getDateValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROCEDUREDATE)){
-				noteExt.setProcedureDate(l.getDateValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.AGEATONSET)){
-				noteExt.setAgeAtOnset(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.TREATMENT)){
-				noteExt.setTreatment(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROBLEMSTATUS)){
-				noteExt.setProblemStatus(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.EXPOSUREDETAIL)){
-				noteExt.setExposureDetail(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.RELATIONSHIP)){
-				noteExt.setRelationship(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.LIFESTAGE)){
-				noteExt.setLifeStage(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.HIDECPP)){
-				noteExt.setHideCpp(l.getValue());
-			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROBLEMDESC)){
-				noteExt.setProblemDesc(l.getValue());
+
+	// refactor this to converter
+	private void copyToNoteExtTo1(List<CaseManagementNoteExt> extNoteList, NoteExtTo1 noteExt)
+	{
+		if(extNoteList == null)
+		{
+			return;
+		}
+
+		for(CaseManagementNoteExt extNote : extNoteList)
+		{
+			logger.debug("NOTE EXT KEY:" + extNote.getKeyVal() + extNote.getValue());
+
+			if(extNote.getKeyVal().equals(CaseManagementNoteExt.STARTDATE))
+			{
+				Integer id = Math.toIntExact(extNote.getId());
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getExtPartialDate(id, extNote.getDateValue(), PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+				noteExt.setStartDate(partialDate);
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.RESOLUTIONDATE))
+			{
+				Integer id = Math.toIntExact(extNote.getId());
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getExtPartialDate(id, extNote.getDateValue(), PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+				noteExt.setResolutionDate(partialDate);
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.PROCEDUREDATE))
+			{
+				Integer id = Math.toIntExact(extNote.getId());
+				org.oscarehr.dataMigration.model.common.PartialDate partialDate = getExtPartialDate(id, extNote.getDateValue(), PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+				noteExt.setProcedureDate(partialDate);
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.AGEATONSET))
+			{
+				noteExt.setAgeAtOnset(extNote.getValue());
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.TREATMENT))
+			{
+				noteExt.setTreatment(extNote.getValue());
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.PROBLEMSTATUS))
+			{
+				noteExt.setProblemStatus(extNote.getValue());
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.EXPOSUREDETAIL))
+			{
+				noteExt.setExposureDetail(extNote.getValue());
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.RELATIONSHIP))
+			{
+				noteExt.setRelationship(extNote.getValue());
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.LIFESTAGE))
+			{
+				noteExt.setLifeStage(extNote.getValue());
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.HIDECPP))
+			{
+				noteExt.setHideCpp(extNote.getValue());
+			}
+			else if(extNote.getKeyVal().equals(CaseManagementNoteExt.PROBLEMDESC))
+			{
+				noteExt.setProblemDesc(extNote.getValue());
 			}
 		}
 	}
@@ -1744,5 +1806,14 @@ public class NotesService extends AbstractServiceImpl
 			logger.error("Invalid or missing document link for note: " + noteId);
 		}
 		return linkedDoc;
+	}
+
+	private org.oscarehr.dataMigration.model.common.PartialDate getExtPartialDate(Integer noteId, Date fullDateValue, Integer partialDateType)
+	{
+		org.oscarehr.common.model.PartialDate partialDateEntity = partialDateDao.getPartialDate(PartialDate.TABLE_CASEMGMT_NOTE_EXT,
+				noteId,
+				partialDateType);
+
+		return org.oscarehr.dataMigration.model.common.PartialDate.from(ConversionUtils.toNullableLocalDate(fullDateValue), partialDateEntity);
 	}
 }
