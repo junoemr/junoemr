@@ -63,19 +63,23 @@ public class DemographicRosterService
 
 		RosterStatus rosterStatus = rosterStatusService.findByStatus(demographic.getRosterStatus());
 		demographicRoster.setRosterStatus(rosterStatus);
-
+		
+		if (!rosterStatus.isRostered())
+		{
+			// Set the date in all non-rostered cases, and the reason only if the status is terminated.  This is due to the front
+			// end only displaying the termination reason select on status TE.
+			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
+			
+			if (RosterStatus.ROSTER_STATUS_TERMINATED.equals(rosterStatus.getRosterStatus()))
+			{
+				DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(Integer.parseInt(demographic.getRosterTerminationReason()));
+				demographicRoster.setRosterTerminationReason(terminationReason);
+			}
+		}
+		
 		demographicRoster.setRosteredPhysician(demographic.getFamilyDoctorName());
 		demographicRoster.setOhipNo(demographic.getFamilyDoctorNumber());
-
-		// Only set terminated fields if it's not explicitly a rostered status
-		if (!demographicRoster.getRosterStatus().isRostered())
-		{
-			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
-			DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(
-					Integer.parseInt(demographic.getRosterTerminationReason()));
-			demographicRoster.setRosterTerminationReason(terminationReason);
-		}
-
+			
 		demographicRosterDao.persist(demographicRoster);
 
 		return demographicRoster;
