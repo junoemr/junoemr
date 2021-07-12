@@ -106,9 +106,9 @@ public class DemographicModelToDbConverter
 		List<Address> addressList = input.getAddressList();
 		for(Address address : addressList)
 		{
-			// If address is marked as current address or the list of addresses is 1 then it's the primary address
+			// If address is marked as current address then it's the primary address
 			// Otherwise it's an alternative address.
-			if(address.isCurrentAddress() || addressList.size() == 1)
+			if(address.isCurrentAddress())
 			{
 				dbDemographic.setAddress(address.getAddressLinesString());
 				dbDemographic.setCity(address.getCity());
@@ -131,8 +131,6 @@ public class DemographicModelToDbConverter
 				demographicExtList.add(altPostal);
 			}
 		}
-
-
 
 		// phone conversions
 		PhoneNumber homePhone = input.getHomePhone();
