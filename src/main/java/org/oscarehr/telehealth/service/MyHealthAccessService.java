@@ -150,7 +150,7 @@ public class MyHealthAccessService
 	}
 
 	/**
-	 * create or get user remote integration data (user integration access) & loginToken.
+	 * create or get user remote integration data (user integration access) &amp; loginToken.
 	 * @param integrationData - integration to create the record in
 	 * @param loggedInUser - the logged in user who the account is for
 	 * @return existing or new integrationData depending on if the record already exists
