@@ -31,4 +31,15 @@ public class DxCode extends AbstractTransientModel
 	private String code;
 	private DxCodingSystem codingSystem;
 	private String description;
+
+	public DxCode()
+	{
+	}
+
+	public DxCode(DxCode toCopy)
+	{
+		this.code = toCopy.code;
+		this.codingSystem = toCopy.codingSystem;
+		this.description = toCopy.description;
+	}
 }

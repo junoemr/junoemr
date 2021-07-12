@@ -46,6 +46,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Entity(name = "entity.Flowsheet")
@@ -101,6 +102,50 @@ public class Flowsheet extends AbstractModel<Integer>
 
 	@Column(name = "deleted_by")
 	private String deletedBy;
+
+	public Flowsheet()
+	{
+	}
+
+	public Flowsheet(Flowsheet toCopy)
+	{
+		this.id = null;
+		this.name = toCopy.name + " (Copy)";
+		this.description = toCopy.description;
+		this.enabled = toCopy.enabled;
+		this.systemManaged = false;
+
+		// copy item groups (and contained items)
+		this.flowsheetItemGroups = toCopy.flowsheetItemGroups
+				.stream()
+				.map((group) -> new FlowsheetItemGroup(group, this))
+				.collect(Collectors.toList());
+
+		// add items in groups
+		this.flowsheetItems = this.flowsheetItemGroups
+				.stream()
+				.filter((group) -> group.getFlowsheetItems() != null)
+				.flatMap((group) -> group.getFlowsheetItems().stream())
+				.collect(Collectors.toList());
+
+		// add items in original flowsheet the have no group
+		this.flowsheetItems.addAll(toCopy.getFlowsheetItems()
+				.stream()
+				.filter((item) -> item.getFlowsheetItemGroup() == null)
+				.map((item) -> new FlowsheetItem(item, this, null))
+				.collect(Collectors.toList()));
+
+		// copy triggers and drools sets. set must be a new object
+		this.icd9Triggers = new HashSet<>(toCopy.icd9Triggers);
+		this.drools = new HashSet<>(toCopy.drools);
+
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+		this.deletedAt = null;
+		this.createdBy = null;
+		this.updatedBy = null;
+		this.deletedBy = null;
+	}
 
 	/**
 	 * must be overridden to prevent default impl from infinite loading jpa links

@@ -209,7 +209,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onRemoveGroup = async (group): Promise<void> =>
 				{
-					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
+					const confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Remove flowsheet group",
 						"Are you sure you want to remove this group (and all items within it) from the flowsheet?",
 						ctrl.componentStyle);
@@ -277,6 +277,31 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					else
 					{
 						ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
+					}
+				}
+
+				ctrl.onCloneFlowsheet = async (): Promise<void> =>
+				{
+					const confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
+						"Copy flowsheet",
+						"Are you sure you want to create a copy of this flowsheet?",
+						ctrl.componentStyle);
+
+					if(confirmation)
+					{
+						ctrl.isLoading = true;
+						try
+						{
+							const flowsheetCloneId = await flowsheetApiService.cloneFlowsheet(ctrl.flowsheet.id);
+							$state.go('.',
+								{
+									flowsheetId: flowsheetCloneId,
+								});
+						}
+						finally
+						{
+							ctrl.isLoading = false;
+						}
 					}
 				}
 

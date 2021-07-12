@@ -40,7 +40,9 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Entity(name = "entity.FlowsheetItemGroup")
@@ -83,6 +85,30 @@ public class FlowsheetItemGroup extends AbstractModel<Integer>
 
 	@Column(name = "deleted_by")
 	private String deletedBy;
+
+	public FlowsheetItemGroup()
+	{
+		flowsheetItems = new ArrayList<>();
+	}
+
+	public FlowsheetItemGroup(FlowsheetItemGroup toCopy, Flowsheet flowsheetReference)
+	{
+		this.id = null;
+		this.name = toCopy.name;
+		this.description = toCopy.description;
+		this.flowsheet = flowsheetReference;
+		this.flowsheetItems = toCopy.flowsheetItems
+				.stream()
+				.map((item) -> new FlowsheetItem(item, flowsheetReference, this))
+				.collect(Collectors.toList());
+
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+		this.deletedAt = null;
+		this.createdBy = null;
+		this.updatedBy = null;
+		this.deletedBy = null;
+	}
 
 	public void addItem(FlowsheetItem flowsheetItem)
 	{

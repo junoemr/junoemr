@@ -107,5 +107,10 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		{
 			return (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
 		}
+
+		service.cloneFlowsheet = async (flowsheetId: number): Promise<number> =>
+		{
+			return (await service.flowsheetApi.cloneFlowsheet(flowsheetId)).data.body;
+		}
 	}
 ]);

@@ -44,6 +44,15 @@
 					Save
 				</juno-button>
 			</div>
+			<div class="save-button-wrapper">
+				<juno-button component-style="$ctrl.componentStyle"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
+				             disabled="$ctrl.isLoading"
+				             click="$ctrl.onCloneFlowsheet()">
+					Create Copy
+				</juno-button>
+			</div>
 		</div>
 	</div>
 	<div class="flex-row flex-grow">

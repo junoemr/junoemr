@@ -24,6 +24,7 @@ package org.oscarehr.flowsheet.service;
 
 
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
+import org.oscarehr.flowsheet.converter.FlowsheetModelToEntityConverter;
 import org.oscarehr.flowsheet.converter.FlowsheetTransferToEntityConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.model.Flowsheet;
@@ -51,6 +52,9 @@ public class FlowsheetService
 	@Autowired
 	private FlowsheetTransferToEntityConverter flowsheetTransferToEntityConverter;
 
+	@Autowired
+	private FlowsheetModelToEntityConverter flowsheetModelToEntityConverter;
+
 	public List<Flowsheet> getFlowsheets(int offset, int perPage)
 	{
 		return flowsheetEntityToModelConverter.convert(flowsheetDao.findAll(offset, perPage));
@@ -59,6 +63,15 @@ public class FlowsheetService
 	public Flowsheet addNewFlowsheet(String creatingProviderId, FlowsheetCreateTransfer creationTransfer)
 	{
 		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetTransferToEntityConverter.convert(creationTransfer);
+		entity.setCreatedBy(creatingProviderId);
+		flowsheetDao.persist(entity);
+		return flowsheetEntityToModelConverter.convert(entity);
+	}
+
+	public Flowsheet addNewFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy)
+	{
+		org.oscarehr.flowsheet.entity.Flowsheet flowsheetToCopy = flowsheetDao.find(flowsheetIdToCopy);
+		org.oscarehr.flowsheet.entity.Flowsheet entity = new org.oscarehr.flowsheet.entity.Flowsheet(flowsheetToCopy); // copy constructor
 		entity.setCreatedBy(creatingProviderId);
 		flowsheetDao.persist(entity);
 		return flowsheetEntityToModelConverter.convert(entity);
