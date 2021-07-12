@@ -48,6 +48,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'staticDataService',
 	'referralDoctorsService',
 	'user',
+	'uxService',
 
 	function(
 		$scope,
@@ -66,7 +67,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		securityService,
 		staticDataService,
 		referralDoctorsService,
-		user)
+		user,
+		uxService)
 	{
 
 		var controller = this;
@@ -1289,6 +1291,7 @@ function demoContactShow(demoContact)
 		tmp.lastName = demoContact.lastName;
 		tmp.firstName = demoContact.firstName;
 		tmp.phone = demoContact.phone;
+		tmp.contactId = demoContact.contactId;
 		contactShow = [tmp];
 	}
 	for (var i = 0; i < contactShow.length; i++)

@@ -199,10 +199,19 @@
 							<bean:message key="web.record.details.manage"/>
 						</button>
 					</h3>
+
+
 					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContacts">
-						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
+						<juno-button
+                         ng-click="detailsCtrl.openContacts(dc.contactId)"
+                         button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
+                         button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+							{{dc.role}}: {{dc.lastName}}, {{dc.firstName}} Phone: {{dc.phone}}
+                         </juno-button>
+
+						<!--<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
-						<div class="col-md-5">{{dc.phone}}</div>
+						<div class="col-md-5">{{dc.phone}}</div>-->
 					</div>
 				</div>
 				<hr>
