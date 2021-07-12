@@ -6,7 +6,7 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - ABSENC
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'ASTHMA - COUGH' AS type, 'Asthma - cough' AS typeDisplayName, 'Num Of School/Work Absence' AS typeDescription, 'Per week' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'ASTHMA - COUGH' AS type, 'Asthma - Cough' AS typeDisplayName, 'Num Of School/Work Absence' AS typeDescription, 'Per week' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - COUGH');
 
@@ -26,7 +26,7 @@ INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringIn
 SELECT * FROM
 (SELECT 'ASTHMA - MEDICATION  REVIEW' AS type, 'Asthma - Medication review' AS typeDisplayName, 'Record whether medication has been reviewed' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - DYSPNEA');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - MEDICATION  REVIEW');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
@@ -63,12 +63,6 @@ SELECT * FROM
 (SELECT 'URINARY MICROALBUMIN SCREEN' AS type, 'Urinary Microalbumin Screen' AS typeDisplayName, 'Urinary Microalbumin Screen' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'URINARY MICROALBUMIN SCREEN');
-
-INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
-SELECT * FROM
-(SELECT 'PITTING EDEMA' AS type, 'Pitting Edema' AS typeDisplayName, 'Records yes/no' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
-FROM validations v WHERE v.name = 'Yes/No') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'PITTING EDEMA');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
