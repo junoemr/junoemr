@@ -250,6 +250,7 @@ module.exports = {
 			'./src/common/components/junoTab/components/module.js',
 			'./src/common/components/junoTab/components/swimLaneTab/swimLaneTabComponent.js',
 			'./src/common/components/junoDateSelect/junoDateSelectComponent.js',
+			'./src/common/components/junoPartialDateSelect/junoPartialDateSelectComponent.js',
 			'./src/common/components/junoTimeSelect/junoTimeSelectComponent.js',
 			'./src/common/components/junoDivider/junoDividerComponent.js',
 			'./src/common/components/junoToggle/junoToggleComponent.js',

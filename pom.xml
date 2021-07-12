@@ -1936,6 +1936,7 @@
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
+								org.oscarehr.ws.rest.NotesService
 							</value>
 						</systemProperty>
 						<systemProperty>
