@@ -37,11 +37,13 @@ angular.module('Record.Tracker').component('healthTracker',
 		controller: [
 			'$state',
 			'$stateParams',
+			'$uibModal',
 			'demographicApiService',
 			'flowsheetApiService',
 			function (
 				$state,
 				$stateParams,
+				$uibModal,
 				demographicApiService,
 				flowsheetApiService)
 			{
@@ -58,31 +60,79 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.accordianListItems = [
 					{
-						name: "All Flowsheets",
+						name: "Standard Flowsheets",
 						expanded: false,
-						items: [], // will be the list of flowsheets
+						items: [], // will be the list of clinic flowsheets
+					},
+					{
+						name: "My Flowsheets",
+						expanded: false,
+						items: [], // will be the list of provider flowsheets
+					},
+					{
+						name: "Patient Flowsheets",
+						expanded: false,
+						items: [], // will be the list of demographic flowsheets
 					}
 				];
 
-				ctrl.$onInit = async () =>
+				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.demographicNo = $stateParams.demographicNo;
 					ctrl.flowsheets = await flowsheetApiService.searchFlowsheets(true, true, true, ctrl.user.providerNo, true, ctrl.demographicNo, 1, 100);
 					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicNo);
-					ctrl.accordianListItems[0].items = ctrl.flowsheets;
 
 					if($stateParams.flowsheetId)
 					{
 						ctrl.selectedFlowsheet = ctrl.flowsheets.find((flowsheet) => flowsheet.id === Number($stateParams.flowsheetId));
 					}
 
-					ctrl.findTriggeredFlowsheets();
+					ctrl.initFlowsheetLists(ctrl.flowsheets);
 				}
 
-				ctrl.findTriggeredFlowsheets = (): void =>
+				ctrl.initFlowsheetLists = (flowsheets: FlowsheetModel[]): void =>
+				{
+					const clinicFlowsheetItems = ctrl.accordianListItems[0].items;
+					const providerFlowsheetItems = ctrl.accordianListItems[1].items;
+					const demographicFlowsheetItems = ctrl.accordianListItems[2].items;
+
+					// sort all flowsheets by level (clinic, provider, demographic)
+					flowsheets.forEach((flowsheet: FlowsheetModel) =>
+					{
+						if(flowsheet.ownerDemographicId)
+						{
+							demographicFlowsheetItems.push(flowsheet);
+						}
+						if(flowsheet.ownerProviderId)
+						{
+							providerFlowsheetItems.push(flowsheet);
+						}
+						else
+						{
+							clinicFlowsheetItems.push(flowsheet);
+						}
+					});
+
+					// find triggered flowsheets, and ensure only the more specific one appears when related flowsheets are found
+					// a flowsheet is related if it has a parent ID
+					const flowsheetMap = new Map();
+
+					ctrl.getTriggeredFlowsheets(clinicFlowsheetItems).forEach((flowsheet) => {
+						flowsheetMap.set(flowsheet.id, flowsheet);
+					});
+					ctrl.getTriggeredFlowsheets(providerFlowsheetItems).forEach((flowsheet) => {
+						flowsheetMap.set(flowsheet.parentFlowsheetId, flowsheet);
+					});
+					ctrl.getTriggeredFlowsheets(demographicFlowsheetItems).forEach((flowsheet) => {
+						flowsheetMap.set(flowsheet.parentFlowsheetId, flowsheet);
+					});
+					ctrl.triggerdFlowsheets = Array.from(flowsheetMap.values());
+				}
+
+				ctrl.getTriggeredFlowsheets = (flowsheets: FlowsheetModel[]): FlowsheetModel[] =>
 				{
 					const activeCodes: DxCodeModel[] = ctrl.activeDxRecords.map((dxRecord: DxRecordModel) => dxRecord.dxCode);
-					ctrl.triggerdFlowsheets = ctrl.flowsheets.filter((flowsheet: FlowsheetModel) =>
+					return flowsheets.filter((flowsheet: FlowsheetModel) =>
 					{
 						for(let activeCode of activeCodes)
 						{
@@ -95,10 +145,10 @@ angular.module('Record.Tracker').component('healthTracker',
 							}
 						}
 						return false;
-					});
+					})
 				}
 
-				ctrl.onFlowsheetSelect = (flowsheet) =>
+				ctrl.onFlowsheetSelect = (flowsheet): void =>
 				{
 					ctrl.selectedFlowsheet = flowsheet;
 
@@ -108,6 +158,15 @@ angular.module('Record.Tracker').component('healthTracker',
 							demographicNo: ctrl.demographicNo,
 							flowsheetId: flowsheet.id,
 						});
+				}
+
+				ctrl.onManageFlowsheets = (): void =>
+				{
+					// todo
+					// $state.go(".",
+					// 	{
+					//
+					// 	});
 				}
 			}]
 	});

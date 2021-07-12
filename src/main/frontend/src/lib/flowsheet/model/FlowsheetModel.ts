@@ -37,6 +37,9 @@ export default class FlowsheetModel
 	private _systemManaged: boolean;
 	private _flowsheetItemGroups: FlowsheetItemGroupModel[];
 	private _triggerCodes: DxCodeModel[];
+	private _parentFlowsheetId: number;
+	private _ownerDemographicId: number;
+	private _ownerProviderId: string;
 
 	public constructor()
 	{
@@ -113,5 +116,36 @@ export default class FlowsheetModel
 	set triggerCodes(value: DxCodeModel[])
 	{
 		this._triggerCodes = value;
+	}
+
+
+	get parentFlowsheetId(): number
+	{
+		return this._parentFlowsheetId;
+	}
+
+	set parentFlowsheetId(value: number)
+	{
+		this._parentFlowsheetId = value;
+	}
+
+	get ownerDemographicId(): number
+	{
+		return this._ownerDemographicId;
+	}
+
+	set ownerDemographicId(value: number)
+	{
+		this._ownerDemographicId = value;
+	}
+
+	get ownerProviderId(): string
+	{
+		return this._ownerProviderId;
+	}
+
+	set ownerProviderId(value: string)
+	{
+		this._ownerProviderId = value;
 	}
 }

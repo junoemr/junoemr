@@ -22,7 +22,24 @@
 --%>
 
 <div class="health-tracker-component">
-    <h1>Patient Health Tracker</h1>
+    <div class="flex-row justify-content-between align-items-center">
+        <h1>Patient Health Tracker</h1>
+
+        <div class="flex-row">
+            <div class="options-button-wrapper">
+                <juno-button component-style="$ctrl.componentStyle"
+                             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+                             disabled="$ctrl.isLoading"
+                             click="$ctrl.onManageFlowsheets()">
+                    <div class="flex-row align-items-center">
+                        <i class="icon icon-gears"></i>
+                        <span>Manage Flowsheets</span>
+                    </div>
+                </juno-button>
+            </div>
+        </div>
+    </div>
 
     <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.FLOWSHEET_READ">
         <div class="flex-row">

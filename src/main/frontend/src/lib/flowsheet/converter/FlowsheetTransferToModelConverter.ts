@@ -48,6 +48,9 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 		flowsheetModel.systemManaged = flowsheetTransfer.systemManaged;
 		flowsheetModel.flowsheetItemGroups = this.convertAllGroups(flowsheetTransfer.flowsheetItemGroups);
 		flowsheetModel.triggerCodes = new DxCodeTransferToModelConverter().convertList(flowsheetTransfer.triggerCodes);
+		flowsheetModel.parentFlowsheetId = flowsheetTransfer.parentFlowsheetId;
+		flowsheetModel.ownerProviderId = flowsheetTransfer.ownerProviderId;
+		flowsheetModel.ownerDemographicId = flowsheetTransfer.ownerDemographicId;
 
 		return flowsheetModel;
 	}

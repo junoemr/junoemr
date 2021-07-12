@@ -65,6 +65,7 @@
 							   data-target="#tracker"
 							   role="tab"
 							   data-toggle="tab">
+								Tracker
 							</a>
 						</li>
 						<li class="pull-right">
