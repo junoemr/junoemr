@@ -27,8 +27,20 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.data.*,oscar.oscarPrevention.pageUtil.*,java.net.*,oscar.eform.*"%>
-<%@page import="oscar.OscarProperties, org.oscarehr.util.SpringUtils, org.oscarehr.common.dao.BillingONCHeader1Dao" %>
+<%@page import="oscar.OscarProperties"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.common.dao.BillingONCHeader1Dao" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicNameAgeString" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="oscar.oscarPrevention.pageUtil.PreventionReportDisplay" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
+<%@ page import="org.oscarehr.PMmodule.utility.UtilDateUtilities" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="oscar.oscarReport.data.RptSearchData" %>
+<%@ page import="org.oscarehr.common.model.DemographicContact" %>
+<%@ page import="org.oscarehr.common.model.Contact" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -525,7 +537,8 @@ table.ele thead {
                        </tr>
                        </thead>
                        <tbody>
-                       <%DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
+                       <%
+                           DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
                          DemographicData demoData= new DemographicData();
                          boolean setBill;
                          String enabled = "";
@@ -584,15 +597,45 @@ table.ele thead {
 
 
                           <% }else {
-                              org.oscarehr.common.model.Demographic demoSDM = demoData.getSubstituteDecisionMaker(LoggedInInfo.getLoggedInInfoFromSession(request), dis.demographicNo.toString());%>
+                              LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+                              DemographicContact demographicContact = demoData.getSubstituteDecisionMaker(dis.demographicNo.toString());
+                              // internal
+                              String contactFullName = "";
+                              String contactPhone = "";
+                              String contactAddress = "";
+                              if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
+                              {
+                                  org.oscarehr.common.model.Demographic demographic = demoData.getInternalContact(loggedInInfo, demographicContact);
+                                  if (demographic != null)
+                                  {
+                                      contactFullName = demographic.getFullName();
+                                      contactPhone = demographic.getPhone();
+                                      contactAddress = StringUtils.trimToEmpty(demographic.getAddress()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getCity()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getProvince()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getPostal());
+                                  }
+                              }
+                              // external
+                              else if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_CONTACT)
+                              {
+                                  Contact contact = demoData.getExternalContact(demographicContact);
+                                  if (contact != null)
+                                  {
+                                      contactFullName = contact.getFormattedName();
+                                      contactPhone = contact.getCellPhone();
+                                      contactAddress = contact.getAddress();
+                                  }
+                              }
+                          %>
                           <td><%=demo.getAgeAsOf(asDate)%></td>
                           <td><%=h.get("sex")%></td>
                           <td><%=h.get("lastName")%></td>
                           <td><%=h.get("firstName")%></td>
                           <td><%=demo.getHin()+demo.getVer()%></td>
-                          <td><%=demoSDM==null?"":demoSDM.getLastName()%><%=demoSDM==null?"":","%> <%= demoSDM==null?"":demoSDM.getFirstName() %>&nbsp;</td>
-                          <td><%=demoSDM==null?"":demoSDM.getPhone()%> &nbsp;</td>
-                          <td><%=demoSDM==null?"":demoSDM.getAddress()+" "+demoSDM==null?"":demoSDM.getCity()+" "+demoSDM==null?"":demoSDM.getProvince()+" "+demoSDM==null?"":demoSDM.getPostal()%> &nbsp;</td>
+                          <td><%=contactFullName %>&nbsp;</td>
+                          <td><%=contactPhone%> &nbsp;</td>
+                          <td><%=contactAddress%> &nbsp;</td>
                           <td><oscar:nextAppt demographicNo="<%=demo.getDemographicNo().toString()%>"/></td>
                           <td bgcolor="<%=dis.color%>"><%=dis.state%></td>
                           <td bgcolor="<%=dis.color%>"><%=dis.numShots%></td>                          

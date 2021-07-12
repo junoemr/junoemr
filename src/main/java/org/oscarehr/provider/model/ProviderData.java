@@ -200,6 +200,9 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 
 	@Column(name = "imd_health_uuid")
 	private String imdHealthUuid = null;
+	
+	@Column(name = "ontario_cno_number")
+	private String ontarioCnoNumber;
 
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()

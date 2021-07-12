@@ -23,11 +23,6 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
@@ -36,6 +31,10 @@ import org.oscarehr.demographic.model.Demographic;
 import oscar.util.Jackson.DateDeserializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
@@ -45,6 +44,7 @@ public class DemographicTo1 implements Serializable {
 
 	private Integer demographicNo; // fields
 	private AddressTo1 address = new AddressTo1();
+	private AddressTo1 address2 = new AddressTo1();
 	private String phone;
 	private String alternativePhone;
 	private String patientStatus;
@@ -141,6 +141,16 @@ public class DemographicTo1 implements Serializable {
 
 	public void setAddress(AddressTo1 address) {
 		this.address = address;
+	}
+
+	public AddressTo1 getAddress2()
+	{
+		return address2;
+	}
+
+	public void setAddress2(AddressTo1 address2)
+	{
+		this.address2 = address2;
 	}
 
 	public String getPatientStatus() {

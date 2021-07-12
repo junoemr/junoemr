@@ -449,6 +449,10 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			controller.pref.consultationLetterHeadNameDefault = "1";
 		}
 
+		if (controller.pref.cppRemindersStartDate == null)
+		{
+			controller.pref.cppRemindersStartDate = false;
+		}
 
 		if ($state.current.data !== undefined)
 		{

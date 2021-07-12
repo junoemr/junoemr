@@ -1,0 +1,23 @@
+.mha-config {
+	@include juno-font-body-smallest();
+	color: var(--color-neutral-darkest);
+
+	.content-area {
+		&> div {
+			width: 100%;
+			max-width: 75em;
+		}
+
+		&> .footer {
+			color: var(--color-neutral-grey);
+		}
+
+		.mha-enabled-label {
+			color: var(--color-lime-dark);
+		}
+
+		.mha-disabled-label {
+			color: var(--color-red-dark);
+		}
+	}
+}
