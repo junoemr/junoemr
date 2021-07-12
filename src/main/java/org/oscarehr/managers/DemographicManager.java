@@ -58,6 +58,9 @@ import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
+import org.oscarehr.ws.rest.to.model.AddressTo1;
+import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
+import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -67,6 +70,8 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -371,13 +376,10 @@ public class DemographicManager {
 		String currentStatus = demographic.getPatientStatus();
 		Date currentStatusDate = demographic.getPatientStatusDate();
 
-		if (!(previousStatus.equals(currentStatus)))
+		// fill in a default patient status date if the status changes and no date is given
+		if (!currentStatus.equals(previousStatus) && currentStatusDate == null)
 		{
 			demographic.setPatientStatusDate(new Date());
-		}
-		else if (previousStatusDate.compareTo(currentStatusDate) != 0)
-		{
-			demographic.setPatientStatusDate(currentStatusDate);
 		}
 
 		//save current demo
@@ -514,7 +516,7 @@ public class DemographicManager {
 
 	public void archiveExtension(DemographicExt ext) {
 		//TODO-legacy: this needs a loggedInInfo
-		if (ext != null && ext.getId() != null) {
+		if (ext != null && ext.getId() != null && ext.getValue() != null) {
 			DemographicExt prevExt = demographicExtDao.find(ext.getId());
 			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {
 				demographicExtArchiveDao.archiveDemographicExt(prevExt);
@@ -532,8 +534,9 @@ public class DemographicManager {
 									  org.oscarehr.demographic.model.Demographic previousDemo)
 	{
 		boolean hasChanged = false;
-		// check if any fields changed from last time we edited
-		if (currentDemo.getRosterStatus() != null)
+		
+		// If the roster status is valid, check if any fields changed from last time we edited
+		if (ConversionUtils.hasContent(currentDemo.getRosterStatus()))
 		{
 			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
 			hasChanged |= currentDemo.getRosterDate() != null && currentDemo.getRosterDate() != previousDemo.getRosterDate();
@@ -1268,5 +1271,71 @@ public class DemographicManager {
 			MiscUtils.getLogger().warn("Looked up HIN=" + healthNumber + " and got " + demographics.size() + " result(s), expected 1");
 		}
 		return null;
+	}
+
+	public AddressTo1 getExtraAddress(DemographicTo1 demographic)
+	{
+		List<DemographicExtTo1> extrasList = demographic.getExtras();
+			AddressTo1 extraAddress = new AddressTo1();
+
+			for (DemographicExtTo1 extra: extrasList)
+			{
+				String key = extra.getKey();
+				String value = extra.getValue();
+				switch (key)
+				{
+					case DemographicExt.ALTERNATE_ADDRESS:
+							extraAddress.setAddress(value);
+
+						break;
+					case DemographicExt.ALTERNATE_CITY:
+							extraAddress.setCity(value);
+
+						break;
+					case DemographicExt.ALTERNATE_POSTAL:
+							extraAddress.setPostal(value);
+
+						break;
+					case DemographicExt.ALTERNATE_PROVINCE:
+							extraAddress.setProvince(value);
+
+				}
+			}
+			return extraAddress;
+	}
+
+	public List<DemographicExtTo1> setExtraAddress(DemographicTo1 demographic)
+	{
+		List<String> alternateAddress = Arrays.asList(DemographicExt.ALTERNATE_ADDRESS, DemographicExt.ALTERNATE_CITY, DemographicExt.ALTERNATE_POSTAL, DemographicExt.ALTERNATE_PROVINCE);
+		List<DemographicExtTo1> extrasList = new ArrayList<>();
+		for(String address: alternateAddress)
+		{
+			DemographicExtTo1 extraAddress = new DemographicExtTo1();
+
+			extraAddress.setDemographicNo(demographic.getDemographicNo());
+			extraAddress.setDateCreated(new Date());
+
+			switch (address)
+			{
+				case DemographicExt.ALTERNATE_ADDRESS:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getAddress());
+					break;
+				case DemographicExt.ALTERNATE_CITY:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getCity());
+					break;
+				case DemographicExt.ALTERNATE_POSTAL:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getPostal());
+					break;
+				case DemographicExt.ALTERNATE_PROVINCE:
+					extraAddress.setKey(address);
+					extraAddress.setValue(demographic.getAddress2().getProvince());
+					break;
+			}
+			extrasList.add(extraAddress);
+		}
+		return extrasList;
 	}
 }
