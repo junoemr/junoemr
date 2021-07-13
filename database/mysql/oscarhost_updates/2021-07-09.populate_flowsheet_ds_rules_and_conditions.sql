@@ -64,20 +64,19 @@ WHERE "Never Entered" NOT IN (
     AND system_managed IS TRUE
 );
 
--- rule for "haven't entered in more than 6 months"
 INSERT INTO ds_rule(rule_name, description, system_managed, created_at, created_by, updated_at, updated_by)
 SELECT
-    "Not Entered in Over 6 mo" AS rule_name,
+    "Not Entered in Over 6 months" AS rule_name,
     "Measurement hasn't been recorded in over 6 months" AS description,
     TRUE AS system_managed,
     NOW() AS created_at,
     "-1" AS created_by,
     NOW() AS updated_at,
     "-1" AS updated_by
-WHERE "Not Entered in Over 6 mo" NOT IN (
+WHERE "Not Entered in Over 6 months" NOT IN (
     SELECT rule_name
     FROM ds_rule
-    WHERE rule_name = "Not Entered in Over 6 mo"
+    WHERE rule_name = "Not Entered in Over 6 months"
     AND system_managed IS TRUE
 );
 
@@ -131,7 +130,7 @@ SELECT
     NOW() AS updated_at,
     "-1" AS updated_by
 FROM ds_rule
-WHERE rule_name = "Not Entered in Over 6 mo"
+WHERE rule_name = "Not Entered in Over 6 months"
 AND system_managed IS TRUE
 AND id NOT IN (
     SELECT ds_rule_id
@@ -152,7 +151,7 @@ SELECT
     NOW(),
     "-1"
 FROM ds_rule
-WHERE rule_name = "Not Entered in Over 6 mo"
+WHERE rule_name = "Not Entered in Over 6 months"
 AND system_managed IS TRUE
 AND id NOT IN (
     SELECT ds_rule_id
