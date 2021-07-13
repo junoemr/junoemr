@@ -43,6 +43,20 @@
 			</div>
 		</juno-button>
 
+		<!-- UnArchive -->
+		<juno-button ng-if="$ctrl.groupId === MessageGroup.Archived"
+		             class="header-button m-l-16"
+		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
+		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             disabled="$ctrl.isLoading"
+		             component-style="$ctrl.componentStyle"
+		             title="Unarchive selected message(s)"
+		             click="$ctrl.archiveSelectedMessages(false)">
+			<div class="flex-row align-items-center">
+				<i class="icon icon-archive"></i>
+			</div>
+		</juno-button>
+
 		<!-- Only Unread -->
 		<juno-button ng-if="$ctrl.groupId !== MessageGroup.Archived"
 		             class="header-button m-l-8"
