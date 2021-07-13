@@ -1,0 +1,18 @@
+.demographic-details-section.contacts-section{
+	.fields {
+		.column {
+			.select-with-button {
+				display: flex;
+				justify-content: right;
+
+				.juno-select {
+					width: 340px;
+				}
+
+				.juno-button {
+					margin-left: 4px;
+				}
+			}
+		}
+	}
+}

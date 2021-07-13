@@ -333,6 +333,7 @@ module.exports = {
 			'./src/record/details/components/mhaPatientConnection/mhaPatientConnectionComponent.js',
 			'./src/record/details/components/demographicSection/demographicSectionComponent.js',
 			'./src/record/details/components/contactSection/contactSectionComponent.js',
+			'./src/record/details/components/contactsSection/contactsSectionComponent.js',
 			'./src/record/details/components/healthInsuranceSection/healthInsuranceSectionComponent.js',
 			'./src/record/details/components/careTeamSection/careTeamSectionComponent.js',
 			'./src/record/details/components/rosterDisplay/rosterDisplayComponent.js',

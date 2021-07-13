@@ -799,21 +799,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			window.open(url, "uploadWin", "width=500, height=300");
 		};
 
-		//manage contacts
-		controller.manageContacts = function manageContacts()
-		{
-			var discard = true;
-			if (controller.page.dataChanged > 0)
-			{
-				discard = confirm("You may have unsaved data. Are you sure to leave?");
-			}
-			if (discard)
-			{
-				var url = "../demographic/Contact.do?method=manage&demographic_no=" + controller.page.demo.demographicNo;
-				window.open(url, "ManageContacts", "width=960, height=700");
-			}
-		};
-
 		//print buttons
 		controller.printLabel = function printLabel(label)
 		{
@@ -1177,6 +1162,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 			);
 		};
+
+
 
 		controller.resetEditState = function resetEditState()
 		{
