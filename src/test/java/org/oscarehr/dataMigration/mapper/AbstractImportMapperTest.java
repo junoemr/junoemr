@@ -32,6 +32,7 @@ import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
 import org.oscarehr.dataMigration.mapper.cds.in.CDSImportMapper;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
+import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
@@ -49,6 +50,9 @@ public class AbstractImportMapperTest
 
 	@Mock
 	protected PatientImportContext patientImportContext;
+
+	@Mock
+	protected PatientImportContextService patientImportContextService;
 
 	@Before
 	public void setUp()
@@ -86,8 +90,11 @@ public class AbstractImportMapperTest
 	public void testCoalescePartialDatesToDateTimeWithDefault()
 	{
 		LocalDate expectedDate = LocalDate.of(2021, 2, 3);
-		when(patientImportContext.getDefaultDate()).thenReturn(expectedDate);
-		when(patientImportContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
+
+		PatientImportContext importContext = Mockito.mock(PatientImportContext.class);
+		when(patientImportContextService.getContext()).thenReturn(importContext);
+		when(importContext.getDefaultDate()).thenReturn(expectedDate);
+		when(importContext.getImportLogger()).thenReturn(Mockito.mock(CDSImportLogger.class));
 
 		assertEquals(expectedDate.atStartOfDay(), cdsImportMapper.coalescePartialDatesToDateTimeWithDefault("Test", null, null));
 	}
