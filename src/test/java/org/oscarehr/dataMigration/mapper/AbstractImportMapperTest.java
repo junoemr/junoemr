@@ -49,9 +49,6 @@ public class AbstractImportMapperTest
 	private CDSImportMapper cdsImportMapper;
 
 	@Mock
-	protected PatientImportContext patientImportContext;
-
-	@Mock
 	protected PatientImportContextService patientImportContextService;
 
 	@Before
