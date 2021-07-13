@@ -36,6 +36,7 @@ public class DemographicContactFewTo1 implements Serializable {
 	private String ec;
 	private String category;
 	private String contactId;
+	private int type;
 	
 	private String lastName;
 	private String firstName;	
@@ -91,5 +92,13 @@ public class DemographicContactFewTo1 implements Serializable {
     public void setContactId(String contactId)
     {
     	this.contactId = contactId;
+    }
+    public int getType()
+	{
+		return type;
+	}
+    public void settype(int type)
+    {
+    	this.type = type;
     }
 }

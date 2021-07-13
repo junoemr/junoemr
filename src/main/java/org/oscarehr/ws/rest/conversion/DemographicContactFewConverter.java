@@ -45,6 +45,7 @@ public class DemographicContactFewConverter {
 		if (d.getType()==DemographicContact.TYPE_DEMOGRAPHIC) {
 			Demographic demographic = (Demographic) obj;
 			t.setContactId(d.getContactId());
+			t.settype(d.getType());
 			t.setFirstName(demographic.getFirstName());
 			t.setLastName(demographic.getLastName());
 			

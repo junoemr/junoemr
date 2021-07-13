@@ -15,9 +15,9 @@
 				Manage Contacts
 			</juno-button>
 
-			<juno-button ng-repeat="dc in $ctrl.ngModel"
-			             ng-model="dc.page.demoContacts"
-			             ng-click="$ctrl.openContacts(dc.contactId)"
+			<juno-button ng-repeat="dc in $ctrl.demoContacts"
+			             ng-model="dc"
+			             ng-click="$ctrl.openContacts(dc)"
 			             button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
 			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
 				{{dc.role}}: {{dc.lastName}}, {{dc.firstName}} Phone: {{dc.phone}}
@@ -30,9 +30,9 @@
 			<h4 class="title">
 		Professional Contacts
 			</h4>
-			<juno-button ng-repeat="dc in $ctrl.ngModel"
-			             ng-model="dc.page.demoContacts"
-			             ng-click="$ctrl.openContacts(dc.contactId)"
+			<juno-button ng-repeat="dc in $ctrl.demoContactPros"
+			             ng-model="dc.demoContactPros"
+			             ng-click="$ctrl.openContacts(dc)"
 			             button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
 			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
 				{{dc.role}}: {{dc.lastName}}, {{dc.firstName}} Phone: {{dc.phone}}

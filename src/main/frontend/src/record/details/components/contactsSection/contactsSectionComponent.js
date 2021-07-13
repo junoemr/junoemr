@@ -37,13 +37,88 @@ angular.module('Record.Details').component('contactsSection', {
 		$scope.LABEL_POSITION = LABEL_POSITION;
 		ctrl.tab = [];
 		ctrl.demo = null;
-		ctrl.thisDemo = $stateParams.demographicNo;
+		ctrl.thisDemo = null;
+
+		ctrl.demoContacts = [];
+		ctrl.demoContactsInternal = [];
+		ctrl.demoContactPros = [];
+		ctrl.demoContactsExternal = [];
+
 
 		ctrl.$onInit = () =>
 		{
-			console.log(ctrl.ngModel);
-			console.log(ctrl.componentStyle);
+			// retrieve contact lists for demographic
+			ctrl.thisDemo = $stateParams.demographicNo;
+					demographicService.getDemographicContacts(ctrl.thisDemo, "personal").then(
+						function success(data)
+						{
+							console.log(data);
+							ctrl.demoContacts = (data);
+							ctrl.sortContacts();
+						}
+					);
+					demographicService.getDemographicContacts(ctrl.thisDemo, "professional").then(
+						function success(data)
+						{
+							ctrl.demoContactPros = demoContactShow(data);
+						}
+					);
+					 //ctrl.sortContacts();
 		}
+
+		ctrl.sortContacts = function sortContacts()
+		{
+			for (let i = 0; i < ctrl.demoContacts.length; i++)
+			{
+				console.log(ctrl.demoContacts[i].type);
+				if (ctrl.demoContacts[i].type === 1)
+				{
+					ctrl.demoContactsInternal.push(ctrl.demoContacts[i]);
+				}
+				else if (ctrl.demoContacts[i].type === 2)
+				{
+					ctrl.demoContactsExternal.push(ctrl.demoContacts[i]);
+				}
+				else {
+
+				}
+			}
+		}
+
+		function demoContactShow(demoContact)
+{
+	var contactShow = demoContact;
+	if (demoContact.role != null)
+	{ //only 1 entry
+		var tmp = {};
+		tmp.role = demoContact.role;
+		tmp.sdm = demoContact.sdm;
+		tmp.ec = demoContact.ec;
+		tmp.type = demoContact.type;
+		tmp.category = demoContact.category;
+		tmp.lastName = demoContact.lastName;
+		tmp.firstName = demoContact.firstName;
+		tmp.phone = demoContact.phone;
+		tmp.contactId = demoContact.contactId;
+		contactShow = [tmp];
+	}
+	for (var i = 0; i < contactShow.length; i++)
+	{
+		if (contactShow[i].sdm == true) contactShow[i].role += " /sdm";
+		if (contactShow[i].ec == true) contactShow[i].role += " /ec";
+		if (contactShow[i].role == null || contactShow[i].role == "") contactShow[i].role = "-";
+
+		if (contactShow[i].phone == null || contactShow[i].phone == "")
+		{
+			contactShow[i].phone = "-";
+		}
+		else if (contactShow[i].phone.charAt(contactShow[i].phone.length - 1) == "*")
+		{
+			contactShow[i].phone = contactShow[i].phone.substring(0, contactShow[i].phone.length - 1);
+		}
+	}
+	return contactShow;
+}
 
 		ctrl.getTabs = function getTabs(demogNo)
 		{
@@ -62,42 +137,35 @@ angular.module('Record.Details').component('contactsSection', {
 
 		ctrl.openContacts = async (demoContactId) =>
 		{
+			console.log(demoContactId.contactId);
 
-			demographicService.getDemographic(demoContactId).then(
-						function success(results)
-						{
-							ctrl.demo = results;
-							console.log("it exists", results);
-						},
-						function error(errors)
-						{
-							alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
-						}
-					);
 			if(ctrl.demo != null)
 			{
-				ctrl.getTabs(demoContactId);
+				ctrl.getTabs(demoContactId.contactId);
 				//ctrl.changeTab(ctrl.tab);
 			}
-			//ctrl.getTabs(demoContactId);
-			//ctrl.changeTab(ctrl.tab);
-			/* try
-             {
-                 await $uibModal.open(
-                     {
-                         component: 'rosteredHistoryModal',
-                         backdrop: 'static',
-                         windowClass: "juno-modal lg",
-                         resolve: {
-                             demographic: ctrl.ngModel,
-                         }
-                     })
-             }
-             catch(_reason)
-             {
-                 // do nothing on cancel
-             }*/
+			else
+			{
+				try
+				{
+					await $uibModal.open(
+						{
+							component: 'externalContactsModal',
+							backdrop: 'static',
+							windowClass: "juno-modal lg",
+							resolve: {
+								demographic: ctrl.thisDemo,
+							}
+						})
+				}
+				catch (_reason)
+				{
+					// do nothing on cancel
+				}
+			}
 		}
+
+
 		ctrl.changeTab = function changeTab(temp)
 		{
 			//controller.currenttab2 = controller.recordtabs2[temp.id];
@@ -119,8 +187,8 @@ angular.module('Record.Details').component('contactsSection', {
 			{
 						if (angular.isDefined(temp.url))
 						{
-							var win;
-								var rnd = Math.round(Math.random() * 1000);
+							let win;
+								let rnd = Math.round(Math.random() * 1000);
 								win = "win" + rnd;
 							window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600", "");
 						}

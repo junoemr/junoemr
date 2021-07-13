@@ -138,7 +138,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					);
 
 					// retrieve contact lists for demographic
-					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "personal").then(
+					/*demographicService.getDemographicContacts(controller.page.demo.demographicNo, "personal").then(
 						function success(data) {
 							controller.page.demoContacts = demoContactShow(data);
 						}
@@ -147,7 +147,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						function success(data) {
 							controller.page.demoContactPros = demoContactShow(data);
 						}
-					);
+					);*/
 
 
 					//show notes
@@ -1265,7 +1265,7 @@ function getPhoneNum(phone)
 	return phone;
 }
 
-function demoContactShow(demoContact)
+/*function demoContactShow(demoContact)
 {
 	var contactShow = demoContact;
 	if (demoContact.role != null)
@@ -1297,7 +1297,7 @@ function demoContactShow(demoContact)
 		}
 	}
 	return contactShow;
-}
+}*/
 
 function toArray(obj)
 { //convert single object to array

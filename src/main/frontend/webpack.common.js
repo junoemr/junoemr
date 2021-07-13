@@ -339,6 +339,7 @@ module.exports = {
 			'./src/record/details/components/rosterDisplay/rosterDisplayComponent.js',
 			'./src/record/details/components/rosteredHistory/rosteredHistoryModalComponent.js',
 			'./src/record/details/components/additionalInformationSection/additionalInformationSectionComponent.js',
+			'./src/record/details/components/externalContacts/externalContactsModalComponent.js',
 			'./src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModalComponent.js',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
