@@ -31,10 +31,13 @@ import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ClinicalNotes;
 import xml.cds.v5_0.DateTimeFullOrPartial;
 
+import java.time.format.DateTimeFormatter;
+
 @Component
 public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<ClinicalNotes, EncounterNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSEncounterNoteImportMapper.class);
+	private static final DateTimeFormatter SIGNING_DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MMM-yyyy hh:mm");
 
 	public CDSEncounterNoteImportMapper()
 	{
@@ -102,8 +105,31 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<Cl
 		{
 			logEvent("EncounterNote [" + note.getObservationDate() + "] has no text value");
 		}
-		note.setNoteText(noteText);
 
+		for (ClinicalNotes.NoteReviewer reviewer : importStructure.getNoteReviewer())
+		{
+			// Not perfect way to import reviewers.
+			// The only alternative is to import a completely duplicated note other than the signing provider
+			// and author for each reviewer.
+			String signedText = generateSignedText(reviewer);
+			if (signedText != null)
+			{
+				noteText += signedText;
+			}
+		}
+
+		note.setNoteText(noteText);
 		return note;
+	}
+
+	protected String generateSignedText(ClinicalNotes.NoteReviewer reviewer)
+	{
+		if (reviewer.getName() != null) // Ensure NoteReviewer isn't an empty element "<NoteReviewer/>"
+		{
+			return "\n[Signed on "
+					+ SIGNING_DATE_FORMAT.format(reviewer.getDateTimeNoteReviewed().getFullDateTime().toGregorianCalendar().toZonedDateTime()) + " by " +
+					reviewer.getName().getFirstName() + " " + reviewer.getName().getLastName() + "]";
+		}
+		return null;
 	}
 }
