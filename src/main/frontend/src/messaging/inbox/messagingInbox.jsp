@@ -14,6 +14,7 @@
 		                  search-keyword="$ctrl.searchKeyword"
 		                  source-id="$ctrl.selectedSourceId"
 		                  group-id="$ctrl.selectedGroupId"
+		                  on-reload-messages="$ctrl.onReloadMessages()"
 		                  disable-search="$ctrl.recordPageEmbedded">
 		</inbox-header-bar>
 

@@ -42,7 +42,8 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 		messagingBackendId: "<",
 		sourceId: "<",
 		groupId: "<",
-		disableSearch: "<?"
+		disableSearch: "<?",
+		onReloadMessages: "&?"
 	},
 	controller: [
 		"$scope",
@@ -169,6 +170,14 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 				else
 				{
 					ctrl.massEditList = [];
+				}
+			}
+
+			ctrl.reloadMessageList = () =>
+			{
+				if (ctrl.onReloadMessages)
+				{
+					ctrl.onReloadMessages({});
 				}
 			}
 

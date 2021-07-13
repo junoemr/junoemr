@@ -26,6 +26,7 @@ import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import StreamingList from "../../lib/util/StreamingList";
 import {MessageGroup} from "../../lib/messaging/model/MessageGroup";
 import MessagingStringResourceSetFactory from "../../lib/messaging/factory/MessagingStringResourceSetFactory";
+import {BroadcastEvent} from "./components/messageList/messageListComponentConstants";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',
@@ -74,6 +75,15 @@ angular.module("Messaging").component('messagingInbox', {
 					await messagingService.getMessageSourceById(ctrl.selectedSourceId),
 					$stateParams.messageableId);
 			}
+		}
+
+		/**
+		 * called when the message list is to be manually reloaded.
+		 */
+		ctrl.onReloadMessages = () =>
+		{
+			// tell message list to reload.
+			$scope.$broadcast(BroadcastEvent.RefreshMessageList);
 		}
 
 		/**

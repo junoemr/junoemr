@@ -25,6 +25,7 @@ import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 import MessagingServiceFactory from "../../../../lib/messaging/factory/MessagingServiceFactory";
 import ActionAlreadyInProgressError from "../../../../lib/error/ActionAlreadyInProgressError";
 import {MessageGroup} from "../../../../lib/messaging/model/MessageGroup";
+import {BroadcastEvent} from "./messageListComponentConstants";
 
 angular.module("Messaging.Components").component('messageList', {
 	templateUrl: 'src/messaging/inbox/components/messageList/messageList.jsp',
@@ -308,5 +309,6 @@ angular.module("Messaging.Components").component('messageList', {
 			$scope.$watch("$ctrl.messageableFilter", ctrl.startReloadDebounce);
 			$scope.$watch("$ctrl.onlyUnread", ctrl.startReloadDebounce);
 			$scope.$watch("$ctrl.searchKeyword", ctrl.startReloadDebounce);
+			$scope.$on(BroadcastEvent.RefreshMessageList, ctrl.startReloadDebounce);
 		}],
 });
