@@ -810,6 +810,11 @@ oscarApp.config([
 					},
 				},
 		})
+		.state('record.configureFlowsheets',
+		{
+			url: '/configureFlowsheets',
+			component: 'flowsheetManager',
+		})
         .state('record.patientEducation',
         {
             url: '/patientEducation',

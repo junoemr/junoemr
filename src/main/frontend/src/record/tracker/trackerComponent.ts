@@ -103,7 +103,7 @@ angular.module('Record.Tracker').component('healthTracker',
 						{
 							demographicFlowsheetItems.push(flowsheet);
 						}
-						if(flowsheet.ownerProviderId)
+						else if(flowsheet.ownerProviderId)
 						{
 							providerFlowsheetItems.push(flowsheet);
 						}
@@ -117,14 +117,21 @@ angular.module('Record.Tracker').component('healthTracker',
 					// a flowsheet is related if it has a parent ID
 					const flowsheetMap = new Map();
 
-					ctrl.getTriggeredFlowsheets(clinicFlowsheetItems).forEach((flowsheet) => {
+					// put all base level flowsheets into a map
+					ctrl.getTriggeredFlowsheets(clinicFlowsheetItems).forEach((flowsheet: FlowsheetModel) => {
 						flowsheetMap.set(flowsheet.id, flowsheet);
 					});
-					ctrl.getTriggeredFlowsheets(providerFlowsheetItems).forEach((flowsheet) => {
-						flowsheetMap.set(flowsheet.parentFlowsheetId, flowsheet);
+
+					// overwrite mapped values with provider specific version where possible
+					ctrl.getTriggeredFlowsheets(providerFlowsheetItems).forEach((flowsheet: FlowsheetModel) => {
+						const key = flowsheet.parentFlowsheetId ? flowsheet.parentFlowsheetId : flowsheet.id;
+						flowsheetMap.set(key, flowsheet);
 					});
-					ctrl.getTriggeredFlowsheets(demographicFlowsheetItems).forEach((flowsheet) => {
-						flowsheetMap.set(flowsheet.parentFlowsheetId, flowsheet);
+
+					// overwrite mapped values again with demographic specific version where possible
+					ctrl.getTriggeredFlowsheets(demographicFlowsheetItems).forEach((flowsheet: FlowsheetModel) => {
+						const key = flowsheet.parentFlowsheetId ? flowsheet.parentFlowsheetId : flowsheet.id;
+						flowsheetMap.set(key, flowsheet);
 					});
 					ctrl.triggerdFlowsheets = Array.from(flowsheetMap.values());
 				}
@@ -162,11 +169,10 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.onManageFlowsheets = (): void =>
 				{
-					// todo
-					// $state.go(".",
-					// 	{
-					//
-					// 	});
+					$state.go("record.configureFlowsheets",
+						{
+							demographicId: ctrl.demographicNo,
+						});
 				}
 			}]
 	});

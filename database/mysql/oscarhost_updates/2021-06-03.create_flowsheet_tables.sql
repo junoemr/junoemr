@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS flowsheet_item_group
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
     flowsheet_id    INTEGER(10) NOT NULL,
-    group_name      VARCHAR(255) NOT NULL,
+    group_name      VARCHAR(255),
     description     TEXT,
 
     created_at      DATETIME NOT NULL,
