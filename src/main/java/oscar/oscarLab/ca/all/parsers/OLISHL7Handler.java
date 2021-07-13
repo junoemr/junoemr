@@ -1588,7 +1588,12 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			String obxCategory = Terser.get(obr, 4, 0, 1, 1);
 			OLISRequestNomenclatureDao requestDao = (OLISRequestNomenclatureDao) SpringUtils.getBean("OLISRequestNomenclatureDao");
 			OLISRequestNomenclature requestNomenclature = requestDao.findByNameId(obxCategory);
-			return StringUtils.trimToEmpty(requestNomenclature.getCategory());
+			String nomenclatureCategory = "";
+			if (requestNomenclature != null)
+			{
+				nomenclatureCategory = StringUtils.trimToEmpty(requestNomenclature.getCategory());
+			}
+			return nomenclatureCategory;
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
@@ -1602,7 +1607,12 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		try {
 			OLISResultNomenclatureDao resultDao = (OLISResultNomenclatureDao) SpringUtils.getBean("OLISResultNomenclatureDao");
 			OLISResultNomenclature resultNomenclature = resultDao.findByNameId(obxName);
-			return StringUtils.trimToEmpty(resultNomenclature.getName());
+			String nomenclatureCategory = "";
+			if (resultNomenclature != null)
+			{
+				nomenclatureCategory = StringUtils.trimToEmpty(resultNomenclature.getName());
+			}
+			return nomenclatureCategory;
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
@@ -2293,7 +2303,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public String getDocName() {
 		try {
-			return (getFullDocName("/.OBR-16-"));
+			// Previously getFullDocName
+			// Changed to stop injecting HTML into OLIS labs
+			return (getShortName("/.OBR-16-"));
 		} catch (Exception e) {
 			return ("");
 		}
@@ -2312,14 +2324,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 		try {
 			int i = 0;
-			String docs = getFullDocName("/.OBR-28(" + i + ")-");
+			String docs = getShortName("/.OBR-28(" + i + ")-");
 			i++;
-			String nextDoc = getFullDocName("/.OBR-28(" + i + ")-");
+			String nextDoc = getShortName("/.OBR-28(" + i + ")-");
 
 			while (!nextDoc.equals("")) {
 				docs = docs + ", " + nextDoc;
 				i++;
-				nextDoc = getFullDocName("/.OBR-28(" + i + ")-");
+				nextDoc = getShortName("/.OBR-28(" + i + ")-");
 			}
 
 			return (docs);

@@ -86,25 +86,30 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				ctrl.integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
 				for (let integration of ctrl.integrationsList)
 				{
-					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.demographic.demographicNo)).data.body;
-					if (patient)
+					try
 					{
-						if(patient.link_status === PatientTo1.LinkStatusEnum.CONFIRMED ||
-							patient.link_status === PatientTo1.LinkStatusEnum.VERIFIED)
+						const patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.demographic.demographicNo)).data.body;
+						if (patient)
 						{
 							// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
 							let province = patient.address_province_code !== "UNKNOWN" ? patient.address_province_code : "";
 							let city = patient.city != null ? patient.city : "";
 							patient.city_province = `${city} ${province}`;
-						}
-						integration.patient = patient;
-					}
-					integration.inviteSent = false;
 
+							integration.patient = patient;
+						}
+					}
+					catch(error)
+					{
+						console.error(`Could not fetch MHA patient profile for site [${integration.siteName}]`);
+						console.error(error);
+					}
+
+					integration.inviteSent = false;
 					ctrl.integrationTabs.push({
 						label: integration.siteName,
 						value: integration,
-					})
+					});
 				}
 
 				if (ctrl.integrationTabs.length > 0)
@@ -146,18 +151,19 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 		ctrl.getConnectionStatusHuman = (patientConnectionStatus) =>
 		{
-			if (patientConnectionStatus === PatientTo1.LinkStatusEnum.CONFIRMED ||
-				patientConnectionStatus === PatientTo1.LinkStatusEnum.VERIFIED)
+			switch (patientConnectionStatus)
 			{
-				return "Patient is a CONFIRMED user";
-			}
-			else if (patientConnectionStatus === PatientTo1.LinkStatusEnum.CLINICREJECTED)
-			{
-				return "Patient has been REJECTED by clinic";
-			}
-			else
-			{
-				return "Patient is a UNCONFIRMED user";
+				case PatientTo1.LinkStatusEnum.CLINICREJECTED:
+					return "Patient has been REJECTED by clinic";
+				case PatientTo1.LinkStatusEnum.PENDINGCLINICCONFIRM:
+					return "Patient is an UNCONFIRMED user";
+				case PatientTo1.LinkStatusEnum.VERIFIED:
+					return "Patient is a VERIFIED user";
+				case PatientTo1.LinkStatusEnum.CONFIRMED:
+					return "Patient is a CONFIRMED user";
+				default:
+					// if we get here Juno has managed to pull a patient record from MHA that it shouldn't have access to.
+					return "Patient connection is in UNKNOWN";
 			}
 		}
 
