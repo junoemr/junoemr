@@ -220,7 +220,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 				}
 
-				ctrl.lookupPreventions = async (searchTerm): Promise<Array<object>> =>
+				ctrl.lookupPreventions = async (searchTerm): Promise<object[]> =>
 				{
 					const searchResults = await flowsheetApiService.searchPreventionTypes(searchTerm);
 					return searchResults.body.map((result) =>
@@ -233,7 +233,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					});
 				}
 
-				ctrl.lookupMeasurements = async (searchTerm): Promise<Array<object>> =>
+				ctrl.lookupMeasurements = async (searchTerm): Promise<object[]> =>
 				{
 					const searchResults = await flowsheetApiService.searchMeasurementTypes(searchTerm);
 					return searchResults.body.map((result) =>
@@ -246,7 +246,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					});
 				}
 
-				ctrl.lookupIcd9Codes = async (searchTerm): Promise<Array<object>> =>
+				ctrl.lookupIcd9Codes = async (searchTerm): Promise<object[]> =>
 				{
 					const searchResults: DxCodeModel[] = await flowsheetApiService.searchDxCodes(DxCodingSystem.ICD9, searchTerm);
 					return searchResults.map((result) =>

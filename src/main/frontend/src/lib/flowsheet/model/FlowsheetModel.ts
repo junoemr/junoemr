@@ -46,6 +46,7 @@ export default class FlowsheetModel
 		this.enabled = true;
 		this.systemManaged = false;
 		this.flowsheetItemGroups = [];
+		this.triggerCodes = [];
 	}
 
 	get id(): number

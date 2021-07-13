@@ -23,25 +23,35 @@
 package org.oscarehr.flowsheet.service;
 
 
+import org.oscarehr.common.dao.Icd9Dao;
+import org.oscarehr.common.model.Icd9;
+import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.decisionSupport2.dao.DsRuleDao;
+import org.oscarehr.decisionSupport2.transfer.DsRuleUpdateInput;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
-import org.oscarehr.flowsheet.converter.FlowsheetModelToEntityConverter;
-import org.oscarehr.flowsheet.converter.FlowsheetTransferToEntityConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
+import org.oscarehr.flowsheet.entity.FlowsheetItem;
+import org.oscarehr.flowsheet.entity.FlowsheetItemGroup;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.search.FlowsheetCriteriaSearch;
 import org.oscarehr.flowsheet.transfer.FlowsheetCreateTransfer;
+import org.oscarehr.flowsheet.transfer.FlowsheetItemCreateUpdateTransfer;
+import org.oscarehr.flowsheet.transfer.FlowsheetItemGroupCreateUpdateTransfer;
 import org.oscarehr.flowsheet.transfer.FlowsheetUpdateTransfer;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,13 +68,13 @@ public class FlowsheetService
 	private DemographicDao demographicDao;
 
 	@Autowired
+	private DsRuleDao dsRuleDao;
+
+	@Autowired
+	private Icd9Dao icd9Dao;
+
+	@Autowired
 	private FlowsheetEntityToModelConverter flowsheetEntityToModelConverter;
-
-	@Autowired
-	private FlowsheetTransferToEntityConverter flowsheetTransferToEntityConverter;
-
-	@Autowired
-	private FlowsheetModelToEntityConverter flowsheetModelToEntityConverter;
 
 	public RestSearchResponse<Flowsheet> executeCriteriaSearch(FlowsheetCriteriaSearch criteriaSearch, int page, int perPage)
 	{
@@ -72,14 +82,6 @@ public class FlowsheetService
 		int total = flowsheetDao.criteriaSearchCount(criteriaSearch);
 
 		return RestSearchResponse.successResponse(flowsheetEntityToModelConverter.convert(flowsheets), page, perPage, total);
-	}
-
-	public Flowsheet addNewFlowsheet(String creatingProviderId, FlowsheetCreateTransfer creationTransfer)
-	{
-		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetTransferToEntityConverter.convert(creationTransfer);
-		entity.setCreatedBy(creatingProviderId);
-		flowsheetDao.persist(entity);
-		return flowsheetEntityToModelConverter.convert(entity);
 	}
 
 	public Flowsheet addNewFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy)
@@ -97,22 +99,60 @@ public class FlowsheetService
 		return addNewFlowsheetCopy(creatingProviderId, flowsheetIdToCopy, Optional.empty(), Optional.ofNullable(ownerDemographicId));
 	}
 
+	public Flowsheet addNewFlowsheet(String creatingProviderId, FlowsheetCreateTransfer creationTransfer)
+	{
+		org.oscarehr.flowsheet.entity.Flowsheet entity = new org.oscarehr.flowsheet.entity.Flowsheet();
+		entity.setName(creationTransfer.getName());
+		entity.setDescription(creationTransfer.getDescription());
+		entity.setEnabled(creationTransfer.isEnabled());
+
+		List<FlowsheetItemGroup> flowsheetGroups = creationTransfer.getFlowsheetItemGroups()
+				.stream()
+				.map((group) -> createNewGroup(group, entity))
+				.collect(Collectors.toList());
+		entity.setFlowsheetItemGroups(flowsheetGroups);
+		entity.setFlowsheetItems(flowsheetGroups
+				.stream()
+				.filter((group) -> group.getFlowsheetItems() != null)
+				.flatMap((group) -> group.getFlowsheetItems().stream())
+				.collect(Collectors.toList()));
+
+		entity.setIcd9Triggers(convertIcd9Triggers(creationTransfer.getTriggerCodes()));
+		entity.setCreatedBy(creatingProviderId);
+		flowsheetDao.persist(entity);
+		return flowsheetEntityToModelConverter.convert(entity);
+	}
+
 	public Flowsheet updateFlowsheet(String updatingProviderId, Integer flowsheetId, FlowsheetUpdateTransfer updateTransfer)
 	{
-		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetTransferToEntityConverter.convert(updateTransfer);
+		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetDao.find(flowsheetId);
+		entity.setName(updateTransfer.getName());
+		entity.setDescription(updateTransfer.getDescription());
+		entity.setEnabled(updateTransfer.isEnabled());
 
-		// set provider updated/deleted by states
-		// this can be moved to the converter logic once the logged in provider can be accessed globally
-		entity.setUpdatedBy(updatingProviderId);
-		entity.getFlowsheetItemGroups()
-				.stream()
-				.filter((group) -> group.getDeletedAt() != null)
-				.forEach((group) -> group.setDeletedBy(updatingProviderId));
-		entity.getFlowsheetItems()
-				.stream()
-				.filter((item) -> item.getDeletedAt() != null)
-				.forEach((item) -> item.setDeletedBy(updatingProviderId));
+		// diff the groups and items within the flowsheet
+		List<FlowsheetItemGroup> currentFlowsheetItemGroups = entity.getFlowsheetItemGroups();
 
+		if(updateTransfer.getFlowsheetItemGroups() != null)
+		{
+			currentFlowsheetItemGroups.forEach((group) -> mergeExistingGroup(updatingProviderId, group, updateTransfer.getFlowsheetItemGroups()));
+			currentFlowsheetItemGroups.addAll(
+					updateTransfer.getFlowsheetItemGroups()
+							.stream()
+							.filter((group) -> (group.getId() == null))
+							.map((group) -> createNewGroup(group, entity))
+							.collect(Collectors.toList())
+			);
+		}
+
+		entity.setFlowsheetItemGroups(currentFlowsheetItemGroups);
+		entity.setFlowsheetItems(currentFlowsheetItemGroups
+				.stream()
+				.filter((group) -> group.getFlowsheetItems() != null)
+				.flatMap((group) -> group.getFlowsheetItems().stream())
+				.collect(Collectors.toList()));
+
+		entity.setIcd9Triggers(convertIcd9Triggers(updateTransfer.getTriggerCodes()));
 		flowsheetDao.merge(entity);
 
 		//TODO figure out how to return the new version of the entity correctly.
@@ -188,5 +228,101 @@ public class FlowsheetService
 
 		flowsheetDao.persist(entity);
 		return flowsheetEntityToModelConverter.convert(entity);
+	}
+
+	private Set<Icd9> convertIcd9Triggers(List<DxCode> triggerCodes)
+	{
+		return triggerCodes.stream().map((input) -> icd9Dao.findByCode(input.getCode())).collect(Collectors.toSet());
+	}
+
+	private FlowsheetItemGroup mergeExistingGroup(String currentUserId, FlowsheetItemGroup existingGroupEntity, List<FlowsheetItemGroupCreateUpdateTransfer> groupInputList)
+	{
+		Optional<FlowsheetItemGroupCreateUpdateTransfer> matchingInput = groupInputList
+				.stream()
+				.filter((input) -> existingGroupEntity.getId().equals(input.getId()))
+				.findFirst();
+
+		List<FlowsheetItem> flowsheetItems = Optional.ofNullable(existingGroupEntity.getFlowsheetItems()).orElse(new ArrayList<>());
+		if(matchingInput.isPresent())
+		{
+			FlowsheetItemGroupCreateUpdateTransfer input = matchingInput.get();
+			BeanUtils.copyProperties(input, existingGroupEntity, "id", "flowsheetItems");
+
+			flowsheetItems.forEach((item) -> mergeExistingItem(currentUserId, item, input.getFlowsheetItems()));
+			flowsheetItems.addAll(
+					input.getFlowsheetItems()
+							.stream()
+							.filter((item) -> (item.getId() == null))
+							.map((item) -> createNewItem(item, existingGroupEntity.getFlowsheet(), existingGroupEntity))
+							.collect(Collectors.toList())
+			);
+			existingGroupEntity.setFlowsheetItems(flowsheetItems);
+		}
+		else
+		{
+			existingGroupEntity.setDeletedAt(LocalDateTime.now());
+			existingGroupEntity.setDeletedBy(currentUserId);
+			flowsheetItems.forEach((item) -> {
+				item.setDeletedAt(LocalDateTime.now());
+				item.setDeletedBy(currentUserId);
+			});
+			existingGroupEntity.setFlowsheetItems(flowsheetItems);
+		}
+		return existingGroupEntity;
+	}
+	private FlowsheetItemGroup createNewGroup(FlowsheetItemGroupCreateUpdateTransfer groupInput,
+	                                          org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity)
+	{
+		FlowsheetItemGroup group = new FlowsheetItemGroup();
+		group.setFlowsheet(flowsheetEntity);
+		BeanUtils.copyProperties(groupInput, group, "id", "flowsheetItems");
+
+		// all items in a new group will be new
+		List<FlowsheetItemCreateUpdateTransfer> inputItems = Optional.ofNullable(groupInput.getFlowsheetItems()).orElse(new ArrayList<>());
+		group.setFlowsheetItems(
+				inputItems
+						.stream()
+						.map((item) -> createNewItem(item, flowsheetEntity, group))
+						.collect(Collectors.toList())
+		);
+		return group;
+	}
+
+	private FlowsheetItem mergeExistingItem(String currentUserId,
+	                                        FlowsheetItem existingItemEntity,
+	                                        List<FlowsheetItemCreateUpdateTransfer> itemInputList)
+	{
+		Optional<FlowsheetItemCreateUpdateTransfer> matchingInput = itemInputList
+				.stream()
+				.filter((input) -> existingItemEntity.getId().equals(input.getId()))
+				.findFirst();
+
+		if(matchingInput.isPresent())
+		{
+			FlowsheetItemCreateUpdateTransfer input = matchingInput.get();
+			BeanUtils.copyProperties(input, existingItemEntity, "id");
+			existingItemEntity.setDsRules(input.getRules().stream().map((rule) -> dsRuleDao.find(rule.getId())).collect(Collectors.toSet()));
+		}
+		else
+		{
+			existingItemEntity.setDeletedAt(LocalDateTime.now());
+			existingItemEntity.setDeletedBy(currentUserId);
+		}
+		return existingItemEntity;
+	}
+
+	private FlowsheetItem createNewItem(FlowsheetItemCreateUpdateTransfer itemInput,
+	                                    org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity,
+	                                    FlowsheetItemGroup groupEntity)
+	{
+		FlowsheetItem item = new FlowsheetItem();
+		item.setFlowsheet(flowsheetEntity);
+		item.setFlowsheetItemGroup(groupEntity);
+		BeanUtils.copyProperties(itemInput, item);
+
+		List<DsRuleUpdateInput> itemRules = Optional.ofNullable(itemInput.getRules()).orElse(new ArrayList<>());
+		item.setDsRules(itemRules.stream().map((rule) -> dsRuleDao.find(rule.getId())).collect(Collectors.toSet()));
+
+		return item;
 	}
 }
