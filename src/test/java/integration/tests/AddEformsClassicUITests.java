@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
@@ -67,7 +66,7 @@ public class AddEformsClassicUITests extends SeleniumTestBase
 		String subject = "EFormTest";
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitleeforms")));
+		Thread.sleep(2000);
 		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();
 		Thread.sleep(10000);
 		PageUtil.switchToLastWindow(driver);
