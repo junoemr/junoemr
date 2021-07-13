@@ -536,10 +536,6 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				{
 					return providerService.getMe();
 				}],
-				properties: ['uxService', function(uxService)
-				{
-					return uxService.getDisplayProperties();
-				}]
 			}
 		})
 		.state('record.details',

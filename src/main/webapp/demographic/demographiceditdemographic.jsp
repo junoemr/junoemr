@@ -2324,8 +2324,6 @@ if ( Dead.equals(PatStat) ) {%>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formRefDocNo" />:</span><span class="info"><%=referralDoctorNo%></span>
 							</li>
-							<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
-							{ %>
 							<li>
 								<span class="label">
 									<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>:
@@ -2338,8 +2336,7 @@ if ( Dead.equals(PatStat) ) {%>
 								</span>
 								<span class="info"><%=familyDoctorNo%></span>
 							</li>
-							<% }
-								//-- Licensed producer drop-down selection (display only)-->
+							<%  //-- Licensed producer drop-down selection (display only)-->
 								if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
 								{ %>
 							<li>
@@ -3081,10 +3078,6 @@ document.updatedelete.referral_doctor_no.value = refNo;
 								<% } %>
 								</td>
 							</tr>
-
-							<!-- Family Doctor -->
-							<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
-							{ %>
 							<tr>
 								<td align="right" nowrap>
 									<b>
@@ -3114,8 +3107,6 @@ document.updatedelete.referral_doctor_no.value = refNo;
 									<% } %>
 								</td>
 							</tr>
-							<% } %>
-
 </oscar:oscarPropertiesCheck>
 <%-- END TOGGLE OFF PATIENT CLINIC STATUS --%>
 

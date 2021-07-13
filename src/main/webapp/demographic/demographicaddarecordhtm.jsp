@@ -1268,8 +1268,6 @@ document.forms[1].referral_doctor_no.value = refNo;
 				</td>
 			</tr>
 			<!-- Family Doctor -->
-			<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
-			{ %>
 			<tr>
 				<td align="right" nowrap>
 					<b>
@@ -1299,7 +1297,6 @@ document.forms[1].referral_doctor_no.value = refNo;
 					<% } %>
 				</td>
 			</tr>
-			<% } %>
 			<tr valign="top">
 				<td align="right" id="rosterStatusLbl" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNRosterStatus" />: </b></td>

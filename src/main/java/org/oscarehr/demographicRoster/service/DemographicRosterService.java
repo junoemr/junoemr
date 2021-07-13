@@ -68,10 +68,10 @@ public class DemographicRosterService
 		{
 			// Set the date in all non-rostered cases, and the reason only if the status is terminated.  This is due to the front
 			// end only displaying the termination reason select on status TE.
-			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
 			
 			if (RosterStatus.ROSTER_STATUS_TERMINATED.equals(rosterStatus.getRosterStatus()))
 			{
+				demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
 				DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(Integer.parseInt(demographic.getRosterTerminationReason()));
 				demographicRoster.setRosterTerminationReason(terminationReason);
 			}
