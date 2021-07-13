@@ -149,8 +149,21 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				}
 			}
 		}
-
-
+		
+		controller.appointmentReasonOptions = [
+			{
+				"value": "DEFAULT_ALL",
+				"label": "Show category and reason",
+			},
+			{
+				"value": "REASON_ONLY",
+				"label": "Show reason only",
+			},
+			{
+				"value": "NONE",
+				"label": "Off ",
+			}];
+		
 		controller.tabs = [
 		{
 			id: 0,
@@ -703,5 +716,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		};
 
 		controller.init();
+		console.log(controller.pref);
 	}
 ]);
