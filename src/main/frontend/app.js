@@ -373,14 +373,6 @@ oscarApp.config([
 				{
 					return providerService.getSettings();
 				}],
-				groupNames: ['formService', function(formService)
-				{
-					return formService.getGroupNames();
-				}],
-				loadedApps: ['appService', function(appService)
-				{
-					return appService.getApps();
-				}]
 			}
 		})
 		.state('settings.persona',
@@ -498,44 +490,60 @@ oscarApp.config([
 		.state('settings.documents',
 			{
 				url: '/documents',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "documentSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'documents'
-				}
+				},
 			})
 		.state('settings.summary',
 			{
 				url: '/summary',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "summarySettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'summary'
-				}
+				},
 			})
 		.state('settings.eforms',
 			{
 				url: '/eforms',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "eformSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'eforms'
-				}
+				},
+				resolve: {
+					groupNames: ['formService', function(formService)
+					{
+						return formService.getGroupNames();
+					}],
+				},
 			})
 		.state('settings.inbox',
 			{
 				url: '/inbox',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "inboxSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'inbox'
-				}
+				},
 			})
 		.state('settings.programs',
 			{
 				url: '/programs',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "programSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'programs'
 				}
@@ -543,16 +551,24 @@ oscarApp.config([
 		.state('settings.integration',
 			{
 				url: '/integration',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "integrationSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'integration'
-				}
+				},
 			})
 		.state('settings.tracker',
 			{
 				url: '/healthTracker',
 				component: 'flowsheetManager',
+				params: {
+					pref: null,
+				},
+				data: {
+					tab: 'integration'
+				},
 			})
 		.state('support',
 		{

@@ -52,9 +52,9 @@
 			<!-- Integration settings -->
 			<div ng-if="$ctrl.selectedIntegration === integration"
 			     class="settings p-16 p-l-32 p-r-32">
-				<integration-settings integration="integration"
-				                      component-style="$ctrl.componentStyle">
-				</integration-settings>
+				<mha-integration-settings integration="integration"
+				                          component-style="$ctrl.componentStyle">
+				</mha-integration-settings>
 			</div>
 		</div>
 	</div>

@@ -29,7 +29,7 @@ import {
 import MhaSSOService from "../../../../../lib/integration/myhealthaccess/service/MhaSSOService";
 import MhaConfigService from "../../../../../lib/integration/myhealthaccess/service/MhaConfigService";
 
-angular.module('Admin.Section.MhaConfig').component('integrationSettings',
+angular.module('Admin.Section.MhaConfig').component('mhaIntegrationSettings',
 	{
 		templateUrl: 'src/admin/section/mhaConfig/components/integrationSettings/integrationSettings.jsp',
 		bindings: {
