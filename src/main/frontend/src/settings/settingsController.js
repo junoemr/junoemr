@@ -1,5 +1,3 @@
-import {SitesApi} from "../../generated/api/SitesApi";
-import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Settings').controller('Settings.SettingsController', [
@@ -13,8 +11,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 	'user',
 	'loadedSettings',
 	'providerService',
-	'encounterForms',
-	'eforms',
 	'teams',
 	'groupNames',
 	'loadedApps',
@@ -31,8 +27,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		user,
 		loadedSettings,
 		providerService,
-		encounterForms,
-		eforms,
 		teams,
 		groupNames,
 		loadedApps,
@@ -42,17 +36,10 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		var controller = this;
 
-		controller.sitesApi = new SitesApi($http, $httpParamSerializer,
-		'../ws/rs');
-		controller.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
-			'../ws/rs');
-
 		$scope.$emit('configureShowPatientList', false);
 
 		controller.user = user;
 		controller.pref = loadedSettings;
-		controller.encounterForms = encounterForms.content;
-		controller.eforms = eforms;
 		controller.loadedApps = loadedApps;
 
 		controller.siteOptions = [];
@@ -99,45 +86,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			"value": "",
 			"label": "None"
 		});
-
-		//this needs to be done to do the weird checkbox lists. basically add a property to each encounterList object called checked:[true|false]
-		for (var i = 0; i < controller.pref.appointmentScreenForms.length; i++)
-		{
-			var selected = $filter('filter')(controller.encounterForms,
-			{
-				formName: controller.pref.appointmentScreenForms[i]
-			});
-			if (selected != null)
-			{
-				for (var x = 0; x < selected.length; x++)
-				{
-					if (selected[x].formName === controller.pref.appointmentScreenForms[i])
-					{
-						selected[x].checked = true;
-					}
-				}
-			}
-		}
-
-		//this needs to be done to do the weird checkbox lists. basically add a property to each encounterList object called checked:[true|false]
-		for (var i = 0; i < controller.pref.appointmentScreenEforms.length; i++)
-		{
-			var selected = $filter('filter')(controller.eforms,
-			{
-				id: controller.pref.appointmentScreenEforms[i]
-			});
-			if (selected != null)
-			{
-				for (var x = 0; x < selected.length; x++)
-				{
-					if (selected[x].id === controller.pref.appointmentScreenEforms[i])
-					{
-						selected[x].checked = true;
-					}
-				}
-			}
-		}
-
 
 		controller.tabs = [
 		{
@@ -458,45 +406,9 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			controller.currentTab = controller.tabs[0];
 		}
 
-
-
-
 		controller.init = function()
 		{
-			controller.sitesApi.getSiteList().then(
-				function success(rawResults)
-				{
-					var results = rawResults.data.body;
-					var out = [];
-					if (angular.isArray(results))
-					{
-						for (var i = 0; i < results.length; i++)
-						{
-							out.push({
-								id: results[i].siteId,
-								value: results[i].name,
-								label: results[i].name,
-								color: results[i].bgColor,
-							});
-						}
-					}
-					controller.siteOptions = out;
-				}
-			);
-			controller.scheduleApi.getScheduleGroups().then(
-				function success(rawResults)
-				{
-					var results = rawResults.data.body;
-					for (var i = 0; i < results.length; i++)
-					{
-						var scheduleData = results[i];
-
-						results[i].label = results[i].name;
-						results[i].value = results[i].identifier;
-
-						controller.scheduleOptions.push(scheduleData);
-					}
-				});
+			controller.changeTab(controller.currentTab);// hack to make everything load
 		};
 
 		controller.isActive = function(tab)
@@ -579,68 +491,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		{
 			controller.pref = {};
 			$state.go('dashboard');
-		};
-
-		controller.selectEncounterForms = function()
-		{
-			var selected = $filter('filter')(controller.encounterForms,
-			{
-				checked: true
-			});
-			var tmp = [];
-			for (var i = 0; i < selected.length; i++)
-			{
-				tmp.push(selected[i].formName);
-			}
-			controller.pref.appointmentScreenForms = tmp;
-		};
-
-		controller.selectEForms = function()
-		{
-			var selected = $filter('filter')(controller.eforms,
-			{
-				checked: true
-			});
-			var tmp = [];
-			for (var i = 0; i < selected.length; i++)
-			{
-				tmp.push(selected[i].id);
-			}
-			controller.pref.appointmentScreenEforms = tmp;
-		};
-
-		controller.removeQuickLinks = function()
-		{
-			var newList = [];
-
-			for (var i = 0; i < controller.pref.appointmentScreenQuickLinks.length; i++)
-			{
-				if (controller.pref.appointmentScreenQuickLinks[i].checked == null || controller.pref.appointmentScreenQuickLinks[i].checked == false)
-				{
-					newList.push(controller.pref.appointmentScreenQuickLinks[i]);
-				}
-			}
-			controller.pref.appointmentScreenQuickLinks = newList;
-		};
-
-		controller.openQuickLinkModal = function()
-		{
-			var modalInstance = $uibModal.open(
-			{
-				templateUrl: 'src/settings/quickLink.jsp',
-				controller: 'QuickLinkController'
-			});
-
-			modalInstance.result.then(function(selectedItem)
-			{
-				if (selectedItem != null)
-				{
-					if (selectedItem != null && selectedItem.name != null && selectedItem.url != null)
-					{
-						controller.pref.appointmentScreenQuickLinks.push(selectedItem);
-					}
-				}
-			});
 		};
 
 		controller.editDocumentTemplates = function()

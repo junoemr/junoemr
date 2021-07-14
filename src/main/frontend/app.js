@@ -373,14 +373,6 @@ oscarApp.config([
 				{
 					return providerService.getSettings();
 				}],
-				encounterForms: ['formService', function(formService)
-				{
-					return formService.getAllEncounterForms();
-				}],
-				eforms: ['formService', function(formService)
-				{
-					return formService.getAllEForms();
-				}],
 				teams: ['providerService', function(providerService)
 				{
 					return providerService.getActiveTeams();
@@ -402,11 +394,17 @@ oscarApp.config([
 				params: {
 					pref: null,
 				},
+				data: {
+					tab: 'persona',
+				},
 			})
 		.state('settings.general',
 			{
 				url: '/general',
 				component: "generalSettings",
+				data: {
+					tab: 'general',
+				},
 				params: {
 					pref: null,
 				},
@@ -427,11 +425,23 @@ oscarApp.config([
 		.state('settings.schedule',
 			{
 				url: '/schedule',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "scheduleSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'schedule'
-				}
+				},
+				resolve: {
+					encounterForms: ['formService', function(formService)
+					{
+						return formService.getAllEncounterForms();
+					}],
+					eforms: ['formService', function(formService)
+					{
+						return formService.getAllEForms();
+					}],
+				},
 			})
 		.state('settings.billing',
 			{
@@ -439,6 +449,9 @@ oscarApp.config([
 				component: 'billingSettings',
 				params: {
 					pref: null,
+				},
+				data: {
+					tab: 'billing',
 				},
 				resolve: {
 					billingServiceTypes: ['billingService', function(billingService)
