@@ -336,41 +336,6 @@
 					</div>
 				</div>
 
-
-				<div class="row" ng-show="settingsCtrl.currentTab.path == 'billing'">
-					<div class="col-sm-6 md-margin-top">
-						<div class="form-group col-sm-6">
-							<label>Default Billing Form:</label>
-							<select class="form-control" ng-model="settingsCtrl.pref.defaultServiceType"
-								ng-options="item.type as item.name for item in settingsCtrl.billingServiceTypesMod">
-							</select>
-						</div>
-						<div class="form-group col-sm-6">
-							<label>Default Diagnostic Code:</label>
-							<div class="input-group">
-								<input ng-model="settingsCtrl.pref.defaultDxCode" placeholder="" class="form-control" type="text">
-								<span class="input-group-btn">
-									<button class="btn btn-default btn-search" ng-disabled="true">Search</button>
-								</span>
-							</div>
-						</div>
-
-						<div class="form-group col-sm-6">
-							<label>Do Not Delete Previous Billing:</label>
-							<div class="controls">
-								<label class="checkbox-inline" for="radiosx-0">
-									<input ng-model="settingsCtrl.pref.defaultDoNotDeleteBilling" name="radiosx" id="radiosx-0" ng-value="true"  type="radio">
-									Enable
-								</label>
-								<label class="checkbox-inline" for="radiosx-1">
-									<input ng-model="settingsCtrl.pref.defaultDoNotDeleteBilling" name="radiosx" id="radiosx-1" ng-value="false" type="radio">
-									Disable
-								</label>
-							</div>
-						</div>
-					</div>
-				</div>
-
 				<div class="row" ng-show="settingsCtrl.currentTab.path == 'rx'">
 					<div class="col-sm-6">
 						<div class="col-sm-6 no-padding md-margin-top">

@@ -369,10 +369,6 @@ oscarApp.config([
 				{
 					return providerService.getMe();
 				}],
-				billingServiceTypes: ['billingService', function(billingService)
-				{
-					return billingService.getUniqueServiceTypes();
-				}],
 				providerList: ['providerService', function(providerService)
 				{
 					return providerService.searchProviders(
@@ -436,11 +432,16 @@ oscarApp.config([
 		.state('settings.billing',
 			{
 				url: '/billing',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
-				data: {
-					tab: 'billing'
-				}
+				component: 'billingSettings',
+				params: {
+					pref: null,
+				},
+				resolve: {
+					billingServiceTypes: ['billingService', function(billingService)
+					{
+						return billingService.getUniqueServiceTypes();
+					}],
+				},
 			})
 		.state('settings.rx',
 			{

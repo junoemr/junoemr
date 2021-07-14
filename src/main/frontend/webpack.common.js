@@ -464,6 +464,8 @@ module.exports = {
 			'./src/settings/quickLinkController.js',
 			'./src/settings/summaryItemSettingsController.js',
 
+			...(glob.sync("./src/settings/**/*.ts", {nosort: true})),
+
 			'./src/help/module.js',
 			'./src/help/supportController.js',
 			'./src/help/helpController.js',

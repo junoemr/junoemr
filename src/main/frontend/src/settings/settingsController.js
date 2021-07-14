@@ -12,7 +12,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 	'$filter',
 	'providerList',
 	'user',
-	'billingServiceTypes',
 	'loadedSettings',
 	'providerService',
 	'encounterForms',
@@ -32,7 +31,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		$filter,
 		providerList,
 		user,
-		billingServiceTypes,
 		loadedSettings,
 		providerService,
 		encounterForms,
@@ -55,7 +53,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		controller.providerList = providerList;
 		controller.user = user;
-		controller.billingServiceTypes = billingServiceTypes;
 		controller.pref = loadedSettings;
 		controller.encounterForms = encounterForms.content;
 		controller.eforms = eforms;
@@ -104,15 +101,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		{
 			"value": "",
 			"label": "None"
-		});
-
-		//add none -option to start.
-		controller.billingServiceTypesMod = [];
-		angular.copy(controller.billingServiceTypes, controller.billingServiceTypesMod);
-		controller.billingServiceTypesMod.splice(0, 0,
-		{
-			"type": "no",
-			"name": "--None--"
 		});
 
 		//this needs to be done to do the weird checkbox lists. basically add a property to each encounterList object called checked:[true|false]
@@ -522,7 +510,10 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		controller.changeTab = function(tab)
 		{
 			controller.currentTab = tab;
-			$state.go('settings.' + tab.path);
+			$state.go('settings.' + tab.path,
+				{
+					pref: controller.pref,
+				});
 		};
 
 		controller.saveEnabled = () =>
