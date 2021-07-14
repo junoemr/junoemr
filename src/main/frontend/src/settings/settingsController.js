@@ -11,7 +11,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 	'user',
 	'loadedSettings',
 	'providerService',
-	'teams',
 	'groupNames',
 	'loadedApps',
 	'appService',
@@ -27,7 +26,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		user,
 		loadedSettings,
 		providerService,
-		teams,
 		groupNames,
 		loadedApps,
 		appService,
@@ -65,27 +63,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				"label": groupNames[i]
 			});
 		}
-
-
-		//convert to value/label obj list. Add all/none
-		controller.teams = [
-		{
-			"value": "-1",
-			"label": "All"
-		}];
-		for (var i = 0; i < teams.length; i++)
-		{
-			controller.teams.push(
-			{
-				"value": teams[i],
-				"label": teams[i]
-			});
-		}
-		controller.teams.push(
-		{
-			"value": "",
-			"label": "None"
-		});
 
 		controller.tabs = [
 		{
@@ -159,37 +136,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			path: 'tracker'
 		},
 		];
-		controller.pageSizes = [
-		{
-			value: 'PageSize.A4',
-			label: 'A4'
-		},
-		{
-			value: 'PageSize.A6',
-			label: 'A6'
-		}];
-
-		controller.rxInteractionWarningLevels = [
-		{
-			value: '0',
-			label: 'Not Specified'
-		},
-		{
-			value: '1',
-			label: 'Low'
-		},
-		{
-			value: '2',
-			label: 'Medium'
-		},
-		{
-			value: '3',
-			label: 'High'
-		},
-		{
-			value: '4',
-			label: 'None'
-		}];
 
 		controller.staleDates = [
 		{
@@ -361,30 +307,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		{
 			value: '5687',
 			label: 'LifeLabs'
-		}];
-
-		controller.pasteFormats = [
-		{
-			value: 'single',
-			label: 'Single Line'
-		},
-		{
-			value: 'multi',
-			label: 'Multi Line'
-		}];
-
-		controller.letterHeadNameDefaults = [
-		{
-			value: '1',
-			label: 'Provider (user)'
-		},
-		{
-			value: '2',
-			label: 'MRP'
-		},
-		{
-			value: '3',
-			label: 'Clinic'
 		}];
 
 		if (controller.pref.consultationLetterHeadNameDefault == null)

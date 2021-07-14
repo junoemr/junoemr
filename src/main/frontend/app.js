@@ -373,10 +373,6 @@ oscarApp.config([
 				{
 					return providerService.getSettings();
 				}],
-				teams: ['providerService', function(providerService)
-				{
-					return providerService.getActiveTeams();
-				}],
 				groupNames: ['formService', function(formService)
 				{
 					return formService.getGroupNames();
@@ -463,29 +459,41 @@ oscarApp.config([
 		.state('settings.rx',
 			{
 				url: '/rx',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "rxSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'rx'
-				}
+				},
 			})
 		.state('settings.masterdemo',
 			{
 				url: '/masterdemo',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "masterDemographicSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'masterdemo'
-				}
+				},
 			})
 		.state('settings.consults',
 			{
 				url: '/consults',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "consultSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'consults'
-				}
+				},
+				resolve: {
+					teams: ['providerService', function(providerService)
+					{
+						return providerService.getActiveTeams();
+					}],
+				},
 			})
 		.state('settings.documents',
 			{
