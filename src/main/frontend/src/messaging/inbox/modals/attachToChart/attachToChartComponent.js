@@ -22,6 +22,9 @@
 */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import DocumentService from "../../../../lib/documents/service/DocumentService";
+import {JunoDocumentFactory} from "../../../../lib/documents/factory/JunoDocumentFactory";
+import DemographicDocumentService from "../../../../lib/documents/service/DemographicDocumentService";
 
 angular.module("Messaging.Modals").component('attachToChart', {
 	templateUrl: 'src/messaging/inbox/modals/attachToChart/attachToChart.jsp',
@@ -35,25 +38,57 @@ angular.module("Messaging.Modals").component('attachToChart', {
 			$scope)
 		{
 			const ctrl = this;
+			const documentService = new DocumentService();
+			const demographicDocumentService = new DemographicDocumentService();
 
 			$scope.LABEL_POSITION = LABEL_POSITION;
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
+			ctrl.isAttachingToChart = false;
 			ctrl.description = null;
-			ctrl.type = null;
+			ctrl.documentType = null;
+			ctrl.documentTypes = []; //Type JunoDocumentType[]
+			ctrl.documentTypesOptions = [];
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
 				ctrl.attachment = ctrl.resolve.attachment;
+				ctrl.description = ctrl.attachment.name;
+				ctrl.demographicNo = ctrl.resolve.demographicNo;
+				await ctrl.loadDocumentTypes();
+			}
+
+			ctrl.loadDocumentTypes = async () =>
+			{
+				ctrl.documentTypes = await documentService.getDemographicDocumentTypes();
+				ctrl.documentTypesOptions = ctrl.documentTypes.map((type) => {
+					return {label: type.type, value: type};
+				});
 			}
 
 			ctrl.canAttach = () =>
 			{
-				return ctrl.description && ctrl.type;
+				return ctrl.description && ctrl.documentType;
 			}
 
-			ctrl.cancel = () =>
+			ctrl.attachToChart = async () =>
+			{
+				try
+				{
+					ctrl.isAttachingToChart = true;
+					const junoDoc = JunoDocumentFactory.build(ctrl.attachment.name, ctrl.description, ctrl.documentType, ctrl.attachment.type, await ctrl.attachment.getBase64Data());
+					await demographicDocumentService.uploadDocumentToDemographicChart(junoDoc, ctrl.demographicNo);
+					this.close();
+				}
+				finally
+				{
+					ctrl.isAttachingToChart = false;
+					$scope.$apply();
+				}
+			}
+
+			ctrl.close = () =>
 			{
 				ctrl.modalInstance.close();
 			}
