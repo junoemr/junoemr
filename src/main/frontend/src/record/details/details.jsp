@@ -165,12 +165,6 @@
 												validations="detailsCtrl.validations"
 												component-style="pageStyle">
 				</additional-information-section>
-				<juno-divider component-style="pageStyle"></juno-divider>
-				<contacts-section ng-model="detailsCtrl.page.demoContacts"
-												validations="detailsCtrl.validations"
-												component-style="pageStyle">
-				</contacts-section>
-				<juno-divider component-style="pageStyle"></juno-divider>
 			</div>
 		</div>
 		<br/>
@@ -198,6 +192,12 @@
 				</div>
 				<hr>
 
+				<div class="col-md-12">
+					<demographic-contacts-section
+							ng-model="detailsCtrl.page.demoContacts"
+							component-style="pageStyle">
+					</demographic-contacts-section>
+				</div>
 			</div>
 		</div>
 	</div>
