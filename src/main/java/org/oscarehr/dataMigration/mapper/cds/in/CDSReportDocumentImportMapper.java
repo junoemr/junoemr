@@ -23,11 +23,14 @@
 package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.Reports;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEFAULT_DOCUMENT_DESCRIPTION;
 
@@ -59,7 +62,64 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		document.setStatus(Document.STATUS.ACTIVE);
 		document.setDescription(getDocumentDescription(importStructure));
 
+		document.setSourceFacility(importStructure.getSourceFacility());
+
+		document.setResidualInfo(generateResidualInfo(importStructure));
+
 		return document;
+	}
+
+	protected List<ResidualInfo> generateResidualInfo(Reports importStructure)
+	{
+		List<ResidualInfo> residualInfoList = new ArrayList<>();
+		if (importStructure.getRecipientName() != null)
+		{
+			ResidualInfo recipientName = new ResidualInfo();
+			recipientName.setContentKey("RecipientName");
+			recipientName.setContentType("String");
+			recipientName.setContentValue("\n FirstName: " + importStructure.getRecipientName().getFirstName()
+										+ "\n LastName: " + importStructure.getRecipientName().getLastName());
+			residualInfoList.add(recipientName);
+		}
+		if (importStructure.getSentDateTime() != null)
+		{
+			ResidualInfo sentDateTime = new ResidualInfo();
+			sentDateTime.setContentKey("SentDateTime");
+			sentDateTime.setContentType("String");
+			if (importStructure.getSentDateTime().getFullDateTime() != null)
+			{
+				sentDateTime.setContentValue(importStructure.getSentDateTime().getFullDateTime().toString());
+			}
+			else if (importStructure.getSentDateTime().getFullDate() != null)
+			{
+				sentDateTime.setContentValue(importStructure.getSentDateTime().getFullDate().toString());
+			}
+			else if (importStructure.getSentDateTime().getYearMonth() != null)
+			{
+				sentDateTime.setContentValue(importStructure.getSentDateTime().getYearMonth().toString());
+			}
+			else
+			{
+				sentDateTime.setContentValue(importStructure.getSentDateTime().getYearOnly().toString());
+			}
+
+			residualInfoList.add(sentDateTime);
+		}
+		if (importStructure.getSentDateTime() != null)
+		{
+			ResidualInfo filePath = new ResidualInfo();
+			filePath.setContentKey("FilePath");
+			filePath.setContentType("String");
+			filePath.setContentValue(importStructure.getFilePath());
+			residualInfoList.add(filePath);
+		}
+
+		if (residualInfoList.isEmpty())
+		{
+			return null;
+		}
+		return residualInfoList;
+
 	}
 
 	protected String getDocumentDescription(Reports importStructure)

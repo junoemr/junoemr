@@ -43,6 +43,7 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,7 @@ import java.io.InputStream;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static oscar.util.StringUtils.filled;
 
@@ -97,6 +99,9 @@ public class DocumentService
 	@Autowired
 	private InboxManager inboxManagerService;
 
+	@Autowired
+	private ProviderService providerService;
+
 	/**
 	 * Create a new document from the given document model and a file
 	 * This method will move the file to the documents directory and persist the record
@@ -124,15 +129,15 @@ public class DocumentService
 	{
 		Document dbDocument = uploadNewDemographicDocument(documentModelToDbConverter.convert(documentModel), documentModel.getFile(), demographic.getId());
 
-		String annotation = documentModel.getAnnotation();
-		if (annotation != null)
+		Optional<CaseManagementNote> documentNoteOptional = encounterNoteService.buildBaseAnnotationNote(
+				documentModel.getAnnotation(), documentModel.getResidualInfo());
+		if(documentNoteOptional.isPresent())
 		{
 			ProviderData createdBy = dbDocument.getCreatedBy();
-			CaseManagementNote documentNote = new CaseManagementNote();
+			CaseManagementNote documentNote = documentNoteOptional.get();
 			documentNote.setProvider(createdBy);
 			documentNote.setSigningProvider(createdBy);
 			documentNote.setDemographic(demographic);
-			documentNote.setNote(annotation);
 			documentNote.setObservationDate(dbDocument.getObservationdate());
 			documentNote.setProgramNo(documentModel.getProgramId() != null ? String.valueOf(documentModel.getProgramId()) : null);
 			encounterNoteService.saveDocumentNote(documentNote, dbDocument);
