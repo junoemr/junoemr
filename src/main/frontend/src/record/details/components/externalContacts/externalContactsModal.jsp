@@ -16,6 +16,8 @@
 	</modal-ctl-buttons>
 
 	<modal-body>
+		<div class="fields">
+		     <div class="column">
 		<div class="height-100 overflow-auto ">
 
 			<juno-input
@@ -38,6 +40,8 @@
 					placeholder="First Name"
 					component-style="$ctrl.componentStyle">
 			</juno-input>
+		</div>
+			<div class="divider"></div>
 
 			<juno-input
 					ng-model="$ctrl.contact.lastName"
@@ -55,5 +59,12 @@
 
 
 		</div>
+		</div>
+
+	<div class="modal-footer">
+		<button class="btn" type="button" ng-click="" >Cancel</button>
+		<button class="btn btn-success" type="button" ng-click="" >Edit</button>
+
+	</div>
 	</modal-body>
 </juno-modal>
