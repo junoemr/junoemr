@@ -128,7 +128,7 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - COLLAB
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'PEFR BEFORE' AS type, 'PEF before' AS typeDisplayName, 'Peak Expiratory Flow' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'PEFR BEFORE' AS type, 'PEFR before' AS typeDisplayName, 'Peak Expiratory Flow' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'PEFR BEFORE');
 
