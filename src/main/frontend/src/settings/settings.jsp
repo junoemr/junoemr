@@ -66,6 +66,11 @@
 	<div class="primary-content-window">
 
 		<juno-security-check show-placeholder="true" permissions="settingsCtrl.SecurityPermissions.PREFERENCE_READ">
+
+			<div class="ui-view-wrapper flex-grow">
+				<ui-view></ui-view>
+			</div>
+
 			<form>
 
 				<div class="row" ng-show="settingsCtrl.currentTab.path == 'persona'">

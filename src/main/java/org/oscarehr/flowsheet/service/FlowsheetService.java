@@ -106,7 +106,7 @@ public class FlowsheetService
 		entity.setDescription(creationTransfer.getDescription());
 		entity.setEnabled(creationTransfer.isEnabled());
 
-		List<FlowsheetItemGroup> flowsheetGroups = creationTransfer.getFlowsheetItemGroups()
+		List<FlowsheetItemGroup> flowsheetGroups = Optional.ofNullable(creationTransfer.getFlowsheetItemGroups()).orElse(new ArrayList<>())
 				.stream()
 				.map((group) -> createNewGroup(group, entity))
 				.collect(Collectors.toList());

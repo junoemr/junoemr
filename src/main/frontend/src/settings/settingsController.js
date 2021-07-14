@@ -219,7 +219,13 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			id: 12,
 			displayName: 'Integration',
 			path: 'integration'
-		}, ];
+		},
+		{
+			id: 13,
+			displayName: 'Health Tracker',
+			path: 'tracker'
+		},
+		];
 		controller.pageSizes = [
 		{
 			value: 'PageSize.A4',
@@ -510,7 +516,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		controller.isActive = function(tab)
 		{
-			return (tab != null && controller.currentTab != null && tab.id == controller.currentTab.id);
+			return (tab != null && controller.currentTab != null && tab.id === controller.currentTab.id);
 		};
 
 		controller.changeTab = function(tab)

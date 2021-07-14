@@ -261,7 +261,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onCancel = (): void =>
 				{
-					$state.transitionTo('admin.configureFlowsheets',
+					$state.transitionTo('admin.configureHealthTracker',
 						{},
 						{
 							notify: false

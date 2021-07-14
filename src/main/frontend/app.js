@@ -268,14 +268,14 @@ oscarApp.config([
 			url: '/billing',
 			component: 'systemPropertiesBilling',
 		})
-		.state('admin.configureFlowsheets',
+		.state('admin.configureHealthTracker',
 		{
-			url: '/configureFlowsheets',
+			url: '/configureHealthTracker',
 			component: 'flowsheetManager',
 		})
 		.state('admin.editFlowsheet',
 		{
-			url: '/configureFlowsheets/flowsheet/:flowsheetId',
+			url: '/configureHealthTracker/flowsheet/:flowsheetId',
 			component: 'flowsheetEdit',
 		})
 		.state('ticklers',
@@ -522,6 +522,11 @@ oscarApp.config([
 				data: {
 					tab: 'integration'
 				}
+			})
+		.state('settings.tracker',
+			{
+				url: '/healthTracker',
+				component: 'flowsheetManager',
 			})
 		.state('support',
 		{
@@ -810,9 +815,9 @@ oscarApp.config([
 					},
 				},
 		})
-		.state('record.configureFlowsheets',
+		.state('record.configureHealthTracker',
 		{
-			url: '/configureFlowsheets',
+			url: '/configureHealthTracker',
 			component: 'flowsheetManager',
 		})
         .state('record.patientEducation',

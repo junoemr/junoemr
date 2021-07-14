@@ -169,7 +169,7 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.onManageFlowsheets = (): void =>
 				{
-					$state.go("record.configureFlowsheets",
+					$state.go("record.configureHealthTracker",
 						{
 							demographicId: ctrl.demographicNo,
 						});
