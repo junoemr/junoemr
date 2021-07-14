@@ -171,7 +171,7 @@ angular.module('Record.Tracker').component('healthTracker',
 				{
 					$state.go("record.configureHealthTracker",
 						{
-							demographicId: ctrl.demographicNo,
+							demographicNo: ctrl.demographicNo,
 						});
 				}
 			}]

@@ -567,7 +567,13 @@ oscarApp.config([
 					pref: null,
 				},
 				data: {
-					tab: 'integration'
+					tab: 'tracker'
+				},
+				resolve: {
+					user: ['providerService', function(providerService)
+					{
+						return providerService.getMe();
+					}]
 				},
 			})
 		.state('support',
@@ -861,6 +867,12 @@ oscarApp.config([
 		{
 			url: '/configureHealthTracker',
 			component: 'flowsheetManager',
+			resolve: {
+				user: ['providerService', function(providerService)
+				{
+					return providerService.getMe();
+				}]
+			},
 		})
         .state('record.patientEducation',
         {

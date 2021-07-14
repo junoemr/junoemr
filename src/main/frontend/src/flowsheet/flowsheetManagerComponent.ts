@@ -23,20 +23,24 @@
 
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../common/components/junoComponentConstants";
+import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
 
 angular.module('Flowsheet').component('flowsheetManager',
 	{
 		templateUrl: 'src/flowsheet/flowsheetManager.jsp',
 		bindings: {
 			componentStyle: "<?",
+			user: "<?",
 		},
 		controller: [
 			'$state',
+			'$stateParams',
 			'$uibModal',
 			'flowsheetApiService',
 			'securityRolesService',
 			function (
 				$state,
+				$stateParams,
 				$uibModal,
 				flowsheetApiService,
 				securityRolesService,
@@ -52,10 +56,60 @@ angular.module('Flowsheet').component('flowsheetManager',
 				ctrl.validationAlerts = [] as Array<string>;
 				ctrl.isLoading = true as boolean;
 
+				ctrl.tablesConfig = [];
+
 				ctrl.$onInit = async (): Promise<void> =>
 				{
-					ctrl.flowsheets = await flowsheetApiService.searchFlowsheets(null, true, false, null, false, null, 1, 100);
+					ctrl.userId = ctrl.user?.providerNo || null;
+					ctrl.demographicId = $stateParams.demographicNo || null;
+
+					ctrl.flowsheets = await flowsheetApiService.searchFlowsheets(
+						null,
+						true,
+						ctrl.manageProviderLevel(),
+						ctrl.userId,
+						ctrl.manageDemographicLevel(),
+						ctrl.demographicId,
+						1, 100);
+					ctrl.separateFlowsheetLevels(ctrl.flowsheets);
 					ctrl.isLoading = false;
+				}
+
+				ctrl.separateFlowsheetLevels = (flowsheets: FlowsheetModel[]): void =>
+				{
+					ctrl.tablesConfig = [
+						{
+							name: "Clinic Flowsheets",
+							visible: true,
+							items: [],
+						},
+						{
+							name: "My Flowsheets",
+							visible: ctrl.manageProviderLevel(),
+							items: [],
+						},
+						{
+							name: "Patient Flowsheets",
+							visible: ctrl.manageDemographicLevel(),
+							items: [],
+						}
+					];
+					// sort all flowsheets by level (clinic, provider, demographic)
+					flowsheets.forEach((flowsheet: FlowsheetModel) =>
+					{
+						if (flowsheet.ownerDemographicId)
+						{
+							ctrl.tablesConfig[2].items.push(flowsheet);
+						}
+						else if (flowsheet.ownerProviderId)
+						{
+							ctrl.tablesConfig[1].items.push(flowsheet);
+						}
+						else
+						{
+							ctrl.tablesConfig[0].items.push(flowsheet);
+						}
+					});
 				}
 
 				ctrl.userCanEdit = (): boolean =>
@@ -69,6 +123,15 @@ angular.module('Flowsheet').component('flowsheetManager',
 				ctrl.userCanDelete = (): boolean =>
 				{
 					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_DELETE);
+				}
+
+				ctrl.manageProviderLevel = (): boolean =>
+				{
+					return Boolean(ctrl.userId);
+				}
+				ctrl.manageDemographicLevel = (): boolean =>
+				{
+					return Boolean(ctrl.demographicId);
 				}
 
 				ctrl.onFlowsheetNew = (): void =>
