@@ -1,7 +1,4 @@
-'use strict';
-
 /*
-
 	Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
 	This software is published under the GPL GNU General Public License.
 	This program is free software; you can redistribute it and/or
@@ -25,5 +22,5 @@
 
  */
 
-angular.module('Common.Components', [ 'Common.Services', 'Common.Components.JunoTab', 'Common.Components.MhaPatientDetailsModal']);
+angular.module('Common.Components.MhaPatientDetailsModal', [ 'Common.Components' ]);
 

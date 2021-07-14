@@ -91,7 +91,7 @@ angular.module('Record.Details').component('demographicSection', {
 								{
 									component: 'mhaPatientDetailsModal',
 									backdrop: 'static',
-									windowClass: "juno-modal",
+									windowClass: "juno-simple-modal-window",
 									resolve: {
 										style: () => ctrl.componentStyle,
 										demographic: () => ctrl.ngModel,
