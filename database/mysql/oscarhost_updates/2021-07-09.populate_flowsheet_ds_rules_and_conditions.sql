@@ -202,4 +202,48 @@ AND id NOT IN (
     AND created_by = "-1"
 );
 
+INSERT INTO ds_rule_consequence(ds_rule_id, consequence_type, consequence_severity, consequence_message, created_at, created_by, updated_at, updated_by)
+SELECT
+	id,
+	"ALERT",
+	"WARNING",
+	"Measurement value recorded to be over 0",
+	NOW(),
+	"-1",
+	NOW(),
+	"-1"
+FROM ds_rule
+WHERE rule_name = "Number Greater Than 0"
+AND system_managed IS TRUE
+AND id NOT IN (
+	SELECT ds_rule_id
+	FROM ds_rule_consequence
+	WHERE consequence_type = "ALERT"
+	AND consequence_severity = "WARNING"
+	AND consequence_message = "Measurement value recorded to be over 0"
+	AND created_by = "-1"
+);
+
+INSERT INTO ds_rule_consequence(ds_rule_id, consequence_type, consequence_severity, consequence_message, created_at, created_by, updated_at, updated_by)
+SELECT
+	id,
+	"ALERT",
+	"WARNING",
+	"Measurement value recorded to be over 4",
+	NOW(),
+	"-1",
+	NOW(),
+	"-1"
+FROM ds_rule
+WHERE rule_name = "Number Greater Than 4"
+AND system_managed IS TRUE
+AND id NOT IN (
+	SELECT ds_rule_id
+	FROM ds_rule_consequence
+	WHERE consequence_type = "ALERT"
+	AND consequence_severity = "WARNING"
+	AND consequence_message = "Measurement value recorded to be over 4"
+	AND created_by = "-1"
+);
+
 COMMIT;
