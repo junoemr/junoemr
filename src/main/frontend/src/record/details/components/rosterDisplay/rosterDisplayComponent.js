@@ -107,7 +107,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                 {
                     await $uibModal.open(
                         {
-                            component: 'externalContactsModal',
+                            component: 'rosterHistoryModal',
                             backdrop: 'static',
                             windowClass: "juno-modal lg",
                             resolve: {

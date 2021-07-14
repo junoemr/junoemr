@@ -41,9 +41,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
         ctrl.thisDemo = null;
 
         ctrl.demoContacts = [];
-       // ctrl.demoContactsInternal = [];
         ctrl.demoContactPros = [];
-        //ctrl.demoContactsExternal = [];
 
 
         ctrl.$onInit = () =>
@@ -75,7 +73,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                     }
                 });
         };
-        
+
         ctrl.manageContacts = function manageContacts()
         {
                 var url = "../demographic/Contact.do?method=manage&demographic_no=" + ctrl.thisDemo;
