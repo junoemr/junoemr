@@ -7,7 +7,7 @@
 		     class="flex-row align-items-center m-r-8">
 			<!-- Attachment name -->
 			<div class="attachment flex-row align-items-center p-4" title="Download">
-				<span class="flex-row align-items-center" ng-click="$ctrl.downloadAttachment(attachment)">
+				<span class="flex-row align-items-center" ng-click="$ctrl.openAttachmentPreview(attachment)">
 					<i class="download-icon icon icon-cloud-download m-r-8"></i>
 					<span> {{attachment.name}} </span>
 				</span>

@@ -123,6 +123,21 @@ angular.module("Messaging.Components").component('attachmentList', {
 				}
 			}
 
+			ctrl.openAttachmentPreview = async (attachment) =>
+			{
+				await $uibModal.open(
+					{
+						component: 'attachmentPreview',
+						backdrop: 'static',
+						windowClass: "juno-simple-modal-window",
+						resolve: {
+							style: () => JUNO_STYLE.DEFAULT,
+							file: () => attachment,
+						}
+					}
+				).result;
+			}
+
 			ctrl.showAttachmentErrorAlert = () =>
 			{
 				Juno.Common.Util.errorAlert(
@@ -134,11 +149,6 @@ angular.module("Messaging.Components").component('attachmentList', {
 			ctrl.removeAttachment = (attachment) =>
 			{
 				ctrl.attachments.splice(ctrl.attachments.indexOf(attachment), 1);
-			}
-
-			ctrl.downloadAttachment = async (attachment) =>
-			{
-				await FileUtil.saveFile(attachment.name, attachment.type, await attachment.getBase64Data());
 			}
 
 			/**

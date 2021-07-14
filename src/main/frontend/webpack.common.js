@@ -295,12 +295,7 @@ module.exports = {
 			'./src/messaging/inbox/components/messageView/components/message/messageComponent.js',
 			'./src/messaging/inbox/components/messageView/messageViewComponent.js',
 			'./src/messaging/inbox/messagingInboxComponent.js',
-			'./src/messaging/inbox/modals/module.js',
-			'./src/messaging/inbox/modals/attachmentSelect/components/module.js',
-			'./src/messaging/inbox/modals/attachmentSelect/attachmentSelectComponent.js',
-			'./src/messaging/inbox/modals/attachmentSelect/components/fileSelectList/fileSelectListComponent.js',
-			'./src/messaging/inbox/modals/attachmentSelect/components/fileSourceSelect/fileSourceSelectComponent.js',
-			'./src/messaging/inbox/modals/messageCompose/messageComposeComponent.js',
+			...(glob.sync("./src/messaging/inbox/modals/**/*.js", {nosort: true})),
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
