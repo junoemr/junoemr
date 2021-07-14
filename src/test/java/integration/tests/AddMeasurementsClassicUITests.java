@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 
@@ -42,11 +43,14 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 public class AddMeasurementsClassicUITests extends SeleniumTestBase
 {
+	@Autowired
+	private static DatabaseUtil databaseUtil;
+
 	@BeforeClass
 	public static void setup()
 	{
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
+		databaseUtil.createTestDemographic();
 	}
 
 	@AfterClass
