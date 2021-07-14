@@ -32,10 +32,14 @@
 	</div>
 
 	<!-- Subject row -->
-	<div class="message-subject body-small m-l-48 m-r-16 m-b-4"
-	     ng-class="{'bold': !$ctrl.message.isRead}"
-	     title="{{$ctrl.message.subject}}">
-		{{$ctrl.message.subject}}
+	<div class="message-subject body-small flex-row m-r-16 m-b-4">
+		<!-- Attachment icon --->
+		<i ng-if="$ctrl.message.hasAttachments" class="attachment-icon icon icon-file-2" title="Has attachments"></i>
+
+		<!-- Subject -->
+		<div ng-class="{'bold': !$ctrl.message.isRead, 'm-l-48': !$ctrl.message.hasAttachments}" title="{{$ctrl.message.subject}}">
+			{{$ctrl.message.subject}}
+		</div>
 	</div>
 
 	<!-- Message preview row -->
