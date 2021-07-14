@@ -147,14 +147,14 @@ public class AddAllergiesClassicUITests extends SeleniumTestBase
 		addAllergyDetails(reaction_modified, startDate_modified, ageOfOnset_modified, lifeStage_modified, severity_modified, onset_modified);
 
 		//** Verify the updated content from Allergies page **
-		String allergyInforXpath = "//table[@class='allergy_table']/descendant::td[contains(., '" + allergyNameQuickButton.toUpperCase() + "')]/parent::tr";
-		String allergyInfor = driver.findElement(By.xpath(allergyInforXpath)).getText();
-		Boolean reactionStatus = allergyInfor.contains(reaction_modified);
-		Boolean startDateStatus = allergyInfor.contains(startDate_modified);
-		Boolean ageOfOnsetStatus = allergyInfor.contains(ageOfOnset_modified);
-		Boolean lifeStageStatus = allergyInfor.contains("Child");
-		Boolean severityStatus = allergyInfor.contains(severity_modified);
-		Boolean onsetStatus = allergyInfor.contains(onset_modified);
+		String allergyInfoXpath = "//table[@class='allergy_table']/descendant::td[contains(., '" + allergyNameQuickButton.toUpperCase() + "')]/parent::tr";
+		String allergyInfo = driver.findElement(By.xpath(allergyInfoXpath)).getText();
+		Boolean reactionStatus = allergyInfo.contains(reaction_modified);
+		Boolean startDateStatus = allergyInfo.contains(startDate_modified);
+		Boolean ageOfOnsetStatus = allergyInfo.contains(ageOfOnset_modified);
+		Boolean lifeStageStatus = allergyInfo.contains("Child");
+		Boolean severityStatus = allergyInfo.contains(severity_modified);
+		Boolean onsetStatus = allergyInfo.contains(onset_modified);
 		Assert.assertTrue("Allergies Page: Allergy information for " + allergyNameQuickButton + " is NOT modified successfully",
 				reactionStatus && startDateStatus && ageOfOnsetStatus && lifeStageStatus && severityStatus && onsetStatus );
 
