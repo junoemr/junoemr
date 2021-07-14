@@ -347,8 +347,6 @@ public class PatientImportService
 			// check if the lab has passed validation and can be saved
 			if(parser.canUpload())
 			{
-				//List<ProviderData> reviewers = reviewerModelToDbConverter.convert(lab.getReviewers());
-
 				List<Reviewer> reviewers = lab.getReviewers();
 
 				// remove provider duplicates

@@ -90,8 +90,6 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 			medication.setTakeMin(Float.parseFloat(importStructure.getDosage()));
 		}
 
-
-
 		medication.setWrittenDate(getWrittenDate(importStructure));
 		medication.setRxStartDate(getStartDate(importStructure));
 
@@ -118,14 +116,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		medication.setNonAuthoritative(toBooleanOrNull(importStructure.getNonAuthoritativeIndicator()));
 		medication.setDispenseInterval(toIntOrNull(importStructure.getDispenseInterval()));
 		medication.setRxEndDate(getEndDate(importStructure));
-		// medication.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
 		medication.setResidualInfo(generateResidualInfo(importStructure));
-
-		// TODO WHAT TO DO WITH THESE?
-		// TODO importStructure.getPriorPrescriptionReferenceIdentifier();
-		// TODO importStructure.getDrugDescription();
-		// TODO importStructure.getProblemCode();
-		// TODO importStructure.getProtocolIdentifier();
 
 		return medication;
 	}
