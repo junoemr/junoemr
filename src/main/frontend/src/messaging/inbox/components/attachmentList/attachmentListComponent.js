@@ -94,16 +94,37 @@ angular.module("Messaging.Components").component('attachmentList', {
 					}
 					else if (targets.length === 1)
 					{
+						const demographicNo = await targets[0].localId();
 
-						const ok = await Juno.Common.Util.confirmationDialog($uibModal,
-							`Attach to chart?`,
-							`Are you sure you want to attach ${attachment.name} to ${targets[0].name}'s chart?`);
-
-						if (ok)
+						try
 						{
-							const junoDoc = JunoDocumentFactory.build(attachment.name, attachment.name, attachment.type, await attachment.getBase64Data());
-							await documentService.uploadDocumentToDemographicChart(junoDoc, await targets[0].localId());
+							await $uibModal.open(
+								{
+									component: 'attachToChart',
+									backdrop: 'static',
+									windowClass: "juno-simple-modal-window",
+									resolve: {
+										style: () => JUNO_STYLE.GREY,
+										attachment: () => attachment,
+										demographicNo: () => demographicNo,
+									}
+								}
+							).result;
 						}
+						catch (error)
+						{
+							// ESC key
+						}
+
+						// const ok = await Juno.Common.Util.confirmationDialog($uibModal,
+						// 	`Attach to chart?`,
+						// 	`Are you sure you want to attach ${attachment.name} to ${targets[0].name}'s chart?`);
+						//
+						// if (ok)
+						// {
+						// 	const junoDoc = JunoDocumentFactory.build(attachment.name, attachment.name, attachment.type, await attachment.getBase64Data());
+						// 	await documentService.uploadDocumentToDemographicChart(junoDoc, await targets[0].localId());
+						// }
 					}
 					else
 					{
@@ -131,7 +152,7 @@ angular.module("Messaging.Components").component('attachmentList', {
 						backdrop: 'static',
 						windowClass: "juno-simple-modal-window",
 						resolve: {
-							style: () => JUNO_STYLE.DEFAULT,
+							style: () => JUNO_STYLE.GREY,
 							file: () => attachment,
 						}
 					}
