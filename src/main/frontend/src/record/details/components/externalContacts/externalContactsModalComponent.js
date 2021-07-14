@@ -6,7 +6,7 @@ import {
 import {DemographicApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('externalContactsModal', {
-    templateUrl: 'src/record/details/components/externalContacts/externalContactsModel.jsp',
+    templateUrl: 'src/record/details/components/externalContacts/externalContactsModal.jsp',
     bindings: {
         modalInstance: "<",
         resolve: "<",
@@ -16,7 +16,7 @@ angular.module('Record.Details').component('externalContactsModal', {
         "$http",
         "$httpParamSerializer",
         "NgTableParams",
-        function(
+        function (
             $scope,
             $http,
             $httpParamSerializer,
@@ -28,38 +28,21 @@ angular.module('Record.Details').component('externalContactsModal', {
             ctrl.LABEL_POSITION = LABEL_POSITION;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+            ctrl.contact = null;
+            ctrl.contactType = null;
+            ctrl.demo = null;
 
-            const demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
-
-            ctrl.rosteredHistory = [];
-            ctrl.tableParams = new NgTableParams(
-                {
-                    page: 1,
-                    count: -1,
-                }
-            );
-
-            ctrl.$onInit = async () =>
+            ctrl.$onInit = () =>
             {
-                ctrl.demographic = ctrl.resolve.demographic;
+                ctrl.contact = ctrl.resolve.demoContact;
 
-                demographicApi.getRosteredHistory(ctrl.demographic.demographicNo).then(
-                    (data) => {
-                        ctrl.rosteredHistory = data.data.body.map((entry) => {
-                            return {
-                                statusDescription: entry.rosterStatus.statusDescription,
-                                rosteredPhysician: entry.rosteredPhysician,
-                                rosterDate: entry.rosterDate == null? "" :
-                                    Juno.Common.Util.formatMomentDate(
-                                        Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterDate)),
-                                rosterTerminationDate: entry.rosterTerminationDate == null ? "" :
-                                    Juno.Common.Util.formatMomentDate(
-                                        Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.rosterTerminationDate)),
-                                rosterTerminationDescription: entry.rosterTerminationDescription,
-                                addedAt: Juno.Common.Util.getDatetimeNoTimezoneMoment(entry.addedAt),
-                            }
-                        });
-                    });
+                if (ctrl.contact.type === 1)
+                {
+                    ctrl.contactType = "Internal Contact";
+                } else
+                {
+                    ctrl.contactType = "External Contact";
+                }
             }
 
             ctrl.onCancel = () =>

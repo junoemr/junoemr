@@ -1,74 +1,59 @@
-<div class="demographic-details-section ">
-	<h4 class="title">
-		Rostering/Enrollment
-	</h4>
+<juno-modal class="demographic-details-section external-contacts-modal"
+            component-style="$ctrl.resolve.style"
+            >
+	<modal-title>
+		<h3>{{$ctrl.demographic}} Contact</h3>
+	</modal-title>
 
-	<div class="fields">
-		<div class="column">
-			<!-- Family Doctor -->
-			<juno-typeahead model="$ctrl.ngModel.scrFamilyDoc"
-			                options="$ctrl.familyDoctors"
-			                filter-options="false"
-			                name="FamilyDoctor"
-			                title="Family/Enrolled Doctor"
-			                placeholder="Family Doctor"
-			                label-position="LABEL_POSITION.LEFT"
-			                on-change="$ctrl.updateFamilyDoctors(value)"
-			                on-selected="$ctrl.updateFamilyDocNo(value)"
-			                component-style="$ctrl.componentStyle">
-			</juno-typeahead>
-			<!-- Roster Status -->
-			<juno-select ng-model="$ctrl.ngModel.rosterStatus"
-			             options="$ctrl.rosterStatusList"
-			             label="Roster Status"
-			             component-style="$ctrl.componentStyle">
-			</juno-select>
-			<!-- Termination Reason -->
-			<juno-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
-			             ng-model="$ctrl.ngModel.rosterTerminationReason"
-			             options="$ctrl.rosterTermReasons"
-			             invalid="!$ctrl.validations.rosterTerminationReason()"
-			             label="Termination Reason"
-			             component-style="$ctrl.componentStyle">
-			</juno-select>
-		</div>
+	<modal-ctl-buttons>
+		<button type="button"
+		        class="btn btn-icon"
+		        aria-label="Close"
+		        ng-click="$ctrl.onCancel()"
+		        title="Close">
+			<i class="icon icon-modal-ctl icon-close"></i>
+		</button>
+	</modal-ctl-buttons>
 
-		<div class="divider">
-		</div>
+	<modal-body>
+		<div class="height-100 overflow-auto ">
 
-		<div class="column">
-			<!-- Family Doctor Number -->
 			<juno-input
-					ng-model="$ctrl.ngModel.scrFamilyDocNo"
-					label="Family Doctor #"
-					placeholder="Family Doctor #"
-					valid-regex="$ctrl.numberRegex"
+					ng-model="$ctrl.contactType"
+					label="Internal/External"
+					placeholder="Contact Type"
 					component-style="$ctrl.componentStyle">
 			</juno-input>
-			<!-- Date Rostered -->
-			<juno-date-select ng-model="$ctrl.ngModel.rosterDate"
-			                  label="Roster Date"
-			                  on-validity-change="$ctrl.rosterDateValid = valid"
-			                  component-style="$ctrl.componentStyle">
-			</juno-date-select>
-			<!-- Termination Date -->
-			<juno-date-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
-			                  ng-model="$ctrl.ngModel.rosterTerminationDate"
-			                  label="Termination Date"
-			                  on-validity-change="$ctrl.terminationDateValid = valid"
-			                  component-style="$ctrl.componentStyle">
-			</juno-date-select>
-		</div>
 
-	</div>
-	<div class="fields">
-		<div class="">
-			<juno-button class="rostered-history-button"
-			             ng-click="$ctrl.openRosteredHistoryModal()"
-			             button-color="JUNO_BUTTON_COLOR.PRIMARY"
-			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
-				View Enrollment History
-			</juno-button>
+			<juno-input
+					ng-model="$ctrl.contact.role"
+					label="Role"
+		            placeholder="Role"
+		            component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.firstName"
+					label="First Name"
+					placeholder="First Name"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.lastName"
+					label="Last Name"
+					placeholder="Last Name"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.phone"
+					label="Phone"
+					placeholder="Phone number"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+
 		</div>
-	</div>
-</div>
+	</modal-body>
+</juno-modal>

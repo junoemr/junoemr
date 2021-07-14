@@ -1,7 +1,10 @@
-.roster-history {
-  @include juno-table-default;
-}
+.external-contacts-modal{
+  .juno-input {
 
-.roster-history-table {
-  padding: 16px;
+      margin-top: 10px;
+      margin-left: 10px;
+	  width: 376px;
+  }
+
+
 }
