@@ -21,12 +21,13 @@
 * Canada
 */
 
-angular.module('Settings').component('billingSettings',
+angular.module('Settings').component('generalSettings',
 	{
-		templateUrl: 'src/settings/billing/billingSettings.jsp',
+		templateUrl: 'src/settings/general/generalSettings.jsp',
 		bindings: {
 			pref: "=",
 			billingServiceTypes: "=",
+			providerList: "=",
 		},
 		controller: [
 			'$stateParams',
@@ -40,6 +41,7 @@ angular.module('Settings').component('billingSettings',
 				ctrl.$onInit = (): void =>
 				{
 					ctrl.pref = ctrl.pref || $stateParams.pref;
+					ctrl.providerList = ctrl.providerList || [];
 
 					//add none -option to start.
 					angular.copy(ctrl.billingServiceTypes, ctrl.billingServiceTypesMod);
@@ -49,5 +51,10 @@ angular.module('Settings').component('billingSettings',
 							"name": "--None--"
 						});
 				}
+
+				ctrl.openChangePasswordModal = (): void =>
+				{
+					window.open('../provider/providerchangepassword.jsp', 'change_password', 'width=750,height=500');
+				};
 			}]
 	});

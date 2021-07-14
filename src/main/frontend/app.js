@@ -369,13 +369,6 @@ oscarApp.config([
 				{
 					return providerService.getMe();
 				}],
-				providerList: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						'active': true
-					});
-				}],
 				loadedSettings: ['providerService', function(providerService)
 				{
 					return providerService.getSettings();
@@ -405,20 +398,31 @@ oscarApp.config([
 		.state('settings.persona',
 			{
 				url: '/persona',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
-				data: {
-					tab: 'persona'
-				}
+				component: "personaSettings",
+				params: {
+					pref: null,
+				},
 			})
 		.state('settings.general',
 			{
 				url: '/general',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
-				data: {
-					tab: 'general'
-				}
+				component: "generalSettings",
+				params: {
+					pref: null,
+				},
+				resolve: {
+					billingServiceTypes: ['billingService', function(billingService)
+					{
+						return billingService.getUniqueServiceTypes();
+					}],
+					providerList: ['providerService', function(providerService)
+					{
+						return providerService.searchProviders(
+							{
+								'active': true
+							});
+					}],
+				},
 			})
 		.state('settings.schedule',
 			{

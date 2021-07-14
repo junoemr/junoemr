@@ -10,7 +10,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 	'$state',
 	'$uibModal',
 	'$filter',
-	'providerList',
 	'user',
 	'loadedSettings',
 	'providerService',
@@ -29,7 +28,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		$state,
 		$uibModal,
 		$filter,
-		providerList,
 		user,
 		loadedSettings,
 		providerService,
@@ -51,7 +49,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		$scope.$emit('configureShowPatientList', false);
 
-		controller.providerList = providerList;
 		controller.user = user;
 		controller.pref = loadedSettings;
 		controller.encounterForms = encounterForms.content;
@@ -625,19 +622,6 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			}
 			controller.pref.appointmentScreenQuickLinks = newList;
 		};
-
-
-		controller.openChangePasswordModal = function()
-		{
-			/*
-        var modalInstance = $uibModal.open({
-        	templateUrl: 'src/settings/changePassword.jsp',
-            controller: 'ChangePasswordController'
-        });
-     */
-			window.open('../provider/providerchangepassword.jsp', 'change_password', 'width=750,height=500');
-		};
-
 
 		controller.openQuickLinkModal = function()
 		{

@@ -21,12 +21,11 @@
 * Canada
 */
 
-angular.module('Settings').component('billingSettings',
+angular.module('Settings').component('personaSettings',
 	{
-		templateUrl: 'src/settings/billing/billingSettings.jsp',
+		templateUrl: 'src/settings/persona/personaSettings.jsp',
 		bindings: {
 			pref: "=",
-			billingServiceTypes: "=",
 		},
 		controller: [
 			'$stateParams',
@@ -35,19 +34,10 @@ angular.module('Settings').component('billingSettings',
 			)
 			{
 				const ctrl = this;
-				ctrl.billingServiceTypesMod = [];
 
 				ctrl.$onInit = (): void =>
 				{
 					ctrl.pref = ctrl.pref || $stateParams.pref;
-
-					//add none -option to start.
-					angular.copy(ctrl.billingServiceTypes, ctrl.billingServiceTypesMod);
-					ctrl.billingServiceTypesMod.splice(0, 0,
-						{
-							"type": "no",
-							"name": "--None--"
-						});
 				}
 			}]
 	});
