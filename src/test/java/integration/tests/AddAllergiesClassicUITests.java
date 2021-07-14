@@ -60,16 +60,6 @@ public class AddAllergiesClassicUITests extends SeleniumTestBase
 				);
 	}
 
-	public void addAllergyDetails(String reaction, String startDate, String ageOfOnset, String lifeStage, String severity, String onset)
-	{
-		textEdit(driver, By.xpath("//textarea[@name='reactionDescription']"), reaction);
-		textEdit(driver, By.id("startDate"), startDate);
-		textEdit(driver, By.id("ageOfOnset"), ageOfOnset);
-		ActionUtil.dropdownSelectByVisibleText(driver, By.id("lifeStage"), lifeStage);
-		ActionUtil.dropdownSelectByVisibleText(driver, By.name("severityOfReaction"), severity);
-		ActionUtil.dropdownSelectByVisibleText(driver, By.name("onSetOfReaction"), onset);
-		driver.findElement(By.xpath("//input[@type='submit']")).click();
-	}
 	@Test
 	public void addAllergiesClassicUITest()
 			throws InterruptedException
@@ -177,6 +167,17 @@ public class AddAllergiesClassicUITests extends SeleniumTestBase
 		Thread.sleep(2000);
 		Assert.assertFalse("eChart Page: " + allergyNameCustom + " is NOT inactivated successfully.",
 				PageUtil.isExistsBy(By.linkText(allergyNameCustom.toUpperCase()), driver));
+	}
+
+	protected void addAllergyDetails(String reaction, String startDate, String ageOfOnset, String lifeStage, String severity, String onset)
+	{
+		textEdit(driver, By.xpath("//textarea[@name='reactionDescription']"), reaction);
+		textEdit(driver, By.id("startDate"), startDate);
+		textEdit(driver, By.id("ageOfOnset"), ageOfOnset);
+		ActionUtil.dropdownSelectByVisibleText(driver, By.id("lifeStage"), lifeStage);
+		ActionUtil.dropdownSelectByVisibleText(driver, By.name("severityOfReaction"), severity);
+		ActionUtil.dropdownSelectByVisibleText(driver, By.name("onSetOfReaction"), onset);
+		driver.findElement(By.xpath("//input[@type='submit']")).click();
 	}
 }
 
