@@ -103,6 +103,12 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		{
 			note += "\nUniqueVenderIdSequence: " + importStructure.getUniqueVendorIdSequence();
 		}
+
+		if(importStructure.getFamilyPhysician() != null)
+		{
+			note += "\nFamilyPhysician: " + importStructure.getFamilyPhysician().getFirstName() + " "
+					+ importStructure.getFamilyPhysician().getLastName();
+		}
 		return StringUtils.trimToEmpty(note);
 	}
 
@@ -173,16 +179,13 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		}
 
 		/* family doctor import logic
-		* Family doctor field in Oscar is the Family Doctor in CDS when rostered status is "not rostered"
-		* Family doctor field in Oscar is the Enrollment Doctor in CDS when rostered status is "rostered" */
+		* Family doctor field in Oscar is the Enrollment Doctor in CDS when rostered status is "rostered"
+		* FamilyPhysician is just going into the demographic notes to keep logic simple.
+		*/
 		RosterData currentRosterData = demographic.getCurrentRosterData();
 		if(currentRosterData != null && currentRosterData.isRostered())
 		{
 			demographic.setFamilyDoctor(currentRosterData.getRosterProvider());
-		}
-		else
-		{
-			demographic.setFamilyDoctor(toProvider(importStructure.getFamilyPhysician()));
 		}
 	}
 
