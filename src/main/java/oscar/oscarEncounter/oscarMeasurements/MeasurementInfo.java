@@ -207,7 +207,7 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public int getLastDateRecordedInMonths(String measurement)
     {
         int numMonths = -1;
-        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if ( list != null && list.size() > 0){
             EctMeasurementsDataBean mdata = list.get(0);
             Date date = mdata.getDateObservedAsDate();
@@ -220,7 +220,7 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public String getLastDateRecordedInMonthsMsg (String measurement){
         String message = "";
         int numMonths = -1;
-        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
 
         if ( list != null && list.size() > 0){
            
@@ -254,7 +254,7 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public int getLastValueAsInt(String measurement)
     {
         int value = -1; //TODO-legacy not sure how to handle a non int value.
-        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if(list != null && list.size() > 0)
         {
             EctMeasurementsDataBean mdata = list.get(0);
@@ -262,7 +262,7 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
             {
                 value = Integer.parseInt(mdata.getDataField());
             }
-            catch(Exception e)
+            catch(NumberFormatException e)
             {
                 MiscUtils.getLogger().error("Error", e);
             }
@@ -274,7 +274,7 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public String getLatestValue(String measurement)
     {
         String value = null;
-        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if(list != null && list.size() > 0)
         {
             EctMeasurementsDataBean mdata = list.get(0);
@@ -286,7 +286,7 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public int isDataEqualToYes(String measurement){
         int v = 0;
         String str="";
-        ArrayList<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if ( list != null && list.size() > 0){
             EctMeasurementsDataBean mdata = list.get(0);
             try{

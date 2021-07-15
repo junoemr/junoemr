@@ -81,6 +81,17 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 					],
 				};
 
+				ctrl.conditionTypesWithTextInput = [
+					ConditionType.MONTHS_SINCE_GT,
+					ConditionType.MONTHS_SINCE_LT,
+					ConditionType.VALUE_LT,
+					ConditionType.VALUE_GT,
+					ConditionType.VALUE_EQ,
+					ConditionType.VALUE_NE,
+					ConditionType.PATIENT_AGE_GT,
+					ConditionType.PATIENT_AGE_LT,
+				] as ConditionType[];
+
 				ctrl.$onInit = (): void =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
@@ -104,15 +115,7 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 
 				ctrl.showConditionValueInput = (condition: DsRuleConditionModel): boolean =>
 				{
-					return (condition.type === ConditionType.MONTHS_SINCE_GT
-						|| condition.type === ConditionType.MONTHS_SINCE_LT
-						|| condition.type === ConditionType.VALUE_LT
-						|| condition.type === ConditionType.VALUE_GT
-						|| condition.type === ConditionType.VALUE_EQ
-						|| condition.type === ConditionType.VALUE_NE
-						|| condition.type === ConditionType.PATIENT_AGE_GT
-						|| condition.type === ConditionType.PATIENT_AGE_LT
-					);
+					return ctrl.conditionTypesWithTextInput.includes(condition.type);
 				}
 
 				ctrl.showConditionValueSelect = (condition: DsRuleConditionModel): boolean =>
