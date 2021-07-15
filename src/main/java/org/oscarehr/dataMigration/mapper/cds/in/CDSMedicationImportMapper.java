@@ -132,47 +132,32 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		// No other place to put the following items.
 		if (importStructure.getPrescriptionIdentifier() != null)
 		{
-			ResidualInfo prescriptionIdentifier = new ResidualInfo();
-			prescriptionIdentifier.setContentKey("PrescriptionIdentifier");
-			prescriptionIdentifier.setContentType("String");
-			prescriptionIdentifier.setContentValue(importStructure.getPrescriptionIdentifier());
-			residualInfoList.add(prescriptionIdentifier);
+			residualInfoList.add(buildResidualInfo(residualInfoList, "PrescriptionIdentifier", 
+					"String", importStructure.getPrescriptionIdentifier()));
 		}
 
 		if (importStructure.getPriorPrescriptionReferenceIdentifier() != null)
 		{
-			ResidualInfo priorPrescriptionReferenceIdentifier = new ResidualInfo();
-			priorPrescriptionReferenceIdentifier.setContentKey("PriorPrescriptionReferenceIdentifier");
-			priorPrescriptionReferenceIdentifier.setContentType("String");
-			priorPrescriptionReferenceIdentifier.setContentValue(importStructure.getPriorPrescriptionReferenceIdentifier());
-			residualInfoList.add(priorPrescriptionReferenceIdentifier);
+			residualInfoList.add(buildResidualInfo(residualInfoList, "PriorPrescriptionReferenceIdentifier", 
+					"String", importStructure.getPriorPrescriptionReferenceIdentifier()));
 		}
 
 		if (importStructure.getDrugDescription() != null)
 		{
-			ResidualInfo drugDescription = new ResidualInfo();
-			drugDescription.setContentKey("DrugDescription");
-			drugDescription.setContentType("String");
-			drugDescription.setContentValue(importStructure.getDrugDescription());
-			residualInfoList.add(drugDescription);
+			residualInfoList.add(buildResidualInfo(residualInfoList, "DrugDescription", 
+					"String", importStructure.getDrugDescription()));
 		}
 
 		if (importStructure.getProblemCode() != null)
 		{
-			ResidualInfo problemCode = new ResidualInfo();
-			problemCode.setContentKey("ProblemCode");
-			problemCode.setContentType("String");
-			problemCode.setContentValue(importStructure.getProblemCode());
-			residualInfoList.add(problemCode);
+			residualInfoList.add(buildResidualInfo(residualInfoList, "ProblemCode", 
+					"String", importStructure.getProblemCode()));
 		}
 
 		if (importStructure.getProtocolIdentifier() != null)
 		{
-			ResidualInfo protocolIdentifier = new ResidualInfo();
-			protocolIdentifier.setContentKey("ProtocolIdentifier");
-			protocolIdentifier.setContentType("String");
-			protocolIdentifier.setContentValue(importStructure.getProtocolIdentifier());
-			residualInfoList.add(protocolIdentifier);
+			residualInfoList.add(buildResidualInfo(residualInfoList, "ProtocolIdentifier", 
+					"String", importStructure.getProtocolIdentifier()));
 		}
 
 		if (residualInfoList.isEmpty())
@@ -180,6 +165,17 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 			return null;
 		}
 		return residualInfoList;
+	}
+
+	protected ResidualInfo buildResidualInfo(List<ResidualInfo> residualInfoList, String contentKey, String contentType,
+	                                                   String contentValue)
+	{
+		ResidualInfo residualInfo = new ResidualInfo();
+		residualInfo.setContentKey(contentKey);
+		residualInfo.setContentType(contentType);
+		residualInfo.setContentValue(contentValue);
+		residualInfoList.add(residualInfo);
+		return residualInfo;
 	}
 
 	protected String getOutsideProviderName(MedicationsAndTreatments.PrescribedBy prescribedBy)
@@ -280,13 +276,13 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		{
 			if (StringUtils.isNumeric(indicator))
 			{
-				return !"0".equals(indicator);
+				return !indicator.equals("0");
 			}
 			else if (indicator.equals(CDSConstants.Y_INDICATOR_TRUE))
 			{
 				return true;
 			}
-			else if (indicator.equals(CDSConstants.Y_INDICATOR_TRUE))
+			else if (indicator.equals(CDSConstants.Y_INDICATOR_FALSE))
 			{
 				return false;
 			}
