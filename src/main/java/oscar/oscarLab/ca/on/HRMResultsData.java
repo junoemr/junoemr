@@ -43,22 +43,31 @@ public class HRMResultsData {
 	public HRMResultsData() {
 	}
 
-	public Collection<LabResultData> populateHRMdocumentsResultsData(LoggedInInfo loggedInInfo, String providerNo, String status, Date newestDate, Date oldestDate) {
-		if (providerNo == null || "".equals(providerNo)) {
+	public Collection<LabResultData> populateHRMdocumentsResultsData(LoggedInInfo loggedInInfo, String providerNo, String status, Date newestDate, Date oldestDate)
+	{
+		if (providerNo == null || providerNo.equals(""))
+		{
 			providerNo = "%";
-		} else if (providerNo.equalsIgnoreCase("0")) {
+		}
+		else if (providerNo.equalsIgnoreCase("0"))
+		{
 			providerNo = "-1";
 		}
 
 		Boolean viewed = true;
 		Boolean signedOff = false;
-		if (status == null || status.equalsIgnoreCase("N")) {
+
+		if (status == null || status.equalsIgnoreCase("N"))
+		{
 			viewed = null;
-		} else if (status != null && (status.equalsIgnoreCase("A") || status.equalsIgnoreCase("F"))) {
+		}
+		else if (status != null && (status.equalsIgnoreCase("A") || status.equalsIgnoreCase("F")))
+		{
 			signedOff = true;
 		}
 
-		if (status != null && status.equalsIgnoreCase("")) {
+		if (status != null && status.equalsIgnoreCase(""))
+		{
 			viewed = null;
 			signedOff = null;
 		}
@@ -69,7 +78,8 @@ public class HRMResultsData {
 		HashMap<String,LabResultData> labResults=new HashMap<String,LabResultData>();
 		HashMap<String,HRMReport> labReports=new HashMap<String,HRMReport>();
 
-		for (HRMDocumentToProvider hrmDocResult : hrmDocResultsProvider) {
+		for (HRMDocumentToProvider hrmDocResult : hrmDocResultsProvider)
+		{
 			Integer id = hrmDocResult.getHrmDocument().getId();
 			LabResultData lbData = new LabResultData(LabResultData.HRM);
 
@@ -89,19 +99,23 @@ public class HRMResultsData {
 
 			hrmReport.setHrmDocumentId(id);
 
-			if (hrmDocResultsDemographic.size() > 0) {
+			if (hrmDocResultsDemographic.size() > 0)
+			{
 				Demographic demographic = demographicManager.getDemographic(loggedInInfo, hrmDocResultsDemographic.get(0).getDemographicNo());
-				if (demographic != null) {
+
+				if (demographic != null)
+				{
 					lbData.patientName = demographic.getLastName() + "," + demographic.getFirstName();
 					lbData.sex = demographic.getSex();
 					lbData.healthNumber = demographic.getHin();
 					lbData.isMatchedToPatient = true;
 				}
-			} else {
+			}
+			else
+			{
 				lbData.sex = hrmReport.getGender();
 				lbData.healthNumber = hrmReport.getHCN();
 				lbData.patientName = hrmReport.getLegalName();
-
 			}
 
 			lbData.reportStatus = hrmReport.getResultStatus();
@@ -141,7 +155,6 @@ public class HRMResultsData {
 					newerLabData.getDuplicateLabIds().add(hrmReport.getHrmDocumentId());
 				}
 			}
-
 		}
 
 		if (logger.isDebugEnabled()) {
