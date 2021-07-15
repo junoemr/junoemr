@@ -27,6 +27,8 @@ import StreamingList from "../../lib/util/StreamingList";
 import {MessageGroup} from "../../lib/messaging/model/MessageGroup";
 import MessagingStringResourceSetFactory from "../../lib/messaging/factory/MessagingStringResourceSetFactory";
 import {BroadcastEvent} from "./components/messageList/messageListComponentConstants";
+import ToastService from "../../lib/alerts/service/ToastService";
+import {toastStore} from "../../lib/alerts/store/ToastStore";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',

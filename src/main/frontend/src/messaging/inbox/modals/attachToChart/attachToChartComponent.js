@@ -25,6 +25,7 @@ import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../.
 import DocumentService from "../../../../lib/documents/service/DocumentService";
 import {JunoDocumentFactory} from "../../../../lib/documents/factory/JunoDocumentFactory";
 import DemographicDocumentService from "../../../../lib/documents/service/DemographicDocumentService";
+import ToastService from "../../../../lib/alerts/service/ToastService";
 
 angular.module("Messaging.Modals").component('attachToChart', {
 	templateUrl: 'src/messaging/inbox/modals/attachToChart/attachToChart.jsp',
@@ -57,6 +58,7 @@ angular.module("Messaging.Modals").component('attachToChart', {
 				ctrl.description = ctrl.attachment.name;
 				ctrl.demographicNo = ctrl.resolve.demographicNo;
 				await ctrl.loadDocumentTypes();
+				$scope.$apply();
 			}
 
 			ctrl.loadDocumentTypes = async () =>
@@ -79,6 +81,7 @@ angular.module("Messaging.Modals").component('attachToChart', {
 					ctrl.isAttachingToChart = true;
 					const junoDoc = JunoDocumentFactory.build(ctrl.attachment.name, ctrl.description, ctrl.documentType, ctrl.attachment.type, await ctrl.attachment.getBase64Data());
 					await demographicDocumentService.uploadDocumentToDemographicChart(junoDoc, ctrl.demographicNo);
+					(new ToastService()).successToast("Document attached to chart");
 					this.close();
 				}
 				finally

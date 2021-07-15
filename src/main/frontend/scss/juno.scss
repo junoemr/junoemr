@@ -50,6 +50,7 @@
 @import "../src/common/components/junoSelect/junoSelect";
 @import "../src/common/components/junoTab/junoTab";
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
+@import "../src/common/components/junoToast/junoToast";
 @import "../src/common/components/junoToggle/junoToggle";
 @import "../src/common/components/junoDateSelect/junoDateSelect";
 @import "../src/common/components/junoTimeSelect/junoTimeSelect";
@@ -72,6 +73,7 @@
 // Section-specific things
 @import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";
+@import "../src/layout/toastArea/toastArea";
 @import "../src/layout/components/appointmentQueue/appointmentQueue";
 @import "../src/layout/components/appointmentQueue/components/appointmentCard/appointmentCard";
 @import "../src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModal";

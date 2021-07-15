@@ -1,0 +1,64 @@
+.juno-toast {
+
+	// customization variables
+	--background-color: var(--color-primary-base);
+	--color: var(--color-neutral-white);
+	--border: none;
+	--border-radius: 2em;
+	--padding: 8px 32px;
+	--max-width: calc(min(512px, 100vh));
+	--min-width: 128px;
+	--font-size: 1.5rem;
+	--icon-size: 2em;
+
+	background-color: var(--background-color);
+	color: var(--color);
+
+	min-width: var(--min-width);
+	max-width: var(--max-width);
+	padding: var(--padding);
+
+	border: var(--border);
+	border-radius: var(--border-radius);
+	box-shadow: 1px 1px 6px var(--color-neutral-black);
+
+	pointer-events: all;
+	font-size: var(--font-size);
+
+	// entry animation
+	@keyframes slide-in {
+		0% {
+			opacity: 0.0;
+			transform: translateY(100px);
+		}
+		100% {
+			opacity: 1.0;
+			transform: translateY(0);
+		}
+	}
+	animation: slide-in 0.25s ease-out;
+	transition: opacity 0.5s ease-in;
+
+
+	&.clickable {
+		cursor: pointer;
+	}
+
+	&.toast-invisible {
+		opacity: 0.0;
+	}
+
+	i {
+		font-size: var(--icon-size);
+	}
+
+	&.toast-warning {
+		--background-color: var(--color-yellow-base);
+		--color: var(--color-neutral-darkest);
+	}
+
+	&.toast-error {
+		--background-color: var(--color-red-base);
+	}
+}
+
