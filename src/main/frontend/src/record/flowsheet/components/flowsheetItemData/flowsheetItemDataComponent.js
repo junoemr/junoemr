@@ -1,5 +1,3 @@
-import {JUNO_STYLE} from "../../../common/components/junoComponentConstants";
-
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -24,14 +22,14 @@ import {JUNO_STYLE} from "../../../common/components/junoComponentConstants";
  */
 
 
-const {JUNO_BUTTON_COLOR_PATTERN} = require("../../../common/components/junoComponentConstants");
-const {JUNO_BUTTON_COLOR} = require("../../../common/components/junoComponentConstants");
-const {LABEL_POSITION} = require("../../../common/components/junoComponentConstants");
-const {SecurityPermissions} = require("../../../common/security/securityConstants");
+const {JUNO_BUTTON_COLOR_PATTERN} = require("../../../../common/components/junoComponentConstants");
+const {JUNO_BUTTON_COLOR} = require("../../../../common/components/junoComponentConstants");
+const {LABEL_POSITION, JUNO_STYLE} = require("../../../../common/components/junoComponentConstants");
+const {SecurityPermissions} = require("../../../../common/security/securityConstants");
 
 angular.module('Record.Flowsheet').component('flowsheetItemData',
 	{
-		templateUrl: 'src/record/flowsheet/components/flowsheetItemData.jsp',
+		templateUrl: 'src/record/flowsheet/components/flowsheetItemData/flowsheetItemData.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",

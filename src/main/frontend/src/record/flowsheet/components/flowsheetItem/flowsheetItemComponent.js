@@ -22,14 +22,14 @@
  */
 
 
-const {JUNO_BUTTON_COLOR_PATTERN} = require("../../../common/components/junoComponentConstants");
-const {JUNO_BUTTON_COLOR} = require("../../../common/components/junoComponentConstants");
-const {LABEL_POSITION} = require("../../../common/components/junoComponentConstants");
-const {SecurityPermissions} = require("../../../common/security/securityConstants");
+const {JUNO_BUTTON_COLOR_PATTERN} = require("../../../../common/components/junoComponentConstants");
+const {JUNO_BUTTON_COLOR} = require("../../../../common/components/junoComponentConstants");
+const {LABEL_POSITION} = require("../../../../common/components/junoComponentConstants");
+const {SecurityPermissions} = require("../../../../common/security/securityConstants");
 
 angular.module('Record.Flowsheet').component('flowsheetItem',
 	{
-		templateUrl: 'src/record/flowsheet/components/flowsheetItem.jsp',
+		templateUrl: 'src/record/flowsheet/components/flowsheetItem/flowsheetItem.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
@@ -57,8 +57,13 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 
 				ctrl.$onInit = async () =>
 				{
+					ctrl.clearNewEntry();
+				}
+
+				ctrl.clearNewEntry = () =>
+				{
 					ctrl.newEntry = {
-						value: "",
+						value: null,
 						observationDateTime: moment(),
 					};
 					ctrl.checkboxValue = false;
@@ -140,6 +145,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					{
 						let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.flowsheetId, ctrl.model.id, ctrl.newEntry);
 						ctrl.model.data.push(newDataElement);
+						ctrl.clearNewEntry();
 					}
 					catch (errorObject)
 					{

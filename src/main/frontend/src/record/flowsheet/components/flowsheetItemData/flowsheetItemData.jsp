@@ -21,12 +21,8 @@
 * Canada
 --%>
 <div class="flowsheet-item-data">
-	<panel no-header="true" component-style="$ctrl.componentStyle">
-		<panel-body>
-			<div class="flowsheet-item-data-panel">
-				<div>{{$ctrl.getDateForDisplay($ctrl.model.observationDateTime)}}</div>
-				<h6>{{$ctrl.model.value}}</h6>
-			</div>
-		</panel-body>
-	</panel>
+	<div class="flex-column align-items-center">
+		<span class="display-date">{{$ctrl.getDateForDisplay($ctrl.model.observationDateTime)}}</span>
+		<span class="display-value">{{$ctrl.model.value}}</span>
+	</div>
 </div>

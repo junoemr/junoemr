@@ -69,8 +69,9 @@
 			</juno-button>
 		</div>
 	</div>
-	<div class="flex-row">
+	<div class="flex-row row-margin flex-wrap data-container">
 		<flowsheet-item-data ng-repeat="data in $ctrl.model.data | filter:$ctrl.showData"
+		                     class="column-margin"
 		                     model="data">
 		</flowsheet-item-data>
 	</div>

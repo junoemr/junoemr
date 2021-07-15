@@ -12,11 +12,11 @@
 	.item-guideline {
 		padding: 4px 0 8px 0;
 	}
-}
-
-.flowsheet-item-data {
-	width: 256px;
-
-	.flowsheet-item-data-panel {
+	.row-margin {
+		margin: 0 -2px;
+	}
+	.column-margin {
+		// keep padding on top for item wrapping
+		margin: 8px 2px 0 2px;
 	}
 }
