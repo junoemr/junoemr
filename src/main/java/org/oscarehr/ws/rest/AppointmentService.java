@@ -99,9 +99,7 @@ public class AppointmentService extends AbstractServiceImpl
 		}
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), savedAppointment.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,
-				LogConst.STATUS_SUCCESS, String.valueOf(savedAppointment.getId()), loggedInInfo.getIp());
-
+		
 		CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
 
 		responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
