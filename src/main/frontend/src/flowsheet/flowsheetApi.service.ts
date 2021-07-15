@@ -118,17 +118,17 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 			return (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
 		}
 
-		service.cloneFlowsheetForClinic = async (flowsheetId: number): Promise<number> =>
+		service.cloneFlowsheetForClinic = async (flowsheetId: number): Promise<FlowsheetModel> =>
 		{
-			return (await service.flowsheetApi.cloneFlowsheet(flowsheetId)).data.body;
+			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId)).data.body);
 		}
-		service.cloneFlowsheetForProvider = async (flowsheetId: number, providerId: string): Promise<number> =>
+		service.cloneFlowsheetForProvider = async (flowsheetId: number, providerId: string): Promise<FlowsheetModel> =>
 		{
-			return (await service.flowsheetApi.cloneFlowsheet(flowsheetId, providerId)).data.body;
+			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId, providerId)).data.body);
 		}
-		service.cloneFlowsheetForDemographic = async (flowsheetId: number, demographicId: number): Promise<number> =>
+		service.cloneFlowsheetForDemographic = async (flowsheetId: number, demographicId: number): Promise<FlowsheetModel> =>
 		{
-			return (await service.flowsheetApi.cloneFlowsheet(flowsheetId, null, demographicId)).data.body;
+			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId, null, demographicId)).data.body);
 		}
 	}
 ]);

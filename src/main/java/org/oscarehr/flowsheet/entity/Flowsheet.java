@@ -155,7 +155,7 @@ public class Flowsheet extends AbstractModel<Integer>
 		this.icd9Triggers = new HashSet<>(toCopy.icd9Triggers);
 		this.drools = new HashSet<>(toCopy.drools);
 
-		this.parentFlowsheet = toCopy;
+		this.parentFlowsheet = toCopy.getParentFlowsheet();
 		this.ownerProvider = toCopy.getOwnerProvider();
 		this.ownerDemographic = toCopy.getOwnerDemographic();
 

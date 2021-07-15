@@ -29,6 +29,7 @@ import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.decisionSupport2.dao.DsRuleDao;
 import org.oscarehr.decisionSupport2.transfer.DsRuleUpdateInput;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.flowsheet.converter.FlowsheetEntityToModelConverter;
 import org.oscarehr.flowsheet.dao.FlowsheetDao;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
@@ -40,6 +41,7 @@ import org.oscarehr.flowsheet.transfer.FlowsheetItemCreateUpdateTransfer;
 import org.oscarehr.flowsheet.transfer.FlowsheetItemGroupCreateUpdateTransfer;
 import org.oscarehr.flowsheet.transfer.FlowsheetUpdateTransfer;
 import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,17 +88,36 @@ public class FlowsheetService
 
 	public Flowsheet addNewFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy)
 	{
-		return addNewFlowsheetCopy(creatingProviderId, flowsheetIdToCopy, Optional.empty(), Optional.empty());
+		return addNewFlowsheetCopy(
+				creatingProviderId,
+				flowsheetIdToCopy,
+				Optional.empty(),
+				Optional.empty(),
+				Optional.of(" (copy)"));
 	}
 
 	public Flowsheet addNewProviderFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy, String ownerProviderId)
 	{
-		return addNewFlowsheetCopy(creatingProviderId, flowsheetIdToCopy, Optional.ofNullable(ownerProviderId), Optional.empty());
+		ProviderData providerData = providerDao.find(ownerProviderId);
+		String suffix = " (copy for " + providerData.getDisplayName() + ")";
+		return addNewFlowsheetCopy(
+				creatingProviderId,
+				flowsheetIdToCopy,
+				Optional.of(providerData),
+				Optional.empty(),
+				Optional.of(suffix));
 	}
 
 	public Flowsheet addNewDemographicFlowsheetCopy(String creatingProviderId, Integer flowsheetIdToCopy, Integer ownerDemographicId)
 	{
-		return addNewFlowsheetCopy(creatingProviderId, flowsheetIdToCopy, Optional.empty(), Optional.ofNullable(ownerDemographicId));
+		Demographic demographic = demographicDao.find(ownerDemographicId);
+		String suffix = " (copy for " + demographic.getDisplayName() + ")";
+		return addNewFlowsheetCopy(
+				creatingProviderId,
+				flowsheetIdToCopy,
+				Optional.empty(),
+				Optional.of(demographic),
+				Optional.of(suffix));
 	}
 
 	public Flowsheet addNewFlowsheet(String creatingProviderId, FlowsheetCreateTransfer creationTransfer)
@@ -215,16 +236,26 @@ public class FlowsheetService
 
 	private Flowsheet addNewFlowsheetCopy(String creatingProviderId,
 	                                      Integer flowsheetIdToCopy,
-	                                      Optional<String> providerOwnerId,
-	                                      Optional<Integer> demographicOwnerId)
+	                                      Optional<ProviderData> providerOwner,
+	                                      Optional<Demographic> demographicOwner,
+	                                      Optional<String> nameSuffix)
 	{
 		org.oscarehr.flowsheet.entity.Flowsheet flowsheetToCopy = flowsheetDao.find(flowsheetIdToCopy);
 		org.oscarehr.flowsheet.entity.Flowsheet entity = new org.oscarehr.flowsheet.entity.Flowsheet(flowsheetToCopy); // copy constructor
 		entity.setCreatedBy(creatingProviderId);
+		entity.setUpdatedBy(creatingProviderId);
 		entity.setSystemManaged(false); // copies are never system managed
 
-		entity.setOwnerProvider(providerOwnerId.map((id) -> providerDao.find(id)).orElse(null));
-		entity.setOwnerDemographic(demographicOwnerId.map((id) -> demographicDao.find(id)).orElse(null));
+		entity.setOwnerProvider(providerOwner.orElse(null));
+		entity.setOwnerDemographic(demographicOwner.orElse(null));
+		nameSuffix.ifPresent((suffix) -> entity.setName(flowsheetToCopy.getName() + suffix));
+
+		// for now, we don't want multiple levels of parent 'chaining', so all copies will reference the original's parent.
+		// if there is no parent then we can set the version being copied as the 'top level' parent
+		if(!flowsheetToCopy.getOptionalParentFlowsheet().isPresent())
+		{
+			entity.setParentFlowsheet(flowsheetToCopy);
+		}
 
 		flowsheetDao.persist(entity);
 		return flowsheetEntityToModelConverter.convert(entity);

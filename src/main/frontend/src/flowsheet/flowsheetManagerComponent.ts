@@ -59,9 +59,9 @@ angular.module('Flowsheet').component('flowsheetManager',
 				ctrl.tablesConfig = [];
 
 				enum accessLevels {
-					CLINIC = 0,
-					PROVIDER = 1,
-					DEMOGRAPHIC = 2,
+					CLINIC = 1,
+					PROVIDER = 2,
+					DEMOGRAPHIC = 3,
 				}
 
 				ctrl.$onInit = async (): Promise<void> =>
@@ -185,6 +185,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 						{
 							await flowsheetApiService.deleteFlowsheet(flowsheet.id);
 							ctrl.flowsheets = ctrl.flowsheets.filter((entry) => entry.id !== flowsheet.id);
+							ctrl.separateFlowsheetLevels(ctrl.flowsheets);
 						}
 						finally
 						{
@@ -209,7 +210,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 							ctrl.componentStyle);
 						if(confirm)
 						{
-							selection = options[0];
+							selection = options[0].value;
 						}
 					}
 					else
@@ -228,20 +229,25 @@ angular.module('Flowsheet').component('flowsheetManager',
 						ctrl.isLoading = true;
 						try
 						{
-							let flowsheetCloneId;
-							if(selection.value === accessLevels.CLINIC)
+							let flowsheetClone: FlowsheetModel = null;
+							if(selection === accessLevels.CLINIC)
 							{
-								flowsheetCloneId = await flowsheetApiService.cloneFlowsheetForClinic(flowsheet.id);
+								flowsheetClone = await flowsheetApiService.cloneFlowsheetForClinic(flowsheet.id);
 							}
-							else if(selection.value === accessLevels.PROVIDER)
+							else if(selection === accessLevels.PROVIDER)
 							{
-								flowsheetCloneId = await flowsheetApiService.cloneFlowsheetForProvider(flowsheet.id, ctrl.userId);
+								flowsheetClone = await flowsheetApiService.cloneFlowsheetForProvider(flowsheet.id, ctrl.userId);
 							}
-							else if(selection.value === accessLevels.DEMOGRAPHIC)
+							else if(selection === accessLevels.DEMOGRAPHIC)
 							{
-								flowsheetCloneId = await flowsheetApiService.cloneFlowsheetForDemographic(flowsheet.id, ctrl.demographicId);
+								flowsheetClone = await flowsheetApiService.cloneFlowsheetForDemographic(flowsheet.id, ctrl.demographicId);
 							}
-							ctrl.toFlowsheetEdit(flowsheetCloneId);
+							else
+							{
+								return;
+							}
+							ctrl.flowsheets.push(flowsheetClone);
+							ctrl.separateFlowsheetLevels(ctrl.flowsheets);
 						}
 						finally
 						{

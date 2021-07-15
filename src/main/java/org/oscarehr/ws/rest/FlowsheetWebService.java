@@ -97,7 +97,7 @@ public class FlowsheetWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/{id}/clone")
-	public RestResponse<Integer> cloneFlowsheet(@PathParam("id") Integer flowsheetId,
+	public RestResponse<Flowsheet> cloneFlowsheet(@PathParam("id") Integer flowsheetId,
 	                                            @QueryParam("providerId") String providerId,
 	                                            @QueryParam("demographicId") Integer demographicId)
 	{
@@ -116,6 +116,6 @@ public class FlowsheetWebService extends AbstractServiceImpl
 		{
 			clone = flowsheetService.addNewFlowsheetCopy(getLoggedInProviderId(), flowsheetId);
 		}
-		return RestResponse.successResponse(clone.getId());
+		return RestResponse.successResponse(clone);
 	}
 }
