@@ -13,6 +13,7 @@ package oscar.oscarLab.ca.on;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
@@ -49,9 +50,9 @@ public class HRMResultsData {
 		{
 			providerNo = "%";
 		}
-		else if (providerNo.equalsIgnoreCase("0"))
+		else if (providerNo.equalsIgnoreCase(Provider.UNCLAIMED_PROVIDER_NO))
 		{
-			providerNo = "-1";
+			providerNo = Provider.SYSTEM_PROVIDER_NO;
 		}
 
 		Boolean viewed = true;
