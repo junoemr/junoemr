@@ -42,11 +42,13 @@ angular.module('Flowsheet').component('flowsheetEdit',
 			'$stateParams',
 			'$uibModal',
 			'flowsheetApiService',
+			'securityRolesService',
 			function (
 				$state,
 				$stateParams,
 				$uibModal,
 				flowsheetApiService,
+				securityRolesService,
 			)
 			{
 				const ctrl = this;
@@ -57,6 +59,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.isLoading = true;
+				ctrl.flowsheet = null as FlowsheetModel;
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
@@ -71,9 +74,23 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 					ctrl.isLoading = false;
 				}
+
 				ctrl.isNewFlowsheet = (): boolean =>
 				{
-					return Juno.Common.Util.isBlank(ctrl.flowsheet.id);
+					if(ctrl.flowsheet)
+					{
+						return Juno.Common.Util.isBlank(ctrl.flowsheet.id);
+					}
+				}
+
+				ctrl.userCanEdit = (): boolean =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_UPDATE);
+				}
+
+				ctrl.userCanCreate = (): boolean =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_CREATE);
 				}
 
 				ctrl.onAddNewGroup = async (): Promise<void> =>
@@ -284,13 +301,47 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onSave = async (): Promise<void> =>
 				{
-					if(ctrl.isNewFlowsheet())
+					ctrl.isLoading = true;
+					try
 					{
-						ctrl.flowsheet = await flowsheetApiService.createFlowsheet(ctrl.flowsheet);
+						if (ctrl.isNewFlowsheet())
+						{
+							ctrl.flowsheet = await flowsheetApiService.createFlowsheet(ctrl.flowsheet);
+						}
+						else
+						{
+							ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
+						}
+						Juno.Common.Util.successAlert($uibModal, "Save Complete", "The changes have been applied");
 					}
-					else
+					finally
 					{
-						ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
+						ctrl.isLoading = false;
+					}
+				}
+
+				ctrl.canSave = (): boolean =>
+				{
+					let hasPermission = ctrl.isNewFlowsheet() ? ctrl.userCanCreate() : ctrl.userCanEdit();
+					return ctrl.flowsheet  && !ctrl.flowsheet.systemManaged && hasPermission;
+				}
+
+				ctrl.saveButtonTooltip = (): string =>
+				{
+					if(ctrl.flowsheet)
+					{
+						if (ctrl.flowsheet.systemManaged)
+						{
+							return "System Managed Flowsheets can not be modified";
+						}
+						else if (!ctrl.canSave())
+						{
+							return "You do not have the required permissions to save this";
+						}
+						else
+						{
+							return "Save Changes";
+						}
 					}
 				}
 			}]

@@ -147,6 +147,11 @@ public class FlowsheetService
 	public Flowsheet updateFlowsheet(String updatingProviderId, Integer flowsheetId, FlowsheetUpdateTransfer updateTransfer)
 	{
 		org.oscarehr.flowsheet.entity.Flowsheet entity = flowsheetDao.find(flowsheetId);
+		if(entity.isSystemManaged())
+		{
+			throw new IllegalArgumentException("System managed flowsheets can not be updated");
+		}
+
 		entity.setName(updateTransfer.getName());
 		entity.setDescription(updateTransfer.getDescription());
 		entity.setEnabled(updateTransfer.isEnabled());
@@ -207,6 +212,11 @@ public class FlowsheetService
 	public void deleteFlowsheet(String deletingProviderId, Integer flowsheetId)
 	{
 		org.oscarehr.flowsheet.entity.Flowsheet flowsheetEntity = flowsheetDao.find(flowsheetId);
+		if(flowsheetEntity.isSystemManaged())
+		{
+			throw new IllegalArgumentException("System managed flowsheets can not be deleted");
+		}
+
 		flowsheetEntity.setDeletedAt(LocalDateTime.now());
 		flowsheetEntity.setDeletedBy(deletingProviderId);
 		flowsheetEntity.setUpdatedBy(deletingProviderId);

@@ -32,14 +32,15 @@
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 				             disabled="$ctrl.isLoading"
 				             click="$ctrl.onCancel()">
-					Cancel
+					Close
 				</juno-button>
 			</div>
 			<div class="save-button-wrapper">
 				<juno-button component-style="$ctrl.componentStyle"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.SUCCESS"
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-				             disabled="$ctrl.isLoading"
+				             disabled="$ctrl.isLoading || !$ctrl.canSave()"
+				             title="{{$ctrl.saveButtonTooltip()}}"
 				             click="$ctrl.onSave()">
 					Save
 				</juno-button>
