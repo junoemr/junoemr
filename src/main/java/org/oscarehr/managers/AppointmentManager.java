@@ -403,7 +403,7 @@ public class AppointmentManager {
 //		}
 //		appointmentDao.merge(appt);
 //		return appt;
-//	}a
+//	}
 
 	
 	
