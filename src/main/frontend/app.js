@@ -576,6 +576,11 @@ oscarApp.config([
 					}]
 				},
 			})
+		.state('settings.editFlowsheet',
+			{
+				url: '/healthTracker/flowsheet/:flowsheetId',
+				component: 'flowsheetEdit',
+			})
 		.state('support',
 		{
 			url: '/support',
@@ -874,6 +879,11 @@ oscarApp.config([
 				}]
 			},
 		})
+		.state('record.editFlowsheet',
+			{
+				url: '/configureHealthTracker/flowsheet/:flowsheetId',
+				component: 'flowsheetEdit',
+			})
         .state('record.patientEducation',
         {
             url: '/patientEducation',

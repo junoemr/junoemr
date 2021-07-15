@@ -58,6 +58,12 @@ angular.module('Flowsheet').component('flowsheetManager',
 
 				ctrl.tablesConfig = [];
 
+				enum accessLevels {
+					CLINIC = 0,
+					PROVIDER = 1,
+					DEMOGRAPHIC = 2,
+				}
+
 				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.userId = ctrl.user?.providerNo || null;
@@ -81,27 +87,36 @@ angular.module('Flowsheet').component('flowsheetManager',
 						{
 							name: "Clinic Flowsheets",
 							visible: true,
+							enableEdit: ctrl.userCanEditClinicLevel(),
+							enableClone: ctrl.userCanCreateClinicLevel(),
+							enableDelete: ctrl.userCanDeleteClinicLevel(),
 							items: [],
 						},
 						{
 							name: "My Flowsheets",
 							visible: ctrl.manageProviderLevel(),
+							enableEdit: ctrl.userCanEdit(),
+							enableClone: ctrl.userCanCreate(),
+							enableDelete: ctrl.userCanDelete(),
 							items: [],
 						},
 						{
 							name: "Patient Flowsheets",
 							visible: ctrl.manageDemographicLevel(),
+							enableEdit: ctrl.userCanEdit(),
+							enableClone: ctrl.userCanCreate(),
+							enableDelete: ctrl.userCanDelete(),
 							items: [],
 						}
 					];
 					// sort all flowsheets by level (clinic, provider, demographic)
 					flowsheets.forEach((flowsheet: FlowsheetModel) =>
 					{
-						if (flowsheet.ownerDemographicId)
+						if (flowsheet.isDemographicLevel())
 						{
 							ctrl.tablesConfig[2].items.push(flowsheet);
 						}
-						else if (flowsheet.ownerProviderId)
+						else if (flowsheet.isProviderLevel())
 						{
 							ctrl.tablesConfig[1].items.push(flowsheet);
 						}
@@ -116,13 +131,25 @@ angular.module('Flowsheet').component('flowsheetManager',
 				{
 					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_UPDATE);
 				}
+				ctrl.userCanEditClinicLevel = (): boolean =>
+				{
+					return ctrl.userCanEdit() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ADMIN_UPDATE);
+				}
 				ctrl.userCanCreate = (): boolean =>
 				{
 					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_CREATE);
 				}
+				ctrl.userCanCreateClinicLevel = (): boolean =>
+				{
+					return ctrl.userCanCreate() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ADMIN_CREATE);
+				}
 				ctrl.userCanDelete = (): boolean =>
 				{
 					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_DELETE);
+				}
+				ctrl.userCanDeleteClinicLevel = (): boolean =>
+				{
+					return ctrl.userCanDelete() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ADMIN_DELETE);
 				}
 
 				ctrl.manageProviderLevel = (): boolean =>
@@ -144,9 +171,10 @@ angular.module('Flowsheet').component('flowsheetManager',
 					ctrl.toFlowsheetEdit(flowsheet.id);
 				}
 
-				ctrl.onFlowsheetDelete = async (flowsheet): Promise<void> =>
+				ctrl.onFlowsheetDelete = async (flowsheet: FlowsheetModel): Promise<void> =>
 				{
-					const userOk : boolean = await Juno.Common.Util.confirmationDialog($uibModal, "Confirm Delete",
+					const userOk : boolean = await Juno.Common.Util.confirmationDialog($uibModal,
+						"Confirm Delete",
 						"You are about to delete flowsheet " + flowsheet.name + "." +
 						"Are you sure you want to delete this flowsheet?");
 
@@ -165,7 +193,82 @@ angular.module('Flowsheet').component('flowsheetManager',
 					}
 				}
 
-				ctrl.onToggleFlowsheetEnabled = async (flowsheet): Promise<void> =>
+				ctrl.onCloneFlowsheet = async (flowsheet: FlowsheetModel): Promise<void> =>
+				{
+					const options = ctrl.getCloneOptions(flowsheet);
+					let selection = null;
+					if(options.length < 1)
+					{
+						return;
+					}
+					if(options.length === 1)
+					{
+						const confirm = await Juno.Common.Util.confirmationDialog($uibModal,
+							"Copy flowsheet",
+							"Are you sure you want to copy this flowsheet for " + options[0].label,
+							ctrl.componentStyle);
+						if(confirm)
+						{
+							selection = options[0];
+						}
+					}
+					else
+					{
+						selection = await Juno.Common.Util.openSelectDialog($uibModal,
+							"Copy flowsheet",
+							"Select who this copy can be used by.",
+							options,
+							ctrl.componentStyle,
+							"Create Copy",
+							"Select user level");
+					}
+
+					if(selection)
+					{
+						ctrl.isLoading = true;
+						try
+						{
+							let flowsheetCloneId;
+							if(selection.value === accessLevels.CLINIC)
+							{
+								flowsheetCloneId = await flowsheetApiService.cloneFlowsheetForClinic(flowsheet.id);
+							}
+							else if(selection.value === accessLevels.PROVIDER)
+							{
+								flowsheetCloneId = await flowsheetApiService.cloneFlowsheetForProvider(flowsheet.id, ctrl.userId);
+							}
+							else if(selection.value === accessLevels.DEMOGRAPHIC)
+							{
+								flowsheetCloneId = await flowsheetApiService.cloneFlowsheetForDemographic(flowsheet.id, ctrl.demographicId);
+							}
+							ctrl.toFlowsheetEdit(flowsheetCloneId);
+						}
+						finally
+						{
+							ctrl.isLoading = false;
+						}
+					}
+				}
+
+				ctrl.getCloneOptions = (flowsheet: FlowsheetModel): object[] =>
+				{
+					const options = [];
+					if(!flowsheet.isDemographicLevel() && !flowsheet.isProviderLevel() && ctrl.userCanCreateClinicLevel())
+					{
+						options.push({label: "All Users", value: accessLevels.CLINIC});
+					}
+					if (!flowsheet.isDemographicLevel() && ctrl.manageProviderLevel())
+					{
+						options.push({label: "Just Me", value: accessLevels.PROVIDER});
+					}
+					if (ctrl.manageDemographicLevel())
+					{
+						options.push({label: "Current patient only", value: accessLevels.DEMOGRAPHIC});
+					}
+					return options;
+				}
+
+				ctrl.onToggleFlowsheetEnabled = async (flowsheet: FlowsheetModel): Promise<void> =>
 				{
 					ctrl.isLoading = true;
 					try
@@ -178,20 +281,35 @@ angular.module('Flowsheet').component('flowsheetManager',
 					}
 				}
 
-				ctrl.toggleFlowsheetEnabledLabel = (flowsheet): string =>
+				ctrl.toggleFlowsheetEnabledLabel = (flowsheet: FlowsheetModel): string =>
 				{
 					return flowsheet.enabled ? "Disable" : "Enable";
 				}
 
-				ctrl.toFlowsheetEdit = (flowsheetId): void =>
+				ctrl.toFlowsheetEdit = (flowsheetId: number): void =>
 				{
-					$state.transitionTo('admin.editFlowsheet',
-						{
-							flowsheetId: flowsheetId,
-						},
-						{
-							notify: false
-						});
+					if($state.includes("**.admin.**"))
+					{
+						$state.go('admin.editFlowsheet',
+							{
+								flowsheetId: flowsheetId,
+							});
+					}
+					else if($state.includes("**.settings.**"))
+					{
+						$state.go('settings.editFlowsheet',
+							{
+								flowsheetId: flowsheetId,
+							});
+					}
+					else if($state.includes("**.record.**"))
+					{
+						$state.go('record.editFlowsheet',
+							{
+								flowsheetId: flowsheetId,
+								demographicNo: ctrl.demographicId,
+							});
+					}
 				}
 			}]
 	});

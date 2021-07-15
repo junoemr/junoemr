@@ -261,11 +261,25 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onCancel = (): void =>
 				{
-					$state.transitionTo('admin.configureHealthTracker',
-						{},
-						{
-							notify: false
-						});
+					if($state.includes("**.admin.**"))
+					{
+						$state.go('admin.configureHealthTracker');
+					}
+					else if($state.includes("**.settings.**"))
+					{
+						$state.go('settings.tracker');
+					}
+					else if($state.includes("**.record.**"))
+					{
+						$state.go("record.configureHealthTracker",
+							{
+								demographicNo: $stateParams.demographicNo,
+							});
+					}
+					else
+					{
+						$state.go('dashboard');
+					}
 				}
 
 				ctrl.onSave = async (): Promise<void> =>
@@ -279,31 +293,5 @@ angular.module('Flowsheet').component('flowsheetEdit',
 						ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
 					}
 				}
-
-				ctrl.onCloneFlowsheet = async (): Promise<void> =>
-				{
-					const confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
-						"Copy flowsheet",
-						"Are you sure you want to create a copy of this flowsheet?",
-						ctrl.componentStyle);
-
-					if(confirmation)
-					{
-						ctrl.isLoading = true;
-						try
-						{
-							const flowsheetCloneId = await flowsheetApiService.cloneFlowsheet(ctrl.flowsheet.id);
-							$state.go('.',
-								{
-									flowsheetId: flowsheetCloneId,
-								});
-						}
-						finally
-						{
-							ctrl.isLoading = false;
-						}
-					}
-				}
-
 			}]
 	});

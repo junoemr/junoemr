@@ -118,9 +118,17 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 			return (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
 		}
 
-		service.cloneFlowsheet = async (flowsheetId: number): Promise<number> =>
+		service.cloneFlowsheetForClinic = async (flowsheetId: number): Promise<number> =>
 		{
 			return (await service.flowsheetApi.cloneFlowsheet(flowsheetId)).data.body;
+		}
+		service.cloneFlowsheetForProvider = async (flowsheetId: number, providerId: string): Promise<number> =>
+		{
+			return (await service.flowsheetApi.cloneFlowsheet(flowsheetId, providerId)).data.body;
+		}
+		service.cloneFlowsheetForDemographic = async (flowsheetId: number, demographicId: number): Promise<number> =>
+		{
+			return (await service.flowsheetApi.cloneFlowsheet(flowsheetId, null, demographicId)).data.body;
 		}
 	}
 ]);

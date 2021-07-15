@@ -99,11 +99,11 @@ angular.module('Record.Tracker').component('healthTracker',
 					// sort all flowsheets by level (clinic, provider, demographic)
 					flowsheets.forEach((flowsheet: FlowsheetModel) =>
 					{
-						if(flowsheet.ownerDemographicId)
+						if(flowsheet.isDemographicLevel())
 						{
 							demographicFlowsheetItems.push(flowsheet);
 						}
-						else if(flowsheet.ownerProviderId)
+						else if(flowsheet.isProviderLevel())
 						{
 							providerFlowsheetItems.push(flowsheet);
 						}

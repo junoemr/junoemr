@@ -1,0 +1,24 @@
+.flowsheet-manager {
+	@include juno-table-default;
+
+	.button-wrapper {
+		width: 128px;
+	}
+	.action-button-wrapper {
+		width: 64px;
+	}
+
+	.action-buttons {
+		width: 312px;
+	}
+
+	.row-spacing {
+		margin: 0 4px;
+	}
+	.row-spacing-l {
+		margin: 0 4px 0 0;
+	}
+	.row-spacing-r {
+		margin: 0 0 0 4px;
+	}
+}

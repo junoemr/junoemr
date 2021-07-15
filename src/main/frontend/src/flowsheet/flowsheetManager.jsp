@@ -51,30 +51,39 @@
 						{{flowsheet.description}}
 					</td>
 					<td class="action-buttons">
-						<div class="row">
-							<div class="col-md-4">
+						<div class="flex-row justify-content-space-evenly">
+							<div class="row-spacing-l action-button-wrapper">
 								<juno-button component-style="$ctrl.componentStyle"
 								             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								             disabled="$ctrl.isLoading || !$ctrl.userCanEdit()"
-								             click="$ctrl.onToggleFlowsheetEnabled(flowsheet)">
-									{{$ctrl.toggleFlowsheetEnabledLabel(flowsheet)}}
-								</juno-button>
-							</div>
-							<div class="col-md-4">
-								<juno-button component-style="$ctrl.componentStyle"
-								             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								             disabled="$ctrl.isLoading || !$ctrl.userCanEdit()"
+								             disabled="$ctrl.isLoading || !flowsheetTable.enableEdit"
 								             click="$ctrl.onFlowsheetEdit(flowsheet)">
 									Edit
 								</juno-button>
 							</div>
-							<div class="col-md-4">
+							<div class="row-spacing action-button-wrapper">
+								<juno-button component-style="$ctrl.componentStyle"
+								             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+								             disabled="$ctrl.isLoading || !flowsheetTable.enableClone"
+								             click="$ctrl.onCloneFlowsheet(flowsheet)">
+									Copy
+								</juno-button>
+							</div>
+							<div class="row-spacing action-button-wrapper">
+								<juno-button component-style="$ctrl.componentStyle"
+								             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+								             disabled="$ctrl.isLoading || !flowsheetTable.enableEdit"
+								             click="$ctrl.onToggleFlowsheetEnabled(flowsheet)">
+									{{$ctrl.toggleFlowsheetEnabledLabel(flowsheet)}}
+								</juno-button>
+							</div>
+							<div class="row-spacing-r action-button-wrapper">
 								<juno-button component-style="$ctrl.componentStyle"
 								             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								             disabled="$ctrl.isLoading || !$ctrl.userCanDelete()"
+								             disabled="$ctrl.isLoading || !flowsheetTable.enableDelete"
 								             click="$ctrl.onFlowsheetDelete(flowsheet)">
 									Delete
 								</juno-button>

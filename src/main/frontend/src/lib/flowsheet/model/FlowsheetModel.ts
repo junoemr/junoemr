@@ -49,6 +49,19 @@ export default class FlowsheetModel
 		this.triggerCodes = [];
 	}
 
+	public isDemographicLevel(): boolean
+	{
+		return Boolean(this.ownerDemographicId);
+	}
+	public isProviderLevel(): boolean
+	{
+		return Boolean(this.ownerProviderId);
+	}
+	public isClinicLevel(): boolean
+	{
+		return !(this.isProviderLevel() || this.isDemographicLevel());
+	}
+
 	get id(): number
 	{
 		return this._id;
