@@ -253,6 +253,11 @@ oscarApp.config([
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.mhaConfig',
+		{
+			url: "/mhaConfig",
+			component: "mhaConfig",
+		})
 		.state('admin.rosterStatus',
 		{
 			url: '/rosterStatus',
@@ -263,14 +268,14 @@ oscarApp.config([
 			url: '/billing',
 			component: 'systemPropertiesBilling',
 		})
-		.state('admin.configureFlowsheets',
+		.state('admin.configureHealthTracker',
 		{
-			url: '/configureFlowsheets',
+			url: '/configureHealthTracker',
 			component: 'flowsheetManager',
 		})
 		.state('admin.editFlowsheet',
 		{
-			url: '/configureFlowsheets/flowsheet/:flowsheetId',
+			url: '/configureHealthTracker/flowsheet/:flowsheetId',
 			component: 'flowsheetEdit',
 		})
 		.state('ticklers',
@@ -364,147 +369,181 @@ oscarApp.config([
 				{
 					return providerService.getMe();
 				}],
-				billingServiceTypes: ['billingService', function(billingService)
-				{
-					return billingService.getUniqueServiceTypes();
-				}],
-				providerList: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						'active': true
-					});
-				}],
 				loadedSettings: ['providerService', function(providerService)
 				{
 					return providerService.getSettings();
 				}],
-				encounterForms: ['formService', function(formService)
-				{
-					return formService.getAllEncounterForms();
-				}],
-				eforms: ['formService', function(formService)
-				{
-					return formService.getAllEForms();
-				}],
-				teams: ['providerService', function(providerService)
-				{
-					return providerService.getActiveTeams();
-				}],
-				groupNames: ['formService', function(formService)
-				{
-					return formService.getGroupNames();
-				}],
-				loadedApps: ['appService', function(appService)
-				{
-					return appService.getApps();
-				}]
 			}
 		})
 		.state('settings.persona',
 			{
 				url: '/persona',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "personaSettings",
+				params: {
+					pref: null,
+				},
 				data: {
-					tab: 'persona'
-				}
+					tab: 'persona',
+				},
 			})
 		.state('settings.general',
 			{
 				url: '/general',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "generalSettings",
 				data: {
-					tab: 'general'
-				}
+					tab: 'general',
+				},
+				params: {
+					pref: null,
+				},
+				resolve: {
+					billingServiceTypes: ['billingService', function(billingService)
+					{
+						return billingService.getUniqueServiceTypes();
+					}],
+					providerList: ['providerService', function(providerService)
+					{
+						return providerService.searchProviders(
+							{
+								'active': true
+							});
+					}],
+				},
 			})
 		.state('settings.schedule',
 			{
 				url: '/schedule',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "scheduleSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'schedule'
-				}
+				},
+				resolve: {
+					encounterForms: ['formService', function(formService)
+					{
+						return formService.getAllEncounterForms();
+					}],
+					eforms: ['formService', function(formService)
+					{
+						return formService.getAllEForms();
+					}],
+				},
 			})
 		.state('settings.billing',
 			{
 				url: '/billing',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: 'billingSettings',
+				params: {
+					pref: null,
+				},
 				data: {
-					tab: 'billing'
-				}
+					tab: 'billing',
+				},
+				resolve: {
+					billingServiceTypes: ['billingService', function(billingService)
+					{
+						return billingService.getUniqueServiceTypes();
+					}],
+				},
 			})
 		.state('settings.rx',
 			{
 				url: '/rx',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "rxSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'rx'
-				}
+				},
 			})
 		.state('settings.masterdemo',
 			{
 				url: '/masterdemo',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "masterDemographicSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'masterdemo'
-				}
+				},
 			})
 		.state('settings.consults',
 			{
 				url: '/consults',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "consultSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'consults'
-				}
+				},
+				resolve: {
+					teams: ['providerService', function(providerService)
+					{
+						return providerService.getActiveTeams();
+					}],
+				},
 			})
 		.state('settings.documents',
 			{
 				url: '/documents',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "documentSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'documents'
-				}
+				},
 			})
 		.state('settings.summary',
 			{
 				url: '/summary',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "summarySettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'summary'
-				}
+				},
 			})
 		.state('settings.eforms',
 			{
 				url: '/eforms',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "eformSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'eforms'
-				}
+				},
+				resolve: {
+					groupNames: ['formService', function(formService)
+					{
+						return formService.getGroupNames();
+					}],
+				},
 			})
 		.state('settings.inbox',
 			{
 				url: '/inbox',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "inboxSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'inbox'
-				}
+				},
 			})
 		.state('settings.programs',
 			{
 				url: '/programs',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "programSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'programs'
 				}
@@ -512,11 +551,35 @@ oscarApp.config([
 		.state('settings.integration',
 			{
 				url: '/integration',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "integrationSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'integration'
-				}
+				},
+			})
+		.state('settings.tracker',
+			{
+				url: '/healthTracker',
+				component: 'flowsheetManager',
+				params: {
+					pref: null,
+				},
+				data: {
+					tab: 'tracker'
+				},
+				resolve: {
+					user: ['providerService', function(providerService)
+					{
+						return providerService.getMe();
+					}]
+				},
+			})
+		.state('settings.editFlowsheet',
+			{
+				url: '/healthTracker/flowsheet/:flowsheetId',
+				component: 'flowsheetEdit',
 			})
 		.state('support',
 		{
@@ -576,6 +639,35 @@ oscarApp.config([
 					checkDemographicAccess: true,
 				},
 			},
+		})
+		.state('record.summary.tracker',
+		{
+			url: '/tracker',
+			component: 'healthTracker',
+			resolve:
+			{
+				user: ['providerService', function (providerService)
+				{
+					return providerService.getMe();
+				}],
+			},
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
+		})
+		.state('record.summary.tracker.flowsheet',
+		{
+			url: '/flowsheet/:flowsheetId',
+			component: 'flowsheet',
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 		})
 		.state('record.forms',
 		{
@@ -751,6 +843,13 @@ oscarApp.config([
 		{
 			url: '/tracker',
 			component: 'healthTracker',
+			resolve:
+			{
+				user: ['providerService', function (providerService)
+				{
+					return providerService.getMe();
+				}],
+			},
 			meta:
 			{
 				auth: {
@@ -769,6 +868,22 @@ oscarApp.config([
 					},
 				},
 		})
+		.state('record.configureHealthTracker',
+		{
+			url: '/configureHealthTracker',
+			component: 'flowsheetManager',
+			resolve: {
+				user: ['providerService', function(providerService)
+				{
+					return providerService.getMe();
+				}]
+			},
+		})
+		.state('record.editFlowsheet',
+			{
+				url: '/configureHealthTracker/flowsheet/:flowsheetId',
+				component: 'flowsheetEdit',
+			})
         .state('record.patientEducation',
         {
             url: '/patientEducation',

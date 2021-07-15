@@ -350,8 +350,8 @@ module.exports = {
 			'./src/record/summary/encounterNoteListComponent.js',
 			'./src/record/flowsheet/module.js',
 			'./src/record/flowsheet/flowsheetComponent.js',
-			'./src/record/flowsheet/components/flowsheetItemComponent.js',
-			'./src/record/flowsheet/components/flowsheetItemDataComponent.js',
+			'./src/record/flowsheet/components/flowsheetItem/flowsheetItemComponent.js',
+			'./src/record/flowsheet/components/flowsheetItemData/flowsheetItemDataComponent.js',
 			'./src/record/forms/module.js',
 			'./src/record/forms/formsController.js',
 			'./src/record/forms/components/formView/formViewComponent.js',
@@ -373,7 +373,7 @@ module.exports = {
 			'./src/record/phr/phrController.js',
 
 			'./src/record/tracker/module.js',
-			'./src/record/tracker/trackerController.ts',
+			'./src/record/tracker/trackerComponent.ts',
 
 			'./src/tickler/module.js',
 			'./src/tickler/ticklerListController.js',
@@ -414,6 +414,10 @@ module.exports = {
 			'./src/admin/section/know2act/Know2actTemplateController.js',
 			'./src/admin/section/frameContent/frameContentController.js',
 			'./src/admin/section/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.js',
+			'./src/admin/section/mhaConfig/components/module.js',
+			'./src/admin/section/mhaConfig/components/integrationList/integrationListComponent.js',
+			'./src/admin/section/mhaConfig/components/integrationSettings/integrationSettingsComponent.js',
+			'./src/admin/section/mhaConfig/mhaConfigComponent.js',
 			'./src/admin/section/dataManagement/module.js',
 			'./src/admin/section/dataManagement/demographicImport/demographicImportComponent.js',
 			'./src/admin/section/dataManagement/demographicExport/demographicExportComponent.js',
@@ -459,6 +463,8 @@ module.exports = {
 			'./src/settings/changePasswordController.js',
 			'./src/settings/quickLinkController.js',
 			'./src/settings/summaryItemSettingsController.js',
+
+			...(glob.sync("./src/settings/**/*.ts", {nosort: true})),
 
 			'./src/help/module.js',
 			'./src/help/supportController.js',

@@ -169,12 +169,26 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			$scope.$emit('loadNoteForEdit', note);
 		};
 
-		controller.trackerUrl = "";
-
-		controller.getTrackerUrl = function getTrackerUrl(demographicNo)
+		controller.onOpenTrackerTab = () =>
 		{
-			controller.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
-		};
+			if(!$state.includes("**.tracker") || !$state.includes("**.tracker.**"))
+			{
+				$state.go("record.summary.tracker",
+					{
+						demographicNo: $stateParams.demographicNo,
+					});
+			}
+		}
+		controller.onOpenNotesTab = () =>
+		{
+			if(!$state.is("record.summary"))
+			{
+				$state.go("record.summary",
+					{
+						demographicNo: $stateParams.demographicNo,
+					});
+			}
+		}
 
 		controller.getLeftItems = () =>
 		{

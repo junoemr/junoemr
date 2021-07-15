@@ -40,6 +40,10 @@ public class Flowsheet extends AbstractTransientModel
 	private List<FlowsheetItemGroup> flowsheetItemGroups;
 	private List<DxCode> triggerCodes;
 
+	private Integer parentFlowsheetId;
+	private Integer ownerDemographicId;
+	private String ownerProviderId;
+
 	public Flowsheet()
 	{
 		flowsheetItemGroups = new ArrayList<>();

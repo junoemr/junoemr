@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.flowsheet.model.Flowsheet;
+import org.oscarehr.flowsheet.search.FlowsheetCriteriaSearch;
 import org.oscarehr.flowsheet.service.FlowsheetService;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
@@ -49,16 +50,43 @@ public class FlowsheetsWebService extends AbstractServiceImpl
 	private FlowsheetService flowsheetService;
 
 	@GET
-	@Path("/")
-	public RestSearchResponse<Flowsheet> getFlowsheets(
+	@Path("/search")
+	public RestSearchResponse<Flowsheet> searchFlowsheets(
+			@QueryParam("enabled") Boolean isEnabled,
+			@QueryParam("includeClinicLevel") @DefaultValue("true") boolean includeClinicLevel,
+			@QueryParam("includeProviderLevel") @DefaultValue("false") boolean includeProviderLevel,
+			@QueryParam("providerId") String owningProviderId,
+			@QueryParam("includeDemographicLevel") @DefaultValue("false") boolean includeDemographicLevel,
+			@QueryParam("DemographicId") Integer owningDemographicId,
 			@QueryParam("page") @DefaultValue("1") Integer page,
 			@QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ);
+
+		if(includeProviderLevel && owningProviderId == null)
+		{
+			throw new IllegalArgumentException("A providerId must be provided if includeProviderLevel is true");
+		}
+		if(includeDemographicLevel && owningDemographicId == null)
+		{
+			throw new IllegalArgumentException("A demographicId must be provided if includeDemographicLevel is true");
+		}
+
 		page = validPageNo(page);
 		perPage = limitedResultCount(perPage);
 		int offset = calculatedOffset(page, perPage);
 
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ);
-		return RestSearchResponse.successResponseOnePage(flowsheetService.getFlowsheets(offset, perPage));
+		FlowsheetCriteriaSearch criteriaSearch = new FlowsheetCriteriaSearch();
+		criteriaSearch.setEnabled(isEnabled);
+		criteriaSearch.setIncludeClinicLevel(includeClinicLevel);
+		criteriaSearch.setIncludeProviderLevel(includeProviderLevel);
+		criteriaSearch.setIncludeDemographicLevel(includeDemographicLevel);
+		criteriaSearch.setProviderId(owningProviderId);
+		criteriaSearch.setDemographicId(owningDemographicId);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setJunctionTypeOR();
+
+		return flowsheetService.executeCriteriaSearch(criteriaSearch, page, perPage);
 	}
 }

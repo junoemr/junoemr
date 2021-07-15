@@ -1,26 +1,34 @@
-RENAME TABLE Flowsheet TO FlowsheetOld;
+RENAME TABLE `Flowsheet` TO FlowsheetOld;
 
 CREATE TABLE IF NOT EXISTS flowsheet
 (
-    id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    flowsheet_name  VARCHAR(255) NOT NULL,
-    description     TEXT,
-    system_managed  BOOLEAN NOT NULL DEFAULT false,
-    enabled         BOOLEAN NOT NULL DEFAULT true,
+    id                      INTEGER PRIMARY KEY AUTO_INCREMENT,
+    parent_flowsheet_id     INTEGER(10) DEFAULT NULL,
+    owner_provider_id       VARCHAR(6) DEFAULT NULL,
+    owner_demographic_id    INTEGER(10) DEFAULT NULL,
+    system_managed          BOOLEAN NOT NULL DEFAULT false,
+    enabled                 BOOLEAN NOT NULL DEFAULT true,
+    flowsheet_name          VARCHAR(255) NOT NULL,
+    description             TEXT,
 
-    created_at      DATETIME NOT NULL,
-    created_by      VARCHAR(6) DEFAULT NULL,
-    updated_at      DATETIME NOT NULL,
-    updated_by      VARCHAR(6) DEFAULT NULL,
-    deleted_at      DATETIME,
-    deleted_by      VARCHAR(6) DEFAULT NULL
+    created_at              DATETIME NOT NULL,
+    created_by              VARCHAR(6) DEFAULT NULL,
+    updated_at              DATETIME NOT NULL,
+    updated_by              VARCHAR(6) DEFAULT NULL,
+    deleted_at              DATETIME,
+    deleted_by              VARCHAR(6) DEFAULT NULL,
+
+    CONSTRAINT `flowsheet_flowsheet_parent_id_fk` FOREIGN KEY (parent_flowsheet_id) REFERENCES flowsheet (id),
+    CONSTRAINT `flowsheet_owner_provider_id_fk` FOREIGN KEY (owner_provider_id) REFERENCES provider (provider_no),
+    CONSTRAINT `flowsheet_owner_demographic_id_fk` FOREIGN KEY (owner_demographic_id) REFERENCES demographic (demographic_no)
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS flowsheet_item_group
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
     flowsheet_id    INTEGER(10) NOT NULL,
-    group_name      VARCHAR(255) NOT NULL,
+    group_name      VARCHAR(255),
     description     TEXT,
 
     created_at      DATETIME NOT NULL,

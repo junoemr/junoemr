@@ -103,6 +103,7 @@
 @import "../src/patient/search/patientSearch";
 @import "../src/report/reports";
 @import "../src/flowsheet/flowsheetEdit";
+@import "../src/flowsheet/flowsheetManager";
 @import "../src/flowsheet/components/flowsheetItemGroup/flowsheetItemGroup";
 @import "../src/flowsheet/components/flowsheetEditItem/flowsheetEditItem";
 @import "../src/flowsheet/components/flowsheetItemRule/flowsheetItemRule";
@@ -122,7 +123,8 @@
 @import "../src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModal";
 @import "../src/record/details/components/rosteredHistory/rosteredHistoryModal";
 @import "../src/record/flowsheet/flowsheet";
-@import "../src/record/flowsheet/components/flowsheetItem";
+@import "../src/record/flowsheet/components/flowsheetItem/flowsheetItem";
+@import "../src/record/flowsheet/components/flowsheetItemData/flowsheetItemData";
 @import "../src/record/forms/forms";
 @import "../src/record/forms/components/groupSelector/groupSelector";
 @import "../src/record/forms/components/modeSelector/modeSelector";
@@ -157,4 +159,7 @@
 @import "../src/admin/section/imdHealth/imdHealthAdmin";
 @import "../src/admin/section/imdHealth/imdHealthLanding";
 @import "../src/admin/section/rosterStatus/modals/editRosterStatusModal";
+@import "../src/admin/section/mhaConfig/mhaConfig";
+@import "../src/admin/section/mhaConfig/components/integrationSettings/integrationSettings";
+@import "../src/admin/section/mhaConfig/components/integrationList/integrationList";
 @import "../src/admin/section/frameContent/frameContent";

@@ -31,8 +31,8 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClinicStatusResponseTo1 implements Serializable
 {
-	private static final String STATUS_IDENTIFIER_CONNECTED = "connected";
-	private static final String STATUS_IDENTIFIER_DISCONNECTED = "disconnected";
+	public static final String STATUS_IDENTIFIER_CONNECTED = "connected";
+	public static final String STATUS_IDENTIFIER_DISCONNECTED = "disconnected";
 
 	@JsonProperty("message")
 	private String message;

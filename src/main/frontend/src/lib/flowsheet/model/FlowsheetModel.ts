@@ -37,12 +37,29 @@ export default class FlowsheetModel
 	private _systemManaged: boolean;
 	private _flowsheetItemGroups: FlowsheetItemGroupModel[];
 	private _triggerCodes: DxCodeModel[];
+	private _parentFlowsheetId: number;
+	private _ownerDemographicId: number;
+	private _ownerProviderId: string;
 
 	public constructor()
 	{
 		this.enabled = true;
 		this.systemManaged = false;
 		this.flowsheetItemGroups = [];
+		this.triggerCodes = [];
+	}
+
+	public isDemographicLevel(): boolean
+	{
+		return Boolean(this.ownerDemographicId);
+	}
+	public isProviderLevel(): boolean
+	{
+		return Boolean(this.ownerProviderId);
+	}
+	public isClinicLevel(): boolean
+	{
+		return !(this.isProviderLevel() || this.isDemographicLevel());
 	}
 
 	get id(): number
@@ -113,5 +130,36 @@ export default class FlowsheetModel
 	set triggerCodes(value: DxCodeModel[])
 	{
 		this._triggerCodes = value;
+	}
+
+
+	get parentFlowsheetId(): number
+	{
+		return this._parentFlowsheetId;
+	}
+
+	set parentFlowsheetId(value: number)
+	{
+		this._parentFlowsheetId = value;
+	}
+
+	get ownerDemographicId(): number
+	{
+		return this._ownerDemographicId;
+	}
+
+	set ownerDemographicId(value: number)
+	{
+		this._ownerDemographicId = value;
+	}
+
+	get ownerProviderId(): string
+	{
+		return this._ownerProviderId;
+	}
+
+	set ownerProviderId(value: string)
+	{
+		this._ownerProviderId = value;
 	}
 }

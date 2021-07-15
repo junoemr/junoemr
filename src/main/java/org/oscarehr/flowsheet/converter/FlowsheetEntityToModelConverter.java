@@ -25,10 +25,12 @@ package org.oscarehr.flowsheet.converter;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dx.converter.Icd9EntityToDxCodeConverter;
 import org.oscarehr.flowsheet.entity.FlowsheetItem;
 import org.oscarehr.flowsheet.model.Flowsheet;
 import org.oscarehr.flowsheet.model.FlowsheetItemGroup;
+import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,10 +53,20 @@ public class FlowsheetEntityToModelConverter extends AbstractModelConverter<org.
 	public Flowsheet convert(org.oscarehr.flowsheet.entity.Flowsheet input)
 	{
 		Flowsheet flowsheetModel = new Flowsheet();
-		BeanUtils.copyProperties(input, flowsheetModel, "flowsheetItems", "flowsheetItemGroups", "icd9Triggers");
+		BeanUtils.copyProperties(input, flowsheetModel,
+				"flowsheetItems",
+				"flowsheetItemGroups",
+				"icd9Triggers",
+				"parentFlowsheet",
+				"ownerProvider",
+				"ownerDemographic");
 
 		flowsheetModel.setFlowsheetItemGroups(buildGroups(input));
 		flowsheetModel.setTriggerCodes(buildTriggers(input));
+
+		flowsheetModel.setParentFlowsheetId(input.getOptionalParentFlowsheet().map(org.oscarehr.flowsheet.entity.Flowsheet::getId).orElse(null));
+		flowsheetModel.setOwnerProviderId(input.getOptionalOwnerProvider().map(ProviderData::getId).orElse(null));
+		flowsheetModel.setOwnerDemographicId(input.getOptionalOwnerDemographic().map(Demographic::getId).orElse(null));
 
 		return flowsheetModel;
 	}

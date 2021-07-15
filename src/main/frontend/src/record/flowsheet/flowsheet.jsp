@@ -22,7 +22,10 @@
 --%>
 
 <div class="flowsheet-container">
-	<h3>{{$ctrl.flowsheet.name}} flowsheet</h3>
+	<div class="flex-column">
+		<h3>{{$ctrl.flowsheet.name}}</h3>
+		<span>{{$ctrl.flowsheet.description}}</span>
+	</div>
 
 	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.FLOWSHEET_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ]">
 		<filter-panel initial-state-expanded="false">
@@ -77,7 +80,8 @@
 			</div>
 		</filter-panel>
 
-		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups | filter:$ctrl.showFlowsheetGroup">
+		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups | filter:$ctrl.showFlowsheetGroup"
+		                      model="itemGroup">
 			<div ng-repeat="item in itemGroup.flowsheetItems | filter:$ctrl.showFlowsheetItem">
 				<div class="item-divider" ng-if="!$first"></div>
 				<flowsheet-item

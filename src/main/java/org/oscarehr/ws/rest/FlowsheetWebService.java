@@ -94,4 +94,28 @@ public class FlowsheetWebService extends AbstractServiceImpl
 		flowsheetService.deleteFlowsheet(getLoggedInProviderId(), flowsheetId);
 		return RestResponse.successResponse(true);
 	}
+
+	@POST
+	@Path("/{id}/clone")
+	public RestResponse<Flowsheet> cloneFlowsheet(@PathParam("id") Integer flowsheetId,
+	                                            @QueryParam("providerId") String providerId,
+	                                            @QueryParam("demographicId") Integer demographicId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_CREATE);
+
+		Flowsheet clone;
+		if(demographicId != null)
+		{
+			clone = flowsheetService.addNewDemographicFlowsheetCopy(getLoggedInProviderId(), flowsheetId, demographicId);
+		}
+		else if (providerId != null)
+		{
+			clone = flowsheetService.addNewProviderFlowsheetCopy(getLoggedInProviderId(), flowsheetId, providerId);
+		}
+		else
+		{
+			clone = flowsheetService.addNewFlowsheetCopy(getLoggedInProviderId(), flowsheetId);
+		}
+		return RestResponse.successResponse(clone);
+	}
 }

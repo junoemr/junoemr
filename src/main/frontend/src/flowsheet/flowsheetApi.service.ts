@@ -51,9 +51,19 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.flowsheetTransferConverter = new FlowsheetModelToTransferConverter();
 		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
 
-		service.getAllFlowsheets = async (): Promise<Array<FlowsheetModel>> =>
+		service.searchFlowsheets = async (
+			enabled: boolean,
+			includeClinicLevel: boolean,
+			includeProviderLevel: boolean,
+			providerId: string,
+			includeDemographicLevel: boolean,
+			demographicId: number,
+			page: number,
+			perPage: number): Promise<Array<FlowsheetModel>> =>
 		{
-			return service.flowsheetModelConverter.convertList((await service.flowsheetsApi.getFlowsheets()).data.body);
+			return service.flowsheetModelConverter.convertList(
+				(await service.flowsheetsApi.searchFlowsheets(
+					enabled, includeClinicLevel, includeProviderLevel, providerId, includeDemographicLevel, demographicId, page, perPage)).data.body);
 		}
 
 		service.getFlowsheet = async (flowsheetId: number): Promise<FlowsheetModel> =>
@@ -106,6 +116,19 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: object): Promise<any> =>
 		{
 			return (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
+		}
+
+		service.cloneFlowsheetForClinic = async (flowsheetId: number): Promise<FlowsheetModel> =>
+		{
+			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId)).data.body);
+		}
+		service.cloneFlowsheetForProvider = async (flowsheetId: number, providerId: string): Promise<FlowsheetModel> =>
+		{
+			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId, providerId)).data.body);
+		}
+		service.cloneFlowsheetForDemographic = async (flowsheetId: number, demographicId: number): Promise<FlowsheetModel> =>
+		{
+			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId, null, demographicId)).data.body);
 		}
 	}
 ]);

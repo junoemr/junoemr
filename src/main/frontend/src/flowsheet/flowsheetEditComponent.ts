@@ -42,11 +42,13 @@ angular.module('Flowsheet').component('flowsheetEdit',
 			'$stateParams',
 			'$uibModal',
 			'flowsheetApiService',
+			'securityRolesService',
 			function (
 				$state,
 				$stateParams,
 				$uibModal,
 				flowsheetApiService,
+				securityRolesService,
 			)
 			{
 				const ctrl = this;
@@ -57,6 +59,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.isLoading = true;
+				ctrl.flowsheet = null as FlowsheetModel;
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
@@ -71,9 +74,23 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 					ctrl.isLoading = false;
 				}
+
 				ctrl.isNewFlowsheet = (): boolean =>
 				{
-					return Juno.Common.Util.isBlank(ctrl.flowsheet.id);
+					if(ctrl.flowsheet)
+					{
+						return Juno.Common.Util.isBlank(ctrl.flowsheet.id);
+					}
+				}
+
+				ctrl.userCanEdit = (): boolean =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_UPDATE);
+				}
+
+				ctrl.userCanCreate = (): boolean =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_CREATE);
 				}
 
 				ctrl.onAddNewGroup = async (): Promise<void> =>
@@ -209,7 +226,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onRemoveGroup = async (group): Promise<void> =>
 				{
-					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
+					const confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Remove flowsheet group",
 						"Are you sure you want to remove this group (and all items within it) from the flowsheet?",
 						ctrl.componentStyle);
@@ -220,7 +237,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 				}
 
-				ctrl.lookupPreventions = async (searchTerm): Promise<Array<object>> =>
+				ctrl.lookupPreventions = async (searchTerm): Promise<object[]> =>
 				{
 					const searchResults = await flowsheetApiService.searchPreventionTypes(searchTerm);
 					return searchResults.body.map((result) =>
@@ -233,7 +250,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					});
 				}
 
-				ctrl.lookupMeasurements = async (searchTerm): Promise<Array<object>> =>
+				ctrl.lookupMeasurements = async (searchTerm): Promise<object[]> =>
 				{
 					const searchResults = await flowsheetApiService.searchMeasurementTypes(searchTerm);
 					return searchResults.body.map((result) =>
@@ -246,7 +263,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					});
 				}
 
-				ctrl.lookupIcd9Codes = async (searchTerm): Promise<Array<object>> =>
+				ctrl.lookupIcd9Codes = async (searchTerm): Promise<object[]> =>
 				{
 					const searchResults: DxCodeModel[] = await flowsheetApiService.searchDxCodes(DxCodingSystem.ICD9, searchTerm);
 					return searchResults.map((result) =>
@@ -261,24 +278,71 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onCancel = (): void =>
 				{
-					$state.transitionTo('admin.configureFlowsheets',
-						{},
-						{
-							notify: false
-						});
+					if($state.includes("**.admin.**"))
+					{
+						$state.go('admin.configureHealthTracker');
+					}
+					else if($state.includes("**.settings.**"))
+					{
+						$state.go('settings.tracker');
+					}
+					else if($state.includes("**.record.**"))
+					{
+						$state.go("record.configureHealthTracker",
+							{
+								demographicNo: $stateParams.demographicNo,
+							});
+					}
+					else
+					{
+						$state.go('dashboard');
+					}
 				}
 
 				ctrl.onSave = async (): Promise<void> =>
 				{
-					if(ctrl.isNewFlowsheet())
+					ctrl.isLoading = true;
+					try
 					{
-						ctrl.flowsheet = await flowsheetApiService.createFlowsheet(ctrl.flowsheet);
+						if (ctrl.isNewFlowsheet())
+						{
+							ctrl.flowsheet = await flowsheetApiService.createFlowsheet(ctrl.flowsheet);
+						}
+						else
+						{
+							ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
+						}
+						Juno.Common.Util.successAlert($uibModal, "Save Complete", "The changes have been applied");
 					}
-					else
+					finally
 					{
-						ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
+						ctrl.isLoading = false;
 					}
 				}
 
+				ctrl.canSave = (): boolean =>
+				{
+					let hasPermission = ctrl.isNewFlowsheet() ? ctrl.userCanCreate() : ctrl.userCanEdit();
+					return ctrl.flowsheet  && !ctrl.flowsheet.systemManaged && hasPermission;
+				}
+
+				ctrl.saveButtonTooltip = (): string =>
+				{
+					if(ctrl.flowsheet)
+					{
+						if (ctrl.flowsheet.systemManaged)
+						{
+							return "System Managed Flowsheets can not be modified";
+						}
+						else if (!ctrl.canSave())
+						{
+							return "You do not have the required permissions to save this";
+						}
+						else
+						{
+							return "Save Changes";
+						}
+					}
+				}
 			}]
 	});

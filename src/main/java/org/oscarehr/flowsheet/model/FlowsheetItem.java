@@ -40,14 +40,15 @@ public class FlowsheetItem extends AbstractTransientModel
 	private String name;
 	private String description;
 	private String guideline;
-
 	private ItemType type;
 	private String typeCode;
-	private boolean hidden;
 
 	private ValueType valueType;
 	private String valueLabel;
 	private List<DsRule> rules;
+
+	// transient
+	private boolean hidden;
 	private List<FlowsheetItemAlert> flowsheetItemAlerts;
 	private List<FlowsheetItemData> data;
 

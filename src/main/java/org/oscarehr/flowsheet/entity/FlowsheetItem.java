@@ -91,7 +91,7 @@ public class FlowsheetItem extends AbstractModel<Integer>
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_item_ds_rule", joinColumns = @JoinColumn(name="flowsheet_item_id"), inverseJoinColumns = @JoinColumn(name="ds_rule_id"))
-	private Set<DsRule> dsRules = new HashSet<>();
+	private Set<DsRule> dsRules;
 
 	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime createdAt;
@@ -110,6 +110,35 @@ public class FlowsheetItem extends AbstractModel<Integer>
 
 	@Column(name = "deleted_by")
 	private String deletedBy;
+
+	public FlowsheetItem()
+	{
+		this.dsRules = new HashSet<>();
+	}
+
+	public FlowsheetItem(FlowsheetItem toCopy, Flowsheet flowsheetReference, FlowsheetItemGroup groupReference)
+	{
+		this.id = null;
+		this.name = toCopy.name;
+		this.description = toCopy.description;
+		this.guideline = toCopy.guideline;
+		this.type = toCopy.type;
+		this.typeCode = toCopy.typeCode;
+
+		this.valueType = toCopy.valueType;
+		this.valueLabel = toCopy.valueLabel;
+		this.dsRules = new HashSet<>(toCopy.dsRules);
+		this.flowsheet = flowsheetReference;
+		this.flowsheetItemGroup = groupReference;
+
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+		this.deletedAt = null;
+		this.createdBy = null;
+		this.updatedBy = null;
+		this.deletedBy = null;
+	}
+
 
 	/**
 	 * must be overridden to prevent default impl from infinite loading jpa links

@@ -539,7 +539,7 @@ public class AdminNavService
 
 		if(securityInfoManager.hasPrivileges(providerNo, Permission.FLOWSHEET_READ))
 		{
-			systemManagementItems.add( new AdminNavItemTo1("Customize Flowsheets", "configureFlowsheets"));
+			systemManagementItems.add( new AdminNavItemTo1("Customize Flowsheets", "configureHealthTracker"));
 		}
 
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))
@@ -700,6 +700,11 @@ public class AdminNavService
 			{
 				integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall/settings"));
 			}
+		}
+
+		if (securityInfoManager.isSuperAdmin(providerNo))
+		{
+			integrationItems.add(new AdminNavItemTo1("MHA Configuration", "mhaConfig"));
 		}
 
 		integrationGroup.setItems(integrationItems);
