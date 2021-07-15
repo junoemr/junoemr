@@ -758,6 +758,23 @@
 							</label>
 						</div>
 					</div>
+					<div class="form-group col-sm-12 m-t-16">
+						<label>Top Bar Unread Message Count:</label>
+						<div class="controls">
+							<label class="radio m-l-24" for="radios-mcm-0">
+								<input name="radios-mcm-0" id="radios-mcm-0" ng-model="settingsCtrl.pref.messageCountMode" ng-value="MessageCountMode.Mha" type="radio">
+								Count only MHA messages.
+							</label>
+							<label class="radio m-l-24" for="radios-inb-1">
+								<input name="radios-mcm-1" id="radios-mcm-1" ng-model="settingsCtrl.pref.messageCountMode" ng-value="MessageCountMode.Internal" type="radio">
+								Count only internal messages.
+							</label>
+							<label class="radio m-l-24" for="radios-mcm-2">
+								<input name="radios-mcm-2" id="radios-mcm-2" ng-model="settingsCtrl.pref.messageCountMode" ng-value="MessageCountMode.MhaInternal" type="radio">
+								Sum MHA and internal message count.
+							</label>
+						</div>
+					</div>
 
 				</div>
 			</div>

@@ -23,6 +23,8 @@
  */
 package org.oscarehr.managers.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.eform.service.EFormTemplateService;
 
 import java.util.ArrayList;
@@ -157,6 +159,18 @@ public class ProviderSettings
 	private boolean appointmentCountIncludeCancelled;
 	private boolean appointmentCountIncludeNoShow;
 	private boolean appointmentCountIncludeNoDemographic;
+
+	// when counting the number of unread messages how the value should be calculated.
+	public enum MESSAGE_COUNT_SUM_MODE
+	{
+		MHA, // only show mha count
+		INTERNAL, // only show internal count
+		MHA_INTERNAL, // show mha + internal count
+	}
+
+	@Getter
+	@Setter
+	private MESSAGE_COUNT_SUM_MODE messageCountMode;
 
 	public String getRecentPatients()
 	{
