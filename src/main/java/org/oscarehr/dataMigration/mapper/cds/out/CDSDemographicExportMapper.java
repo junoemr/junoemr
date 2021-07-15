@@ -178,14 +178,8 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 			// Address in demographic table maps to residential address
 			// demographicExt address maps to mailing address
 			// This is an attempt to maintain data consistency for importing then exporting the same patient.
-			if (address.isCurrentAddress())
-			{
-				exportAddressList.add(toCdsAddress(address, AddressType.R));
-			}
-			else
-			{
-				exportAddressList.add(toCdsAddress(address, AddressType.M));
-			}
+			AddressType addressType = (address.isCurrentAddress()) ? AddressType.R : AddressType.M;
+			exportAddressList.add(toCdsAddress(address, addressType));
 		}
 		return exportAddressList;
 	}

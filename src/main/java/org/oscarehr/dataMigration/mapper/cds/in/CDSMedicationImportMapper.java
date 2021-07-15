@@ -126,7 +126,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		List<ResidualInfo> residualInfoList = importAllResidualInfo(importStructure.getResidualInfo());
 		if (residualInfoList == null)
 		{
-			residualInfoList = new ArrayList<>(4); // If residualInfoList is null, max item count is 4
+			residualInfoList = new ArrayList<>(5); // If residualInfoList is null, max item count is 5
 		}
 
 		// No other place to put the following items.
@@ -282,11 +282,11 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 			{
 				return !"0".equals(indicator);
 			}
-			else if (indicator.equals("Y"))
+			else if (indicator.equals(CDSConstants.Y_INDICATOR_TRUE))
 			{
 				return true;
 			}
-			else if (indicator.equals("N"))
+			else if (indicator.equals(CDSConstants.Y_INDICATOR_TRUE))
 			{
 				return false;
 			}

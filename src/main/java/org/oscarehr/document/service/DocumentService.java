@@ -27,7 +27,6 @@ package org.oscarehr.document.service;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
@@ -43,7 +42,6 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,9 +80,6 @@ public class DocumentService
 	private CtlDocumentDao ctlDocumentDao;
 
 	@Autowired
-	private ProviderInboxRoutingDao providerInboxRoutingDao;
-
-	@Autowired
 	private PatientLabRoutingDao patientLabRoutingDao;
 
 	@Autowired
@@ -99,8 +94,6 @@ public class DocumentService
 	@Autowired
 	private InboxManager inboxManagerService;
 
-	@Autowired
-	private ProviderService providerService;
 
 	/**
 	 * Create a new document from the given document model and a file

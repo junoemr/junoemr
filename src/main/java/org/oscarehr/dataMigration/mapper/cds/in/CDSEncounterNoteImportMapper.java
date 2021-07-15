@@ -28,16 +28,17 @@ import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 import xml.cds.v5_0.ClinicalNotes;
 import xml.cds.v5_0.DateTimeFullOrPartial;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 @Component
 public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<ClinicalNotes, EncounterNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSEncounterNoteImportMapper.class);
-	private static final DateTimeFormatter SIGNING_DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MMM-yyyy hh:mm");
+	private static final String SIGNING_DATE_FORMAT = "dd-MMM-yyyy hh:mm";
 
 	public CDSEncounterNoteImportMapper()
 	{
@@ -126,9 +127,10 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<Cl
 	{
 		if (reviewer.getName() != null) // Ensure NoteReviewer isn't an empty element "<NoteReviewer/>"
 		{
+			LocalDateTime reviewedDateTime = toNullablePartialDateTime(reviewer.getDateTimeNoteReviewed()).toLocalDateTime();
 			return "\n[Signed on "
-					+ SIGNING_DATE_FORMAT.format(reviewer.getDateTimeNoteReviewed().getFullDateTime().toGregorianCalendar().toZonedDateTime()) + " by " +
-					reviewer.getName().getFirstName() + " " + reviewer.getName().getLastName() + "]";
+					+ ConversionUtils.toDateTimeString(reviewedDateTime, SIGNING_DATE_FORMAT)
+					+ reviewer.getName().getFirstName() + " " + reviewer.getName().getLastName() + "]";
 		}
 		return null;
 	}

@@ -353,13 +353,13 @@ public class PatientImportService
 				Map<ProviderData, LocalDateTime> filteredReviewers = new HashMap<>();
 				for(Reviewer reviewer : reviewers)
 				{
-					if (!filteredReviewers.containsKey(reviewerModelToDbConverter.convert(reviewer)))
+					ProviderData provider = reviewerModelToDbConverter.convert(reviewer);
+					if (!filteredReviewers.containsKey(provider))
 					{
-						filteredReviewers.put(reviewerModelToDbConverter.convert(reviewer), reviewer.getReviewDateTime().toLocalDateTime());
+						filteredReviewers.put(provider, reviewer.getReviewDateTime().toLocalDateTime());
 					}
 
 				}
-				logger.error(filteredReviewers.toString());
 
 				Hl7TextMessage hl7TextMessage = labService.persistNewHL7Lab(parser, labHl7, "Juno-Import",
 						0, dbDemographic, filteredReviewers, ProviderInboxItem.ACK);

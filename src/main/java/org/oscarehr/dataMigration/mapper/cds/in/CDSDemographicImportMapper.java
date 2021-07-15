@@ -101,7 +101,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 
 		if (importStructure.getUniqueVendorIdSequence() != null)
 		{
-			note += "\nUniqueVenderIdSequence: " + importStructure.getUniqueVendorIdSequence();
+			note += "\nUniqueVendorIdSequence: " + importStructure.getUniqueVendorIdSequence();
 		}
 
 		if(importStructure.getFamilyPhysician() != null)
@@ -109,7 +109,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			note += "\nFamilyPhysician: " + importStructure.getFamilyPhysician().getFirstName() + " "
 					+ importStructure.getFamilyPhysician().getLastName();
 		}
-		return StringUtils.trimToEmpty(note);
+		return StringUtils.trimToNull(note);
 	}
 
 	protected void mapHealthInsuranceInfo(Demographics importStructure, Demographic demographic)
