@@ -43,9 +43,8 @@ public class RestSearchResponse<T> extends GenericRestResponse<RestSearchRespons
 	}
 	public static <T> RestSearchResponse<T> successResponse(List<T> body)
 	{
-		return new RestSearchResponse<>(new RestSearchResponseHeaders(0, 0, 0, false), body, null, ResponseStatus.SUCCESS);
+		return successResponseOnePage(body);
 	}
-
 	public static <T> RestSearchResponse<T> successResponse(List<T> body, int page, int perPage, int total)
 	{
 		return successResponse(new RestSearchResponseHeaders(), body, page, perPage, total);
