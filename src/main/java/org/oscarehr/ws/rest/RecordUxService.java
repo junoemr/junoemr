@@ -78,7 +78,6 @@ import org.springframework.stereotype.Component;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import oscar.OscarProperties;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
 

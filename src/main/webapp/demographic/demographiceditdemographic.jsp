@@ -2327,7 +2327,7 @@ if ( Dead.equals(PatStat) ) {%>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formRefDocNo" />:</span><span class="info"><%=referralDoctorNo%></span>
 							</li>
-							<% if (systemPreferenceService.isPreferenceEnabled("enable_family_doctor_and_rostering", false))
+							<% if (systemPreferenceService.isPreferenceEnabled(UserProperty.ROSTERING_AND_FAMILY_DOCTOR_ENABLED, false))
 							{ %>
 							<li>
 								<span class="label">
@@ -3086,7 +3086,7 @@ document.updatedelete.referral_doctor_no.value = refNo;
 							</tr>
 
 							<!-- Family Doctor -->
-							<% if (systemPreferenceService.isPreferenceEnabled("enable_family_doctor_and_rostering", false))
+							<% if (systemPreferenceService.isPreferenceEnabled(UserProperty.ROSTERING_AND_FAMILY_DOCTOR_ENABLED, false))
 							{ %>
 							<tr>
 								<td align="right" nowrap>
