@@ -136,7 +136,7 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 	/**
 	 * return additional fields,
 	 * - Patient ID \w assigning authority - all values
-	 * @return list of pairs <title, value>
+	 * @return list of pairs &lt;title, value>
 	 */
 	@Override
 	public ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()

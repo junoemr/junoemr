@@ -90,7 +90,7 @@ import oscar.oscarDemographic.pageUtil.Util;
 import oscar.util.DateUtils;
 
 /**
- * Helper class for creating xPhr & NexJ CDA documents
+ * Helper class for creating xPhr &amp; NexJ CDA documents
  * date Modified: November 13th 2013
  * date Modified: February 3rd 2013
  */

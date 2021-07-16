@@ -121,7 +121,7 @@ public abstract class MessageHandler
 	public abstract void postUpload();
 
 	/**
-	 * return a list of pairs <title, value> that will be displayed in the Patient Detail Results area of the lab display
+	 * return a list of pairs &lt;title, value> that will be displayed in the Patient Detail Results area of the lab display
 	 * @return - list of fields
 	 */
 	public  ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()
@@ -130,7 +130,7 @@ public abstract class MessageHandler
 	}
 
 	/**
-	 * return a list of pairs <title, value> Results Info area of the lab display
+	 * return a list of pairs &lt;title, value> Results Info area of the lab display
 	 * @return - list of fields
 	 */
 	public ArrayList<Pair<String, String>> getExtendedResultDescriptionFields()

@@ -85,7 +85,7 @@ public class DisplayImageAction extends DownloadAction
 
 	/**
 	 *
-	 * @param f String <filename e.g example.jpeg>
+	 * @param f String &lt;filename e.g example.jpeg>
 	 * This method used to get file extension from a given filename
 	 * @return String <file extension>
 	 *

@@ -1,176 +1,33 @@
-.juno-modal {
-	.mha-patient-details-modal {
-		@include juno-font-body-small();
+.mha-patient-details-modal {
+	@include juno-font-body-small();
+	color: var(--color-neutral-darkest);
 
-		.modal-ctl-buttons {
-			.icon-modal-ctl {
-				cursor: pointer;
-			}
+	.patient-details-container {
+		display: grid;
+		grid-template-columns: 448px 1fr;
+
+		background-color: var(--color-neutral-white);
+		box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+
+		border: solid 1px var(--color-neutral-light-grey);
+		border-radius: 8px;
+
+		flex-grow: 1;
+		padding:8px;
+
+		> .grey-box {
+			background-color: var(--color-neutral-lightest);
+
+			border: solid 1px var(--color-neutral-light-grey);
+			border-radius: 8px;
 		}
+	}
 
-		.modal-title {
-			.patient-title {
-				display: flex;
-				align-items: baseline !important;
-				color: $color-neutral-white;
-				font-size: 14px;
+	.patient-details-button-row {
+		min-height: 40px;
+	}
 
-				.header-start {
-					display: flex;
-					align-items: baseline;
-					margin-right: 12px;
-
-					h3 {
-						font-size: 20px;
-					}
-
-					h4 {
-						font-size: 18px;
-					}
-				}
-
-				h5 {
-					font-weight: normal;
-					font-size: 14px;
-					margin: 0 8px 0 8px;
-				}
-			}
-		}
-
-		.modal-body {
-			.patient-modal-body {
-				padding: 8px;
-
-				display: flex !important;
-				flex-direction: column;
-
-				.juno-tab {
-					margin-top: 0;
-					margin-bottom: 24px;
-				}
-
-				// fight style leakage (we need to aggressively scope styles to components or this stuff happens!!!)
-				.juno-input {
-					margin: 16px 0 0 16px;
-					label {
-						text-align: inherit;
-						padding: inherit;
-					}
-				}
-
-				.content-area {
-					flex: 1 1 100%;
-					display: flex;
-
-					.left-content {
-						flex: 1 1 100%;
-						display: flex;
-						flex-direction: column;
-						height: 100%;
-
-						.top-content {
-							flex: 1 0 100px;
-						}
-
-						.panel-content {
-							display: flex;
-
-							.panel-left {
-								flex: 0 0 180px;
-								display: flex;
-								flex-direction: column;
-							}
-
-							.panel-right {
-								flex: 1 1 100%;
-								display: flex;
-								flex-wrap: wrap;
-
-								juno-input {
-									flex: 1 0 145px;
-									max-width: 145px;
-
-									&.small {
-										flex: 0 0 84px;
-										max-width: 84px;
-									}
-								}
-							}
-
-							.juno-input {
-								margin: 0 0 24px 0;
-							}
-
-							.no-margin {
-								.juno-input {
-									margin: 0 !important;
-								}
-							}
-						}
-					}
-
-					.right-content {
-						flex: 1 0 303px;
-						height: 100%;
-
-						display: flex;
-						flex-direction: column;
-
-						.juno-input {
-							width: 255px;
-						}
-
-						.connection-status {
-							width: 100%;
-							display: flex;
-							align-items: flex-end;
-
-							.icon {
-								font-size: 16px;
-								margin-bottom: 8px;
-								color: $color-primary-base;
-							}
-						}
-					}
-				}
-			}
-
-			.juno-divider {
-				margin: 0 8px 0 8px;
-			}
-		}
-
-		.modal-footer {
-			.juno-panel {
-				margin-top: 0;
-				.panel-body {
-					padding: 12px 8px 12px 8px;
-					display: flex;
-					width: 100%;
-
-					panel-body {
-						width: 100%;
-					}
-
-					.footer-button-wrapper {
-						display: flex;
-						flex-direction: row;
-						justify-content: space-between;
-					}
-
-					.cancel-connection-btn {
-						flex: 0 0 128px;
-						.juno-button {
-							margin: 0;
-							width: 128px;
-
-							.cancel-btn-text {
-								color: $color-red-base;
-							}
-						}
-					}
-				}
-			}
-		}
+	.cancel-reject-button {
+		width: 200px;
 	}
 }

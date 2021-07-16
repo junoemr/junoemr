@@ -43,8 +43,6 @@ import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
-import com.quatro.model.security.LdapSecurity;
-
 public final class LoginCheckLoginBean {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String LOG_PRE = "Login!@#$: ";
@@ -156,8 +154,6 @@ public final class LoginCheckLoginBean {
 
 		if (security == null) {
 			return null;
-		} else if (OscarProperties.isLdapAuthenticationEnabled()) {
-			security = new LdapSecurity(security);
 		}
 
 		// find the detail of the user

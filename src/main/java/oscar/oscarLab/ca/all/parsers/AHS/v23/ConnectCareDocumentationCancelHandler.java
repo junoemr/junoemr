@@ -89,7 +89,7 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 	/**
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
 	 * @param appendNamespace - if true append namespace to end of identifier
-	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
 	{

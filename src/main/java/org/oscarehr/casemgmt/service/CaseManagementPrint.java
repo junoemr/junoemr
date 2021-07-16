@@ -208,7 +208,7 @@ public class CaseManagementPrint {
 		}
 		catch (IOException e)
 		{
-			logger.error("Error ",e);
+			logger.error("Error ", e);
 		}
 		finally
 		{

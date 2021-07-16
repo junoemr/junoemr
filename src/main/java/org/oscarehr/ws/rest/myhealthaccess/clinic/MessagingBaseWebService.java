@@ -64,7 +64,7 @@ public class MessagingBaseWebService extends AbstractServiceImpl
 	}
 
 	/**
-	 * build a basic messageable form just the id & type.
+	 * build a basic messageable form just the id &amp; type.
 	 * @param id - the id of the messageable
 	 * @param type - the type of the messageable
 	 * @return - a basic mesageable.
