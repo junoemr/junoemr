@@ -41,17 +41,24 @@
 
 	<div class="flex-row">
 		<div class="flex-row flex-grow align-items-center">
-			<juno-check-box ng-if="$ctrl.isTypeMeasurement() && $ctrl.valueIsBoolean()"
+			<juno-check-box ng-if="$ctrl.showValueBooleanInput()"
 			                label="{{$ctrl.getInputLabel()}}"
 			                change="$ctrl.onBooleanValueChange(value)"
 			                ng-model="$ctrl.checkboxValue">
 			</juno-check-box>
-			<span ng-if="$ctrl.isTypeMeasurement() && $ctrl.valueIsBoolean()" class="boolean-value-indicator">{{$ctrl.newEntry.value}}</span>
-			<juno-input ng-if="$ctrl.isTypeMeasurement() && !$ctrl.valueIsBoolean()"
+			<span ng-if="$ctrl.showValueBooleanInput()" class="boolean-value-indicator">{{$ctrl.newEntry.value}}</span>
+			<juno-input ng-if="$ctrl.showValueTextInput()"
 			            label="{{$ctrl.getInputLabel()}}"
 			            ng-model="$ctrl.newEntry.value"
-			            only-numeric="$ctrl.valueIsNumeric()">
+			            only-numeric="$ctrl.model.valueTypeIsNumeric()">
 			</juno-input>
+			<juno-date-select
+					ng-if="$ctrl.showValueDateInput()"
+					label="{{$ctrl.getInputLabel()}}"
+					ng-model="$ctrl.dateValue"
+					change="$ctrl.onDateChangeValue(value)">
+			</juno-date-select>
+			{{$ctrl.dateValue}}
 		</div>
 		<div>
 			<juno-date-select

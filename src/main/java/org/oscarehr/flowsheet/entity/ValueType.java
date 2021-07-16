@@ -27,4 +27,5 @@ public enum ValueType
 	STRING,
 	NUMERIC,
 	BOOLEAN,
+	DATE,
 }

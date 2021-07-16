@@ -21,11 +21,9 @@
  * Canada
  */
 
-
-const {JUNO_BUTTON_COLOR_PATTERN} = require("../../../../common/components/junoComponentConstants");
-const {JUNO_BUTTON_COLOR} = require("../../../../common/components/junoComponentConstants");
-const {LABEL_POSITION} = require("../../../../common/components/junoComponentConstants");
-const {SecurityPermissions} = require("../../../../common/security/securityConstants");
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {Moment} from "moment";
 
 angular.module('Record.Flowsheet').component('flowsheetItem',
 	{
@@ -55,41 +53,23 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 				ctrl.validationAlerts = [];
 				ctrl.isLoading = false;
 
-				ctrl.$onInit = async () =>
+				ctrl.$onInit = (): void =>
 				{
 					ctrl.clearNewEntry();
 				}
 
-				ctrl.clearNewEntry = () =>
+				ctrl.clearNewEntry = (): void =>
 				{
 					ctrl.newEntry = {
 						value: null,
+						// @ts-ignore
 						observationDateTime: moment(),
 					};
 					ctrl.checkboxValue = false;
+					ctrl.dateValue = null;
 				}
 
-				ctrl.valueIsBoolean = () =>
-				{
-					return ctrl.model.valueType === "BOOLEAN";
-				}
-
-				ctrl.valueIsNumeric = () =>
-				{
-					return ctrl.model.valueType === "NUMBER";
-				}
-
-				ctrl.isTypeMeasurement = () =>
-				{
-					return ctrl.model.type === "MEASUREMENT";
-				}
-
-				ctrl.isTypePrevention = () =>
-				{
-					return ctrl.model.type === "PREVENTION";
-				}
-
-				ctrl.getAlertClass = (severityLevel) =>
+				ctrl.getAlertClass = (severityLevel): string =>
 				{
 					if(severityLevel === "RECOMMENDATION")
 					{
@@ -105,10 +85,11 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					}
 				}
 
-				ctrl.showData = (data) =>
+				ctrl.showData = (data): boolean =>
 				{
 					if(ctrl.filterDateBefore || ctrl.filterDateAfter)
 					{
+						// @ts-ignore
 						const observationDate = moment.utc(data.observationDateTime);
 						if (!observationDate.isValid() ||
 							(ctrl.filterDateAfter && ctrl.filterDateAfter.isValid() && !observationDate.isSameOrAfter(ctrl.filterDateAfter, "day")) ||
@@ -124,20 +105,37 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					return true;
 				}
 
-				ctrl.onBooleanValueChange = (value) =>
+				ctrl.showValueBooleanInput = (): boolean =>
+				{
+					return ctrl.model && ctrl.model.itemTypeIsMeasurement() && ctrl.model.valueTypeIsBoolean();
+				}
+				ctrl.showValueTextInput = (): boolean =>
+				{
+					return ctrl.model && ctrl.model.itemTypeIsMeasurement() && (ctrl.model.valueTypeIsFreeText() || ctrl.model.valueTypeIsNumeric());
+				}
+				ctrl.showValueDateInput = (): boolean =>
+				{
+					return ctrl.model && ctrl.model.itemTypeIsMeasurement() && ctrl.model.valueTypeIsDate();
+				}
+
+				ctrl.onBooleanValueChange = (value: boolean): void =>
 				{
 					ctrl.newEntry.value = value ? "Yes" : "No";
 				}
 
-				ctrl.canSubmitItem = () =>
+				ctrl.onDateChangeValue = (value: Moment): void =>
 				{
-					return (!ctrl.isLoading && (
-							ctrl.isTypePrevention() ||
-							ctrl.isTypeMeasurement() && !Juno.Common.Util.isBlank(ctrl.newEntry.value))
+					ctrl.newEntry.value = value.isValid() ? Juno.Common.Util.formatMomentDate(value) : null;
+				}
+
+				ctrl.canSubmitItem = (): boolean =>
+				{
+					return (!ctrl.isLoading && ctrl.model
+						&& (ctrl.model.itemTypeIsPrevention() || (ctrl.model.itemTypeIsMeasurement() && !Juno.Common.Util.isBlank(ctrl.newEntry.value)))
 					);
 				}
 
-				ctrl.submitNewItemData = async () =>
+				ctrl.submitNewItemData = async (): Promise<void> =>
 				{
 					ctrl.isLoading = true;
 					ctrl.validationAlerts = [];
@@ -159,14 +157,18 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					}
 				}
 
-				ctrl.getInputLabel = () =>
+				ctrl.getInputLabel = (): string =>
 				{
 					let label = ctrl.model.valueLabel;
 					if(!label)
 					{
-						if(ctrl.valueIsBoolean())
+						if(ctrl.model.valueTypeIsBoolean())
 						{
 							label = "Complete";
+						}
+						else if(ctrl.model.valueTypeIsDate())
+						{
+							label = "Date";
 						}
 						else
 						{

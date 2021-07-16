@@ -52,6 +52,35 @@ export default class FlowsheetItemModel
 		this.rules = [];
 	}
 
+	public itemTypeIsPrevention = (): boolean =>
+	{
+		return this.type === FlowsheetItemType.PREVENTION;
+	}
+
+	public itemTypeIsMeasurement = (): boolean =>
+	{
+		return this.type === FlowsheetItemType.MEASUREMENT;
+	}
+
+	public valueTypeIsBoolean = (): boolean =>
+	{
+		return this.valueType === FlowsheetItemValueType.BOOLEAN;
+	}
+
+	public valueTypeIsFreeText = (): boolean =>
+	{
+		return this.valueType === FlowsheetItemValueType.STRING;
+	}
+
+	public valueTypeIsNumeric = (): boolean =>
+	{
+		return this.valueType === FlowsheetItemValueType.NUMERIC;
+	}
+
+	public valueTypeIsDate = (): boolean =>
+	{
+		return this.valueType === FlowsheetItemValueType.DATE;
+	}
 
 	get id(): number
 	{

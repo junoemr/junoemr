@@ -350,7 +350,7 @@ module.exports = {
 			'./src/record/summary/encounterNoteListComponent.js',
 			'./src/record/flowsheet/module.js',
 			'./src/record/flowsheet/flowsheetComponent.js',
-			'./src/record/flowsheet/components/flowsheetItem/flowsheetItemComponent.js',
+			'./src/record/flowsheet/components/flowsheetItem/flowsheetItemComponent.ts',
 			'./src/record/flowsheet/components/flowsheetItemData/flowsheetItemDataComponent.js',
 			'./src/record/forms/module.js',
 			'./src/record/forms/formsController.js',

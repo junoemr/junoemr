@@ -47,6 +47,7 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 					{label: "Text", value: FlowsheetItemValueType.STRING},
 					{label: "Numeric", value: FlowsheetItemValueType.NUMERIC},
 					{label: "Checkbox", value: FlowsheetItemValueType.BOOLEAN},
+					{label: "Date", value: FlowsheetItemValueType.DATE},
 				];
 
 				ctrl.isLoading = true;
