@@ -1,0 +1,58 @@
+.mha-patient-connection-details {
+	@include juno-font-body-smallest();
+	color: var(--color-neutral-darkest);
+
+	padding-top: 20px;
+
+	.text-grey {
+		color: var(--color-neutral-grey);
+	}
+
+	.connection-status-grid-layout {
+		display: grid;
+		grid-template-columns: 152px 1fr 160px;
+		grid-auto-flow: row;
+		align-items: center;
+
+		.verification-code-area {
+			grid-area: 2 / 1 / 3 / 4;
+			overflow: hidden;
+
+			> div {
+				@keyframes slide-in {
+					0% {
+						transform: translateX(-300px);
+					}
+
+					100% {
+						transform: translateX(0);
+					}
+				}
+
+				animation: slide-in 0.8s ease-out;
+			}
+
+			// prevent the code input from shifting when the icon
+			// shows / hides by reserving the space
+			.spacing-div {
+				width: 48px;
+			}
+
+			.icon {
+				font-size: 48px;
+
+				&.help {
+					cursor: help;
+				}
+
+				&.primary {
+					color: var(--color-primary-base);
+				}
+
+				&.danger {
+					color: var(--color-red-base);
+				}
+			}
+		}
+	}
+}

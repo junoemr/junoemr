@@ -565,7 +565,7 @@ public class CBIUtil
 	}
 
 	/**
-	 * data structure - LinkedHashMap<YEAR-VALUE, LinkedHashMap<MONTH-VALUE,
+	 * data structure - LinkedHashMap&lt;YEAR-VALUE, LinkedHashMap&lt;MONTH-VALUE,
 	 * HashSet<String>(day-of-months)>>
 	 */
 	public LinkedHashMap<String, LinkedHashMap<String, HashSet<String>>> prepareDataStructure(List<Date> list)

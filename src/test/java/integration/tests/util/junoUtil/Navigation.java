@@ -47,6 +47,7 @@ public class Navigation
 		"&appointmentDate=" +
 		"&startTime=" +
 		"&status=";
+	public static final String Consultation_URL = "/oscarEncounter/IncomingConsultation.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&userName=doctor+" + AuthUtils.TEST_USER_NAME;
 
 	private static Logger logger = MiscUtils.getLogger();
 

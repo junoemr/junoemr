@@ -162,38 +162,39 @@ public class AppointmentTest
 			null,
 			new CalendarAppointment(
 				1, //appointmentNo
-				"BC",
-				"MFP",
-				null,
-				"1",
-				"First1",
-				"Last1",
+				"BC", // billingRegion
+				"MFP", // billingForm
+				null, // billingRdohip
+				"1", // userProvider
+				"First1", // userFirstName
+				"Last1", // userLastName
 				LocalDate.of(2000,1,1),
-				"Last1, First1",
-				null, // TODO-legacy get phone number
-				1,
-				null,
+				"Last1, First1", // demographicName
+				null, // TODO-legacy get phone number // demographicPhone
+				1, // demographicNo
+				null, // providerNo
 				LocalDateTime.of(2018,1,1,0,0,0),
 				LocalDateTime.of(2018,1,1,1,0,0),
-				"A",
-				null,
-				null,
-				"reason1",
-				1,
-				"notes1",
-				null,
-				"site1",
-				null,
-				null,
-				null,
-				false,
-				false,
-				false,
-				false,
-				null,
-				false,
-				1,
-				null
+				"A", // eventStatusCode
+				null, // eventStatusModifier
+				null, // numInvoices
+				"reason1", // reason
+				1, // reasonCode
+				"notes1", // notes
+				null, // tagNames
+				"site1", // site
+				null, // type
+				null, // resources
+				null, // urgency
+				false, // doNotBook
+				false, // tagSelfBooked
+				false, // tagSelfCancelled
+				false, // virtual
+				null, // tagSystemCodes
+				false, // isConfirmed
+				1, // creatorSecurityId
+				null, // bookingSource
+				false // critical
 			)
 		));
 
@@ -280,38 +281,39 @@ public class AppointmentTest
 				null,
 				new CalendarAppointment(
 						1, //appointmentNo
-						"BC",
-						"MFP",
-						null,
-						"1",
-						"First1",
-						"Last1",
+						"BC", // billingRegion
+						"MFP", // billingForm
+						null, // billingRdohip
+						"1", // userProviderNo
+						"First1", // userFirstName
+						"Last1", // userLastName
 						LocalDate.of(2000,1,1),
-						"Last1, First1",
+						"Last1, First1", // demographicName
 						null, // TODO-legacy get phone number
-						1,
-						null,
+						1, // demographicNo
+						null, // providerNo
 						LocalDateTime.of(2018,1,1,0,0,0),
 						LocalDateTime.of(2018,1,1,1,0,0),
-						"A",
-						null,
-						null,
-						"reason1",
-						1,
-						"notes1",
-						null,
-						"site1",
-						null,
-						null,
-						null,
-						false,
-						true,
-						false,
-						false,
-						null,
-						false,
-						1,
-						org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name()
+						"A", // eventStatusCode
+						null, // eventStatusModifier
+						null, // numInvoices
+						"reason1", // reason
+						1, // reasonCode
+						"notes1", // notes
+						null, // tagNames
+						"site1", // site
+						null, // type
+						null, // resources
+						null, // urgency
+						false, // doNotBook
+						true, // tagSelfBooked
+						false, // tagSelfCancelled
+						false, // virtual
+						null, // tagSystemCodes
+						false, // isConfirmed
+						1, // creatorSecurityId
+						org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name(),
+						false // critical
 				)
 		));
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -396,45 +398,41 @@ public class AppointmentTest
 			null,
 			null,
 			new CalendarAppointment(
-				1,
-				"BC",
-				"MFP",
-				null,
-
-/*				"1",
-				"First1",
-				"Last1",*/
-
-				null,
-				null,
-				null,
+				1, // appointmentNo
+				"BC", // billingRegion
+				"MFP", // billingForm
+				null, // billingRdohip
+				null, // userProviderNo
+				null, // userFirstName
+				null, // userLastName
 
 				LocalDate.of(2000,1,1),
-				"Last1, First1",
+				"Last1, First1", // demographicName
 				null, // TODO-legacy get phone number
-				1,
-				null,
+				1, // demographicNo
+				null, // providerNo
 				LocalDateTime.of(2018,1,1,0,0,0),
 				LocalDateTime.of(2018,1,1,1,0,0),
-				null,
-				null,
-				null,
-				"reason1",
-				1,
-				"notes1",
-				null,
-				"site1",
-				null,
-				null,
-				null,
-				false,
-				false,
-				false,
-				false,
-				null,
-				false,
-				1,
-				null
+				null, // eventStatusCode
+				null, // eventStatusModifier
+				null, // numInvoices
+				"reason1", // reason
+				1, // reasonCode
+				"notes1", // notes
+				null, // tagNames
+				"site1", // site
+				null, // type
+				null, // resources
+				null, // urgency
+				false, // doNotBook
+				false, // tagSelfBooked
+				false, // tagSelfCancelled
+				false, // virtual
+				null, // tagSystemCodes
+				false, // isConfirmed
+				1, // creatorSecurityId
+				null, // bookingSource
+				false // critical
 			)
 		));
 
@@ -520,44 +518,40 @@ public class AppointmentTest
 			null,
 			null,
 			new CalendarAppointment(
-				1,
-				"BC",
-				"MFP",
-				null,
-
-/*				"1",
-				"First1",
-				"Last1",*/
-
-				null,
-				null,
-				null,
+				1, // appointmentNo
+				"BC", // billingRegion
+				"MFP", // billingForm
+				null, // billingRdoHip
+				null, // userProviderNo
+				null, // userFirstName
+				null, // userLastName
 				LocalDate.of(2000,1,1),
-				"Last1, First1",
+				"Last1, First1", // demographicName
 				null, // TODO-legacy get phone number
-				1,
+				1, // demographicNo
 				null, // TODO-legacy get patient's doctor
 				LocalDateTime.of(2018,1,1,0,0,0),
 				LocalDateTime.of(2018,1,1,1,0,0),
-				"A",
-				"s",
-				null,
-				"reason1",
-				1,
-				"notes1",
-				null,
-				"site1",
-				null,
-				null,
-				null,
-				false,
-				false,
-				false,
-				false,
-				null,
-				false,
-				1,
-				null
+				"A", // eventStatusCode
+				"s", // eventStatusModifier
+				null, // numInvoices
+				"reason1", // reason
+				1, // reasonCode
+				"notes1", // notes
+				null, // tagNames
+				"site1", // site
+				null, // type
+				null, // resources
+				null, // urgency
+				false, // doNotBook
+				false, // tagSelfBooked
+				false, // tagSelfCancelled
+				false, // virtual
+				null, // tagSystemCodes
+				false, // isConfirmed
+				1, // creatorSecurityId
+				null, // bookingSource
+				false // critical
 			)
 		));
 

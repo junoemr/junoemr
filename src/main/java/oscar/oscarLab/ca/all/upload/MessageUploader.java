@@ -222,7 +222,7 @@ public final class MessageUploader {
 					{
 						resultStatus = "A";
 					}
-					j++;
+ 					j++;
 				}
 				i++;
 			}

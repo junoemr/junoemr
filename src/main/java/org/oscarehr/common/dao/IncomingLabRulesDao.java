@@ -88,7 +88,7 @@ public class IncomingLabRulesDao extends AbstractDao<IncomingLabRules>{
 	}
 
 	/**
-	 * find all current lab forwarding rules separated & mapped by providerId
+	 * find all current lab forwarding rules separated &amp; mapped by providerId
 	 * @return - mapped rules, with providerId as the map key
 	 */
 	public Map<String, List<IncomingLabRules>> findActiveAsProviderMap()

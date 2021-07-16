@@ -15,4 +15,12 @@
 		               component-style="$ctrl.componentStyle">
 		</swim-lane-tab>
 	</div>
+
+	<!-- folder tab style -->
+	<div ng-if="$ctrl.type === JUNO_TAB_TYPE.FOLDER_TAB" class="height-100 width-100">
+		<folder-tab ng-model="$ctrl.ngModel"
+		            tabs="$ctrl.tabs"
+		            component-style="$ctrl.componentStyle">
+		</folder-tab>
+	</div>
 </div>

@@ -43,14 +43,15 @@ public class HRMDocumentToProviderDaoTest extends DaoTestFixtures
 	@Autowired
 	public HRMDocumentToProviderDao hrmDocumentToProviderDao;
 
-
 	@Before
-	public void before() throws Exception {
+	public void before() throws Exception
+	{
 		SchemaUtils.restoreTable("HRMDocumentToProvider","HRMDocument");
 	}
 
 	@Test
-	public void testCreate() throws Exception {
+	public void testCreate() throws Exception
+	{
 		HRMDocumentToProvider entity = new HRMDocumentToProvider();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		hrmDocumentToProviderDao.persist(entity);

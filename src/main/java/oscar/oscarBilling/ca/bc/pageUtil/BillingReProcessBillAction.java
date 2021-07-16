@@ -419,7 +419,7 @@ public class BillingReProcessBillAction extends Action {
   }
 
   /**
-   * @todo-legacy THis belongs in a utility class
+   * todo-legacy THis belongs in a utility class
    * @param s String
    * @return String
    */

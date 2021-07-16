@@ -403,6 +403,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.patient.AccessWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.SSOWebService"/>
 			<!-- MHA -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.NotesService"/>
