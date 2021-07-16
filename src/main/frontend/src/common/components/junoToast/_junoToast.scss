@@ -4,12 +4,14 @@
 	--background-color: var(--color-primary-base);
 	--color: var(--color-neutral-white);
 	--border: none;
-	--border-radius: 2em;
-	--padding: 8px 32px;
-	--max-width: calc(min(512px, 100vh));
-	--min-width: 128px;
-	--font-size: 1.5rem;
-	--icon-size: 2em;
+	--border-radius: 0.5em;
+	--padding: 8px 48px;
+	--max-width: calc(min(800px, 100vw));
+	--min-width: calc(min(512px, 100vw));
+	--font-size: 14px;
+	--icon-size: 1.5em;
+
+	position: relative;
 
 	background-color: var(--background-color);
 	color: var(--color);
@@ -20,7 +22,7 @@
 
 	border: var(--border);
 	border-radius: var(--border-radius);
-	box-shadow: 1px 1px 6px var(--color-neutral-black);
+	box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
 
 	pointer-events: all;
 	font-size: var(--font-size);
@@ -29,7 +31,7 @@
 	@keyframes slide-in {
 		0% {
 			opacity: 0.0;
-			transform: translateY(100px);
+			transform: translateY(-100px);
 		}
 		100% {
 			opacity: 1.0;
@@ -48,13 +50,15 @@
 		opacity: 0.0;
 	}
 
-	i {
+	.toast-icon {
+		position: absolute;
+		right: 8px;
+		top: 8px;
 		font-size: var(--icon-size);
 	}
 
 	&.toast-warning {
-		--background-color: var(--color-yellow-base);
-		--color: var(--color-neutral-darkest);
+		--background-color: var(--color-red-base);
 	}
 
 	&.toast-error {

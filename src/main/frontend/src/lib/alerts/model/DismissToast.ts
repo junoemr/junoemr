@@ -21,19 +21,9 @@ export default class DismissToast extends BasicToast
 		super(message, style, icon, duration);
 	}
 
-	onClick(): void
-	{
-		(new ToastService()).dismissToast(this);
-	}
-
 	// ==========================================================================
 	// Getters
 	// ==========================================================================
-
-	get clickable(): boolean
-	{
-		return true;
-	}
 
 	get unlimitedDuration(): boolean
 	{

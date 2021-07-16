@@ -93,7 +93,10 @@ class ToastStore
 	 */
 	protected applyUpdates(): void
 	{
-		this.getRootScope().$apply();
+		if (!this.getRootScope().$$phase)
+		{
+			this.getRootScope().$apply();
+		}
 	}
 }
 

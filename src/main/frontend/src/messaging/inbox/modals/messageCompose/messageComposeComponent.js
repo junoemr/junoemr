@@ -129,7 +129,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 					resolve: {
 						style: () => ctrl.resolve.style,
 						messageable: () => ctrl.recipient,
-						backend: () => ctrl.messagingService.getType(),
+						messagingBackendType: () => ctrl.messagingService.getType(),
 					}
 				}).result;
 

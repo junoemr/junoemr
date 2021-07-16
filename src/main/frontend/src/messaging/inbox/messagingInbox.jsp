@@ -1,4 +1,4 @@
-<page-wrapper class="messaging-inbox" no-header="$ctrl.recordPageEmbedded" dont-set-height="$ctrl.recordPageEmbedded">
+<page-wrapper class="messaging-inbox" show-header="!$ctrl.recordPageEmbedded" dont-set-height="$ctrl.recordPageEmbedded">
 	<page-header class="flex-row align-items-center h-100">
 		<h6>{{stringResources.getString("inbox.pageTitle")}}</h6>
 	</page-header>

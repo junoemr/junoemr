@@ -60,7 +60,7 @@ li.cpp-note-list:last-child {
 
 .toast-alert-area {
 	position: absolute;
-	bottom: 0;
+	top: calc(#{$primary-navbar-height} + #{$page-header-height});
 	left: 0;
 	right: 0;
 

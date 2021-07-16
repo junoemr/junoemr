@@ -32,7 +32,7 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 		onSourceSelected: "&?",
 		hideChartSources: "<?",
 		messageable: "<?",
-		backend: "<",
+		messagingBackendType: "<",
 	},
 	controller: [
 		"$scope",
@@ -48,7 +48,7 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSo
 				ctrl.selectedSource = ctrl.selectedSource || FileSource.DOCUMENTS;
 				ctrl.hideChartSources = ctrl.hideChartSources || false;
 				ctrl.confidenceLevelMessage = await ctrl.messageable.localMappingConfidenceExplanationString();
-				$scope.stringResources = MessagingStringResourceSetFactory.build(ctrl.backend);
+				$scope.stringResources = MessagingStringResourceSetFactory.build(ctrl.messagingBackendType);
 			}
 
 			ctrl.selectSource = (source) =>

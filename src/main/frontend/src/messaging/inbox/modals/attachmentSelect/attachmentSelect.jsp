@@ -11,7 +11,7 @@
 			                    hide-chart-sources="!$ctrl.canReadChart"
 			                    messageable="$ctrl.messageable"
 			                    on-source-selected="$ctrl.switchFileSource(value)"
-			                    backend="$ctrl.backend">
+			                    messaging-backend-type="$ctrl.messagingBackendType">
 			</file-source-select>
 		</div>
 

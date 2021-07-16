@@ -42,11 +42,11 @@ export default class ToastFactory
 	/**
 	 * build a error toast
 	 * @param message - message to display
-	 * @param requireDismiss - if ture notification will not auto dismiss. Requires user to click to dismiss.
+	 * @param requireDismiss - [default true] if ture notification will not auto dismiss. Requires user to click to dismiss.
 	 */
-	public static buildErrorToast(message: string, requireDismiss= false): Toast
+	public static buildErrorToast(message: string, requireDismiss= true): Toast
 	{
-		return this.buildToast(message, ToastStyle.Error, requireDismiss, "icon-delete");
+		return this.buildToast(message, ToastStyle.Error, requireDismiss, "icon-cancel");
 	}
 
 	/**

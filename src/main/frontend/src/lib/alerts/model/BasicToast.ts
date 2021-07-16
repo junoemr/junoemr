@@ -1,5 +1,6 @@
 import Toast from "./Toast";
 import {ToastStyle} from "./ToastStyle";
+import ToastService from "../service/ToastService";
 
 export default class BasicToast implements Toast
 {
@@ -32,7 +33,7 @@ export default class BasicToast implements Toast
 
 	onClick(): void
 	{
-		// nop
+		(new ToastService()).dismissToast(this);
 	}
 
 	// ==========================================================================
@@ -55,7 +56,7 @@ export default class BasicToast implements Toast
 
 	get clickable(): boolean
 	{
-		return false;
+		return true;
 	}
 
 	get cssClasses(): string[]
