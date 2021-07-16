@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.springframework.stereotype.Component;
@@ -76,7 +77,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		{
 			ResidualInfo recipientName = new ResidualInfo();
 			recipientName.setContentKey("RecipientName");
-			recipientName.setContentType("String");
+			recipientName.setContentType(CDSConstants.ResidualInfoDataType.TEXT.name());
 			recipientName.setContentValue("\n FirstName: " + importStructure.getRecipientName().getFirstName()
 										+ "\n LastName: " + importStructure.getRecipientName().getLastName());
 			residualInfoList.add(recipientName);
@@ -85,7 +86,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		{
 			ResidualInfo sentDateTime = new ResidualInfo();
 			sentDateTime.setContentKey("SentDateTime");
-			sentDateTime.setContentType("String");
+			sentDateTime.setContentType(CDSConstants.ResidualInfoDataType.TEXT.name());
 			if (importStructure.getSentDateTime().getFullDateTime() != null)
 			{
 				sentDateTime.setContentValue(importStructure.getSentDateTime().getFullDateTime().toString());

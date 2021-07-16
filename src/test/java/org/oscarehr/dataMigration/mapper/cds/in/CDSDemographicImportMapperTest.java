@@ -187,7 +187,7 @@ public class CDSDemographicImportMapperTest
 	}
 
 	/**
-	 * ensure family physician is NOT used over enrolled physician when patient is not enrolled
+	 * ensure that family doctor is not set when patient is not enrolled
 	 */
 	@Test
 	public void testMapCareTeamInfo_EnrolledPhysicianMapping_RosterTerminated() throws Exception
@@ -255,10 +255,7 @@ public class CDSDemographicImportMapperTest
 	public void testFamilyPhysicianNullPatientNote() throws Exception
 	{
 		//set up
-		ObjectFactory objectFactory = new ObjectFactory();
-
 		PersonNameSimple familyDoctor = null;
-
 		Demographics importStructure = mockFamilyPhysician(familyDoctor);
 
 		// run the test
@@ -270,7 +267,7 @@ public class CDSDemographicImportMapperTest
 	}
 
 	/**
-	 * ensure UniqueVendorSequenceId is incldued in PatientNote
+	 * ensure UniqueVendorSequenceId is included in PatientNote
 	 */
 	@Test
 	public void testUniqueVendorIdSequenceIncludedPatientNote() throws Exception
@@ -282,7 +279,7 @@ public class CDSDemographicImportMapperTest
 		String expectedNote = "UniqueVendorIdSequence: " + vendorId;
 
 		//set up
-		Demographics importStructure = mockUniqueVenderIdSequence(vendorId);
+		Demographics importStructure = mockUniqueVendorIdSequence(vendorId);
 
 		// run the test
 		Demographic demographic = new Demographic();
@@ -296,10 +293,10 @@ public class CDSDemographicImportMapperTest
 	 * ensure if UniqueVendorSequenceId is not included, it doesn't effect PatientNote
 	 */
 	@Test
-	public void testUniqueVenderIdSequenceNullPatientNote() throws Exception
+	public void testUniqueVendorIdSequenceNullPatientNote() throws Exception
 	{
 		//set up
-		Demographics importStructure = mockUniqueVenderIdSequence(null);
+		Demographics importStructure = mockUniqueVendorIdSequence(null);
 
 		// run the test
 		Demographic demographic = new Demographic();
@@ -335,7 +332,7 @@ public class CDSDemographicImportMapperTest
 		return importStructure;
 	}
 
-	private Demographics mockUniqueVenderIdSequence(String uniqueVenderIdSequence) throws Exception
+	private Demographics mockUniqueVendorIdSequence(String uniqueVenderIdSequence) throws Exception
 	{
 		Demographics importStructure = Mockito.mock(Demographics.class);
 		Mockito.when(importStructure.getUniqueVendorIdSequence()).thenReturn(uniqueVenderIdSequence);
