@@ -45,31 +45,52 @@ public class HRMDocumentToProviderDao extends AbstractDao<HRMDocumentToProvider>
 		return documentToProviders;
 	}
 
-	public List<HRMDocumentToProvider> findByProviderNoLimit(String providerNo, Date newestDate, Date oldestDate, Integer viewed, Integer signedOff) {
+	public List<HRMDocumentToProvider> findByProviderNoLimit(String providerNo, Date newestDate, Date oldestDate, Boolean viewed, Boolean signedOff)
+	{
 		String sql = "select x from " + this.modelClass.getName() + " x, HRMDocument h where x.hrmDocument.id=h.id and x.providerNo like ?1";
+
 		if (newestDate != null)
+		{
 			sql += " and h.reportDate <= :newest";
+		}
+
 		if (oldestDate != null)
+		{
 			sql += " and h.reportDate >= :oldest";
-		if (viewed != 2)
+		}
+
+		if (viewed != null)
+		{
 			sql += " and x.viewed = :viewed";
-		if (signedOff != 2)
+		}
+
+		if (signedOff != null)
+		{
 			sql += " and x.signedOff = :signedOff";
+		}
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, providerNo);
 
 		if (newestDate != null)
+		{
 			query.setParameter("newest", newestDate);
+		}
 
 		if (oldestDate != null)
+		{
 			query.setParameter("oldest", oldestDate);
+		}
 
-		if (viewed != 2)
+		if (viewed != null)
+		{
 			query.setParameter("viewed", viewed);
+		}
 
-		if (signedOff != 2)
+		if (signedOff != null)
+		{
 			query.setParameter("signedOff", signedOff);
+		}
 		@SuppressWarnings("unchecked")
 		List<HRMDocumentToProvider> documentToProviders = query.getResultList();
 		return documentToProviders;

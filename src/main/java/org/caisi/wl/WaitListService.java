@@ -42,7 +42,7 @@ public interface WaitListService {
 	/**
 	 * 
 	 * @param arg0
-	 * @return returns java.util.List<org.caisi.wl.MatchBO>
+	 * @return returns java.util.List&lt;org.caisi.wl.MatchBO>
 	 */
 	@WebMethod
 	@WebResult(targetNamespace = "")
@@ -66,7 +66,7 @@ public interface WaitListService {
 	/**
 	 * 
 	 * @param arg0
-	 * @return returns java.util.List<org.caisi.wl.VacancyDisplayBO>
+	 * @return returns java.util.List&lt;org.caisi.wl.VacancyDisplayBO>
 	 */
 	@WebMethod
 	@WebResult(targetNamespace = "")
@@ -78,7 +78,7 @@ public interface WaitListService {
 	/**
 	 * 
 	 * @param arg0
-	 * @return returns java.util.List<org.caisi.wl.VacancyDisplayBO>
+	 * @return returns java.util.List&lt;org.caisi.wl.VacancyDisplayBO>
 	 */
 	@WebMethod
 	@WebResult(targetNamespace = "")
@@ -90,7 +90,7 @@ public interface WaitListService {
 	/**
 	 * 
 	 * @param arg0
-	 * @return returns java.util.List<org.caisi.wl.ClientWLEntryBO>
+	 * @return returns java.util.List&lt;org.caisi.wl.ClientWLEntryBO>
 	 */
 	@WebMethod
 	@WebResult(targetNamespace = "")

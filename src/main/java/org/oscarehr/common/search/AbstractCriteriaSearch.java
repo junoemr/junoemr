@@ -27,6 +27,7 @@ import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+@Deprecated // Hibernate's legacy org.hibernate.Criteria API is deprecated; use the JPA javax.persistence.criteria.CriteriaQuery instead
 public abstract class AbstractCriteriaSearch
 {
 	public enum SORTDIR

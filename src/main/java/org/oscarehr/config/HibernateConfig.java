@@ -25,7 +25,6 @@ package org.oscarehr.config;
 
 import org.oscarehr.util.persistence.OscarMySQL5Dialect;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -40,33 +39,11 @@ import java.util.Properties;
 @Configuration
 public class HibernateConfig
 {
-	// This is neccessary to set the sql_mode to the MariaDB 10.1 default.  The default mode for
-	// MariaDB 10.2.4+ causes errors.
-	private static final String CONNECTION_STRING_SUFFIX =
-			"&sessionVariables=sql_mode='NO_ENGINE_SUBSTITUTION,NO_AUTO_CREATE_USER'";
-
-	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
-
 	@Autowired
 	private DataSource dataSource;
 
 	@Autowired
 	private ResourceLoader resourceLoader;
-
-	@Bean(name="dataSource")
-	public DataSource getDataSource()
-	{
-		String dbUri = oscarProperties.getDbUri();
-		String dbName = oscarProperties.getDbName();
-
-		DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-		dataSourceBuilder.driverClassName(oscarProperties.getDbDriver());
-		dataSourceBuilder.url(dbUri + dbName + CONNECTION_STRING_SUFFIX);
-		dataSourceBuilder.username(oscarProperties.getDbUserName());
-		dataSourceBuilder.password(oscarProperties.getDbPassword());
-
-		return dataSourceBuilder.build();
-	}
 
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() throws IOException

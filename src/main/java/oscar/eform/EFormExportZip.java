@@ -64,7 +64,7 @@ import oscar.eform.upload.ImageUploadForm;
 
 /**
  *
- * @author apavel & not Jay - Jay is too lazy to make this, so he makes Paul do the work for him
+ * @author apavel &amp; not Jay - Jay is too lazy to make this, so he makes Paul do the work for him
  */
 public class EFormExportZip {
 	private static final Logger _log = MiscUtils.getLogger();

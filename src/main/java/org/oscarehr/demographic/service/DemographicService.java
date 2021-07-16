@@ -374,11 +374,17 @@ public class DemographicService
 			extension.setProviderNo(providerNoStr);
 			demographicManager.createExtension(providerNoStr, extension);
 		}
-		for(DemographicRoster demographicRoster : demographic.getRosterHistory())
+		
+		List<DemographicRoster> rosterHistory = demographic.getRosterHistory();
+		if (rosterHistory != null)
 		{
-			demographicRoster.setDemographicId(demographicNo);
-			demographicRosterDao.persist(demographicRoster);
+			for (DemographicRoster rosterItem : rosterHistory)
+			{
+				rosterItem.setDemographicId(demographicNo);
+				demographicRosterDao.persist(rosterItem);
+			}
 		}
+		
 		return demographic;
 	}
 

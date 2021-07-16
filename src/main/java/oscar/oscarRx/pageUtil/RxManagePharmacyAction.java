@@ -55,7 +55,7 @@ import oscar.oscarRx.data.RxPharmacyData;
 
 /**
  *
- * @author  Jay Gallagher & Jackson Bi
+ * @author  Jay Gallagher &amp; Jackson Bi
  */
 public final class RxManagePharmacyAction extends DispatchAction {
 
