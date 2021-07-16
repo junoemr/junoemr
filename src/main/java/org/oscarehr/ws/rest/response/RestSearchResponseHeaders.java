@@ -23,6 +23,8 @@
 package org.oscarehr.ws.rest.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * custom headers class for rest search responses.
@@ -36,13 +38,23 @@ public class RestSearchResponseHeaders extends RestResponseHeaders
 	private int page;
 	@Schema(description = "max results for a page")
 	private int perPage;
+	@Getter
+	@Setter
+	@Schema(description = "are the results paged or not")
+	private boolean paged;
 
 	public RestSearchResponseHeaders(int page, int perPage, int total)
+	{
+		this(page, perPage, total, true);
+	}
+
+	public RestSearchResponseHeaders(int page, int perPage, int total, boolean paged)
 	{
 		super();
 		this.total = total;
 		this.page = page;
 		this.perPage = perPage;
+		this.paged = paged;
 	}
 	public RestSearchResponseHeaders()
 	{

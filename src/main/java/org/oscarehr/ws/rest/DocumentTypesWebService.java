@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.dao.CtlDocTypeDao;
 import org.oscarehr.common.model.CtlDocType;
 import org.oscarehr.ws.rest.conversion.document.CtlDocTypeToDocumentTypeDtoConverter;
-import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.document.DocumentTypeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -64,13 +64,13 @@ public class DocumentTypesWebService extends AbstractServiceImpl
 	@Path("/")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<DocumentTypeDto>> getDocumentTypes(
+	public RestSearchResponse<DocumentTypeDto> getDocumentTypes(
 			@QueryParam("status") String status,
 			@QueryParam("module") String module
 	)
 	{
 		List<CtlDocType> docTypes = ctlDocTypeDao.findByStatusAndModule(Collections.singletonList(status), module);
-		return RestResponse.successResponse((new CtlDocTypeToDocumentTypeDtoConverter()).convert(docTypes));
+		return RestSearchResponse.successResponse((new CtlDocTypeToDocumentTypeDtoConverter()).convert(docTypes));
 	}
 
 }
