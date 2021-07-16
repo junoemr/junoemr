@@ -16,7 +16,7 @@
 				Are you sure you want to send an invite to this patient?
 			</h3>
 			<span>{{$ctrl.demographicEmail}}</span>
-			<juno-select ng-if="$ctrl.isMultisiteEnabled"
+			<juno-select ng-if="$ctrl.isMultisiteEnabled && !$ctrl.hideIntegrationSelect"
 			             component-style="$ctrl.resolve.style"
 			             label="Site"
 			             label-position="$ctrl.LABEL_POSITION.TOP"
