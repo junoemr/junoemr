@@ -5,6 +5,15 @@
 
 	<juno-divider class="item-divider m-l-16 m-r-8" horizontal="true" slim="true"></juno-divider>
 
+	<!-- check / un check all -->
+	<juno-check-box ng-model="$ctrl.massSelectActive"
+	                class="checkbox-no-drop-shadow m-r-8"
+	                title="{{$ctrl.massSelectActive ? 'Clear selection' : 'Select all'}}"
+	                change="$ctrl.selectUnselectAll()"
+	                disabled="!$ctrl.messageStream"
+	                dummy="true">
+	</juno-check-box>
+
 	<!-- Search -->
 	<messageable-search class="search-input"
 	                    ng-model="$ctrl.messageableFilter"
@@ -21,13 +30,6 @@
 	<juno-divider class="item-divider m-l-8 m-r-8" horizontal="true" slim="true"></juno-divider>
 
 	<div class="left-buttons flex-row align-items-center">
-		<!-- check / un check all -->
-		<juno-check-box ng-model="$ctrl.massSelectActive"
-		                class="checkbox-no-drop-shadow"
-		                title="{{$ctrl.massSelectActive ? 'Clear selection' : 'Select all'}}"
-		                change="$ctrl.selectUnselectAll()"
-		                dummy="true">
-		</juno-check-box>
 
 		<!-- Archive -->
 		<juno-button ng-if="$ctrl.groupId !== MessageGroup.Archived"

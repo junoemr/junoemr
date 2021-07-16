@@ -3,7 +3,11 @@
 
 	background-color: var(--color-neutral-lightest);
 	border: solid 1px var(--color-neutral-light-grey);
-	
+
+	.inbox-title {
+		width: 165px;
+	}
+
 	.item-divider {
 		height: 32px;
 		.juno-divider {
@@ -22,7 +26,7 @@
 	}
 
 	.search-input {
-		width: 344px;
+		width: 308px;
 		min-width: 128px;
 	}
 
@@ -51,7 +55,11 @@
 		}
 	}
 
-	@media only screen and (max-width: 900px) {
+	@media only screen and (max-width: 1080px) {
+		.inbox-title {
+			width: 101px;
+		}
+
 		.left-buttons {
 			> .header-button {
 				margin: 0;
