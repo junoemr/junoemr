@@ -106,11 +106,11 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 
 			residualInfoList.add(sentDateTime);
 		}
-		if (importStructure.getSentDateTime() != null)
+		if (importStructure.getFilePath() != null)
 		{
 			ResidualInfo filePath = new ResidualInfo();
 			filePath.setContentKey("FilePath");
-			filePath.setContentType("String");
+			filePath.setContentType(CDSConstants.ResidualInfoDataType.TEXT.name());
 			filePath.setContentValue(importStructure.getFilePath());
 			residualInfoList.add(filePath);
 		}
