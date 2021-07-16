@@ -1268,6 +1268,8 @@ document.forms[1].referral_doctor_no.value = refNo;
 				</td>
 			</tr>
 			<!-- Family Doctor -->
+			<% if (systemPreferenceService.isPreferenceEnabled("enable_family_doctor_and_rostering", false))
+			{ %>
 			<tr>
 				<td align="right" nowrap>
 					<b>
@@ -1297,6 +1299,7 @@ document.forms[1].referral_doctor_no.value = refNo;
 					<% } %>
 				</td>
 			</tr>
+			<% } %>
 			<tr valign="top">
 				<td align="right" id="rosterStatusLbl" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNRosterStatus" />: </b></td>

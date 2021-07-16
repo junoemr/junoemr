@@ -79,6 +79,8 @@
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
     ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
+    SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
+
     WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
     boolean privateConsentEnabled = OscarProperties.getInstance().isPropertyActive("privateConsentEnabled");
 
@@ -288,6 +290,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <html:html locale="true">
 
 <head>
@@ -2324,6 +2327,8 @@ if ( Dead.equals(PatStat) ) {%>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formRefDocNo" />:</span><span class="info"><%=referralDoctorNo%></span>
 							</li>
+							<% if (systemPreferenceService.isPreferenceEnabled("enable_family_doctor_and_rostering", false))
+							{ %>
 							<li>
 								<span class="label">
 									<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>:
@@ -2336,7 +2341,8 @@ if ( Dead.equals(PatStat) ) {%>
 								</span>
 								<span class="info"><%=familyDoctorNo%></span>
 							</li>
-							<%  //-- Licensed producer drop-down selection (display only)-->
+							<% }
+								//-- Licensed producer drop-down selection (display only)-->
 								if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
 								{ %>
 							<li>
@@ -3078,6 +3084,10 @@ document.updatedelete.referral_doctor_no.value = refNo;
 								<% } %>
 								</td>
 							</tr>
+
+							<!-- Family Doctor -->
+							<% if (systemPreferenceService.isPreferenceEnabled("enable_family_doctor_and_rostering", false))
+							{ %>
 							<tr>
 								<td align="right" nowrap>
 									<b>
@@ -3107,6 +3117,8 @@ document.updatedelete.referral_doctor_no.value = refNo;
 									<% } %>
 								</td>
 							</tr>
+							<% } %>
+
 </oscar:oscarPropertiesCheck>
 <%-- END TOGGLE OFF PATIENT CLINIC STATUS --%>
 
