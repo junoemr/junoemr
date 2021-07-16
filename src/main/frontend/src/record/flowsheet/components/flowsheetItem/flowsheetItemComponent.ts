@@ -23,7 +23,9 @@
 
 import {SecurityPermissions} from "../../../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
+import FlowsheetItemDataModel from "../../../../lib/flowsheet/model/FlowsheetItemDataModel";
+import {AlertSeverityType} from "../../../../lib/flowsheet/model/AlertSeverityType";
 
 angular.module('Record.Flowsheet').component('flowsheetItem',
 	{
@@ -53,6 +55,9 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 				ctrl.validationAlerts = [];
 				ctrl.isLoading = false;
 
+				ctrl.dataTrueValue = "Yes";
+				ctrl.dataFalseValue = "No";
+
 				ctrl.$onInit = (): void =>
 				{
 					ctrl.clearNewEntry();
@@ -60,26 +65,23 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 
 				ctrl.clearNewEntry = (): void =>
 				{
-					ctrl.newEntry = {
-						value: null,
-						// @ts-ignore
-						observationDateTime: moment(),
-					};
+					ctrl.newEntry = new FlowsheetItemDataModel();
+					ctrl.newEntry.observationDateTime = moment();
 					ctrl.checkboxValue = false;
 					ctrl.dateValue = null;
 				}
 
-				ctrl.getAlertClass = (severityLevel): string =>
+				ctrl.getAlertClass = (severityLevel: AlertSeverityType): string =>
 				{
-					if(severityLevel === "RECOMMENDATION")
+					if(severityLevel === AlertSeverityType.RECOMMENDATION)
 					{
 						return "alert-info";
 					}
-					if(severityLevel === "WARNING")
+					if(severityLevel === AlertSeverityType.WARNING)
 					{
 						return "alert-warning";
 					}
-					if(severityLevel === "DANGER")
+					if(severityLevel === AlertSeverityType.DANGER)
 					{
 						return "alert-danger";
 					}
@@ -120,7 +122,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 
 				ctrl.onBooleanValueChange = (value: boolean): void =>
 				{
-					ctrl.newEntry.value = value ? "Yes" : "No";
+					ctrl.newEntry.value = value ? ctrl.dataTrueValue : ctrl.dataFalseValue;
 				}
 
 				ctrl.onDateChangeValue = (value: Moment): void =>

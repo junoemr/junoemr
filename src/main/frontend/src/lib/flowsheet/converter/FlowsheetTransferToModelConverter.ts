@@ -24,12 +24,14 @@
  */
 
 import FlowsheetModel from "../model/FlowsheetModel";
-import {Flowsheet, FlowsheetItem, FlowsheetItemGroup} from "../../../../generated";
+import {Flowsheet, FlowsheetItem, FlowsheetItemAlert, FlowsheetItemGroup} from "../../../../generated";
 import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
 import FlowsheetItemModel from "../model/FlowsheetItemModel";
 import DsRuleTransferToModelConverter from "../../decisionSupport/converter/DsRuleTransferToModelConverter";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import DxCodeTransferToModelConverter from "../../dx/converter/DxCodeTransferToModelConverter";
+import AlertModel from "../model/AlertModel";
+import FlowsheetItemDataTransferToModelConverter from "./FlowsheetItemDataTransferToModelConverter";
 
 export default class FlowsheetTransferToModelConverter extends AbstractConverter<Flowsheet, FlowsheetModel>
 {
@@ -55,7 +57,7 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 		return flowsheetModel;
 	}
 
-	private convertAllGroups(itemGroups: Array<FlowsheetItemGroup>): Array<FlowsheetItemGroupModel>
+	private convertAllGroups(itemGroups: FlowsheetItemGroup[]): FlowsheetItemGroupModel[]
 	{
 		return itemGroups.map(itemGroup =>
 		{
@@ -69,7 +71,7 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 		});
 	}
 
-	private convertAllItems(items: Array<FlowsheetItem>): Array<FlowsheetItemModel>
+	private convertAllItems(items: FlowsheetItem[]): FlowsheetItemModel[]
 	{
 		const ruleToModelConverter = new DsRuleTransferToModelConverter();
 		return items.map(item =>
@@ -84,12 +86,22 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 			model.hidden = item.hidden;
 			model.valueType = item.valueType;
 			model.valueLabel = item.valueLabel;
-			model.flowsheetItemAlerts = item.flowsheetItemAlerts;
-			model.data = item.data;
+			model.flowsheetItemAlerts = this.convertAllAlerts(item.flowsheetItemAlerts);
+			model.data = new FlowsheetItemDataTransferToModelConverter().convertList(item.data);
 			model.rules = ruleToModelConverter.convertList(item.rules);
 
 			return model;
 		});
 	}
 
+	private convertAllAlerts(alerts: FlowsheetItemAlert[]): AlertModel[]
+	{
+		return alerts.map(alert =>
+		{
+			const alertModel = new AlertModel();
+			alertModel.message = alert.message;
+			alertModel.severityLevel = alert.severityLevel;
+			return alertModel;
+		});
+	}
 }

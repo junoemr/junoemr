@@ -25,10 +25,11 @@
 
  */
 
-import {FlowsheetItemAlert, FlowsheetItemData} from "../../../../generated";
 import DsRuleModel from "../../decisionSupport/model/DsRuleModel";
 import {FlowsheetItemType} from "./FlowsheetItemType";
 import {FlowsheetItemValueType} from "./FlowsheetItemValueType";
+import AlertModel from "./AlertModel";
+import FlowsheetItemDataModel from "./FlowsheetItemDataModel";
 
 export default class FlowsheetItemModel
 {
@@ -41,8 +42,8 @@ export default class FlowsheetItemModel
 	private _hidden: boolean;
 	private _valueType: FlowsheetItemValueType;
 	private _valueLabel: string;
-	private _flowsheetItemAlerts: FlowsheetItemAlert[];
-	private _data: FlowsheetItemData[];
+	private _flowsheetItemAlerts: AlertModel[];
+	private _data: FlowsheetItemDataModel[];
 	private _rules: DsRuleModel[];
 
 	public constructor()
@@ -172,22 +173,22 @@ export default class FlowsheetItemModel
 		this._valueLabel = value;
 	}
 
-	get flowsheetItemAlerts(): FlowsheetItemAlert[]
+	get flowsheetItemAlerts(): AlertModel[]
 	{
 		return this._flowsheetItemAlerts;
 	}
 
-	set flowsheetItemAlerts(value: FlowsheetItemAlert[])
+	set flowsheetItemAlerts(value: AlertModel[])
 	{
 		this._flowsheetItemAlerts = value;
 	}
 
-	get data(): FlowsheetItemData[]
+	get data(): FlowsheetItemDataModel[]
 	{
 		return this._data;
 	}
 
-	set data(value: FlowsheetItemData[])
+	set data(value: FlowsheetItemDataModel[])
 	{
 		this._data = value;
 	}

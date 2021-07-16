@@ -31,6 +31,9 @@ import FlowsheetModelToTransferConverter from "../lib/flowsheet/converter/Flowsh
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
 import DxCodeTransferToModelConverter from "../lib/dx/converter/DxCodeTransferToModelConverter";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
+import FlowsheetItemDataModel from "../lib/flowsheet/model/FlowsheetItemDataModel";
+import FlowsheetItemDataTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetItemDataTransferToModelConverter";
+import FlowsheetItemDataModelToTransferConverter from "../lib/flowsheet/converter/FlowsheetItemDataModelToTransferConverter";
 
 angular.module("Flowsheet").service("flowsheetApiService", [
 	'$http',
@@ -50,6 +53,8 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.flowsheetModelConverter = new FlowsheetTransferToModelConverter();
 		service.flowsheetTransferConverter = new FlowsheetModelToTransferConverter();
 		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
+		service.flowsheetItemDataTransferToModelConverter = new FlowsheetItemDataTransferToModelConverter();
+		service.flowsheetItemDataModelToTransferConverter = new FlowsheetItemDataModelToTransferConverter();
 
 		service.searchFlowsheets = async (
 			enabled: boolean,
@@ -113,9 +118,11 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 			return service.flowsheetModelConverter.convert((await service.demographicApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body);
 		}
 
-		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: object): Promise<any> =>
+		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: FlowsheetItemDataModel): Promise<FlowsheetItemDataModel> =>
 		{
-			return (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, data)).data.body;
+			const transferOut = service.flowsheetItemDataModelToTransferConverter.convert(data);
+			const transferIn = (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, transferOut)).data.body;
+			return service.flowsheetItemDataTransferToModelConverter.convert(transferIn);
 		}
 
 		service.cloneFlowsheetForClinic = async (flowsheetId: number): Promise<FlowsheetModel> =>

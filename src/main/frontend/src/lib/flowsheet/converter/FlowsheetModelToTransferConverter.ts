@@ -79,9 +79,11 @@ export default class FlowsheetModelToTransferConverter extends AbstractConverter
 			model.hidden = item.hidden;
 			model.valueType = item.valueType;
 			model.valueLabel = item.valueLabel;
-			model.flowsheetItemAlerts = item.flowsheetItemAlerts;
-			model.data = item.data;
 			model.rules = ruleToTransferConverter.convertList(item.rules);
+
+			// data and alerts are not submitted with the flowsheet transfer
+			model.data = null;
+			model.flowsheetItemAlerts = null;
 
 			return model;
 		});
