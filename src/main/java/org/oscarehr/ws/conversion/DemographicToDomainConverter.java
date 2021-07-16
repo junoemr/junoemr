@@ -31,7 +31,9 @@ import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,9 +67,21 @@ public class DemographicToDomainConverter extends AbstractModelConverter<Demogra
 		BeanUtils.copyProperties(transfer, demographic, ignoreProperties);
 
 		demographic.setDemographicId(transfer.getDemographicNo());
-		demographic.setDayOfBirth(transfer.getDobDay());
-		demographic.setMonthOfBirth(transfer.getDobMonth());
-		demographic.setYearOfBirth(transfer.getDobYear());
+		LocalDateTime dateOfBirth = ConversionUtils.toLocalDateTime(transfer.getDateOfBirth());
+		demographic.setDayOfBirth(Integer.toString(dateOfBirth.getDayOfMonth()));
+		demographic.setMonthOfBirth(Integer.toString(dateOfBirth.getMonthValue()));
+		demographic.setYearOfBirth(Integer.toString(dateOfBirth.getYear()));
+
+		if (demographic.getDayOfBirth().length() == 1)
+		{
+			demographic.setDayOfBirth("0" + demographic.getDayOfBirth());
+		}
+		// Legacy shenanigans - Juno expects these to be zero-padded
+		if (demographic.getMonthOfBirth().length() == 1)
+		{
+			demographic.setMonthOfBirth("0" + demographic.getMonthOfBirth());
+		}
+
 		demographic.setReferralDoctor(transfer.getFamilyDoctor());
 		demographic.setFamilyDoctor(transfer.getFamilyDoctor2());
 		demographic.setHcEffectiveDate(transfer.getEffDate());
