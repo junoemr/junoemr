@@ -9,7 +9,9 @@ angular.module('Record.Details').component('demographicContactsModal', {
     templateUrl: 'src/record/details/components/demographicContactsModal/demographicContactsModal.jsp',
     bindings: {
         modalInstance: "<",
+        title: "<",
         resolve: "<",
+        componentStyle: "<",
     },
     controller: [
         "$scope",
@@ -22,15 +24,28 @@ angular.module('Record.Details').component('demographicContactsModal', {
         )
         {
             const ctrl = this;
+            const EDIT_TITLE = "Edit contact";
+            const NO_EDIT_TITLE = "Editing is currently only available for internal contacts";
 
-            const PROVIDER = 0;
-            const INTERNAL = 1;
-            const EXTERNAL = 2;
-            const PROFESSIONALSPECIALIST = 3;
-            ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
-            ctrl.JUNO_STYLE = JUNO_STYLE.GREY;
+            ctrl.types = {
+                PROVIDER: 0,
+                INTERNAL: 1,
+                EXTERNAL: 2,
+                PROFESSIONAL_SPECIALIST: 3,
+            }
+
+            ctrl.typesText = {
+                PROVIDER_TEXT: "Provider Contact",
+                INTERNAL_TEXT: "Internal Contact",
+                EXTERNAL_TEXT: "External Contact",
+                PROFESSIONAL_SPECIALIST_TEXT: "Professional Specialist Contact"
+            }
+
+            ctrl.LABEL_POSITION = LABEL_POSITION;
+            ctrl.JUNO_STYLE = JUNO_STYLE;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
             ctrl.contact = null;
             ctrl.contactType = null;
             ctrl.demo = null;
@@ -39,31 +54,43 @@ angular.module('Record.Details').component('demographicContactsModal', {
             {
                 ctrl.contact = ctrl.resolve.demoContact;
 
-                if (ctrl.contact.type === INTERNAL)
+                switch(ctrl.contact.type)
                 {
-                    ctrl.contactType = "Internal Contact";
-                } else
-                {
-                    ctrl.contactType = "External Contact";
+                    case ctrl.types.INTERNAL:
+                        ctrl.title = EDIT_TITLE;
+                        ctrl.contactType = ctrl.typesText.INTERNAL_TEXT;
+                        break;
+                    case ctrl.types.EXTERNAL:
+                        ctrl.title = NO_EDIT_TITLE;
+                        ctrl.contactType = ctrl.typesText.EXTERNAL_TEXT;
+                        break;
+                    case ctrl.types.PROVIDER:
+                        ctrl.title = NO_EDIT_TITLE;
+                        ctrl.contactType = ctrl.typesText.PROVIDER_TEXT;
+                        break;
+                    case ctrl.types.PROFESSIONAL_SPECIALIST:
+                        ctrl.title = NO_EDIT_TITLE;
+                        ctrl.contactType = ctrl.typesText.PROFESSIONAL_SPECIALIST_TEXT;
                 }
-            }
+            };
 
             ctrl.onCancel = () =>
             {
                 ctrl.modalInstance.close();
-            }
+            };
 
             ctrl.edit = () =>
             {
-                if (ctrl.contact.type === INTERNAL)
+                if (ctrl.contact.type === ctrl.typesText.INTERNAL)
                 {
-                    ctrl.getTabs(ctrl.contact.contactId)
+                    ctrl.getTabs(ctrl.contact.contactId);
                 }
                 else
                 {
                     //not yet implemented
                 }
-            }
+            };
+
             ctrl.getTabs = function getTabs(contactId)
             {
                 uxService.menu(contactId).then(
@@ -90,12 +117,12 @@ angular.module('Record.Details').component('demographicContactsModal', {
                                 demographicNo: tab.demoId
                             });
                         ctrl.modalInstance.close();
-                    } else
+                    }
+                    else
                     {
                         $state.go(tab.state[0]);
                     }
                 }
             };
-
         }]
 });

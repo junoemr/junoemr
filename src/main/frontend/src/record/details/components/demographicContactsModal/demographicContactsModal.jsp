@@ -24,7 +24,7 @@
 							label="Contact Role"
 							readonly="true"
 							placeholder="Mother/Father/Guardian/Uncle"
-							component-style="$ctrl.componentStyle">
+							component-style="$ctrl.JUNO_STYLE.GREY">
 					</juno-input>
 
 					<juno-input
@@ -32,42 +32,52 @@
 							label="Contact Type"
 							readonly="true"
 							placeholder="Contact Type"
-							component-style="$ctrl.componentStyle">
+							component-style="$ctrl.JUNO_STYLE.GREY">
 					</juno-input>
 
-				<juno-input
-						ng-model="$ctrl.contact.firstName"
-						label="First Name"
-						readonly="true"
-						placeholder="First Name"
-						component-style="$ctrl.componentStyle">
-				</juno-input>
+					<juno-input
+							ng-model="$ctrl.contact.firstName"
+							label="First Name"
+							readonly="true"
+							placeholder="First Name"
+							component-style="$ctrl.JUNO_STYLE.GREY">
+					</juno-input>
 
-				<juno-input
-						ng-model="$ctrl.contact.lastName"
-						label="Last Name"
-						readonly="true"
-						placeholder="Last Name"
-						component-style="$ctrl.componentStyle">
-				</juno-input>
+					<juno-input
+							ng-model="$ctrl.contact.lastName"
+							label="Last Name"
+							readonly="true"
+							placeholder="Last Name"
+							component-style="$ctrl.JUNO_STYLE.GREY">
+					</juno-input>
 
-				<juno-input
-						ng-model="$ctrl.contact.phone"
-						label="Phone"
-						readonly="true"
-						placeholder="Phone number"
-						component-style="$ctrl.componentStyle">
-				</juno-input>
+					<juno-input
+							ng-model="$ctrl.contact.phone"
+							label="Phone"
+							readonly="true"
+							placeholder="Phone number"
+							component-style="$ctrl.JUNO_STYLE.GREY">
+					</juno-input>
 
-			</div>
+				</div>
 			</div>
 	</modal-body>
 
 	<modal-footer>
 
-		<button class="btn" type="button" ng-click="$ctrl.onCancel()">Close</button>
-		<button class="btn btn-success" type="button" ng-if="$ctrl.contact.type === 1" ng-click="$ctrl.edit()">Edit</button>
+		<juno-button
+		             ng-click="$ctrl.onCancel()">
+			Close
+		</juno-button>
+
+		<juno-button
+		             ng-click="$ctrl.edit()"
+		             disabled="!($ctrl.contact.type === 1)"
+		             title="{{$ctrl.title}}"
+		             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+		             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+			Edit
+		</juno-button>
 
 	</modal-footer>
-
 </juno-modal>

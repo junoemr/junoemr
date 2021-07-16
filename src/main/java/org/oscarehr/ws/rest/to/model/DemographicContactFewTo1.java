@@ -25,8 +25,11 @@
 
 package org.oscarehr.ws.rest.to.model;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 public class DemographicContactFewTo1 implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -37,68 +40,7 @@ public class DemographicContactFewTo1 implements Serializable {
 	private String category;
 	private String contactId;
 	private int type;
-	
 	private String lastName;
 	private String firstName;	
 	private String phone;
-	
-	public String getRole() {
-		return role;
-	}
-	public void setRole(String role) {
-		this.role = role;
-	}
-	public String getSdm() {
-		return sdm;
-	}
-	public void setSdm(String sdm) {
-		this.sdm = sdm;
-	}
-	public String getEc() {
-		return ec;
-	}
-	public void setEc(String ec) {
-		this.ec = ec;
-	}
-	public String getCategory() {
-		return category;
-	}
-	public void setCategory(String category) {
-		this.category = category;
-	}
-	
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getPhone() {
-		return phone;
-	}
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-	public String getContactId()
-	{
-		return contactId;
-	}
-    public void setContactId(String contactId)
-    {
-    	this.contactId = contactId;
-    }
-    public int getType()
-	{
-		return type;
-	}
-    public void settype(int type)
-    {
-    	this.type = type;
-    }
 }
