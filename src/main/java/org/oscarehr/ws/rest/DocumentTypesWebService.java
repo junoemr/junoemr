@@ -30,7 +30,6 @@ import org.oscarehr.ws.rest.conversion.document.CtlDocTypeToDocumentTypeDtoConve
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.document.DocumentTypeDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;

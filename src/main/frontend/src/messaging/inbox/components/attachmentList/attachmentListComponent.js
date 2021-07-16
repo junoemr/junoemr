@@ -115,16 +115,6 @@ angular.module("Messaging.Components").component('attachmentList', {
 						{
 							// ESC key
 						}
-
-						// const ok = await Juno.Common.Util.confirmationDialog($uibModal,
-						// 	`Attach to chart?`,
-						// 	`Are you sure you want to attach ${attachment.name} to ${targets[0].name}'s chart?`);
-						//
-						// if (ok)
-						// {
-						// 	const junoDoc = JunoDocumentFactory.build(attachment.name, attachment.name, attachment.type, await attachment.getBase64Data());
-						// 	await documentService.uploadDocumentToDemographicChart(junoDoc, await targets[0].localId());
-						// }
 					}
 					else
 					{
