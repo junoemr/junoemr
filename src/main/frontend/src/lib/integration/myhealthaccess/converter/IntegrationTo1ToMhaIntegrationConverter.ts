@@ -11,6 +11,6 @@ export default class IntegrationTo1ToMhaIntegrationConverter extends AbstractCon
 
 	public convert(from: IntegrationTo1): MhaIntegration
 	{
-		return new MhaIntegration(from.id.toString(), from.remoteId, from.integrationType as IntegrationType, from.apiKey, from.siteId.toString(), from.siteName);
+		return new MhaIntegration(from.id.toString(), from.remoteId, from.integrationType as IntegrationType, from.apiKey, from.siteId?.toString(), from.siteName);
 	}
 }
