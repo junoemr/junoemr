@@ -23,7 +23,7 @@
 
 <div class="flowsheet-edit">
 	<div class="flex-row justify-content-between align-items-center">
-		<h1>Edit Flowsheet</h1>
+		<h1>Edit Care Tracker</h1>
 
 		<div class="flex-row">
 			<div class="save-button-wrapper">

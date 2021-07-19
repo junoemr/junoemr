@@ -537,9 +537,9 @@ public class AdminNavService
 					"frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/Customization.jsp"));
 		}
 
-		if(securityInfoManager.hasPrivileges(providerNo, Permission.FLOWSHEET_READ))
+		if(securityInfoManager.hasPrivileges(providerNo, Permission.CARE_TRACKER_READ))
 		{
-			systemManagementItems.add( new AdminNavItemTo1("Customize Flowsheets", "configureHealthTracker"));
+			systemManagementItems.add( new AdminNavItemTo1("Customize Health Tracker", "configureHealthTracker"));
 		}
 
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN))

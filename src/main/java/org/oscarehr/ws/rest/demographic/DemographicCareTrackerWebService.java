@@ -57,7 +57,7 @@ public class DemographicCareTrackerWebService extends AbstractServiceImpl
 			@PathParam("careTrackerId") Integer careTrackerId)
 			throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.FLOWSHEET_READ);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.CARE_TRACKER_READ);
 		return RestResponse.successResponse(careTrackerDataService.getCareTrackerForDemographic(careTrackerId, demographicId));
 	}
 
@@ -70,7 +70,7 @@ public class DemographicCareTrackerWebService extends AbstractServiceImpl
 			@PathParam("itemId") Integer careTrackerItemId,
 			CareTrackerItemData careTrackerItem)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.MEASUREMENT_CREATE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.MEASUREMENT_CREATE, Permission.PREVENTION_CREATE);
 		return RestResponse.successResponse(careTrackerDataService.addCareTrackerItemData(getLoggedInProviderId(), demographicId, careTrackerItemId, careTrackerItem));
 	}
 }

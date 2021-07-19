@@ -37,7 +37,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "FlowsheetOld")
+@Table(name = "Flowsheet")
 public class Flowsheet extends AbstractModel<Integer> implements Serializable {
 
 	@Id

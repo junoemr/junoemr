@@ -93,9 +93,7 @@
 						</div>
 
 						<div class="tab-pane" id="tracker">
-							<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.FLOWSHEET_READ">
-								<ui-view></ui-view>
-							</juno-security-check>
+							<ui-view></ui-view>
 						</div>
 					</div><!-- tab content -->
 				</div>

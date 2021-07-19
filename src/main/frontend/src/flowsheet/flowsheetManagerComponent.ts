@@ -129,7 +129,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 
 				ctrl.userCanEdit = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_UPDATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_UPDATE);
 				}
 				ctrl.userCanEditClinicLevel = (): boolean =>
 				{
@@ -137,7 +137,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 				}
 				ctrl.userCanCreate = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_CREATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_CREATE);
 				}
 				ctrl.userCanCreateClinicLevel = (): boolean =>
 				{
@@ -145,7 +145,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 				}
 				ctrl.userCanDelete = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_DELETE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_DELETE);
 				}
 				ctrl.userCanDeleteClinicLevel = (): boolean =>
 				{

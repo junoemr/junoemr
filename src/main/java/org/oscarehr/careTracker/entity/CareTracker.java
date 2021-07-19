@@ -75,10 +75,10 @@ public class CareTracker extends AbstractModel<Integer>
 	@Column(name = "enabled")
 	private boolean enabled;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "care_tracker", cascade = CascadeType.ALL)
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "careTracker", cascade = CascadeType.ALL)
 	private List<CareTrackerItem> careTrackerItems;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "care_tracker", cascade = CascadeType.ALL)
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "careTracker", cascade = CascadeType.ALL)
 	private List<CareTrackerItemGroup> careTrackerItemGroups;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

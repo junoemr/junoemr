@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.FLOWSHEET_READ">
+    <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
         <div class="flex-row">
             <div class="flex-column">
                 <div class="list-group">

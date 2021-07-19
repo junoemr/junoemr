@@ -56,7 +56,7 @@ public class Drools extends AbstractModel<Integer>
 	private String description;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_drools", joinColumns = @JoinColumn(name="drools_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_id"))
+	@JoinTable(name = "care_tracker_drools", joinColumns = @JoinColumn(name="drools_id"), inverseJoinColumns = @JoinColumn(name="care_tracker_id"))
 	private Set<CareTracker> careTrackers = new HashSet<>();
 
 	/**

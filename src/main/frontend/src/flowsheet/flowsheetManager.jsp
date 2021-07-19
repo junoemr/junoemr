@@ -36,7 +36,7 @@
 		</div>
 	</div>
 
-	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.FLOWSHEET_READ">
+	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
 		<div ng-repeat="flowsheetTable in $ctrl.tablesConfig"
 		     ng-if="flowsheetTable.visible"
 		     class="flowsheets-list">

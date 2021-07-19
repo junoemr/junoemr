@@ -61,7 +61,7 @@ public class CareTrackersWebService extends AbstractServiceImpl
 			@QueryParam("page") @DefaultValue("1") Integer page,
 			@QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_READ);
 
 		if(includeProviderLevel && owningProviderId == null)
 		{

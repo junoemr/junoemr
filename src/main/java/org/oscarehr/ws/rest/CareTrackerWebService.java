@@ -56,25 +56,25 @@ public class CareTrackerWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/")
-	public RestResponse<CareTracker> create(CareTrackerCreateTransfer careTracker)
+	public RestResponse<CareTracker> createCareTracker(CareTrackerCreateTransfer careTracker)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_CREATE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_CREATE);
 		return RestResponse.successResponse(careTrackerService.addNewCareTracker(getLoggedInProviderId(), careTracker));
 	}
 
 	@GET
 	@Path("/{id}")
-	public RestResponse<CareTracker> get(@PathParam("id") Integer careTrackerId)
+	public RestResponse<CareTracker> getCareTracker(@PathParam("id") Integer careTrackerId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_READ);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_READ);
 		return RestResponse.successResponse(careTrackerService.getCareTracker(careTrackerId));
 	}
 
 	@PUT
 	@Path("/{id}")
-	public RestResponse<CareTracker> update(@PathParam("id") Integer careTrackerId, CareTrackerUpdateTransfer careTracker)
+	public RestResponse<CareTracker> updateCareTracker(@PathParam("id") Integer careTrackerId, CareTrackerUpdateTransfer careTracker)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_UPDATE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_UPDATE);
 		return RestResponse.successResponse(careTrackerService.updateCareTracker(getLoggedInProviderId(), careTrackerId, careTracker));
 	}
 
@@ -82,26 +82,27 @@ public class CareTrackerWebService extends AbstractServiceImpl
 	@Path("/{id}/enabled")
 	public RestResponse<Boolean> setEnabledState(@PathParam("id") Integer careTrackerId, @QueryParam("state") boolean enabled)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_UPDATE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_UPDATE);
 		return RestResponse.successResponse(careTrackerService.setCareTrackerEnabled(getLoggedInProviderId(), careTrackerId, enabled));
 	}
 
 	@DELETE
 	@Path("/{id}")
-	public RestResponse<Boolean> delete(@PathParam("id") Integer careTrackerId)
+	public RestResponse<Boolean> deleteCareTracker(@PathParam("id") Integer careTrackerId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_DELETE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_DELETE);
 		careTrackerService.deleteCareTracker(getLoggedInProviderId(), careTrackerId);
 		return RestResponse.successResponse(true);
 	}
 
 	@POST
 	@Path("/{id}/clone")
-	public RestResponse<CareTracker> clone(@PathParam("id") Integer careTrackerId,
-	                                       @QueryParam("providerId") String providerId,
-	                                       @QueryParam("demographicId") Integer demographicId)
+	public RestResponse<CareTracker> cloneCareTracker(
+			@PathParam("id") Integer careTrackerId,
+			@QueryParam("providerId") String providerId,
+			@QueryParam("demographicId") Integer demographicId)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FLOWSHEET_CREATE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_CREATE);
 
 		CareTracker clone;
 		if(demographicId != null)

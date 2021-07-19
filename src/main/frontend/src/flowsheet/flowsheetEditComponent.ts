@@ -85,12 +85,12 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.userCanEdit = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_UPDATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_UPDATE);
 				}
 
 				ctrl.userCanCreate = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FLOWSHEET_CREATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_CREATE);
 				}
 
 				ctrl.onAddNewGroup = async (): Promise<void> =>

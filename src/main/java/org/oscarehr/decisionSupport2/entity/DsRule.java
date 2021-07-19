@@ -73,7 +73,7 @@ public class DsRule extends AbstractModel<Integer>
 	private List<DsRuleConsequence> consequences;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_item_ds_rule", joinColumns = @JoinColumn(name="ds_rule_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_item_id"))
+	@JoinTable(name = "care_tracker_item_ds_rule", joinColumns = @JoinColumn(name="ds_rule_id"), inverseJoinColumns = @JoinColumn(name="care_tracker_item_id"))
 	private Set<CareTrackerItem> careTrackerItems = new HashSet<>();
 
 	@Column(name = "created_at", columnDefinition = "TIMESTAMP")

@@ -43,8 +43,8 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		$httpParamSerializer)
 	{
 		const service = this;
-		service.flowsheetApi = new CareTrackerApi($http, $httpParamSerializer, '../ws/rs');
-		service.flowsheetsApi = new CareTrackersApi($http, $httpParamSerializer, '../ws/rs');
+		service.careTrackerApi = new CareTrackerApi($http, $httpParamSerializer, '../ws/rs');
+		service.careTrackersApi = new CareTrackersApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 		service.preventionsApi = new PreventionsApi($http, $httpParamSerializer, '../ws/rs');
 		service.measurementsApi = new MeasurementsApi($http, $httpParamSerializer, '../ws/rs');
@@ -67,75 +67,75 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 			perPage: number): Promise<Array<FlowsheetModel>> =>
 		{
 			return service.flowsheetModelConverter.convertList(
-				(await service.flowsheetsApi.searchFlowsheets(
+				(await service.careTrackersApi.search(
 					enabled, includeClinicLevel, includeProviderLevel, providerId, includeDemographicLevel, demographicId, page, perPage)).data.body);
 		}
 
-		service.getFlowsheet = async (flowsheetId: number): Promise<FlowsheetModel> =>
+		service.getFlowsheet = async (careTrackerId: number): Promise<FlowsheetModel> =>
 		{
-			return service.flowsheetModelConverter.convert((await service.flowsheetApi.getFlowsheet(flowsheetId)).data.body);
+			return service.flowsheetModelConverter.convert((await service.careTrackerApi.getCareTracker(careTrackerId)).data.body);
 		}
 
 		service.createFlowsheet = async (flowsheet: FlowsheetModel): Promise<FlowsheetModel> =>
 		{
 			const transfer = service.flowsheetTransferConverter.convert(flowsheet);
-			return service.flowsheetModelConverter.convert((await service.flowsheetApi.createFlowsheet(transfer)).data.body);
+			return service.flowsheetModelConverter.convert((await service.careTrackerApi.createCareTracker(transfer)).data.body);
 		}
 
-		service.updateFlowsheet = async (flowsheetId: number, flowsheet: FlowsheetModel): Promise<FlowsheetModel> =>
+		service.updateFlowsheet = async (careTrackerId: number, flowsheet: FlowsheetModel): Promise<FlowsheetModel> =>
 		{
 			const transfer = service.flowsheetTransferConverter.convert(flowsheet);
-			return service.flowsheetModelConverter.convert((await service.flowsheetApi.updateFlowsheet(flowsheetId, transfer)).data.body);
+			return service.flowsheetModelConverter.convert((await service.careTrackerApi.updateCareTracker(careTrackerId, transfer)).data.body);
 		}
 
-		service.setFlowsheetEnabled = async (flowsheetId: number, enabled: boolean): Promise<boolean> =>
+		service.setFlowsheetEnabled = async (careTrackerId: number, enabled: boolean): Promise<boolean> =>
 		{
-			return (await service.flowsheetApi.setFlowsheetEnabledState(flowsheetId, enabled)).data.body;
+			return (await service.careTrackerApi.setEnabledState(careTrackerId, enabled)).data.body;
 		}
 
-		service.deleteFlowsheet = async (flowsheetId: number): Promise<boolean> =>
+		service.deleteFlowsheet = async (careTrackerId: number): Promise<boolean> =>
 		{
-			return (await service.flowsheetApi.deleteFlowsheet(flowsheetId)).data.body;
+			return (await service.careTrackerApi.deleteCareTracker(careTrackerId)).data.body;
 		}
 
-		service.searchPreventionTypes = async (keyword: string): Promise<Array<string>> =>
+		service.searchPreventionTypes = async (keyword: string): Promise<string[]> =>
 		{
 			return (await service.preventionsApi.searchPreventionTypes(keyword)).data;
 		}
 
-		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<Array<string>> =>
+		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<string[]> =>
 		{
 			return (await service.measurementsApi.searchMeasurementTypes(keyword, page, perPage)).data;
 		}
 
-		service.searchDxCodes = async (codingSystem: DxCodingSystem, keyword: string, page?: number, perPage?: number): Promise<Array<DxCodeModel>> =>
+		service.searchDxCodes = async (codingSystem: DxCodingSystem, keyword: string, page?: number, perPage?: number): Promise<DxCodeModel[]> =>
 		{
 			return service.dxCodeTransferToModelConverter.convertList((await service.diseaseRegistryApi.searchDxCodes(codingSystem, keyword, page, perPage)).data.body);
 		}
 
-		service.getDemographicFlowsheet = async (demographicId: number, flowsheetId: number): Promise<FlowsheetModel> =>
+		service.getDemographicFlowsheet = async (demographicId: number, careTrackerId: number): Promise<FlowsheetModel> =>
 		{
-			return service.flowsheetModelConverter.convert((await service.demographicApi.getFlowsheetForDemographic(demographicId, flowsheetId)).data.body);
+			return service.flowsheetModelConverter.convert((await service.demographicApi.getCareTrackerForDemographic(demographicId, careTrackerId)).data.body);
 		}
 
-		service.addFlowsheetItemData = async (demographicId: number, flowsheetId: number, flowsheetItemId: number, data: FlowsheetItemDataModel): Promise<FlowsheetItemDataModel> =>
+		service.addFlowsheetItemData = async (demographicId: number, careTrackerId: number, careTrackerItemId: number, data: FlowsheetItemDataModel): Promise<FlowsheetItemDataModel> =>
 		{
 			const transferOut = service.flowsheetItemDataModelToTransferConverter.convert(data);
-			const transferIn = (await service.demographicApi.addFlowsheetItemData(demographicId, flowsheetId, flowsheetItemId, transferOut)).data.body;
+			const transferIn = (await service.demographicApi.addCareTrackerItemData(demographicId, careTrackerId, careTrackerItemId, transferOut)).data.body;
 			return service.flowsheetItemDataTransferToModelConverter.convert(transferIn);
 		}
 
-		service.cloneFlowsheetForClinic = async (flowsheetId: number): Promise<FlowsheetModel> =>
+		service.cloneFlowsheetForClinic = async (careTrackerId: number): Promise<FlowsheetModel> =>
 		{
-			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId)).data.body);
+			return service.flowsheetModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId)).data.body);
 		}
-		service.cloneFlowsheetForProvider = async (flowsheetId: number, providerId: string): Promise<FlowsheetModel> =>
+		service.cloneFlowsheetForProvider = async (careTrackerId: number, providerId: string): Promise<FlowsheetModel> =>
 		{
-			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId, providerId)).data.body);
+			return service.flowsheetModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, providerId)).data.body);
 		}
-		service.cloneFlowsheetForDemographic = async (flowsheetId: number, demographicId: number): Promise<FlowsheetModel> =>
+		service.cloneFlowsheetForDemographic = async (careTrackerId: number, demographicId: number): Promise<FlowsheetModel> =>
 		{
-			return service.flowsheetModelConverter.convert((await service.flowsheetApi.cloneFlowsheet(flowsheetId, null, demographicId)).data.body);
+			return service.flowsheetModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, null, demographicId)).data.body);
 		}
 	}
 ]);

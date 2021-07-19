@@ -27,7 +27,7 @@
 		<span>{{$ctrl.flowsheet.description}}</span>
 	</div>
 
-	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.FLOWSHEET_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ]">
+	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.CARE_TRACKER_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ, $ctrl.SecurityPermissions.PREVENTION_READ]">
 		<filter-panel initial-state-expanded="false">
 			<div class="filter-wrapper">
 				<h6>Filter Items</h6>
