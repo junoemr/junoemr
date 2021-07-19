@@ -21,7 +21,7 @@
 * Canada
 --%>
 
-<div class="flowsheet-edit">
+<div class="care-tracker-edit">
 	<div class="flex-row justify-content-between align-items-center">
 		<h1>Edit Care Tracker</h1>
 
@@ -49,22 +49,22 @@
 	</div>
 	<div class="flex-row flex-grow">
 		<div class="flex-column width-25 row-padding-r">
-			<juno-input label="Flowsheet Name"
+			<juno-input label="Care Tracker Name"
 			            label-position="$ctrl.LABEL_POSITION.TOP"
-			            ng-model="$ctrl.flowsheet.name">
+			            ng-model="$ctrl.careTracker.name">
 			</juno-input>
 		</div>
 		<div class="flex-column flex-grow row-padding-l">
 			<juno-input label="Description"
 			            label-position="$ctrl.LABEL_POSITION.TOP"
-			            ng-model="$ctrl.flowsheet.description">
+			            ng-model="$ctrl.careTracker.description">
 			</juno-input>
 		</div>
 	</div>
 	<div class="flex-column trigger-code-list">
 		<span class="row-padding">Trigger Codes</span>
 		<div class="flex-row flex-grow">
-			<care-tracker-trigger ng-repeat="triggerCode in $ctrl.flowsheet.triggerCodes"
+			<care-tracker-trigger ng-repeat="triggerCode in $ctrl.careTracker.triggerCodes"
 			                      model="triggerCode"
 			                      class="row-padding"
 			                      on-delete="$ctrl.onDeleteTriggerCode(triggerCode)">
@@ -82,7 +82,7 @@
 	</div>
 
 	<div class="flex-column">
-		<care-tracker-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups"
+		<care-tracker-item-group ng-repeat="itemGroup in $ctrl.careTracker.careTrackerItemGroups"
 		                      model="itemGroup"
 		                      show-delete="true"
 		                      on-delete="$ctrl.onRemoveGroup(group)">

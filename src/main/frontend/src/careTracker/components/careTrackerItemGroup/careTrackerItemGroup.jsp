@@ -1,4 +1,4 @@
-<div class="flowsheet-item-group">
+<div class="care-tracker-item-group">
 	<panel no-header="!$ctrl.model.name">
 		<panel-header>
 			<h6>{{$ctrl.model.name}}</h6>

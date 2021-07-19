@@ -40,9 +40,9 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 			filterMaxEntries: "<?",
 		},
 		controller: [
-			'flowsheetApiService',
+			'careTrackerApiService',
 			function (
-				flowsheetApiService,
+				careTrackerApiService,
 			)
 			{
 				const ctrl = this;
@@ -143,7 +143,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					ctrl.validationAlerts = [];
 					try
 					{
-						let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
+						let newDataElement = await careTrackerApiService.addCareTrackerItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
 						ctrl.model.data.push(newDataElement);
 						ctrl.clearNewEntry();
 					}

@@ -23,8 +23,8 @@
 
 <div class="care-tracker-container">
 	<div class="flex-column">
-		<h3>{{$ctrl.flowsheet.name}}</h3>
-		<span>{{$ctrl.flowsheet.description}}</span>
+		<h3>{{$ctrl.careTracker.name}}</h3>
+		<span>{{$ctrl.careTracker.description}}</span>
 	</div>
 
 	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.CARE_TRACKER_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ, $ctrl.SecurityPermissions.PREVENTION_READ]">
@@ -80,12 +80,12 @@
 			</div>
 		</filter-panel>
 
-		<care-tracker-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups | filter:$ctrl.showFlowsheetGroup"
+		<care-tracker-item-group ng-repeat="itemGroup in $ctrl.careTracker.careTrackerItemGroups | filter:$ctrl.showCareTrackerGroup"
 		                         model="itemGroup">
-			<div ng-repeat="item in itemGroup.careTrackerItems | filter:$ctrl.showFlowsheetItem">
+			<div ng-repeat="item in itemGroup.careTrackerItems | filter:$ctrl.showCareTrackerItem">
 				<div class="item-divider" ng-if="!$first"></div>
 				<care-tracker-item
-						tracker-id="$ctrl.flowsheet.id"
+						tracker-id="$ctrl.careTracker.id"
 						demographic-id="$ctrl.demographicId"
 						model="item"
 						filter-date-after="$ctrl.filter.data.afterDate"

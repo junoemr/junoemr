@@ -39,13 +39,13 @@ angular.module('Record.Tracker').component('healthTracker',
 			'$stateParams',
 			'$uibModal',
 			'demographicApiService',
-			'flowsheetApiService',
+			'careTrackerApiService',
 			function (
 				$state,
 				$stateParams,
 				$uibModal,
 				demographicApiService,
-				flowsheetApiService)
+				careTrackerApiService)
 			{
 				const ctrl = this;
 				ctrl.SecurityPermissions = SecurityPermissions;
@@ -53,97 +53,97 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.flowsheets = [] as CareTrackerModel[];
-				ctrl.triggerdFlowsheets = [] as CareTrackerModel[];
-				ctrl.selectedFlowsheet = null as CareTrackerModel;
+				ctrl.careTrackers = [] as CareTrackerModel[];
+				ctrl.triggerdcareTrackers = [] as CareTrackerModel[];
+				ctrl.selectedCareTracker = null as CareTrackerModel;
 				ctrl.activeDxRecords = [];
 
 				ctrl.accordianListItems = [
 					{
-						name: "Standard Flowsheets",
+						name: "Standard careTrackers",
 						expanded: false,
-						items: [], // will be the list of clinic flowsheets
+						items: [], // will be the list of clinic careTrackers
 					},
 					{
-						name: "My Flowsheets",
+						name: "My careTrackers",
 						expanded: false,
-						items: [], // will be the list of provider flowsheets
+						items: [], // will be the list of provider careTrackers
 					},
 					{
-						name: "Patient Flowsheets",
+						name: "Patient careTrackers",
 						expanded: false,
-						items: [], // will be the list of demographic flowsheets
+						items: [], // will be the list of demographic careTrackers
 					}
 				];
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.demographicNo = $stateParams.demographicNo;
-					ctrl.flowsheets = await flowsheetApiService.searchFlowsheets(true, true, true, ctrl.user.providerNo, true, ctrl.demographicNo, 1, 100);
+					ctrl.careTrackers = await careTrackerApiService.searchCareTrackers(true, true, true, ctrl.user.providerNo, true, ctrl.demographicNo, 1, 100);
 					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicNo);
 
-					if($stateParams.flowsheetId)
+					if($stateParams.careTrackerId)
 					{
-						ctrl.selectedFlowsheet = ctrl.flowsheets.find((flowsheet) => flowsheet.id === Number($stateParams.flowsheetId));
+						ctrl.selectedCareTracker = ctrl.careTrackers.find((careTracker) => careTracker.id === Number($stateParams.careTrackerId));
 					}
 
-					ctrl.initFlowsheetLists(ctrl.flowsheets);
+					ctrl.initCareTrackerLists(ctrl.careTrackers);
 				}
 
-				ctrl.initFlowsheetLists = (flowsheets: CareTrackerModel[]): void =>
+				ctrl.initCareTrackerLists = (careTrackers: CareTrackerModel[]): void =>
 				{
-					const clinicFlowsheetItems = ctrl.accordianListItems[0].items;
-					const providerFlowsheetItems = ctrl.accordianListItems[1].items;
-					const demographicFlowsheetItems = ctrl.accordianListItems[2].items;
+					const clinicCareTrackerItems = ctrl.accordianListItems[0].items;
+					const providerCareTrackerItems = ctrl.accordianListItems[1].items;
+					const demographicCareTrackerItems = ctrl.accordianListItems[2].items;
 
-					// sort all flowsheets by level (clinic, provider, demographic)
-					flowsheets.forEach((flowsheet: CareTrackerModel) =>
+					// sort all careTrackers by level (clinic, provider, demographic)
+					careTrackers.forEach((careTracker: CareTrackerModel) =>
 					{
-						if(flowsheet.isDemographicLevel())
+						if(careTracker.isDemographicLevel())
 						{
-							demographicFlowsheetItems.push(flowsheet);
+							demographicCareTrackerItems.push(careTracker);
 						}
-						else if(flowsheet.isProviderLevel())
+						else if(careTracker.isProviderLevel())
 						{
-							providerFlowsheetItems.push(flowsheet);
+							providerCareTrackerItems.push(careTracker);
 						}
 						else
 						{
-							clinicFlowsheetItems.push(flowsheet);
+							clinicCareTrackerItems.push(careTracker);
 						}
 					});
 
-					// find triggered flowsheets, and ensure only the more specific one appears when related flowsheets are found
-					// a flowsheet is related if it has a parent ID
-					const flowsheetMap = new Map();
+					// find triggered careTrackers, and ensure only the more specific one appears when related careTrackers are found
+					// a careTracker is related if it has a parent ID
+					const triggerMap = new Map();
 
-					// put all base level flowsheets into a map
-					ctrl.getTriggeredFlowsheets(clinicFlowsheetItems).forEach((flowsheet: CareTrackerModel) => {
-						flowsheetMap.set(flowsheet.id, flowsheet);
+					// put all base level careTrackers into a map
+					ctrl.getTriggeredCareTrackers(clinicCareTrackerItems).forEach((careTracker: CareTrackerModel) => {
+						triggerMap.set(careTracker.id, careTracker);
 					});
 
 					// overwrite mapped values with provider specific version where possible
-					ctrl.getTriggeredFlowsheets(providerFlowsheetItems).forEach((flowsheet: CareTrackerModel) => {
-						const key = flowsheet.parentCareTrackerId ? flowsheet.parentCareTrackerId : flowsheet.id;
-						flowsheetMap.set(key, flowsheet);
+					ctrl.getTriggeredCareTrackers(providerCareTrackerItems).forEach((careTracker: CareTrackerModel) => {
+						const key = careTracker.parentCareTrackerId ? careTracker.parentCareTrackerId : careTracker.id;
+						triggerMap.set(key, careTracker);
 					});
 
 					// overwrite mapped values again with demographic specific version where possible
-					ctrl.getTriggeredFlowsheets(demographicFlowsheetItems).forEach((flowsheet: CareTrackerModel) => {
-						const key = flowsheet.parentCareTrackerId ? flowsheet.parentCareTrackerId : flowsheet.id;
-						flowsheetMap.set(key, flowsheet);
+					ctrl.getTriggeredCareTrackers(demographicCareTrackerItems).forEach((careTracker: CareTrackerModel) => {
+						const key = careTracker.parentCareTrackerId ? careTracker.parentCareTrackerId : careTracker.id;
+						triggerMap.set(key, careTracker);
 					});
-					ctrl.triggerdFlowsheets = Array.from(flowsheetMap.values());
+					ctrl.triggerdCareTrackers = Array.from(triggerMap.values());
 				}
 
-				ctrl.getTriggeredFlowsheets = (flowsheets: CareTrackerModel[]): CareTrackerModel[] =>
+				ctrl.getTriggeredCareTrackers = (careTrackers: CareTrackerModel[]): CareTrackerModel[] =>
 				{
 					const activeCodes: DxCodeModel[] = ctrl.activeDxRecords.map((dxRecord: DxRecordModel) => dxRecord.dxCode);
-					return flowsheets.filter((flowsheet: CareTrackerModel) =>
+					return careTrackers.filter((careTracker: CareTrackerModel) =>
 					{
 						for(let activeCode of activeCodes)
 						{
-							for (let triggerCode of flowsheet.triggerCodes)
+							for (let triggerCode of careTracker.triggerCodes)
 							{
 								if (triggerCode.codingSystem === activeCode.codingSystem && triggerCode.code === activeCode.code)
 								{
@@ -155,19 +155,19 @@ angular.module('Record.Tracker').component('healthTracker',
 					})
 				}
 
-				ctrl.onFlowsheetSelect = (flowsheet): void =>
+				ctrl.onCareTrackerSelect = (careTracker): void =>
 				{
-					ctrl.selectedFlowsheet = flowsheet;
+					ctrl.selectedCareTracker = careTracker;
 
-					const state = $state.includes("**.flowsheet") ? "." : ".flowsheet";
+					const state = $state.includes("**.careTracker") ? "." : ".careTracker";
 					$state.go(state,
 						{
 							demographicNo: ctrl.demographicNo,
-							flowsheetId: flowsheet.id,
+							careTrackerId: careTracker.id,
 						});
 				}
 
-				ctrl.onManageFlowsheets = (): void =>
+				ctrl.onManageCareTrackers = (): void =>
 				{
 					$state.go("record.configureHealthTracker",
 						{

@@ -86,7 +86,7 @@ angular.module('CareTracker').component('careTrackerEditItem',
 					// @ts-ignore
 					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Remove decision support rule",
-						"Are you sure you want to remove this rule from the flowsheet item?",
+						"Are you sure you want to remove this rule from the care tracker item?",
 						ctrl.componentStyle);
 
 					if(confirmation)

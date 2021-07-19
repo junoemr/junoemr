@@ -36,13 +36,13 @@ angular.module('CareTracker').component('careTrackerManager',
 			'$state',
 			'$stateParams',
 			'$uibModal',
-			'flowsheetApiService',
+			'careTrackerApiService',
 			'securityRolesService',
 			function (
 				$state,
 				$stateParams,
 				$uibModal,
-				flowsheetApiService,
+				careTrackerApiService,
 				securityRolesService,
 			)
 			{
@@ -69,7 +69,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					ctrl.userId = ctrl.user?.providerNo || null;
 					ctrl.demographicId = $stateParams.demographicNo || null;
 
-					ctrl.flowsheets = await flowsheetApiService.searchFlowsheets(
+					ctrl.careTrackers = await careTrackerApiService.searchCareTrackers(
 						null,
 						true,
 						ctrl.manageProviderLevel(),
@@ -77,15 +77,15 @@ angular.module('CareTracker').component('careTrackerManager',
 						ctrl.manageDemographicLevel(),
 						ctrl.demographicId,
 						1, 100);
-					ctrl.separateFlowsheetLevels(ctrl.flowsheets);
+					ctrl.separateCareTrackerLevels(ctrl.careTrackers);
 					ctrl.isLoading = false;
 				}
 
-				ctrl.separateFlowsheetLevels = (flowsheets: CareTrackerModel[]): void =>
+				ctrl.separateCareTrackerLevels = (careTrackers: CareTrackerModel[]): void =>
 				{
 					ctrl.tablesConfig = [
 						{
-							name: "Clinic Flowsheets",
+							name: "Clinic Care Trackers",
 							visible: true,
 							enableEdit: ctrl.userCanEditClinicLevel(),
 							enableClone: ctrl.userCanCreateClinicLevel(),
@@ -93,7 +93,7 @@ angular.module('CareTracker').component('careTrackerManager',
 							items: [],
 						},
 						{
-							name: "My Flowsheets",
+							name: "My Care Trackers",
 							visible: ctrl.manageProviderLevel(),
 							enableEdit: ctrl.userCanEdit(),
 							enableClone: ctrl.userCanCreate(),
@@ -101,7 +101,7 @@ angular.module('CareTracker').component('careTrackerManager',
 							items: [],
 						},
 						{
-							name: "Patient Flowsheets",
+							name: "Patient Care Trackers",
 							visible: ctrl.manageDemographicLevel(),
 							enableEdit: ctrl.userCanEdit(),
 							enableClone: ctrl.userCanCreate(),
@@ -109,20 +109,20 @@ angular.module('CareTracker').component('careTrackerManager',
 							items: [],
 						}
 					];
-					// sort all flowsheets by level (clinic, provider, demographic)
-					flowsheets.forEach((flowsheet: CareTrackerModel) =>
+					// sort all careTrackers by level (clinic, provider, demographic)
+					careTrackers.forEach((careTracker: CareTrackerModel) =>
 					{
-						if (flowsheet.isDemographicLevel())
+						if (careTracker.isDemographicLevel())
 						{
-							ctrl.tablesConfig[2].items.push(flowsheet);
+							ctrl.tablesConfig[2].items.push(careTracker);
 						}
-						else if (flowsheet.isProviderLevel())
+						else if (careTracker.isProviderLevel())
 						{
-							ctrl.tablesConfig[1].items.push(flowsheet);
+							ctrl.tablesConfig[1].items.push(careTracker);
 						}
 						else
 						{
-							ctrl.tablesConfig[0].items.push(flowsheet);
+							ctrl.tablesConfig[0].items.push(careTracker);
 						}
 					});
 				}
@@ -161,31 +161,31 @@ angular.module('CareTracker').component('careTrackerManager',
 					return Boolean(ctrl.demographicId);
 				}
 
-				ctrl.onFlowsheetNew = (): void =>
+				ctrl.onCareTrackerNew = (): void =>
 				{
-					ctrl.toFlowsheetEdit(null);
+					ctrl.toCareTrackerEdit(null);
 				}
 
-				ctrl.onFlowsheetEdit = (flowsheet): void =>
+				ctrl.onCareTrackerEdit = (careTracker): void =>
 				{
-					ctrl.toFlowsheetEdit(flowsheet.id);
+					ctrl.toCareTrackerEdit(careTracker.id);
 				}
 
-				ctrl.onFlowsheetDelete = async (flowsheet: CareTrackerModel): Promise<void> =>
+				ctrl.onCareTrackerDelete = async (careTracker: CareTrackerModel): Promise<void> =>
 				{
 					const userOk : boolean = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Confirm Delete",
-						"You are about to delete flowsheet " + flowsheet.name + "." +
-						"Are you sure you want to delete this flowsheet?");
+						"You are about to delete care tracker " + careTracker.name + "." +
+						"Are you sure you want to delete this care tracker?");
 
 					if (userOk)
 					{
 						ctrl.isLoading = true;
 						try
 						{
-							await flowsheetApiService.deleteFlowsheet(flowsheet.id);
-							ctrl.flowsheets = ctrl.flowsheets.filter((entry) => entry.id !== flowsheet.id);
-							ctrl.separateFlowsheetLevels(ctrl.flowsheets);
+							await careTrackerApiService.deleteCareTracker(careTracker.id);
+							ctrl.careTrackers = ctrl.careTrackers.filter((entry) => entry.id !== careTracker.id);
+							ctrl.separateCareTrackerLevels(ctrl.careTrackers);
 						}
 						finally
 						{
@@ -194,9 +194,9 @@ angular.module('CareTracker').component('careTrackerManager',
 					}
 				}
 
-				ctrl.onCloneFlowsheet = async (flowsheet: CareTrackerModel): Promise<void> =>
+				ctrl.onCloneCareTracker = async (careTracker: CareTrackerModel): Promise<void> =>
 				{
-					const options = ctrl.getCloneOptions(flowsheet);
+					const options = ctrl.getCloneOptions(careTracker);
 					let selection = null;
 					if(options.length < 1)
 					{
@@ -205,8 +205,8 @@ angular.module('CareTracker').component('careTrackerManager',
 					if(options.length === 1)
 					{
 						const confirm = await Juno.Common.Util.confirmationDialog($uibModal,
-							"Copy flowsheet",
-							"Are you sure you want to copy this flowsheet for " + options[0].label,
+							"Copy Care Tracker",
+							"Are you sure you want to copy this care tracker for " + options[0].label,
 							ctrl.componentStyle);
 						if(confirm)
 						{
@@ -216,7 +216,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					else
 					{
 						selection = await Juno.Common.Util.openSelectDialog($uibModal,
-							"Copy flowsheet",
+							"Copy Care Tracker",
 							"Select who this copy can be used by.",
 							options,
 							ctrl.componentStyle,
@@ -229,25 +229,25 @@ angular.module('CareTracker').component('careTrackerManager',
 						ctrl.isLoading = true;
 						try
 						{
-							let flowsheetClone: CareTrackerModel = null;
+							let careTrackerClone: CareTrackerModel = null;
 							if(selection === accessLevels.CLINIC)
 							{
-								flowsheetClone = await flowsheetApiService.cloneFlowsheetForClinic(flowsheet.id);
+								careTrackerClone = await careTrackerApiService.cloneCareTrackerForClinic(careTracker.id);
 							}
 							else if(selection === accessLevels.PROVIDER)
 							{
-								flowsheetClone = await flowsheetApiService.cloneFlowsheetForProvider(flowsheet.id, ctrl.userId);
+								careTrackerClone = await careTrackerApiService.cloneCareTrackerForProvider(careTracker.id, ctrl.userId);
 							}
 							else if(selection === accessLevels.DEMOGRAPHIC)
 							{
-								flowsheetClone = await flowsheetApiService.cloneFlowsheetForDemographic(flowsheet.id, ctrl.demographicId);
+								careTrackerClone = await careTrackerApiService.cloneCareTrackerForDemographic(careTracker.id, ctrl.demographicId);
 							}
 							else
 							{
 								return;
 							}
-							ctrl.flowsheets.push(flowsheetClone);
-							ctrl.separateFlowsheetLevels(ctrl.flowsheets);
+							ctrl.careTrackers.push(careTrackerClone);
+							ctrl.separateCareTrackerLevels(ctrl.careTrackers);
 						}
 						finally
 						{
@@ -256,14 +256,14 @@ angular.module('CareTracker').component('careTrackerManager',
 					}
 				}
 
-				ctrl.getCloneOptions = (flowsheet: CareTrackerModel): object[] =>
+				ctrl.getCloneOptions = (careTracker: CareTrackerModel): object[] =>
 				{
 					const options = [];
-					if(!flowsheet.isDemographicLevel() && !flowsheet.isProviderLevel() && ctrl.userCanCreateClinicLevel())
+					if(!careTracker.isDemographicLevel() && !careTracker.isProviderLevel() && ctrl.userCanCreateClinicLevel())
 					{
 						options.push({label: "All Users", value: accessLevels.CLINIC});
 					}
-					if (!flowsheet.isDemographicLevel() && ctrl.manageProviderLevel())
+					if (!careTracker.isDemographicLevel() && ctrl.manageProviderLevel())
 					{
 						options.push({label: "Just Me", value: accessLevels.PROVIDER});
 					}
@@ -274,12 +274,12 @@ angular.module('CareTracker').component('careTrackerManager',
 					return options;
 				}
 
-				ctrl.onToggleFlowsheetEnabled = async (flowsheet: CareTrackerModel): Promise<void> =>
+				ctrl.onToggleCareTrackerEnabled = async (careTracker: CareTrackerModel): Promise<void> =>
 				{
 					ctrl.isLoading = true;
 					try
 					{
-						flowsheet.enabled = await flowsheetApiService.setFlowsheetEnabled(flowsheet.id, !flowsheet.enabled);
+						careTracker.enabled = await careTrackerApiService.setCareTrackerEnabled(careTracker.id, !careTracker.enabled);
 					}
 					finally
 					{
@@ -287,32 +287,32 @@ angular.module('CareTracker').component('careTrackerManager',
 					}
 				}
 
-				ctrl.toggleFlowsheetEnabledLabel = (flowsheet: CareTrackerModel): string =>
+				ctrl.toggleCareTrackerEnabledLabel = (careTracker: CareTrackerModel): string =>
 				{
-					return flowsheet.enabled ? "Disable" : "Enable";
+					return careTracker.enabled ? "Disable" : "Enable";
 				}
 
-				ctrl.toFlowsheetEdit = (flowsheetId: number): void =>
+				ctrl.toCareTrackerEdit = (id: number): void =>
 				{
 					if($state.includes("**.admin.**"))
 					{
-						$state.go('admin.editFlowsheet',
+						$state.go('admin.editCareTracker',
 							{
-								flowsheetId: flowsheetId,
+								careTrackerId: id,
 							});
 					}
 					else if($state.includes("**.settings.**"))
 					{
-						$state.go('settings.editFlowsheet',
+						$state.go('settings.editCareTracker',
 							{
-								flowsheetId: flowsheetId,
+								careTrackerId: id,
 							});
 					}
 					else if($state.includes("**.record.**"))
 					{
-						$state.go('record.editFlowsheet',
+						$state.go('record.editCareTracker',
 							{
-								flowsheetId: flowsheetId,
+								careTrackerId: id,
 								demographicNo: ctrl.demographicId,
 							});
 					}

@@ -41,13 +41,13 @@ angular.module('CareTracker').component('careTrackerEdit',
 			'$state',
 			'$stateParams',
 			'$uibModal',
-			'flowsheetApiService',
+			'careTrackerApiService',
 			'securityRolesService',
 			function (
 				$state,
 				$stateParams,
 				$uibModal,
-				flowsheetApiService,
+				careTrackerApiService,
 				securityRolesService,
 			)
 			{
@@ -59,27 +59,27 @@ angular.module('CareTracker').component('careTrackerEdit',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.isLoading = true;
-				ctrl.flowsheet = null as CareTrackerModel;
+				ctrl.careTracker = null as CareTrackerModel;
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-					if($stateParams.flowsheetId)
+					if($stateParams.careTrackerId)
 					{
-						ctrl.flowsheet = await flowsheetApiService.getFlowsheet($stateParams.flowsheetId);
+						ctrl.careTracker = await careTrackerApiService.getCareTracker($stateParams.careTrackerId);
 					}
 					else
 					{
-						ctrl.flowsheet = new CareTrackerModel();
+						ctrl.careTracker = new CareTrackerModel();
 					}
 					ctrl.isLoading = false;
 				}
 
-				ctrl.isNewFlowsheet = (): boolean =>
+				ctrl.isNewCareTracker = (): boolean =>
 				{
-					if(ctrl.flowsheet)
+					if(ctrl.careTracker)
 					{
-						return Juno.Common.Util.isBlank(ctrl.flowsheet.id);
+						return Juno.Common.Util.isBlank(ctrl.careTracker.id);
 					}
 				}
 
@@ -96,7 +96,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 				ctrl.onAddNewGroup = async (): Promise<void> =>
 				{
 					let groupName = await Juno.Common.Util.openInputDialog($uibModal,
-						"Add Flowsheet Group",
+						"Add group",
 						"Please enter a name for this group",
 						ctrl.componentStyle,
 						"Ok",
@@ -107,14 +107,14 @@ angular.module('CareTracker').component('careTrackerEdit',
 					{
 						const newGroup = new CareTrackerItemGroupModel();
 						newGroup.name = groupName;
-						ctrl.flowsheet.flowsheetItemGroups.push(newGroup);
+						ctrl.careTracker.careTrackerItemGroups.push(newGroup);
 					}
 				}
 
 				ctrl.onRenameGroup = async (itemGroup): Promise<void> =>
 				{
 					let groupName = await Juno.Common.Util.openInputDialog($uibModal,
-						"Rename Flowsheet Group",
+						"Rename group",
 						"Please enter a new name for this group",
 						ctrl.componentStyle,
 						"Ok",
@@ -146,20 +146,20 @@ angular.module('CareTracker').component('careTrackerEdit',
 						"Search codes");
 					if(selection)
 					{
-						ctrl.flowsheet.triggerCodes.push(selection.data);
+						ctrl.careTracker.triggerCodes.push(selection.data);
 					}
 				}
 
 				ctrl.onDeleteTriggerCode = async (triggerCode: DxCodeModel): Promise<void> =>
 				{
 					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
-						"Remove flowsheet trigger",
-						"Are you sure you want to remove this trigger code from the flowsheet?",
+						"Remove trigger",
+						"Are you sure you want to remove this trigger code from the care tracker?",
 						ctrl.componentStyle);
 
 					if(confirmation)
 					{
-						ctrl.flowsheet.triggerCodes = ctrl.flowsheet.triggerCodes.filter((entry) => entry !== triggerCode);
+						ctrl.careTracker.triggerCodes = ctrl.careTracker.triggerCodes.filter((entry) => entry !== triggerCode);
 					}
 				}
 
@@ -214,8 +214,8 @@ angular.module('CareTracker').component('careTrackerEdit',
 				ctrl.onRemoveItem = async (item, itemGroup): Promise<void> =>
 				{
 					let confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
-						"Remove flowsheet item",
-						"Are you sure you want to remove this item from the flowsheet group?",
+						"Remove item",
+						"Are you sure you want to remove this item from the care tracker group?",
 						ctrl.componentStyle);
 
 					if(confirmation)
@@ -227,19 +227,19 @@ angular.module('CareTracker').component('careTrackerEdit',
 				ctrl.onRemoveGroup = async (group): Promise<void> =>
 				{
 					const confirmation = await Juno.Common.Util.confirmationDialog($uibModal,
-						"Remove flowsheet group",
-						"Are you sure you want to remove this group (and all items within it) from the flowsheet?",
+						"Remove group",
+						"Are you sure you want to remove this group (and all items within it) from the care tracker?",
 						ctrl.componentStyle);
 
 					if(confirmation)
 					{
-						ctrl.flowsheet.flowsheetItemGroups = ctrl.flowsheet.flowsheetItemGroups.filter((entry) => !(entry.name === group.name));
+						ctrl.careTracker.careTrackerItemGroups = ctrl.careTracker.careTrackerItemGroups.filter((entry) => !(entry.name === group.name));
 					}
 				}
 
 				ctrl.lookupPreventions = async (searchTerm): Promise<object[]> =>
 				{
-					const searchResults = await flowsheetApiService.searchPreventionTypes(searchTerm);
+					const searchResults = await careTrackerApiService.searchPreventionTypes(searchTerm);
 					return searchResults.body.map((result) =>
 					{
 						return {
@@ -252,7 +252,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.lookupMeasurements = async (searchTerm): Promise<object[]> =>
 				{
-					const searchResults = await flowsheetApiService.searchMeasurementTypes(searchTerm);
+					const searchResults = await careTrackerApiService.searchMeasurementTypes(searchTerm);
 					return searchResults.body.map((result) =>
 					{
 						return {
@@ -265,7 +265,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.lookupIcd9Codes = async (searchTerm): Promise<object[]> =>
 				{
-					const searchResults: DxCodeModel[] = await flowsheetApiService.searchDxCodes(DxCodingSystem.ICD9, searchTerm);
+					const searchResults: DxCodeModel[] = await careTrackerApiService.searchDxCodes(DxCodingSystem.ICD9, searchTerm);
 					return searchResults.map((result) =>
 					{
 						return {
@@ -304,13 +304,13 @@ angular.module('CareTracker').component('careTrackerEdit',
 					ctrl.isLoading = true;
 					try
 					{
-						if (ctrl.isNewFlowsheet())
+						if (ctrl.isNewCareTracker())
 						{
-							ctrl.flowsheet = await flowsheetApiService.createFlowsheet(ctrl.flowsheet);
+							ctrl.careTracker = await careTrackerApiService.createCareTracker(ctrl.careTracker);
 						}
 						else
 						{
-							ctrl.flowsheet = await flowsheetApiService.updateFlowsheet(ctrl.flowsheet.id, ctrl.flowsheet);
+							ctrl.careTracker = await careTrackerApiService.updateCareTracker(ctrl.careTracker.id, ctrl.careTracker);
 						}
 						Juno.Common.Util.successAlert($uibModal, "Save Complete", "The changes have been applied");
 					}
@@ -322,17 +322,17 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.canSave = (): boolean =>
 				{
-					let hasPermission = ctrl.isNewFlowsheet() ? ctrl.userCanCreate() : ctrl.userCanEdit();
-					return ctrl.flowsheet  && !ctrl.flowsheet.systemManaged && hasPermission;
+					let hasPermission = ctrl.isNewCareTracker() ? ctrl.userCanCreate() : ctrl.userCanEdit();
+					return ctrl.careTracker  && !ctrl.careTracker.systemManaged && hasPermission;
 				}
 
 				ctrl.saveButtonTooltip = (): string =>
 				{
-					if(ctrl.flowsheet)
+					if(ctrl.careTracker)
 					{
-						if (ctrl.flowsheet.systemManaged)
+						if (ctrl.careTracker.systemManaged)
 						{
-							return "System Managed Flowsheets can not be modified";
+							return "System managed care trackers can not be modified";
 						}
 						else if (!ctrl.canSave())
 						{

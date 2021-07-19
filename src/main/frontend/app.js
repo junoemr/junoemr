@@ -273,9 +273,9 @@ oscarApp.config([
 			url: '/configureHealthTracker',
 			component: 'careTrackerManager',
 		})
-		.state('admin.editFlowsheet',
+		.state('admin.editCareTracker',
 		{
-			url: '/configureHealthTracker/flowsheet/:flowsheetId',
+			url: '/configureHealthTracker/careTracker/:careTrackerId',
 			component: 'careTrackerEdit',
 		})
 		.state('ticklers',
@@ -576,9 +576,9 @@ oscarApp.config([
 					}]
 				},
 			})
-		.state('settings.editFlowsheet',
+		.state('settings.editCareTracker',
 			{
-				url: '/healthTracker/flowsheet/:flowsheetId',
+				url: '/healthTracker/careTracker/:careTrackerId',
 				component: 'careTrackerEdit',
 			})
 		.state('support',
@@ -658,9 +658,9 @@ oscarApp.config([
 					},
 				},
 		})
-		.state('record.summary.tracker.flowsheet',
+		.state('record.summary.tracker.careTracker',
 		{
-			url: '/flowsheet/:flowsheetId',
+			url: '/careTracker/:careTrackerId',
 			component: 'careTracker',
 			meta:
 				{
@@ -857,9 +857,9 @@ oscarApp.config([
 				},
 			},
 		})
-		.state('record.tracker.flowsheet',
+		.state('record.tracker.careTracker',
 		{
-			url: '/flowsheet/:flowsheetId',
+			url: '/careTracker/:careTrackerId',
 			component: 'careTracker',
 			meta:
 				{
@@ -879,9 +879,9 @@ oscarApp.config([
 				}]
 			},
 		})
-		.state('record.editFlowsheet',
+		.state('record.editCareTracker',
 			{
-				url: '/configureHealthTracker/flowsheet/:flowsheetId',
+				url: '/configureHealthTracker/careTracker/:careTrackerId',
 				component: 'careTrackerEdit',
 			})
         .state('record.patientEducation',

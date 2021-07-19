@@ -45,7 +45,7 @@ export default class CareTrackerModelToTransferConverter extends AbstractConvert
 			name: careTrackerModel.name,
 			description: careTrackerModel.description,
 			enabled: careTrackerModel.enabled,
-			flowsheetItemGroups: this.convertAllGroups(careTrackerModel.careTrackerItemGroups),
+			careTrackerItemGroups: this.convertAllGroups(careTrackerModel.careTrackerItemGroups),
 			triggerCodes: new DxCodeModelToTransferConverter().convertList(careTrackerModel.triggerCodes),
 		} as CareTracker;
 	}
@@ -81,7 +81,7 @@ export default class CareTrackerModelToTransferConverter extends AbstractConvert
 			model.valueLabel = item.valueLabel;
 			model.rules = ruleToTransferConverter.convertList(item.rules);
 
-			// data and alerts are not submitted with the flowsheet transfer
+			// data and alerts are not submitted with the careTracker transfer
 			model.data = null;
 			model.careTrackerItemAlerts = null;
 

@@ -1,4 +1,4 @@
-<div class="flex-row align-items-center flowsheet-trigger">
+<div class="flex-row align-items-center care-tracker-trigger">
 	<span class="row-item">
 		{{$ctrl.model.codingSystem}}
 	</span>

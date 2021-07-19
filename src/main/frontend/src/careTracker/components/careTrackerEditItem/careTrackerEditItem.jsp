@@ -1,4 +1,4 @@
-<div class="flowsheet-edit-item">
+<div class="care-tracker-edit-item">
 	<juno-simple-close-button click="$ctrl.onClose()" class="item-close-button">
 	</juno-simple-close-button>
 

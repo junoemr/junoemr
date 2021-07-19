@@ -21,7 +21,7 @@
 * Canada
 --%>
 
-<div class="flowsheet-manager">
+<div class="care-tracker-manager">
 	<div class="flex-row justify-content-between align-items-center">
 		<h1>Manage Health Tracker</h1>
 
@@ -30,25 +30,25 @@
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 			             disabled="$ctrl.isLoading || !$ctrl.userCanCreate()"
-			             click="$ctrl.onFlowsheetNew()">
-				New Flowsheet
+			             click="$ctrl.onCareTrackerNew()">
+				New Care Tracker
 			</juno-button>
 		</div>
 	</div>
 
 	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
-		<div ng-repeat="flowsheetTable in $ctrl.tablesConfig"
-		     ng-if="flowsheetTable.visible"
-		     class="flowsheets-list">
-			<span>{{flowsheetTable.name}}</span>
+		<div ng-repeat="table in $ctrl.tablesConfig"
+		     ng-if="table.visible"
+		     class="care-trackers-list">
+			<span>{{table.name}}</span>
 			<table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
 				<tbody>
-				<tr ng-repeat="flowsheet in flowsheetTable.items">
-					<td data-title="'Flowsheet'">
-						{{flowsheet.name}}
+				<tr ng-repeat="item in table.items">
+					<td data-title="'Care Tracker'">
+						{{item.name}}
 					</td>
 					<td data-title="'Description'">
-						{{flowsheet.description}}
+						{{item.description}}
 					</td>
 					<td class="action-buttons">
 						<div class="flex-row justify-content-space-evenly">
@@ -56,8 +56,8 @@
 								<juno-button component-style="$ctrl.componentStyle"
 								             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								             disabled="$ctrl.isLoading || !flowsheetTable.enableEdit"
-								             click="$ctrl.onFlowsheetEdit(flowsheet)">
+								             disabled="$ctrl.isLoading || !table.enableEdit"
+								             click="$ctrl.onCareTrackerEdit(item)">
 									Edit
 								</juno-button>
 							</div>
@@ -65,8 +65,8 @@
 								<juno-button component-style="$ctrl.componentStyle"
 								             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								             disabled="$ctrl.isLoading || !flowsheetTable.enableClone"
-								             click="$ctrl.onCloneFlowsheet(flowsheet)">
+								             disabled="$ctrl.isLoading || !table.enableClone"
+								             click="$ctrl.onCloneCareTracker(item)">
 									Copy
 								</juno-button>
 							</div>
@@ -74,17 +74,17 @@
 								<juno-button component-style="$ctrl.componentStyle"
 								             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								             disabled="$ctrl.isLoading || !flowsheetTable.enableEdit"
-								             click="$ctrl.onToggleFlowsheetEnabled(flowsheet)">
-									{{$ctrl.toggleFlowsheetEnabledLabel(flowsheet)}}
+								             disabled="$ctrl.isLoading || !table.enableEdit"
+								             click="$ctrl.onToggleCareTrackerEnabled(item)">
+									{{$ctrl.toggleCareTrackerEnabledLabel(item)}}
 								</juno-button>
 							</div>
 							<div class="row-spacing-r action-button-wrapper">
 								<juno-button component-style="$ctrl.componentStyle"
 								             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								             disabled="$ctrl.isLoading || !flowsheetTable.enableDelete"
-								             click="$ctrl.onFlowsheetDelete(flowsheet)">
+								             disabled="$ctrl.isLoading || !table.enableDelete"
+								             click="$ctrl.onCareTrackerDelete(item)">
 									Delete
 								</juno-button>
 							</div>

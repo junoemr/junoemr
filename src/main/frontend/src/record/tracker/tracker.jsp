@@ -31,10 +31,10 @@
                              button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
                              button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
                              disabled="$ctrl.isLoading"
-                             click="$ctrl.onManageFlowsheets()">
+                             click="$ctrl.onManageCareTrackers()">
                     <div class="flex-row align-items-center">
                         <i class="icon icon-gears"></i>
-                        <span>Manage Flowsheets</span>
+                        <span>Manage CareTrackers</span>
                     </div>
                 </juno-button>
             </div>
@@ -45,18 +45,18 @@
         <div class="flex-row">
             <div class="flex-column">
                 <div class="list-group">
-                    <button ng-repeat="tracker in $ctrl.triggerdFlowsheets"
+                    <button ng-repeat="tracker in $ctrl.triggerdCareTrackers"
                             type="button"
                             class="list-group-item list-group-item-action"
-                            ng-class="{'active': tracker === $ctrl.selectedFlowsheet}"
-                            ng-click="$ctrl.onFlowsheetSelect(tracker)">
+                            ng-class="{'active': tracker === $ctrl.selectedCareTracker}"
+                            ng-click="$ctrl.onCareTrackerSelect(tracker)">
                         {{tracker.name}}
                     </button>
-                    <span ng-if="$ctrl.triggerdFlowsheets.length === 0" class="list-group-item">
+                    <span ng-if="$ctrl.triggerdCareTrackers.length === 0" class="list-group-item">
                         No Active Care Trackers
                     </span>
                 </div>
-                <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onFlowsheetSelect(item)">
+                <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onCareTrackerSelect(item)">
                 </accordion-list>
             </div>
             <div class="ui-view-wrapper flex-grow">

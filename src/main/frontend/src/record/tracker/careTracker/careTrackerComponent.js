@@ -33,11 +33,11 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 		controller: [
 			'$state',
 			'$stateParams',
-			'flowsheetApiService',
+			'careTrackerApiService',
 			function (
 				$state,
 				$stateParams,
-				flowsheetApiService,
+				careTrackerApiService,
 			)
 			{
 				const ctrl = this;
@@ -47,7 +47,7 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.flowsheet = null;
+				ctrl.careTracker = null;
 				ctrl.demographicId = null;
 
 				ctrl.filter = {
@@ -76,7 +76,7 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 				ctrl.$onInit = async () =>
 				{
 					ctrl.demographicId = $stateParams.demographicNo;
-					ctrl.flowsheet = await flowsheetApiService.getDemographicFlowsheet(ctrl.demographicId, $stateParams.flowsheetId);
+					ctrl.careTracker = await careTrackerApiService.getDemographicCareTracker(ctrl.demographicId, $stateParams.careTrackerId);
 				}
 
 				ctrl.clearFilters = () =>
@@ -88,13 +88,13 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 					ctrl.filter.data.maxEntries = null;
 				};
 
-				ctrl.showFlowsheetGroup = (group) =>
+				ctrl.showCareTrackerGroup = (group) =>
 				{
 					// filter visible items. show group if one or more items visible
-					let visibleItems = group.careTrackerItems.filter((item) => ctrl.showFlowsheetItem(item));
+					let visibleItems = group.careTrackerItems.filter((item) => ctrl.showCareTrackerItem(item));
 					return (visibleItems.length > 0);
 				}
-				ctrl.showFlowsheetItem = (item) =>
+				ctrl.showCareTrackerItem = (item) =>
 				{
 					if(!item || (!ctrl.filter.item.showHidden && item.hidden))
 					{
