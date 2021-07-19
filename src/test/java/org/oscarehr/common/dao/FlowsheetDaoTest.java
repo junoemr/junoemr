@@ -41,7 +41,7 @@ import org.oscarehr.common.model.Flowsheet;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CareTrackerDaoTest extends DaoTestFixtures
+public class FlowsheetDaoTest extends DaoTestFixtures
 {
 	@Autowired
 	protected FlowsheetDao flowsheetDao;
