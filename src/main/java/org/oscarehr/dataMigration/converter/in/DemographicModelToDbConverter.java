@@ -101,10 +101,13 @@ public class DemographicModelToDbConverter
 		dbDemographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(input.getPatientStatusDate()));
 		dbDemographic.setLastUpdateUser(SYSTEM_PROVIDER_NO);
 
+		List<DemographicExt> demographicExtList = new ArrayList<>();
+
 		List<Address> addressList = input.getAddressList();
 		for(Address address : addressList)
 		{
-			// TODO how to handle multiple addresses?
+			// If address is marked as current address then it's the primary address
+			// Otherwise it's an alternative address.
 			if(address.isCurrentAddress())
 			{
 				dbDemographic.setAddress(address.getAddressLinesString());
@@ -112,9 +115,22 @@ public class DemographicModelToDbConverter
 				dbDemographic.setProvince(getProvinceCode(address.getRegionCode(), address.getCountryCode()));
 				dbDemographic.setPostal(address.getPostalCode());
 			}
+			else
+			{
+				DemographicExt altAddress = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_ADDRESS, address.getAddressLinesString());
+				DemographicExt altCity = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_CITY, address.getCity());
+				DemographicExt altProvince = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_PROVINCE, getProvinceCode(address.getRegionCode(), address.getCountryCode()));
+				DemographicExt altPostal = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_POSTAL, address.getPostalCode());
+				demographicExtList.add(altAddress);
+				demographicExtList.add(altCity);
+				demographicExtList.add(altProvince);
+				demographicExtList.add(altPostal);
+			}
 		}
-
-		List<DemographicExt> demographicExtList = new ArrayList<>();
 
 		// phone conversions
 		PhoneNumber homePhone = input.getHomePhone();
