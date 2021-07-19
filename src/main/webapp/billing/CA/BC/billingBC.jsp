@@ -75,7 +75,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
 <%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
 <%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
-<%@ page import="org.apache.commons.lang.NumberUtils" %>
+<%@ page import="org.apache.commons.lang.math.NumberUtils" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -1162,7 +1162,7 @@ if(wcbneeds != null){%>
                 LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
 
               AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
-              Appointment appt = apptManager.getAppointment(info, NumberUtils.stringToInt(bean.getApptNo(), 0));
+              Appointment appt = apptManager.getAppointment(info, NumberUtils.toInt(bean.getApptNo(), 0));
           %>
           <tr>
               <td></td>

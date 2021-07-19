@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderSiteDao;
@@ -374,16 +375,7 @@ public class ClinicaidAPIService
 
 				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
 				{
-					Integer appointmentNo = 0;
-					try
-					{
-						appointmentNo = Integer.parseInt(request.getParameter("appointment_no"));
-					}
-					catch (NumberFormatException e)
-					{
-						MiscUtils.getLogger().warn("Could not parse appointment number", e);
-					}
-
+					Integer appointmentNo = NumberUtils.toInt(request.getParameter("appointment_no"), 0);
 					Appointment appointment = appointmentDao.find(appointmentNo);
 
 					// If billed from the master file, appointmentNo = 0
