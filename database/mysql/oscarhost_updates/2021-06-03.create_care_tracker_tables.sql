@@ -1,14 +1,13 @@
-RENAME TABLE `Flowsheet` TO FlowsheetOld;
 
-CREATE TABLE IF NOT EXISTS flowsheet
+CREATE TABLE IF NOT EXISTS care_tracker
 (
     id                      INTEGER PRIMARY KEY AUTO_INCREMENT,
-    parent_flowsheet_id     INTEGER(10) DEFAULT NULL,
+    parent_care_tracker_id  INTEGER(10) DEFAULT NULL,
     owner_provider_id       VARCHAR(6) DEFAULT NULL,
     owner_demographic_id    INTEGER(10) DEFAULT NULL,
     system_managed          BOOLEAN NOT NULL DEFAULT false,
     enabled                 BOOLEAN NOT NULL DEFAULT true,
-    flowsheet_name          VARCHAR(255) NOT NULL,
+    care_tracker_name       VARCHAR(255) NOT NULL,
     description             TEXT,
 
     created_at              DATETIME NOT NULL,
@@ -18,16 +17,16 @@ CREATE TABLE IF NOT EXISTS flowsheet
     deleted_at              DATETIME,
     deleted_by              VARCHAR(6) DEFAULT NULL,
 
-    CONSTRAINT `flowsheet_flowsheet_parent_id_fk` FOREIGN KEY (parent_flowsheet_id) REFERENCES flowsheet (id),
-    CONSTRAINT `flowsheet_owner_provider_id_fk` FOREIGN KEY (owner_provider_id) REFERENCES provider (provider_no),
-    CONSTRAINT `flowsheet_owner_demographic_id_fk` FOREIGN KEY (owner_demographic_id) REFERENCES demographic (demographic_no)
+    CONSTRAINT `care_tracker_care_tracker_parent_id_fk` FOREIGN KEY (parent_care_tracker_id) REFERENCES care_tracker (id),
+    CONSTRAINT `care_tracker_owner_provider_id_fk` FOREIGN KEY (owner_provider_id) REFERENCES provider (provider_no),
+    CONSTRAINT `care_tracker_owner_demographic_id_fk` FOREIGN KEY (owner_demographic_id) REFERENCES demographic (demographic_no)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_item_group
+CREATE TABLE IF NOT EXISTS care_tracker_item_group
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    flowsheet_id    INTEGER(10) NOT NULL,
+    care_tracker_id INTEGER(10) NOT NULL,
     group_name      VARCHAR(255),
     description     TEXT,
 
@@ -38,14 +37,14 @@ CREATE TABLE IF NOT EXISTS flowsheet_item_group
     deleted_at      DATETIME,
     deleted_by      VARCHAR(6) DEFAULT NULL,
 
-    CONSTRAINT `flowsheet_item_group_flowsheet_id_fk` FOREIGN KEY (flowsheet_id) REFERENCES flowsheet (id)
+    CONSTRAINT `care_tracker_item_group_care_tracker_id_fk` FOREIGN KEY (care_tracker_id) REFERENCES care_tracker (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_item
+CREATE TABLE IF NOT EXISTS care_tracker_item
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    flowsheet_id    INTEGER(10) NOT NULL,
-    flowsheet_item_group_id INTEGER(10),
+    care_tracker_id INTEGER(10) NOT NULL,
+    care_tracker_item_group_id INTEGER(10),
     item_name       VARCHAR(255) NOT NULL,
     item_type       VARCHAR(255) NOT NULL,
     item_type_code  VARCHAR(255) NOT NULL,
@@ -62,8 +61,8 @@ CREATE TABLE IF NOT EXISTS flowsheet_item
     deleted_at      DATETIME,
     deleted_by      VARCHAR(6) DEFAULT NULL,
 
-    CONSTRAINT `flowsheet_item_flowsheet_id_fk` FOREIGN KEY (flowsheet_id) REFERENCES flowsheet (id),
-    CONSTRAINT `flowsheet_item_flowsheet_item_group_id_fk` FOREIGN KEY (flowsheet_item_group_id) REFERENCES flowsheet_item_group (id)
+    CONSTRAINT `care_tracker_item_care_tracker_id_fk` FOREIGN KEY (care_tracker_id) REFERENCES care_tracker (id),
+    CONSTRAINT `care_tracker_item_care_tracker_item_group_id_fk` FOREIGN KEY (care_tracker_item_group_id) REFERENCES care_tracker_item_group (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS ds_rule
@@ -84,7 +83,7 @@ CREATE TABLE IF NOT EXISTS ds_rule
 CREATE TABLE IF NOT EXISTS ds_rule_condition
 (
     id                  INTEGER PRIMARY KEY AUTO_INCREMENT,
-    ds_rule_id   INTEGER(10) NOT NULL,
+    ds_rule_id          INTEGER(10) NOT NULL,
     condition_type      VARCHAR(255) NOT NULL,
     condition_value     VARCHAR(255),
 
@@ -116,13 +115,13 @@ CREATE TABLE IF NOT EXISTS ds_rule_consequence
     CONSTRAINT `ds_rule_consequence_ds_rule_id_fk` FOREIGN KEY (ds_rule_id) REFERENCES ds_rule (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_item_ds_rule
+CREATE TABLE IF NOT EXISTS care_tracker_item_ds_rule
 (
-    flowsheet_item_id     INTEGER NOT NULL,
-    ds_rule_id     INTEGER NOT NULL,
-    PRIMARY KEY (flowsheet_item_id, ds_rule_id),
-    CONSTRAINT `flowsheet_item_ds_rule_flowsheet_item_id_fk` FOREIGN KEY (flowsheet_item_id) REFERENCES flowsheet_item (id),
-    CONSTRAINT `flowsheet_item_ds_rule_ds_rule_id_fk` FOREIGN KEY (ds_rule_id) REFERENCES ds_rule (id)
+    care_tracker_item_id     INTEGER NOT NULL,
+    ds_rule_id               INTEGER NOT NULL,
+    PRIMARY KEY (care_tracker_item_id, ds_rule_id),
+    CONSTRAINT `care_tracker_item_ds_rule_care_tracker_item_id_fk` FOREIGN KEY (care_tracker_item_id) REFERENCES care_tracker_item (id),
+    CONSTRAINT `care_tracker_item_ds_rule_ds_rule_id_fk` FOREIGN KEY (ds_rule_id) REFERENCES ds_rule (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS drools
@@ -136,20 +135,20 @@ CREATE TABLE IF NOT EXISTS drools
     deleted_at      DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_drools
+CREATE TABLE IF NOT EXISTS care_tracker_drools
 (
-    drools_id       INTEGER NOT NULL,
-    flowsheet_id    INTEGER NOT NULL,
-    PRIMARY KEY (drools_id, flowsheet_id),
-    CONSTRAINT `flowsheet_drools_drools_id_fk` FOREIGN KEY (drools_id) REFERENCES drools (id),
-    CONSTRAINT `flowsheet_drools_flowsheet_id_fk` FOREIGN KEY (flowsheet_id) REFERENCES flowsheet (id)
+    drools_id           INTEGER NOT NULL,
+    care_tracker_id     INTEGER NOT NULL,
+    PRIMARY KEY (drools_id, care_tracker_id),
+    CONSTRAINT `care_tracker_drools_drools_id_fk` FOREIGN KEY (drools_id) REFERENCES drools (id),
+    CONSTRAINT `care_tracker_drools_care_tracker_id_fk` FOREIGN KEY (care_tracker_id) REFERENCES care_tracker (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS flowsheet_triggers_icd9
+CREATE TABLE IF NOT EXISTS care_tracker_triggers_icd9
 (
-    icd9_id         INTEGER NOT NULL,
-    flowsheet_id    INTEGER NOT NULL,
-    PRIMARY KEY (icd9_id, flowsheet_id),
-    CONSTRAINT `flowsheet_triggers_icd9_icd9_id_fk` FOREIGN KEY (icd9_id) REFERENCES icd9 (id),
-    CONSTRAINT `flowsheet_triggers_icd9_flowsheet_id_fk` FOREIGN KEY (flowsheet_id) REFERENCES flowsheet (id)
+    icd9_id             INTEGER NOT NULL,
+    care_tracker_id     INTEGER NOT NULL,
+    PRIMARY KEY (icd9_id, care_tracker_id),
+    CONSTRAINT `care_tracker_triggers_icd9_icd9_id_fk` FOREIGN KEY (icd9_id) REFERENCES icd9 (id),
+    CONSTRAINT `care_tracker_triggers_icd9_care_tracker_id_fk` FOREIGN KEY (care_tracker_id) REFERENCES care_tracker (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
