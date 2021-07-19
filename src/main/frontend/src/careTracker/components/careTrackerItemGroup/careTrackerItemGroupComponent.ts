@@ -21,9 +21,9 @@
  * Canada
  */
 
-angular.module('Flowsheet').component('flowsheetItemGroup',
+angular.module('CareTracker').component('careTrackerItemGroup',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetItemGroup/flowsheetItemGroup.jsp',
+		templateUrl: 'src/careTracker/components/careTrackerItemGroup/careTrackerItemGroup.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",

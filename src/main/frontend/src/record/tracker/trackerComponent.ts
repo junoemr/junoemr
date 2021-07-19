@@ -23,7 +23,7 @@
 
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import CareTrackerModel from "../../lib/flowsheet/model/CareTrackerModel";
+import CareTrackerModel from "../../lib/careTracker/model/CareTrackerModel";
 import DxRecordModel from "../../lib/dx/model/DxRecordModel";
 import DxCodeModel from "../../lib/dx/model/DxCodeModel";
 

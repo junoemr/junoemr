@@ -20,7 +20,7 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div class="flowsheet-item-data">
+<div class="care-tracker-item-data">
 	<div class="flex-column align-items-center">
 		<span class="display-date">{{$ctrl.getDateForDisplay($ctrl.model.observationDateTime)}}</span>
 		<span class="display-value">{{$ctrl.model.value}}</span>

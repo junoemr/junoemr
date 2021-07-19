@@ -107,12 +107,12 @@
 @import "../src/patient/demographicCard";
 @import "../src/patient/search/patientSearch";
 @import "../src/report/reports";
-@import "../src/flowsheet/flowsheetEdit";
-@import "../src/flowsheet/flowsheetManager";
-@import "../src/flowsheet/components/flowsheetItemGroup/flowsheetItemGroup";
-@import "../src/flowsheet/components/flowsheetEditItem/flowsheetEditItem";
-@import "../src/flowsheet/components/flowsheetItemRule/flowsheetItemRule";
-@import "../src/flowsheet/components/flowsheetTrigger/flowsheetTrigger";
+@import "../src/careTracker/careTrackerEdit";
+@import "../src/careTracker/careTrackerManager";
+@import "../src/careTracker/components/careTrackerItemGroup/careTrackerItemGroup";
+@import "../src/careTracker/components/careTrackerEditItem/careTrackerEditItem";
+@import "../src/careTracker/components/careTrackerItemRule/careTrackerItemRule";
+@import "../src/careTracker/components/careTrackerTrigger/careTrackerTrigger";
 
 // patient record
 @import "../src/record/record";
@@ -127,9 +127,9 @@
 @import "../src/record/details/components/additionalInformationSection/additionalInformationSection";
 @import "../src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModal";
 @import "../src/record/details/components/rosteredHistory/rosteredHistoryModal";
-@import "../src/record/flowsheet/flowsheet";
-@import "../src/record/flowsheet/components/flowsheetItem/flowsheetItem";
-@import "../src/record/flowsheet/components/flowsheetItemData/flowsheetItemData";
+@import "../src/record/tracker/careTracker/careTracker";
+@import "../src/record/tracker/careTracker/components/careTrackerItem/careTrackerItem";
+@import "../src/record/tracker/careTracker/components/careTrackerItemData/careTrackerItemData";
 @import "../src/record/forms/forms";
 @import "../src/record/forms/components/groupSelector/groupSelector";
 @import "../src/record/forms/components/modeSelector/modeSelector";

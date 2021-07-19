@@ -23,9 +23,9 @@
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
-angular.module('Flowsheet').component('flowsheetTrigger',
+angular.module('CareTracker').component('careTrackerItemRule',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetTrigger/flowsheetTrigger.jsp',
+		templateUrl: 'src/careTracker/components/careTrackerItemRule/careTrackerItemRule.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
@@ -51,7 +51,7 @@ angular.module('Flowsheet').component('flowsheetTrigger',
 				{
 					if(ctrl.onDelete)
 					{
-						ctrl.onDelete({triggerCode: ctrl.model});
+						ctrl.onDelete({rule: ctrl.model});
 					}
 				}
 			}]

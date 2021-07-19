@@ -45,15 +45,15 @@
         <div class="flex-row">
             <div class="flex-column">
                 <div class="list-group">
-                    <button ng-repeat="flowsheet in $ctrl.triggerdFlowsheets"
+                    <button ng-repeat="tracker in $ctrl.triggerdFlowsheets"
                             type="button"
                             class="list-group-item list-group-item-action"
-                            ng-class="{'active': flowsheet === $ctrl.selectedFlowsheet}"
-                            ng-click="$ctrl.onFlowsheetSelect(flowsheet)">
-                        {{flowsheet.name}}
+                            ng-class="{'active': tracker === $ctrl.selectedFlowsheet}"
+                            ng-click="$ctrl.onFlowsheetSelect(tracker)">
+                        {{tracker.name}}
                     </button>
                     <span ng-if="$ctrl.triggerdFlowsheets.length === 0" class="list-group-item">
-                        No Active Flowsheets
+                        No Active Care Trackers
                     </span>
                 </div>
                 <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onFlowsheetSelect(item)">

@@ -30,10 +30,10 @@
 		</div>
 	</div>
 	<div class="flex-column">
-		<flowsheet-item-rule ng-repeat="rule in $ctrl.model.rules"
+		<care-tracker-item-rule ng-repeat="rule in $ctrl.model.rules"
 		                     model="rule" class="flex-grow"
 		                     on-delete="$ctrl.removeRule(rule)">
-		</flowsheet-item-rule>
+		</care-tracker-item-rule>
 	</div>
 	<div class="flex-row flex-grow">
 		<div class="add-button-wrapper">

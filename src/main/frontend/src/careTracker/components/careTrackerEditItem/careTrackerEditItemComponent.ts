@@ -23,11 +23,11 @@
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import DsRuleModel from "../../../lib/decisionSupport/model/DsRuleModel";
-import {CareTrackerItemValueType} from "../../../lib/flowsheet/model/CareTrackerItemValueType";
+import {CareTrackerItemValueType} from "../../../lib/careTracker/model/CareTrackerItemValueType";
 
-angular.module('Flowsheet').component('flowsheetEditItem',
+angular.module('CareTracker').component('careTrackerEditItem',
 	{
-		templateUrl: 'src/flowsheet/components/flowsheetEditItem/flowsheetEditItem.jsp',
+		templateUrl: 'src/careTracker/components/careTrackerEditItem/careTrackerEditItem.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",

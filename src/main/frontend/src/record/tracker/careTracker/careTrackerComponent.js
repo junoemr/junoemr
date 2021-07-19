@@ -21,12 +21,12 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
-angular.module('Record.Flowsheet').component('flowsheet',
+angular.module('Record.Tracker.CareTracker').component('careTracker',
 	{
-		templateUrl: 'src/record/flowsheet/flowsheet.jsp',
+		templateUrl: 'src/record/tracker/careTracker/careTracker.jsp',
 		bindings: {
 			componentStyle: "<?",
 		},

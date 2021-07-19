@@ -44,7 +44,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngStorage',
 	'Common',
 	'DecisionSupport',
-	'Flowsheet',
+	'CareTracker',
 	'Layout',
 	'Messaging',
 	'Tickler',
@@ -271,12 +271,12 @@ oscarApp.config([
 		.state('admin.configureHealthTracker',
 		{
 			url: '/configureHealthTracker',
-			component: 'flowsheetManager',
+			component: 'careTrackerManager',
 		})
 		.state('admin.editFlowsheet',
 		{
 			url: '/configureHealthTracker/flowsheet/:flowsheetId',
-			component: 'flowsheetEdit',
+			component: 'careTrackerEdit',
 		})
 		.state('ticklers',
 		{
@@ -562,7 +562,7 @@ oscarApp.config([
 		.state('settings.tracker',
 			{
 				url: '/healthTracker',
-				component: 'flowsheetManager',
+				component: 'careTrackerManager',
 				params: {
 					pref: null,
 				},
@@ -579,7 +579,7 @@ oscarApp.config([
 		.state('settings.editFlowsheet',
 			{
 				url: '/healthTracker/flowsheet/:flowsheetId',
-				component: 'flowsheetEdit',
+				component: 'careTrackerEdit',
 			})
 		.state('support',
 		{
@@ -661,7 +661,7 @@ oscarApp.config([
 		.state('record.summary.tracker.flowsheet',
 		{
 			url: '/flowsheet/:flowsheetId',
-			component: 'flowsheet',
+			component: 'careTracker',
 			meta:
 				{
 					auth: {
@@ -860,7 +860,7 @@ oscarApp.config([
 		.state('record.tracker.flowsheet',
 		{
 			url: '/flowsheet/:flowsheetId',
-			component: 'flowsheet',
+			component: 'careTracker',
 			meta:
 				{
 					auth: {
@@ -871,7 +871,7 @@ oscarApp.config([
 		.state('record.configureHealthTracker',
 		{
 			url: '/configureHealthTracker',
-			component: 'flowsheetManager',
+			component: 'careTrackerManager',
 			resolve: {
 				user: ['providerService', function(providerService)
 				{
@@ -882,7 +882,7 @@ oscarApp.config([
 		.state('record.editFlowsheet',
 			{
 				url: '/configureHealthTracker/flowsheet/:flowsheetId',
-				component: 'flowsheetEdit',
+				component: 'careTrackerEdit',
 			})
         .state('record.patientEducation',
         {

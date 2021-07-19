@@ -23,17 +23,17 @@
 
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../common/components/junoComponentConstants";
-import CareTrackerModel from "../lib/flowsheet/model/CareTrackerModel";
-import CareTrackerItemModel from "../lib/flowsheet/model/CareTrackerItemModel";
-import CareTrackerItemGroupModel from "../lib/flowsheet/model/CareTrackerItemGroupModel";
-import {CareTrackerItemType} from "../lib/flowsheet/model/CareTrackerItemType";
-import {CareTrackerItemValueType} from "../lib/flowsheet/model/CareTrackerItemValueType";
+import CareTrackerModel from "../lib/careTracker/model/CareTrackerModel";
+import CareTrackerItemModel from "../lib/careTracker/model/CareTrackerItemModel";
+import CareTrackerItemGroupModel from "../lib/careTracker/model/CareTrackerItemGroupModel";
+import {CareTrackerItemType} from "../lib/careTracker/model/CareTrackerItemType";
+import {CareTrackerItemValueType} from "../lib/careTracker/model/CareTrackerItemValueType";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
 
-angular.module('Flowsheet').component('flowsheetEdit',
+angular.module('CareTracker').component('careTrackerEdit',
 	{
-		templateUrl: 'src/flowsheet/flowsheetEdit.jsp',
+		templateUrl: 'src/careTracker/careTrackerEdit.jsp',
 		bindings: {
 			componentStyle: "<?",
 		},

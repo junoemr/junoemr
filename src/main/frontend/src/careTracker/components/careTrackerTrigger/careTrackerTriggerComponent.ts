@@ -21,40 +21,38 @@
  * Canada
  */
 
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
-const {JUNO_BUTTON_COLOR_PATTERN} = require("../../../../common/components/junoComponentConstants");
-const {JUNO_BUTTON_COLOR} = require("../../../../common/components/junoComponentConstants");
-const {LABEL_POSITION, JUNO_STYLE} = require("../../../../common/components/junoComponentConstants");
-const {SecurityPermissions} = require("../../../../common/security/securityConstants");
-
-angular.module('Record.Flowsheet').component('flowsheetItemData',
+angular.module('CareTracker').component('careTrackerTrigger',
 	{
-		templateUrl: 'src/record/flowsheet/components/flowsheetItemData/flowsheetItemData.jsp',
+		templateUrl: 'src/careTracker/components/careTrackerTrigger/careTrackerTrigger.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
+			onDelete: "&?",
 		},
 		controller: [
-			function (
-			)
+			function ()
 			{
 				const ctrl = this;
 
-				ctrl.SecurityPermissions = SecurityPermissions;
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.validationAlerts = [];
+				ctrl.isLoading = true;
 
-				ctrl.$onInit = async () =>
+				ctrl.$onInit = (): void =>
 				{
-					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+					ctrl.isLoading = false;
 				}
 
-				ctrl.getDateForDisplay = (dateTime) =>
+				ctrl.onClose = () =>
 				{
-					return Juno.Common.Util.formatDate(dateTime) + ' ' + Juno.Common.Util.formatTime(dateTime);
+					if(ctrl.onDelete)
+					{
+						ctrl.onDelete({triggerCode: ctrl.model});
+					}
 				}
 			}]
 	});

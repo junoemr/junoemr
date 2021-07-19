@@ -64,11 +64,11 @@
 	<div class="flex-column trigger-code-list">
 		<span class="row-padding">Trigger Codes</span>
 		<div class="flex-row flex-grow">
-			<flowsheet-trigger ng-repeat="triggerCode in $ctrl.flowsheet.triggerCodes"
-			                   model="triggerCode"
-			                   class="row-padding"
-			                   on-delete="$ctrl.onDeleteTriggerCode(triggerCode)">
-			</flowsheet-trigger>
+			<care-tracker-trigger ng-repeat="triggerCode in $ctrl.flowsheet.triggerCodes"
+			                      model="triggerCode"
+			                      class="row-padding"
+			                      on-delete="$ctrl.onDeleteTriggerCode(triggerCode)">
+			</care-tracker-trigger>
 			<div class="icon-only-button-wrapper">
 				<juno-button component-style="$ctrl.componentStyle"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
@@ -82,7 +82,7 @@
 	</div>
 
 	<div class="flex-column">
-		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups"
+		<care-tracker-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups"
 		                      model="itemGroup"
 		                      show-delete="true"
 		                      on-delete="$ctrl.onRemoveGroup(group)">
@@ -107,10 +107,10 @@
 					</div>
 				</div>
 				<div ng-repeat="item in itemGroup.careTrackerItems" class="flex-row flex-grow align-items-center">
-					<flowsheet-edit-item model="item"
-					                     on-delete="$ctrl.onRemoveItem(item, itemGroup)"
-					                     class="flex-grow">
-					</flowsheet-edit-item>
+					<care-tracker-edit-item model="item"
+					                        on-delete="$ctrl.onRemoveItem(item, itemGroup)"
+					                        class="flex-grow">
+					</care-tracker-edit-item>
 				</div>
 				<div class="flex-row flex-grow">
 					<div class="add-button-wrapper">
@@ -135,7 +135,7 @@
 					</div>
 				</div>
 			</div>
-		</flowsheet-item-group>
+		</care-tracker-item-group>
 	</div>
 	<div class="add-button-wrapper">
 		<juno-button component-style="$ctrl.componentStyle"

@@ -21,7 +21,7 @@
 * Canada
 --%>
 
-<div class="flowsheet-container">
+<div class="care-tracker-container">
 	<div class="flex-column">
 		<h3>{{$ctrl.flowsheet.name}}</h3>
 		<span>{{$ctrl.flowsheet.description}}</span>
@@ -80,19 +80,19 @@
 			</div>
 		</filter-panel>
 
-		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups | filter:$ctrl.showFlowsheetGroup"
-		                      model="itemGroup">
+		<care-tracker-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups | filter:$ctrl.showFlowsheetGroup"
+		                         model="itemGroup">
 			<div ng-repeat="item in itemGroup.careTrackerItems | filter:$ctrl.showFlowsheetItem">
 				<div class="item-divider" ng-if="!$first"></div>
-				<flowsheet-item
-						flowsheet-id="$ctrl.flowsheet.id"
+				<care-tracker-item
+						tracker-id="$ctrl.flowsheet.id"
 						demographic-id="$ctrl.demographicId"
 						model="item"
 						filter-date-after="$ctrl.filter.data.afterDate"
 						filter-date-before="$ctrl.filter.data.beforeDate"
 						filter-max-entries="$ctrl.filter.data.maxEntries">
-				</flowsheet-item>
+				</care-tracker-item>
 			</div>
-		</flowsheet-item-group>
+		</care-tracker-item-group>
 	</juno-security-check>
 </div>

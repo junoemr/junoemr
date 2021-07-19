@@ -25,17 +25,17 @@
 
  */
 import {DemographicApi, DiseaseRegistryApi, CareTrackerApi, CareTrackersApi, MeasurementsApi, PreventionsApi} from "../../generated";
-import CareTrackerModel from "../lib/flowsheet/model/CareTrackerModel";
-import CareTrackerTransferToModelConverter from "../lib/flowsheet/converter/CareTrackerTransferToModelConverter";
-import CareTrackerModelToTransferConverter from "../lib/flowsheet/converter/CareTrackerModelToTransferConverter";
+import CareTrackerModel from "../lib/careTracker/model/CareTrackerModel";
+import CareTrackerTransferToModelConverter from "../lib/careTracker/converter/CareTrackerTransferToModelConverter";
+import CareTrackerModelToTransferConverter from "../lib/careTracker/converter/CareTrackerModelToTransferConverter";
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
 import DxCodeTransferToModelConverter from "../lib/dx/converter/DxCodeTransferToModelConverter";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
-import CareTrackerItemDataModel from "../lib/flowsheet/model/CareTrackerItemDataModel";
-import CareTrackerItemDataTransferToModelConverter from "../lib/flowsheet/converter/CareTrackerItemDataTransferToModelConverter";
-import CareTrackerItemDataModelToTransferConverter from "../lib/flowsheet/converter/CareTrackerItemDataModelToTransferConverter";
+import CareTrackerItemDataModel from "../lib/careTracker/model/CareTrackerItemDataModel";
+import CareTrackerItemDataTransferToModelConverter from "../lib/careTracker/converter/CareTrackerItemDataTransferToModelConverter";
+import CareTrackerItemDataModelToTransferConverter from "../lib/careTracker/converter/CareTrackerItemDataModelToTransferConverter";
 
-angular.module("Flowsheet").service("flowsheetApiService", [
+angular.module("CareTracker").service("flowsheetApiService", [
 	'$http',
 	'$httpParamSerializer',
 	function(

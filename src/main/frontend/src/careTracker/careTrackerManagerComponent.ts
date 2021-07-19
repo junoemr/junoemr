@@ -23,11 +23,11 @@
 
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../common/components/junoComponentConstants";
-import CareTrackerModel from "../lib/flowsheet/model/CareTrackerModel";
+import CareTrackerModel from "../lib/careTracker/model/CareTrackerModel";
 
-angular.module('Flowsheet').component('flowsheetManager',
+angular.module('CareTracker').component('careTrackerManager',
 	{
-		templateUrl: 'src/flowsheet/flowsheetManager.jsp',
+		templateUrl: 'src/careTracker/careTrackerManager.jsp',
 		bindings: {
 			componentStyle: "<?",
 			user: "<?",

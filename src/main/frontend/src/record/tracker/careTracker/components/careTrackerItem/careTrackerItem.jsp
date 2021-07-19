@@ -20,7 +20,7 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div class="flowsheet-item">
+<div class="care-tracker-item">
 	<div class="flex-row align-items-center">
 		<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
 		<div class="item-description">{{$ctrl.model.description}}</div>
@@ -33,7 +33,7 @@
 		</div>
 	</div>
 
-	<div ng-repeat="alert in $ctrl.model.flowsheetItemAlerts">
+	<div ng-repeat="alert in $ctrl.model.careTrackerItemAlerts">
 		<div class="alert" ng-class="$ctrl.getAlertClass(alert.severityLevel)" role="alert">
 			{{alert.message}}
 		</div>
@@ -77,9 +77,9 @@
 		</div>
 	</div>
 	<div class="flex-row row-margin flex-wrap data-container">
-		<flowsheet-item-data ng-repeat="data in $ctrl.model.data | filter:$ctrl.showData"
+		<care-tracker-item-data ng-repeat="data in $ctrl.model.data | filter:$ctrl.showData"
 		                     class="column-margin"
 		                     model="data">
-		</flowsheet-item-data>
+		</care-tracker-item-data>
 	</div>
 </div>

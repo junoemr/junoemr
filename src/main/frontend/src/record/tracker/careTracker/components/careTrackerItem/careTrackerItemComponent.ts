@@ -21,20 +21,20 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../../../../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../../../../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
 import moment, {Moment} from "moment";
-import CareTrackerItemDataModel from "../../../../lib/flowsheet/model/CareTrackerItemDataModel";
-import {AlertSeverityType} from "../../../../lib/flowsheet/model/AlertSeverityType";
+import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
+import {AlertSeverityType} from "../../../../../lib/careTracker/model/AlertSeverityType";
 
-angular.module('Record.Flowsheet').component('flowsheetItem',
+angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 	{
-		templateUrl: 'src/record/flowsheet/components/flowsheetItem/flowsheetItem.jsp',
+		templateUrl: 'src/record/tracker/careTracker/components/careTrackerItem/careTrackerItem.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
 			demographicId: "<",
-			flowsheetId: "<",
+			trackerId: "<",
 			filterDateBefore: "<?",
 			filterDateAfter: "<?",
 			filterMaxEntries: "<?",
@@ -143,7 +143,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 					ctrl.validationAlerts = [];
 					try
 					{
-						let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.flowsheetId, ctrl.model.id, ctrl.newEntry);
+						let newDataElement = await flowsheetApiService.addFlowsheetItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
 						ctrl.model.data.push(newDataElement);
 						ctrl.clearNewEntry();
 					}
