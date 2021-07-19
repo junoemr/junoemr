@@ -84,7 +84,7 @@ INSERT INTO ds_rule_condition(ds_rule_id, condition_type, condition_value, creat
 SELECT
     id AS ds_rule_id,
     "VALUE_EQ" AS condition_type,
-    "Yes/No" AS condition_value,
+    "Yes" AS condition_value,
     NOW() AS created_at,
     "-1" AS created_by,
     NOW() AS updated_at,
@@ -96,7 +96,7 @@ AND id NOT IN (
     SELECT ds_rule_id
     FROM ds_rule_condition
     WHERE condition_type = "VALUE_EQ"
-    AND condition_value = "Yes/No"
+    AND condition_value = "Yes"
     AND created_by = "-1"
 );
 
@@ -138,6 +138,50 @@ AND id NOT IN (
     WHERE condition_type = "MONTHS_SINCE_GT"
     AND condition_value = "6"
     AND created_by = "-1"
+);
+
+INSERT INTO ds_rule_consequence(ds_rule_id, consequence_type, consequence_severity, consequence_message, created_at, created_by, updated_at, updated_by)
+SELECT
+	id,
+	"ALERT",
+	"WARNING",
+	"Problem indicator checked",
+	NOW(),
+	"-1",
+	NOW(),
+	"-1"
+FROM ds_rule
+WHERE rule_name = "Is Checked"
+AND system_managed IS TRUE
+AND id NOT IN (
+	SELECT ds_rule_id
+	FROM ds_rule_consequence
+	WHERE consequence_type = "ALERT"
+	AND consequence_severity = "WARNING"
+	AND consequence_message = "Problem indicator checked"
+	AND created_by = "-1"
+);
+
+INSERT INTO ds_rule_consequence(ds_rule_id, consequence_type, consequence_severity, consequence_message, created_at, created_by, updated_at, updated_by)
+SELECT
+	id,
+	"ALERT",
+	"WARNING",
+	"Never Entered",
+	NOW(),
+	"-1",
+	NOW(),
+	"-1"
+FROM ds_rule
+WHERE rule_name = "Never Entered"
+AND system_managed IS TRUE
+AND id NOT IN (
+	SELECT ds_rule_id
+	FROM ds_rule_consequence
+	WHERE consequence_type = "ALERT"
+	AND consequence_severity = "WARNING"
+	AND consequence_message = "Never Entered"
+	AND created_by = "-1"
 );
 
 INSERT INTO ds_rule_consequence(ds_rule_id, consequence_type, consequence_severity, consequence_message, created_at, created_by, updated_at, updated_by)

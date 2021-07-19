@@ -51,7 +51,8 @@ SELECT
 	"-1"
 FROM care_tracker sheet
 JOIN care_tracker_item_group item_group ON sheet.id = item_group.care_tracker_id
-JOIN measurementType type ON type.validation = "14"
+JOIN validations v ON v.name="Numeric Value greater than or equal to 0"
+JOIN measurementType type ON type.validation = v.id
 WHERE type.type IN ("ANR", "FEV1", "SPIR", "ANSY", "ASYM", "PEFR")
 AND item_group.group_name = "Asthma Measurements"
 AND type.type NOT IN (
@@ -78,7 +79,8 @@ SELECT
 	"-1"
 FROM care_tracker sheet
 JOIN care_tracker_item_group item_group ON sheet.id = item_group.care_tracker_id
-JOIN measurementType type ON type.validation = "7"
+JOIN validations v ON v.name="Yes/No/NA"
+JOIN measurementType type ON type.validation = v.id
 WHERE type.type IN ("ALPA", "ASWA", "AELV", "ARAD", "ARMA", "ARDT", "SMCS", "ASTA", "AENC", "ACOS", "AACP", "AEDR", "ASPR", "LHAD", "OUTR")
 AND item_group.group_name = "Asthma Measurements"
 AND type.type NOT IN (
