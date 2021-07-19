@@ -372,9 +372,18 @@ public class ClinicaidAPIService
 				// Default facility number
 				String facilityNumber = null;
 
-				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && ConversionUtils.hasContent(request.getParameter("appointment_no")))
+				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
 				{
-					Integer appointmentNo = Integer.parseInt(request.getParameter("appointment_no"));
+					Integer appointmentNo = 0;
+					try
+					{
+						appointmentNo = Integer.parseInt(request.getParameter("appointment_no"));
+					}
+					catch (NumberFormatException e)
+					{
+						MiscUtils.getLogger().warn("Could not parse appointment number", e);
+					}
+
 					Appointment appointment = appointmentDao.find(appointmentNo);
 
 					// If billed from the master file, appointmentNo = 0
