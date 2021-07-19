@@ -377,8 +377,8 @@ public class DemographicService extends AbstractServiceImpl {
 
 		try
 		{
-			if (data.getAddress2().getAddress() != null || data.getAddress2().getCity() != null
-					|| data.getAddress2().getPostal() != null || data.getAddress2().getProvince() != null)
+			if (data.getAddress2().getAddress() != null || data.getAddress2().getCity() != null ||
+					 data.getAddress2().getPostal() != null || data.getAddress2().getProvince() != null)
 			{
 				List<DemographicExtTo1> extraAddress = demographicManager.setExtraAddress(data);
 				data.setExtras(extraAddress);

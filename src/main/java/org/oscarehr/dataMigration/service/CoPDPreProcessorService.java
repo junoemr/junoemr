@@ -145,6 +145,12 @@ public class CoPDPreProcessorService
 			instant = printDuration(instant, "fixReferralPractitionerNo");
 		}
 
+		if (CoPDImportService.IMPORT_SOURCE.HEALTHQUEST.equals(importSource))
+		{
+			message = formatHealthQuestSegments(message);
+			instant = printDuration(instant, "formatHealthQuestSegments");
+		}
+
 		// should come last
 		message = ensureNumeric(message, recordData);
 		instant = printDuration(instant, "ensureNumeric");
@@ -696,6 +702,20 @@ public class CoPDPreProcessorService
 		message = message.replaceAll("&#x2022;", "");
 		message = message.replaceAll("&#xA0;", "");
 		message = message.replaceAll("&#13", "");
+
+		return message;
+	}
+
+	/**
+	 * Strips out <OBX.2/> from the message
+	 *
+	 * @param message message to clean
+	 * @return message stripped of problematic encoded segments
+	 */
+	private String formatHealthQuestSegments(String message)
+	{
+		// XML-encoded chars
+		message = message.replaceAll("<OBX.2/>", "");
 
 		return message;
 	}

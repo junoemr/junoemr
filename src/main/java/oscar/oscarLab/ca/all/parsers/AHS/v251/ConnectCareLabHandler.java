@@ -99,7 +99,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
 	 * An overload of the implementation is required because this handler uses ORU_R01 v 2.5.1 message
 	 * @param appendNamespace - if true append namespace to end of identifier
-	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
 	 */
 	@Override
 	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
@@ -141,7 +141,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	/**
 	 * return additional fields,
 	 * - Patient ID \w assigning authority - all values
-	 * @return list of pairs <title, value>
+	 * @return list of pairs &lt;title, value>
 	 */
 	@Override
 	public ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()

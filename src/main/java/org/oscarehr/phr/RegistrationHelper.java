@@ -119,7 +119,7 @@ public final class RegistrationHelper {
 	}
 
 	/**
-	 * @return map of <MyOscarUserName,Provider>
+	 * @return map of &lt;MyOscarUserName,Provider>
 	 */
 	public static TreeMap<String, Provider> getMyOscarProviders() {
 		TreeMap<String, Provider> results = new TreeMap<String, Provider>();

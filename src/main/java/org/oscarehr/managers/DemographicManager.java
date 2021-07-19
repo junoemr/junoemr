@@ -120,7 +120,6 @@ public class DemographicManager {
 			"or semicolons are allowed.";
 	public static final String FIELD_UNSAFE = "No html tags and no quotes, line breaks " +
 			"or semicolons are allowed.";
-
 	//endregion
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -377,13 +376,10 @@ public class DemographicManager {
 		String currentStatus = demographic.getPatientStatus();
 		Date currentStatusDate = demographic.getPatientStatusDate();
 
-		if (!(previousStatus.equals(currentStatus)))
+		// fill in a default patient status date if the status changes and no date is given
+		if (!currentStatus.equals(previousStatus) && currentStatusDate == null)
 		{
 			demographic.setPatientStatusDate(new Date());
-		}
-		else if (previousStatusDate.compareTo(currentStatusDate) != 0)
-		{
-			demographic.setPatientStatusDate(currentStatusDate);
 		}
 
 		//save current demo
@@ -520,7 +516,7 @@ public class DemographicManager {
 
 	public void archiveExtension(DemographicExt ext) {
 		//TODO-legacy: this needs a loggedInInfo
-		if (ext != null && ext.getId() != null) {
+		if (ext != null && ext.getId() != null && ext.getValue() != null) {
 			DemographicExt prevExt = demographicExtDao.find(ext.getId());
 			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {
 				demographicExtArchiveDao.archiveDemographicExt(prevExt);
@@ -538,8 +534,9 @@ public class DemographicManager {
 									  org.oscarehr.demographic.model.Demographic previousDemo)
 	{
 		boolean hasChanged = false;
-		// check if any fields changed from last time we edited
-		if (currentDemo.getRosterStatus() != null)
+		
+		// If the roster status is valid, check if any fields changed from last time we edited
+		if (ConversionUtils.hasContent(currentDemo.getRosterStatus()))
 		{
 			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
 			hasChanged |= currentDemo.getRosterDate() != null && currentDemo.getRosterDate() != previousDemo.getRosterDate();
@@ -1288,16 +1285,20 @@ public class DemographicManager {
 				switch (key)
 				{
 					case DemographicExt.ALTERNATE_ADDRESS:
-						extraAddress.setAddress(value);
+							extraAddress.setAddress(value);
+
 						break;
-					case DemographicExt.CITY:
-						extraAddress.setCity(value);
+					case DemographicExt.ALTERNATE_CITY:
+							extraAddress.setCity(value);
+
 						break;
-					case DemographicExt.POSTAL:
-						extraAddress.setPostal(value);
+					case DemographicExt.ALTERNATE_POSTAL:
+							extraAddress.setPostal(value);
+
 						break;
-					case DemographicExt.PROVINCE:
-						extraAddress.setProvince(value);
+					case DemographicExt.ALTERNATE_PROVINCE:
+							extraAddress.setProvince(value);
+
 				}
 			}
 			return extraAddress;
@@ -1305,7 +1306,7 @@ public class DemographicManager {
 
 	public List<DemographicExtTo1> setExtraAddress(DemographicTo1 demographic)
 	{
-		List<String> alternateAddress = Arrays.asList(DemographicExt.ALTERNATE_ADDRESS, DemographicExt.CITY, DemographicExt.POSTAL, DemographicExt.PROVINCE);
+		List<String> alternateAddress = Arrays.asList(DemographicExt.ALTERNATE_ADDRESS, DemographicExt.ALTERNATE_CITY, DemographicExt.ALTERNATE_POSTAL, DemographicExt.ALTERNATE_PROVINCE);
 		List<DemographicExtTo1> extrasList = new ArrayList<>();
 		for(String address: alternateAddress)
 		{
@@ -1314,27 +1315,25 @@ public class DemographicManager {
 			extraAddress.setDemographicNo(demographic.getDemographicNo());
 			extraAddress.setDateCreated(new Date());
 
-
 			switch (address)
 			{
 				case DemographicExt.ALTERNATE_ADDRESS:
 					extraAddress.setKey(address);
 					extraAddress.setValue(demographic.getAddress2().getAddress());
 					break;
-				case DemographicExt.CITY:
+				case DemographicExt.ALTERNATE_CITY:
 					extraAddress.setKey(address);
 					extraAddress.setValue(demographic.getAddress2().getCity());
 					break;
-				case DemographicExt.POSTAL:
+				case DemographicExt.ALTERNATE_POSTAL:
 					extraAddress.setKey(address);
 					extraAddress.setValue(demographic.getAddress2().getPostal());
 					break;
-				case DemographicExt.PROVINCE:
+				case DemographicExt.ALTERNATE_PROVINCE:
 					extraAddress.setKey(address);
 					extraAddress.setValue(demographic.getAddress2().getProvince());
 					break;
 			}
-
 			extrasList.add(extraAddress);
 		}
 		return extrasList;

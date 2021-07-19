@@ -100,6 +100,146 @@
 	flex-shrink: 0;
 }
 
+.flex-gap-0 {
+	gap: 0;
+}
+.flex-gap-4 {
+	gap: 4px;
+}
+.flex-gap-8 {
+	gap: 8px;
+}
+.flex-gap-16 {
+	gap: 16px;
+}
+
+// ========================= Grid Helpers ==============================
+
+.d-grid {
+	display: grid;
+}
+
+.grid-flow-column {
+	display: grid;
+	grid-auto-flow: column;
+}
+.grid-flow-row {
+	display: grid;
+	grid-auto-flow: row;
+}
+
+.grid-auto-flow-column {
+	grid-auto-flow: column;
+}
+.grid-auto-flow-row {
+	grid-auto-flow: row;
+}
+
+// grid layout. 2 equal rows X columns
+.grid-row-2 {
+	@extend .grid-flow-column;
+	grid-template-rows: .5fr .5fr;
+}
+.grid-row-3 {
+	@extend .grid-flow-column;
+	grid-template-rows: .333fr .333fr .333fr;
+}
+.grid-row-4 {
+	@extend .grid-flow-column;
+	grid-template-rows: .25fr .25fr .25fr .25fr;
+}
+
+// grid layout. 2 equal columns X rows.
+.grid-column-2 {
+	@extend .grid-flow-row;
+	grid-template-columns: .5fr .5fr;
+}
+.grid-column-3 {
+	@extend .grid-flow-row;
+	grid-template-columns: .333fr .333fr .333fr;
+}
+.grid-column-4 {
+	@extend .grid-flow-row;
+	grid-template-columns: .25fr .25fr .25fr .25fr;
+}
+
+.grid-gap-0 {
+	gap: 0;
+}
+.grid-gap-4 {
+	gap: 4px;
+}
+.grid-gap-8 {
+	gap: 8px;
+}
+.grid-gap-16 {
+	gap: 16px;
+}
+.grid-gap-24 {
+	gap: 24px;
+}
+.grid-gap-32 {
+	gap: 32px;
+}
+
+.grid-row-gap-0 {
+	grid-row-gap: 0;
+}
+.grid-row-gap-4 {
+	grid-row-gap: 4px;
+}
+.grid-row-gap-8 {
+	grid-row-gap: 8px;
+}
+.grid-row-gap-16 {
+	grid-row-gap: 16px;
+}
+.grid-row-gap-24 {
+	grid-row-gap: 24px;
+}
+.grid-row-gap-32 {
+	grid-row-gap: 32px;
+}
+
+.grid-column-gap-0 {
+	grid-column-gap: 0;
+}
+.grid-column-gap-4 {
+	grid-column-gap: 4px;
+}
+.grid-column-gap-8 {
+	grid-column-gap: 8px;
+}
+.grid-column-gap-16 {
+	grid-column-gap: 16px;
+}
+.grid-column-gap-24 {
+	grid-column-gap: 24px;
+}
+.grid-column-gap-32 {
+	grid-column-gap: 32px;
+}
+
+.grid-align-items-start {
+	align-items: start;
+}
+.grid-align-items-center {
+	align-items: center;
+}
+.grid-align-items-end {
+	align-items: end;
+}
+
+.grid-justify-content-start {
+	justify-content: start;
+}
+.grid-justify-content-center {
+	justify-content: center;
+}
+.grid-justify-content-end {
+	justify-content: end;
+}
+
 
 // ========================= Size Helpers ==============================
 
@@ -197,6 +337,9 @@
 .p-t-16 {
 	padding-top: 16px;
 }
+.p-t-24 {
+	padding-top: 24px;
+}
 .p-t-32 {
 	padding-top: 32px;
 }
@@ -221,6 +364,9 @@
 }
 .p-r-16 {
 	padding-right: 16px;
+}
+.p-r-24 {
+	padding-right: 24px;
 }
 .p-r-32 {
 	padding-right: 32px;
@@ -253,6 +399,9 @@
 }
 .p-l-16 {
 	padding-left: 16px;
+}
+.p-l-24 {
+	padding-left: 24px;
 }
 .p-l-32 {
 	padding-left: 32px;

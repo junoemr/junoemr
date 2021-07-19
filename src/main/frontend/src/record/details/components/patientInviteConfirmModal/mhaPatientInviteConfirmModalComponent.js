@@ -63,6 +63,7 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 			ctrl.demographicNo = ctrl.resolve.demographicNo;
 			ctrl.demographicEmail = ctrl.resolve.demographicEmail;
 			ctrl.initialIntegration = ctrl.resolve.selectedIntegration;
+			ctrl.hideIntegrationSelect = ctrl.resolve.hideIntegrationSelect || false;
 
 			systemPreferenceApi.getPropertyEnabled("multisites").then((response) =>
 			{

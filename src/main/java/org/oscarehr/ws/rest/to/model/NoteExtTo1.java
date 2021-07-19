@@ -23,12 +23,9 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+import org.oscarehr.dataMigration.model.common.PartialDate;
 import java.io.Serializable;
-
-import java.util.Date;
-
 import javax.xml.bind.annotation.XmlRootElement;
-
 
 @XmlRootElement(name="groupNoteExt")
 public class NoteExtTo1 implements Serializable{
@@ -46,19 +43,18 @@ public class NoteExtTo1 implements Serializable{
 	public static String LIFESTAGE	    = "Life Stage"	;
 	public static String HIDECPP	    = "Hide Cpp"	;
 	public static String PROBLEMDESC    = "Problem Description";
-        
 		
 	//Class fields
 	private Long id;
 	private Long noteId;
 	private String keyVal;
 	private String value;
-	private Date dateValue;
+	private PartialDate dateValue;
 	
 	//keyVal's
-	private Date startDate;
-	private Date resolutionDate;
-	private Date procedureDate;
+	private PartialDate startDate;
+	private PartialDate resolutionDate;
+	private PartialDate procedureDate;
 
 	private String ageAtOnset;
 	private String treatment;
@@ -97,35 +93,35 @@ public class NoteExtTo1 implements Serializable{
 	    this.value = value;
 	}
 	
-	public Date getDateValue() {
+	public PartialDate getDateValue() {
 	    return this.dateValue;
 	}
 
-	public void setDateValue(Date dateValue) {
+	public void setDateValue(PartialDate dateValue) {
 	    this.dateValue = dateValue;
 	}
 	
-	public Date getStartDate() {
+	public PartialDate getStartDate() {
 	    return startDate;
     }
 	
-	public void setStartDate(Date startDate) {
+	public void setStartDate(PartialDate startDate) {
 	    this.startDate = startDate;
     }
 	
-	public Date getResolutionDate() {
+	public PartialDate getResolutionDate() {
 	    return resolutionDate;
     }
 	
-	public void setResolutionDate(Date resolutionDate) {
+	public void setResolutionDate(PartialDate resolutionDate) {
 	    this.resolutionDate = resolutionDate;
     }
 	
-	public Date getProcedureDate() {
+	public PartialDate getProcedureDate() {
 	    return procedureDate;
     }
 	
-	public void setProcedureDate(Date procedureDate) {
+	public void setProcedureDate(PartialDate procedureDate) {
 	    this.procedureDate = procedureDate;
     }
 	public String getAgeAtOnset() {
@@ -188,6 +184,4 @@ public class NoteExtTo1 implements Serializable{
 	public void setProblemDesc(String problemDesc) {
 	    this.problemDesc = problemDesc;
     }
-	
-		
 }

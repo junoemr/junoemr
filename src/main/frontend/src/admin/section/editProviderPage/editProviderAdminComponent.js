@@ -122,7 +122,7 @@ angular.module('Admin.Section').component('editProviderAdmin',
 
 		// options for the ON service location indicator
 		ctrl.onServiceLocationIndicatorOptions = staticDataService.getOntarioServiceLocationIndicators();
-
+		
 		// options for the BC service location field
 		ctrl.bcServiceLocationOptions = [];
 
@@ -219,6 +219,7 @@ angular.module('Admin.Section').component('editProviderAdmin',
 
 			//3rd Party Identifiers
 			cpsid: null,
+			onCnoNumber: null,
 			ihaProviderMnemonic: null,
 			connectCareProviderId: null,
 			takNumber: null,
@@ -812,7 +813,6 @@ angular.module('Admin.Section').component('editProviderAdmin',
 			// copy provider obj
 			let newProvider = {};
 			Object.assign(newProvider, providerObj);
-
 			return newProvider;
 		};
 

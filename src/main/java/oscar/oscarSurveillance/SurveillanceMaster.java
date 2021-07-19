@@ -161,21 +161,19 @@ public   class SurveillanceMaster {
     * the Key is: surveillance_config_file
     *
     * XML format ex
-          <PRE>
-
-         <surveillance-config>
-            <survey surveyTitle="Flu Survey 2004 / 2005 survey" randomness="10" period="1" surveyId="flu04">
-                <surveyQuestion>Does the patient have sore throat, arthralgia, myalgia, or prostration which could be due to influenza virus.</surveyQuestion>
-                <provider>999998</provider>
-                <provider>999999</provider>
-                <answer status="D" value="">Ask Later</answer>
-                <answer status="A" value="Y">Yes</answer>
-                <answer status="A" value="N">No</answer>
-                <answer status="A" value="R">Don't Ask Again</answer>
-             </survey>
-          </surveillance-config>
-
-    *     </PRE>
+    *      <pre>
+    *     &lt;surveillance-config>
+    *        &lt;survey surveyTitle="Flu Survey 2004 / 2005 survey" randomness="10" period="1" surveyId="flu04">
+    *            &lt;surveyQuestion>Does the patient have sore throat, arthralgia, myalgia, or prostration which could be due to influenza virus.</surveyQuestion>
+    *            &lt;provider>999998</provider>
+    *            &lt;provider>999999</provider>
+    *            &lt;answer status="D" value="">Ask Later</answer>
+    *            &lt;answer status="A" value="Y">Yes</answer>
+    *            &lt;answer status="A" value="N">No</answer>
+    *            &lt;answer status="A" value="R">Don't Ask Again</answer>
+    *         &lt;/survey>
+    *      &lt;/surveillance-config>
+    *     </pre>
     * More than one survey element can be defined
     *
     * surveyTitle.....Title of the survey, This will display at the top of the page.
