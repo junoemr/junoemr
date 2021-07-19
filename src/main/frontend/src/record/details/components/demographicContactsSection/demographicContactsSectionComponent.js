@@ -21,8 +21,12 @@
 * Canada
 */
 
-import {JUNO_STYLE, LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN,} from "../../../../common/components/junoComponentConstants";
-import {SystemPreferenceApi} from "../../../../../generated";
+import {
+    LABEL_POSITION,
+    JUNO_BUTTON_COLOR,
+    JUNO_BUTTON_COLOR_PATTERN,
+}
+    from "../../../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').component('demographicContactsSection', {
     templateUrl: 'src/record/details/components/demographicContactsSection/demographicContactsSection.jsp',
@@ -31,53 +35,69 @@ angular.module('Record.Details').component('demographicContactsSection', {
         validations: "=",
         componentStyle: "<?"
     },
-    controller: ["staticDataService", "$scope", "$uibModal", "$http", "$httpParamSerializer", "$state", "$stateParams", "demographicService", "uxService", function (staticDataService, $scope, $uibModal, $http, $httpParamSerializer, $state, $stateParams, demographicService, uxService)
-    {
-        let ctrl = this;
-        $scope.LABEL_POSITION = LABEL_POSITION;
-        $scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-        $scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
-        ctrl.tab = [];
-        ctrl.thisDemo = null;
-
-        ctrl.demoContacts = [];
-        ctrl.demoContactPros = [];
-
-
-        ctrl.$onInit = () =>
+    controller: ["staticDataService",
+        "$uibModal",
+        "$stateParams",
+        "demographicService",
+        function (staticDataService,
+                  $uibModal,
+                  $stateParams,
+                  demographicService)
         {
-            ctrl.thisDemo = $stateParams.demographicNo;
-            demographicService.getDemographicContacts(ctrl.thisDemo, "personal").then(
-                function success(data)
-                {
-                    ctrl.demoContacts = (data);
-                }
-            );
-            demographicService.getDemographicContacts(ctrl.thisDemo, "professional").then(
-                function success(data)
-                {
-                    ctrl.demoContactPros = (data);
-                }
-            );
-        }
+            let ctrl = this;
 
-        ctrl.openContacts = function (demoContactId)
-        {
-            $uibModal.open(
-                {
-                    component: 'demographicContactsModal',
-                    backdrop: 'static',
-                    windowClass: "juno-modal",
-                    resolve: {
-                        demoContact: demoContactId,
+            ctrl.LABEL_POSITION = LABEL_POSITION;
+            ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+            ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+            ctrl.tab = [];
+            ctrl.thisDemo = null;
+
+            ctrl.demoContacts = [];
+            ctrl.demoContactPros = [];
+
+
+            ctrl.$onInit = () =>
+            {
+                ctrl.thisDemo = $stateParams.demographicNo;
+                demographicService.getDemographicContacts(ctrl.thisDemo, "personal").then(
+                    function success(data)
+                    {
+                        ctrl.demoContacts = (data);
+                    },
+                    function error(error)
+                    {
+                        alert("Unable to retrieve contacts", error);
+                    });
+
+                demographicService.getDemographicContacts(ctrl.thisDemo, "professional").then(
+                    function success(data)
+                    {
+                        ctrl.demoContactPros = (data);
+                    },
+                    function error(error)
+                    {
+                        alert("Unable to retrieve contacts", error);
                     }
-                });
-        };
+                );
+            }
 
-        ctrl.manageContacts = function manageContacts()
-        {
-                var url = "../demographic/Contact.do?method=manage&demographic_no=" + ctrl.thisDemo;
+            ctrl.openContacts = function (demoContactId)
+            {
+                $uibModal.open(
+                    {
+                        component: 'demographicContactsModal',
+                        backdrop: 'static',
+                        windowClass: "juno-modal",
+                        resolve: {
+                            demoContact: demoContactId,
+                        }
+                    });
+            };
+
+            ctrl.manageContacts = function manageContacts()
+            {
+                let url = "../demographic/Contact.do?method=manage&demographic_no=" + ctrl.thisDemo;
                 window.open(url, "ManageContacts", "width=960, height=700");
-        };
-    }]
+            };
+        }]
 });

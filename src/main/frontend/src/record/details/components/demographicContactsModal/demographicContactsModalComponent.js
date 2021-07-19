@@ -14,11 +14,9 @@ angular.module('Record.Details').component('demographicContactsModal', {
         componentStyle: "<",
     },
     controller: [
-        "$scope",
         "$state",
         "uxService",
         function (
-            $scope,
             $state,
             uxService,
         )
@@ -81,7 +79,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
 
             ctrl.edit = () =>
             {
-                if (ctrl.contact.type === ctrl.typesText.INTERNAL)
+                if (ctrl.contact.type === ctrl.types.INTERNAL)
                 {
                     ctrl.getTabs(ctrl.contact.contactId);
                 }
@@ -102,7 +100,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                     },
                     function error(errors)
                     {
-                        console.log(errors);
+                        alert("Unable to open tab.",errors);
                     });
             };
 

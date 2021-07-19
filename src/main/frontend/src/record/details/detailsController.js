@@ -137,19 +137,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						}
 					);
 
-					// retrieve contact lists for demographic
-					/*demographicService.getDemographicContacts(controller.page.demo.demographicNo, "personal").then(
-						function success(data) {
-							controller.page.demoContacts = demoContactShow(data);
-						}
-					);
-					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "professional").then(
-						function success(data) {
-							controller.page.demoContactPros = demoContactShow(data);
-						}
-					);*/
-
-
 					//show notes
 					if (controller.page.demo.notes != null)
 					{
@@ -1264,40 +1251,6 @@ function getPhoneNum(phone)
 	}
 	return phone;
 }
-
-/*function demoContactShow(demoContact)
-{
-	var contactShow = demoContact;
-	if (demoContact.role != null)
-	{ //only 1 entry
-		var tmp = {};
-		tmp.role = demoContact.role;
-		tmp.sdm = demoContact.sdm;
-		tmp.ec = demoContact.ec;
-		tmp.category = demoContact.category;
-		tmp.lastName = demoContact.lastName;
-		tmp.firstName = demoContact.firstName;
-		tmp.phone = demoContact.phone;
-		tmp.contactId = demoContact.contactId;
-		contactShow = [tmp];
-	}
-	for (var i = 0; i < contactShow.length; i++)
-	{
-		if (contactShow[i].sdm == true) contactShow[i].role += " /sdm";
-		if (contactShow[i].ec == true) contactShow[i].role += " /ec";
-		if (contactShow[i].role == null || contactShow[i].role == "") contactShow[i].role = "-";
-
-		if (contactShow[i].phone == null || contactShow[i].phone == "")
-		{
-			contactShow[i].phone = "-";
-		}
-		else if (contactShow[i].phone.charAt(contactShow[i].phone.length - 1) == "*")
-		{
-			contactShow[i].phone = contactShow[i].phone.substring(0, contactShow[i].phone.length - 1);
-		}
-	}
-	return contactShow;
-}*/
 
 function toArray(obj)
 { //convert single object to array

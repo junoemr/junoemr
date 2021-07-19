@@ -1,12 +1,32 @@
 .demographic-contacts-modal {
 
   .juno-input {
-      margin-top: 8px;
-      margin-left: 8px;
-	  width: 376px;
+    margin-top: 8px;
+    margin-left: 8px;
+    width: 376px;
   }
-  .footer {
+
+  .modal-footer {
+    .buttons {
       display: flex;
-      flex-direction: row;
+      justify-content: flex-end;
+
+      juno-button {
+        flex-grow: 0;
+
+        .juno-button {
+          margin-top: 0;
+          width: 60px;
+
+          button {
+            height: 40px;
+          }
+        }
+
+        &:first-child {
+          margin-right: 8px;
+        }
+      }
+    }
   }
 }
