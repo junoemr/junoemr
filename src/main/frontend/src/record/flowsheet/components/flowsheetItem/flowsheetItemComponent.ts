@@ -24,7 +24,7 @@
 import {SecurityPermissions} from "../../../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 import moment, {Moment} from "moment";
-import FlowsheetItemDataModel from "../../../../lib/flowsheet/model/FlowsheetItemDataModel";
+import CareTrackerItemDataModel from "../../../../lib/flowsheet/model/CareTrackerItemDataModel";
 import {AlertSeverityType} from "../../../../lib/flowsheet/model/AlertSeverityType";
 
 angular.module('Record.Flowsheet').component('flowsheetItem',
@@ -65,7 +65,7 @@ angular.module('Record.Flowsheet').component('flowsheetItem',
 
 				ctrl.clearNewEntry = (): void =>
 				{
-					ctrl.newEntry = new FlowsheetItemDataModel();
+					ctrl.newEntry = new CareTrackerItemDataModel();
 					ctrl.newEntry.observationDateTime = moment();
 					ctrl.checkboxValue = false;
 					ctrl.dateValue = null;

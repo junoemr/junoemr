@@ -80,9 +80,9 @@
 			</div>
 		</filter-panel>
 
-		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups | filter:$ctrl.showFlowsheetGroup"
+		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups | filter:$ctrl.showFlowsheetGroup"
 		                      model="itemGroup">
-			<div ng-repeat="item in itemGroup.flowsheetItems | filter:$ctrl.showFlowsheetItem">
+			<div ng-repeat="item in itemGroup.careTrackerItems | filter:$ctrl.showFlowsheetItem">
 				<div class="item-divider" ng-if="!$first"></div>
 				<flowsheet-item
 						flowsheet-id="$ctrl.flowsheet.id"

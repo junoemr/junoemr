@@ -23,60 +23,60 @@
 
  */
 
-import FlowsheetModel from "../model/FlowsheetModel";
+import CareTrackerModel from "../model/CareTrackerModel";
 import {CareTracker, CareTrackerItem, CareTrackerItemAlert, CareTrackerItemGroup} from "../../../../generated";
-import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
-import FlowsheetItemModel from "../model/FlowsheetItemModel";
+import CareTrackerItemGroupModel from "../model/CareTrackerItemGroupModel";
+import CareTrackerItemModel from "../model/CareTrackerItemModel";
 import DsRuleTransferToModelConverter from "../../decisionSupport/converter/DsRuleTransferToModelConverter";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import DxCodeTransferToModelConverter from "../../dx/converter/DxCodeTransferToModelConverter";
 import AlertModel from "../model/AlertModel";
-import FlowsheetItemDataTransferToModelConverter from "./FlowsheetItemDataTransferToModelConverter";
+import CareTrackerItemDataTransferToModelConverter from "./CareTrackerItemDataTransferToModelConverter";
 
-export default class FlowsheetTransferToModelConverter extends AbstractConverter<CareTracker, FlowsheetModel>
+export default class CareTrackerTransferToModelConverter extends AbstractConverter<CareTracker, CareTrackerModel>
 {
-	public convert(flowsheetTransfer: CareTracker): FlowsheetModel
+	public convert(careTracker: CareTracker): CareTrackerModel
 	{
-		if (!flowsheetTransfer)
+		if (!careTracker)
 		{
 			return null;
 		}
 
-		const flowsheetModel = new FlowsheetModel();
-		flowsheetModel.id = flowsheetTransfer.id;
-		flowsheetModel.name = flowsheetTransfer.name;
-		flowsheetModel.description = flowsheetTransfer.description;
-		flowsheetModel.enabled = flowsheetTransfer.enabled;
-		flowsheetModel.systemManaged = flowsheetTransfer.systemManaged;
-		flowsheetModel.flowsheetItemGroups = this.convertAllGroups(flowsheetTransfer.careTrackerItemGroups);
-		flowsheetModel.triggerCodes = new DxCodeTransferToModelConverter().convertList(flowsheetTransfer.triggerCodes);
-		flowsheetModel.parentFlowsheetId = flowsheetTransfer.parentCareTrackerId;
-		flowsheetModel.ownerProviderId = flowsheetTransfer.ownerProviderId;
-		flowsheetModel.ownerDemographicId = flowsheetTransfer.ownerDemographicId;
+		const careTrackerModel = new CareTrackerModel();
+		careTrackerModel.id = careTracker.id;
+		careTrackerModel.name = careTracker.name;
+		careTrackerModel.description = careTracker.description;
+		careTrackerModel.enabled = careTracker.enabled;
+		careTrackerModel.systemManaged = careTracker.systemManaged;
+		careTrackerModel.careTrackerItemGroups = this.convertAllGroups(careTracker.careTrackerItemGroups);
+		careTrackerModel.triggerCodes = new DxCodeTransferToModelConverter().convertList(careTracker.triggerCodes);
+		careTrackerModel.parentCareTrackerId = careTracker.parentCareTrackerId;
+		careTrackerModel.ownerProviderId = careTracker.ownerProviderId;
+		careTrackerModel.ownerDemographicId = careTracker.ownerDemographicId;
 
-		return flowsheetModel;
+		return careTrackerModel;
 	}
 
-	private convertAllGroups(itemGroups: CareTrackerItemGroup[]): FlowsheetItemGroupModel[]
+	private convertAllGroups(itemGroups: CareTrackerItemGroup[]): CareTrackerItemGroupModel[]
 	{
 		return itemGroups.map(itemGroup =>
 		{
-			const groupModel = new FlowsheetItemGroupModel();
+			const groupModel = new CareTrackerItemGroupModel();
 			groupModel.id = itemGroup.id;
 			groupModel.name = itemGroup.name;
 			groupModel.description = itemGroup.description;
-			groupModel.flowsheetItems = this.convertAllItems(itemGroup.careTrackerItems);
+			groupModel.careTrackerItems = this.convertAllItems(itemGroup.careTrackerItems);
 
 			return groupModel;
 		});
 	}
 
-	private convertAllItems(items: CareTrackerItem[]): FlowsheetItemModel[]
+	private convertAllItems(items: CareTrackerItem[]): CareTrackerItemModel[]
 	{
 		const ruleToModelConverter = new DsRuleTransferToModelConverter();
 		return items.map(item =>
 		{
-			const model = new FlowsheetItemModel();
+			const model = new CareTrackerItemModel();
 			model.id = item.id;
 			model.name = item.name;
 			model.description = item.description;
@@ -86,8 +86,8 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 			model.hidden = item.hidden;
 			model.valueType = item.valueType;
 			model.valueLabel = item.valueLabel;
-			model.flowsheetItemAlerts = this.convertAllAlerts(item.careTrackerItemAlerts);
-			model.data = new FlowsheetItemDataTransferToModelConverter().convertList(item.data);
+			model.careTrackerItemAlerts = this.convertAllAlerts(item.careTrackerItemAlerts);
+			model.data = new CareTrackerItemDataTransferToModelConverter().convertList(item.data);
 			model.rules = ruleToModelConverter.convertList(item.rules);
 
 			return model;

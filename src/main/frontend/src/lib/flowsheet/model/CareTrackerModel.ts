@@ -25,19 +25,19 @@
 
  */
 
-import FlowsheetItemGroupModel from "./FlowsheetItemGroupModel";
+import CareTrackerItemGroupModel from "./CareTrackerItemGroupModel";
 import DxCodeModel from "../../dx/model/DxCodeModel";
 
-export default class FlowsheetModel
+export default class CareTrackerModel
 {
 	private _id: number;
 	private _name: string;
 	private _description: string;
 	private _enabled: boolean;
 	private _systemManaged: boolean;
-	private _flowsheetItemGroups: FlowsheetItemGroupModel[];
+	private _careTrackerItemGroups: CareTrackerItemGroupModel[];
 	private _triggerCodes: DxCodeModel[];
-	private _parentFlowsheetId: number;
+	private _parentCareTrackerId: number;
 	private _ownerDemographicId: number;
 	private _ownerProviderId: string;
 
@@ -45,7 +45,7 @@ export default class FlowsheetModel
 	{
 		this.enabled = true;
 		this.systemManaged = false;
-		this.flowsheetItemGroups = [];
+		this.careTrackerItemGroups = [];
 		this.triggerCodes = [];
 	}
 
@@ -112,14 +112,14 @@ export default class FlowsheetModel
 		this._systemManaged = value;
 	}
 
-	get flowsheetItemGroups(): FlowsheetItemGroupModel[]
+	get careTrackerItemGroups(): CareTrackerItemGroupModel[]
 	{
-		return this._flowsheetItemGroups;
+		return this._careTrackerItemGroups;
 	}
 
-	set flowsheetItemGroups(value: FlowsheetItemGroupModel[])
+	set careTrackerItemGroups(value: CareTrackerItemGroupModel[])
 	{
-		this._flowsheetItemGroups = value;
+		this._careTrackerItemGroups = value;
 	}
 
 	get triggerCodes(): DxCodeModel[]
@@ -133,14 +133,14 @@ export default class FlowsheetModel
 	}
 
 
-	get parentFlowsheetId(): number
+	get parentCareTrackerId(): number
 	{
-		return this._parentFlowsheetId;
+		return this._parentCareTrackerId;
 	}
 
-	set parentFlowsheetId(value: number)
+	set parentCareTrackerId(value: number)
 	{
-		this._parentFlowsheetId = value;
+		this._parentCareTrackerId = value;
 	}
 
 	get ownerDemographicId(): number

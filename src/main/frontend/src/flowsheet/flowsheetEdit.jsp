@@ -82,7 +82,7 @@
 	</div>
 
 	<div class="flex-column">
-		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.flowsheetItemGroups"
+		<flowsheet-item-group ng-repeat="itemGroup in $ctrl.flowsheet.careTrackerItemGroups"
 		                      model="itemGroup"
 		                      show-delete="true"
 		                      on-delete="$ctrl.onRemoveGroup(group)">
@@ -106,7 +106,7 @@
 						</juno-button>
 					</div>
 				</div>
-				<div ng-repeat="item in itemGroup.flowsheetItems" class="flex-row flex-grow align-items-center">
+				<div ng-repeat="item in itemGroup.careTrackerItems" class="flex-row flex-grow align-items-center">
 					<flowsheet-edit-item model="item"
 					                     on-delete="$ctrl.onRemoveItem(item, itemGroup)"
 					                     class="flex-grow">

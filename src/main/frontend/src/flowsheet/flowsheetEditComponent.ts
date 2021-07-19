@@ -23,11 +23,11 @@
 
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../common/components/junoComponentConstants";
-import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
-import FlowsheetItemModel from "../lib/flowsheet/model/FlowsheetItemModel";
-import FlowsheetItemGroupModel from "../lib/flowsheet/model/FlowsheetItemGroupModel";
-import {FlowsheetItemType} from "../lib/flowsheet/model/FlowsheetItemType";
-import {FlowsheetItemValueType} from "../lib/flowsheet/model/FlowsheetItemValueType";
+import CareTrackerModel from "../lib/flowsheet/model/CareTrackerModel";
+import CareTrackerItemModel from "../lib/flowsheet/model/CareTrackerItemModel";
+import CareTrackerItemGroupModel from "../lib/flowsheet/model/CareTrackerItemGroupModel";
+import {CareTrackerItemType} from "../lib/flowsheet/model/CareTrackerItemType";
+import {CareTrackerItemValueType} from "../lib/flowsheet/model/CareTrackerItemValueType";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
 
@@ -59,7 +59,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.isLoading = true;
-				ctrl.flowsheet = null as FlowsheetModel;
+				ctrl.flowsheet = null as CareTrackerModel;
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
@@ -70,7 +70,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					}
 					else
 					{
-						ctrl.flowsheet = new FlowsheetModel();
+						ctrl.flowsheet = new CareTrackerModel();
 					}
 					ctrl.isLoading = false;
 				}
@@ -105,7 +105,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 					if(groupName)
 					{
-						const newGroup = new FlowsheetItemGroupModel();
+						const newGroup = new CareTrackerItemGroupModel();
 						newGroup.name = groupName;
 						ctrl.flowsheet.flowsheetItemGroups.push(newGroup);
 					}
@@ -165,22 +165,22 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 				ctrl.onAddNewMeasurementItem = (itemGroup): void =>
 				{
-					ctrl.onAddNewItem(itemGroup, FlowsheetItemType.MEASUREMENT);
+					ctrl.onAddNewItem(itemGroup, CareTrackerItemType.MEASUREMENT);
 				}
 
 				ctrl.onAddNewPreventionItem = (itemGroup): void =>
 				{
-					ctrl.onAddNewItem(itemGroup, FlowsheetItemType.PREVENTION);
+					ctrl.onAddNewItem(itemGroup, CareTrackerItemType.PREVENTION);
 				}
 
 				ctrl.onAddNewItem = async (itemGroup, type): Promise<void> =>
 				{
-					const isMeasurementType = (type === FlowsheetItemType.MEASUREMENT);
+					const isMeasurementType = (type === CareTrackerItemType.MEASUREMENT);
 					const typeLabel = (isMeasurementType) ? "measurement" : "prevention";
 					const callback = (isMeasurementType) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
 
 					const selection = await Juno.Common.Util.openTypeaheadDialog($uibModal,
-						"Add flowsheet " + typeLabel,
+						"Add Care Tracker " + typeLabel,
 						"Search for a " + typeLabel + " within the system",
 						callback,
 						ctrl.componentStyle,
@@ -189,25 +189,25 @@ angular.module('Flowsheet').component('flowsheetEdit',
 					if(selection)
 					{
 						const data = selection.data;
-						let newItem = new FlowsheetItemModel();
+						let newItem = new CareTrackerItemModel();
 						if(isMeasurementType)
 						{
 							newItem.name = data.name;
-							newItem.type = FlowsheetItemType.MEASUREMENT;
+							newItem.type = CareTrackerItemType.MEASUREMENT;
 							newItem.typeCode = data.code;
 							newItem.description = data.description;
 							newItem.guideline = data.instructions;
-							newItem.valueType = FlowsheetItemValueType.STRING;
+							newItem.valueType = CareTrackerItemValueType.STRING;
 						}
 						else
 						{
 							newItem.name = data.name;
-							newItem.type = FlowsheetItemType.PREVENTION;
+							newItem.type = CareTrackerItemType.PREVENTION;
 							newItem.typeCode = data.code;
 							newItem.description = data.description;
-							newItem.valueType = FlowsheetItemValueType.STRING;
+							newItem.valueType = CareTrackerItemValueType.STRING;
 						}
-						itemGroup.flowsheetItems.push(newItem);
+						itemGroup.careTrackerItems.push(newItem);
 					}
 				}
 
@@ -220,7 +220,7 @@ angular.module('Flowsheet').component('flowsheetEdit',
 
 					if(confirmation)
 					{
-						itemGroup.flowsheetItems = itemGroup.flowsheetItems.filter((entry) => !(entry.type === item.type && entry.typeCode === item.typeCode));
+						itemGroup.careTrackerItems = itemGroup.careTrackerItems.filter((entry) => !(entry.type === item.type && entry.typeCode === item.typeCode));
 					}
 				}
 

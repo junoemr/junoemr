@@ -25,16 +25,20 @@
 
  */
 
-import {Moment} from "moment";
+import CareTrackerItemModel from "./CareTrackerItemModel";
 
-export default class FlowsheetItemDataModel
+export default class CareTrackerItemGroupModel
 {
 	private _id: number;
-	private _value: string;
-	private _observationDateTime: Moment;
-	private _createdDateTime: Moment;
-	private _updatedDateTime: Moment;
+	private _name: string;
+	private _description: string;
+	private _careTrackerItems: CareTrackerItemModel[];
 
+
+	public constructor()
+	{
+		this.careTrackerItems = [];
+	}
 
 	get id(): number
 	{
@@ -46,43 +50,33 @@ export default class FlowsheetItemDataModel
 		this._id = value;
 	}
 
-	get value(): string
+	get name(): string
 	{
-		return this._value;
+		return this._name;
 	}
 
-	set value(value: string)
+	set name(value: string)
 	{
-		this._value = value;
+		this._name = value;
 	}
 
-	get observationDateTime(): Moment
+	get description(): string
 	{
-		return this._observationDateTime;
+		return this._description;
 	}
 
-	set observationDateTime(value: Moment)
+	set description(value: string)
 	{
-		this._observationDateTime = value;
+		this._description = value;
 	}
 
-	get createdDateTime(): Moment
+	get careTrackerItems(): CareTrackerItemModel[]
 	{
-		return this._createdDateTime;
+		return this._careTrackerItems;
 	}
 
-	set createdDateTime(value: Moment)
+	set careTrackerItems(value: CareTrackerItemModel[])
 	{
-		this._createdDateTime = value;
-	}
-
-	get updatedDateTime(): Moment
-	{
-		return this._updatedDateTime;
-	}
-
-	set updatedDateTime(value: Moment)
-	{
-		this._updatedDateTime = value;
+		this._careTrackerItems = value;
 	}
 }

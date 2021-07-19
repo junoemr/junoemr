@@ -1,3 +1,5 @@
+'use strict';
+
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -23,23 +25,5 @@
 
  */
 
-import {CareTrackerItemData} from "../../../../generated";
-import AbstractConverter from "../../conversion/AbstractConverter";
-import FlowsheetItemDataModel from "../model/FlowsheetItemDataModel";
-
-export default class FlowsheetItemDataModelToTransferConverter extends AbstractConverter<FlowsheetItemDataModel, CareTrackerItemData>
-{
-	public convert(dataModel: FlowsheetItemDataModel): CareTrackerItemData
-	{
-		if (!dataModel)
-		{
-			return null;
-		}
-
-		return {
-			id: dataModel.id,
-			value: dataModel.value,
-			observationDateTime: Juno.Common.Util.formatMomentDateTimeNoTimezone(dataModel.observationDateTime),
-		} as CareTrackerItemData;
-	}
-}
+import {CareTrackerItem} from "../../../../generated";
+export import CareTrackerItemType = CareTrackerItem.TypeEnum;

@@ -26,61 +26,61 @@
  */
 
 import DsRuleModel from "../../decisionSupport/model/DsRuleModel";
-import {FlowsheetItemType} from "./FlowsheetItemType";
-import {FlowsheetItemValueType} from "./FlowsheetItemValueType";
+import {CareTrackerItemType} from "./CareTrackerItemType";
+import {CareTrackerItemValueType} from "./CareTrackerItemValueType";
 import AlertModel from "./AlertModel";
-import FlowsheetItemDataModel from "./FlowsheetItemDataModel";
+import CareTrackerItemDataModel from "./CareTrackerItemDataModel";
 
-export default class FlowsheetItemModel
+export default class CareTrackerItemModel
 {
 	private _id: number;
 	private _name: string;
 	private _description: string;
 	private _guideline: string;
-	private _type: FlowsheetItemType;
+	private _type: CareTrackerItemType;
 	private _typeCode: string;
 	private _hidden: boolean;
-	private _valueType: FlowsheetItemValueType;
+	private _valueType: CareTrackerItemValueType;
 	private _valueLabel: string;
-	private _flowsheetItemAlerts: AlertModel[];
-	private _data: FlowsheetItemDataModel[];
+	private _careTrackerItemAlerts: AlertModel[];
+	private _data: CareTrackerItemDataModel[];
 	private _rules: DsRuleModel[];
 
 	public constructor()
 	{
-		this.flowsheetItemAlerts = [];
+		this.careTrackerItemAlerts = [];
 		this.data = [];
 		this.rules = [];
 	}
 
 	public itemTypeIsPrevention = (): boolean =>
 	{
-		return this.type === FlowsheetItemType.PREVENTION;
+		return this.type === CareTrackerItemType.PREVENTION;
 	}
 
 	public itemTypeIsMeasurement = (): boolean =>
 	{
-		return this.type === FlowsheetItemType.MEASUREMENT;
+		return this.type === CareTrackerItemType.MEASUREMENT;
 	}
 
 	public valueTypeIsBoolean = (): boolean =>
 	{
-		return this.valueType === FlowsheetItemValueType.BOOLEAN;
+		return this.valueType === CareTrackerItemValueType.BOOLEAN;
 	}
 
 	public valueTypeIsFreeText = (): boolean =>
 	{
-		return this.valueType === FlowsheetItemValueType.STRING;
+		return this.valueType === CareTrackerItemValueType.STRING;
 	}
 
 	public valueTypeIsNumeric = (): boolean =>
 	{
-		return this.valueType === FlowsheetItemValueType.NUMERIC;
+		return this.valueType === CareTrackerItemValueType.NUMERIC;
 	}
 
 	public valueTypeIsDate = (): boolean =>
 	{
-		return this.valueType === FlowsheetItemValueType.DATE;
+		return this.valueType === CareTrackerItemValueType.DATE;
 	}
 
 	get id(): number
@@ -123,12 +123,12 @@ export default class FlowsheetItemModel
 		this._guideline = value;
 	}
 
-	get type(): FlowsheetItemType
+	get type(): CareTrackerItemType
 	{
 		return this._type;
 	}
 
-	set type(value: FlowsheetItemType)
+	set type(value: CareTrackerItemType)
 	{
 		this._type = value;
 	}
@@ -153,12 +153,12 @@ export default class FlowsheetItemModel
 		this._hidden = value;
 	}
 
-	get valueType(): FlowsheetItemValueType
+	get valueType(): CareTrackerItemValueType
 	{
 		return this._valueType;
 	}
 
-	set valueType(value: FlowsheetItemValueType)
+	set valueType(value: CareTrackerItemValueType)
 	{
 		this._valueType = value;
 	}
@@ -173,22 +173,22 @@ export default class FlowsheetItemModel
 		this._valueLabel = value;
 	}
 
-	get flowsheetItemAlerts(): AlertModel[]
+	get careTrackerItemAlerts(): AlertModel[]
 	{
-		return this._flowsheetItemAlerts;
+		return this._careTrackerItemAlerts;
 	}
 
-	set flowsheetItemAlerts(value: AlertModel[])
+	set careTrackerItemAlerts(value: AlertModel[])
 	{
-		this._flowsheetItemAlerts = value;
+		this._careTrackerItemAlerts = value;
 	}
 
-	get data(): FlowsheetItemDataModel[]
+	get data(): CareTrackerItemDataModel[]
 	{
 		return this._data;
 	}
 
-	set data(value: FlowsheetItemDataModel[])
+	set data(value: CareTrackerItemDataModel[])
 	{
 		this._data = value;
 	}

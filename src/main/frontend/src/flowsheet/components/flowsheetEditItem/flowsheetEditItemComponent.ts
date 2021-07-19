@@ -23,7 +23,7 @@
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import DsRuleModel from "../../../lib/decisionSupport/model/DsRuleModel";
-import {FlowsheetItemValueType} from "../../../lib/flowsheet/model/FlowsheetItemValueType";
+import {CareTrackerItemValueType} from "../../../lib/flowsheet/model/CareTrackerItemValueType";
 
 angular.module('Flowsheet').component('flowsheetEditItem',
 	{
@@ -44,10 +44,10 @@ angular.module('Flowsheet').component('flowsheetEditItem',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.valueTypeOptions = [
-					{label: "Text", value: FlowsheetItemValueType.STRING},
-					{label: "Numeric", value: FlowsheetItemValueType.NUMERIC},
-					{label: "Checkbox", value: FlowsheetItemValueType.BOOLEAN},
-					{label: "Date", value: FlowsheetItemValueType.DATE},
+					{label: "Text", value: CareTrackerItemValueType.STRING},
+					{label: "Numeric", value: CareTrackerItemValueType.NUMERIC},
+					{label: "Checkbox", value: CareTrackerItemValueType.BOOLEAN},
+					{label: "Date", value: CareTrackerItemValueType.DATE},
 				];
 
 				ctrl.isLoading = true;

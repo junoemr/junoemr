@@ -91,7 +91,7 @@ angular.module('Record.Flowsheet').component('flowsheet',
 				ctrl.showFlowsheetGroup = (group) =>
 				{
 					// filter visible items. show group if one or more items visible
-					let visibleItems = group.flowsheetItems.filter((item) => ctrl.showFlowsheetItem(item));
+					let visibleItems = group.careTrackerItems.filter((item) => ctrl.showFlowsheetItem(item));
 					return (visibleItems.length > 0);
 				}
 				ctrl.showFlowsheetItem = (item) =>

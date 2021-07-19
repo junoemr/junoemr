@@ -25,5 +25,64 @@
 
  */
 
-import {CareTrackerItem} from "../../../../generated";
-export import FlowsheetItemType = CareTrackerItem.TypeEnum;
+import {Moment} from "moment";
+
+export default class CareTrackerItemDataModel
+{
+	private _id: number;
+	private _value: string;
+	private _observationDateTime: Moment;
+	private _createdDateTime: Moment;
+	private _updatedDateTime: Moment;
+
+
+	get id(): number
+	{
+		return this._id;
+	}
+
+	set id(value: number)
+	{
+		this._id = value;
+	}
+
+	get value(): string
+	{
+		return this._value;
+	}
+
+	set value(value: string)
+	{
+		this._value = value;
+	}
+
+	get observationDateTime(): Moment
+	{
+		return this._observationDateTime;
+	}
+
+	set observationDateTime(value: Moment)
+	{
+		this._observationDateTime = value;
+	}
+
+	get createdDateTime(): Moment
+	{
+		return this._createdDateTime;
+	}
+
+	set createdDateTime(value: Moment)
+	{
+		this._createdDateTime = value;
+	}
+
+	get updatedDateTime(): Moment
+	{
+		return this._updatedDateTime;
+	}
+
+	set updatedDateTime(value: Moment)
+	{
+		this._updatedDateTime = value;
+	}
+}

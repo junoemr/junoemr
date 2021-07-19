@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -25,58 +23,27 @@
 
  */
 
-import FlowsheetItemModel from "./FlowsheetItemModel";
+import {CareTrackerItemData} from "../../../../generated";
+import AbstractConverter from "../../conversion/AbstractConverter";
+import CareTrackerItemDataModel from "../model/CareTrackerItemDataModel";
+import moment from "moment";
 
-export default class FlowsheetItemGroupModel
+export default class CareTrackerItemDataTransferToModelConverter extends AbstractConverter<CareTrackerItemData, CareTrackerItemDataModel>
 {
-	private _id: number;
-	private _name: string;
-	private _description: string;
-	private _flowsheetItems: FlowsheetItemModel[];
-
-
-	public constructor()
+	public convert(transfer: CareTrackerItemData): CareTrackerItemDataModel
 	{
-		this.flowsheetItems = [];
-	}
+		if (!transfer)
+		{
+			return null;
+		}
 
-	get id(): number
-	{
-		return this._id;
-	}
+		const dataModel = new CareTrackerItemDataModel();
+		dataModel.id = transfer.id;
+		dataModel.value = transfer.value;
+		dataModel.observationDateTime = moment(transfer.observationDateTime);
+		dataModel.createdDateTime = moment(transfer.createdDateTime);
+		dataModel.updatedDateTime = moment(transfer.updatedDateTime);
 
-	set id(value: number)
-	{
-		this._id = value;
-	}
-
-	get name(): string
-	{
-		return this._name;
-	}
-
-	set name(value: string)
-	{
-		this._name = value;
-	}
-
-	get description(): string
-	{
-		return this._description;
-	}
-
-	set description(value: string)
-	{
-		this._description = value;
-	}
-
-	get flowsheetItems(): FlowsheetItemModel[]
-	{
-		return this._flowsheetItems;
-	}
-
-	set flowsheetItems(value: FlowsheetItemModel[])
-	{
-		this._flowsheetItems = value;
+		return dataModel;
 	}
 }

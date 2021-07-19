@@ -25,15 +25,15 @@
 
  */
 import {DemographicApi, DiseaseRegistryApi, CareTrackerApi, CareTrackersApi, MeasurementsApi, PreventionsApi} from "../../generated";
-import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
-import FlowsheetTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetTransferToModelConverter";
-import FlowsheetModelToTransferConverter from "../lib/flowsheet/converter/FlowsheetModelToTransferConverter";
+import CareTrackerModel from "../lib/flowsheet/model/CareTrackerModel";
+import CareTrackerTransferToModelConverter from "../lib/flowsheet/converter/CareTrackerTransferToModelConverter";
+import CareTrackerModelToTransferConverter from "../lib/flowsheet/converter/CareTrackerModelToTransferConverter";
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
 import DxCodeTransferToModelConverter from "../lib/dx/converter/DxCodeTransferToModelConverter";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
-import FlowsheetItemDataModel from "../lib/flowsheet/model/FlowsheetItemDataModel";
-import FlowsheetItemDataTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetItemDataTransferToModelConverter";
-import FlowsheetItemDataModelToTransferConverter from "../lib/flowsheet/converter/FlowsheetItemDataModelToTransferConverter";
+import CareTrackerItemDataModel from "../lib/flowsheet/model/CareTrackerItemDataModel";
+import CareTrackerItemDataTransferToModelConverter from "../lib/flowsheet/converter/CareTrackerItemDataTransferToModelConverter";
+import CareTrackerItemDataModelToTransferConverter from "../lib/flowsheet/converter/CareTrackerItemDataModelToTransferConverter";
 
 angular.module("Flowsheet").service("flowsheetApiService", [
 	'$http',
@@ -50,11 +50,11 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		service.measurementsApi = new MeasurementsApi($http, $httpParamSerializer, '../ws/rs');
 		service.diseaseRegistryApi = new DiseaseRegistryApi($http, $httpParamSerializer, '../ws/rs');
 
-		service.flowsheetModelConverter = new FlowsheetTransferToModelConverter();
-		service.flowsheetTransferConverter = new FlowsheetModelToTransferConverter();
+		service.flowsheetModelConverter = new CareTrackerTransferToModelConverter();
+		service.flowsheetTransferConverter = new CareTrackerModelToTransferConverter();
 		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
-		service.flowsheetItemDataTransferToModelConverter = new FlowsheetItemDataTransferToModelConverter();
-		service.flowsheetItemDataModelToTransferConverter = new FlowsheetItemDataModelToTransferConverter();
+		service.flowsheetItemDataTransferToModelConverter = new CareTrackerItemDataTransferToModelConverter();
+		service.flowsheetItemDataModelToTransferConverter = new CareTrackerItemDataModelToTransferConverter();
 
 		service.searchFlowsheets = async (
 			enabled: boolean,
@@ -64,25 +64,25 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 			includeDemographicLevel: boolean,
 			demographicId: number,
 			page: number,
-			perPage: number): Promise<Array<FlowsheetModel>> =>
+			perPage: number): Promise<Array<CareTrackerModel>> =>
 		{
 			return service.flowsheetModelConverter.convertList(
 				(await service.careTrackersApi.search(
 					enabled, includeClinicLevel, includeProviderLevel, providerId, includeDemographicLevel, demographicId, page, perPage)).data.body);
 		}
 
-		service.getFlowsheet = async (careTrackerId: number): Promise<FlowsheetModel> =>
+		service.getFlowsheet = async (careTrackerId: number): Promise<CareTrackerModel> =>
 		{
 			return service.flowsheetModelConverter.convert((await service.careTrackerApi.getCareTracker(careTrackerId)).data.body);
 		}
 
-		service.createFlowsheet = async (flowsheet: FlowsheetModel): Promise<FlowsheetModel> =>
+		service.createFlowsheet = async (flowsheet: CareTrackerModel): Promise<CareTrackerModel> =>
 		{
 			const transfer = service.flowsheetTransferConverter.convert(flowsheet);
 			return service.flowsheetModelConverter.convert((await service.careTrackerApi.createCareTracker(transfer)).data.body);
 		}
 
-		service.updateFlowsheet = async (careTrackerId: number, flowsheet: FlowsheetModel): Promise<FlowsheetModel> =>
+		service.updateFlowsheet = async (careTrackerId: number, flowsheet: CareTrackerModel): Promise<CareTrackerModel> =>
 		{
 			const transfer = service.flowsheetTransferConverter.convert(flowsheet);
 			return service.flowsheetModelConverter.convert((await service.careTrackerApi.updateCareTracker(careTrackerId, transfer)).data.body);
@@ -113,27 +113,27 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 			return service.dxCodeTransferToModelConverter.convertList((await service.diseaseRegistryApi.searchDxCodes(codingSystem, keyword, page, perPage)).data.body);
 		}
 
-		service.getDemographicFlowsheet = async (demographicId: number, careTrackerId: number): Promise<FlowsheetModel> =>
+		service.getDemographicFlowsheet = async (demographicId: number, careTrackerId: number): Promise<CareTrackerModel> =>
 		{
 			return service.flowsheetModelConverter.convert((await service.demographicApi.getCareTrackerForDemographic(demographicId, careTrackerId)).data.body);
 		}
 
-		service.addFlowsheetItemData = async (demographicId: number, careTrackerId: number, careTrackerItemId: number, data: FlowsheetItemDataModel): Promise<FlowsheetItemDataModel> =>
+		service.addFlowsheetItemData = async (demographicId: number, careTrackerId: number, careTrackerItemId: number, data: CareTrackerItemDataModel): Promise<CareTrackerItemDataModel> =>
 		{
 			const transferOut = service.flowsheetItemDataModelToTransferConverter.convert(data);
 			const transferIn = (await service.demographicApi.addCareTrackerItemData(demographicId, careTrackerId, careTrackerItemId, transferOut)).data.body;
 			return service.flowsheetItemDataTransferToModelConverter.convert(transferIn);
 		}
 
-		service.cloneFlowsheetForClinic = async (careTrackerId: number): Promise<FlowsheetModel> =>
+		service.cloneFlowsheetForClinic = async (careTrackerId: number): Promise<CareTrackerModel> =>
 		{
 			return service.flowsheetModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId)).data.body);
 		}
-		service.cloneFlowsheetForProvider = async (careTrackerId: number, providerId: string): Promise<FlowsheetModel> =>
+		service.cloneFlowsheetForProvider = async (careTrackerId: number, providerId: string): Promise<CareTrackerModel> =>
 		{
 			return service.flowsheetModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, providerId)).data.body);
 		}
-		service.cloneFlowsheetForDemographic = async (careTrackerId: number, demographicId: number): Promise<FlowsheetModel> =>
+		service.cloneFlowsheetForDemographic = async (careTrackerId: number, demographicId: number): Promise<CareTrackerModel> =>
 		{
 			return service.flowsheetModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, null, demographicId)).data.body);
 		}

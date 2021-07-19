@@ -23,7 +23,7 @@
 
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import FlowsheetModel from "../../lib/flowsheet/model/FlowsheetModel";
+import CareTrackerModel from "../../lib/flowsheet/model/CareTrackerModel";
 import DxRecordModel from "../../lib/dx/model/DxRecordModel";
 import DxCodeModel from "../../lib/dx/model/DxCodeModel";
 
@@ -53,9 +53,9 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.flowsheets = [] as FlowsheetModel[];
-				ctrl.triggerdFlowsheets = [] as FlowsheetModel[];
-				ctrl.selectedFlowsheet = null as FlowsheetModel;
+				ctrl.flowsheets = [] as CareTrackerModel[];
+				ctrl.triggerdFlowsheets = [] as CareTrackerModel[];
+				ctrl.selectedFlowsheet = null as CareTrackerModel;
 				ctrl.activeDxRecords = [];
 
 				ctrl.accordianListItems = [
@@ -90,14 +90,14 @@ angular.module('Record.Tracker').component('healthTracker',
 					ctrl.initFlowsheetLists(ctrl.flowsheets);
 				}
 
-				ctrl.initFlowsheetLists = (flowsheets: FlowsheetModel[]): void =>
+				ctrl.initFlowsheetLists = (flowsheets: CareTrackerModel[]): void =>
 				{
 					const clinicFlowsheetItems = ctrl.accordianListItems[0].items;
 					const providerFlowsheetItems = ctrl.accordianListItems[1].items;
 					const demographicFlowsheetItems = ctrl.accordianListItems[2].items;
 
 					// sort all flowsheets by level (clinic, provider, demographic)
-					flowsheets.forEach((flowsheet: FlowsheetModel) =>
+					flowsheets.forEach((flowsheet: CareTrackerModel) =>
 					{
 						if(flowsheet.isDemographicLevel())
 						{
@@ -118,28 +118,28 @@ angular.module('Record.Tracker').component('healthTracker',
 					const flowsheetMap = new Map();
 
 					// put all base level flowsheets into a map
-					ctrl.getTriggeredFlowsheets(clinicFlowsheetItems).forEach((flowsheet: FlowsheetModel) => {
+					ctrl.getTriggeredFlowsheets(clinicFlowsheetItems).forEach((flowsheet: CareTrackerModel) => {
 						flowsheetMap.set(flowsheet.id, flowsheet);
 					});
 
 					// overwrite mapped values with provider specific version where possible
-					ctrl.getTriggeredFlowsheets(providerFlowsheetItems).forEach((flowsheet: FlowsheetModel) => {
-						const key = flowsheet.parentFlowsheetId ? flowsheet.parentFlowsheetId : flowsheet.id;
+					ctrl.getTriggeredFlowsheets(providerFlowsheetItems).forEach((flowsheet: CareTrackerModel) => {
+						const key = flowsheet.parentCareTrackerId ? flowsheet.parentCareTrackerId : flowsheet.id;
 						flowsheetMap.set(key, flowsheet);
 					});
 
 					// overwrite mapped values again with demographic specific version where possible
-					ctrl.getTriggeredFlowsheets(demographicFlowsheetItems).forEach((flowsheet: FlowsheetModel) => {
-						const key = flowsheet.parentFlowsheetId ? flowsheet.parentFlowsheetId : flowsheet.id;
+					ctrl.getTriggeredFlowsheets(demographicFlowsheetItems).forEach((flowsheet: CareTrackerModel) => {
+						const key = flowsheet.parentCareTrackerId ? flowsheet.parentCareTrackerId : flowsheet.id;
 						flowsheetMap.set(key, flowsheet);
 					});
 					ctrl.triggerdFlowsheets = Array.from(flowsheetMap.values());
 				}
 
-				ctrl.getTriggeredFlowsheets = (flowsheets: FlowsheetModel[]): FlowsheetModel[] =>
+				ctrl.getTriggeredFlowsheets = (flowsheets: CareTrackerModel[]): CareTrackerModel[] =>
 				{
 					const activeCodes: DxCodeModel[] = ctrl.activeDxRecords.map((dxRecord: DxRecordModel) => dxRecord.dxCode);
-					return flowsheets.filter((flowsheet: FlowsheetModel) =>
+					return flowsheets.filter((flowsheet: CareTrackerModel) =>
 					{
 						for(let activeCode of activeCodes)
 						{

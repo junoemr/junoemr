@@ -23,7 +23,7 @@
 
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../common/components/junoComponentConstants";
-import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
+import CareTrackerModel from "../lib/flowsheet/model/CareTrackerModel";
 
 angular.module('Flowsheet').component('flowsheetManager',
 	{
@@ -81,7 +81,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 					ctrl.isLoading = false;
 				}
 
-				ctrl.separateFlowsheetLevels = (flowsheets: FlowsheetModel[]): void =>
+				ctrl.separateFlowsheetLevels = (flowsheets: CareTrackerModel[]): void =>
 				{
 					ctrl.tablesConfig = [
 						{
@@ -110,7 +110,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 						}
 					];
 					// sort all flowsheets by level (clinic, provider, demographic)
-					flowsheets.forEach((flowsheet: FlowsheetModel) =>
+					flowsheets.forEach((flowsheet: CareTrackerModel) =>
 					{
 						if (flowsheet.isDemographicLevel())
 						{
@@ -171,7 +171,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 					ctrl.toFlowsheetEdit(flowsheet.id);
 				}
 
-				ctrl.onFlowsheetDelete = async (flowsheet: FlowsheetModel): Promise<void> =>
+				ctrl.onFlowsheetDelete = async (flowsheet: CareTrackerModel): Promise<void> =>
 				{
 					const userOk : boolean = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Confirm Delete",
@@ -194,7 +194,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 					}
 				}
 
-				ctrl.onCloneFlowsheet = async (flowsheet: FlowsheetModel): Promise<void> =>
+				ctrl.onCloneFlowsheet = async (flowsheet: CareTrackerModel): Promise<void> =>
 				{
 					const options = ctrl.getCloneOptions(flowsheet);
 					let selection = null;
@@ -229,7 +229,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 						ctrl.isLoading = true;
 						try
 						{
-							let flowsheetClone: FlowsheetModel = null;
+							let flowsheetClone: CareTrackerModel = null;
 							if(selection === accessLevels.CLINIC)
 							{
 								flowsheetClone = await flowsheetApiService.cloneFlowsheetForClinic(flowsheet.id);
@@ -256,7 +256,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 					}
 				}
 
-				ctrl.getCloneOptions = (flowsheet: FlowsheetModel): object[] =>
+				ctrl.getCloneOptions = (flowsheet: CareTrackerModel): object[] =>
 				{
 					const options = [];
 					if(!flowsheet.isDemographicLevel() && !flowsheet.isProviderLevel() && ctrl.userCanCreateClinicLevel())
@@ -274,7 +274,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 					return options;
 				}
 
-				ctrl.onToggleFlowsheetEnabled = async (flowsheet: FlowsheetModel): Promise<void> =>
+				ctrl.onToggleFlowsheetEnabled = async (flowsheet: CareTrackerModel): Promise<void> =>
 				{
 					ctrl.isLoading = true;
 					try
@@ -287,7 +287,7 @@ angular.module('Flowsheet').component('flowsheetManager',
 					}
 				}
 
-				ctrl.toggleFlowsheetEnabledLabel = (flowsheet: FlowsheetModel): string =>
+				ctrl.toggleFlowsheetEnabledLabel = (flowsheet: CareTrackerModel): string =>
 				{
 					return flowsheet.enabled ? "Disable" : "Enable";
 				}

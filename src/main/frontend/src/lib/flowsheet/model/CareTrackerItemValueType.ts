@@ -1,3 +1,5 @@
+'use strict';
+
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -23,27 +25,5 @@
 
  */
 
-import {CareTrackerItemData} from "../../../../generated";
-import AbstractConverter from "../../conversion/AbstractConverter";
-import FlowsheetItemDataModel from "../model/FlowsheetItemDataModel";
-import moment from "moment";
-
-export default class FlowsheetItemDataTransferToModelConverter extends AbstractConverter<CareTrackerItemData, FlowsheetItemDataModel>
-{
-	public convert(transfer: CareTrackerItemData): FlowsheetItemDataModel
-	{
-		if (!transfer)
-		{
-			return null;
-		}
-
-		const dataModel = new FlowsheetItemDataModel();
-		dataModel.id = transfer.id;
-		dataModel.value = transfer.value;
-		dataModel.observationDateTime = moment(transfer.observationDateTime);
-		dataModel.createdDateTime = moment(transfer.createdDateTime);
-		dataModel.updatedDateTime = moment(transfer.updatedDateTime);
-
-		return dataModel;
-	}
-}
+import {CareTrackerItem} from "../../../../generated";
+export import CareTrackerItemValueType = CareTrackerItem.ValueTypeEnum;
