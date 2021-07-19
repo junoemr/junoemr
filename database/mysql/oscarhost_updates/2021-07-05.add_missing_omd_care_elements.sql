@@ -12,7 +12,7 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - COUGH'
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'ASTHMA - DEF. REVIEW' AS type, 'Asthma - Definition review' AS typeDisplayName, 'Records whether the asthma definition has been reviewed' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'ASTHMA - DEF. REVIEW' AS type, 'Asthma - Definition Review' AS typeDisplayName, 'Records whether the asthma definition has been reviewed' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - DEF. REVIEW');
 
@@ -24,7 +24,7 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - DYSPNE
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'ASTHMA - MEDICATION  REVIEW' AS type, 'Asthma - Medication review' AS typeDisplayName, 'Record whether medication has been reviewed' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'ASTHMA - MEDICATION  REVIEW' AS type, 'Asthma - Medication Review' AS typeDisplayName, 'Record whether medication has been reviewed' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - MEDICATION  REVIEW');
 
@@ -48,13 +48,13 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - WHEEZE
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'WHEEZING - yes/no' AS type, 'Wheezing yes/no' AS typeDisplayName, 'Wheezing yes/no' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'WHEEZING - Yes/No' AS type, 'Wheezing Yes/No' AS typeDisplayName, 'Wheezing Yes/No' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'WHEEZING - yes/no');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'WHEEZING - Yes/No');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'WHEEZING - LOCATION' AS type, 'Wheezing location' AS typeDisplayName, 'Indicate location' AS typeDescription, 'location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'WHEEZING - LOCATION' AS type, 'Wheezing Location' AS typeDisplayName, 'Indicate location' AS typeDescription, 'location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'WHEEZING - LOCATION');
 
@@ -66,9 +66,9 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'URINARY MICROAL
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'PITTING EDEMA - location' AS type, 'Pitting Edema - location' AS typeDisplayName, 'Records location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'PITTING EDEMA - Location' AS type, 'Pitting Edema - Location' AS typeDisplayName, 'Records location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'PITTING EDEMA - location');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'PITTING EDEMA - Location');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
@@ -78,39 +78,39 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'NEUROLOGICAL EX
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'NYHA - CLASS I' AS type, 'NYHA - Class I' AS typeDisplayName, 'NYHA classification - no symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'NYHA - CLASS I' AS type, 'NYHA - Class I' AS typeDisplayName, 'NYHA classification - no symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'NYHA - CLASS I');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'NYHA - CLASS II' AS type, 'NYHA - Class II' AS typeDisplayName, 'NYHA classification - symptoms with ordinary activity' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'NYHA - CLASS II' AS type, 'NYHA - Class II' AS typeDisplayName, 'NYHA classification - symptoms with ordinary activity' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'NYHA - CLASS II');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'NYHA - CLASS III' AS type, 'NYHA - Class III' AS typeDisplayName, 'NYHA classification - symptoms with less than ordinary activity' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'NYHA - CLASS III' AS type, 'NYHA - Class III' AS typeDisplayName, 'NYHA classification - symptoms with less than ordinary activity' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'NYHA - CLASS III');
 
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'NYHA - CLASS IV' AS type, 'NYHA - Class IV' AS typeDisplayName, 'NYHA classification - symptoms at rest' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'NYHA - CLASS IV' AS type, 'NYHA - Class IV' AS typeDisplayName, 'NYHA classification - symptoms at rest' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'NYHA - CLASS IV');
 
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'LUNG CRACKLES - location' AS type, 'Lung Crackles' AS typeDisplayName, 'Lung Crackles location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'LUNG CRACKLES - Location' AS type, 'Lung Crackles' AS typeDisplayName, 'Lung Crackles location' AS typeDescription, 'Indicate location' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'LUNG CRACKLES - location');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'LUNG CRACKLES - Location');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FOOT EXAM - findings' AS type, 'Foot Exam' AS typeDisplayName, 'Record Foot Exam findings' AS typeDescription, 'Indicate findings' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FOOT EXAM - Findings' AS type, 'Foot Exam' AS typeDisplayName, 'Record Foot Exam findings' AS typeDescription, 'Indicate findings' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FOOT EXAM - findings');
 
@@ -128,7 +128,7 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'ASTHMA - COLLAB
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'PEFR BEFORE' AS type, 'PEFR before' AS typeDisplayName, 'Peak Expiratory Flow' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'PEFR BEFORE' AS type, 'PEFR Before' AS typeDisplayName, 'Peak Expiratory Flow' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'PEFR BEFORE');
 
@@ -158,13 +158,13 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FVC PREDICTED')
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FVC AFTER/FVC PREDICTED' AS type, 'FVC after/FVC predicted' AS typeDisplayName, 'FVC ratio of FVC actual after puff to FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FVC AFTER/FVC PREDICTED' AS type, 'FVC After/FVC Predicted' AS typeDisplayName, 'FVC ratio of FVC actual after puff to FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FVC AFTER/FVC PREDICTED');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FVC BEFORE/FVC PREDICTED' AS type, 'FVC before/FVC predicted' AS typeDisplayName, 'FVC ratio of FVC actual before puff to FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FVC BEFORE/FVC PREDICTED' AS type, 'FVC Before/FVC Predicted' AS typeDisplayName, 'FVC ratio of FVC actual before puff to FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FVC BEFORE/FVC PREDICTED');
 
@@ -194,37 +194,37 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1 PREDICTED'
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FEV1/FVC BEFORE' AS type, 'FEV1/FVC ratio before' AS typeDisplayName, 'FEV1/FVC ratio before puff' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FEV1/FVC BEFORE' AS type, 'FEV1/FVC Ratio Before' AS typeDisplayName, 'FEV1/FVC ratio before puff' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FVC BEFORE');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FEV1/FVC AFTER' AS type, 'FEV1/FVC ratio after' AS typeDisplayName, 'FEV1/FVC ratio before puff' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FEV1/FVC AFTER' AS type, 'FEV1/FVC Ratio After' AS typeDisplayName, 'FEV1/FVC ratio before puff' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FVC AFTER');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FEV1/FVC PREDICTED' AS type, 'FEV1/FVC ratio predicted' AS typeDisplayName, 'ratio of FEV1 predicted to FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FEV1/FVC PREDICTED' AS type, 'FEV1/FVC Ratio Predicted' AS typeDisplayName, 'ratio of FEV1 predicted to FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FVC PREDICTED');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FEV1/FVC RATIO BEFORE/PREDICTED' AS type, 'FEV1/FVC ratio before/predicted ratio' AS typeDisplayName, 'FEV1 ratio before puff of the patient / the average FEV1 ratio predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FEV1/FVC RATIO BEFORE/PREDICTED' AS type, 'FEV1/FVC Ratio Before/Predicted Ratio' AS typeDisplayName, 'FEV1 ratio before puff of the patient / the average FEV1 ratio predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FVC ratio BEFORE/PREDICTED');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FEV1/FEV AFTER OF FEV1/FEV PREDICTED' AS type, 'FEV1/FEV after of FEV1/FEV predicted' AS typeDisplayName, 'FEV1 / FVC after puff actual divided by FEV1 / FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FEV1/FEV AFTER OF FEV1/FEV PREDICTED' AS type, 'FEV1/FEV After of FEV1/FEV Predicted' AS typeDisplayName, 'FEV1 / FVC after puff actual divided by FEV1 / FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FEV AFTER OF FEV1/FEV PREDICTED');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'FEV1/FEV BEFORE OF FEV1/FEV PREDICTED' AS type, 'FEV1/FEV before of FEV1/FEV predicted' AS typeDisplayName, 'FEV1 / FVC before puff actual divided by FEV1 / FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'FEV1/FEV BEFORE OF FEV1/FEV PREDICTED' AS type, 'FEV1/FEV Before of FEV1/FEV Predicted' AS typeDisplayName, 'FEV1 / FVC before puff actual divided by FEV1 / FVC predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FEV BEFORE OF FEV1/FEV PREDICTED');
 
@@ -248,31 +248,31 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'COPD - CHALLENG
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'COPD - MILD' AS type, 'COPD - Mild' AS typeDisplayName, 'FEV1 80 percent or more compared to predicted' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'COPD - MILD' AS type, 'COPD - Mild' AS typeDisplayName, 'FEV1 80 percent or more compared to predicted' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'COPD - MILD');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'COPD - MODERATE' AS type, 'COPD - Moderate' AS typeDisplayName, 'FEV1 less than 80 percent and more than 50 percent compared to predicted' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'COPD - MODERATE' AS type, 'COPD - Moderate' AS typeDisplayName, 'FEV1 less than 80 percent and more than 50 percent compared to predicted' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'COPD - MODERATE');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'COPD - Severe' AS type, 'COPD - Severe' AS typeDisplayName, 'FEV1 less than 50 percent and more than 30 percent compared to predicted' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'COPD - Severe' AS type, 'COPD - Severe' AS typeDisplayName, 'FEV1 less than 50 percent and more than 30 percent compared to predicted' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'COPD - Severe');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'COPD - Very Severe' AS type, 'COPD - Very severe' AS typeDisplayName, 'FEV1 less than 30 percent compared to predicted' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'COPD - Very Severe' AS type, 'COPD - Very Severe' AS typeDisplayName, 'FEV1 less than 30 percent compared to predicted' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'COPD - Very Severe');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HT - MEDICATION' AS type, 'HT - Medication' AS typeDisplayName, 'Medication Review' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HT - MEDICATION' AS type, 'HT - Medication' AS typeDisplayName, 'Medication Review' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HT - MEDICATION');
 
@@ -302,43 +302,43 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - CHALLENGE'
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HF - SYNCOPE' AS type, 'HF - Syncope' AS typeDisplayName, 'Symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HF - SYNCOPE' AS type, 'HF - Syncope' AS typeDisplayName, 'Symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - SYNCOPE');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HF - DYSPNEA AT REST' AS type, 'HF - Dyspnea at rest' AS typeDisplayName, 'Symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HF - DYSPNEA AT REST' AS type, 'HF - Dyspnea at Rest' AS typeDisplayName, 'Symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - DYSPNEA AT REST');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HF - DIZZINESS' AS type, 'HF - Dizziness' AS typeDisplayName, 'Symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HF - DIZZINESS' AS type, 'HF - Dizziness' AS typeDisplayName, 'Symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - DIZZINESS');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HF - DYSPNEA ON EXERTION' AS type, 'HF - Dyspnea on exertion' AS typeDisplayName, 'Symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HF - DYSPNEA ON EXERTION' AS type, 'HF - Dyspnea on Exertion' AS typeDisplayName, 'Symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - DYSPNEA ON EXERTION');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HF - FATIGUE' AS type, 'HF - Fatigue' AS typeDisplayName, 'Symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HF - FATIGUE' AS type, 'HF - Fatigue' AS typeDisplayName, 'Symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - FATIGUE');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HF - ORTHOPNEA' AS type, 'HF - Orthopnea' AS typeDisplayName, 'Symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HF - ORTHOPNEA' AS type, 'HF - Orthopnea' AS typeDisplayName, 'Symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - ORTHOPNEA');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HF - PAROXYSMAL NOCTURNAL DYSPNEA' AS type, 'HF - Paroxysmal nocturnal dyspnea' AS typeDisplayName, 'Symptoms' AS typeDescription, 'yes/no' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HF - PAROXYSMAL NOCTURNAL DYSPNEA' AS type, 'HF - Paroxysmal Nocturnal Dyspnea' AS typeDisplayName, 'Symptoms' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
 WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - PAROXYSMAL NOCTURNAL DYSPNEA');
 
@@ -350,27 +350,27 @@ WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HF - PHARMACOLO
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HT - Exercise reviewed' AS type, 'Exercise reviewed' AS typeDisplayName, 'Exercise reviewed' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HT - Exercise Reviewed' AS type, 'Exercise Reviewed' AS typeDisplayName, 'Exercise reviewed' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HT - Exercise reviewed');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HT - Exercise Reviewed');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'HT - Medication reviewed' AS type, 'Medication reviewed' AS typeDisplayName, 'Medication reviewed' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'HT - Medication Reviewed' AS type, 'Medication Reviewed' AS typeDisplayName, 'Medication reviewed' AS typeDescription, 'Yes/No' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Yes/No') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HT - Medication reviewed');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'HT - Medication Reviewed');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'COPD - Exacerbation plan' AS type, 'Exacerbation plan' AS typeDisplayName, 'Exacerbation plan' AS typeDescription, 'Provided/Revised/Reviewed' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'COPD - Exacerbation Plan' AS type, 'Exacerbation Plan' AS typeDisplayName, 'Exacerbation plan' AS typeDescription, 'Provided/Revised/Reviewed' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'COPD - Exacerbation plan');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'COPD - Exacerbation Plan');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
-(SELECT 'Asthma - Action plan' AS type, 'Action plan' AS typeDisplayName, 'Action plan' AS typeDescription, 'Provided/Revised/Reviewed' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
+(SELECT 'Asthma - Action Plan' AS type, 'Action Plan' AS typeDisplayName, 'Action plan' AS typeDescription, 'Provided/Revised/Reviewed' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'Asthma - Action plan');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'Asthma - Action Plan');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
