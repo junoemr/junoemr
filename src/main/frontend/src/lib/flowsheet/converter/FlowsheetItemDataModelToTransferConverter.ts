@@ -23,13 +23,13 @@
 
  */
 
-import {FlowsheetItemData} from "../../../../generated";
+import {CareTrackerItemData} from "../../../../generated";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import FlowsheetItemDataModel from "../model/FlowsheetItemDataModel";
 
-export default class FlowsheetItemDataModelToTransferConverter extends AbstractConverter<FlowsheetItemDataModel, FlowsheetItemData>
+export default class FlowsheetItemDataModelToTransferConverter extends AbstractConverter<FlowsheetItemDataModel, CareTrackerItemData>
 {
-	public convert(dataModel: FlowsheetItemDataModel): FlowsheetItemData
+	public convert(dataModel: FlowsheetItemDataModel): CareTrackerItemData
 	{
 		if (!dataModel)
 		{
@@ -40,6 +40,6 @@ export default class FlowsheetItemDataModelToTransferConverter extends AbstractC
 			id: dataModel.id,
 			value: dataModel.value,
 			observationDateTime: Juno.Common.Util.formatMomentDateTimeNoTimezone(dataModel.observationDateTime),
-		} as FlowsheetItemData;
+		} as CareTrackerItemData;
 	}
 }

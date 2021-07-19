@@ -20,16 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.decisionSupport2.entity;
+package org.oscarehr.careTracker.entity;
 
 import lombok.Data;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.careTracker.entity.CareTrackerItem;
+import org.oscarehr.decisionSupport2.entity.DsRule;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,44 +39,59 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "ds_rule")
+@Table(name = "care_tracker_item")
 @Where(clause = "deleted_at IS NULL")
-public class DsRule extends AbstractModel<Integer>
+public class CareTrackerItem extends AbstractModel<Integer>
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
 
-	@Column(name = "rule_name")
+	@Column(name = "item_name")
 	private String name;
 
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "system_managed")
-	private boolean systemManaged;
+	@Column(name = "guideline")
+	private String guideline;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "dsRule", cascade = CascadeType.ALL)
-	private List<DsRuleCondition> conditions;
+	@Column(name = "item_type")
+	@Enumerated(value = EnumType.STRING)
+	private ItemType type;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "dsRule", cascade = CascadeType.ALL)
-	private List<DsRuleConsequence> consequences;
+	@Column(name = "item_type_code")
+	private String typeCode;
+
+	@Column(name = "value_type")
+	@Enumerated(value = EnumType.STRING)
+	private ValueType valueType;
+
+	@Column(name = "value_label")
+	private String valueLabel;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "care_tracker_id")
+	private CareTracker careTracker;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "care_tracker_item_group_id")
+	private CareTrackerItemGroup careTrackerItemGroup;
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_item_ds_rule", joinColumns = @JoinColumn(name="ds_rule_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_item_id"))
-	private Set<CareTrackerItem> careTrackerItems = new HashSet<>();
+	@JoinTable(name = "care_tracker_item_ds_rule", joinColumns = @JoinColumn(name="care_tracker_item_id"), inverseJoinColumns = @JoinColumn(name="ds_rule_id"))
+	private Set<DsRule> dsRules;
 
 	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime createdAt;
@@ -94,6 +111,59 @@ public class DsRule extends AbstractModel<Integer>
 	@Column(name = "deleted_by")
 	private String deletedBy;
 
+	public CareTrackerItem()
+	{
+		this.dsRules = new HashSet<>();
+	}
+
+	public CareTrackerItem(CareTrackerItem toCopy, CareTracker careTrackerReference, CareTrackerItemGroup groupReference)
+	{
+		this.id = null;
+		this.name = toCopy.name;
+		this.description = toCopy.description;
+		this.guideline = toCopy.guideline;
+		this.type = toCopy.type;
+		this.typeCode = toCopy.typeCode;
+
+		this.valueType = toCopy.valueType;
+		this.valueLabel = toCopy.valueLabel;
+		this.dsRules = new HashSet<>(toCopy.dsRules);
+		this.careTracker = careTrackerReference;
+		this.careTrackerItemGroup = groupReference;
+
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+		this.deletedAt = null;
+		this.createdBy = null;
+		this.updatedBy = null;
+		this.deletedBy = null;
+	}
+
+
+	/**
+	 * must be overridden to prevent default impl from infinite loading jpa links
+	 */
+	@Override
+	public int hashCode()
+	{
+		return id;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.getClass().getName() + "{id: " + id + ", name: " + name + "}";
+	}
+
+	public boolean isMeasurementType()
+	{
+		return ItemType.MEASUREMENT.equals(this.type);
+	}
+	public boolean isPreventionType()
+	{
+		return ItemType.PREVENTION.equals(this.type);
+	}
+
 	@PrePersist
 	private void prePersist()
 	{
@@ -102,7 +172,7 @@ public class DsRule extends AbstractModel<Integer>
 
 		if(getCreatedBy() == null)
 		{
-			throw new IllegalStateException("CreatedBy can not be null");
+			setCreatedBy(getCareTracker().getCreatedBy());
 		}
 		if(getUpdatedBy() == null)
 		{
@@ -114,9 +184,6 @@ public class DsRule extends AbstractModel<Integer>
 	private void preUpdate()
 	{
 		this.setUpdatedAt(LocalDateTime.now());
-		if(getUpdatedBy() == null)
-		{
-			throw new IllegalStateException("UpdatedBy can not be null");
-		}
+		setUpdatedBy(getCareTracker().getUpdatedBy());
 	}
 }

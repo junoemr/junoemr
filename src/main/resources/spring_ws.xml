@@ -359,16 +359,18 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.BatchOperationService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.BillingService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.CareTrackerWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.CareTrackersWebService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.ClinicService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DecisionSupportWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicMergeService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicCareTrackerWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDxWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicFlowsheetWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
@@ -377,8 +379,6 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxAccountWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxInboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FlowsheetWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FlowsheetsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
 			<!-- AQS (Appointment Queue Service) -->

@@ -1861,17 +1861,17 @@
 							<key>openApiSpecBuilder.resourceClassCsv</key>
 							<value>
 								org.oscarehr.ws.rest.AppointmentService
+								org.oscarehr.ws.rest.CareTrackerWebService
+								org.oscarehr.ws.rest.CareTrackersWebService
 								org.oscarehr.ws.rest.DecisionSupportWebService
 								org.oscarehr.ws.rest.DemographicService
 								org.oscarehr.ws.rest.DemographicsService
+								org.oscarehr.ws.rest.demographic.DemographicCareTrackerWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
 								org.oscarehr.ws.rest.demographic.DemographicDxWebService
-								org.oscarehr.ws.rest.demographic.DemographicFlowsheetWebService
 								org.oscarehr.ws.rest.DiseaseRegistryService
 								org.oscarehr.ws.rest.DocumentWebService
-								org.oscarehr.ws.rest.FlowsheetWebService
-								org.oscarehr.ws.rest.FlowsheetsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService

@@ -23,14 +23,14 @@
 
  */
 
-import {FlowsheetItemData} from "../../../../generated";
+import {CareTrackerItemData} from "../../../../generated";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import FlowsheetItemDataModel from "../model/FlowsheetItemDataModel";
 import moment from "moment";
 
-export default class FlowsheetItemDataTransferToModelConverter extends AbstractConverter<FlowsheetItemData, FlowsheetItemDataModel>
+export default class FlowsheetItemDataTransferToModelConverter extends AbstractConverter<CareTrackerItemData, FlowsheetItemDataModel>
 {
-	public convert(transfer: FlowsheetItemData): FlowsheetItemDataModel
+	public convert(transfer: CareTrackerItemData): FlowsheetItemDataModel
 	{
 		if (!transfer)
 		{

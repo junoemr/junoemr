@@ -20,12 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.decisionSupport2.entity;
+package org.oscarehr.careTracker.entity;
 
 import lombok.Data;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.careTracker.entity.CareTrackerItem;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,46 +34,39 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
-@Table(name = "ds_rule")
+@Table(name = "care_tracker_item_group")
 @Where(clause = "deleted_at IS NULL")
-public class DsRule extends AbstractModel<Integer>
+public class CareTrackerItemGroup extends AbstractModel<Integer>
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
 
-	@Column(name = "rule_name")
+	@Column(name = "group_name")
 	private String name;
 
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "system_managed")
-	private boolean systemManaged;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "care_tracker_id")
+	private CareTracker careTracker;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "dsRule", cascade = CascadeType.ALL)
-	private List<DsRuleCondition> conditions;
-
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "dsRule", cascade = CascadeType.ALL)
-	private List<DsRuleConsequence> consequences;
-
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "flowsheet_item_ds_rule", joinColumns = @JoinColumn(name="ds_rule_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_item_id"))
-	private Set<CareTrackerItem> careTrackerItems = new HashSet<>();
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "careTrackerItemGroup", cascade = CascadeType.ALL)
+	private List<CareTrackerItem> careTrackerItems;
 
 	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
 	private LocalDateTime createdAt;
@@ -94,6 +86,50 @@ public class DsRule extends AbstractModel<Integer>
 	@Column(name = "deleted_by")
 	private String deletedBy;
 
+	public CareTrackerItemGroup()
+	{
+		careTrackerItems = new ArrayList<>();
+	}
+
+	public CareTrackerItemGroup(CareTrackerItemGroup toCopy, CareTracker careTrackerReference)
+	{
+		this.id = null;
+		this.name = toCopy.name;
+		this.description = toCopy.description;
+		this.careTracker = careTrackerReference;
+		this.careTrackerItems = toCopy.careTrackerItems
+				.stream()
+				.map((item) -> new CareTrackerItem(item, careTrackerReference, this))
+				.collect(Collectors.toList());
+
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+		this.deletedAt = null;
+		this.createdBy = null;
+		this.updatedBy = null;
+		this.deletedBy = null;
+	}
+
+	public void addItem(CareTrackerItem careTrackerItem)
+	{
+		this.careTrackerItems.add(careTrackerItem);
+	}
+
+	/**
+	 * must be overridden to prevent default impl from infinite loading jpa links
+	 */
+	@Override
+	public int hashCode()
+	{
+		return id;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.getClass().getName() + "{id: " + id + ", name: " + name + "}";
+	}
+
 	@PrePersist
 	private void prePersist()
 	{
@@ -102,7 +138,7 @@ public class DsRule extends AbstractModel<Integer>
 
 		if(getCreatedBy() == null)
 		{
-			throw new IllegalStateException("CreatedBy can not be null");
+			setCreatedBy(getCareTracker().getCreatedBy());
 		}
 		if(getUpdatedBy() == null)
 		{
@@ -114,9 +150,6 @@ public class DsRule extends AbstractModel<Integer>
 	private void preUpdate()
 	{
 		this.setUpdatedAt(LocalDateTime.now());
-		if(getUpdatedBy() == null)
-		{
-			throw new IllegalStateException("UpdatedBy can not be null");
-		}
+		setUpdatedBy(getCareTracker().getUpdatedBy());
 	}
 }

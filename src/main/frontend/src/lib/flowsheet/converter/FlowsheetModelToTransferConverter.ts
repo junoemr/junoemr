@@ -24,16 +24,16 @@
  */
 
 import FlowsheetModel from "../model/FlowsheetModel";
-import {Flowsheet, FlowsheetItem, FlowsheetItemGroup} from "../../../../generated";
+import {CareTracker, CareTrackerItem, CareTrackerItemGroup} from "../../../../generated";
 import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
 import FlowsheetItemModel from "../model/FlowsheetItemModel";
 import DsRuleModelToTransferConverter from "../../decisionSupport/converter/DsRuleModelToTransferConverter";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import DxCodeModelToTransferConverter from "../../dx/converter/DxCodeModelToTransferConverter";
 
-export default class FlowsheetModelToTransferConverter extends AbstractConverter<FlowsheetModel, Flowsheet>
+export default class FlowsheetModelToTransferConverter extends AbstractConverter<FlowsheetModel, CareTracker>
 {
-	public convert(flowsheetModel: FlowsheetModel): Flowsheet
+	public convert(flowsheetModel: FlowsheetModel): CareTracker
 	{
 		if (!flowsheetModel)
 		{
@@ -47,29 +47,29 @@ export default class FlowsheetModelToTransferConverter extends AbstractConverter
 			enabled: flowsheetModel.enabled,
 			flowsheetItemGroups: this.convertAllGroups(flowsheetModel.flowsheetItemGroups),
 			triggerCodes: new DxCodeModelToTransferConverter().convertList(flowsheetModel.triggerCodes),
-		} as Flowsheet;
+		} as CareTracker;
 	}
 
-	private convertAllGroups(itemGroups: Array<FlowsheetItemGroupModel>): Array<FlowsheetItemGroup>
+	private convertAllGroups(itemGroups: Array<FlowsheetItemGroupModel>): Array<CareTrackerItemGroup>
 	{
 		return itemGroups.map(itemGroup =>
 		{
-			const groupModel = {} as FlowsheetItemGroup;
+			const groupModel = {} as CareTrackerItemGroup;
 			groupModel.id = itemGroup.id;
 			groupModel.name = itemGroup.name;
 			groupModel.description = itemGroup.description;
-			groupModel.flowsheetItems = this.convertAllItems(itemGroup.flowsheetItems);
+			groupModel.careTrackerItems = this.convertAllItems(itemGroup.flowsheetItems);
 
 			return groupModel;
 		});
 	}
 
-	private convertAllItems(items: Array<FlowsheetItemModel>): Array<FlowsheetItem>
+	private convertAllItems(items: Array<FlowsheetItemModel>): Array<CareTrackerItem>
 	{
 		const ruleToTransferConverter = new DsRuleModelToTransferConverter();
 		return items.map(item =>
 		{
-			const model = {} as FlowsheetItem;
+			const model = {} as CareTrackerItem;
 			model.id = item.id;
 			model.name = item.name;
 			model.description = item.description;
@@ -83,7 +83,7 @@ export default class FlowsheetModelToTransferConverter extends AbstractConverter
 
 			// data and alerts are not submitted with the flowsheet transfer
 			model.data = null;
-			model.flowsheetItemAlerts = null;
+			model.careTrackerItemAlerts = null;
 
 			return model;
 		});

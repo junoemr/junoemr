@@ -24,7 +24,7 @@
     Canada
 
  */
-import {DemographicApi, DiseaseRegistryApi, FlowsheetServiceApi, FlowsheetsServiceApi, MeasurementsApi, PreventionsApi} from "../../generated";
+import {DemographicApi, DiseaseRegistryApi, CareTrackerApi, CareTrackersApi, MeasurementsApi, PreventionsApi} from "../../generated";
 import FlowsheetModel from "../lib/flowsheet/model/FlowsheetModel";
 import FlowsheetTransferToModelConverter from "../lib/flowsheet/converter/FlowsheetTransferToModelConverter";
 import FlowsheetModelToTransferConverter from "../lib/flowsheet/converter/FlowsheetModelToTransferConverter";
@@ -43,8 +43,8 @@ angular.module("Flowsheet").service("flowsheetApiService", [
 		$httpParamSerializer)
 	{
 		const service = this;
-		service.flowsheetApi = new FlowsheetServiceApi($http, $httpParamSerializer, '../ws/rs');
-		service.flowsheetsApi = new FlowsheetsServiceApi($http, $httpParamSerializer, '../ws/rs');
+		service.flowsheetApi = new CareTrackerApi($http, $httpParamSerializer, '../ws/rs');
+		service.flowsheetsApi = new CareTrackersApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 		service.preventionsApi = new PreventionsApi($http, $httpParamSerializer, '../ws/rs');
 		service.measurementsApi = new MeasurementsApi($http, $httpParamSerializer, '../ws/rs');

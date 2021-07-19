@@ -24,7 +24,7 @@ package org.oscarehr.decisionSupport2.entity;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.flowsheet.entity.Flowsheet;
+import org.oscarehr.careTracker.entity.CareTracker;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -57,7 +57,7 @@ public class Drools extends AbstractModel<Integer>
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "flowsheet_drools", joinColumns = @JoinColumn(name="drools_id"), inverseJoinColumns = @JoinColumn(name="flowsheet_id"))
-	private Set<Flowsheet> flowsheets = new HashSet<>();
+	private Set<CareTracker> careTrackers = new HashSet<>();
 
 	/**
 	 * must be overridden to prevent default impl from infinite loading jpa links

@@ -24,7 +24,7 @@
  */
 
 import FlowsheetModel from "../model/FlowsheetModel";
-import {Flowsheet, FlowsheetItem, FlowsheetItemAlert, FlowsheetItemGroup} from "../../../../generated";
+import {CareTracker, CareTrackerItem, CareTrackerItemAlert, CareTrackerItemGroup} from "../../../../generated";
 import FlowsheetItemGroupModel from "../model/FlowsheetItemGroupModel";
 import FlowsheetItemModel from "../model/FlowsheetItemModel";
 import DsRuleTransferToModelConverter from "../../decisionSupport/converter/DsRuleTransferToModelConverter";
@@ -33,9 +33,9 @@ import DxCodeTransferToModelConverter from "../../dx/converter/DxCodeTransferToM
 import AlertModel from "../model/AlertModel";
 import FlowsheetItemDataTransferToModelConverter from "./FlowsheetItemDataTransferToModelConverter";
 
-export default class FlowsheetTransferToModelConverter extends AbstractConverter<Flowsheet, FlowsheetModel>
+export default class FlowsheetTransferToModelConverter extends AbstractConverter<CareTracker, FlowsheetModel>
 {
-	public convert(flowsheetTransfer: Flowsheet): FlowsheetModel
+	public convert(flowsheetTransfer: CareTracker): FlowsheetModel
 	{
 		if (!flowsheetTransfer)
 		{
@@ -48,16 +48,16 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 		flowsheetModel.description = flowsheetTransfer.description;
 		flowsheetModel.enabled = flowsheetTransfer.enabled;
 		flowsheetModel.systemManaged = flowsheetTransfer.systemManaged;
-		flowsheetModel.flowsheetItemGroups = this.convertAllGroups(flowsheetTransfer.flowsheetItemGroups);
+		flowsheetModel.flowsheetItemGroups = this.convertAllGroups(flowsheetTransfer.careTrackerItemGroups);
 		flowsheetModel.triggerCodes = new DxCodeTransferToModelConverter().convertList(flowsheetTransfer.triggerCodes);
-		flowsheetModel.parentFlowsheetId = flowsheetTransfer.parentFlowsheetId;
+		flowsheetModel.parentFlowsheetId = flowsheetTransfer.parentCareTrackerId;
 		flowsheetModel.ownerProviderId = flowsheetTransfer.ownerProviderId;
 		flowsheetModel.ownerDemographicId = flowsheetTransfer.ownerDemographicId;
 
 		return flowsheetModel;
 	}
 
-	private convertAllGroups(itemGroups: FlowsheetItemGroup[]): FlowsheetItemGroupModel[]
+	private convertAllGroups(itemGroups: CareTrackerItemGroup[]): FlowsheetItemGroupModel[]
 	{
 		return itemGroups.map(itemGroup =>
 		{
@@ -65,13 +65,13 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 			groupModel.id = itemGroup.id;
 			groupModel.name = itemGroup.name;
 			groupModel.description = itemGroup.description;
-			groupModel.flowsheetItems = this.convertAllItems(itemGroup.flowsheetItems);
+			groupModel.flowsheetItems = this.convertAllItems(itemGroup.careTrackerItems);
 
 			return groupModel;
 		});
 	}
 
-	private convertAllItems(items: FlowsheetItem[]): FlowsheetItemModel[]
+	private convertAllItems(items: CareTrackerItem[]): FlowsheetItemModel[]
 	{
 		const ruleToModelConverter = new DsRuleTransferToModelConverter();
 		return items.map(item =>
@@ -86,7 +86,7 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 			model.hidden = item.hidden;
 			model.valueType = item.valueType;
 			model.valueLabel = item.valueLabel;
-			model.flowsheetItemAlerts = this.convertAllAlerts(item.flowsheetItemAlerts);
+			model.flowsheetItemAlerts = this.convertAllAlerts(item.careTrackerItemAlerts);
 			model.data = new FlowsheetItemDataTransferToModelConverter().convertList(item.data);
 			model.rules = ruleToModelConverter.convertList(item.rules);
 
@@ -94,7 +94,7 @@ export default class FlowsheetTransferToModelConverter extends AbstractConverter
 		});
 	}
 
-	private convertAllAlerts(alerts: FlowsheetItemAlert[]): AlertModel[]
+	private convertAllAlerts(alerts: CareTrackerItemAlert[]): AlertModel[]
 	{
 		return alerts.map(alert =>
 		{

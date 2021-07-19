@@ -25,5 +25,5 @@
 
  */
 
-import {FlowsheetItem} from "../../../../generated";
-export import FlowsheetItemValueType = FlowsheetItem.ValueTypeEnum;
+import {CareTrackerItem} from "../../../../generated";
+export import FlowsheetItemValueType = CareTrackerItem.ValueTypeEnum;

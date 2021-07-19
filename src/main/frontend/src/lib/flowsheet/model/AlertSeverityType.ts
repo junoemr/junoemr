@@ -25,5 +25,5 @@
 
  */
 
-import {FlowsheetItemAlert} from "../../../../generated";
-export import AlertSeverityType = FlowsheetItemAlert.SeverityLevelEnum;
+import {CareTrackerItemAlert} from "../../../../generated";
+export import AlertSeverityType = CareTrackerItemAlert.SeverityLevelEnum;
