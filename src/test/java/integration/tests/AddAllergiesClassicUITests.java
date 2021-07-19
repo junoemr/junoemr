@@ -54,9 +54,7 @@ public class AddAllergiesClassicUITests extends SeleniumTestBase
 			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		SchemaUtils.restoreTable(
-				"admission", "allergies", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
-				"Facility", "issue", "log", "log_ws_rest", "LookupList", "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
-				"partial_date", "provider", "ProviderPreference", "roster_status", "tickler_text_suggest", "validations"
+				"admission", "allergies", "demographic", "log", "log_ws_rest", "measurementType", "partial_date", "validations"
 				);
 	}
 
