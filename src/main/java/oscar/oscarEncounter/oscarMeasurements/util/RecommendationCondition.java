@@ -32,16 +32,20 @@ import org.jdom.Element;
 /**
  * Stores Conditions for target Colours
  *
- <ruleset>
-  <rule indicationColor="HIGH">
-     <condition type="doubleValue"  value="&gt;=2.0"/>
-     <condition type="isfemale"/>
-  </rule>
-  <rule consequence="m.setIndicationColor(\"HIGH\");">
-  	 <condition type="doubleValue"  value="&gt;=2.0"/>
-     <condition type="isMale"/>
-  </rule>
-</ruleset>
+ * <pre>
+ * {@code
+ * <ruleset>
+ *  <rule indicationColor="HIGH">
+ *     <condition type="doubleValue"  value="&gt;=2.0"/>
+ *     <condition type="isfemale"/>
+ *  </rule>
+ *  <rule consequence="m.setIndicationColor(\"HIGH\");">
+ *  	 <condition type="doubleValue"  value="&gt;=2.0"/>
+ *     <condition type="isMale"/>
+ *  </rule>
+ * </ruleset>
+ * }
+ * </pre>
 
  * @author jaygallagher
  */

@@ -70,7 +70,8 @@ export enum JUNO_BUTTON_COLOR
 export enum JUNO_TAB_TYPE
 {
 	NORMAL = "juno-tab-normal",
-	SWIM_LANE = "juno-tab-swim-lane"
+	SWIM_LANE = "juno-tab-swim-lane",
+	FOLDER_TAB = "juno-tab-folder-tab",
 }
 
 export enum JUNO_INPUT_MODAL_TYPE

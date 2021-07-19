@@ -1024,8 +1024,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let billingElem = eventElement.find(".event-invoice");
 				let rxElem = eventElement.find(".event-rx");
 				let telehealthElem = eventElement.find('.event-telehealth');
-				// By default this element is hidden
+				let criticalElem = eventElement.find('.event-critical')
+				// By default these elements are hidden
 				telehealthElem.hide();
+				criticalElem.hide();
 				// var eventSite = $scope.sites[event.data.site];
 
 				/* disable buttons if modules are disabled */
@@ -1081,6 +1083,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventName = "";
 				let eventReason = "";
 				let eventNotes = "";
+
+				if (event.data.critical)
+				{
+					criticalElem.show();
+				}
 
 				// telehealth
 				if (controller.telehealthEnabled && event.data.virtual)

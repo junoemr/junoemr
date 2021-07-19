@@ -227,7 +227,7 @@ public class QueuedAppointmentService extends BaseService
 	}
 
 	/**
-	 * move a queued appointment in to the schedule updating all necessary servers (AQS & MHA)
+	 * move a queued appointment in to the schedule updating all necessary servers (AQS &amp; MHA)
 	 * @param queuedAppointmentId - the id of the queued appointment to move in to the schedule
 	 * @param queueId - the queue the above appointment is contained in
 	 * @param providerNo - the provider who's schedule the appointment is getting moved to

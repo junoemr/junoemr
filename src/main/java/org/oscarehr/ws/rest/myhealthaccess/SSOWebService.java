@@ -32,6 +32,7 @@ import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -40,6 +41,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("myhealthaccess/integration/{integrationId}/sso/")
+@Component("mhaSSOWebService")
 @Tag(name = "mhaSSO")
 public class SSOWebService extends AbstractServiceImpl
 {

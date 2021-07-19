@@ -56,6 +56,32 @@ export default class MhaPatientService
 	}
 
 	/**
+	 * get an MHA profile by account id code (a short lived code used for account verification)
+	 * from the specified integration.
+	 * @param integrationId - integration to get the profile from
+	 * @param idCode - the account id to get the profile for
+	 * @return mha profile or null if profile cannot be found.
+	 */
+	public async getProfileByAccountIdCode(integrationId: string, idCode: string): Promise<MhaPatient>
+	{
+		try
+		{
+			const profileTransfers = (await this._mhaPatientApi.searchPatients(integrationId, null, idCode)).data.body;
+
+			if (profileTransfers && profileTransfers.length == 1)
+			{
+				return (new PatientTo1ToMhaPatientConverter()).convert(profileTransfers[0]);
+			}
+		}
+		catch(error)
+		{
+			console.warn(error.data?.error?.message);
+		}
+
+		return null;
+	}
+
+	/**
 	 * get the MHA profile for the demographic.
 	 * @param integrationId - the integration to perform the lookup in
 	 * @param demographicNo - the demographicNo who's MHA profile is to be fetched.

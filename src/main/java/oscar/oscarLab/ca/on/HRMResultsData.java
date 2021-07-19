@@ -13,6 +13,7 @@ package oscar.oscarLab.ca.on;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
@@ -43,24 +44,33 @@ public class HRMResultsData {
 	public HRMResultsData() {
 	}
 
-	public Collection<LabResultData> populateHRMdocumentsResultsData(LoggedInInfo loggedInInfo, String providerNo, String status, Date newestDate, Date oldestDate) {
-		if (providerNo == null || "".equals(providerNo)) {
+	public Collection<LabResultData> populateHRMdocumentsResultsData(LoggedInInfo loggedInInfo, String providerNo, String status, Date newestDate, Date oldestDate)
+	{
+		if (providerNo == null || providerNo.equals(""))
+		{
 			providerNo = "%";
-		} else if (providerNo.equalsIgnoreCase("0")) {
-			providerNo = "-1";
+		}
+		else if (providerNo.equalsIgnoreCase(Provider.UNCLAIMED_PROVIDER_NO))
+		{
+			providerNo = Provider.SYSTEM_PROVIDER_NO;
 		}
 
-		Integer viewed = 1;
-		Integer signedOff = 0;
-		if (status == null || status.equalsIgnoreCase("N")) {
-			viewed = 2;
-		} else if (status != null && (status.equalsIgnoreCase("A") || status.equalsIgnoreCase("F"))) {
-			signedOff = 1;
+		Boolean viewed = true;
+		Boolean signedOff = false;
+
+		if (status == null || status.equalsIgnoreCase("N"))
+		{
+			viewed = null;
+		}
+		else if (status != null && (status.equalsIgnoreCase("A") || status.equalsIgnoreCase("F")))
+		{
+			signedOff = true;
 		}
 
-		if (status != null && status.equalsIgnoreCase("")) {
-			viewed = 2;
-			signedOff = 2;
+		if (status != null && status.equalsIgnoreCase(""))
+		{
+			viewed = null;
+			signedOff = null;
 		}
 
 		List<HRMDocumentToProvider> hrmDocResultsProvider = hrmDocumentToProviderDao.findByProviderNoLimit(providerNo, newestDate, oldestDate, viewed, signedOff);
@@ -69,7 +79,8 @@ public class HRMResultsData {
 		HashMap<String,LabResultData> labResults=new HashMap<String,LabResultData>();
 		HashMap<String,HRMReport> labReports=new HashMap<String,HRMReport>();
 
-		for (HRMDocumentToProvider hrmDocResult : hrmDocResultsProvider) {
+		for (HRMDocumentToProvider hrmDocResult : hrmDocResultsProvider)
+		{
 			Integer id = hrmDocResult.getHrmDocument().getId();
 			LabResultData lbData = new LabResultData(LabResultData.HRM);
 
@@ -89,19 +100,23 @@ public class HRMResultsData {
 
 			hrmReport.setHrmDocumentId(id);
 
-			if (hrmDocResultsDemographic.size() > 0) {
+			if (hrmDocResultsDemographic.size() > 0)
+			{
 				Demographic demographic = demographicManager.getDemographic(loggedInInfo, hrmDocResultsDemographic.get(0).getDemographicNo());
-				if (demographic != null) {
+
+				if (demographic != null)
+				{
 					lbData.patientName = demographic.getLastName() + "," + demographic.getFirstName();
 					lbData.sex = demographic.getSex();
 					lbData.healthNumber = demographic.getHin();
 					lbData.isMatchedToPatient = true;
 				}
-			} else {
+			}
+			else
+			{
 				lbData.sex = hrmReport.getGender();
 				lbData.healthNumber = hrmReport.getHCN();
 				lbData.patientName = hrmReport.getLegalName();
-
 			}
 
 			lbData.reportStatus = hrmReport.getResultStatus();
@@ -141,7 +156,6 @@ public class HRMResultsData {
 					newerLabData.getDuplicateLabIds().add(hrmReport.getHrmDocumentId());
 				}
 			}
-
 		}
 
 		if (logger.isDebugEnabled()) {
