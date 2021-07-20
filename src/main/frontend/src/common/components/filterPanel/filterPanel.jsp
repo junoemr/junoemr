@@ -1,4 +1,4 @@
-<div class="filter-panel">
+<div class="filter-panel no-print">
 	<a class="flex-row expand-filters-bar"
 	   ng-click="$ctrl.toggleShowFilters()"
 	   title="{{$ctrl.tooltip}}"

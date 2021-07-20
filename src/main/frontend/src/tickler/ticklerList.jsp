@@ -31,7 +31,7 @@
 </div>
 <juno-security-check show-placeholder="true" permissions="ticklerListCtrl.SecurityPermissions.TICKLER_READ">
 	<div class="col-xs-12" id="tickler-list-page">
-		<form name="searchForm" id="search-form" class="noprint">
+		<form name="searchForm" id="search-form" class="no-print">
 			<div class="row search-filters">
 				<div class="col-lg-2 col-sm-4 col-xs-6">
 					<label>Service Start Date</label>
@@ -131,12 +131,12 @@
 			<tbody>
 				<tr ng-repeat="tickler in $data">
 					<td>
-						<input type="checkbox" ng-model="tickler.checked" class="noprint">
+						<input type="checkbox" ng-model="tickler.checked" class="no-print">
 					</td>
 					<td>
 						<button ng-click="ticklerListCtrl.editTickler(tickler)"
 						        ng-disabled="!ticklerListCtrl.canEdit()"
-						        class="btn btn-xs btn-primary noprint">
+						        class="btn btn-xs btn-primary no-print">
 							<bean:message key="global.edit" bundle="ui"/>
 						</button>
 					</td>
@@ -177,14 +177,14 @@
 					<td data-title="'<bean:message key="tickler.list.header.note" bundle="ui"/>'">
 						<a ng-show="ticklerListCtrl.canEdit()"
 						   ng-click="ticklerListCtrl.editNote2(tickler)"
-						   class="hand-hover noprint">
+						   class="hand-hover no-print">
 							<span class="glyphicon glyphicon-edit" ></span>
 						</a>
 					</td>
 				</tr>
 			</tbody>
 
-			<tfoot class="noprint">
+			<tfoot class="no-print">
 				<tr>
 					<td colspan="12" class="white">
 						<a ng-click="ticklerListCtrl.checkAll($data)"><bean:message key="tickler.list.checkAll" bundle="ui"/></a> -
