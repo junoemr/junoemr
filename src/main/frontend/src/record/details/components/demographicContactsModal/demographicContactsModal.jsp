@@ -18,22 +18,6 @@
 
 		<div class="height-100 overflow-auto ">
 			<juno-input
-					ng-model="$ctrl.contact.role"
-					disabled="true"
-					label="Contact Role"
-					placeholder="Mother/Father/Guardian/Uncle"
-					component-style="$ctrl.componentStyle">
-			</juno-input>
-
-			<juno-input
-					ng-model="$ctrl.contactType"
-					label="Contact Type"
-					disabled="true"
-					placeholder="Contact Type"
-					component-style="$ctrl.componentStyle">
-			</juno-input>
-
-			<juno-input
 					ng-model="$ctrl.contact.firstName"
 					label="First Name"
 					disabled="true"
@@ -54,6 +38,22 @@
 					label="Phone"
 					disabled="true"
 					placeholder="Phone number"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.role"
+					disabled="true"
+					label="Contact Role"
+					placeholder="Mother/Father/Guardian/Uncle"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contactType"
+					label="Contact Type"
+					disabled="true"
+					placeholder="Contact Type"
 					component-style="$ctrl.componentStyle">
 			</juno-input>
 		</div>
