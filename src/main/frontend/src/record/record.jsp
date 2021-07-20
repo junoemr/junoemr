@@ -55,7 +55,7 @@
 		</div>
 	</juno-security-check>
 
-	<nav class="nav record-navbar" role="navigation" id="record-nav">
+	<nav class="nav record-navbar noprint" role="navigation" id="record-nav">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -201,7 +201,7 @@
 	    </div>
 
 		<juno-security-check permissions="recordCtrl.SecurityPermissions.ENCOUNTER_NOTE_CREATE">
-			<div class="row" id="note-editor-container">
+			<div class="row noprint" id="note-editor-container">
 				<div id="note-editor-minimized"
 					class="col-sm-3 col-xs-12 text-center hand-hover"
 					ng-click="recordCtrl.toggleNote();"

@@ -39,7 +39,7 @@
 		</div>
 	</div>
 
-	<div class="flex-row">
+	<div class="flex-row new-data-input">
 		<div class="flex-row flex-grow align-items-center">
 			<juno-check-box ng-if="$ctrl.showValueBooleanInput()"
 			                label="{{$ctrl.getInputLabel()}}"

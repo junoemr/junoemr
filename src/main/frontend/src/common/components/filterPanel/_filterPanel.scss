@@ -1,6 +1,10 @@
 .filter-panel {
 	$common-border-radius: 8px;
 
+	@media print {
+		display: none;
+	}
+
 	margin: 4px 0 8px 0;
 	a {
 		&:hover {

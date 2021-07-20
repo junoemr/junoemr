@@ -70,6 +70,7 @@
 			<div class="flex-row flex-grow">
 				<left-aside
 						id="content-left-pane"
+						class="noprint"
 						ng-class="{
 								'expanded': bodyCtrl.showPatientList,
 								'collapsed': !bodyCtrl.showPatientList }"

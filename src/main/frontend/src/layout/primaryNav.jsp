@@ -4,7 +4,7 @@
 <div ng-init="$ctrl.init()"
      ng-show="$ctrl.me != null"
      id="primary-navigation">
-	<nav class="nav">
+	<nav class="nav noprint">
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<button class="btn btn-icon"

@@ -26,6 +26,11 @@
 	.primary-content-window {
 		@extend %juno-primary-view-pane-tabs;
 		@include juno-page-padding-default;
+
+		@media print {
+			overflow: unset;
+			height: auto;
+		}
 	}
 
 	.sub-nav {
@@ -50,9 +55,6 @@
 	}
 
 	@media print {
-		.noprint {
-			display: none;
-		}
 		.patient-header-name {
 			font-size: 16px;
 		}

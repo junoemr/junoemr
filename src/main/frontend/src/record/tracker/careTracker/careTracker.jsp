@@ -94,5 +94,14 @@
 				</care-tracker-item>
 			</div>
 		</care-tracker-item-group>
+		<div class="tracker-footer flex-column align-items-end noprint">
+			<div class="footer-button-wrapper">
+				<juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+				             click="$ctrl.onPrint()">
+					Print
+				</juno-button>
+			</div>
+		</div>
 	</juno-security-check>
 </div>

@@ -374,7 +374,7 @@ module.exports = {
 			'./src/record/tracker/module.js',
 			'./src/record/tracker/trackerComponent.ts',
 			'./src/record/tracker/careTracker/module.js',
-			'./src/record/tracker/careTracker/careTrackerComponent.js',
+			'./src/record/tracker/careTracker/careTrackerComponent.ts',
 			'./src/record/tracker/careTracker/components/careTrackerItem/careTrackerItemComponent.ts',
 			'./src/record/tracker/careTracker/components/careTrackerItemData/careTrackerItemDataComponent.ts',
 

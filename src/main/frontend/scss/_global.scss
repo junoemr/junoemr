@@ -358,3 +358,9 @@ a,.clickable {
 .width-25 {
 	width: 25%;
 }
+
+@media print {
+	.noprint {
+		display: none !important;
+	}
+}

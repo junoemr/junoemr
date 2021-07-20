@@ -22,7 +22,7 @@
 --%>
 
 <div class="health-tracker-component">
-    <div class="flex-row justify-content-between align-items-center">
+    <div class="flex-row justify-content-between align-items-center noprint">
         <h1>Patient Health Tracker</h1>
 
         <div class="flex-row">
@@ -43,7 +43,7 @@
 
     <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
         <div class="flex-row">
-            <div class="flex-column">
+            <div class="flex-column noprint">
                 <div class="list-group">
                     <button ng-repeat="tracker in $ctrl.triggerdCareTrackers"
                             type="button"

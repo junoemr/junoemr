@@ -19,4 +19,12 @@
 		// keep padding on top for item wrapping
 		margin: 8px 2px 0 2px;
 	}
+
+	@media print {
+		page-break-inside: avoid;
+
+		.new-data-input {
+			display: none;
+		}
+	}
 }

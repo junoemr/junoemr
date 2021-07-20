@@ -23,6 +23,8 @@
 
 import {SecurityPermissions} from "../../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import CareTrackerItemGroupModel from "../../../lib/careTracker/model/CareTrackerItemGroupModel";
+import CareTrackerItemModel from "../../../lib/careTracker/model/CareTrackerItemModel";
 
 angular.module('Record.Tracker.CareTracker').component('careTracker',
 	{
@@ -73,13 +75,13 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 					],
 				};
 
-				ctrl.$onInit = async () =>
+				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.demographicId = $stateParams.demographicNo;
 					ctrl.careTracker = await careTrackerApiService.getDemographicCareTracker(ctrl.demographicId, $stateParams.careTrackerId);
 				}
 
-				ctrl.clearFilters = () =>
+				ctrl.clearFilters = (): void =>
 				{
 					ctrl.filter.item.textFilter = null;
 					ctrl.filter.item.showHidden = false;
@@ -88,13 +90,13 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 					ctrl.filter.data.maxEntries = null;
 				};
 
-				ctrl.showCareTrackerGroup = (group) =>
+				ctrl.showCareTrackerGroup = (group: CareTrackerItemGroupModel): boolean =>
 				{
 					// filter visible items. show group if one or more items visible
-					let visibleItems = group.careTrackerItems.filter((item) => ctrl.showCareTrackerItem(item));
+					let visibleItems = group.careTrackerItems.filter((item: CareTrackerItemModel) => ctrl.showCareTrackerItem(item));
 					return (visibleItems.length > 0);
 				}
-				ctrl.showCareTrackerItem = (item) =>
+				ctrl.showCareTrackerItem = (item: CareTrackerItemModel): boolean =>
 				{
 					if(!item || (!ctrl.filter.item.showHidden && item.hidden))
 					{
@@ -104,6 +106,11 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 						(!item.name || !item.name.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())) &&
 						(!item.typeCode || !item.typeCode.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())) &&
 						(!item.description || !item.description.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())));
+				}
+
+				ctrl.onPrint = (): void =>
+				{
+					window.print();
 				}
 			}]
 	});
