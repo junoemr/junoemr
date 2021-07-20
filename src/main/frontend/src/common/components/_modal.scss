@@ -36,6 +36,9 @@
 	&.sml {
 		@include modal-size($modal-width-sml, $modal-height-sml, 48px, 48px);
 	}
+	&.med-sml {
+		@include modal-size($modal-width-med-sml, $modal-height-med-sml, 48px, 48px);
+	}
 	.modal-dialog {
 		.modal-content {
 			height: 100%;

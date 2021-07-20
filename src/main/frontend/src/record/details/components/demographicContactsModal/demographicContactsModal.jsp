@@ -1,4 +1,4 @@
-<juno-modal class="juno-modal sml demographic-contacts-modal">
+<juno-modal class="juno-modal med-sml demographic-contacts-modal">
 
 	<modal-title>
 		<h3>{{$ctrl.contactType}}</h3>
@@ -35,7 +35,7 @@
 
 			<juno-input
 					ng-model="$ctrl.contact.phone"
-					label="Phone"
+					label="Phone #"
 					disabled="true"
 					placeholder="Phone number"
 					component-style="$ctrl.componentStyle">

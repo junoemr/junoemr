@@ -89,7 +89,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                     {
                         component: 'demographicContactsModal',
                         backdrop: 'static',
-                        windowClass: "juno-modal sml",
+                        windowClass: "juno-modal med-sml",
                         resolve: {
                             demoContact: demoContact,
                         }
