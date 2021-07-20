@@ -15,7 +15,7 @@
 
 			<juno-button ng-repeat="dc in $ctrl.demoContacts"
 			             ng-model="dc"
-			             ng-click="$ctrl.openContacts(dc)"
+			             click="$ctrl.openContacts(dc)"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
 				{{dc.role}}: {{dc.lastName}}, {{dc.firstName}}
@@ -38,7 +38,7 @@
 
 			<juno-button ng-repeat="dc in $ctrl.demoContactPros"
 			             ng-model="dc.demoContactPros"
-			             ng-click="$ctrl.openContacts(dc)"
+			             click="$ctrl.openContacts(dc)"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
 				{{dc.role}}: {{dc.lastName}}, {{dc.firstName}}
@@ -50,7 +50,7 @@
 			<juno-button
 					button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-					ng-click="$ctrl.manageContacts()">
+					click="$ctrl.manageContacts()">
 				Manage Contacts
 			</juno-button>
 		</div>

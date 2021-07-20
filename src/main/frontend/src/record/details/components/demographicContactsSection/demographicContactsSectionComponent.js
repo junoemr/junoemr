@@ -25,6 +25,7 @@ import {
     LABEL_POSITION,
     JUNO_BUTTON_COLOR,
     JUNO_BUTTON_COLOR_PATTERN,
+    JUNO_STYLE,
 }
     from "../../../../common/components/junoComponentConstants";
 
@@ -46,6 +47,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
         {
             let ctrl = this;
 
+            ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.GREY;
             ctrl.LABEL_POSITION = LABEL_POSITION;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -81,15 +83,15 @@ angular.module('Record.Details').component('demographicContactsSection', {
                 );
             }
 
-            ctrl.openContacts = function (demoContactId)
+            ctrl.openContacts = function (demoContact)
             {
                 $uibModal.open(
                     {
                         component: 'demographicContactsModal',
                         backdrop: 'static',
-                        windowClass: "juno-modal",
+                        windowClass: "juno-modal sml",
                         resolve: {
-                            demoContact: demoContactId,
+                            demoContact: demoContact,
                         }
                     });
             };
