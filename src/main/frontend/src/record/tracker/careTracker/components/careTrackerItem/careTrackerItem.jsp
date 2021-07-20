@@ -39,7 +39,7 @@
 		</div>
 	</div>
 
-	<div class="flex-row new-data-input">
+	<div class="flex-row flex-wrap flex-gap-4 justify-content-end new-data-input">
 		<div class="flex-row flex-grow align-items-center">
 			<juno-check-box ng-if="$ctrl.showValueBooleanInput()"
 			                label="{{$ctrl.getInputLabel()}}"
@@ -59,6 +59,11 @@
 					change="$ctrl.onDateChangeValue(value)">
 			</juno-date-select>
 			{{$ctrl.dateValue}}
+		</div>
+		<div class="flex-row flex-grow align-items-center">
+			<juno-check-box label="Add to Note"
+			                ng-model="$ctrl.newEntry.selected">
+			</juno-check-box>
 		</div>
 		<div>
 			<juno-date-select

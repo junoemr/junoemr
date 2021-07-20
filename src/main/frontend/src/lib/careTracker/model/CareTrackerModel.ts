@@ -62,6 +62,16 @@ export default class CareTrackerModel
 		return !(this.isProviderLevel() || this.isDemographicLevel());
 	}
 
+	public getItemCount = (): number =>
+	{
+		let count = 0;
+		this.careTrackerItemGroups.forEach((group: CareTrackerItemGroupModel) =>
+		{
+			count += group.careTrackerItems.length;
+		})
+		return count;
+	}
+
 	get id(): number
 	{
 		return this._id;

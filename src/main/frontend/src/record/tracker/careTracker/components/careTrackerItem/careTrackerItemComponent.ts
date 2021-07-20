@@ -26,6 +26,7 @@ import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../.
 import moment, {Moment} from "moment";
 import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
 import {AlertSeverityType} from "../../../../../lib/careTracker/model/AlertSeverityType";
+import {IAngularEvent} from "angular";
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 	{
@@ -40,8 +41,10 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 			filterMaxEntries: "<?",
 		},
 		controller: [
+			'$scope',
 			'careTrackerApiService',
 			function (
+				$scope,
 				careTrackerApiService,
 			)
 			{
@@ -137,13 +140,14 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					);
 				}
 
-				ctrl.submitNewItemData = async (): Promise<void> =>
+				ctrl.submitNewItemData = async (): Promise<CareTrackerItemDataModel> =>
 				{
 					ctrl.isLoading = true;
 					ctrl.validationAlerts = [];
+					let newDataElement: CareTrackerItemDataModel = null;
 					try
 					{
-						let newDataElement = await careTrackerApiService.addCareTrackerItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
+						newDataElement = await careTrackerApiService.addCareTrackerItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
 						ctrl.model.data.push(newDataElement);
 						ctrl.clearNewEntry();
 					}
@@ -157,7 +161,23 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					{
 						ctrl.isLoading = false;
 					}
+					return newDataElement;
 				}
+
+				$scope.$on("careTracker.savePendingData", async (event: IAngularEvent, callback: Function): Promise<void> =>
+				{
+					let newDataModel: CareTrackerItemDataModel = null;
+					if(ctrl.canSubmitItem())
+					{
+						const selected = ctrl.newEntry.selected;
+						newDataModel = await ctrl.submitNewItemData();
+						newDataModel.selected = selected;
+					}
+					if(callback)
+					{
+						callback(ctrl.model, newDataModel);
+					}
+				})
 
 				ctrl.getInputLabel = (): string =>
 				{

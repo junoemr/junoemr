@@ -83,6 +83,11 @@ export default class CareTrackerItemModel
 		return this.valueType === CareTrackerItemValueType.DATE;
 	}
 
+	public toString = (): string =>
+	{
+		return this.name + " (" + this.typeCode + ")";
+	}
+
 	get id(): number
 	{
 		return this._id;

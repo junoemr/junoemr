@@ -25,6 +25,8 @@ import {SecurityPermissions} from "../../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import CareTrackerItemGroupModel from "../../../lib/careTracker/model/CareTrackerItemGroupModel";
 import CareTrackerItemModel from "../../../lib/careTracker/model/CareTrackerItemModel";
+import CareTrackerItemDataModel from "../../../lib/careTracker/model/CareTrackerItemDataModel";
+import CareTrackerModel from "../../../lib/careTracker/model/CareTrackerModel";
 
 angular.module('Record.Tracker.CareTracker').component('careTracker',
 	{
@@ -33,10 +35,12 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 			componentStyle: "<?",
 		},
 		controller: [
+			'$scope',
 			'$state',
 			'$stateParams',
 			'careTrackerApiService',
 			function (
+				$scope,
 				$state,
 				$stateParams,
 				careTrackerApiService,
@@ -49,7 +53,7 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.careTracker = null;
+				ctrl.careTracker = null as CareTrackerModel;
 				ctrl.demographicId = null;
 
 				ctrl.filter = {
@@ -111,6 +115,48 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 				ctrl.onPrint = (): void =>
 				{
 					window.print();
+				}
+
+				ctrl.onSaveAll = async (): Promise<void> =>
+				{
+					const expectedResponseCount: number = ctrl.careTracker.getItemCount();
+
+					/*
+					 We need to tell each item to submit it's pending data value.
+					 When that is done, combine all the new items data into a single note string and add it to the existing open note
+					 */
+					await Promise.race([
+						new Promise((resolve, reject) =>
+						{
+							const map = new Map();
+							$scope.$broadcast("careTracker.savePendingData", (item: CareTrackerItemModel, newItemData?: CareTrackerItemDataModel): void =>
+							{
+								map.set(item.id, {item: item, data: newItemData});
+								if(map.size >= expectedResponseCount)
+								{
+									ctrl.appendToCurrentNote(Array.from(map.values()));
+									resolve();
+								}
+							});
+						}),
+						new Promise((resolve, reject) =>
+						{
+							window.setTimeout(() => reject(), 10000);
+						})
+					]);
+				}
+
+				ctrl.appendToCurrentNote = (itemDataPairs: object[]) =>
+				{
+					const message = itemDataPairs
+						.filter((pair: any) => pair.data && pair.data.selected)
+						.map((pair: any) => {
+						const item = pair.item as CareTrackerItemModel;
+						const data = pair.data as CareTrackerItemDataModel;
+						return item.toString() + ": " + data.toString();
+					}).join("\n");
+
+					console.info("note", message);
 				}
 			}]
 	});

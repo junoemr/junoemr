@@ -94,12 +94,19 @@
 				</care-tracker-item>
 			</div>
 		</care-tracker-item-group>
-		<div class="tracker-footer flex-column align-items-end no-print">
+		<div class="tracker-footer flex-row justify-content-end flex-gap-8 no-print">
 			<div class="footer-button-wrapper">
 				<juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 				             click="$ctrl.onPrint()">
 					Print
+				</juno-button>
+			</div>
+			<div class="footer-button-wrapper">
+				<juno-button button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+				             click="$ctrl.onSaveAll()">
+					Save All & Add to Note
 				</juno-button>
 			</div>
 		</div>

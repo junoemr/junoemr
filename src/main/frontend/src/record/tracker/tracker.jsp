@@ -43,7 +43,7 @@
 
     <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
         <div class="flex-row">
-            <div class="flex-column no-print">
+            <div class="flex-column no-print tracker-nav">
                 <div class="list-group">
                     <button ng-repeat="tracker in $ctrl.triggerdCareTrackers"
                             type="button"

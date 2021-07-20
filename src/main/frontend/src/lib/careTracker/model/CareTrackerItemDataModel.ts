@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -35,6 +33,18 @@ export default class CareTrackerItemDataModel
 	private _createdDateTime: Moment;
 	private _updatedDateTime: Moment;
 
+	// transient - front end only
+	private _selected: boolean;
+
+	public constructor()
+	{
+		this.selected = false;
+	}
+
+	public toString = (): string =>
+	{
+		return this.value;
+	}
 
 	get id(): number
 	{
@@ -84,5 +94,15 @@ export default class CareTrackerItemDataModel
 	set updatedDateTime(value: Moment)
 	{
 		this._updatedDateTime = value;
+	}
+
+	get selected(): boolean
+	{
+		return this._selected;
+	}
+
+	set selected(value: boolean)
+	{
+		this._selected = value;
 	}
 }
