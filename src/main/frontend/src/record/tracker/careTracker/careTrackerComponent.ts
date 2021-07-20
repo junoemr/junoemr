@@ -156,7 +156,7 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 						return item.toString() + ": " + data.toString();
 					}).join("\n");
 
-					console.info("note", message);
+					$scope.$emit("appendToCurrentNote", message);
 				}
 			}]
 	});

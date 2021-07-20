@@ -164,6 +164,21 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					return newDataElement;
 				}
 
+				ctrl.saveAndAddToNote = async (): Promise<void> =>
+				{
+					if(ctrl.canSubmitItem())
+					{
+						const selected = ctrl.newEntry.selected;
+						const newDataModel: CareTrackerItemDataModel = await ctrl.submitNewItemData();
+
+						if(newDataModel && selected)
+						{
+							const message = ctrl.model.toString() + ": " + newDataModel.toString();
+							$scope.$emit("appendToCurrentNote", message);
+						}
+					}
+				}
+
 				$scope.$on("careTracker.savePendingData", async (event: IAngularEvent, callback: Function): Promise<void> =>
 				{
 					let newDataModel: CareTrackerItemDataModel = null;

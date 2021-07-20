@@ -76,7 +76,7 @@
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 			             disabled="!$ctrl.canSubmitItem()"
-			             click="$ctrl.submitNewItemData()">
+			             click="$ctrl.saveAndAddToNote()">
 				Add
 			</juno-button>
 		</div>

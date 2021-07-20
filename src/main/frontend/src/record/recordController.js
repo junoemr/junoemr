@@ -654,6 +654,23 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.removeEditingNoteFlag();
 		});
 
+		$scope.$on('appendToCurrentNote', (event, message) =>
+		{
+			if(!controller.page.encounterNote)
+			{
+				controller.page.encounterNote = {
+					note: "",
+				}
+			}
+			controller.page.encounterNote.note = controller.page.encounterNote.note + "\n" + message;
+			controller.getIssueNote();
+
+			controller.$storage.hideNote = false;
+			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
+
+			controller.removeEditingNoteFlag();
+		})
+
 		controller.initAppendNoteEditor = function initAppendNoteEditor()
 		{
 			if ($location.search().noteEditorText != null)
