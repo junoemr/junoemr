@@ -26,7 +26,6 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Tickler;
-import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.provider.model.ProviderData;
 
@@ -66,7 +65,7 @@ public class TicklerMapper extends AbstractMapper
 		Tickler tickler = null;
 
 		// so far only WOLF has added tickler info
-		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
+		if(importSource.equals(ImporterExporterFactory.IMPORT_SOURCE.WOLF))
 		{
 			String ticklerText = getTicklerText(rep);
 			if(ticklerText != null)
@@ -87,7 +86,7 @@ public class TicklerMapper extends AbstractMapper
 	{
 		ProviderData signingProvider = null;
 
-		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
+		if(importSource.equals(ImporterExporterFactory.IMPORT_SOURCE.WOLF))
 		{
 			signingProvider = getWOLFParsedProviderInfo(getAttendingMd(rep), "ZFU.2");
 		}

@@ -30,7 +30,6 @@ import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.dataMigration.service.CoPDPreProcessorService;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
@@ -56,7 +55,7 @@ public class DemographicMapper extends AbstractMapper
 
 	public Demographic getDemographic() throws HL7Exception
 	{
-		if ((hasFirstName(0) && hasLastName(0)) || !CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if ((hasFirstName(0) && hasLastName(0)) || !ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			Demographic demographic = new Demographic();
 			demographic.setFirstName(getFirstName(0));
@@ -277,7 +276,7 @@ public class DemographicMapper extends AbstractMapper
 	public String getPHN() throws HL7Exception
 	{
 		Integer rep = 0;
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			rep = getPatientIdentifierRepByCode("ULI");
 		}

@@ -25,7 +25,6 @@ package org.oscarehr.common.hl7.copd.mapper;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.util.MiscUtils;
@@ -82,7 +81,7 @@ public class DocumentMapper extends AbstractMapper
 
 		document.setDocdesc(docDescription);
 
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{// Mediplan file names can include HTML escape sequences!
 			document.setDocfilename(StringEscapeUtils.unescapeHtml(getFileName(rep)));
 		}

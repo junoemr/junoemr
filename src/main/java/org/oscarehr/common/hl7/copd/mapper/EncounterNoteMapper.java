@@ -25,7 +25,6 @@ package org.oscarehr.common.hl7.copd.mapper;
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.provider.model.ProviderData;
@@ -66,7 +65,7 @@ public class EncounterNoteMapper extends AbstractMapper
 		CaseManagementNote note = new CaseManagementNote();
 
 		String noteText = getEncounterNoteText(rep);
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			noteText = noteText.replace(" / ", "\n");
 		}
