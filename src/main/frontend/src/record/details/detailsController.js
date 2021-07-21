@@ -98,10 +98,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
+		
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
-		controller.properties = $scope.$parent.recordCtrl.properties;
+		controller.rosteringModuleEnabled = false;
 		controller.displayMessages = messagesFactory.factory();
 		controller.validations = {};
 
@@ -299,7 +300,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
 				}
 			);
-
+			
 			// show eligibility check button only if instance is BC OR (ON AND billing type CLINICAID)
 			systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
 					function success(result)
@@ -330,7 +331,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						console.error("Failed to fetch instance type with error: " + result);
 					}
 			);
-
+			
+			systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false).then((result) =>
+			{
+				controller.rosteringModuleEnabled = result.data.body;
+			});
 		};
 
 		controller.initDemographicVars = function initDemographicVars()

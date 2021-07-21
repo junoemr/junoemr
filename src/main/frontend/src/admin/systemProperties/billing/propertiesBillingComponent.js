@@ -21,6 +21,7 @@
  * Canada
  */
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
+import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../../common/components/junoComponentConstants";
 
 angular.module('Admin').component('systemPropertiesBilling',
@@ -56,7 +57,7 @@ angular.module('Admin').component('systemPropertiesBilling',
                 ctrl.propertiesList = [{
                         name: "Service Location Code",
                         description: "Change the default service location code",
-                        propertyName: "service_location_code",
+                        propertyName: SYSTEM_PROPERTIES.SERVICE_LOCATION_CODE,
                         value: ctrl.selectedValue,
                     }];
 

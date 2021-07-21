@@ -131,6 +131,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String CARE_CONNECT_ENABLED = "integration.CareConnect.enabled";
     public static final String EFORM_POPUP_WIDTH = "eform.popup.width";
     public static final String EFORM_POPUP_HEIGHT = "eform.popup.height";
+    public static final String ROSTERING_AND_FAMILY_DOCTOR_ENABLED = "enable_family_doctor_and_rostering";
 
     public static final String ICE_FALL_VISIBLE = "icefall_visible";
     public static final String ICE_FALL_INTEGRATION_ENABLED = "icefall_enabled";

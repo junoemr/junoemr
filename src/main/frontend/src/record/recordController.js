@@ -47,7 +47,6 @@ angular.module('Record').controller('Record.RecordController', [
 	'demographicService',
 	'demo',
 	'user',
-	'properties',
 	'noteService',
 	'uxService',
 	'securityService',
@@ -69,7 +68,6 @@ angular.module('Record').controller('Record.RecordController', [
 		demographicService,
 		demo,
 		user,
-		properties,
 		noteService,
 		uxService,
 		securityService,
@@ -85,7 +83,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = demo;
-		controller.properties = properties;
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
 
