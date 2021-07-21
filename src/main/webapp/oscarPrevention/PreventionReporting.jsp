@@ -250,7 +250,7 @@ function saveContacts() {
         var lastFollowupTD = $('lastFollowup'+hash['id']);
         var nextProcedureTD = $('nextSuggestedProcedure'+hash['id']);
         //alert(nextProcedureTD);
-        nextProcedureTD.innerHTML = "----";
+        nextProcedureTD.innerHTML = "------";
         lastFollowupTD.innerHTML = hash['followupValue']+" "+hash['Date'];
     }
 </script>
@@ -478,7 +478,7 @@ table.ele thead {
                        <td style="40%;">&nbsp;<%=request.getAttribute("patientSet")%> </td>                       
                        <td>	
                        		<select onchange="setNextContactMethod(this)">
-                       			<option value="----">Select Contact Method</option>
+                       			<option value="------">Select Contact Method</option>
                        			<option value="Email">Email</option>
                        			<option value="L1">Letter 1</option>
                        			<option value="L2">Letter 2</option>
@@ -639,7 +639,7 @@ table.ele thead {
                                  <%=UtilDateUtilities.DateToString(dis.lastFollowup)%>
                                  <%=UtilDateUtilities.getNumMonths(dis.lastFollowup,new Date())%>M
                              <% }else{ %>
-                                ----
+                                ------
                              <% } %>
                           </td>
                           <td bgcolor="<%=dis.color%>" id="nextSuggestedProcedure<%=i+1%>">

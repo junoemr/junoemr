@@ -187,7 +187,7 @@ public class MammogramReport implements PreventionReport{
                 else if (refused)
                 {
                    prd.rank = 3;
-                   prd.lastDate = "-----";
+                   prd.lastDate = "------";
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
@@ -371,8 +371,8 @@ public class MammogramReport implements PreventionReport{
                           
                           
                           if( prd.lastFollupProcedure.equals(this.PHONE1)) {
-                        	  prd.nextSuggestedProcedure = "----";
-                        	  return "----";
+                        	  prd.nextSuggestedProcedure = "------";
+                        	  return "------";
                           }
 
 
@@ -388,7 +388,7 @@ public class MammogramReport implements PreventionReport{
                   }
 
                   switch (prd.lastFollupProcedure) {
-                      case "____":
+                      case "------":
                           prd.nextSuggestedProcedure = this.LETTER1;
                           break;
                       case "L1":
@@ -398,7 +398,7 @@ public class MammogramReport implements PreventionReport{
                           prd.nextSuggestedProcedure = this.PHONE1;
                           break;
                       default:
-                          prd.nextSuggestedProcedure = "----";
+                          prd.nextSuggestedProcedure = "------";
                   }
 
                   return prd.nextSuggestedProcedure;
@@ -414,11 +414,11 @@ public class MammogramReport implements PreventionReport{
                   prd.lastFollowup = measurementData.getDateObservedAsDate();
                   prd.lastFollupProcedure = measurementData.getDataField();
               }
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
                 //prd.numMonths ;
           }else if(prd.state.equals("Ineligible")){
                 // Do nothing
-                prd.nextSuggestedProcedure = "----";
+                prd.nextSuggestedProcedure = "------";
           }else if(prd.state.equals("Pending")){
                 prd.nextSuggestedProcedure = this.CALLFU;
           }else if(prd.state.equals("Up to date")){
@@ -432,7 +432,7 @@ public class MammogramReport implements PreventionReport{
                   prd.lastFollowup = measurementData.getDateObservedAsDate();
                   prd.lastFollupProcedure = measurementData.getDataField();
               }
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
           }else{
                log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
           }

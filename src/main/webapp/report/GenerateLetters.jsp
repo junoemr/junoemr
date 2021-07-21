@@ -134,7 +134,7 @@ function disableifchecked(ele,nextDate){
         var hash = origRequest.responseText.parseQuery();
         var lastFollowupTD = $(hash['id']+'lastFollowup');
         var nextProcedureTD = $(hash['id']+'nextSuggestedProcedure');
-        nextProcedureTD.innerHTML = "----";
+        nextProcedureTD.innerHTML = "------";
         lastFollowupTD.innerHTML = hash['followupValue']+" "+hash['Date'];
     }
 </script>

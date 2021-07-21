@@ -105,7 +105,7 @@ public class GeneratePatientLettersAction extends Action {
         String followupValue = request.getParameter("followupValue");
         String lastPreventionDate= request.getParameter("lastDate");
 
-        if ("----".equals(lastPreventionDate))
+        if ("------".equals(lastPreventionDate))
         {
             lastPreventionDate = "'no data'";
         }

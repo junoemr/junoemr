@@ -180,7 +180,7 @@ public class FOBTReport implements PreventionReport{
 
                 } else if (refused){  // recorded and refused
                    prd.rank = 3;
-                   prd.lastDate = "-----";
+                   prd.lastDate = "------";
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
@@ -367,43 +367,34 @@ public class FOBTReport implements PreventionReport{
                           
                           
                           if( prd.lastFollupProcedure.equals(this.PHONE1)) {
-                        	  prd.nextSuggestedProcedure = "----";
-                        	  return "----";
+                        	  prd.nextSuggestedProcedure = "------";
+                        	  return "------";
                           }
-                          
-                          
-
                 	  }
                 	  
-                	  
-                	  log.debug(prd.demographicNo + " obs" + observationDate + String.valueOf(observationDate.before(onemonth.getTime())) + " OneYear " + oneyear.getTime() + " " + String.valueOf(observationDate.after(oneyear.getTime())));
-                	  if( observationDate.before(onemonth.getTime()) && observationDate.after(oneyear.getTime())) {                		  
+                	  /*if( observationDate.before(onemonth.getTime()) && observationDate.after(oneyear.getTime())) {
                 		  ++count;
                 	  }
                 	  else if( count > 1 && observationDate.after(oneyear.getTime()) ) {
                 		  ++count;
-                	  }
-                	  
-                	  
-                	  ++index;
+                	  }*/
 
+                	  ++index;
                   }
-                  
-                  switch (count) {
-                  case 0: 
-                   	  prd.nextSuggestedProcedure = this.LETTER1;
-                	  break;
-                  case 1:
-                	  prd.nextSuggestedProcedure = this.LETTER2;
-                	  break;
-                  case 2:
-                	  prd.nextSuggestedProcedure = this.PHONE1;
-                	  break;
-                  default:
-                	  prd.nextSuggestedProcedure = "----";
+
+                  switch (prd.lastFollupProcedure) {
+                      case "------":
+                          prd.nextSuggestedProcedure = this.LETTER1;
+                          break;
+                      case "L1":
+                          prd.nextSuggestedProcedure = this.LETTER2;
+                          break;
+                      case "L2":
+                          prd.nextSuggestedProcedure = this.PHONE1;
+                          break;
+                      default:
+                          prd.nextSuggestedProcedure = "------";
                   }
-                  
-                  return prd.nextSuggestedProcedure;
                       
                       
 /*                      if ( measurementData.getDateObservedAsDate().before(onemonth.getTime())){
@@ -435,16 +426,16 @@ public class FOBTReport implements PreventionReport{
 
           }else if (prd.state.equals("Refused")){  //Not sure what to do about refused
                 //prd.lastDate = "-----";
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
                 //prd.numMonths ;
           }else if(prd.state.equals("Ineligible")){
                 // Do nothing
-                prd.nextSuggestedProcedure = "----";
+                prd.nextSuggestedProcedure = "------";
           }else if(prd.state.equals("Pending")){
                 prd.nextSuggestedProcedure = this.CALLFU;
           }else if(prd.state.equals("Up to date")){
                 //Do nothing
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
           }else{
                log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
           }

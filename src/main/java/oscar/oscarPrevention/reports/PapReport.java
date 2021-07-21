@@ -347,7 +347,7 @@ public class PapReport implements PreventionReport {
                   int count = 0;
                   int index = 0;
                   EctMeasurementsDataBean measurementData = null;
-                  
+
                   @SuppressWarnings("unchecked")
             	  Iterator<EctMeasurementsDataBean>iterator = followupData.iterator();                                    
                   
@@ -368,8 +368,8 @@ public class PapReport implements PreventionReport {
                           }
 
                           if( prd.lastFollupProcedure.equals(this.PHONE1)) {
-                        	  prd.nextSuggestedProcedure = "----";
-                        	  return "----";
+                        	  prd.nextSuggestedProcedure = "------";
+                        	  return "------";
                           }
                 	  }
                 	  /*if( observationDate.after(oneyear.getTime())) {
@@ -383,7 +383,7 @@ public class PapReport implements PreventionReport {
                   }
                   
                   switch (prd.lastFollupProcedure) {
-                      case "____":
+                      case "------":
                    	     prd.nextSuggestedProcedure = this.LETTER1;
                 	     break;
                      case "L1":
@@ -393,7 +393,7 @@ public class PapReport implements PreventionReport {
                 	     prd.nextSuggestedProcedure = this.PHONE1;
                 	     break;
                      default:
-                	      prd.nextSuggestedProcedure = "----";
+                	      prd.nextSuggestedProcedure = "------";
                   }
                   
                   return prd.nextSuggestedProcedure;
@@ -409,11 +409,11 @@ public class PapReport implements PreventionReport {
                   prd.lastFollowup = measurementData.getDateObservedAsDate();
                   prd.lastFollupProcedure = measurementData.getDataField();
               }
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
                 //prd.numMonths ;
           }else if(prd.state.equals("Ineligible")){
                 // Do nothing
-                prd.nextSuggestedProcedure = "----";
+                prd.nextSuggestedProcedure = "------";
           }else if(prd.state.equals("Up to date")){
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
@@ -425,7 +425,7 @@ public class PapReport implements PreventionReport {
                   prd.lastFollowup = measurementData.getDateObservedAsDate();
                   prd.lastFollupProcedure = measurementData.getDataField();
               }
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
           }else{
                log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
           }

@@ -349,34 +349,31 @@ public class ChildImmunizationReport implements PreventionReport {
                           prd.lastFollupProcedure = measurementData.getDataField();
 
                           if( prd.lastFollupProcedure.equals(this.PHONE1)) {
-                        	  prd.nextSuggestedProcedure = "----";
-                        	  return "----";
+                        	  prd.nextSuggestedProcedure = "------";
+                        	  return "------";
                           }
 
                 	  }
                 	  
-                	  
-                	  log.debug(prd.demographicNo + " obs" + observationDate + String.valueOf(observationDate.before(onemon)) + " threeMth " + threemon + " " + String.valueOf(observationDate.after(threemon)));
-                	  if( observationDate.before(onemon) && observationDate.after(threemon)) {                		  
+                	/*  if( observationDate.before(onemon) && observationDate.after(threemon)) {
                 		  ++count;
-                	  }
-                	  
-                	  ++index;
+                	  }*/
 
+                	  ++index;
                   }
-                  
-                  switch (count) {
-                  case 0: 
-                   	  prd.nextSuggestedProcedure = this.LETTER1;
-                	  break;
-                  case 1:
-                	  prd.nextSuggestedProcedure = this.LETTER2;
-                	  break;
-                  case 2:
-                	  prd.nextSuggestedProcedure = this.PHONE1;
-                	  break;
-                  default:
-                	  prd.nextSuggestedProcedure = "----";
+
+                  switch (prd.lastFollupProcedure) {
+                      case "------":
+                          prd.nextSuggestedProcedure = this.LETTER1;
+                          break;
+                      case "L1":
+                          prd.nextSuggestedProcedure = this.LETTER2;
+                          break;
+                      case "L2":
+                          prd.nextSuggestedProcedure = this.PHONE1;
+                          break;
+                      default:
+                          prd.nextSuggestedProcedure = "------";
                   }
                   
                   return prd.nextSuggestedProcedure;
@@ -419,14 +416,14 @@ public class ChildImmunizationReport implements PreventionReport {
                   prd.lastFollupProcedure = measurementData.getDataField();
               }
 
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
                 //prd.numMonths ;
           }else if(prd.state.equals("Ineligible")){
                 // Do nothing
-                prd.nextSuggestedProcedure = "----";
+                prd.nextSuggestedProcedure = "------";
           }else if(prd.state.equals("Up to date")){
                 //Do nothing
-              prd.nextSuggestedProcedure = "----";
+              prd.nextSuggestedProcedure = "------";
           }else{
                log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
           }
