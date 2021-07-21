@@ -22,7 +22,7 @@
  */
 package org.oscarehr.dataMigration.logger.topd;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.logger.BaseLogger;
@@ -36,8 +36,6 @@ import java.nio.file.StandardOpenOption;
 public abstract class TOPDBaseLogger implements BaseLogger
 {
 	private static final Logger applicationLogger = Logger.getLogger(TOPDBaseLogger.class);
-	protected static final int SUMMARY_LOG_COLUMN_WIDTH = 14;
-	protected static final int SUMMARY_LOG_ITEM_COUNT = 15;
 
 	protected final GenericFile summaryLogFile;
 	protected final GenericFile eventLogFile;
@@ -79,32 +77,22 @@ public abstract class TOPDBaseLogger implements BaseLogger
 	@Override
 	public synchronized void logEvent(String message)
 	{
-		applicationLogger.warn("[Event-Log]: " + message);
+		applicationLogger.info("[Event-Log]: " + message);
 		log(eventLogFile, message);
 	}
 
 	@Override
 	public synchronized void logSummaryHeader()
 	{
-		String summaryLine = buildSummaryLine("Patient ID", "Family", "Past Health", "Problem List",
-				"Risk Factor", "Allergy &", "Medication", "Immunization",
-				"Labs", "Appointments", "Clinical", "Reports", "Reports",
-				"Care Elements", "Alerts and");
-		String summaryLine2 = buildSummaryLine("", "History", "", "",
-				"", "Adv. Reaction", "", "",
-				"", "", "Notes", "Text", "Binary",
-				"", "Special Needs");
-
-		this.logSummaryLine(summaryLine);
-		this.logSummaryLine(summaryLine2);
-
-		this.logSummaryLine(StringUtils.rightPad("-", (SUMMARY_LOG_COLUMN_WIDTH * SUMMARY_LOG_ITEM_COUNT) + SUMMARY_LOG_ITEM_COUNT, "-"));
+		this.logSummaryLine("ToPD Import Summary");
+		this.logSummaryLine("-------------------");
 	}
 
 	@Override
 	public void logSummaryFooter()
 	{
-		this.logSummaryLine(StringUtils.rightPad("-", (SUMMARY_LOG_COLUMN_WIDTH * SUMMARY_LOG_ITEM_COUNT) + SUMMARY_LOG_ITEM_COUNT, "-") + "\n");
+		this.logSummaryLine("------------------");
+		this.logSummaryLine("END OF ToPD IMPORT");
 	}
 
 	@Override
@@ -114,62 +102,10 @@ public abstract class TOPDBaseLogger implements BaseLogger
 	}
 
 	@Override
-	public void logSummaryLine(PatientRecord patientRecord)
+	public void logSummaryLine(PatientRecord patientRecord) throws NotImplementedException
 	{
-		String summaryLine = buildSummaryLine(
-				String.valueOf(patientRecord.getDemographic().getId()),
-				String.valueOf(patientRecord.getFamilyHistoryNoteList().size()),
-				String.valueOf(patientRecord.getMedicalHistoryNoteList().size()),
-				String.valueOf(patientRecord.getConcernNoteList().size()),
-				String.valueOf(patientRecord.getRiskFactorNoteList().size()),
-				String.valueOf(patientRecord.getAllergyList().size()),
-				String.valueOf(patientRecord.getMedicationList().size()),
-				String.valueOf(patientRecord.getImmunizationList().size()),
-				String.valueOf(patientRecord.getLabList().size()),
-				String.valueOf(patientRecord.getAppointmentList().size()),
-				String.valueOf(patientRecord.getEncounterNoteList().size()),
-				String.valueOf(patientRecord.getDocumentList().size()),
-				String.valueOf(patientRecord.getDocumentList().size()),
-				String.valueOf(patientRecord.getMeasurementList().size()),
-				String.valueOf(patientRecord.getReminderNoteList().size()));
-		this.logSummaryLine(summaryLine);
+		// unused for current version of topd importer but required for BaseLogger interface
+		throw new NotImplementedException();
 	}
-
-	private String buildSummaryLine(String patientId,
-	                                String familyHistCount,
-	                                String pastHealth,
-	                                String problems,
-	                                String riskFactor,
-	                                String allergy,
-	                                String medications,
-	                                String immunizations,
-	                                String labs,
-	                                String appointments,
-	                                String clinicalNotes,
-	                                String reportsText,
-	                                String reportsBinary,
-	                                String careElements,
-	                                String alerts)
-	{
-		return paddedSummaryItem(patientId) +
-				paddedSummaryItem(familyHistCount) +
-				paddedSummaryItem(pastHealth) +
-				paddedSummaryItem(problems) +
-				paddedSummaryItem(riskFactor) +
-				paddedSummaryItem(allergy) +
-				paddedSummaryItem(medications) +
-				paddedSummaryItem(immunizations) +
-				paddedSummaryItem(labs) +
-				paddedSummaryItem(appointments) +
-				paddedSummaryItem(clinicalNotes) +
-				paddedSummaryItem(reportsText) +
-				paddedSummaryItem(reportsBinary) +
-				paddedSummaryItem(careElements) +
-				paddedSummaryItem(alerts);
-	}
-
-	private String paddedSummaryItem(String name)
-	{
-		return StringUtils.rightPad(name, SUMMARY_LOG_COLUMN_WIDTH) + "|";
-	}
+	
 }

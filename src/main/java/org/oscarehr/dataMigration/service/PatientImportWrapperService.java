@@ -47,6 +47,8 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -133,28 +135,26 @@ public class PatientImportWrapperService
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 			logDataMigrationDao.persist(dataMigration);
 			importLogger.logSummaryHeader();
-			
-			
 
 			List<Integer> demographicIds = new ArrayList<>(importFileList.size());
 			for(GenericFile importFile : importFileList)
 			{
 				try
 				{
-					
-					if (importerType.name().equals(ImporterExporterFactory.IMPORTER_TYPE.ToPD.name()))
+					if (importerType.equals(ImporterExporterFactory.IMPORTER_TYPE.ToPD))
 					{
 						if (coPDPreProcessorService.looksLikeCoPDFormat(importFile))
 						{
-							importDemographicFromCoPD(importFile, mergeStrategy, importSource, documentLocation, skipMissingDocs);
+							importLogger.logEvent(importFile.getName() + " : Importing...");
+							importDemographicFromCoPD(importFile, mergeStrategy, importSource, documentLocation, skipMissingDocs, importLogger);
+							importLogger.logEvent(importFile.getName() + " : Imported successfully");
 						}
-						else
+						else // skip file if not CoPD format, keeps it in it's current location
 						{
-							continue;
+							throw new InvalidImportFileException();
 						}
-						
 					}
-					else if (importerType.name().equals(ImporterExporterFactory.IMPORTER_TYPE.CDS_5.name()))
+					else if (importerType.equals(ImporterExporterFactory.IMPORTER_TYPE.CDS_5))
 					{
 						context.addProcessIdentifier(importFile.getName());
 						Demographic demographic = patientImportService.importDemographic(
@@ -163,8 +163,6 @@ public class PatientImportWrapperService
 								mergeStrategy);
 						demographicIds.add(demographic.getId());
 					}
-					
-
 					importCount++;
 					onSuccess(importFile);
 				}
@@ -288,7 +286,7 @@ public class PatientImportWrapperService
 
 	protected void importDemographicFromCoPD(GenericFile importFile, DemographicImporter.MERGE_STRATEGY mergeStrategy, 
 	                                            ImporterExporterFactory.IMPORT_SOURCE importSource, String documentLocation,
-	                                            boolean skipMissingDocs
+	                                            boolean skipMissingDocs, ImportLogger importLogger
 	                                            ) throws Exception
 	{
 		boolean hasFailure = false;
@@ -304,10 +302,10 @@ public class PatientImportWrapperService
 			CoPDRecordData recordData = new CoPDRecordData();
 			try
 			{
-				// Instant startPreProcess = Instant.now();
+				Instant startPreProcess = Instant.now();
 				message = coPDPreProcessorService.preProcessMessage(message, importSource, recordData);
-				// Instant startImport = Instant.now();
-				// logger.info("[DURATION] Pre-Processing took " + Duration.between(startPreProcess, startImport));
+				Instant startImport = Instant.now();
+				importLogger.logEvent("[DURATION] Pre-Processing took " + Duration.between(startPreProcess, startImport));
 
 				boolean mergeDemographics = false;
 				if (mergeStrategy == DemographicImporter.MERGE_STRATEGY.MERGE)
@@ -316,25 +314,23 @@ public class PatientImportWrapperService
 				}
 
 				coPDImportService.importFromHl7Message(message, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
-				// Instant endImport = Instant.now();
-				// logger.info("[DURATION] Import process took " + Duration.between(startImport, endImport));
-
+				Instant endImport = Instant.now();
+				importLogger.logEvent("[DURATION] Import process took " + Duration.between(startImport, endImport));
 			}
 			catch (Exception e)
 			{
-				logger.error("failed to import message: " + messageCount + "\n With error:", e);
+				importLogger.logEvent("[ERROR] Failed to import message: " + messageCount + "\n With error:" + e);
 				hasFailure = true;
 				failureCount += 1;
 			}
 			finally
 			{
-				//TODO - potentially print this to it's own log file
 				recordData.print();
 			}
 		}
 		if (hasFailure)
 		{
-				throw new RuntimeException("[" + failureCount + "] messages failed to import");
+			throw new RuntimeException("[" + failureCount + "] messages failed to import");
 		}
 	}
 }
