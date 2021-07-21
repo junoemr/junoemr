@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
@@ -45,7 +46,7 @@ public class DemographicMapper extends AbstractMapper
 	private final PID messagePID;
 	private final String DEMO_NULL_NAME = "NULL_NAME";
 
-	public DemographicMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	public DemographicMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, importSource);
 		this.messagePID = message.getPATIENT().getPID();

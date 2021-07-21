@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.provider.model.ProviderData;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.List;
 
 public class TicklerMapper extends AbstractMapper
 {
-	public TicklerMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public TicklerMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}

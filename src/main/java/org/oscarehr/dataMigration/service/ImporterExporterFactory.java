@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.logger.ExportLogger;
 import org.oscarehr.dataMigration.logger.ImportLogger;
 import org.oscarehr.dataMigration.logger.cds.CDSExportLogger;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
+import org.oscarehr.dataMigration.logger.topd.TOPDImportLogger;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.pref.ImportPreferences;
 import org.oscarehr.dataMigration.service.cds.CDSExporter;
@@ -50,6 +51,9 @@ public class ImporterExporterFactory
 
 	@Autowired
 	private HRMExporter hrmExporter;
+	
+	@Autowired
+	private CoPDImportService coPDImportService;
 
 	public enum IMPORTER_TYPE
 	{
@@ -70,6 +74,7 @@ public class ImporterExporterFactory
 		MEDIPLAN,
 		MEDACCESS,
 		ACCURO,
+		HEALTHQUEST,
 		UNKNOWN
 	}
 
@@ -88,8 +93,8 @@ public class ImporterExporterFactory
 	{
 		switch(type)
 		{
-			case CDS_5: return cdsImporter;
-			case ToPD: // TODO
+			case CDS_5: 
+			case ToPD: return cdsImporter; // TODO implement own importer
 			default: throw new RuntimeException(type + " importer not implemented");
 		}
 	}
@@ -99,7 +104,7 @@ public class ImporterExporterFactory
 		switch(type)
 		{
 			case CDS_5: return new CDSImportLogger();
-			case ToPD: // TODO
+			case ToPD: return new TOPDImportLogger();
 			default: throw new RuntimeException(type + " logger not implemented");
 		}
 	}

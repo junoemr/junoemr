@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
@@ -36,7 +37,7 @@ import java.util.List;
 
 public class EncounterNoteMapper extends AbstractMapper
 {
-	public EncounterNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public EncounterNoteMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}

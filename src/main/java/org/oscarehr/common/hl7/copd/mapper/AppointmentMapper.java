@@ -28,7 +28,7 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.SpringUtils;
@@ -53,7 +53,7 @@ public class AppointmentMapper extends AbstractMapper
 	public static final String DEFAULT_APPOINTMENT_DURATION_MIN = "15";
 	public static final Date FALLBACK_APPOINTMENT_DATE = new Date(1900, 1, 1, 0 ,0);
 
-	public AppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	public AppointmentMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		super(message, importSource);
 		this.recordData = recordData;
@@ -225,21 +225,21 @@ public class AppointmentMapper extends AbstractMapper
 
 	public String getStatus(int rep) throws HL7Exception
 	{
-		return getStatus(rep, CoPDImportService.IMPORT_SOURCE.UNKNOWN);
+		return getStatus(rep, ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN);
 	}
 
-	public String getStatus(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public String getStatus(int rep, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		//TODO how to determine status from import data?
 		Date apptDate = getAppointmentDate(rep);
 
-		if (apptDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if (apptDate == null && ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			apptDate = getCreationDate(rep);
 		}
 
 		// attempt to map status based on znote text
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			String znote = getNotes(rep);
 			if (znote != null)

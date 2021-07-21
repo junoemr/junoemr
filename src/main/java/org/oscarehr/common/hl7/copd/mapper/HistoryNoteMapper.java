@@ -26,7 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
@@ -48,7 +48,7 @@ public class HistoryNoteMapper extends AbstractMapper
 
 	protected static Map<String, String> relationshipTypeMap = new HashMap<>();
 
-	public HistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
+	public HistoryNoteMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		super(message, providerRep, importSource);
 		this.oldestEncounterNoteDate = getOldestEncounterNoteContactDate();
