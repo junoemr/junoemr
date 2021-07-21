@@ -33,15 +33,11 @@ export default class CareTrackerItemDataModel
 	private _createdDateTime: Moment;
 	private _updatedDateTime: Moment;
 
-	// transient - front end only
-	private _selected: boolean;
-
 	public constructor()
 	{
-		this.selected = false;
 	}
 
-	public toString = (): string =>
+	public toString(): string
 	{
 		return this.value;
 	}
@@ -94,15 +90,5 @@ export default class CareTrackerItemDataModel
 	set updatedDateTime(value: Moment)
 	{
 		this._updatedDateTime = value;
-	}
-
-	get selected(): boolean
-	{
-		return this._selected;
-	}
-
-	set selected(value: boolean)
-	{
-		this._selected = value;
 	}
 }

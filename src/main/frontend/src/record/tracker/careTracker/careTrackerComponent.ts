@@ -129,15 +129,18 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 						new Promise((resolve, reject) =>
 						{
 							const map = new Map();
-							$scope.$broadcast("careTracker.savePendingData", (item: CareTrackerItemModel, newItemData?: CareTrackerItemDataModel): void =>
-							{
-								map.set(item.id, {item: item, data: newItemData});
-								if(map.size >= expectedResponseCount)
+							$scope.$broadcast("careTracker.savePendingData",
+								(item: CareTrackerItemModel,
+								 selected?: boolean,
+								 newItemData?: CareTrackerItemDataModel): void =>
 								{
-									ctrl.appendToCurrentNote(Array.from(map.values()));
-									resolve();
-								}
-							});
+									map.set(item.id, {item: item, data: newItemData, selected: Boolean(selected)});
+									if (map.size >= expectedResponseCount)
+									{
+										ctrl.appendToCurrentNote(Array.from(map.values()));
+										resolve();
+									}
+								});
 						}),
 						new Promise((resolve, reject) =>
 						{
@@ -149,10 +152,10 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 				ctrl.appendToCurrentNote = (itemDataPairs: object[]) =>
 				{
 					const message = itemDataPairs
-						.filter((pair: any) => pair.data && pair.data.selected)
-						.map((pair: any) => {
-						const item = pair.item as CareTrackerItemModel;
-						const data = pair.data as CareTrackerItemDataModel;
+						.filter((result: any) => result.data && result.selected)
+						.map((result: any) => {
+						const item = result.item as CareTrackerItemModel;
+						const data = result.data as CareTrackerItemDataModel;
 						return item.toString() + ": " + data.toString();
 					}).join("\n");
 

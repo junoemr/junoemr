@@ -57,6 +57,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 
 				ctrl.validationAlerts = [];
 				ctrl.isLoading = false;
+				ctrl.addToNoteOnSave = false;
 
 				ctrl.dataTrueValue = "Yes";
 				ctrl.dataFalseValue = "No";
@@ -72,6 +73,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					ctrl.newEntry.observationDateTime = moment();
 					ctrl.checkboxValue = false;
 					ctrl.dateValue = null;
+					ctrl.addToNoteOnSave = false;
 				}
 
 				ctrl.getAlertClass = (severityLevel: AlertSeverityType): string =>
@@ -168,7 +170,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				{
 					if(ctrl.canSubmitItem())
 					{
-						const selected = ctrl.newEntry.selected;
+						const selected: boolean = ctrl.addToNoteOnSave;
 						const newDataModel: CareTrackerItemDataModel = await ctrl.submitNewItemData();
 
 						if(newDataModel && selected)
@@ -182,15 +184,14 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				$scope.$on("careTracker.savePendingData", async (event: IAngularEvent, callback: Function): Promise<void> =>
 				{
 					let newDataModel: CareTrackerItemDataModel = null;
+					const selected: boolean = ctrl.addToNoteOnSave;
 					if(ctrl.canSubmitItem())
 					{
-						const selected = ctrl.newEntry.selected;
 						newDataModel = await ctrl.submitNewItemData();
-						newDataModel.selected = selected;
 					}
 					if(callback)
 					{
-						callback(ctrl.model, newDataModel);
+						callback(ctrl.model, selected, newDataModel);
 					}
 				})
 

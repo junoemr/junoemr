@@ -62,7 +62,7 @@
 		</div>
 		<div class="flex-row flex-grow align-items-center">
 			<juno-check-box label="Add to Note"
-			                ng-model="$ctrl.newEntry.selected">
+			                ng-model="$ctrl.addToNoteOnSave">
 			</juno-check-box>
 		</div>
 		<div>

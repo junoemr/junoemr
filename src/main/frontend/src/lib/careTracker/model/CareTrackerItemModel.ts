@@ -53,37 +53,37 @@ export default class CareTrackerItemModel
 		this.rules = [];
 	}
 
-	public itemTypeIsPrevention = (): boolean =>
+	public itemTypeIsPrevention(): boolean
 	{
 		return this.type === CareTrackerItemType.PREVENTION;
 	}
 
-	public itemTypeIsMeasurement = (): boolean =>
+	public itemTypeIsMeasurement(): boolean
 	{
 		return this.type === CareTrackerItemType.MEASUREMENT;
 	}
 
-	public valueTypeIsBoolean = (): boolean =>
+	public valueTypeIsBoolean(): boolean
 	{
 		return this.valueType === CareTrackerItemValueType.BOOLEAN;
 	}
 
-	public valueTypeIsFreeText = (): boolean =>
+	public valueTypeIsFreeText(): boolean
 	{
 		return this.valueType === CareTrackerItemValueType.STRING;
 	}
 
-	public valueTypeIsNumeric = (): boolean =>
+	public valueTypeIsNumeric(): boolean
 	{
 		return this.valueType === CareTrackerItemValueType.NUMERIC;
 	}
 
-	public valueTypeIsDate = (): boolean =>
+	public valueTypeIsDate(): boolean
 	{
 		return this.valueType === CareTrackerItemValueType.DATE;
 	}
 
-	public toString = (): string =>
+	public toString(): string
 	{
 		return this.name + " (" + this.typeCode + ")";
 	}
