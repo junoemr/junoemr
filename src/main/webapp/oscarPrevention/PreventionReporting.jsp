@@ -465,6 +465,7 @@ table.ele thead {
                   ArrayList list = (ArrayList) request.getAttribute("returnReport");
                   Date asDate = (Date) request.getAttribute("asDate");
                   if (asDate == null){ asDate = Calendar.getInstance().getTime(); }
+                  String lastDate = null;
                   
                   String error = (String) request.getAttribute("error");
 
@@ -549,6 +550,8 @@ table.ele thead {
                             PreventionReportDisplay dis = (PreventionReportDisplay) list.get(i);
                             Hashtable h = deName.getNameAgeSexHashtable(LoggedInInfo.getLoggedInInfoFromSession(request), dis.demographicNo.toString());
                             org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request),  dis.demographicNo.toString());
+                            
+                            lastDate = dis.lastDate;
 
                             if ( dis.nextSuggestedProcedure != null ){
                                 if (dis.nextSuggestedProcedure.equals("L1")){
@@ -715,19 +718,19 @@ table.ele thead {
                   <% if ( firstLetter.size() > 0 ) {
                         String queryStr = getUrlParamList(firstLetter, "demo");
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1">Generate First Letter</a>
+                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate First Letter</a>
                   <%}%>
 
                   <% if ( secondLetter.size() > 0 ) {
                         String queryStr = getUrlParamList(secondLetter, "demo");
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L2">Generate Second Letter</a>
+                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L2&amp;lastDate=<%=lastDate%>">Generate Second Letter</a>
                   <%}%>
 
                   <% if ( refusedLetter.size() > 0 ) {
                         String queryStr = getUrlParamList(refusedLetter, "demo");
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1">Generate Refused Letter</a>
+                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate Refused Letter</a>
                   <%}%>
 
 

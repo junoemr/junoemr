@@ -213,11 +213,16 @@ function disableifchecked(ele,nextDate){
                   String followUpType =  request.getParameter("followupType");//"FLUF";
                   String followUpValue = request.getParameter("followupValue"); //"L1";
                   String comment = request.getParameter("message");
+                  String preventionLastDate = request.getParameter("lastDate");
+
                   if ( followUpType != null && followUpValue != null ){ %>
 			Mark in patients Records: <input type="checkbox" name="addFollowUp"
 				value="ON" checked /> <input type="hidden" name="followupType"
 				value="<%=followUpType%>" /> <input type="hidden"
-				name="followupValue" value="<%=followUpValue%>" /> <%}%>
+				name="followupValue" value="<%=followUpValue%>" />
+				<input type="hidden"
+				name="lastDate" value="<%=preventionLastDate%>" />
+				<%}%>
 			</div>
 
 			<input type="submit" value="Generate Letters" />

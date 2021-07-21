@@ -33,6 +33,7 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
+import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,8 +46,6 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-
-import oscar.util.UtilDateUtilities;
 
 /**
  *
@@ -367,51 +366,38 @@ public class PapReport implements PreventionReport {
                               prd.nextSuggestedProcedure = this.LETTER1;
                               return this.LETTER1;
                           }
-                          
-                          
+
                           if( prd.lastFollupProcedure.equals(this.PHONE1)) {
                         	  prd.nextSuggestedProcedure = "----";
                         	  return "----";
                           }
-                          
-                          
+                	  }
+                	  /*if( observationDate.after(oneyear.getTime())) {
+                		  ++count;
+                	  }
+                	  else if( count >= 1 && observationDate.after(oneyear.getTime()) ) {
+                		  ++count;
+                	  }*/
 
-                	  }
-                	  
-                	  
-                	  log.debug(prd.demographicNo + " obs" + observationDate + String.valueOf(observationDate.before(onemonth.getTime())) + " OneYear " + oneyear.getTime() + " " + String.valueOf(observationDate.after(oneyear.getTime())));
-                	  if( observationDate.before(onemonth.getTime()) && observationDate.after(oneyear.getTime())) {                		  
-                		  ++count;
-                	  }
-                	  else if( count > 1 && observationDate.after(oneyear.getTime()) ) {
-                		  ++count;
-                	  }
-                	  
-                	  
                 	  ++index;
-
                   }
                   
-                  switch (count) {
-                  case 0: 
-                   	  prd.nextSuggestedProcedure = this.LETTER1;
-                	  break;
-                  case 1:
-                	  prd.nextSuggestedProcedure = this.LETTER2;
-                	  break;
-                  case 2:
-                	  prd.nextSuggestedProcedure = this.PHONE1;
-                	  break;
-                  default:
-                	  prd.nextSuggestedProcedure = "----";
+                  switch (prd.lastFollupProcedure) {
+                      case "____":
+                   	     prd.nextSuggestedProcedure = this.LETTER1;
+                	     break;
+                     case "L1":
+                	     prd.nextSuggestedProcedure = this.LETTER2;
+                	     break;
+                     case "L2":
+                	     prd.nextSuggestedProcedure = this.PHONE1;
+                	     break;
+                     default:
+                	      prd.nextSuggestedProcedure = "----";
                   }
                   
                   return prd.nextSuggestedProcedure;
-
               }
-
-
-
 
           }else if (prd.state.equals("Refused")){  //Not sure what to do about refused
                 //prd.lastDate = "-----";

@@ -374,44 +374,35 @@ public class MammogramReport implements PreventionReport{
                         	  prd.nextSuggestedProcedure = "----";
                         	  return "----";
                           }
-                          
-                          
+
+
 
                 	  }
-                	  
-                	  
-                	  log.debug(prd.demographicNo + " obs" + observationDate + String.valueOf(observationDate.before(onemonth.getTime())) + " OneYear " + oneyear.getTime() + " " + String.valueOf(observationDate.after(oneyear.getTime())));
-                	  if( observationDate.before(onemonth.getTime()) && observationDate.after(oneyear.getTime())) {                		  
+                	 /* if( observationDate.after(oneyear.getTime())) {
                 		  ++count;
                 	  }
                 	  else if( count > 1 && observationDate.after(oneyear.getTime()) ) {
                 		  ++count;
-                	  }
-                	  
-                	  
+                	  }*/
                 	  ++index;
+                  }
 
+                  switch (prd.lastFollupProcedure) {
+                      case "____":
+                          prd.nextSuggestedProcedure = this.LETTER1;
+                          break;
+                      case "L1":
+                          prd.nextSuggestedProcedure = this.LETTER2;
+                          break;
+                      case "L2":
+                          prd.nextSuggestedProcedure = this.PHONE1;
+                          break;
+                      default:
+                          prd.nextSuggestedProcedure = "----";
                   }
-                  
-                  switch (count) {
-                  case 0: 
-                   	  prd.nextSuggestedProcedure = this.LETTER1;
-                	  break;
-                  case 1:
-                	  prd.nextSuggestedProcedure = this.LETTER2;
-                	  break;
-                  case 2:
-                	  prd.nextSuggestedProcedure = this.PHONE1;
-                	  break;
-                  default:
-                	  prd.nextSuggestedProcedure = "----";
-                  }
-                  
+
                   return prd.nextSuggestedProcedure;
               }
-
-
-
 
           }else if (prd.state.equals("Refused")){  //Not sure what to do about refused
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
