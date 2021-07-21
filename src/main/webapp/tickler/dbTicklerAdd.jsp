@@ -105,9 +105,9 @@
 				try
 				{
 					TicklerLink tLink = new TicklerLink();
-					tLink.setTableId(Long.parseLong(docId));
+					tLink.setTableId(docId);
 					tLink.setTableName(docType);
-					tLink.setTicklerNo(new Long(ticklerNo).intValue());
+					tLink.setTickler(tickler);
 					TicklerLinkDao ticklerLinkDao = (TicklerLinkDao) SpringUtils.getBean("ticklerLinkDao");
 					ticklerLinkDao.save(tLink);
 				} catch (Exception e)

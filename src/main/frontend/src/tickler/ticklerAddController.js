@@ -1,4 +1,5 @@
 import {SystemPreferenceApi} from "../../generated";
+import TicklerAttachmentToTicklerLinkDtoConverter from "../lib/tickler/converter/TicklerAttachmentToTicklerLinkDtoConverter";
 
 angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
@@ -12,6 +13,8 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 	'demographicsService',
 	'providerService',
 	'ticklerService',
+	'attachment',
+	'presetDemographicNo',
 
 	function(
 		$scope,
@@ -23,7 +26,9 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		demographicService,
 		demographicsService,
 		providerService,
-		ticklerService)
+		ticklerService,
+		attachment,
+		presetDemographicNo)
 	{
 		var controller = this;
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
@@ -66,6 +71,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			suggestedTextId: 0,
 			taskAssignedTo: null,
 			taskAssignedToName: null,
+			attachments: [attachment],
 		};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
@@ -75,10 +81,11 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		{
 			controller.setTicklerProvider();
 
-			if (Juno.Common.Util.exists($stateParams.demographicNo))
+			if (Juno.Common.Util.exists($stateParams.demographicNo) || presetDemographicNo)
 			{
-				console.log('initializing demographicSearch pre-selected', $stateParams.demographicNo);
-				demographicService.getDemographic($stateParams.demographicNo).then(function(data)
+				const demographicNo = $stateParams.demographicNo || presetDemographicNo;
+				console.log('initializing demographicSearch pre-selected', demographicNo);
+				demographicService.getDemographic(demographicNo).then(function(data)
 				{
 					controller.demographicSearch = {
 						demographicNo: data.demographicNo,
@@ -156,6 +163,10 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			tickler.priority = controller.tickler.priority;
 			tickler.status = 'A';
 			tickler.message = controller.tickler.message;
+			if (controller.tickler.attachments)
+			{
+				tickler.attachments = (new TicklerAttachmentToTicklerLinkDtoConverter()).convertList(controller.tickler.attachments);
+			}
 
 			var givenDate = controller.tickler.serviceDateDate;
 			var givenTime;

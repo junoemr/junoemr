@@ -25,11 +25,18 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -41,15 +48,24 @@ import javax.persistence.Table;
 @Table(name="tickler_link")
 public class TicklerLink extends AbstractModel<Integer>{
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-	@Column(name="table_name")
+    @Column(name="table_name")
     private String tableName;
-	@Column(name="table_id")
-    private Long tableId;
-	@Column(name="tickler_no")
-    private Integer ticklerNo;
+    @Column(name="table_id")
+    private String tableId;
+
+    @Column(name="meta")
+    @Getter
+    @Setter
+    private String meta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="tickler_no")
+    @Getter
+    @Setter
+    private Tickler tickler;
 
     public Integer getId() {
         return id;
@@ -67,21 +83,19 @@ public class TicklerLink extends AbstractModel<Integer>{
         this.tableName = tableName;
     }
 
-    public Long getTableId() {
+    public String getTableId() {
         return tableId;
     }
 
-    public void setTableId(Long tableId) {
+    public void setTableId(String tableId) {
         this.tableId = tableId;
     }
 
     public Integer getTicklerNo() {
-        return ticklerNo;
+        if (this.tickler != null)
+        {
+            return this.tickler.getId();
+        }
+        return null;
     }
-
-    public void setTicklerNo(Integer ticklerNo) {
-        this.ticklerNo = ticklerNo;
-    }
-
-
 }

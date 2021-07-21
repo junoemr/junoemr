@@ -23,11 +23,14 @@
  */
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.util.LocaleUtils;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -49,6 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -138,8 +142,7 @@ public class Tickler extends AbstractModel<Integer> {
     @JoinColumn(name="tickler_no", referencedColumnName="tickler_no")
 	@OrderBy("updateDate ASC")
 	private Set<TicklerComment> comments = new HashSet<TicklerComment>();
-	
-	
+
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="demographic_no", referencedColumnName="demographic_no", insertable=false, updatable=false)
 	@NotFound(action=NotFoundAction.IGNORE)
@@ -161,6 +164,10 @@ public class Tickler extends AbstractModel<Integer> {
 	@NotFound(action=NotFoundAction.IGNORE)
 	private Program program;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tickler")
+	@Getter
+	@Setter
+	private List<TicklerLink> ticklerLink;
 	
 	@Transient
 	private String demographic_webName;
