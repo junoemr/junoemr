@@ -101,15 +101,13 @@ public class GeneratePatientLettersAction extends Action {
 
         String[] demographicIds = request.getParameterValues("demos");
         String id = request.getParameter("reportLetter");
-        String providerId =(String) request.getSession().getAttribute("user");
-        String lastPreventionDate;
-        if (request.getParameter("lastDate") != "----")
+        String providerId = (String) request.getSession().getAttribute("user");
+        String followupValue = request.getParameter("followupValue");
+        String lastPreventionDate= request.getParameter("lastDate");
+
+        if ("----".equals(lastPreventionDate))
         {
             lastPreventionDate = "'no data'";
-        }
-        else
-        {
-            lastPreventionDate = request.getParameter("lastDate");
         }
 
         if (log.isTraceEnabled()) {
@@ -142,7 +140,7 @@ public class GeneratePatientLettersAction extends Action {
         for (int i = 0; i < demographicIds.length; i++)
         {
             PreventionLetter prevLetter = new PreventionLetter();
-            if (request.getParameter("followupValue") != "L2")
+            if (!("L2".equals(followupValue)))
             {
                 prevLetter.setContactMethod(FIRST);
                 prevLetter.setLastPreventionDate(lastPreventionDate);

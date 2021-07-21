@@ -50,7 +50,7 @@
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+      String roleName$ = session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	  boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_prevention" rights="r" reverse="<%=true%>">
@@ -64,15 +64,9 @@ if(!authed) {
 %>
 
 <%
-  String demographic_no = request.getParameter("demographic_no");
-
   oscar.oscarReport.data.RptSearchData searchData  = new oscar.oscarReport.data.RptSearchData();
   ArrayList queryArray = searchData.getQueryTypes();
 
-  String preventionText = "";
-
-  String eformSearch = (String) request.getAttribute("eformSearch");
-  //EfmData efData = new EfmData();
   BillingONCHeader1Dao bCh1Dao = (BillingONCHeader1Dao)SpringUtils.getBean("billingONCHeader1Dao");
 %>
 
@@ -112,8 +106,7 @@ function setNextContactMethod(selectElem) {
 	var displayId;
 	var currentValue;
 	var idNum;
-	var indexPos;
-	
+
 	if( nextSelectedContactMethod == "other" ) {
 		nextSelectedContactMethod = prompt("Enter next contact method: ");
 		if( nextSelectedContactMethod == null ) {
@@ -226,11 +219,8 @@ function saveContacts() {
                     alert( ret.status + " There was a problem saving contacts.");
                 }
             }
-
         );
-
         return false;
-
 }
 
 </script>
@@ -262,9 +252,6 @@ function saveContacts() {
         //alert(nextProcedureTD);
         nextProcedureTD.innerHTML = "----";
         lastFollowupTD.innerHTML = hash['followupValue']+" "+hash['Date'];
-
-        //alert(nextProcedureTD.innerText);
-
     }
 </script>
 
@@ -375,7 +362,6 @@ table.ele thead {
 </head>
 
 <body class="BodyStyle" vlink="#0000FF">
-<!--  -->
     <table  class="MainTable" id="scrollNumber1" >
         <tr class="MainTableTopRow">
             <td class="MainTableTopRowLeftColumn" width="100" >

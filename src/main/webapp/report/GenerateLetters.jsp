@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+      String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
       boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_report,_admin.reporting" rights="r" reverse="<%=true%>">
@@ -42,7 +42,8 @@ if(!authed) {
         "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page
-	import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.data.*,oscar.oscarPrevention.pageUtil.*,java.net.*,oscar.eform.*"%>
+	import="oscar.oscarDemographic.data.*,java.util.*"%>
+<%@ page import="oscar.oscarReport.data.ManageLetters" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -50,9 +51,7 @@ if(!authed) {
 	scope="session" />
 
 <%
-  
-  String demographic_no = request.getParameter("demographic_no"); 
-  
+
   String[] demos = request.getParameterValues("demo");
   
 %>
@@ -119,9 +118,6 @@ function disableifchecked(ele,nextDate){
 
 
 <script type="text/javascript">
-                        
-                        
-                        
     //Function sends AJAX request to action
     function completedProcedure(idval,followUpType,procedure,demographic){
        var comment = prompt('Are you sure you want to added this to patients record \n\nAdd Comment Below ','');
@@ -135,22 +131,13 @@ function disableifchecked(ele,nextDate){
     }
 
     function followUp(origRequest){
-        //alert(origRequest.responseText);
         var hash = origRequest.responseText.parseQuery();
-        //alert( hash['id'] + " " + hash['followupValue']+" "+hash['Date'] );
-        //("id="+id+"&followupValue="+followUpValue+"&Date=
         var lastFollowupTD = $(hash['id']+'lastFollowup');
         var nextProcedureTD = $(hash['id']+'nextSuggestedProcedure');
-        //alert(nextProcedureTD);
         nextProcedureTD.innerHTML = "----";
         lastFollowupTD.innerHTML = hash['followupValue']+" "+hash['Date'];
-
-        //alert(nextProcedureTD.innerText);
-
     }
 </script>
-
-
 
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 
@@ -264,9 +251,9 @@ function disableifchecked(ele,nextDate){
 </table>
 
 <div>
-<%// if ( firstLetter.size() > 0 ) { 
-                    //    String queryStr = getUrlParamList(firstLetter, "demo"); 
-                    //                       
+<%// if ( firstLetter.size() > 0 ) {
+                    //    String queryStr = getUrlParamList(firstLetter, "demo");
+                    //
                     //&message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")
                     //&followupType=
                     //&followupValue=L1
@@ -274,7 +261,6 @@ function disableifchecked(ele,nextDate){
 </div>
 
 <script type="text/javascript">
-   // Calendar.setup( { inputField : "asofDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "date", singleClick : true, step : 1 } );
    function genEnvelopes(form){
        window.location = "../report/GenerateEnvelopes.do?"+Form.serialize('listDemographic');
    }
