@@ -174,10 +174,10 @@ public class DefaultNoteService implements NoteService {
 			EChartNoteEntry eChartNoteEntry = new EChartNoteEntry();
 			eChartNoteEntry.setId(eform.get("fdid"));
 
+			String date = eform.get("formDate") + " " + eform.get("formTime");
 			try
 			{
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				String date = eform.get("formDate") + " " + eform.get("formTime");
 				eChartNoteEntry.setDate(sdf.parse(date));
 			}
 			catch (ParseException e1)
@@ -223,10 +223,10 @@ public class DefaultNoteService implements NoteService {
 				EChartNoteEntry eChartNoteEntry = new EChartNoteEntry();
 				eChartNoteEntry.setId(h1.get("id"));
 
+				String date = h1.get("billingDate") + " " + h1.get("billing_time");
 				try
 				{
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					String date = h1.get("billingDate") + " " + h1.get("billing_time");
 					eChartNoteEntry.setDate(sdf.parse(date));
 				}
 				catch (ParseException e1)
