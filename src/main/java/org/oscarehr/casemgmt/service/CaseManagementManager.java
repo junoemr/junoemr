@@ -1193,21 +1193,31 @@ public class CaseManagementManager {
 		return filteredNotes;
 	}
 
-	public List<EChartNoteEntry> filterNotes1(String providerNo, Collection<EChartNoteEntry> notes, String programId) {
-
+	public List<EChartNoteEntry> filterNotes1(String providerNo, Collection<EChartNoteEntry> notes, String programId)
+	{
 		List<EChartNoteEntry> filteredNotes = new ArrayList<EChartNoteEntry>();
 
-		if (notes.isEmpty()) {
+		if (programId == null || programId.length() == 0)
+		{
+			programId = "0";
+		}
+
+		if (notes.isEmpty())
+		{
 			return filteredNotes;
 		}
 
 		// Get Role - if no ProgramProvider record found, show no issues.
 		@SuppressWarnings("unchecked")
 		List ppList = programProviderDao.getProgramProviderByProviderProgramId(providerNo, new Long(programId));
-		if (ppList == null || ppList.isEmpty()) {
-			for(EChartNoteEntry note:notes) {
+		if (ppList == null || ppList.isEmpty())
+		{
+			for(EChartNoteEntry note:notes)
+			{
 				if(!note.getType().equals("local_note") && !note.getType().equals("remote_note"))
+				{
 					filteredNotes.add(note);
+				}
 			}
 			return filteredNotes;
 		}
@@ -1218,75 +1228,89 @@ public class CaseManagementManager {
 		Map programAccessMap = ProgramAccessCache.getAccessMap(new Long(programId));
 
 		// iterate through the issue list
-		for (EChartNoteEntry cmNote : notes) {
-			if(!cmNote.getType().equals("local_note") && !cmNote.getType().equals("remote_note")) {
+		for (EChartNoteEntry cmNote : notes)
+		{
+			if (!cmNote.getType().equals("local_note") && !cmNote.getType().equals("remote_note"))
+			{
 				filteredNotes.add(cmNote);
 				continue;
 			}
 			String noteRole = null;
 			String noteRoleName = "";
 
-			if(cmNote.getType().equals("local_note")) {
+			if (cmNote.getType().equals("local_note"))
+			{
 				noteRole = cmNote.getRole();
 				noteRoleName = RoleCache.getRole(Long.valueOf(noteRole)).getName().toLowerCase();
 			}
-			if(cmNote.getType().equals("remote_note")) {
+			if (cmNote.getType().equals("remote_note"))
+			{
 				noteRoleName = cmNote.getRole();
 			}
+
 			ProgramAccess pa = null;
 			boolean add = false;
 
 			// write
 			pa = null;
+
 			// read
 			pa = (ProgramAccess) programAccessMap.get("read " + noteRoleName + " notes");
-			if (pa != null) {
-				if (pa.isAllRoles() || isRoleIncludedInAccess(pa, role)) {
-					// filteredIssues.add(cmIssue);
+			if (pa != null)
+			{
+				if (pa.isAllRoles() || isRoleIncludedInAccess(pa, role))
+				{
 					add = true;
 				}
-			} else {
+			}
+			else
+			{
 				logger.debug(noteRoleName + " is null");
-				try {
-					if (Long.valueOf(noteRole).longValue() == role.getId().longValue()) {
+				try
+				{
+					if (Long.valueOf(noteRole).longValue() == role.getId().longValue())
+					{
 						// default
 						logger.debug("noteRole " + noteRole + " = Provider Role from secRole " + role.getId());
 						add = true;
 					}
-				} catch (NumberFormatException ex) {
+				}
+				catch (NumberFormatException ex)
+				{
 					logger.error("noteRole cannot be parsed: noteRole = " + noteRole);
 				}
 			}
 
 			// apply defaults
-			if (!add) {
-				try {
-					if (Long.valueOf(noteRole).longValue() == role.getId().longValue()) {
+			if (!add)
+			{
+				try
+				{
+					if (Long.valueOf(noteRole).longValue() == role.getId().longValue())
+					{
 						logger.debug("noteRole " + noteRole + " = Provider Role from secRole " + role.getId());
 						add = true;
 					}
-				} catch (NumberFormatException ex) {
+				}
+				catch (NumberFormatException ex)
+				{
 					logger.error("noteRole cannot be parsed: noteRole = " + noteRole);
 				}
 			}
 
 			// global default role access
 			String accessName = "read " + noteRoleName + " notes";
-			if (RoleCache.hasAccess(accessName, role.getId())) {
+			if (RoleCache.hasAccess(accessName, role.getId()))
+			{
 				add = true;
 			}
 
 			// did it pass the test?
-			if (add) {
+			if (add)
+			{
 				filteredNotes.add(cmNote);
 			}
 		}
-
-		// filter notes based on facility
-		//if (OscarProperties.getInstance().getBooleanProperty("FILTER_ON_FACILITY", "true")) {
-		//	filteredNotes = notesFacilityFiltering(filteredNotes);
-		//}
-
 		return filteredNotes;
 	}
 
@@ -1931,19 +1955,23 @@ public class CaseManagementManager {
 	 * @param unlockedNotesMap
 	 * @return CaseManagementNote
 	 */
-	public CaseManagementNote getLastSaved(String programId, String demono, String providerNo,Map unlockedNotesMap) {
-		//CaseManagementNote note = null;
+	public CaseManagementNote getLastSaved(String programId, String demoNo, String providerNo, Map unlockedNotesMap)
+	{
 		List<EChartNoteEntry> entries = new ArrayList<EChartNoteEntry>();
 
 		//Gets some of the note data, no relationships, not the note/history..just enough
-		List<Map<String,Object>> notes = caseManagementNoteDAO.getUnsignedRawNoteInfoMapByDemographic(demono);
+		List<Map<String,Object>> notes = caseManagementNoteDAO.getUnsignedRawNoteInfoMapByDemographic(demoNo);
 		Map<String,Object> filteredNotes = new LinkedHashMap<String,Object>();
 
 		//This gets rid of old revisions (better than left join on a computed subset of itself
-		for(Map<String,Object> note:notes) {
-			if(filteredNotes.get(note.get("uuid"))!=null)
+		for (Map<String,Object> note:notes)
+		{
+			if (filteredNotes.get(note.get("uuid"))!=null)
+			{
 				continue;
+			}
 			filteredNotes.put((String)note.get("uuid"),true);
+
 			EChartNoteEntry e = new EChartNoteEntry();
 			e.setId(note.get("id"));
 			e.setDate((Date)note.get("observation_date"));
@@ -1952,33 +1980,24 @@ public class CaseManagementManager {
 			e.setRole((String)note.get("reporter_caisi_role"));
 			e.setType("local_note");
 			entries.add(e);
-
-		}
-
-		// UserProperty prop = caseManagementMgr.getUserProperty(providerNo, UserProperty.STALE_NOTEDATE);
-		//notes = caseManagementMgr.getNotes(demono);
-		//notes = manageLockedNotes(notes, false, this.getUnlockedNotesMap(request));
-
-		
-		if (programId == null || programId.length() == 0) {
-			programId = "0";
 		}
 
 		entries = filterNotes1(providerNo, entries, programId);
 
 		Collections.sort(entries,EChartNoteEntry.getDateComparatorDesc());
-
 		
-		for(EChartNoteEntry entry:entries) {
+		for (EChartNoteEntry entry:entries)
+		{
 			CaseManagementNote n = getNote(String.valueOf(entry.getId()));
-			if(n.isLocked() && unlockedNotesMap.get(entry.getId()) != null ) {
+			if (n.isLocked() && unlockedNotesMap.get(entry.getId()) != null )
+			{
 				n.setLocked(false);
 			}
-			if(n.getProviderNo().equals(providerNo)) {
+			if (n.getProviderNo().equals(providerNo))
+			{
 				return n;
 			}
 		}
-
 		return null;
 	}
 	
