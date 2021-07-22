@@ -450,8 +450,8 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 
 		controller.popup = function popup(vheight, vwidth, varpage, winname)
 		{
-			windowprops = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";
-			var popup = window.open(varpage, winname, windowprops);
+			let windowprops = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";
+			let popup = window.open(varpage, winname, windowprops);
 			if (popup != null)
 			{
 				if (popup.opener == null)
@@ -460,6 +460,5 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				}
 			}
 		};
-
 	}
 ]);
