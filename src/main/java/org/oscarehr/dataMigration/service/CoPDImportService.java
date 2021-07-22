@@ -205,7 +205,7 @@ public class CoPDImportService
 
 	private static final HashMap<String, ProviderData> providerLookupCache = new HashMap<>();
 
-	public void importFromHl7Message(String message, String documentLocation,
+	public Demographic importFromHl7Message(String message, String documentLocation,
 	                                 ImporterExporterFactory.IMPORT_SOURCE importSource,
 	                                 CoPDRecordData recordData,
 	                                 boolean skipMissingDocs,
@@ -230,14 +230,14 @@ public class CoPDImportService
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
 
 		missingDocumentCount = 0;
-		importRecordData(zpdZtrMessage, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
+		return importRecordData(zpdZtrMessage, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
 	}
 	public long getMissingDocumentCount()
 	{
 		return missingDocumentCount;
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage,
+	private Demographic importRecordData(ZPD_ZTR zpdZtrMessage,
 	                              String documentLocation,
 	                              ImporterExporterFactory.IMPORT_SOURCE importSource,
 	                              CoPDRecordData recordData,
@@ -267,6 +267,7 @@ public class CoPDImportService
 			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource, recordData);
 			instant = printDuration(instant, "importAppointmentData");
 		}
+		return demographic;
 	}
 
 	/**

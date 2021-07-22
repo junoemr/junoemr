@@ -47,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -135,34 +136,31 @@ public class PatientImportWrapperService
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 			logDataMigrationDao.persist(dataMigration);
 			importLogger.logSummaryHeader();
+			Demographic demographic;
 
 			List<Integer> demographicIds = new ArrayList<>(importFileList.size());
 			for(GenericFile importFile : importFileList)
 			{
 				try
 				{
+					context.addProcessIdentifier(importFile.getName());
 					if (importerType.equals(ImporterExporterFactory.IMPORTER_TYPE.ToPD))
 					{
-						if (coPDPreProcessorService.looksLikeCoPDFormat(importFile))
-						{
-							importLogger.logEvent(importFile.getName() + " : Importing...");
-							importDemographicFromCoPD(importFile, mergeStrategy, importSource, documentLocation, skipMissingDocs, importLogger);
-							importLogger.logEvent(importFile.getName() + " : Imported successfully");
-						}
-						else // skip file if not CoPD format, keeps it in it's current location
-						{
-							throw new InvalidImportFileException();
-						}
+						demographic = importDemographicFromCoPD(importFile, mergeStrategy, importSource, documentLocation, skipMissingDocs, importLogger);
 					}
-					else if (importerType.equals(ImporterExporterFactory.IMPORTER_TYPE.CDS_5))
+					else
 					{
-						context.addProcessIdentifier(importFile.getName());
-						Demographic demographic = patientImportService.importDemographic(
+						demographic = patientImportService.importDemographic(
 								importFile,
 								context,
 								mergeStrategy);
-						demographicIds.add(demographic.getId());
 					}
+					
+					if (demographic != null)
+					{
+						demographicIds.add(demographic.getId());
+					} 
+					
 					importCount++;
 					onSuccess(importFile);
 				}
@@ -282,21 +280,29 @@ public class PatientImportWrapperService
 		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures. " + duplicateCount + " duplicates)");
 	}
 
-
-
-	protected void importDemographicFromCoPD(GenericFile importFile, DemographicImporter.MERGE_STRATEGY mergeStrategy, 
+	protected Demographic importDemographicFromCoPD(GenericFile importFile, DemographicImporter.MERGE_STRATEGY mergeStrategy, 
 	                                            ImporterExporterFactory.IMPORT_SOURCE importSource, String documentLocation,
 	                                            boolean skipMissingDocs, ImportLogger importLogger
 	                                            ) throws Exception
 	{
+		if (!coPDPreProcessorService.looksLikeCoPDFormat(importFile))
+		{
+			throw new InvalidImportFileException();
+		}
+		
 		boolean hasFailure = false;
 		int failureCount = 0;
 		int messageCount = 0;
 		
 		CoPDMessageStream messageStream;
 		String message;
+		Demographic demographic = null;
 		
 		messageStream = new CoPDMessageStream(importFile);
+
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		importLogger.logEvent("[" + timestamp + "] : " + importFile.getName() + " : Importing...");
+		
 		while (!(message = messageStream.getNextMessage()).isEmpty())
 		{
 			CoPDRecordData recordData = new CoPDRecordData();
@@ -313,9 +319,11 @@ public class PatientImportWrapperService
 					mergeDemographics = true;
 				}
 
-				coPDImportService.importFromHl7Message(message, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
+				demographic = coPDImportService.importFromHl7Message(message, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
 				Instant endImport = Instant.now();
 				importLogger.logEvent("[DURATION] Import process took " + Duration.between(startImport, endImport));
+				timestamp = new Timestamp(System.currentTimeMillis());
+				importLogger.logEvent("[" + timestamp + "] : " + importFile.getName() + " : Imported. Demographic Id: " + demographic.getDemographicId());
 			}
 			catch (Exception e)
 			{
@@ -332,5 +340,6 @@ public class PatientImportWrapperService
 		{
 			throw new RuntimeException("[" + failureCount + "] messages failed to import");
 		}
+		return demographic;
 	}
 }
