@@ -25,13 +25,6 @@ package org.oscarehr.careTracker.service;
 
 import org.drools.FactException;
 import org.drools.RuleBase;
-import org.oscarehr.common.model.Measurement;
-import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
-import org.oscarehr.decisionSupport2.entity.Drools;
-import org.oscarehr.decisionSupport2.model.DsInfoCache;
-import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
-import org.oscarehr.decisionSupport2.service.DroolsCachingService;
-import org.oscarehr.decisionSupport2.service.DsRuleService;
 import org.oscarehr.careTracker.converter.CareTrackerEntityToModelConverter;
 import org.oscarehr.careTracker.converter.PreventionToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.dao.CareTrackerDao;
@@ -41,6 +34,13 @@ import org.oscarehr.careTracker.model.CareTracker;
 import org.oscarehr.careTracker.model.CareTrackerItemAlert;
 import org.oscarehr.careTracker.model.CareTrackerItemData;
 import org.oscarehr.careTracker.model.CareTrackerItemGroup;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
+import org.oscarehr.decisionSupport2.entity.Drools;
+import org.oscarehr.decisionSupport2.model.DsInfoCache;
+import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
+import org.oscarehr.decisionSupport2.service.DroolsCachingService;
+import org.oscarehr.decisionSupport2.service.DsRuleService;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
@@ -152,7 +152,13 @@ public class CareTrackerDataService
 				CareTrackerItemAlert alert = new CareTrackerItemAlert(warning, SeverityLevel.WARNING);
 				item.addCareTrackerItemAlert(alert);
 			});
-
+		}
+		if(dsInfoCache.hasCriticalAlert(typeCode))
+		{
+			dsInfoCache.getCriticalAlerts(typeCode).forEach((warning) -> {
+				CareTrackerItemAlert alert = new CareTrackerItemAlert(warning, SeverityLevel.DANGER);
+				item.addCareTrackerItemAlert(alert);
+			});
 		}
 		item.setHidden(dsInfoCache.getHidden(typeCode));
 	}

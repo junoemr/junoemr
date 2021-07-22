@@ -44,9 +44,13 @@ public class ConsequenceAlert extends DsConsequence
 				break;
 			}
 			case WARNING:
-			case DANGER:
 			{
 				dsInfoCache.addWarning(typeCode, getMessage());
+				break;
+			}
+			case DANGER:
+			{
+				dsInfoCache.addCriticalAlert(typeCode, getMessage());
 				break;
 			}
 		}

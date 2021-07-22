@@ -61,6 +61,7 @@ public class Prevention implements DsInfoCache, DsInfoLookup
    ArrayList<String> messageList = new ArrayList<String>();
    ArrayList<String> reminder = new ArrayList<String>();
 
+    private final Map<String, List<String>> criticalAlertHash = new HashMap<>();
     private final Map<String, List<String>> warningHash = new HashMap<>();
     private final Map<String, List<String>> recommendationHash = new HashMap<>();
     private final Map<String, Boolean> hiddenPreventions = new HashMap<>();
@@ -93,6 +94,35 @@ public class Prevention implements DsInfoCache, DsInfoLookup
    public String getSex(){ return sex; }
    public java.lang.String getName() { return name; }
    public void setName(java.lang.String name) { this.name = name; }
+
+
+
+    @Override
+    public void addCriticalAlert(String measurement, String warningMessage)
+    {
+        if(criticalAlertHash.containsKey(measurement))
+        {
+            criticalAlertHash.get(measurement).add(warningMessage);
+        }
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(warningMessage);
+            criticalAlertHash.put(measurement, messageList);
+        }
+    }
+
+    @Override
+    public boolean hasCriticalAlert(String measurement)
+    {
+        return criticalAlertHash.get(measurement) != null;
+    }
+
+    @Override
+    public List<String> getCriticalAlerts(String measurement)
+    {
+        return criticalAlertHash.get(measurement);
+    }
 
    public void addWarning(String warn){
       messageList.add(warn);

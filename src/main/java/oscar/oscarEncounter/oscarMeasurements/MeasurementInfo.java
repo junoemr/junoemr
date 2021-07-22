@@ -53,6 +53,7 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     private static final Logger log = MiscUtils.getLogger();
 
     private final List<String> warning = new ArrayList<>();
+    private final Map<String, List<String>> criticalAlertHash = new HashMap<>();
     private final Map<String, List<String>> warningHash = new HashMap<>();
     private final List<String> recommendations = new ArrayList<>();
     private final Map<String, List<String>> recommendationHash = new HashMap<>();
@@ -155,6 +156,21 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     }
 
     @Override
+    public void addCriticalAlert(String measurement, String warningMessage)
+    {
+        if(criticalAlertHash.containsKey(measurement))
+        {
+            criticalAlertHash.get(measurement).add(warningMessage);
+        }
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(warningMessage);
+            criticalAlertHash.put(measurement, messageList);
+        }
+    }
+
+    @Override
     public void addHidden(String measurement, boolean hidden)
     {
         hiddens.put(measurement, hidden);
@@ -170,6 +186,12 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public boolean hasRecommendation(String measurement)
     {
         return recommendationHash.get(measurement) != null;
+    }
+
+    @Override
+    public boolean hasCriticalAlert(String measurement)
+    {
+        return criticalAlertHash.get(measurement) != null;
     }
 
     @Deprecated
@@ -196,6 +218,12 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     public List<String> getWarnings(String measurement)
     {
         return warningHash.get(measurement);
+    }
+
+    @Override
+    public List<String> getCriticalAlerts(String measurement)
+    {
+        return criticalAlertHash.get(measurement);
     }
 
     @Override

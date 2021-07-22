@@ -26,14 +26,17 @@ import java.util.List;
 
 public interface DsInfoCache
 {
+	void addCriticalAlert(String typeCode, String message);
 	void addWarning(String typeCode, String message);
 	void addRecommendation(String typeCode, String message);
 	void addHidden(String typeCode, boolean isHidden);
 
+	boolean hasCriticalAlert(String typeCode);
 	boolean hasWarning(String typeCode);
 	boolean hasRecommendation(String typeCode);
 	boolean getHidden(String measurement);
 
+	List<String> getCriticalAlerts(String typeCode);
 	List<String> getWarnings(String typeCode);
 	List<String> getRecommendations(String typeCode);
 }
