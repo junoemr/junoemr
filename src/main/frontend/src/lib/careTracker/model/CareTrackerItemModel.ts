@@ -88,6 +88,15 @@ export default class CareTrackerItemModel
 		return this.name + " (" + this.typeCode + ")";
 	}
 
+	public sortDataByObservationDate(): void
+	{
+		this.data = this.data.sort((itemA: CareTrackerItemDataModel, itemB: CareTrackerItemDataModel) =>
+		{
+			// newest items at beginning of the list
+			return itemB.observationDateTime.diff(itemA.observationDateTime);
+		});
+	}
+
 	get id(): number
 	{
 		return this._id;
