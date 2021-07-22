@@ -41,6 +41,20 @@ public class DemographicContactFewTo1 implements Serializable {
 	private String contactId;
 	private int type;
 	private String lastName;
-	private String firstName;	
-	private String phone;
+	private String firstName;
+
+	private String address;
+	private String address2;
+	private String city;
+	private String postal;
+	private String province;
+
+	private String homePhone;
+	private String cellPhone;
+	private String workPhone;
+	private String hPhoneExt;
+	private String wPhoneExt;
+	private String fax;
+	private String email;
+	private String note;
 }
