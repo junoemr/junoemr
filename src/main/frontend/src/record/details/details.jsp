@@ -165,6 +165,7 @@
 												validations="detailsCtrl.validations"
 												component-style="pageStyle">
 				</additional-information-section>
+				<juno-divider component-style="pageStyle"></juno-divider>
 			</div>
 		</div>
 		<br/>
@@ -191,6 +192,20 @@
 					</div>
 				</div>
 				<hr>
+
+				<div class="col-md-12">
+					<h3 class="form-heading">
+						<bean:message key="web.record.details.proContacts"/>
+						<button type="button" class="btn btn-primary pull-right"  ng-click="detailsCtrl.manageContacts()">
+							<bean:message key="web.record.details.manage"/>
+						</button>
+					</h3>
+					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContactPros">
+						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
+						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
+						<div class="col-md-5">{{dc.phone}}</div>
+					</div>
+				</div>
 
 				<div class="col-md-12">
 					<demographic-contacts-section

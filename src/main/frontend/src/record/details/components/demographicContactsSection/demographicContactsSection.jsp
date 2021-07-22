@@ -1,59 +1,29 @@
 <div class="demographic-details-section demographic-contacts-section">
 
-	<div class="fields">
-		<div class="column">
-			<h4 class="title">
-				Contacts
-			</h4>
-			<juno-button
-						 ng-if="$ctrl.demoContacts.length == 0"
-						 disabled="true"
-						 button-color="$ctrl.JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
-						 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
-				No Contacts
-			</juno-button>
-
-			<juno-button ng-repeat="dc in $ctrl.demoContacts"
-			             ng-model="dc"
-			             click="$ctrl.openContacts(dc)"
-			             button-color="$ctrl.JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
-			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
-				{{dc.role}}: {{dc.lastName}}, {{dc.firstName}}
-			</juno-button>
+	<h3 class="form-heading">
+		<div class="title">
+			<div>Personal Contacts</div>
+			<div>
+				<juno-button
+						button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						class="button-width"
+						button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+						click="$ctrl.manageContacts()">
+					Manage
+				</juno-button>
+			</div>
 		</div>
+	</h3>
 
-		<div class="divider"></div>
-
-		<div class="column">
-			<h4 class="title">
-				Professional Contacts
-			</h4>
-			<juno-button
-						 ng-if="$ctrl.demoContactPros.length == 0"
-						 disabled="true"
-						 button-color="$ctrl.JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
-						 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
-				No Contacts
-			</juno-button>
-
-			<juno-button ng-repeat="dc in $ctrl.demoContactPros"
-			             ng-model="dc.demoContactPros"
-			             click="$ctrl.openContacts(dc)"
-			             button-color="$ctrl.JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
-			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
-				{{dc.role}}: {{dc.lastName}}, {{dc.firstName}}
-			</juno-button>
+	<div class="contacts" ng-repeat="dc in $ctrl.demoContacts"
+	     ng-model="dc">
+		<div class="bold">{{dc.role}}</div>
+		<div class="linkable">
+			<div><a class="color" ng-click="$ctrl.openContacts(dc)">{{dc.lastName}}, {{dc.firstName}}</a></div>
+			<div><a class="color" ng-if="dc.phone" ng-click="$ctrl.openContacts(dc)">Phone: {{dc.phone}}</a></div>
 		</div>
 	</div>
 
-		<div class="manage">
-			<juno-button
-					button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-					button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-					click="$ctrl.manageContacts()">
-				Manage Contacts
-			</juno-button>
-		</div>
 </div>
 
 

@@ -51,6 +51,9 @@ angular.module('Record.Details').component('demographicContactsModal', {
             ctrl.$onInit = () =>
             {
                 ctrl.contact = ctrl.resolve.demoContact;
+                console.log(ctrl.contact);
+                console.log(ctrl.contact.scrHPhoneExt);
+                console.log(ctrl.contact.hphoneExt);
 
                 switch(ctrl.contact.type)
                 {

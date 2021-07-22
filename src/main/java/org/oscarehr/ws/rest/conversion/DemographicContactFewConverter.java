@@ -43,42 +43,39 @@ public class DemographicContactFewConverter {
 		demographicContactFewTo1.setCategory(demographicContact.getCategory());
 		demographicContactFewTo1.setType(demographicContact.getType());
 		
-		if (demographicContact.getType()==DemographicContact.TYPE_DEMOGRAPHIC) {
+		if (demographicContact.getType()== DemographicContact.TYPE_DEMOGRAPHIC) {
 			Demographic demographic = (Demographic) obj;
 			demographicContactFewTo1.setContactId(demographicContact.getContactId());
 			demographicContactFewTo1.setFirstName(demographic.getFirstName());
 			demographicContactFewTo1.setLastName(demographic.getLastName());
 			
-			if (isPreferredPhone(demographic.getPhone())) {
-				demographicContactFewTo1.setPhone(demographic.getPhone());
+			if (demographic.getPhone() != null) {
+				demographicContactFewTo1.setHomePhone(demographic.getPhone());
 			}
-			else if (isPreferredPhone(demographic.getPhone2())) {
-				demographicContactFewTo1.setPhone(demographic.getPhone2());
-			}
-			else {
-				if (demographic.getPhone()!=null) demographicContactFewTo1.setPhone(demographic.getPhone());
-				else if (demographic.getPhone2()!=null) demographicContactFewTo1.setPhone(demographic.getPhone2());
+			else if (demographic.getPhone2() != null) {
+				demographicContactFewTo1.setWorkPhone(demographic.getPhone2());
 			}
 		}
 		else if (demographicContact.getType()==DemographicContact.TYPE_PROVIDER) {
 			Provider provider = (Provider) obj;
 			demographicContactFewTo1.setFirstName(provider.getFirstName());
 			demographicContactFewTo1.setLastName(provider.getLastName());
-			demographicContactFewTo1.setPhone(provider.getPhone());
+			demographicContactFewTo1.setWorkPhone(provider.getPhone());
 		}
 		else if (demographicContact.getType()==DemographicContact.TYPE_PROFESSIONALSPECIALIST) {
 			ProfessionalSpecialist specialist = (ProfessionalSpecialist) obj;
 			demographicContactFewTo1.setFirstName(specialist.getFirstName());
 			demographicContactFewTo1.setLastName(specialist.getLastName());
-			demographicContactFewTo1.setPhone(specialist.getPhoneNumber());
+			demographicContactFewTo1.setWorkPhone(specialist.getPhoneNumber());
 		}
 		else if (demographicContact.getType()==DemographicContact.TYPE_CONTACT) {
 			Contact contact = (Contact) obj;
 			demographicContactFewTo1.setFirstName(contact.getFirstName());
 			demographicContactFewTo1.setLastName(contact.getLastName());
-			if (contact.getResidencePhone()!=null) demographicContactFewTo1.setPhone(contact.getResidencePhone());
-			else if (contact.getWorkPhone()!=null) demographicContactFewTo1.setPhone(contact.getWorkPhone());
-			else if (contact.getCellPhone()!=null) demographicContactFewTo1.setPhone(contact.getCellPhone());
+			if (contact.getResidencePhone()!=null) demographicContactFewTo1.setHomePhone(contact.getResidencePhone());
+			else if (contact.getWorkPhone()!=null) demographicContactFewTo1.setWorkPhone(contact.getWorkPhone());
+			else if (contact.getWorkPhoneExtension()!=null) demographicContactFewTo1.setWPhoneExt(contact.getWorkPhoneExtension());
+			else if (contact.getCellPhone()!=null) demographicContactFewTo1.setCellPhone(contact.getCellPhone());
 		}
 		return demographicContactFewTo1;
 	}

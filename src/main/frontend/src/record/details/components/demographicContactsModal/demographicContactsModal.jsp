@@ -1,4 +1,4 @@
-<juno-modal class="juno-modal med-sml demographic-contacts-modal">
+<juno-modal class="juno-modal demographic-contacts-modal">
 
 	<modal-title>
 		<h3>{{$ctrl.contactType}}</h3>
@@ -16,7 +16,7 @@
 
 	<modal-body class="modal-body">
 
-		<div class="height-100 overflow-auto ">
+		<div class="body height-100 overflow-auto" >
 			<juno-input
 					ng-model="$ctrl.contact.firstName"
 					label="First Name"
@@ -34,14 +34,6 @@
 			</juno-input>
 
 			<juno-input
-					ng-model="$ctrl.contact.phone"
-					label="Phone #"
-					disabled="true"
-					placeholder="Phone number"
-					component-style="$ctrl.componentStyle">
-			</juno-input>
-
-			<juno-input
 					ng-model="$ctrl.contact.role"
 					disabled="true"
 					label="Contact Role"
@@ -50,15 +42,104 @@
 			</juno-input>
 
 			<juno-input
-					ng-model="$ctrl.contactType"
-					label="Contact Type"
+					ng-model="$ctrl.contact.address"
+					label="Address"
 					disabled="true"
-					placeholder="Contact Type"
+					placeholder="Address"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.city"
+					label="City"
+					disabled="true"
+					placeholder="City"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.postal"
+					label="Postal Code"
+					disabled="true"
+					placeholder="Postal Code"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.province"
+					label="Province"
+					disabled="true"
+					placeholder="Province"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+		<div class="phone-with-ext">
+			<juno-input
+					ng-model="$ctrl.contact.homePhone"
+					label="Home Phone"
+					disabled="true"
+					placeholder="000-000-0000"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+			<juno-input
+					class="phone-ext"
+					ng-model="$ctrl.contact.scrHPhoneExt"
+					label="Ext"
+					disabled="true"
+					placeholder="00000"
 					component-style="$ctrl.componentStyle">
 			</juno-input>
 		</div>
-	</modal-body>
 
+			<juno-input
+					ng-model="$ctrl.contact.cellPhone"
+					label="Cell Phone"
+					disabled="true"
+					placeholder="000-000-0000"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+			<div class="phone-with-ext">
+			<juno-input
+					ng-model="$ctrl.contact.workPhone"
+					label="Work Phone"
+					disabled="true"
+					placeholder="000-000-0000"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+			<juno-input
+					class="phone-ext"
+					ng-model="$ctrl.contact.wphoneExt"
+					label="Ext"
+					disabled="true"
+					placeholder="000-000-0000"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+		</div>
+
+			<juno-input
+					ng-model="$ctrl.contact.fax"
+					label="Fax"
+					disabled="true"
+					placeholder="000-000-0000"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input
+					ng-model="$ctrl.contact.email"
+					label="Email Address"
+					disabled="true"
+					placeholder="Email"
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+			<juno-input
+					ng-model="$ctrl.contact.note"
+					label="Notes"
+					disabled="true"
+
+					component-style="$ctrl.componentStyle">
+			</juno-input>
+
+		</div>
+	</modal-body>
 
 	<modal-footer class="modal-footer">
 		<div class="buttons">
