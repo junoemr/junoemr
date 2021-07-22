@@ -28,6 +28,11 @@ require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
 require('angular-drag-and-drop-lists');
 require('file-saver');
+require('chart.js');
+require('angular-chart.js');
+
+// import "chart.js";
+// import "angular-chart.js"
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
@@ -61,6 +66,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Dashboard',
 	'Consults',
 	'Admin',
+	// 'chart.js',
+	// 'angular-chart.js',
 ]);
 
 oscarApp.config([

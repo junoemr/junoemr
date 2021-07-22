@@ -42,9 +42,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 		},
 		controller: [
 			'$scope',
+			'$uibModal',
 			'careTrackerApiService',
 			function (
 				$scope,
+				$uibModal,
 				careTrackerApiService,
 			)
 			{
@@ -123,6 +125,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				ctrl.showValueDateInput = (): boolean =>
 				{
 					return ctrl.model && ctrl.model.itemTypeIsMeasurement() && ctrl.model.valueTypeIsDate();
+				}
+
+				ctrl.isGraphable = (): boolean =>
+				{
+					return ctrl.model.valueTypeIsNumeric();
 				}
 
 				ctrl.onBooleanValueChange = (value: boolean): void =>
@@ -215,6 +222,20 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 						}
 					}
 					return label;
+				}
+
+				ctrl.onShowDataGraph = () =>
+				{
+					$uibModal.open(
+						{
+							component: 'careTrackerItemGraphModal',
+							backdrop: 'static',
+							windowClass: "juno-simple-modal-window",
+							resolve: {
+								style: ctrl.componentStyle,
+							}
+						}
+					).result;
 				}
 			}]
 	});
