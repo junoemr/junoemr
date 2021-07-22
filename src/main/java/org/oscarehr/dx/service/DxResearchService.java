@@ -50,9 +50,7 @@ public class DxResearchService
 
 	public List<DxRecord> getAssignedDxRecords(Integer demographicNo)
 	{
-		//TODO filter active. probably in query
-		List<Dxresearch> dxresearchList = dxresearchDAO.getDxResearchItemsByPatient(demographicNo);
-		return dxDbToModelConverter.convert(dxresearchList);
+		return dxDbToModelConverter.convert(dxresearchDAO.getByDemographicNo(demographicNo));
 	}
 
 	public void assignDxCodeToDemographic(Integer demographicNo, Integer providerNo, String dxCode, String codingSystem)
