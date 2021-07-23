@@ -12,11 +12,11 @@ import java.util.Iterator;
 
 public abstract class PreventionsReport implements PreventionReport
 {
-
     public String letterProcessing(PreventionReportDisplay reportDisplay, String measurementType, Date asOfDate, @Nullable Date preventionDate)
     {
         EctMeasurementsDataBeanHandler measurementDataHandler;
         Collection<EctMeasurementsDataBean> followupData;
+
         if (reportDisplay != null)
         {
             measurementDataHandler = new EctMeasurementsDataBeanHandler(reportDisplay.demographicNo, measurementType);
@@ -27,7 +27,15 @@ public abstract class PreventionsReport implements PreventionReport
             {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(asOfDate);
-                cal.add(Calendar.YEAR, -2);
+                if (measurementType == "PAPF")
+                {
+                    cal.add(Calendar.YEAR, -3);
+                }
+                else
+                {
+                    cal.add(Calendar.YEAR, -2); 
+                }
+
                 Date dueDate = cal.getTime();
                 cal.add(Calendar.MONTH, -6);
                 Date cutoffDate = cal.getTime();
@@ -49,10 +57,6 @@ public abstract class PreventionsReport implements PreventionReport
                     Calendar oneyear = Calendar.getInstance();
                     oneyear.setTime(asOfDate);
                     oneyear.add(Calendar.YEAR, -1);
-
-                    Calendar onemonth = Calendar.getInstance();
-                    onemonth.setTime(asOfDate);
-                    onemonth.add(Calendar.MONTH, -1);
 
                     Date observationDate = null;
                     int index = 0;
@@ -142,7 +146,7 @@ public abstract class PreventionsReport implements PreventionReport
             }
             else
             {
-                // log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
+                // log.debug("NOT SURE WHAT HAPPENED IN THE LETTER PROCESSING");
             }
             return reportDisplay.nextSuggestedProcedure;
         }
