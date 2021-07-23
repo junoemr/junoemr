@@ -1,38 +1,58 @@
 .demographic-contacts-modal {
 
+  label {
+    text-align: left;
+  }
+
+  .postal-prov {
+    display: flex;
+    align-items: center;
+
+    .juno-input {
+      width: 172px;
+    }
+  }
+
   .phone-with-ext {
-				display: flex;
-				align-items: center;
+    display: flex;
+    align-items: center;
 
-				.juno-input {
-					width: 248px;
+    .juno-input {
+      width: 248px;
 
-					input {
-						padding: 0 8px 0 16px;
-					}
-				}
-				.phone-ext {
-					.juno-input {
-						width: 128px;
+      input {
+        padding: 0 8px 0 16px;
 
-						label {
-							min-width: 32px;
-						}
-					}
-				}
-				.juno-check-box {
-					margin-left: 8px;
-				}
-			}
+      }
+    }
+
+    .phone-ext {
+      .juno-input {
+        width: 96px;
+
+        label {
+          min-width: 32px;
+        }
+      }
+    }
+  }
+
+  .notes {
+    .juno-input {
+      width: 710px;
+    }
+  }
 
   .body {
     display: flex;
     flex-wrap: wrap;
   }
+
   .juno-input {
     margin-top: 8px;
     margin-left: 8px;
-    width: 376px;
+    width: 352px;
+    text-align: left;
   }
 
   .modal-footer {
@@ -44,11 +64,11 @@
         flex-grow: 0;
 
         .juno-button {
-          margin-top: 0;
-          width: 60px;
+          margin-top: 8px;
+          width: 64px;
 
           button {
-            height: 40px;
+            height: 42px;
           }
         }
 

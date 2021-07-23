@@ -42,7 +42,7 @@ public class DemographicContactFewTo1 implements Serializable {
 	private int type;
 	private String lastName;
 	private String firstName;
-
+	private String middleName;
 	private String address;
 	private String address2;
 	private String city;
@@ -54,6 +54,7 @@ public class DemographicContactFewTo1 implements Serializable {
 	private String workPhone;
 	private String hPhoneExt;
 	private String wPhoneExt;
+	private String cPhoneExt;
 	private String fax;
 	private String email;
 	private String note;

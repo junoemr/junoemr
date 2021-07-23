@@ -33,7 +33,6 @@ angular.module('Record.Details').component('demographicContactsSection', {
     templateUrl: 'src/record/details/components/demographicContactsSection/demographicContactsSection.jsp',
     bindings: {
         ngModel: "=",
-        validations: "=",
         componentStyle: "<?"
     },
     controller: ["staticDataService",
@@ -68,7 +67,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                     },
                     function error(error)
                     {
-                        alert("Unable to retrieve contacts", error);
+                        Juno.Common.Util.alert("Unable to retrieve contacts", error);
                     });
 
                 demographicService.getDemographicContacts(ctrl.thisDemo, "professional").then(
@@ -78,7 +77,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                     },
                     function error(error)
                     {
-                        alert("Unable to retrieve contacts", error);
+                        Juno.Common.Util.alert("Unable to retrieve contacts", error);
                     }
                 );
             }

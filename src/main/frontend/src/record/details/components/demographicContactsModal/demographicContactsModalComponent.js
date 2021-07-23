@@ -40,7 +40,6 @@ angular.module('Record.Details').component('demographicContactsModal', {
             }
 
             ctrl.LABEL_POSITION = LABEL_POSITION;
-            ctrl.JUNO_STYLE = JUNO_STYLE;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
@@ -51,9 +50,6 @@ angular.module('Record.Details').component('demographicContactsModal', {
             ctrl.$onInit = () =>
             {
                 ctrl.contact = ctrl.resolve.demoContact;
-                console.log(ctrl.contact);
-                console.log(ctrl.contact.scrHPhoneExt);
-                console.log(ctrl.contact.hphoneExt);
 
                 switch(ctrl.contact.type)
                 {
@@ -103,15 +99,15 @@ angular.module('Record.Details').component('demographicContactsModal', {
                     },
                     function error(errors)
                     {
-                        alert("Unable to open tab.",errors);
+                        Juno.Common.Util.alert("Unable to open tab.",errors);
                     });
             };
 
             ctrl.changeTab = function changeTab(tab)
             {
-                if (Juno.Common.Util.isDefinedAndNotNull(tab.state))
+                if (tab.state)
                 {
-                    if (Juno.Common.Util.isDefinedAndNotNull(tab.demoId))
+                    if (tab.demoId)
                     {
                         $state.go(tab.state[0],
                             {

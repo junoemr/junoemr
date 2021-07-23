@@ -25,7 +25,7 @@
 
 package org.oscarehr.common.model;
 
-import java.util.Date;
+import lombok.Data;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
@@ -39,7 +39,9 @@ import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
+@Data
 @Entity
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="type")
@@ -51,7 +53,8 @@ public class Contact extends AbstractModel<Integer> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
 	private String lastName;
-	private String firstName;	
+	private String firstName;
+	private String middleName;
 	private String address;
 	private String address2;
 	private String city;
@@ -61,6 +64,8 @@ public class Contact extends AbstractModel<Integer> {
 	private String residencePhone;
 	private String cellPhone;
 	private String workPhone;
+	private String residencePhoneExtension;
+	private String cellPhoneExtension;
 	private String workPhoneExtension;
 	private String email;
 	private String fax;
