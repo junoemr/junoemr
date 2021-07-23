@@ -21,8 +21,8 @@
  * Canada
  */
 
-import CareTrackerItemModel from "../../../../../lib/careTracker/model/CareTrackerItemModel";
 import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
+import {Moment} from "moment";
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModal',
 	{
@@ -38,27 +38,20 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 				ctrl.isLoading = true;
 
 				ctrl.labels = [];
-				ctrl.series = [];
+				ctrl.series = ["Recorded Value"];
 				ctrl.data = [];
-				ctrl.options = {
-					scales: {
-						yAxes: [
-							{
-								id: 'y-axis-1',
-								type: 'linear',
-								display: true,
-								position: 'left'
-							},
-						]
-					}
-				};
+				ctrl.options = [];
+				ctrl.colours = [
+					"#455899",
+				];
 
 				ctrl.$onInit = (): void =>
 				{
-					ctrl.model = ctrl.resolve.model;
-					ctrl.series = ["Recorded Value"];
+					ctrl.model = angular.copy(ctrl.resolve.model); // use a copy so we don't modify the real model
+					ctrl.model.sortDataByObservationDate(true);
 					ctrl.labels = ctrl.formatLabels(ctrl.model.data);
 					ctrl.data = [ctrl.formatData(ctrl.model.data)];
+					ctrl.options = ctrl.formatOptions(ctrl.model.data);
 					ctrl.isLoading = false;
 				}
 
@@ -66,7 +59,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 				{
 					return dataPoints.map((data: CareTrackerItemDataModel) =>
 					{
-						return Juno.Common.Util.formatMomentDate(data.observationDateTime, Juno.Common.Util.DisplaySettings.calendarDateFormat);
+						return data.observationDateTime.toDate();
 					});
 				}
 
@@ -75,14 +68,50 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 					return dataPoints.map((data: CareTrackerItemDataModel) => Number(data.value));
 				}
 
-				// ctrl.labels = ["January", "February", "March", "April", "May", "June", "July"];
-				// ctrl.series = ['Series A', 'Series B'];
-				// ctrl.data = [
-				// 	[65, 59, 80, 81, 56, 55, 40],
-				// 	// [28, 48, 40, 19, 86, 27, 90]
-				// ];
-				// ctrl.onClick = function (points, evt) {
-				// 	console.log(points, evt);
-				// };
+				ctrl.formatOptions = (dataPoints: CareTrackerItemDataModel[]): object =>
+				{
+					const axisDaysThreshold = 30; // after this, only months are displayed on x-axis
+					const axisMonthsThreshold = 365 * 2; // after this, only years are displayed on x-axis
+
+					const firstDate: Moment = dataPoints[0].observationDateTime;
+					const lastDate: Moment = dataPoints[dataPoints.length - 1].observationDateTime;
+					const timeScaleDays: number = Math.abs(lastDate.diff(firstDate, 'days'));
+					const unit = (timeScaleDays > axisDaysThreshold) ? ((timeScaleDays > axisMonthsThreshold) ? "year" : "month") : "day";
+
+					return ctrl.options = {
+						scales: {
+							yAxes: [
+								{
+									id: 'y-axis-1',
+									type: 'linear',
+									display: true,
+									position: 'left',
+									// title option doesn't appear to work
+									title: {
+										display: true,
+										text: "Value",
+									},
+								},
+							],
+							xAxes: [
+								{
+									id: 'x-axis-1',
+									type: 'time',
+									distribution: 'linear',
+									display: true,
+									// title option doesn't appear to work
+									title: {
+										display: true,
+										text: "Date & Time",
+									},
+									time: {
+										tooltipFormat: Juno.Common.Util.DisplaySettings.calendarDateFormat,
+										unit: unit,
+									},
+								}
+							],
+						}
+					};
+				}
 			}]
 	});

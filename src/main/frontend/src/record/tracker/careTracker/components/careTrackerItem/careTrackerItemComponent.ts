@@ -158,7 +158,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					{
 						newDataElement = await careTrackerApiService.addCareTrackerItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
 						ctrl.model.data.push(newDataElement);
-						ctrl.model.sortDataByObservationDate();
+						ctrl.model.sortDataByObservationDate(false);
 						ctrl.clearNewEntry();
 					}
 					catch (errorObject)

@@ -2,8 +2,14 @@
 
 	.canvas-wrapper {
 		padding: 8px;
-		//position: relative;
-		//width: 100%;
-		//height: 100%;
+	}
+	.x-axis-label {
+		height: 32px;
+		@include juno-font-body();
+	}
+	.y-axis-label {
+		width: 32px;
+		@include juno-font-body();
+		transform: rotate(-90deg);
 	}
 }
