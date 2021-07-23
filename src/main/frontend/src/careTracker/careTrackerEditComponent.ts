@@ -242,8 +242,11 @@ angular.module('CareTracker').component('careTrackerEdit',
 					const searchResults = await careTrackerApiService.searchPreventionTypes(searchTerm);
 					return searchResults.body.map((result) =>
 					{
+						let extraData = (result.healthCanadaType && result.healthCanadaType !== result.name) ? (" [" + result.healthCanadaType + "]") : "";
+						extraData = (result.atc) ? (extraData + " - " + result.atc) : extraData;
+
 						return {
-							label: result.name,
+							label: result.name + extraData,
 							value: result.code,
 							data: result,
 						}
@@ -256,7 +259,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 					return searchResults.body.map((result) =>
 					{
 						return {
-							label: result.name + "(" + result.code + ")",
+							label: result.name + " (" + result.code + ") " + result.instructions,
 							value: result.code,
 							data: result,
 						}

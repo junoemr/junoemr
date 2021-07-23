@@ -98,12 +98,12 @@ angular.module("CareTracker").service("careTrackerApiService", [
 			return (await service.careTrackerApi.deleteCareTracker(careTrackerId)).data.body;
 		}
 
-		service.searchPreventionTypes = async (keyword: string): Promise<string[]> =>
+		service.searchPreventionTypes = async (keyword: string): Promise<object[]> =>
 		{
 			return (await service.preventionsApi.searchPreventionTypes(keyword)).data;
 		}
 
-		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<string[]> =>
+		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<object[]> =>
 		{
 			return (await service.measurementsApi.searchMeasurementTypes(keyword, page, perPage)).data;
 		}
