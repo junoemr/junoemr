@@ -26,6 +26,7 @@
 package org.oscarehr.common.model;
 
 import com.google.common.collect.Sets;
+import org.apache.xpath.operations.Bool;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -71,17 +72,17 @@ public class DemographicContact extends AbstractModel<Integer> {
 	private Date created;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
-	private boolean deleted;
-	private int demographicNo;
+	private Boolean deleted;
+	private Integer demographicNo;
 	private String contactId;
 	private String role;
-	private int type;
+	private Integer type;
 	private String category;
 	private String sdm;
 	private String ec;
 	private String note;
 
-	private int facilityId;
+	private Integer facilityId;
 	private String creator;
 
 	private Boolean consentToContact = true;
@@ -147,11 +148,11 @@ public class DemographicContact extends AbstractModel<Integer> {
 		this.role = role;
 	}
 
-	public int getType() {
+	public Integer getType() {
 		return type;
 	}
 
-	public void setType(int type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 
@@ -162,11 +163,6 @@ public class DemographicContact extends AbstractModel<Integer> {
 	public void setCategory(String category) {
     	this.category = category;
     }
-/*
-	public void setId(Integer id) {
-    	this.id = id;
-    }
-*/
 
 	public String getContactName() {
     	return contactName;
@@ -200,8 +196,6 @@ public class DemographicContact extends AbstractModel<Integer> {
     	this.note = note;
     }
 
-
-
 	public int getFacilityId() {
     	return facilityId;
     }
@@ -229,7 +223,7 @@ public class DemographicContact extends AbstractModel<Integer> {
 		this.setUpdateDate(new Date());
 	}
 
-	public boolean isConsentToContact() {
+	public Boolean isConsentToContact() {
 		return consentToContact;
 	}
 
@@ -237,7 +231,7 @@ public class DemographicContact extends AbstractModel<Integer> {
 		this.consentToContact = consentToContact;
 	}
 
-	public boolean isActive() {
+	public Boolean isActive() {
 		return active;
 	}
 
@@ -252,6 +246,4 @@ public class DemographicContact extends AbstractModel<Integer> {
 	public void setDetails(Contact details) {
 	    this.details = details;
     }
-
-	
 }
