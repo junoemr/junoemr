@@ -26,7 +26,6 @@
 package org.oscarehr.common.model;
 
 import com.google.common.collect.Sets;
-import org.apache.xpath.operations.Bool;
 
 import java.util.Date;
 import java.util.HashSet;
