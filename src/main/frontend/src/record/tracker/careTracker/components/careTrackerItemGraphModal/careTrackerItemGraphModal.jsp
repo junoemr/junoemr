@@ -7,14 +7,15 @@
 			TEST TEST TEST
 		</span>
 		<div class="canvas-wrapper flex-row flex-grow align-items-end">
-			<canvas id="line"
+			<canvas ng-if="!$ctrl.isLoading"
+			        id="line"
 			        class="chart chart-line"
 			        chart-data="$ctrl.data"
 			        chart-labels="$ctrl.labels"
 			        chart-series="$ctrl.series"
 			        chart-options="$ctrl.options"
 			        chart-dataset-override="$ctrl.datasetOverride"
-			        chart-click="$ctrl.onClick">
+			        >
 			</canvas>
 		</div>
 	</div>

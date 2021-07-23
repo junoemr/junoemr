@@ -233,6 +233,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 							windowClass: "juno-simple-modal-window",
 							resolve: {
 								style: ctrl.componentStyle,
+								model: ctrl.model,
 							}
 						}
 					).result;

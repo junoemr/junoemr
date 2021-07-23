@@ -21,6 +21,9 @@
  * Canada
  */
 
+import CareTrackerItemModel from "../../../../../lib/careTracker/model/CareTrackerItemModel";
+import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
+
 angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModal',
 	{
 		templateUrl: 'src/record/tracker/careTracker/components/careTrackerItemGraphModal/careTrackerItemGraphModal.jsp',
@@ -32,17 +35,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 			function()
 			{
 				const ctrl = this;
+				ctrl.isLoading = true;
 
-				ctrl.labels = ["January", "February", "March", "April", "May", "June", "July"];
-				ctrl.series = ['Series A', 'Series B'];
-				ctrl.data = [
-					[65, 59, 80, 81, 56, 55, 40],
-					[28, 48, 40, 19, 86, 27, 90]
-				];
-				ctrl.onClick = function (points, evt) {
-					console.log(points, evt);
-				};
-				ctrl.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+				ctrl.labels = [];
+				ctrl.series = [];
+				ctrl.data = [];
 				ctrl.options = {
 					scales: {
 						yAxes: [
@@ -52,14 +49,40 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 								display: true,
 								position: 'left'
 							},
-							{
-								id: 'y-axis-2',
-								type: 'linear',
-								display: true,
-								position: 'right'
-							}
 						]
 					}
 				};
+
+				ctrl.$onInit = (): void =>
+				{
+					ctrl.model = ctrl.resolve.model;
+					ctrl.series = ["Recorded Value"];
+					ctrl.labels = ctrl.formatLabels(ctrl.model.data);
+					ctrl.data = [ctrl.formatData(ctrl.model.data)];
+					ctrl.isLoading = false;
+				}
+
+				ctrl.formatLabels = (dataPoints: CareTrackerItemDataModel[]): object[] =>
+				{
+					return dataPoints.map((data: CareTrackerItemDataModel) =>
+					{
+						return Juno.Common.Util.formatMomentDate(data.observationDateTime, Juno.Common.Util.DisplaySettings.calendarDateFormat);
+					});
+				}
+
+				ctrl.formatData = (dataPoints: CareTrackerItemDataModel[]): number[] =>
+				{
+					return dataPoints.map((data: CareTrackerItemDataModel) => Number(data.value));
+				}
+
+				// ctrl.labels = ["January", "February", "March", "April", "May", "June", "July"];
+				// ctrl.series = ['Series A', 'Series B'];
+				// ctrl.data = [
+				// 	[65, 59, 80, 81, 56, 55, 40],
+				// 	// [28, 48, 40, 19, 86, 27, 90]
+				// ];
+				// ctrl.onClick = function (points, evt) {
+				// 	console.log(points, evt);
+				// };
 			}]
 	});

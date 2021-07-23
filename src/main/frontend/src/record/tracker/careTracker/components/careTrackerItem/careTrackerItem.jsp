@@ -25,11 +25,11 @@
 		<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
 		<div class="item-description">{{$ctrl.model.description}}</div>
 	</div>
-	<div class="graphing-button-container no-print">
+	<div ng-if="$ctrl.isGraphable()"
+	     class="graphing-button-container no-print">
 		<juno-button component-style="$ctrl.componentStyle"
 		             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 		             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-		             disabled="!$ctrl.isGraphable()"
 		             click="$ctrl.onShowDataGraph()">
 			Graph
 		</juno-button>
