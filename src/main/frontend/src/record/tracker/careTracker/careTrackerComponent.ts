@@ -102,14 +102,28 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 				}
 				ctrl.showCareTrackerItem = (item: CareTrackerItemModel): boolean =>
 				{
-					if(!item || (!ctrl.filter.item.showHidden && item.hidden))
+					if(item)
 					{
-						return false;
+						// only show hidden items if the showHidden filter is set
+						if(item.hidden && !ctrl.filter.item.showHidden)
+						{
+							return false;
+						}
+						// only show the item if a keyword matches
+						const keyword = ctrl.filter.item.textFilter;
+						if(!Juno.Common.Util.isBlank(keyword))
+						{
+							return ctrl.textFilterMatch(item.name, keyword)
+								|| ctrl.textFilterMatch(item.typeCode, keyword)
+								|| ctrl.textFilterMatch(item.description, keyword)
+						}
+						return true;
 					}
-					return !(!Juno.Common.Util.isBlank(ctrl.filter.item.textFilter) &&
-						(!item.name || !item.name.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())) &&
-						(!item.typeCode || !item.typeCode.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())) &&
-						(!item.description || !item.description.toLowerCase().includes(ctrl.filter.item.textFilter.toLowerCase())));
+					return false;
+				}
+				ctrl.textFilterMatch = (toCheck: string, keyword: string): boolean =>
+				{
+					return toCheck && toCheck.toLowerCase().includes(keyword.toLowerCase());
 				}
 
 				ctrl.onPrint = (): void =>

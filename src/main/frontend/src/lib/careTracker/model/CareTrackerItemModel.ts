@@ -83,6 +83,11 @@ export default class CareTrackerItemModel
 		return this.valueType === CareTrackerItemValueType.DATE;
 	}
 
+	public hasAttachedData(): boolean
+	{
+		return (this.data && this.data.length > 0);
+	}
+
 	public toString(): string
 	{
 		return this.name + " (" + this.typeCode + ")";
