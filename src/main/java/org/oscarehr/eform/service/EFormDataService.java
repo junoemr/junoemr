@@ -25,6 +25,7 @@ package org.oscarehr.eform.service;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessages;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.dao.EFormInstanceDao;
@@ -35,12 +36,15 @@ import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.model.EFormInstance;
 import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.eform.transfer.InstancedEFormListTransfer;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.WKHtmlToPdfUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -173,6 +177,27 @@ public class EFormDataService
 			eForm.setCurrent(!deleted);
 			eFormDataDao.merge(eForm);
 		}
+	}
+
+	/**
+	 * print an eform to pdf
+	 * @param loggedInInfo - the logged in user info
+	 * @param contextPath - the current context path
+	 * @param fdid - the fdid of the eform to print
+	 * @return byte - binary pdf data
+	 */
+	public byte[] printEForm(LoggedInInfo loggedInInfo, String contextPath, Integer fdid) throws IOException, HtmlToPdfConversionException
+	{
+		String printUrl = WKHtmlToPdfUtils.getEformRequestUrl(loggedInInfo.getLoggedInProviderNo(), fdid.toString(), "http", contextPath);
+		return WKHtmlToPdfUtils.convertToPdf(printUrl);
+	}
+
+	/**
+	 * see printEForm
+	 */
+	public byte[] printEForm(LoggedInInfo loggedInInfo, String contextPath, EFormData eFormData) throws IOException, HtmlToPdfConversionException
+	{
+		return printEForm(loggedInInfo, contextPath, eFormData.getId());
 	}
 
 	/**

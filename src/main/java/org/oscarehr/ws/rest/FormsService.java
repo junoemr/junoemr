@@ -43,6 +43,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -92,6 +93,7 @@ import oscar.oscarProvider.data.ProviderMyOscarIdData;
  */
 @Path("/forms")
 @Component("formsService")
+@Tag(name = "Form")
 @Transactional
 public class FormsService extends AbstractServiceImpl {
 	Logger logger = MiscUtils.getLogger();

@@ -373,6 +373,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentTypesWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.eform.EFormInstanceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EncounterSectionsService"/>
