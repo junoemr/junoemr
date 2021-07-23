@@ -29,8 +29,6 @@ package oscar.oscarPrevention.reports;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
 import oscar.util.UtilDateUtilities;
@@ -39,19 +37,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
  *
  * @author jay
  */
-public class PapReport implements PreventionReport {
+public class PapReport extends PreventionsReport {
     private static Logger log = MiscUtils.getLogger();
     /** Creates a new instance of PapReport */
     public PapReport() {
@@ -79,6 +75,8 @@ public class PapReport implements PreventionReport {
              prd.demographicNo = demo;
              prd.bonusStatus = "N";
              prd.billStatus = "N";
+             Date prevDate = null;
+
              if(ineligible(prevs)){
                 prd.rank = 5;
                 prd.lastDate = "------";
@@ -95,7 +93,7 @@ public class PapReport implements PreventionReport {
              }else{
                 DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 Map<String,Object> h = noFutureItems.get(noFutureItems.size()-1);
-             
+
                 boolean refused = false;
                 boolean dateIsRefused = false;
                 if ( h.get("refused") != null && ((String) h.get("refused")).equals("1")){
@@ -104,7 +102,6 @@ public class PapReport implements PreventionReport {
                 }
 
                 String prevDateStr = (String) h.get("prevention_date");
-
 
                 if (refused && noFutureItems.size() > 1){
                     log.debug("REFUSED AND PREV IS greater than one for demo "+demo);
@@ -120,14 +117,11 @@ public class PapReport implements PreventionReport {
                         }
                     }
                 }
-                Date prevDate = null;
                 try{
                    prevDate = formatter.parse(prevDateStr);
                 }catch (Exception e){
                 	//extra
                 }
-
-
 
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(asofDate);
@@ -198,7 +192,6 @@ public class PapReport implements PreventionReport {
                    prd.state = "Overdue";
                    prd.numMonths = numMonths;
                    prd.color = "red"; //FF00FF
-
                 }
                 // recorded and refused
                 else if (refused)
@@ -208,7 +201,6 @@ public class PapReport implements PreventionReport {
                    prd.state = "Refused";
                    prd.numMonths = numMonths;
                    prd.color = "orange"; //FF9933
-
                 }
                 // recorded done
                 else if (dueDate.before(prevDate))
@@ -218,13 +210,13 @@ public class PapReport implements PreventionReport {
                    prd.state = "Up to date";
                    prd.numMonths = numMonths;
                    prd.color = "green";
-                   //done++;
                 }
              }
-             letterProcessing( prd,"PAPF",asofDate);
-             returnReport.add(prd);
 
+             prd.nextSuggestedProcedure = letterProcessing( prd,"PAPF", asofDate, prevDate);
+             returnReport.add(prd);
           }
+
           String percentStr = "0";
           String percentWithGraceStr = "0";
           double eligible = list.size() - inList;
@@ -237,12 +229,7 @@ public class PapReport implements PreventionReport {
              percentWithGraceStr = ""+Math.round(percentageWithGrace);
           }
 
-
-
-        /////
-
-
-            Collections.sort(returnReport);
+          Collections.sort(returnReport);
 
           Hashtable<String,Object> h = new Hashtable<String,Object>();
 
@@ -295,167 +282,4 @@ public class PapReport implements PreventionReport {
        }
        return noFutureItems;
    }
-
-
-    //TODO-legacy: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
-   //If they don't have a PAP Test with guidelines
-                //Get contact methods
-                    //NO contact
-                        //Send letter
-                    //Was last contact within a year ago
-                        //NO
-                            //Send Letter 1
-   					//Was contact within the last year and at least one month ago
-                            //Yes count it
-   
-   				//No contacts qualify 
-   					//send letter 1
-   				//One contact qualifies
-   					//send letter 2
-   				//Two contacts qualify
-   					//Phone call
-   				//Reached limit no contact suggested
-
-   //Measurement Type will be 1 per Prevention report, with the dataField holding method ie L1, L2, P1 (letter 1 , letter 2, phone call 1)
-   String LETTER1 = "L1";
-   String LETTER2 = "L2";
-   String PHONE1 = "P1";
-
-   private String letterProcessing(PreventionReportDisplay prd,String measurementType,Date asofDate){
-       if (prd != null){
-          if (prd.state.equals("No Info") || prd.state.equals("due") || prd.state.equals("Overdue")){
-              // Get LAST contact method
-              EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
-              log.debug("getting followup data for "+prd.demographicNo);
-
-              Collection followupData = measurementDataHandler.getMeasurementsData();
-              //NO Contact
-
-              if ( followupData.size() == 0 ){
-                  prd.nextSuggestedProcedure = this.LETTER1;
-                  return this.LETTER1;
-              }else{ //There has been contact
-            	  Calendar oneyear = Calendar.getInstance();
-                  oneyear.setTime(asofDate);
-                  oneyear.add(Calendar.YEAR,-1);                  
-
-                  Calendar onemonth = Calendar.getInstance();
-                  onemonth.setTime(asofDate);
-                  onemonth.add(Calendar.MONTH,-1);
-                   
-                  Date observationDate = null;
-                  int count = 0;
-                  int index = 0;
-                  EctMeasurementsDataBean measurementData = null;
-
-                  @SuppressWarnings("unchecked")
-            	  Iterator<EctMeasurementsDataBean>iterator = followupData.iterator();                                    
-                  
-                  while(iterator.hasNext()) {
-                	  measurementData =  iterator.next();
-                	  observationDate = measurementData.getDateObservedAsDate();
-                	  
-                	  if( index == 0 ) {
-                          log.debug("fluData "+measurementData.getDataField());
-                          log.debug("lastFollowup "+measurementData.getDateObservedAsDate()+ " last procedure "+measurementData.getDateObservedAsDate());
-                          log.debug("toString: "+measurementData.toString());
-                          prd.lastFollowup = observationDate;
-                          prd.lastFollupProcedure = measurementData.getDataField();
-
-                          if ( measurementData.getDateObservedAsDate().before(oneyear.getTime())){
-                              prd.nextSuggestedProcedure = this.LETTER1;
-                              return this.LETTER1;
-                          }
-
-                          if( prd.lastFollupProcedure.equals(this.PHONE1)) {
-                        	  prd.nextSuggestedProcedure = "------";
-                        	  return "------";
-                          }
-                	  }
-                	  /*if( observationDate.after(oneyear.getTime())) {
-                		  ++count;
-                	  }
-                	  else if( count >= 1 && observationDate.after(oneyear.getTime()) ) {
-                		  ++count;
-                	  }*/
-
-                	  ++index;
-                  }
-                  
-                  switch (prd.lastFollupProcedure) {
-                      case "------":
-                   	     prd.nextSuggestedProcedure = this.LETTER1;
-                	     break;
-                     case "L1":
-                	     prd.nextSuggestedProcedure = this.LETTER2;
-                	     break;
-                     case "L2":
-                	     prd.nextSuggestedProcedure = this.PHONE1;
-                	     break;
-                     default:
-                	      prd.nextSuggestedProcedure = "------";
-                  }
-                  
-                  return prd.nextSuggestedProcedure;
-              }
-
-          }else if (prd.state.equals("Refused")){  //Not sure what to do about refused
-                //prd.lastDate = "-----";
-              EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
-              log.debug("getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsData();
-              if ( followupData.size() > 0 ){
-                  EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();
-                  prd.lastFollowup = measurementData.getDateObservedAsDate();
-                  prd.lastFollupProcedure = measurementData.getDataField();
-              }
-              prd.nextSuggestedProcedure = "------";
-                //prd.numMonths ;
-          }else if(prd.state.equals("Ineligible")){
-                // Do nothing
-                prd.nextSuggestedProcedure = "------";
-          }else if(prd.state.equals("Up to date")){
-                //Do nothing
-              EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
-              log.debug("getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsData();
-
-              if ( followupData.size() > 0 ){
-                  EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();
-                  prd.lastFollowup = measurementData.getDateObservedAsDate();
-                  prd.lastFollupProcedure = measurementData.getDataField();
-              }
-              prd.nextSuggestedProcedure = "------";
-          }else{
-               log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
-          }
-       }
-       return null;
-   }
 }
-
-
-
-
-
-//                  Calendar today = Calendar.getInstance();
-//                  today.setTime(asofDate);
-//                  int num = UtilDateUtilities.getNumMonths(measurementData.getDateObservedAsDate(),today.getTime());
-//                  if (num > 12){
-//                        prd.nextSuggestedProcedure = this.LETTER1;
-//                        return this.LETTER1;
-//                  }else{ //AFTER CUTOFF DATE
-//                      if ( num > 3 ){
-//                          if (prd.lastFollupProcedure.equals(this.LETTER1)){
-//                                prd.nextSuggestedProcedure = this.LETTER2;
-//                                return this.LETTER2;
-//                          }else if(prd.lastFollupProcedure.equals(this.LETTER1)){
-//                                prd.nextSuggestedProcedure = this.PHONE1;
-//                                return this.PHONE1;
-//                          }else{
-//                              prd.nextSuggestedProcedure = "----";
-//                              return "----";
-//                          }
-//
-//                        }
-//

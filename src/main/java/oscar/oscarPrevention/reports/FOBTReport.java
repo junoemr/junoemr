@@ -28,8 +28,6 @@ package oscar.oscarPrevention.reports;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
 import oscar.util.ConversionUtils;
@@ -39,19 +37,17 @@ import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
  *
  * @author jay
  */
-public class FOBTReport implements PreventionReport{
+public class FOBTReport extends PreventionsReport{
     private static Logger log = MiscUtils.getLogger();
     
     /** Creates a new instance of MammogramReport */
@@ -76,7 +72,7 @@ public class FOBTReport implements PreventionReport{
 
              //search   prevention_date prevention_type  deleted   refused
              ArrayList<Map<String,Object>> prevs = PreventionData.getPreventionData(loggedInInfo, "FOBT",demo);
-             PreventionData.addRemotePreventions(loggedInInfo,prevs, demo,"FOBT",null);
+             PreventionData.addRemotePreventions(loggedInInfo, prevs, demo,"FOBT",null);
              ArrayList<Map<String,Object>> colonoscopys = PreventionData.getPreventionData(loggedInInfo, "COLONOSCOPY",demo);
              PreventionData.addRemotePreventions(loggedInInfo,colonoscopys, demo,"COLONOSCOPY",null);
              PreventionReportDisplay prd = new PreventionReportDisplay();
@@ -197,13 +193,13 @@ public class FOBTReport implements PreventionReport{
                    prd.state = "Up to date";
                    prd.numMonths = numMonths;
                    prd.color = "green";
-                   //done++;
                 }
              }
-             letterProcessing( prd,"FOBF",asofDate,prevDate);
-             returnReport.add(prd);
 
+             prd.nextSuggestedProcedure = letterProcessing( prd,"FOBF", asofDate, prevDate);
+             returnReport.add(prd);
           }
+
           String percentStr = "0";
           String percentWithGraceStr = "0";
           double eligible = list.size() - inList;
@@ -276,197 +272,4 @@ public class FOBTReport implements PreventionReport{
        }
        return false;
    }
-
-
-   //TODO-legacy: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
-   //If they don't have a FOBT Test with guidelines
- //Get contact methods
-   //NO contact
-       //Send letter
-   //Was last contact within a year ago
-       //NO
-           //Send Letter 1
-   //Was contact within the last year and at least one month ago
-           //Yes count it
-
-	//No contacts qualify 
-		//send letter 1
-	//One contact qualifies
-		//send letter 2
-	//Two contacts qualify
-		//Phone call
-	//Reached limit no contact suggested
-
-   //Measurement Type will be 1 per Prevention report, with the dataField holding method ie L1, L2, P1 (letter 1 , letter 2, phone call 1)
-   String LETTER1 = "L1";
-   String LETTER2 = "L2";
-   String PHONE1 = "P1";
-   String CALLFU = "Follow Up";
-
-   private String letterProcessing(PreventionReportDisplay prd,String measurementType,Date asofDate, Date prevDate){
-       if (prd != null){
-          boolean inclUpToDate = false;
-          if( prd.state.equals("Up to date") ) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(asofDate);
-            cal.add(Calendar.YEAR, -2);
-            Date dueDate = cal.getTime();
-            cal.add(Calendar.MONTH,-6);
-            Date cutoffDate = cal.getTime();
-
-            if( (dueDate.after(prevDate) && cutoffDate.before(prevDate)) || cutoffDate.after(prevDate) ) {
-                inclUpToDate = true;
-            }
-          }
-
-           if (prd.state.equals("No Info") || prd.state.equals("due") || prd.state.equals("Overdue") || inclUpToDate ){
-
-              // Get LAST contact method
-              EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
-              log.debug("getting followup data for "+prd.demographicNo);
-
-              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
-              //NO Contact
-
-              if ( followupData.size() == 0 ){
-                  prd.nextSuggestedProcedure = this.LETTER1;
-                  return this.LETTER1;
-              }else{ //There has been contact
-                  
-                  Calendar oneyear = Calendar.getInstance();
-                  oneyear.setTime(asofDate);
-                  oneyear.add(Calendar.YEAR,-1);                  
-
-                  Calendar onemonth = Calendar.getInstance();
-                  onemonth.setTime(asofDate);
-                  onemonth.add(Calendar.MONTH,-1);
-                   
-                  Date observationDate = null;
-                  int count = 0;
-                  int index = 0;
-                  EctMeasurementsDataBean measurementData = null;
-                  
-                  @SuppressWarnings("unchecked")
-            	  Iterator<EctMeasurementsDataBean>iterator = followupData.iterator();                                    
-                  
-                  while(iterator.hasNext()) {
-                	  measurementData =  iterator.next();
-                	  observationDate = measurementData.getDateObservedAsDate();
-                	  
-                	  if( index == 0 ) {
-                          log.debug("fluData "+measurementData.getDataField());
-                          log.debug("lastFollowup "+measurementData.getDateObservedAsDate()+ " last procedure "+measurementData.getDateObservedAsDate());
-                          log.debug("toString: "+measurementData.toString());
-                          prd.lastFollowup = observationDate;
-                          prd.lastFollupProcedure = measurementData.getDataField();
-
-                          if ( measurementData.getDateObservedAsDate().before(oneyear.getTime())){
-                              prd.nextSuggestedProcedure = this.LETTER1;
-                              return this.LETTER1;
-                          }
-                          
-                          
-                          if( prd.lastFollupProcedure.equals(this.PHONE1)) {
-                        	  prd.nextSuggestedProcedure = "------";
-                        	  return "------";
-                          }
-                	  }
-                	  
-                	  /*if( observationDate.before(onemonth.getTime()) && observationDate.after(oneyear.getTime())) {
-                		  ++count;
-                	  }
-                	  else if( count > 1 && observationDate.after(oneyear.getTime()) ) {
-                		  ++count;
-                	  }*/
-
-                	  ++index;
-                  }
-
-                  switch (prd.lastFollupProcedure) {
-                      case "------":
-                          prd.nextSuggestedProcedure = this.LETTER1;
-                          break;
-                      case "L1":
-                          prd.nextSuggestedProcedure = this.LETTER2;
-                          break;
-                      case "L2":
-                          prd.nextSuggestedProcedure = this.PHONE1;
-                          break;
-                      default:
-                          prd.nextSuggestedProcedure = "------";
-                  }
-                      
-                      
-/*                      if ( measurementData.getDateObservedAsDate().before(onemonth.getTime())){
-                              if (prd.lastFollupProcedure.equals(this.LETTER1)){
-                                    prd.nextSuggestedProcedure = this.LETTER2;
-                                    return this.LETTER2;
-                              }else if(prd.lastFollupProcedure.equals(this.LETTER2)){
-                                    prd.nextSuggestedProcedure = this.PHONE1;
-                                    return this.PHONE1;
-                              }else{
-                                  prd.nextSuggestedProcedure = "----";
-                                  return "----";
-                              }
-
-                          }else if(prd.lastFollupProcedure.equals(this.LETTER2)){
-                              prd.nextSuggestedProcedure = this.PHONE1;
-                              return this.PHONE1;
-                          }else{
-                              prd.nextSuggestedProcedure = "----";
-                              return "----";
-                          }
-                  
-*/
-                      
-              }
-
-
-
-
-          }else if (prd.state.equals("Refused")){  //Not sure what to do about refused
-                //prd.lastDate = "-----";
-              prd.nextSuggestedProcedure = "------";
-                //prd.numMonths ;
-          }else if(prd.state.equals("Ineligible")){
-                // Do nothing
-                prd.nextSuggestedProcedure = "------";
-          }else if(prd.state.equals("Pending")){
-                prd.nextSuggestedProcedure = this.CALLFU;
-          }else if(prd.state.equals("Up to date")){
-                //Do nothing
-              prd.nextSuggestedProcedure = "------";
-          }else{
-               log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
-          }
-       }
-       return null;
-   }
-
 }
-
-
-
-
-
-//                  Calendar today = Calendar.getInstance();
-//                  today.setTime(asofDate);
-//                  int num = UtilDateUtilities.getNumMonths(measurementData.getDateObservedAsDate(),today.getTime());
-//                  if (num > 12){
-//                        prd.nextSuggestedProcedure = this.LETTER1;
-//                        return this.LETTER1;
-//                  }else{ //AFTER CUTOFF DATE
-//                      if ( num > 3 ){
-//                          if (prd.lastFollupProcedure.equals(this.LETTER1)){
-//                                prd.nextSuggestedProcedure = this.LETTER2;
-//                                return this.LETTER2;
-//                          }else if(prd.lastFollupProcedure.equals(this.LETTER1)){
-//                                prd.nextSuggestedProcedure = this.PHONE1;
-//                                return this.PHONE1;
-//                          }else{
-//                              prd.nextSuggestedProcedure = "----";
-//                              return "----";
-//                          }
-//
-//                        }
-//                  }

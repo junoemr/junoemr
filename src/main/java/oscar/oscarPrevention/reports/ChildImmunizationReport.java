@@ -34,8 +34,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarDemographic.data.DemographicData;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
 import oscar.util.UtilDateUtilities;
@@ -43,13 +41,10 @@ import oscar.util.UtilDateUtilities;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +58,7 @@ import java.util.Map;
  * claimed.  These patients must have received all applicable immunizations by 30 months of age
  *
  */
-public class ChildImmunizationReport implements PreventionReport {
+public class ChildImmunizationReport extends PreventionsReport {
 
 	private static final DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	private static final Logger log = MiscUtils.getLogger();
@@ -162,7 +157,7 @@ public class ChildImmunizationReport implements PreventionReport {
 	        // Ideally this would use a hard coded sql query with the only parameter being the rostered provider.
 	        
             PreventionReportDisplay entry = createReportEntry(demographic, immunizationsCompleted, latestPrevention, asOfDate, atLeastOneRefused, atLeastOneIneligible);
-	        letterProcessing(entry, "CIMF", asOfDate);
+	        entry.nextSuggestedProcedure = letterProcessing(entry, "CIMF", asOfDate, latestPrevention);
          
 	        childhoodImmunizationReport.add(entry);
 
@@ -304,7 +299,7 @@ public class ChildImmunizationReport implements PreventionReport {
                         //Was is L2
                             //P1
 
-   //Measurement Type will be 1 per Prevention report, with the dataField holding method ie L1, L2, P1 (letter 1 , letter 2, phone call 1)
+  /* //Measurement Type will be 1 per Prevention report, with the dataField holding method ie L1, L2, P1 (letter 1 , letter 2, phone call 1)
    String LETTER1 = "L1";
    String LETTER2 = "L2";
    String PHONE1 = "P1";
@@ -355,11 +350,11 @@ public class ChildImmunizationReport implements PreventionReport {
 
                 	  }
                 	  
-                	/*  if( observationDate.before(onemon) && observationDate.after(threemon)) {
+                	  if( observationDate.before(onemon) && observationDate.after(threemon)) {
                 		  ++count;
-                	  }*/
+                	  }
 
-                	  ++index;
+
                   }
 
                   switch (prd.lastFollupProcedure) {
@@ -401,7 +396,7 @@ public class ChildImmunizationReport implements PreventionReport {
                   }else{
                       prd.nextSuggestedProcedure = "----";
                       return "----";
-                  }*/
+                  }
               }
           }else if (prd.state.equals("Refused") ){  //Not sure what to do about refused
                 //prd.lastDate = "-----";
@@ -429,7 +424,7 @@ public class ChildImmunizationReport implements PreventionReport {
           }
        }
        return null;
-   }
+   }*/
 	
 	/**
 	 * Create a Map<type, # vaccines on schedule>
