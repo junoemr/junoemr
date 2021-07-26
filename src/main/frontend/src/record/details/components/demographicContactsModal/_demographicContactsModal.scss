@@ -1,9 +1,5 @@
 .demographic-contacts-modal {
 
-  label {
-    text-align: left;
-  }
-
   .postal-prov {
     display: flex;
     align-items: center;
@@ -46,6 +42,10 @@
   .body {
     display: flex;
     flex-wrap: wrap;
+
+    label {
+      text-align: left;
+    }
   }
 
   .juno-input {
