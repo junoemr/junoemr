@@ -379,7 +379,7 @@ public class GenericIntakeDAO extends HibernateDaoSupport {
 	public static class GenericIntakeReportStatistics {
 		public int totalIntakeCount = 0;
 		/**
-		 * This is a map of <intake_node_id, <intake_answer.val, count>>
+		 * This is a map of &lt;intake_node_id, &lt;intake_answer.val, count>>
 		 */
 		public HashMap<Integer, AccumulatorMap<String>> intakeNodeResults = new HashMap<Integer, AccumulatorMap<String>>();
 

@@ -16,6 +16,7 @@ Juno.Common.Util.settings = {
 	time_format: "h:mma",
 	date_format: "YYYY-MM-DD",
 	dayofweek_format: "dddd",
+	month_name_day_year: "LL",
 	message_date_format: "h:mm A LL",
 
 	defaultTimeFormat: "HH:mm:ss"

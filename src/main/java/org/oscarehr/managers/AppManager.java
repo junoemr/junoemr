@@ -35,6 +35,8 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.AppDefinitionTo1;
@@ -49,6 +51,9 @@ public class AppManager {
 	 
 	@Autowired
 	private AppDefinitionDao appDefinitionDao;
+	
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 
 	@Autowired
 	private AppUserDao appUserDao;
@@ -130,12 +135,12 @@ public class AppManager {
 		return false;
 	}
 	
-	public boolean isK2AEnabled(){
-		AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-		if(k2aApp != null){
-			return true;
-		}
-		return false;
+	public boolean isK2AEnabled()
+	{
+		boolean k2aEnabled = systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
+		boolean k2aPresent = appDefinitionDao.findByName("K2A") != null;
+		
+		return k2aEnabled && k2aPresent;
 	}
 	
 	public String getK2ANotificationNumber(LoggedInInfo loggedInInfo){

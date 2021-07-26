@@ -1,3 +1,7 @@
+import PartialDateModel from "../../lib/common/partialDate/model/partialDateModel";
+import PartialDateConverter from "../../lib/common/partialDate/converter/partialDateConverter";
+import PartialDateModelConverter from "../../lib/common/partialDate/converter/partialDateModelConverter";
+
 angular.module('Record.Summary').controller('Record.Summary.GroupNotesController', [
 
 	'$scope',
@@ -27,15 +31,13 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		securityService,
 		diseaseRegistryService)
 	{
-
 		var controller = this;
-
 
 		controller.page = {};
 		controller.page.title = mod.displayName;
 		controller.page.items = mod.summaryItem;
 		controller.page.quickLists = [];
-		
+
 		//controller.action = action;
 		controller.page.code = mod.summaryCode;
 
@@ -47,7 +49,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		};
 
 		controller.working = false;
-
 
 		//set hidden which can can move out of hidden to $scope values
 		var now = new Date();
@@ -103,8 +104,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				{
 					console.log(errors);
 				});
-
-
 		};
 
 		//disable click and keypress if user only has read-access
@@ -122,7 +121,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			return controller.working;
 		};
 
-		displayIssueId = function displayIssueId(issueCode)
+		controller.displayIssueId = function displayIssueId(issueCode)
 		{
 			noteService.getIssueId(issueCode).then(
 				function success(results)
@@ -135,24 +134,31 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 		};
 
-		displayIssueId(controller.page.code);
+		controller.displayIssueId(controller.page.code);
 
-		displayGroupNote = function displayGroupNote(item, itemId)
+		controller.displayGroupNote = function displayGroupNote(item, itemId)
 		{
 			if (controller.page.items[itemId].noteId != null)
 			{
 				noteService.getIssueNote(controller.page.items[itemId].noteId).then(
 					function success(results)
 					{
+						let partialDateConverter = new PartialDateConverter();
+
 						controller.groupNotesForm.encounterNote = results.encounterNote;
 						controller.groupNotesForm.encounterNote.editorNames = mod.editorNames; // Get editor names.
 						controller.groupNotesForm.groupNoteExt = results.groupNoteExt;
 
-						controller.groupNotesForm.groupNoteExt.startDate = moment(results.groupNoteExt.startDate).toDate();
-						controller.groupNotesForm.groupNoteExt.resolutionDate = moment(results.groupNoteExt.resolutionDate).toDate();
-						controller.groupNotesForm.groupNoteExt.procedureDate = moment(results.groupNoteExt.procedureDate).toDate();
-						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
+						let partialStartDateModel = partialDateConverter.convert(results.groupNoteExt.startDate);
+						controller.groupNotesForm.groupNoteExt.startDate = partialStartDateModel;
 
+						let partialResolutionDateModel = partialDateConverter.convert(results.groupNoteExt.resolutionDate);
+						controller.groupNotesForm.groupNoteExt.resolutionDate = partialResolutionDateModel;
+
+						let partialProcedureDateModel = partialDateConverter.convert(results.groupNoteExt.procedureDate);
+						controller.groupNotesForm.groupNoteExt.procedureDate = partialProcedureDateModel;
+
+						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
 						controller.groupNotesForm.assignedCMIssues = [];
 
 						if (results.assignedCMIssues instanceof Array)
@@ -218,7 +224,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		//action is NULL when new , action is some id when not
 		if (action != null)
 		{
-			displayGroupNote(controller.page.items, action);
+			controller.displayGroupNote(controller.page.items, action);
 		}
 		else
 		{
@@ -259,24 +265,55 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			{
 				return;
 			}
+			if(!controller.allDatesValid())
+			{
+				controller.working = false;
+				Juno.Common.Util.errorAlert($uibModal,"Error", "Please correct highlighted fields");
+				return;
+			}
 			controller.working = true;
 
-			if (controller.groupNotesForm.encounterNote.noteId == null)
+			let groupNotesFormTransfer = angular.copy(controller.groupNotesForm);
+
+			if (groupNotesFormTransfer.encounterNote.noteId == null)
 			{
-				controller.groupNotesForm.encounterNote.noteId = 0;
+				groupNotesFormTransfer.encounterNote.noteId = 0;
 			}
 
-			controller.groupNotesForm.encounterNote.cpp = true;
-			controller.groupNotesForm.encounterNote.editable = true;
-			controller.groupNotesForm.encounterNote.isSigned = true;
-			controller.groupNotesForm.encounterNote.observationDate = new Date();
-			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO-legacy: make this dynamic so it changes on edit
-			controller.groupNotesForm.encounterNote.encounterType = "";
-			controller.groupNotesForm.encounterNote.encounterTime = "";
-			controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
-			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code;
+			groupNotesFormTransfer.encounterNote.cpp = true;
+			groupNotesFormTransfer.encounterNote.editable = true;
+			groupNotesFormTransfer.encounterNote.isSigned = true;
+			groupNotesFormTransfer.encounterNote.observationDate = new Date();
+			groupNotesFormTransfer.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO-legacy: make this dynamic so it changes on edit
+			groupNotesFormTransfer.encounterNote.encounterType = "";
+			groupNotesFormTransfer.encounterNote.encounterTime = "";
+			groupNotesFormTransfer.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
+			groupNotesFormTransfer.encounterNote.summaryCode = controller.page.code;
 
-			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
+			let partialDateModelConverter = new PartialDateModelConverter();
+
+			let startDate = groupNotesFormTransfer.groupNoteExt.startDate;
+			if (startDate)
+			{
+				let partialStartDate = partialDateModelConverter.convert(startDate);
+				groupNotesFormTransfer.groupNoteExt.startDate = partialStartDate;
+			}
+
+			let resolutionDate = groupNotesFormTransfer.groupNoteExt.resolutionDate;
+			if (resolutionDate)
+			{
+				let partialResolutionDate = partialDateModelConverter.convert(resolutionDate);
+				groupNotesFormTransfer.groupNoteExt.resolutionDate = partialResolutionDate;
+			}
+
+			let procedureDate = groupNotesFormTransfer.groupNoteExt.procedureDate;
+			if (procedureDate)
+			{
+				let partialProcedureDate = partialDateModelConverter.convert(procedureDate);
+				groupNotesFormTransfer.groupNoteExt.procedureDate = partialProcedureDate;
+			}
+
+			noteService.saveIssueNote($stateParams.demographicNo, groupNotesFormTransfer).then(
 				function success(results)
 				{
 					$uibModalInstance.close(results.body);
@@ -502,5 +539,32 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		};
 
+		controller.allDatesValid = () =>
+		{
+			let startDateValid = true;
+			let resolutionDateValid = true;
+			let procedureDateValid = true;
+
+			let startDate = controller.groupNotesForm.groupNoteExt.startDate;
+			if (startDate)
+			{
+				startDateValid = startDate.isValidPartialDate();
+			}
+
+			let resolutionDate = controller.groupNotesForm.groupNoteExt.resolutionDate;
+
+			if (resolutionDate)
+			{
+				resolutionDateValid = resolutionDate.isValidPartialDate();
+			}
+
+			let procedureDate = controller.groupNotesForm.groupNoteExt.procedureDate;
+			if (procedureDate)
+			{
+				procedureDateValid = procedureDate.isValidPartialDate();
+			}
+
+			return startDateValid && resolutionDateValid && procedureDateValid;
+		}
 	}
 ]);

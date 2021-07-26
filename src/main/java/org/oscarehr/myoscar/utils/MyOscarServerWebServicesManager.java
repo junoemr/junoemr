@@ -67,7 +67,7 @@ import org.oscarehr.util.QueueCache;
  * Port Caching : ports are partially thread safe (see the CXF documentation), they are not when the configuration is altered.
  * We change the configuration on a per user bases (WSS configuration), therefore it's thread safe on a per-credential basis.
  * 
- * For the key we can use MyOscarLoggedInInfo, we won't mandate equals() & hashCode because it's more efficient to do a pointer compare.
+ * For the key we can use MyOscarLoggedInInfo, we won't mandate equals() &amp; hashCode because it's more efficient to do a pointer compare.
  * If some one on the off chance has 2 credentials that are equivalent, it'll just make 2 entries in the cache, and everything works fine.
  * 
  * This class uses ConfigXmlUtils to controls some configuration parameters, they are all defaulted if not specified.

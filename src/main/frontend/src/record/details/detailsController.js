@@ -98,10 +98,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
+		
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
-		controller.properties = $scope.$parent.recordCtrl.properties;
+		controller.rosteringModuleEnabled = false;
 		controller.displayMessages = messagesFactory.factory();
 		controller.validations = {};
 
@@ -299,7 +300,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
 				}
 			);
-
+			
 			// show eligibility check button only if instance is BC OR (ON AND billing type CLINICAID)
 			systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
 					function success(result)
@@ -330,7 +331,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						console.error("Failed to fetch instance type with error: " + result);
 					}
 			);
-
+			
+			systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false).then((result) =>
+			{
+				controller.rosteringModuleEnabled = result.data.body;
+			});
 		};
 
 		controller.initDemographicVars = function initDemographicVars()
@@ -671,37 +676,34 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalComplete = async function isPostalComplete(postalCode, province)
+		controller.isPostalComplete = function isPostalComplete(postal, province)
 		{
-			if (postalCode !== null && province !== null && province !== "OT" && province.indexOf("US") !== 0)
+			// If Canadian province is selected, proceed with validation
+			if (postal && province && province !== "OT" && province.indexOf("US") !== 0)
 			{
-				postalCode = await controller.isPostalValid(postalCode)
+				if (controller.isPostalValidCanadian(postal))
+				{
+					return true;
+				}
+
 				controller.resetEditState();
+				return false;
 			}
-			return postalCode;
+
+			return true;
 		};
 
-		controller.isPostalValid = function isPostalValid(postalCode)
+		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
 		{
-
-		let postal = postalCode.replace(/\s/g, ""); // Trim whitespace
-
-			// If postal code is an empty string, set it to null and continue
-			if(postal.length === 0)
+			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]\d[A-Za-z]\d$/); // Match to Canadian postal code standard
+			if (regex.test(postalCode))
 			{
-				postal = null;
+				return true;
 			}
-
-			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/); // Match to Canadian postal code standard (minus the space)
-			if (regex.test(postal))
+			else
 			{
-				// Format postal code to Canadian standard
-				postal = postal.substring(0, 3) + " " + postal.substring(3);
-				return postal;
-			}
-			else {
 				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
-				return null;
+				return false;
 			}
 		};
 
@@ -1064,7 +1066,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//-----------------//
 		// save operations //
 		//-----------------//
-		controller.save = async function save()
+		controller.save = function save()
 		{
 			if (!Juno.Validations.allValidationsValid(controller.validations))
 			{
@@ -1104,12 +1106,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				return;
 			}
 			if (!controller.checkPatientStatus()) return;
-
-			controller.page.demo.address.postal = await controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province);
-			controller.page.demo.address2.postal = await controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province);
-			if (controller.page.demo.address.postal === null || controller.page.demo.address2.postal === null) return;
-			//if (!controller.isPostalComplete(controller.page.demo.address2)) return;
-
+			if (!controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province)) return;
+			if (!controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 

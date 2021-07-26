@@ -205,7 +205,7 @@ angular.module('Layout').component("primaryNavigation", {
 		 */
 		ctrl.checkIfMhaEnabled = async () =>
 		{
-			ctrl.mhaEnabled = await ctrl.mhaConfigService.MhaEnabled();
+			ctrl.mhaEnabled = await ctrl.mhaConfigService.mhaEnabled();
 
 			$scope.$apply();
 		}
@@ -339,7 +339,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.updateMhaPatientMessagesCount = async () =>
 		{
-			if (await ctrl.mhaConfigService.MhaEnabled())
+			if (await ctrl.mhaConfigService.mhaEnabled())
 			{
 				// MHA message count
 				const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);

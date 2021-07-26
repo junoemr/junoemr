@@ -512,7 +512,7 @@ public class ProviderData {
 	}
 
 	/**
-	* getters && setters
+	* getters &amp;&amp; setters
 	**/
 
 	public java.lang.String getPractitionerNo() {

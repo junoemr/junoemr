@@ -1054,7 +1054,7 @@
 			
 			var oClasses = oSettings.oClasses;
 			
-			// @todo-legacy Remove in 1.11
+			// todo-legacy Remove in 1.11
 			if ( oInit.bJQueryUI )
 			{
 				/* Use the JUI classes object for display. You could clone the oStdClasses object if
@@ -2862,7 +2862,7 @@
 	 *     row will be invalidated
 	 * @memberof DataTable#oApi
 	 *
-	 * @todo-legacy For the modularisation of v1.11 this will need to become a callback, so
+	 * todo-legacy For the modularisation of v1.11 this will need to become a callback, so
 	 *   the sort and filter methods can subscribe to it. That will required
 	 *   initialisation options for sorting, which is why it is not already baked in
 	 */
@@ -5880,7 +5880,7 @@
 	 * Change the order of the table
 	 *  @param {object} oSettings dataTables settings object
 	 *  @memberof DataTable#oApi
-	 *  @todo-legacy This really needs split up!
+	 *  todo-legacy This really needs split up!
 	 */
 	function _fnSort ( oSettings )
 	{
@@ -6485,7 +6485,7 @@
 	 *      references
 	 *  @returns {object} out Reference, just for convenience - out === the return.
 	 *  @memberof DataTable#oApi
-	 *  @todo-legacy This doesn't take account of arrays inside the deep copied objects.
+	 *  todo-legacy This doesn't take account of arrays inside the deep copied objects.
 	 */
 	function _fnExtend( out, extender, breakRefs )
 	{
@@ -12867,7 +12867,7 @@
 	 * NOT be manipulated outside of DataTables. Any configuration should be done
 	 * through the initialisation options.
 	 *  @namespace
-	 *  @todo-legacy Really should attach the settings object to individual instances so we
+	 *  todo-legacy Really should attach the settings object to individual instances so we
 	 *    don't need to create new instances on each $().dataTable() call (if the
 	 *    table already exists). It would also save passing oSettings around and
 	 *    into every single function. However, this is a very significant
@@ -13196,7 +13196,7 @@
 		 * Note that this parameter will be set by the initialisation routine. To
 		 * set a default use {@link DataTable.defaults}.
 		 *  @type array
-		 *  @todo-legacy These inner arrays should really be objects
+		 *  todo-legacy These inner arrays should really be objects
 		 */
 		"aaSorting": null,
 	

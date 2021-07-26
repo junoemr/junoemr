@@ -121,15 +121,6 @@ public class DemographicRelationship {
 		return list;
 	}
 
-	public String getSDM(String demographic) {
-		RelationshipsDao dao = SpringUtils.getBean(RelationshipsDao.class);
-		List<Relationships> rs = dao.findActiveSubDecisionMaker(ConversionUtils.fromIntString(demographic));
-		String result = null;
-		for (Relationships r : rs)
-			result = ConversionUtils.toIntString(r.getRelationDemographicNo());
-		return result;
-	}
-
 	public List<Map<String, Object>> getDemographicRelationshipsWithNamePhone(LoggedInInfo loggedInInfo, String demographic_no) {
 		RelationshipsDao dao = SpringUtils.getBean(RelationshipsDao.class);
 		List<Relationships> rs = dao.findActiveSubDecisionMaker(ConversionUtils.fromIntString(demographic_no));

@@ -309,8 +309,8 @@ public class AlphaHandler extends DefaultGenericHandler {
     
     
     /** When the Test Source = ”FORM”, then REPLACE all previous  NM and ST results with the FT results.
-     * When the Test Source<>”FORM”, then APPEND the FT results to the previous results.
-     * **/
+     * When the Test Source&lt;>”FORM”, then APPEND the FT results to the previous results.
+	 */
     public boolean oBXHasForm(int i, int j){
         try{
         	if (version.equals("2.2")) {

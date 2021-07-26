@@ -52,12 +52,6 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		ctrl.inviteSent = false;
 		ctrl.integrationsList = [];
 
-		ctrl.buttonStates = Object.freeze({
-			unavailable: 0,
-			invite: 1,
-			edit: 2,
-		});
-
 		// load apis
 		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
 				'../ws/rs');
@@ -82,55 +76,17 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.getButtonText = () =>
 		{
-			if (ctrl.isButtonStateEdit())
-			{
-				return "View or Edit MHA Status";
-			}
-			else if (ctrl.isButtonStateInvite() && ctrl.inviteSent)
-			{
-				return "Resend MyHealthAccess Invite";
-			}
-			else if (ctrl.isButtonStateInvite())
-			{
-				return "Invite to MyHealthAccess";
-			}
-			else
-			{
-				return "Unable to Invite to MyHealthAccess";
-			}
+			return "View or Edit MHA Status";
 		}
 
 		ctrl.getToolTip = () =>
 		{
-			if (ctrl.isButtonStateEdit())
-			{
-				return "View or Edit MHA Status";
-			}
-			else if (ctrl.isButtonStateInvite())
-			{
-				return "Invite patient to MHA via email";
-			}
-			else
-			{
-				return "Demographic must have an email address, to be invited to MHA";
-			}
+			return "View or Edit MHA Status";
 		}
-
 
 		ctrl.getButtonColor = () =>
 		{
-			if (ctrl.isButtonStateEdit())
-			{
-				return JUNO_BUTTON_COLOR.PRIMARY;
-			}
-			else if (ctrl.isButtonStateInvite())
-			{
-				return JUNO_BUTTON_COLOR.GREYSCALE_LIGHT;
-			}
-			else
-			{
-				return JUNO_BUTTON_COLOR.PRIMARY;
-			}
+			return JUNO_BUTTON_COLOR.PRIMARY;
 		}
 
 		ctrl.getButtonColorPattern = () =>
@@ -138,67 +94,14 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			return JUNO_BUTTON_COLOR_PATTERN.FILL;
 		}
 
-		ctrl.iconClasses = () =>
-		{
-			if (this.isConfirmed)
-			{
-				return [];
-			}
-			else
-			{
-				return ["icon-primary"];
-			}
-		}
-
 		ctrl.hasEmail = () =>
 		{
 			return this.demographic && this.demographic.email && this.demographic.email !== "";
 		}
 
-		ctrl.buttonDisabled = () =>
-		{
-			return (ctrl.isButtonStateUnavailable());
-		}
-
-		ctrl.isButtonStateEdit = () =>
-		{
-			return ctrl.buttonState() === ctrl.buttonStates.edit;
-		}
-		ctrl.isButtonStateInvite = () =>
-		{
-			return ctrl.buttonState() === ctrl.buttonStates.invite;
-		}
-		ctrl.isButtonStateUnavailable = () =>
-		{
-			return ctrl.buttonState() === ctrl.buttonStates.unavailable;
-		}
-
-		ctrl.buttonState = () =>
-		{
-			if (ctrl.isConfirmed)
-			{
-				return ctrl.buttonStates.edit;
-			}
-			else if (ctrl.hasEmail() && ctrl.integrationsList.length > 0)
-			{
-				return ctrl.buttonStates.invite;
-			}
-			else
-			{
-				return ctrl.buttonStates.unavailable;
-			}
-		}
-
 		ctrl.onClick = () =>
 		{
-			if (ctrl.isButtonStateEdit())
-			{
-				ctrl.openPatientModal();
-			}
-			else if (ctrl.isButtonStateInvite())
-			{
-				ctrl.openInviteConfirmModal();
-			}
+			ctrl.openPatientModal();
 		}
 
 		ctrl.openPatientModal = async () =>
@@ -209,7 +112,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 					{
 						component: 'mhaPatientDetailsModal',
 						backdrop: 'static',
-						windowClass: "juno-modal",
+						windowClass: "juno-simple-modal-window",
 						resolve: {
 							style: () => ctrl.componentStyle,
 							demographic: () => ctrl.demographic,
@@ -222,30 +125,6 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 					// re check confirmation status
 					await ctrl.loadMhaPatientProfiles();
 				}
-			}
-			catch(err)
-			{
-				// user pressed ESC key
-			}
-		}
-
-		ctrl.openInviteConfirmModal = async () =>
-		{
-			try
-			{
-				ctrl.inviteSent = await $uibModal.open(
-					{
-						component: 'mhaPatientInviteConfirmModal',
-						backdrop: 'static',
-						windowClass: "juno-modal sml",
-						resolve: {
-							style: () => ctrl.componentStyle,
-							demographicNo: () => ctrl.demographic.demographicNo,
-							demographicEmail: () => ctrl.demographic.email,
-							integrationsList: () => ctrl.integrationsList,
-						}
-					}
-				).result;
 			}
 			catch(err)
 			{

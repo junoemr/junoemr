@@ -249,6 +249,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.mhaConfig',
+		{
+			url: "/mhaConfig",
+			component: "mhaConfig",
+		})
 		.state('admin.rosterStatus',
 		{
 			url: '/rosterStatus',
@@ -531,10 +536,6 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				{
 					return providerService.getMe();
 				}],
-				properties: ['uxService', function(uxService)
-				{
-					return uxService.getDisplayProperties();
-				}]
 			}
 		})
 		.state('record.details',

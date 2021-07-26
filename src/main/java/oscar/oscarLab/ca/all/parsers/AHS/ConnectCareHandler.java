@@ -107,7 +107,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	/**
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
 	 * @param appendNamespace - if true append namespace to end of identifier
-	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
 	{
@@ -157,7 +157,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 
 	/**
 	 *  call getPatientIdentificationList default behavior of appending namespace
-	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList()
 	{

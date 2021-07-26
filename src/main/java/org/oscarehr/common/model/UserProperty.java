@@ -131,6 +131,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String CARE_CONNECT_ENABLED = "integration.CareConnect.enabled";
     public static final String EFORM_POPUP_WIDTH = "eform.popup.width";
     public static final String EFORM_POPUP_HEIGHT = "eform.popup.height";
+    public static final String ROSTERING_AND_FAMILY_DOCTOR_ENABLED = "enable_family_doctor_and_rostering";
 
     public static final String ICE_FALL_VISIBLE = "icefall_visible";
     public static final String ICE_FALL_INTEGRATION_ENABLED = "icefall_enabled";
@@ -181,7 +182,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
 	public static final String INTEGRATOR_PATIENT_CONSENT = "integrator_patient_consent";	
 	public static final String STUDENT_PARTICIPATION_CONSENT = "student_participation_consent";	
 	public static final String PROVIDER_FOR_TICKLER_WARNING = "provider_for_tickler_warning";
-	
+	public static final String CARECONNECT_PPN_CHECK = "careconnect_enable_ppn_check";
 
 	public static final String MCEDT_ACCOUNT_PASSWORD = "mcedt_account_password";
 

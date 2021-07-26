@@ -31,13 +31,13 @@ public class PatientTestCollection
 	public static String[] patientLNames = {"Momlname", "Dadlname", "Sonlname"};
 	static
 	{
-		PatientTestData patient = new PatientTestData(patientLNames[0], "Momfname", "1980", "09", "09", "F", "0123456789");
+		PatientTestData patient = new PatientTestData(patientLNames[0], "Momfname", "1980", "09", "09", "F", "9086526269");
 		patientMap.put(patient.lastName, patient);
 
-		PatientTestData patient2 = new PatientTestData(patientLNames[1], "Dadfname", "1988", "08", "08", "M", "1111111111");
+		PatientTestData patient2 = new PatientTestData(patientLNames[1], "Dadfname", "1988", "08", "08", "M", "9316780035");
 		patientMap.put(patient2.lastName, patient2);
 
-		PatientTestData patient3 = new PatientTestData(patientLNames[2], "Sonfname", "2008", "08", "08", "M", "9874397159");
+		PatientTestData patient3 = new PatientTestData(patientLNames[2], "Sonfname", "2008", "08", "08", "M", "9603602731");
 		patientMap.put(patient3.lastName, patient3);
 	}
 }

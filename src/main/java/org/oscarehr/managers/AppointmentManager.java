@@ -57,7 +57,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/** use <org.oscarehr.appointment.service.Appointment> instead */
+/** use &lt;org.oscarehr.appointment.service.Appointment> instead */
 @Deprecated
 @Service
 @Transactional
