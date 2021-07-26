@@ -5,7 +5,7 @@
 	</modal-title>
 
 	<modal-ctl-buttons>
-		<juno-button>
+		<juno-button button-color-pattern=$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT>
 			<i class="icon icon-modal-ctl icon-close" ng-click="$ctrl.onCancel()"></i>
 		</juno-button>
 	</modal-ctl-buttons>

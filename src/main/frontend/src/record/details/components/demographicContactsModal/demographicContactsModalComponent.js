@@ -2,7 +2,6 @@ import {
     JUNO_BUTTON_COLOR,
     JUNO_BUTTON_COLOR_PATTERN,
     LABEL_POSITION,
-    JUNO_STYLE,
 } from "../../../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').component('demographicContactsModal', {

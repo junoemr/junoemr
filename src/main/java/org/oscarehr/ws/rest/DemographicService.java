@@ -300,19 +300,18 @@ public class DemographicService extends AbstractServiceImpl {
 						DemographicExt hPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_H_PHONE_EXT);
 						DemographicExt wPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_W_PHONE_EXT);
 
-						if (cell != null)
+						if (cell != null && !"".equals(cell))
 						{
 							demoContactTo1.setCellPhone(cell.getValue());
 						}
-						if (hPhoneExt != null)
+						if (hPhoneExt != null && !"".equals(hPhoneExt))
 						{
 							demoContactTo1.setHPhoneExt(hPhoneExt.getValue());
 						}
-						if (hPhoneExt != null)
+						if (wPhoneExt != null && !"".equals(wPhoneExt))
 						{
 							demoContactTo1.setWPhoneExt(wPhoneExt.getValue());
 						}
-
 					}
 					else if (demoContact.getType() == DemographicContact.TYPE_CONTACT)
 					{
