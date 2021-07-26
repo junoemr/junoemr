@@ -68,8 +68,12 @@ public abstract class PreventionsReport implements PreventionReport
                     inclUpToDate = true;
                 }
             }
-            if (reportDisplay.state.equals(PreventionReport.NOINFO) || reportDisplay.state.equals(PreventionReport.DUE) || reportDisplay.state.equals(PreventionReport.OVERDUE) || inclUpToDate)
+            if (reportDisplay.state.equals(PreventionReport.NOINFO) ||
+                    reportDisplay.state.equals(PreventionReport.DUE) ||
+                    reportDisplay.state.equals(PreventionReport.OVERDUE) ||
+                    inclUpToDate)
             {
+
                 if (followupData.size() == 0)
                 {
                     reportDisplay.nextSuggestedProcedure = PreventionReport.FIRST_LETTER;

@@ -361,7 +361,7 @@ public class FluReport extends PreventionsReport {
               if ( fluFollowupData.size() == 0 )
               {
                   prd.nextSuggestedProcedure = PreventionReport.FIRST_LETTER;
-                  return PreventionReport.FIRST_LETTER;
+                  //return PreventionReport.FIRST_LETTER;
               }
               else
               {
@@ -372,13 +372,14 @@ public class FluReport extends PreventionsReport {
                   if (prd.lastFollupProcedure.equals(PreventionReport.FIRST_LETTER))
                   {
                       prd.nextSuggestedProcedure = PreventionReport.PHONE_CALL;
-                      return PreventionReport.PHONE_CALL;
+                     // return PreventionReport.PHONE_CALL;
                   }
                   else
                   {
                       prd.nextSuggestedProcedure = PreventionReport.NO_FOLLOWUP;
                   }
               }
+
           }else if (PreventionReport.REFUSED.equals(prd.state)){  //Not sure what to do about refused
               EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting FLUF data for "+prd.demographicNo);
@@ -410,6 +411,7 @@ public class FluReport extends PreventionsReport {
               log.warn("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
         	  log.error("prd.state appears to be null or a missed case : "+prd.state);
           }
+          return prd.nextSuggestedProcedure;
        }
        return null;
    }
