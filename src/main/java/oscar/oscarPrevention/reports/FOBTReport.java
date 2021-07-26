@@ -272,4 +272,10 @@ public class FOBTReport extends PreventionsReport{
        }
        return false;
    }
+
+    @Override
+    protected String letterProcessing(PreventionReportDisplay prd, Date cuttoffDate)
+    {
+        return null;
+    }
 }

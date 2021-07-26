@@ -33,7 +33,7 @@ public abstract class PreventionsReport implements PreventionReport
                 }
                 else
                 {
-                    cal.add(Calendar.YEAR, -2); 
+                    cal.add(Calendar.YEAR, -2);
                 }
 
                 Date dueDate = cal.getTime();
@@ -152,4 +152,7 @@ public abstract class PreventionsReport implements PreventionReport
         }
         return null;
     }
+
+    //FLu is different then the others IT only has one letter and a phone call
+     protected abstract String letterProcessing(PreventionReportDisplay prd, Date cuttoffDate);
 }

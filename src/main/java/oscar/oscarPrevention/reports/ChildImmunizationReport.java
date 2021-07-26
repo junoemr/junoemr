@@ -287,144 +287,6 @@ public class ChildImmunizationReport extends PreventionsReport {
         
         return entry;
     }
-    
-   //TODO: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
-
-                //Get last contact method?
-                    //NO contact
-                        //Send letter
-                    //Was it atleast 3months ago?
-                        //WAS is L1
-                            //SEnd L2
-                        //Was is L2
-                            //P1
-
-  /* //Measurement Type will be 1 per Prevention report, with the dataField holding method ie L1, L2, P1 (letter 1 , letter 2, phone call 1)
-   String LETTER1 = "L1";
-   String LETTER2 = "L2";
-   String PHONE1 = "P1";
-
-   private String letterProcessing(PreventionReportDisplay prd,String measurementType,Date asofDate){
-       if (prd != null){
-          if (prd.state.equals("No Info") || prd.state.equals("due") || prd.state.equals("Overdue") ){
-              // Get LAST contact method
-              EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
-              log.debug("getting followup data for "+prd.demographicNo);
-
-              Collection followupData = measurementDataHandler.getMeasurementsData();
-              //NO Contact
-              if ( followupData.size() == 0 ){
-                  prd.nextSuggestedProcedure = this.LETTER1;
-                  return this.LETTER1;
-              }else{ //There has been contact
-            	  
-                  Calendar threemonth = Calendar.getInstance();
-                  threemonth.setTime(asofDate);
-                  threemonth.add(Calendar.MONTH,-1);
-                  Date onemon = threemonth.getTime();
-                  threemonth.add(Calendar.MONTH,-2);
-                  Date threemon = threemonth.getTime();               
-                  Date observationDate = null;
-                  int count = 0;
-                  int index = 0;
-                  EctMeasurementsDataBean measurementData = null;
-                  
-                  @SuppressWarnings("unchecked")
-            	  Iterator<EctMeasurementsDataBean>iterator = followupData.iterator();                                    
-                  
-                  while(iterator.hasNext()) {
-                	  measurementData =  iterator.next();
-                	  observationDate = measurementData.getDateObservedAsDate();
-                	  
-                	  if( index == 0 ) {
-                          log.debug("fluData "+measurementData.getDataField());
-                          log.debug("lastFollowup "+measurementData.getDateObservedAsDate()+ " last procedure "+measurementData.getDateObservedAsDate());
-                          log.debug("toString: "+measurementData.toString());
-                          prd.lastFollowup = observationDate;
-                          prd.lastFollupProcedure = measurementData.getDataField();
-
-                          if( prd.lastFollupProcedure.equals(this.PHONE1)) {
-                        	  prd.nextSuggestedProcedure = "------";
-                        	  return "------";
-                          }
-
-                	  }
-                	  
-                	  if( observationDate.before(onemon) && observationDate.after(threemon)) {
-                		  ++count;
-                	  }
-
-
-                  }
-
-                  switch (prd.lastFollupProcedure) {
-                      case "------":
-                          prd.nextSuggestedProcedure = this.LETTER1;
-                          break;
-                      case "L1":
-                          prd.nextSuggestedProcedure = this.LETTER2;
-                          break;
-                      case "L2":
-                          prd.nextSuggestedProcedure = this.PHONE1;
-                          break;
-                      default:
-                          prd.nextSuggestedProcedure = "------";
-                  }
-                  
-                  return prd.nextSuggestedProcedure;
-
-                  /*if ( measurementData.getDateObservedAsDate().before(onemon)){
-                	  
-                      if (prd.lastFollupProcedure.equals(this.LETTER1)){
-                                    prd.nextSuggestedProcedure = this.LETTER2;
-                                    return this.LETTER2;
-                      //is last measurementData within 3 months
-                      }else if( measurementData.getDateObservedAsDate().before(threemon)){
-                                  prd.nextSuggestedProcedure = "----";
-                                  return "----";
-                      }else if(prd.lastFollupProcedure.equals(this.LETTER2)){
-                                    prd.nextSuggestedProcedure = this.PHONE1;
-                                    return this.PHONE1;
-                      }else{
-                                  prd.nextSuggestedProcedure = "----";
-                                  return "----";
-                      }
-
-                  }else if(prd.lastFollupProcedure.equals(this.LETTER2)){
-                      prd.nextSuggestedProcedure = this.PHONE1;
-                      return this.PHONE1;
-                  }else{
-                      prd.nextSuggestedProcedure = "----";
-                      return "----";
-                  }
-              }
-          }else if (prd.state.equals("Refused") ){  //Not sure what to do about refused
-                //prd.lastDate = "-----";
-
-              EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
-              log.debug("2getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsData();
-
-              if ( followupData.size() > 0 ){
-                  EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();
-                  prd.lastFollowup = measurementData.getDateObservedAsDate();
-                  prd.lastFollupProcedure = measurementData.getDataField();
-              }
-
-              prd.nextSuggestedProcedure = "------";
-                //prd.numMonths ;
-          }else if(prd.state.equals("Ineligible")){
-                // Do nothing
-                prd.nextSuggestedProcedure = "------";
-          }else if(prd.state.equals("Up to date")){
-                //Do nothing
-              prd.nextSuggestedProcedure = "------";
-          }else{
-               log.debug("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
-          }
-       }
-       return null;
-   }*/
 	
 	/**
 	 * Create a Map<type, # vaccines on schedule>
@@ -482,4 +344,10 @@ public class ChildImmunizationReport extends PreventionsReport {
 
    	    return inAgeRange && allShots && thirtyMonthsAtLastPrevention;
    }
+
+    @Override
+    protected String letterProcessing(PreventionReportDisplay prd, Date cuttoffDate)
+    {
+        return null;
+    }
 }

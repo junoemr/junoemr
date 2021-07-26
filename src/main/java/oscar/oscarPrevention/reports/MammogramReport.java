@@ -277,4 +277,10 @@ public class MammogramReport extends PreventionsReport{
        }
        return noFutureItems;
    }
+
+    @Override
+    protected String letterProcessing(PreventionReportDisplay prd, Date cuttoffDate)
+    {
+        return null;
+    }
 }
