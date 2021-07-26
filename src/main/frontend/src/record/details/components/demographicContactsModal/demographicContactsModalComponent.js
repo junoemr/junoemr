@@ -29,14 +29,14 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 INTERNAL: 1,
                 EXTERNAL: 2,
                 PROFESSIONAL_SPECIALIST: 3,
-            }
+            };
 
             ctrl.typesText = {
                 PROVIDER_TEXT: "Provider Contact",
                 INTERNAL_TEXT: "Internal Contact",
                 EXTERNAL_TEXT: "External Contact",
                 PROFESSIONAL_SPECIALIST_TEXT: "Professional Specialist Contact"
-            }
+            };
 
             ctrl.LABEL_POSITION = LABEL_POSITION;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -98,7 +98,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                     },
                     function error(errors)
                     {
-                        Juno.Common.Util.alert("Unable to open tab.",errors);
+                        Juno.Common.Util.alert("Unable to open tab.", errors);
                     });
             };
 

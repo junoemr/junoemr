@@ -39,13 +39,10 @@
     }
   }
 
-  .body {
+  > .body {
     display: flex;
     flex-wrap: wrap;
-
-    label {
-      text-align: left;
-    }
+    text-align: left;
   }
 
   .juno-input {
