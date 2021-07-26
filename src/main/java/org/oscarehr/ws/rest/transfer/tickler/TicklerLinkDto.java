@@ -28,6 +28,7 @@ import lombok.Data;
 @Data
 public class TicklerLinkDto
 {
+	protected Integer id;
 	protected Integer ticklerNo;
 	protected String type;
 	protected String linkId;

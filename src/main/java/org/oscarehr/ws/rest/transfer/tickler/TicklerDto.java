@@ -32,6 +32,7 @@ import java.util.List;
 @Data
 public class TicklerDto
 {
+	protected Integer ticklerNo;
 	protected Integer demographicNo;
 	protected String taskAssignedTo;
 	protected String message;

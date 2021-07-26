@@ -59,6 +59,7 @@ public class TicklerDtoToTicklerConverter extends AbstractModelConverter<Tickler
 
 		Tickler tickler = new Tickler();
 
+		tickler.setId(input.getTicklerNo());
 		tickler.setDemographicNo(input.getDemographicNo());
 		tickler.setTaskAssignedTo(input.getTaskAssignedTo());
 		tickler.setMessage(input.getMessage());

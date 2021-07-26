@@ -64,6 +64,7 @@ public class TicklerLinkDtoToTicklerLinkConverter extends AbstractModelConverter
 		{
 			ticklerLink.setTickler(ticklerDao.find(input.getTicklerNo()));
 		}
+		ticklerLink.setId(input.getId());
 		ticklerLink.setTableName(input.getType());
 		ticklerLink.setTableId(input.getLinkId());
 		ticklerLink.setMeta(input.getJsonMeta());
