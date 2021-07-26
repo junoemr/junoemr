@@ -32,7 +32,7 @@ import {AllowedAttachmentTypes} from "../../../../lib/messaging/constants/Allowe
 import FileUtil from "../../../../lib/util/FileUtil";
 import AttachmentFactory from "../../../../lib/messaging/factory/AttachmentFactory";
 import Attachment from "../../../../lib/messaging/model/Attachment";
-import DemographicEFormService from "../../../../lib/eform/service/DemographicEFormService";
+import DemographicEFormInstanceService from "../../../../lib/eform/service/DemographicEFormInstanceService";
 
 angular.module("Messaging.Modals").component('attachmentSelect', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/attachmentSelect.jsp',
@@ -141,7 +141,7 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 
 			ctrl.loadEForms = async () =>
 			{
-				const eformService = new DemographicEFormService();
+				const eformService = new DemographicEFormInstanceService();
 				ctrl.eformFileList = await eformService.getDemographicEForms(await ctrl.messageable.localId());
 			}
 

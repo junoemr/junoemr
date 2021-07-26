@@ -4,7 +4,7 @@ import {FormType} from "../model/FormType";
 import FormTo1ToEFormInstanceConverter from "../converter/FormTo1ToEFormInstanceConverter";
 import EFormInstance from "../model/EFormInstance";
 
-export default class DemographicEFormService
+export default class DemographicEFormInstanceService
 {
 
 	protected _eFormApi: EFormApi;

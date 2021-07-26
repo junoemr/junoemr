@@ -24,7 +24,7 @@ export default class FormTo1ToEFormInstanceConverter extends AbstractConverter<F
 			throw new ArgumentError("FormTo1ToEFormInstanceConverter only converts FormTo1 of type FormType.EForm ('eform') type provided: " + from.type)
 		}
 
-		return new EFormInstance(from.id?.toString(), from.formId?.toString(), from.name, from.status, from.subject, from.demographicNo?.toString(), moment(from.date));
+		return new EFormInstance(from.formId?.toString(), from.id?.toString(), from.name, from.status, from.subject, from.demographicNo?.toString(), moment(from.date));
 	}
 
 }

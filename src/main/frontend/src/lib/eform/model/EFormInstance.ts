@@ -1,9 +1,10 @@
 import {Moment} from "moment";
 import JunoFile from "../../documents/model/JunoFile";
+import EFormInstanceService from "../service/EFormInstanceService";
 
 export default class EFormInstance implements JunoFile
 {
-	protected _id: string;
+	protected _formId: string;
 	protected _formInstanceId: string;
 	protected _name: string;
 	protected _statusMessage: string;
@@ -15,9 +16,9 @@ export default class EFormInstance implements JunoFile
 	// Public Methods
 	// ==========================================================================
 
-	constructor(id: string, formInstanceId: string, name: string, statusMessage: string, subject: string, demographicNo: string, updatedAt: Moment)
+	constructor(formId: string, formInstanceId: string, name: string, statusMessage: string, subject: string, demographicNo: string, updatedAt: Moment)
 	{
-		this._id = id;
+		this._formId = formId;
 		this._formInstanceId = formInstanceId;
 		this._name = name;
 		this._statusMessage = statusMessage;
@@ -30,9 +31,9 @@ export default class EFormInstance implements JunoFile
 	// JunoFile Implementation
 	// ==========================================================================
 
-	public getBase64Data(): Promise<string>
+	public async getBase64Data(): Promise<string>
 	{
-		return Promise.resolve("");
+		return await (new EFormInstanceService()).printEForm(this);
 	}
 
 	get type(): string
@@ -44,9 +45,9 @@ export default class EFormInstance implements JunoFile
 	// Getters
 	// ==========================================================================
 
-	get id(): string
+	get formId(): string
 	{
-		return this._id;
+		return this._formId;
 	}
 
 	get formInstanceId(): string
@@ -56,6 +57,10 @@ export default class EFormInstance implements JunoFile
 
 	get name(): string
 	{
+		return `${this.subject} (${this.formName})`;
+	}
+
+	get formName(): string {
 		return this._name;
 	}
 

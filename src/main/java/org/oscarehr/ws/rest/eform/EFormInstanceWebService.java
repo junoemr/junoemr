@@ -28,6 +28,7 @@ import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,13 @@ public class EFormInstanceWebService extends AbstractServiceImpl
 			@PathParam("fdid") String fdid) throws IOException, HtmlToPdfConversionException
 	{
 		EFormData eFormData = eFormDataDao.findByFormDataId(Integer.parseInt(fdid));
+
+		securityInfoManager.requireAllPrivilege(
+				getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ,
+				eFormData.getDemographicId(),
+				"_eform");
+
 		return RestResponse.successResponse(Base64.getEncoder().encodeToString(this.eFormDataService.printEForm(getLoggedInInfo(), getHttpServletRequest().getContextPath(), eFormData)));
 	}
 

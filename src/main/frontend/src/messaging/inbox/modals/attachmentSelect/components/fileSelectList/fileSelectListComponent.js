@@ -24,6 +24,7 @@
 import {JUNO_BUTTON_COLOR} from "../../../../../../common/components/junoComponentConstants";
 import {AllowedAttachmentMimeTypes} from "../../../../../../lib/messaging/constants/AllowedAttachmentTypes";
 import Attachment from "../../../../../../lib/messaging/model/Attachment";
+import ToastService from "../../../../../../lib/alerts/service/ToastService";
 
 angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSelectList', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/components/fileSelectList/fileSelectList.jsp',
@@ -91,6 +92,19 @@ angular.module("Messaging.Modals.AttachmentSelect.Components").component('fileSe
 								"File is to big",
 								`File ${junoFile.name} is ${Math.trunc(fileBinary.length / 1024 / 1024)} MB which 
 							exceeds the limit of ${Attachment.MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024} MB.`);
+						}
+					}
+					catch(error)
+					{
+						const toastService = new ToastService();
+
+						if (error.status === 403)
+						{
+							toastService.errorToast("You do not have the necessary permissions to attach this document.");
+						}
+						else
+						{
+							toastService.errorToast("Failed to attach document to message.");
 						}
 					}
 					finally
