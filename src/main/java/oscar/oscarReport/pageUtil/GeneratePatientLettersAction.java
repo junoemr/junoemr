@@ -143,15 +143,13 @@ public class GeneratePatientLettersAction extends Action {
             if (!("L2".equals(followupValue)))
             {
                 prevLetter.setContactMethod(FIRST);
-                prevLetter.setLastPreventionDate(lastPreventionDate);
-
             }
             else
             {
                 prevLetter.setContactMethod(SECOND);
-                prevLetter.setLastPreventionDate(lastPreventionDate);
             }
 
+            prevLetter.setLastPreventionDate(lastPreventionDate);
             fillData(prevLetter, demographicIds[i], providerId);
 
             if (!preventionLetterList.isEmpty())
