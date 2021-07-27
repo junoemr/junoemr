@@ -114,7 +114,7 @@ public class SFTPConnector {
 		//if no files in directory, got nothing to do
 		if (files.length == 0) {
 			fLogger.info("Server folder '" + remoteDir + "' has no files for downloading. Terminated.");
-			throw new Exception("Server directory '" + remoteDir + "' has no files to download!");
+			//throw new Exception("Server directory '" + remoteDir + "' has no files to download!");  TODO: holy heck why
 		}
 
 		//fetch all files from remote dir
@@ -128,7 +128,8 @@ public class SFTPConnector {
 		}
 
 		//delete all files from remote dir
-		deleteDirectoryContents(remoteDir, files);
+		// TODO: CS!!!! re-enable later
+		// deleteDirectoryContents(remoteDir, files);
 
 		//disconnect
 		close();
@@ -190,7 +191,7 @@ public class SFTPConnector {
 	public static String getDownloadsDirectory() {
 		String dd = downloadsDirectory;
 		if (dd == null || dd.equals("")){
-			dd = "webapps/OscarDocument/hrm/sftp_downloads/";
+			dd = "webapps/OscarDocument/hrm/sftp_downloads/";       // TODO
 			return dd;
 
 		} else {
@@ -357,8 +358,8 @@ public class SFTPConnector {
 	 * @throws SftpException
 	 */
 	public void deleteDirectory(String serverDirectory) throws SftpException {
-		String[] files = ls(serverDirectory);
-		deleteDirectoryContents(serverDirectory, files);
+		//String[] files = ls(serverDirectory);
+		//deleteDirectoryContents(serverDirectory, files);
 	}
 
 	/**
@@ -372,7 +373,7 @@ public class SFTPConnector {
 	 * @throws SftpException
 	 */
 	public void deleteDirectoryContents(String serverDirectory, String[] filenames) throws SftpException {
-		cmd.cd("/");
+		/*cmd.cd("/");
 
 		fLogger.info("About to delete all contents from server directory: " + serverDirectory);
 		logger.debug("Deleting contents from directory: " + serverDirectory);
@@ -384,7 +385,7 @@ public class SFTPConnector {
 				fLogger.info("Deleted file " + file + " from server");
 				logger.debug("Deleted server file " + file);
 			}
-		}
+		}*/
 
 	}
 
@@ -493,7 +494,7 @@ public class SFTPConnector {
 	/********************************************************/
 	/////////////////// HELPERS / STATIC /////////////////////
 	/********************************************************/
-
+	
 	public static String getDayMonthYearTimestamp() {
 		Calendar cal = Calendar.getInstance();
 
@@ -507,7 +508,7 @@ public class SFTPConnector {
 
 		String year = cal.get(Calendar.YEAR) + "";
 
-		return day + month + year;
+		return year + month + day;
 	}
 
 	/**
@@ -587,33 +588,36 @@ public class SFTPConnector {
 			
 			if (remoteDir == null || remoteDir.isEmpty()) {
 				remoteDir = TEST_DIRECTORY;
-			} 
+			}
 			
 			logger.info("SFTPConnector, remoteDir:"+remoteDir);
 			
 			try {
-
+			
 				String[] files = ls(remoteDir);
+				String[] paths = downloadDirectoryContents(remoteDir);
+				String[] localFilePaths = copyFilesToDocumentDir(loggedInInfo, paths);
 				
-				String[] localFilePaths =null;
 				
-
-				String[] paths = null;
 				if(doDecrypt()) {
 					paths = decryptFiles(localFilePaths);
 				} else {
 					paths = localFilePaths;
 				}
 		
-				//delete all files from remote dir
-				deleteDirectoryContents(remoteDir, files);
+				//delete all files from remote dir  // TODO CS: wtf
+				// deleteDirectoryContents(remoteDir, files);
 
 				
-				paths = copyFilesToDocumentDir(loggedInInfo, paths);
+				// paths = copyFilesToDocumentDir(loggedInInfo, paths);
 								
 				for (String filePath : paths) {
-					HRMReport report = HRMReportParser.parseReport(loggedInInfo, filePath);
-					if (report != null) HRMReportParser.addReportToInbox(loggedInInfo, report);
+					HRMReport report = HRMReportParser.parseReport(filePath, "4.3");
+					
+					if (report != null)
+					{
+						HRMReportParser.addReportToInbox(loggedInInfo, report);
+					}
 				}
 			
 
@@ -692,43 +696,4 @@ public class SFTPConnector {
 	    }
 	}
 }
-/*
-class MyUserInfo implements UserInfo {
 
-	@Override
-	public String getPassphrase() {
-		// TODO-legacy Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getPassword() {
-		return "password";
-	}
-
-	@Override
-	public boolean promptPassword(String message) {
-		// TODO-legacy Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public boolean promptPassphrase(String message) {
-		// TODO-legacy Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean promptYesNo(String message) {
-		// TODO-legacy Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void showMessage(String message) {
-		// TODO-legacy Auto-generated method stub
-		
-	}
-	
-}
-*/

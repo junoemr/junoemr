@@ -24,6 +24,7 @@ package org.oscarehr.dataMigration.mapper.cds.out;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -65,7 +66,7 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 		}
 		else
 		{
-			HRMReport hrmReport = HRMReportParser.parseReport(exportStructure.getReportFile().getFileObject(), exportStructure.getReportFileSchemaVersion());
+			HRMReport hrmReport = HRMReportParser.parseReport(new XMLFile(exportStructure.getReportFile().getFileObject()), exportStructure.getReportFileSchemaVersion());
 			media = hrmReport.getBinaryContent();
 			reports.setFileExtensionAndVersion(hrmReport.getFileExtension());
 		}

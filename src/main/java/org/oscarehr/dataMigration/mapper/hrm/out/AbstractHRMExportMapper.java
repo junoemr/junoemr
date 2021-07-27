@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+import xml.cds.v5_0.ReportClass;
 import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.ObjectFactory;
 import xml.hrm.v4_3.PersonNameSimple;
@@ -109,5 +110,14 @@ public abstract class AbstractHRMExportMapper<I, E> extends AbstractExportMapper
 			personNameSimple.setLastName(provider.getLastName());
 		}
 		return personNameSimple;
+	}
+	
+	protected String getReportClass(ReportClass clazz)
+	{
+		if(clazz != null)
+		{
+			return clazz.value();
+		}
+		return null;
 	}
 }

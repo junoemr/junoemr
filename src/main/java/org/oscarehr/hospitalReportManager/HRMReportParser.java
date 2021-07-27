@@ -14,14 +14,17 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMapper;
+import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDocumentMapper;
+import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.parser.hrm.HRMFileParser;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
@@ -30,22 +33,15 @@ import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
-import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_1;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
-import org.oscarehr.hospitalReportManager.xsd.OmdCds;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.SAXException;
 import oscar.util.ConversionUtils;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -69,24 +65,14 @@ public class HRMReportParser
 		{
 			try
 			{
-				//a lot of the parsers need to refer to a file and even when they provide functions like parse(String text)
-				//it will not parse the same way because it will treat the text as a URL
-				//so we take the lab and store them temporarily in a random filename in /tmp/oscar-sftp/
-				File tmpXMLHolder = new File(hrmReportFileLocation);
-
-				//check the DOCUMENT_DIR
-				if(!tmpXMLHolder.exists())
-				{
-					tmpXMLHolder = FileFactory.getHrmFile(hrmReportFileLocation).getFileObject();
-				}
-
-				if(!tmpXMLHolder.exists())
+				GenericFile hrmXML = new XMLFile(new File(hrmReportFileLocation));
+				if(!hrmXML.getFileObject().exists())
 				{
 					logger.warn("unable to find the HRM report. checked " + hrmReportFileLocation + ", and in the document_dir");
 					return null;
 				}
 
-				return parseReport(tmpXMLHolder, schemaVersion);
+				return parseReport(hrmXML);
 			}
 			catch(SAXException e)
 			{
@@ -100,42 +86,64 @@ public class HRMReportParser
 		return null;
 	}
 
-	public static HRMReport parseReport(File hrmFile, String schemaVersion) throws IOException, SAXException, JAXBException
+	public static HRMReport parseReport(GenericFile hrmFile) throws IOException, SAXException, JAXBException
 	{
-		String fileData = FileUtils.getStringFromFile(hrmFile);
-
+		String fileData = FileUtils.getStringFromFile(hrmFile.getFileObject());
+		
 		HRMFileParser hrmParser = new HRMFileParser();
-		if(hrmParser.getSchemaVersion().equals(schemaVersion))
-		{
-			xml.hrm.v4_3.OmdCds root = hrmParser.parse(new XMLFile(hrmFile));
-			return new HRMReport_4_3(root, hrmFile.getPath(), fileData);
-
-		}
-		else // legacy load HRM 4.1 or other
-		{
-			// Load a WXS schema, represented by a Schema instance.
-			// Create a SchemaFactory capable of understanding WXS schemas.
-			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-			String OMDDirectory = SFTPConnector.OMD_directory;
-			File schemaFile = new File(OMDDirectory, "report_manager_cds.xsd");
-			Schema schema = factory.newSchema(new StreamSource(schemaFile));
-
-			JAXBContext jc = JAXBContext.newInstance("org.oscarehr.hospitalReportManager.xsd");
-			Unmarshaller u = jc.createUnmarshaller();
-			u.setSchema(schema);
-
-			OmdCds root = (OmdCds) u.unmarshal(hrmFile);
-			return new HRMReport_4_1(root, hrmFile.getPath(), fileData);
-		}
+		
+			xml.hrm.v4_3.OmdCds root = hrmParser.parse(hrmFile);
+			
+			HRMReport_4_3 report = new HRMReport_4_3(root, hrmFile.getPath(), fileData);
+			
+			HRMReportImportMapper mapper = new HRMReportImportMapper();
+			HRMReportDemographicMapper demoMapper = new HRMReportDemographicMapper();
+			
+			try
+			{
+				HrmDocument model = mapper.importToJuno(report);
+				org.oscarehr.dataMigration.model.demographic.Demographic demographic = demoMapper.importToJuno(report);
+				
+				org.oscarehr.demographic.dao.DemographicDao demographicDao = SpringUtils.getBean(org.oscarehr.demographic.dao.DemographicDao.class);
+				
+				DemographicCriteriaSearch criteria = new DemographicCriteriaSearch();
+				criteria.setHin(demographic.getHealthNumber());
+				criteria.setHealthCardVersion(demographic.getHealthNumberVersion());
+				criteria.set
+				
+				List<org.oscarehr.demographic.model.Demographic> demographics = demographicDao.criteriaSearch(criteria);
+				
+				if (demographics == null || demographics.isEmpty())
+				{
+					// route with a null demographics
+				}
+				
+				
+				if (demographics.size() > 1)
+				{
+					// Only one match, we know where to route
+				}
+				
+				
+				
+				return report;
+			}
+			catch (Exception e)
+			{
+				return report;
+			}
+			
+		DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
 	}
-
+	
+	DemographicCriteriaSearch blah;
+	
 	/**
 	 * legacy method signature
  	 */
 	public static HRMReport parseReport(LoggedInInfo loggedInInfo, String hrmReportFileLocation)
 	{
-		return parseReport(hrmReportFileLocation, null);
+		return parseReport(hrmReportFileLocation, "4.3");
 	}
 
 	public static void addReportToInbox(LoggedInInfo loggedInInfo, HRMReport report) {
@@ -495,7 +503,7 @@ public class HRMReportParser
 	public static void routeReportToProvider(String reportId, String providerNo) {
 		HRMDocumentToProviderDao hrmDocumentToProviderDao = (HRMDocumentToProviderDao) SpringUtils.getBean("HRMDocumentToProviderDao");
 		HRMDocumentToProvider providerRouting = new HRMDocumentToProvider();
-		HRMDocument hrmDocument = hrmDocumentDao.find(reportId);
+		HRMDocument hrmDocument = hrmDocumentDao.find(Integer.parseInt(reportId));
 
 		providerRouting.setHrmDocument(hrmDocument);
 		providerRouting.setProviderNo(providerNo);
