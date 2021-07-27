@@ -361,7 +361,6 @@ public class FluReport extends PreventionsReport {
               if ( fluFollowupData.size() == 0 )
               {
                   prd.nextSuggestedProcedure = PreventionReport.FIRST_LETTER;
-                  //return PreventionReport.FIRST_LETTER;
               }
               else
               {
@@ -372,20 +371,21 @@ public class FluReport extends PreventionsReport {
                   if (prd.lastFollupProcedure.equals(PreventionReport.FIRST_LETTER))
                   {
                       prd.nextSuggestedProcedure = PreventionReport.PHONE_CALL;
-                     // return PreventionReport.PHONE_CALL;
                   }
                   else
                   {
                       prd.nextSuggestedProcedure = PreventionReport.NO_FOLLOWUP;
                   }
               }
-
-          }else if (PreventionReport.REFUSED.equals(prd.state)){  //Not sure what to do about refused
+          }
+          else if (PreventionReport.REFUSED.equals(prd.state))
+          {  //Not sure what to do about refused
               EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting FLUF data for "+prd.demographicNo);
               Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsData();
 
-              if ( fluFollowupData.size() > 0 ){
+              if ( fluFollowupData.size() > 0 )
+              {
                   EctMeasurementsDataBean fluData = fluFollowupData.iterator().next();
                   log.debug("fluData "+fluData.getDataField());
                   log.debug("lastFollowup "+fluData.getDateObservedAsDate()+ " last procedure "+fluData.getDateObservedAsDate());
@@ -394,20 +394,26 @@ public class FluReport extends PreventionsReport {
                   prd.lastFollowup = fluData.getDateObservedAsDate();
                   prd.lastFollupProcedure = fluData.getDataField();
               }
-          }else if(PreventionReport.INELIGIBLE.equals(prd.state)){
+          }else if(PreventionReport.INELIGIBLE.equals(prd.state))
+          {
                 // Do nothing
-          }else if(PreventionReport.UPTODATE.equals(prd.state)){
+          }
+          else if(PreventionReport.UPTODATE.equals(prd.state))
+          {
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting followup data for "+prd.demographicNo);
               Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
 
-              if ( followupData.size() > 0 ){
+              if ( followupData.size() > 0 )
+              {
                   EctMeasurementsDataBean measurementData = followupData.iterator().next();
                   prd.lastFollowup = measurementData.getDateObservedAsDate();
                   prd.lastFollupProcedure = measurementData.getDataField();
               }
-          }else{
+          }
+          else
+          {
               log.warn("NOT SURE WHAT HAPPEND IN THE LETTER PROCESSING");
         	  log.error("prd.state appears to be null or a missed case : "+prd.state);
           }
