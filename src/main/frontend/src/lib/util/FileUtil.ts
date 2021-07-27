@@ -7,6 +7,17 @@ export default class FileUtil
 	// ==========================================================================
 
 	/**
+	 * convert a base64 string to utf8 string.
+	 * @param base64
+	 */
+	public static base64ToUtf8(base64: string): string
+	{
+		return decodeURIComponent(atob(base64).split('').map(function(c) {
+			return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+		}).join(''));
+	}
+
+	/**
 	 * get a file's data as a base64 string
 	 * @param file - the file to get the base64 data from
 	 * @return promise that resolves to base64 string data

@@ -70,6 +70,8 @@ public interface MessagingService
 	 * @param group - [optional] filter messages by group. Group ALL is equivalent to null.
 	 * @param limit - [optional] limit results to this number (use for paging).
 	 * @param offset - [optional] offset results by this number (use for paging).
+	 * @param onlyUnread - [optional] if true only unread messages will be returned
+	 * @param keyword - [optional] if not null filter messages to ones containing this keyword in the title / subject
 	 * @param sender - [optional] filter messages to only those sent by this sender.
 	 * @param receiver - [optional] filter messages to only those received by this recipient.
 	 * @return - a list of messages.
@@ -83,6 +85,8 @@ public interface MessagingService
 			@Nullable MessageGroup group,
 			@Nullable Integer limit,
 			@Nullable Integer offset,
+			@Nullable Boolean onlyUnread,
+			@Nullable String keyword,
 			@Nullable Messageable<?> sender,
 			@Nullable Messageable<?> receiver);
 
@@ -90,11 +94,25 @@ public interface MessagingService
 	 * get the total count of messages in a group for the given messageable
 	 * @param loggedInInfo - currently logged in user info
 	 * @param messageable - the messageable whose group is being counted.
+	 * @param startDateTime - [optional] filter messages to only those that where sent after this time.
+	 * @param endDateTime - [optional] filter messages to only those that where sent before this time.
 	 * @param group - the group to count
-	 * @param onlyUnread - if true only unread messages will be counted
+	 * @param onlyUnread - [optional] if true only unread messages will be returned
+	 * @param keyword - [optional] if not null filter messages to ones containing this keyword in the title / subject
+	 * @param sender - [optional] filter messages to only those sent by this sender.
+	 * @param receiver - [optional] filter messages to only those received by this recipient.
 	 * @return - the count of messages in the group
 	 */
-	public Integer countMessagesInGroup(LoggedInInfo loggedInInfo, Messageable<?> messageable, MessageGroup group, Boolean onlyUnread);
+	public Integer countMessagesInGroup(
+			LoggedInInfo loggedInInfo,
+			Messageable<?> messageable,
+			MessageGroup group,
+			@Nullable ZonedDateTime startDateTime,
+			@Nullable ZonedDateTime endDateTime,
+			@Nullable Boolean onlyUnread,
+			@Nullable String keyword,
+			@Nullable Messageable<?> sender,
+			@Nullable Messageable<?> receiver);
 
 	/**
 	 * get a conversation for the messageable by id.

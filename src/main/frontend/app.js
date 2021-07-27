@@ -322,7 +322,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		})
 		.state('messaging.view',
 		{
-			url: "/view/:backend/source/:source/group/:group?messageableId",
+			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded?onlyUnread?keyword",
 			component: "messagingInbox",
 			params: {
 				backend: {
@@ -337,6 +337,17 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				messageableId: {
 					dynamic: true,
 				},
+				recordPageEmbedded: {
+					value: "false",
+				},
+				onlyUnread: {
+					dynamic: true,
+					value: "false",
+				},
+				keyword: {
+					dynamic: true,
+					value: null,
+				}
 			}
 		})
 		.state('messaging.view.message',
@@ -675,6 +686,46 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/phr',
 			templateUrl: 'src/record/phr/phr.jsp',
 			controller: 'Record.PHR.PHRController as phrCtrl'
+		})
+		.state("record.messaging",
+		{
+			url: "/messaging"
+		})
+		.state('record.messaging.view',
+		{
+			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded?onlyUnread?keyword",
+			component: "messagingInbox",
+			params: {
+				backend: {
+					dynamic: true,
+				},
+				source: {
+					dynamic: true,
+				},
+				group: {
+					dynamic: true,
+				},
+				messageableId: {
+					dynamic: true,
+					value: null,
+				},
+				recordPageEmbedded: {
+					value: "false",
+				},
+				onlyUnread: {
+					dynamic: true,
+					value: "false",
+				},
+				keyword: {
+					dynamic: true,
+					value: null,
+				}
+			}
+		})
+		.state('record.messaging.view.message',
+		{
+			url: "/message/:messageId/view",
+			component: "messageView",
 		})
 		// .state('admin.integration',
 		.state('k2aConfig',

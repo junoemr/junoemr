@@ -1,4 +1,5 @@
 import ActionAlreadyInProgressError from "../error/ActionAlreadyInProgressError";
+import {StreamSource} from "./StreamSource";
 
 export default class StreamingList<T> extends Array<T>
 {
@@ -80,6 +81,11 @@ export default class StreamingList<T> extends Array<T>
 		return this._isLoading;
 	}
 
+	get sources(): StreamSource<T>[]
+	{
+		return this._sources;
+	}
+
 	// ==========================================================================
 	// Protected Methods
 	// ==========================================================================
@@ -119,29 +125,4 @@ export default class StreamingList<T> extends Array<T>
 		await Promise.all(this._sources.map((source) => source.preload()));
 	}
 
-}
-
-export interface StreamSource<T>
-{
-	// ==========================================================================
-	// Public Methods
-	// ==========================================================================
-
-	/**
-	 * get the next item from this source
-	 * @return the next item or null if no more items.
-	 */
-	peekNext(): Promise<T>;
-
-	/**
-	 * get the next item from this source, poping it from the stack
-	 * @return the next item or null if no more items.
-	 */
-	popNext(): Promise<T>;
-	
-	/**
-	 * Called by user to indicate to a source that it should preload stream content.
-	 * This is for performance reasons only. There is not requirement to actually preload any thing.
-	 */
-	preload(): Promise<void>;
 }

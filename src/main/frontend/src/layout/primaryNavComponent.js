@@ -5,6 +5,7 @@ import {MessageGroup} from "../lib/messaging/model/MessageGroup";
 import {MhaIntegrationApi} from "../../generated";
 import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
+import {MessageCountMode} from "../lib/provider/settings/model/MessageCountMode";
 
 angular.module('Layout').component("primaryNavigation", {
 	bindings: {},
@@ -72,6 +73,7 @@ angular.module('Layout').component("primaryNavigation", {
 			ctrl.mhaUnreadMessageTotal = 0;
 			ctrl.demographicSearch = null;
 			ctrl.consultationTeamWarning = "";
+			ctrl.messageCountMode = MessageCountMode.MhaInternal;
 			ctrl.mhaConfigService = new MhaConfigService();
 			ctrl.mhaEnabled = false;
 			// measured in months
@@ -143,6 +145,8 @@ angular.module('Layout').component("primaryNavigation", {
 					{
 						ctrl.consultationTeamWarning = results.consultationTeamWarning;
 					}
+
+					ctrl.messageCountMode = results.messageCountMode;
 				},
 				function error(errors)
 				{
@@ -343,7 +347,20 @@ angular.module('Layout').component("primaryNavigation", {
 			{
 				// MHA message count
 				const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);
-				ctrl.mhaUnreadMessageTotal = await messagingService.countMessages(await messagingService.getDefaultMessageSource(), MessageGroup.Received, true);
+				ctrl.mhaUnreadMessageTotal = await messagingService.countMessages(await messagingService.getDefaultMessageSource(), {group: MessageGroup.Received, onlyUnread: true});
+			}
+		}
+
+		ctrl.getMessengerMessageCount = () =>
+		{
+			switch(ctrl.messageCountMode)
+			{
+				case MessageCountMode.Mha:
+					return ctrl.mhaUnreadMessageTotal;
+				case MessageCountMode.Internal:
+					return ctrl.unreadMessageTotal;
+				case MessageCountMode.MhaInternal:
+					return ctrl.unreadMessageTotal + ctrl.mhaUnreadMessageTotal;
 			}
 		}
 

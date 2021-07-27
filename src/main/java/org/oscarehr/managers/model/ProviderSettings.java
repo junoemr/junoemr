@@ -160,6 +160,18 @@ public class ProviderSettings
 	private boolean appointmentCountIncludeNoShow;
 	private boolean appointmentCountIncludeNoDemographic;
 
+	// when counting the number of unread messages how the value should be calculated.
+	public enum MESSAGE_COUNT_SUM_MODE
+	{
+		MHA, // only show mha count
+		INTERNAL, // only show internal count
+		MHA_INTERNAL, // show mha + internal count
+	}
+
+	@Getter
+	@Setter
+	private MESSAGE_COUNT_SUM_MODE messageCountMode;
+
 	@Getter
 	@Setter
 	private boolean enableCareConnectPPNCheck;
