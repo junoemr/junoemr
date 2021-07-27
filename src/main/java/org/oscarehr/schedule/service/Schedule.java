@@ -339,7 +339,7 @@ public class Schedule
 	}
 
 	/**
-	 * delete any existing schedules by date & provider, and create a new one with the given values.
+	 * delete any existing schedules by date &amp; provider, and create a new one with the given values.
 	 * @param providerNoStr provider id
 	 * @param date date of schedule
 	 * @param available 1 or 0

@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
 /**
- * Data associated with billing submitted to Alberta Health & Wellness
+ * Data associated with billing submitted to Alberta Health &amp; Wellness
  */
 public class ZBA extends AbstractSegment
 {

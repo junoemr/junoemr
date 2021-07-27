@@ -1,0 +1,27 @@
+.attachment-preview-modal {
+	.attachment-container {
+		background-color: var(--color-neutral-lightest);
+		border-radius: 8px;
+		overflow: auto;
+
+		.embedded-content {
+			&.stretch {
+				width: 100%;
+				height: 100%;
+			}
+
+			&.clamp-width {
+				max-width: 100%;
+			}
+		}
+
+		> pre {
+			background-color: transparent;
+			border: none;
+		}
+	}
+
+	.bottom-buttons {
+		height: 32px;
+	}
+}

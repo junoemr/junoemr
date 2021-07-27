@@ -25,5 +25,5 @@
 
  */
 
-angular.module('Common.Components', [ 'Common.Services', 'Common.Components.JunoTab']);
+angular.module('Common.Components', [ 'Common.Services', 'Common.Components.JunoTab', 'Common.Components.MhaPatientDetailsModal']);
 

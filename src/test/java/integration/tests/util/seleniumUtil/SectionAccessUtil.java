@@ -34,7 +34,6 @@ import static integration.tests.util.seleniumUtil.PageUtil.isExistsBy;
 public class SectionAccessUtil
 {
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
-			throws InterruptedException
 	{
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);

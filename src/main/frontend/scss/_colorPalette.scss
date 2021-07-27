@@ -1,6 +1,7 @@
 
 // Colour Palette
 :root {
+	--color-neutral-black-alpha: 36, 40, 51;
 	--color-neutral-black: #242833;
 	--color-neutral-darkest: #262933;
 	--color-neutral-darker: #45474d;
@@ -36,6 +37,14 @@
 	--color-orange-light: #e69545;
 	--color-orange-lighter: #f2b679;
 	--color-orange-lightest: #ffd9b3;
+
+	--color-yellow-darkest: #4d420f;
+	--color-yellow-darker: #806e19;
+	--color-yellow-dark: #b39b24;
+	--color-yellow-base: #e6c72e;
+	--color-yellow-light: #e6cf5c;
+	--color-yellow-lighter: #f2e291;
+	--color-yellow-lightest: #fff7cc;
 
 	--color-lime-darkest: #243811;
 	--color-lime-darker: #406619;

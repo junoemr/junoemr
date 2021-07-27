@@ -125,15 +125,6 @@ public class PageUtil
 		targetLocator.window(windowHandle);
 	}
 
-	public static void switchToLastWindow1(WebDriver driver)
-	{
-		Set<String> allHandles = driver.getWindowHandles();
-		allHandles.remove(allHandles.iterator().next());
-		String lastHandle = allHandles.iterator().next();
-		driver.switchTo().window(lastHandle);
-		driver.manage().window().maximize();
-	}
-
 	public static void switchToLastWindow(WebDriver driver)
 	{
 		Set<String> allHandles = driver.getWindowHandles();

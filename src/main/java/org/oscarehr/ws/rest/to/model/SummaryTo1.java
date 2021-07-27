@@ -49,7 +49,7 @@ title: "Ongoing Concerns",displaySize: 5,
 	              			},
 	              			{
 	              				id : 3,
-	              				desc : 'Aortic stenosis 2nd to rheumatic fever; AV replaced Jan 08 Large irreducible hiatus Hernia 11/06 HTN on Accupril & HCTZ AF; Recurrent thromboembolism of lower legs with filter insertion - on coumadin'
+	              				desc : 'Aortic stenosis 2nd to rheumatic fever; AV replaced Jan 08 Large irreducible hiatus Hernia 11/06 HTN on Accupril &amp; HCTZ AF; Recurrent thromboembolism of lower legs with filter insertion - on coumadin'
 	              			} ]
 						};
 */

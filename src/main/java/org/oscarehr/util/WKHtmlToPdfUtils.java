@@ -75,7 +75,7 @@ public class WKHtmlToPdfUtils
 	 * exception that the uri is removed and replaced with our eform viewing uri. Note that this
 	 * requires that the remote url is valid for local access. i.e. the host name from outside needs
 	 * to resolve inside as well. The result needs to look something like this:
-	 * https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms
+	 * https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&amp;parentAjaxId=eforms
 	 */
 	public static String getEformRequestUrl(String providerId, String formId, String httpScheme, String contextPath)
 	{

@@ -75,8 +75,8 @@ public class UtilMisc {
  /**
   * For eformGenerator to Edit-Html window
   * This method is used to generate html symbols
-  * eg. change '&lt' to  '<'
-  *            '&gt' to '>'
+  * eg. change '&amp;lt' to  '&lt;'
+  *            '&amp;gt' to '>'
   *
   */
   public static String rhtmlEscape(String S) {

@@ -62,6 +62,7 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 			{
 				ctrl.messageable = ctrl.resolve.messageable;
 				ctrl.canReadChart = await ctrl.checkCanReadChart();
+				ctrl.messagingBackendType = ctrl.resolve.messagingBackendType;
 
 				await ctrl.loadDocumentFiles();
 

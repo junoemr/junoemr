@@ -1,7 +1,7 @@
-import {StreamSource} from "../../../../util/StreamingList";
 import Message from "../../../model/Message";
 import MessagingServiceInterface, {MessageSearchParams} from "../../../service/MessagingServiceInterface";
 import MessageSource from "../../../model/MessageSource";
+import {StreamSource} from "../../../../util/StreamSource";
 
 export default class ClinicMailboxStreamSource implements StreamSource<Message>
 {
@@ -11,6 +11,8 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 	protected _offset: number;
 	protected readonly _bucketSize = 25;
 	protected _bucket: Message[];
+	protected _lastLoadBucket: Message[]; // contains the last loaded bucket (items aren't removed on popNext())
+	protected _totalMessageCount: number = null;
 	protected _exhausted: boolean;
 
 	// ==========================================================================
@@ -53,9 +55,27 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 		return null;
 	}
 
+	public rewind(amount: number): void
+	{
+		this._offset = Math.max(this._offset - (amount + this._bucket.length), 0);
+		this._bucket = [];
+	}
+
+	public fastForward(amount: number): void
+	{
+		this._offset += (amount - this._bucket.length);
+		this._bucket = [];
+	}
+
 	public async preload(): Promise<void>
 	{
+		await this.adjustForAsyncActivity();
 		await this.refillIfRequired();
+	}
+
+	get sourceId(): string
+	{
+		return this._source.id;
 	}
 
 	// ==========================================================================
@@ -75,10 +95,55 @@ export default class ClinicMailboxStreamSource implements StreamSource<Message>
 		this._searchParams.offset = this._offset;
 		this._searchParams.limit = this._bucketSize;
 
+		this.countMessages();// intentional no await
 		this._bucket = (await this._messagingService.searchMessages(this._source, this._searchParams)).reverse();
+		this._lastLoadBucket = [...this._bucket];
 
 		this._exhausted = this._bucket.length == 0;
-		this._offset += this._bucketSize;
+		this._offset += this._bucket.length;
+	}
+
+	protected async countMessages(): Promise<void>
+	{
+		this._totalMessageCount = (await this._messagingService.countMessages(this._source, this._searchParams));
+	}
+
+	/**
+	 * adjust this stream source to account for any async activities (other providers doing things) that may have
+	 * occurred since the last message load. The stream will be fast forwarded or rewound adjust.
+	 * @protected
+	 */
+	protected async adjustForAsyncActivity(): Promise<void>
+	{
+		if (this._totalMessageCount && !this._exhausted)
+		{
+			const currCount = (await this._messagingService.countMessages(this._source, this._searchParams));
+
+			if (currCount !== this._totalMessageCount && (await this.haveMessagesShifted()))
+			{
+				if (currCount > this._totalMessageCount)
+				{
+					this.fastForward(currCount - this._totalMessageCount);
+				}
+				else if (currCount < this._totalMessageCount)
+				{
+					this.rewind(this._totalMessageCount - currCount);
+				}
+			}
+		}
+	}
+
+	/**
+	 * check if the messages on the server have shifted when compared to what we have loaded
+	 * @return true / false indicating if messages have shifted or no
+	 * @protected
+	 */
+	protected async haveMessagesShifted(): Promise<boolean>
+	{
+		this._searchParams.limit = 1;
+		this._searchParams.offset = this._offset -1;
+		const lastKnownMessage: Message[] = (await this._messagingService.searchMessages(this._source, this._searchParams));
+		return lastKnownMessage.length === 0 || lastKnownMessage[0].id !== this._lastLoadBucket[0].id;
 	}
 
 }

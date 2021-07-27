@@ -192,7 +192,7 @@ public class PHRMessage  extends PHRDocument implements Serializable{
      * ie READ + READ != REPLIED
      *
      * logic
-     * if result has status and status < 0 the if it should go
+     * if result has status and status &lt; 0 the if it should go
      *   or
      * if result does not have status and status > 0 it should go
      */

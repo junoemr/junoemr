@@ -91,6 +91,8 @@ public class MessagesWebService extends MessagingBaseWebService
 			@QueryParam("group") String group,
 			@QueryParam("limit") Integer limit,
 			@QueryParam("offset") Integer offset,
+			@QueryParam("onlyUnread") Boolean onlyUnread,
+			@QueryParam("keyword") String keyword,
 			@QueryParam("senderId") String senderId,
 			@QueryParam("senderType") String senderType,
 			@QueryParam("recipientId") String recipientId,
@@ -104,6 +106,8 @@ public class MessagesWebService extends MessagingBaseWebService
 				group == null ? null : MessageGroup.fromString(group),
 				limit,
 				offset,
+				onlyUnread,
+				keyword,
 				senderId == null ? null : this.messageableFromIdType(senderId, MessageableType.fromString(senderType)),
 				recipientId == null ? null : this.messageableFromIdType(recipientId, MessageableType.fromString(recipientType)));
 
@@ -115,16 +119,25 @@ public class MessagesWebService extends MessagingBaseWebService
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Integer> countMessages(
 			@PathParam("integrationId") String integrationId,
-
 			@QueryParam("group") String group,
-			@QueryParam("onlyUnread") Boolean onlyUnread
+			@QueryParam("onlyUnread") Boolean onlyUnread,
+			@QueryParam("keyword") String keyword,
+			@QueryParam("senderId") String senderId,
+			@QueryParam("senderType") String senderType,
+			@QueryParam("recipientId") String recipientId,
+			@QueryParam("recipientType") String recipientType
 	)
 	{
 		return RestResponse.successResponse(this.messagingService.countMessagesInGroup(
 				getLoggedInInfo(),
 				messageableFromIntegrationId(integrationId),
 				MessageGroup.fromString(group),
-				onlyUnread
+				null,
+				null,
+				onlyUnread,
+				keyword,
+				senderId == null ? null : this.messageableFromIdType(senderId, MessageableType.fromString(senderType)),
+				recipientId == null ? null : this.messageableFromIdType(recipientId, MessageableType.fromString(recipientType))
 		));
 	}
 }

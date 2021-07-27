@@ -1,5 +1,6 @@
 import JunoDocument from "../model/JunoDocument";
 import {DocumentStatus} from "../model/DocumentStatus";
+import JunoDocumentType from "../model/JunoDocumentType";
 
 export class JunoDocumentFactory
 {
@@ -9,10 +10,10 @@ export class JunoDocumentFactory
 	// Class Methods
 	// ==========================================================================
 
-	public static build(fileName: string, description: string, contentType: string, base64Data: string): JunoDocument
+	public static build(fileName: string, description: string, documentType: JunoDocumentType, contentType: string, base64Data: string): JunoDocument
 	{
 		const doc = new JunoDocument(fileName, description, base64Data);
-		doc.documentType = JunoDocumentFactory.DEFAULT_DOC_TYPE;
+		doc.documentType = documentType.type;
 		doc.status = DocumentStatus.A;
 		doc.contentType = contentType;
 

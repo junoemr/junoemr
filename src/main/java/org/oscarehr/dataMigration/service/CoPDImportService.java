@@ -137,6 +137,7 @@ public class CoPDImportService
 		MEDIPLAN,
 		MEDACCESS,
 		ACCURO,
+		HEALTHQUEST,
 		UNKNOWN
 	}
 

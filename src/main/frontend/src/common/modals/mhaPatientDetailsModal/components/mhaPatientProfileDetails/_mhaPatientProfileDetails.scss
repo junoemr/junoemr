@@ -1,0 +1,14 @@
+.mha-patient-profile-details {
+	line-height: 18px;
+
+	> .bottom-box {
+		border: solid 1px var(--color-neutral-light-grey);
+		border-radius: 8px;
+
+		height: 186px;
+	}
+
+	.patient-rejected-text {
+		color: var(--color-red-base);
+	}
+}

@@ -22,6 +22,7 @@
  */
 
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
+import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin').component('systemPropertiesGeneral',
     {
@@ -61,15 +62,23 @@ angular.module('Admin').component('systemPropertiesGeneral',
                     {
                         name: "Phone Prefix",
                         description: "Change the default phone number prefix (XXX or XXX-)",
-                        propertyName: "phone_prefix",
+                        propertyName: SYSTEM_PROPERTIES.DEFAULT_PHONE_PREFIX,
 	                    type: propertyTypes.text,
 	                    value: "",
 	                    validation: ctrl.validations.phonePrefixValid,
                     },
+	                {
+		                name: "Family Doctor & Demographic Rostering",
+		                description: "Enable additional family doctor field in classic UI and demographic rostering section in Juno UI",
+		                propertyName: SYSTEM_PROPERTIES.ROSTERING_MODULE,
+		                type: propertyTypes.toggle,
+		                value: false,
+		                validation: false,
+	                },
 					{
 	                	name: "Additional Demographic Address",
 		                description: "Enable an additional demographic address",
-		                propertyName: "enable_additional_address",
+		                propertyName: SYSTEM_PROPERTIES.EXTRA_ADDRESS_FIELD,
 		                type: propertyTypes.toggle,
 		                value: false,
 		                validation: false,

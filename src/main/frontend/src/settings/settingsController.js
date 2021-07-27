@@ -1,5 +1,6 @@
 import {SitesApi} from "../../generated/api/SitesApi";
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {MessageCountMode} from "../lib/provider/settings/model/MessageCountMode";
 
 angular.module('Settings').controller('Settings.SettingsController', [
 
@@ -50,6 +51,8 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		$scope.$emit('configureShowPatientList', false);
 
+		$scope.MessageCountMode = MessageCountMode;
+
 		controller.providerList = providerList;
 		controller.user = user;
 		controller.billingServiceTypes = billingServiceTypes;
@@ -65,6 +68,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		{
 			controller.pref.recentPatients = "8";
 		}
+
 
 		//convert to value/label object list from string array
 		controller.formGroupNames = [

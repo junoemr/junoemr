@@ -1,0 +1,13 @@
+{
+  "inbox":
+  {
+    "pageTitle": "Messenger",
+    "messageCompose":
+    {
+      "attachmentSelect":
+      {
+        "eChartNotAvailableTooltip": "Demographic mapping confidence level is not high enough to access the patients chart"
+      }
+    }
+  }
+}
