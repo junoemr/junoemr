@@ -39,10 +39,9 @@
     }
   }
 
-  > .body {
+   .body {
     display: flex;
     flex-wrap: wrap;
-    text-align: left;
   }
 
   .juno-input {
@@ -50,6 +49,10 @@
     margin-left: 8px;
     width: 352px;
     text-align: left;
+
+    label {
+      text-align: left;
+    }
   }
 
   .modal-footer {
