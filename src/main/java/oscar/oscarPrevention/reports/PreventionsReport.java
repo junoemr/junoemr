@@ -46,7 +46,7 @@ public abstract class PreventionsReport implements PreventionReport
             followupData = measurementDataHandler.getMeasurementsData();
             boolean inclUpToDate = false;
 
-            if (reportDisplay.state.equals(PreventionReport.UPTODATE) && preventionDate != null)
+            if (reportDisplay.state.equals(PreventionReport.UP_TO_DATE) && preventionDate != null)
             {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(asOfDate);
@@ -68,7 +68,8 @@ public abstract class PreventionsReport implements PreventionReport
                     inclUpToDate = true;
                 }
             }
-            else if (reportDisplay.state.equals(PreventionReport.NOINFO) ||
+
+            if (reportDisplay.state.equals(PreventionReport.NO_INFO) ||
                     reportDisplay.state.equals(PreventionReport.DUE) ||
                     reportDisplay.state.equals(PreventionReport.OVERDUE) ||
                     inclUpToDate)
@@ -156,7 +157,7 @@ public abstract class PreventionsReport implements PreventionReport
             {
                 reportDisplay.nextSuggestedProcedure = PreventionReport.CALL_FOLLOWUP;
             }
-            else if (reportDisplay.state.equals(PreventionReport.UPTODATE))
+            else if (reportDisplay.state.equals(PreventionReport.UP_TO_DATE))
             {
                 //Do nothing
                 measurementDataHandler = new EctMeasurementsDataBeanHandler(reportDisplay.demographicNo, measurementType);

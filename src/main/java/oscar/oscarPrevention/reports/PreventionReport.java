@@ -47,10 +47,10 @@ public interface PreventionReport {
     String CALL_FOLLOWUP = "Follow Up";
 
     //Prevention state
-    String NOINFO = "No Info";
+    String NO_INFO = "No Info";
     String DUE = "due";
     String OVERDUE = "Overdue";
-    String UPTODATE = "Up to date";
+    String UP_TO_DATE = "Up to date";
     String REFUSED = "Refused";
     String INELIGIBLE = "Ineligible";
     String PENDING = "Pending";

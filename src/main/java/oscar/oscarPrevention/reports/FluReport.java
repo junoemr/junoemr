@@ -351,7 +351,7 @@ public class FluReport extends PreventionsReport {
     {
        if (prd != null)
        {
-          if (PreventionReport.NOINFO.equals(prd.state) || PreventionReport.DUE.equals(prd.state) || PreventionReport.OVERDUE.equals(prd.state))
+          if (PreventionReport.NO_INFO.equals(prd.state) || PreventionReport.DUE.equals(prd.state) || PreventionReport.OVERDUE.equals(prd.state))
           {
               // Get LAST contact method
               EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
@@ -398,7 +398,7 @@ public class FluReport extends PreventionsReport {
           {
                 // Do nothing
           }
-          else if(PreventionReport.UPTODATE.equals(prd.state))
+          else if(PreventionReport.UP_TO_DATE.equals(prd.state))
           {
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
