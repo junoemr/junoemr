@@ -293,7 +293,8 @@ public class PatientImportService
 					SYSTEM_PROVIDER_NO,
 					measurement.getTypeCode(),
 					measurement.getMeasurementValue(),
-					ConversionUtils.toLegacyDateTime(measurement.getObservationDateTime()));
+					ConversionUtils.toLegacyDateTime(measurement.getObservationDateTime()),
+					measurement.getComments());
 			measurementDao.persist(dbMeasurement);
 		}
 	}

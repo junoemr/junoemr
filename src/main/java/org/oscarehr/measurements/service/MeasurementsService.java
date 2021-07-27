@@ -71,10 +71,11 @@ public class MeasurementsService
 	 * @param type - type of measurement
 	 * @param observation - observation value
 	 * @param obsDate - observation date
+	 * @param comment - comment
 	 * @return - a new measurement
 	 */
-	public Measurement createNewMeasurement(Integer demographicNo, String providerNo, String type, String observation, Date obsDate)
+	public Measurement createNewMeasurement(Integer demographicNo, String providerNo, String type, String observation, Date obsDate, String comment)
 	{
-		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, "");
+		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, comment);
 	}
 }

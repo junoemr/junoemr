@@ -189,7 +189,8 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		{
 			DiabetesSelfManagementCollaborativeMeasurement measurement = new DiabetesSelfManagementCollaborativeMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(selfManagementCollaborative.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(selfManagementCollaborative.getDocumentedGoals());
+			measurement.setMeasurementValue(Measurement.VALUE_YES);
+			measurement.setComments(toMeasurementComment(selfManagementCollaborative.getDocumentedGoals()));
 			measurements.add(measurement);
 		}
 
@@ -226,6 +227,15 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		}
 
 		return measurements;
+	}
+	
+	protected String toMeasurementComment(String field)
+	{
+		if (field == null)
+		{
+			return Measurement.DEFAULT_COMMENT;
+		} 
+		return StringUtils.trimToEmpty(field);
 	}
 
 	private String ynIndicatorToMeasurementValue(String ynIndicator)
