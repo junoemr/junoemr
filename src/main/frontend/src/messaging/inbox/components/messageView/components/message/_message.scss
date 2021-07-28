@@ -2,4 +2,35 @@
 	.text-grey {
 		color: var(--color-neutral-dark-grey);
 	}
+
+	.chart-link {
+		color: var(--color-primary-base);
+		text-decoration: underline;
+	}
+
+	&.compact {
+
+		&.indent-level-1 {
+			margin-left: 16px;
+		}
+		&.indent-level-2 {
+			margin-left: 32px;
+		}
+		&.indent-level-3 {
+			margin-left: 48px;
+		}
+
+		.message-container {
+			margin-top: 16px;
+		}
+
+		.recipients-container, .subject-container {
+			margin-top: 8px;
+
+			> div {
+				display: inline-block;
+				margin: 0;
+			}
+		}
+	}
 }

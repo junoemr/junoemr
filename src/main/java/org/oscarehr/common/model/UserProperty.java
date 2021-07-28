@@ -89,6 +89,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String SCHEDULE_COUNT_INCLUDE_CANCELLED = "schedule_count_include_cancelled";
     public static final String SCHEDULE_COUNT_INCLUDE_NO_SHOW = "schedule_count_include_noshow";
     public static final String SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC = "schedule_count_include_no_demographic";
+    public static final String MESSAGING_UNREAD_COUNT_MODE = "messaging_unread_count_mode";
     public static final String MYGROUP_NO = "mygroup_no";
     public static final String NEW_CME = "new_cme";
     public static final String ENCOUNTER_FORM_LENGTH = "encounter.form_length";
@@ -131,6 +132,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String CARE_CONNECT_ENABLED = "integration.CareConnect.enabled";
     public static final String EFORM_POPUP_WIDTH = "eform.popup.width";
     public static final String EFORM_POPUP_HEIGHT = "eform.popup.height";
+    public static final String ROSTERING_AND_FAMILY_DOCTOR_ENABLED = "enable_family_doctor_and_rostering";
 
     public static final String ICE_FALL_VISIBLE = "icefall_visible";
     public static final String ICE_FALL_INTEGRATION_ENABLED = "icefall_enabled";

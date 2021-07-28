@@ -10,7 +10,8 @@
 			<file-source-select class="d-inline-block h-100 w-100"
 			                    hide-chart-sources="!$ctrl.canReadChart"
 			                    messageable="$ctrl.messageable"
-			                    on-source-selected="$ctrl.switchFileSource(value)">
+			                    on-source-selected="$ctrl.switchFileSource(value)"
+			                    messaging-backend-type="$ctrl.messagingBackendType">
 			</file-source-select>
 		</div>
 

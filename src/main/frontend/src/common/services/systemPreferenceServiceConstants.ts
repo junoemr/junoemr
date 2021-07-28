@@ -26,6 +26,17 @@ export enum SYSTEM_PROPERTIES
     INSTANCE_TYPE = "instance_type",
     BILLING_TYPE = "billing_type",
 
+    // GENERAL PREFERENCES
+    DEFAULT_PHONE_PREFIX = "phone_prefix",
+    ROSTERING_MODULE = "enable_family_doctor_and_rostering",
+    EXTRA_ADDRESS_FIELD = "enable_additional_address",
+
+    // RX PREFERENCES
+    AUTO_STAMP_RX_SIGNATURES = "rx_preset_signatures",
+
+    // BILLING PREFERENCES
+    SERVICE_LOCATION_CODE = "service_location_code",
+
     // AQS
     AQS_ORGANIZATION_ID = "aqs_organization_id",
     AQS_ORGANIZATION_SECRET = "aqs_api_secret_key",
@@ -38,8 +49,7 @@ export enum INSTANCE_TYPE
     AB = "AB"
 }
 
-export enum BILLING_TYPE
-{
+export enum BILLING_TYPE {
     BC = "BC",
     ON = "ON",
     CLINICAID = "CLINICAID"

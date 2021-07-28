@@ -1,5 +1,6 @@
 import {SitesApi} from "../../generated/api/SitesApi";
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {MessageCountMode} from "../lib/provider/settings/model/MessageCountMode";
 
 angular.module('Settings').controller('Settings.SettingsController', [
 
@@ -49,6 +50,8 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			'../ws/rs');
 
 		$scope.$emit('configureShowPatientList', false);
+
+		$scope.MessageCountMode = MessageCountMode;
 
 		controller.providerList = providerList;
 		controller.user = user;
