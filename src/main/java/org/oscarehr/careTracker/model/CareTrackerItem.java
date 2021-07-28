@@ -24,10 +24,10 @@ package org.oscarehr.careTracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.model.DsRule;
 import org.oscarehr.careTracker.entity.ItemType;
 import org.oscarehr.careTracker.entity.ValueType;
+import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.decisionSupport2.model.DsRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,5 +77,9 @@ public class CareTrackerItem extends AbstractTransientModel
 	public void addCareTrackerItemData(CareTrackerItemData itemData)
 	{
 		data.add(itemData);
+	}
+	public void addAllCareTrackerItemData(List<CareTrackerItemData> itemDataList)
+	{
+		data.addAll(itemDataList);
 	}
 }

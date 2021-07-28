@@ -40,6 +40,7 @@ export default class CareTrackerItemDataTransferToModelConverter extends Abstrac
 		const dataModel = new CareTrackerItemDataModel();
 		dataModel.id = transfer.id;
 		dataModel.value = transfer.value;
+		dataModel.comment = transfer.comment;
 		dataModel.observationDateTime = moment(transfer.observationDateTime);
 		dataModel.createdDateTime = moment(transfer.createdDateTime);
 		dataModel.updatedDateTime = moment(transfer.updatedDateTime);

@@ -22,44 +22,26 @@
  */
 package org.oscarehr.careTracker.converter;
 
-import org.apache.commons.lang.StringUtils;
 import org.oscarehr.careTracker.model.CareTrackerItemData;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.prevention.model.Prevention;
-import org.oscarehr.prevention.model.PreventionExt;
 import org.springframework.stereotype.Component;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.util.ConversionUtils;
 
-import java.util.List;
-import java.util.Optional;
-
 @Component
-public class PreventionToCareTrackerItemDataConverter extends AbstractModelConverter<Prevention, CareTrackerItemData>
+public class MeasurementsDataBeanToCareTrackerItemDataConverter extends AbstractModelConverter<EctMeasurementsDataBean, CareTrackerItemData>
 {
 	@Override
-	public CareTrackerItemData convert(Prevention input)
+	public CareTrackerItemData convert(EctMeasurementsDataBean input)
 	{
 		CareTrackerItemData careTrackerItemData = new CareTrackerItemData();
 		careTrackerItemData.setId(input.getId());
-		careTrackerItemData.setValue(input.getPreventionType());
-		careTrackerItemData.setComment(getCommentFromExt(input.getPreventionExtensionList()));
-		careTrackerItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(input.getPreventionDate()));
-		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getCreationDate()));
-		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getLastUpdateDate()));
+		careTrackerItemData.setValue(input.getDataField());
+		careTrackerItemData.setComment(input.getComments());
+		careTrackerItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(input.getDateObservedAsDate()));
+		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
+		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
 
 		return careTrackerItemData;
-	}
-
-	private String getCommentFromExt(List<PreventionExt> extList)
-	{
-		if(extList != null)
-		{
-			Optional<PreventionExt> commentExt = extList.stream().filter((ext) -> PreventionExt.KEY_COMMENT.equals(ext.getkeyval())).findFirst();
-			if(commentExt.isPresent())
-			{
-				return StringUtils.trimToNull(commentExt.get().getVal());
-			}
-		}
-		return null;
 	}
 }

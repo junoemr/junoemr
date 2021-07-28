@@ -39,6 +39,7 @@ export default class CareTrackerItemDataModelToTransferConverter extends Abstrac
 		return {
 			id: dataModel.id,
 			value: dataModel.value,
+			comment: dataModel.comment,
 			observationDateTime: Juno.Common.Util.formatMomentDateTimeNoTimezone(dataModel.observationDateTime),
 		} as CareTrackerItemData;
 	}

@@ -26,6 +26,7 @@ package org.oscarehr.careTracker.service;
 import org.drools.FactException;
 import org.drools.RuleBase;
 import org.oscarehr.careTracker.converter.CareTrackerEntityToModelConverter;
+import org.oscarehr.careTracker.converter.MeasurementsDataBeanToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.converter.PreventionToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.dao.CareTrackerDao;
 import org.oscarehr.careTracker.dao.CareTrackerItemDao;
@@ -86,6 +87,9 @@ public class CareTrackerDataService
 
 	@Autowired
 	private PreventionToCareTrackerItemDataConverter preventionToCareTrackerItemDataConverter;
+
+	@Autowired
+	private MeasurementsDataBeanToCareTrackerItemDataConverter measurementsDataBeanToCareTrackerItemDataConverter;
 
 	@Autowired
 	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
@@ -165,28 +169,14 @@ public class CareTrackerDataService
 
 	private void fillMeasurementItemData(MeasurementInfo measurementInfo, org.oscarehr.careTracker.model.CareTrackerItem item)
 	{
-		// set existing data
 		List<EctMeasurementsDataBean> measurementsDataBeans = measurementInfo.getMeasurementData(item.getTypeCode());
-		for(EctMeasurementsDataBean dataBean : measurementsDataBeans)
-		{
-			CareTrackerItemData itemData = new CareTrackerItemData();
-			itemData.setId(dataBean.getId());
-			itemData.setValue(dataBean.getDataField());
-			itemData.setObservationDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateObservedAsDate()));
-			itemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
-			itemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(dataBean.getDateEnteredAsDate()));
-
-			item.addCareTrackerItemData(itemData);
-		}
+		item.addAllCareTrackerItemData(measurementsDataBeanToCareTrackerItemDataConverter.convert(measurementsDataBeans));
 	}
 
 	private void fillPreventionItemData(Integer demographicId, org.oscarehr.careTracker.model.CareTrackerItem item)
 	{
 		List<Prevention> preventions = preventionDao.findByTypeAndDemoNo(item.getTypeCode(), demographicId);
-		for(Prevention prevention : preventions)
-		{
-			item.addCareTrackerItemData(preventionToCareTrackerItemDataConverter.convert(prevention));
-		}
+		item.addAllCareTrackerItemData(preventionToCareTrackerItemDataConverter.convert(preventions));
 	}
 
 	private MeasurementInfo loadMeasurementInfoWithDrools(org.oscarehr.careTracker.entity.CareTracker careTrackerEntity, Integer demographicId)

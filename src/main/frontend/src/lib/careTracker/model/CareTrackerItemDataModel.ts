@@ -29,6 +29,7 @@ export default class CareTrackerItemDataModel
 {
 	private _id: number;
 	private _value: string;
+	private _comment: string;
 	private _observationDateTime: Moment;
 	private _createdDateTime: Moment;
 	private _updatedDateTime: Moment;
@@ -60,6 +61,16 @@ export default class CareTrackerItemDataModel
 	set value(value: string)
 	{
 		this._value = value;
+	}
+
+	get comment(): string
+	{
+		return this._comment;
+	}
+
+	set comment(value: string)
+	{
+		this._comment = value;
 	}
 
 	get observationDateTime(): Moment

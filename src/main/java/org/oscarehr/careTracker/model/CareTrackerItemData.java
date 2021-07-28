@@ -32,6 +32,7 @@ public class CareTrackerItemData extends AbstractTransientModel
 {
 	private Integer id;
 	private String value;
+	private String comment;
 
 	private LocalDateTime observationDateTime;
 	private LocalDateTime createdDateTime;
