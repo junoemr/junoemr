@@ -81,6 +81,7 @@
 					ng-model="$ctrl.newEntry.observationDateTime">
 			</juno-date-select>
 		</div>
+
 		<div class="action-button-container">
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
@@ -89,6 +90,13 @@
 			             click="$ctrl.saveAndAddToNote()">
 				Add
 			</juno-button>
+		</div>
+	</div>
+	<div class="flex-row flex-wrap flex-gap-4 justify-content-end new-data-input m-t-8">
+		<div class="flex-grow">
+			<juno-input label="Comment"
+			            ng-model="$ctrl.newEntry.comment">
+			</juno-input>
 		</div>
 	</div>
 	<div class="flex-row row-margin flex-wrap data-container">

@@ -23,13 +23,13 @@
 
  */
 
-import {CareTrackerItemData} from "../../../../generated";
+import {CareTrackerItemDataCreateTransfer} from "../../../../generated";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import CareTrackerItemDataModel from "../model/CareTrackerItemDataModel";
 
-export default class CareTrackerItemDataModelToTransferConverter extends AbstractConverter<CareTrackerItemDataModel, CareTrackerItemData>
+export default class CareTrackerItemDataModelToCreateTransferConverter extends AbstractConverter<CareTrackerItemDataModel, CareTrackerItemDataCreateTransfer>
 {
-	public convert(dataModel: CareTrackerItemDataModel): CareTrackerItemData
+	public convert(dataModel: CareTrackerItemDataModel): CareTrackerItemDataCreateTransfer
 	{
 		if (!dataModel)
 		{
@@ -37,10 +37,9 @@ export default class CareTrackerItemDataModelToTransferConverter extends Abstrac
 		}
 
 		return {
-			id: dataModel.id,
 			value: dataModel.value,
 			comment: dataModel.comment,
 			observationDateTime: Juno.Common.Util.formatMomentDateTimeNoTimezone(dataModel.observationDateTime),
-		} as CareTrackerItemData;
+		} as CareTrackerItemDataCreateTransfer;
 	}
 }

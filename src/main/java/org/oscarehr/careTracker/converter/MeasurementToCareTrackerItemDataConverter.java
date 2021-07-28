@@ -25,23 +25,23 @@ package org.oscarehr.careTracker.converter;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.careTracker.model.CareTrackerItemData;
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.model.Measurement;
 import org.springframework.stereotype.Component;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.util.ConversionUtils;
 
 @Component
-public class MeasurementsDataBeanToCareTrackerItemDataConverter extends AbstractModelConverter<EctMeasurementsDataBean, CareTrackerItemData>
+public class MeasurementToCareTrackerItemDataConverter extends AbstractModelConverter<Measurement, CareTrackerItemData>
 {
 	@Override
-	public CareTrackerItemData convert(EctMeasurementsDataBean input)
+	public CareTrackerItemData convert(Measurement input)
 	{
 		CareTrackerItemData careTrackerItemData = new CareTrackerItemData();
 		careTrackerItemData.setId(input.getId());
 		careTrackerItemData.setValue(input.getDataField());
 		careTrackerItemData.setComment(StringUtils.trimToNull(input.getComments()));
-		careTrackerItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(input.getDateObservedAsDate()));
-		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
-		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
+		careTrackerItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(input.getDateObserved()));
+		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getCreateDate()));
+		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getCreateDate()));
 
 		return careTrackerItemData;
 	}

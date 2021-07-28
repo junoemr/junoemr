@@ -26,6 +26,7 @@ package org.oscarehr.careTracker.service;
 import org.drools.FactException;
 import org.drools.RuleBase;
 import org.oscarehr.careTracker.converter.CareTrackerEntityToModelConverter;
+import org.oscarehr.careTracker.converter.MeasurementToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.converter.MeasurementsDataBeanToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.converter.PreventionToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.dao.CareTrackerDao;
@@ -35,6 +36,7 @@ import org.oscarehr.careTracker.model.CareTracker;
 import org.oscarehr.careTracker.model.CareTrackerItemAlert;
 import org.oscarehr.careTracker.model.CareTrackerItemData;
 import org.oscarehr.careTracker.model.CareTrackerItemGroup;
+import org.oscarehr.careTracker.transfer.CareTrackerItemDataCreateTransfer;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
 import org.oscarehr.decisionSupport2.entity.Drools;
@@ -45,6 +47,7 @@ import org.oscarehr.decisionSupport2.service.DsRuleService;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +60,10 @@ import oscar.oscarPrevention.PreventionData;
 import oscar.util.ConversionUtils;
 
 import javax.validation.ValidationException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,12 +95,19 @@ public class CareTrackerDataService
 	private PreventionToCareTrackerItemDataConverter preventionToCareTrackerItemDataConverter;
 
 	@Autowired
+	private MeasurementToCareTrackerItemDataConverter measurementToCareTrackerItemDataConverter;
+
+	@Autowired
 	private MeasurementsDataBeanToCareTrackerItemDataConverter measurementsDataBeanToCareTrackerItemDataConverter;
 
 	@Autowired
 	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
 
-	public CareTrackerItemData addCareTrackerItemData(String providerId, Integer demographicId, Integer careTrackerItemId, CareTrackerItemData itemData)
+	public CareTrackerItemData addCareTrackerItemData(
+			String providerId,
+			Integer demographicId,
+			Integer careTrackerItemId,
+			CareTrackerItemDataCreateTransfer itemData)
 	{
 		CareTrackerItem careTrackerItem = careTrackerItemDao.find(careTrackerItemId);
 		if(careTrackerItem.isMeasurementType())
@@ -223,7 +236,11 @@ public class CareTrackerDataService
 		return prevention;
 	}
 
-	private CareTrackerItemData addCareTrackerMeasurement(String providerId, Integer demographicId, CareTrackerItem careTrackerItem, CareTrackerItemData itemData)
+	private CareTrackerItemData addCareTrackerMeasurement(
+			String providerId,
+			Integer demographicId,
+			CareTrackerItem careTrackerItem,
+			CareTrackerItemDataCreateTransfer itemData)
 	{
 		List<String> validationErrors = measurementsService.getValidationErrors(careTrackerItem.getTypeCode(), itemData.getValue());
 
@@ -234,16 +251,10 @@ public class CareTrackerDataService
 					providerId,
 					careTrackerItem.getTypeCode(),
 					itemData.getValue(),
-					ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()));
+					ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()),
+					itemData.getComment());
 
-			CareTrackerItemData careTrackerItemData = new CareTrackerItemData();
-			careTrackerItemData.setId(measurement.getId());
-			careTrackerItemData.setValue(measurement.getDataField());
-			careTrackerItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(measurement.getDateObserved()));
-			careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(measurement.getCreateDate()));
-			careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(measurement.getCreateDate()));
-
-			return careTrackerItemData;
+			return measurementToCareTrackerItemDataConverter.convert(measurement);
 		}
 		else
 		{
@@ -252,8 +263,18 @@ public class CareTrackerDataService
 		}
 	}
 
-	private CareTrackerItemData addCareTrackerPrevention(String providerId, Integer demographicId, CareTrackerItem careTrackerItem, CareTrackerItemData itemData)
+	private CareTrackerItemData addCareTrackerPrevention(
+			String providerId,
+			Integer demographicId,
+			CareTrackerItem careTrackerItem,
+			CareTrackerItemDataCreateTransfer itemData)
 	{
+		// because preventionData structure needs to be refactored
+		List<Map<String, String>> extList = new ArrayList<>();
+		Map<String, String> extMap = new HashMap<>();
+		extMap.put(PreventionExt.KEY_COMMENT, itemData.getComment());
+		extList.add(extMap);
+
 		Integer preventionId = PreventionData.insertPreventionData(
 				providerId,
 				demographicId,
@@ -266,7 +287,7 @@ public class CareTrackerDataService
 				false,
 				null,
 				false,
-				null);
+				extList);
 
 		Prevention prevention = preventionDao.find(preventionId);
 		return preventionToCareTrackerItemDataConverter.convert(prevention);

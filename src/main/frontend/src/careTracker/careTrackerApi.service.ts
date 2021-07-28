@@ -33,7 +33,7 @@ import DxCodeTransferToModelConverter from "../lib/dx/converter/DxCodeTransferTo
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
 import CareTrackerItemDataModel from "../lib/careTracker/model/CareTrackerItemDataModel";
 import CareTrackerItemDataTransferToModelConverter from "../lib/careTracker/converter/CareTrackerItemDataTransferToModelConverter";
-import CareTrackerItemDataModelToTransferConverter from "../lib/careTracker/converter/CareTrackerItemDataModelToTransferConverter";
+import CareTrackerItemDataModelToCreateTransferConverter from "../lib/careTracker/converter/CareTrackerItemDataModelToCreateTransferConverter";
 
 angular.module("CareTracker").service("careTrackerApiService", [
 	'$http',
@@ -54,7 +54,7 @@ angular.module("CareTracker").service("careTrackerApiService", [
 		service.careTrackerTransferConverter = new CareTrackerModelToTransferConverter();
 		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
 		service.careTrackerItemDataTransferToModelConverter = new CareTrackerItemDataTransferToModelConverter();
-		service.careTrackerItemDataModelToTransferConverter = new CareTrackerItemDataModelToTransferConverter();
+		service.careTrackerItemDataModelToTransferConverter = new CareTrackerItemDataModelToCreateTransferConverter();
 
 		service.searchCareTrackers = async (
 			enabled: boolean,

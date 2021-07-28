@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.careTracker.model.CareTracker;
 import org.oscarehr.careTracker.model.CareTrackerItemData;
 import org.oscarehr.careTracker.service.CareTrackerDataService;
+import org.oscarehr.careTracker.transfer.CareTrackerItemDataCreateTransfer;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -68,7 +69,7 @@ public class DemographicCareTrackerWebService extends AbstractServiceImpl
 			@PathParam("demographicNo") Integer demographicId,
 			@PathParam("careTrackerId") Integer careTrackerId,
 			@PathParam("itemId") Integer careTrackerItemId,
-			CareTrackerItemData careTrackerItem)
+			CareTrackerItemDataCreateTransfer careTrackerItem)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.MEASUREMENT_CREATE, Permission.PREVENTION_CREATE);
 		return RestResponse.successResponse(careTrackerDataService.addCareTrackerItemData(getLoggedInProviderId(), demographicId, careTrackerItemId, careTrackerItem));

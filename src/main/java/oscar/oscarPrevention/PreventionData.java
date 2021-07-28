@@ -109,7 +109,7 @@ public class PreventionData {
 			boolean ineligible,
 			Date nextDate,
 			boolean neverWarn,
-			ArrayList<Map<String, String>> list)
+			List<Map<String, String>> list)
 	{
 		Integer insertId = -1;
 		try

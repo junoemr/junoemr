@@ -25,6 +25,7 @@
 package org.oscarehr.measurements.service;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
@@ -62,9 +63,9 @@ public class MeasurementsService
 		Measurement newMeasurement = new Measurement();
 		newMeasurement.setCreateDate(new Date());
 		newMeasurement.setDateObserved(obsDate);
-		newMeasurement.setComments(comment);
+		newMeasurement.setComments(StringUtils.trimToEmpty(comment));
 		newMeasurement.setDataField(observation);
-		newMeasurement.setMeasuringInstruction(measuringInstruction);
+		newMeasurement.setMeasuringInstruction(StringUtils.trimToEmpty(measuringInstruction));
 		newMeasurement.setDemographicId(demographicNo);
 		newMeasurement.setProviderNo(providerNo);
 		newMeasurement.setType(type);
@@ -84,9 +85,9 @@ public class MeasurementsService
 		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, "");
 	}
 
-	public Measurement createNewMeasurementAndPersist(Integer demographicNo, String providerNo, String type, String observation, Date obsDate)
+	public Measurement createNewMeasurementAndPersist(Integer demographicNo, String providerNo, String type, String observation, Date obsDate, String comment)
 	{
-		Measurement measurement = createNewMeasurement(demographicNo, providerNo, type, observation, obsDate);
+		Measurement measurement = createNewMeasurement(demographicNo, providerNo, type, observation, null, obsDate, comment);
 		measurementDao.persist(measurement);
 		return measurement;
 	}
