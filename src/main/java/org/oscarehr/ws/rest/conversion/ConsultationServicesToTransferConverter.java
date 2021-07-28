@@ -46,6 +46,11 @@ public class ConsultationServicesToTransferConverter extends AbstractModelConver
 		BeanUtils.copyProperties(domain, transfer, "specialists");
 
 		List<ProfessionalSpecialistTo1> specialists = specialistToTransferConverter.convert(domain.getSpecialists());
+
+		if (specialists != null && specialists.size() > 1)
+		{
+			specialists.sort((specialist1, specialist2) -> specialist1.getLastName().compareToIgnoreCase(specialist2.getLastName()));
+		}
 		transfer.setSpecialists(specialists);
 
 		return transfer;
