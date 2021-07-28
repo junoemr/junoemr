@@ -75,17 +75,17 @@ public class DemographicContactFewConverter {
 		}
 		else if (demographicContact.getType() == DemographicContact.TYPE_CONTACT) {
 			Contact contact = (Contact) obj;
-			demographicContactFewTo1.setFirstName(contact.getFirstName());
-			demographicContactFewTo1.setLastName(contact.getLastName());
-			demographicContactFewTo1.setMiddleName(contact.getMiddleName());
-			demographicContactFewTo1.setAddress(String.valueOf(contact.getAddress()));
-			demographicContactFewTo1.setAddress2(String.valueOf(contact.getAddress2()));
-			demographicContactFewTo1.setCity(contact.getCity());
-			demographicContactFewTo1.setPostal(contact.getPostal());
-			demographicContactFewTo1.setProvince(contact.getProvince());
-			demographicContactFewTo1.setFax(String.valueOf(contact.getFax()));
-			demographicContactFewTo1.setEmail(contact.getEmail());
-			demographicContactFewTo1.setNote(contact.getNote());
+			if (contact.getFirstName() != null) demographicContactFewTo1.setFirstName(contact.getFirstName());
+			if (contact.getLastName() != null) demographicContactFewTo1.setLastName(contact.getLastName());
+			if (contact.getMiddleName() != null) demographicContactFewTo1.setMiddleName(contact.getMiddleName());
+			if (contact.getAddress() != null) demographicContactFewTo1.setAddress(String.valueOf(contact.getAddress()));
+			if (contact.getAddress2() != null) demographicContactFewTo1.setAddress2(String.valueOf(contact.getAddress2()));
+			if (contact.getCity() != null) demographicContactFewTo1.setCity(contact.getCity());
+			if (contact.getPostal() != null) demographicContactFewTo1.setPostal(contact.getPostal());
+			if (contact.getProvince() != null) demographicContactFewTo1.setProvince(contact.getProvince());
+			if (contact.getFax() != null) demographicContactFewTo1.setFax(String.valueOf(contact.getFax()));
+			if (contact.getEmail() != null) demographicContactFewTo1.setEmail(contact.getEmail());
+			if (contact.getNote() != null) demographicContactFewTo1.setNote(contact.getNote());
 			if (contact.getResidencePhone()!=null) demographicContactFewTo1.setHomePhone(contact.getResidencePhone());
 			if (contact.getWorkPhone()!=null) demographicContactFewTo1.setWorkPhone(contact.getWorkPhone());
 			if (contact.getCellPhone()!=null) demographicContactFewTo1.setCellPhone(contact.getCellPhone());

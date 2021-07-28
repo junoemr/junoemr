@@ -36,7 +36,7 @@
 					label="Middle Name"
 					label-position="$ctrl.LABEL_POSITION.TOP"
 					disabled="true"
-					placeholder="Last Name"
+					placeholder="Middle Name"
 					component-style="$ctrl.componentStyle">
 			</juno-input>
 
