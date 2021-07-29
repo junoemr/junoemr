@@ -91,6 +91,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                         windowClass: "juno-modal",
                         resolve: {
                             demoContact: demoContact,
+                            demographic: () => ctrl.thisDemo,
                         }
                     });
             };

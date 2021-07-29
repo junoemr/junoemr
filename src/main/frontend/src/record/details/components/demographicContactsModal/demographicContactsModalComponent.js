@@ -15,9 +15,11 @@ angular.module('Record.Details').component('demographicContactsModal', {
     controller: [
         "$state",
         "uxService",
+        "demographicService",
         function (
             $state,
             uxService,
+            demographicService,
         )
         {
             const ctrl = this;
@@ -49,6 +51,8 @@ angular.module('Record.Details').component('demographicContactsModal', {
             ctrl.$onInit = () =>
             {
                 ctrl.contact = ctrl.resolve.demoContact;
+                ctrl.demographic = ctrl.resolve.demographic;
+                ctrl.editable = false;
 
                 switch(ctrl.contact.type)
                 {
@@ -83,9 +87,32 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 }
                 else
                 {
-                    //not yet implemented
+                    ctrl.externalContactEdit();
                 }
             };
+
+            ctrl.externalContactEdit = function externalContactsEdit()
+            {
+                ctrl.editable = true;
+            };
+
+            ctrl.save = function save()
+            {
+                ctrl.contact.firstName = ctrl.contact.firstName;
+
+			demographicService.updateExternalContact(ctrl.contact, ctrl.demographic).then(
+				function success()
+				{
+				    console.log("success");
+				    ctrl.modalInstance.close();
+				},
+				function error()
+				{
+					Juno.Common.Util.alert("Unable to save contacts", error);
+				}
+			);
+
+            }
 
             ctrl.getTabs = function getTabs(contactId)
             {

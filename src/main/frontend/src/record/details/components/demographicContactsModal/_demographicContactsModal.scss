@@ -66,14 +66,11 @@
         .juno-button {
           margin-top: 8px;
           width: 64px;
+          margin-right: 4px;
 
           button {
             height: 42px;
           }
-        }
-
-        &:first-child {
-          margin-right: 8px;
         }
       }
     }

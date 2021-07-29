@@ -57,6 +57,8 @@ import org.oscarehr.ws.conversion.DemographicToDomainConverter;
 import org.oscarehr.ws.conversion.DemographicToTransferConverter;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
+import org.oscarehr.ws.rest.conversion.DemographicContactFewToContactDomainConverter;
+import org.oscarehr.ws.rest.conversion.DemographicContactFewToDomainConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -116,6 +118,12 @@ public class DemographicService extends AbstractServiceImpl {
 	
 	@Autowired
 	private ContactDao contactDao;
+
+	@Autowired
+	private DemographicContactFewToContactDomainConverter demographicContactToDomainConverter;
+
+	@Autowired
+	private DemographicContactFewToDomainConverter demoContactToDomainConverter;
 	
 	@Autowired
 	private WaitingListDao waitingListDao;
@@ -265,6 +273,47 @@ public class DemographicService extends AbstractServiceImpl {
 			logger.error("Error",e);
 		}
 		return RestResponse.errorResponse("Error");
+	}
+
+	@PUT
+	@Path("/{demographicNo}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//change to return DemographicContactFewTo1
+	public DemographicContact updateExternalContact(DemographicContactFewTo1 demographicContactFewTo1, @PathParam("demographicNo") Integer demographicNo)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		//set old contact to deleted
+		Contact oldContact = contactDao.find(Integer.parseInt(demographicContactFewTo1.getContactId()));
+		oldContact.setDeleted(true);
+		demographicManager.updateExternalPersonalContact(oldContact);
+
+		// where to put record of old contact version?
+
+		// convert and persist editted Contact
+		org.oscarehr.common.model.Contact domainContact = demographicContactToDomainConverter.convert(demographicContactFewTo1);
+		Contact updatedContact = demographicManager.updateExternalPersonalContact(domainContact);
+		//DemographicContactFewTo1 demoContactTo1 = new DemographicContactFewT * fromo1();
+
+		// convert and persist DemographicContact
+		List<DemographicContact> oldDemoContact = demographicContactDao.find(demographicNo, Integer.parseInt(demographicContactFewTo1.getContactId()));
+		for (DemographicContact contact : oldDemoContact)
+		{
+			contact.setDeleted(true);
+			demographicManager.updateExternalPersonalDemographicContact(loggedInInfo, contact);
+		}
+
+		org.oscarehr.common.model.DemographicContact domainDemoContact = demoContactToDomainConverter.convert(demographicContactFewTo1);
+		domainDemoContact.setContactId(String.valueOf(updatedContact.getId()));
+		domainDemoContact.setDemographicNo(demographicNo);
+		DemographicContact updatedDemoContact = demographicManager.updateExternalPersonalDemographicContact(loggedInInfo, domainDemoContact);
+
+
+		// return updated DemographicContactFewTo1
+		DemographicContact demoContact = new DemographicContact();
+		demoContactFewConverter.getAsTransferObject(demoContact, updatedContact);
+
+		return demoContact;
 	}
 
 	@GET

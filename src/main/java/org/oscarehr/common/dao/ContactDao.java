@@ -25,15 +25,14 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class ContactDao extends AbstractDao<Contact> {
@@ -41,6 +40,16 @@ public class ContactDao extends AbstractDao<Contact> {
 	public ContactDao() {
 		super(Contact.class);
 	}
+
+	/*public List<Contact> find(int contactId) {
+		String sql = "select x from " + this.modelClass.getName() + " x.id = ?1 and x.deleted=false";
+		Query query = entityManager.createQuery(sql);
+		//query.setParameter(1, demographicNo);
+		query.setParameter(1, contactId);
+		@SuppressWarnings("unchecked")
+		List<Contact> dContacts = query.getResultList();
+		return dContacts;
+	}*/
 	
 	public List<Contact> search(String searchMode, String orderBy, String keyword) {
 		StringBuilder where = new StringBuilder();

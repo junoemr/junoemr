@@ -29,12 +29,14 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
+import org.oscarehr.common.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
+import org.oscarehr.common.model.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
 import org.oscarehr.common.model.DemographicContact;
@@ -126,14 +128,21 @@ public class DemographicManager {
 
 	@Autowired
 	private DemographicDao demographicDao;
+
 	@Autowired
 	private org.oscarehr.demographic.dao.DemographicDao newDemographicDao;
+
 	@Autowired
 	private DemographicExtDao demographicExtDao;
+
 	@Autowired
 	private DemographicCustDao demographicCustDao;
+
 	@Autowired
 	private DemographicContactDao demographicContactDao;
+
+	@Autowired
+	private ContactDao contactDao;
 
 	@Autowired
 	private DemographicArchiveDao demographicArchiveDao;
@@ -305,6 +314,19 @@ public class DemographicManager {
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicContactDao.findByDemographicNoAndType(demographicNo, type);
+	}
+
+	public Contact updateExternalPersonalContact(Contact contact)
+	{
+		Contact revised = (Contact) contactDao.merge(contact);
+		return revised;
+	}
+
+	public DemographicContact updateExternalPersonalDemographicContact(LoggedInInfo loggedInInfo, DemographicContact contact)
+	{
+		contact.setCreator(loggedInInfo.getLoggedInProviderNo());
+		DemographicContact revised = (DemographicContact) demographicContactDao.merge(contact);
+		return revised;
 	}
 
 	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider) {
