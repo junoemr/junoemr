@@ -28,7 +28,6 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
-import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
@@ -78,10 +77,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setSexDesc(transfer.getSexDesc());
 		demographic.setDateJoined(transfer.getDateJoined());
 		demographic.setFamilyDoctor(transfer.getFamilyDoctor());
-		if (OscarProperties.getInstance().isPropertyActive("demographic_family_doctor"))
-		{
-			demographic.setFamilyDoctor2(transfer.getFamilyDoctor2());
-		}
+		demographic.setFamilyDoctor2(transfer.getFamilyDoctor2());
 		demographic.setCity(transfer.getAddress().getCity());
 		demographic.setFirstName(transfer.getFirstName());
 		demographic.setPostal(transfer.getAddress().getPostal());
@@ -166,10 +162,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setSexDesc(demographic.getSexDesc());
 		transfer.setDateJoined(demographic.getDateJoined());
 		transfer.setFamilyDoctor(demographic.getFamilyDoctor());
-		if (OscarProperties.getInstance().isPropertyActive("demographic_family_doctor"))
-		{
-			transfer.setFamilyDoctor2(demographic.getFamilyDoctor2());
-		}
+		transfer.setFamilyDoctor2(demographic.getFamilyDoctor2());
 		transfer.getAddress().setCity(demographic.getCity());
 		transfer.setFirstName(demographic.getFirstName());
 		transfer.getAddress().setPostal(demographic.getPostal());

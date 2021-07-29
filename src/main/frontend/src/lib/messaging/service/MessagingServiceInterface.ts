@@ -6,12 +6,18 @@ import Messageable from "../model/Messageable";
 import StreamingList from "../../util/StreamingList";
 import Conversation from "../model/Conversation";
 import Attachment from "../model/Attachment";
+import {MessagingServiceType} from "../model/MessagingServiceType";
 
 export default interface MessagingServiceInterface
 {
 	// ==========================================================================
 	// Interface Methods
 	// ==========================================================================
+
+	/**
+	 * @return the type of this messaging service.
+	 */
+	getType(): MessagingServiceType
 
 	/**
 	 * get a message
@@ -55,11 +61,10 @@ export default interface MessagingServiceInterface
 	/**
 	 * count messages.
 	 * @param source - source to count messages in
-	 * @param group - [optional] group to count messages in
-	 * @param onlyUnread - [optional] if true only count unread messages
+	 * @param searchOptions - filters to narrow the count.
 	 * @return the count of messages
 	 */
-	countMessages(source: MessageSource, group?: MessageGroup, onlyUnread?: boolean): Promise<number>;
+	countMessages(source: MessageSource, searchOptions: MessageSearchParams): Promise<number>;
 
 	/**
 	 * get a conversation
@@ -127,6 +132,8 @@ export interface MessageSearchParams
 	group?: MessageGroup, // items not in this message group will be filtered
 	limit?: number, // limit the returned results to this number
 	offset?: number, // offset the returned results by this number
+	onlyUnread?: boolean, // if true only unread messages will be returned.
+	keyword?: string, // if provided only messages matching this keyword in their subject or body will be returned.
 	sender?: Messageable, // limit to only items sent by this sender
 	recipient?: Messageable, // limit to only items received by this recipient
 }

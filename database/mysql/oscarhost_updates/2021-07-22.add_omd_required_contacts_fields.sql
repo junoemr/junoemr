@@ -1,0 +1,3 @@
+ALTER TABLE Contact ADD COLUMN IF NOT EXISTS middleName VARCHAR(100) AFTER lastName;
+ALTER TABLE Contact ADD COLUMN IF NOT EXISTS residencePhoneExtension VARCHAR(10) AFTER residencePhone;
+ALTER TABLE Contact ADD COLUMN IF NOT EXISTS cellPhoneExtension VARCHAR(10) AFTER cellPhone;

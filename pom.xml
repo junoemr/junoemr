@@ -1388,6 +1388,14 @@
 			<version>2.9.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.xeustechnologies/jcl -->
+		<dependency>
+			<groupId>org.xeustechnologies</groupId>
+			<artifactId>jcl-core</artifactId>
+			<version>2.8</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -1793,48 +1801,6 @@
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>io.leonard.maven.plugins</groupId>
-				<artifactId>jspc-maven-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>jspc</id>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<phase>process-classes</phase>
-						<configuration>
-							<excludes>
-								<!-- These should already be included by other jsp files -->
-								<exclude>**/*.jspf</exclude>
-							</excludes>
-							<threads>4</threads>
-							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
-							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.tomcat</groupId>
-						<artifactId>tomcat-jasper</artifactId>
-						<version>${tomcat.version}</version>
-						<exclusions>
-							<exclusion>
-								<groupId>org.eclipse.jdt.core.compiler</groupId>
-								<artifactId>ecj</artifactId>
-							</exclusion>
-						</exclusions>
-					</dependency>
-					<dependency>
-						<groupId>org.eclipse.jdt.core.compiler</groupId>
-						<artifactId>ecj</artifactId>
-						<version>4.6.1</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-
 			<!-- This plugin creates the openapi.json file for the internal REST api.  It is used -->
 			<!-- below to generate code.  This must be run before the generate-typescpipt-api -->
 			<!-- execution. -->
@@ -1866,6 +1832,7 @@
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
+								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DocumentWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
 								org.oscarehr.ws.rest.DemographicService
@@ -2017,7 +1984,7 @@
 					</execution>
 					<execution>
 						<id>copy_web_xml_for_jsp_precompile</id>
-						<phase>process-classes</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
@@ -2104,6 +2071,49 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+      <!-- This has to run after webpack because webpack modifies some jsp files -->
+			<plugin>
+				<groupId>io.leonard.maven.plugins</groupId>
+				<artifactId>jspc-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>jspc</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<phase>process-classes</phase>
+						<configuration>
+							<excludes>
+								<!-- These should already be included by other jsp files -->
+								<exclude>**/*.jspf</exclude>
+							</excludes>
+							<threads>4</threads>
+							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
+							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.tomcat</groupId>
+						<artifactId>tomcat-jasper</artifactId>
+						<version>${tomcat.version}</version>
+						<exclusions>
+							<exclusion>
+								<groupId>org.eclipse.jdt.core.compiler</groupId>
+								<artifactId>ecj</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.jdt.core.compiler</groupId>
+						<artifactId>ecj</artifactId>
+						<version>4.6.1</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 		<pluginManagement>

@@ -46,5 +46,7 @@ public class PreventionLetter
 
     private String providerFName;
     private String providerLName;
+    private String contactMethod;
+    private String lastPreventionDate;
 }
 

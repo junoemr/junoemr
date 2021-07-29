@@ -1,0 +1,81 @@
+.demographic-contacts-modal {
+
+  .postal-prov {
+    display: flex;
+    align-items: center;
+
+    .juno-input {
+      width: 172px;
+    }
+  }
+
+  .phone-with-ext {
+    display: flex;
+    align-items: center;
+
+    .juno-input {
+      width: 248px;
+
+      input {
+        padding: 0 8px 0 16px;
+
+      }
+    }
+
+    .phone-ext {
+      .juno-input {
+        width: 96px;
+
+        label {
+          min-width: 32px;
+        }
+      }
+    }
+  }
+
+  .notes {
+    .juno-input {
+      width: 710px;
+    }
+  }
+
+   .body {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .juno-input {
+    margin-top: 8px;
+    margin-left: 8px;
+    width: 352px;
+    text-align: left;
+
+    label {
+      text-align: left;
+    }
+  }
+
+  .modal-footer {
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+
+      juno-button {
+        flex-grow: 0;
+
+        .juno-button {
+          margin-top: 8px;
+          width: 64px;
+
+          button {
+            height: 42px;
+          }
+        }
+
+        &:first-child {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}

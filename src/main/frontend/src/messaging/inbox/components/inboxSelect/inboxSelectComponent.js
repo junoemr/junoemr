@@ -67,11 +67,11 @@ angular.module("Messaging.Components").component('inboxSelect', {
 			{
 				switch(group)
 				{
-					case MessageGroup.ARCHIVED:
+					case MessageGroup.Archived:
 						return "Archived";
-					case MessageGroup.RECEIVED:
-						return "Inbox";
-					case MessageGroup.SENT:
+					case MessageGroup.Received:
+						return "Received";
+					case MessageGroup.Sent:
 						return "Sent";
 					default:
 						return group.toString();

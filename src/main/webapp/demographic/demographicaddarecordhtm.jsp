@@ -1268,7 +1268,7 @@ document.forms[1].referral_doctor_no.value = refNo;
 				</td>
 			</tr>
 			<!-- Family Doctor -->
-			<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
+			<% if (systemPreferenceService.isPreferenceEnabled(UserProperty.ROSTERING_AND_FAMILY_DOCTOR_ENABLED, false))
 			{ %>
 			<tr>
 				<td align="right" nowrap>

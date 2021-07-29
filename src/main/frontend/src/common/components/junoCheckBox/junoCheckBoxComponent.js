@@ -53,21 +53,24 @@ angular.module('Common.Components').component('junoCheckBox', {
 
 		ctrl.onClick = () =>
 		{
+			let newValue = null;
+			if (ctrl.ngModel === ctrl.trueValue)
+			{
+				newValue = false;
+			}
+			else
+			{
+				newValue = ctrl.trueValue;
+			}
+
 			if (!ctrl.dummy)
 			{
-				if (ctrl.ngModel === ctrl.trueValue)
-				{
-					ctrl.ngModel = false;
-				}
-				else
-				{
-					ctrl.ngModel = ctrl.trueValue;
-				}
+				ctrl.ngModel = newValue
 			}
 
 			if(ctrl.change)
 			{
-				ctrl.change({value: ctrl.ngModel});
+				ctrl.change({value: newValue});
 			}
 		}
 

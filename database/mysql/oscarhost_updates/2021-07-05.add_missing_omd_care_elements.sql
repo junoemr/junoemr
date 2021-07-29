@@ -112,7 +112,7 @@ INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringIn
 SELECT * FROM
 (SELECT 'FOOT EXAM - Findings' AS type, 'Foot Exam' AS typeDisplayName, 'Record Foot Exam findings' AS typeDescription, 'Indicate findings' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'No Validations') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FOOT EXAM - findings');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FOOT EXAM - Findings');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM
@@ -214,7 +214,7 @@ INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringIn
 SELECT * FROM
 (SELECT 'FEV1/FVC RATIO BEFORE/PREDICTED' AS type, 'FEV1/FVC Ratio Before/Predicted Ratio' AS typeDisplayName, 'FEV1 ratio before puff of the patient / the average FEV1 ratio predicted' AS typeDescription, 'Numeric value' AS measuringInstruction, v.id AS validation, CURDATE() AS createDate
 FROM validations v WHERE v.name = 'Numeric Value greater than or equal to 0') AS temp
-WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FVC ratio BEFORE/PREDICTED');
+WHERE NOT EXISTS (SELECT type FROM measurementType WHERE type = 'FEV1/FVC RATIO BEFORE/PREDICTED');
 
 INSERT INTO measurementType (type, typeDisplayName, typeDescription, measuringInstruction, validation, createDate)
 SELECT * FROM

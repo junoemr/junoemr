@@ -79,6 +79,8 @@
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
     ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
+    SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
+
     WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
     boolean privateConsentEnabled = OscarProperties.getInstance().isPropertyActive("privateConsentEnabled");
 
@@ -288,6 +290,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <html:html locale="true">
 
 <head>
@@ -2324,7 +2327,7 @@ if ( Dead.equals(PatStat) ) {%>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formRefDocNo" />:</span><span class="info"><%=referralDoctorNo%></span>
 							</li>
-							<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
+							<% if (systemPreferenceService.isPreferenceEnabled(UserProperty.ROSTERING_AND_FAMILY_DOCTOR_ENABLED, false))
 							{ %>
 							<li>
 								<span class="label">
@@ -3083,7 +3086,7 @@ document.updatedelete.referral_doctor_no.value = refNo;
 							</tr>
 
 							<!-- Family Doctor -->
-							<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
+							<% if (systemPreferenceService.isPreferenceEnabled(UserProperty.ROSTERING_AND_FAMILY_DOCTOR_ENABLED, false))
 							{ %>
 							<tr>
 								<td align="right" nowrap>

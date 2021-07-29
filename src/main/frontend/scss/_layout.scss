@@ -31,6 +31,10 @@
 	display: flex;
 	flex-direction: column;
 }
+.flex-col-reverse {
+	display: flex;
+	flex-direction: column-reverse;
+}
 
 .flex-wrap {
 	flex-wrap: wrap;
@@ -534,6 +538,9 @@
 .m-r-16 {
 	margin-right: 16px;
 }
+.m-r-24 {
+	margin-right: 24px;
+}
 .m-r-32 {
 	margin-right: 32px;
 }
@@ -567,6 +574,10 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.text-bold {
+	font-weight: bold;
 }
 
 // ========================= Overflow helpers ==============================
