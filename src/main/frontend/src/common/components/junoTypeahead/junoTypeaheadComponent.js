@@ -38,6 +38,7 @@ angular.module('Common.Components').component('junoTypeahead',
 		onChange: "&?",
 		onSelected: "&?",
 		disabled: '<?',
+		initialText: "<?", // initial text to prefill the typeahead with
 		typeaheadMinLength: "@?",
 		componentStyle: "<?",
 		// output the output of the ubi-typeahead directly, without translation
@@ -54,12 +55,11 @@ angular.module('Common.Components').component('junoTypeahead',
 		let ctrl = this;
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
-		ctrl.selectedValue = null;
-
 		let lastModel = null;
 
 		ctrl.$onInit = function()
 		{
+			ctrl.selectedValue = ctrl.initialText || null;
 			ctrl.typeaheadMinLength = ctrl.typeaheadMinLength ? ctrl.typeaheadMinLength : 1;
 			ctrl.rawOutput = ctrl.rawOutput || false;
 			if (ctrl.filterOptions === undefined)

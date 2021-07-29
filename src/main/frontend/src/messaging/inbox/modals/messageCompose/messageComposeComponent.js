@@ -52,7 +52,6 @@ angular.module("Messaging.Modals").component('messageCompose', {
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 			$scope.LABEL_POSITION = LABEL_POSITION;
 
-			ctrl.recipient = null;
 			ctrl.subject = "";
 			ctrl.sending = false;
 			ctrl.messageSourceOptions = [];
@@ -65,6 +64,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 				ctrl.isReply = ctrl.resolve.isReply || false;
 				ctrl.subject = ctrl.resolve.subject || "";
 				ctrl.conversation = ctrl.resolve.conversation || null;
+				ctrl.recipient = ctrl.resolve.recipient || null;
 				ctrl.participantNames = this.getParticipantNames();
 				ctrl.messageSourceOptions = await ctrl.loadMessageSourceOptions();
 
@@ -129,6 +129,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 					resolve: {
 						style: () => ctrl.resolve.style,
 						messageable: () => ctrl.recipient,
+						messagingBackendType: () => ctrl.messagingService.getType(),
 					}
 				}).result;
 
@@ -171,9 +172,17 @@ angular.module("Messaging.Modals").component('messageCompose', {
 				ctrl.modalInstance.close();
 			};
 
-			ctrl.onSourceChange = (value) =>
+			ctrl.onSourceChange = async (sourceId) =>
 			{
-				ctrl.recipient = null;
+				if (sourceId && ctrl.recipient)
+				{
+					ctrl.recipient = await ctrl.messagingService.getMessageable(await ctrl.messagingService.getMessageSourceById(sourceId), ctrl.recipient.id);
+					$scope.$apply();
+				}
+				else
+				{
+					ctrl.recipient = null;
+				}
 			}
 
 			ctrl.canSend = () =>

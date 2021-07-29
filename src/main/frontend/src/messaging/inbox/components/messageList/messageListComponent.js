@@ -25,14 +25,18 @@ import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 import MessagingServiceFactory from "../../../../lib/messaging/factory/MessagingServiceFactory";
 import ActionAlreadyInProgressError from "../../../../lib/error/ActionAlreadyInProgressError";
 import {MessageGroup} from "../../../../lib/messaging/model/MessageGroup";
+import {BroadcastEvent} from "./messageListComponentConstants";
 
 angular.module("Messaging.Components").component('messageList', {
 	templateUrl: 'src/messaging/inbox/components/messageList/messageList.jsp',
 	bindings: {
 		componentStyle: "<?",
 		selectedMessageId: "=",
+		massEditList: "=?", // list of messages selected for group operation "mass actions"
 		messagingBackend: "<",
 		messageableFilter: "<?",
+		onlyUnread: "<?",
+		searchKeyword: "<?",
 		sourceId: "<",
 		groupId: "<",
 		messageStreamChange: "&?", // called when the message stream changes. var "stream" is the new message stream
@@ -53,7 +57,7 @@ angular.module("Messaging.Components").component('messageList', {
 
 			ctrl.messageStream = null;
 			ctrl.debounceTimeout = null;
-			ctrl.DEBOUNCE_TIME_MS = 500;
+			ctrl.DEBOUNCE_TIME_MS = 1000; // 1 second
 			ctrl.MESSAGE_FETCH_COUNT = 10;
 
 			ctrl.newMessagesCheckInterval = null;
@@ -62,6 +66,11 @@ angular.module("Messaging.Components").component('messageList', {
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				// a list of all messages currently selected for "group editing"
+				ctrl.massEditList = ctrl.massEditList || []; // Type Message[]
+				ctrl.onlyUnread = ctrl.onlyUnread || false;
+				ctrl.searchKeyword = ctrl.searchKeyword || "";
+
 				ctrl.setupNewMessageCheck();
 			};
 
@@ -83,16 +92,21 @@ angular.module("Messaging.Components").component('messageList', {
 					if (ctrl.shouldCheckForNewMessages())
 					{
 						const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
-						const count = await messagingService.countMessages(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.groupId);
+						const count = await messagingService.countMessages(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.getMessageSearchParams());
 
 						if (count > ctrl.currentMessageCount)
 						{
-							const diff = count - ctrl.currentMessageCount;
-							const newMessages = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId),
-								ctrl.getMessageSearchParams(diff, 0));
-							ctrl.messageStream.unshift(...newMessages);
+							const firstMessage = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId), ctrl.getMessageSearchParams(1, 0));
 
-							$scope.$apply();
+							if (firstMessage.length === 0 || firstMessage[0].id !== ctrl.messageStream[0].id)
+							{
+								const diff = count - ctrl.currentMessageCount;
+								const newMessages = await messagingService.searchMessages(await messagingService.getMessageSourceById(ctrl.sourceId),
+									ctrl.getMessageSearchParams(diff, 0));
+								ctrl.messageStream.unshift(...newMessages);
+
+								$scope.$apply();
+							}
 						}
 						ctrl.currentMessageCount = count;
 					}
@@ -105,7 +119,7 @@ angular.module("Messaging.Components").component('messageList', {
 			 */
 			ctrl.shouldCheckForNewMessages = () =>
 			{
-				return ctrl.messageStream && ctrl.currentMessageCount && !ctrl.messageableFilter;
+				return ctrl.messageStream && ctrl.currentMessageCount;
 			}
 
 			/**
@@ -114,24 +128,77 @@ angular.module("Messaging.Components").component('messageList', {
 			 */
 			ctrl.onSelectMessage = (message) =>
 			{
-				const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
+				ctrl.selectedMessageId = message.id;
+			}
 
-				// mark message as read
-				if (!message.read)
+			/**
+			 * called when a message is added / removed from the message group
+			 * @param message - the message that has changed
+			 * @param selected - the new state
+			 */
+			ctrl.onMessageGroupSelectionChange = (message, selected) =>
+			{
+				const existingMessage = ctrl.massEditList.find((msg) => msg.id === message.id);
+				if (selected && !existingMessage)
 				{
-					message.read = true;
-					messagingService.updateMessage(message);
+					// add
+					ctrl.massEditList.push(message);
+				}
+				else if (!selected && existingMessage)
+				{
+					// remove
+					ctrl.massEditList = ctrl.massEditList.filter((msg) => msg.id !== existingMessage.id);
+				}
+			}
+
+			ctrl.updateMessageView = () =>
+			{
+				if (ctrl.selectedMessageId)
+				{
+					const targetState = $state.includes("**.message") ? "." : ".message";
+
+					// display the selected message
+					$state.go(targetState,
+						{
+							backend: ctrl.messagingBackend,
+							source: ctrl.sourceId,
+							group: ctrl.groupId,
+							messageId: ctrl.selectedMessageId,
+						}, {location: "replace"});
+				}
+			}
+
+			ctrl.onMessageSelectionChange = async (messageId) =>
+			{
+				if (ctrl.messageStream)
+				{
+					const messagingService = MessagingServiceFactory.build(ctrl.messagingBackend);
+					const message = ctrl.messageStream.find((msg) => msg.id === messageId );
+
+					if (message)
+					{
+						// mark message as read
+						if (!message.read)
+						{
+							message.read = true;
+							await messagingService.updateMessage(message);
+						}
+					}
 				}
 
-				// display the selected message
-				ctrl.selectedMessageId = message.id;
-				$state.go("messaging.view.message",
-				{
-					backend: ctrl.messagingBackend,
-					source: ctrl.sourceId,
-					group: ctrl.groupId,
-					messageId: message.id,
-				}, {location: "replace"});
+				ctrl.updateMessageView();
+			}
+
+			$scope.$watch("$ctrl.selectedMessageId", ctrl.onMessageSelectionChange);
+
+			/**
+			 * check if the passed massage is in the mass edit list
+			 * @param message - message to check
+			 * @return true or false
+			 */
+			ctrl.inMassEditList = (message) =>
+			{
+				return !!(ctrl.massEditList.find((msg) => msg.id === message.id));
 			}
 
 			/**
@@ -176,7 +243,6 @@ angular.module("Messaging.Components").component('messageList', {
 					if (ctrl.messageStream)
 					{
 						await ctrl.messageStream.load(ctrl.MESSAGE_FETCH_COUNT);
-						$scope.$apply();
 					}
 
 					// notify parent of stream change.
@@ -185,22 +251,40 @@ angular.module("Messaging.Components").component('messageList', {
 						ctrl.messageStreamChange({stream: ctrl.messageStream});
 					}
 
+					$scope.$apply();
+
 					// get initial message count
 					ctrl.currentMessageCount = await messagingService.countMessages(
 						await messagingService.getMessageSourceById(ctrl.sourceId),
-						ctrl.groupId);
+						ctrl.getMessageSearchParams());
 				}
 			}
 
 			ctrl.getMessageSearchParams = (limit = null, offset = null) =>
 			{
+				const searchParams = {
+					group: ctrl.groupId,
+					onlyUnread: ctrl.onlyUnread,
+					limit,
+					offset,
+				}
+
+				if (!ctrl.messageableFilter && ctrl.searchKeyword && ctrl.searchKeyword.length > 0)
+				{
+					searchParams.keyword = ctrl.searchKeyword;
+				}
+
 				switch (ctrl.groupId)
 				{
 					case MessageGroup.Sent:
-						return {group: ctrl.groupId, recipient: ctrl.messageableFilter, limit, offset}
+						searchParams.recipient = ctrl.messageableFilter;
+						break;
 					default:
-						return {group: ctrl.groupId, sender: ctrl.messageableFilter, limit, offset}
+						searchParams.sender = ctrl.messageableFilter;
+						break;
 				}
+
+				return searchParams;
 			}
 
 			/**
@@ -214,6 +298,7 @@ angular.module("Messaging.Components").component('messageList', {
 				}
 
 				ctrl.messageStream = null;
+				ctrl.massEditList = [];
 				ctrl.debounceTimeout = window.setTimeout(ctrl.reloadMessages, ctrl.DEBOUNCE_TIME_MS);
 			}
 
@@ -222,5 +307,8 @@ angular.module("Messaging.Components").component('messageList', {
 			$scope.$watch("$ctrl.groupId", ctrl.startReloadDebounce);
 			$scope.$watch("$ctrl.messagingBackend", ctrl.startReloadDebounce);
 			$scope.$watch("$ctrl.messageableFilter", ctrl.startReloadDebounce);
+			$scope.$watch("$ctrl.onlyUnread", ctrl.startReloadDebounce);
+			$scope.$watch("$ctrl.searchKeyword", ctrl.startReloadDebounce);
+			$scope.$on(BroadcastEvent.RefreshMessageList, ctrl.startReloadDebounce);
 		}],
 });

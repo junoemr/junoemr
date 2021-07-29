@@ -40,6 +40,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,10 +73,24 @@ public class MhaPatientsWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<PatientTo1>> searchPatients(
 			@PathParam("integrationId") String integrationId,
-			@QueryParam("keyword") String keyword)
+			@QueryParam("keyword") String keyword,
+			@QueryParam("accountIdCode") String accountIdCode)
 	{
 		Integration integration = integrationDao.find(Integer.parseInt(integrationId));
-		return RestResponse.successResponse(
-				this.patientService.searchPatientsByKeyword(integration, keyword).stream().map(PatientTo1::new).collect(Collectors.toList()));
+
+		if (keyword != null)
+		{
+			return RestResponse.successResponse(
+					this.patientService.searchPatientsByKeyword(integration, keyword).stream().map(PatientTo1::new).collect(Collectors.toList()));
+		}
+		else if (accountIdCode != null)
+		{
+			return RestResponse.successResponse(Collections.singletonList(
+					new PatientTo1(this.patientService.getPatientByAccountIdCodeCode(integration, accountIdCode))));
+		}
+		else
+		{
+			throw new IllegalArgumentException("One of 'keyword' or 'accountIdCode' must be provided");
+		}
 	}
 }

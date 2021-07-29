@@ -1,6 +1,10 @@
 import {LinkStatus} from "./LinkStatus";
 import {Province} from "../../../constants/Province";
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
+import {Sex} from "../../../demographic/model/Sex";
+import MhaPatientAccess from "./MhaPatientAccess";
+import MhaPatientAccessService from "../service/MhaPatientAccessService";
+import MhaIntegration from "./MhaIntegration";
 
 export default class MhaPatient
 {
@@ -8,7 +12,8 @@ export default class MhaPatient
 	protected _firstName: string;
 	protected _middleName: string;
 	protected _lastName: string;
-	private _birthDate: Moment;
+	protected _birthDate: Moment;
+	protected _sex: Sex;
 
 	protected _healthCareProvinceCode: Province;
 	protected _healthNumber: string;
@@ -24,6 +29,31 @@ export default class MhaPatient
 	protected _linkStatus: LinkStatus;
 	protected _canMessage: boolean;
 	protected _demographicNo: string;
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	/**
+	 * get all patient access records for this patient across all MHA integrations
+	 * @return promise that resolves to a list of access records
+	 */
+	public async getPatientAccessRecords(): Promise<MhaPatientAccess[]>
+	{
+		const accessService = new MhaPatientAccessService();
+		return await accessService.getPatientAccesses(this.id);
+	}
+
+	/**
+	 * get a specific access record for this patient
+	 * @param integration - the integration to get the record from
+	 * @return promise that resolves to an access record or null
+	 */
+	public async getPatientAccessRecord(integration: MhaIntegration): Promise<MhaPatientAccess>
+	{
+		const accessService = new MhaPatientAccessService();
+		return await accessService.getPatientAccess(integration.id, this.id);
+	}
 
 	// ==========================================================================
 	// Setters
@@ -52,6 +82,11 @@ export default class MhaPatient
 	set birthDate(value: Moment)
 	{
 		this._birthDate = value;
+	}
+
+	set sex(value: Sex)
+	{
+		this._sex = value;
 	}
 
 	set healthCareProvinceCode(value: Province)
@@ -114,10 +149,9 @@ export default class MhaPatient
 		this._demographicNo = value;
 	}
 
-// ==========================================================================
+	// ==========================================================================
 	// Getters
 	// ==========================================================================
-
 
 	get id(): string
 	{
@@ -139,9 +173,30 @@ export default class MhaPatient
 		return this._lastName;
 	}
 
+	get displayName(): string
+	{
+		return `${this.firstName} ${this.lastName}`;
+	}
+
 	get birthDate(): Moment
 	{
 		return this._birthDate;
+	}
+
+	get age(): number
+	{
+		let now = moment();
+		let age = moment.duration(now.diff(this.birthDate)).years();
+		if (isNaN(age))
+		{
+			return null;
+		}
+		return age;
+	}
+
+	get sex(): Sex
+	{
+		return this._sex;
 	}
 
 	get healthCareProvinceCode(): Province
@@ -189,6 +244,11 @@ export default class MhaPatient
 		return this._province;
 	}
 
+	get fullAddress(): string
+	{
+		return `${this.address ? this._address : ''} ${this.city ? this.city : ''}, ${this.province ? this.province : ''}`
+	}
+
 	get linkStatus(): LinkStatus
 	{
 		return this._linkStatus;
@@ -202,6 +262,12 @@ export default class MhaPatient
 	get isVerified(): boolean
 	{
 		return this._linkStatus === LinkStatus.VERIFIED;
+	}
+
+	get isRejected(): boolean
+	{
+		return this._linkStatus === LinkStatus.CLINIC_REJECTED ||
+			this._linkStatus === LinkStatus.PATIENT_REJECTED;
 	}
 
 	get canMessage(): boolean

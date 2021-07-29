@@ -1,9 +1,7 @@
 <div class="message-list h-100 w-100">
 	<!-- Loading indicator -->
 	<div ng-if="!$ctrl.messageStream">
-		<juno-loading-indicator message-alignment="vertical"
-		                        indicator-type="dot-pulse">
-		</juno-loading-indicator>
+		<div class="zero-state-text text-center body-normal m-t-32">Mailbox is loading</div>
 	</div>
 
 	<!-- Message list -->
@@ -18,6 +16,8 @@
 			              selected="message.id === $ctrl.selectedMessageId"
 			              component-style="$ctrl.componentStyle"
 			              sent-view="$ctrl.groupId === MessageGroup.Sent"
+			              in-mass-edit-list="$ctrl.inMassEditList(message)"
+			              on-group-select-change="$ctrl.onMessageGroupSelectionChange(message, value)"
 			              click="$ctrl.onSelectMessage(message)">
 			</message-card>
 		</div>
@@ -25,7 +25,7 @@
 
 	<!-- Zero state -->
 	<div ng-if="$ctrl.messageStream && $ctrl.messageStream.length === 0 && !$ctrl.messageStream.isLoading">
-		<div class="zero-sate-text text-center body-normal m-t-32">This mailbox is empty</div>
+		<div class="zero-state-text text-center body-normal m-t-32">This mailbox is empty</div>
 	</div>
 
 </div>

@@ -1,16 +1,25 @@
-<div class="message-card flex-col" ng-class="$ctrl.selected ? 'selected' : ''" ng-click="$ctrl.onClick()">
+<div class="message-card flex-col"
+     ng-class="{'selected': $ctrl.selected, 'group-selected': $ctrl.inMassEditList, 'read': $ctrl.message.isRead}"
+     ng-click="$ctrl.onClick()">
 	<!-- Header row -->
 	<div class="flex-row align-items-center m-t-8 m-b-4 m-r-16">
-		<div class="message-circle" ng-class="{'read': $ctrl.message.isRead}"></div>
+		<juno-check-box class="round-checkbox m-r-16 m-l-16"
+		                ng-model="$ctrl.inMassEditList"
+		                title="Select message"
+		                change="$ctrl.onCheckedChange(value)"
+		                dummy="true">
+		</juno-check-box>
 
 		<!-- Sender / To -->
 		<div ng-if="!$ctrl.sentView"
 		     class="text-ellipsis"
+		     ng-class="{'bold': !$ctrl.message.isRead}"
 		     title="{{$ctrl.message.sender.name}}">
 			From: {{$ctrl.message.sender.name ? $ctrl.message.sender.name : "Account Deleted"}}
 		</div>
 		<div ng-if="$ctrl.sentView"
 		     class="text-ellipsis"
+		     ng-class="{'bold': !$ctrl.message.isRead}"
 		     title="{{$ctrl.recipientNames()}}">
 			To: {{$ctrl.recipientNames()}}
 		</div>
@@ -23,9 +32,14 @@
 	</div>
 
 	<!-- Subject row -->
-	<div class="message-subject body-small m-l-48 m-r-16 m-b-4"
-	     title="{{$ctrl.message.subject}}">
-		{{$ctrl.message.subject}}
+	<div class="message-subject body-small flex-row m-r-16 m-b-4">
+		<!-- Attachment icon --->
+		<i ng-if="$ctrl.message.hasAttachments" class="attachment-icon icon icon-file-2" title="Has attachments"></i>
+
+		<!-- Subject -->
+		<div ng-class="{'bold': !$ctrl.message.isRead, 'm-l-48': !$ctrl.message.hasAttachments}" title="{{$ctrl.message.subject}}">
+			{{$ctrl.message.subject}}
+		</div>
 	</div>
 
 	<!-- Message preview row -->

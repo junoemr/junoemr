@@ -22,11 +22,18 @@
  */
 package org.oscarehr.schedule.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Getter
+@Setter
+@ToString
 public class CalendarAppointment implements Serializable
 {
 	private Integer appointmentNo;
@@ -55,6 +62,7 @@ public class CalendarAppointment implements Serializable
 	private String resources;
 	private String urgency;
 	private boolean doNotBook;
+	private boolean critical;
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
 	private boolean virtual;
@@ -76,8 +84,8 @@ public class CalendarAppointment implements Serializable
 	                           String eventStatusModifier, Integer numInvoices, String reason, Integer reasonCode,
 	                           String notes, String tagNames, String site, String type,
 	                           String resources, String urgency, boolean doNotBook, boolean tagSelfBooked,
-	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes, boolean isConfirmed, Integer creatorSecurityId,  String bookingSource)
-
+	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes, boolean isConfirmed,
+	                           Integer creatorSecurityId,  String bookingSource, boolean critical)
 	{
 		this.appointmentNo = appointmentNo;
 		this.billingRegion = billingRegion;
@@ -112,356 +120,7 @@ public class CalendarAppointment implements Serializable
 		this.isConfirmed = isConfirmed;
 		this.creatorSecurityId = creatorSecurityId;
 		this.bookingSource = bookingSource;
-	}
-
-	public Integer getAppointmentNo()
-	{
-		return appointmentNo;
-	}
-
-	public void setAppointmentNo(Integer appointmentNo)
-	{
-		this.appointmentNo = appointmentNo;
-	}
-
-	public String getBillingRegion()
-	{
-		return billingRegion;
-	}
-
-	public void setBillingRegion(String billingRegion)
-	{
-		this.billingRegion = billingRegion;
-	}
-
-	public String getBillingForm()
-	{
-		return billingForm;
-	}
-
-	public void setBillingForm(String billingForm)
-	{
-		this.billingForm = billingForm;
-	}
-
-	public String getBillingRdohip()
-	{
-		return billingRdohip;
-	}
-
-	public String getUserProviderNo()
-	{
-		return userProviderNo;
-	}
-
-	public void setUserProviderNo(String userProviderNo)
-	{
-		this.userProviderNo = userProviderNo;
-	}
-
-	public String getUserFirstName()
-	{
-		return userFirstName;
-	}
-
-	public void setUserFirstName(String userFirstName)
-	{
-		this.userFirstName = userFirstName;
-	}
-
-	public String getUserLastName()
-	{
-		return userLastName;
-	}
-
-	public void setUserLastName(String userLastName)
-	{
-		this.userLastName = userLastName;
-	}
-
-	public void setBillingRdohip(String billingRdohip)
-	{
-		this.billingRdohip = billingRdohip;
-	}
-
-	public LocalDate getDemographicDob()
-	{
-		return demographicDob;
-	}
-
-	public void setDemographicDob(LocalDate demographicDob)
-	{
-		this.demographicDob = demographicDob;
-	}
-
-	public String getDemographicName()
-	{
-		return demographicName;
-	}
-
-	public void setDemographicName(String demographicName)
-	{
-		this.demographicName = demographicName;
-	}
-
-	public String getDemographicPhone()
-	{
-		return demographicPhone;
-	}
-
-	public void setDemographicPhone(String demographicPhone)
-	{
-		this.demographicPhone = demographicPhone;
-	}
-
-	public Integer getDemographicNo()
-	{
-		return demographicNo;
-	}
-
-	public void setDemographicNo(Integer demographicNo)
-	{
-		this.demographicNo = demographicNo;
-	}
-
-	public Integer getProviderNo()
-	{
-		return providerNo;
-	}
-
-	public void setProviderNo(Integer providerNo)
-	{
-		this.providerNo = providerNo;
-	}
-
-	public LocalDateTime getStartTime()
-	{
-		return startTime;
-	}
-
-	public void setStartTime(LocalDateTime startTime)
-	{
-		this.startTime = startTime;
-	}
-
-	public LocalDateTime getEndTime()
-	{
-		return endTime;
-	}
-
-	public void setEndTime(LocalDateTime endTime)
-	{
-		this.endTime = endTime;
-	}
-
-	public String getEventStatusCode()
-	{
-		return eventStatusCode;
-	}
-
-	public void setEventStatusCode(String eventStatusCode)
-	{
-		this.eventStatusCode = eventStatusCode;
-	}
-
-	public String getEventStatusModifier()
-	{
-		return eventStatusModifier;
-	}
-
-	public void setEventStatusModifier(String eventStatusModifier)
-	{
-		this.eventStatusModifier = eventStatusModifier;
-	}
-
-	public Integer getNumInvoices()
-	{
-		return numInvoices;
-	}
-
-	public void setNumInvoices(Integer numInvoices)
-	{
-		this.numInvoices = numInvoices;
-	}
-
-	public String getReason()
-	{
-		return reason;
-	}
-
-	public void setReason(String reason)
-	{
-		this.reason = reason;
-	}
-
-	public Integer getReasonCode()
-	{
-		return reasonCode;
-	}
-
-	public void setReasonCode(Integer reasonCode)
-	{
-		this.reasonCode = reasonCode;
-	}
-
-	public String getNotes()
-	{
-		return notes;
-	}
-
-	public void setNotes(String notes)
-	{
-		this.notes = notes;
-	}
-
-	public String getTagNames()
-	{
-		return tagNames;
-	}
-
-	public void setTagNames(String tagNames)
-	{
-		this.tagNames = tagNames;
-	}
-
-	public String getSite()
-	{
-		return site;
-	}
-
-	public void setSite(String site)
-	{
-		this.site = site;
-	}
-
-	public String getType()
-	{
-		return type;
-	}
-
-	public void setType(String type)
-	{
-		this.type = type;
-	}
-
-	public String getResources()
-	{
-		return resources;
-	}
-
-	public void setResources(String resources)
-	{
-		this.resources = resources;
-	}
-
-	public String getUrgency()
-	{
-		return urgency;
-	}
-
-	public void setUrgency(String urgency)
-	{
-		this.urgency = urgency;
-	}
-
-	public boolean isDoNotBook()
-	{
-		return doNotBook;
-	}
-
-	public void setDoNotBook(boolean doNotBook)
-	{
-		this.doNotBook = doNotBook;
-	}
-
-	public boolean isTagSelfBooked()
-	{
-		return tagSelfBooked;
-	}
-
-	public void setTagSelfBooked(boolean tagSelfBooked)
-	{
-		this.tagSelfBooked = tagSelfBooked;
-	}
-
-	public boolean isTagSelfCancelled()
-	{
-		return tagSelfCancelled;
-	}
-
-	public void setTagSelfCancelled(boolean tagSelfCancelled)
-	{
-		this.tagSelfCancelled = tagSelfCancelled;
-	}
-
-	public boolean isVirtual()
-	{
-		return virtual;
-	}
-
-	public void setIsVirtual(boolean virtual)
-	{
-		this.virtual = virtual;
-	}
-
-	public String getTagSystemCodes()
-	{
-		return tagSystemCodes;
-	}
-
-	public void setTagSystemCodes(String tagSystemCodes)
-	{
-		this.tagSystemCodes = tagSystemCodes;
-	}
-
-	public String getAppointmentName()
-	{
-		return appointmentName;
-	}
-
-	public void setAppointmentName(String appointmentName)
-	{
-		this.appointmentName = appointmentName;
-	}
-
-	public String getBookingSource()
-	{
-		return bookingSource;
-	}
-
-	public void setBookingSource(String bookingSource)
-	{
-		this.bookingSource = bookingSource;
-	}
-
-	public Integer getCreatorSecurityId()
-	{
-		return creatorSecurityId;
-	}
-
-	public void setCreatorSecurityId(Integer creatorSecurityId)
-	{
-		this.creatorSecurityId = creatorSecurityId;
-	}
-
-	public boolean isSendNotification()
-	{
-		return sendNotification;
-	}
-
-	public void setSendNotification(boolean sendNotification)
-	{
-		this.sendNotification = sendNotification;
-	}
-
-	public boolean isConfirmed()
-	{
-		return isConfirmed;
-	}
-
-	public void setConfirmed(boolean confirmed)
-	{
-		isConfirmed = confirmed;
+		this.critical = critical;
 	}
 
 	@Override
@@ -473,6 +132,7 @@ public class CalendarAppointment implements Serializable
 		return tagSelfBooked == that.tagSelfBooked &&
 				tagSelfCancelled == that.tagSelfCancelled &&
 				virtual == that.virtual &&
+				critical == that.critical &&
 				Objects.equals(appointmentNo, that.appointmentNo) &&
 				Objects.equals(billingRegion, that.billingRegion) &&
 				Objects.equals(billingForm, that.billingForm) &&
@@ -506,45 +166,6 @@ public class CalendarAppointment implements Serializable
 	@Override
 	public int hashCode()
 	{
-
-		return Objects.hash(appointmentNo, billingRegion, billingForm, billingRdohip, userProviderNo, userFirstName, userLastName, demographicDob, demographicName, demographicPhone, demographicNo, providerNo, startTime, endTime, eventStatusCode, eventStatusModifier, numInvoices, reason, notes, tagNames, site, type, resources, urgency, tagSelfBooked, tagSelfCancelled, tagSystemCodes, bookingSource,creatorSecurityId);
-	}
-
-	@Override
-	public String toString()
-	{
-		return "CalendarAppointment{" +
-				"appointmentNo=" + appointmentNo +
-				", billingRegion='" + billingRegion + '\'' +
-				", billingForm='" + billingForm + '\'' +
-				", billingRdohip='" + billingRdohip + '\'' +
-				", userProviderNo='" + userProviderNo + '\'' +
-				", userFirstName='" + userFirstName + '\'' +
-				", userLastName='" + userLastName + '\'' +
-				", demographicDob=" + demographicDob +
-				", demographicName='" + demographicName + '\'' +
-				", demographicPhone='" + demographicPhone + '\'' +
-				", demographicNo=" + demographicNo +
-				", providerNo=" + providerNo +
-				", startTime=" + startTime +
-				", endTime=" + endTime +
-				", eventStatusCode='" + eventStatusCode + '\'' +
-				", eventStatusModifier='" + eventStatusModifier + '\'' +
-				", numInvoices=" + numInvoices +
-				", reason='" + reason + '\'' +
-				", notes='" + notes + '\'' +
-				", tagNames='" + tagNames + '\'' +
-				", site='" + site + '\'' +
-				", type='" + type + '\'' +
-				", resources='" + resources + '\'' +
-				", urgency='" + urgency + '\'' +
-				", tagSelfBooked=" + tagSelfBooked +
-				", tagSelfCancelled=" + tagSelfCancelled +
-				", isVirtual=" + virtual +
-				", tagSystemCodes='" + tagSystemCodes + '\'' +
-				", isConfirmed=" + isConfirmed + '\'' +
-				", bookingSource='" + bookingSource + '\'' +
-				", creatorSecurityId='" + creatorSecurityId + '\'' +
-				'}';
+		return Objects.hash(appointmentNo, billingRegion, billingForm, billingRdohip, userProviderNo, userFirstName, userLastName, demographicDob, demographicName, demographicPhone, demographicNo, providerNo, startTime, endTime, eventStatusCode, eventStatusModifier, numInvoices, reason, notes, tagNames, site, type, resources, urgency, tagSelfBooked, tagSelfCancelled, tagSystemCodes, bookingSource, creatorSecurityId, critical);
 	}
 }

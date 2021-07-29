@@ -88,24 +88,7 @@ angular.module("Common.Services").service("uxService", [
 
 			return deferred.promise;
 		};
-
-		service.getDisplayProperties = function getDisplayProperties()
-		{
-			var deferred = $q.defer();
-			$http.get(service.apiPath + '/properties').then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("uxService:getDisplayProperties error", errors);
-					deferred.reject("An error occurred while fetching display properties.")
-				}
-			);
-			return deferred.promise;
-		};
-
+		
 		service.getAllDashboards = function ()
 		{
 			var deferred = $q.defer();

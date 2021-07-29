@@ -44,7 +44,7 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 	/**
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
 	 * @param appendNamespace - if true append namespace to end of identifier
-	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
 	{

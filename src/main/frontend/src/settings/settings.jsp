@@ -143,7 +143,10 @@
 						<label>Fax:</label>
 						<input ng-model="settingsCtrl.pref.faxNumber" placeholder="Fax" class="form-control" type="text">
 					</div>
-
+					<div class="col-sm-12">
+						<h3>Other Settings</h3>
+						<hr>
+					</div>
 					<div class="form-group col-sm-6">
 						<label>Tickler Window Provider:</label>
 						<select ng-model="settingsCtrl.pref.ticklerWarningProvider" class="form-control" ng-options="p.providerNo as p.name for p in settingsCtrl.providerList">
@@ -187,6 +190,29 @@
 							<label class="checkbox-inline" for="onlymine-ticklers-radio">
 								<input ng-model="settingsCtrl.pref.ticklerViewOnlyMine" name="tickler-view-radios" id="onlymine-ticklers-radio" ng-value="true" type="radio">
 								View mine only
+							</label>
+						</div>
+					</div>
+					<!-- Extra column intentionally left empty to make things line up -->
+					<div class="form-group col-sm-6"></div>
+					<div class="form-group col-sm-6">
+						<label>CareConnect PPN Check</label>
+						<div>
+							<label class="checkbox-inline" for="careconnect-ppn-enable-radio">
+								<input ng-model="settingsCtrl.pref.enableCareConnectPPNCheck"
+									   name="careconnect-view-disable"
+									   id="careconnect-ppn-enable-radio"
+									   ng-value="true"
+									   type="radio">
+								Check for PPN
+							</label>
+							<label class="checkbox-inline" for="careconnect-ppn-disable-radio">
+								<input ng-model="settingsCtrl.pref.enableCareConnectPPNCheck"
+									   name="careconnect-view-disable"
+									   id="careconnect-ppn-disable-radio"
+									   ng-value="false"
+									   type="radio">
+								Disable PPN Check
 							</label>
 						</div>
 					</div>
@@ -755,6 +781,23 @@
 							<label class="radio-inline" for="radios-inb-1">
 								<input name="radios-inb-1" id="radios-inb-1" ng-model="settingsCtrl.pref.disableCommentOnAck" ng-value="false" type="radio">
 								Disable
+							</label>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 m-t-16">
+						<label>Top Bar Unread Message Count:</label>
+						<div class="controls">
+							<label class="radio m-l-24" for="radios-mcm-0">
+								<input name="radios-mcm-0" id="radios-mcm-0" ng-model="settingsCtrl.pref.messageCountMode" ng-value="MessageCountMode.Mha" type="radio">
+								Count only MHA messages.
+							</label>
+							<label class="radio m-l-24" for="radios-inb-1">
+								<input name="radios-mcm-1" id="radios-mcm-1" ng-model="settingsCtrl.pref.messageCountMode" ng-value="MessageCountMode.Internal" type="radio">
+								Count only internal messages.
+							</label>
+							<label class="radio m-l-24" for="radios-mcm-2">
+								<input name="radios-mcm-2" id="radios-mcm-2" ng-model="settingsCtrl.pref.messageCountMode" ng-value="MessageCountMode.MhaInternal" type="radio">
+								Sum MHA and internal message count.
 							</label>
 						</div>
 					</div>

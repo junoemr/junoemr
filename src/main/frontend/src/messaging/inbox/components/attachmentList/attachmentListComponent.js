@@ -94,15 +94,26 @@ angular.module("Messaging.Components").component('attachmentList', {
 					}
 					else if (targets.length === 1)
 					{
+						const demographicNo = await targets[0].localId();
 
-						const ok = await Juno.Common.Util.confirmationDialog($uibModal,
-							`Attach to chart?`,
-							`Are you sure you want to attach ${attachment.name} to ${targets[0].name}'s chart?`);
-
-						if (ok)
+						try
 						{
-							const junoDoc = JunoDocumentFactory.build(attachment.name, attachment.name, attachment.type, await attachment.getBase64Data());
-							await documentService.uploadDocumentToDemographicChart(junoDoc, await targets[0].localId());
+							await $uibModal.open(
+								{
+									component: 'attachToChart',
+									backdrop: 'static',
+									windowClass: "juno-simple-modal-window",
+									resolve: {
+										style: () => JUNO_STYLE.GREY,
+										attachment: () => attachment,
+										demographicNo: () => demographicNo,
+									}
+								}
+							).result;
+						}
+						catch (error)
+						{
+							// ESC key
 						}
 					}
 					else
@@ -123,6 +134,21 @@ angular.module("Messaging.Components").component('attachmentList', {
 				}
 			}
 
+			ctrl.openAttachmentPreview = async (attachment) =>
+			{
+				await $uibModal.open(
+					{
+						component: 'attachmentPreview',
+						backdrop: 'static',
+						windowClass: "juno-simple-modal-window",
+						resolve: {
+							style: () => JUNO_STYLE.GREY,
+							file: () => attachment,
+						}
+					}
+				).result;
+			}
+
 			ctrl.showAttachmentErrorAlert = () =>
 			{
 				Juno.Common.Util.errorAlert(
@@ -134,11 +160,6 @@ angular.module("Messaging.Components").component('attachmentList', {
 			ctrl.removeAttachment = (attachment) =>
 			{
 				ctrl.attachments.splice(ctrl.attachments.indexOf(attachment), 1);
-			}
-
-			ctrl.downloadAttachment = async (attachment) =>
-			{
-				await FileUtil.saveFile(attachment.name, attachment.type, await attachment.getBase64Data());
 			}
 
 			/**
