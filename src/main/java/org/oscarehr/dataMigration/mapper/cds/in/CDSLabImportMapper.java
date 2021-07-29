@@ -136,6 +136,10 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 			for(LaboratoryResults.ResultReviewer importReviewer : laboratoryResults.getResultReviewer())
 			{
 				// use names not ohip number for check since names are required
+				if (importReviewer == null)
+				{
+					continue;
+				}
 				String reviewerKey = importReviewer.getName().getFirstName() + importReviewer.getName().getLastName();
 				if(!uniqueReviewerSet.contains(reviewerKey))
 				{
