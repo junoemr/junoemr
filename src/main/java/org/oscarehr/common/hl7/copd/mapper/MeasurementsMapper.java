@@ -47,8 +47,6 @@ import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_MINI_MENTAL
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WAIST;
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WEIGHT;
 
-import static org.oscarehr.dataMigration.model.measurement.Measurement.DEFAULT_COMMENT;
-
 public class MeasurementsMapper extends AbstractMapper
 {
 	
@@ -92,27 +90,27 @@ public class MeasurementsMapper extends AbstractMapper
 
 			if (miniHealth != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM, miniHealth, obsDate, DEFAULT_COMMENT));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM, miniHealth, obsDate));
 			}
 
 			if (systolicBP != null && diastolicBP != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_BLOOD_PRESSURE, systolicBP + "/" + diastolicBP, obsDate, DEFAULT_COMMENT));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_BLOOD_PRESSURE, systolicBP + "/" + diastolicBP, obsDate));
 			}
 
 			if (height != null && !height.equals("0.0"))
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_HEIGHT, height, obsDate, DEFAULT_COMMENT));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_HEIGHT, height, obsDate));
 			}
 
 			if (weight != null && !weight.equals("0.0"))
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WEIGHT, weight, obsDate, DEFAULT_COMMENT));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WEIGHT, weight, obsDate));
 			}
 
 			if (waist != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WAIST, waist, obsDate, DEFAULT_COMMENT));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WAIST, waist, obsDate));
 			}
 		}
 
