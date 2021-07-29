@@ -34,13 +34,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
-import org.oscarehr.common.dao.utils.ConfigUtils;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -91,7 +88,12 @@ public class SeleniumTestBase
 		ffb.addCommandLineOptions("--headless");
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		Navigation.doLogin(
+			AuthUtils.TEST_USER_NAME,
+			AuthUtils.TEST_PASSWORD,
+			AuthUtils.TEST_PIN,
+			Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+			driver);
 		driver.manage().window().setSize(new Dimension(1920, 1080));
 		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}

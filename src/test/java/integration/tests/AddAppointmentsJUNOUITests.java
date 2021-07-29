@@ -30,14 +30,19 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.AddPatientsTests.mom;
 import static integration.tests.util.data.SiteTestCollection.siteNames;
@@ -45,6 +50,9 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVis
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(DatabaseUtil.class)
 public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 {
 	@Autowired
@@ -58,6 +66,11 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 	@Before
 	public void setup() throws Exception
 	{
+		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
+			"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
+			"ProviderPreference", "providersite", "secUserRole", "site",
+			"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
+
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
@@ -68,10 +81,6 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 	@After
 	public void cleanup() throws Exception
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
-				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
-				"ProviderPreference", "providersite", "secUserRole", "site",
-				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
 	}
 
 	public void selectTimeSlot(String startTimeExpected)
@@ -105,6 +114,7 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		dropdownSelectByVisibleText(driver, By.id("input-event-appt-status"), apptStatus);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-reason-code")));
 		dropdownSelectByVisibleText(driver, By.id("input-reason-code"), "Follow-Up");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='input-site']/option[text()='" + siteName + "']")));
 		dropdownSelectByVisibleText(driver, By.id("input-site"), siteName);
 		driver.findElement(By.id("input-notes")).sendKeys("Appointment Notes");
 		driver.findElement(By.id("input-event_reason")).sendKeys("Appointment Reason");
