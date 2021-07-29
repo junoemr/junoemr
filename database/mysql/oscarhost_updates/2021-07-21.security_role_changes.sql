@@ -39,7 +39,6 @@ ALTER TABLE secUserRole ADD COLUMN IF NOT EXISTS sec_role_id INTEGER(10) after i
 UPDATE secUserRole u JOIN secRole r ON (r.role_name = u.role_name)
     SET u.sec_role_id = r.role_no
 WHERE u.sec_role_id IS NULL OR u.sec_role_id = 0;
-ALTER TABLE secUserRole MODIFY sec_role_id INTEGER(10) NOT NULL;
 ALTER TABLE secUserRole ADD FOREIGN KEY IF NOT EXISTS secUserRole_sec_role_id_fk(sec_role_id) REFERENCES secRole(role_no);
 
 -- add system_managed flag to secRole
@@ -80,3 +79,30 @@ ALTER TABLE secObjPrivilege ADD COLUMN IF NOT EXISTS inclusive BOOLEAN NOT NULL 
 UPDATE secObjPrivilege SET inclusive = FALSE WHERE privilege IN ('o');
 
 commit;
+
+-- add triggers to ensure data correctness in systems with out of date war file
+-- these triggers can be safely removed once all systems are running the new roles code.
+DROP TRIGGER IF EXISTS secUserRole_sec_role_id_insert;
+DROP TRIGGER IF EXISTS secUserRole_sec_role_id_update;
+
+DELIMITER //
+
+CREATE TRIGGER secUserRole_sec_role_id_insert
+    BEFORE INSERT ON secUserRole
+    FOR EACH ROW
+BEGIN
+    IF NEW.sec_role_id IS NULL THEN
+        SET NEW.sec_role_id = (SELECT role_no FROM secRole s WHERE s.role_name = NEW.role_name);
+    END IF;
+END //
+
+CREATE TRIGGER secUserRole_sec_role_id_update
+    BEFORE UPDATE ON secUserRole
+    FOR EACH ROW
+BEGIN
+    IF NEW.sec_role_id IS NULL THEN
+        SET NEW.sec_role_id = (SELECT role_no FROM secRole s WHERE s.role_name = NEW.role_name);
+    END IF;
+END //
+
+DELIMITER ;
