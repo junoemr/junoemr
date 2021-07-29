@@ -23,6 +23,7 @@
 package org.oscarehr.careTracker.service;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.drools.FactException;
 import org.drools.RuleBase;
 import org.oscarehr.careTracker.converter.CareTrackerEntityToModelConverter;
@@ -61,9 +62,7 @@ import oscar.util.ConversionUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -269,13 +268,18 @@ public class CareTrackerDataService
 			CareTrackerItem careTrackerItem,
 			CareTrackerItemDataCreateTransfer itemData)
 	{
-		// because preventionData structure needs to be refactored
-		List<Map<String, String>> extList = new ArrayList<>();
-		Map<String, String> extMap = new HashMap<>();
-		extMap.put(PreventionExt.KEY_COMMENT, itemData.getComment());
-		extList.add(extMap);
+		// set up the comment extension
+		List<PreventionExt> extList = new ArrayList<>();
+		String commentText = StringUtils.trimToNull(itemData.getComment());
+		if(commentText != null)
+		{
+			PreventionExt commentExt = new PreventionExt();
+			commentExt.setKeyval(PreventionExt.KEY_COMMENT);
+			commentExt.setVal(commentText);
+			extList.add(commentExt);
+		}
 
-		Integer preventionId = PreventionData.insertPreventionData(
+		Prevention prevention = PreventionData.insertPreventionData(
 				providerId,
 				demographicId,
 				ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()),
@@ -288,8 +292,6 @@ public class CareTrackerDataService
 				null,
 				false,
 				extList);
-
-		Prevention prevention = preventionDao.find(preventionId);
 		return preventionToCareTrackerItemDataConverter.convert(prevention);
 	}
 }
