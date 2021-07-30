@@ -2,6 +2,11 @@ START TRANSACTION;
 
 SET @care_tracker_name = "Diabetes";
 
+SET @rule_name_never_entered = "Warn: Never Entered";
+SET @rule_name_3m_6m = "Note: 3-6 months since last entry";
+SET @rule_name_6m_plus = "Warn: Over 6 months since last entry";
+SET @rule_name_12m_plus = "Warn: Over 12 months since last entry";
+
 CALL addCareTracker(@care_tracker_name, "Measurements for tracking Diabetes", TRUE);
 
 -- set up the drools connection
@@ -18,24 +23,54 @@ CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "BP", "STRING", NUL
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "WT", "NUMERIC", "Weight", 1, "Weight in kg");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "HT", "NUMERIC", "Height", 1, "Height in cm");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "BMI", "NUMERIC", "BMI", 1, "Target: 18.5 - 24.9 (kg/m^2)");
+CALL addCareTrackerItemRule(@care_tracker_name, "BMI", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "BMI", @rule_name_3m_6m);
+CALL addCareTrackerItemRule(@care_tracker_name, "BMI", @rule_name_6m_plus);
+CALL addCareTrackerItemRule(@care_tracker_name, "BMI", "BMI low indicator");
+CALL addCareTrackerItemRule(@care_tracker_name, "BMI", "BMI high indicator");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "WAIS", "NUMERIC", "Waist Circ", 1, NULL);
+CALL addCareTrackerItemRule(@care_tracker_name, "WAIS", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "WAIS", @rule_name_3m_6m);
+CALL addCareTrackerItemRule(@care_tracker_name, "WAIS", @rule_name_6m_plus);
+CALL addCareTrackerItemRule(@care_tracker_name, "WAIS", "WAIS high indicator (male)");
+CALL addCareTrackerItemRule(@care_tracker_name, "WAIS", "WAIS high indicator (female)");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "WHR", "NUMERIC", "Waist to Hip Ratio", 1, NULL);
-
+CALL addCareTrackerItemRule(@care_tracker_name, "WHR", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "WHR", @rule_name_3m_6m);
+CALL addCareTrackerItemRule(@care_tracker_name, "WHR", @rule_name_6m_plus);
+CALL addCareTrackerItemRule(@care_tracker_name, "WHR", "WHR high indicator (male)");
+CALL addCareTrackerItemRule(@care_tracker_name, "WHR", "WHR high indicator (female)");
 
 -- *** Cardiovascular measurements groups ***
 SET @group_name = "Cardiovascular - Lipids";
 CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Lipids related cardio measurements");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "HDL", "NUMERIC", "HDL", 1, NULL);
+CALL addCareTrackerItemRule(@care_tracker_name, "HDL", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "HDL", @rule_name_12m_plus);
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "LDL", "NUMERIC", "LDL", 1, "LDL < 2.0");
+CALL addCareTrackerItemRule(@care_tracker_name, "LDL", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "LDL", @rule_name_12m_plus);
+CALL addCareTrackerItemRule(@care_tracker_name, "LDL", "Warn: Number Greater Than 2");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "TG", "NUMERIC", "Triglycerides", 1, "Target: < 2.0 mmol/L");
+CALL addCareTrackerItemRule(@care_tracker_name, "TG", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "TG", @rule_name_12m_plus);
+CALL addCareTrackerItemRule(@care_tracker_name, "TG", "Warn: Number Greater Than 2");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "TCHD", "NUMERIC", "TC/HDL", 1, "Ratio < 4.0");
+CALL addCareTrackerItemRule(@care_tracker_name, "TCHD", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "TCHD", @rule_name_12m_plus);
+CALL addCareTrackerItemRule(@care_tracker_name, "TCHD", "Warn: Number Greater Than 4");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "EDNL", "BOOLEAN", "Completed", 0, "Education Nutrition");
+CALL addCareTrackerItemRule(@care_tracker_name, "EDNL", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "EDNL", @rule_name_12m_plus);
 
 SET @group_name = "Cardiovascular - Smoking";
 CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Smoking related cardio measurements");
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "SKST", "BOOLEAN", "Smoker", 0, NULL);
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "POSK", "NUMERIC", "Packs per day", 1, NULL);
 CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "MCCS", "BOOLEAN", "Completed", 0, NULL);
+CALL addCareTrackerItemRule(@care_tracker_name, "MCCS", @rule_name_never_entered);
+CALL addCareTrackerItemRule(@care_tracker_name, "MCCS", @rule_name_3m_6m);
+CALL addCareTrackerItemRule(@care_tracker_name, "MCCS", @rule_name_6m_plus);
 
 SET @group_name = "Cardiovascular - Other";
 CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Other related cardio measurements");

@@ -4,6 +4,7 @@ DROP PROCEDURE IF EXISTS addCareTrackerDrools;
 DROP PROCEDURE IF EXISTS addCareTrackerIcd9Trigger;
 DROP PROCEDURE IF EXISTS careTrackerAddItemGroupProcedure;
 DROP PROCEDURE IF EXISTS careTrackerAddItemProcedure;
+DROP PROCEDURE IF EXISTS addCareTrackerItemRule;
 
 SET @creatorId = "-1"; -- system provider id
 
@@ -160,6 +161,27 @@ BEGIN
             WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
         ) limit 1;
     END IF;
+END //
+
+CREATE PROCEDURE addCareTrackerItemRule(IN in_care_tracker_name varchar(255), IN in_type_code varchar(255), IN in_rule_name varchar(255))
+    SQL SECURITY INVOKER
+BEGIN
+    INSERT INTO care_tracker_item_ds_rule(care_tracker_item_id, ds_rule_id)
+    SELECT
+        items.id,
+        rules.id
+    FROM care_tracker_item items
+             JOIN care_tracker sheet ON items.care_tracker_id = sheet.id
+             JOIN ds_rule rules ON rules.rule_name = in_rule_name AND rules.system_managed IS TRUE
+    WHERE sheet.care_tracker_name = in_care_tracker_name
+      AND sheet.system_managed IS TRUE
+      AND items.item_type_code = in_type_code
+      AND items.id NOT IN (
+        SELECT ir.care_tracker_item_id
+        FROM care_tracker_item_ds_rule ir
+        JOIN ds_rule _rule ON (_rule.id = ir.care_tracker_item_id)
+          WHERE _rule.rule_name = in_rule_name AND _rule.system_managed IS TRUE
+    );
 END //
 
 DELIMITER ;

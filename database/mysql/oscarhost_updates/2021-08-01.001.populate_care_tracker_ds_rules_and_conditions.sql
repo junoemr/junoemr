@@ -80,29 +80,95 @@ END //
 
 DELIMITER ;
 
+-- ** time since last check rules **
+
+SET @rule_name = "Warn: Never Entered";
+CALL addDsRule(@rule_name, "Measurement has never been recorded");
+CALL addDsRuleCondition(@rule_name, "NEVER_GIVEN", NULL);
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Never Entered");
+
+SET @rule_name = "Warn: Over 6 months since last entry";
+CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 6 months");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "6");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Last check was over 6 months ago");
+
+SET @rule_name = "Warn: Over 12 months since last entry";
+CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 12 months");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "12");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Last check was over 12 months ago");
+
+SET @rule_name = "Note: 3-6 months since last entry";
+CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 3 months");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "3");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_LT", "6");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "RECOMMENDATION", "Last check was over 3 months ago");
+
+-- ** patient data based rules **
+
+SET @rule_name = "Visible for Female Patients Only";
+CALL addDsRule(@rule_name, "Visible for Female Patients Only");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_NE", "F");
+CALL addDsRuleConsequence(@rule_name, "HIDDEN", "RECOMMENDATION", NULL);
+
+SET @rule_name = "Visible for Male Patients Only";
+CALL addDsRule(@rule_name, "Visible for Male Patients Only");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_NE", "M");
+CALL addDsRuleConsequence(@rule_name, "HIDDEN", "RECOMMENDATION", NULL);
+
+-- ** generic value entered rules & indicators **
+
+SET @rule_name = "Warn: Number Greater Than 0";
+CALL addDsRule(@rule_name, "Any numeric value greater than 0");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "0");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 0");
+
+SET @rule_name = "Warn: Number Greater Than 2";
+CALL addDsRule(@rule_name, "Any numeric value greater than 2");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "2");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 2");
+
+SET @rule_name = "Warn: Number Greater Than 4";
+CALL addDsRule(@rule_name, "Any numeric value greater than 4");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "4");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 4");
+
+ -- ** Measurement specific rules **
+
 SET @rule_name = "Problem indicator checked";
 CALL addDsRule(@rule_name, "Indicates whether a possibly problematic measurement has been checked off");
 CALL addDsRuleCondition(@rule_name, "VALUE_EQ", "Yes");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Problem indicator checked");
 
-SET @rule_name = "Number Greater Than 0";
-CALL addDsRule(@rule_name, "Any numeric value greater than 0");
-CALL addDsRuleCondition(@rule_name, "VALUE_GT", "0");
-CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING",  "Measurement value recorded to be over 0");
+SET @rule_name = "BMI low indicator";
+CALL addDsRule(@rule_name, "Indicates an abnormally low BMI value");
+CALL addDsRuleCondition(@rule_name, "VALUE_LT", "18.5");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Body Mass Index is low (under 18.5)");
 
-SET @rule_name = "Number Greater Than 4";
-CALL addDsRule(@rule_name, "Any numeric value greater than 4");
-CALL addDsRuleCondition(@rule_name, "VALUE_GT", "4");
-CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING",  "Measurement value recorded to be over 4");
+SET @rule_name = "BMI high indicator";
+CALL addDsRule(@rule_name, "Indicates an abnormally high BMI value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "24.9");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Body Mass Index is high (over 24.9)");
 
-SET @rule_name = "Never Entered";
-CALL addDsRule(@rule_name, "Measurement has never been recorded");
-CALL addDsRuleCondition(@rule_name, "NEVER_GIVEN", NULL);
-CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Never Entered");
+SET @rule_name = "WAIS high indicator (male)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high male Waist Circumference value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "102");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "M");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Waist Circumference is high (over 102)");
+SET @rule_name = "WAIS high indicator (female)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high female Waist Circumference value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "88");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "F");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Waist Circumference is high (over 88)");
 
-SET @rule_name = "Not Entered in Over 6 months";
-CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 6 months");
-CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "6");
-CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Last check was over 6 months ago");
+SET @rule_name = "WHR high indicator (male)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high male Waist Hip Ratio value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "0.9");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "M");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Waist Hip Ratio is high (over 0.9)");
+SET @rule_name = "WHR high indicator (female)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high female Waist Hip Ratio value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "0.85");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "F");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Waist Hip Ratio is high (over 0.85)");
 
 COMMIT;
