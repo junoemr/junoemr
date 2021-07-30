@@ -1,163 +1,110 @@
 START TRANSACTION;
 
--- add the care tracker
-INSERT INTO `care_tracker` (care_tracker_name, description, system_managed, enabled, created_at, created_by, updated_at, updated_by)
-SELECT
-    "Diabetes" AS care_tracker_name,
-    "Measurements for tracking Diabetes",
-    1,
-    1,
-    NOW(),
-    "-1",
-    NOW(),
-    "-1"
-WHERE "Diabetes" NOT IN (
-    SELECT care_tracker_name
-    FROM care_tracker
-    WHERE care_tracker_name = "Diabetes"
-      AND system_managed IS TRUE
-);
+SET @care_tracker_name = "Diabetes";
+
+CALL addCareTracker(@care_tracker_name, "Measurements for tracking Diabetes", TRUE);
 
 -- set up the drools connection
-INSERT INTO drools (drl_file, description, created_at, updated_at)
-SELECT
-    'diab.drl',
-    'diabetes decision support',
-    NOW(),
-    NOW()
-WHERE 'diab.drl' NOT IN
-      (
-          SELECT drl_file
-          FROM drools
-          WHERE drl_file = 'diab.drl'
-      );
-
-INSERT INTO care_tracker_drools
-SELECT
-    drl.id,
-    sheet.id
-FROM care_tracker sheet
-         JOIN drools drl ON drl.drl_file = 'diab.drl'
-WHERE sheet.care_tracker_name = "Diabetes" AND system_managed IS TRUE
-  AND sheet.id NOT IN (
-    SELECT care_tracker_id
-    FROM care_tracker_drools
-    WHERE sheet.care_tracker_name = "Diabetes" AND system_managed IS TRUE
-);
+CALL addCareTrackerDrools(@care_tracker_name, "diab.drl", "diabetes decision support");
 
 -- set up icd9 triggers
-INSERT INTO care_tracker_triggers_icd9(care_tracker_id, icd9_id)
-SELECT
-    f.id,
-    i.id
-FROM care_tracker f
-         JOIN icd9 i ON i.icd9 = "250"
-WHERE f.care_tracker_name="Diabetes"
-  AND f.system_managed IS TRUE
-  AND f.id NOT IN (
-    SELECT care_tracker_id
-    FROM care_tracker_triggers_icd9
-             JOIN icd9 icd_inner ON icd_inner.icd9 = "250"
-    WHERE icd9_id = icd_inner.id
-);
-INSERT INTO care_tracker_triggers_icd9(care_tracker_id, icd9_id)
-SELECT
-    f.id,
-    i.id
-FROM care_tracker f
-         JOIN icd9 i ON i.icd9 = "7902"
-WHERE f.care_tracker_name="Diabetes"
-  AND f.system_managed IS TRUE
-  AND f.id NOT IN (
-    SELECT care_tracker_id
-    FROM care_tracker_triggers_icd9
-             JOIN icd9 icd_inner ON icd_inner.icd9 = "7902"
-    WHERE icd9_id = icd_inner.id
-);
+CALL addCareTrackerIcd9Trigger(@care_tracker_name, "250");
+CALL addCareTrackerIcd9Trigger(@care_tracker_name, "7902");
 
 -- *** Vitals measurements group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Vitals", "Diabetes related vital measurements");
-CALL careTrackerAddItemProcedure("Vitals", "MEASUREMENT", "BP", "STRING", NULL, 0, "Target > 130/80");
-CALL careTrackerAddItemProcedure("Vitals", "MEASUREMENT", "WT", "NUMERIC", "Weight", 1, "Weight in kg");
-CALL careTrackerAddItemProcedure("Vitals", "MEASUREMENT", "HT", "NUMERIC", "Height", 1, "Height in cm");
-CALL careTrackerAddItemProcedure("Vitals", "MEASUREMENT", "BMI", "NUMERIC", "BMI", 1, "Target: 18.5 - 24.9 (kg/m^2)");
-CALL careTrackerAddItemProcedure("Vitals", "MEASUREMENT", "WAIS", "NUMERIC", "Waist Circ", 1, NULL);
-CALL careTrackerAddItemProcedure("Vitals", "MEASUREMENT", "WHR", "NUMERIC", "Waist to Hip Ratio", 1, NULL);
+SET @group_name = "Vitals";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Diabetes related vital measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "BP", "STRING", NULL, 0, "Target > 130/80");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "WT", "NUMERIC", "Weight", 1, "Weight in kg");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "HT", "NUMERIC", "Height", 1, "Height in cm");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "BMI", "NUMERIC", "BMI", 1, "Target: 18.5 - 24.9 (kg/m^2)");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "WAIS", "NUMERIC", "Waist Circ", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "WHR", "NUMERIC", "Waist to Hip Ratio", 1, NULL);
 
 
 -- *** Cardiovascular measurements groups ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Cardiovascular - Lipids", "Lipids related cardio measurements");
-CALL careTrackerAddItemProcedure("Cardiovascular - Lipids", "MEASUREMENT", "HDL", "NUMERIC", "HDL", 1, NULL);
-CALL careTrackerAddItemProcedure("Cardiovascular - Lipids", "MEASUREMENT", "LDL", "NUMERIC", "LDL", 1, "LDL < 2.0");
-CALL careTrackerAddItemProcedure("Cardiovascular - Lipids", "MEASUREMENT", "TG", "NUMERIC", "Triglycerides", 1, "Target: < 2.0 mmol/L");
-CALL careTrackerAddItemProcedure("Cardiovascular - Lipids", "MEASUREMENT", "TCHD", "NUMERIC", "TC/HDL", 1, "Ratio < 4.0");
-CALL careTrackerAddItemProcedure("Cardiovascular - Lipids", "MEASUREMENT", "EDNL", "BOOLEAN", "Completed", 0, "Education Nutrition");
+SET @group_name = "Cardiovascular - Lipids";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Lipids related cardio measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "HDL", "NUMERIC", "HDL", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "LDL", "NUMERIC", "LDL", 1, "LDL < 2.0");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "TG", "NUMERIC", "Triglycerides", 1, "Target: < 2.0 mmol/L");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "TCHD", "NUMERIC", "TC/HDL", 1, "Ratio < 4.0");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "EDNL", "BOOLEAN", "Completed", 0, "Education Nutrition");
 
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Cardiovascular - Smoking", "Smoking related cardio measurements");
-CALL careTrackerAddItemProcedure("Cardiovascular - Smoking", "MEASUREMENT", "SKST", "BOOLEAN", "Smoker", 0, NULL);
-CALL careTrackerAddItemProcedure("Cardiovascular - Smoking", "MEASUREMENT", "POSK", "NUMERIC", "Packs per day", 1, NULL);
-CALL careTrackerAddItemProcedure("Cardiovascular - Smoking", "MEASUREMENT", "MCCS", "BOOLEAN", "Completed", 0, NULL);
+SET @group_name = "Cardiovascular - Smoking";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Smoking related cardio measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "SKST", "BOOLEAN", "Smoker", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "POSK", "NUMERIC", "Packs per day", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "MCCS", "BOOLEAN", "Completed", 0, NULL);
 
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Cardiovascular - Other", "Other related cardio measurements");
-CALL careTrackerAddItemProcedure("Cardiovascular - Other", "MEASUREMENT", "ECG", "STRING", "ECG", 0, NULL);
-CALL careTrackerAddItemProcedure("Cardiovascular - Other", "MEASUREMENT", "PSSC", "BOOLEAN", "Screened", 0, NULL);
-CALL careTrackerAddItemProcedure("Cardiovascular - Other", "MEASUREMENT", "STRE", "BOOLEAN", "Stress Testing", 0, NULL);
+SET @group_name = "Cardiovascular - Other";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Other related cardio measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "ECG", "STRING", "ECG", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "PSSC", "BOOLEAN", "Screened", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "STRE", "BOOLEAN", "Stress Testing", 0, NULL);
 
 -- *** Glycemic measurements group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Glycemic", "Glycemic measurements");
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "DTYP", "STRING", "type", 0, "1 or 2");
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "A1C", "NUMERIC", "A1C", 1, "Target > 7.0%");
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "FBS", "NUMERIC", "Fasting Plasma Glucose", 1, NULL);
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "FGLC", "BOOLEAN", "Within 20%", 0, "Meter within 20% of simultaneous lab values");
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "FBPC", "NUMERIC", "2 hr PC BG", 1, NULL);
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "SMBG", "NUMERIC", "Self Monitoring BG", 1, NULL);
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "HYPM", "BOOLEAN", "Reviewed", 0, "discussed");
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "HYPE", "NUMERIC", "# of episodes", 1, "Since last assessed");
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "MCCN", "BOOLEAN", "Completed", 0, NULL);
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "MCCE", "BOOLEAN", "Completed", 0, NULL);
-CALL careTrackerAddItemProcedure("Glycemic", "MEASUREMENT", "SMCD", "STRING", "Challenges", 0, "Self Management Challenges");
+SET @group_name = "Glycemic";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Glycemic measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "DTYP", "STRING", "type", 0, "1 or 2");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "A1C", "NUMERIC", "A1C", 1, "Target > 7.0%");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "FBS", "NUMERIC", "Fasting Plasma Glucose", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "FGLC", "BOOLEAN", "Within 20%", 0, "Meter within 20% of simultaneous lab values");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "FBPC", "NUMERIC", "2 hr PC BG", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "SMBG", "NUMERIC", "Self Monitoring BG", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "HYPM", "BOOLEAN", "Reviewed", 0, "discussed");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "HYPE", "NUMERIC", "# of episodes", 1, "Since last assessed");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "MCCN", "BOOLEAN", "Completed", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "MCCE", "BOOLEAN", "Completed", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "SMCD", "STRING", "Challenges", 0, "Self Management Challenges");
 
 -- *** Mental Health measurements group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Mental Health", "Mental health check");
-CALL careTrackerAddItemProcedure("Mental Health", "MEASUREMENT", "DEPR", "BOOLEAN", "Depressed", 0, "Yearly or As Needed");
-CALL careTrackerAddItemProcedure("Mental Health", "MEASUREMENT", "LETH", "BOOLEAN", "Lethargic", 0, "Yearly or As Needed");
+SET @group_name = "Mental Health";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Mental health check");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "DEPR", "BOOLEAN", "Depressed", 0, "Yearly or As Needed");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "LETH", "BOOLEAN", "Lethargic", 0, "Yearly or As Needed");
 
 -- *** Nephropathy measurements group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Nephropathy", "Nephropathy measurements");
-CALL careTrackerAddItemProcedure("Nephropathy", "MEASUREMENT", "ACR", "NUMERIC", "ACR", 1, "Target: < 2.0 M : < 2.8 F");
-CALL careTrackerAddItemProcedure("Nephropathy", "MEASUREMENT", "SCR", "NUMERIC", "Serum Creatinine", 1, NULL);
-CALL careTrackerAddItemProcedure("Nephropathy", "MEASUREMENT", "EGFR", "NUMERIC", "eGFR", 1, NULL);
-CALL careTrackerAddItemProcedure("Nephropathy", "MEASUREMENT", "AORA", "BOOLEAN", "ACE-I OR ARB", 0, "Yes No");
-CALL careTrackerAddItemProcedure("Nephropathy", "MEASUREMENT", "CRCL", "NUMERIC", "Creatinine Clearance", 1, NULL);
+SET @group_name = "Nephropathy";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Nephropathy measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "ACR", "NUMERIC", "ACR", 1, "Target: < 2.0 M : < 2.8 F");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "SCR", "NUMERIC", "Serum Creatinine", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "EGFR", "NUMERIC", "eGFR", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "AORA", "BOOLEAN", "ACE-I OR ARB", 0, "Yes No");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "CRCL", "NUMERIC", "Creatinine Clearance", 1, NULL);
 
 -- *** Neuropathy measurements group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Neuropathy", "Neuropathy measurements");
-CALL careTrackerAddItemProcedure("Neuropathy", "MEASUREMENT", "AORA", "BOOLEAN", "Present", 0, "Erectile Dysfunction, gastrointestinal disturbance");
-CALL careTrackerAddItemProcedure("Neuropathy", "MEASUREMENT", "FTLS", "BOOLEAN", "Normal", 0, "Check for peripheral anesthesia with 10g monofilament or 128 Hz tuning fork");
-CALL careTrackerAddItemProcedure("Neuropathy", "MEASUREMENT", "PANE", "BOOLEAN", "Present", 0, NULL);
-CALL careTrackerAddItemProcedure("Neuropathy", "MEASUREMENT", "FTE", "BOOLEAN", "Normal", 0, "Foot Care");
+SET @group_name = "Neuropathy";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Neuropathy measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "AORA", "BOOLEAN", "Present", 0, "Erectile Dysfunction, gastrointestinal disturbance");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "FTLS", "BOOLEAN", "Normal", 0, "Check for peripheral anesthesia with 10g monofilament or 128 Hz tuning fork");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "PANE", "BOOLEAN", "Present", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "FTE", "BOOLEAN", "Normal", 0, "Foot Care");
 
-CALL careTrackerAddItemProcedure("Neuropathy", "MEASUREMENT", "EDF", "BOOLEAN", "Dysfunction", 0, "Yes No");
-CALL careTrackerAddItemProcedure("Neuropathy", "MEASUREMENT", "BCTR", "BOOLEAN", "Birth Control", 0, "On Birth Control");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "EDF", "BOOLEAN", "Dysfunction", 0, "Yes No");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "BCTR", "BOOLEAN", "Birth Control", 0, "On Birth Control");
 
 -- *** Retinopathy measurements group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Retinopathy", "Retinopathy measurements");
-CALL careTrackerAddItemProcedure("Retinopathy", "MEASUREMENT", "EYEE", "BOOLEAN", "Exam Done", 0, "Dilated Eye Exam, comment if referred");
+SET @group_name = "Retinopathy";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Retinopathy measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "EYEE", "BOOLEAN", "Exam Done", 0, "Dilated Eye Exam, comment if referred");
 
 -- *** Vaccination preventions group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Vaccination", "Vaccinations");
-CALL careTrackerAddItemProcedure("Vaccination", "PREVENTION", "Pneumovax", "BOOLEAN", "Pneumococcal vaccine", 0, NULL);
-CALL careTrackerAddItemProcedure("Vaccination", "PREVENTION", "Flu", "BOOLEAN", "Flu Vaccine", 0, "Annually");
+SET @group_name = "Vaccination";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Vaccinations");
+CALL careTrackerAddItemProcedure(@group_name, "PREVENTION", "Pneumovax", "BOOLEAN", "Pneumococcal vaccine", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "PREVENTION", "Flu", "BOOLEAN", "Flu Vaccine", 0, "Annually");
 
 -- *** Other measurements group ***
-CALL careTrackerAddItemGroupProcedure("Diabetes", "Other", "Other diabetes related measurements");
-CALL careTrackerAddItemProcedure("Other", "MEASUREMENT", "DMME", "BOOLEAN", "Discussed", 0, "Assess and discuss self-management challenges");
-CALL careTrackerAddItemProcedure("Other", "MEASUREMENT", "EDND", "BOOLEAN", "Completed", 0, NULL);
-CALL careTrackerAddItemProcedure("Other", "MEASUREMENT", "MCCO", "BOOLEAN", "Completed", 0, NULL);
-CALL careTrackerAddItemProcedure("Other", "MEASUREMENT", "CGSD", "STRING", "Goal", 0, NULL);
-CALL careTrackerAddItemProcedure("Other", "MEASUREMENT", "ASAU", "BOOLEAN", "Used", 0, NULL);
-CALL careTrackerAddItemProcedure("Other", "MEASUREMENT", "AST", "NUMERIC", "AST", 1, NULL);
-CALL careTrackerAddItemProcedure("Other", "MEASUREMENT", "ALT", "NUMERIC", "ALT", 1, NULL);
+SET @group_name = "Other";
+CALL careTrackerAddItemGroupProcedure(@care_tracker_name, @group_name, "Other diabetes related measurements");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "DMME", "BOOLEAN", "Discussed", 0, "Assess and discuss self-management challenges");
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "EDND", "BOOLEAN", "Completed", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "MCCO", "BOOLEAN", "Completed", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "CGSD", "STRING", "Goal", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "ASAU", "BOOLEAN", "Used", 0, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "AST", "NUMERIC", "AST", 1, NULL);
+CALL careTrackerAddItemProcedure(@group_name, "MEASUREMENT", "ALT", "NUMERIC", "ALT", 1, NULL);
 
 
 
