@@ -1,0 +1,5 @@
+# Ignore everything unless specified
+**
+
+# Allow Juno war
+!/target/oscar-14.0.0-SNAPSHOT.war
