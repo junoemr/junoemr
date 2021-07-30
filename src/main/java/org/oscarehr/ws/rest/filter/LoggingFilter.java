@@ -27,11 +27,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.log.model.RestServiceLog;
+import org.oscarehr.metrics.prometheus.service.SystemMetricsService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipAllLogging;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
+import org.springframework.beans.factory.annotation.Autowired;
 import oscar.log.LogAction;
 
 import javax.annotation.Priority;
@@ -63,6 +65,9 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
     private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
 	private static final String PROP_SKIP_LOGGING_CONTENT_OUTBOUND = "LoggingFilter.doNotLogContentOutbound";
 	public static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
+
+	@Autowired
+	SystemMetricsService systemMetricsService;
 
 	@Context
 	ContextResolver<ObjectMapper> mapperResolver;
@@ -159,6 +164,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 		if(requestDateTime != null)
 		{
 			duration = new Date().getTime() - requestDateTime.getTime();
+			systemMetricsService.recordApiRequestLatency(duration);
 		}
 		else
 		{
