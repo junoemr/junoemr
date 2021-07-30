@@ -87,6 +87,11 @@ CALL addDsRule(@rule_name, "Measurement has never been recorded");
 CALL addDsRuleCondition(@rule_name, "NEVER_GIVEN", NULL);
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Never Entered");
 
+SET @rule_name = "Warn: Over 3 months since last entry";
+CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 3 months");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "3");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Last check was over 3 months ago");
+
 SET @rule_name = "Warn: Over 6 months since last entry";
 CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 6 months");
 CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "6");
@@ -132,6 +137,32 @@ CALL addDsRule(@rule_name, "Any numeric value greater than 4");
 CALL addDsRuleCondition(@rule_name, "VALUE_GT", "4");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 4");
 
+SET @rule_name = "Warn: Number Greater Than 5";
+CALL addDsRule(@rule_name, "Any numeric value greater than 5");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "5");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 5");
+
+SET @rule_name = "Warn: Number Less Than 5";
+CALL addDsRule(@rule_name, "Any numeric value less than 5");
+CALL addDsRuleCondition(@rule_name, "VALUE_LT", "5");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be under 5");
+
+SET @rule_name = "Warn: Number Greater Than 7";
+CALL addDsRule(@rule_name, "Any numeric value greater than 7");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "7");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 7");
+
+SET @rule_name = "Warn: Number Less Than 7";
+CALL addDsRule(@rule_name, "Any numeric value less than 7");
+CALL addDsRuleCondition(@rule_name, "VALUE_LT", "7");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be under 7");
+
+SET @rule_name = "Warn: Number Greater Than 10";
+CALL addDsRule(@rule_name, "Any numeric value greater than 10");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "10");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 10");
+
+
  -- ** Measurement specific rules **
 
 SET @rule_name = "Problem indicator checked";
@@ -170,5 +201,16 @@ CALL addDsRule(@rule_name, "Indicates an abnormally high female Waist Hip Ratio 
 CALL addDsRuleCondition(@rule_name, "VALUE_GT", "0.85");
 CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "F");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Waist Hip Ratio is high (over 0.85)");
+
+SET @rule_name = "ACR high indicator (male)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high male Alb creat ratio value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "2.0");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "M");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Alb creat ratio is high (over 2.0)");
+SET @rule_name = "ACR high indicator (female)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high female Alb creat ratio value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "2.8");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "F");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Alb creat ratio is high (over 2.8)");
 
 COMMIT;

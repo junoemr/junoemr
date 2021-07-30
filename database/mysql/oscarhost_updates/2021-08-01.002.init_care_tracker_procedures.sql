@@ -171,16 +171,19 @@ BEGIN
         items.id,
         rules.id
     FROM care_tracker_item items
-             JOIN care_tracker sheet ON items.care_tracker_id = sheet.id
+             JOIN care_tracker tracker ON items.care_tracker_id = tracker.id
              JOIN ds_rule rules ON rules.rule_name = in_rule_name AND rules.system_managed IS TRUE
-    WHERE sheet.care_tracker_name = in_care_tracker_name
-      AND sheet.system_managed IS TRUE
+    WHERE tracker.care_tracker_name = in_care_tracker_name
+      AND tracker.system_managed IS TRUE
       AND items.item_type_code = in_type_code
       AND items.id NOT IN (
         SELECT ir.care_tracker_item_id
         FROM care_tracker_item_ds_rule ir
-        JOIN ds_rule _rule ON (_rule.id = ir.care_tracker_item_id)
+        JOIN ds_rule _rule ON (_rule.id = ir.ds_rule_id)
+        JOIN care_tracker_item _item ON (_item.id = ir.care_tracker_item_id)
+        JOIN care_tracker _tracker ON (_item.care_tracker_id = _tracker.id)
           WHERE _rule.rule_name = in_rule_name AND _rule.system_managed IS TRUE
+          AND _tracker.care_tracker_name = in_care_tracker_name
     );
 END //
 
