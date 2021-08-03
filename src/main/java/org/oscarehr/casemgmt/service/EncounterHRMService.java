@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +95,7 @@ public class EncounterHRMService extends EncounterSectionService
 	{
 		return WIN_NAME_PREFIX + sectionParams.getDemographicNo();
 	}
-
+	
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
 		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), SecObjectName._HRM,
@@ -134,11 +135,12 @@ public class EncounterHRMService extends EncounterSectionService
 
 			String trimmedText = EncounterSectionService.getTrimmedText(text);
 
-			LocalDateTime date = ConversionUtils.toNullableLocalDate(
-				hrmDocument.getTimeReceived()).atStartOfDay();
-
-			sectionNote.setUpdateDate(date);
-
+			LocalDate date = ConversionUtils.toNullableLocalDate(hrmDocument.getTimeReceived());
+			if (date != null)
+			{
+				sectionNote.setUpdateDate(date.atStartOfDay());
+			}
+			
 			StringBuilder duplicateLabIdQueryString = new StringBuilder();
 			if (duplicateIdList!=null)
 			{
@@ -167,8 +169,8 @@ public class EncounterHRMService extends EncounterSectionService
 			}
 
 			sectionNote.setText(labRead + trimmedText + labRead);
-			sectionNote.setTitle(formatTitleWithLocalDateTime(trimmedText, date));
-
+			sectionNote.setTitle(formatTitleWithLocalDateTime(trimmedText, date != null ? date.atStartOfDay() : null));
+			
 			out.add(sectionNote);
 		}
 

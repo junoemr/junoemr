@@ -68,7 +68,7 @@ public class HRMDisplayReportAction extends DispatchAction {
                     HRMDocument document = hrmDocumentDao.findById(Integer.parseInt(hrmDocumentId)).get(0);
 
                     if (document != null) {
-                        logger.debug("reading repotFile : "+document.getReportFile());
+                        logger.debug("reading reportFile : "+document.getReportFile());
                         HRMReport report = HRMReportParser.parseReport(document.getReportFile(), document.getReportFileSchemaVersion());
                         
                         request.setAttribute("hrmDocument", document);

@@ -33,6 +33,8 @@ import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -62,7 +64,24 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 
 		hrmDocument.setDocumentSubClassList(convertSubClassList(hrmDocument, input.getObservations()));
 		hrmDocument.setCommentList(convertCommentList(hrmDocument, input.getComments()));
-		hrmDocument.setDocumentToProviderList(convertProviderLinks(hrmDocument, input.getReviewers()));
+		
+		hrmDocument.setReportHash(input.getMessageUniqueId());
+		hrmDocument.setNumDuplicatesReceived(0);
+		
+		List<HRMDocumentToProvider> providerLinks = new ArrayList<HRMDocumentToProvider>();
+		
+		HRMDocumentToProvider deliverToProviderLink = createDeliverToLink(hrmDocument, input.getDeliverToUserId());
+		if (deliverToProviderLink != null)
+		{
+			providerLinks.add(deliverToProviderLink);
+		}
+		
+		if (input.getInternalReviewers() != null && !input.getInternalReviewers().isEmpty())
+		{
+			providerLinks.addAll(convertReviewerLinks(hrmDocument, input.getInternalReviewers()));
+		}
+		
+		hrmDocument.setDocumentToProviderList(providerLinks);
 
 		return hrmDocument;
 	}
@@ -129,7 +148,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return hrmDocumentCommentList;
 	}
 
-	protected List<HRMDocumentToProvider> convertProviderLinks(HRMDocument hrmDocument, List<Reviewer> reviewers)
+	protected List<HRMDocumentToProvider> convertReviewerLinks(HRMDocument hrmDocument, List<Reviewer> reviewers)
 	{
 		List<HRMDocumentToProvider> hrmDocumentToProviderList = new ArrayList<>(reviewers.size());
 		for(Reviewer reviewer : reviewers)
@@ -148,5 +167,47 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 			hrmDocumentToProviderList.add(hrmDocumentToProvider);
 		}
 		return hrmDocumentToProviderList;
+	}
+	
+	/**
+	 * Find the provider associated with the deliverToID.  If the ID starts with a "D", the id refers to the CPSID
+	 * of a physician.  If it starts with an "N", then it's the CNO number of a nurse.
+	 * @param deliverToID Practitioner No of the provider for the link
+	 * @returns provider link if provider exists in the system, otherwise null
+	 */
+	protected HRMDocumentToProvider createDeliverToLink(HRMDocument document, String deliverToID)
+	{
+		final String PREFIX_DOCTOR = "D";
+		final String PREFIX_NURSE = "N";
+		
+		ProviderCriteriaSearch searchParams = new ProviderCriteriaSearch();
+		String practitionerNumber = deliverToID.substring(1);
+		
+		switch (deliverToID.substring(0,1))
+		{
+			case PREFIX_NURSE:
+				searchParams.setOntarioCnoNumber(practitionerNumber);
+				break;
+			case PREFIX_DOCTOR:
+			default:
+				searchParams.setPractitionerNo(practitionerNumber);
+				break;
+		}
+		
+		List<ProviderData> providers = searchProviders(searchParams);
+		
+		if (providers != null && providers.size() == 1)
+		{
+			ProviderData foundProvider = providers.get(0);
+			
+			HRMDocumentToProvider link = new HRMDocumentToProvider();
+			link.setProviderNo(String.valueOf(foundProvider.getProviderNo()));
+			link.setHrmDocument(document);
+			
+			return link;
+		}
+		
+		// TODO: General inbox route?
+		return null;
 	}
 }

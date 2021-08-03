@@ -110,7 +110,7 @@ public class HrmDocument extends AbstractTransientModel
 	private Integer id;
 	private String messageUniqueId;
 	private String deliverToUserId;
-
+	
 	private LocalDateTime reportDateTime;
 	private LocalDateTime receivedDateTime;
 	private Provider createdBy;
@@ -131,13 +131,13 @@ public class HrmDocument extends AbstractTransientModel
 
 	private List<HrmComment> comments;
 	private List<HrmObservation> observations;
-	private List<Reviewer> reviewers;
+	private List<Reviewer> internalReviewers;       // TODO:  Confirm that these are the internal reviewers
 
 	public HrmDocument()
 	{
 		comments = new ArrayList<>();
 		observations = new ArrayList<>();
-		reviewers = new ArrayList<>();
+		internalReviewers = new ArrayList<>();
 	}
 
 	public void addComment(HrmComment comment)
@@ -160,10 +160,10 @@ public class HrmDocument extends AbstractTransientModel
 
 	public void addReviewer(Reviewer reviewer)
 	{
-		if(this.reviewers == null)
+		if(this.internalReviewers == null)
 		{
-			this.reviewers = new ArrayList<>();
+			this.internalReviewers = new ArrayList<>();
 		}
-		this.reviewers.add(reviewer);
+		this.internalReviewers.add(reviewer);
 	}
 }

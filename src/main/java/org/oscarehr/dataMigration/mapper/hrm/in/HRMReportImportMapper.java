@@ -25,22 +25,39 @@ package org.oscarehr.dataMigration.mapper.hrm.in;
 
 
 import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 
 
 import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import xml.hrm.v4_3.PersonNameSimple;
 import xml.hrm.v4_3.ReportsReceived;
+import xml.hrm.v4_3.TransactionInformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3, HrmDocument>
 {
 	@Autowired
 	static HRMReportDocumentMapper documentMapper = new HRMReportDocumentMapper();
+	
+	@Autowired
+	static ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+	
+	@Autowired
+	static ProviderDbToModelConverter providerConverter = SpringUtils.getBean(ProviderDbToModelConverter.class);
 	
 	private static final String SCHEMA_VERSION = "4.3";
 	
@@ -51,8 +68,8 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		model.setParentReport(null);
 		
 		model.setMessageUniqueId(importStructure.getMessageUniqueId());
-		model.setDeliverToUserId(importStructure.getDeliverToUserId());
 		model.setDescription("Downloaded HRM Document");
+		model.setDeliverToUserId(importStructure.getDeliverToUserId());
 		
 		// Despite the name, there is exactly one report per imported HRMReport
 		ReportsReceived report = importStructure.getDocumentRoot().getPatientRecord().getReportsReceived().get(0);
@@ -61,7 +78,7 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		model.setReceivedDateTime(toNullableLocalDateTime(report.getReceivedDateTime()));
 		model.setCreatedBy(stubProviderFromPersonName(report.getAuthorPhysician()));
 		model.setReportStatus(getStatus(report.getResultStatus()));
-		model.setReviewers(stubReviewers(report.getReviewingOHIPPhysicianId(), report.getReviewedDateTime()));  // TODO: can only stub?
+		model.setInternalReviewers(stubReviewers(report.getReviewingOHIPPhysicianId(), report.getReviewedDateTime()));  // TODO: can only stub?
 		model.setReportClass(getReportClass(report.getClazz()));
 		model.setReportSubClass(report.getSubClass());
 		model.setReportFileSchemaVersion(SCHEMA_VERSION);
@@ -72,11 +89,13 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		
 		model.setObservations(importStructure.getObservations());
 		
-		model.setHashData(mapUniqueId(importStructure));
+		model.setHashData(mapMatchingData(importStructure));
 		
 		model.setDocument(documentMapper.importToJuno(importStructure));
-		
 		model.setReportFile(FileFactory.getExistingFile(importStructure.getFileLocation()));   // IO Exception
+		
+		// According to the schema there is exactly one transaction information per message
+		//model.setDeliverToUsers(mapTargetProviders(importStructure.getDocumentRoot().getPatientRecord().getTransactionInformation()));
 		
 		// category (HrmCategory)               // TODO: Leave blank???
 		// hashData (HrmDocumentMatchingData)   // TODO: HashData??
@@ -86,13 +105,69 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		return model;
 	}
 	
-	protected HrmDocumentMatchingData mapUniqueId(HRMReport_4_3 importStructure)
+	protected HrmDocumentMatchingData mapMatchingData(HRMReport_4_3 importStructure)
 	{
 		HrmDocumentMatchingData data = new HrmDocumentMatchingData();
 		data.setReportHash(importStructure.getMessageUniqueId());
 		data.setNumDuplicatesReceived(0);
 		
 		return data;
+	}
+	
+	protected List<Provider> mapTargetProviders(List<TransactionInformation> transactionInfo)
+	{
+		List<Provider> providers = new ArrayList<Provider>();
+		
+		for (TransactionInformation transInfo : transactionInfo)
+		{
+			PersonNameSimple providerName = transInfo.getProvider();
+			String deliverToID = transInfo.getDeliverToUserID();
+			
+			ProviderCriteriaSearch searchParams = createProviderCriteriaSearch(providerName, deliverToID);
+			
+			List<ProviderData> knownProviders = providerDao.criteriaSearch(searchParams);
+			if (knownProviders.size() == 1)
+			{
+				providers.add(providerConverter.convert(knownProviders.get(0)));
+			}
+		}
+		
+		return providers;
+	}
+	
+	private ProviderCriteriaSearch createProviderCriteriaSearch(PersonNameSimple providerName, String deliverToID)
+	{
+		final String PREFIX_PHYSICIAN = "D";
+		final String PREFIX_NURSE = "N";
+		
+		ProviderCriteriaSearch searchParams = new ProviderCriteriaSearch();
+		
+		if (providerName.getFirstName() != null)
+		{
+			searchParams.setFirstName(providerName.getFirstName());
+		}
+		
+		if (providerName.getLastName() != null )
+		{
+			searchParams.setLastName(providerName.getLastName());
+		}
+		
+		if (deliverToID != null)
+		{
+			switch (deliverToID)
+			{
+				case PREFIX_PHYSICIAN:
+					searchParams.setPractitionerNo(deliverToID);
+					break;
+				case PREFIX_NURSE:
+					searchParams.setOntarioCnoNumber(deliverToID);
+					break;
+				default:
+					break;
+			}
+		}
+		
+		return searchParams;
 	}
 	
 }

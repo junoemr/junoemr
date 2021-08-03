@@ -73,9 +73,9 @@ public class HRMReportExportMapper extends AbstractHRMExportMapper<ReportsReceiv
 		reportsReceived.setAuthorPhysician(toPersonNameSimple(exportStructure.getCreatedBy()));
 		reportsReceived.setResultStatus(getReportStatus(exportStructure.getReportStatus()));
 
-		if(!exportStructure.getReviewers().isEmpty())
+		if(!exportStructure.getInternalReviewers().isEmpty())
 		{
-			Reviewer reviewer = exportStructure.getReviewers().get(0);
+			Reviewer reviewer = exportStructure.getInternalReviewers().get(0);
 			reportsReceived.setReviewingOHIPPhysicianId(reviewer.getOhipNumber());
 			reportsReceived.setReviewedDateTime(toNullableDateFullOrPartial(reviewer.getReviewDateTime()));
 		}

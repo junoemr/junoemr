@@ -616,6 +616,7 @@ public class SFTPConnector {
 					
 					if (report != null)
 					{
+						// TODO: Move this functionality somewhere else
 						HRMReportParser.addReportToInbox(loggedInInfo, report);
 					}
 				}

@@ -50,26 +50,33 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		this.objectFactory = new ObjectFactory();
 	}
 	
-	protected LocalDateTime toNullableLocalDateTime(DateFullOrPartial xmlDate)
+	protected LocalDateTime toNullableLocalDateTime(DateFullOrPartial fullOrPartial)
 	{
-		if (xmlDate == null || xmlDate.getFullDate() == null)
+		if(fullOrPartial != null)
 		{
-			return null;
+			return ConversionUtils.fillPartialCalendar(
+					fullOrPartial.getDateTime(),
+					fullOrPartial.getFullDate(),
+					fullOrPartial.getYearMonth(),
+					fullOrPartial.getYearOnly());
 		}
-		
-		return ConversionUtils.toLocalDateTime(xmlDate.getFullDate());
+		return null;
 	}
 	
-	protected LocalDate toNullableLocalDate(DateFullOrPartial xmlDate)
+	protected LocalDate toNullableLocalDate(DateFullOrPartial fullOrPartial)
 	{
-		LocalDateTime dateTime = toNullableLocalDateTime(xmlDate);
-		
-		if (dateTime == null)
+		if(fullOrPartial != null)
 		{
-			return null;
+			LocalDateTime dateTime = ConversionUtils.fillPartialCalendar(
+					fullOrPartial.getFullDate(),
+					fullOrPartial.getYearMonth(),
+					fullOrPartial.getYearOnly());
+			if(dateTime != null)
+			{
+				return dateTime.toLocalDate();
+			}
 		}
-		
-		return dateTime.toLocalDate();
+		return null;
 	}
 	
 	protected PartialDateTime toPartialDateTime(DateFullOrPartial xmlDate)
@@ -82,7 +89,7 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		return PartialDateTime.from(toNullableLocalDateTime(xmlDate));
 	}
 	
-	// TODO:  This will almost certainly blow up in the future, a reviewer is not a provider, it's just an OHIP number
+	// TODO:  This will almost certainly blow up, a reviewer is not a provider, it's just an OHIP number
 	protected List<Reviewer> stubReviewers(String reviewerOHIPNo, DateFullOrPartial reviewDate)
 	{
 		if (reviewerOHIPNo == null)
@@ -94,13 +101,15 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		Reviewer reviewer = new Reviewer();
 		reviewer.setOhipNumber(reviewerOHIPNo);
 		reviewer.setReviewDateTime(toPartialDateTime(reviewDate));
+		reviewer.setFirstName("HRM Document");      // TODO
+		reviewer.setLastName("HRM Document");       // TODO
 		
 		reviewers.add(reviewer);
 		
 		return reviewers;
 	}
 	
-	// TODO:  This will almost certainly blow up in the future, the Author is a SimpleName, not a provider
+	// TODO:  This will almost certainly blow up, the Author is a SimpleName, not a provider
 	protected Provider stubProviderFromPersonName(PersonNameSimple name)
 	{
 		if (name == null)

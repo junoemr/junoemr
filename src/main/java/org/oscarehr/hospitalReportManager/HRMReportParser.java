@@ -13,17 +13,16 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMapper;
-import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDocumentMapper;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.parser.hrm.HRMFileParser;
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
@@ -72,7 +71,7 @@ public class HRMReportParser
 					return null;
 				}
 
-				return parseReport(hrmXML);
+				return parseReport(hrmXML, schemaVersion);
 			}
 			catch(SAXException e)
 			{
@@ -86,7 +85,8 @@ public class HRMReportParser
 		return null;
 	}
 
-	public static HRMReport parseReport(GenericFile hrmFile) throws IOException, SAXException, JAXBException
+	// TODO:  Have to put the schema version back, in case there's older reports
+	public static HRMReport parseReport(GenericFile hrmFile, String schemaVersion) throws IOException, SAXException, JAXBException
 	{
 		String fileData = FileUtils.getStringFromFile(hrmFile.getFileObject());
 		
@@ -104,27 +104,36 @@ public class HRMReportParser
 				HrmDocument model = mapper.importToJuno(report);
 				org.oscarehr.dataMigration.model.demographic.Demographic demographic = demoMapper.importToJuno(report);
 				
-				org.oscarehr.demographic.dao.DemographicDao demographicDao = SpringUtils.getBean(org.oscarehr.demographic.dao.DemographicDao.class);
+				DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
 				
 				DemographicCriteriaSearch criteria = new DemographicCriteriaSearch();
-				criteria.setHin(demographic.getHealthNumber());
-				criteria.setHealthCardVersion(demographic.getHealthNumberVersion());
-				criteria.set
+				
+				if (demographic.getHealthNumber() != null)
+				{
+					criteria.setHin(demographic.getHealthNumber());
+				}
+				
+				if (demographic.getHealthNumberVersion() != null)
+				{
+					criteria.setHealthCardVersion(demographic.getHealthNumberVersion());
+				}
+				
+				if (demographic.getDateOfBirth() != null)
+				{
+					criteria.setDateOfBirth(demographic.getDateOfBirth());
+				}
 				
 				List<org.oscarehr.demographic.model.Demographic> demographics = demographicDao.criteriaSearch(criteria);
 				
-				if (demographics == null || demographics.isEmpty())
+				org.oscarehr.demographic.model.Demographic demographicToLink = null;
+				if (demographics.size() == 1)
 				{
-					// route with a null demographics
+					demographicToLink = demographics.get(0);
 				}
 				
+				HRMService hrmService = SpringUtils.getBean(HRMService.class);
 				
-				if (demographics.size() > 1)
-				{
-					// Only one match, we know where to route
-				}
-				
-				
+				hrmService.uploadNewHRMDocument(model, demographicToLink);
 				
 				return report;
 			}
@@ -132,11 +141,7 @@ public class HRMReportParser
 			{
 				return report;
 			}
-			
-		DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
 	}
-	
-	DemographicCriteriaSearch blah;
 	
 	/**
 	 * legacy method signature
@@ -252,7 +257,7 @@ public class HRMReportParser
 		logger.info("Routing Report To Demographic, for file:"+report.getFileLocation());
 		
 		// Search the demographics on the system for a likely match and route it to them automatically
-		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+		org.oscarehr.common.dao.DemographicDao demographicDao = (org.oscarehr.common.dao.DemographicDao) SpringUtils.getBean("demographicDao");
 
 		List<Demographic> matchingDemographicListByName = demographicDao.searchDemographic(report.getLegalName());
 
@@ -353,7 +358,7 @@ public class HRMReportParser
 
 
 	private static List<HRMReport> loadAllReportsRoutedToDemographic(LoggedInInfo loggedInInfo, String legalName) {
-		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+		org.oscarehr.common.dao.DemographicDao demographicDao = (org.oscarehr.common.dao.DemographicDao) SpringUtils.getBean("demographicDao");
 		HRMDocumentToDemographicDao hrmDocumentToDemographicDao = (HRMDocumentToDemographicDao) SpringUtils.getBean("HRMDocumentToDemographicDao");
 		HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
 

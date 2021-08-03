@@ -77,7 +77,7 @@ public class HRMService
 	public HRMDocument uploadNewHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic) throws IOException
 	{
 		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
-
+		
 		// persist hrm database info and associated objects through cascade
 		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
 		hrmDocumentDao.persist(hrmDocument);
@@ -85,13 +85,17 @@ public class HRMService
 
 		// assign the hrm document to the demographic
 		routeToDemographic(hrmDocument, demographic);
-
-		// link the associated providers
+		
+		// link the deliverToProvider
+		
+		
+		// link the associated reviewers
 		for(HRMDocumentToProvider documentToProvider : hrmDocument.getDocumentToProviderList())
 		{
 			hrmDocumentToProviderDao.persist(documentToProvider);
 		}
 
+		
 		return hrmDocument;
 	}
 
