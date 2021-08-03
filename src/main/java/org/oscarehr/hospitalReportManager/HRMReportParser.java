@@ -13,17 +13,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMapper;
-import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.parser.hrm.HRMFileParser;
-import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
@@ -33,7 +29,6 @@ import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
-import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -64,7 +59,7 @@ public class HRMReportParser
 		{
 			try
 			{
-				GenericFile hrmXML = new XMLFile(new File(hrmReportFileLocation));
+				GenericFile hrmXML = FileFactory.getExistingFile(hrmReportFileLocation);
 				if(!hrmXML.getFileObject().exists())
 				{
 					logger.warn("unable to find the HRM report. checked " + hrmReportFileLocation + ", and in the document_dir");
@@ -92,55 +87,11 @@ public class HRMReportParser
 		
 		HRMFileParser hrmParser = new HRMFileParser();
 		
-			xml.hrm.v4_3.OmdCds root = hrmParser.parse(hrmFile);
+		xml.hrm.v4_3.OmdCds root = hrmParser.parse(hrmFile);
 			
-			HRMReport_4_3 report = new HRMReport_4_3(root, hrmFile.getPath(), fileData);
-			
-			HRMReportImportMapper mapper = new HRMReportImportMapper();
-			HRMReportDemographicMapper demoMapper = new HRMReportDemographicMapper();
-			
-			try
-			{
-				HrmDocument model = mapper.importToJuno(report);
-				org.oscarehr.dataMigration.model.demographic.Demographic demographic = demoMapper.importToJuno(report);
-				
-				DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
-				
-				DemographicCriteriaSearch criteria = new DemographicCriteriaSearch();
-				
-				if (demographic.getHealthNumber() != null)
-				{
-					criteria.setHin(demographic.getHealthNumber());
-				}
-				
-				if (demographic.getHealthNumberVersion() != null)
-				{
-					criteria.setHealthCardVersion(demographic.getHealthNumberVersion());
-				}
-				
-				if (demographic.getDateOfBirth() != null)
-				{
-					criteria.setDateOfBirth(demographic.getDateOfBirth());
-				}
-				
-				List<org.oscarehr.demographic.model.Demographic> demographics = demographicDao.criteriaSearch(criteria);
-				
-				org.oscarehr.demographic.model.Demographic demographicToLink = null;
-				if (demographics.size() == 1)
-				{
-					demographicToLink = demographics.get(0);
-				}
-				
-				HRMService hrmService = SpringUtils.getBean(HRMService.class);
-				
-				hrmService.uploadNewHRMDocument(model, demographicToLink);
-				
-				return report;
-			}
-			catch (Exception e)
-			{
-				return report;
-			}
+		HRMReport_4_3 report = new HRMReport_4_3(root, hrmFile.getPath(), fileData);
+		
+		return report;
 	}
 	
 	/**

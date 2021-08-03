@@ -76,7 +76,7 @@ public class HRMDisplayReportAction extends DispatchAction {
                         if (report != null) {
                             request.setAttribute("hrmReport", report);
                             request.setAttribute("hrmReportId", document.getId());
-                            request.setAttribute("hrmReportTime", document.getTimeReceived().toString());
+                            request.setAttribute("hrmReportTime", document.getTimeReceived() != null ? document.getTimeReceived() : "");
                             request.setAttribute("hrmDuplicateNum", document.getNumDuplicatesReceived());
 
                             List<HRMDocumentToDemographic> demographicLinkList = hrmDocumentToDemographicDao.findByHrmDocumentId(document.getId());

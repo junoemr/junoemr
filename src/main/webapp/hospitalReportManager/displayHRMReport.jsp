@@ -725,8 +725,8 @@ if (duplicateLabIdsString!=null)
 		%>
 			<tr>
 				<td><%=tempId %></td>
-				<td><%=formatter.format(dupReportDates.get(Integer.parseInt(tempId))) %></td>
-				<td><%=formatter.format(dupTimeReceived.get(Integer.parseInt(tempId))) %></td>
+				<%--<td><%=formatter.format(dupReportDates.get(Integer.parseInt(tempId))) %></td>
+				<td><%=formatter.format(dupTimeReceived.get(Integer.parseInt(tempId))) %></td>--%>
 			    <td><input type="button" value="Open Report" onclick="window.open('?id=<%=tempId%>&segmentId=<%=tempId%>&providerNo=<%=request.getParameter("providerNo")%>&searchProviderNo=<%=request.getParameter("searchProviderNo")%>&status=<%=request.getParameter("status")%>&demoName=<%=StringEscapeUtils.escapeHtml(request.getParameter("demoName"))%>', null)" /> </td> 
 			</tr>
 			

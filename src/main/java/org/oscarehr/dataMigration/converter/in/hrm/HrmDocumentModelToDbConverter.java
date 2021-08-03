@@ -59,7 +59,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
 		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
 
-		hrmDocument.setReportFile(getReportFileName(input.getReportFile()));
+		hrmDocument.setReportFile(getReportFilePath(input.getReportFile()));
 		hrmDocument.setReportFileSchemaVersion(input.getReportFileSchemaVersion());
 
 		hrmDocument.setDocumentSubClassList(convertSubClassList(hrmDocument, input.getObservations()));
@@ -86,11 +86,11 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return hrmDocument;
 	}
 
-	protected String getReportFileName(GenericFile file)
+	protected String getReportFilePath(GenericFile file)
 	{
 		if(file != null)
 		{
-			return file.getName();
+			return file.getPath();
 		}
 		return null;
 	}

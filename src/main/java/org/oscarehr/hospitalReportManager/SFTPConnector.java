@@ -27,6 +27,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMapper;
+import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
@@ -38,6 +46,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import org.oscarehr.common.model.OscarMsgType;
 
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
 
@@ -592,39 +601,85 @@ public class SFTPConnector {
 			
 			logger.info("SFTPConnector, remoteDir:"+remoteDir);
 			
-			try {
-			
+			try
+			{
+				
 				String[] files = ls(remoteDir);
 				String[] paths = downloadDirectoryContents(remoteDir);
 				String[] localFilePaths = copyFilesToDocumentDir(loggedInInfo, paths);
 				
-				
-				if(doDecrypt()) {
+				if (doDecrypt())
+				{
 					paths = decryptFiles(localFilePaths);
-				} else {
+				}
+				else
+				{
 					paths = localFilePaths;
 				}
-		
+				
 				//delete all files from remote dir  // TODO CS: wtf
 				// deleteDirectoryContents(remoteDir, files);
-
 				
 				// paths = copyFilesToDocumentDir(loggedInInfo, paths);
-								
-				for (String filePath : paths) {
+				
+				for (String filePath : paths)
+				{
 					HRMReport report = HRMReportParser.parseReport(filePath, "4.3");
 					
-					if (report != null)
+					HRMReportImportMapper mapper = new HRMReportImportMapper();
+					HRMReportDemographicMapper demoMapper = new HRMReportDemographicMapper();
+					
+					try
 					{
-						// TODO: Move this functionality somewhere else
-						HRMReportParser.addReportToInbox(loggedInInfo, report);
+						HrmDocument model = mapper.importToJuno((HRMReport_4_3) report);
+						
+						// Rebind the document here...  Otherwise the path won't be correct
+						model.getDocument().setFile(FileFactory.getExistingFile(filePath));
+						
+						org.oscarehr.dataMigration.model.demographic.Demographic demographic = demoMapper.importToJuno((HRMReport_4_3) report);
+						
+						DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+						
+						DemographicCriteriaSearch criteria = new DemographicCriteriaSearch();
+						
+						if (demographic.getHealthNumber() != null)
+						{
+							criteria.setHin(demographic.getHealthNumber());
+						}
+						
+						if (demographic.getHealthNumberVersion() != null)
+						{
+							criteria.setHealthCardVersion(demographic.getHealthNumberVersion());
+						}
+						
+						if (demographic.getDateOfBirth() != null)
+						{
+							criteria.setDateOfBirth(demographic.getDateOfBirth());
+						}
+						
+						List<org.oscarehr.demographic.model.Demographic> demographics = demographicDao.criteriaSearch(criteria);
+						
+						org.oscarehr.demographic.model.Demographic demographicToLink = null;
+						if (demographics.size() == 1)
+						{
+							demographicToLink = demographics.get(0);
+						}
+						
+						HRMService hrmService = SpringUtils.getBean(HRMService.class);
+						
+						hrmService.uploadNewHRMDocument(model, demographicToLink);
+						
+						// doNotSentMsgForOuttage.clear();
+					}
+					catch (Exception e)
+					{
+						logger.error("Couldn't perform SFTP fetch for HRM", e);
 					}
 				}
-			
-
-				doNotSentMsgForOuttage.clear();
-			} catch (Exception e) {
-				logger.error("Couldn't perform SFTP fetch for HRM", e);
+			}
+			catch (Exception e)
+			{
+				logger.error("Something went wrong in the top level.");
 			}
 
 			SFTPConnector.isAutoFetchRunning = false;
