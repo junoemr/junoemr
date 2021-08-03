@@ -169,6 +169,7 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.onViewAllPatientMeasurements = (): void =>
 				{
+					ctrl.selectedCareTracker = null;
 					const state = $state.includes("**.careTracker") ? "^.measurements" : ".measurements";
 					$state.go(state,
 						{

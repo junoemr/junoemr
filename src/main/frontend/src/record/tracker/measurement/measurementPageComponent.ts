@@ -21,6 +21,8 @@
  * Canada
  */
 
+import MeasurementModel from "../../../lib/measurement/model/measurementModel";
+
 angular.module('Record.Tracker.Measurement').component('measurementPage',
 	{
 		templateUrl: 'src/record/tracker/measurement/measurementPage.jsp',
@@ -37,12 +39,33 @@ angular.module('Record.Tracker.Measurement').component('measurementPage',
 			{
 				const ctrl = this;
 				ctrl.measurements = [];
+				ctrl.measurementGroups = {}; //can't use map, not supported by ng-repeat
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.demographicNo = $stateParams.demographicNo;
 
 					ctrl.measurements = await measurementApiService.getDemographicMeasurements(ctrl.demographicNo);
+					ctrl.measurements.forEach((measurement: MeasurementModel) =>
+					{
+						const key = measurement.typeCode;
+						if(ctrl.measurementGroups[key])
+						{
+							const list = ctrl.measurementGroups[key];
+							list.push(measurement);
+							list.sort((itemA: MeasurementModel, itemB: MeasurementModel) =>
+							{
+								// newest items at beginning of the list
+								return itemB.observationDateTime.diff(itemA.observationDateTime);
+							});
+						}
+						else
+						{
+							const list = [];
+							list.push(measurement);
+							ctrl.measurementGroups[key] = list;
+						}
+					});
 				}
 			}]
 	});

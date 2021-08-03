@@ -41,9 +41,8 @@ export default class MeasurementTransferToModelConverter extends AbstractConvert
 		model.id = measurement.id;
 		model.typeCode = measurement.typeCode;
 		model.comment = measurement.comments;
-		// model.measurementUnit = measurement.measurementUnit;
-		model.measurementValue = measurement.measurementValue;
-		model.measuringInstruction = measurement.measuringInstruction;
+		model.value = measurement.measurementValue;
+		model.instruction = measurement.measuringInstruction;
 		model.createdDateTime = moment(measurement.createdDateTime);
 		model.observationDateTime = moment(measurement.observationDateTime);
 

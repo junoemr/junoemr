@@ -30,9 +30,9 @@ export default class MeasurementModel
 	private _id: number;
 	private _comment: string;
 	private _createdDateTime: Moment;
-	private _measurementUnit: string;
-	private _measurementValue: string;
-	private _measuringInstruction: string;
+	private _unit: string;
+	private _value: string;
+	private _instruction: string;
 	private _observationDateTime: Moment;
 	private _typeCode: string;
 
@@ -66,34 +66,34 @@ export default class MeasurementModel
 		this._createdDateTime = value;
 	}
 
-	get measurementUnit(): string
+	get unit(): string
 	{
-		return this._measurementUnit;
+		return this._unit;
 	}
 
-	set measurementUnit(value: string)
+	set unit(value: string)
 	{
-		this._measurementUnit = value;
+		this._unit = value;
 	}
 
-	get measurementValue(): string
+	get value(): string
 	{
-		return this._measurementValue;
+		return this._value;
 	}
 
-	set measurementValue(value: string)
+	set value(value: string)
 	{
-		this._measurementValue = value;
+		this._value = value;
 	}
 
-	get measuringInstruction(): string
+	get instruction(): string
 	{
-		return this._measuringInstruction;
+		return this._instruction;
 	}
 
-	set measuringInstruction(value: string)
+	set instruction(value: string)
 	{
-		this._measuringInstruction = value;
+		this._instruction = value;
 	}
 
 	get observationDateTime(): Moment

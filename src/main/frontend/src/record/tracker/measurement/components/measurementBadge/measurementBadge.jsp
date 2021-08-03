@@ -24,6 +24,6 @@
 	<div class="flex-column align-items-center"
 	     title="{{$ctrl.model.comment}}">
 		<span class="display-date">{{$ctrl.getDateForDisplay($ctrl.model.observationDateTime)}}</span>
-		<span class="display-value">{{$ctrl.model.typeCode}}</span>
+		<span class="display-value">{{$ctrl.model.value}}</span>
 	</div>
 </div>

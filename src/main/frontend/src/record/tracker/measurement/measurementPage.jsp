@@ -22,9 +22,13 @@
 --%>
 
 <div class="tracker-measurements">
-	<h1>Measurements display</h1>
+	<h5>Recorded Measurements</h5>
 
-	<div ng-repeat="measurement in $ctrl.measurements">
-		<measurement-badge model="measurement"></measurement-badge>
+	<div ng-repeat="(type, measurements) in $ctrl.measurementGroups"
+	     class="flex-column flex-wrap flex-grow flex-gap-4">
+		<h6>{{type}}</h6>
+		<div class="flex-row flex-wrap flex-grow flex-gap-4">
+			<measurement-badge ng-repeat="measurement in measurements" model="measurement"></measurement-badge>
+		</div>
 	</div>
 </div>
