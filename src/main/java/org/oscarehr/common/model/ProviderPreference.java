@@ -80,7 +80,8 @@ public class ProviderPreference extends AbstractModel<String> implements Seriali
 	public enum AppointmentReasonDisplayLevel
 	{
 		DEFAULT_ALL ("Show category and reason"),
-		REASON_ONLY ("Show reason only");
+		REASON_ONLY ("Show reason only"),
+		NONE ("Off");
 
 		private String label;
 

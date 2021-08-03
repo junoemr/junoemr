@@ -25,6 +25,7 @@ package org.oscarehr.appointment.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.oscarehr.common.dao.AppointmentArchiveDao;
 import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
@@ -72,6 +73,9 @@ public class Appointment
 {
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
+	
+	@Autowired
+	AppointmentArchiveDao appointmentArchiveDao;
 
 	@Autowired
 	ProviderDataDao providerDataDao;
@@ -309,14 +313,20 @@ public class Appointment
 	public org.oscarehr.common.model.Appointment updateAppointment(org.oscarehr.common.model.Appointment appointment,
 																LoggedInInfo loggedInInfo, HttpServletRequest request)
 	{
+		org.oscarehr.common.model.Appointment oldRecord = oscarAppointmentDao.find(appointment.getId());
+		
+		appointment.setCreator(oldRecord.getCreator());
+		appointment.setCreateDateTime(oldRecord.getCreateDateTime());
 		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		
+		appointmentArchiveDao.archiveAppointment(oldRecord);
 		oscarAppointmentDao.merge(appointment);
-
+		
 		if (appointment.getIsVirtual())
 		{
 			myHealthAccessService.queueAppointmentCacheUpdate(appointment);
 		}
-
+		
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
 						appointment.getDemographicNo(),
 						LogConst.ACTION_UPDATE,

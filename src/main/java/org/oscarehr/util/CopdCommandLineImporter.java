@@ -31,6 +31,7 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.dataMigration.service.CoPDMessageStream;
 import org.oscarehr.dataMigration.service.CoPDPreProcessorService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
@@ -94,17 +95,17 @@ public class CopdCommandLineImporter
 		}
 
 		String importSourceStr = args[4];
-		CoPDImportService.IMPORT_SOURCE importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
+		ImporterExporterFactory.IMPORT_SOURCE importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 
 		try
 		{
 			logger.info("Import source: " + importSourceStr);
-			importSource = CoPDImportService.IMPORT_SOURCE.valueOf(importSourceStr);
+			importSource = ImporterExporterFactory.IMPORT_SOURCE.valueOf(importSourceStr);
 		}
 		catch(IllegalArgumentException e)
 		{
 			logger.error("Unknown import source. Defaulting to UNKNOWN");
-			importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
+			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
@@ -208,7 +209,7 @@ public class CopdCommandLineImporter
 	}
 
 
-	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics)
+	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, ImporterExporterFactory.IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics)
 			throws Exception
 	{
 		boolean hasFailure = false;

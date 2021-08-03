@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.util.MiscUtils;
 
@@ -39,7 +39,7 @@ public class AllergyMapperMediplan extends AllergyMapper
 
 	public AllergyMapperMediplan(ZPD_ZTR message, int providerRep)
 	{
-		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDIPLAN);
+		super(message, providerRep, ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN);
 	}
 
 	@Override

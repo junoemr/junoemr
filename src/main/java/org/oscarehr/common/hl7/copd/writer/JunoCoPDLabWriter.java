@@ -38,7 +38,7 @@ import org.oscarehr.common.hl7.copd.mapper.MapperFactory;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 	private ORU_R01 oru_r01;
 
 	public JunoCoPDLabWriter(ZPD_ZTR message, String accessionNumber, String labDateString,
-							 List<ZPD_ZTR_LAB> zpdZtrLabList, CoPDImportService.IMPORT_SOURCE importSource) throws IOException, HL7Exception
+							 List<ZPD_ZTR_LAB> zpdZtrLabList, ImporterExporterFactory.IMPORT_SOURCE importSource) throws IOException, HL7Exception
 	{
 		super(new ORU_R01(), new PipeParser());
 		oru_r01 = (ORU_R01) this.message;
