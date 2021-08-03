@@ -159,11 +159,20 @@ angular.module('Record.Tracker').component('healthTracker',
 				{
 					ctrl.selectedCareTracker = careTracker;
 
-					const state = $state.includes("**.careTracker") ? "." : ".careTracker";
+					const state = $state.includes("**.careTracker") ? "." : $state.includes("**.measurements") ? "^.careTracker" : ".careTracker";
 					$state.go(state,
 						{
 							demographicNo: ctrl.demographicNo,
 							careTrackerId: careTracker.id,
+						});
+				}
+
+				ctrl.onViewAllPatientMeasurements = (): void =>
+				{
+					const state = $state.includes("**.careTracker") ? "^.measurements" : ".measurements";
+					$state.go(state,
+						{
+							demographicNo: ctrl.demographicNo,
 						});
 				}
 
