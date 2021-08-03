@@ -84,10 +84,13 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		}
 
 		// "dosage" in CDS == takemin/takemax
-		if (importStructure.getDosage() != null)
+		String[] dosageMinMax = getDosageMinMax(importStructure.getDosage());
+		if (dosageMinMax != null)
 		{
-			medication.setTakeMax(Float.parseFloat(importStructure.getDosage()));
-			medication.setTakeMin(Float.parseFloat(importStructure.getDosage()));
+			// This will throw an exception if the dosage string is in the forms "X-", "-Y" or "-" or,  if X or Y can't parse to floats
+			// Want this behaviour so that it will fail the patient in these cases, to bring attention to the invalid data
+			medication.setTakeMax(Float.parseFloat(dosageMinMax[0]));
+			medication.setTakeMin(Float.parseFloat(dosageMinMax[1]));
 		}
 
 		medication.setWrittenDate(getWrittenDate(importStructure));
@@ -300,6 +303,24 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		if(StringUtils.isNumeric(integerStr))
 		{
 			return Integer.parseInt(integerStr);
+		}
+		return null;
+	}
+
+	/**
+	 * Helper function to split CDS dosage into a 2 string element array
+	 * @param dosage
+	 * @return String Array containing the split dosage, or null
+	 */
+	protected String[] getDosageMinMax(String dosage)
+	{
+		if (dosage != null)
+		{
+			if (dosage.matches(".*-.*"))
+			{
+				return dosage.split("-");
+			}
+			return new String[] {dosage, dosage};
 		}
 		return null;
 	}
