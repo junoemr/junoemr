@@ -125,7 +125,7 @@ SELECT
     rules.id
 FROM care_tracker_item items
 JOIN care_tracker sheet ON items.care_tracker_id = sheet.id
-JOIN ds_rule rules ON rules.rule_name = "Is Checked" AND rules.system_managed IS TRUE
+JOIN ds_rule rules ON rules.rule_name = "Problem indicator checked" AND rules.system_managed IS TRUE
 WHERE sheet.care_tracker_name = "Asthma"
 AND sheet.system_managed IS TRUE
 AND items.item_type_code IN ("ALPA", "ASWA", "AELV")
@@ -140,7 +140,7 @@ SELECT
     rules.id
 FROM care_tracker_item items
 JOIN care_tracker sheet ON items.care_tracker_id = sheet.id
-JOIN ds_rule rules ON rules.rule_name = "Number Greater Than 4" AND rules.system_managed IS TRUE
+JOIN ds_rule rules ON rules.rule_name = "Warn: Number Greater Than 4" AND rules.system_managed IS TRUE
 WHERE sheet.care_tracker_name = "Asthma"
 AND sheet.system_managed IS TRUE
 AND items.item_type_code IN ("ANR", "ASYM")
@@ -155,7 +155,7 @@ SELECT
     rules.id
 FROM care_tracker_item items
 JOIN care_tracker sheet ON items.care_tracker_id = sheet.id
-JOIN ds_rule rules ON rules.rule_name = "Number Greater Than 0" AND rules.system_managed IS TRUE
+JOIN ds_rule rules ON rules.rule_name = "Warn: Number Greater Than 0" AND rules.system_managed IS TRUE
 WHERE sheet.care_tracker_name = "Asthma"
 AND sheet.system_managed IS TRUE
 AND items.item_type_code IN ("ANSY")
@@ -170,14 +170,14 @@ SELECT
     rules.id
 FROM care_tracker_item items
 JOIN care_tracker sheet ON items.care_tracker_id = sheet.id
-JOIN ds_rule rules ON rules.rule_name = "Never Entered" AND rules.system_managed IS TRUE
+JOIN ds_rule rules ON rules.rule_name = "Warn: Never Entered" AND rules.system_managed IS TRUE
 WHERE sheet.care_tracker_name = "Asthma"
 AND sheet.system_managed IS TRUE
 AND items.item_type_code IN ("SPIR")
 AND items.id NOT IN (
     SELECT care_tracker_item_id
     FROM care_tracker_item_ds_rule
-    JOIN ds_rule rules ON rules.rule_name = "Never Entered" AND rules.system_managed IS TRUE
+    JOIN ds_rule rules ON rules.rule_name = "Warn: Never Entered" AND rules.system_managed IS TRUE
 );
 
 INSERT INTO care_tracker_item_ds_rule(care_tracker_item_id, ds_rule_id)
@@ -186,14 +186,14 @@ SELECT
     rules.id
 FROM care_tracker_item items
 JOIN care_tracker sheet ON items.care_tracker_id = sheet.id
-JOIN ds_rule rules ON rules.rule_name = "Not Entered in Over 6 mo" AND rules.system_managed IS TRUE
+JOIN ds_rule rules ON rules.rule_name = "Warn: Over 6 months since last entry" AND rules.system_managed IS TRUE
 WHERE sheet.care_tracker_name = "Asthma"
 AND sheet.system_managed IS TRUE
 AND items.item_type_code IN ("SPIR")
 AND items.id NOT IN (
     SELECT care_tracker_item_id
     FROM care_tracker_item_ds_rule
-    JOIN ds_rule rules_inner ON rules_inner.rule_name = "Not Entered in Over 6 mo" AND rules_inner.system_managed IS TRUE
+    JOIN ds_rule rules_inner ON rules_inner.rule_name = "Warn: Over 6 months since last entry" AND rules_inner.system_managed IS TRUE
     WHERE rules_inner.id != rules.id
 );
 
