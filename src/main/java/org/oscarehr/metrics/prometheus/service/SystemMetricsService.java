@@ -24,6 +24,7 @@
 package org.oscarehr.metrics.prometheus.service;
 
 import io.prometheus.client.Histogram;
+import io.prometheus.client.Gauge;
 import org.springframework.stereotype.Service;
 
 @Service("SystemMetricsService")
@@ -33,8 +34,10 @@ public class SystemMetricsService
 	// Metrics
 	// ==========================================================================
 
-	static final Histogram apiRestRequestsLatency = Histogram.build().name("api_rest_request_latency").help("The average amount of time a REST API request takes").register();
-	static final Histogram apiSoapRequestsLatency = Histogram.build().name("api_soap_request_latency").help("The average amount of time a SOAP API request takes").register();
+	static final Histogram apiRestRequestsLatency = Histogram.build().name("api_rest_request_latency").help("The amount of time a REST API request takes").register();
+	static final Histogram apiSoapRequestsLatency = Histogram.build().name("api_soap_request_latency").help("The amount of time a SOAP API request takes").register();
+	static final Histogram rbtRequestLatency = Histogram.build().name("rbt_request_latency").help("The amount of time RBT queries take").register();
+	static final Gauge rbtCurrentRequests = Gauge.build().name("rbt_current_requests").help("The number of currently running RBT queries").register();
 
 	// ==========================================================================
 	// Public Methods
@@ -46,7 +49,8 @@ public class SystemMetricsService
 	 */
 	public void recordRestApiRequestLatency(long requestDurationMs)
 	{
-		synchronized (apiRestRequestsLatency) {
+		synchronized (apiRestRequestsLatency)
+		{
 			apiRestRequestsLatency.observe(requestDurationMs);
 		}
 	}
@@ -57,8 +61,44 @@ public class SystemMetricsService
 	 */
 	public void recordSoapApiRequestLatency(long requestDurationMs)
 	{
-		synchronized (apiSoapRequestsLatency) {
+		synchronized (apiSoapRequestsLatency)
+		{
 			apiSoapRequestsLatency.observe(requestDurationMs);
+		}
+	}
+
+	/**
+	 * record the latency (duration) of an RBT run.
+	 * @param rbtDurationMs - the duration of the RBT report.
+	 */
+	public void recordRbtRequestLatency(long rbtDurationMs)
+	{
+		synchronized (rbtRequestLatency)
+		{
+			rbtRequestLatency.observe(rbtDurationMs);
+		}
+	}
+
+	/**
+	 * increment the number of currently running RBTs.
+	 * Don't forget to call decrementCurrentRunningRbtCount() when the RBT is done.
+	 */
+	public void incrementCurrentRunningRbtCount()
+	{
+		synchronized (rbtCurrentRequests)
+		{
+			rbtCurrentRequests.inc();
+		}
+	}
+
+	/**
+	 * decrement the number of currently running RBTs.
+	 */
+	public void decrementCurrentRunningRbtCount()
+	{
+		synchronized (rbtCurrentRequests)
+		{
+			rbtCurrentRequests.dec();
 		}
 	}
 
