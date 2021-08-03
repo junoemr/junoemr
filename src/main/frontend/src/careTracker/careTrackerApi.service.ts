@@ -54,7 +54,7 @@ angular.module("CareTracker").service("careTrackerApiService", [
 		service.careTrackerTransferConverter = new CareTrackerModelToTransferConverter();
 		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
 		service.careTrackerItemDataTransferToModelConverter = new CareTrackerItemDataTransferToModelConverter();
-		service.careTrackerItemDataModelToTransferConverter = new CareTrackerItemDataModelToCreateTransferConverter();
+		service.careTrackerItemDataModelToCreateTransferConverter = new CareTrackerItemDataModelToCreateTransferConverter();
 
 		service.searchCareTrackers = async (
 			enabled: boolean,
@@ -120,7 +120,7 @@ angular.module("CareTracker").service("careTrackerApiService", [
 
 		service.addCareTrackerItemData = async (demographicId: number, careTrackerId: number, careTrackerItemId: number, data: CareTrackerItemDataModel): Promise<CareTrackerItemDataModel> =>
 		{
-			const transferOut = service.careTrackerItemDataModelToTransferConverter.convert(data);
+			const transferOut = service.careTrackerItemDataModelToCreateTransferConverter.convert(data);
 			const transferIn = (await service.demographicApi.addCareTrackerItemData(demographicId, careTrackerId, careTrackerItemId, transferOut)).data.body;
 			return service.careTrackerItemDataTransferToModelConverter.convert(transferIn);
 		}

@@ -24,6 +24,7 @@
 
 package oscar.oscarPrevention;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
@@ -108,10 +109,10 @@ public class PreventionData {
 					providerNo,
 					providerName,
 					preventionType,
-					refused.trim().equals("1"),
-					refused.trim().equals("2"),
+					String.valueOf(Prevention.REFUSED_STATUS_REFUSED).equals(StringUtils.trimToNull(refused)),
+					String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE).equals(StringUtils.trimToNull(refused)),
 					ConversionUtils.fromDateString(nextDate, ConversionUtils.DEFAULT_DATE_PATTERN),
-					neverWarn.trim().equals("1"),
+					String.valueOf(Prevention.NEVER_SEND_REMINDER).equals(StringUtils.trimToNull(neverWarn)),
 					extList);
 		}
 		catch(Exception e)
