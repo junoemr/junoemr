@@ -164,7 +164,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 		if(requestDateTime != null)
 		{
 			duration = new Date().getTime() - requestDateTime.getTime();
-			systemMetricsService.recordApiRequestLatency(duration);
+			systemMetricsService.recordRestApiRequestLatency(duration);
 		}
 		else
 		{

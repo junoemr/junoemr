@@ -33,20 +33,32 @@ public class SystemMetricsService
 	// Metrics
 	// ==========================================================================
 
-	static final Histogram apiRequestsLatency = Histogram.build().name("api_request_latency").help("The average amount of time an API request takes").register();
+	static final Histogram apiRestRequestsLatency = Histogram.build().name("api_rest_request_latency").help("The average amount of time a REST API request takes").register();
+	static final Histogram apiSoapRequestsLatency = Histogram.build().name("api_soap_request_latency").help("The average amount of time a SOAP API request takes").register();
 
 	// ==========================================================================
 	// Public Methods
 	// ==========================================================================
 
 	/**
-	 * record the latency (duration) of an api request.
+	 * record the latency (duration) of a REST api request.
 	 * @param requestDurationMs - the duration of the request in milliseconds.
 	 */
-	public void recordApiRequestLatency(long requestDurationMs)
+	public void recordRestApiRequestLatency(long requestDurationMs)
 	{
-		synchronized (apiRequestsLatency) {
-			apiRequestsLatency.observe(requestDurationMs);
+		synchronized (apiRestRequestsLatency) {
+			apiRestRequestsLatency.observe(requestDurationMs);
+		}
+	}
+
+	/**
+	 * record the latency (duration) of a SOAP api request.
+	 * @param requestDurationMs - the duration of the request in milliseconds.
+	 */
+	public void recordSoapApiRequestLatency(long requestDurationMs)
+	{
+		synchronized (apiSoapRequestsLatency) {
+			apiSoapRequestsLatency.observe(requestDurationMs);
 		}
 	}
 
