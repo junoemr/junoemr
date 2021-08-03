@@ -89,12 +89,11 @@ public class SQLReporter implements Reporter
 		String csv = "";
 		String nativeSQL = "";
 		ReportObject curReport = null;
+		Instant startTime = Instant.now();
 
 		try
 		{
 			systemMetricsService.incrementCurrentRunningRbtCount();
-
-			Instant startTime = Instant.now();
 			Integer templateId = Integer.parseInt(templateIdStr);
 			curReport = reportByTemplateService.getAsLegacyReport(templateId, true);
 			nativeSQL = reportByTemplateService.getTemplateSQL(templateId, request.getParameterMap());
@@ -154,8 +153,6 @@ public class SQLReporter implements Reporter
 			rs.last();
 			long rowCount = new Integer(rs.getRow()).longValue();
 			updateLog(logEntry, rowCount);
-
-			systemMetricsService.recordRbtRequestLatency(Duration.between(startTime, Instant.now()).toMillis());
 		}
 		// since users can write custom queries this error is expected and should not generate an error in the log
 		catch(ReportByTemplateException | SQLException | PersistenceException e)
@@ -170,6 +167,7 @@ public class SQLReporter implements Reporter
 		}
 		finally
 		{
+			systemMetricsService.recordRbtRequestLatency(Duration.between(startTime, Instant.now()).toMillis());
 			systemMetricsService.decrementCurrentRunningRbtCount();
 		}
 

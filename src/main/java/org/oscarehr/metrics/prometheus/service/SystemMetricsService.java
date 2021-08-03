@@ -37,7 +37,7 @@ public class SystemMetricsService
 	static final Histogram apiRestRequestsLatency = Histogram.build().name("api_rest_request_latency").help("The amount of time a REST API request takes").register();
 	static final Histogram apiSoapRequestsLatency = Histogram.build().name("api_soap_request_latency").help("The amount of time a SOAP API request takes").register();
 	static final Histogram rbtRequestLatency = Histogram.build().name("rbt_request_latency").help("The amount of time RBT queries take").register();
-	static final Gauge rbtCurrentRequests = Gauge.build().name("rbt_current_requests").help("The number of currently running RBT queries").register();
+	static final Gauge rbtCurrentRequest= Gauge.build().name("rbt_current_requests").help("The current number of running RBT requests").register();
 
 	// ==========================================================================
 	// Public Methods
@@ -80,25 +80,25 @@ public class SystemMetricsService
 	}
 
 	/**
-	 * increment the number of currently running RBTs.
-	 * Don't forget to call decrementCurrentRunningRbtCount() when the RBT is done.
+	 * increment the count of currently running Rbt reports.
+	 * Be sure to call decrementCurrentRunningRbtCount once the report complets.
 	 */
 	public void incrementCurrentRunningRbtCount()
 	{
-		synchronized (rbtCurrentRequests)
+		synchronized (rbtCurrentRequest)
 		{
-			rbtCurrentRequests.inc();
+			rbtCurrentRequest.inc();
 		}
 	}
 
 	/**
-	 * decrement the number of currently running RBTs.
+	 * decrement the count of currently running Rbt reports.
 	 */
 	public void decrementCurrentRunningRbtCount()
 	{
-		synchronized (rbtCurrentRequests)
+		synchronized (rbtCurrentRequest)
 		{
-			rbtCurrentRequests.dec();
+			rbtCurrentRequest.dec();
 		}
 	}
 
