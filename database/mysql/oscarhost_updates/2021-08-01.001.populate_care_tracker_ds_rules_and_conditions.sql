@@ -1,4 +1,3 @@
-START TRANSACTION;
 
 DROP PROCEDURE IF EXISTS addDsRule;
 DROP PROCEDURE IF EXISTS addDsRuleCondition;
@@ -79,6 +78,8 @@ BEGIN
 END //
 
 DELIMITER ;
+
+START TRANSACTION;
 
 -- ** time since last check rules **
 

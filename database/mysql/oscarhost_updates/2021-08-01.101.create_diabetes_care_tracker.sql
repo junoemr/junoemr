@@ -1,4 +1,3 @@
-START TRANSACTION;
 
 SET @care_tracker_name = "Diabetes";
 
@@ -7,6 +6,8 @@ SET @rule_name_3m_6m = "Note: 3-6 months since last entry";
 SET @rule_name_3m_plus = "Warn: Over 3 months since last entry";
 SET @rule_name_6m_plus = "Warn: Over 6 months since last entry";
 SET @rule_name_12m_plus = "Warn: Over 12 months since last entry";
+
+START TRANSACTION;
 
 CALL addCareTracker(@care_tracker_name, "Measurements for tracking Diabetes", TRUE);
 
