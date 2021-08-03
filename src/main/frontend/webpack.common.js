@@ -163,6 +163,7 @@ module.exports = {
 			'./src/common/services/globalStateService.js',
 			'./src/common/services/inboxService.js',
 			'./src/common/services/k2aService.js',
+			'./src/common/services/measurementApi.service.ts',
 			'./src/common/services/messageService.js',
 			'./src/common/services/mhaService.js',
 			'./src/common/services/noteService.js',
@@ -380,6 +381,7 @@ module.exports = {
 			'./src/record/tracker/careTracker/components/careTrackerItemGraphModal/careTrackerItemGraphModalComponent.ts',
 			'./src/record/tracker/measurement/module.js',
 			'./src/record/tracker/measurement/measurementPageComponent.ts',
+			'./src/record/tracker/measurement/components/measurementBadge/measurementBadgeComponent.ts',
 
 			'./src/tickler/module.js',
 			'./src/tickler/ticklerListController.js',

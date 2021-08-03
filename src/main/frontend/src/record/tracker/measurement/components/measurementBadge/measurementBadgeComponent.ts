@@ -21,28 +21,38 @@
  * Canada
  */
 
-angular.module('Record.Tracker.Measurement').component('measurementPage',
+
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../../../../common/security/securityConstants";
+
+angular.module('Record.Tracker.Measurement').component('measurementBadge',
 	{
-		templateUrl: 'src/record/tracker/measurement/measurementPage.jsp',
+		templateUrl: 'src/record/tracker/measurement/components/measurementBadge/measurementBadge.jsp',
 		bindings: {
 			componentStyle: "<?",
+			model: "<",
 		},
 		controller: [
-			'$stateParams',
-			'measurementApiService',
 			function (
-				$stateParams,
-				measurementApiService,
 			)
 			{
 				const ctrl = this;
-				ctrl.measurements = [];
 
-				ctrl.$onInit = async (): Promise<void> =>
+				ctrl.SecurityPermissions = SecurityPermissions;
+				ctrl.LABEL_POSITION = LABEL_POSITION;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
+				ctrl.validationAlerts = [];
+
+				ctrl.$onInit = async () =>
 				{
-					ctrl.demographicNo = $stateParams.demographicNo;
+					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				}
 
-					ctrl.measurements = await measurementApiService.getDemographicMeasurements(ctrl.demographicNo);
+				ctrl.getDateForDisplay = (dateTime) =>
+				{
+					return Juno.Common.Util.formatDate(dateTime) + ' ' + Juno.Common.Util.formatTime(dateTime);
 				}
 			}]
 	});

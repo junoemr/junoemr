@@ -60,17 +60,17 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.accordianListItems = [
 					{
-						name: "Standard careTrackers",
+						name: "Standard care trackers",
 						expanded: false,
 						items: [], // will be the list of clinic careTrackers
 					},
 					{
-						name: "My careTrackers",
+						name: "My care trackers",
 						expanded: false,
 						items: [], // will be the list of provider careTrackers
 					},
 					{
-						name: "Patient careTrackers",
+						name: "Patient care trackers",
 						expanded: false,
 						items: [], // will be the list of demographic careTrackers
 					}

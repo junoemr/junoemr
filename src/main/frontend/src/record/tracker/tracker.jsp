@@ -34,7 +34,7 @@
                              click="$ctrl.onManageCareTrackers()">
                     <div class="flex-row align-items-center">
                         <i class="icon icon-gears"></i>
-                        <span>Manage CareTrackers</span>
+                        <span>Manage Health Tracker</span>
                     </div>
                 </juno-button>
             </div>
