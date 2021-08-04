@@ -129,7 +129,7 @@ public class SystemMetricsService
 	{
 		synchronized (rbtRequestLatency)
 		{
-			rbtRequestLatency.observe(rbtDurationMs);
+			rbeRequestLatency.observe(rbtDurationMs);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class SystemMetricsService
 	{
 		synchronized (rbtCurrentRequest)
 		{
-			rbtCurrentRequest.inc();
+			rbeCurrentRequest.inc();
 		}
 	}
 
@@ -152,7 +152,7 @@ public class SystemMetricsService
 	{
 		synchronized (rbtCurrentRequest)
 		{
-			rbtCurrentRequest.dec();
+			rbeCurrentRequest.dec();
 		}
 	}
 
