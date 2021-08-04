@@ -103,6 +103,11 @@ CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 12 months")
 CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "12");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Last check was over 12 months ago");
 
+SET @rule_name = "Warn: Over 24 months since last entry";
+CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 24 months");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "24");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Last check was over 24 months ago");
+
 SET @rule_name = "Note: 3-6 months since last entry";
 CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 3 months");
 CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "3");
@@ -139,6 +144,11 @@ CALL addDsRule(@rule_name, "Any numeric value greater than 2");
 CALL addDsRuleCondition(@rule_name, "VALUE_GT", "2");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 2");
 
+SET @rule_name = "Warn: Number Greater Than 3.5";
+CALL addDsRule(@rule_name, "Any numeric value greater than 3.5");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "3.5");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 3.5");
+
 SET @rule_name = "Warn: Number Greater Than 4";
 CALL addDsRule(@rule_name, "Any numeric value greater than 4");
 CALL addDsRuleCondition(@rule_name, "VALUE_GT", "4");
@@ -153,6 +163,11 @@ SET @rule_name = "Warn: Number Less Than 5";
 CALL addDsRule(@rule_name, "Any numeric value less than 5");
 CALL addDsRuleCondition(@rule_name, "VALUE_LT", "5");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be under 5");
+
+SET @rule_name = "Warn: Number Greater Than 6";
+CALL addDsRule(@rule_name, "Any numeric value greater than 6");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "6");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Measurement value recorded to be over 6");
 
 SET @rule_name = "Warn: Number Greater Than 7";
 CALL addDsRule(@rule_name, "Any numeric value greater than 7");
