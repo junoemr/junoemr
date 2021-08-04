@@ -4,11 +4,7 @@ SET @creatorId = "-1"; -- system provider id
 
 SET @rule_name_never_entered = "Warn: Never Entered";
 SET @rule_name_6m_plus = "Warn: Over 6 months since last entry";
-# SET @rule_name_12m_plus = "Warn: Over 12 months since last entry";
-# SET @rule_name_3m_6m = "Note: 3-6 months since last entry";
-# SET @rule_name_10m_12m = "Note: 10-12 months since last entry";
 SET @rule_name_value_over_0 = "Warn: Number Greater Than 0";
-# SET @rule_name_value_over_2 = "Warn: Number Greater Than 2";
 SET @rule_name_value_over_4 = "Warn: Number Greater Than 4";
 SET @rule_name_problem_indicator_checked = "Problem indicator checked";
 
