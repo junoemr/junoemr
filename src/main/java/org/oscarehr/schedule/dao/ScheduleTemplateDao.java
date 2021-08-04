@@ -210,10 +210,10 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			sql = "SELECT STRAIGHT_JOIN\n";
 		}
 
-		sql +=  "  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
-				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
+		sql +=  "  seq AS position, \n" +
+				"  SUBSTRING(st.timecode, seq, 1) AS code_char,\n" +
 				"  sd.sdate AS appt_date,\n" +
-				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
+				"  SEC_TO_TIME(ROUND((24*60*60) * (seq + 1)/LENGTH(st.timecode))) AS appt_time,\n" +
 				"  stc.code,\n" +
 				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
 				"  stc.description,\n" +
@@ -221,23 +221,18 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  stc.juno_color,\n" +
 				"  stc.confirm,\n" +
 				"  stc.bookinglimit\n" +
-				"FROM \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n1    \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n2     \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
-				"CROSS JOIN scheduledate sd\n" +
+				"FROM scheduledate sd\n" +
 				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
+				"CROSS JOIN seq_1_to_299 seq_no \n" +
 				"LEFT JOIN scheduletemplatecode stc " +
-				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
+				"  ON BINARY stc.code = SUBSTRING(st.timecode, seq, 1)\n" +
 				"WHERE sd.status = 'A'\n" +
 				"AND sd.available = :available\n" +
 				"AND sd.sdate = :date\n" +
 				siteFilter +
 				"AND sd.provider_no = :providerNo\n" +
-				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
-				"ORDER BY (n3.i + (10 * n2.i) + (100 * n1.i));";
+				"AND seq <= LENGTH(st.timecode)\n" +
+				"ORDER BY seq;";
 
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
