@@ -34,13 +34,24 @@ public class SystemMetricsService
 	// Metrics
 	// ==========================================================================
 
+	// ========= API =========
 	static final Histogram apiRestRequestsLatency = Histogram.build().name("api_rest_request_latency").help("The amount of time a REST API request takes").register();
 	static final Histogram apiSoapRequestsLatency = Histogram.build().name("api_soap_request_latency").help("The amount of time a SOAP API request takes").register();
+
+	// ========= RBT ========
 	static final Histogram rbtRequestLatency = Histogram.build().name("rbt_request_latency").help("The amount of time RBT queries take").register();
-	static final Gauge rbtCurrentRequest= Gauge.build().name("rbt_current_requests").help("The current number of running RBT requests").register();
+	static final Gauge rbtCurrentRequest = Gauge.build().name("rbt_current_requests").help("The current number of running RBT requests").register();
+
+	// ========= RBE ========
+	static final Histogram rbeRequestLatency = Histogram.build().name("rbe_request_latency").help("The amount of time RBE queries take").register();
+	static final Gauge rbeCurrentRequest = Gauge.build().name("rbe_current_requests").help("The current number of running RBE requests").register();
 
 	// ==========================================================================
 	// Public Methods
+	// ==========================================================================
+
+	// ==========================================================================
+	// API Metrics
 	// ==========================================================================
 
 	/**
@@ -67,6 +78,10 @@ public class SystemMetricsService
 		}
 	}
 
+	// ==========================================================================
+	// RBT Metrics
+	// ==========================================================================
+
 	/**
 	 * record the latency (duration) of an RBT run.
 	 * @param rbtDurationMs - the duration of the RBT report.
@@ -80,8 +95,8 @@ public class SystemMetricsService
 	}
 
 	/**
-	 * increment the count of currently running Rbt reports.
-	 * Be sure to call decrementCurrentRunningRbtCount once the report complets.
+	 * increment the count of currently running RBT reports.
+	 * Be sure to call decrementCurrentRunningRbtCount once the report completes.
 	 */
 	public void incrementCurrentRunningRbtCount()
 	{
@@ -92,9 +107,48 @@ public class SystemMetricsService
 	}
 
 	/**
-	 * decrement the count of currently running Rbt reports.
+	 * decrement the count of currently running RBT reports.
 	 */
 	public void decrementCurrentRunningRbtCount()
+	{
+		synchronized (rbtCurrentRequest)
+		{
+			rbtCurrentRequest.dec();
+		}
+	}
+
+	// ==========================================================================
+	// RBE Metrics (Report By Example)
+	// ==========================================================================
+
+	/**
+	 * record the latency (duration) of an RBE run.
+	 * @param rbtDurationMs - the duration of the RBE report.
+	 */
+	public void recordRbeRequestLatency(long rbtDurationMs)
+	{
+		synchronized (rbtRequestLatency)
+		{
+			rbtRequestLatency.observe(rbtDurationMs);
+		}
+	}
+
+	/**
+	 * increment the count of currently running RBE reports.
+	 * Be sure to call decrementCurrentRunningRbtCount once the report completes.
+	 */
+	public void incrementCurrentRunningRbeCount()
+	{
+		synchronized (rbtCurrentRequest)
+		{
+			rbtCurrentRequest.inc();
+		}
+	}
+
+	/**
+	 * decrement the count of currently running RBE reports.
+	 */
+	public void decrementCurrentRunningRbeCount()
 	{
 		synchronized (rbtCurrentRequest)
 		{
