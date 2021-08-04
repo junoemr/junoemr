@@ -1,5 +1,6 @@
 
 SET @care_tracker_name = "Chronic Obstructive Pulmonary";
+SET @creatorId = "-1"; -- system provider id
 
 SET @rule_name_never_entered = "Warn: Never Entered";
 SET @rule_name_6m_plus = "Warn: Over 6 months since last entry";

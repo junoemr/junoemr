@@ -1,5 +1,6 @@
 
 SET @care_tracker_name = "Diabetes";
+SET @creatorId = "-1"; -- system provider id
 
 SET @rule_name_never_entered = "Warn: Never Entered";
 SET @rule_name_3m_6m = "Note: 3-6 months since last entry";

@@ -109,6 +109,12 @@ CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "3");
 CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_LT", "6");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "RECOMMENDATION", "Last check was over 3 months ago");
 
+SET @rule_name = "Note: 10-12 months since last entry";
+CALL addDsRule(@rule_name, "Measurement hasn't been recorded in over 10 months");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_GT", "10");
+CALL addDsRuleCondition(@rule_name, "MONTHS_SINCE_LT", "12");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "RECOMMENDATION", "Last check was over 10 months ago");
+
 -- ** patient data based rules **
 
 SET @rule_name = "Visible for Female Patients Only";
@@ -213,5 +219,27 @@ CALL addDsRule(@rule_name, "Indicates an abnormally high female Alb creat ratio 
 CALL addDsRuleCondition(@rule_name, "VALUE_GT", "2.8");
 CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "F");
 CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Alb creat ratio is high (over 2.8)");
+
+SET @rule_name = "SCR high indicator (male)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high male Serum Creatinine value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "110");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "M");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Serum Creatinine is high (over 110)");
+SET @rule_name = "SCR high indicator (female)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high female Serum Creatinine value");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "90");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "F");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "Serum Creatinine is high (over 90)");
+
+SET @rule_name = "DRPW high indicator (male)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high number of drinks per week (male)");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "14");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "M");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "high number of drinks per week (over 14)");
+SET @rule_name = "DRPW high indicator (female)";
+CALL addDsRule(@rule_name, "Indicates an abnormally high number of drinks per week (female)");
+CALL addDsRuleCondition(@rule_name, "VALUE_GT", "8");
+CALL addDsRuleCondition(@rule_name, "PATIENT_GENDER_EQ", "F");
+CALL addDsRuleConsequence(@rule_name, "ALERT", "WARNING", "high number of drinks per week (over 8)");
 
 COMMIT;
