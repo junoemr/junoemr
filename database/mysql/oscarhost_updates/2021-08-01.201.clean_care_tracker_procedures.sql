@@ -7,7 +7,7 @@ DROP PROCEDURE IF EXISTS addDsRuleConsequence;
 DROP PROCEDURE IF EXISTS addCareTracker;
 DROP PROCEDURE IF EXISTS addCareTrackerDrools;
 DROP PROCEDURE IF EXISTS addCareTrackerIcd9Trigger;
-DROP PROCEDURE IF EXISTS careTrackerAddItemGroupProcedure;
-DROP PROCEDURE IF EXISTS careTrackerAddItemProcedure;
+DROP PROCEDURE IF EXISTS addCareTrackerItemGroup;
+DROP PROCEDURE IF EXISTS addCareTrackerItem;
 DROP PROCEDURE IF EXISTS addCareTrackerItemRule;
 

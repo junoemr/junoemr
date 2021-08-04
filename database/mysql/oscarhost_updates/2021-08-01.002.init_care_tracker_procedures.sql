@@ -2,8 +2,8 @@
 DROP PROCEDURE IF EXISTS addCareTracker;
 DROP PROCEDURE IF EXISTS addCareTrackerDrools;
 DROP PROCEDURE IF EXISTS addCareTrackerIcd9Trigger;
-DROP PROCEDURE IF EXISTS careTrackerAddItemGroupProcedure;
-DROP PROCEDURE IF EXISTS careTrackerAddItemProcedure;
+DROP PROCEDURE IF EXISTS addCareTrackerItemGroup;
+DROP PROCEDURE IF EXISTS addCareTrackerItem;
 DROP PROCEDURE IF EXISTS addCareTrackerItemRule;
 
 SET @creatorId = "-1"; -- system provider id
@@ -84,7 +84,7 @@ BEGIN
 END //
 
 
-CREATE PROCEDURE careTrackerAddItemGroupProcedure(
+CREATE PROCEDURE addCareTrackerItemGroup(
     IN in_care_tracker_name varchar(255), IN in_group_name varchar(255), IN in_description text)
     SQL SECURITY INVOKER
 BEGIN
@@ -104,8 +104,8 @@ BEGIN
 END //
 
 
-CREATE PROCEDURE careTrackerAddItemProcedure(
-    IN in_group_name varchar(255), IN in_item_type varchar(255), IN in_item_code varchar(255), IN in_value_type varchar(255), IN in_value_label varchar(255), IN in_graphable tinyint(1), IN in_guideline text)
+CREATE PROCEDURE addCareTrackerItem(
+    IN in_care_tracker_name varchar(255), IN in_group_name varchar(255), IN in_item_type varchar(255), IN in_item_code varchar(255), IN in_value_type varchar(255), IN in_value_label varchar(255), IN in_graphable tinyint(1), IN in_guideline text)
     SQL SECURITY INVOKER
 BEGIN
     IF in_item_type = 'PREVENTION' THEN
@@ -126,8 +126,9 @@ BEGIN
             NOW() AS updated_at,
             @creatorId AS updated_by
         FROM care_tracker sheet
-                 JOIN care_tracker_item_group item_group ON sheet.id = item_group.care_tracker_id
-        WHERE item_group.group_name = in_group_name
+         JOIN care_tracker_item_group item_group ON sheet.id = item_group.care_tracker_id
+        WHERE sheet.care_tracker_name = in_care_tracker_name
+          AND item_group.group_name = in_group_name
           AND in_item_code NOT IN (
             SELECT item_type_code
             FROM care_tracker_item
@@ -153,8 +154,9 @@ BEGIN
         FROM care_tracker sheet
                  JOIN care_tracker_item_group item_group ON sheet.id = item_group.care_tracker_id
                  JOIN measurementType type
-        WHERE type.type IN (in_item_code)
+        WHERE sheet.care_tracker_name = in_care_tracker_name
           AND item_group.group_name = in_group_name
+          AND type.type IN (in_item_code)
           AND type.type NOT IN (
             SELECT item_type_code
             FROM care_tracker_item
