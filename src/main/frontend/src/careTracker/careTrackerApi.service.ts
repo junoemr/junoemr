@@ -47,7 +47,6 @@ angular.module("CareTracker").service("careTrackerApiService", [
 		service.careTrackersApi = new CareTrackersApi($http, $httpParamSerializer, '../ws/rs');
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 		service.preventionsApi = new PreventionsApi($http, $httpParamSerializer, '../ws/rs');
-		service.measurementsApi = new MeasurementsApi($http, $httpParamSerializer, '../ws/rs');
 		service.diseaseRegistryApi = new DiseaseRegistryApi($http, $httpParamSerializer, '../ws/rs');
 
 		service.careTrackerModelConverter = new CareTrackerTransferToModelConverter();
@@ -101,11 +100,6 @@ angular.module("CareTracker").service("careTrackerApiService", [
 		service.searchPreventionTypes = async (keyword: string): Promise<object[]> =>
 		{
 			return (await service.preventionsApi.searchPreventionTypes(keyword)).data;
-		}
-
-		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<object[]> =>
-		{
-			return (await service.measurementsApi.searchMeasurementTypes(keyword, page, perPage)).data;
 		}
 
 		service.searchDxCodes = async (codingSystem: DxCodingSystem, keyword: string, page?: number, perPage?: number): Promise<DxCodeModel[]> =>

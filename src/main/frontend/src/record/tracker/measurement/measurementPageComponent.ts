@@ -38,17 +38,17 @@ angular.module('Record.Tracker.Measurement').component('measurementPage',
 			)
 			{
 				const ctrl = this;
-				ctrl.measurements = [];
-				ctrl.measurementGroups = {}; //can't use map, not supported by ng-repeat
+				ctrl.measurements = [] as MeasurementModel[];
+				ctrl.measurementGroups = {} as object; //can't use map, not supported by ng-repeat
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
-					ctrl.demographicNo = $stateParams.demographicNo;
+					ctrl.demographicNo = $stateParams.demographicNo as number;
 
 					ctrl.measurements = await measurementApiService.getDemographicMeasurements(ctrl.demographicNo);
 					ctrl.measurements.forEach((measurement: MeasurementModel) =>
 					{
-						const key = measurement.typeCode;
+						const key: string = measurement.typeCode;
 						if(ctrl.measurementGroups[key])
 						{
 							const list = ctrl.measurementGroups[key];

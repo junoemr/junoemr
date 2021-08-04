@@ -26,6 +26,9 @@
 import {DemographicApi, MeasurementsApi} from "../../../generated";
 import MeasurementModel from "../../lib/measurement/model/measurementModel";
 import MeasurementTransferToModelConverter from "../../lib/measurement/converter/MeasurementTransferToModelConverter";
+import PagedResponse from "../../lib/common/response/pagedRespose";
+import MeasurementTypeModel from "../../lib/measurement/model/measurementTypeModel";
+import MeasurementTypeTransferToModelConverter from "../../lib/measurement/converter/MeasurementTypeTransferToModelConverter";
 
 angular.module("Common.Services").service("measurementApiService", [
 	'$http',
@@ -39,10 +42,12 @@ angular.module("Common.Services").service("measurementApiService", [
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 
 		service.measurementTransferToModelConverter = new MeasurementTransferToModelConverter();
+		service.measurementTypeTransferToModelConverter = new MeasurementTypeTransferToModelConverter();
 
-		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<object[]> =>
+		service.searchMeasurementTypes = async (keyword: string, page?: number, perPage?: number): Promise<PagedResponse<MeasurementTypeModel>> =>
 		{
-			return (await service.measurementsApi.searchMeasurementTypes(keyword, page, perPage)).data;
+			const transfer = (await service.measurementsApi.searchMeasurementTypes(keyword, page, perPage)).data;
+			return new PagedResponse<MeasurementTypeModel>(service.measurementTypeTransferToModelConverter.convertList(transfer.body), transfer.headers);
 		}
 
 		service.getDemographicMeasurements = async (demographicId: number): Promise<MeasurementModel[]> =>
