@@ -3,6 +3,7 @@ import {
     JUNO_BUTTON_COLOR_PATTERN,
     LABEL_POSITION,
 } from "../../../../common/components/junoComponentConstants";
+import {DemographicApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('demographicContactsModal', {
     templateUrl: 'src/record/details/components/demographicContactsModal/demographicContactsModal.jsp',
@@ -13,16 +14,25 @@ angular.module('Record.Details').component('demographicContactsModal', {
         componentStyle: "<",
     },
     controller: [
+        "$scope",
+        "$http",
+        "$httpParamSerializer",
+        "$uibModal",
         "$state",
         "uxService",
         "demographicService",
         function (
+            $scope,
+            $http,
+            $httpParamSerializer,
+            $uibModal,
             $state,
             uxService,
             demographicService,
         )
         {
             const ctrl = this;
+            const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
             const EDIT_TITLE = "Edit contact";
             const NO_EDIT_TITLE = "Editing is currently only available for internal contacts";
 
@@ -50,6 +60,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
 
             ctrl.$onInit = () =>
             {
+                ctrl.dataChanged = false;
                 ctrl.contact = ctrl.resolve.demoContact;
                 ctrl.demographic = ctrl.resolve.demographic;
                 ctrl.editable = false;
@@ -94,25 +105,25 @@ angular.module('Record.Details').component('demographicContactsModal', {
             ctrl.externalContactEdit = function externalContactsEdit()
             {
                 ctrl.editable = true;
+                ctrl.dataChanged = false;
             };
 
             ctrl.save = function save()
             {
-                ctrl.contact.firstName = ctrl.contact.firstName;
+                ctrl.saving = true;
 
-			demographicService.updateExternalContact(ctrl.contact, ctrl.demographic).then(
-				function success()
-				{
-				    console.log("success");
-				    ctrl.modalInstance.close();
-				},
-				function error()
-				{
-					Juno.Common.Util.alert("Unable to save contacts", error);
-				}
-			);
-
+                demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact).then(
+                    (data) => {
+                        console.log(data);
+                        ctrl.onCancel();
+                    });
             }
+
+            ctrl.resetEditState = function resetEditState()
+		{
+			ctrl.saving = false;
+			ctrl.dataChanged = false;
+		};
 
             ctrl.getTabs = function getTabs(contactId)
             {
@@ -147,5 +158,19 @@ angular.module('Record.Details').component('demographicContactsModal', {
                     }
                 }
             };
+
+		//monitor data changed
+		$scope.$watch(function()
+		{
+			return ctrl.contact;
+		}, function(newValue, oldValue)
+		{
+			if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
+			{
+				ctrl.dataChanged = true;
+				console.log(ctrl.dataChanged);
+			}
+
+		}, true);
         }]
 });

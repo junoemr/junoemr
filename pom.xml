@@ -1874,6 +1874,7 @@
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
+								org.oscarehr.ws.rest.demographic.DemographicContactWebService
 								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DocumentWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService

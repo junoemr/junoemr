@@ -41,15 +41,22 @@ public class ContactDao extends AbstractDao<Contact> {
 		super(Contact.class);
 	}
 
-	/*public List<Contact> find(int contactId) {
-		String sql = "select x from " + this.modelClass.getName() + " x.id = ?1 and x.deleted=false";
+	public Contact findActiveContactById(int contactId) {
+		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?1 and x.deleted=false";
 		Query query = entityManager.createQuery(sql);
-		//query.setParameter(1, demographicNo);
 		query.setParameter(1, contactId);
+
 		@SuppressWarnings("unchecked")
+		Contact result = null;
 		List<Contact> dContacts = query.getResultList();
-		return dContacts;
-	}*/
+
+		if (!dContacts.isEmpty())
+		{
+			result = dContacts.get(0);
+		}
+
+		return result;
+	}
 	
 	public List<Contact> search(String searchMode, String orderBy, String keyword) {
 		StringBuilder where = new StringBuilder();

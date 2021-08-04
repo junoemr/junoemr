@@ -316,18 +316,52 @@ public class DemographicManager {
 		return demographicContactDao.findByDemographicNoAndType(demographicNo, type);
 	}
 
-	public Contact updateExternalPersonalContact(Contact contact)
+	public Contact updateExternalContact(LoggedInInfo loggedInInfo, Contact contact, String oldContactId)
 	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+
+		Contact oldContact = contactDao.find(Integer.parseInt(oldContactId));
+		oldContact.setDeleted(true);
+		contactDao.merge(oldContact);
+
 		Contact revised = (Contact) contactDao.merge(contact);
 		return revised;
 	}
 
-	public DemographicContact updateExternalPersonalDemographicContact(LoggedInInfo loggedInInfo, DemographicContact contact)
+	public List<DemographicContact> updateExternalDemographicContact(LoggedInInfo loggedInInfo,
+															   Integer demographicId,
+															   DemographicContact contact,
+															   String oldContactId,
+															   String newContactId)
 	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+
+		//set all old DemographicContacts to deleted
+		List<DemographicContact> oldDemographicContact = demographicContactDao.findAllByContactIdAndCategoryAndType(Integer.parseInt(oldContactId), "personal", 2);
+		//List<DemographicContact> oldDemographicContact = demographicContactDao.find(demographicId, Integer.parseInt(oldContactId));
+		List<DemographicContact> revisedList = new ArrayList<DemographicContact>();
+		for (DemographicContact demographicContact : oldDemographicContact)
+		{
+			//demographicContact.setDeleted(true);
+			demographicContact.setContactId(newContactId);
+			//demographicContactDao.merge(demographicContact);
+			//demographicContact.setCreator(loggedInInfo.getLoggedInProviderNo());
+			DemographicContact rev = (DemographicContact) demographicContactDao.merge(contact);
+			revisedList.add(rev);
+		}
+
+		//update the DemographicContact for the requested demographic
+		contact.setContactId(newContactId);
 		contact.setCreator(loggedInInfo.getLoggedInProviderNo());
+		contact.setDemographicNo(demographicId);
 		DemographicContact revised = (DemographicContact) demographicContactDao.merge(contact);
-		return revised;
+		revisedList.add(revised);
+
+		//update any other DemographicContact linked to the same contact
+		return revisedList;
 	}
+
+
 
 	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider) {
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);

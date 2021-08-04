@@ -62,24 +62,6 @@ angular.module("Common.Services").service("demographicService", [
             return deferred.promise;
         };
 
-        service.updateExternalContact = function updateExternalContact(externalContact, demographicNo)
-        {
-            var deferred = $q.defer();
-
-            junoHttp.put(service.apiPath + '/' + encodeURIComponent(demographicNo), externalContact).then(
-			    function success(results)
-			    {
-				    deferred.resolve(results.data);
-			    },
-			    function error(errors)
-			    {
-				    console.log("demographicServices::updateExternalContacts error", errors);
-				    deferred.reject("An error occurred while updating external contacts");
-			    });
-
-		    return deferred.promise;
-        };
-
 	    service.getDemographicContacts = function getDemographicContacts(demographicNo,contactCategory)
 	    {
 		    var deferred = $q.defer();

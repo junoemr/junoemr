@@ -194,6 +194,7 @@
 			<juno-button
 					click="$ctrl.save()"
 					ng-if="$ctrl.editable"
+					disabled="!$ctrl.dataChanged"
 					button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 				Save

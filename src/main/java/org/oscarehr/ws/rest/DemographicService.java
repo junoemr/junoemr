@@ -275,47 +275,6 @@ public class DemographicService extends AbstractServiceImpl {
 		return RestResponse.errorResponse("Error");
 	}
 
-	@PUT
-	@Path("/{demographicNo}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	//change to return DemographicContactFewTo1
-	public DemographicContact updateExternalContact(DemographicContactFewTo1 demographicContactFewTo1, @PathParam("demographicNo") Integer demographicNo)
-	{
-		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		//set old contact to deleted
-		Contact oldContact = contactDao.find(Integer.parseInt(demographicContactFewTo1.getContactId()));
-		oldContact.setDeleted(true);
-		demographicManager.updateExternalPersonalContact(oldContact);
-
-		// where to put record of old contact version?
-
-		// convert and persist editted Contact
-		org.oscarehr.common.model.Contact domainContact = demographicContactToDomainConverter.convert(demographicContactFewTo1);
-		Contact updatedContact = demographicManager.updateExternalPersonalContact(domainContact);
-		//DemographicContactFewTo1 demoContactTo1 = new DemographicContactFewT * fromo1();
-
-		// convert and persist DemographicContact
-		List<DemographicContact> oldDemoContact = demographicContactDao.find(demographicNo, Integer.parseInt(demographicContactFewTo1.getContactId()));
-		for (DemographicContact contact : oldDemoContact)
-		{
-			contact.setDeleted(true);
-			demographicManager.updateExternalPersonalDemographicContact(loggedInInfo, contact);
-		}
-
-		org.oscarehr.common.model.DemographicContact domainDemoContact = demoContactToDomainConverter.convert(demographicContactFewTo1);
-		domainDemoContact.setContactId(String.valueOf(updatedContact.getId()));
-		domainDemoContact.setDemographicNo(demographicNo);
-		DemographicContact updatedDemoContact = demographicManager.updateExternalPersonalDemographicContact(loggedInInfo, domainDemoContact);
-
-
-		// return updated DemographicContactFewTo1
-		DemographicContact demoContact = new DemographicContact();
-		demoContactFewConverter.getAsTransferObject(demoContact, updatedContact);
-
-		return demoContact;
-	}
-
 	@GET
 	@Path("/{dataId}/contacts")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -364,10 +323,16 @@ public class DemographicService extends AbstractServiceImpl {
 					}
 					else if (demoContact.getType() == DemographicContact.TYPE_CONTACT)
 					{
-						Contact contactC = contactDao.find(contactId);
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactC);
+						Contact contactC = contactDao.findActiveContactById(contactId);
+						if (contactC != null)
+						{
+							demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactC);
+						}
 					}
-					results.add(demoContactTo1);
+					if(demoContactTo1.getContactId() != null)
+					{
+						results.add(demoContactTo1);
+					}
 				}
 				else if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
 				{
