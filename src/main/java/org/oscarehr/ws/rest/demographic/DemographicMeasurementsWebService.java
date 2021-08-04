@@ -38,18 +38,18 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("demographic/{demographicNo}/measurement")
+@Path("demographic/{demographicNo}/measurements")
 @Component("demographicMeasurementWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "demographic")
-public class DemographicMeasurementWebService extends AbstractServiceImpl
+public class DemographicMeasurementsWebService extends AbstractServiceImpl
 {
 	@Autowired
 	private MeasurementsService measurementsService;
 
 	@GET
-	@Path("/all")
+	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<Measurement> getDemographicMeasurements(@PathParam("demographicNo") Integer demographicId)
 	{

@@ -27,23 +27,22 @@ import {Moment} from "moment";
 
 export default class MeasurementModel
 {
-	private _id: number;
+	private readonly _id: number;
 	private _comment: string;
 	private _createdDateTime: Moment;
-	private _unit: string;
 	private _value: string;
 	private _instruction: string;
 	private _observationDateTime: Moment;
 	private _typeCode: string;
 
+	constructor(id)
+	{
+		this._id = id;
+	}
+
 	get id(): number
 	{
 		return this._id;
-	}
-
-	set id(value: number)
-	{
-		this._id = value;
 	}
 
 	get comment(): string
@@ -64,16 +63,6 @@ export default class MeasurementModel
 	set createdDateTime(value: Moment)
 	{
 		this._createdDateTime = value;
-	}
-
-	get unit(): string
-	{
-		return this._unit;
-	}
-
-	set unit(value: string)
-	{
-		this._unit = value;
 	}
 
 	get value(): string

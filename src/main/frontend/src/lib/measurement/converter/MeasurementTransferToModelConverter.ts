@@ -37,8 +37,7 @@ export default class MeasurementTransferToModelConverter extends AbstractConvert
 			return null;
 		}
 
-		const model = new MeasurementModel();
-		model.id = measurement.id;
+		const model = new MeasurementModel(measurement.id);
 		model.typeCode = measurement.typeCode;
 		model.comment = measurement.comments;
 		model.value = measurement.measurementValue;
