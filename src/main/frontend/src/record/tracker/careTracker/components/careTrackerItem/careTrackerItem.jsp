@@ -60,7 +60,7 @@
 			<juno-input ng-if="$ctrl.showValueTextInput()"
 			            label="{{$ctrl.getInputLabel()}}"
 			            ng-model="$ctrl.newEntry.value"
-			            only-numeric="$ctrl.model.valueTypeIsNumeric()">
+			            valid-regex="$ctrl.inputRegexRestriction">
 			</juno-input>
 			<juno-date-select
 					ng-if="$ctrl.showValueDateInput()"

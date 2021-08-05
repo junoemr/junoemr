@@ -63,9 +63,16 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 
 				ctrl.dataTrueValue = "Yes";
 				ctrl.dataFalseValue = "No";
+				ctrl.inputRegexRestriction = null;
 
 				ctrl.$onInit = (): void =>
 				{
+					// restrict input to numeric inputs, with decimals and negatives
+					if(ctrl.model.valueTypeIsNumeric())
+					{
+						ctrl.inputRegexRestriction = /^-?\d*\.?\d*$/;
+					}
+
 					ctrl.clearNewEntry();
 				}
 
