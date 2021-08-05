@@ -32,6 +32,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
+import org.oscarehr.demographic.model.DemographicExt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -169,7 +170,12 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		}
 		if(getPhone() != null)
 		{
-			junction.add(Restrictions.or(getRestrictionCriterion("phone", getPhone()), getRestrictionCriterion("phone2", getPhone())));
+			// left join demographic merged and only return the result if it isn't merged
+			criteria.createAlias(alias + ".demographicExtSet", "dx", Criteria.LEFT_JOIN, Restrictions.eq("dx.key", DemographicExt.KEY_DEMO_CELL));
+
+			junction.add(Restrictions.or(getRestrictionCriterion("phone", getPhone()),
+					getRestrictionCriterion("phone2", getPhone()),
+					getRestrictionCriterion("dx.value", getPhone())));
 		}
 		if(getChartNo() != null)
 		{
