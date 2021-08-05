@@ -22,7 +22,7 @@
 --%>
 <div class="care-tracker-item">
 	<div class="flex-row align-items-center">
-		<h6>{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
+		<h6 class="item-header">{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
 		<div class="item-description">{{$ctrl.model.description}}</div>
 	</div>
 	<div ng-if="$ctrl.isGraphable()"

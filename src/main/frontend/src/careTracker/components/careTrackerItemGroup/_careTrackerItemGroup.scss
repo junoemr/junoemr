@@ -7,6 +7,15 @@
 		right: 4px;
 	}
 
+	.care-tracker-item-group-header {
+		color: var(--color-primary-base);
+		@include juno-font-body-small;
+		font-weight: bold;
+	}
+	.care-tracker-item-group-description {
+		@include juno-font-body-smallest;
+	}
+
 	@media print {
 		page-break-after: always;
 	}

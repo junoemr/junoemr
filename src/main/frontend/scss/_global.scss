@@ -231,6 +231,29 @@ body {
 	}
 }
 
+// will override bootstrap alerts.
+// not in the bootstrap variables since they don't work with css variables
+.alert {
+	margin-bottom: 8px;
+	padding: 4px;
+
+	&.alert-info {
+		background-color: var(--color-primary-lightest);
+		border-color: var(--color-primary-lighter);
+		color: var(--color-primary-dark);
+	}
+	&.alert-warning {
+		background-color: var(--color-yellow-lightest);
+		border-color: var(--color-yellow-lighter);
+		color: var(--color-yellow-darker);
+	}
+	&.alert-danger {
+		background-color: var(--color-red-lightest);
+		border-color: var(--color-red-lighter);
+		color: var(--color-red-dark);
+	}
+}
+
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;

@@ -23,7 +23,7 @@
 
 <div class="care-tracker-container">
 	<div class="flex-column">
-		<h3>{{$ctrl.careTracker.name}}</h3>
+		<h6 class="care-tracker-header">{{$ctrl.careTracker.name}}</h6>
 		<span>{{$ctrl.careTracker.description}}</span>
 	</div>
 

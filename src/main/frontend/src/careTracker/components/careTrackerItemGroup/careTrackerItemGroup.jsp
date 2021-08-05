@@ -1,8 +1,8 @@
 <div class="care-tracker-item-group">
 	<panel no-header="!$ctrl.model.name">
 		<panel-header>
-			<h6>{{$ctrl.model.name}}</h6>
-			<span>{{$ctrl.model.description}}</span>
+			<h6 class="care-tracker-item-group-header">{{$ctrl.model.name}}</h6>
+			<span class="care-tracker-item-group-description">{{$ctrl.model.description}}</span>
 			<juno-simple-close-button ng-if="$ctrl.showDelete"
 			                          click="$ctrl.onClose()"
 			                          class="group-close-button">

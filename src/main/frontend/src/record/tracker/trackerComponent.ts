@@ -33,6 +33,7 @@ angular.module('Record.Tracker').component('healthTracker',
 		bindings: {
 			componentStyle: "<?",
 			user: "<",
+			embeddedView: "<?",
 		},
 		controller: [
 			'$state',
@@ -60,6 +61,11 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.accordianListItems = [
 					{
+						name: "Pinned care trackers",
+						expanded: true,
+						items: [], // will be the list of clinic careTrackers
+					},
+					{
 						name: "Standard care trackers",
 						expanded: false,
 						items: [], // will be the list of clinic careTrackers
@@ -78,6 +84,7 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
+					ctrl.embeddedView = ctrl.embeddedView || false;
 					ctrl.demographicNo = $stateParams.demographicNo;
 					ctrl.careTrackers = await careTrackerApiService.searchCareTrackers(true, true, true, ctrl.user.providerNo, true, ctrl.demographicNo, 1, 100);
 					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicNo);
@@ -92,9 +99,10 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.initCareTrackerLists = (careTrackers: CareTrackerModel[]): void =>
 				{
-					const clinicCareTrackerItems = ctrl.accordianListItems[0].items;
-					const providerCareTrackerItems = ctrl.accordianListItems[1].items;
-					const demographicCareTrackerItems = ctrl.accordianListItems[2].items;
+					const triggerdCareTrackers = ctrl.accordianListItems[0].items;
+					const clinicCareTrackerItems = ctrl.accordianListItems[1].items;
+					const providerCareTrackerItems = ctrl.accordianListItems[2].items;
+					const demographicCareTrackerItems = ctrl.accordianListItems[3].items;
 
 					// sort all careTrackers by level (clinic, provider, demographic)
 					careTrackers.forEach((careTracker: CareTrackerModel) =>
@@ -133,6 +141,7 @@ angular.module('Record.Tracker').component('healthTracker',
 						const key = careTracker.parentCareTrackerId ? careTracker.parentCareTrackerId : careTracker.id;
 						triggerMap.set(key, careTracker);
 					});
+					ctrl.accordianListItems[0].items = Array.from(triggerMap.values());
 					ctrl.triggerdCareTrackers = Array.from(triggerMap.values());
 				}
 

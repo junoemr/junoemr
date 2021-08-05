@@ -22,7 +22,8 @@
 --%>
 
 <div class="health-tracker-component">
-    <div class="flex-row justify-content-between align-items-center no-print">
+    <div ng-if="!$ctrl.embeddedView"
+         class="flex-row justify-content-between align-items-center no-print">
         <h1>Patient Health Tracker</h1>
 
         <div class="flex-row">
@@ -44,23 +45,11 @@
     <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
         <div class="flex-row">
             <div class="flex-column no-print tracker-nav">
-                <div class="list-group">
-                    <button ng-repeat="tracker in $ctrl.triggerdCareTrackers"
-                            type="button"
-                            class="list-group-item list-group-item-action"
-                            ng-class="{'active': tracker === $ctrl.selectedCareTracker}"
-                            ng-click="$ctrl.onCareTrackerSelect(tracker)">
-                        {{tracker.name}}
-                    </button>
-                    <span ng-if="$ctrl.triggerdCareTrackers.length === 0" class="list-group-item">
-                        No Active Care Trackers
-                    </span>
-                </div>
                 <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onCareTrackerSelect(item)">
                 </accordion-list>
                 <juno-button component-style="$ctrl.componentStyle"
                              button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
                              disabled="$ctrl.isLoading"
                              click="$ctrl.onViewAllPatientMeasurements()">
                     View All Measurements

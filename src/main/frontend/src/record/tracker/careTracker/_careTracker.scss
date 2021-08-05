@@ -4,6 +4,11 @@
 	.filter-wrapper {
 		padding-bottom: 8px;
 	}
+
+	.care-tracker-header {
+		color: var(--color-primary-base);
+	}
+
 	.item-divider {
 		// use border so it shows up when printing
 		border-top: 2px solid var(--color-neutral-light);

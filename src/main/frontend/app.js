@@ -652,6 +652,10 @@ oscarApp.config([
 				{
 					return providerService.getMe();
 				}],
+				embeddedView: [function ()
+				{
+					return true;
+				}],
 			},
 			meta:
 				{
