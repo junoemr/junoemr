@@ -44,6 +44,7 @@ public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
 	private final String DEMO_NULL_NAME = "NULL_NAME";
+	private final String DEFAULT_DATE = "19000101";
 
 	public DemographicMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
@@ -171,6 +172,11 @@ public class DemographicMapper extends AbstractMapper
 	public LocalDate getDOB() throws HL7Exception
 	{
 		String dateStr = messagePID.getDateTimeOfBirth().getTimeOfAnEvent().getValue();
+		if (dateStr == null)
+		{
+			logger.warn("Demographic has no date of birth. Replacing with default: " + DEFAULT_DATE);
+			dateStr = DEFAULT_DATE;
+		} 
 		if (dateStr.isEmpty() || "00000000".equals(dateStr))
 		{
 			logger.warn("Replacing empty DOB string with :" + CoPDPreProcessorService.HL7_TIMESTAMP_BEGINNING_OF_TIME +

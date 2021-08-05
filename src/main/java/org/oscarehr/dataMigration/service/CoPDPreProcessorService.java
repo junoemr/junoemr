@@ -714,10 +714,20 @@ public class CoPDPreProcessorService
 	 */
 	private String formatHealthQuestSegments(String message)
 	{
-		// XML-encoded chars
 		message = message.replaceAll("<OBX.2/>", "");
+		message = fixHealthQuestOBX5(message);
 
 		return message;
+	}
+
+	/**
+	 * Some OBX.5 segments for HEALTHQUEST imports have leading spaces, this is illegal. 
+	 * TrimToEmpty since it either has to be a number or empty
+	 */
+	private String fixHealthQuestOBX5(String message)
+	{
+		Function<String, String> trimOBX5ToEmpty = StringUtils::trimToEmpty;
+		return foreachTag(message, Hl7Const.HL7_SEGMENT_OBX_5, trimOBX5ToEmpty);
 	}
 
 	private String formatWolfFollowupSegments(String message)

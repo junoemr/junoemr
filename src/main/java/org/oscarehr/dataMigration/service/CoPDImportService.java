@@ -724,7 +724,7 @@ public class CoPDImportService
 			}
 			catch (FileAlreadyExistsException e)
 			{
-				logger.warn("SKIPPING: File: " + document.getDocfilename() + " already exists in document directory! skipping.");
+				logger.error("File: " + document.getDocfilename() + " already exists in document directory! This needs to be fixed for the patient to be imported");
 				continue;
 			}
 			documentService.routeToProviderInbox(document.getDocumentNo(), false, true, provider.getId());
