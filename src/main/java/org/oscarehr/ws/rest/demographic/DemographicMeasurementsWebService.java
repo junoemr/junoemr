@@ -39,7 +39,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("demographic/{demographicNo}/measurements")
-@Component("demographicMeasurementWebService")
+@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "demographic")

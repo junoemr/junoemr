@@ -22,6 +22,8 @@
  */
 package org.oscarehr.decisionSupport2.model;
 
+import java.util.Optional;
+
 public interface DsInfoLookup
 {
 	/**
@@ -32,10 +34,10 @@ public interface DsInfoLookup
 	int getMonthsSinceLastRecordedDate(String typeCode);
 
 	/**
-	 * gets a numeric representation of the last recorded data, or null if never recorded / is not a number
-	 * @return the numeric value, or null
+	 * gets an optional numeric representation of the last recorded data, if possible
+	 * @return the optional numeric value
 	 */
-	Double getLatestValueNumeric(String typeCode);
+	Optional<Double> getLatestValueNumeric(String typeCode);
 
 	/**
 	 * gets a string representation of the last recorded data, or null if never recorded

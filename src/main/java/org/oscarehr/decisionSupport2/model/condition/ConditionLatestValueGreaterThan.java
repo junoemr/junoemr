@@ -38,7 +38,7 @@ public class ConditionLatestValueGreaterThan extends DsCondition
 	@Override
 	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
-		Optional<Double> latestValueOption = Optional.ofNullable(dsInfoLookup.getLatestValueNumeric(typeCode));
+		Optional<Double> latestValueOption = dsInfoLookup.getLatestValueNumeric(typeCode);
 		Optional<Double> numericValue = getNumericValue();
 		if(latestValueOption.isPresent() && numericValue.isPresent())
 		{

@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  *
@@ -269,14 +270,21 @@ public class MeasurementInfo implements DsInfoCache, DsInfoLookup
     }
 
     @Override
-    public Double getLatestValueNumeric(String measurement)
+    public Optional<Double> getLatestValueNumeric(String measurement)
     {
-       int intVal = getLastValueAsInt(measurement);
-       if(intVal < 0)
-       {
-           return null;
-       }
-       return (double) intVal;
+        try
+        {
+            List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+            if(list != null && list.size() > 0)
+            {
+                return Optional.of(Double.parseDouble(list.get(0).getDataField()));
+            }
+        }
+        catch(NumberFormatException e)
+        {
+            MiscUtils.getLogger().error("Error", e);
+        }
+        return Optional.empty();
     }
 
     public int getLastValueAsInt(String measurement)

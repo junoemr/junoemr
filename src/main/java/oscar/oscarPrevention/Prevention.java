@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Vector;
 
 /**
@@ -512,9 +513,9 @@ public class Prevention implements DsInfoCache, DsInfoLookup
     }
 
     @Override
-    public Double getLatestValueNumeric(String typeCode)
+    public Optional<Double> getLatestValueNumeric(String typeCode)
     {
-        return null;
+        return Optional.empty();
     }
 
     @Override

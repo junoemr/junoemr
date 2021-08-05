@@ -164,6 +164,11 @@ public class CareTrackerItem extends AbstractModel<Integer>
 		return ItemType.PREVENTION.equals(this.type);
 	}
 
+	public boolean isNumericValueType()
+	{
+		return ValueType.NUMERIC.equals(this.valueType);
+	}
+
 	@PrePersist
 	private void prePersist()
 	{

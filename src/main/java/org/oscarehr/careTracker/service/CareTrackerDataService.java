@@ -241,7 +241,15 @@ public class CareTrackerDataService
 			CareTrackerItem careTrackerItem,
 			CareTrackerItemDataCreateTransfer itemData)
 	{
-		List<String> validationErrors = measurementsService.getValidationErrors(careTrackerItem.getTypeCode(), itemData.getValue());
+		// parse numeric types as a double to both ensure their formatting and standardize the double string format. this removes valid cases like '.5'
+		String value = itemData.getValue();
+		if(careTrackerItem.isNumericValueType())
+		{
+			Double numericValue = Double.parseDouble(value);
+			value = String.valueOf(numericValue);
+		}
+
+		List<String> validationErrors = measurementsService.getValidationErrors(careTrackerItem.getTypeCode(), value);
 
 		if(validationErrors.isEmpty())
 		{
@@ -249,7 +257,7 @@ public class CareTrackerDataService
 					demographicId,
 					providerId,
 					careTrackerItem.getTypeCode(),
-					itemData.getValue(),
+					value,
 					ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()),
 					itemData.getComment());
 
