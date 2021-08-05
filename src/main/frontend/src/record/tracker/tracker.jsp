@@ -34,7 +34,7 @@
                              click="$ctrl.onManageCareTrackers()">
                     <div class="flex-row align-items-center">
                         <i class="icon icon-gears"></i>
-                        <span>Manage CareTrackers</span>
+                        <span>Manage Health Tracker</span>
                     </div>
                 </juno-button>
             </div>
@@ -58,6 +58,13 @@
                 </div>
                 <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onCareTrackerSelect(item)">
                 </accordion-list>
+                <juno-button component-style="$ctrl.componentStyle"
+                             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+                             disabled="$ctrl.isLoading"
+                             click="$ctrl.onViewAllPatientMeasurements()">
+                    View All Measurements
+                </juno-button>
             </div>
             <div class="ui-view-wrapper flex-grow">
                 <ui-view></ui-view>

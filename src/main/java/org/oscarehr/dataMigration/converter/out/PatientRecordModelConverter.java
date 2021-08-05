@@ -29,7 +29,6 @@ import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DemographicPharmacyDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.model.Appointment;
@@ -37,7 +36,6 @@ import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.DemographicPharmacy;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.dataMigration.converter.out.contact.DemographicContactDbToModelConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
@@ -57,6 +55,7 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.search.CaseManagementNoteCriteriaSearch;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.rx.dao.DrugDao;
@@ -117,10 +116,7 @@ public class PatientRecordModelConverter extends
 	private Hl7TextInfoDao hl7TextInfoDao;
 
 	@Autowired
-	private MeasurementDao measurementDao;
-
-	@Autowired
-	private MeasurementDbToModelConverter measurementDbToModelConverter;
+	private MeasurementsService measurementsService;
 
 	@Autowired
 	private MedicalHistoryNoteDbToModelConverter medicalHistoryNoteConverter;
@@ -194,8 +190,7 @@ public class PatientRecordModelConverter extends
 		setNotes(input, patientRecord);
 		instant = LogAction.printDuration(instant, "Patient Record Model: Load notes");
 
-		List<Measurement> measurements = measurementDao.findByDemographicId(input.getDemographicId());
-		patientRecord.setMeasurementList(measurementDbToModelConverter.convert(measurements));
+		patientRecord.setMeasurementList(measurementsService.getMeasurements(input.getDemographicId()));
 		instant = LogAction.printDuration(instant, "Patient Record Model: Load measurements");
 
 		setLabs(input, patientRecord);

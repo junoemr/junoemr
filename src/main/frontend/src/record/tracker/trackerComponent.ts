@@ -60,17 +60,17 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.accordianListItems = [
 					{
-						name: "Standard careTrackers",
+						name: "Standard care trackers",
 						expanded: false,
 						items: [], // will be the list of clinic careTrackers
 					},
 					{
-						name: "My careTrackers",
+						name: "My care trackers",
 						expanded: false,
 						items: [], // will be the list of provider careTrackers
 					},
 					{
-						name: "Patient careTrackers",
+						name: "Patient care trackers",
 						expanded: false,
 						items: [], // will be the list of demographic careTrackers
 					}
@@ -159,11 +159,21 @@ angular.module('Record.Tracker').component('healthTracker',
 				{
 					ctrl.selectedCareTracker = careTracker;
 
-					const state = $state.includes("**.careTracker") ? "." : ".careTracker";
+					const state = $state.includes("**.careTracker") ? "." : $state.includes("**.measurements") ? "^.careTracker" : ".careTracker";
 					$state.go(state,
 						{
 							demographicNo: ctrl.demographicNo,
 							careTrackerId: careTracker.id,
+						});
+				}
+
+				ctrl.onViewAllPatientMeasurements = (): void =>
+				{
+					ctrl.selectedCareTracker = null;
+					const state = $state.includes("**.careTracker") ? "^.measurements" : ".measurements";
+					$state.go(state,
+						{
+							demographicNo: ctrl.demographicNo,
 						});
 				}
 

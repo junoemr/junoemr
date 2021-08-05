@@ -30,6 +30,9 @@ import {CareTrackerItemType} from "../lib/careTracker/model/CareTrackerItemType"
 import {CareTrackerItemValueType} from "../lib/careTracker/model/CareTrackerItemValueType";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
+import PagedResponse from "../lib/common/response/pagedRespose";
+import MeasurementTypeModel from "../lib/measurement/model/measurementTypeModel";
+import {JunoSelectOption} from "../lib/common/junoSelectOption";
 
 angular.module('CareTracker').component('careTrackerEdit',
 	{
@@ -42,12 +45,14 @@ angular.module('CareTracker').component('careTrackerEdit',
 			'$stateParams',
 			'$uibModal',
 			'careTrackerApiService',
+			'measurementApiService',
 			'securityRolesService',
 			function (
 				$state,
 				$stateParams,
 				$uibModal,
 				careTrackerApiService,
+				measurementApiService,
 				securityRolesService,
 			)
 			{
@@ -58,7 +63,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.isLoading = true;
+				ctrl.isLoading = true as boolean;
 				ctrl.careTracker = null as CareTrackerModel;
 
 				ctrl.$onInit = async (): Promise<void> =>
@@ -253,29 +258,29 @@ angular.module('CareTracker').component('careTrackerEdit',
 					});
 				}
 
-				ctrl.lookupMeasurements = async (searchTerm): Promise<object[]> =>
+				ctrl.lookupMeasurements = async (searchTerm): Promise<JunoSelectOption[]> =>
 				{
-					const searchResults = await careTrackerApiService.searchMeasurementTypes(searchTerm);
-					return searchResults.body.map((result) =>
+					const searchResults: PagedResponse<MeasurementTypeModel> = await measurementApiService.searchMeasurementTypes(searchTerm);
+					return searchResults.body.map((result: MeasurementTypeModel) =>
 					{
 						return {
 							label: result.name + " (" + result.code + ") " + result.instructions,
 							value: result.code,
 							data: result,
-						}
+						} as JunoSelectOption;
 					});
 				}
 
-				ctrl.lookupIcd9Codes = async (searchTerm): Promise<object[]> =>
+				ctrl.lookupIcd9Codes = async (searchTerm): Promise<JunoSelectOption[]> =>
 				{
 					const searchResults: DxCodeModel[] = await careTrackerApiService.searchDxCodes(DxCodingSystem.ICD9, searchTerm);
-					return searchResults.map((result) =>
+					return searchResults.map((result: DxCodeModel) =>
 					{
 						return {
 							label: result.code + " (" + result.description + ")",
 							value: result.code,
 							data: result,
-						}
+						} as JunoSelectOption;
 					});
 				}
 
@@ -326,7 +331,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 				ctrl.canSave = (): boolean =>
 				{
 					let hasPermission = ctrl.isNewCareTracker() ? ctrl.userCanCreate() : ctrl.userCanEdit();
-					return ctrl.careTracker  && !ctrl.careTracker.systemManaged && hasPermission;
+					return ctrl.careTracker  && !ctrl.careTracker.systemManaged && hasPermission && !Juno.Common.Util.isBlank(ctrl.careTracker.name);
 				}
 
 				ctrl.saveButtonTooltip = (): string =>

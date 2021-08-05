@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
+import org.oscarehr.dataMigration.converter.out.MeasurementDbToModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
@@ -45,7 +46,16 @@ public class MeasurementsService
 	@Autowired
 	protected MeasurementDao measurementDao;
 
+	@Autowired
+	protected MeasurementDbToModelConverter measurementDbToModelConverter;
+
 	public MeasurementsService() {}
+
+	public List<org.oscarehr.dataMigration.model.measurement.Measurement> getMeasurements(Integer demographicId)
+	{
+		List<Measurement> measurements = measurementDao.findByDemographicId(demographicId);
+		return measurementDbToModelConverter.convert(measurements);
+	}
 
 	/**
 	 * create a new measurement

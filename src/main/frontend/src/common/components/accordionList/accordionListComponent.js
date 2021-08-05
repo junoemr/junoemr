@@ -69,7 +69,7 @@ angular.module('Common.Components').component('accordionList', {
 
 		ctrl.getGroupCollapseId = function (group)
 		{
-			return group.name.replace(' ', '').replace('/', '');
+			return group.name.replaceAll(' ', '').replaceAll('/', '');
 		};
 
 		ctrl.onGroupClick = function (group)

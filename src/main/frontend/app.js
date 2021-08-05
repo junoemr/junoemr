@@ -660,6 +660,17 @@ oscarApp.config([
 					},
 				},
 		})
+		.state('record.summary.tracker.measurements',
+			{
+				url: '/measurements',
+				component: 'measurementPage',
+				meta:
+					{
+						auth: {
+							checkDemographicAccess: true,
+						},
+					},
+			})
 		.state('record.summary.tracker.careTracker',
 		{
 			url: '/careTracker/:careTrackerId',
@@ -859,6 +870,17 @@ oscarApp.config([
 				},
 			},
 		})
+		.state('record.tracker.measurements',
+			{
+				url: '/measurements',
+				component: 'measurementPage',
+				meta:
+					{
+						auth: {
+							checkDemographicAccess: true,
+						},
+					},
+			})
 		.state('record.tracker.careTracker',
 		{
 			url: '/careTracker/:careTrackerId',
