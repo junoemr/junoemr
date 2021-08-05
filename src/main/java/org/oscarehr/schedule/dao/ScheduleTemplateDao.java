@@ -213,7 +213,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		sql +=  "  seq AS position, \n" +
 				"  SUBSTRING(st.timecode, seq, 1) AS code_char,\n" +
 				"  sd.sdate AS appt_date,\n" +
-				"  SEC_TO_TIME(ROUND((24*60*60) * (seq + 1)/LENGTH(st.timecode))) AS appt_time,\n" +
+				"  SEC_TO_TIME(ROUND((24*60*60) * (seq - 1)/LENGTH(st.timecode))) AS appt_time,\n" +
 				"  stc.code,\n" +
 				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
 				"  stc.description,\n" +
