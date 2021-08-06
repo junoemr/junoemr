@@ -75,6 +75,7 @@ public class DemographicContact extends AbstractTransientModel
 	private boolean deleted;
 	private Provider createdBy;
 	private LocalDateTime createdAt;
+	private Integer facilityId;
 
 
 	public DemographicContact(Contact contact)

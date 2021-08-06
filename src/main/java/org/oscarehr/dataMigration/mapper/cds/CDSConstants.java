@@ -175,6 +175,8 @@ public class CDSConstants
 	// this document-class value shows up in HRM and CDS documentation but does not match the schema
 	public static final String DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE = "Medical Record Report";
 
+	public static final Integer DEFAULT_CONTACT_FACILITY_ID = 1;
+
 	public enum CodingSystem
 	{
 		ENCODE_FM("ENCODE-FM"),
