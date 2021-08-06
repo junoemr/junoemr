@@ -60,6 +60,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -343,21 +344,21 @@ public class DemographicService
 		Demographic demographic = DemographicConverter.getAsDomainObject(demographicTransferInbound);
 		DemographicCust demoCustom = DemographicConverter.getCustom(demographicTransferInbound);
 		List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTransferInbound);
+		Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtensions);
 
-		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
+		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
 	}
 	public Demographic addNewDemographicRecord(String providerNoStr, org.oscarehr.dataMigration.model.demographic.Demographic demographicModel)
 	{
 		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
-		Set<DemographicExt> demographicExtensions = demographic.getDemographicExtSet();
-		List<DemographicExt> demographicExtList = new ArrayList<>(demographicExtensions);
+		Set<DemographicExt> demographicExtSet = demographic.getDemographicExtSet();
 		DemographicCust demoCustom = demographic.getDemographicCust();
 
-		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtList);
+		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
 	}
 
 	public Demographic addNewDemographicRecord(String providerNoStr, Demographic demographic,
-	                                    DemographicCust demoCustom, List<DemographicExt> demographicExtensions)
+	                                    DemographicCust demoCustom, Set<DemographicExt> demographicExtensions)
 	{
 		// save the base demographic object
 		addNewDemographicRecord(providerNoStr, demographic);
