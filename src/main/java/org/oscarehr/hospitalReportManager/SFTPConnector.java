@@ -667,6 +667,10 @@ public class SFTPConnector {
 						
 						HRMService hrmService = SpringUtils.getBean(HRMService.class);
 						
+						
+						// DO the checks here instead
+						
+						
 						hrmService.uploadNewHRMDocument(model, demographicToLink);
 						
 						// doNotSentMsgForOuttage.clear();
@@ -750,6 +754,75 @@ public class SFTPConnector {
 	    {
 	    	doNotSentMsgForOuttage.add(loggedInInfo.getLoggedInProviderNo());
 	    }
+	}
+	
+	
+	public static void processDocument(String filePath)
+	{
+		HRMReport report = HRMReportParser.parseReport(filePath, "4.3");
+		
+		HRMReportImportMapper mapper = new HRMReportImportMapper();
+		
+		
+		try
+		{
+			HrmDocument model = mapper.importToJuno((HRMReport_4_3) report);
+			// Rebind the document here...  Otherwise the path won't be correct
+			model.getDocument().setFile(FileFactory.getExistingFile(filePath));
+			
+			org.oscarehr.demographic.model.Demographic demographicToLink = searchDemographicForDocument((HRMReport_4_3) report);
+			HRMService hrmService = SpringUtils.getBean(HRMService.class);
+			
+			// TODO: Do the duplicate checks
+			hrmService.uploadNewHRMDocument(model, demographicToLink);
+		}
+		catch (Exception e)
+		{
+			logger.error("Could not process HRM file: " + filePath);
+		}
+	}
+	
+	public static org.oscarehr.demographic.model.Demographic searchDemographicForDocument(HRMReport_4_3 report)
+	{
+		HRMReportDemographicMapper demoMapper = new HRMReportDemographicMapper();
+		
+		try
+		{
+			org.oscarehr.dataMigration.model.demographic.Demographic demographic = demoMapper.importToJuno((report));
+			
+			DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+			DemographicCriteriaSearch criteria = new DemographicCriteriaSearch();
+			
+			if (demographic.getHealthNumber() != null)
+			{
+				criteria.setHin(demographic.getHealthNumber());
+			}
+			
+			if (demographic.getHealthNumberVersion() != null)
+			{
+				criteria.setHealthCardVersion(demographic.getHealthNumberVersion());
+			}
+			
+			if (demographic.getDateOfBirth() != null)
+			{
+				criteria.setDateOfBirth(demographic.getDateOfBirth());
+			}
+			
+			List<org.oscarehr.demographic.model.Demographic> demographics = demographicDao.criteriaSearch(criteria);
+			
+			org.oscarehr.demographic.model.Demographic matchingDemographic = null;
+			if (demographics.size() == 1)
+			{
+				matchingDemographic = demographics.get(0);
+			}
+			
+			return matchingDemographic;
+		}
+		catch (Exception e)
+		{
+			logger.error("Could not map demographic (" + report.getHCN() + ") for HRM Report " + report.getFileLocation());
+			return null;
+		}
 	}
 }
 

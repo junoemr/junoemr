@@ -81,20 +81,17 @@ public class HRMService
 		// persist hrm database info and associated objects through cascade
 		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
 		hrmDocumentDao.persist(hrmDocument);
+		// TODO: the document should have the correct path at this point... CS!!!
 		//hrmDocumentModel.getReportFile().moveToHRMDocuments();
 
 		// assign the hrm document to the demographic
 		routeToDemographic(hrmDocument, demographic);
-		
-		// link the deliverToProvider
-		
 		
 		// link the associated reviewers
 		for(HRMDocumentToProvider documentToProvider : hrmDocument.getDocumentToProviderList())
 		{
 			hrmDocumentToProviderDao.persist(documentToProvider);
 		}
-
 		
 		return hrmDocument;
 	}

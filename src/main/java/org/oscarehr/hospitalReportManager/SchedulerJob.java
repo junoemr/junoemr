@@ -14,7 +14,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.scheduling.annotation.Scheduled;
+//import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +30,7 @@ public class SchedulerJob
 	private static Date lastRun = new Date();
 	private static boolean firstRun = true;
 	
-	@Scheduled(fixedDelay = 60 * 1000L)     // fixed delay = start X millis after last process finishes
+	//@Scheduled(fixedDelay = 60 * 1000L)     // fixed delay = start X millis after last process finishes
 	public void run()
 	{
 /*		Date startTime = new Date();

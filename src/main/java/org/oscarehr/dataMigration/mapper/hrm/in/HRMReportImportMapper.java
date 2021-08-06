@@ -44,6 +44,7 @@ import xml.hrm.v4_3.PersonNameSimple;
 import xml.hrm.v4_3.ReportsReceived;
 import xml.hrm.v4_3.TransactionInformation;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,15 +76,16 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		ReportsReceived report = importStructure.getDocumentRoot().getPatientRecord().getReportsReceived().get(0);
 		
 		model.setReportDateTime(toNullableLocalDateTime(report.getEventDateTime()));
-		model.setReceivedDateTime(toNullableLocalDateTime(report.getReceivedDateTime()));
+		//model.setReceivedDateTime(toNullableLocalDateTime(report.getReceivedDateTime()));
+		model.setReceivedDateTime(LocalDateTime.now());
 		model.setCreatedBy(stubProviderFromPersonName(report.getAuthorPhysician()));
 		model.setReportStatus(getStatus(report.getResultStatus()));
-		model.setInternalReviewers(stubReviewers(report.getReviewingOHIPPhysicianId(), report.getReviewedDateTime()));  // TODO: can only stub?
+		//model.setInternalReviewers(stubReviewers(report.getReviewingOHIPPhysicianId(), report.getReviewedDateTime()));  // TODO: can only stub?
 		model.setReportClass(getReportClass(report.getClazz()));
 		model.setReportSubClass(report.getSubClass());
 		model.setReportFileSchemaVersion(SCHEMA_VERSION);
 		
-		model.setSourceFacility(importStructure.getSendingFacilityId());    // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
+		//model.setSourceFacility(importStructure.getSendingFacilityId());    // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
 		model.setSendingFacilityId(model.getSourceFacility());              // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
 		model.setSendingFacilityReport(importStructure.getSendingFacilityReportNo());
 		

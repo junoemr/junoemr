@@ -26,10 +26,12 @@ package org.oscarehr.dataMigration.mapper.hrm.in;
 
 import org.oscarehr.dataMigration.model.demographic.Demographic;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Component
 public class HRMReportDemographicMapper extends AbstractHRMImportMapper<HRMReport_4_3, Demographic>
 {
 	
@@ -68,7 +70,6 @@ public class HRMReportDemographicMapper extends AbstractHRMImportMapper<HRMRepor
 		}
 		else
 		{
-			// TODO: Exception?
 			return "";
 		}
 	}

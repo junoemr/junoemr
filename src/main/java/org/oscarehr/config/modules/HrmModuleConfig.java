@@ -24,19 +24,23 @@
 package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.hospitalReportManager.HrmSFTPService;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.Scheduled;
 import oscar.OscarProperties;
 
 @Configuration
 @Conditional(HrmModuleConfig.Condition.class)
-@ImportResource({"classpath*:applicationContextHRM.xml"})
 public class HrmModuleConfig
 {
+	@Autowired
+	HrmSFTPService hrmSFTPService;
+	
 	private static final Logger logger = MiscUtils.getLogger();
-
+	
 	public HrmModuleConfig()
 	{
 		logger.info("Loaded HRM module");
@@ -48,5 +52,11 @@ public class HrmModuleConfig
 		{
 			return OscarProperties.Module.MODULE_HRM;
 		}
+	}
+	
+	@Scheduled(fixedDelayString = "${omd.hrm.poll_interval_sec}000")
+	public void pullHRMReports()
+	{
+		hrmSFTPService.pullHRMFromSource();
 	}
 }
