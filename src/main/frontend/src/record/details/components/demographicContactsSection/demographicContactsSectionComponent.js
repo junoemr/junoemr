@@ -29,6 +29,8 @@ import {
 }
     from "../../../../common/components/junoComponentConstants";
 
+    import {DemographicApi} from "../../../../../generated";
+
 angular.module('Record.Details').component('demographicContactsSection', {
     templateUrl: 'src/record/details/components/demographicContactsSection/demographicContactsSection.jsp',
     bindings: {
@@ -37,15 +39,19 @@ angular.module('Record.Details').component('demographicContactsSection', {
     },
     controller: ["staticDataService",
         "$uibModal",
+        "$http",
+        "$httpParamSerializer",
         "$stateParams",
         "demographicService",
         function (staticDataService,
                   $uibModal,
+                  $http,
+                  $httpParamSerializer,
                   $stateParams,
                   demographicService)
         {
             let ctrl = this;
-
+            const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
             ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.GREY;
             ctrl.LABEL_POSITION = LABEL_POSITION;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -60,15 +66,24 @@ angular.module('Record.Details').component('demographicContactsSection', {
             ctrl.$onInit = () =>
             {
                 ctrl.thisDemo = $stateParams.demographicNo;
-                demographicService.getDemographicContacts(ctrl.thisDemo, "personal").then(
+
+                demographicApi.getDemographicContacts(ctrl.thisDemo, "personal").then(
+                    (data) => {
+                        ctrl.demoContacts = (data.data.body);
+                    },
+                    () => {
+                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve contacts');
+                    });
+
+                /*demographicService.getDemographicContacts(ctrl.thisDemo, "personal").then(
                     function success(data)
                     {
                         ctrl.demoContacts = (data);
                     },
                     function error(error)
                     {
-                        Juno.Common.Util.alert("Unable to retrieve contacts", error);
-                    });
+                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve contacts');
+                    });*/
 
                 demographicService.getDemographicContacts(ctrl.thisDemo, "professional").then(
                     function success(data)
@@ -77,7 +92,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                     },
                     function error(error)
                     {
-                        Juno.Common.Util.alert("Unable to retrieve contacts", error);
+                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve contacts');
                     }
                 );
             }

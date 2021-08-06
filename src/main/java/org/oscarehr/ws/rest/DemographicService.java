@@ -279,7 +279,7 @@ public class DemographicService extends AbstractServiceImpl {
 	@Path("/{dataId}/contacts")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("dataId") Integer demographicNo,
-	                                                                           @QueryParam("category") String category)
+																			   @QueryParam("category") String category)
 	{
 		try
 		{

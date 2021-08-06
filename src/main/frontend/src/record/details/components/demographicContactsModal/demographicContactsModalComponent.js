@@ -3,6 +3,7 @@ import {
     JUNO_BUTTON_COLOR_PATTERN,
     LABEL_POSITION,
 } from "../../../../common/components/junoComponentConstants";
+
 import {DemographicApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('demographicContactsModal', {
@@ -114,8 +115,10 @@ angular.module('Record.Details').component('demographicContactsModal', {
 
                 demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact).then(
                     (data) => {
-                        console.log(data);
                         ctrl.onCancel();
+                    },
+                    () => {
+                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not update contacts');
                     });
             }
 
@@ -168,7 +171,6 @@ angular.module('Record.Details').component('demographicContactsModal', {
 			if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
 			{
 				ctrl.dataChanged = true;
-				console.log(ctrl.dataChanged);
 			}
 
 		}, true);

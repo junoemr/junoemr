@@ -65,15 +65,15 @@ public class ContactDao extends AbstractDao<Contact> {
 		if(searchMode.equals("search_name")) {
 			String[] temp = keyword.split("\\,\\p{Space}*");
 			if(temp.length>1) {
-		      where.append("c.lastName like ?1 and c.firstName like ?2");
+		      where.append("c.lastName like ?1 and c.firstName like ?2 and c.deleted=false");
 		      paramList.add(temp[0]+"%");
 		      paramList.add(temp[1]+"%");
 		    } else {
-		      where.append("c.lastName like ?1");
+		      where.append("c.lastName like ?1 and c.deleted=false");
 		      paramList.add(temp[0]+"%");
 		    }
 		}else {		
-			where.append("c." + StringEscapeUtils.escapeSql(searchMode) + " like ?1");
+			where.append("c." + StringEscapeUtils.escapeSql(searchMode) + " like ?1 and c.deleted=false");
 			paramList.add(keyword+"%");
 		}			
 		String sql = "SELECT c from Contact c where " + where.toString() + " order by " + orderBy;

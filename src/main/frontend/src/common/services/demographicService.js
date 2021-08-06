@@ -71,7 +71,7 @@ angular.module("Common.Services").service("demographicService", [
 			    category: contactCategory
 		    };
 
-		    junoHttp.get(service.apiPath + '/' + encodeURIComponent(demographicNo) + "/contacts", config).then(
+		    junoHttp.get(service.apiPath + '/' + encodeURIComponent(demographicNo) + "/contact", config).then(
 			    function success(results)
 			    {
 				    deferred.resolve(results.data);

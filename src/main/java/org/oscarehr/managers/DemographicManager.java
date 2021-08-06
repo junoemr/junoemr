@@ -330,7 +330,7 @@ public class DemographicManager {
 
 	public List<DemographicContact> updateExternalDemographicContact(LoggedInInfo loggedInInfo,
 															   Integer demographicId,
-															   DemographicContact contact,
+															   DemographicContact newContact,
 															   String oldContactId,
 															   String newContactId)
 	{
@@ -342,19 +342,24 @@ public class DemographicManager {
 		List<DemographicContact> revisedList = new ArrayList<DemographicContact>();
 		for (DemographicContact demographicContact : oldDemographicContact)
 		{
-			//demographicContact.setDeleted(true);
-			demographicContact.setContactId(newContactId);
-			//demographicContactDao.merge(demographicContact);
-			//demographicContact.setCreator(loggedInInfo.getLoggedInProviderNo());
-			DemographicContact rev = (DemographicContact) demographicContactDao.merge(contact);
-			revisedList.add(rev);
+			if (demographicContact.getDemographicNo() != demographicId)
+			{
+				//DemographicContact rev = new DemographicContact();
+				//demographicContact.setDeleted(true);
+				demographicContact.setContactId(newContactId);
+				//rev.setDemographicNo(demographicContact.getDemographicNo());
+				//demographicContactDao.merge(demographicContact);
+				demographicContact.setCreator(loggedInInfo.getLoggedInProviderNo());
+				demographicContact = (DemographicContact) demographicContactDao.merge(demographicContact);
+				revisedList.add(demographicContact);
+			}
 		}
 
 		//update the DemographicContact for the requested demographic
-		contact.setContactId(newContactId);
-		contact.setCreator(loggedInInfo.getLoggedInProviderNo());
-		contact.setDemographicNo(demographicId);
-		DemographicContact revised = (DemographicContact) demographicContactDao.merge(contact);
+		newContact.setContactId(newContactId);
+		newContact.setCreator(loggedInInfo.getLoggedInProviderNo());
+		newContact.setDemographicNo(demographicId);
+		DemographicContact revised = (DemographicContact) demographicContactDao.merge(newContact);
 		revisedList.add(revised);
 
 		//update any other DemographicContact linked to the same contact
