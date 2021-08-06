@@ -51,7 +51,7 @@
 				<div class="col-sm-12 summary-tabs"
 					 ng-click="summaryCtrl.checkAction($event)"
 					 ng-keypress="summaryCtrl.checkAction($event)">
-					<ul class="nav nav-tabs round-top">
+					<ul class="nav nav-tabs round-top m-b-8">
 						<li class="active">
 							<a ng-click="summaryCtrl.onOpenNotesTab()"
 							   data-target="#all"
@@ -68,7 +68,7 @@
 								Tracker
 							</a>
 						</li>
-						<li class="pull-right">
+						<li ng-if="summaryCtrl.showSummaryPrintButton()" class="pull-right">
 							<button class="btn btn-sm btn-primary"
 									ng-click="summaryCtrl.showPrintModal()">
 								<span class="fa fa-print"></span>

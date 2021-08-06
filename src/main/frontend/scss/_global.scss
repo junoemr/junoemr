@@ -235,7 +235,8 @@ body {
 // not in the bootstrap variables since they don't work with css variables
 .alert {
 	margin-bottom: 8px;
-	padding: 4px;
+	padding: 7px; // padding of 7 pus font size 14 gets an alert height of 32px
+	@include juno-font-default-size(14px);
 
 	&.alert-info {
 		background-color: var(--color-primary-lightest);

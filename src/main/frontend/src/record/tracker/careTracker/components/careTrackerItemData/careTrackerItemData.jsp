@@ -25,5 +25,6 @@
 	     title="{{$ctrl.model.comment}}">
 		<span class="display-date">{{$ctrl.getDateForDisplay($ctrl.model.observationDateTime)}}</span>
 		<span class="display-value">{{$ctrl.model.value}}</span>
+		<i ng-if="$ctrl.model.comment" class="icon icon-comment"></i>
 	</div>
 </div>

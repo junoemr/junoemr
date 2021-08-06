@@ -468,6 +468,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		};
 
+		controller.showSummaryPrintButton = () =>
+		{
+			return $state.is("record.summary");
+		}
 
 		controller.showPrintModal = function showPrintModal()
 		{

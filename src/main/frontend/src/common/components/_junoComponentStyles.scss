@@ -87,7 +87,9 @@
 	flex-wrap: wrap;
 
 	&.juno-button {
-		height: 32px;
+		button {
+			height: 32px;
+		}
 	}
 
 	&.juno-divider {

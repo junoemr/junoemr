@@ -2,7 +2,13 @@
 	max-width: 1024px;
 
 	.filter-wrapper {
+		position: relative;
 		padding-bottom: 8px;
+
+		.input-size-constraint {
+			width: 240px;
+			min-width: 240px;
+		}
 	}
 
 	.care-tracker-header {

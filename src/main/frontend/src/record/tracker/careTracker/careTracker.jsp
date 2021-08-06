@@ -31,14 +31,14 @@
 		<filter-panel initial-state-expanded="false">
 			<div class="filter-wrapper">
 				<h6>Filter Items</h6>
-				<div class="row">
-					<div class="col-md-2">
+				<div class="flex-row flex-grow flex-gap-4 flex-wrap">
+					<div>
 						<juno-check-box label="Show Hidden Items"
 						                label-position="$ctrl.LABEL_POSITION.TOP"
 						                ng-model="$ctrl.filter.item.showHidden">
 						</juno-check-box>
 					</div>
-					<div class="col-md-10">
+					<div class="flex-grow">
 						<juno-input label="Search Items"
 						            label-position="$ctrl.LABEL_POSITION.TOP"
 						            ng-model="$ctrl.filter.item.textFilter">
@@ -46,35 +46,39 @@
 					</div>
 				</div>
 				<h6>Filter Data</h6>
-				<div class="row">
-					<div class="col-md-2">
+				<div class="flex-row flex-grow flex-gap-8 flex-wrap">
+					<div class="input-size-constraint">
 						<juno-select label="Most recent entries"
 						             label-position="$ctrl.LABEL_POSITION.TOP"
 						             ng-model="$ctrl.filter.data.maxEntries"
 						             options="$ctrl.filterOptions.dataMaxOptions">
 						</juno-select>
 					</div>
-					<div class="col-md-4">
-						<juno-date-select label="After Date"
-						                  label-position="$ctrl.LABEL_POSITION.TOP"
-						                  ng-model="$ctrl.filter.data.afterDate">
-						</juno-date-select>
+					<div class="flex-row flex-grow flex-gap-8 flex-wrap">
+						<div class="input-size-constraint">
+							<juno-date-select label="After Date"
+							                  label-position="$ctrl.LABEL_POSITION.TOP"
+							                  ng-model="$ctrl.filter.data.afterDate">
+							</juno-date-select>
+						</div>
+						<div class="input-size-constraint">
+							<juno-date-select label="Before Date"
+							                  label-position="$ctrl.LABEL_POSITION.TOP"
+							                  ng-model="$ctrl.filter.data.beforeDate">
+							</juno-date-select>
+						</div>
 					</div>
-					<div class="col-md-4">
-						<juno-date-select label="Before Date"
-						                  label-position="$ctrl.LABEL_POSITION.TOP"
-						                  ng-model="$ctrl.filter.data.beforeDate">
-						</juno-date-select>
-					</div>
-					<div class="col-md-2">
-						<juno-button component-style="$ctrl.componentStyle"
-						             label="&nbsp"
-						             label-position="$ctrl.LABEL_POSITION.TOP"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
-						             click="$ctrl.clearFilters()">
-							Clear Filters
-						</juno-button>
+					<div class="flex-row flex-grow justify-content-end">
+						<div>
+							<juno-button component-style="$ctrl.componentStyle"
+							             label="&nbsp"
+							             label-position="$ctrl.LABEL_POSITION.TOP"
+							             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+							             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
+							             click="$ctrl.clearFilters()">
+								Clear Filters
+							</juno-button>
+						</div>
 					</div>
 				</div>
 			</div>

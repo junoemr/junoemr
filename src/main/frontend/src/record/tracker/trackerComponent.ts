@@ -55,28 +55,27 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.careTrackers = [] as CareTrackerModel[];
-				ctrl.triggerdcareTrackers = [] as CareTrackerModel[];
 				ctrl.selectedCareTracker = null as CareTrackerModel;
 				ctrl.activeDxRecords = [];
 
 				ctrl.accordianListItems = [
 					{
-						name: "Pinned care trackers",
+						name: "Pinned Care Trackers",
 						expanded: true,
 						items: [], // will be the list of clinic careTrackers
 					},
 					{
-						name: "Standard care trackers",
+						name: "Standard Care Trackers",
 						expanded: false,
 						items: [], // will be the list of clinic careTrackers
 					},
 					{
-						name: "My care trackers",
+						name: "My Care Trackers",
 						expanded: false,
 						items: [], // will be the list of provider careTrackers
 					},
 					{
-						name: "Patient care trackers",
+						name: "Patient Care Trackers",
 						expanded: false,
 						items: [], // will be the list of demographic careTrackers
 					}
@@ -99,7 +98,6 @@ angular.module('Record.Tracker').component('healthTracker',
 
 				ctrl.initCareTrackerLists = (careTrackers: CareTrackerModel[]): void =>
 				{
-					const triggerdCareTrackers = ctrl.accordianListItems[0].items;
 					const clinicCareTrackerItems = ctrl.accordianListItems[1].items;
 					const providerCareTrackerItems = ctrl.accordianListItems[2].items;
 					const demographicCareTrackerItems = ctrl.accordianListItems[3].items;
@@ -142,7 +140,6 @@ angular.module('Record.Tracker').component('healthTracker',
 						triggerMap.set(key, careTracker);
 					});
 					ctrl.accordianListItems[0].items = Array.from(triggerMap.values());
-					ctrl.triggerdCareTrackers = Array.from(triggerMap.values());
 				}
 
 				ctrl.getTriggeredCareTrackers = (careTrackers: CareTrackerModel[]): CareTrackerModel[] =>

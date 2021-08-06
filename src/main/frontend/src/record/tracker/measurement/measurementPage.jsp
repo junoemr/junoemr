@@ -28,7 +28,7 @@
 	     class="flex-column flex-wrap flex-grow flex-gap-4">
 		<h6>{{type}}</h6>
 		<div class="flex-row flex-wrap flex-grow flex-gap-4">
-			<measurement-badge ng-repeat="measurement in measurements" model="measurement"></measurement-badge>
+			<care-tracker-item-data ng-repeat="measurement in measurements" model="measurement"></care-tracker-item-data>
 		</div>
 	</div>
 </div>

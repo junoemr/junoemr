@@ -52,7 +52,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemData',
 
 				ctrl.getDateForDisplay = (dateTime) =>
 				{
-					return Juno.Common.Util.formatDate(dateTime) + ' ' + Juno.Common.Util.formatTime(dateTime);
+					return Juno.Common.Util.formatDate(dateTime);
 				}
 			}]
 	});

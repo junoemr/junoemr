@@ -381,7 +381,6 @@ module.exports = {
 			'./src/record/tracker/careTracker/components/careTrackerItemGraphModal/careTrackerItemGraphModalComponent.ts',
 			'./src/record/tracker/measurement/module.js',
 			'./src/record/tracker/measurement/measurementPageComponent.ts',
-			'./src/record/tracker/measurement/components/measurementBadge/measurementBadgeComponent.ts',
 
 			'./src/tickler/module.js',
 			'./src/tickler/ticklerListController.js',
