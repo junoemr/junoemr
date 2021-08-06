@@ -35,11 +35,7 @@ import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.dao.WaitingListDao;
 import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
-import org.oscarehr.common.model.Contact;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -66,7 +62,6 @@ import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
-import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
@@ -273,90 +268,6 @@ public class DemographicService extends AbstractServiceImpl {
 			logger.error("Error",e);
 		}
 		return RestResponse.errorResponse("Error");
-	}
-
-	@GET
-	@Path("/{dataId}/contacts")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("dataId") Integer demographicNo,
-																			   @QueryParam("category") String category)
-	{
-		try
-		{
-			// return error if invalid category
-			if(!DemographicContact.ALL_CATEGORIES.contains(category))
-			{
-				return RestSearchResponse.errorResponse("Invalid Category");
-			}
-
-			List<DemographicContactFewTo1> results = new ArrayList<>();
-
-			List<DemographicContact> demoContacts = demographicContactDao.findByDemographicNoAndCategory(demographicNo, category);
-			for (DemographicContact demoContact : demoContacts)
-			{
-				Integer contactId = Integer.valueOf(demoContact.getContactId());
-				DemographicContactFewTo1 demoContactTo1 = new DemographicContactFewTo1();
-
-				if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PERSONAL))
-				{
-					if (demoContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
-					{
-						Demographic contactD = demographicManager.getDemographic(getLoggedInInfo(), contactId);
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
-
-						DemographicExt cell = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_CELL);
-						DemographicExt hPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_H_PHONE_EXT);
-						DemographicExt wPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_W_PHONE_EXT);
-
-						if (cell != null && !cell.toString().isEmpty())
-						{
-							demoContactTo1.setCellPhone(cell.getValue());
-						}
-						if (hPhoneExt != null && !hPhoneExt.toString().isEmpty())
-						{
-							demoContactTo1.setHPhoneExt(hPhoneExt.getValue());
-						}
-						if (wPhoneExt != null && !wPhoneExt.toString().isEmpty())
-						{
-							demoContactTo1.setWPhoneExt(wPhoneExt.getValue());
-						}
-					}
-					else if (demoContact.getType() == DemographicContact.TYPE_CONTACT)
-					{
-						Contact contactC = contactDao.findActiveContactById(contactId);
-						if (contactC != null)
-						{
-							demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactC);
-						}
-					}
-					if(demoContactTo1.getContactId() != null)
-					{
-						results.add(demoContactTo1);
-					}
-				}
-				else if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
-				{
-					if (demoContact.getType() == DemographicContact.TYPE_PROVIDER)
-					{
-						Provider contactP = providerDao.getProvider(contactId.toString());
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactP);
-					}
-					else if (demoContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST)
-					{
-						ProfessionalSpecialist contactS = specialistDao.find(contactId);
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactS);
-					}
-					results.add(demoContactTo1);
-				}
-			}
-			return RestSearchResponse.successResponse(results, 0, 0, 0);
-
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestSearchResponse.errorResponse("Error");
 	}
 
 	/**

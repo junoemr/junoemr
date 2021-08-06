@@ -42,16 +42,20 @@ angular.module('Record.Details').component('demographicContactsSection', {
         "$http",
         "$httpParamSerializer",
         "$stateParams",
-        "demographicService",
         function (staticDataService,
                   $uibModal,
                   $http,
                   $httpParamSerializer,
-                  $stateParams,
-                  demographicService)
+                  $stateParams,)
         {
             let ctrl = this;
             const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
+
+            ctrl.category = {
+                PERSONAL: "personal",
+                PROFESSIONAL: "professional",
+            };
+
             ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.GREY;
             ctrl.LABEL_POSITION = LABEL_POSITION;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -67,34 +71,21 @@ angular.module('Record.Details').component('demographicContactsSection', {
             {
                 ctrl.thisDemo = $stateParams.demographicNo;
 
-                demographicApi.getDemographicContacts(ctrl.thisDemo, "personal").then(
+                demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PERSONAL).then(
                     (data) => {
                         ctrl.demoContacts = (data.data.body);
                     },
                     () => {
-                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve contacts');
+                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not personal retrieve contacts');
                     });
 
-                /*demographicService.getDemographicContacts(ctrl.thisDemo, "personal").then(
-                    function success(data)
-                    {
-                        ctrl.demoContacts = (data);
+                demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PROFESSIONAL).then(
+                    (data) => {
+                        ctrl.demoContactPros = (data.data.body);
                     },
-                    function error(error)
-                    {
-                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve contacts');
-                    });*/
-
-                demographicService.getDemographicContacts(ctrl.thisDemo, "professional").then(
-                    function success(data)
-                    {
-                        ctrl.demoContactPros = (data);
-                    },
-                    function error(error)
-                    {
-                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve contacts');
-                    }
-                );
+                    () => {
+                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve professional contacts');
+                    });
             }
 
             ctrl.openContacts = function (demoContact)

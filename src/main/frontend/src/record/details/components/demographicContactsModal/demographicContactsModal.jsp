@@ -179,10 +179,6 @@
 
 	<modal-footer class="modal-footer">
 		<div class="buttons">
-			<juno-button
-					click="$ctrl.onCancel()">
-				Close
-			</juno-button>
 
 			<juno-button
 					click="$ctrl.edit()"
@@ -198,6 +194,11 @@
 					button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 				Save
+			</juno-button>
+
+			<juno-button
+					click="$ctrl.onCancel()">
+				Close
 			</juno-button>
 		</div>
 	</modal-footer>

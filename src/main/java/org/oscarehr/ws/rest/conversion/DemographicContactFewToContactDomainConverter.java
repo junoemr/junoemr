@@ -36,17 +36,17 @@ public class DemographicContactFewToContactDomainConverter extends AbstractModel
     @Override
     public Contact convert(DemographicContactFewTo1 transfer)
     {
+        if (transfer == null)
+        {
+            return null;
+        }
+
         Contact contact = new Contact();
         String[] ignoreProperties = {
 				"role",
 				"category",
 				"contactId"
 		};
-
-        if (transfer == null)
-        {
-            return null;
-        }
 
         BeanUtils.copyProperties(transfer, contact, ignoreProperties);
 		return contact;

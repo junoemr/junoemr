@@ -21,7 +21,6 @@ angular.module('Record.Details').component('demographicContactsModal', {
         "$uibModal",
         "$state",
         "uxService",
-        "demographicService",
         function (
             $scope,
             $http,
@@ -29,7 +28,6 @@ angular.module('Record.Details').component('demographicContactsModal', {
             $uibModal,
             $state,
             uxService,
-            demographicService,
         )
         {
             const ctrl = this;
@@ -120,7 +118,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                     () => {
                         Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not update contacts');
                     });
-            }
+            };
 
             ctrl.resetEditState = function resetEditState()
 		{

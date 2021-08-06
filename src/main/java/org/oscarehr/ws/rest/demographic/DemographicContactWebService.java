@@ -43,7 +43,6 @@ import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewToContactDomainConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewToDomainConverter;
-import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,7 @@ public class DemographicContactWebService extends AbstractServiceImpl
     protected SecurityInfoManager securityInfoManager;
     protected DemographicManager demographicManager;
     protected DemographicContactFewTo1 demographicContactFewTo1;
-    protected DemographicContactFewToContactDomainConverter demographicContactToDomainConverter;
+    protected DemographicContactFewToContactDomainConverter contactToDomainConverter;
     protected DemographicContactFewToDomainConverter demoContactToDomainConverter;
     protected ContactDao contactDao;
 	protected ProviderDao providerDao;
@@ -83,7 +82,7 @@ public class DemographicContactWebService extends AbstractServiceImpl
 	public DemographicContactWebService(
 			SecurityInfoManager securityInfoManager,
             DemographicManager demographicManager,
-            DemographicContactFewToContactDomainConverter demographicContactToDomainConverter,
+            DemographicContactFewToContactDomainConverter contactToDomainConverter,
             DemographicContactFewToDomainConverter demoContactToDomainConverter,
             ContactDao contactDao,
             ProviderDao providerDao,
@@ -93,7 +92,7 @@ public class DemographicContactWebService extends AbstractServiceImpl
 	{
 		this.securityInfoManager = securityInfoManager;
 		this.demographicManager = demographicManager;
-		this.demographicContactToDomainConverter = demographicContactToDomainConverter;
+		this.contactToDomainConverter = contactToDomainConverter;
 		this.demoContactToDomainConverter = demoContactToDomainConverter;
 		this.contactDao = contactDao;
 		this.demographicContactDao = demographicContactDao;
@@ -110,38 +109,48 @@ public class DemographicContactWebService extends AbstractServiceImpl
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicContactFewTo1> updateExternalContact(@PathParam("demographicId") Integer demographicId,
+	public RestSearchResponse<DemographicContactFewTo1> updateExternalContact(@PathParam("demographicId") Integer demographicId,
 																		DemographicContactFewTo1 demographicContactFewTo1)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicId, "_demographic");
 
-		org.oscarehr.common.model.Contact domainContact = demographicContactToDomainConverter.convert(demographicContactFewTo1);
+		org.oscarehr.common.model.Contact domainContact = contactToDomainConverter.convert(demographicContactFewTo1);
 		Contact updatedContact = demographicManager.updateExternalContact(loggedInInfo, domainContact, demographicContactFewTo1.getContactId());
 
 		org.oscarehr.common.model.DemographicContact domainDemographicContact = demoContactToDomainConverter.convert(demographicContactFewTo1);
-		List<DemographicContact> updatedDemoContact = demographicManager.updateExternalDemographicContact(loggedInInfo, demographicId, domainDemographicContact, demographicContactFewTo1.getContactId(), String.valueOf(updatedContact.getId()));
+		List<DemographicContact> updatedDemographicContactList = demographicManager.updateExternalDemographicContact(loggedInInfo,
+				demographicId,
+				domainDemographicContact,
+				demographicContactFewTo1.getContactId(),
+				String.valueOf(updatedContact.getId()));
 
-		return RestResponse.successResponse(demographicContactFewTo1);
+		List<DemographicContactFewTo1> returnList = new ArrayList<DemographicContactFewTo1>();
+		for (DemographicContact updatedDemographicContact: updatedDemographicContactList)
+		{
+			returnList.add(demoContactFewConverter.getAsTransferObject(updatedDemographicContact, updatedContact));
+		}
+		return RestSearchResponse.successResponse(returnList);
 	}
 
 	@GET
-	@Path("/")
+	@Path("/category/{categoryType}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("demographicId") Integer demographicId, String category)
+	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("demographicId") Integer demographicId,
+																			   @PathParam("categoryType") String categoryType)
 	{
 		Logger logger = MiscUtils.getLogger();
 		try
 		{
 			// return error if invalid category
-			if(!DemographicContact.ALL_CATEGORIES.contains(category))
+			if(!DemographicContact.ALL_CATEGORIES.contains(categoryType))
 			{
 				return RestSearchResponse.errorResponse("Invalid Category");
 			}
 
 			List<DemographicContactFewTo1> results = new ArrayList<>();
 
-			List<DemographicContact> demoContacts = demographicContactDao.findByDemographicNoAndCategory(demographicId, category);
+			List<DemographicContact> demoContacts = demographicContactDao.findByDemographicNoAndCategory(demographicId, categoryType);
 			for (DemographicContact demoContact : demoContacts)
 			{
 				Integer contactId = Integer.valueOf(demoContact.getContactId());

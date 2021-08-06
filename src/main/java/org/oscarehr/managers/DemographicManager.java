@@ -336,19 +336,16 @@ public class DemographicManager {
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 
-		//set all old DemographicContacts to deleted
-		List<DemographicContact> oldDemographicContact = demographicContactDao.findAllByContactIdAndCategoryAndType(Integer.parseInt(oldContactId), "personal", 2);
-		//List<DemographicContact> oldDemographicContact = demographicContactDao.find(demographicId, Integer.parseInt(oldContactId));
+		List<DemographicContact> oldDemographicContact = demographicContactDao.findAllByContactIdAndCategoryAndType(Integer.parseInt(oldContactId),
+															DemographicContact.CATEGORY_PERSONAL,
+															DemographicContact.TYPE_CONTACT);
+
 		List<DemographicContact> revisedList = new ArrayList<DemographicContact>();
 		for (DemographicContact demographicContact : oldDemographicContact)
 		{
 			if (demographicContact.getDemographicNo() != demographicId)
 			{
-				//DemographicContact rev = new DemographicContact();
-				//demographicContact.setDeleted(true);
 				demographicContact.setContactId(newContactId);
-				//rev.setDemographicNo(demographicContact.getDemographicNo());
-				//demographicContactDao.merge(demographicContact);
 				demographicContact.setCreator(loggedInInfo.getLoggedInProviderNo());
 				demographicContact = (DemographicContact) demographicContactDao.merge(demographicContact);
 				revisedList.add(demographicContact);
@@ -362,7 +359,6 @@ public class DemographicManager {
 		DemographicContact revised = (DemographicContact) demographicContactDao.merge(newContact);
 		revisedList.add(revised);
 
-		//update any other DemographicContact linked to the same contact
 		return revisedList;
 	}
 

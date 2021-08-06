@@ -36,6 +36,11 @@ public class DemographicContactFewToDomainConverter extends AbstractModelConvert
     @Override
     public DemographicContact convert(DemographicContactFewTo1 transfer)
     {
+        if (transfer == null)
+        {
+            return null;
+        }
+
         DemographicContact contact = new DemographicContact();
         String[] ignoreProperties = {
                 "lastName",
@@ -58,11 +63,6 @@ public class DemographicContactFewToDomainConverter extends AbstractModelConvert
                 "email",
                 "note"
         };
-
-        if (transfer == null)
-        {
-            return null;
-        }
 
         BeanUtils.copyProperties(transfer, contact, ignoreProperties);
         return contact;
