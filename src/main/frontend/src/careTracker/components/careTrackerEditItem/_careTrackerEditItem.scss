@@ -6,6 +6,15 @@
 	background-color: var(--color-neutral-lightest);
 	position: relative;
 
+	.item-header {
+		@include juno-font-body-small;
+		font-weight: bold;
+	}
+
+	.item-description {
+		@include juno-font-body-smallest;
+	}
+
 	.row-padding {
 		padding: 0 2px;
 	}

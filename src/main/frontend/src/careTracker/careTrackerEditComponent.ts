@@ -77,6 +77,8 @@ angular.module('CareTracker').component('careTrackerEdit',
 					{
 						ctrl.careTracker = new CareTrackerModel();
 					}
+
+					ctrl.readOnly = ctrl.careTracker.systemManaged || !ctrl.userCanEdit();
 					ctrl.isLoading = false;
 				}
 
@@ -330,8 +332,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.canSave = (): boolean =>
 				{
-					let hasPermission = ctrl.isNewCareTracker() ? ctrl.userCanCreate() : ctrl.userCanEdit();
-					return ctrl.careTracker  && !ctrl.careTracker.systemManaged && hasPermission && !Juno.Common.Util.isBlank(ctrl.careTracker.name);
+					return ctrl.careTracker  && !ctrl.readOnly && !Juno.Common.Util.isBlank(ctrl.careTracker.name);
 				}
 
 				ctrl.saveButtonTooltip = (): string =>

@@ -30,6 +30,7 @@ angular.module('CareTracker').component('careTrackerItemRule',
 			componentStyle: "<?",
 			model: "<",
 			onDelete: "&?",
+			disabled: "<?",
 		},
 		controller: [
 			function ()

@@ -9,6 +9,7 @@
 	<juno-simple-close-button
 			class="row-item"
 			click="$ctrl.onClose()"
+			disabled="$ctrl.disabled"
 			tooltip="Remove Trigger Code">
 	</juno-simple-close-button>
 </div>

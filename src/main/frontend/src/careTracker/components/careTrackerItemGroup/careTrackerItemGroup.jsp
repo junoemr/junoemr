@@ -5,6 +5,7 @@
 			<span class="care-tracker-item-group-description">{{$ctrl.model.description}}</span>
 			<juno-simple-close-button ng-if="$ctrl.showDelete"
 			                          click="$ctrl.onClose()"
+			                          disabled="$ctrl.disabled"
 			                          class="group-close-button">
 			</juno-simple-close-button>
 		</panel-header>

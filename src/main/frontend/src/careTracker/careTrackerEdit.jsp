@@ -51,12 +51,14 @@
 		<div class="flex-column width-25 row-padding-r">
 			<juno-input label="Care Tracker Name"
 			            label-position="$ctrl.LABEL_POSITION.TOP"
+			            disabled="$ctrl.isLoading || $ctrl.readOnly"
 			            ng-model="$ctrl.careTracker.name">
 			</juno-input>
 		</div>
 		<div class="flex-column flex-grow row-padding-l">
 			<juno-input label="Description"
 			            label-position="$ctrl.LABEL_POSITION.TOP"
+			            disabled="$ctrl.isLoading || $ctrl.readOnly"
 			            ng-model="$ctrl.careTracker.description">
 			</juno-input>
 		</div>
@@ -67,13 +69,14 @@
 			<care-tracker-trigger ng-repeat="triggerCode in $ctrl.careTracker.triggerCodes"
 			                      model="triggerCode"
 			                      class="row-padding"
+			                      disabled="$ctrl.isLoading || $ctrl.readOnly"
 			                      on-delete="$ctrl.onDeleteTriggerCode(triggerCode)">
 			</care-tracker-trigger>
 			<div class="icon-only-button-wrapper">
 				<juno-button component-style="$ctrl.componentStyle"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-				             disabled="$ctrl.isLoading"
+				             disabled="$ctrl.isLoading || $ctrl.readOnly"
 				             click="$ctrl.onAddIcd9TriggerCode()">
 					<i class="icon icon-add"></i>
 				</juno-button>
@@ -83,13 +86,15 @@
 
 	<div class="flex-column">
 		<care-tracker-item-group ng-repeat="itemGroup in $ctrl.careTracker.careTrackerItemGroups"
-		                      model="itemGroup"
-		                      show-delete="true"
-		                      on-delete="$ctrl.onRemoveGroup(group)">
+		                         model="itemGroup"
+		                         show-delete="true"
+		                         disabled="$ctrl.readOnly"
+		                         on-delete="$ctrl.onRemoveGroup(group)">
 			<div class="flex-column flex-grow">
 				<div class="flex-row flex-grow justify-content-between">
 					<div class="flex flex-grow">
 						<juno-input label="Group description"
+						            disabled="$ctrl.isLoading || $ctrl.readOnly"
 						            label-position="$ctrl.LABEL_POSITION.TOP"
 						            ng-model="itemGroup.description">
 						</juno-input>
@@ -100,7 +105,7 @@
 						             label-position="$ctrl.LABEL_POSITION.TOP"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-						             disabled="$ctrl.isLoading"
+						             disabled="$ctrl.isLoading || $ctrl.readOnly"
 						             click="$ctrl.onRenameGroup(itemGroup)">
 							<i class="icon icon-gear"></i>
 						</juno-button>
@@ -108,6 +113,7 @@
 				</div>
 				<div ng-repeat="item in itemGroup.careTrackerItems" class="flex-row flex-grow align-items-center">
 					<care-tracker-edit-item model="item"
+					                        disabled="$ctrl.readOnly"
 					                        on-delete="$ctrl.onRemoveItem(item, itemGroup)"
 					                        class="flex-grow">
 					</care-tracker-edit-item>
@@ -117,7 +123,7 @@
 						<juno-button component-style="$ctrl.componentStyle"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-						             disabled="$ctrl.isLoading"
+						             disabled="$ctrl.isLoading || $ctrl.readOnly"
 						             click="$ctrl.onAddNewMeasurementItem(itemGroup)">
 							<i class="icon icon-add"></i>
 							<span>Add Measurement Item</span>
@@ -127,7 +133,7 @@
 						<juno-button component-style="$ctrl.componentStyle"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-						             disabled="$ctrl.isLoading"
+						             disabled="$ctrl.isLoading || $ctrl.readOnly"
 						             click="$ctrl.onAddNewPreventionItem(itemGroup)">
 							<i class="icon icon-add"></i>
 							<span>Add Prevention Item</span>
@@ -141,7 +147,7 @@
 		<juno-button component-style="$ctrl.componentStyle"
 		             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 		             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-		             disabled="$ctrl.isLoading"
+		             disabled="$ctrl.isLoading || $ctrl.readOnly"
 		             click="$ctrl.onAddNewGroup()">
 			<i class="icon icon-add"></i>
 			<span>Add Group</span>

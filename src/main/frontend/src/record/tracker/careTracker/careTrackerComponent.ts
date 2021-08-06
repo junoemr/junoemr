@@ -33,7 +33,6 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 		templateUrl: 'src/record/tracker/careTracker/careTracker.jsp',
 		bindings: {
 			componentStyle: "<?",
-			embeddedView: "<?",
 		},
 		controller: [
 			'$scope',
@@ -48,7 +47,6 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 			)
 			{
 				const ctrl = this;
-				ctrl.embeddedView = true;
 
 				ctrl.SecurityPermissions = SecurityPermissions;
 				ctrl.LABEL_POSITION = LABEL_POSITION;

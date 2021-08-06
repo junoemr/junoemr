@@ -32,6 +32,7 @@ angular.module('CareTracker').component('careTrackerEditItem',
 			componentStyle: "<?",
 			model: "<",
 			onDelete: "&?",
+			disabled: "<?"
 		},
 		controller: [
 			'$uibModal',

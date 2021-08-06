@@ -30,6 +30,7 @@ angular.module('CareTracker').component('careTrackerTrigger',
 			componentStyle: "<?",
 			model: "<",
 			onDelete: "&?",
+			disabled: "<?",
 		},
 		controller: [
 			function ()

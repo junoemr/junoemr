@@ -83,7 +83,7 @@
 								<juno-button component-style="$ctrl.componentStyle"
 								             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 								             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								             disabled="$ctrl.isLoading || !table.enableDelete"
+								             disabled="$ctrl.isLoading || !table.enableDelete || item.systemManaged"
 								             click="$ctrl.onCareTrackerDelete(item)">
 									Delete
 								</juno-button>

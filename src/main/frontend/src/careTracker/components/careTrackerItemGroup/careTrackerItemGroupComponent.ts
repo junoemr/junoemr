@@ -29,6 +29,7 @@ angular.module('CareTracker').component('careTrackerItemGroup',
 			model: "<",
 			showDelete: "<?",
 			onDelete: "&?",
+			disabled: "<?",
 		},
 		transclude: true,
 		controller: [
