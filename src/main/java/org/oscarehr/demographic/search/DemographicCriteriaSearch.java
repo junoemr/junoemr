@@ -170,7 +170,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		}
 		if(getPhone() != null)
 		{
-			// left join demographic merged and only return the result if it isn't merged
 			criteria.createAlias(alias + ".demographicExtSet", "dx", Criteria.LEFT_JOIN, Restrictions.eq("dx.key", DemographicExt.KEY_DEMO_CELL));
 
 			junction.add(Restrictions.or(getRestrictionCriterion("phone", getPhone()),
