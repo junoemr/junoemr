@@ -37,13 +37,12 @@ angular.module('Record.Details').component('demographicContactsSection', {
         ngModel: "=",
         componentStyle: "<?"
     },
-    controller: ["staticDataService",
+    controller: [
         "$uibModal",
         "$http",
         "$httpParamSerializer",
         "$stateParams",
-        function (staticDataService,
-                  $uibModal,
+        function ($uibModal,
                   $http,
                   $httpParamSerializer,
                   $stateParams,)
