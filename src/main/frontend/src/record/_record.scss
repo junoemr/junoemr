@@ -23,9 +23,17 @@
 		@include juno-breakpoints(1600px, $screen-nav-md, $screen-nav-sm);
 	}
 
-	.primary-content-window {
-		@extend %juno-primary-view-pane-tabs;
-		@include juno-page-padding-default;
+	.page-fill-wrapper {
+		position: relative;
+
+		.primary-content-window {
+			@include juno-page-padding-default;
+
+			position: absolute;
+			inset: 0;
+
+			overflow-y: auto;
+		}
 	}
 
 	.sub-nav {
