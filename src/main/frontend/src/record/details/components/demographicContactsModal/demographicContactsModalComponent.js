@@ -116,7 +116,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                         ctrl.onCancel();
                     },
                     () => {
-                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not update contacts');
+                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not update contacts');
                     });
             };
 
@@ -137,7 +137,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                     },
                     function error(errors)
                     {
-                        Juno.Common.Util.alert("Unable to open tab.", errors);
+                        Juno.Common.Util.errorAlert($uibModal, "Error", "Unable to open tab.");
                     });
             };
 

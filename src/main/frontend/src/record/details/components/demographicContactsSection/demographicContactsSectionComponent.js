@@ -76,7 +76,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                         ctrl.demoContacts = (data.data.body);
                     },
                     () => {
-                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not personal retrieve contacts');
+                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not retrieve personal contacts');
                     });
 
                 demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PROFESSIONAL).then(
@@ -84,7 +84,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                         ctrl.demoContactPros = (data.data.body);
                     },
                     () => {
-                        Juno.Common.Util.successAlert($uibModal, 'Error', 'Could not retrieve professional contacts');
+                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not retrieve professional contacts');
                     });
             }
 

@@ -328,18 +328,17 @@ public class DemographicManager {
 		return revised;
 	}
 
-	public List<DemographicContact> updateExternalDemographicContact(LoggedInInfo loggedInInfo,
+	public DemographicContact updateExternalDemographicContact(LoggedInInfo loggedInInfo,
 															   Integer demographicId,
 															   DemographicContact newContact,
 															   String oldContactId,
 															   String newContactId)
 	{
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-
 		List<DemographicContact> oldDemographicContact = demographicContactDao.findAllByContactIdAndCategoryAndType(Integer.parseInt(oldContactId),
 															DemographicContact.CATEGORY_PERSONAL,
 															DemographicContact.TYPE_CONTACT);
 
+		//update the contactId for DemographicContacts linked to the edited Contact
 		List<DemographicContact> revisedList = new ArrayList<DemographicContact>();
 		for (DemographicContact demographicContact : oldDemographicContact)
 		{
@@ -359,7 +358,7 @@ public class DemographicManager {
 		DemographicContact revised = (DemographicContact) demographicContactDao.merge(newContact);
 		revisedList.add(revised);
 
-		return revisedList;
+		return revised;
 	}
 
 

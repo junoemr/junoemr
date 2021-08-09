@@ -43,6 +43,7 @@ import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewToContactDomainConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewToDomainConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,28 +110,23 @@ public class DemographicContactWebService extends AbstractServiceImpl
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<DemographicContactFewTo1> updateExternalContact(@PathParam("demographicId") Integer demographicId,
+	public RestResponse<DemographicContactFewTo1> updateExternalContact(@PathParam("demographicId") Integer demographicId,
 																		DemographicContactFewTo1 demographicContactFewTo1)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicId, "_demographic");
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.UPDATE, demographicId, "_demographic");
 
 		org.oscarehr.common.model.Contact domainContact = contactToDomainConverter.convert(demographicContactFewTo1);
 		Contact updatedContact = demographicManager.updateExternalContact(loggedInInfo, domainContact, demographicContactFewTo1.getContactId());
 
 		org.oscarehr.common.model.DemographicContact domainDemographicContact = demoContactToDomainConverter.convert(demographicContactFewTo1);
-		List<DemographicContact> updatedDemographicContactList = demographicManager.updateExternalDemographicContact(loggedInInfo,
+		DemographicContact updatedDemographicContact = demographicManager.updateExternalDemographicContact(loggedInInfo,
 				demographicId,
 				domainDemographicContact,
 				demographicContactFewTo1.getContactId(),
 				String.valueOf(updatedContact.getId()));
 
-		List<DemographicContactFewTo1> returnList = new ArrayList<DemographicContactFewTo1>();
-		for (DemographicContact updatedDemographicContact: updatedDemographicContactList)
-		{
-			returnList.add(demoContactFewConverter.getAsTransferObject(updatedDemographicContact, updatedContact));
-		}
-		return RestSearchResponse.successResponse(returnList);
+		return RestResponse.successResponse(demoContactFewConverter.getAsTransferObject(updatedDemographicContact, updatedContact));
 	}
 
 	@GET

@@ -47,13 +47,7 @@ public class ContactDao extends AbstractDao<Contact> {
 		query.setParameter(1, contactId);
 
 		@SuppressWarnings("unchecked")
-		Contact result = null;
-		List<Contact> dContacts = query.getResultList();
-
-		if (!dContacts.isEmpty())
-		{
-			result = dContacts.get(0);
-		}
+		Contact result = this.getSingleResultOrNull(query);
 
 		return result;
 	}
