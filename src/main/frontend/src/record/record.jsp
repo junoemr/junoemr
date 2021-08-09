@@ -41,15 +41,20 @@
 				</span>
 				{{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}}
 				(<span ng-if="!recordCtrl.isNaN(recordCtrl.demographic.age)">{{recordCtrl.demographic.age}}</span>)
-
-				<%--<span class="patient-header-label">--%>
-					<%--<bean:message key="Appointment.msgTelephone"/>:--%>
-				<%--</span>--%>
 			</h5>
-			<i class="icon icon-tele-call"></i>
-			<h5 class="patient-header-info">
-				{{recordCtrl.demographic.phone}}
-			</h5>
+			<span ng-if="recordCtrl.demographic.phone" class="flex-row">
+				<i class="icon icon-tele-call"></i>
+				<h5 class="patient-header-info">
+					{{recordCtrl.demographic.phone}}
+				</h5>
+			</span>
+			<span ng-if="recordCtrl.canMHACallPatient">
+				<juno-button  title="Call patient"
+				              button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
+				              button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
+					<i class="icon icon-tele-call"></i>
+				</juno-button>
+			</span>
 		</div>
 	</div>
 

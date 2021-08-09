@@ -61,6 +61,9 @@ public class MHAPatient
 	private String workPhone;
 	private String primaryFax;
 
+	@Setter
+	@Getter
+	private Boolean hasVoipToken;
 	private LINK_STATUS linkStatus;
 	@Getter
 	@Setter
