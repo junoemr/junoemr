@@ -24,7 +24,7 @@
 package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.log4j.Logger;
+import org.apache.jcs.access.exception.InvalidArgumentException;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicContactDao;
@@ -38,7 +38,6 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewToContactDomainConverter;
@@ -55,6 +54,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,18 +130,17 @@ public class DemographicContactWebService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/category/{categoryType}")
+	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("demographicId") Integer demographicId,
-																			   @PathParam("categoryType") String categoryType)
+																			   @QueryParam("categoryType") String categoryType) throws InvalidArgumentException
 	{
-		Logger logger = MiscUtils.getLogger();
-		try
-		{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicId, "_demographic");
+
 			// return error if invalid category
 			if(!DemographicContact.ALL_CATEGORIES.contains(categoryType))
 			{
-				return RestSearchResponse.errorResponse("Invalid Category");
+				throw new InvalidArgumentException("Invalid category: " + categoryType);
 			}
 
 			List<DemographicContactFewTo1> results = new ArrayList<>();
@@ -204,13 +203,6 @@ public class DemographicContactWebService extends AbstractServiceImpl
 					results.add(demoContactTo1);
 				}
 			}
-			return RestSearchResponse.successResponse(results, 0, 0, 0);
-
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestSearchResponse.errorResponse("Error");
+			return RestSearchResponse.successResponseOnePage(results);
 	}
 }
