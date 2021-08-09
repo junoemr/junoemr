@@ -318,8 +318,6 @@ public class DemographicManager {
 
 	public Contact updateExternalContact(LoggedInInfo loggedInInfo, Contact contact, String oldContactId)
 	{
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-
 		Contact oldContact = contactDao.find(Integer.parseInt(oldContactId));
 		oldContact.setDeleted(true);
 		contactDao.merge(oldContact);
