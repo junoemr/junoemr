@@ -625,7 +625,7 @@ function popup1(height, width, url, windowName){
         onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
 				<% if (faxEnabled) { %>
 				<input type="button"
-					value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
+					value="Fax Documents"
 					onclick="return newWindowForm('<rewrite:reWrite jspPage="faxPDFs.do"/>');" />
 		 		<%
 				}
