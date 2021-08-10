@@ -49,7 +49,6 @@ public class DemographicContactModelToDbConverter
 		convertedDemoContact.setUpdateDate(ConversionUtils.toNullableLegacyDateTime(input.getUpdateDateTime()));
 		convertedDemoContact.setType(inputContact.getContactType().getValue());
 		convertedDemoContact.setContactId(inputContact.getIdString());
-		convertedDemoContact.setFacilityId(input.getFacilityId());
 
 		return convertedDemoContact;
 	}

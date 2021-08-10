@@ -34,7 +34,6 @@ import java.util.List;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEFAULT_CONTACT_FACILITY_ID;
 
 @Component
 public class CDSContactImportMapper extends AbstractCDSImportMapper<Demographics.Contact, DemographicContact>
@@ -84,7 +83,6 @@ public class CDSContactImportMapper extends AbstractCDSImportMapper<Demographics
 		demographicContact.setConsentToContact(false);
 		demographicContact.setCreatedAt(LocalDateTime.now());
 		demographicContact.setUpdateDateTime(LocalDateTime.now());
-		demographicContact.setFacilityId(DEFAULT_CONTACT_FACILITY_ID);
 
 		return demographicContact;
 	}
