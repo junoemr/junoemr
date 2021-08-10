@@ -35,8 +35,28 @@ import java.util.Hashtable;
  *
  * @author jay
  */
+
+
 public interface PreventionReport {
+
+    //Prevention followup
+    String FIRST_LETTER = "L1";
+    String SECOND_LETTER = "L2";
+    String PHONE_CALL = "P1";
+    String NO_FOLLOWUP = "------";
+    String CALL_FOLLOWUP = "Follow Up";
+
+    //Prevention state
+    String NO_INFO = "No Info";
+    String DUE = "due";
+    String OVERDUE = "Overdue";
+    String UP_TO_DATE = "Up to date";
+    String REFUSED = "Refused";
+    String INELIGIBLE = "Ineligible";
+    String PENDING = "Pending";
+
     public boolean displayNumShots();
 
     public Hashtable runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate);
 }
+

@@ -119,7 +119,8 @@ String labStatus = "";
 if (ackList != null){
     for (int i=0; i < ackList.size(); i++){
         ReportStatus reportStatus = (ReportStatus) ackList.get(i);
-        if ( reportStatus.getProviderNo().equals(providerNo) ) {
+        if (reportStatus != null && reportStatus.getProviderNo() != null && reportStatus.getProviderNo().equals(providerNo))
+        {
             labStatus = reportStatus.getStatus();
             if(labStatus.equals("A") ){
             	ackFlag = true;

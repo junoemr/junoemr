@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
@@ -38,15 +38,15 @@ public class AbstractMapper
 
 	protected final ZPD_ZTR message;
 	protected final ZPD_ZTR_PROVIDER provider;
-	protected final CoPDImportService.IMPORT_SOURCE importSource;
+	protected final ImporterExporterFactory.IMPORT_SOURCE importSource;
 
 	protected AbstractMapper()
 	{
 		this.message = null;
 		this.provider = null;
-		this.importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
+		this.importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 	}
-	protected AbstractMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	protected AbstractMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		this.message = message;
 		this.provider = message.getPATIENT().getPROVIDER(providerRep);
@@ -54,9 +54,9 @@ public class AbstractMapper
 	}
 	protected AbstractMapper(ZPD_ZTR message, int providerRep)
 	{
-		this(message, providerRep, CoPDImportService.IMPORT_SOURCE.UNKNOWN);
+		this(message, providerRep, ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN);
 	}
-	protected AbstractMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	protected AbstractMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		this.message = message;
 		this.provider = null;
@@ -64,7 +64,7 @@ public class AbstractMapper
 	}
 	protected AbstractMapper(ZPD_ZTR message)
 	{
-		this(message, CoPDImportService.IMPORT_SOURCE.UNKNOWN);
+		this(message, ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN);
 	}
 
 	protected static Date getNullableDate(String segmentValue)

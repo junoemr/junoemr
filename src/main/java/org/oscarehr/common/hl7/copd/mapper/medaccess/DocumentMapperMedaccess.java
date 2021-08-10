@@ -26,14 +26,14 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DocumentMapperMedaccess extends DocumentMapper
 {
-	public DocumentMapperMedaccess(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public DocumentMapperMedaccess(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}

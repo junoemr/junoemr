@@ -29,8 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.dataMigration.service.CoPDImportService;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.dataMigration.transfer.CoPDRecordMessage;
 import org.oscarehr.measurements.service.MeasurementsService;
@@ -51,7 +51,7 @@ public class MeasurementsMapper extends AbstractMapper
 {
 	protected MeasurementsService measurementsService = SpringUtils.getBean(MeasurementsService.class);
 
-	public MeasurementsMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public MeasurementsMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}

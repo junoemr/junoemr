@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.olap4j.impl.ArrayMap;
 import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.provider.model.ProviderData;
 
 import java.util.Date;
@@ -43,7 +43,7 @@ public class EncounterNoteMapperWolf extends EncounterNoteMapper
 
 	public EncounterNoteMapperWolf(ZPD_ZTR message, int providerRep)
 	{
-		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.WOLF);
+		super(message, providerRep, ImporterExporterFactory.IMPORT_SOURCE.WOLF);
 	}
 
 	@Override
