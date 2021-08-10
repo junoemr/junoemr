@@ -30,13 +30,14 @@ import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.springframework.stereotype.Component;
 import xml.hrm.v4_3.ReportsReceived;
 
+import java.io.IOException;
 import java.util.List;
 
 @Component
 public class HRMReportDocumentMapper extends AbstractHRMImportMapper<HRMReport_4_3, Document>
 {
 	@Override
-	public Document importToJuno(HRMReport_4_3 importStructure) throws Exception
+	public Document importToJuno(HRMReport_4_3 importStructure) throws IOException
 	{
 		Document document = new Document();
 		document.setStatus(Document.STATUS.ACTIVE);

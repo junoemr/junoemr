@@ -23,30 +23,24 @@
 
 package org.oscarehr.dataMigration.mapper.hrm.in;
 
-
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 
-
 import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
-import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 
 import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.provider.search.ProviderCriteriaSearch;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import xml.hrm.v4_3.PersonNameSimple;
 import xml.hrm.v4_3.ReportsReceived;
-import xml.hrm.v4_3.TransactionInformation;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3, HrmDocument>
@@ -60,33 +54,33 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 	@Autowired
 	static ProviderDbToModelConverter providerConverter = SpringUtils.getBean(ProviderDbToModelConverter.class);
 	
+	static final Logger logger = MiscUtils.getLogger();
+	
 	private static final String SCHEMA_VERSION = "4.3";
 	
 	@Override
-	public HrmDocument importToJuno(HRMReport_4_3 importStructure) throws Exception
+	public HrmDocument importToJuno(HRMReport_4_3 importStructure) throws IOException
 	{
 		HrmDocument model = new HrmDocument();
 		model.setParentReport(null);
 		
 		model.setMessageUniqueId(importStructure.getMessageUniqueId());
-		model.setDescription("Downloaded HRM Document");
+		model.setDescription(importStructure.getFirstReportClass());
 		model.setDeliverToUserId(importStructure.getDeliverToUserId());
 		
 		// Despite the name, there is exactly one report per imported HRMReport
 		ReportsReceived report = importStructure.getDocumentRoot().getPatientRecord().getReportsReceived().get(0);
 		
 		model.setReportDateTime(toNullableLocalDateTime(report.getEventDateTime()));
-		//model.setReceivedDateTime(toNullableLocalDateTime(report.getReceivedDateTime()));
 		model.setReceivedDateTime(LocalDateTime.now());
 		model.setCreatedBy(stubProviderFromPersonName(report.getAuthorPhysician()));
 		model.setReportStatus(getStatus(report.getResultStatus()));
-		//model.setInternalReviewers(stubReviewers(report.getReviewingOHIPPhysicianId(), report.getReviewedDateTime()));  // TODO: can only stub?
 		model.setReportClass(getReportClass(report.getClazz()));
 		model.setReportSubClass(report.getSubClass());
 		model.setReportFileSchemaVersion(SCHEMA_VERSION);
 		
-		//model.setSourceFacility(importStructure.getSendingFacilityId());    // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
-		model.setSendingFacilityId(model.getSourceFacility());              // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
+		//model.setSourceFacility(importStructure.getSendingFacilityId());              // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
+		model.setSendingFacilityId(importStructure.getSendingFacilityId());             // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
 		model.setSendingFacilityReport(importStructure.getSendingFacilityReportNo());
 		
 		model.setObservations(importStructure.getObservations());
@@ -95,14 +89,6 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		
 		model.setDocument(documentMapper.importToJuno(importStructure));
 		model.setReportFile(FileFactory.getExistingFile(importStructure.getFileLocation()));   // IO Exception
-		
-		// According to the schema there is exactly one transaction information per message
-		//model.setDeliverToUsers(mapTargetProviders(importStructure.getDocumentRoot().getPatientRecord().getTransactionInformation()));
-		
-		// category (HrmCategory)               // TODO: Leave blank???
-		// hashData (HrmDocumentMatchingData)   // TODO: HashData??
-		
-		// comments List<HrmComments>           // TODO: leave this blank??
 		
 		return model;
 	}
@@ -115,61 +101,4 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		
 		return data;
 	}
-	
-	protected List<Provider> mapTargetProviders(List<TransactionInformation> transactionInfo)
-	{
-		List<Provider> providers = new ArrayList<Provider>();
-		
-		for (TransactionInformation transInfo : transactionInfo)
-		{
-			PersonNameSimple providerName = transInfo.getProvider();
-			String deliverToID = transInfo.getDeliverToUserID();
-			
-			ProviderCriteriaSearch searchParams = createProviderCriteriaSearch(providerName, deliverToID);
-			
-			List<ProviderData> knownProviders = providerDao.criteriaSearch(searchParams);
-			if (knownProviders.size() == 1)
-			{
-				providers.add(providerConverter.convert(knownProviders.get(0)));
-			}
-		}
-		
-		return providers;
-	}
-	
-	private ProviderCriteriaSearch createProviderCriteriaSearch(PersonNameSimple providerName, String deliverToID)
-	{
-		final String PREFIX_PHYSICIAN = "D";
-		final String PREFIX_NURSE = "N";
-		
-		ProviderCriteriaSearch searchParams = new ProviderCriteriaSearch();
-		
-		if (providerName.getFirstName() != null)
-		{
-			searchParams.setFirstName(providerName.getFirstName());
-		}
-		
-		if (providerName.getLastName() != null )
-		{
-			searchParams.setLastName(providerName.getLastName());
-		}
-		
-		if (deliverToID != null)
-		{
-			switch (deliverToID)
-			{
-				case PREFIX_PHYSICIAN:
-					searchParams.setPractitionerNo(deliverToID);
-					break;
-				case PREFIX_NURSE:
-					searchParams.setOntarioCnoNumber(deliverToID);
-					break;
-				default:
-					break;
-			}
-		}
-		
-		return searchParams;
-	}
-	
 }
