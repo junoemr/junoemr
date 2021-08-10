@@ -500,7 +500,7 @@ function popup1(height, width, url, windowName){
             %>
         <tr>
           <td>
-          <% if (curdoc.isPDF()){%> <input class="tightCheckbox<%=i%>"
+          <% if (curdoc.isFaxable()){%> <input class="tightCheckbox<%=i%>"
             type="checkbox" name="docNo" id="docNo<%=curdoc.getDocId()%>"
             value="<%=curdoc.getDocId()%>" style="margin: 0px; padding: 0px;" />
           <%}else{%> &nbsp; <%}%>

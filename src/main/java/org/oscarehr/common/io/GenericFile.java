@@ -23,7 +23,6 @@
 
 package org.oscarehr.common.io;
 
-import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -41,26 +40,44 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GenericFile
 {
 	protected static final Logger logger = MiscUtils.getLogger();
 	protected static final OscarProperties props = oscar.OscarProperties.getInstance();
-
-	private static final Set<String> ALLOWED_CONTENT_TYPE = Sets.newHashSet(
-			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",//docx
-			"application/pdf",
-			"application/xml",
-			"application/image",
-			"application/doc",
-			"application/msword",
-			"application/octet-stream",
-			"text/csv",
-			"text/plain",
-			"image/tiff",
-			"image/jpeg",
-			"image/png",
-			"image/bmp");
+	
+	public enum ALLOWED_CONTENT_TYPES
+	{
+		APPLICATION_DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+		APPLICATION_PDF("application/pdf"),
+		APPLICATION_XML("application/xml"),
+		APPLICATION_IMAGE("application/image"),
+		APPLICATION_DOC("application/doc"),
+		APPLICATION_MSWORD("application/msword"),
+		APPLICATION_ZIP("application/zip"),
+		APPLICATION_OCTET_STREAM("application/octet-stream"),
+		TEXT_CSV("text/csv"),
+		TEXT_PLAIN("text/plain"),
+		TEXT_XML("text/xml"),
+		IMAGE_TIFF("image/tiff"),
+		IMAGE_JPEG("image/jpeg"),
+		IMAGE_PNG("image/png"),
+		IMAGE_BMP("image/bmp");
+		
+		private String contentType;
+		
+		public String getContentType()
+		{
+			return contentType;
+		}
+		
+		ALLOWED_CONTENT_TYPES(String contentType)
+		{
+			this.contentType = contentType;
+		}
+	}
 
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 
@@ -309,7 +326,9 @@ public class GenericFile
 	}
 	public static Set<String> getAllowedContent()
 	{
-		return ALLOWED_CONTENT_TYPE;
+		return Stream.of(ALLOWED_CONTENT_TYPES.values())
+		             .map(ALLOWED_CONTENT_TYPES::getContentType)
+		             .collect(Collectors.toSet());
 	}
 
 	/**

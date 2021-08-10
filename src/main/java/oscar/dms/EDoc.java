@@ -399,10 +399,15 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 	 *Returns true if document a PDF.
 	 */
 	public boolean isPDF() {
-		if (this.contentType != null && this.contentType.contains("/pdf")) {
-			return true;
-		}
-		return false;
+		return this.contentType != null &&
+				       this.contentType.equals(GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_PDF.getContentType());
+	}
+	
+	public boolean isFaxable()
+	{
+		return this.contentType != null &&
+				       (this.contentType.equals(GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_PDF.getContentType()) ||
+						        this.contentType.equals(GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_DOCX.getContentType()));
 	}
 
 	/**
