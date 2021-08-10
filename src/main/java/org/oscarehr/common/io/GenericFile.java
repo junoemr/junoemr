@@ -54,6 +54,7 @@ public class GenericFile
 		APPLICATION_PDF("application/pdf"),
 		APPLICATION_XML("application/xml"),
 		APPLICATION_IMAGE("application/image"),
+		APPLICATION_DOC("application/doc"),
 		APPLICATION_MSWORD("application/msword"),
 		APPLICATION_ZIP("application/zip"),
 		APPLICATION_OCTET_STREAM("application/octet-stream"),
