@@ -26,6 +26,7 @@ package org.oscarehr.managers;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
@@ -34,6 +35,7 @@ import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
+import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Contact;
@@ -41,6 +43,7 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
+import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
 import org.oscarehr.demographic.dao.DemographicCustDao;
@@ -60,7 +63,9 @@ import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
+import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
+import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,12 +147,20 @@ public class DemographicManager {
 	private DemographicContactDao demographicContactDao;
 
 	@Autowired
+	private DemographicContactFewConverter demographicContactFewConverter;
+
+	@Autowired
 	private ContactDao contactDao;
 
 	@Autowired
+	private ProfessionalSpecialistDao specialistDao;
+
+	@Autowired
 	private DemographicArchiveDao demographicArchiveDao;
+
 	@Autowired
 	private DemographicExtArchiveDao demographicExtArchiveDao;
+
 	@Autowired
 	private DemographicCustArchiveDao demographicCustArchiveDao;
 
@@ -177,6 +190,9 @@ public class DemographicManager {
 
 	@Autowired
 	private DemographicRosterService demographicRosterService;
+
+	@Autowired
+	private ProviderDao providerDao;
 
 	@Deprecated
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
@@ -316,7 +332,72 @@ public class DemographicManager {
 		return demographicContactDao.findByDemographicNoAndType(demographicNo, type);
 	}
 
-	public Contact updateExternalContact(LoggedInInfo loggedInInfo, Contact contact, String oldContactId)
+	public List<DemographicContactFewTo1> getDemographicContactsByCategory(LoggedInInfo loggedInInfo, Integer demographicId, String categoryType)
+	{
+		List<DemographicContactFewTo1> results = new ArrayList<>();
+		List<DemographicContact> demographicContacts =  demographicContactDao.findByDemographicNoAndCategory(demographicId, categoryType);
+
+		for (DemographicContact demographicContact : demographicContacts)
+			{
+				Integer contactId = Integer.valueOf(demographicContact.getContactId());
+				DemographicContactFewTo1 demographicContactFewTo1 = new DemographicContactFewTo1();
+
+				if (demographicContact.getCategory().equals(DemographicContact.CATEGORY_PERSONAL))
+				{
+					if (demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
+					{
+						Demographic contactD = this.getDemographic(loggedInInfo, contactId);
+						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactD);
+
+						DemographicExt cell = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_CELL);
+						DemographicExt hPhoneExt = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_H_PHONE_EXT);
+						DemographicExt wPhoneExt = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_W_PHONE_EXT);
+
+						if (cell != null && !cell.toString().isEmpty())
+						{
+							demographicContactFewTo1.setCellPhone(cell.getValue());
+						}
+						if (hPhoneExt != null && !hPhoneExt.toString().isEmpty())
+						{
+							demographicContactFewTo1.setHPhoneExt(hPhoneExt.getValue());
+						}
+						if (wPhoneExt != null && !wPhoneExt.toString().isEmpty())
+						{
+							demographicContactFewTo1.setWPhoneExt(wPhoneExt.getValue());
+						}
+					}
+					else if (demographicContact.getType() == DemographicContact.TYPE_CONTACT)
+					{
+						Contact contactC = contactDao.findActiveContactById(contactId);
+						if (contactC != null)
+						{
+							demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactC);
+						}
+					}
+					if(demographicContactFewTo1.getContactId() != null)
+					{
+						results.add(demographicContactFewTo1);
+					}
+				}
+				else if (demographicContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
+				{
+					if (demographicContact.getType() == DemographicContact.TYPE_PROVIDER)
+					{
+						Provider contactP = providerDao.getProvider(contactId.toString());
+						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactP);
+					}
+					else if (demographicContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST)
+					{
+						ProfessionalSpecialist contactS = specialistDao.find(contactId);
+						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactS);
+					}
+					results.add(demographicContactFewTo1);
+				}
+			}
+		return results;
+	}
+
+	public Contact updateExternalContact(Contact contact, String oldContactId)
 	{
 		Contact oldContact = contactDao.find(Integer.parseInt(oldContactId));
 		oldContact.setDeleted(true);
@@ -336,26 +417,28 @@ public class DemographicManager {
 															DemographicContact.CATEGORY_PERSONAL,
 															DemographicContact.TYPE_CONTACT);
 
-		//update the contactId for DemographicContacts linked to the edited Contact
-		List<DemographicContact> revisedList = new ArrayList<DemographicContact>();
+		DemographicContact revised = new DemographicContact();
 		for (DemographicContact demographicContact : oldDemographicContact)
 		{
+
 			if (demographicContact.getDemographicNo() != demographicId)
 			{
 				demographicContact.setContactId(newContactId);
 				demographicContact.setCreator(loggedInInfo.getLoggedInProviderNo());
-				demographicContact = (DemographicContact) demographicContactDao.merge(demographicContact);
-				revisedList.add(demographicContact);
+				demographicContactDao.merge(demographicContact);
+			}
+			else
+			{
+				DemographicContact dc = demographicContactDao.find(demographicContact.getId());
+				dc.setDeleted(true);
+				demographicContactDao.merge(dc);
+
+				newContact.setContactId(newContactId);
+				newContact.setCreator(loggedInInfo.getLoggedInProviderNo());
+				newContact.setDemographicNo(demographicId);
+				revised = (DemographicContact) demographicContactDao.merge(newContact);
 			}
 		}
-
-		//update the DemographicContact for the requested demographic
-		newContact.setContactId(newContactId);
-		newContact.setCreator(loggedInInfo.getLoggedInProviderNo());
-		newContact.setDemographicNo(demographicId);
-		DemographicContact revised = (DemographicContact) demographicContactDao.merge(newContact);
-		revisedList.add(revised);
-
 		return revised;
 	}
 
