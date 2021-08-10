@@ -407,7 +407,8 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 	{
 		return this.contentType != null &&
 				       (this.contentType.equals(GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_PDF.getContentType()) ||
-						        this.contentType.equals(GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_DOCX.getContentType()));
+						this.contentType.equals(GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_DOCX.getContentType()) ||
+						this.contentType.equals(GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_MSWORD.getContentType()));
 	}
 
 	/**
