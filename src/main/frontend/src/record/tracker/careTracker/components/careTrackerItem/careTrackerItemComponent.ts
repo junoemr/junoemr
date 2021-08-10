@@ -233,7 +233,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					let label = ctrl.model.valueLabel;
 					if(!label)
 					{
-						if(ctrl.model.valueTypeIsBoolean())
+						if(ctrl.model.itemTypeIsPrevention())
+						{
+							label = "Given";
+						}
+						else if(ctrl.model.valueTypeIsBoolean())
 						{
 							label = "Complete";
 						}

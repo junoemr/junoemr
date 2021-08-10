@@ -52,7 +52,7 @@
 	<div class="flex-row flex-wrap flex-gap-4 justify-content-end new-data-input">
 		<div class="flex-row flex-grow align-items-center">
 			<juno-check-box ng-if="$ctrl.model.itemTypeIsPrevention()"
-			                label="Given"
+			                label="{{$ctrl.getInputLabel()}}"
 			                ng-model="$ctrl.preventionGivenCheck">
 			</juno-check-box>
 
