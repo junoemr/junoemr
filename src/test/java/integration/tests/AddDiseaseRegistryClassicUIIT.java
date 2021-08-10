@@ -31,21 +31,24 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 
-public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -97,7 +100,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 	public void addDiseaseRegistryClassicUITest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
 		Thread.sleep(5000);
 		addDiseaseRegistry();

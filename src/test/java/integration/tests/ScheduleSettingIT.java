@@ -58,10 +58,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ScheduleSettingTests extends SeleniumTestBase {
-
-	@Autowired
-	private DatabaseUtil databaseUtil;
+public class ScheduleSettingIT extends SeleniumTestBase {
 
 	public static String templateTitleGeneral = "P:General";
 

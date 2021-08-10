@@ -37,10 +37,10 @@ import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import org.springframework.boot.test.context.TestComponent;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.data.ProviderTestCollection.providerLNames;

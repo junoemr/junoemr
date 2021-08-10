@@ -31,19 +31,22 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ClassicUIPreventionsTests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class ClassicUIPreventionsIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	// Reused URLs to navigate to
 	private static final String PREVENTION_URL = "/oscarPrevention/index.jsp?demographic_no=1";
 	private static final String PREVENTION_INJECTION_URL = "/oscarPrevention/AddPreventionData.jsp?prevention=COVID-19&demographic_no=1&prevResultDesc=";
@@ -76,7 +79,7 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		// *** Add prevention ***
-		driver.get(Navigation.OSCAR_URL + PREVENTION_INJECTION_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_INJECTION_URL);
 
 		String originalName = "A vaccine";
 		String originalLocation = "The clinic";
@@ -154,7 +157,7 @@ public class ClassicUIPreventionsTests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		// *** Add prevention ***
-		driver.get(Navigation.OSCAR_URL + EXAM_PREVENTION_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + EXAM_PREVENTION_URL);
 
 		String originalComments = "I'm a smoking check!";
 

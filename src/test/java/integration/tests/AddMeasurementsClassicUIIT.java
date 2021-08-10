@@ -32,21 +32,23 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
-public class AddMeasurementsClassicUITests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	private static DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -94,10 +96,10 @@ public class AddMeasurementsClassicUITests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		// ** Add flowsheets to Disease Registry. **
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		Thread.sleep(5000);
 		String currWindowHandle = driver.getWindowHandle();
-		AddDiseaseRegistryClassicUITests addDiseaseRegistry = new AddDiseaseRegistryClassicUITests();
+		AddDiseaseRegistryClassicUIIT addDiseaseRegistry = new AddDiseaseRegistryClassicUIIT();
 		addDiseaseRegistry.addDiseaseRegistry();
 
 		//** Add measurements  **

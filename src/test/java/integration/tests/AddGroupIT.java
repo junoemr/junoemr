@@ -29,30 +29,32 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddProvidersTests.drApple;
-import static integration.tests.AddProvidersTests.drBerry;
-import static integration.tests.AddProvidersTests.drCherry;
+import static integration.tests.AddProvidersIT.drApple;
+import static integration.tests.AddProvidersIT.drBerry;
+import static integration.tests.AddProvidersIT.drCherry;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 
-public class AddGroupTests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddGroupIT extends SeleniumTestBase
 {
 	public static final String groupName = "TestGroup";
 	public static final String valueOfDrApple = groupName + drApple.providerNo;
 	public static final String valueOfDrBerry = groupName + drBerry.providerNo;
 	public static final String valueOfDrCherry = groupName + drCherry.providerNo;
-
-	@Autowired
-	DatabaseUtil databaseUtil;
 
 	@Before
 	public void setup()

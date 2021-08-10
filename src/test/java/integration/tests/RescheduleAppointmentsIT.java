@@ -26,34 +26,34 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
-import javax.xml.crypto.Data;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddPatientsTests.mom;
-import static integration.tests.AddPatientsTests.momFullNameJUNO;
+import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.AddPatientsIT.momFullNameJUNO;
 import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
-public class RescheduleAppointmentsTests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class RescheduleAppointmentsIT extends SeleniumTestBase
 {
-	@Autowired
-    DatabaseUtil databaseUtil;
-
     @Before
     public void setup() throws Exception
     {
@@ -79,7 +79,7 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
     {
         // Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
         String currWindowHandle = driver.getWindowHandle();
-        AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+        AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
         addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle, mom.firstName);
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
         Assert.assertTrue("Appointments is NOT added successfully.",
@@ -126,7 +126,7 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         // Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
         driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
         String currWindowHandle = driver.getWindowHandle();
-        AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+        AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
         addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
         Assert.assertTrue("Appointments is NOT added successfully.",

@@ -24,18 +24,18 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -43,26 +43,25 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddGroupTests.valueOfDrApple;
-import static integration.tests.AddGroupTests.valueOfDrBerry;
-import static integration.tests.AddPatientsTests.mom;
-import static integration.tests.AddProvidersTests.drApple;
-import static integration.tests.AddProvidersTests.drBerry;
-import static integration.tests.ScheduleSettingTests.getDailySchedule;
-import static integration.tests.ScheduleSettingTests.setupSchedule;
-import static integration.tests.ScheduleSettingTests.setupTemplate;
-import static integration.tests.ScheduleSettingTests.templateTitleGeneral;
+import static integration.tests.AddGroupIT.valueOfDrApple;
+import static integration.tests.AddGroupIT.valueOfDrBerry;
+import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.AddProvidersIT.drApple;
+import static integration.tests.AddProvidersIT.drBerry;
+import static integration.tests.ScheduleSettingIT.getDailySchedule;
+import static integration.tests.ScheduleSettingIT.setupSchedule;
+import static integration.tests.ScheduleSettingIT.setupTemplate;
+import static integration.tests.ScheduleSettingIT.templateTitleGeneral;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
-
-public class AddAppointmentsTests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddAppointmentsIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
-	//static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@Before
 	public void setup() throws Exception
 	{
@@ -136,6 +135,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 
 	@Test
 	public void addAppointmentsSchedulePageTest() throws InterruptedException {
+		Thread.sleep(100000);
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
@@ -280,8 +280,8 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		//Setup Groups
 		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
-		AddGroupTests addGroupTests = new AddGroupTests();
-		addGroupTests.addGroup(groupName, 2);
+		AddGroupIT addGroupIT = new AddGroupIT();
+		addGroupIT.addGroup(groupName, 2);
 		Assert.assertTrue("Group is Not added successfully.",
 				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
 						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver));

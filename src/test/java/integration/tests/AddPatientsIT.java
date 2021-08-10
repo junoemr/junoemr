@@ -52,7 +52,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddPatientsTests extends SeleniumTestBase
+public class AddPatientsIT extends SeleniumTestBase
 {
 	public static final PatientTestData mom = PatientTestCollection.patientMap.get(patientLNames[0]);
 	public static final PatientTestData dad = PatientTestCollection.patientMap.get(patientLNames[1]);

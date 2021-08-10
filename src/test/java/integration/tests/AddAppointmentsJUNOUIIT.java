@@ -30,26 +30,29 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddPatientsTests.mom;
+import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.util.data.SiteTestCollection.siteNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
-public class AddAppointmentsJUNOUITests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	static String patientFName = "Test";
 	static String patientLName = "Test";
 	static String patientName = patientLName + "," + patientFName;
@@ -192,8 +195,8 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		//Add Group
 		String testGroup = "TestGroup";
 		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group");
-		AddGroupTests addGroupTests = new AddGroupTests();
-		addGroupTests.addGroup(testGroup, 2);
+		AddGroupIT addGroupIT = new AddGroupIT();
+		addGroupIT.addGroup(testGroup, 2);
 		driver.switchTo().defaultContent();
 		driver.findElement(By.linkText("Schedule")).click();
 
