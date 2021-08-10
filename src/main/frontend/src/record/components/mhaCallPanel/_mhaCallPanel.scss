@@ -1,3 +1,22 @@
 .mha-call-panel {
+	position: relative;
 
+	border: 1px solid var(--color-neutral-light-grey);
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
+
+	color: var(--color-neutral-darkest);
+	background-color: var(--color-neutral-lightest);
+
+	overflow: hidden;
+
+	&.in-session {
+		height: 60px;
+	}
+
+	> .close-button {
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
 }

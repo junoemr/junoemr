@@ -50,6 +50,12 @@
 		}
 	}
 
+	.audio-call-panel {
+		position: fixed;
+		right: 16px;
+		bottom: 0;
+	}
+
 	@media (max-width: 1320px) {
 
 		.patient-header-name {
@@ -72,6 +78,7 @@
 		}
 	}
 }
+
 #note-editor-container {
 	display: flex;
 	justify-content: center;

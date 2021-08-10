@@ -1,3 +1,37 @@
-<div class="mha-call-panel">
-	<h1>HELLO WORLD</h1>
+<div class="mha-call-panel" ng-class="$ctrl.componentClasses()">
+	<juno-button class="close-button"
+	             click="$ctrl.close()"
+	             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARKEST"
+	             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+		<i class="icon icon-delete"></i>
+	</juno-button>
+
+	<!-- MHA audio call iframe -->
+	<iframe ng-if="$ctrl.inSession"
+	        src="https://ben-cloudmd.mhadev.ca/patient/#/clinic_user/appointments/e6958cc6-c2ec-4d20-8c68-6e3695483a19/audio/session"
+	        allow="camera;microphone"
+	        width="280"
+	        height="60"
+	        frameborder="0">
+	</iframe>
+
+	<div ng-if="!$ctrl.inSession && $ctrl.integrationList.length > 0" class="integration-select flex-col p-16">
+		<div class="p-l-8 p-r-8">
+			<p>Which clinic would you like to call the patient from?</p>
+		</div>
+
+		<juno-select ng-model="$ctrl.selectedIntegration"
+		             options="$ctrl.integrationOptions"
+		             label-position="LABEL_POSITION.TOP"
+		             label="Select clinic">
+		</juno-select>
+
+		<juno-button class="m-t-16"
+		             click="$ctrl.startCall()"
+		             disabled="!$ctrl.selectedIntegration"
+		             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
+			Start Call
+		</juno-button>
+	</div>
 </div>

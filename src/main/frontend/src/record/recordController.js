@@ -30,6 +30,7 @@ import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFa
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import {MessageGroup} from "../lib/messaging/model/MessageGroup";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
+import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -103,7 +104,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.working = false;
 
 		controller.canMHACallPatient = false;
-		controller.mhaCallPanelOpen = true;
+		controller.mhaCallPanelOpen = false;
 
 
 		controller.init = function init()
@@ -930,6 +931,19 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
+
+		/**
+		 * open the mha audio call panel.
+		 */
+		controller.openMhaCallPanel = () => {
+			controller.mhaCallPanelOpen = true;
+		}
+
+		// close the mha audio call panel.
+		$scope.$on(MhaCallPanelEvents.Close, () =>
+		{
+			controller.mhaCallPanelOpen = false;
+		})
 
 		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 		controller.init();

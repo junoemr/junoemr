@@ -22,9 +22,18 @@
 */
 
 
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	LABEL_POSITION
+} from "../../../common/components/junoComponentConstants";
+import {MhaCallPanelEvents} from "./mhaCallPanelEvents";
+import MhaConfigService from "../../../lib/integration/myhealthaccess/service/MhaConfigService";
+
 angular.module("Record.Components").component('mhaCallPanel', {
 	templateUrl: 'src/record/components/mhaCallPanel/mhaCallPanel.jsp',
 	bindings: {
+		demographicNo: "<",
 	},
 	controller: [
 		"$scope",
@@ -32,6 +41,57 @@ angular.module("Record.Components").component('mhaCallPanel', {
 			$scope)
 		{
 			const ctrl = this;
+
+			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+			$scope.LABEL_POSITION = LABEL_POSITION;
+
+			ctrl.inSession = false;
+			ctrl.selectedIntegration = null; // Type MhaIntegration
+			ctrl.integrationList = []; // Type MhaIntegration[]
+			ctrl.integrationOptions = [];
+
+			ctrl.$onInit = async () =>
+			{
+				await ctrl.loadIntegrations();
+				$scope.$apply();
+			}
+
+			ctrl.loadIntegrations = async () =>
+			{
+				const mhaConfigService = new MhaConfigService()
+				ctrl.integrationList = await mhaConfigService.getMhaIntegrations();
+				ctrl.integrationOptions = ctrl.integrationList.map((integration) =>
+				{
+					return {
+						label: integration.siteName,
+						value: integration.id,
+						data: integration,
+					};
+				});
+
+				if (ctrl.integrationList.length === 1)
+				{
+					ctrl.selectedIntegration = ctrl.integrationList[0];
+				}
+			}
+
+			ctrl.startCall = () =>
+			{
+				ctrl.inSession = true;
+			}
+
+			ctrl.close = () =>
+			{
+				$scope.$emit(MhaCallPanelEvents.Close);
+			}
+
+			ctrl.componentClasses = () =>
+			{
+				return {
+					"in-session": ctrl.inSession,
+				};
+			}
 		}
 	],
 });

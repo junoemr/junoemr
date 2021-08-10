@@ -50,6 +50,7 @@
 			</span>
 			<span ng-if="recordCtrl.canMHACallPatient">
 				<juno-button  title="Call patient"
+				              click="recordCtrl.openMhaCallPanel()"
 				              button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
 				              button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
 					<i class="icon icon-tele-call"></i>
@@ -327,6 +328,11 @@
 					</div>
 				</div>
 			</div>
+
+			<mha-call-panel ng-if="recordCtrl.mhaCallPanelOpen"
+			                class="audio-call-panel"
+			                demographic-no="recordCtrl.demographicNo">
+			</mha-call-panel>
 		</div>
 	</div>
 </div>
