@@ -9,8 +9,9 @@ set the html structure up like this:
 /* The switch - the box around the slider */
 
 .juno-toggle {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
   @include juno-toggle-switch(32px, 4px, .4s);
+
+  .toggle-value-label {
+    padding: 0 4px;
+  }
 }

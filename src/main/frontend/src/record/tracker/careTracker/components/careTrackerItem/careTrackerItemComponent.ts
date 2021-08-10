@@ -27,6 +27,8 @@ import moment, {Moment} from "moment";
 import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
 import {AlertSeverityType} from "../../../../../lib/careTracker/model/AlertSeverityType";
 import {IAngularEvent} from "angular";
+import {JunoSelectOption} from "../../../../../lib/common/junoSelectOption";
+import {JUNO_RADIO_STYLE} from "../../../../../common/components/junoRadioSelect/junoRadioSelectConstants";
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 	{
@@ -56,13 +58,27 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.JUNO_RADIO_STYLE = JUNO_RADIO_STYLE;
 
 				ctrl.validationAlerts = [];
 				ctrl.isLoading = false;
 				ctrl.addToNoteOnSave = false;
 
-				ctrl.dataTrueValue = "Yes";
-				ctrl.dataFalseValue = "No";
+				ctrl.booleanInputOptions = [
+					{
+						label: "Skip",
+						value: null,
+					},
+					{
+						label: "Yes",
+						value: "Yes",
+					},
+					{
+						label: "No",
+						value: "No",
+					},
+				] as JunoSelectOption[];
+
 				ctrl.inputRegexRestriction = null;
 
 				ctrl.$onInit = (): void =>
@@ -80,7 +96,8 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				{
 					ctrl.newEntry = new CareTrackerItemDataModel();
 					ctrl.newEntry.observationDateTime = moment();
-					ctrl.checkboxValue = false;
+					ctrl.preventionGivenCheck = false;
+					ctrl.booleanInputValue = null;
 					ctrl.dateValue = null;
 					ctrl.addToNoteOnSave = false;
 				}
@@ -139,9 +156,9 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					return ctrl.model.valueTypeIsNumeric();
 				}
 
-				ctrl.onBooleanValueChange = (value: boolean): void =>
+				ctrl.onToggleValueChange = (value: any, option: JunoSelectOption): void =>
 				{
-					ctrl.newEntry.value = value ? ctrl.dataTrueValue : ctrl.dataFalseValue;
+					ctrl.newEntry.value = value;
 				}
 
 				ctrl.onDateChangeValue = (value: Moment): void =>
@@ -152,7 +169,8 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				ctrl.canSubmitItem = (): boolean =>
 				{
 					return (!ctrl.isLoading && ctrl.model
-						&& (ctrl.model.itemTypeIsPrevention() || (ctrl.model.itemTypeIsMeasurement() && !Juno.Common.Util.isBlank(ctrl.newEntry.value)))
+						&& ((ctrl.model.itemTypeIsPrevention() && ctrl.preventionGivenCheck)
+							|| (ctrl.model.itemTypeIsMeasurement() && !Juno.Common.Util.isBlank(ctrl.newEntry.value)))
 					);
 				}
 

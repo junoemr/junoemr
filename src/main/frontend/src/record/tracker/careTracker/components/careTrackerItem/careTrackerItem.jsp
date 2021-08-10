@@ -51,12 +51,19 @@
 
 	<div class="flex-row flex-wrap flex-gap-4 justify-content-end new-data-input">
 		<div class="flex-row flex-grow align-items-center">
-			<juno-check-box ng-if="$ctrl.showValueBooleanInput()"
-			                label="{{$ctrl.getInputLabel()}}"
-			                change="$ctrl.onBooleanValueChange(value)"
-			                ng-model="$ctrl.checkboxValue">
+			<juno-check-box ng-if="$ctrl.model.itemTypeIsPrevention()"
+			                label="Given"
+			                ng-model="$ctrl.preventionGivenCheck">
 			</juno-check-box>
-			<span ng-if="$ctrl.showValueBooleanInput()" class="boolean-value-indicator">{{$ctrl.newEntry.value}}</span>
+
+			<juno-radio-select ng-if="$ctrl.showValueBooleanInput()"
+			                   label="{{$ctrl.getInputLabel()}}"
+			                   options="$ctrl.booleanInputOptions"
+			                   radio-style="$ctrl.JUNO_RADIO_STYLE.CHECK"
+			                   ng-model="$ctrl.booleanInputValue"
+			                   change="$ctrl.onToggleValueChange(value, option)">
+			</juno-radio-select>
+
 			<juno-input ng-if="$ctrl.showValueTextInput()"
 			            label="{{$ctrl.getInputLabel()}}"
 			            ng-model="$ctrl.newEntry.value"

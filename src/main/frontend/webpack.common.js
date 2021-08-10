@@ -258,6 +258,7 @@ module.exports = {
 			'./src/common/components/junoTimeSelect/junoTimeSelectComponent.js',
 			'./src/common/components/junoDivider/junoDividerComponent.js',
 			'./src/common/components/junoToggle/junoToggleComponent.js',
+			'./src/common/components/junoRadioSelect/junoRadioSelectComponent.ts',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',

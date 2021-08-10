@@ -331,7 +331,7 @@
 .icon-noshow:before {
   content: "\e965";
 }
-.icked:before {
+.icon-picked:before {
   content: "\e966";
 }
 .icon-play-circle:before {
