@@ -68,7 +68,8 @@ public class HRMService
 	private HRMDocumentToProviderDao hrmDocumentToProviderDao;
 
 	/**
-	 * upload a new HRM document to the database with an associated document reference.
+	 * Upload a new HRM document to the database and move the associated hrm report xml file to the to the HRM documents folder
+	 *
 	 * @param hrmDocumentModel - the model
 	 * @param demographic - the demographic entity
 	 * @return - the persisted HRM entity
@@ -76,16 +77,42 @@ public class HRMService
 	 */
 	public HRMDocument uploadNewHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic) throws IOException
 	{
+		HRMDocument documentModel = persistHRMDocument(hrmDocumentModel, demographic);
+		hrmDocumentModel.getReportFile().moveToHRMDocuments();
+		
+		return documentModel;
+	}
+	
+	
+	public void uploadAllNewHRMDocuments(List<HrmDocument> hrmDocumentModels, Demographic demographic) throws IOException
+	{
+		for(HrmDocument documentModel : hrmDocumentModels)
+		{
+			uploadNewHRMDocument(documentModel, demographic);
+			
+		}
+	}
+	
+	/**
+	 * Persist HRMDocument and any associated provider and demographic linkages.
+	 *
+	 * @param hrmDocumentModel hrmDocument to persist
+	 * @param demographic <optional>Demographic to associate with the HRM document</optional>
+	 * @return HRMDocument entity
+	 */
+	public HRMDocument persistHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic)
+	{
 		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
 		
 		// persist hrm database info and associated objects through cascade
 		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
 		hrmDocumentDao.persist(hrmDocument);
-		// TODO: the document should have the correct path at this point... CS!!!
-		//hrmDocumentModel.getReportFile().moveToHRMDocuments();
-
+		
 		// assign the hrm document to the demographic
-		routeToDemographic(hrmDocument, demographic);
+		if (demographic != null && demographic.getId() != null)
+		{
+			routeToDemographic(hrmDocument, demographic);
+		}
 		
 		// link the associated reviewers
 		for(HRMDocumentToProvider documentToProvider : hrmDocument.getDocumentToProviderList())
@@ -94,14 +121,6 @@ public class HRMService
 		}
 		
 		return hrmDocument;
-	}
-
-	public void uploadAllNewHRMDocuments(List<HrmDocument> hrmDocumentModels, Demographic demographic) throws IOException
-	{
-		for(HrmDocument documentModel : hrmDocumentModels)
-		{
-			uploadNewHRMDocument(documentModel, demographic);
-		}
 	}
 
 	public void routeToDemographic(HRMDocument document, Demographic demographic)

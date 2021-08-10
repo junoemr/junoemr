@@ -24,7 +24,7 @@
 package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.hospitalReportManager.HrmSFTPService;
+import org.oscarehr.hospitalReportManager.service.HRMSftpService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -37,7 +37,7 @@ import oscar.OscarProperties;
 public class HrmModuleConfig
 {
 	@Autowired
-	HrmSFTPService hrmSFTPService;
+	HRMSftpService hrmSFTPService;
 	
 	private static final Logger logger = MiscUtils.getLogger();
 	

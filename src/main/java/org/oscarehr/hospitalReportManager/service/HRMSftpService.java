@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.hospitalReportManager;
+package org.oscarehr.hospitalReportManager.service;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -51,22 +51,22 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 @Component
-public class HrmSFTPService
+public class HRMSftpService
 {
 	// CONNECTION SETTINGS
-	private static final String OMD_HRM_USER = OscarProperties.getInstance().getProperty("OMD_HRM_USER");
-	private static final String OMD_HRM_IP = OscarProperties.getInstance().getProperty("OMD_HRM_IP");
-	private static final int OMD_HRM_PORT = Integer.parseInt(OscarProperties.getInstance().getProperty("OMD_HRM_PORT"));
-	private static final String REMOTE_PATH = OscarProperties.getInstance().getProperty("OMD_HRM_REMOTE_DIR");
+	private static final String OMD_HRM_USER = OscarProperties.getInstance().getProperty("omd.hrm.user");
+	private static final String OMD_HRM_IP = OscarProperties.getInstance().getProperty("omd.hrm.address");
+	private static final int OMD_HRM_PORT = Integer.parseInt(OscarProperties.getInstance().getProperty("omd.hrm.port"));
+	private static final String REMOTE_PATH = OscarProperties.getInstance().getProperty("omd.hrm.remote_path");
 	
-	// LOCAL DIRECTORIES
-	private static String OMD_DIRECTORY = OscarProperties.getInstance().getProperty("OMD_directory");
-	private static String OMD_SFTP_SSH_KEY = OMD_DIRECTORY + OscarProperties.getInstance().getProperty("OMD_HRM_AUTH_KEY_FILENAME");
-	private static String DECRYPTION_KEY = OscarProperties.getInstance().getProperty("OMD_HRM_DECRYPTION_KEY");
+	// LOCAL CONFIG
+	private static final String OMD_DIRECTORY = OscarProperties.getInstance().getProperty("omd.hrm.local_base_hhsdfasdfafasdfsafsafasfasdfsadfsadfasdfsddirectory");
+	private static final String OMD_SFTP_SSH_KEY = OMD_DIRECTORY + OscarProperties.getInstance().getProperty("omd.hrm.private_key_file");
+	private static final String DECRYPTION_KEY = OscarProperties.getInstance().getProperty("omd.hrm.decryption_key");
 	
 	// UTIL
 	private static final int TIMEOUT_SECONDS = 20;
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 	
 	@Autowired
 	private HRMReportProcessor processor;
