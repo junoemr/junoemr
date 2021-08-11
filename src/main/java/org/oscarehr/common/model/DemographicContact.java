@@ -81,7 +81,7 @@ public class DemographicContact extends AbstractModel<Integer> {
 	private String ec;
 	private String note;
 
-	private Integer facilityId;
+	private int facilityId;
 	private String creator;
 
 	private Boolean consentToContact = true;
