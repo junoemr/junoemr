@@ -112,6 +112,8 @@ public class ClinicMessagingService extends BaseService
 	 * @param group - [optional] filter messages by group. Group ALL is equivalent to null.
 	 * @param limit - [optional] limit results to this number (use for paging).
 	 * @param offset - [optional] offset results by this number (use for paging).
+	 * @param onlyUnread - [optional] if true only unread messages will be returned
+	 * @param keyword - [optional] if not null filter messages to ones containing this keyword in the title / subject
 	 * @param sender - [optional] filter messages to only those sent by this sender.
 	 * @param receiver - [optional] filter messages to only those received by this recipient.
 	 * @return - a list of messages.
@@ -124,28 +126,14 @@ public class ClinicMessagingService extends BaseService
 			@Nullable MessageGroup group,
 			@Nullable Integer limit,
 			@Nullable Integer offset,
+			@Nullable Boolean onlyUnread,
+			@Nullable String keyword,
 			@Nullable Messageable<?> sender,
 			@Nullable Messageable<?> receiver)
 	{
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
-		// fill out query params
-		MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-		Optional.ofNullable(startDateTime).ifPresent((startDate) -> queryParams.add("start_datetime", startDate.toString()));
-		Optional.ofNullable(endDateTime).ifPresent((endDate) -> queryParams.add("end_datetime", endDate.toString()));
-		Optional.ofNullable(group).ifPresent((messageGroup -> queryParams.add("group", messageGroup.getName())));
-		Optional.ofNullable(limit).ifPresent((lim) -> queryParams.add("limit", lim.toString()));
-		Optional.ofNullable(offset).ifPresent((off) -> queryParams.add("offset", off.toString()));
-		if (sender != null)
-		{
-			queryParams.add("sender_id", sender.getId());
-			queryParams.add("sender_type", sender.getType().getName());
-		}
-		if (receiver != null)
-		{
-			queryParams.add("recipient_id", receiver.getId());
-			queryParams.add("recipient_type", receiver.getType().getName());
-		}
+		MultiValueMap<String, String> queryParams = this.buildSearchQueryParams(startDateTime, endDateTime, group, limit, offset, onlyUnread, keyword, sender, receiver);
 
 		String url = restClient.formatEndpointFull("/clinic_user/self/clinic/messages", null, queryParams);
 
@@ -160,13 +148,20 @@ public class ClinicMessagingService extends BaseService
 	 * @param onlyUnread - if true only unread messages are counted.
 	 * @return - the count of messages
 	 */
-	public Integer countMessages(Integration integration,	LoggedInInfo loggedInInfo, MessageGroup group, Boolean onlyUnread)
+	public Integer countMessages(
+			Integration integration,
+			LoggedInInfo loggedInInfo,
+			MessageGroup group,
+			@Nullable ZonedDateTime startDateTime,
+			@Nullable ZonedDateTime endDateTime,
+			@Nullable Boolean onlyUnread,
+			@Nullable String keyword,
+			@Nullable Messageable<?> sender,
+			@Nullable Messageable<?> receiver)
 	{
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
-		MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-		queryParams.add("only_unread", onlyUnread.toString());
-		queryParams.add("group", group.getName());
+		MultiValueMap<String, String> queryParams = this.buildSearchQueryParams(startDateTime, endDateTime, group, null, null, onlyUnread, keyword, sender, receiver);
 
 		String url = restClient.formatEndpointFull("/clinic_user/self/clinic/messages/count", null, queryParams);
 
@@ -211,6 +206,55 @@ public class ClinicMessagingService extends BaseService
 	// ==========================================================================
 	// Protected Methods
 	// ==========================================================================
+
+	/**
+	 * build query params for search
+	 * @param startDateTime - [optional] filter messages to only those that where sent after this time.
+	 * @param endDateTime - [optional] filter messages to only those that where sent before this time.
+	 * @param group - [optional] filter messages by group. Group ALL is equivalent to null.
+	 * @param limit - [optional] limit results to this number (use for paging).
+	 * @param offset - [optional] offset results by this number (use for paging).
+	 * @param onlyUnread - [optional] if true only unread messages will be returned
+	 * @param keyword - [optional] if not null filter messages to ones containing this keyword in the title / subject
+	 * @param sender - [optional] filter messages to only those sent by this sender.
+	 * @param receiver - [optional] filter messages to only those received by this recipient.
+	 * @return query params
+	 */
+	protected MultiValueMap<String, String> buildSearchQueryParams(
+			@Nullable ZonedDateTime startDateTime,
+			@Nullable ZonedDateTime endDateTime,
+			@Nullable MessageGroup group,
+			@Nullable Integer limit,
+			@Nullable Integer offset,
+			@Nullable Boolean onlyUnread,
+			@Nullable String keyword,
+			@Nullable Messageable<?> sender,
+			@Nullable Messageable<?> receiver)
+	{
+		MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
+		// fill out query params
+		Optional.ofNullable(startDateTime).ifPresent((startDate) -> queryParams.add("start_datetime", startDate.toString()));
+		Optional.ofNullable(endDateTime).ifPresent((endDate) -> queryParams.add("end_datetime", endDate.toString()));
+		Optional.ofNullable(group).ifPresent((messageGroup -> queryParams.add("group", messageGroup.getName())));
+		Optional.ofNullable(limit).ifPresent((lim) -> queryParams.add("limit", lim.toString()));
+		Optional.ofNullable(offset).ifPresent((off) -> queryParams.add("offset", off.toString()));
+		Optional.ofNullable(onlyUnread).ifPresent((unread) -> queryParams.add("only_unread", unread.toString()));
+		Optional.ofNullable(keyword).ifPresent((searchKeyword) -> queryParams.add("keyword", searchKeyword));
+
+		if (sender != null)
+		{
+			queryParams.add("sender_id", sender.getId());
+			queryParams.add("sender_type", sender.getType().getName());
+		}
+		if (receiver != null)
+		{
+			queryParams.add("recipient_id", receiver.getId());
+			queryParams.add("recipient_type", receiver.getType().getName());
+		}
+
+		return queryParams;
+	}
 
 	/**
 	 * get a clinic_user login token

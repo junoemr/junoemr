@@ -97,9 +97,13 @@ public class CtlDocType extends AbstractModel<Integer>{
     	return status;
     }
 
+	public boolean isActive()
+	{
+		return this.getStatus().equals(Status.Active.toString());
+	}
+
 	public void setStatus(String status) {
     	this.status = status;
     }
-
 
 }

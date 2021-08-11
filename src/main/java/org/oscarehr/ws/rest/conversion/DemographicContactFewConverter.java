@@ -34,51 +34,66 @@ import org.springframework.stereotype.Component;
 @Component
 public class DemographicContactFewConverter {
 	
-	public DemographicContactFewTo1 getAsTransferObject(DemographicContact d, Object obj) throws ConversionException {
-		DemographicContactFewTo1 t = new DemographicContactFewTo1();
+	public DemographicContactFewTo1 getAsTransferObject(DemographicContact demographicContact, Object obj) throws ConversionException {
+		DemographicContactFewTo1 demographicContactFewTo1 = new DemographicContactFewTo1();
 		
-		t.setRole(d.getRole());
-		t.setEc(d.getEc());
-		t.setSdm(d.getSdm());
-		t.setCategory(d.getCategory());
+		demographicContactFewTo1.setRole(demographicContact.getRole());
+		demographicContactFewTo1.setEc(demographicContact.getEc());
+		demographicContactFewTo1.setSdm(demographicContact.getSdm());
+		demographicContactFewTo1.setCategory(demographicContact.getCategory());
+		demographicContactFewTo1.setType(demographicContact.getType());
 		
-		if (d.getType()==DemographicContact.TYPE_DEMOGRAPHIC) {
+		if (demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC) {
 			Demographic demographic = (Demographic) obj;
-			t.setFirstName(demographic.getFirstName());
-			t.setLastName(demographic.getLastName());
+			demographicContactFewTo1.setContactId(demographicContact.getContactId());
+			demographicContactFewTo1.setFirstName(demographic.getFirstName());
+			demographicContactFewTo1.setLastName(demographic.getLastName());
+			demographicContactFewTo1.setAddress(demographic.getAddress());
+			demographicContactFewTo1.setCity(demographic.getCity());
+			demographicContactFewTo1.setPostal(demographic.getPostal());
+			demographicContactFewTo1.setProvince(demographic.getProvince());
+			demographicContactFewTo1.setEmail(demographic.getEmail());
 			
-			if (isPreferredPhone(demographic.getPhone())) {
-				t.setPhone(demographic.getPhone());
+			if (demographic.getPhone() != null) {
+				demographicContactFewTo1.setHomePhone(demographic.getPhone());
 			}
-			else if (isPreferredPhone(demographic.getPhone2())) {
-				t.setPhone(demographic.getPhone2());
-			}
-			else {
-				if (demographic.getPhone()!=null) t.setPhone(demographic.getPhone());
-				else if (demographic.getPhone2()!=null) t.setPhone(demographic.getPhone2());
+			if (demographic.getPhone2() != null) {
+				demographicContactFewTo1.setWorkPhone(demographic.getPhone2());
 			}
 		}
-		else if (d.getType()==DemographicContact.TYPE_PROVIDER) {
+		else if (demographicContact.getType() == DemographicContact.TYPE_PROVIDER) {
 			Provider provider = (Provider) obj;
-			t.setFirstName(provider.getFirstName());
-			t.setLastName(provider.getLastName());
-			t.setPhone(provider.getPhone());
+			demographicContactFewTo1.setFirstName(provider.getFirstName());
+			demographicContactFewTo1.setLastName(provider.getLastName());
+			demographicContactFewTo1.setWorkPhone(provider.getPhone());
 		}
-		else if (d.getType()==DemographicContact.TYPE_PROFESSIONALSPECIALIST) {
+		else if (demographicContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST) {
 			ProfessionalSpecialist specialist = (ProfessionalSpecialist) obj;
-			t.setFirstName(specialist.getFirstName());
-			t.setLastName(specialist.getLastName());
-			t.setPhone(specialist.getPhoneNumber());
+			demographicContactFewTo1.setFirstName(specialist.getFirstName());
+			demographicContactFewTo1.setLastName(specialist.getLastName());
+			demographicContactFewTo1.setWorkPhone(specialist.getPhoneNumber());
 		}
-		else if (d.getType()==DemographicContact.TYPE_CONTACT) {
+		else if (demographicContact.getType() == DemographicContact.TYPE_CONTACT) {
 			Contact contact = (Contact) obj;
-			t.setFirstName(contact.getFirstName());
-			t.setLastName(contact.getLastName());
-			if (contact.getResidencePhone()!=null) t.setPhone(contact.getResidencePhone());
-			else if (contact.getWorkPhone()!=null) t.setPhone(contact.getWorkPhone());
-			else if (contact.getCellPhone()!=null) t.setPhone(contact.getCellPhone());
+			demographicContactFewTo1.setFirstName(contact.getFirstName());
+			demographicContactFewTo1.setLastName(contact.getLastName());
+			demographicContactFewTo1.setMiddleName(contact.getMiddleName());
+			demographicContactFewTo1.setAddress(String.valueOf(contact.getAddress()));
+			demographicContactFewTo1.setAddress2(String.valueOf(contact.getAddress2()));
+			demographicContactFewTo1.setCity(contact.getCity());
+			demographicContactFewTo1.setPostal(contact.getPostal());
+			demographicContactFewTo1.setProvince(contact.getProvince());
+			demographicContactFewTo1.setFax(String.valueOf(contact.getFax()));
+			demographicContactFewTo1.setEmail(contact.getEmail());
+			demographicContactFewTo1.setNote(contact.getNote());
+			if (contact.getResidencePhone()!=null) demographicContactFewTo1.setHomePhone(contact.getResidencePhone());
+			if (contact.getWorkPhone()!=null) demographicContactFewTo1.setWorkPhone(contact.getWorkPhone());
+			if (contact.getCellPhone()!=null) demographicContactFewTo1.setCellPhone(contact.getCellPhone());
+			if (contact.getWorkPhoneExtension()!=null) demographicContactFewTo1.setWPhoneExt(contact.getWorkPhoneExtension());
+			if (contact.getCellPhoneExtension() != null) demographicContactFewTo1.setCPhoneExt(contact.getCellPhoneExtension());
+			if (contact.getResidencePhoneExtension() != null) demographicContactFewTo1.setHPhoneExt(contact.getResidencePhoneExtension());
 		}
-		return t;
+		return demographicContactFewTo1;
 	}
 
 	private boolean isPreferredPhone(String phone) {

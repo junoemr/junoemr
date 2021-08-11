@@ -661,6 +661,15 @@ public class ProviderManager2
 			settings.setAppointmentCountIncludeNoDemographic("true".equals(map.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue()));
 		}
 
+		if (map.get(UserProperty.MESSAGING_UNREAD_COUNT_MODE) == null)
+		{
+			settings.setMessageCountMode(ProviderSettings.MESSAGE_COUNT_SUM_MODE.MHA_INTERNAL);
+		}
+		else
+		{
+			settings.setMessageCountMode(ProviderSettings.MESSAGE_COUNT_SUM_MODE.valueOf(map.get(UserProperty.MESSAGING_UNREAD_COUNT_MODE).getValue()));
+		}
+
 		if (map.get(UserProperty.CARECONNECT_PPN_CHECK) != null)
 		{
 			settings.setEnableCareConnectPPNCheck(ConversionUtils.fromBoolString(map.get(UserProperty.CARECONNECT_PPN_CHECK).getValue()));
@@ -674,6 +683,7 @@ public class ProviderManager2
 		settings.setPeriod(pp.getEveryMin());
 		settings.setGroupNo(pp.getMyGroupNo());
 		settings.setAppointmentScreenLinkNameDisplayLength(pp.getAppointmentScreenLinkNameDisplayLength());
+		settings.setAppointmentReasonDisplayLevel(pp.getAppointmentReasonDisplayLevel());
 
 		if (pp.getAppointmentScreenForms() != null)
 		{
@@ -702,12 +712,12 @@ public class ProviderManager2
 		settings.setDefaultDoNotDeleteBilling(pp.getDefaultDoNotDeleteBilling() == 1 ? true : false);
 
 		settings.setPrintQrCodeOnPrescription(pp.isPrintQrCodeOnPrescriptions());
-		settings.seteRxEnabled(pp.isERxEnabled());
-		settings.seteRxTrainingMode(pp.isERxTrainingMode());
-		settings.seteRxFacility(pp.getERxFacility());
-		settings.seteRxURL(pp.getERx_SSO_URL());
-		settings.seteRxUsername(pp.getERxUsername());
-		settings.seteRxPassword(pp.getERxPassword());
+		settings.setERxEnabled(pp.isERxEnabled());
+		settings.setERxTrainingMode(pp.isERxTrainingMode());
+		settings.setERxFacility(pp.getERxFacility());
+		settings.setERxURL(pp.getERx_SSO_URL());
+		settings.setERxUsername(pp.getERxUsername());
+		settings.setERxPassword(pp.getERxPassword());
 
 		settings.setDefaultPmm("enabled".equals(pp.getDefaultCaisiPmm()));
 
@@ -790,17 +800,18 @@ public class ProviderManager2
 		pp.setDefaultDoNotDeleteBilling(settings.isDefaultDoNotDeleteBilling() ? 1 : 0);
 
 		pp.setPrintQrCodeOnPrescriptions(settings.isPrintQrCodeOnPrescription());
-		pp.setERxEnabled(settings.iseRxEnabled());
+		pp.setERxEnabled(settings.isERxEnabled());
 
-		pp.setERxTrainingMode(settings.iseRxTrainingMode());
-		pp.setERxFacility(settings.geteRxFacility());
-		pp.setERx_SSO_URL(settings.geteRxURL());
-		pp.setERxUsername(settings.geteRxUsername());
-		pp.setERxPassword(settings.geteRxPassword());
+		pp.setERxTrainingMode(settings.isERxTrainingMode());
+		pp.setERxFacility(settings.getERxFacility());
+		pp.setERx_SSO_URL(settings.getERxURL());
+		pp.setERxUsername(settings.getERxUsername());
+		pp.setERxPassword(settings.getERxPassword());
 
 		pp.setDefaultCaisiPmm(settings.isDefaultPmm() ? "enabled" : "disabled");
 		pp.setProviderNo(providerNo);
 
+		pp.setAppointmentReasonDisplayLevel(settings.getAppointmentReasonDisplayLevel());
 
 		providerPreferenceDao.merge(pp);
 
@@ -978,13 +989,15 @@ public class ProviderManager2
 		property.setValue(settings.isIntakeFormEnabled() ? "yes" : "no");
 
 		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_ENABLED, providerNo);
-		property.setValue(Boolean.toString(settings.getAppointmentCountEnabled()));
+		property.setValue(Boolean.toString(settings.isAppointmentCountEnabled()));
 		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED, providerNo);
-		property.setValue(Boolean.toString(settings.getAppointmentCountIncludeCancelled()));
+		property.setValue(Boolean.toString(settings.isAppointmentCountEnabled()));
 		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW, providerNo);
-		property.setValue(Boolean.toString(settings.getAppointmentCountIncludeNoShow()));
+		property.setValue(Boolean.toString(settings.isAppointmentCountIncludeNoShow()));
 		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC, providerNo);
-		property.setValue(Boolean.toString(settings.getAppointmentCountIncludeNoDemographic()));
+		property.setValue(Boolean.toString(settings.isAppointmentCountIncludeNoDemographic()));
+		property = getMappedOrNewProperty(map, UserProperty.MESSAGING_UNREAD_COUNT_MODE, providerNo);
+		property.setValue(settings.getMessageCountMode().name());
 
 		property = getMappedOrNewProperty(map, UserProperty.CARECONNECT_PPN_CHECK, providerNo);
 		property.setValue(Boolean.toString(settings.isEnableCareConnectPPNCheck()));

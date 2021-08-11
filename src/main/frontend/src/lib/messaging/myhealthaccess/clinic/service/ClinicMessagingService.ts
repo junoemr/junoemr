@@ -4,7 +4,7 @@ import Message from "../../../model/Message";
 import {API_BASE_PATH} from "../../../../constants/ApiConstants";
 import MessagingError from "../../../../error/MessagingError";
 import {MessageDto, MhaClinicMessagingApi, MhaIntegrationApi, MhaPatientApi} from "../../../../../../generated";
-import StreamingList, {StreamSource} from "../../../../util/StreamingList";
+import StreamingList from "../../../../util/StreamingList";
 import ClinicMailboxStreamSource from "../model/ClinicMailboxStreamSource";
 import Conversation from "../../../model/Conversation";
 import IntegrationTo1ToMessageSourceConverter from "../../../converter/IntegrationTo1ToMessageSourceConverter";
@@ -16,11 +16,12 @@ import {message} from "gulp-typescript/release/utils";
 import MessageDtoToMhaMessageConverter from "../../converter/MessageDtoToMhaMessageConverter";
 import ConversationDtoToMhaConversationConverter from "../../converter/ConversationDtoToMhaConversationConverter";
 import Messageable from "../../../model/Messageable";
-import PatientTo1ToMhaPatientConverter
-	from "../../../../integration/myhealthaccess/converter/PatientTo1ToMhaPatientConverter";
+import PatientTo1ToMhaPatientConverter from "../../../../integration/myhealthaccess/converter/PatientTo1ToMhaPatientConverter";
 import MhaPatientToMessageableConverter from "../../converter/MhaPatientToMessageableConverter";
 import MhaMessage from "../model/MhaMessage";
 import MhaAttachment from "../model/MhaAttachment";
+import {StreamSource} from "../../../../util/StreamSource";
+import {MessagingServiceType} from "../../../model/MessagingServiceType";
 
 export default class ClinicMessagingService implements MessagingServiceInterface
 {
@@ -58,6 +59,14 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	// ==========================================================================
 	// MessagingServiceInterface Implementation
 	// ==========================================================================
+
+	/**
+	 * @return the type of this messaging service.
+	 */
+	getType(): MessagingServiceType
+	{
+		return MessagingServiceType.MHA_CLINIC;
+	}
 
 	/**
 	 * get a message
@@ -185,6 +194,8 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 					searchOptions.group?.toString(),
 					searchOptions.limit,
 					searchOptions.offset,
+					searchOptions.onlyUnread,
+					searchOptions.keyword,
 					searchOptions.sender?.id,
 					searchOptions.sender?.type.toString(),
 					searchOptions.recipient?.id,
@@ -229,20 +240,32 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	/**
 	 * count messages.
 	 * @param source - source to count messages in
-	 * @param group - [optional] group to count messages in
-	 * @param onlyUnread - [optional] if true only count unread messages
+	 * @param searchOptions - filters to narrow the count.
 	 * @return the count of messages
 	 */
-	public async countMessages(source: MessageSource, group = MessageGroup.all, onlyUnread = false): Promise<number>
+	public async countMessages(source: MessageSource, searchOptions: MessageSearchParams): Promise<number>
 	{
 		if (source.isVirtual)
 		{
 			return await this.getPhysicalMessagingSources().reduce(async (total: Promise<number>, physicalSource) => {
-				return (await total) + (await this.countMessages(physicalSource, group, onlyUnread));
+				return (await total) + (await this.countMessages(physicalSource, searchOptions));
 			}, new Promise((resolve) => resolve(0))) as number;
 		}
 
-		return (await this._mhaClinicMessagingApi.countMessages(source.id, group.toString(), onlyUnread)).data.body;
+		if (!searchOptions.group)
+		{
+			searchOptions.group = MessageGroup.all;
+		}
+
+		return (await this._mhaClinicMessagingApi.countMessages(
+			source.id,
+			searchOptions.group.toString(),
+			searchOptions.onlyUnread,
+			searchOptions.keyword,
+			searchOptions.sender?.id,
+			searchOptions.sender?.type.toString(),
+			searchOptions.recipient?.id,
+			searchOptions.recipient?.type.toString())).data.body;
 	}
 
 	/**

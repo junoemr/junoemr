@@ -1,6 +1,7 @@
 import {SitesApi} from "../../generated/api/SitesApi";
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {SecurityPermissions} from "../common/security/securityConstants";
+import {MessageCountMode} from "../lib/provider/settings/model/MessageCountMode";
 
 angular.module('Settings').controller('Settings.SettingsController', [
 
@@ -52,6 +53,8 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			'../ws/rs');
 
 		$scope.$emit('configureShowPatientList', false);
+
+		$scope.MessageCountMode = MessageCountMode;
 
 		controller.providerList = providerList;
 		controller.user = user;
@@ -154,6 +157,19 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			}
 		}
 
+		controller.appointmentReasonOptions = [
+			{
+				"value": "DEFAULT_ALL",
+				"label": "Show category and reason",
+			},
+			{
+				"value": "REASON_ONLY",
+				"label": "Show reason only",
+			},
+			{
+				"value": "NONE",
+				"label": "Off ",
+			}];
 
 		controller.tabs = [
 		{

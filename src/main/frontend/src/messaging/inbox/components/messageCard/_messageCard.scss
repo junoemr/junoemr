@@ -5,36 +5,43 @@
 	user-select: none;
 
 	&:hover {
-		background-color: var(--color-neutral-lightest);
-	}
-
-	&.selected {
-		background-color: var(--color-primary-base);
-		color: var(--color-neutral-white);
-
-		.message-circle {
-			background-color: var(--color-neutral-white);
-		}
-
-		.timestamp-text {
-			color: var(--color-neutral-white);
-		}
-	}
-
-	.message-circle {
-		width: 8px;
-		height: 8px;
-		margin: 0 20px 0 20px;
-		border-radius: 100%;
-		background-color: var(--color-primary-base);
-
 		&.read {
 			background-color: var(--color-neutral-lighter);
 		}
+		&.selected {
+			background-color: var(--color-neutral-light);
+		}
+		&.group-selected {
+			background-color: var(--color-primary-lighter);
+		}
+		background-color: var(--color-neutral-lighter);
+	}
+	&.read {
+		background-color: var(--color-neutral-lightest);
+	}
+	&.selected {
+		background-color: var(--color-neutral-light);
+	}
+	&.group-selected {
+		background-color: var(--color-primary-lightest);
+	}
+
+	.bold {
+		font-weight: bold;
+	}
+
+	.juno-check-box {
+		--box-shadow: none;
 	}
 
 	.timestamp-text {
 		color: var(--color-neutral-dark-grey);
+	}
+
+	.attachment-icon {
+		color: var(--color-neutral-dark);
+		font-size: 16px;
+		margin: 0 16px;
 	}
 
 	.message-subject {

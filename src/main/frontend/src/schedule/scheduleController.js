@@ -3,7 +3,7 @@ import {ScheduleApi} from '../../generated/api/ScheduleApi';
 import {SitesApi} from '../../generated/api/SitesApi';
 import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
-import {MhaAppointmentApi, MhaIntegrationApi, ProvidersServiceApi} from "../../generated";
+import {MhaAppointmentApi, MhaIntegrationApi, ProviderSettings, ProvidersServiceApi} from "../../generated";
 import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
@@ -89,6 +89,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			noShow: 'N',
 			billed: 'B',
 		});
+
+		controller.appointmentReasonDisplayLevel = ProviderSettings.AppointmentReasonDisplayLevelEnum.DEFAULTALL;
+		controller.appointmentReasons = {};
 
 		//=========================================================================
 		// Local scope variables
@@ -206,6 +209,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					includeNoShow: prefs.appointmentCountIncludeNoShow,
 					includeCancelled: prefs.appointmentCountIncludeCancelled,
 				}
+
+				controller.appointmentReasonDisplayLevel = prefs.appointmentReasonDisplayLevel;
 			});
 		}
 
@@ -213,45 +218,32 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_READ))
 			{
-				controller.masterFileEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
-				controller.encounterEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
-				controller.billingEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.BILLING_READ);
-				controller.rxEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RX_READ);
-
 				$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
 
-				$scope.loadAvailabilityTypes().then(function ()
-				{
-					scheduleService.loadEventStatuses().then(function ()
+				Promise.all([
+					$scope.loadAvailabilityTypes(),
+					scheduleService.loadEventStatuses(),
+					$scope.loadScheduleOptions(),
+					controller.loadResourceHash(),
+					$scope.loadSiteOptions(),
+					controller.loadAppointmentReasons(),
+					controller.loadTelehealthEnabled(),
+					controller.loadExtraLinkData()
+				])
+					.then((result) =>
 					{
-						$scope.loadScheduleOptions().then(function ()
-						{
-							controller.loadResourceHash().then(function ()
-							{
-								$scope.loadSiteOptions().then(function ()
-								{
-									controller.loadExtraLinkData().then(function ()
-									{
-										controller.loadTelehealthEnabled().then(function ()
-										{
-											$scope.loadDefaultSelections();
-											$scope.setEventSources();
+						$scope.loadDefaultSelections();
+						$scope.setEventSources();
 
-											controller.initEventsAutoRefresh();
+						controller.initEventsAutoRefresh();
 
-											$scope.applyUiConfig($scope.uiConfig);
+						$scope.applyUiConfig($scope.uiConfig);
 
-											controller.loadWatches();
-											$scope.initialized = true;
-										});
-									});
-								});
-							});
-						});
+						controller.loadWatches();
+						$scope.initialized = true;
 					});
-				});
 			}
-		}
+		};
 
 
 		//=========================================================================
@@ -1136,10 +1128,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					eventNotes = event.data.notes;
 				}
 
-				var detailText = "";
-				if (!Juno.Common.Util.isBlank(eventReason))
+				let detailText = "";
+
+				switch (controller.appointmentReasonDisplayLevel)
 				{
-					detailText += "(" + eventReason + ")";
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.NONE:
+						break;
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.REASONONLY:
+						detailText += `(${eventReason})`;
+						break;
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.DEFAULTALL:
+					default:
+						detailText += `(${controller.appointmentReasons[event.data.reasonCode]} - ${eventReason})`;
 				}
 
 				let eventTitle = eventName + "\n" +
@@ -1987,6 +1987,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			);
 			return deferred.promise;
 		};
+
+		controller.loadAppointmentReasons = async () =>
+		{
+			await $scope.scheduleApi.getAppointmentReasons().then((result) =>
+			{
+				let reasons = {};
+				const lookupListItems = result.data.body;
+
+				lookupListItems.forEach((item) => {
+					reasons[item.id] = item.value;
+				});
+
+				controller.appointmentReasons = reasons;
+			});
+		}
 
 		controller.loadTelehealthEnabled = function loadTelehealthEnabled()
 		{

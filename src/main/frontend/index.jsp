@@ -84,6 +84,10 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- toast alerts -->
+		<toast-area class="toast-alert-area">
+		</toast-area>
 	</div>
 <script>
 

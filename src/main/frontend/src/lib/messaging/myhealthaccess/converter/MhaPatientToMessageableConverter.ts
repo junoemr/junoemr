@@ -12,6 +12,11 @@ export default class MhaPatientToMessageableConverter extends AbstractConverter<
 
 	convert(from: MhaPatient): Messageable
 	{
+		if (!from)
+		{
+			return null;
+		}
+
 		const birthDate = from.birthDate ? `(${from.birthDate.format(Juno.Common.Util.settings.date_format)})` : "";
 
 		return new MhaMessageable(
