@@ -20,46 +20,45 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.transfer;
+package org.oscarehr.careTrackerDecisionSupport.model.condition;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.careTrackerDecisionSupport.transfer.DsRuleUpdateInput;
-import org.oscarehr.careTracker.entity.ItemType;
-import org.oscarehr.careTracker.entity.ValueType;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoLookup;
+import org.oscarehr.util.MiscUtils;
 
-import java.util.List;
+import java.util.Optional;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class CareTrackerItemCreateUpdateTransfer extends AbstractTransientModel
+public abstract class DsCondition extends AbstractTransientModel
 {
 	private Integer id;
-	private String name;
-	private String description;
-	private String guideline;
+	private String value;
+	private ConditionType type;
 
-	private ItemType type;
-	private String typeCode;
-	private boolean hidden;
-
-	private ValueType valueType;
-	private String valueLabel;
-
-	private List<DsRuleUpdateInput> rules;
-
-	public CareTrackerItemCreateUpdateTransfer()
+	protected DsCondition()
 	{
+		this(ConditionType.NEVER_GIVEN);
 	}
 
-	public boolean isMeasurementType()
+	public DsCondition(ConditionType type)
 	{
-		return ItemType.MEASUREMENT.equals(this.type);
+		this.type = type;
 	}
 
-	public boolean isPreventionType()
+	protected Optional<Double> getNumericValue()
 	{
-		return ItemType.PREVENTION.equals(this.type);
+		Double numericValue = null;
+		try
+		{
+			numericValue = Double.parseDouble(this.getValue());
+		}
+		catch(NumberFormatException e)
+		{
+			MiscUtils.getLogger().warn("invalid ds rule condition value: '" + getValue() + "' is not numeric");
+		}
+		return Optional.ofNullable(numericValue);
 	}
+
+	public abstract boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup);
 }

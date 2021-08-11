@@ -26,8 +26,8 @@
 package oscar.oscarPrevention;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.decisionSupport2.model.DsInfoCache;
-import org.oscarehr.decisionSupport2.model.DsInfoLookup;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoCache;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoLookup;
 import org.oscarehr.util.MiscUtils;
 
 import java.text.DateFormat;

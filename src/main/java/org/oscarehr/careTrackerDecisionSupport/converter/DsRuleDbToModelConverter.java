@@ -20,29 +20,36 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.converter;
+package org.oscarehr.careTrackerDecisionSupport.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.careTrackerDecisionSupport.converter.DsRuleDbToModelConverter;
-import org.oscarehr.careTracker.model.CareTrackerItem;
+import org.oscarehr.careTrackerDecisionSupport.model.DsRule;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CareTrackerItemEntityToModelConverter extends AbstractModelConverter<org.oscarehr.careTracker.entity.CareTrackerItem, CareTrackerItem>
+public class DsRuleDbToModelConverter extends AbstractModelConverter<org.oscarehr.careTrackerDecisionSupport.entity.DsRule, DsRule>
 {
 	@Autowired
-	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
+	private DsConditionDbToModelConverter dsConditionDbToModelConverter;
+
+	@Autowired
+	private DsConsequenceDbToModelConverter dsConsequenceDbToModelConverter;
 
 	@Override
-	public CareTrackerItem convert(org.oscarehr.careTracker.entity.CareTrackerItem input)
+	public DsRule convert(org.oscarehr.careTrackerDecisionSupport.entity.DsRule input)
 	{
-		CareTrackerItem careTrackerItemModel = new CareTrackerItem();
-		BeanUtils.copyProperties(input, careTrackerItemModel, "careTrackerItemGroup", "dsRules");
+		if(input == null)
+		{
+			return null;
+		}
+		DsRule dsRule = new DsRule();
+		BeanUtils.copyProperties(input, dsRule, "conditions" ,"consequences");
 
-		careTrackerItemModel.setRules(dsRuleDbToModelConverter.convert(input.getDsRules()));
+		dsRule.setConditions(dsConditionDbToModelConverter.convert(input.getConditions()));
+		dsRule.setConsequences(dsConsequenceDbToModelConverter.convert(input.getConsequences()));
 
-		return careTrackerItemModel;
+		return dsRule;
 	}
 }

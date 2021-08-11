@@ -27,7 +27,7 @@ import lombok.Data;
 import org.oscarehr.careTracker.entity.ItemType;
 import org.oscarehr.careTracker.entity.ValueType;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.decisionSupport2.model.DsRule;
+import org.oscarehr.careTrackerDecisionSupport.model.DsRule;
 
 import java.util.ArrayList;
 import java.util.List;

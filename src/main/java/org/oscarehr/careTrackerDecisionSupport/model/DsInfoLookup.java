@@ -20,27 +20,40 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.model;
+package org.oscarehr.careTrackerDecisionSupport.model;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
+import java.util.Optional;
 
-@Data
-public class CareTrackerItemAlert extends AbstractTransientModel
+public interface DsInfoLookup
 {
-	private SeverityLevel severityLevel;
-	private String message;
+	/**
+	 * get the number of months since the last recorded case
+	 * @param typeCode the type of item
+	 * @return the number of months since the last recorded data, or -1 if never recorded
+	 */
+	int getMonthsSinceLastRecordedDate(String typeCode);
 
-	public CareTrackerItemAlert()
-	{
-		this(null, SeverityLevel.RECOMMENDATION);
-	}
+	/**
+	 * gets an optional numeric representation of the last recorded data, if possible
+	 * @return the optional numeric value
+	 */
+	Optional<Double> getLatestValueNumeric(String typeCode);
 
-	public CareTrackerItemAlert(String message, SeverityLevel severityLevel)
-	{
-		this.message = message;
-		this.severityLevel = severityLevel;
-	}
+	/**
+	 * gets a string representation of the last recorded data, or null if never recorded
+	 * @return the string value, or null
+	 */
+	String getLatestValue(String typeCode);
+
+	/**
+	 * gets the gender assigned to the patient record, as a string
+	 * @return the gender string representation
+	 */
+	String getGender();
+
+	/**
+	 * get the patient age in years
+	 * @return the age value
+	 */
+	int getAgeInYears();
 }
-
