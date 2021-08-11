@@ -21,6 +21,8 @@
 * Canada
 */
 
+import {MessageCountMode} from "../../lib/provider/settings/model/MessageCountMode";
+
 angular.module('Settings').component('inboxSettings',
 	{
 		templateUrl: 'src/settings/inbox/inboxSettings.jsp',
@@ -34,6 +36,8 @@ angular.module('Settings').component('inboxSettings',
 			)
 			{
 				const ctrl = this;
+
+				ctrl.MessageCountMode = MessageCountMode;
 
 				ctrl.$onInit = (): void =>
 				{

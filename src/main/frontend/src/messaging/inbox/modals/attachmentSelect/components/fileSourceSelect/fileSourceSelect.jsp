@@ -6,7 +6,7 @@
 		<div class="source flex-row align-items-center"
 		     ng-class="$ctrl.sourceClasses(FileSource.DOCUMENTS)"
 		     ng-click="$ctrl.selectSource(FileSource.DOCUMENTS)"
-		     title="{{$ctrl.hideChartSources ? $ctrl.confidenceLevelMessage : ''}}">
+		     title="{{$ctrl.hideChartSources ? stringResources.getString('inbox.messageCompose.attachmentSelect.eChartNotAvailableTooltip') : ''}}">
 			<span> Documents </span>
 		</div>
 	</div>

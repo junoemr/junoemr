@@ -4,30 +4,84 @@
 	background-color: var(--color-neutral-lightest);
 	border: solid 1px var(--color-neutral-light-grey);
 
+	.inbox-title {
+		width: 165px;
+	}
+
+	.item-divider {
+		height: 32px;
+		.juno-divider {
+			--divider-color: var(--color-neutral-light);
+		}
+	}
+
+	.unread-checkbox {
+		min-width: 78px;
+	}
+
+	.checkbox-no-drop-shadow {
+		.juno-check-box {
+			--box-shadow: none;
+		}
+	}
+
 	.search-input {
-		width: 344px;
+		width: 308px;
 		min-width: 128px;
 	}
 
 	.header-button {
 		flex-grow: 0;
 
+		&.compose-message-button {
+			.juno-button {
+				--border-radius: 44px;
+			}
+		}
+
 		.icon {
-			margin: 8px;
-			font-size: 16px;
+			font-size: 24px;
+
+			&.icon-blue {
+				color: var(--color-primary-base);
+			}
 		}
 	}
 
-	@media only screen and (max-width: 800px) {
+	.loading-indicator {
+		.loading-spinner-container {
+			width: 2em;
+			height: 2em;
+		}
+	}
+
+	@media only screen and (max-width: 1080px) {
+		.inbox-title {
+			width: 101px;
+		}
+
+		.left-buttons {
+			> .header-button {
+				margin: 0;
+			}
+		}
+
+		.right-buttons {
+			padding: 0 8px;
+		}
+
+		.juno-divider {
+			--divider-margin: 8px;
+		}
+	}
+
+	@media only screen and (max-width: 700px) {
 		flex-wrap: wrap;
 		height: auto;
+		padding: 8px;
 
 		.right-buttons {
 			justify-content: flex-start;
-		}
-
-		.search-input {
-			width: 256px;
 		}
 
 		.inbox-title {

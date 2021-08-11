@@ -54,6 +54,15 @@
 				ca-empty-option="true"
 		>
 		</ca-field-select>
+		<ca-field-select
+				class="col-sm-6"
+				ca-name="settings-schedule-reasonOpts"
+				ca-title="Display Appointment Reason"
+				ca-template="label"
+				ca-model="$ctrl.pref.appointmentReasonDisplayLevel"
+				ca-options="$ctrl.appointmentReasonOptions"
+		>
+		</ca-field-select>
 
 		<div class="form-group col-sm-6">
 			<label>Length of patient name to display on appointment screen:</label>

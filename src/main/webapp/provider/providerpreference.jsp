@@ -686,11 +686,19 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 				<td>
 					<select name="appointmentReasonDisplayLevel">
 						<% for (ProviderPreference.AppointmentReasonDisplayLevel displayLevel : ProviderPreference.AppointmentReasonDisplayLevel.values())
-						{ %>
-						<option value="<%=displayLevel%>" <%=(providerReasonLevel == null || displayLevel == providerReasonLevel) ? "selected" : ""%>>
-							<%=displayLevel.toLabel()%>
-						</option>
-						<% } %>
+						{
+							// There is already an option to toggle this on and off, so allowing none as an option is redundant.
+                            // AppointmentDisplayLevel.NONE is meant for the Juno UI, where no such toggle exists.
+							if (displayLevel != ProviderPreference.AppointmentReasonDisplayLevel.NONE)
+							{
+						%>
+						    <option value="<%=displayLevel%>" <%=(providerReasonLevel == null || displayLevel == providerReasonLevel) ? "selected" : ""%>>
+							    <%=displayLevel.toLabel()%>
+						    </option>
+                        <%
+							}
+						}
+                        %>
 					</select>
 				</td>
 			</tr>

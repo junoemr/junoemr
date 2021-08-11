@@ -50,6 +50,20 @@ angular.module('Settings').component('scheduleSettings',
 				ctrl.siteOptions = [];
 				ctrl.scheduleOptions = [];
 
+				ctrl.appointmentReasonOptions = [
+					{
+						value: "DEFAULT_ALL",
+						label: "Show category and reason",
+					},
+					{
+						value: "REASON_ONLY",
+						label: "Show reason only",
+					},
+					{
+						value: "NONE",
+						label: "Off ",
+					}];
+
 				ctrl.$onInit = (): void =>
 				{
 					ctrl.pref = ctrl.pref || $stateParams.pref;

@@ -55,7 +55,6 @@ import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.oscarehr.ws.rest.transfer.DashboardTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
 import javax.servlet.http.HttpServletRequest;
@@ -594,19 +593,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		
 		EncounterTemplateResponse response = new EncounterTemplateResponse();
 		response.setTemplates(transfers);
-		
-		return response;
-	}
 
-	@GET
-	@Path("/properties")
-	@Produces(MediaType.APPLICATION_JSON)
-	public JSONObject getDisplayProperties()
-	{
-		JSONObject response = new JSONObject();
-		OscarProperties oscarProperties = OscarProperties.getInstance();
-
-		response.put("demographic_family_doctor", oscarProperties.isPropertyActive("demographic_family_doctor"));
 		return response;
 	}
 

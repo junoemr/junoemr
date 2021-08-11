@@ -11,6 +11,7 @@
 			on-change="$ctrl.checkMessageableSelection(value)"
 			on-selected="$ctrl.onMessageableSelected(value)"
 			disabled="$ctrl.disabled"
+			initial-text="$ctrl.initialText"
 			component-style="$ctrl.componentStyle">
 	</juno-typeahead>
 

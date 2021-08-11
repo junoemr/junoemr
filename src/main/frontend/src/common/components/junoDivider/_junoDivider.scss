@@ -1,4 +1,9 @@
 .juno-divider {
+
+	// Customization variables
+	--divider-color: var(--color-neutral-lightest);
+	--divider-margin: 24px;// margin to both the left & right of the divider or top & bottom depending on orientation
+
 	height: 4px;
 	width: 100%;
 
@@ -20,10 +25,10 @@
 
 div {
 	&.juno-divider {
-		margin: 24px 0 24px 0;
+		margin: var(--divider-margin) 0 var(--divider-margin) 0;
 
 		&.horizontal {
-			margin: 0 24px 0 24px;
+			margin: 0 var(--divider-margin) 0 var(--divider-margin);
 		}
 	}
 }

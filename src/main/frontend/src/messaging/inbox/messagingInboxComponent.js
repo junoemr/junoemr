@@ -25,6 +25,10 @@ import MessagingServiceFactory from "../../lib/messaging/factory/MessagingServic
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import StreamingList from "../../lib/util/StreamingList";
 import {MessageGroup} from "../../lib/messaging/model/MessageGroup";
+import MessagingStringResourceSetFactory from "../../lib/messaging/factory/MessagingStringResourceSetFactory";
+import {BroadcastEvent} from "./components/messageList/messageListComponentConstants";
+import ToastService from "../../lib/alerts/service/ToastService";
+import {toastStore} from "../../lib/alerts/store/ToastStore";
 
 angular.module("Messaging").component('messagingInbox', {
 	templateUrl: 'src/messaging/inbox/messagingInbox.jsp',
@@ -41,14 +45,23 @@ angular.module("Messaging").component('messagingInbox', {
 		)
 	{
 		const ctrl = this;
+
+		$scope.stringResources = MessagingStringResourceSetFactory.build($stateParams.backend);
+
 		ctrl.backend = $stateParams.backend;
 		ctrl.selectedSourceId = $stateParams.source;
 		ctrl.selectedGroupId = $stateParams.group;
+		ctrl.recordPageEmbedded = $stateParams.recordPageEmbedded ? Juno.Common.Util.parseBoolean($stateParams.recordPageEmbedded) : false;
 		ctrl.componentStyle = JUNO_STYLE.GREY;
 		ctrl.messageSources = [];
 		ctrl.groups = [];
 		ctrl.messageStream = null;
 		ctrl.selectedMessageId = $stateParams.messageId;
+		ctrl.onlyUnread = $stateParams.onlyUnread ? Juno.Common.Util.parseBoolean($stateParams.onlyUnread) : false; // only show unread messages
+		ctrl.searchKeyword = $stateParams.keyword || null;
+
+		// a list of all messages currently selected for "group editing"
+		ctrl.massEditList = []; // Type Message[]
 
 		ctrl.$onInit = async () =>
 		{
@@ -64,6 +77,15 @@ angular.module("Messaging").component('messagingInbox', {
 					await messagingService.getMessageSourceById(ctrl.selectedSourceId),
 					$stateParams.messageableId);
 			}
+		}
+
+		/**
+		 * called when the message list is to be manually reloaded.
+		 */
+		ctrl.onReloadMessages = () =>
+		{
+			// tell message list to reload.
+			$scope.$broadcast(BroadcastEvent.RefreshMessageList);
 		}
 
 		/**

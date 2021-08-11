@@ -49,6 +49,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'staticDataService',
 	'referralDoctorsService',
 	'user',
+	'uxService',
 
 	function(
 		$scope,
@@ -67,7 +68,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		securityRolesService,
 		staticDataService,
 		referralDoctorsService,
-		user)
+		user,
+		uxService)
 	{
 
 		var controller = this;
@@ -99,10 +101,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
+
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
-		controller.properties = $scope.$parent.recordCtrl.properties;
+		controller.rosteringModuleEnabled = false;
 		controller.displayMessages = messagesFactory.factory();
 		controller.validations = {};
 		controller.SecurityPermissions = SecurityPermissions;
@@ -138,21 +141,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 							}
 						);
 
-						// retrieve contact lists for demographic
-						demographicService.getDemographicContacts(controller.page.demo.demographicNo, "personal").then(
-							function success(data)
-							{
-								controller.page.demoContacts = demoContactShow(data);
-							}
-						);
-						demographicService.getDemographicContacts(controller.page.demo.demographicNo, "professional").then(
-							function success(data)
-							{
-								controller.page.demoContactPros = demoContactShow(data);
-							}
-						);
-
-						//show notes
+						// show notes
 						if (controller.page.demo.notes != null)
 						{
 							controller.page.demo.scrNotes = controller.page.demo.notes;
@@ -304,7 +293,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					}
 				);
 			}
-
 			// show eligibility check button only if instance is BC OR (ON AND billing type CLINICAID)
 			systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
 					function success(result)
@@ -336,6 +324,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					}
 			);
 
+			systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false).then((result) =>
+			{
+				controller.rosteringModuleEnabled = result.data.body;
+			});
 		};
 
 		controller.canAccessAppointments = () =>
@@ -783,21 +775,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			window.open(url, "uploadWin", "width=500, height=300");
 		};
 
-		//manage contacts
-		controller.manageContacts = function manageContacts()
-		{
-			var discard = true;
-			if (controller.page.dataChanged > 0)
-			{
-				discard = confirm("You may have unsaved data. Are you sure to leave?");
-			}
-			if (discard)
-			{
-				var url = "../demographic/Contact.do?method=manage&demographic_no=" + controller.page.demo.demographicNo;
-				window.open(url, "ManageContacts", "width=960, height=700");
-			}
-		};
-
 		//print buttons
 		controller.printLabel = function printLabel(label)
 		{
@@ -1162,6 +1139,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			);
 		};
 
+
+
 		controller.resetEditState = function resetEditState()
 		{
 			controller.page.saving = false;
@@ -1258,39 +1237,6 @@ function getPhoneNum(phone)
 		phone = phone.substring(0, phone.length - 1);
 	}
 	return phone;
-}
-
-function demoContactShow(demoContact)
-{
-	var contactShow = demoContact;
-	if (demoContact.role != null)
-	{ //only 1 entry
-		var tmp = {};
-		tmp.role = demoContact.role;
-		tmp.sdm = demoContact.sdm;
-		tmp.ec = demoContact.ec;
-		tmp.category = demoContact.category;
-		tmp.lastName = demoContact.lastName;
-		tmp.firstName = demoContact.firstName;
-		tmp.phone = demoContact.phone;
-		contactShow = [tmp];
-	}
-	for (var i = 0; i < contactShow.length; i++)
-	{
-		if (contactShow[i].sdm == true) contactShow[i].role += " /sdm";
-		if (contactShow[i].ec == true) contactShow[i].role += " /ec";
-		if (contactShow[i].role == null || contactShow[i].role == "") contactShow[i].role = "-";
-
-		if (contactShow[i].phone == null || contactShow[i].phone == "")
-		{
-			contactShow[i].phone = "-";
-		}
-		else if (contactShow[i].phone.charAt(contactShow[i].phone.length - 1) == "*")
-		{
-			contactShow[i].phone = contactShow[i].phone.substring(0, contactShow[i].phone.length - 1);
-		}
-	}
-	return contactShow;
 }
 
 function toArray(obj)

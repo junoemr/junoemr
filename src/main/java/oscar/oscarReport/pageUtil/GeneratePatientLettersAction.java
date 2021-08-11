@@ -80,6 +80,8 @@ public class GeneratePatientLettersAction extends Action {
     DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
     ClinicDAO clinicDao = SpringUtils.getBean(ClinicDAO.class);
     ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+    private final String SECOND = "Second";
+    private final String FIRST = "First";
 
     /**
      * Creates a new instance of GeneratePatientLettersAction
@@ -99,7 +101,14 @@ public class GeneratePatientLettersAction extends Action {
 
         String[] demographicIds = request.getParameterValues("demos");
         String id = request.getParameter("reportLetter");
-        String providerId =(String) request.getSession().getAttribute("user");
+        String providerId = (String) request.getSession().getAttribute("user");
+        String followupValue = request.getParameter("followupValue");
+        String lastPreventionDate= request.getParameter("lastDate");
+
+        if ("------".equals(lastPreventionDate))
+        {
+            lastPreventionDate = "'no data'";
+        }
 
         if (log.isTraceEnabled()) {
             if (demographicIds == null){
@@ -131,6 +140,16 @@ public class GeneratePatientLettersAction extends Action {
         for (int i = 0; i < demographicIds.length; i++)
         {
             PreventionLetter prevLetter = new PreventionLetter();
+            if (!("L2".equals(followupValue)))
+            {
+                prevLetter.setContactMethod(FIRST);
+            }
+            else
+            {
+                prevLetter.setContactMethod(SECOND);
+            }
+
+            prevLetter.setLastPreventionDate(lastPreventionDate);
             fillData(prevLetter, demographicIds[i], providerId);
 
             if (!preventionLetterList.isEmpty())

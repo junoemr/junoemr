@@ -23,12 +23,15 @@
 import {saveAs} from "file-saver";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../../common/components/junoComponentConstants";
 import {MessageableLocalType} from "../../../../../../lib/messaging/model/MessageableLocalType";
+import RoutingUtil from "../../../../../../lib/util/RoutingUtil";
 
 angular.module("Messaging.Components.View.Components").component('message', {
 	templateUrl: 'src/messaging/inbox/components/messageView/components/message/message.jsp',
 	bindings: {
 		message: "<",
 		messagingService: "<",
+		compact: "<",
+		indentLevel: "<?"
 	},
 	controller: [
 		"$scope",
@@ -43,6 +46,9 @@ angular.module("Messaging.Components.View.Components").component('message', {
 
 			ctrl.$onInit = async () =>
 			{
+				ctrl.compact = ctrl.compact || false;
+				ctrl.indentLevel = ctrl.indentLevel || 0;
+
 				try
 				{
 					ctrl.loading = true;
@@ -54,6 +60,16 @@ angular.module("Messaging.Components.View.Components").component('message', {
 					$scope.$apply();
 				}
 			};
+
+			ctrl.getComponentClasses = () =>
+			{
+				return {
+					'compact': ctrl.compact,
+					'indent-level-1': ctrl.indentLevel === 1,
+					'indent-level-2': ctrl.indentLevel === 2,
+					'indent-level-3': ctrl.indentLevel >= 3,
+				}
+			}
 
 			/**
 			 * setup the messageable id to demographic id mapping.
@@ -74,15 +90,14 @@ angular.module("Messaging.Components.View.Components").component('message', {
 
 			ctrl.formattedMessageDate = () =>
 			{
-				return ctrl.message.createdAtDateTime.format(Juno.Common.Util.settings.message_date_format);
+				return ctrl.message.createdAtDateTime.format(Juno.Common.Util.settings.message_date_long_format);
 			};
 
 			ctrl.toDemographicSummary = (demographicNo) =>
 			{
-				$state.go("record.summary", {
-					demographicNo: demographicNo
+				RoutingUtil.goNewTab($state, "record.summary", {
+					demographicNo: demographicNo,
 				});
 			};
-
 		}],
 });

@@ -230,8 +230,8 @@
 								   data-toggle="dropdown">
 									<i class="icon icon-chat"></i>
 									<span class="caret"></span>
-									<span ng-show="($ctrl.unreadMessageTotal + $ctrl.mhaUnreadMessageTotal) > 0" class="badge badge-danger flex-row align-items-center">
-												{{$ctrl.unreadMessageTotal + $ctrl.mhaUnreadMessageTotal}}
+									<span ng-show="$ctrl.getMessengerMessageCount() > 0" class="badge badge-danger flex-row align-items-center">
+												{{$ctrl.getMessengerMessageCount()}}
 									</span>
 								</a>
 								<ul class="dropdown-menu"

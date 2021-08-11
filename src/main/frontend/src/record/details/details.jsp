@@ -167,11 +167,13 @@
 					</care-team-section>
 					<juno-divider component-style="pageStyle"></juno-divider>
 
-					<roster-display-section ng-model="detailsCtrl.page.demo"
+					<roster-display-section ng-if="detailsCtrl.rosteringModuleEnabled"
+                                        ng-model="detailsCtrl.page.demo"
 											validations="detailsCtrl.validations"
 											component-style="pageStyle">
 					</roster-display-section>
-					<juno-divider component-style="pageStyle"></juno-divider>
+					<juno-divider ng-if="detailsCtrl.rosteringModuleEnabled"
+                              component-style="pageStyle"></juno-divider>
 					<additional-information-section ng-model="detailsCtrl.page.demo"
 													validations="detailsCtrl.validations"
 													component-style="pageStyle">
@@ -200,24 +202,11 @@
 					</div>
 				</div>
 				<hr>
-				<div class="col-md-12">
-					<h3 class="form-heading">
-						<bean:message key="global.contacts"/>
-						<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="detailsCtrl.manageContacts()">
-							<bean:message key="web.record.details.manage"/>
-						</button>
-					</h3>
-					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContacts">
-						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
-						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
-						<div class="col-md-5">{{dc.phone}}</div>
-					</div>
-				</div>
-				<hr>
+
 				<div class="col-md-12">
 					<h3 class="form-heading">
 						<bean:message key="web.record.details.proContacts"/>
-						<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="detailsCtrl.manageContacts()">
+						<button type="button" class="btn btn-primary pull-right"  ng-click="detailsCtrl.manageContacts()">
 							<bean:message key="web.record.details.manage"/>
 						</button>
 					</h3>
@@ -226,6 +215,13 @@
 						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 						<div class="col-md-5">{{dc.phone}}</div>
 					</div>
+				</div>
+
+				<div class="col-md-12">
+					<demographic-contacts-section
+							ng-model="detailsCtrl.page.demoContacts"
+							component-style="pageStyle">
+					</demographic-contacts-section>
 				</div>
 			</div>
 		</div>

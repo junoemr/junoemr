@@ -1,0 +1,28 @@
+.demographic-details-section.demographic-contacts-section {
+
+  .title {
+    margin-top: 32px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .contacts {
+    margin-left: 32px;
+    margin-bottom: 16px;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .linkable {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 4px;
+  }
+
+  .color {
+        color: #455899; //where do i get this color?
+  }
+}

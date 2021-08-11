@@ -7,6 +7,7 @@
 
 .juno-input-label-left {
 	margin-right: var(--juno-form-input-label-padding-left);
+	margin-bottom: 0 !important;/// _forms.scss is a little baby and will add a margin to the bottom!
 	text-align: right;
 }
 
@@ -93,8 +94,8 @@
 	}
 
 	&.juno-divider {
-		background-color: $color-neutral-lightest;
-		border: 1px solid $color-neutral-lighter;
+		background-color: var(--divider-color);
+		border: 1px solid var(--divider-color);
 	}
 
 	@include juno-table-default();
@@ -107,7 +108,7 @@
 	@include juno-tab-color-scheme-white;
 
 	&.juno-divider {
-		border: 1px solid $color-neutral-lighter;
+		border: 1px solid var(--divider-color);
 	}
 
 	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter, $color-neutral-darker);

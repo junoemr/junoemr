@@ -338,7 +338,7 @@ oscarApp.config([
 		})
 		.state('messaging.view',
 		{
-			url: "/view/:backend/source/:source/group/:group?messageableId",
+			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded?onlyUnread?keyword",
 			component: "messagingInbox",
 			params: {
 				backend: {
@@ -353,6 +353,17 @@ oscarApp.config([
 				messageableId: {
 					dynamic: true,
 				},
+				recordPageEmbedded: {
+					value: "false",
+				},
+				onlyUnread: {
+					dynamic: true,
+					value: "false",
+				},
+				keyword: {
+					dynamic: true,
+					value: null,
+				}
 			}
 		})
 		.state('messaging.view.message',
@@ -606,10 +617,6 @@ oscarApp.config([
 				{
 					return providerService.getMe();
 				}],
-				properties: ['uxService', function(uxService)
-				{
-					return uxService.getDisplayProperties();
-				}]
 			},
 			meta:
 			{
@@ -934,6 +941,46 @@ oscarApp.config([
 					checkDemographicAccess: true,
 				},
 			},
+		})
+		.state("record.messaging",
+		{
+			url: "/messaging"
+		})
+		.state('record.messaging.view',
+		{
+			url: "/view/:backend/source/:source/group/:group?messageableId&recordPageEmbedded?onlyUnread?keyword",
+			component: "messagingInbox",
+			params: {
+				backend: {
+					dynamic: true,
+				},
+				source: {
+					dynamic: true,
+				},
+				group: {
+					dynamic: true,
+				},
+				messageableId: {
+					dynamic: true,
+					value: null,
+				},
+				recordPageEmbedded: {
+					value: "false",
+				},
+				onlyUnread: {
+					dynamic: true,
+					value: "false",
+				},
+				keyword: {
+					dynamic: true,
+					value: null,
+				}
+			}
+		})
+		.state('record.messaging.view.message',
+		{
+			url: "/message/:messageId/view",
+			component: "messageView",
 		})
 		// .state('admin.integration',
 		.state('k2aConfig',
