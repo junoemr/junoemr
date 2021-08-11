@@ -1420,7 +1420,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<executable>true</executable>
 					<image>
 						<env>
 							<BP_JVM_VERSION>16.0.2</BP_JVM_VERSION>

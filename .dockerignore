@@ -1,5 +1,5 @@
 # Ignore everything unless specified
 **
 
-# Allow Juno war
+# Allow Juno war for building for OpenShift
 !/target/oscar-14.0.0-SNAPSHOT.war
