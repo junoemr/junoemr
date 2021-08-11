@@ -38,6 +38,7 @@ public class DemographicContactFewConverter {
 		DemographicContactFewTo1 demographicContactFewTo1 = new DemographicContactFewTo1();
 		
 		demographicContactFewTo1.setRole(demographicContact.getRole());
+		demographicContactFewTo1.setConsentToContact(demographicContact.getConsentToContact());
 		demographicContactFewTo1.setEc(demographicContact.getEc());
 		demographicContactFewTo1.setSdm(demographicContact.getSdm());
 		demographicContactFewTo1.setCategory(demographicContact.getCategory());

@@ -40,14 +40,21 @@
 					component-style="$ctrl.componentStyle">
 			</juno-input>
 
-			<juno-input
-					ng-model="$ctrl.contact.role"
-					disabled="!$ctrl.editable"
-					label="Contact Role"
-					label-position="$ctrl.LABEL_POSITION.TOP"
-					placeholder="Mother/Father/Guardian/Uncle"
-					component-style="$ctrl.componentStyle">
-			</juno-input>
+			<div class="half-half">
+				<juno-input
+						ng-model="$ctrl.contact.role"
+						disabled="!$ctrl.editable"
+						label="Contact Role"
+						label-position="$ctrl.LABEL_POSITION.TOP"
+						placeholder="Mother/Father/Guardian/Uncle"
+						component-style="$ctrl.componentStyle">
+				</juno-input>
+				<juno-check-box
+						ng-model="$ctrl.contact.consentToContact"
+						disabled="!$ctrl.editable"
+						label="Consent to contact">
+				</juno-check-box>
+			</div>
 
 			<juno-input
 					ng-model="$ctrl.contact.address"
@@ -67,7 +74,7 @@
 					component-style="$ctrl.componentStyle">
 			</juno-input>
 
-			<div class="postal-prov">
+			<div class="half-half">
 				<juno-input
 					ng-model="$ctrl.contact.postal"
 					label="Postal Code"

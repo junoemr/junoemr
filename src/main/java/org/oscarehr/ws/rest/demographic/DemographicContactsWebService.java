@@ -24,64 +24,66 @@
 package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.jcs.access.exception.InvalidArgumentException;
+import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
-@Path("demographic/{demographicId}/contact/")
-@Component("DemographicContactWebService")
+@Path("demographic/{demographicId}/contacts/")
+@Component("DemographicContactsWebService")
 @Tag(name = "demographic")
-public class DemographicContactWebService extends AbstractServiceImpl
+public class DemographicContactsWebService extends AbstractServiceImpl
 {
     protected SecurityInfoManager securityInfoManager;
     protected DemographicManager demographicManager;
+    protected DemographicContactFewTo1 demographicContactFewTo1;
 
     // ==========================================================================
-	// Public Methods
-	// ==========================================================================
+    // Public Methods
+    // ==========================================================================
 
     @Autowired
-	public DemographicContactWebService(
-			SecurityInfoManager securityInfoManager,
+    public DemographicContactsWebService(
+            SecurityInfoManager securityInfoManager,
             DemographicManager demographicManager)
-	{
-		this.securityInfoManager = securityInfoManager;
-		this.demographicManager = demographicManager;
-	}
+    {
+        this.securityInfoManager = securityInfoManager;
+        this.demographicManager = demographicManager;
+    }
 
     // ==========================================================================
-	// Endpoints
-	// ==========================================================================
+    // Endpoints
+    // ==========================================================================
 
-    @PUT
-	@Path("/{contactId}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicContactFewTo1> updateExternalContact(@PathParam("demographicId") Integer demographicId,
-																		@PathParam("contactId") String contactId,
-																		DemographicContactFewTo1 demographicContactFewTo1)
-	{
-		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.UPDATE, demographicId, "_demographic");
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("demographicId") Integer demographicId,
+                                                                               @QueryParam("categoryType") String categoryType) throws InvalidArgumentException
+    {
+        LoggedInInfo loggedInInfo = getLoggedInInfo();
+        securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicId, "_demographic");
 
-		DemographicContactFewTo1 updatedContact = demographicManager.updateExternalContact(demographicContactFewTo1, contactId, demographicId);
+        if (!DemographicContact.ALL_CATEGORIES.contains(categoryType))
+        {
+            throw new InvalidArgumentException("Invalid category: " + categoryType);
+        }
 
-		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographicId, LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC_CONTACT, LogConst.STATUS_SUCCESS,
-					demographicContactFewTo1.getContactId(), getHttpServletRequest().getRemoteAddr());
-		return RestResponse.successResponse(updatedContact);
-	}
+        List<DemographicContactFewTo1> results = demographicManager.getDemographicContactsByCategory(loggedInInfo, demographicId, categoryType);
+        return RestSearchResponse.successResponseOnePage(results);
+    }
 }

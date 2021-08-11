@@ -64,6 +64,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
+import org.oscarehr.ws.rest.conversion.DemographicContactFewToContactDomainConverter;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
@@ -193,6 +194,12 @@ public class DemographicManager {
 
 	@Autowired
 	private ProviderDao providerDao;
+
+	@Autowired
+	DemographicContactFewToContactDomainConverter contactToDomainConverter;
+
+	@Autowired
+	DemographicContactFewConverter demoContactFewConverter;
 
 	@Deprecated
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
@@ -397,49 +404,44 @@ public class DemographicManager {
 		return results;
 	}
 
-	public Contact updateExternalContact(Contact contact, String oldContactId)
+	public DemographicContactFewTo1 updateExternalContact(DemographicContactFewTo1 demographicContactFewTo1, String contactId, Integer demographicId)
 	{
-		Contact oldContact = contactDao.find(Integer.parseInt(oldContactId));
-		oldContact.setDeleted(true);
-		contactDao.merge(oldContact);
+		Contact contact = contactDao.find(Integer.parseInt(contactId));
 
-		Contact revised = (Contact) contactDao.merge(contact);
-		return revised;
+		contact.setFirstName(StringUtils.trimToNull(demographicContactFewTo1.getFirstName()));
+		contact.setLastName(StringUtils.trimToNull(demographicContactFewTo1.getLastName()));
+		contact.setMiddleName(StringUtils.trimToNull(demographicContactFewTo1.getMiddleName()));
+		contact.setAddress(StringUtils.trimToNull(demographicContactFewTo1.getAddress()));
+		contact.setCity(StringUtils.trimToNull(demographicContactFewTo1.getCity()));;
+		contact.setPostal(StringUtils.trimToNull(demographicContactFewTo1.getPostal()));
+		contact.setProvince(StringUtils.trimToNull(demographicContactFewTo1.getProvince()));
+		contact.setResidencePhone(StringUtils.trimToNull(demographicContactFewTo1.getHomePhone()));
+		contact.setResidencePhoneExtension(StringUtils.trimToNull(demographicContactFewTo1.getHPhoneExt()));
+		contact.setCellPhone(StringUtils.trimToNull(demographicContactFewTo1.getCellPhone()));
+		contact.setCellPhoneExtension(StringUtils.trimToNull(demographicContactFewTo1.getCPhoneExt()));
+		contact.setWorkPhone(StringUtils.trimToNull(demographicContactFewTo1.getWorkPhone()));
+		contact.setWorkPhoneExtension(StringUtils.trimToNull(demographicContactFewTo1.getWPhoneExt()));
+		contact.setFax(StringUtils.trimToNull(demographicContactFewTo1.getFax()));
+		contact.setEmail(StringUtils.trimToNull(demographicContactFewTo1.getEmail()));
+		contact.setNote(StringUtils.trimToNull(demographicContactFewTo1.getNote()));
+
+		Contact revised = (Contact)contactDao.merge(contact);
+
+		DemographicContact demographicContact = this.updateExternalDemographicContact(demographicContactFewTo1, contactId, demographicId);
+
+		return 	demoContactFewConverter.getAsTransferObject(demographicContact, revised);
+
 	}
 
-	public DemographicContact updateExternalDemographicContact(LoggedInInfo loggedInInfo,
-															   Integer demographicId,
-															   DemographicContact newContact,
-															   String oldContactId,
-															   String newContactId)
+	public DemographicContact updateExternalDemographicContact(DemographicContactFewTo1 demographicContactFewTo1, String contactId, Integer demographicId)
 	{
-		List<DemographicContact> oldDemographicContact = demographicContactDao.findAllByContactIdAndCategoryAndType(Integer.parseInt(oldContactId),
-															DemographicContact.CATEGORY_PERSONAL,
-															DemographicContact.TYPE_CONTACT);
+		List<DemographicContact> demographicContactList = demographicContactDao.find(demographicId, Integer.parseInt(contactId));
 
-		DemographicContact revised = new DemographicContact();
-		for (DemographicContact demographicContact : oldDemographicContact)
-		{
+		DemographicContact demographicContact = demographicContactList.get(0);
+		demographicContact.setRole(demographicContactFewTo1.getRole());
+		demographicContact.setConsentToContact(demographicContactFewTo1.getConsentToContact());
 
-			if (demographicContact.getDemographicNo() != demographicId)
-			{
-				demographicContact.setContactId(newContactId);
-				demographicContact.setCreator(loggedInInfo.getLoggedInProviderNo());
-				demographicContactDao.merge(demographicContact);
-			}
-			else
-			{
-				DemographicContact dc = demographicContactDao.find(demographicContact.getId());
-				dc.setDeleted(true);
-				demographicContactDao.merge(dc);
-
-				newContact.setContactId(newContactId);
-				newContact.setCreator(loggedInInfo.getLoggedInProviderNo());
-				newContact.setDemographicNo(demographicId);
-				revised = (DemographicContact) demographicContactDao.merge(newContact);
-			}
-		}
-		return revised;
+		return (DemographicContact) demographicContactDao.merge(demographicContact);
 	}
 
 

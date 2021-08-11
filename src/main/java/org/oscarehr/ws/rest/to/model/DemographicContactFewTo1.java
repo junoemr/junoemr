@@ -35,6 +35,7 @@ public class DemographicContactFewTo1 implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private String role;
+	private Boolean consentToContact;
 	private String sdm;
 	private String ec;
 	private String category;

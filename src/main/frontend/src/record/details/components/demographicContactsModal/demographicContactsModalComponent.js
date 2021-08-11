@@ -111,7 +111,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
             {
                 ctrl.saving = true;
 
-                demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact).then(
+                demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact.contactId, ctrl.contact).then(
                     (data) => {
                         ctrl.onCancel();
                     },
