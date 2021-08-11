@@ -53,9 +53,15 @@ angular.module('Record.Details').component('demographicContactsModal', {
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
+            ctrl.phoneNumberRegex = /^[\d-\s()]*$/;
             ctrl.contact = null;
             ctrl.contactType = null;
             ctrl.demo = null;
+
+            ctrl.valid = {
+                email : true,
+                postal: true
+            }
 
             ctrl.$onInit = () =>
             {
@@ -109,8 +115,16 @@ angular.module('Record.Details').component('demographicContactsModal', {
 
             ctrl.save = function save()
             {
-                ctrl.saving = true;
+                ctrl.valid.postal = true;
+                ctrl.valid.email = true;
 
+                if (!ctrl.validate())
+			{
+				Juno.Common.Util.errorAlert($uibModal, 'Error', 'Some fields are invalid, Please correct the highlighted fields');
+				return;
+			}
+
+                ctrl.saving = true;
                 demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact.contactId, ctrl.contact).then(
                     (data) => {
                         ctrl.onCancel();
@@ -121,10 +135,10 @@ angular.module('Record.Details').component('demographicContactsModal', {
             };
 
             ctrl.resetEditState = function resetEditState()
-		{
-			ctrl.saving = false;
-			ctrl.dataChanged = false;
-		};
+		    {
+			    ctrl.saving = false;
+			    ctrl.dataChanged = false;
+		    };
 
             ctrl.getTabs = function getTabs(contactId)
             {
@@ -135,7 +149,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                         ctrl.tab.demoId = contactId;
                         ctrl.changeTab(ctrl.tab);
                     },
-                    function error(errors)
+                    function error()
                     {
                         Juno.Common.Util.errorAlert($uibModal, "Error", "Unable to open tab.");
                     });
@@ -160,17 +174,35 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 }
             };
 
-		//monitor data changed
-		$scope.$watch(function()
-		{
-			return ctrl.contact;
-		}, function(newValue, oldValue)
-		{
-			if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
-			{
-				ctrl.dataChanged = true;
-			}
+            ctrl.validate = function validate()
+            {
+                if (ctrl.contact.email && (ctrl.contact.email === "" || !ctrl.contact.email.match(/^[^@ ]+@([A-z0-9-]+\.)+[A-z0-9-]+$/)))
+		        {
+		            ctrl.valid.email = false;
+			        return false;
+		        }
+                if (ctrl.contact.postal && (ctrl.contact.postal === "" || !ctrl.contact.postal.match(/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/)))
+                {
+                    ctrl.valid.postal = false;
+			        return false;
+                }
+                else
+                {
+                    return true;
+                }
+            };
 
-		}, true);
+		    //monitor data changed
+		    $scope.$watch(function()
+		    {
+		    	return ctrl.contact;
+		    }, function(newValue, oldValue)
+		    {
+		    	if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
+		    	{
+		    		ctrl.dataChanged = true;
+		    	}
+
+	    	}, true);
         }]
 });

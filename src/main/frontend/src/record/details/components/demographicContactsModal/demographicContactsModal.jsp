@@ -81,6 +81,7 @@
 					label-position="$ctrl.LABEL_POSITION.TOP"
 					disabled="!$ctrl.editable"
 					placeholder="Postal Code"
+					invalid="!$ctrl.valid.postal"
 					component-style="$ctrl.componentStyle">
 				</juno-input>
 
@@ -101,6 +102,7 @@
 					label-position="$ctrl.LABEL_POSITION.TOP"
 					disabled="!$ctrl.editable"
 					placeholder="000-000-0000"
+					valid-regex="$ctrl.phoneNumberRegex"
 					component-style="$ctrl.componentStyle">
 				</juno-input>
 				<juno-input
@@ -110,6 +112,7 @@
 					label-position="$ctrl.LABEL_POSITION.TOP"
 					disabled="!$ctrl.editable"
 					placeholder="00000"
+					valid-regex="$ctrl.phoneNumberRegex"
 					component-style="$ctrl.componentStyle">
 				</juno-input>
 			</div>
@@ -121,6 +124,7 @@
 						label-position="$ctrl.LABEL_POSITION.TOP"
 						disabled="!$ctrl.editable"
 						placeholder="000-000-0000"
+						valid-regex="$ctrl.phoneNumberRegex"
 						component-style="$ctrl.componentStyle">
 				</juno-input>
 				<juno-input
@@ -130,6 +134,7 @@
 						label-position="$ctrl.LABEL_POSITION.TOP"
 						disabled="!$ctrl.editable"
 						placeholder="00000"
+						valid-regex="$ctrl.phoneNumberRegex"
 						component-style="$ctrl.componentStyle">
 				</juno-input>
 			</div>
@@ -141,6 +146,7 @@
 						label-position="$ctrl.LABEL_POSITION.TOP"
 						disabled="!$ctrl.editable"
 						placeholder="000-000-0000"
+						valid-regex="$ctrl.phoneNumberRegex"
 						component-style="$ctrl.componentStyle">
 				</juno-input>
 				<juno-input
@@ -150,6 +156,7 @@
 						label-position="$ctrl.LABEL_POSITION.TOP"
 						disabled="!$ctrl.editable"
 						placeholder="00000"
+						valid-regex="$ctrl.phoneNumberRegex"
 						component-style="$ctrl.componentStyle">
 				</juno-input>
 			</div>
@@ -160,6 +167,7 @@
 					label-position="$ctrl.LABEL_POSITION.TOP"
 					disabled="!$ctrl.editable"
 					placeholder="000-000-0000"
+					valid-regex="$ctrl.phoneNumberRegex"
 					component-style="$ctrl.componentStyle">
 			</juno-input>
 
@@ -168,7 +176,8 @@
 					label="Email Address"
 					label-position="$ctrl.LABEL_POSITION.TOP"
 					disabled="!$ctrl.editable"
-					placeholder="Email"
+					placeholder="home@email.com"
+					invalid="!$ctrl.valid.email"
 					component-style="$ctrl.componentStyle">
 			</juno-input>
 
