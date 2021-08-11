@@ -435,7 +435,7 @@ public class DemographicManager {
 
 	public DemographicContact updateExternalDemographicContact(DemographicContactFewTo1 demographicContactFewTo1, String contactId, Integer demographicId)
 	{
-		DemographicContact demographicContact = demographicContactDao.find(demographicId, Integer.parseInt(contactId), demographicContactFewTo1.getCategory());
+		DemographicContact demographicContact = demographicContactDao.find(demographicId, contactId, demographicContactFewTo1.getCategory());
 
 		demographicContact.setRole(demographicContactFewTo1.getRole());
 		demographicContact.setConsentToContact(demographicContactFewTo1.getConsentToContact());

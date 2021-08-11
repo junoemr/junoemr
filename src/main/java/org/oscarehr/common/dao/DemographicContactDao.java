@@ -94,16 +94,16 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 		return dContacts;
 	}
 
-	public DemographicContact find(int demographicNo, int contactId, String category) throws NonUniqueResultException
+	public DemographicContact find(int demographicNo, String contactId, String category) throws NonUniqueResultException
 	{
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo = ?1 and x.contactId = ?2 and x.category = ?3 and x.deleted = false";
-		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, demographicNo);
-		query.setParameter(2, Integer.toString(contactId));
-		query.setParameter(3, category);
+		Query query = entityManager.createQuery("SELECT x FROM DemographicContact x WHERE x.demographicNo =: demographicNo AND x.contactId =: contactId AND x.category =: category AND x.deleted = false");
+		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("contactId", contactId);
+		query.setParameter("category", category);
+
 		@SuppressWarnings("unchecked")
-		DemographicContact dContacts = (DemographicContact) query.getSingleResult();
-		return dContacts;
+		DemographicContact dContact = (DemographicContact) query.getSingleResult();
+		return dContact;
 	}
 	
 	public List<DemographicContact> findAllByContactIdAndCategoryAndType(int contactId, String category, int type) {
