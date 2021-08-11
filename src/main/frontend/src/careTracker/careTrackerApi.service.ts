@@ -24,16 +24,18 @@
     Canada
 
  */
-import {DemographicApi, DiseaseRegistryApi, CareTrackerApi, CareTrackersApi, MeasurementsApi, PreventionsApi} from "../../generated";
+import {CareTrackerApi, CareTrackersApi, DemographicApi, DiseaseRegistryApi, PreventionsApi} from "../../generated";
 import CareTrackerModel from "../lib/careTracker/model/CareTrackerModel";
 import CareTrackerTransferToModelConverter from "../lib/careTracker/converter/CareTrackerTransferToModelConverter";
 import CareTrackerModelToTransferConverter from "../lib/careTracker/converter/CareTrackerModelToTransferConverter";
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
 import DxCodeTransferToModelConverter from "../lib/dx/converter/DxCodeTransferToModelConverter";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
+import CareTrackerItemDataModelToCreateTransferConverter from "../lib/careTracker/converter/CareTrackerItemDataModelToCreateTransferConverter";
+import CareTrackerItemTransferToModelConverter from "../lib/careTracker/converter/CareTrackerItemTransferToModelConverter";
+import CareTrackerItemModel from "../lib/careTracker/model/CareTrackerItemModel";
 import CareTrackerItemDataModel from "../lib/careTracker/model/CareTrackerItemDataModel";
 import CareTrackerItemDataTransferToModelConverter from "../lib/careTracker/converter/CareTrackerItemDataTransferToModelConverter";
-import CareTrackerItemDataModelToCreateTransferConverter from "../lib/careTracker/converter/CareTrackerItemDataModelToCreateTransferConverter";
 
 angular.module("CareTracker").service("careTrackerApiService", [
 	'$http',
@@ -49,11 +51,15 @@ angular.module("CareTracker").service("careTrackerApiService", [
 		service.preventionsApi = new PreventionsApi($http, $httpParamSerializer, '../ws/rs');
 		service.diseaseRegistryApi = new DiseaseRegistryApi($http, $httpParamSerializer, '../ws/rs');
 
-		service.careTrackerModelConverter = new CareTrackerTransferToModelConverter();
-		service.careTrackerTransferConverter = new CareTrackerModelToTransferConverter();
-		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
+		// inbound converters
+		service.careTrackerTransferToModelConverter = new CareTrackerTransferToModelConverter();
+		service.careTrackerItemTransferToModelConverter = new CareTrackerItemTransferToModelConverter();
 		service.careTrackerItemDataTransferToModelConverter = new CareTrackerItemDataTransferToModelConverter();
+
+		// outbound converters
+		service.careTrackerModelToTransferConverter = new CareTrackerModelToTransferConverter();
 		service.careTrackerItemDataModelToCreateTransferConverter = new CareTrackerItemDataModelToCreateTransferConverter();
+		service.dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
 
 		service.searchCareTrackers = async (
 			enabled: boolean,
@@ -65,26 +71,26 @@ angular.module("CareTracker").service("careTrackerApiService", [
 			page: number,
 			perPage: number): Promise<Array<CareTrackerModel>> =>
 		{
-			return service.careTrackerModelConverter.convertList(
+			return service.careTrackerTransferToModelConverter.convertList(
 				(await service.careTrackersApi.search(
 					enabled, includeClinicLevel, includeProviderLevel, providerId, includeDemographicLevel, demographicId, page, perPage)).data.body);
 		}
 
 		service.getCareTracker = async (careTrackerId: number): Promise<CareTrackerModel> =>
 		{
-			return service.careTrackerModelConverter.convert((await service.careTrackerApi.getCareTracker(careTrackerId)).data.body);
+			return service.careTrackerTransferToModelConverter.convert((await service.careTrackerApi.getCareTracker(careTrackerId)).data.body);
 		}
 
 		service.createCareTracker = async (careTracker: CareTrackerModel): Promise<CareTrackerModel> =>
 		{
-			const transfer = service.careTrackerTransferConverter.convert(careTracker);
-			return service.careTrackerModelConverter.convert((await service.careTrackerApi.createCareTracker(transfer)).data.body);
+			const transfer = service.careTrackerModelToTransferConverter.convert(careTracker);
+			return service.careTrackerTransferToModelConverter.convert((await service.careTrackerApi.createCareTracker(transfer)).data.body);
 		}
 
 		service.updateCareTracker = async (careTrackerId: number, careTracker: CareTrackerModel): Promise<CareTrackerModel> =>
 		{
-			const transfer = service.careTrackerTransferConverter.convert(careTracker);
-			return service.careTrackerModelConverter.convert((await service.careTrackerApi.updateCareTracker(careTrackerId, transfer)).data.body);
+			const transfer = service.careTrackerModelToTransferConverter.convert(careTracker);
+			return service.careTrackerTransferToModelConverter.convert((await service.careTrackerApi.updateCareTracker(careTrackerId, transfer)).data.body);
 		}
 
 		service.setCareTrackerEnabled = async (careTrackerId: number, enabled: boolean): Promise<boolean> =>
@@ -109,7 +115,12 @@ angular.module("CareTracker").service("careTrackerApiService", [
 
 		service.getDemographicCareTracker = async (demographicId: number, careTrackerId: number): Promise<CareTrackerModel> =>
 		{
-			return service.careTrackerModelConverter.convert((await service.demographicApi.getCareTrackerForDemographic(demographicId, careTrackerId)).data.body);
+			return service.careTrackerTransferToModelConverter.convert((await service.demographicApi.getCareTrackerForDemographic(demographicId, careTrackerId)).data.body);
+		}
+
+		service.getDemographicCareTrackerItem = async (demographicId: number, careTrackerId: number, careTrackerItemId: number): Promise<CareTrackerItemModel> =>
+		{
+			return service.careTrackerItemTransferToModelConverter.convert((await service.demographicApi.getCareTrackerItemForDemographic(demographicId, careTrackerId, careTrackerItemId)).data.body);
 		}
 
 		service.addCareTrackerItemData = async (demographicId: number, careTrackerId: number, careTrackerItemId: number, data: CareTrackerItemDataModel): Promise<CareTrackerItemDataModel> =>
@@ -121,15 +132,15 @@ angular.module("CareTracker").service("careTrackerApiService", [
 
 		service.cloneCareTrackerForClinic = async (careTrackerId: number): Promise<CareTrackerModel> =>
 		{
-			return service.careTrackerModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId)).data.body);
+			return service.careTrackerTransferToModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId)).data.body);
 		}
 		service.cloneCareTrackerForProvider = async (careTrackerId: number, providerId: string): Promise<CareTrackerModel> =>
 		{
-			return service.careTrackerModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, providerId)).data.body);
+			return service.careTrackerTransferToModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, providerId)).data.body);
 		}
 		service.cloneCareTrackerForDemographic = async (careTrackerId: number, demographicId: number): Promise<CareTrackerModel> =>
 		{
-			return service.careTrackerModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, null, demographicId)).data.body);
+			return service.careTrackerTransferToModelConverter.convert((await service.careTrackerApi.cloneCareTracker(careTrackerId, null, demographicId)).data.body);
 		}
 	}
 ]);

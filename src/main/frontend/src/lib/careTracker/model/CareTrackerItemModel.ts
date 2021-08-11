@@ -33,7 +33,7 @@ import CareTrackerItemDataModel from "./CareTrackerItemDataModel";
 
 export default class CareTrackerItemModel
 {
-	private _id: number;
+	private readonly _id: number;
 	private _name: string;
 	private _description: string;
 	private _guideline: string;
@@ -46,11 +46,12 @@ export default class CareTrackerItemModel
 	private _data: CareTrackerItemDataModel[];
 	private _rules: DsRuleModel[];
 
-	public constructor()
+	public constructor(id: number = null)
 	{
 		this.careTrackerItemAlerts = [];
 		this.data = [];
 		this.rules = [];
+		this._id = id;
 	}
 
 	public itemTypeIsPrevention(): boolean
@@ -113,11 +114,6 @@ export default class CareTrackerItemModel
 	get id(): number
 	{
 		return this._id;
-	}
-
-	set id(value: number)
-	{
-		this._id = value;
 	}
 
 	get name(): string

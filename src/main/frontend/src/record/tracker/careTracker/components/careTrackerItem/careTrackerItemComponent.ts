@@ -122,7 +122,6 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				{
 					if(ctrl.filterDateBefore || ctrl.filterDateAfter)
 					{
-						// @ts-ignore
 						const observationDate = moment.utc(data.observationDateTime);
 						if (!observationDate.isValid() ||
 							(ctrl.filterDateAfter && ctrl.filterDateAfter.isValid() && !observationDate.isSameOrAfter(ctrl.filterDateAfter, "day")) ||
@@ -182,14 +181,16 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					try
 					{
 						newDataElement = await careTrackerApiService.addCareTrackerItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
-						ctrl.model.data.push(newDataElement);
+						ctrl.model = await careTrackerApiService.getDemographicCareTrackerItem(ctrl.demographicId, ctrl.trackerId, ctrl.model.id);
 						ctrl.model.sortDataByObservationDate(false);
 						ctrl.clearNewEntry();
 					}
 					catch (errorObject)
 					{
-						return ctrl.validationAlerts.push({
-							message: errorObject.data.error.message,
+						console.error(errorObject);
+						const errorMessage = (errorObject) ?  errorObject.data.error.message : "Unknown Error";
+						ctrl.validationAlerts.push({
+							message: errorMessage,
 						});
 					}
 					finally
