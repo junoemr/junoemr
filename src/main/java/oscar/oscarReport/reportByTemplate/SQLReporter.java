@@ -30,6 +30,7 @@ import org.oscarehr.common.model.Explain;
 import org.oscarehr.log.dao.LogReportByTemplateDao;
 import org.oscarehr.log.dao.LogReportByTemplateExplainDao;
 import org.oscarehr.log.model.LogReportByTemplate;
+import org.oscarehr.metrics.prometheus.service.SystemMetricsService;
 import org.oscarehr.report.SQLReportHelper;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
 import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
@@ -46,6 +47,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.StringWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -68,6 +71,7 @@ public class SQLReporter implements Reporter
 	private static LogReportByTemplateDao logReportByTemplateDao = SpringUtils.getBean(LogReportByTemplateDao.class);
 	private static LogReportByTemplateExplainDao logReportByTemplateExplainDao = SpringUtils.getBean(LogReportByTemplateExplainDao.class);
 	private static ReportTemplatesDao rptTemplatesDao = SpringUtils.getBean(ReportTemplatesDao.class);
+	private static SystemMetricsService systemMetricsService = SpringUtils.getBean(SystemMetricsService.class);
 
 	/**
 	 * Creates a new instance of SQLReporter
@@ -85,9 +89,11 @@ public class SQLReporter implements Reporter
 		String csv = "";
 		String nativeSQL = "";
 		ReportObject curReport = null;
+		Instant startTime = Instant.now();
 
 		try
 		{
+			systemMetricsService.incrementCurrentRunningRbtCount();
 			Integer templateId = Integer.parseInt(templateIdStr);
 			curReport = reportByTemplateService.getAsLegacyReport(templateId, true);
 			nativeSQL = reportByTemplateService.getTemplateSQL(templateId, request.getParameterMap());
@@ -158,6 +164,11 @@ public class SQLReporter implements Reporter
 		{
 			logger.error("Error", sqe);
 			rsHtml += "<br>" + sqe.getMessage();
+		}
+		finally
+		{
+			systemMetricsService.recordRbtRequestLatency(Duration.between(startTime, Instant.now()).toMillis());
+			systemMetricsService.decrementCurrentRunningRbtCount();
 		}
 
 		request.getSession().setAttribute("csv", csv);
