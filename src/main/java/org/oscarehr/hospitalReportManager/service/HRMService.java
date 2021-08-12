@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -41,6 +43,7 @@ import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -66,7 +69,9 @@ public class HRMService
 
 	@Autowired
 	private HRMDocumentToProviderDao hrmDocumentToProviderDao;
-
+	
+	private Logger logger = MiscUtils.getLogger();
+	
 	/**
 	 * Upload a new HRM document to the database and move the associated hrm report xml file to the to the HRM documents folder
 	 *
@@ -77,52 +82,77 @@ public class HRMService
 	 */
 	public HRMDocument uploadNewHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic) throws IOException
 	{
-		HRMDocument documentModel = persistHRMDocument(hrmDocumentModel, demographic);
-		hrmDocumentModel.getReportFile().moveToHRMDocuments();
+		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
+		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
 		
+		HRMDocument documentModel = persistAndLinkHRMDocument(hrmDocument, demographic);
+		hrmDocumentModel.getReportFile().moveToHRMDocuments();
+
 		return documentModel;
 	}
-	
 	
 	public void uploadAllNewHRMDocuments(List<HrmDocument> hrmDocumentModels, Demographic demographic) throws IOException
 	{
 		for(HrmDocument documentModel : hrmDocumentModels)
 		{
 			uploadNewHRMDocument(documentModel, demographic);
-			
 		}
 	}
 	
+	public boolean isDuplicateReport(HRMDocument model)
+	{
+		// report hash matches = duplicate report for same recipient
+		// no transaction info hash matches = duplicate report, but different recipient TODO handle somewhere?
+		
+		List<Integer> duplicateIds = hrmDocumentDao.findByHash(model.getReportHash());
+		return duplicateIds != null && duplicateIds.size() > 0;
+	}
+	
 	/**
-	 * Persist HRMDocument and any associated provider and demographic linkages.
+	 * Persist HRMDocument and any associated provider and demographic linkages through cascade.
 	 *
-	 * @param hrmDocumentModel hrmDocument to persist
+	 * @param hrmDocument hrmDocument to persist
 	 * @param demographic <optional>Demographic to associate with the HRM document</optional>
 	 * @return HRMDocument entity
 	 */
-	public HRMDocument persistHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic)
+	public HRMDocument persistAndLinkHRMDocument(HRMDocument hrmDocument, Demographic demographic)
 	{
-		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
-		
-		// persist hrm database info and associated objects through cascade
-		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
 		hrmDocumentDao.persist(hrmDocument);
 		
-		// assign the hrm document to the demographic
 		if (demographic != null && demographic.getId() != null)
 		{
 			routeToDemographic(hrmDocument, demographic);
 		}
 		
-		// link the associated reviewers
-		for(HRMDocumentToProvider documentToProvider : hrmDocument.getDocumentToProviderList())
+		if (!hrmDocument.getDocumentToProviderList().isEmpty())
 		{
-			hrmDocumentToProviderDao.persist(documentToProvider);
+			// includes the deliverTo provider and any associated reviewers
+			routeToProviders(hrmDocument.getDocumentToProviderList());
+		}
+		else
+		{
+			routeToGeneralInbox(hrmDocument);
 		}
 		
 		return hrmDocument;
 	}
-
+	
+	private void routeToProviders(List<HRMDocumentToProvider> providerLinks)
+	{
+		for(HRMDocumentToProvider documentToProvider : providerLinks)
+		{
+			hrmDocumentToProviderDao.persist(documentToProvider);
+		}
+	}
+	
+	private void routeToGeneralInbox(HRMDocument hrmDocument)
+	{
+		HRMDocumentToProvider generalInboxLink = new HRMDocumentToProvider();
+		generalInboxLink.setHrmDocument(hrmDocument);
+		generalInboxLink.setProviderNo(ProviderData.SYSTEM_PROVIDER_NO);
+		hrmDocumentToProviderDao.persist(generalInboxLink);
+	}
+	
 	public void routeToDemographic(HRMDocument document, Demographic demographic)
 	{
 		HRMDocumentToDemographic hrmDocumentToDemographic = hrmDocumentToDemographicDao.findByHrmDocumentIdAndDemographicNo(document.getId(), demographic.getId());
@@ -274,5 +304,22 @@ public class HRMService
 		}
 
 		return out;
+	}
+	
+	public void handleDuplicate(HRMDocument hrmDocument)
+	{
+		List<Integer> matchingDocuments = hrmDocumentDao.findByHash(hrmDocument.getReportHash());
+		
+		if (matchingDocuments != null && !matchingDocuments.isEmpty())
+		{
+			HRMDocument originalDocument = hrmDocumentDao.find(matchingDocuments.get(0));
+			originalDocument.setNumDuplicatesReceived(originalDocument.getNumDuplicatesReceived() + 1);
+			hrmDocumentDao.merge(originalDocument);
+		}
+		
+		if (matchingDocuments != null && matchingDocuments.size() > 1)
+		{
+			logger.warn(String.format("Multiple HRM documents have the same report hash %s", hrmDocument.getReportHash()));
+		}
 	}
 }

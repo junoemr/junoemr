@@ -25,6 +25,7 @@ package org.oscarehr.hospitalReportManager.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMapper;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
@@ -33,6 +34,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,9 @@ public class HRMReportProcessor
 	private HRMReportDemographicMapper demoMapper;
 	
 	@Autowired
+	private HrmDocumentModelToDbConverter hrmDocumentModelToDbConverter;
+	
+	@Autowired
 	private HRMService hrmService;
 	
 	@Autowired
@@ -66,31 +71,42 @@ public class HRMReportProcessor
 			HRMReport hrmReport = HRMReportParser.parseReport(hrmFile, SCHEMA_VERSION);
 			HrmDocument model = reportMapper.importToJuno((HRMReport_4_3) hrmReport);
 			
-			Demographic demographicMatchingData = demoMapper.importToJuno((HRMReport_4_3) hrmReport);
+			HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(model);
+			HRMReportParser.fillDocumentHashData(hrmDocument, hrmFile);
 			
-			List<org.oscarehr.demographic.model.Demographic> matchingDemographics = findDemographicToLink(demographicMatchingData);
-			
-			org.oscarehr.demographic.model.Demographic demographicToLink = null;
-			
-			if (matchingDemographics.size() > 1)
+			if (!hrmService.isDuplicateReport(hrmDocument))
 			{
-				logger.info("Multiple demographics matched for HRM file, leaving unlinked: " + hrmFile.getPath());
+				Demographic demographicMatchingData = demoMapper.importToJuno((HRMReport_4_3) hrmReport);
+				
+				List<org.oscarehr.demographic.model.Demographic> matchingDemographics = findDemographicToLink(demographicMatchingData);
+				
+				org.oscarehr.demographic.model.Demographic demographicToLink = null;
+				
+				if (matchingDemographics.size() > 1)
+				{
+					logger.info(String.format("Multiple demographics matched for HRM file, leaving unlinked: %s", hrmFile.getPath()));
+				}
+				if (matchingDemographics.size() == 1)
+				{
+					demographicToLink = matchingDemographics.get(0);
+				}
+				if (matchingDemographics.size() == 0)
+				{
+					logger.info(String.format("No demographics matched for HRM file: %s", hrmFile.getPath()));
+				}
+				
+				// sending null here is ok, will not associate with a demographic if one can't be found
+				hrmService.persistAndLinkHRMDocument(hrmDocument, demographicToLink);
 			}
-			if (matchingDemographics.size() == 1)
+			else
 			{
-				demographicToLink = matchingDemographics.get(0);
+				logger.info(String.format("Duplicate report hash (%s) for file: %s", model.getHashData().getReportHash(), model.getReportFile().getPath()));
+				hrmService.handleDuplicate(hrmDocument);
 			}
-			if (matchingDemographics.size() == 0)
-			{
-				logger.info("No demographics matched for HRM file: " + hrmFile.getPath());
-			}
-			
-			// sending null here is ok, will not associate with a demographic if one can't be found
-			hrmService.persistHRMDocument(model, demographicToLink);
 		}
 		catch (Exception e)
 		{
-			logger.error("Could not process HRM file: " + hrmFile.getPath(), e);
+			logger.error(String.format("Could not process HRM file: %s", hrmFile.getPath()), e);
 		}
 	}
 	
@@ -118,8 +134,6 @@ public class HRMReportProcessor
 			criteria.setDateOfBirth(matchingData.getDateOfBirth());
 		}
 		
-		List<org.oscarehr.demographic.model.Demographic> demographics = demographicDao.criteriaSearch(criteria);
-		
-		return demographics;
+		return demographicDao.criteriaSearch(criteria);
 	}
 }

@@ -28,7 +28,6 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 
-import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -85,20 +84,11 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		
 		model.setObservations(importStructure.getObservations());
 		
-		model.setHashData(mapMatchingData(importStructure));
-		
 		model.setDocument(documentMapper.importToJuno(importStructure));
-		model.setReportFile(FileFactory.getExistingFile(importStructure.getFileLocation()));   // IO Exception
+		model.setReportFile(FileFactory.getExistingFile(importStructure.getFileLocation()));
+		
+		// Document matching data is mapped at the service level
 		
 		return model;
-	}
-	
-	protected HrmDocumentMatchingData mapMatchingData(HRMReport_4_3 importStructure)
-	{
-		HrmDocumentMatchingData data = new HrmDocumentMatchingData();
-		data.setReportHash(importStructure.getMessageUniqueId());
-		data.setNumDuplicatesReceived(0);
-		
-		return data;
 	}
 }

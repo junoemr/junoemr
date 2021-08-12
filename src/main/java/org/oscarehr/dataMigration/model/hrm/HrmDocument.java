@@ -131,7 +131,7 @@ public class HrmDocument extends AbstractTransientModel
 
 	private List<HrmComment> comments;
 	private List<HrmObservation> observations;
-	private List<Reviewer> internalReviewers;       // TODO:  Confirm that these are the internal reviewers
+	private List<Reviewer> internalReviewers;
 
 	public HrmDocument()
 	{

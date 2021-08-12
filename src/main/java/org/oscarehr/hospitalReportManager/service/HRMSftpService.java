@@ -43,7 +43,10 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -60,8 +63,8 @@ public class HRMSftpService
 	private static final String REMOTE_PATH = OscarProperties.getInstance().getProperty("omd.hrm.remote_path");
 	
 	// LOCAL CONFIG
-	private static final String OMD_DIRECTORY = OscarProperties.getInstance().getProperty("omd.hrm.local_base_hhsdfasdfafasdfsafsafasfasdfsadfsadfasdfsddirectory");
-	private static final String OMD_SFTP_SSH_KEY = OMD_DIRECTORY + OscarProperties.getInstance().getProperty("omd.hrm.private_key_file");
+	private static final String OMD_DIRECTORY = OscarProperties.getInstance().getProperty("omd.hrm.local_base_directory");
+	private static final String OMD_SFTP_SSH_KEY = Paths.get(OMD_DIRECTORY, OscarProperties.getInstance().getProperty("omd.hrm.private_key_file")).toString();
 	private static final String DECRYPTION_KEY = OscarProperties.getInstance().getProperty("omd.hrm.decryption_key");
 	
 	// UTIL
@@ -167,10 +170,12 @@ public class HRMSftpService
 	
 	private GenericFile downloadRemoteFile(ChannelSftp sftp, ChannelSftp.LsEntry remoteFile, LocalDate dateSubDirectory) throws Exception
 	{
-		logger.info("Starting HRM download: " + remoteFile.getFilename());
+		LocalDateTime start = LocalDateTime.now();
 		GenericFile tempFile = FileFactory.createHRMFile(remoteFile.getFilename(), dateSubDirectory, "encrypted");
 		sftp.get(remoteFile.getFilename(), tempFile.getPath());
-		logger.info("Completed download of HRM file: " + remoteFile.getFilename());
+		long elapsed = ChronoUnit.MILLIS.between(start, LocalDateTime.now());
+		
+		logger.info(String.format("Downloaded HRM File in %d ms: %s", elapsed, remoteFile.getFilename()));
 		
 		return tempFile;
 	}

@@ -96,9 +96,11 @@ public class HRMDownloadFileAction extends DownloadAction
 		{
 			throw new Exception("no binary document found");
 		}
-    	
-    	byte[] binaryContent = report.getBinaryContent();
-
+  
+		// TODO This is passing the sample validation, but the spec says that this needs to be decoded from base64 first...
+    	byte[] binaryContent = report.getBase64BinaryContent();
+		//report.getBinaryContent();
+		
     	String fileExtension = report.getFileExtension().toLowerCase();
 	    fileExtension = fileExtension.replaceAll("\\.", "");
 

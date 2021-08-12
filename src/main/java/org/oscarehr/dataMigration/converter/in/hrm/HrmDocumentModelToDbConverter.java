@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.converter.in.hrm;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
@@ -35,6 +36,7 @@ import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.search.ProviderCriteriaSearch;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -44,6 +46,8 @@ import java.util.List;
 @Component
 public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDocument, HRMDocument>
 {
+	private Logger logger = MiscUtils.getLogger();
+	
 	@Override
 	public HRMDocument convert(HrmDocument input)
 	{
@@ -195,19 +199,30 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		}
 		
 		List<ProviderData> providers = searchProviders(searchParams);
+		HRMDocumentToProvider link = null;
 		
-		if (providers != null && providers.size() == 1)
+		if (providers == null || providers.size() == 0)
+		{
+			logger.info(String.format("Could not match provider (%s) for HRM document: %s",
+			                          document.getDeliverToUserId(),
+			                          document.getReportFile()));
+		}
+		else if (providers.size() == 1)
 		{
 			ProviderData foundProvider = providers.get(0);
 			
-			HRMDocumentToProvider link = new HRMDocumentToProvider();
+			link = new HRMDocumentToProvider();
 			link.setProviderNo(String.valueOf(foundProvider.getProviderNo()));
 			link.setHrmDocument(document);
-			
-			return link;
+		}
+		else
+		{
+			logger.info(String.format("Multiple providers (%s) matched for HRM document: %s",
+			                          document.getDeliverToUserId(),
+			                          document.getReportFile()));
 		}
 		
 		// TODO: General inbox route?
-		return null;
+		return link;
 	}
 }

@@ -9,6 +9,7 @@
 
 package org.oscarehr.hospitalReportManager;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,10 @@ public class HRMDisplayReportAction extends DispatchAction {
                         if (report != null) {
                             request.setAttribute("hrmReport", report);
                             request.setAttribute("hrmReportId", document.getId());
-                            request.setAttribute("hrmReportTime", document.getTimeReceived() != null ? document.getTimeReceived() : "");
+                            
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            request.setAttribute("hrmReportTime", formatter.format(document.getTimeReceived()));
+                            
                             request.setAttribute("hrmDuplicateNum", document.getNumDuplicatesReceived());
 
                             List<HRMDocumentToDemographic> demographicLinkList = hrmDocumentToDemographicDao.findByHrmDocumentId(document.getId());

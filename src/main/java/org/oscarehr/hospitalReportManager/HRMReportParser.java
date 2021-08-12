@@ -36,7 +36,6 @@ import org.xml.sax.SAXException;
 import oscar.util.ConversionUtils;
 
 import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -44,7 +43,6 @@ import java.util.List;
 
 public class HRMReportParser
 {
-
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final HRMDocumentDao hrmDocumentDao = SpringUtils.getBean(HRMDocumentDao.class);
 	
@@ -102,7 +100,7 @@ public class HRMReportParser
 		return parseReport(hrmReportFileLocation, "4.3");
 	}
 
-	public static void addReportToInbox(LoggedInInfo loggedInInfo, HRMReport report) {
+/*	public static void addReportToInbox(LoggedInInfo loggedInInfo, HRMReport report) {
 		
 		if(report == null) {
 			logger.info("addReportToInbox cannot continue, report parameter is null");
@@ -170,7 +168,7 @@ public class HRMReportParser
 
 			hrmDocumentDao.merge(existingDocument);
 		}
-	}
+	}*/
 
 	/**
 	 * fill hrm document hash data based on the file string
@@ -185,10 +183,11 @@ public class HRMReportParser
 		String noMessageIdHash = DigestUtils.md5Hex(noMessageIdFileData);
 		String noTransactionInfoHash = DigestUtils.md5Hex(noTransactionInfoFileData);
 		String noDemographicInfoHash = DigestUtils.md5Hex(noDemograhpicInfoFileData);
-
+		
 		document.setReportHash(noMessageIdHash);
 		document.setReportLessTransactionInfoHash(noTransactionInfoHash);
 		document.setReportLessDemographicInfoHash(noDemographicInfoHash);
+		document.setNumDuplicatesReceived(0);
 	}
 
 	public static void fillDocumentHashData(HRMDocument document, GenericFile hrmFile)
@@ -197,7 +196,7 @@ public class HRMReportParser
 		fillDocumentHashData(document, reportFileData);
 	}
 
-	private static void routeReportToDemographic(HRMReport report, HRMDocument mergedDocument) {
+	/*private static void routeReportToDemographic(HRMReport report, HRMDocument mergedDocument) {
 		
 		if(report == null) {
 			logger.info("routeReportToDemographic cannot continue, report parameter is null");
@@ -227,7 +226,7 @@ public class HRMReportParser
 				}
 			}
 		}
-	}
+	}*/
 
 
 	private static boolean hasSameStatus(HRMReport report, HRMReport loadedReport) {
