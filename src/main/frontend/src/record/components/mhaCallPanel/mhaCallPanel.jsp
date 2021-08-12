@@ -28,7 +28,7 @@
 
 		<juno-button class="m-t-16"
 		             click="$ctrl.startCall()"
-		             disabled="!$ctrl.selectedIntegration"
+		             disabled="!$ctrl.selectedIntegration || $ctrl.calling"
 		             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
 			Start Call

@@ -54,6 +54,7 @@ angular.module("Record.Components").component('mhaCallPanel', {
 
 			ctrl.iframeUrl = null;
 			ctrl.inSession = false;
+			ctrl.calling = false;
 			ctrl.selectedIntegration = null; // Type MhaIntegration
 			ctrl.integrationList = []; // Type MhaIntegration[]
 			ctrl.integrationOptions = [];
@@ -107,9 +108,17 @@ angular.module("Record.Components").component('mhaCallPanel', {
 				const mhaPatientService = new MhaPatientService();
 				const mhaSSOService = new MhaSSOService();
 
-				const newAppointment = await mhaAppointmentService.bookOnDemandAudioAppointment(ctrl.selectedIntegration, await mhaPatientService.profileForDemographic(ctrl.selectedIntegration.id, ctrl.demographicNo));
-				ctrl.iframeUrl = $sce.trustAsResourceUrl(await mhaSSOService.getOnDemandAudioCallSSOLink(ctrl.selectedIntegration, newAppointment));
-				ctrl.inSession = true;
+				try
+				{
+					ctrl.calling = true;
+					const newAppointment = await mhaAppointmentService.bookOnDemandAudioAppointment(ctrl.selectedIntegration, await mhaPatientService.profileForDemographic(ctrl.selectedIntegration.id, ctrl.demographicNo));
+					ctrl.iframeUrl = $sce.trustAsResourceUrl(await mhaSSOService.getOnDemandAudioCallSSOLink(ctrl.selectedIntegration, newAppointment));
+					ctrl.inSession = true;
+				}
+				finally
+				{
+					ctrl.calling = false;
+				}
 
 				$scope.$apply();
 			}
