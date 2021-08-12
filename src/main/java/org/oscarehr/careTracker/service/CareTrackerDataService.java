@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.drools.FactException;
 import org.drools.RuleBase;
 import org.oscarehr.careTracker.converter.CareTrackerEntityToModelConverter;
+import org.oscarehr.careTracker.converter.CareTrackerItemEntityToModelConverter;
 import org.oscarehr.careTracker.converter.MeasurementToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.converter.MeasurementsDataBeanToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.converter.PreventionToCareTrackerItemDataConverter;
@@ -36,15 +37,14 @@ import org.oscarehr.careTracker.entity.CareTrackerItem;
 import org.oscarehr.careTracker.model.CareTracker;
 import org.oscarehr.careTracker.model.CareTrackerItemAlert;
 import org.oscarehr.careTracker.model.CareTrackerItemData;
-import org.oscarehr.careTracker.model.CareTrackerItemGroup;
 import org.oscarehr.careTracker.transfer.CareTrackerItemDataCreateTransfer;
 import org.oscarehr.common.model.Measurement;
-import org.oscarehr.decisionSupport2.converter.DsRuleDbToModelConverter;
-import org.oscarehr.decisionSupport2.entity.Drools;
-import org.oscarehr.decisionSupport2.model.DsInfoCache;
-import org.oscarehr.decisionSupport2.model.consequence.SeverityLevel;
-import org.oscarehr.decisionSupport2.service.DroolsCachingService;
-import org.oscarehr.decisionSupport2.service.DsRuleService;
+import org.oscarehr.careTrackerDecisionSupport.converter.DsRuleDbToModelConverter;
+import org.oscarehr.careTrackerDecisionSupport.entity.Drools;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoCache;
+import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
+import org.oscarehr.careTrackerDecisionSupport.service.DroolsCachingService;
+import org.oscarehr.careTrackerDecisionSupport.service.DsRuleService;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
@@ -62,7 +62,9 @@ import oscar.util.ConversionUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +93,9 @@ public class CareTrackerDataService
 	private CareTrackerEntityToModelConverter careTrackerEntityToModelConverter;
 
 	@Autowired
+	private CareTrackerItemEntityToModelConverter careTrackerItemEntityToModelConverter;
+
+	@Autowired
 	private PreventionToCareTrackerItemDataConverter preventionToCareTrackerItemDataConverter;
 
 	@Autowired
@@ -102,6 +107,14 @@ public class CareTrackerDataService
 	@Autowired
 	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
 
+	/**
+	 * add new care tracker data with the given values, based on the rules defined by the given care tracker item
+	 * @param providerId the adding provider identifier
+	 * @param demographicId the demographic identifier
+	 * @param careTrackerItemId the care tracker item identifier
+	 * @param itemData the data to be saved
+	 * @return the new data item created
+	 */
 	public CareTrackerItemData addCareTrackerItemData(
 			String providerId,
 			Integer demographicId,
@@ -124,31 +137,68 @@ public class CareTrackerDataService
 	}
 
 
-	public CareTracker getCareTrackerForDemographic(Integer careTrackerId, Integer demographicId) throws Exception
+	/**
+	 * get the care tracker for the given demographic, with all of the attached item data filled out
+	 * @param demographicId the demographic identifier
+	 * @param careTrackerId the care tracker identifier
+	 * @return the care tracker
+	 * @throws Exception on error
+	 */
+	public CareTracker getCareTrackerForDemographic(Integer demographicId, Integer careTrackerId) throws Exception
 	{
 		org.oscarehr.careTracker.entity.CareTracker careTrackerEntity = careTrackerDao.find(careTrackerId);
 		CareTracker careTracker = careTrackerEntityToModelConverter.convert(careTrackerEntity);
 
-		MeasurementInfo measurementInfo = loadMeasurementInfoWithDrools(careTrackerEntity, demographicId);
-		oscar.oscarPrevention.Prevention preventionInfo = loadPreventionInfoWithDrools(careTrackerEntity, demographicId);
+		MeasurementInfo measurementInfo = loadMeasurementInfoWithDrools(careTrackerEntity.getCareTrackerItems(), careTrackerEntity.getDrools(), demographicId);
+		oscar.oscarPrevention.Prevention preventionInfo = loadPreventionInfoWithDrools(careTrackerEntity.getCareTrackerItems(), demographicId);
 
-		for(CareTrackerItemGroup group : careTracker.getCareTrackerItemGroups())
+		careTracker.getCareTrackerItemGroups().forEach((group) ->
 		{
-			for(org.oscarehr.careTracker.model.CareTrackerItem item : group.getCareTrackerItems())
-			{
-				if(item.isMeasurementType())
-				{
-					fillItemAlerts(measurementInfo, item);
-					fillMeasurementItemData(measurementInfo, item);
-				}
-				else
-				{
-					fillItemAlerts(preventionInfo, item);
-					fillPreventionItemData(demographicId, item);
-				}
-			}
-		}
+			group.getCareTrackerItems().forEach((item) -> fillItem(item, measurementInfo, preventionInfo, demographicId));
+		});
 		return careTracker;
+	}
+
+	/**
+	 * get a single item within a care tracker for the given demographic, with all of the attached item data filled out
+	 * @param demographicId the demographic identifier
+	 * @param careTrackerItemId the care tracker item identifier
+	 * @return the care tracker item
+	 * @throws Exception on error
+	 */
+	public org.oscarehr.careTracker.model.CareTrackerItem getCareTrackerItemForDemographic(Integer demographicId, Integer careTrackerItemId) throws Exception
+	{
+		CareTrackerItem careTrackerItem = careTrackerItemDao.find(careTrackerItemId);
+		org.oscarehr.careTracker.entity.CareTracker careTrackerEntity = careTrackerItem.getCareTracker();
+
+		List<CareTrackerItem> items = new ArrayList<>(1);
+		items.add(careTrackerItem);
+
+		MeasurementInfo measurementInfo = loadMeasurementInfoWithDrools(items, careTrackerEntity.getDrools(), demographicId);
+		oscar.oscarPrevention.Prevention preventionInfo = loadPreventionInfoWithDrools(items, demographicId);
+
+		org.oscarehr.careTracker.model.CareTrackerItem itemModel = careTrackerItemEntityToModelConverter.convert(careTrackerItem);
+		fillItem(itemModel, measurementInfo, preventionInfo, demographicId);
+
+		return itemModel;
+	}
+
+	private void fillItem(
+			org.oscarehr.careTracker.model.CareTrackerItem item,
+			MeasurementInfo measurementInfo,
+			oscar.oscarPrevention.Prevention preventionInfo,
+			Integer demographicId)
+	{
+		if(item.isMeasurementType())
+		{
+			fillItemAlerts(measurementInfo, item);
+			fillMeasurementItemData(measurementInfo, item);
+		}
+		else
+		{
+			fillItemAlerts(preventionInfo, item);
+			fillPreventionItemData(demographicId, item);
+		}
 	}
 
 	private void fillItemAlerts(DsInfoCache dsInfoCache, org.oscarehr.careTracker.model.CareTrackerItem item)
@@ -191,13 +241,16 @@ public class CareTrackerDataService
 		item.addAllCareTrackerItemData(preventionToCareTrackerItemDataConverter.convert(preventions));
 	}
 
-	private MeasurementInfo loadMeasurementInfoWithDrools(org.oscarehr.careTracker.entity.CareTracker careTrackerEntity, Integer demographicId)
+	private MeasurementInfo loadMeasurementInfoWithDrools(
+			Collection<CareTrackerItem> careTrackerItemEntities,
+			Set<Drools> droolsSet,
+			Integer demographicId)
 			throws Exception
 	{
 		MeasurementInfo measurementInfo = new MeasurementInfo(String.valueOf(demographicId));
 
 		// fill measurementInfo measurement codes. prereq for applying drools
-		List<String> careTrackerMeasurementCodes = careTrackerEntity.getCareTrackerItems()
+		List<String> careTrackerMeasurementCodes = careTrackerItemEntities
 				.stream()
 				.filter(CareTrackerItem::isMeasurementType)
 				.map(CareTrackerItem::getTypeCode)
@@ -205,14 +258,14 @@ public class CareTrackerDataService
 		measurementInfo.getMeasurements(careTrackerMeasurementCodes);
 
 		// load drools alerts. the measurementInfo object alerts/recommendations will be filled
-		for(Drools drools : careTrackerEntity.getDrools())
+		for(Drools drools : droolsSet)
 		{
 			RuleBase ruleBase = droolsCachingService.getDroolsRuleBase(drools.getFilename());
 			dsRuleService.applyRuleBase(ruleBase, measurementInfo);
 		}
 
 		// load the database alerts, similar to the drools alerts above
-		for(CareTrackerItem careTrackerItem : careTrackerEntity.getCareTrackerItems())
+		for(CareTrackerItem careTrackerItem : careTrackerItemEntities)
 		{
 			dsRuleService.applyRules(measurementInfo, measurementInfo, careTrackerItem.getTypeCode(), dsRuleDbToModelConverter.convert(careTrackerItem.getDsRules()));
 		}
@@ -220,14 +273,14 @@ public class CareTrackerDataService
 		return measurementInfo;
 	}
 
-	private oscar.oscarPrevention.Prevention loadPreventionInfoWithDrools(org.oscarehr.careTracker.entity.CareTracker careTrackerEntity, Integer demographicId)
+	private oscar.oscarPrevention.Prevention loadPreventionInfoWithDrools(Collection<CareTrackerItem> careTrackerItemEntities, Integer demographicId)
 			throws FactException
 	{
 		oscar.oscarPrevention.Prevention prevention = PreventionData.getPrevention(new LoggedInInfo(), demographicId);
 		dsRuleService.applyRuleBase(PreventionDS.ruleBase, prevention);
 
 		// load the database alerts, similar to the drools alerts above
-		for(CareTrackerItem careTrackerItem : careTrackerEntity.getCareTrackerItems())
+		for(CareTrackerItem careTrackerItem : careTrackerItemEntities)
 		{
 			dsRuleService.applyRules(prevention, prevention, careTrackerItem.getTypeCode(), dsRuleDbToModelConverter.convert(careTrackerItem.getDsRules()));
 		}

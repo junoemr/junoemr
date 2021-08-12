@@ -20,27 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.model;
+package org.oscarehr.careTrackerDecisionSupport.model.consequence;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
-
-@Data
-public class CareTrackerItemAlert extends AbstractTransientModel
+public enum SeverityLevel
 {
-	private SeverityLevel severityLevel;
-	private String message;
-
-	public CareTrackerItemAlert()
-	{
-		this(null, SeverityLevel.RECOMMENDATION);
-	}
-
-	public CareTrackerItemAlert(String message, SeverityLevel severityLevel)
-	{
-		this.message = message;
-		this.severityLevel = severityLevel;
-	}
+	RECOMMENDATION,
+	WARNING,
+	DANGER,
 }
-

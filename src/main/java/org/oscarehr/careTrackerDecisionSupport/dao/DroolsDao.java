@@ -20,27 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.model;
+package org.oscarehr.careTrackerDecisionSupport.dao;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.careTrackerDecisionSupport.entity.Drools;
+import org.springframework.stereotype.Repository;
 
-@Data
-public class CareTrackerItemAlert extends AbstractTransientModel
+@Repository
+public class DroolsDao extends AbstractDao<Drools>
 {
-	private SeverityLevel severityLevel;
-	private String message;
-
-	public CareTrackerItemAlert()
+	protected DroolsDao()
 	{
-		this(null, SeverityLevel.RECOMMENDATION);
-	}
-
-	public CareTrackerItemAlert(String message, SeverityLevel severityLevel)
-	{
-		this.message = message;
-		this.severityLevel = severityLevel;
+		super(Drools.class);
 	}
 }
-

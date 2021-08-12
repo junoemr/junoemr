@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.careTracker.model.CareTracker;
+import org.oscarehr.careTracker.model.CareTrackerItem;
 import org.oscarehr.careTracker.model.CareTrackerItemData;
 import org.oscarehr.careTracker.service.CareTrackerDataService;
 import org.oscarehr.careTracker.transfer.CareTrackerItemDataCreateTransfer;
@@ -62,11 +63,26 @@ public class DemographicCareTrackerWebService extends AbstractServiceImpl
 				Permission.CARE_TRACKER_READ,
 				Permission.MEASUREMENT_READ,
 				Permission.PREVENTION_READ);
-		return RestResponse.successResponse(careTrackerDataService.getCareTrackerForDemographic(careTrackerId, demographicId));
+		return RestResponse.successResponse(careTrackerDataService.getCareTrackerForDemographic(demographicId, careTrackerId));
+	}
+
+	@GET
+	@Path("/{careTrackerId}/item/{itemId}")
+	public RestResponse<CareTrackerItem> getCareTrackerItemForDemographic(
+			@PathParam("demographicNo") Integer demographicId,
+			@PathParam("careTrackerId") Integer careTrackerId,
+			@PathParam("itemId") Integer careTrackerItemId)
+			throws Exception
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId,
+				Permission.CARE_TRACKER_READ,
+				Permission.MEASUREMENT_READ,
+				Permission.PREVENTION_READ);
+		return RestResponse.successResponse(careTrackerDataService.getCareTrackerItemForDemographic(demographicId, careTrackerItemId));
 	}
 
 	@POST
-	@Path("/{careTrackerId}/item/{itemId}/add")
+	@Path("/{careTrackerId}/item/{itemId}/data")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<CareTrackerItemData> addCareTrackerItemData(
 			@PathParam("demographicNo") Integer demographicId,

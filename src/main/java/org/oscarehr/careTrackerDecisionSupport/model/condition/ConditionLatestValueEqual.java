@@ -20,46 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.transfer;
+package org.oscarehr.careTrackerDecisionSupport.model.condition;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.careTrackerDecisionSupport.transfer.DsRuleUpdateInput;
-import org.oscarehr.careTracker.entity.ItemType;
-import org.oscarehr.careTracker.entity.ValueType;
-
-import java.util.List;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoLookup;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class CareTrackerItemCreateUpdateTransfer extends AbstractTransientModel
+public class ConditionLatestValueEqual extends DsCondition
 {
-	private Integer id;
-	private String name;
-	private String description;
-	private String guideline;
-
-	private ItemType type;
-	private String typeCode;
-	private boolean hidden;
-
-	private ValueType valueType;
-	private String valueLabel;
-
-	private List<DsRuleUpdateInput> rules;
-
-	public CareTrackerItemCreateUpdateTransfer()
+	public ConditionLatestValueEqual()
 	{
+		super(ConditionType.VALUE_EQ);
 	}
 
-	public boolean isMeasurementType()
+	@Override
+	public boolean meetsRequirements(String typeCode, DsInfoLookup dsInfoLookup)
 	{
-		return ItemType.MEASUREMENT.equals(this.type);
-	}
-
-	public boolean isPreventionType()
-	{
-		return ItemType.PREVENTION.equals(this.type);
+		String latestValue = dsInfoLookup.getLatestValue(typeCode);
+		return (getValue().equalsIgnoreCase(latestValue));
 	}
 }

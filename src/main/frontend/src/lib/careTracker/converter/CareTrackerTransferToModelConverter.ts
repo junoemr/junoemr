@@ -24,17 +24,17 @@
  */
 
 import CareTrackerModel from "../model/CareTrackerModel";
-import {CareTracker, CareTrackerItem, CareTrackerItemAlert, CareTrackerItemGroup} from "../../../../generated";
+import {CareTracker, CareTrackerItemGroup} from "../../../../generated";
 import CareTrackerItemGroupModel from "../model/CareTrackerItemGroupModel";
-import CareTrackerItemModel from "../model/CareTrackerItemModel";
-import DsRuleTransferToModelConverter from "../../decisionSupport/converter/DsRuleTransferToModelConverter";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import DxCodeTransferToModelConverter from "../../dx/converter/DxCodeTransferToModelConverter";
-import AlertModel from "../model/AlertModel";
-import CareTrackerItemDataTransferToModelConverter from "./CareTrackerItemDataTransferToModelConverter";
+import CareTrackerItemTransferToModelConverter from "./CareTrackerItemTransferToModelConverter";
 
 export default class CareTrackerTransferToModelConverter extends AbstractConverter<CareTracker, CareTrackerModel>
 {
+	protected readonly careTrackerItemTransferToModelConverter = new CareTrackerItemTransferToModelConverter();
+	protected readonly dxCodeTransferToModelConverter = new DxCodeTransferToModelConverter();
+
 	public convert(careTracker: CareTracker): CareTrackerModel
 	{
 		if (!careTracker)
@@ -49,7 +49,7 @@ export default class CareTrackerTransferToModelConverter extends AbstractConvert
 		careTrackerModel.enabled = careTracker.enabled;
 		careTrackerModel.systemManaged = careTracker.systemManaged;
 		careTrackerModel.careTrackerItemGroups = this.convertAllGroups(careTracker.careTrackerItemGroups);
-		careTrackerModel.triggerCodes = new DxCodeTransferToModelConverter().convertList(careTracker.triggerCodes);
+		careTrackerModel.triggerCodes = this.dxCodeTransferToModelConverter.convertList(careTracker.triggerCodes);
 		careTrackerModel.parentCareTrackerId = careTracker.parentCareTrackerId;
 		careTrackerModel.ownerProviderId = careTracker.ownerProviderId;
 		careTrackerModel.ownerDemographicId = careTracker.ownerDemographicId;
@@ -65,43 +65,9 @@ export default class CareTrackerTransferToModelConverter extends AbstractConvert
 			groupModel.id = itemGroup.id;
 			groupModel.name = itemGroup.name;
 			groupModel.description = itemGroup.description;
-			groupModel.careTrackerItems = this.convertAllItems(itemGroup.careTrackerItems);
+			groupModel.careTrackerItems = this.careTrackerItemTransferToModelConverter.convertList(itemGroup.careTrackerItems);
 
 			return groupModel;
-		});
-	}
-
-	private convertAllItems(items: CareTrackerItem[]): CareTrackerItemModel[]
-	{
-		const ruleToModelConverter = new DsRuleTransferToModelConverter();
-		return items.map(item =>
-		{
-			const model = new CareTrackerItemModel();
-			model.id = item.id;
-			model.name = item.name;
-			model.description = item.description;
-			model.guideline = item.guideline;
-			model.type = item.type;
-			model.typeCode = item.typeCode;
-			model.hidden = item.hidden;
-			model.valueType = item.valueType;
-			model.valueLabel = item.valueLabel;
-			model.careTrackerItemAlerts = this.convertAllAlerts(item.careTrackerItemAlerts);
-			model.data = new CareTrackerItemDataTransferToModelConverter().convertList(item.data);
-			model.rules = ruleToModelConverter.convertList(item.rules);
-
-			return model;
-		});
-	}
-
-	private convertAllAlerts(alerts: CareTrackerItemAlert[]): AlertModel[]
-	{
-		return alerts.map(alert =>
-		{
-			const alertModel = new AlertModel();
-			alertModel.message = alert.message;
-			alertModel.severityLevel = alert.severityLevel;
-			return alertModel;
 		});
 	}
 }

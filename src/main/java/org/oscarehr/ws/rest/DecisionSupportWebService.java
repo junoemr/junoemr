@@ -23,9 +23,9 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.decisionSupport2.model.DsRule;
-import org.oscarehr.decisionSupport2.service.DsRuleService;
-import org.oscarehr.decisionSupport2.transfer.DsRuleCreateInput;
+import org.oscarehr.careTrackerDecisionSupport.model.DsRule;
+import org.oscarehr.careTrackerDecisionSupport.service.DsRuleService;
+import org.oscarehr.careTrackerDecisionSupport.transfer.DsRuleCreateInput;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;

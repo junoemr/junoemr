@@ -20,29 +20,36 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.converter;
+package org.oscarehr.careTrackerDecisionSupport.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.careTrackerDecisionSupport.converter.DsRuleDbToModelConverter;
-import org.oscarehr.careTracker.model.CareTrackerItem;
+import org.oscarehr.careTrackerDecisionSupport.entity.DsRuleConsequence;
+import org.oscarehr.careTrackerDecisionSupport.model.consequence.ConsequenceAlert;
+import org.oscarehr.careTrackerDecisionSupport.model.consequence.ConsequenceHideItemType;
+import org.oscarehr.careTrackerDecisionSupport.model.consequence.DsConsequence;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CareTrackerItemEntityToModelConverter extends AbstractModelConverter<org.oscarehr.careTracker.entity.CareTrackerItem, CareTrackerItem>
+public class DsConsequenceDbToModelConverter extends AbstractModelConverter<DsRuleConsequence, DsConsequence>
 {
-	@Autowired
-	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
-
 	@Override
-	public CareTrackerItem convert(org.oscarehr.careTracker.entity.CareTrackerItem input)
+	public DsConsequence convert(DsRuleConsequence input)
 	{
-		CareTrackerItem careTrackerItemModel = new CareTrackerItem();
-		BeanUtils.copyProperties(input, careTrackerItemModel, "careTrackerItemGroup", "dsRules");
+		if(input == null)
+		{
+			return null;
+		}
+		DsConsequence consequence;
+		switch(input.getType())
+		{
+			case ALERT: consequence = new ConsequenceAlert(); break;
+			case HIDDEN: consequence = new ConsequenceHideItemType(); break;
+			default: throw new IllegalStateException(input.getType() + " is not a valid consequence type");
+		}
 
-		careTrackerItemModel.setRules(dsRuleDbToModelConverter.convert(input.getDsRules()));
+		BeanUtils.copyProperties(input, consequence);
 
-		return careTrackerItemModel;
+		return consequence;
 	}
 }

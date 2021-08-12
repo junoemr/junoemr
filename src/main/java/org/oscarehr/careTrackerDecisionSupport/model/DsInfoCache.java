@@ -20,27 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.model;
+package org.oscarehr.careTrackerDecisionSupport.model;
 
-import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
+import java.util.List;
 
-@Data
-public class CareTrackerItemAlert extends AbstractTransientModel
+public interface DsInfoCache
 {
-	private SeverityLevel severityLevel;
-	private String message;
+	void addCriticalAlert(String typeCode, String message);
+	void addWarning(String typeCode, String message);
+	void addRecommendation(String typeCode, String message);
+	void addHidden(String typeCode, boolean isHidden);
 
-	public CareTrackerItemAlert()
-	{
-		this(null, SeverityLevel.RECOMMENDATION);
-	}
+	boolean hasCriticalAlert(String typeCode);
+	boolean hasWarning(String typeCode);
+	boolean hasRecommendation(String typeCode);
+	boolean getHidden(String measurement);
 
-	public CareTrackerItemAlert(String message, SeverityLevel severityLevel)
-	{
-		this.message = message;
-		this.severityLevel = severityLevel;
-	}
+	List<String> getCriticalAlerts(String typeCode);
+	List<String> getWarnings(String typeCode);
+	List<String> getRecommendations(String typeCode);
 }
-

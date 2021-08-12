@@ -20,46 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.transfer;
+package org.oscarehr.careTrackerDecisionSupport.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.careTrackerDecisionSupport.transfer.DsRuleUpdateInput;
-import org.oscarehr.careTracker.entity.ItemType;
-import org.oscarehr.careTracker.entity.ValueType;
-
-import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CareTrackerItemCreateUpdateTransfer extends AbstractTransientModel
+public class DsRuleConditionUpdateInput extends DsRuleConditionCreateInput
 {
 	private Integer id;
-	private String name;
-	private String description;
-	private String guideline;
-
-	private ItemType type;
-	private String typeCode;
-	private boolean hidden;
-
-	private ValueType valueType;
-	private String valueLabel;
-
-	private List<DsRuleUpdateInput> rules;
-
-	public CareTrackerItemCreateUpdateTransfer()
-	{
-	}
-
-	public boolean isMeasurementType()
-	{
-		return ItemType.MEASUREMENT.equals(this.type);
-	}
-
-	public boolean isPreventionType()
-	{
-		return ItemType.PREVENTION.equals(this.type);
-	}
 }
