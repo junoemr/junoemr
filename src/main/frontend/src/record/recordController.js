@@ -93,6 +93,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
 		controller.page.isNoteSaved = false; // Track save state of note TODO-legacy: Potentially add this to the encounterNote object on the backend
+		controller.page.editingNoteCursorIndex = null;
 
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
@@ -681,6 +682,12 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
+		controller.onTextAreaChange = () =>
+		{
+			controller.updateCursorLocation();
+			controller.setEditingNoteFlag();
+		}
+
 		controller.setEditingNoteFlag = function setEditingNoteFlag()
 		{
 			if (controller.page.encounterNote.uuid == null) return;
@@ -751,29 +758,41 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		controller.insertTemplate = function insertTemplate(item, model, label)
+		controller.insertTemplate = async function insertTemplate(item, model, label)
 		{
-			
-			uxService.getTemplate(
+			try
 			{
-				name: model
-			}).then(
-				function success(results)
-				{
-					if (results.templates !== null)
-					{
-						var template = results.templates[0];
-						controller.page.encounterNote.note = controller.page.encounterNote.note + template.encounterTemplateValue;
-						controller.options = {
-							magicVal: ''
-						};
-					}
+				const results = await uxService.getTemplate({name: model});
 
-				},
-				function error(errors)
+				if (results.templates !== null)
 				{
-					console.log(errors);
-				});
+					const templateValue = results.templates[0].encounterTemplateValue;
+					const currentNote = controller.page.encounterNote.note;
+					const cursorIndex = controller.page.editingNoteCursorIndex;
+
+					console.info(currentNote, currentNote.length, cursorIndex);
+
+					let newNoteValue;
+					// attempt to split the current note on the cursor position. the template will be inserted where the cursor is
+					if (currentNote && cursorIndex && currentNote.length > cursorIndex)
+					{
+						newNoteValue = currentNote.substring(0, cursorIndex) + templateValue + currentNote.substring(cursorIndex);
+					}
+					else // append template to the end of the note normally
+					{
+						newNoteValue = currentNote + templateValue;
+					}
+					controller.page.encounterNote.note = newNoteValue;
+
+					controller.options = {
+						magicVal: ''
+					};
+				}
+			}
+			catch(errors)
+			{
+				console.error(errors);
+			}
 		};
 
 		controller.displayWarning = function displayWarning(noteToEdit)
@@ -906,6 +925,11 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
+
+		controller.updateCursorLocation = () =>
+		{
+			controller.page.editingNoteCursorIndex = controller.encounterNoteTextAreaRef.prop("selectionStart");
+		}
 
 		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 		controller.init();

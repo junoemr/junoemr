@@ -251,11 +251,14 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<textarea class="form-control input-md col-lg-4 note-editor-textarea"
-							rows="6"
-							ng-model="recordCtrl.page.encounterNote.note"
-							ng-disabled="recordCtrl.page.cannotChange"
-							id="noteEditor{{recordCtrl.demographicNo}}"
-							ng-change="recordCtrl.setEditingNoteFlag()">
+						          ng-ref="recordCtrl.encounterNoteTextAreaRef"
+						          rows="6"
+						          ng-model="recordCtrl.page.encounterNote.note"
+						          ng-disabled="recordCtrl.page.cannotChange"
+						          id="noteEditor{{recordCtrl.demographicNo}}"
+						          ng-click="recordCtrl.updateCursorLocation()"
+						          ng-keyup="recordCtrl.updateCursorLocation()"
+						          ng-change="recordCtrl.onTextAreaChange()">
 						</textarea>
 					</div>
 
