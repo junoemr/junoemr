@@ -96,7 +96,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 
 	public DemographicContact find(int demographicNo, String contactId, String category) throws NonUniqueResultException
 	{
-		Query query = entityManager.createQuery("SELECT x FROM DemographicContact x WHERE x.demographicNo =: demographicNo AND x.contactId =: contactId AND x.category =: category AND x.deleted = false");
+		Query query = entityManager.createQuery("SELECT x FROM DemographicContact x WHERE x.demographicNo = :demographicNo AND x.contactId = :contactId AND x.category = :category AND x.deleted = false");
 		query.setParameter("demographicNo", demographicNo);
 		query.setParameter("contactId", contactId);
 		query.setParameter("category", category);
