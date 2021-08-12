@@ -31,7 +31,7 @@ import java.util.UUID;
 @Data
 public class AppointmentBookingTransfer
 {
-	// Juno side information. Not required.
+	// Juno side information.
 	protected String appointmentNo;
 	protected String providerNo;
 	protected String demographicNo;
