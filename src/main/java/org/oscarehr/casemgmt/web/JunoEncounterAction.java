@@ -494,7 +494,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		leftSections.add(EncounterSection.TYPE_MEASUREMENTS);
 		leftSections.add(EncounterSection.TYPE_CONSULTATIONS);
 
-		if(OscarProperties.getInstance().hasHRMDocuments())
+		if(OscarProperties.getInstance().isModuleEnabled(OscarProperties.Module.MODULE_HRM))
 		{
 			leftSections.add(EncounterSection.TYPE_HRM);
 		}

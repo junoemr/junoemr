@@ -99,7 +99,7 @@ public class EncounterHRMService extends EncounterSectionService
 	{
 		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), SecObjectName._HRM,
 			SecurityInfoManager.READ, sectionParams.getDemographicNo())
-			|| !OscarProperties.getInstance().hasHRMDocuments())
+			|| !OscarProperties.getInstance().isModuleEnabled(OscarProperties.Module.MODULE_HRM))
 		{
 			return EncounterNotes.noNotes();
 		}

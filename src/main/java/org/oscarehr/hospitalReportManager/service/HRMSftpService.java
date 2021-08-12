@@ -103,7 +103,7 @@ public class HRMSftpService
 			                                                               .filter(entry -> !entry.getAttrs().isDir())
 			                                                               .collect(Collectors.toList());
 			
-			downloadedFiles = downloadFiles(sftp, remoteFiles, dateSubDirectory, false);
+			downloadedFiles = downloadFiles(sftp, remoteFiles, dateSubDirectory, true);
 		}
 		catch (JSchException | SftpException e)
 		{
@@ -134,7 +134,9 @@ public class HRMSftpService
 	}
 	
 	/**
-	 * Downloads files of the SFTP into the local temporary folder
+	 * Downloads files of the SFTP into the hrm documents folder inside a subdirectory formatted according to the
+	 * current date yyyyMMdd.
+	 *
 	 * @param sftp sftp command object
 	 * @param remoteFiles collection of remote files
 	 * @param deleteAfterDownload true to remove each file from the remote server after downloading it
@@ -160,7 +162,6 @@ public class HRMSftpService
 			catch (Exception e)
 			{
 				// Any exception downloading the file leaves it on the server
-				// TODO: alert somehow
 				logger.error("Could not download remote HRM file: " + remoteFile.getFilename(), e);
 			}
 		}
