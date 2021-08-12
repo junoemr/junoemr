@@ -1,13 +1,82 @@
 .demographic-details-section.demographic-section  {
 
+	.body {
+    display: flex;
+    flex-wrap: wrap;
+
+		.juno-input {
+			margin-top: 8px;
+			//margin-left: 2px;
+			width: 400px;
+			text-align: left;
+          margin-right: 20px;
+
+
+		}
+
+		label {
+				text-align: right;
+				margin-left: 24px;
+          		width: 108px;
+			}
+
+		.juno-typeahead {
+			margin-top: 8px;
+			//margin-left: 2px;
+			width: 400px;
+			text-align: left;
+          margin-right: 20px;
+		}
+		.juno-select {
+			margin-top: 8px;
+			//margin-left: 2px;
+			width: 400px;
+			text-align: left;
+          margin-right: 20px;
+
+
+		}
+		juno-date-select {
+			margin-top: 8px;
+
+          	margin-right: 20px;
+			//margin-left: 2px;
+			width: 400px;
+			text-align: left;
+			input {
+				max-width: 58px;
+
+			}
+
+
+		}
+
+		.juno-button {
+			margin-top: 8px;
+
+          	margin-right: 64px;
+			//margin-left: 2px;
+			width: 400px;
+			text-align: left;
+		}
+  }
+
+
+
 	.connected-sites {
 		display: flex;
+		margin-top: 8px;
 		.juno-input {
-			width: 384px;
+			width: 400px;
+			margin-top: 8px;
+
 		}
 		.juno-button {
 			width: 32px;
-			margin-left: 4px;
+			//margin-left: 4px;
+			margin-right: 64px;
+			margin-top: 8px;
+
 
 			.icon {
 				font-size: 20px;

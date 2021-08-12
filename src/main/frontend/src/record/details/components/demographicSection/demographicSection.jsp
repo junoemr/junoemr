@@ -3,10 +3,16 @@
 		Demographic
 	</h4>
 
-	<div class="fields">
-		<div class="column">
+	<div class="body">
+		<!--<div class="column">-->
 			<juno-input ng-model="$ctrl.ngModel.lastName"
 							label="Last Name"
+							uppercase="true"
+							component-style="$ctrl.componentStyle">
+			</juno-input>
+
+			<juno-input ng-model="$ctrl.ngModel.firstName"
+							label="First Name"
 							uppercase="true"
 							component-style="$ctrl.componentStyle">
 			</juno-input>
@@ -41,20 +47,6 @@
 							component-style="$ctrl.componentStyle">
 			</juno-select>
 
-			<mha-patient-connection demographic="$ctrl.ngModel"
-			                        component-style="$ctrl.componentStyle"
-			                        on-site-list-change="$ctrl.onMHASiteListChange(sites)">
-			</mha-patient-connection>
-		</div>
-
-		<div class="divider"></div>
-
-		<div class="column">
-			<juno-input ng-model="$ctrl.ngModel.firstName"
-							label="First Name"
-							uppercase="true"
-							component-style="$ctrl.componentStyle">
-			</juno-input>
 
 			<juno-select
 							ng-model="$ctrl.ngModel.sex"
@@ -89,6 +81,11 @@
 							component-style="$ctrl.componentStyle">
 			</juno-input>
 
+			<mha-patient-connection demographic="$ctrl.ngModel"
+			                        component-style="$ctrl.componentStyle"
+			                        on-site-list-change="$ctrl.onMHASiteListChange(sites)">
+			</mha-patient-connection>
+
 			<div class="connected-sites">
 				<juno-input ng-model="$ctrl.mhaSites"
 								label="Connected Site"
@@ -105,6 +102,5 @@
 					</div>
 				</juno-button>
 			</div>
-		</div>
 	</div>
 </div>
