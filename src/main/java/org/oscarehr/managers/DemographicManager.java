@@ -1157,6 +1157,7 @@ public class DemographicManager {
 	{
 		DemographicCriteriaSearch search = new DemographicCriteriaSearch();
 		search.setHin(healthNumber);
+		search.setMatchModeExact();
 		search.setStatusMode(DemographicCriteriaSearch.STATUS_MODE.all);
 
 		if (versionCode != null && !versionCode.isEmpty())
