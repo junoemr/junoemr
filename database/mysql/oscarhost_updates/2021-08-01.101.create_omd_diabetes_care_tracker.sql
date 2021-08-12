@@ -102,7 +102,7 @@ CALL addCareTrackerItemRule(@care_tracker_name, "FBPC", @rule_name_never_entered
 CALL addCareTrackerItemRule(@care_tracker_name, "FBPC", @rule_name_3m_plus);
 CALL addCareTrackerItemRule(@care_tracker_name, "FBPC", "Warn: Number Greater Than 10");
 CALL addCareTrackerItemRule(@care_tracker_name, "FBPC", "Warn: Number Less Than 5");
-CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "SMBG", "NUMERIC", "Self Monitoring BG", 1, NULL);
+CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "SMBG", "BOOLEAN", "Self Monitoring BG", 0, NULL);
 CALL addCareTrackerItemRule(@care_tracker_name, "SMBG", @rule_name_never_entered);
 CALL addCareTrackerItemRule(@care_tracker_name, "SMBG", @rule_name_3m_plus);
 CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "HYPM", "BOOLEAN", "Reviewed", 0, "discussed");
@@ -189,7 +189,7 @@ CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "MCCO", 
 CALL addCareTrackerItemRule(@care_tracker_name, "MCCO", @rule_name_never_entered);
 CALL addCareTrackerItemRule(@care_tracker_name, "MCCO", @rule_name_3m_6m);
 CALL addCareTrackerItemRule(@care_tracker_name, "MCCO", @rule_name_6m_plus);
-CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "CGSD", "STRING", "Goal", 0, NULL);
+CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "CGSD", "BOOLEAN", "Goal", 0, NULL);
 CALL addCareTrackerItemRule(@care_tracker_name, "CGSD", @rule_name_never_entered);
 CALL addCareTrackerItemRule(@care_tracker_name, "CGSD", @rule_name_3m_6m);
 CALL addCareTrackerItemRule(@care_tracker_name, "CGSD", @rule_name_6m_plus);
