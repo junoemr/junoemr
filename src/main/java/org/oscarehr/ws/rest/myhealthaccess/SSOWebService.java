@@ -72,6 +72,20 @@ public class SSOWebService extends AbstractServiceImpl
 		IntegrationData integrationData = new IntegrationData(integration);
 
 		integrationData = myHealthAccessService.createOrGetUserIntegrationData(integrationData, getLoggedInInfo().getLoggedInSecurity());
-		return RestResponse.successResponse(myHealthAccessService.getTelehealthUrl(integrationData, null, null));
+		return RestResponse.successResponse(myHealthAccessService.getSSORedirectUrl(integrationData, MyHealthAccessService.MHA_HOME_URL));
+	}
+
+	@GET
+	@Path("/appointment/{appointmentId}/session/audio")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<String> getTelehealthAudioCallSSOLink(@PathParam("integrationId") String integrationId, @PathParam("appointmentId") String appointmentId)
+	{
+		Integration integration = integrationDao.findOrThrow(Integer.parseInt(integrationId));
+		IntegrationData integrationData = new IntegrationData(integration);
+
+		integrationData = myHealthAccessService.createOrGetUserIntegrationData(integrationData, getLoggedInInfo().getLoggedInSecurity());
+		return RestResponse.successResponse(myHealthAccessService.getSSORedirectUrl(
+				integrationData,
+				String.format(MyHealthAccessService.MHA_OD_AUDIO_CALL_URL, appointmentId)));
 	}
 }

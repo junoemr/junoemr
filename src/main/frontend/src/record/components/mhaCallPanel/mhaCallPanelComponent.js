@@ -29,6 +29,10 @@ import {
 } from "../../../common/components/junoComponentConstants";
 import {MhaCallPanelEvents} from "./mhaCallPanelEvents";
 import MhaConfigService from "../../../lib/integration/myhealthaccess/service/MhaConfigService";
+import MhaPatient from "../../../lib/integration/myhealthaccess/model/MhaPatient";
+import MhaPatientService from "../../../lib/integration/myhealthaccess/service/MhaPatientService";
+import MhaAppointmentService from "../../../lib/integration/myhealthaccess/service/MhaAppointmentService";
+import MhaSSOService from "../../../lib/integration/myhealthaccess/service/MhaSSOService";
 
 angular.module("Record.Components").component('mhaCallPanel', {
 	templateUrl: 'src/record/components/mhaCallPanel/mhaCallPanel.jsp',
@@ -37,8 +41,10 @@ angular.module("Record.Components").component('mhaCallPanel', {
 	},
 	controller: [
 		"$scope",
+		"$sce",
 		function (
-			$scope)
+			$scope,
+			$sce)
 		{
 			const ctrl = this;
 
@@ -46,6 +52,7 @@ angular.module("Record.Components").component('mhaCallPanel', {
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 			$scope.LABEL_POSITION = LABEL_POSITION;
 
+			ctrl.iframeUrl = null;
 			ctrl.inSession = false;
 			ctrl.selectedIntegration = null; // Type MhaIntegration
 			ctrl.integrationList = []; // Type MhaIntegration[]
@@ -54,19 +61,37 @@ angular.module("Record.Components").component('mhaCallPanel', {
 			ctrl.$onInit = async () =>
 			{
 				await ctrl.loadIntegrations();
+
+				// if only one integration start call.
+				if (ctrl.selectedIntegration)
+				{
+					ctrl.startCall();
+				}
 				$scope.$apply();
 			}
 
 			ctrl.loadIntegrations = async () =>
 			{
 				const mhaConfigService = new MhaConfigService()
+				const mhaPatientService = new MhaPatientService();
+
+				// get integration list
 				ctrl.integrationList = await mhaConfigService.getMhaIntegrations();
+
+				// filter out integrations where the patient is not confirmed.
+				const profileIntegrationMap = await Promise.all(ctrl.integrationList.map( async (integration) =>
+				{
+					return [integration, await mhaPatientService.profileForDemographic(integration.id, ctrl.demographicNo)];
+				}));
+				ctrl.integrationList = profileIntegrationMap.filter((integrationProfile) => integrationProfile[1] && integrationProfile[1].isConfirmed)
+					.map((integrationProfile) => integrationProfile[0]);
+
+				// build integration option list for UI.
 				ctrl.integrationOptions = ctrl.integrationList.map((integration) =>
 				{
 					return {
 						label: integration.siteName,
-						value: integration.id,
-						data: integration,
+						value: integration,
 					};
 				});
 
@@ -76,9 +101,17 @@ angular.module("Record.Components").component('mhaCallPanel', {
 				}
 			}
 
-			ctrl.startCall = () =>
+			ctrl.startCall = async () =>
 			{
+				const mhaAppointmentService = new MhaAppointmentService();
+				const mhaPatientService = new MhaPatientService();
+				const mhaSSOService = new MhaSSOService();
+
+				const newAppointment = await mhaAppointmentService.bookOnDemandAudioAppointment(ctrl.selectedIntegration, await mhaPatientService.profileForDemographic(ctrl.selectedIntegration.id, ctrl.demographicNo));
+				ctrl.iframeUrl = $sce.trustAsResourceUrl(await mhaSSOService.getOnDemandAudioCallSSOLink(ctrl.selectedIntegration, newAppointment));
 				ctrl.inSession = true;
+
+				$scope.$apply();
 			}
 
 			ctrl.close = () =>

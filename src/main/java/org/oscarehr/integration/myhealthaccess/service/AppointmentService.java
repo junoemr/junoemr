@@ -35,6 +35,7 @@ import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentSearchTo1;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentTo1;
 import org.oscarehr.integration.myhealthaccess.dto.NotificationTo1;
 import org.oscarehr.integration.myhealthaccess.dto.SessionInfoInboundDto;
 import org.oscarehr.integration.myhealthaccess.exception.BookingException;
@@ -46,6 +47,7 @@ import org.oscarehr.integration.myhealthaccess.model.MHATelehealthSessionInfo;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.UUID;
 
 @Service("myHealthAppointmentService")
@@ -77,6 +79,34 @@ public class AppointmentService extends BaseService
 	}
 
 	/**
+	 * Book an MHA appointment.
+	 * The booking doesn't even have to be an "appointment" (for example if type is ON_DEMAND_AUDIO_CALL).
+	 * @param loggedInInfo - logged in info
+	 * @param appointmentBookTo1 - the appointment booking transfer to send.
+	 * @return - mha appointment that was just booked
+	 * @throws InvalidIntegrationException
+	 */
+	public MHAAppointment bookMhaAppointment(LoggedInInfo loggedInInfo, AppointmentBookTo1 appointmentBookTo1) throws InvalidIntegrationException
+	{
+		Integration targetIntegration = integrationService.findMhaIntegration(appointmentBookTo1.getSite());
+		RestClientBase restClient = RestClientFactory.getRestClient(integrationOrException(targetIntegration));
+
+		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentBookTo1.getSite()).getToken();
+		AppointmentBookResponseTo1 appointmentBookResponseTo1 = restClient.doPostWithToken(
+				restClient.formatEndpoint("/clinic_user/appointment/book"),
+				loginToken,
+				appointmentBookTo1,
+				AppointmentBookResponseTo1.class);
+
+		if (!appointmentBookResponseTo1.isSuccess())
+		{
+			throw new BookingException(appointmentBookResponseTo1.getMessage());
+		}
+
+		return this.getAppointment(targetIntegration, appointmentBookResponseTo1.getRemoteAppointmentId());
+	}
+
+	/**
 	 * book a telehealth appointment in MHA.
 	 * @param loggedInInfo - logged in info.
 	 * @param appointment - the appointment to book.
@@ -85,7 +115,7 @@ public class AppointmentService extends BaseService
 	 */
 	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification) throws InvalidIntegrationException
 	{
-		bookTelehealthAppointment(loggedInInfo, appointment, sendNotification, null);
+		bookTelehealthAppointment(loggedInInfo, appointment, sendNotification, null, MHAAppointment.APPOINTMENT_TYPE.REGULAR);
 	}
 
 	/**
@@ -94,9 +124,10 @@ public class AppointmentService extends BaseService
 	 * @param appointment - the appointment to book.
 	 * @param sendNotification - if true the patient is sent a notification of the appointment booking.
 	 * @param remoteId - if provided (can be null) this overrides demographic_no and the appointment will be booked directly for that remote patient id.
+	 * @param appointmentType - the type of the appointment being booked.
 	 * @throws InvalidIntegrationException - if MHA integration invalid
 	 */
-	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification, UUID remoteId) throws InvalidIntegrationException
+	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification, UUID remoteId, MHAAppointment.APPOINTMENT_TYPE appointmentType) throws InvalidIntegrationException
 	{
 		String appointmentSite = null;
 		if (IsPropertiesOn.isMultisitesEnable())
@@ -104,18 +135,7 @@ public class AppointmentService extends BaseService
 			appointmentSite = appointment.getLocation();
 		}
 
-		RestClientBase restClient = RestClientFactory.getRestClient(integrationOrException(integrationService.findMhaIntegration(appointmentSite)));
-		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
-		AppointmentBookResponseTo1 appointmentBookResponseTo1 = restClient.doPostWithToken(
-				restClient.formatEndpoint("/clinic_user/appointment/book"),
-				loginToken,
-				new AppointmentBookTo1(appointment, false, sendNotification, remoteId),
-				AppointmentBookResponseTo1.class);
-
-		if (!appointmentBookResponseTo1.isSuccess())
-		{
-			throw new BookingException(appointmentBookResponseTo1.getMessage());
-		}
+		this.bookMhaAppointment(loggedInInfo, new AppointmentBookTo1(appointment, false, sendNotification, remoteId, appointmentType));
 	}
 
 	/**
@@ -123,7 +143,7 @@ public class AppointmentService extends BaseService
 	 * @param loggedInInfo - logged in info
 	 * @param appointment - the appointment to book.
 	 * @param sendNotification - If true MHA will send a notification to the user. This notification will include the one time link.
-	 * @throws InvalidIntegrationException
+	 * @throws InvalidIntegrationException - if MHA integration invalid
 	 */
 	public void bookOneTimeTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, Boolean sendNotification) throws InvalidIntegrationException
 	{
@@ -133,18 +153,7 @@ public class AppointmentService extends BaseService
 			appointmentSite = appointment.getLocation();
 		}
 
-		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
-		RestClientBase restClient = RestClientFactory.getRestClient(integrationOrException(integrationService.findMhaIntegration(appointmentSite)));
-		AppointmentBookResponseTo1 appointmentBookResponseTo1 = restClient.doPostWithToken(
-				restClient.formatEndpoint("/clinic_user/appointment/book"),
-				loginToken,
-				new AppointmentBookTo1(appointment, true, sendNotification, null),
-				AppointmentBookResponseTo1.class);
-
-		if (!appointmentBookResponseTo1.isSuccess())
-		{
-			throw new BookingException(appointmentBookResponseTo1.getMessage());
-		}
+		this.bookMhaAppointment(loggedInInfo, new AppointmentBookTo1(appointment, true, sendNotification, null, MHAAppointment.APPOINTMENT_TYPE.ONE_TIME_LINK));
 	}
 
 	/**
@@ -231,6 +240,29 @@ public class AppointmentService extends BaseService
 	}
 
 	/**
+	 * fetch remote appointment from MHA by remoteId
+	 * @param integration - the integration to search for the appointment in
+	 * @param remoteId - the remote appointment id to fetch
+	 * @return - the MHAAppointment or null if not found for that remoteId.
+	 */
+	public MHAAppointment getAppointment(Integration integration, String remoteId)
+	{
+		RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+		String url = restClient.formatEndpoint(
+				"/clinic/%s/appointment/%s/",
+				integration.getRemoteId(),
+				remoteId);
+
+		AppointmentTo1 appointmentTransfer = restClient.doGet(url, AppointmentTo1.class);
+		if (appointmentTransfer != null)
+		{
+			return new MHAAppointment(appointmentTransfer);
+		}
+		return null;
+	}
+
+	/**
 	 * get information about the MHA telehealth session
 	 * @param integration - integration to use when fetching the information
 	 * @param mhaAppointmentId - the appointment to get session information for.
@@ -275,5 +307,4 @@ public class AppointmentService extends BaseService
 				new AppointmentAqsLinkTo1(queuedAppointmentId),
 				null);
 	}
-
 }

@@ -8,7 +8,7 @@
 
 	<!-- MHA audio call iframe -->
 	<iframe ng-if="$ctrl.inSession"
-	        src="https://ben-cloudmd.mhadev.ca/patient/#/clinic_user/appointments/e6958cc6-c2ec-4d20-8c68-6e3695483a19/audio/session"
+	        src="{{$ctrl.iframeUrl}}"
 	        allow="camera;microphone"
 	        width="280"
 	        height="60"
