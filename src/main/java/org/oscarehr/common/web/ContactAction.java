@@ -667,7 +667,7 @@ public class ContactAction extends DispatchAction {
 		for (DemographicContact demographicContact : contacts)
 		{
 			role = demographicContact.getRole();
-			if (role != null && StringUtils.isNumeric(role) && !role.isEmpty())
+			if (StringUtils.isNumeric(role) && !role.isEmpty())
 			{
 				specialty = contactSpecialtyDao.find(Integer.parseInt(role.trim()));
 
@@ -677,47 +677,44 @@ public class ContactAction extends DispatchAction {
 				}
 			}
 
-			if (demographicContact.getType() != null)
+			switch (demographicContact.getType())
 			{
-				switch (demographicContact.getType())
-				{
-					case DemographicContact.TYPE_DEMOGRAPHIC:
-						demographicContact.setContactName(demographicDao.getClientByDemographicNo(Integer.parseInt(demographicContact.getContactId())).getFormattedName());
-						break;
+				case DemographicContact.TYPE_DEMOGRAPHIC:
+					demographicContact.setContactName(demographicDao.getClientByDemographicNo(Integer.parseInt(demographicContact.getContactId())).getFormattedName());
+					break;
 
-					case DemographicContact.TYPE_PROVIDER:
-						provider = providerDao.getProvider(demographicContact.getContactId());
-						if (provider != null)
-						{
-							providerFormattedName = provider.getFormattedName();
-						}
+				case DemographicContact.TYPE_PROVIDER:
+					provider = providerDao.getProvider(demographicContact.getContactId());
+					if (provider != null)
+					{
+						providerFormattedName = provider.getFormattedName();
+					}
 
-						if (StringUtils.isBlank(providerFormattedName))
-						{
-							providerFormattedName = "Error: Contact Support";
-							logger.error("Formatted name for provder was not avaialable. Contact number: " + demographicContact.getContactId());
-						}
-						demographicContact.setContactName(providerFormattedName);
+					if (StringUtils.isBlank(providerFormattedName))
+					{
+						providerFormattedName = "Error: Contact Support";
+						logger.error("Formatted name for provder was not avaialable. Contact number: " + demographicContact.getContactId());
+					}
+					demographicContact.setContactName(providerFormattedName);
 
-						contact = new ProfessionalContact();
-						contact.setWorkPhone("internal");
-						contact.setFax("internal");
-						demographicContact.setDetails(contact);
-						break;
+					contact = new ProfessionalContact();
+					contact.setWorkPhone("internal");
+					contact.setFax("internal");
+					demographicContact.setDetails(contact);
+					break;
 
-					case DemographicContact.TYPE_CONTACT:
-						contact = contactDao.find(Integer.parseInt(demographicContact.getContactId()));
-						demographicContact.setContactName(contact.getFormattedName());
-						demographicContact.setDetails(contact);
-						break;
+				case DemographicContact.TYPE_CONTACT:
+					contact = contactDao.find(Integer.parseInt(demographicContact.getContactId()));
+					demographicContact.setContactName(contact.getFormattedName());
+					demographicContact.setDetails(contact);
+					break;
 
-					case DemographicContact.TYPE_PROFESSIONALSPECIALIST:
-						professionalSpecialist = professionalSpecialistDao.find(Integer.parseInt(demographicContact.getContactId()));
-						demographicContact.setContactName(professionalSpecialist.getFormattedName());
-						contact = buildContact(professionalSpecialist);
-						demographicContact.setDetails(contact);
-						break;
-				}
+				case DemographicContact.TYPE_PROFESSIONALSPECIALIST:
+					professionalSpecialist = professionalSpecialistDao.find(Integer.parseInt(demographicContact.getContactId()));
+					demographicContact.setContactName(professionalSpecialist.getFormattedName());
+					contact = buildContact(professionalSpecialist);
+					demographicContact.setDetails(contact);
+					break;
 			}
 		}
 		return contacts;
