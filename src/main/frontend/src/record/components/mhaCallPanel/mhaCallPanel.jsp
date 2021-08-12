@@ -12,11 +12,12 @@
 	        allow="camera;microphone"
 	        width="280"
 	        height="60"
+	        class="m-l-16 m-r-16"
 	        frameborder="0">
 	</iframe>
 
-	<div ng-if="!$ctrl.inSession && $ctrl.integrationList.length > 0" class="integration-select flex-col p-16">
-		<div class="p-l-8 p-r-8">
+	<div ng-if="!$ctrl.inSession && $ctrl.integrationList.length > 0" class="integration-select flex-col p-16 m-t-24">
+		<div>
 			<p>Which clinic would you like to call the patient from?</p>
 		</div>
 
@@ -26,7 +27,7 @@
 		             label="Select clinic">
 		</juno-select>
 
-		<juno-button class="m-t-16"
+		<juno-button class="m-t-24"
 		             click="$ctrl.startCall()"
 		             disabled="!$ctrl.selectedIntegration || $ctrl.calling"
 		             button-color="JUNO_BUTTON_COLOR.PRIMARY"

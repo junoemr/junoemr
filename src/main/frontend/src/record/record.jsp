@@ -26,7 +26,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div id="patient-record-page" class="h-min-100 flex-col">
 	<div class="flex-row align-items-center patient-record-header">
-		<div class="flex-row align-items-center">
+		<div class="flex-row align-items-center flex-item-grow">
 			<h3 class="patient-header-name" ng-cloak>
 				{{recordCtrl.demographic.lastName}}, {{recordCtrl.demographic.firstName}}
 				<span ng-show="recordCtrl.demographic.alias">({{recordCtrl.demographic.alias}})</span>
@@ -48,14 +48,18 @@
 					{{recordCtrl.demographic.phone}}
 				</h5>
 			</span>
-			<span ng-if="recordCtrl.canMHACallPatient">
-				<juno-button  title="Call patient"
+			<div ng-if="recordCtrl.canMHACallPatient" class="flex-item-grow flex-row justify-content-end p-8">
+				<juno-button  title="Call patient through the MHA app"
+				              class="flex-item-no-grow"
 				              click="recordCtrl.openMhaCallPanel()"
 				              button-color="JUNO_BUTTON_COLOR.GREYSCALE_LIGHT"
 				              button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
-					<i class="icon icon-tele-call"></i>
+					<div class="flex-row align-items-center">
+						<i class="icon icon-tele-call"></i>
+						Call Patient
+					</div>
 				</juno-button>
-			</span>
+			</div>
 		</div>
 	</div>
 
