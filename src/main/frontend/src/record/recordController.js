@@ -770,8 +770,6 @@ angular.module('Record').controller('Record.RecordController', [
 					const currentNote = controller.page.encounterNote.note;
 					const cursorIndex = controller.page.editingNoteCursorIndex;
 
-					console.info(currentNote, currentNote.length, cursorIndex);
-
 					let newNoteValue;
 					// attempt to split the current note on the cursor position. the template will be inserted where the cursor is
 					if (currentNote && cursorIndex && currentNote.length > cursorIndex)
