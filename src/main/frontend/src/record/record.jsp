@@ -48,7 +48,7 @@
 			</h5>
 			<i class="icon icon-tele-call"></i>
 			<h5 class="patient-header-info">
-				{{recordCtrl.demographic.phone}}
+				{{recordCtrl.displayPhone}}
 			</h5>
 		</div>
 	</div>

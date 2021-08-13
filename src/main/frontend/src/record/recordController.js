@@ -98,10 +98,31 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.recordtabs2 = [];
 		controller.working = false;
 
+		controller.displayPhone = null;
+
 
 		controller.init = function init()
 		{
 			controller.fillMenu();
+
+			// quick and dirty way to show preferred phone
+			if(controller.demographic.alternativePhone && controller.demographic.alternativePhone.endsWith("*"))
+			{
+				controller.displayPhone = controller.demographic.alternativePhone;
+			}
+			else if(controller.demographic.extras)
+			{
+				const cellExt = controller.demographic.extras.find((extra) => extra.key === "demo_cell");
+				if(cellExt && cellExt.value.endsWith("*"))
+				{
+					controller.displayPhone = cellExt.value;
+				}
+			}
+			else
+			{
+				controller.displayPhone = controller.demographic.phone;
+			}
+			controller.displayPhone = controller.displayPhone.replace("*", "");
 		};
 
 		//get access rights
