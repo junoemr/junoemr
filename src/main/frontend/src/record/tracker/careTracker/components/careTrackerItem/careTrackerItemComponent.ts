@@ -27,7 +27,6 @@ import moment, {Moment} from "moment";
 import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
 import {AlertSeverityType} from "../../../../../lib/careTracker/model/AlertSeverityType";
 import {IAngularEvent} from "angular";
-import {JunoSelectOption} from "../../../../../lib/common/junoSelectOption";
 import {JUNO_RADIO_STYLE} from "../../../../../common/components/junoRadioSelect/junoRadioSelectConstants";
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
@@ -66,21 +65,6 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 
 				ctrl.dataTrueValue = "Yes";
 				ctrl.dataFalseValue = "No";
-				ctrl.booleanInputOptions = [
-					{
-						label: "Skip",
-						value: null,
-					},
-					{
-						label: "Yes",
-						value: "Yes",
-					},
-					{
-						label: "No",
-						value: "No",
-					},
-				] as JunoSelectOption[];
-
 				ctrl.inputRegexRestriction = null;
 
 				ctrl.$onInit = (): void =>

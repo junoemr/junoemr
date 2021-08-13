@@ -21,19 +21,20 @@
 * Canada
 --%>
 <div class="care-tracker-item">
-	<div class="flex-row align-items-center">
-		<h6 class="item-header">{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
-		<div class="item-description">{{$ctrl.model.description}}</div>
-	</div>
-	<div ng-if="$ctrl.isGraphable()"
-	     class="graphing-button-container no-print">
-		<juno-button component-style="$ctrl.componentStyle"
-		             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-		             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-		             disabled="!$ctrl.model.hasAttachedData()"
-		             click="$ctrl.onShowDataGraph()">
-			Graph
-		</juno-button>
+	<div class="flex-row justify-content-between flex-wrap">
+		<div class="flex-row align-items-center">
+			<h6 class="item-header">{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
+			<div class="item-description">{{$ctrl.model.description}}</div>
+		</div>
+		<div ng-if="$ctrl.isGraphable()" class="no-print m-t-2">
+			<juno-button component-style="$ctrl.componentStyle"
+			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+			             disabled="!$ctrl.model.hasAttachedData()"
+			             click="$ctrl.onShowDataGraph()">
+				Graph
+			</juno-button>
+		</div>
 	</div>
 	<div class="item-guideline">Guideline: {{$ctrl.model.guideline}}</div>
 

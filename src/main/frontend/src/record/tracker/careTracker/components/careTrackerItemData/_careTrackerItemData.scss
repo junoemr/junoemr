@@ -1,7 +1,11 @@
 .care-tracker-item-data {
 	position: relative;
 	min-width: 128px;
-	max-width: 256px;
+
+	// limit size when in app, but ensure all text visible when printing
+	@media screen {
+		max-width: 256px;
+	}
 
 	border: 2px solid var(--color-neutral-light-grey);
 	border-radius: 8px;
