@@ -71,7 +71,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			suggestedTextId: 0,
 			taskAssignedTo: null,
 			taskAssignedToName: null,
-			attachments: [attachment],
+			attachments: attachment ? [attachment] : null,
 		};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
