@@ -65,7 +65,7 @@ public class AppointmentService extends BaseService
 	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
 		RestClientBase restClient = RestClientFactory.getRestClient(integrationData.getIntegration());
-		String endpoint = "/clinic/%s/appointment/%s/cache";
+		String endpoint = APPOINTMENT_CACHE_UPDATE;
 
 		String clinicId = integrationData.getIntegration().getRemoteId();
 		String appointmentId = appointmentTransfer.getId();
@@ -93,7 +93,7 @@ public class AppointmentService extends BaseService
 
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentBookTo1.getSite()).getToken();
 		AppointmentBookResponseTo1 appointmentBookResponseTo1 = restClient.doPostWithToken(
-				restClient.formatEndpoint("/clinic_user/appointment/book"),
+				restClient.formatEndpoint(APPOINTMENT_BOOK),
 				loginToken,
 				appointmentBookTo1,
 				AppointmentBookResponseTo1.class);
@@ -166,7 +166,7 @@ public class AppointmentService extends BaseService
 	{
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 		restClient.doPostWithToken(
-				restClient.formatEndpoint("/clinic_user/self/clinic/appointment/%s/send_telehealth_notification", remoteId),
+				restClient.formatEndpoint(APPOINTMENT_SEND_TELEHEALTH_NOTIFICATION, remoteId),
 				loginToken,
 				null,
 				Boolean.class);
@@ -187,7 +187,7 @@ public class AppointmentService extends BaseService
 		{
 			NotificationTo1 notificationTo1 = new NotificationTo1(appointment);
 			restClient.doPostWithToken(
-					restClient.formatEndpoint("/clinic_user/self/juno/appointment/%s/send_general_notification", appointmentNo.toString()),
+					restClient.formatEndpoint(APPOINTMENT_SEND_GENERAL_NOTIFICATION, appointmentNo.toString()),
 					loginToken,
 					notificationTo1,
 					Boolean.class);
@@ -209,7 +209,7 @@ public class AppointmentService extends BaseService
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
 		String url = restClient.formatEndpoint(
-				"/clinic/%s/appointments?search_by=remote_id&remote_id=%s",
+				APPOINTMENT_SEARCH + "?search_by=remote_id&remote_id=%s",
 				integration.getRemoteId(),
 				appointmentNo);
 
@@ -250,7 +250,7 @@ public class AppointmentService extends BaseService
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
 		String url = restClient.formatEndpoint(
-				"/clinic/%s/appointment/%s/",
+				APPOINTMENT_GET,
 				integration.getRemoteId(),
 				remoteId);
 
@@ -272,7 +272,7 @@ public class AppointmentService extends BaseService
 	{
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 
-		String url = restClient.formatEndpoint("/clinic/%s/appointment/%s/session", integration.getRemoteId(), mhaAppointmentId);
+		String url = restClient.formatEndpoint(APPOINTMENT_GET_TELEHEALTH_SESSION_INFO, integration.getRemoteId(), mhaAppointmentId);
 		return sessionInfoConverter.convert(restClient.doGet(url, SessionInfoInboundDto.class));
 	}
 
@@ -302,7 +302,7 @@ public class AppointmentService extends BaseService
 		RestClientBase restClient = RestClientFactory.getRestClient(integration);
 		String loginToken = clinicService.loginOrCreateClinicUser(integration, loggedInInfo.getLoggedInSecurity().getSecurityNo()).getToken();
 		restClient.doPostWithToken(
-				restClient.formatEndpoint("/clinic_user/self/appointment/" + mhaAppointment.getId() + "/aqs_link"),
+				restClient.formatEndpoint(APPOINTMENT_LINK_AQS_TO_CLINIC_APPOINTMENT, mhaAppointment.getId()),
 				loginToken,
 				new AppointmentAqsLinkTo1(queuedAppointmentId),
 				null);

@@ -46,7 +46,7 @@ import java.util.ResourceBundle;
 public abstract class AbstractServiceImpl {
 
 	@Autowired
-	SecurityInfoManager securityInfoManager;
+	protected SecurityInfoManager securityInfoManager;
 
 	private static final int MAX_PAGE_RESULTS = 100;
 
