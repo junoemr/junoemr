@@ -935,7 +935,8 @@ angular.module('Record').controller('Record.RecordController', [
 		/**
 		 * open the mha audio call panel.
 		 */
-		controller.openMhaCallPanel = () => {
+		controller.openMhaCallPanel = () =>
+		{
 			controller.mhaCallPanelOpen = true;
 		}
 
