@@ -79,6 +79,12 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 					const unit = (timeScaleDays > axisDaysThreshold) ? ((timeScaleDays > axisMonthsThreshold) ? "year" : "month") : "day";
 
 					return ctrl.options = {
+						elements: {
+							line: {
+								// makes lines straight instead of curved on a spline etc.
+								tension: 0,
+							},
+						},
 						scales: {
 							yAxes: [
 								{
