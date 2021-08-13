@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.AppointmentModelToDbConverter;
 import org.oscarehr.integration.model.Integration;
@@ -65,6 +66,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.SortedMap;
 
 @Service
@@ -79,6 +81,9 @@ public class Appointment
 
 	@Autowired
 	ProviderDataDao providerDataDao;
+
+	@Autowired
+	DemographicDao demographicDao;
 
 	@Autowired
 	AppointmentService appointmentService;
@@ -480,10 +485,17 @@ public class Appointment
 	private void sendAppointmentProviderNotificationSms(org.oscarehr.common.model.Appointment appointment, Integration integration)
 	{
 		ProviderData provider = providerDataDao.find(appointment.getProviderNo());
-		List<String> smsNumbers = provider.getBookingNotificationNumbersList();
-		for (String phoneNumber: smsNumbers)
+		Optional<Demographic> demographic = Optional.ofNullable(demographicDao.find(appointment.getDemographicNo()));
+
+		if (provider != null)
 		{
-			communicationService.sendSms(integration, phoneNumber, "New appointment: " + appointment.getName() + " booked for provider: " + provider.getDisplayName());
+			List<String> smsNumbers = provider.getBookingNotificationNumbersList();
+			for (String phoneNumber : smsNumbers)
+			{
+				communicationService.sendSms(integration, phoneNumber, "New appointment for patient: " +
+						demographic.map(Demographic::getDisplayNameShort).orElse("N/A") +
+						". Booked for provider: " + provider.getDisplayName());
+			}
 		}
 	}
 

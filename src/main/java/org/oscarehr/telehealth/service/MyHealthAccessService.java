@@ -103,6 +103,8 @@ public class MyHealthAccessService
 		String clinicUserPath = "/clinic_users/push_token?";
 
 		String endpoint = ClinicService.concatEndpointStrings(hostDomain, clinicUserPath);
+		// Note the "#" before the token query param! This prevents the token from being submitted to the server. client side code in MHA will handle the token.
+		// The token should NEVER be sent to the server.
 		endpoint = clinicService.buildUrl(endpoint) + "/clinic_id=%s&user_id=%s&redirect_url=%s#token=%s";
 
 		if (StringUtils.isNullOrEmpty(appointmentNo))
