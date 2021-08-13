@@ -19,7 +19,7 @@ CALL addCareTrackerIcd9Trigger(@care_tracker_name, "416");
 -- *** measurements group ***
 SET @group_name = "Measurements";
 CALL addCareTrackerItemGroup(@care_tracker_name, @group_name, "chronic obstructive pulmonary measurements");
-CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "FEV1", "BOOLEAN", "Value", "FEV 1 percent of Predicted");
+CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "FEV1", "NUMERIC", "Value", "FEV 1 percent of Predicted");
 CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "CODC", "STRING", "Class", NULL);
 CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "02SA", "NUMERIC", "Percent", NULL);
 CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "RABG", "BOOLEAN", "Recommended", "Aterial Blood Gas");
