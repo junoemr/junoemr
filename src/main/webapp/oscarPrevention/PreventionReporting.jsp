@@ -27,8 +27,20 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.data.*,oscar.oscarPrevention.pageUtil.*,java.net.*,oscar.eform.*"%>
-<%@page import="oscar.OscarProperties, org.oscarehr.util.SpringUtils, org.oscarehr.common.dao.BillingONCHeader1Dao" %>
+<%@page import="oscar.OscarProperties"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.common.dao.BillingONCHeader1Dao" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicNameAgeString" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="oscar.oscarPrevention.pageUtil.PreventionReportDisplay" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
+<%@ page import="org.oscarehr.PMmodule.utility.UtilDateUtilities" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="oscar.oscarReport.data.RptSearchData" %>
+<%@ page import="org.oscarehr.common.model.DemographicContact" %>
+<%@ page import="org.oscarehr.common.model.Contact" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -38,7 +50,7 @@
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+      String roleName$ = session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	  boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_prevention" rights="r" reverse="<%=true%>">
@@ -52,15 +64,9 @@ if(!authed) {
 %>
 
 <%
-  String demographic_no = request.getParameter("demographic_no");
-
   oscar.oscarReport.data.RptSearchData searchData  = new oscar.oscarReport.data.RptSearchData();
   ArrayList queryArray = searchData.getQueryTypes();
 
-  String preventionText = "";
-
-  String eformSearch = (String) request.getAttribute("eformSearch");
-  //EfmData efData = new EfmData();
   BillingONCHeader1Dao bCh1Dao = (BillingONCHeader1Dao)SpringUtils.getBean("billingONCHeader1Dao");
 %>
 
@@ -100,8 +106,7 @@ function setNextContactMethod(selectElem) {
 	var displayId;
 	var currentValue;
 	var idNum;
-	var indexPos;
-	
+
 	if( nextSelectedContactMethod == "other" ) {
 		nextSelectedContactMethod = prompt("Enter next contact method: ");
 		if( nextSelectedContactMethod == null ) {
@@ -214,11 +219,8 @@ function saveContacts() {
                     alert( ret.status + " There was a problem saving contacts.");
                 }
             }
-
         );
-
         return false;
-
 }
 
 </script>
@@ -248,11 +250,8 @@ function saveContacts() {
         var lastFollowupTD = $('lastFollowup'+hash['id']);
         var nextProcedureTD = $('nextSuggestedProcedure'+hash['id']);
         //alert(nextProcedureTD);
-        nextProcedureTD.innerHTML = "----";
+        nextProcedureTD.innerHTML = "------";
         lastFollowupTD.innerHTML = hash['followupValue']+" "+hash['Date'];
-
-        //alert(nextProcedureTD.innerText);
-
     }
 </script>
 
@@ -363,7 +362,6 @@ table.ele thead {
 </head>
 
 <body class="BodyStyle" vlink="#0000FF">
-<!--  -->
     <table  class="MainTable" id="scrollNumber1" >
         <tr class="MainTableTopRow">
             <td class="MainTableTopRowLeftColumn" width="100" >
@@ -453,6 +451,7 @@ table.ele thead {
                   ArrayList list = (ArrayList) request.getAttribute("returnReport");
                   Date asDate = (Date) request.getAttribute("asDate");
                   if (asDate == null){ asDate = Calendar.getInstance().getTime(); }
+                  String lastDate = null;
                   
                   String error = (String) request.getAttribute("error");
 
@@ -479,7 +478,7 @@ table.ele thead {
                        <td style="40%;">&nbsp;<%=request.getAttribute("patientSet")%> </td>                       
                        <td>	
                        		<select onchange="setNextContactMethod(this)">
-                       			<option value="----">Select Contact Method</option>
+                       			<option value="------">Select Contact Method</option>
                        			<option value="Email">Email</option>
                        			<option value="L1">Letter 1</option>
                        			<option value="L2">Letter 2</option>
@@ -525,7 +524,8 @@ table.ele thead {
                        </tr>
                        </thead>
                        <tbody>
-                       <%DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
+                       <%
+                           DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
                          DemographicData demoData= new DemographicData();
                          boolean setBill;
                          String enabled = "";
@@ -536,6 +536,8 @@ table.ele thead {
                             PreventionReportDisplay dis = (PreventionReportDisplay) list.get(i);
                             Hashtable h = deName.getNameAgeSexHashtable(LoggedInInfo.getLoggedInInfoFromSession(request), dis.demographicNo.toString());
                             org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request),  dis.demographicNo.toString());
+                            
+                            lastDate = dis.lastDate;
 
                             if ( dis.nextSuggestedProcedure != null ){
                                 if (dis.nextSuggestedProcedure.equals("L1")){
@@ -584,15 +586,45 @@ table.ele thead {
 
 
                           <% }else {
-                              org.oscarehr.common.model.Demographic demoSDM = demoData.getSubstituteDecisionMaker(LoggedInInfo.getLoggedInInfoFromSession(request), dis.demographicNo.toString());%>
+                              LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+                              DemographicContact demographicContact = demoData.getSubstituteDecisionMaker(dis.demographicNo.toString());
+                              // internal
+                              String contactFullName = "";
+                              String contactPhone = "";
+                              String contactAddress = "";
+                              if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
+                              {
+                                  org.oscarehr.common.model.Demographic demographic = demoData.getInternalContact(loggedInInfo, demographicContact);
+                                  if (demographic != null)
+                                  {
+                                      contactFullName = demographic.getFullName();
+                                      contactPhone = demographic.getPhone();
+                                      contactAddress = StringUtils.trimToEmpty(demographic.getAddress()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getCity()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getProvince()) + " "
+                                              + StringUtils.trimToEmpty(demographic.getPostal());
+                                  }
+                              }
+                              // external
+                              else if (demographicContact != null && demographicContact.getType() == DemographicContact.TYPE_CONTACT)
+                              {
+                                  Contact contact = demoData.getExternalContact(demographicContact);
+                                  if (contact != null)
+                                  {
+                                      contactFullName = contact.getFormattedName();
+                                      contactPhone = contact.getCellPhone();
+                                      contactAddress = contact.getAddress();
+                                  }
+                              }
+                          %>
                           <td><%=demo.getAgeAsOf(asDate)%></td>
                           <td><%=h.get("sex")%></td>
                           <td><%=h.get("lastName")%></td>
                           <td><%=h.get("firstName")%></td>
                           <td><%=demo.getHin()+demo.getVer()%></td>
-                          <td><%=demoSDM==null?"":demoSDM.getLastName()%><%=demoSDM==null?"":","%> <%= demoSDM==null?"":demoSDM.getFirstName() %>&nbsp;</td>
-                          <td><%=demoSDM==null?"":demoSDM.getPhone()%> &nbsp;</td>
-                          <td><%=demoSDM==null?"":demoSDM.getAddress()+" "+demoSDM==null?"":demoSDM.getCity()+" "+demoSDM==null?"":demoSDM.getProvince()+" "+demoSDM==null?"":demoSDM.getPostal()%> &nbsp;</td>
+                          <td><%=contactFullName %>&nbsp;</td>
+                          <td><%=contactPhone%> &nbsp;</td>
+                          <td><%=contactAddress%> &nbsp;</td>
                           <td><oscar:nextAppt demographicNo="<%=demo.getDemographicNo().toString()%>"/></td>
                           <td bgcolor="<%=dis.color%>"><%=dis.state%></td>
                           <td bgcolor="<%=dis.color%>"><%=dis.numShots%></td>                          
@@ -607,7 +639,7 @@ table.ele thead {
                                  <%=UtilDateUtilities.DateToString(dis.lastFollowup)%>
                                  <%=UtilDateUtilities.getNumMonths(dis.lastFollowup,new Date())%>M
                              <% }else{ %>
-                                ----
+                                ------
                              <% } %>
                           </td>
                           <td bgcolor="<%=dis.color%>" id="nextSuggestedProcedure<%=i+1%>">
@@ -672,19 +704,19 @@ table.ele thead {
                   <% if ( firstLetter.size() > 0 ) {
                         String queryStr = getUrlParamList(firstLetter, "demo");
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1">Generate First Letter</a>
+                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate First Letter</a>
                   <%}%>
 
                   <% if ( secondLetter.size() > 0 ) {
                         String queryStr = getUrlParamList(secondLetter, "demo");
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L2">Generate Second Letter</a>
+                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L2&amp;lastDate=<%=lastDate%>">Generate Second Letter</a>
                   <%}%>
 
                   <% if ( refusedLetter.size() > 0 ) {
                         String queryStr = getUrlParamList(refusedLetter, "demo");
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1">Generate Refused Letter</a>
+                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate Refused Letter</a>
                   <%}%>
 
 

@@ -47,7 +47,6 @@ angular.module('Record').controller('Record.RecordController', [
 	'demographicService',
 	'demo',
 	'user',
-	'properties',
 	'noteService',
 	'uxService',
 	'securityService',
@@ -69,7 +68,6 @@ angular.module('Record').controller('Record.RecordController', [
 		demographicService,
 		demo,
 		user,
-		properties,
 		noteService,
 		uxService,
 		securityService,
@@ -85,7 +83,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = demo;
-		controller.properties = properties;
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
 
@@ -169,7 +166,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 			// TODO Robert's security check here
 			// add patient messenger item only if the patient is verified.
-			if (await mhaConfigService.MhaEnabled())
+			if (await mhaConfigService.mhaEnabled())
 			{
 				const mhaProfiles = await mhaPatientService.profilesForDemographic($stateParams.demographicNo);
 				const verified = mhaProfiles.reduce((verified, profile) => verified || profile.isVerified, false);

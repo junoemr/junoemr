@@ -143,7 +143,10 @@
 						<label>Fax:</label>
 						<input ng-model="settingsCtrl.pref.faxNumber" placeholder="Fax" class="form-control" type="text">
 					</div>
-
+					<div class="col-sm-12">
+						<h3>Other Settings</h3>
+						<hr>
+					</div>
 					<div class="form-group col-sm-6">
 						<label>Tickler Window Provider:</label>
 						<select ng-model="settingsCtrl.pref.ticklerWarningProvider" class="form-control" ng-options="p.providerNo as p.name for p in settingsCtrl.providerList">
@@ -190,6 +193,29 @@
 							</label>
 						</div>
 					</div>
+					<!-- Extra column intentionally left empty to make things line up -->
+					<div class="form-group col-sm-6"></div>
+					<div class="form-group col-sm-6">
+						<label>CareConnect PPN Check</label>
+						<div>
+							<label class="checkbox-inline" for="careconnect-ppn-enable-radio">
+								<input ng-model="settingsCtrl.pref.enableCareConnectPPNCheck"
+									   name="careconnect-view-disable"
+									   id="careconnect-ppn-enable-radio"
+									   ng-value="true"
+									   type="radio">
+								Check for PPN
+							</label>
+							<label class="checkbox-inline" for="careconnect-ppn-disable-radio">
+								<input ng-model="settingsCtrl.pref.enableCareConnectPPNCheck"
+									   name="careconnect-view-disable"
+									   id="careconnect-ppn-disable-radio"
+									   ng-value="false"
+									   type="radio">
+								Disable PPN Check
+							</label>
+						</div>
+					</div>
 				</div>
 			</div>
 			<!--  end row -->
@@ -228,7 +254,15 @@
 							ca-empty-option="true"
 					>
 					</ca-field-select>
-
+                    <ca-field-select
+                            class="col-sm-6"
+                            ca-name="settings-schedule-reasonOpts"
+                            ca-title="Display Appointment Reason"
+                            ca-template="label"
+                            ca-model="settingsCtrl.pref.appointmentReasonDisplayLevel"
+                            ca-options="settingsCtrl.appointmentReasonOptions"
+                    >
+                    </ca-field-select>
 					<div class="form-group col-sm-6">
 						<label>Length of patient name to display on appointment screen:</label>
 						<input ng-model="settingsCtrl.pref.patientNameLength" placeholder="Length" class="form-control" type="text">

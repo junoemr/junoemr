@@ -79,7 +79,7 @@ public class CoPDPreProcessorService
 	 * @param message the original message string
 	 * @return the formatted and fixed message string
 	 */
-	public String preProcessMessage(String message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	public String preProcessMessage(String message, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		Instant instant = Instant.now();
 
@@ -95,7 +95,7 @@ public class CoPDPreProcessorService
 		message = fixDateTimeNumbers(message);
 		instant = printDuration(instant, "fixDateTimeNumbers");
 
-		if(CoPDImportService.IMPORT_SOURCE.WOLF.equals(importSource))
+		if(ImporterExporterFactory.IMPORT_SOURCE.WOLF.equals(importSource))
 		{
 			message = formatWolfZPV5SegmentNames(message);
 			instant = printDuration(instant, "formatWolfZPV5SegmentNames");
@@ -112,7 +112,7 @@ public class CoPDPreProcessorService
 			message = fixBackTickBPMeasurements(message);
 			instant = printDuration(instant, "fixBackTickBPMeasurements");
 		}
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			message = fixTimestamps(message);
 			instant = printDuration(instant, "fixTimestamps");
@@ -121,7 +121,7 @@ public class CoPDPreProcessorService
 			instant = printDuration(instant, "fixTimestampsAttachments");
 		}
 
-		if (CoPDImportService.IMPORT_SOURCE.MEDACCESS.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDACCESS.equals(importSource))
 		{
 			message = formatMedAccessSegments(message);
 			instant = printDuration(instant, "formatMedAccessSegments");
@@ -143,6 +143,12 @@ public class CoPDPreProcessorService
 
 			message = fixReferralPractitionerNo(message);
 			instant = printDuration(instant, "fixReferralPractitionerNo");
+		}
+
+		if (ImporterExporterFactory.IMPORT_SOURCE.HEALTHQUEST.equals(importSource))
+		{
+			message = formatHealthQuestSegments(message);
+			instant = printDuration(instant, "formatHealthQuestSegments");
 		}
 
 		// should come last
@@ -696,6 +702,20 @@ public class CoPDPreProcessorService
 		message = message.replaceAll("&#x2022;", "");
 		message = message.replaceAll("&#xA0;", "");
 		message = message.replaceAll("&#13", "");
+
+		return message;
+	}
+
+	/**
+	 * Strips out <OBX.2/> from the message
+	 *
+	 * @param message message to clean
+	 * @return message stripped of problematic encoded segments
+	 */
+	private String formatHealthQuestSegments(String message)
+	{
+		// XML-encoded chars
+		message = message.replaceAll("<OBX.2/>", "");
 
 		return message;
 	}

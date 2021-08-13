@@ -67,6 +67,8 @@ public class HRMDemographicExportMapperTest
 		String expectedCountry = "CA";
 		String expectedPostal = "V8V0T0";
 
+		String expectedProvinceReturn = expectedCountry + "-" + expectedProvince;
+
 		Address address = new Address();
 		address.setAddressLine1(expectedAddressLine1);
 		address.setAddressLine2(expectedAddressLine2);
@@ -79,7 +81,7 @@ public class HRMDemographicExportMapperTest
 		assertEquals(expectedAddressLine1, resultAddress.getStructured().getLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getStructured().getLine2());
 		assertEquals(expectedCity, resultAddress.getStructured().getCity());
-		assertEquals(expectedProvince, resultAddress.getStructured().getCountrySubdivisionCode());
+		assertEquals(expectedProvinceReturn, resultAddress.getStructured().getCountrySubdivisionCode());
 		assertEquals(expectedPostal, resultAddress.getStructured().getPostalZipCode().getPostalCode());
 	}
 

@@ -62,8 +62,10 @@ import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
+import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
+import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -219,6 +221,8 @@ public class DemographicService extends AbstractServiceImpl {
 			}
 
 			DemographicTo1 result = demoConverter.getAsTransferObject(getLoggedInInfo(), demo);
+			AddressTo1 extraAddress = demographicManager.getExtraAddress(result);
+			result.setAddress2(extraAddress);
 
 			DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), id);
 			if (demoCust != null)
@@ -291,10 +295,22 @@ public class DemographicService extends AbstractServiceImpl {
 					{
 						Demographic contactD = demographicManager.getDemographic(getLoggedInInfo(), contactId);
 						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
-						if (demoContactTo1.getPhone() == null || demoContactTo1.getPhone().equals(""))
+
+						DemographicExt cell = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_CELL);
+						DemographicExt hPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_H_PHONE_EXT);
+						DemographicExt wPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_W_PHONE_EXT);
+
+						if (cell != null && !cell.toString().isEmpty())
 						{
-							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_CELL);
-							if (ext != null) demoContactTo1.setPhone(ext.getValue());
+							demoContactTo1.setCellPhone(cell.getValue());
+						}
+						if (hPhoneExt != null && !hPhoneExt.toString().isEmpty())
+						{
+							demoContactTo1.setHPhoneExt(hPhoneExt.getValue());
+						}
+						if (wPhoneExt != null && !wPhoneExt.toString().isEmpty())
+						{
+							demoContactTo1.setWPhoneExt(wPhoneExt.getValue());
 						}
 					}
 					else if (demoContact.getType() == DemographicContact.TYPE_CONTACT)
@@ -373,6 +389,12 @@ public class DemographicService extends AbstractServiceImpl {
 
 		try
 		{
+			if (data.getAddress2().getAddress() != null || data.getAddress2().getCity() != null ||
+					 data.getAddress2().getPostal() != null || data.getAddress2().getProvince() != null)
+			{
+				List<DemographicExtTo1> extraAddress = demographicManager.setExtraAddress(data);
+				data.setExtras(extraAddress);
+			}
 			//update demographiccust
 			if (data.getNurse() != null || data.getResident() != null || data.getAlert() != null || data.getMidwife() != null || data.getNotes() != null)
 			{

@@ -63,7 +63,7 @@ public class BillingPreferencesActionForm
 
   public ActionErrors validate(ActionMapping actionMapping,
                                HttpServletRequest httpServletRequest) {
-      /** @todo-legacy: finish this method, this is just the skeleton.*/
+      /** todo-legacy: finish this method, this is just the skeleton.*/
     return null;
   }
 

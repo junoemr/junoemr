@@ -114,7 +114,7 @@ public class PartialDate extends AbstractModel<Integer> implements Serializable 
 	public static final Integer PREVENTION_DATE = 1;
 
 	public static final Integer FIELD_CASEMGMT_NOTE_EXT_VALUE = 1;
-	
+
 	@Override
 	public Integer getId() {
 		return id;

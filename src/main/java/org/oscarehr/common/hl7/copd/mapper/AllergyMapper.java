@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
@@ -43,7 +43,7 @@ public class AllergyMapper extends AbstractMapper
 	private static final Logger logger = MiscUtils.getLogger();
 	public static final int ALLERGY_DESCRIPTION_LENGTH = 50;
 
-	public AllergyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public AllergyMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}

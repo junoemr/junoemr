@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.5</version>
+        <version>2.5.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.oscarehr</groupId>
@@ -61,6 +61,7 @@
 		<memcachedSessionManager.version>2.3.2</memcachedSessionManager.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<jaxbcore.version>2.3.0.1</jaxbcore.version>
+    <jackson.version>2.12.3</jackson.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -1243,23 +1244,23 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.10.2</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.10.2</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
-			<version>2.10.2</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<!-- json support for java 8 localDate -->
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.10.2</version>
+			<version>${jackson.version}</version>
 		</dependency>
         <dependency>
             <groupId>io.prometheus</groupId>
@@ -1359,7 +1360,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.16</version>
+			<version>1.18.20</version>
 		</dependency>
 		<!-- AQS -->
 		<dependency>
@@ -1386,6 +1387,14 @@
 			<artifactId>jedis</artifactId>
 			<version>2.9.0</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.xeustechnologies/jcl -->
+		<dependency>
+			<groupId>org.xeustechnologies</groupId>
+			<artifactId>jcl-core</artifactId>
+			<version>2.8</version>
+		</dependency>
+
 
 	</dependencies>
 
@@ -1629,7 +1638,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.3.1</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<archive>
@@ -1663,26 +1672,20 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
 <!--
-					<compilerArgs>
-						<arg>&#45;&#45;add-modules</arg>
-						<arg>java.se.ee</arg>
-						<arg>&#45;&#45;add-modules</arg>
-						<arg>jdk.xml.ws</arg>
-						<arg>&#45;&#45;add-modules</arg>
-						<arg>jdk.xml.bind</arg>
-					</compilerArgs>
+					<release>1.8</release>
 -->
-<!--
-					<compilerArguments>
-						<compilerArgument>&#45;&#45;add-modules</compilerArgument>
-						<compilerArgument>java.se.ee</compilerArgument>
-					</compilerArguments>
--->
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.20</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -1757,42 +1760,6 @@
 				</executions>
 				<version>2.10</version>
 			</plugin>
-
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <skipTests>false</skipTests>
-                            <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-                            <excludes>
-                                <exclude>**/SetupDatabase.java</exclude>
-                            </excludes>
-                            <includes>
-                                <include>integration/tests/*</include>
-                            </includes>
-                            <systemPropertyVariables>
-                                <oscar.skip.dbinit>true</oscar.skip.dbinit>
-                                <buildDirectory>${project.build.directory}</buildDirectory>
-                            </systemPropertyVariables>
-                        </configuration>
-                        &lt;!&ndash;
-                        <configuration>
-                            <includes>src/test/java/**/*</includes>
-                        </configuration>
-                        &ndash;&gt;
-                    </execution>
-                </executions>
-            </plugin>
--->
-
             <plugin>
 				<groupId>org.oscarehr</groupId>
 				<artifactId>oscar-il18n-check-plugin</artifactId>
@@ -1829,57 +1796,9 @@
 							<goal>native2ascii</goal>
 						</goals>
 						<configuration>
-<!--
-							<dest>src/main/resources</dest>
-							<src>src/main/resources/native-bundles</src>
-							<encoding>UTF8</encoding>
-							<include>uiResources_*.properties</include>
--->
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>io.leonard.maven.plugins</groupId>
-				<artifactId>jspc-maven-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>jspc</id>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<phase>process-classes</phase>
-						<configuration>
-							<excludes>
-								<!-- These should already be included by other jsp files -->
-								<exclude>**/*.jspf</exclude>
-							</excludes>
-							<threads>4</threads>
-							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
-							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.tomcat</groupId>
-						<artifactId>tomcat-jasper</artifactId>
-						<version>${tomcat.version}</version>
-						<exclusions>
-							<exclusion>
-								<groupId>org.eclipse.jdt.core.compiler</groupId>
-								<artifactId>ecj</artifactId>
-							</exclusion>
-						</exclusions>
-					</dependency>
-					<dependency>
-						<groupId>org.eclipse.jdt.core.compiler</groupId>
-						<artifactId>ecj</artifactId>
-						<version>4.6.1</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 
 			<!-- This plugin creates the openapi.json file for the internal REST api.  It is used -->
@@ -1921,6 +1840,7 @@
                                 org.oscarehr.ws.rest.RosterWebService
                                 org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
 								org.oscarehr.ws.rest.ProvidersService
+								org.oscarehr.ws.rest.ReferralDoctorsService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService
@@ -1928,12 +1848,16 @@
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessagesWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService
 								org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
+								org.oscarehr.ws.rest.myhealthaccess.IntegrationsWebService
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService
                                 org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
+								org.oscarehr.ws.rest.myhealthaccess.patient.AccessWebService
+								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
+								org.oscarehr.ws.rest.NotesService
 							</value>
 						</systemProperty>
 						<systemProperty>
@@ -2060,7 +1984,7 @@
 					</execution>
 					<execution>
 						<id>copy_web_xml_for_jsp_precompile</id>
-						<phase>process-classes</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
@@ -2148,6 +2072,49 @@
 					</execution>
 				</executions>
 			</plugin>
+
+      <!-- This has to run after webpack because webpack modifies some jsp files -->
+			<plugin>
+				<groupId>io.leonard.maven.plugins</groupId>
+				<artifactId>jspc-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>jspc</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<phase>process-classes</phase>
+						<configuration>
+							<excludes>
+								<!-- These should already be included by other jsp files -->
+								<exclude>**/*.jspf</exclude>
+							</excludes>
+							<threads>4</threads>
+							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
+							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.tomcat</groupId>
+						<artifactId>tomcat-jasper</artifactId>
+						<version>${tomcat.version}</version>
+						<exclusions>
+							<exclusion>
+								<groupId>org.eclipse.jdt.core.compiler</groupId>
+								<artifactId>ecj</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.jdt.core.compiler</groupId>
+						<artifactId>ecj</artifactId>
+						<version>4.6.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -2216,189 +2183,104 @@
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>1.6.0</version>
 				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-	<profiles>
-		<profile>
-			<id>jdk6</id>
-			<activation>
-				<jdk>1.6</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.oscarehr</groupId>
-					<artifactId>datasource-jdk6</artifactId>
-					<version>1.0</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.9</version>
-						<configuration>
-							<minmemory>128m</minmemory>
-							<maxmemory>1g</maxmemory>
-							<tags>
-								<tag>
-									<name>todo</name>
-									<placement>a</placement>
-									<head>To Do:</head>
-								</tag>
-							</tags>
-							<quiet>true</quiet>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>verify</phase>
-								<goals>
-									<goal>javadoc</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>jdk7</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-				<jdk>1.7</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.oscarehr</groupId>
-					<artifactId>datasource-jdk7</artifactId>
-					<version>1.0</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.9</version>
-						<configuration>
-							<minmemory>128m</minmemory>
-							<maxmemory>1g</maxmemory>
-							<tags>
-								<tag>
-									<name>todo</name>
-									<placement>a</placement>
-									<head>To Do:</head>
-								</tag>
-							</tags>
-							<quiet>true</quiet>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>verify</phase>
-								<goals>
-									<goal>javadoc</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>jdk8</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<jdk>1.8</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.oscarehr</groupId>
-					<artifactId>datasource-jdk7</artifactId>
-					<version>1.0</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.9</version>
-						<configuration>
-							<minmemory>128m</minmemory>
-							<maxmemory>1g</maxmemory>
-							<tags>
-								<tag>
-									<name>todo</name>
-									<placement>a</placement>
-									<head>To Do:</head>
-								</tag>
-							</tags>
-							<quiet>true</quiet>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>verify</phase>
-								<goals>
-									<goal>javadoc</goal>
-								</goals>
-								<configuration>
-									<additionalparam>-Xdoclint:none</additionalparam>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>jdk10</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<jdk>10</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.oscarehr</groupId>
-					<artifactId>datasource-jdk7</artifactId>
-					<version>1.0</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.9</version>
-						<configuration>
-							<minmemory>128m</minmemory>
-							<maxmemory>1g</maxmemory>
-							<tags>
-								<tag>
-									<name>todo</name>
-									<placement>a</placement>
-									<head>To Do:</head>
-								</tag>
-							</tags>
-							<quiet>true</quiet>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>verify</phase>
-								<goals>
-									<goal>javadoc</goal>
-								</goals>
-								<configuration>
-									<additionalparam>-Xdoclint:none</additionalparam>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<!-- run maven with -Dregenerate-source=true to re-generate files defined below -->
+          </plugins>
+        </pluginManagement>
+      </build>
+      <profiles>
+        <profile>
+          <id>jdk8</id>
+          <activation>
+            <activeByDefault>false</activeByDefault>
+            <jdk>1.8</jdk>
+          </activation>
+          <dependencies>
+            <dependency>
+              <groupId>org.oscarehr</groupId>
+              <artifactId>datasource-jdk7</artifactId>
+              <version>1.0</version>
+            </dependency>
+          </dependencies>
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                  <minmemory>128m</minmemory>
+                  <maxmemory>1g</maxmemory>
+                  <tags>
+                    <tag>
+                      <name>todo</name>
+                      <placement>a</placement>
+                      <head>To Do:</head>
+                    </tag>
+                  </tags>
+                  <quiet>true</quiet>
+                </configuration>
+                <executions>
+                  <execution>
+                    <phase>verify</phase>
+                    <goals>
+                      <goal>javadoc</goal>
+                    </goals>
+                    <configuration>
+                      <additionalparam>-Xdoclint:none</additionalparam>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
+            </plugins>
+          </build>
+        </profile>
+        <profile>
+          <id>jdk16</id>
+          <activation>
+            <activeByDefault>true</activeByDefault>
+            <jdk>16</jdk>
+          </activation>
+          <dependencies>
+            <dependency>
+              <groupId>org.oscarehr</groupId>
+              <artifactId>datasource-jdk7</artifactId>
+              <version>1.0</version>
+            </dependency>
+          </dependencies>
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                  <minmemory>128m</minmemory>
+                  <maxmemory>1g</maxmemory>
+                  <tags>
+                    <tag>
+                      <name>todo</name>
+                      <placement>a</placement>
+                      <head>To Do:</head>
+                    </tag>
+                  </tags>
+                  <quiet>true</quiet>
+                </configuration>
+                <executions>
+                  <execution>
+                    <phase>verify</phase>
+                    <goals>
+                      <goal>javadoc</goal>
+                    </goals>
+                    <configuration>
+                      <additionalOptions>-Xdoclint:none</additionalOptions>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
+            </plugins>
+          </build>
+        </profile>
+        <profile>
+          <!-- run maven with -Dregenerate-source=true to re-generate files defined below -->
 			<id>source-regeneration</id>
 			<activation>
 				<property>
@@ -2488,146 +2370,6 @@
 			</properties>
 			<build>
 				<plugins>
-					<!--
-					<plugin>
-						<groupId>org.apache.tomcat.maven</groupId>
-						<artifactId>tomcat7-maven-plugin</artifactId>
-						<version>2.2</version>
-						<executions>
-							<execution>
-								<id>tomcat7-run</id>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<phase>pre-integration-test</phase>
-								<configuration>
-									<port>9090</port>
-									<path>/</path>
-									<hostName>localhost</hostName>
-									<fork>true</fork>
-									<systemProperties>
-										<oscar.use.integration.prop.file>true</oscar.use.integration.prop.file>
-									</systemProperties>
-								</configuration>
-							</execution>
-							<execution>
-								<id>tomcat7-shutdown</id>
-								<goals>
-									<goal>shutdown</goal>
-								</goals>
-								<phase>post-integration-test</phase>
-								<configuration>
-									<path>/</path>
-								</configuration>
-							</execution>
-						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>org.apache.tomcat.embed</groupId>
-								<artifactId>tomcat-embed-core</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-util</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-coyote</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jdbc</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-dbcp</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-servlet-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jsp-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jasper</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jasper-el</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-el-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-catalina</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-tribes</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-catalina-ha</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-annotations-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-juli</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat.embed</groupId>
-								<artifactId>tomcat-embed-logging-juli</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat.embed</groupId>
-								<artifactId>tomcat-embed-logging-log4j</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-						</dependencies>
-					</plugin>
-					-->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>

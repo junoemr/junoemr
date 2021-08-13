@@ -31,8 +31,11 @@ import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -65,9 +68,7 @@ public class DemographicToDomainConverter extends AbstractModelConverter<Demogra
 		BeanUtils.copyProperties(transfer, demographic, ignoreProperties);
 
 		demographic.setDemographicId(transfer.getDemographicNo());
-		demographic.setDayOfBirth(transfer.getDobDay());
-		demographic.setMonthOfBirth(transfer.getDobMonth());
-		demographic.setYearOfBirth(transfer.getDobYear());
+		demographic.setDateOfBirth(ConversionUtils.toLocalDateTime(transfer.getDateOfBirth()).toLocalDate());
 		demographic.setReferralDoctor(transfer.getFamilyDoctor());
 		demographic.setFamilyDoctor(transfer.getFamilyDoctor2());
 		demographic.setHcEffectiveDate(transfer.getEffDate());
@@ -82,12 +83,14 @@ public class DemographicToDomainConverter extends AbstractModelConverter<Demogra
 				.stream()
 				.map(extra -> demographicExtConverter.getAsDomainObject(null, extra))
 				.collect(Collectors.toList());
+
+		Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtList);
 		// No idea why this has to be done, it's not translating properly
-		for (DemographicExt ext : demographicExtList)
+		for (DemographicExt ext : demographicExtSet)
 		{
 			ext.setDemographicNo(demographic.getDemographicId());
 		}
-		demographic.setDemographicExtList(demographicExtList);
+		demographic.setDemographicExtSet(demographicExtSet);
 
 		return demographic;
 	}

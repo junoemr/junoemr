@@ -91,7 +91,7 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 	/**
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
 	 * @param appendNamespace - if true append namespace to end of identifier
-	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
 	{
@@ -124,7 +124,7 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 	/**
 	 * return additional fields,
 	 * - Patient ID \w assigning authority - all values
-	 * @return list of pairs <title, value>
+	 * @return list of pairs &lt;title, value>
 	 */
 	@Override
 	public ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()
@@ -145,7 +145,7 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 
 	/**
 	 *  call getPatientIdentificationList default behavior of appending namespace
-	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList()
 	{

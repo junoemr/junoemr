@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.data.ProviderTestCollection.providerLNames;
@@ -75,8 +75,9 @@ public class DatabaseUtil
 			demo.setFirstName(patient.firstName);
 			demo.setLastName(patient.lastName);
 			demo.setSex(patient.sex);
+			demo.setHin(patient.hin);
 			demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
-			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new HashSet<DemographicExt>());
 		}
 	}
 	public void createTestProvider()

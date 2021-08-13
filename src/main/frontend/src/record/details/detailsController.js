@@ -48,6 +48,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'staticDataService',
 	'referralDoctorsService',
 	'user',
+	'uxService',
 
 	function(
 		$scope,
@@ -66,7 +67,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		securityService,
 		staticDataService,
 		referralDoctorsService,
-		user)
+		user,
+		uxService)
 	{
 
 		var controller = this;
@@ -98,10 +100,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
+		
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
-		controller.properties = $scope.$parent.recordCtrl.properties;
+		controller.rosteringModuleEnabled = false;
 		controller.displayMessages = messagesFactory.factory();
 		controller.validations = {};
 
@@ -132,18 +135,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					providersServiceApi.getBySecurityRole("midwife").then(
 						function success(results) {
 							controller.page.midwives = results.data.body;
-						}
-					);
-
-					// retrieve contact lists for demographic
-					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "personal").then(
-						function success(data) {
-							controller.page.demoContacts = demoContactShow(data);
-						}
-					);
-					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "professional").then(
-						function success(data) {
-							controller.page.demoContactPros = demoContactShow(data);
 						}
 					);
 
@@ -298,7 +289,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
 				}
 			);
-
+			
 			// show eligibility check button only if instance is BC OR (ON AND billing type CLINICAID)
 			systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
 					function success(result)
@@ -329,7 +320,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						console.error("Failed to fetch instance type with error: " + result);
 					}
 			);
-
+			
+			systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false).then((result) =>
+			{
+				controller.rosteringModuleEnabled = result.data.body;
+			});
 		};
 
 		controller.initDemographicVars = function initDemographicVars()
@@ -670,14 +665,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalComplete = function isPostalComplete()
+		controller.isPostalComplete = function isPostalComplete(postal, province)
 		{
-			var province = controller.page.demo.address.province;
-			var postal = controller.page.demo.address.postal;
 			// If Canadian province is selected, proceed with validation
-			if (postal !== null && province !== null && province !== "OT" && province.indexOf("US") !== 0)
+			if (postal && province && province !== "OT" && province.indexOf("US") !== 0)
 			{
-				if (controller.isPostalValid())
+				if (controller.isPostalValidCanadian(postal))
 				{
 					return true;
 				}
@@ -689,24 +682,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		};
 
-		controller.isPostalValid = function isPostalValid()
+		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
 		{
-			var postal = controller.page.demo.address.postal.replace(/\s/g, ""); // Trim whitespace
-
-			// If postal code is an empty string, set it to null and continue
-			if(postal.length === 0)
+			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]\d[A-Za-z]\d$/); // Match to Canadian postal code standard
+			if (regex.test(postalCode))
 			{
-				controller.page.demo.address.postal = null;
 				return true;
 			}
-
-			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/); // Match to Canadian postal code standard (minus the space)
-			if (regex.test(postal))
+			else
 			{
-				// Format postal code to Canadian standard
-				controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
-				return true;
-			}else {
 				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
 				return false;
 			}
@@ -805,21 +789,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			var url = "../casemgmt/uploadimage.jsp?demographicNo=" + controller.page.demo.demographicNo;
 			window.open(url, "uploadWin", "width=500, height=300");
-		};
-
-		//manage contacts
-		controller.manageContacts = function manageContacts()
-		{
-			var discard = true;
-			if (controller.page.dataChanged > 0)
-			{
-				discard = confirm("You may have unsaved data. Are you sure to leave?");
-			}
-			if (discard)
-			{
-				var url = "../demographic/Contact.do?method=manage&demographic_no=" + controller.page.demo.demographicNo;
-				window.open(url, "ManageContacts", "width=960, height=700");
-			}
 		};
 
 		//print buttons
@@ -1111,7 +1080,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				return;
 			}
 			if (!controller.checkPatientStatus()) return;
-			if (!controller.isPostalComplete()) return;
+			if (!controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province)) return;
+			if (!controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 
@@ -1184,6 +1154,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 			);
 		};
+
+
 
 		controller.resetEditState = function resetEditState()
 		{
@@ -1283,39 +1255,6 @@ function getPhoneNum(phone)
 		phone = phone.substring(0, phone.length - 1);
 	}
 	return phone;
-}
-
-function demoContactShow(demoContact)
-{
-	var contactShow = demoContact;
-	if (demoContact.role != null)
-	{ //only 1 entry
-		var tmp = {};
-		tmp.role = demoContact.role;
-		tmp.sdm = demoContact.sdm;
-		tmp.ec = demoContact.ec;
-		tmp.category = demoContact.category;
-		tmp.lastName = demoContact.lastName;
-		tmp.firstName = demoContact.firstName;
-		tmp.phone = demoContact.phone;
-		contactShow = [tmp];
-	}
-	for (var i = 0; i < contactShow.length; i++)
-	{
-		if (contactShow[i].sdm == true) contactShow[i].role += " /sdm";
-		if (contactShow[i].ec == true) contactShow[i].role += " /ec";
-		if (contactShow[i].role == null || contactShow[i].role == "") contactShow[i].role = "-";
-
-		if (contactShow[i].phone == null || contactShow[i].phone == "")
-		{
-			contactShow[i].phone = "-";
-		}
-		else if (contactShow[i].phone.charAt(contactShow[i].phone.length - 1) == "*")
-		{
-			contactShow[i].phone = contactShow[i].phone.substring(0, contactShow[i].phone.length - 1);
-		}
-	}
-	return contactShow;
 }
 
 function toArray(obj)

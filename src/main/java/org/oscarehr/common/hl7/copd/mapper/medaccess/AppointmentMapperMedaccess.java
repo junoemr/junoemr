@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.AppointmentStatus;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 
 import java.util.Arrays;
@@ -38,12 +38,12 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 {
 	public AppointmentMapperMedaccess(ZPD_ZTR message, CoPDRecordData recordData)
 	{
-		super(message, CoPDImportService.IMPORT_SOURCE.MEDACCESS, recordData);
+		super(message, ImporterExporterFactory.IMPORT_SOURCE.MEDACCESS, recordData);
 	}
 
 
 	@Override
-	public String getStatus(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public String getStatus(int rep, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		String apptStatus = getAppointmentStatusFromApptReason(rep);
 
@@ -64,8 +64,8 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 	}
 
 	/**
-	 * MedAccess SOMETIMES has a strange reason format. <???>:<appointment type>:<reason>
-	 * They've given us that as well as <appointment type>:<reason> so we have to check both.
+	 * MedAccess SOMETIMES has a strange reason format. &lt;???>:&lt;appointment type>:&lt;reason>
+	 * They've given us that as well as &lt;appointment type>:&lt;reason> so we have to check both.
 	 * @param rep - the appointment you want
 	 * @return - the appointment reason
 	 * @throws HL7Exception - if there is an error parsing the hl7
@@ -86,7 +86,7 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 	}
 
 	/**
-	 * MedAccess SOMETIMES has a strange type format. <???>:<appointment type>:<reason>
+	 * MedAccess SOMETIMES has a strange type format. &lt;???>:&lt;appointment type>:&lt;reason>
 	 * They've given us that as well as <appointment type>:<reason> so we have to check both.
 	 * get the appointment type from the beginning of the reason string
 	 * @param rep - the rep that you want the type for

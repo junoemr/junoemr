@@ -1,0 +1,79 @@
+.juno-code-input {
+	// customization variables
+	--input-font-size: 24px;
+	--overlay-color: var(--color-neutral-lightest);
+	--font-color: var(--color-neutral-dark-grey);
+
+	position: relative;
+	background-color: var(--color-neutral-white);
+
+	font-size: var(--input-font-size);
+	padding: 18px 0 18px 1ch;
+	margin: 8px 0;
+
+	> input {
+		padding: 0;
+		font-size: var(--input-font-size);
+		letter-spacing: 2.5ch;
+
+		color: var(--font-color);
+		background-color: transparent;
+		border: none;
+
+		&:focus {
+			outline: none;
+		}
+
+		&::selection {
+			background-color: transparent;
+		}
+	}
+
+	.hole-punch-overlay {
+		font-size: var(--input-font-size);
+
+		position: absolute;
+		top: 0;
+		left: -0.25ch;
+		right: 0;
+		bottom: 0;
+
+		pointer-events: none;
+
+		display: flex;
+		flex-direction: row;
+
+		> .punch-out {
+			position: relative;
+			background-color: transparent;
+
+			border-top: 0.1ch solid var(--overlay-color);
+			border-bottom: 0.1ch solid var(--overlay-color);
+			border-left: 0.3ch solid var(--overlay-color);
+			border-right: 0.3ch solid var(--overlay-color);
+
+			width: 3.5ch;
+
+			&:last-child {
+				width: 4.75ch;
+				border-right: 1.5ch solid var(--overlay-color);
+			}
+
+			> .inner-punch {
+				position: absolute;
+				inset: -8px;
+
+				border: 8px solid var(--overlay-color);
+				border-radius: 16px;
+
+				> .inner-border {
+					height: 100%;
+					width: 100%;
+
+					border: solid 1px var(--color-neutral-light-grey);
+					border-radius: 8px;
+				}
+			}
+		}
+	}
+}

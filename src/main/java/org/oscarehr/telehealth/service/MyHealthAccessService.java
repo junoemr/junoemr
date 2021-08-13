@@ -26,6 +26,7 @@ package org.oscarehr.telehealth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.integration.dao.UserIntegrationAccessDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.model.UserIntegrationAccess;
@@ -40,6 +41,7 @@ import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,6 +71,9 @@ public class MyHealthAccessService
 	@Autowired
 	@Qualifier("myHealthAppointmentService")
 	AppointmentService appointmentService;
+
+	@Autowired
+	UserIntegrationAccessDao userIntegrationAccessDao;
 
 	@Autowired
 	IntegrationPushUpdateService integrationPushUpdateService;
@@ -142,6 +147,37 @@ public class MyHealthAccessService
 		integrationData.setLoginToken(response.getToken());
 
 		return integrationData;
+	}
+
+	/**
+	 * create or get user remote integration data (user integration access) &amp; loginToken.
+	 * @param integrationData - integration to create the record in
+	 * @param loggedInUser - the logged in user who the account is for
+	 * @return existing or new integrationData depending on if the record already exists
+	 */
+	public IntegrationData createOrGetUserIntegrationData(IntegrationData integrationData, Security loggedInUser)
+	{
+		UserIntegrationAccess userAccess = userIntegrationAccessDao.findByIntegrationAndSecurity(integrationData.getIntegration(), loggedInUser);
+		IntegrationData newIntegrationData = new IntegrationData(integrationData.getIntegration());
+
+		if (userAccess != null)
+		{
+			newIntegrationData.setUserIntegrationAccess(userAccess);
+			newIntegrationData.setLoginToken(clinicService.clinicUserLogin(newIntegrationData).getToken());
+			return newIntegrationData;
+		}
+		else
+		{
+			ProviderData provider = providerDataDao.find(loggedInUser.getProviderNo());
+
+			ClinicUserCreateTo1 clinicUser = new ClinicUserCreateTo1(
+					Integer.toString(loggedInUser.getSecurityNo()),
+					provider.getFirstName(),
+					provider.getLastName()
+			);
+
+			return createClinicUser(newIntegrationData, loggedInUser, clinicUser);
+		}
 	}
 
 	public ClinicStatusResponseTo1 testConnection(Integration integration)

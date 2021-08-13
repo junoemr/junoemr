@@ -26,22 +26,20 @@
 package org.oscarehr.common.hl7.v2.oscar_to_oscar;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
+import org.xeustechnologies.jcl.JarClassLoader;
 
 public final class DynamicHapiLoaderUtils {
 
 	private static final Logger logger = MiscUtils.getLogger();
 
-	private static URLClassLoader hackedHapiClassLoader;
+	private static ClassLoader hackedHapiClassLoader;
 	private static Class<?> hackedPipedParserClass;
 	private static Method hackedParseMethod;
 	private static Object hackedPipedParserInstance;
@@ -71,7 +69,7 @@ public final class DynamicHapiLoaderUtils {
 	{
 		hackedHapiClassLoader=getHackedUrlClassLoader();
 
-		hackedPipedParserClass=hackedHapiClassLoader.loadClass("ca.uhn.hl7v2.parser.PipeParser");		
+		hackedPipedParserClass=hackedHapiClassLoader.loadClass("ca.uhn.hl7v2.parser.PipeParser");
 		hackedMessageClass=hackedHapiClassLoader.loadClass("ca.uhn.hl7v2.model.Message");
 		hackedSegmentClass=hackedHapiClassLoader.loadClass("ca.uhn.hl7v2.model.Segment");
 		hackedTerserClass=hackedHapiClassLoader.loadClass("ca.uhn.hl7v2.util.Terser");
@@ -91,28 +89,18 @@ public final class DynamicHapiLoaderUtils {
 		hackedTerserUtilsterser_getFinder_getRoot_getAllMethod=hackedTerserUtilsClass.getMethod("terser_getFinder_getRoot_getAll", hackedTerserClass, String.class);
 	}
 	
-	private static URLClassLoader getHackedUrlClassLoader()
+	private static ClassLoader getHackedUrlClassLoader() throws ClassNotFoundException
 	{
 		// HACKED_HAPI_51_JAR = "/hapi_libs/fork/hapi_51_fork.jar";
 
-		URL[] urls = new URL[2];
-		urls[0] = DynamicHapiLoaderUtils.class.getResource("/hapi_libs/fork/hacked_patched_hapi-0.5.1.jar");
-		urls[1] = DynamicHapiLoaderUtils.class.getResource("/hapi_libs/fork/commons-logging-1.1.1.jar");
-		
-		if (logger.isDebugEnabled()) {
-			try {
-				logger.debug("jar:hacked hapi, size: "+urls[0].openStream().available());
-			} catch (IOException e) {
-				logger.error("Unexpected Error", e);
-			}
-		}
-		
-		URLClassLoader classLoader = new URLClassLoader(urls, null);
-		return(classLoader);
+		JarClassLoader jarClassLoader = new JarClassLoader();
+		jarClassLoader.add(DynamicHapiLoaderUtils.class.getResourceAsStream("/hapi_libs/fork/hacked_patched_hapi-0.5.1.jar"));
+		jarClassLoader.add(DynamicHapiLoaderUtils.class.getResourceAsStream("/hapi_libs/fork/commons-logging-1.1.1.jar"));
+
+		return jarClassLoader;
 	}
-	
-	
-	private static void setNoValidate(URLClassLoader classLoader, Class<?> pipedParserClass, Object pipedParserInstance) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, SecurityException, NoSuchMethodException
+
+	private static void setNoValidate(ClassLoader classLoader, Class<?> pipedParserClass, Object pipedParserInstance) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, SecurityException, NoSuchMethodException
 	{
 		Class<?> noValidateClass=classLoader.loadClass("ca.uhn.hl7v2.validation.impl.NoValidation");
 		Object noValidateInstance=noValidateClass.newInstance();
@@ -124,7 +112,7 @@ public final class DynamicHapiLoaderUtils {
 	}
 	
 	public static Object parseMdsMsg(String hl7Text) throws IllegalAccessException, SecurityException, IllegalArgumentException, InvocationTargetException {
-		Object result=hackedParseMethod.invoke(hackedPipedParserInstance, hl7Text);
+		Object result = hackedParseMethod.invoke(hackedPipedParserInstance, hl7Text);
 		return(result);
 	}
 

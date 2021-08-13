@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.rx.model.Prescription;
@@ -35,6 +35,8 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.util.ConversionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +50,7 @@ public class MedicationMapper extends AbstractMapper
 
 	public static final int MEDICATION_DRUG_NAME_LENGTH = 60;
 
-	public MedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public MedicationMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}
@@ -484,7 +486,13 @@ public class MedicationMapper extends AbstractMapper
 				.getTq16_ServiceDuration().getCq1_Quantity().getValue());
 		if(durationUnitStr != null)
 		{
-			return Integer.parseInt(durationUnitStr);
+			BigDecimal durationPrecise = new BigDecimal(durationUnitStr);
+			int duration = Integer.parseInt(durationPrecise.setScale(0, RoundingMode.CEILING).toString());
+			if (durationPrecise.compareTo(new BigDecimal(duration)) != 0)
+			{
+				MiscUtils.getLogger().warn("Following duration unit is losing information when taking the ceiling and cast to integer: " + durationUnitStr);
+			}
+			return duration;
 		}
 		return 0;
 	}

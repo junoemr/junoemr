@@ -116,7 +116,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -128,17 +130,6 @@ public class CoPDImportService
 	private static final String IMPORT_PROVIDER = properties.getProperty("copd_import_service.system_provider_no", "999900");
 	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "CoPD-provider");
 	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "CoPD-missing");
-
-	@Deprecated // use the more generic ImporterExporterFactory instead
-	// this will be refactored out when topd is moved to the new system
-	public enum IMPORT_SOURCE
-	{
-		WOLF,
-		MEDIPLAN,
-		MEDACCESS,
-		ACCURO,
-		UNKNOWN
-	}
 
 	@Autowired
 	DemographicService demographicService;
@@ -216,8 +207,8 @@ public class CoPDImportService
 
 	private static final HashMap<String, ProviderData> providerLookupCache = new HashMap<>();
 
-	public void importFromHl7Message(String message, String documentLocation,
-	                                 IMPORT_SOURCE importSource,
+	public Demographic importFromHl7Message(String message, String documentLocation,
+	                                 ImporterExporterFactory.IMPORT_SOURCE importSource,
 	                                 CoPDRecordData recordData,
 	                                 boolean skipMissingDocs,
 	                                 boolean mergeDemographics)
@@ -241,16 +232,16 @@ public class CoPDImportService
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
 
 		missingDocumentCount = 0;
-		importRecordData(zpdZtrMessage, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
+		return importRecordData(zpdZtrMessage, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
 	}
 	public long getMissingDocumentCount()
 	{
 		return missingDocumentCount;
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage,
+	private Demographic importRecordData(ZPD_ZTR zpdZtrMessage,
 	                              String documentLocation,
-	                              IMPORT_SOURCE importSource,
+	                              ImporterExporterFactory.IMPORT_SOURCE importSource,
 	                              CoPDRecordData recordData,
 	                              boolean skipMissingDocs,
 	                              boolean mergeDemographics)
@@ -278,6 +269,7 @@ public class CoPDImportService
 			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource, recordData);
 			instant = printDuration(instant, "importAppointmentData");
 		}
+		return demographic;
 	}
 
 	/**
@@ -288,7 +280,7 @@ public class CoPDImportService
 	 * @throws HL7Exception
 	 */
 	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic,
-	                                        String documentLocation, IMPORT_SOURCE importSource,
+	                                        String documentLocation, ImporterExporterFactory.IMPORT_SOURCE importSource,
 	                                        CoPDRecordData recordData, boolean skipMissingDocs)
 			throws HL7Exception, IOException, InterruptedException
 	{
@@ -443,7 +435,7 @@ public class CoPDImportService
 		return provider;
 	}
 
-	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource, boolean mergeDemographics) throws HL7Exception
+	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, ImporterExporterFactory.IMPORT_SOURCE importSource, boolean mergeDemographics) throws HL7Exception
 	{
 		DemographicMapper demographicMapper = MapperFactory.newDemographicMapper(zpdZtrMessage, importSource);
 		Demographic demographic = demographicMapper.getDemographic();
@@ -474,14 +466,15 @@ public class CoPDImportService
 		{
 			DemographicCust demographicCust = demographicMapper.getDemographicCust();
 			List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
+			Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtList);
 
-			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtSet);
 		}
 		return demographic;
 	}
 
 	private void importMeasurements(ZPD_ZTR zpdZtrMessage, Demographic demographic, int provderRep, ProviderData assignedProvider,
-	                                IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
+	                                ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		MeasurementsMapper measurementsMapper = MapperFactory.newMeasurementsMapper(zpdZtrMessage, provderRep, importSource);
 
@@ -493,7 +486,8 @@ public class CoPDImportService
 		}
 	}
 
-	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider,
+	                                   ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		if(properties.isPropertyActive("multisites"))
 		{
@@ -525,7 +519,7 @@ public class CoPDImportService
 	}
 
 	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic,
-	                                  IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	                                  ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 			throws HL7Exception
 	{
 		MedicationMapper medicationMapper = MapperFactory.newMedicationMapper(zpdZtrMessage, providerRep, importSource, recordData);
@@ -546,7 +540,7 @@ public class CoPDImportService
 			drug.setProviderNo(String.valueOf(provider.getProviderNo()));
 			drug.setScriptNo(prescription.getId());
 
-			if (!medicationMapper.isDrugMostRecent(i) && importSource != IMPORT_SOURCE.WOLF)
+			if (!medicationMapper.isDrugMostRecent(i) && importSource != ImporterExporterFactory.IMPORT_SOURCE.WOLF)
 			{
 				drug.setArchived(true);
 				drug.setArchivedReason("represcribed");
@@ -591,7 +585,7 @@ public class CoPDImportService
 	{
 		//TODO - not implemented
 	}
-	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		PregnancyMapper pregnancyMapper = MapperFactory.newPregnancyMapper(zpdZtrMessage, providerRep, importSource);
 
@@ -612,7 +606,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		AllergyMapper allergyMapper = MapperFactory.newAllergyMapper(zpdZtrMessage, providerRep, importSource);
 
@@ -651,7 +645,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception, IOException
+	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception, IOException
 	{
 		LabMapper labMapper = MapperFactory.newLabMapper(zpdZtrMessage, providerRep, importSource);
 
@@ -690,7 +684,7 @@ public class CoPDImportService
 	}
 
 	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic,
-	                                String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	                                String documentLocation, ImporterExporterFactory.IMPORT_SOURCE importSource, boolean skipMissingDocs)
 			throws IOException, InterruptedException
 	{
 		DocumentMapper documentMapper = MapperFactory.newDocumentMapper(zpdZtrMessage, providerRep, importSource);
@@ -719,7 +713,7 @@ public class CoPDImportService
 				}
 			}
 
-			if(importSource.equals(IMPORT_SOURCE.WOLF) && documentFile instanceof XMLFile)
+			if(importSource.equals(ImporterExporterFactory.IMPORT_SOURCE.WOLF) && documentFile instanceof XMLFile)
 			{
 				/* Wolf has instructed us not to import the xml files they include.
 				 * The content of their internal wolf referral docs are also included as regular documents in the data.
@@ -740,7 +734,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importAlerts(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importAlerts(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		AlertMapper alertMapper = MapperFactory.newAlertMapper(zpdZtrMessage, providerRep, importSource);
 		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList())
@@ -752,7 +746,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importTicklers(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importTicklers(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		TicklerMapper ticklerMapper = MapperFactory.newTicklerMapper(zpdZtrMessage, providerRep, importSource);
 
@@ -773,7 +767,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
+	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		EncounterNoteMapper encounterNoteMapper = MapperFactory.newEncounterNoteMapper(zpdZtrMessage, providerRep, importSource);
 
@@ -824,7 +818,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importMessageData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importMessageData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		MessageMapper messageMapper = MapperFactory.newMessageMapper(zpdZtrMessage, providerRep, importSource);
 

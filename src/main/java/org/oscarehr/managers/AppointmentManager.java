@@ -57,7 +57,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/** use <org.oscarehr.appointment.service.Appointment> instead */
+/** use &lt;org.oscarehr.appointment.service.Appointment> instead */
 @Deprecated
 @Service
 @Transactional
@@ -401,18 +401,6 @@ public class AppointmentManager {
 //			appointmentArchiveDao.archiveAppointment(appt);
 //
 //			appt.setType(type);
-//		}
-//		appointmentDao.merge(appt);
-//		return appt;
-//	}
-//
-//	public Appointment updateAppointmentUrgency(LoggedInInfo loggedInInfo, int apptNo, String urgency) {
-//
-//		Appointment appt = appointmentDao.find(apptNo);
-//		if (appt != null) {
-//			appointmentArchiveDao.archiveAppointment(appt);
-//
-//			appt.setUrgency(urgency);
 //		}
 //		appointmentDao.merge(appt);
 //		return appt;
