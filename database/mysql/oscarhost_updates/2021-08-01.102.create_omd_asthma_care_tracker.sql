@@ -32,7 +32,7 @@ CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "ASWA", 
 CALL addCareTrackerItemRule(@care_tracker_name, "ASWA", @rule_name_problem_indicator_checked);
 CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "ANSY", "NUMERIC", "Frequency/Week", "frequency per week");
 CALL addCareTrackerItemRule(@care_tracker_name, "ANSY", @rule_name_value_over_0);
-CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "FEV1", "BOOLEAN", "90% personal or predicted best", "greater than 90 percent personal or predicted or personal best");
+CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "FEV1", "NUMERIC", "90% personal or predicted best", "greater than 90 percent personal or predicted or personal best");
 CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "AELV", "BOOLEAN", "Has", "Requiring clinical evaluations");
 CALL addCareTrackerItemRule(@care_tracker_name, "AELV", @rule_name_problem_indicator_checked);
 CALL addCareTrackerItem(@care_tracker_name, @group_name, "MEASUREMENT", "SPIR", "NUMERIC", "Spirometry", "Number >= 0");

@@ -64,6 +64,8 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				ctrl.isLoading = false;
 				ctrl.addToNoteOnSave = false;
 
+				ctrl.dataTrueValue = "Yes";
+				ctrl.dataFalseValue = "No";
 				ctrl.booleanInputOptions = [
 					{
 						label: "Skip",
@@ -97,7 +99,8 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					ctrl.newEntry = new CareTrackerItemDataModel();
 					ctrl.newEntry.observationDateTime = moment();
 					ctrl.preventionGivenCheck = false;
-					ctrl.booleanInputValue = null;
+					ctrl.booleanCheckYes = false;
+					ctrl.booleanCheckNo = false;
 					ctrl.dateValue = null;
 					ctrl.addToNoteOnSave = false;
 				}
@@ -155,9 +158,16 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					return ctrl.model.valueTypeIsNumeric();
 				}
 
-				ctrl.onToggleValueChange = (value: any, option: JunoSelectOption): void =>
+				ctrl.onBooleanValueYes = (value: boolean): void =>
 				{
-					ctrl.newEntry.value = value;
+					ctrl.booleanCheckNo = false;
+					ctrl.newEntry.value = value ? ctrl.dataTrueValue : null;
+				}
+
+				ctrl.onBooleanValueNo = (value: boolean): void =>
+				{
+					ctrl.booleanCheckYes = false;
+					ctrl.newEntry.value = value ? ctrl.dataFalseValue : null;
 				}
 
 				ctrl.onDateChangeValue = (value: Moment): void =>

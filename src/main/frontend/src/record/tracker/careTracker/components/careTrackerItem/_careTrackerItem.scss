@@ -13,6 +13,9 @@
 	.boolean-value-indicator {
 		margin: 0 8px;
 	}
+	.boolean-checks {
+		--juno-form-input-label-padding-left: 4px;
+	}
 	.item-description {
 		@include juno-font-body-smallest;
 		padding: 4px 16px;

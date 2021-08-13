@@ -56,13 +56,19 @@
 			                ng-model="$ctrl.preventionGivenCheck">
 			</juno-check-box>
 
-			<juno-radio-select ng-if="$ctrl.showValueBooleanInput()"
-			                   label="{{$ctrl.getInputLabel()}}"
-			                   options="$ctrl.booleanInputOptions"
-			                   radio-style="$ctrl.JUNO_RADIO_STYLE.CHECK"
-			                   ng-model="$ctrl.booleanInputValue"
-			                   change="$ctrl.onToggleValueChange(value, option)">
-			</juno-radio-select>
+			<div class="flex-row align-items-center flex-gap-16 boolean-checks" ng-if="$ctrl.showValueBooleanInput()">
+				<label class="m-b-0">{{$ctrl.getInputLabel()}}</label>
+				<div class="flex-row flex-gap-8">
+					<juno-check-box label="{{$ctrl.dataTrueValue}}"
+					                ng-model="$ctrl.booleanCheckYes"
+					                change="$ctrl.onBooleanValueYes(value)">
+					</juno-check-box>
+					<juno-check-box label="{{$ctrl.dataFalseValue}}"
+					                ng-model="$ctrl.booleanCheckNo"
+					                change="$ctrl.onBooleanValueNo(value)">
+					</juno-check-box>
+				</div>
+			</div>
 
 			<juno-input ng-if="$ctrl.showValueTextInput()"
 			            label="{{$ctrl.getInputLabel()}}"
