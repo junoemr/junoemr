@@ -50,7 +50,6 @@ CREATE TABLE IF NOT EXISTS care_tracker_item
     item_type_code  VARCHAR(255) NOT NULL,
     value_type      VARCHAR(255) NOT NULL,
     value_label     VARCHAR(255),
-    graphable       BOOLEAN NOT NULL DEFAULT false,
     guideline       TEXT,
     description     TEXT,
 

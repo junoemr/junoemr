@@ -34,7 +34,7 @@ AND f.id NOT IN (SELECT care_tracker_id FROM care_tracker_item_group);
 -- groups:
 
 -- text // STRING
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -43,7 +43,6 @@ SELECT
 	type.type,
 	"STRING",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -62,7 +61,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -71,7 +70,6 @@ SELECT
 	type.type,
 	"STRING",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -91,7 +89,7 @@ AND type.type NOT IN (
 );
 
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -100,7 +98,6 @@ SELECT
 	type.type,
 	"NUMERIC",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -119,7 +116,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -128,7 +125,6 @@ SELECT
 	type.type,
 	"NUMERIC",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -148,7 +144,7 @@ AND type.type NOT IN (
 );
 
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -157,7 +153,6 @@ SELECT
 	type.type,
 	"NUMERIC",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -176,7 +171,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -185,7 +180,6 @@ SELECT
 	type.type,
 	"NUMERIC",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -206,7 +200,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -215,7 +209,6 @@ SELECT
 	type.type,
 	"NUMERIC",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -234,7 +227,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -243,7 +236,6 @@ SELECT
 	type.type,
 	"NUMERIC",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -262,7 +254,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -271,7 +263,6 @@ SELECT
 	type.type,
 	"NUMERIC",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -292,7 +283,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -301,7 +292,6 @@ SELECT
 	type.type,
 	"BOOLEAN",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -333,7 +323,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -342,7 +332,6 @@ SELECT
 	type.type,
 	"BOOLEAN",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),
@@ -361,7 +350,7 @@ AND type.type NOT IN (
 	WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
 );
 
-INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
 SELECT
 	sheet.id,
 	item_group.id,
@@ -370,7 +359,6 @@ SELECT
 	type.type,
 	"DATE",
 	NULL,
-	0,
 	"Number >= 0" AS guideline,
 	type.typeDescription AS description,
 	NOW(),

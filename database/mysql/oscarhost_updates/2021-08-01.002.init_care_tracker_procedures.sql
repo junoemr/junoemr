@@ -105,11 +105,11 @@ END //
 
 
 CREATE PROCEDURE addCareTrackerItem(
-    IN in_care_tracker_name varchar(255), IN in_group_name varchar(255), IN in_item_type varchar(255), IN in_item_code varchar(255), IN in_value_type varchar(255), IN in_value_label varchar(255), IN in_graphable tinyint(1), IN in_guideline text)
+    IN in_care_tracker_name varchar(255), IN in_group_name varchar(255), IN in_item_type varchar(255), IN in_item_code varchar(255), IN in_value_type varchar(255), IN in_value_label varchar(255), IN in_guideline text)
     SQL SECURITY INVOKER
 BEGIN
     IF in_item_type = 'PREVENTION' THEN
-        INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+        INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
         SELECT
             sheet.id,
             item_group.id,
@@ -118,7 +118,6 @@ BEGIN
             in_item_code,
             in_value_type,
             in_value_label,
-            in_graphable,
             in_guideline AS guideline,
             NULL AS description,
             NOW() AS created_at,
@@ -135,7 +134,7 @@ BEGIN
             WHERE care_tracker_id=sheet.id AND care_tracker_item_group_id=item_group.id
         ) limit 1;
     ELSE
-        INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, graphable, guideline, description, created_at, created_by, updated_at, updated_by)
+        INSERT INTO `care_tracker_item`(care_tracker_id, care_tracker_item_group_id, item_name, item_type, item_type_code, value_type, value_label, guideline, description, created_at, created_by, updated_at, updated_by)
         SELECT
             sheet.id,
             item_group.id,
@@ -144,7 +143,6 @@ BEGIN
             type.type,
             in_value_type,
             in_value_label,
-            in_graphable,
             in_guideline AS guideline,
             type.typeDescription AS description,
             NOW() AS created_at,
