@@ -765,7 +765,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 					let newNoteValue;
 					// attempt to split the current note on the cursor position. the template will be inserted where the cursor is
-					if (currentNote && cursorIndex && currentNote.length > cursorIndex)
+					if (!Juno.Common.Util.isBlank(cursorIndex) && currentNote.length > cursorIndex)
 					{
 						newNoteValue = currentNote.substring(0, cursorIndex) + templateValue + currentNote.substring(cursorIndex);
 					}
