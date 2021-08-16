@@ -771,7 +771,7 @@ angular.module('Record').controller('Record.RecordController', [
 					}
 					else // append template to the end of the note normally
 					{
-						newNoteValue = currentNote + templateValue;
+						newNoteValue = (currentNote + "\n" + templateValue).trim();
 					}
 					controller.page.encounterNote.note = newNoteValue;
 
