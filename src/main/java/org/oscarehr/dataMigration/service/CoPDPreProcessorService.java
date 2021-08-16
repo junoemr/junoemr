@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 @Service
 public class CoPDPreProcessorService
 {
-	public static final String HL7_TIMESTAMP_BEGINNING_OF_TIME = "19700101";
+	public static final String DEFAULT_DATE = "19000101";
 	private static final Logger logger = MiscUtils.getLogger();
 
 	public boolean looksLikeCoPDFormat(GenericFile genericFile) throws IOException
@@ -270,7 +270,7 @@ public class CoPDPreProcessorService
 			Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
 			if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp))
 			{
-				return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				return DEFAULT_DATE;
 			}
 			else if (timeStampMatcher.find())
 			{// look for timestamps with bad hour.
@@ -305,7 +305,7 @@ public class CoPDPreProcessorService
 		{
 			if (timeStamp.contains("00000"))
 			{
-				return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				return DEFAULT_DATE;
 			}
 			return timeStamp;
 		};

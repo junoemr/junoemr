@@ -171,17 +171,12 @@ public class DemographicMapper extends AbstractMapper
 	}
 	public LocalDate getDOB() throws HL7Exception
 	{
-		String dateStr = messagePID.getDateTimeOfBirth().getTimeOfAnEvent().getValue();
-		if (dateStr == null)
-		{
-			logger.warn("Demographic has no date of birth. Replacing with default: " + DEFAULT_DATE);
-			dateStr = DEFAULT_DATE;
-		} 
+		String dateStr = StringUtils.trimToEmpty(messagePID.getDateTimeOfBirth().getTimeOfAnEvent().getValue());
 		if (dateStr.isEmpty() || "00000000".equals(dateStr))
 		{
-			logger.warn("Replacing empty DOB string with :" + CoPDPreProcessorService.HL7_TIMESTAMP_BEGINNING_OF_TIME +
+			logger.warn("Replacing empty DOB string with :" + CoPDPreProcessorService.DEFAULT_DATE +
 					" for demographic: " + getLastName(0) + "," + getFirstName(0));
-			dateStr = CoPDPreProcessorService.HL7_TIMESTAMP_BEGINNING_OF_TIME;
+			dateStr = CoPDPreProcessorService.DEFAULT_DATE;
 		}
 		return ConversionUtils.toLocalDate(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
 	}
