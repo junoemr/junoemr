@@ -26,8 +26,6 @@
 package org.oscarehr.ws.rest.to.model;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.io.Serializable;
 
 @Data
