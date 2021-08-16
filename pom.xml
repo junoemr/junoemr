@@ -61,7 +61,7 @@
 		<memcachedSessionManager.version>2.3.2</memcachedSessionManager.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<jaxbcore.version>2.3.0.1</jaxbcore.version>
-    <jackson.version>2.12.3</jackson.version>
+    	<jackson.version>2.12.3</jackson.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -1410,13 +1410,30 @@
 				<directory>${basedir}/src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
+			<resource>
+				<directory>${basedir}/database</directory>
+				<filtering>false</filtering>
+				<targetPath>create_instance/database</targetPath>
+			</resource>
+			<resource>
+				<directory>${basedir}/package_files</directory>
+				<filtering>false</filtering>
+				<targetPath>create_instance/package_files</targetPath>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<executable>true</executable>
+					<image>
+						<env>
+							<BP_JVM_VERSION>16.0.2</BP_JVM_VERSION>
+						</env>
+					</image>
+					<layers>
+						<enabled>true</enabled>
+					</layers>
 				</configuration>
 			</plugin>
 			<plugin>
