@@ -9,35 +9,15 @@
 
 package com.indivica.olis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
-
+import ca.ssha._2005.hial.ArrayOfError;
+import ca.ssha._2005.hial.ArrayOfString;
+import ca.ssha._2005.hial.Response;
+import ca.ssha.www._2005.hial.OLISStub;
+import ca.ssha.www._2005.hial.OLISStub.HIALRequest;
+import ca.ssha.www._2005.hial.OLISStub.HIALRequestSignedRequest;
+import ca.ssha.www._2005.hial.OLISStub.OLISRequest;
+import ca.ssha.www._2005.hial.OLISStub.OLISRequestResponse;
+import com.indivica.olis.queries.Query;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
@@ -57,27 +37,46 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.Store;
 import org.bouncycastle.util.encoders.Base64;
 import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.OscarLog;
+import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.olis.OLISProtocolSocketFactory;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.InputSource;
-
 import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
-import ca.ssha._2005.hial.ArrayOfError;
-import ca.ssha._2005.hial.ArrayOfString;
-import ca.ssha._2005.hial.Response;
-import ca.ssha.www._2005.hial.OLISStub;
-import ca.ssha.www._2005.hial.OLISStub.HIALRequest;
-import ca.ssha.www._2005.hial.OLISStub.HIALRequestSignedRequest;
-import ca.ssha.www._2005.hial.OLISStub.OLISRequest;
-import ca.ssha.www._2005.hial.OLISStub.OLISRequestResponse;
 
-import com.indivica.olis.queries.Query;
-import org.oscarehr.common.model.OscarMsgType;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Driver {
 
@@ -118,21 +117,33 @@ public class Driver {
 				logItem.setContent("query");
 				logItem.setData(olisHL7String);
 
-				LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-				if (loggedInInfo.getLoggedInProvider() != null) logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+				// TODO the request is always null right now
+				if(request != null)
+				{
+					LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+					if(loggedInInfo.getLoggedInProvider() != null) logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+				}
+				else
+				{
+					MiscUtils.getLogger().warn("unable to retrieve logged in info from empty request");
+				}
 
 				logDao.persist(logItem);
-
-			} catch (Exception e) {
+			}
+			catch(Exception e)
+			{
 				MiscUtils.getLogger().error("Couldn't write log message for OLIS query", e);
 			}
 
-			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes")) {
+			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
+			{
 				String response = (String) request.getSession().getAttribute("olisResponseContent");
 				request.setAttribute("olisResponseContent", response);
 				request.getSession().setAttribute("olisResponseContent", null);
 				return response;
-			} else {
+			}
+			else
+			{
 				OLISRequestResponse olisResponse = olis.oLISRequest(olisRequest);
 
 				String signedData = olisResponse.getHIALResponse().getSignedResponse().getSignedData();
@@ -154,14 +165,19 @@ public class Driver {
 				return unsignedData;
 
 			}
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			MiscUtils.getLogger().error("Can't perform OLIS query due to exception.", e);
-			if (request != null) {
-				request.setAttribute("searchException", e);
-			}
 
-			LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-			notifyOlisError(loggedInInfo.getLoggedInProvider(), e.getMessage());
+			// TODO the request is always null right now
+			if(request != null)
+			{
+				request.setAttribute("searchException", e);
+
+				LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+				notifyOlisError(loggedInInfo.getLoggedInProvider(), e.getMessage());
+			}
 			return "";
 		}
 	}
@@ -258,6 +274,7 @@ public class Driver {
 		PrivateKey priv = null;
 		KeyStore keystore = null;
 		String pwd = OscarProperties.getInstance().getProperty("olis_ssl_keystore_password","changeit");
+		String keystoreAlias = OscarProperties.getInstance().getProperty("olis_ssl_keystore_alias","olis");
 		String result = null;
 		try {
 			Security.addProvider(new BouncyCastleProvider());
@@ -266,11 +283,19 @@ public class Driver {
 			// Load the keystore
 			keystore.load(new FileInputStream(OscarProperties.getInstance().getProperty("olis_keystore")), pwd.toCharArray());
 
-			//Enumeration e = keystore.aliases();
-			String name = "olis";
+			Enumeration<String> e = keystore.aliases();
+
+			// print keystore aliases in debug mode.
+			if(MiscUtils.getLogger().isDebugEnabled())
+			{
+				while(e.hasMoreElements())
+				{
+					MiscUtils.getLogger().debug("keystore alis: " + e.nextElement());
+				}
+			}
 
 			// Get the private key and the certificate
-			priv = (PrivateKey) keystore.getKey(name, pwd.toCharArray());
+			priv = (PrivateKey) keystore.getKey(keystoreAlias, pwd.toCharArray());
 
 			FileInputStream is = new FileInputStream(OscarProperties.getInstance().getProperty("olis_returned_cert"));
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -403,14 +428,16 @@ public class Driver {
 		messageData.sendMessage2(message, "OLIS Retrieval Error", "System", sentToString, "-1", sendToProviderListData, null, null, OscarMsgType.GENERAL_TYPE);
 	}
 
-	static void writeToFile(String data) {
-		try {
-			File tempFile = new File(System.getProperty("java.io.tmpdir") + (Math.random() * 100) + ".xml");
-			PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
-			pw.println(data);
-			pw.flush();
-			pw.close();
-		} catch (Exception e) {
+	static void writeToFile(String data)
+	{
+		try
+		{
+			InputStream inputStream = new ByteArrayInputStream(data.getBytes());
+			GenericFile tempFile = FileFactory.createTempFile(inputStream, "_olis_response.xml");
+			//TODO where to keep these files?
+		}
+		catch(Exception e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 	}

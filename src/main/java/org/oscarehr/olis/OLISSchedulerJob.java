@@ -8,29 +8,30 @@
  */
 package org.oscarehr.olis;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimerTask;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * A job can start many tasks
  * 
  * @author Indivica
  */
-public class OLISSchedulerJob extends TimerTask {
+@Service
+public class OLISSchedulerJob {
 
 	private static final Logger logger = MiscUtils.getLogger();
+	private static final int DEFAULT_POLLING_FREQUENCY = 60; // minutes
 
-	@Override
 	public void run() {
 		try {
 			logger.info("starting OLIS poller job");
@@ -61,7 +62,12 @@ public class OLISSchedulerJob extends TimerTask {
 
 			if (olisPrefs.getLastRun() != null) {
 				// check to see if we are past last run + frequency interval
-				int freqMins = olisPrefs.getPollFrequency();
+				Integer freqMins = olisPrefs.getPollFrequency();
+				if(freqMins == null)
+				{
+					freqMins = DEFAULT_POLLING_FREQUENCY;
+				}
+
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(olisPrefs.getLastRun());
 				cal.add(Calendar.MINUTE, freqMins);

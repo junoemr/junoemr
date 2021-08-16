@@ -24,18 +24,22 @@
 package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.olis.OLISSchedulerJob;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.Scheduled;
 import oscar.OscarProperties;
 
 @Configuration
 @Conditional(OlisModuleConfig.Condition.class)
-@ImportResource({"classpath*:applicationContextOLIS.xml"})
 public class OlisModuleConfig
 {
 	private static final Logger logger = MiscUtils.getLogger();
+
+	@Autowired
+	protected OLISSchedulerJob olisSchedulerJob;
 
 	public OlisModuleConfig()
 	{
@@ -48,5 +52,12 @@ public class OlisModuleConfig
 		{
 			return OscarProperties.Module.MODULE_OLIS;
 		}
+	}
+
+	@Scheduled(fixedDelayString = "${omd.olis.poll_interval_sec}000")
+	public void pullOLISReports()
+	{
+		logger.info("Initialize OLIS scheduler job");
+		olisSchedulerJob.run();
 	}
 }
