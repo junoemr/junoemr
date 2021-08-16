@@ -68,13 +68,6 @@
 								Tracker
 							</a>
 						</li>
-<%--						<li ng-if="summaryCtrl.showSummaryPrintButton()" class="pull-right">--%>
-<%--							<button class="btn btn-sm btn-primary"--%>
-<%--									ng-click="summaryCtrl.showPrintModal()">--%>
-<%--								<span class="fa fa-print"></span>--%>
-<%--								Print--%>
-<%--							</button>--%>
-<%--						</li>--%>
 					</ul>
 					<div ng-if="summaryCtrl.showSummaryPrintButton()" class="print-button-wrapper">
 						<button class="btn btn-sm btn-primary"
