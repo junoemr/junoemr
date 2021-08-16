@@ -25,13 +25,9 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.service.CaseManagementIssueService;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.ContactDao;
-import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.dao.WaitingListDao;
 import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
@@ -53,8 +49,6 @@ import org.oscarehr.ws.conversion.DemographicToDomainConverter;
 import org.oscarehr.ws.conversion.DemographicToTransferConverter;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
-import org.oscarehr.ws.rest.conversion.DemographicContactFewToContactDomainConverter;
-import org.oscarehr.ws.rest.conversion.DemographicContactFewToDomainConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -107,30 +101,12 @@ public class DemographicService extends AbstractServiceImpl {
 
 	@Autowired
 	private DemographicManager demographicManager;
-
-	@Autowired
-	private DemographicContactDao demographicContactDao;
-	
-	@Autowired
-	private ContactDao contactDao;
-
-	@Autowired
-	private DemographicContactFewToContactDomainConverter demographicContactToDomainConverter;
-
-	@Autowired
-	private DemographicContactFewToDomainConverter demoContactToDomainConverter;
 	
 	@Autowired
 	private WaitingListDao waitingListDao;
 	
 	@Autowired
 	private WaitingListNameDao waitingListNameDao;
-	
-	@Autowired
-	private ProviderDao providerDao;
-	
-	@Autowired
-	private ProfessionalSpecialistDao specialistDao;
 
 	@Autowired
 	private RecentDemographicAccessService recentDemographicAccessService;

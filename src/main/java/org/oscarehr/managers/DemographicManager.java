@@ -64,7 +64,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
-import org.oscarehr.ws.rest.conversion.DemographicContactFewToContactDomainConverter;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
@@ -194,9 +193,6 @@ public class DemographicManager {
 
 	@Autowired
 	private ProviderDao providerDao;
-
-	@Autowired
-	DemographicContactFewToContactDomainConverter contactToDomainConverter;
 
 	@Autowired
 	DemographicContactFewConverter demoContactFewConverter;
