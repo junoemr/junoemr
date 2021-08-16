@@ -184,6 +184,15 @@ public class SoapLogBuilder
         return logEntry;
     }
 
+    /**
+     * Determine the time needed to process the request in milliseconds
+     *
+     * @return elapsed time in ms
+     */
+    public long calculateElapsedTimeMilliSeconds()
+    {
+        return new Date().getTime() - this.createdAt.getTime();
+    }
 
     /**
      * Generate a String which contains the data posted to the Soap service, transformed by applying all relevant
@@ -214,16 +223,6 @@ public class SoapLogBuilder
             MiscUtils.getLogger().error("Error while sanitizing post data: " + e.getMessage(), e);
             return "Error while sanitizing post data: " + e.getMessage();
         }
-    }
-
-    /**
-     * Determine the time needed to process the request in milliseconds
-     *
-     * @return elapsed time in ms
-     */
-    private long calculateElapsedTimeMilliSeconds()
-    {
-        return new Date().getTime() - this.createdAt.getTime();
     }
 
     /**

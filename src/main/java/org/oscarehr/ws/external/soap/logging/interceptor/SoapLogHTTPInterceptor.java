@@ -32,7 +32,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
+import org.oscarehr.metrics.prometheus.service.SystemMetricsService;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.external.soap.logging.SoapLogBuilder;
 import oscar.log.LogAction;
 
@@ -139,6 +141,11 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
 
         if (logData != null)
         {
+            // record request timing metrics
+            SystemMetricsService userMetricsService = SpringUtils.getBean(SystemMetricsService.class);
+            userMetricsService.recordSoapApiRequestLatency(logData.calculateElapsedTimeMilliSeconds());
+
+            // log soap request
             logData.addErrorData(ex);
             LogAction.saveSoapLogEntry(logData.buildSoapLog());
         }

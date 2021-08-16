@@ -37,8 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
@@ -132,6 +133,8 @@ public class DemographicModelToDbConverter
 			}
 		}
 
+		Set<DemographicExt> demographicExtSet = new HashSet<>();
+
 		// phone conversions
 		PhoneNumber homePhone = input.getHomePhone();
 		if(homePhone != null)
@@ -142,7 +145,7 @@ public class DemographicModelToDbConverter
 			if(extension != null)
 			{
 				DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_H_PHONE_EXT, extension);
-				demographicExtList.add(ext);
+				demographicExtSet.add(ext);
 			}
 		}
 
@@ -155,7 +158,7 @@ public class DemographicModelToDbConverter
 			if(extension != null)
 			{
 				DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_W_PHONE_EXT, extension);
-				demographicExtList.add(ext);
+				demographicExtSet.add(ext);
 			}
 		}
 
@@ -163,9 +166,9 @@ public class DemographicModelToDbConverter
 		if(cellPhone != null)
 		{
 			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
-			demographicExtList.add(ext);
+			demographicExtSet.add(ext);
 		}
-		dbDemographic.setDemographicExtList(demographicExtList);
+		dbDemographic.setDemographicExtSet(demographicExtSet);
 
 		DemographicCust demographicCust = new DemographicCust();
 		demographicCust.setParsedNotes(input.getPatientNote());

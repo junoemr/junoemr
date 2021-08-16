@@ -117,7 +117,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 @Service
@@ -466,8 +468,9 @@ public class CoPDImportService
 		{
 			DemographicCust demographicCust = demographicMapper.getDemographicCust();
 			List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
+			Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtList);
 
-			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtSet);
 		}
 		return demographic;
 	}
