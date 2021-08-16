@@ -102,7 +102,7 @@ public class DemographicModelToDbConverter
 		dbDemographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(input.getPatientStatusDate()));
 		dbDemographic.setLastUpdateUser(SYSTEM_PROVIDER_NO);
 
-		List<DemographicExt> demographicExtList = new ArrayList<>();
+		Set<DemographicExt> demographicExtSet = new HashSet<>();
 
 		List<Address> addressList = input.getAddressList();
 		for(Address address : addressList)
@@ -126,14 +126,12 @@ public class DemographicModelToDbConverter
 						DemographicExt.ALTERNATE_PROVINCE, getProvinceCode(address.getRegionCode(), address.getCountryCode()));
 				DemographicExt altPostal = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
 						DemographicExt.ALTERNATE_POSTAL, address.getPostalCode());
-				demographicExtList.add(altAddress);
-				demographicExtList.add(altCity);
-				demographicExtList.add(altProvince);
-				demographicExtList.add(altPostal);
+				demographicExtSet.add(altAddress);
+				demographicExtSet.add(altCity);
+				demographicExtSet.add(altProvince);
+				demographicExtSet.add(altPostal);
 			}
 		}
-
-		Set<DemographicExt> demographicExtSet = new HashSet<>();
 
 		// phone conversions
 		PhoneNumber homePhone = input.getHomePhone();
