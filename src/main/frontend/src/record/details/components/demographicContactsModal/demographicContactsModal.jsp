@@ -199,6 +199,7 @@
 			<juno-button
 					click="$ctrl.edit()"
 					title="{{$ctrl.title}}"
+					ng-if="!$ctrl.editable"
 					button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 				Edit

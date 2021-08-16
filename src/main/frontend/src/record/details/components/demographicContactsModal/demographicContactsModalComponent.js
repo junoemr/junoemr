@@ -77,7 +77,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                         ctrl.contactType = ctrl.typesText.INTERNAL_TEXT;
                         break;
                     case ctrl.types.EXTERNAL:
-                        ctrl.title = NO_EDIT_TITLE;
+                        ctrl.title = EDIT_TITLE;
                         ctrl.contactType = ctrl.typesText.EXTERNAL_TEXT;
                         break;
                     case ctrl.types.PROVIDER:

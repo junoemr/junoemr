@@ -61,9 +61,11 @@
 	  } else {
 		  contacts = ContactAction.searchContacts(search_mode, orderBy, keyword);
 	  }
+	  List<String> existingContacts =  ContactAction.getDemographicContacts(request.getParameter("demoNo"));
+	  pageContext.setAttribute("existingContacts", existingContacts);
 	   
 	  nItems = contacts.size();
-	  pageContext.setAttribute("contacts",contacts);
+	  pageContext.setAttribute("contacts", contacts);
 	}
 	
 	
@@ -85,7 +87,14 @@
 		  document.forms[0].submit.value="Search";
 		  return true;
 		}
-		function selectResult(data1,data2) {
+		function selectResult(data1, data2, existingContacts) {
+		    if (existingContacts.includes(data1))
+		    {
+		        //put an alert here to prevent adding the existing contact
+				alert(data2  + " is already recorded as a Contact.");
+		        return;
+		    }
+
 			try {
 				serializePopupData(data1, data2);
 			} catch(error) {
@@ -150,6 +159,8 @@
 	<c:forEach var="contact" items="${ contacts }" varStatus="i">
 		<%
 			Contact contact = (Contact)pageContext.getAttribute("contact");
+			List<String> existingContacts = (List<String>)pageContext.getAttribute("existingContacts");
+			///put an array of the existing contact id's here.
 			javax.servlet.jsp.jstl.core.LoopTagStatus i = (javax.servlet.jsp.jstl.core.LoopTagStatus) pageContext.getAttribute("i");
 			String bgColor = i.getIndex()%2==0?"#EEEEFF":"ivory";	
 			
@@ -162,7 +173,7 @@
 		<tr bgcolor="<%=bgColor%>"
 			onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';"
 			onMouseout="this.style.backgroundColor='<%=bgColor%>';"
-			onClick="selectResult('<%=contact.getId()%>', '<%=StringEscapeUtils.escapeEcmaScript(contactFullName)%>');">
+			onClick="selectResult('<%=contact.getId()%>', '<%=StringEscapeUtils.escapeEcmaScript(contactFullName)%>', '<%=existingContacts%>');">
 			<td><c:out value="${contact.lastName}"/></td>
 			<td><c:out value="${contact.firstName}"/></td>
 			<td><c:out value="${contact.residencePhone}" default=""/></td>

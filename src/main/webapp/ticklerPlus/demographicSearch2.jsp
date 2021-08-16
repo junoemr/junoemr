@@ -1,4 +1,5 @@
-<%--
+<%@ page import="org.oscarehr.common.web.ContactAction" %>
+<%@ page import="java.util.List" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -51,6 +52,7 @@
 	String elementName=request.getParameter("elementName");
 	String elementId=request.getParameter("elementId");
 	formName=(formName!=null)?formName:"ticklerForm";
+	List<String> existingContacts =  ContactAction.getDemographicContacts(request.getParameter("demoNo"));
 	elementName=(elementName!=null)?elementName:"filter.demographic_webName";
 	elementId=(elementId!=null)?elementId:"filter.demographic_no";
 %>
@@ -112,6 +114,7 @@
 	<INPUT TYPE="hidden" NAME="formName" VALUE="<%=formName %>" />
 	<INPUT TYPE="hidden" NAME="elementName" VALUE="<%=elementName %>" />
 	<INPUT TYPE="hidden" NAME="elementId" VALUE="<%=elementId %>" />
+	<INPUT TYPE="hidden" NAME="existingContacts" VALUE="<%=existingContacts%>" />
 
 	</form>
 </table>

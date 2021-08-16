@@ -100,6 +100,25 @@
 		margin-top: 32px;
 	}
 }
+.special-indent {
+	font-family: Hindie, sans-serif;
+	margin-left: 18px !important;
+}
+
+.special-indent-extra {
+	margin-left: 22px !important;
+}
+
+.special-indent-extra2 {
+	margin-left: 22px !important;
+	margin-bottom: 16px;
+	font-size: 12px;
+}
+
+.manage-button-wrapper {
+	width: 60px;
+	float: right;
+}
 
 @media (max-width: 768px) {
 	#save-button-top {

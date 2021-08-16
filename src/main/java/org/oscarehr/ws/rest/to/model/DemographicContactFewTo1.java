@@ -26,6 +26,7 @@
 package org.oscarehr.ws.rest.to.model;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -35,7 +36,7 @@ public class DemographicContactFewTo1 implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private String role;
-	private Boolean consentToContact;
+	private boolean consentToContact;
 	private String sdm;
 	private String ec;
 	private String category;

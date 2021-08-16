@@ -25,16 +25,6 @@
 
 package org.oscarehr.common.web;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -61,9 +51,17 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
-
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 public class ContactAction extends DispatchAction {
 
@@ -149,7 +147,7 @@ public class ContactAction extends DispatchAction {
     	if( "ajax".equalsIgnoreCase( postMethod ) ) {
     		forward = postMethod;
     	}
-    	
+
     	for(int x=1;x<=maxContact;x++) {
     		String id = request.getParameter("contact_"+x+".id");
     		if(id != null) {
@@ -196,7 +194,7 @@ public class ContactAction extends DispatchAction {
     			} else {
     				c.setActive(false);
     			}
-    			
+
     			if(c.getId() == null) {
     				demographicContactDao.persist(c);
     			} else {
@@ -224,7 +222,7 @@ public class ContactAction extends DispatchAction {
 		        			c.setSdm("");
 		        			c.setEc("");
 		        			c.setCreator(loggedInInfo.getLoggedInProviderNo());
-		        			
+
 		        			if(c.getId() == null)
 		        				demographicContactDao.persist(c);
 		        			else
@@ -369,7 +367,7 @@ public class ContactAction extends DispatchAction {
 			arrayListIds.add(removeSingleId);
 		}
     	
-		if( proContactIds != null || contactIds != null ) {
+		if( proContactIds != null && !proContactIds.equals("")|| contactIds != null && !contactIds.equals("")) {
 
 			if(proContactIds != null) {
 				arrayListIds.addAll(Arrays.asList( proContactIds ) );
@@ -653,6 +651,16 @@ public class ContactAction extends DispatchAction {
 	public static List<DemographicContact> getDemographicContacts(Demographic demographic) {
 		List<DemographicContact> contacts = demographicContactDao.findByDemographicNo(demographic.getDemographicNo());	
 		return fillContactNames(contacts);
+	}
+
+	public static List<String> getDemographicContacts(String demographicNo) {
+		List<DemographicContact> contacts = demographicContactDao.findByDemographicNo(Integer.parseInt(demographicNo));
+		List<String> demographicContactIds = new ArrayList<String>();
+		for (DemographicContact existingContactId: contacts)
+		{
+				demographicContactIds.add(existingContactId.getContactId());
+		}
+		return demographicContactIds;
 	}
 
 	public static List<DemographicContact> fillContactNames(List<DemographicContact> contacts) {

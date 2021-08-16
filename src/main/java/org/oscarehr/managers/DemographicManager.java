@@ -345,62 +345,63 @@ public class DemographicManager {
 		List<DemographicContact> demographicContacts =  demographicContactDao.findByDemographicNoAndCategory(demographicId, categoryType);
 
 		for (DemographicContact demographicContact : demographicContacts)
+		{
+			Integer contactId = Integer.valueOf(demographicContact.getContactId());
+			DemographicContactFewTo1 demographicContactFewTo1 = new DemographicContactFewTo1();
+
+			if (demographicContact.getCategory().equals(DemographicContact.CATEGORY_PERSONAL))
 			{
-				Integer contactId = Integer.valueOf(demographicContact.getContactId());
-				DemographicContactFewTo1 demographicContactFewTo1 = new DemographicContactFewTo1();
-
-				if (demographicContact.getCategory().equals(DemographicContact.CATEGORY_PERSONAL))
+				if (demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
 				{
-					if (demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
-					{
-						Demographic contactD = this.getDemographic(loggedInInfo, contactId);
-						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactD);
+					Demographic contactD = this.getDemographic(loggedInInfo, contactId);
+					demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactD);
 
-						DemographicExt cell = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_CELL);
-						DemographicExt hPhoneExt = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_H_PHONE_EXT);
-						DemographicExt wPhoneExt = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_W_PHONE_EXT);
+					DemographicExt cell = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_CELL);
+					DemographicExt hPhoneExt = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_H_PHONE_EXT);
+					DemographicExt wPhoneExt = this.getDemographicExt(loggedInInfo, contactId, DemographicExt.KEY_DEMO_W_PHONE_EXT);
 
-						if (cell != null && !cell.toString().isEmpty())
-						{
-							demographicContactFewTo1.setCellPhone(cell.getValue());
-						}
-						if (hPhoneExt != null && !hPhoneExt.toString().isEmpty())
-						{
-							demographicContactFewTo1.setHPhoneExt(hPhoneExt.getValue());
-						}
-						if (wPhoneExt != null && !wPhoneExt.toString().isEmpty())
-						{
-							demographicContactFewTo1.setWPhoneExt(wPhoneExt.getValue());
-						}
-					}
-					else if (demographicContact.getType() == DemographicContact.TYPE_CONTACT)
+					if (cell != null && !cell.toString().isEmpty())
 					{
-						Contact contactC = contactDao.findActiveContactById(contactId);
-						if (contactC != null)
-						{
-							demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactC);
-						}
+						demographicContactFewTo1.setCellPhone(cell.getValue());
 					}
-					if(demographicContactFewTo1.getContactId() != null)
+					if (hPhoneExt != null && !hPhoneExt.toString().isEmpty())
 					{
-						results.add(demographicContactFewTo1);
+						demographicContactFewTo1.setHPhoneExt(hPhoneExt.getValue());
+					}
+					if (wPhoneExt != null && !wPhoneExt.toString().isEmpty())
+					{
+						demographicContactFewTo1.setWPhoneExt(wPhoneExt.getValue());
 					}
 				}
-				else if (demographicContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
+				else if (demographicContact.getType() == DemographicContact.TYPE_CONTACT)
 				{
-					if (demographicContact.getType() == DemographicContact.TYPE_PROVIDER)
+					Contact contactC = contactDao.findActiveContactById(contactId);
+					if (contactC != null)
 					{
-						Provider contactP = providerDao.getProvider(contactId.toString());
-						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactP);
+						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactC);
 					}
-					else if (demographicContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST)
-					{
-						ProfessionalSpecialist contactS = specialistDao.find(contactId);
-						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactS);
-					}
+				}
+
+				if(demographicContactFewTo1.getContactId() != null)
+				{
 					results.add(demographicContactFewTo1);
 				}
 			}
+			else if (demographicContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
+			{
+				if (demographicContact.getType() == DemographicContact.TYPE_PROVIDER)
+				{
+					Provider contactP = providerDao.getProvider(contactId.toString());
+					demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactP);
+				}
+				else if (demographicContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST)
+				{
+					ProfessionalSpecialist contactS = specialistDao.find(contactId);
+					demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactS);
+				}
+				results.add(demographicContactFewTo1);
+			}
+		}
 		return results;
 	}
 
@@ -438,7 +439,7 @@ public class DemographicManager {
 		DemographicContact demographicContact = demographicContactDao.find(demographicId, contactId, demographicContactFewTo1.getCategory());
 
 		demographicContact.setRole(demographicContactFewTo1.getRole());
-		demographicContact.setConsentToContact(demographicContactFewTo1.getConsentToContact());
+		demographicContact.setConsentToContact(demographicContactFewTo1.isConsentToContact());
 
 		return (DemographicContact) demographicContactDao.merge(demographicContact);
 	}

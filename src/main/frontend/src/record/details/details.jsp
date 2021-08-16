@@ -198,14 +198,16 @@
 				<div class="col-md-12">
 					<h3 class="form-heading">
 						<bean:message key="web.record.details.proContacts"/>
+						<div class="manage-button-wrapper">
 						<button type="button" class="btn btn-primary pull-right"  ng-click="detailsCtrl.manageContacts()">
 							<bean:message key="web.record.details.manage"/>
 						</button>
+						</div>
 					</h3>
 					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContactPros">
-						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
-						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
-						<div class="col-md-5">{{dc.phone}}</div>
+						<div class="col-md-12 special-indent" style="font-weight:bold">{{dc.role}}</div>
+						<div class="col-md-7 special-indent-extra" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
+						<div class="col-md-7 special-indent-extra2">Work Phone: {{dc.workPhone}}</div>
 					</div>
 				</div>
 

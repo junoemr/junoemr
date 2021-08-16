@@ -57,15 +57,23 @@ public class ContactDao extends AbstractDao<Contact> {
 		List<String> paramList = new ArrayList<String>();
 	    
 		if(searchMode.equals("search_name")) {
-			String[] temp = keyword.split("\\,\\p{Space}*");
-			if(temp.length>1) {
-		      where.append("c.lastName like ?1 and c.firstName like ?2 and c.deleted=false");
-		      paramList.add(temp[0]+"%");
-		      paramList.add(temp[1]+"%");
-		    } else {
-		      where.append("c.lastName like ?1 and c.deleted=false");
-		      paramList.add(temp[0]+"%");
-		    }
+			if (keyword == null)
+			{
+				where.append("c.deleted=false");
+			}
+			else
+			{
+				String[] temp = keyword.split("\\,\\p{Space}*");
+				if(temp.length>1) {
+					where.append("c.lastName like ?1 and c.firstName like ?2 and c.deleted=false");
+					paramList.add(temp[0]+"%");
+					paramList.add(temp[1]+"%");
+				} else {
+					where.append("c.lastName like ?1 and c.deleted=false");
+					paramList.add(temp[0]+"%");
+				}
+			}
+
 		}else {		
 			where.append("c." + StringEscapeUtils.escapeSql(searchMode) + " like ?1 and c.deleted=false");
 			paramList.add(keyword+"%");
