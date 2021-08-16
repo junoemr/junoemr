@@ -44,7 +44,6 @@ public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
 	private final String DEMO_NULL_NAME = "NULL_NAME";
-	private final String DEFAULT_DATE = "19000101";
 
 	public DemographicMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
