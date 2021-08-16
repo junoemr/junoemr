@@ -93,7 +93,6 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
 		controller.page.isNoteSaved = false; // Track save state of note TODO-legacy: Potentially add this to the encounterNote object on the backend
-		controller.page.editingNoteCursorIndex = null;
 
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
@@ -682,12 +681,6 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		controller.onTextAreaChange = () =>
-		{
-			controller.updateCursorLocation();
-			controller.setEditingNoteFlag();
-		}
-
 		controller.setEditingNoteFlag = function setEditingNoteFlag()
 		{
 			if (controller.page.encounterNote.uuid == null) return;
@@ -768,7 +761,7 @@ angular.module('Record').controller('Record.RecordController', [
 				{
 					const templateValue = results.templates[0].encounterTemplateValue;
 					const currentNote = controller.page.encounterNote.note;
-					const cursorIndex = controller.page.editingNoteCursorIndex;
+					const cursorIndex = controller.encounterNoteTextAreaRef.prop("selectionStart");
 
 					let newNoteValue;
 					// attempt to split the current note on the cursor position. the template will be inserted where the cursor is
@@ -924,10 +917,6 @@ angular.module('Record').controller('Record.RecordController', [
 			};
 		};
 
-		controller.updateCursorLocation = () =>
-		{
-			controller.page.editingNoteCursorIndex = controller.encounterNoteTextAreaRef.prop("selectionStart");
-		}
 
 		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 		controller.init();

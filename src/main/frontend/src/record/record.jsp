@@ -256,9 +256,7 @@
 						          ng-model="recordCtrl.page.encounterNote.note"
 						          ng-disabled="recordCtrl.page.cannotChange"
 						          id="noteEditor{{recordCtrl.demographicNo}}"
-						          ng-click="recordCtrl.updateCursorLocation()"
-						          ng-keyup="recordCtrl.updateCursorLocation()"
-						          ng-change="recordCtrl.onTextAreaChange()">
+						          ng-change="recordCtrl.setEditingNoteFlag()">
 						</textarea>
 					</div>
 
