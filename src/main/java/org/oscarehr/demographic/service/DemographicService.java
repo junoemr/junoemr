@@ -60,7 +60,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service("demographic.service.DemographicService")
 @Transactional
@@ -113,10 +115,11 @@ public class DemographicService
 	public DemographicTransferOutbound getDemographicTransferOutbound(Integer demographicNo)
 	{
 		Demographic demographic = demographicDao.find(demographicNo);
-		List<DemographicExt> demoExtras = demographic.getDemographicExtList();
+		Set<DemographicExt> demoExtras = demographic.getDemographicExtSet();
+		List<DemographicExt> demographicExtList = new ArrayList<>(demoExtras);
 		DemographicCust demoCustom = demographic.getDemographicCust();
 
-		return DemographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
+		return DemographicConverter.getAsTransferObject(demographic, demographicExtList, demoCustom);
 	}
 
 	public SEARCH_MODE searchModeStringToEnum(String searchMode)
@@ -341,20 +344,21 @@ public class DemographicService
 		Demographic demographic = DemographicConverter.getAsDomainObject(demographicTransferInbound);
 		DemographicCust demoCustom = DemographicConverter.getCustom(demographicTransferInbound);
 		List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTransferInbound);
+		Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtensions);
 
-		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
+		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
 	}
 	public Demographic addNewDemographicRecord(String providerNoStr, org.oscarehr.dataMigration.model.demographic.Demographic demographicModel)
 	{
 		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
-		List<DemographicExt> demographicExtensions = demographic.getDemographicExtList();
+		Set<DemographicExt> demographicExtSet = demographic.getDemographicExtSet();
 		DemographicCust demoCustom = demographic.getDemographicCust();
 
-		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
+		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
 	}
 
 	public Demographic addNewDemographicRecord(String providerNoStr, Demographic demographic,
-	                                    DemographicCust demoCustom, List<DemographicExt> demographicExtensions)
+	                                    DemographicCust demoCustom, Set<DemographicExt> demographicExtensions)
 	{
 		// save the base demographic object
 		addNewDemographicRecord(providerNoStr, demographic);
