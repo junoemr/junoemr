@@ -1,5 +1,11 @@
 .health-tracker-component {
+	position: relative;
+
 	.options-button-wrapper {
+		position: absolute;
+		top: 0;
+		right: 0;
+
 		i {
 			font-size: 24px;
 		}

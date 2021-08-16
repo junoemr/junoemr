@@ -22,23 +22,18 @@
 --%>
 
 <div class="health-tracker-component">
-    <div ng-if="!$ctrl.embeddedView"
-         class="flex-row justify-content-between align-items-center no-print">
-        <h1>Patient Health Tracker</h1>
-
-        <div class="flex-row">
-            <div class="options-button-wrapper">
-                <juno-button component-style="$ctrl.componentStyle"
-                             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-                             disabled="$ctrl.isLoading"
-                             click="$ctrl.onManageCareTrackers()">
-                    <div class="flex-row align-items-center">
-                        <i class="icon icon-gears"></i>
-                        <span>Manage Health Tracker</span>
-                    </div>
-                </juno-button>
-            </div>
+    <div ng-if="!$ctrl.embeddedView" class="flex-row justify-content-end">
+        <div class="options-button-wrapper">
+            <juno-button component-style="$ctrl.componentStyle"
+                         button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                         button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+                         disabled="$ctrl.isLoading"
+                         click="$ctrl.onManageCareTrackers()">
+                <div class="flex-row align-items-center">
+                    <i class="icon icon-gears"></i>
+                    <span>Manage Health Tracker</span>
+                </div>
+            </juno-button>
         </div>
     </div>
 
