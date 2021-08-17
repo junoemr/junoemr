@@ -8,6 +8,45 @@
 		color: $color-primary-base;
 	}
 
+	.body {
+		max-width: 900px;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: space-between;
+		align-items: center;
+
+		label {
+			text-align: right;
+			margin-left: 24px;
+			width: 108px;
+		}
+		.juno-input {
+			margin-top: 8px;
+			width: $field-width;
+		}
+		.juno-select {
+			margin-top: 8px;
+			width: $field-width;
+		}
+		.juno-date-select {
+			margin-top: 8px;
+			width: $field-width;
+		}
+		.juno-typeahead {
+			margin-top: 8px;
+			width: $field-width;
+		}
+		.mha-patient-connection {
+				margin-top: 8px;
+				width: $field-width;
+		}
+
+		.juno-button,
+		.juno-check-box {
+			margin-top: 8px;
+		}
+	}
+
 	.fields {
 		display: flex;
 		flex-wrap: wrap;
@@ -34,7 +73,7 @@
 				margin-top: 8px;
 				width: $field-width;
 			}
-			.mha-patient-connection,
+
 			.juno-button,
 			.juno-check-box {
 				margin-top: 8px;

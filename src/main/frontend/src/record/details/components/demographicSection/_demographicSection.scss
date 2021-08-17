@@ -1,53 +1,7 @@
 .demographic-details-section.demographic-section  {
 
-	.body {
-    	display: flex;
-    	flex-flow: row wrap;
-
-		label {
-			text-align: right;
-			margin-left: 24px;
-			width: 108px;
-		}
-		.justify-content-space-between {
-			margin-left: 68px;
-		}
-
-		.juno-input {
-			margin-top: 8px;
-			width: 420px;
-			text-align: left;
-		}
-
-		.juno-typeahead {
-			margin-top: 8px;
-			width: 420px;
-			text-align: left;
-		}
-		.juno-select {
-			margin-top: 8px;
-			width: 420px;
-			text-align: left;
-		}
-
-		juno-date-select {
-			margin-top: 8px;
-			width: 420px;
-			text-align: left
-		}
-
-		.juno-button {
-			margin-top: 8px;
-			width: 420px;
-			text-align: left;
-		}
-  }
-
 	.connected-sites {
 		display: flex;
-		justify-content: space-evenly;
-		margin-top: 8px;
-		width: 420px;
 		.juno-input {
 			width: 384px;
 		}

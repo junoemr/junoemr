@@ -4,7 +4,6 @@
 	</h4>
 
 	<div class="body">
-		<!--<div class="column">-->
 			<juno-input ng-model="$ctrl.ngModel.lastName"
 			            class = "extra-indent"
 							label="Last Name"
@@ -92,7 +91,7 @@
 			</juno-input>
 
 			<mha-patient-connection demographic="$ctrl.ngModel"
-			                        class = "extra-indent"
+
 			                        component-style="$ctrl.componentStyle"
 			                        on-site-list-change="$ctrl.onMHASiteListChange(sites)">
 			</mha-patient-connection>

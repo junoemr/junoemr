@@ -1,9 +1,9 @@
 .demographic-details-section.contact-section{
-	.fields {
-		.column {
+	.body {
 			.mobile-phone {
 				display: flex;
 				align-items: center;
+				width: 420px;
 
 				.juno-input {
 					width: 376px;
@@ -13,23 +13,11 @@
 				}
 			}
 
-			.e-messaging-consent {
-				display: flex;
-				align-items: center;
-
-				.juno-select {
-					width: 256px;
-				}
-
-				.consent-date {
-					margin-left: 8px;
-					margin-top: 8px;
-				}
-			}
-
 			.phone-with-ext {
 				display: flex;
+				flex-direction: row;
 				align-items: center;
+
 
 				.juno-input {
 					width: 248px;
@@ -44,6 +32,7 @@
 
 						label {
 							min-width: 32px;
+
 						}
 					}
 				}
@@ -51,6 +40,19 @@
 					margin-left: 8px;
 				}
 			}
-		}
+			.e-messaging-consent {
+				display: flex;
+				align-items: center;
+				width: 420px;
+
+				.juno-select {
+					width: 256px;
+				}
+
+				.consent-date {
+					margin-left: 8px;
+					margin-top: 8px;
+				}
+			}
 	}
 }
