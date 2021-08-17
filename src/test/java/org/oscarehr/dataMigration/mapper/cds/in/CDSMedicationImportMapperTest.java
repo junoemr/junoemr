@@ -312,6 +312,24 @@ public class CDSMedicationImportMapperTest
 	}
 
 	@Test
+	public void testgetDosageMinMax_emptyString()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "";
+		String[] expected = {"", ""};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_dashOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "-";
+		String[] expected = {};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
 	public void testgetDosageMinMax_null()
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
