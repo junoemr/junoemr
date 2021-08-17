@@ -89,7 +89,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
 
             ctrl.openContacts = function (demoContact)
             {
-                $uibModal.open(
+                ctrl.dialog = $uibModal.open(
                     {
                         component: 'demographicContactsModal',
                         backdrop: 'static',
@@ -99,6 +99,25 @@ angular.module('Record.Details').component('demographicContactsSection', {
                             demographic: () => ctrl.thisDemo,
                         }
                     });
+
+                ctrl.dialog.result.then(
+                    function onClose(updatedContact)
+                    {
+                        let i;
+                        for (i = 0; i < ctrl.demoContacts.length; i++)
+                        {
+                            if (ctrl.demoContacts[i].contactId === updatedContact.data.body.contactId)
+                            {
+                                ctrl.demoContacts[i] = updatedContact.data.body;
+                            }
+                        }
+                        ctrl.dialog = null;
+                    },
+                    function onDismiss()
+                    {
+                        ctrl.dialog = null;
+                    }
+                );
             };
 
             ctrl.manageContacts = function manageContacts()

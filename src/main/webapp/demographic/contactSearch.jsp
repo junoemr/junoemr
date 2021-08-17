@@ -61,8 +61,11 @@
 	  } else {
 		  contacts = ContactAction.searchContacts(search_mode, orderBy, keyword);
 	  }
-	  List<String> existingContacts =  ContactAction.getDemographicContacts(request.getParameter("demoNo"));
-	  pageContext.setAttribute("existingContacts", existingContacts);
+	  if (request.getParameter("demoNo") != null)
+	  {
+		  List<String> existingContacts =  ContactAction.getDemographicContactIds(request.getParameter("demoNo"));
+		  pageContext.setAttribute("existingContacts", existingContacts);
+	  }
 	   
 	  nItems = contacts.size();
 	  pageContext.setAttribute("contacts", contacts);
@@ -90,7 +93,6 @@
 		function selectResult(data1, data2, existingContacts) {
 		    if (existingContacts.includes(data1))
 		    {
-		        //put an alert here to prevent adding the existing contact
 				alert(data2  + " is already recorded as a Contact.");
 		        return;
 		    }
@@ -160,7 +162,7 @@
 		<%
 			Contact contact = (Contact)pageContext.getAttribute("contact");
 			List<String> existingContacts = (List<String>)pageContext.getAttribute("existingContacts");
-			///put an array of the existing contact id's here.
+
 			javax.servlet.jsp.jstl.core.LoopTagStatus i = (javax.servlet.jsp.jstl.core.LoopTagStatus) pageContext.getAttribute("i");
 			String bgColor = i.getIndex()%2==0?"#EEEEFF":"ivory";	
 			

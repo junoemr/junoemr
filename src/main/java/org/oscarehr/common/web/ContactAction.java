@@ -139,6 +139,7 @@ public class ContactAction extends DispatchAction {
     	int maxContact = Integer.parseInt(request.getParameter("contact_num"));
     	String forward = "windowClose";
     	String postMethod = request.getParameter("postMethod");
+    	List<String> existingContacts = getDemographicContactIds(String.valueOf(demographicNo));
    	
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "w", String.valueOf(demographicNo))) {
         	throw new SecurityException("missing required security object (_demographic)");
@@ -160,10 +161,13 @@ public class ContactAction extends DispatchAction {
     			if(id.length()>0 && Integer.parseInt(id)>0) {
     				c = demographicContactDao.find(Integer.parseInt(id));
     			}
-
+    			if (existingContacts.contains(c.getContactId()))
+				{
+					throw new IllegalStateException("Duplicate Contact");
+				}
 				c.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
     			c.setRole(request.getParameter("contact_"+x+".role"));
-    			
+
     			if (request.getParameter("contact_"+x+".type") != null) {
     			    c.setType(Integer.parseInt(request.getParameter("contact_"+x+".type")));
     			}
@@ -182,13 +186,13 @@ public class ContactAction extends DispatchAction {
     			}
     			c.setFacilityId(loggedInInfo.getCurrentFacility().getId());
     			c.setCreator(loggedInInfo.getLoggedInProviderNo());
-    			
+
     			if(request.getParameter("contact_"+x+".consentToContact").equals("1")) {
     				c.setConsentToContact(true);
     			} else {
     				c.setConsentToContact(false);
     			}
-    			
+
     			if(request.getParameter("contact_"+x+".active").equals("1")) {
     				c.setActive(true);
     			} else {
@@ -653,7 +657,7 @@ public class ContactAction extends DispatchAction {
 		return fillContactNames(contacts);
 	}
 
-	public static List<String> getDemographicContacts(String demographicNo) {
+	public static List<String> getDemographicContactIds(String demographicNo) {
 		List<DemographicContact> contacts = demographicContactDao.findByDemographicNo(Integer.parseInt(demographicNo));
 		List<String> demographicContactIds = new ArrayList<String>();
 		for (DemographicContact existingContactId: contacts)

@@ -66,7 +66,8 @@ angular.module('Record.Details').component('demographicContactsModal', {
             ctrl.$onInit = () =>
             {
                 ctrl.dataChanged = false;
-                ctrl.contact = ctrl.resolve.demoContact;
+                ctrl.contact = angular.copy(ctrl.resolve.demoContact);
+                ctrl.contactOnStart = ctrl.resolve.demoContact;
                 ctrl.demographic = ctrl.resolve.demographic;
                 ctrl.editable = false;
 
@@ -90,9 +91,9 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 }
             };
 
-            ctrl.onCancel = () =>
+            ctrl.onCancel = (data) =>
             {
-                ctrl.modalInstance.close();
+                ctrl.modalInstance.close(data);
             };
 
             ctrl.edit = () =>
@@ -127,7 +128,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 ctrl.saving = true;
                 demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact.contactId, ctrl.contact).then(
                     (data) => {
-                        ctrl.onCancel();
+                        ctrl.onCancel(data);
                     },
                     () => {
                         Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not update contacts');

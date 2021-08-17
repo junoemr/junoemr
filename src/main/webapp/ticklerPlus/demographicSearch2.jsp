@@ -52,7 +52,7 @@
 	String elementName=request.getParameter("elementName");
 	String elementId=request.getParameter("elementId");
 	formName=(formName!=null)?formName:"ticklerForm";
-	List<String> existingContacts =  ContactAction.getDemographicContacts(request.getParameter("demoNo"));
+	List<String> existingContacts =  ContactAction.getDemographicContactIds(request.getParameter("demoNo"));
 	elementName=(elementName!=null)?elementName:"filter.demographic_webName";
 	elementId=(elementId!=null)?elementId:"filter.demographic_no";
 %>
