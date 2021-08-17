@@ -751,29 +751,39 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		controller.insertTemplate = function insertTemplate(item, model, label)
+		controller.insertTemplate = async function insertTemplate(item, model, label)
 		{
-			
-			uxService.getTemplate(
+			try
 			{
-				name: model
-			}).then(
-				function success(results)
-				{
-					if (results.templates !== null)
-					{
-						var template = results.templates[0];
-						controller.page.encounterNote.note = controller.page.encounterNote.note + template.encounterTemplateValue;
-						controller.options = {
-							magicVal: ''
-						};
-					}
+				const results = await uxService.getTemplate({name: model});
 
-				},
-				function error(errors)
+				if (results.templates !== null)
 				{
-					console.log(errors);
-				});
+					const templateValue = results.templates[0].encounterTemplateValue;
+					const currentNote = controller.page.encounterNote.note;
+					const cursorIndex = controller.encounterNoteTextAreaRef.prop("selectionStart");
+
+					let newNoteValue;
+					// attempt to split the current note on the cursor position. the template will be inserted where the cursor is
+					if (!Juno.Common.Util.isBlank(cursorIndex) && currentNote.length > cursorIndex)
+					{
+						newNoteValue = currentNote.substring(0, cursorIndex) + templateValue + currentNote.substring(cursorIndex);
+					}
+					else // append template to the end of the note normally
+					{
+						newNoteValue = (currentNote + "\n" + templateValue).trim();
+					}
+					controller.page.encounterNote.note = newNoteValue;
+
+					controller.options = {
+						magicVal: ''
+					};
+				}
+			}
+			catch(errors)
+			{
+				console.error(errors);
+			}
 		};
 
 		controller.displayWarning = function displayWarning(noteToEdit)
@@ -906,6 +916,7 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
+
 
 		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 		controller.init();
