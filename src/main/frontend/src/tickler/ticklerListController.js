@@ -1,3 +1,5 @@
+import {TicklerAttachmentType} from "../lib/tickler/model/TicklerAttachmentType";
+
 angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 	'$scope',
@@ -246,7 +248,11 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				templateUrl: 'src/tickler/ticklerAdd.jsp',
 				controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
 				backdrop: 'static',
-				size: 'lg'
+				size: 'lg',
+				resolve: {
+					attachment: () => null,
+					presetDemographicNo: () => null,
+				}
 			});
 
 			modalInstance.result.then(function(data)
@@ -377,29 +383,37 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.getLinkUrl = function getLinkUrl(input)
 		{
-            if (input !== null && input.id !== null)
-            {
-                var url = "";
-
-                if (input.tableName === 'CML')
-                {
-                    url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
-                }
-                else if (input.tableName === 'MDS')
-                {
-                    url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
-                }
-                else if (input.tableName === 'HL7')
-                {
-                    url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
-                }
-                else if (input.tableName === 'DOC')
-                {
-                    url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
-                }
-                return url;
-            }
-
+			if (input !== null && input.id !== null)
+			{
+				var url = "";
+				if (input.tableName === TicklerAttachmentType.Cml)
+				{
+					url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Mds)
+				{
+					url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Hl7)
+				{
+					url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Doc)
+				{
+					url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Message)
+				{
+					const meta = JSON.parse(input.meta);
+					url = $state.href("messaging.view.message", {
+						messageId: input.tableId,
+						backend: meta.messagingBackend,
+						source: meta.source,
+						group: meta.group,
+					});
+				}
+				return url;
+			}
 		};
 		controller.inDemographicView = function()
 		{
