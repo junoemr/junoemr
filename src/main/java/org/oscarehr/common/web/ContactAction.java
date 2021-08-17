@@ -655,8 +655,8 @@ public class ContactAction extends DispatchAction {
 		return fillContactNames(contacts);
 	}
 
-	public static List<DemographicContact> fillContactNames(List<DemographicContact> contacts) {
-
+	public static List<DemographicContact> fillContactNames(List<DemographicContact> contacts)
+	{
 		Provider provider;
 		Contact contact; 
 		ProfessionalSpecialist professionalSpecialist;
@@ -664,47 +664,59 @@ public class ContactAction extends DispatchAction {
 		String providerFormattedName = ""; 
 		String role = "";
 		
-		for( DemographicContact c : contacts ) {
-			role = c.getRole();
-			if( StringUtils.isNumeric( c.getRole() ) && ! role.isEmpty() ) {
-				specialty = contactSpecialtyDao.find( Integer.parseInt( c.getRole().trim() ) );
-				c.setRole( specialty.getSpecialty() );
+		for (DemographicContact demographicContact : contacts)
+		{
+			role = demographicContact.getRole();
+			if (StringUtils.isNumeric(role) && !role.isEmpty())
+			{
+				specialty = contactSpecialtyDao.find(Integer.parseInt(role.trim()));
+
+				if (specialty != null)
+				{
+					demographicContact.setRole(specialty.getSpecialty());
+				}
 			}
 
-			if( c.getType() == DemographicContact.TYPE_DEMOGRAPHIC ) {
-				c.setContactName(demographicDao.getClientByDemographicNo( Integer.parseInt( c.getContactId() ) ).getFormattedName() );
-			}
-			
-			if( c.getType() == DemographicContact.TYPE_PROVIDER ) {
-				provider = providerDao.getProvider( c.getContactId() );
-				if(provider != null){
-					providerFormattedName = provider.getFormattedName();
-				}
-				if(StringUtils.isBlank(providerFormattedName)) {
-					providerFormattedName = "Error: Contact Support";
-					logger.error("Formatted name for provder was not avaialable. Contact number: " + c.getContactId());
-				}
-				c.setContactName(providerFormattedName);
-				contact = new ProfessionalContact();
-				contact.setWorkPhone("internal");
-				contact.setFax("internal");
-				c.setDetails(contact);
-			}
-			
-			if( c.getType() == DemographicContact.TYPE_CONTACT ) {
-				contact = contactDao.find( Integer.parseInt( c.getContactId() ) );
-				c.setContactName( contact.getFormattedName() );
-				c.setDetails(contact);
-			}
-			
-			if( c.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST ) {
-				professionalSpecialist = professionalSpecialistDao.find( Integer.parseInt( c.getContactId() ) );
-				c.setContactName( professionalSpecialist.getFormattedName() );				
-				contact = buildContact( professionalSpecialist );
-				c.setDetails(contact);
+			switch (demographicContact.getType())
+			{
+				case DemographicContact.TYPE_DEMOGRAPHIC:
+					demographicContact.setContactName(demographicDao.getClientByDemographicNo(Integer.parseInt(demographicContact.getContactId())).getFormattedName());
+					break;
+
+				case DemographicContact.TYPE_PROVIDER:
+					provider = providerDao.getProvider(demographicContact.getContactId());
+					if (provider != null)
+					{
+						providerFormattedName = provider.getFormattedName();
+					}
+
+					if (StringUtils.isBlank(providerFormattedName))
+					{
+						providerFormattedName = "Error: Contact Support";
+						logger.error("Formatted name for provder was not avaialable. Contact number: " + demographicContact.getContactId());
+					}
+					demographicContact.setContactName(providerFormattedName);
+
+					contact = new ProfessionalContact();
+					contact.setWorkPhone("internal");
+					contact.setFax("internal");
+					demographicContact.setDetails(contact);
+					break;
+
+				case DemographicContact.TYPE_CONTACT:
+					contact = contactDao.find(Integer.parseInt(demographicContact.getContactId()));
+					demographicContact.setContactName(contact.getFormattedName());
+					demographicContact.setDetails(contact);
+					break;
+
+				case DemographicContact.TYPE_PROFESSIONALSPECIALIST:
+					professionalSpecialist = professionalSpecialistDao.find(Integer.parseInt(demographicContact.getContactId()));
+					demographicContact.setContactName(professionalSpecialist.getFormattedName());
+					contact = buildContact(professionalSpecialist);
+					demographicContact.setDetails(contact);
+					break;
 			}
 		}
-
 		return contacts;
 	}
 	

@@ -25,7 +25,7 @@ package org.oscarehr.common.hl7.copd.mapper.mediplan;
 import ca.uhn.hl7v2.HL7Exception;
 import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class AlertMapperMediplan extends AlertMapper
 {
 	public AlertMapperMediplan(ZPD_ZTR message, int providerRep)
 	{
-		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDIPLAN);
+		super(message, providerRep, ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class AlertMapperMediplan extends AlertMapper
 	}
 
 	@Override
-	public CaseManagementNote getReminderNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public CaseManagementNote getReminderNote(int rep, ImporterExporterFactory.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		CaseManagementNote note = null;
 

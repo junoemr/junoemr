@@ -405,18 +405,6 @@ public class AppointmentManager {
 //		appointmentDao.merge(appt);
 //		return appt;
 //	}
-//
-//	public Appointment updateAppointmentUrgency(LoggedInInfo loggedInInfo, int apptNo, String urgency) {
-//
-//		Appointment appt = appointmentDao.find(apptNo);
-//		if (appt != null) {
-//			appointmentArchiveDao.archiveAppointment(appt);
-//
-//			appt.setUrgency(urgency);
-//		}
-//		appointmentDao.merge(appt);
-//		return appt;
-//	}
 
 	
 	

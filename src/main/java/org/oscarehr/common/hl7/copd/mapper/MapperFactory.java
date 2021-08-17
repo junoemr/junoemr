@@ -35,7 +35,7 @@ import org.oscarehr.common.hl7.copd.mapper.wolf.HistoryNoteMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MedicationMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MessageMapperWolf;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 
 /**
@@ -49,7 +49,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new appointment mapper
 	 */
-	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		switch(importSource)
 		{
@@ -75,7 +75,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new alert mapper
 	 */
-	public static AlertMapper newAlertMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static AlertMapper newAlertMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		switch(importSource)
 		{
@@ -93,7 +93,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new allergy mapper
 	 */
-	public static AllergyMapper newAllergyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static AllergyMapper newAllergyMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		return new AllergyMapper(message, providerRep, importSource);
 	}
@@ -104,7 +104,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new demographic mapper
 	 */
-	public static DemographicMapper newDemographicMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	public static DemographicMapper newDemographicMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		return new DemographicMapper(message, importSource);
 	}
@@ -116,7 +116,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new document mapper
 	 */
-	public static DocumentMapper newDocumentMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static DocumentMapper newDocumentMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		switch (importSource)
 		{
@@ -145,7 +145,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new Encounter mapper
 	 */
-	public static EncounterNoteMapper newEncounterNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static EncounterNoteMapper newEncounterNoteMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		switch(importSource)
 		{
@@ -165,7 +165,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new history mapper
 	 */
-	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
+	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		switch(importSource)
 		{
@@ -195,7 +195,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new lab mapper
 	 */
-	public static LabMapper newLabMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static LabMapper newLabMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		return new LabMapper(message, providerRep, importSource);
 	}
@@ -207,7 +207,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new medication mapper
 	 */
-	public static MedicationMapper newMedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	public static MedicationMapper newMedicationMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		switch(importSource)
 		{
@@ -225,7 +225,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new message mapper
 	 */
-	public static MessageMapper newMessageMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static MessageMapper newMessageMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		switch(importSource)
 		{
@@ -265,7 +265,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new tickler mapper
 	 */
-	public static TicklerMapper newTicklerMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static TicklerMapper newTicklerMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		return new TicklerMapper(message, providerRep, importSource);
 	}
@@ -277,7 +277,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new measurements mapper
 	 */
-	public static MeasurementsMapper newMeasurementsMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static MeasurementsMapper newMeasurementsMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		return new MeasurementsMapper(message, providerRep, importSource);
 	}
@@ -289,7 +289,7 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new allergy mapper
 	 */
-	public static PregnancyMapper newPregnancyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static PregnancyMapper newPregnancyMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		return new PregnancyMapper(message, providerRep);
 	}

@@ -746,18 +746,22 @@ angular.module('Schedule').component('eventComponent', {
 				$scope.appointmentApi.getEditHistory(appointmentId).then(
 					function success(results)
 					{
-						controller.eventHistory = results.data.body;
+						let appointmentHistory = results.data.body;
+						appointmentHistory.reverse();  // Display the most recent events at the top, similar to the security log
+						
 						var date_format = 'DD MMMM YYYY';
 						var time_format = 'hh:mm A';
 
-						for (var i = 0; i < controller.eventHistory.length; i++)
+						for (var i = 0; i < appointmentHistory.length; i++)
 						{
-							controller.eventHistory[i].formattedUpdateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].updateDateTime), date_format);
-							controller.eventHistory[i].formattedCreateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].createDateTime), date_format);
-
-							controller.eventHistory[i].formattedUpdateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].updateDateTime), time_format);
-							controller.eventHistory[i].formattedCreateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].createDateTime), time_format);
+							appointmentHistory[i].formattedUpdateDate = Juno.Common.Util.formatMomentDate(moment(appointmentHistory[i].updateDateTime), date_format);
+							appointmentHistory[i].formattedCreateDate = Juno.Common.Util.formatMomentDate(moment(appointmentHistory[i].createDateTime), date_format);
+							
+							appointmentHistory[i].formattedUpdateTime = Juno.Common.Util.formatMomentTime(moment(appointmentHistory[i].updateDateTime), time_format);
+							appointmentHistory[i].formattedCreateTime = Juno.Common.Util.formatMomentTime(moment(appointmentHistory[i].createDateTime), time_format);
 						}
+						
+						controller.eventHistory = appointmentHistory;
 						deferred.resolve(controller.eventHistory);
 					}
 				);
