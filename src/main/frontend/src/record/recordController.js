@@ -100,30 +100,69 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.displayPhone = null;
 
+		// phone related constants
+		controller.phone = {
+			cellExtKey: "demo_cell",
+			workPhoneExtensionKey: "wPhoneExt",
+			homePhoneExtensionKey: "hPhoneExt",
+			preferredIndicator: "*",
+		};
 
 		controller.init = function init()
 		{
 			controller.fillMenu();
+			controller.loadPreferredPhone(controller.demographic);
+		};
 
-			// quick and dirty way to show preferred phone
-			if(controller.demographic.alternativePhone && controller.demographic.alternativePhone.endsWith("*"))
+		// quick and dirty way to show preferred phone
+		controller.loadPreferredPhone = (demographic) =>
+		{
+			// default is home phone
+			controller.displayPhone = controller.formatPhone(
+				demographic.phone,
+				controller.findExtValue(demographic, controller.phone.homePhoneExtensionKey));
+
+			// check work phone
+			if(demographic.alternativePhone && demographic.alternativePhone.endsWith(controller.phone.preferredIndicator))
 			{
-				controller.displayPhone = controller.demographic.alternativePhone;
+				controller.displayPhone = controller.formatPhone(
+					demographic.alternativePhone,
+					controller.findExtValue(demographic, controller.phone.workPhoneExtensionKey));
 			}
-			else if(controller.demographic.extras)
+			else  // check cell
 			{
-				const cellExt = controller.demographic.extras.find((extra) => extra.key === "demo_cell");
-				if(cellExt && cellExt.value.endsWith("*"))
+				const cellExtValue = controller.findExtValue(demographic, controller.phone.cellExtKey);
+				if(cellExtValue && cellExtValue.endsWith(controller.phone.preferredIndicator))
 				{
-					controller.displayPhone = cellExt.value;
+					controller.displayPhone = controller.formatPhone(cellExtValue);
 				}
 			}
-			else
+		}
+
+		controller.formatPhone = (number, extension = null) =>
+		{
+			let formatted = Juno.Common.Util.toTrimmedString(number).replace(controller.phone.preferredIndicator, "");
+			if(!Juno.Common.Util.isBlank(extension))
 			{
-				controller.displayPhone = controller.demographic.phone;
+				formatted += " Ext: " + Juno.Common.Util.toTrimmedString(extension);
 			}
-			controller.displayPhone = controller.displayPhone.replace("*", "");
-		};
+			return formatted;
+		}
+
+		controller.findExtValue = (demographic, key) =>
+		{
+			let value = null;
+			if(demographic.extras)
+			{
+				const ext = demographic.extras.find((extra) => extra.key === key);
+				if(ext)
+				{
+					value = ext.value;
+				}
+			}
+			return value;
+		}
+
 
 		//get access rights
 		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
