@@ -50,11 +50,8 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVis
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EditCPPNotesClassicTests extends SeleniumTestBase
+public class EditCPPNotesClassicIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -74,7 +71,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editSocialHistoryTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String socialHistoryInCPP = "Social History Note in CPP";
 		String socialHistoryInEncounter = "Social History Note in Encounter";
 		String editedSocialHistoryNoteInCPP = "Edited Social History Note in CPP";
@@ -124,7 +121,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editMedicalHistoryTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String medicalHistoryInCPP = "Medical History Note in CPP";
 		String medicalHistoryInEncounter = "Medical History Note in Encounter";
 		String editedMedicalHistoryNoteInCPP = "Edited Medical History Note in CPP";
@@ -181,7 +178,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editOngoingConcernsTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String ongoingConcernsInCPP = "Ongoing Concerns Note in CPP";
 		String ongoingConcernsInEncounter = "Ongoing Concerns Note in Encounter";
 		String editedOngoingConcernsNoteInCPP = "Edited Ongoing Concerns History Note in CPP";
@@ -239,7 +236,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editRemindersTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String remindersInCPP = "Reminders Note in CPP";
 		String remindersInEncounter = "Reminders Note in Encounter";
 		String editedRemindersNoteInCPP = "Edited Reminders History Note in CPP";

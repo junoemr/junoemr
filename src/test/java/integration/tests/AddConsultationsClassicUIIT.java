@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
@@ -35,12 +34,9 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
@@ -49,12 +45,8 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVis
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class AddConsultationsClassicUITests extends SeleniumTestBase
+public class AddConsultationsClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	private static DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -77,7 +69,7 @@ public class AddConsultationsClassicUITests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		String serviceName = "Cardiology";
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		Thread.sleep(5000);
 		String eChartWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]")).click();
@@ -95,7 +87,7 @@ public class AddConsultationsClassicUITests extends SeleniumTestBase
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 
 		//** Verify from Consultations top menu. **
-		driver.get(Navigation.OSCAR_URL + Consultation_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Consultation_URL);
 		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",

@@ -47,7 +47,7 @@ public class JunoProperties
 	@Data
 	public static class RedisSessionStore
 	{
-		private boolean enabled;
+		private boolean enabled = false;
 		private String endpoint;
 		private String password;
 	}

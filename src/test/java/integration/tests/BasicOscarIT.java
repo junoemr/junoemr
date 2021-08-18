@@ -29,15 +29,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
+import org.oscarehr.init.OscarPropertiesInitializerWeb;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BasicOscarTests extends SeleniumTestBase
+public class BasicOscarIT extends SeleniumTestBase
 {
 	@Autowired
 	Environment environment;

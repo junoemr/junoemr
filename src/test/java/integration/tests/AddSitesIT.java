@@ -50,7 +50,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddSitesTests extends SeleniumTestBase 
+public class AddSitesIT extends SeleniumTestBase
 {
 	@After
 	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException

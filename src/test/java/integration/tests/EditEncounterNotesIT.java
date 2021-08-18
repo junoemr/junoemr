@@ -43,20 +43,16 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class EditEncounterNotesTests extends SeleniumTestBase
+
+public class EditEncounterNotesIT extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
-
-	@Autowired
-	DatabaseUtil databaseUtil;
 
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
@@ -76,7 +72,7 @@ public class EditEncounterNotesTests extends SeleniumTestBase
 	@Test
 	public void editEncounterNotesClassicUITest()
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 
 		String newNote = "Testing Note";
 		String editedNote = "Edited Testing Note";

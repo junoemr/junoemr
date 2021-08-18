@@ -40,7 +40,6 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
@@ -48,12 +47,9 @@ import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
-{
-	@Autowired
-	DatabaseUtil databaseUtil;
 
+public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
+{
 	@Before
 	public void setup()
 	{
@@ -105,7 +101,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 	public void addDiseaseRegistryClassicUITest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
 		Thread.sleep(5000);
 		addDiseaseRegistry();

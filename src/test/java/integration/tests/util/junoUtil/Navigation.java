@@ -91,6 +91,11 @@ public class Navigation
 		return session != null;
 	}
 
+	public static String getOscarUrl(int serverPort)
+	{
+		return getOscarUrl(Integer.toString(serverPort));
+	}
+
 	public static String getOscarUrl(String serverPort)
 	{
 		return OSCAR_URL + ":" + serverPort + "/" + properties.getProjectHome();

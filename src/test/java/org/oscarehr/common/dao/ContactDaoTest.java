@@ -105,7 +105,7 @@ public class ContactDaoTest extends DaoTestFixtures
 		}
 
 		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
+			if (!expectedResult.get(i).getId().equals(result.get(i).getId())){
 				logger.warn("Items not ordered by ID");
 				fail("Items not ordered by ID");
 			}
@@ -154,7 +154,7 @@ public class ContactDaoTest extends DaoTestFixtures
 		}
 
 		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
+			if (!expectedResult.get(i).getId().equals(result.get(i).getId())){
 				logger.warn("Items not ordered by ID");
 				fail("Items not ordered by ID");
 			}
@@ -203,7 +203,7 @@ public class ContactDaoTest extends DaoTestFixtures
 		}
 	
 		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
+			if (!expectedResult.get(i).getId().equals(result.get(i).getId())){
 				logger.warn("Items not ordered by ID");
 				fail("Items not ordered by ID");
 			}

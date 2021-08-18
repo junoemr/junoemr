@@ -41,19 +41,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class AddEformsClassicUITests extends SeleniumTestBase
+public class AddEformsClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	private static DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -78,7 +73,7 @@ public class AddEformsClassicUITests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		String subject = "EFormTest";
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitleeforms")));
 		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();

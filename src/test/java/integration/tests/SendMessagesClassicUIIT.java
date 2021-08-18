@@ -49,11 +49,8 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SendMessagesClassicUITests extends SeleniumTestBase
+public class SendMessagesClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -148,7 +145,7 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 	{
 		String subjectEchart = "Message from eChart";
 		String patientLName = patientLNames[0];
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		Thread.sleep(2000);
 		String currWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitlemsgs']//descendant::a[contains(., '+')]")).click();

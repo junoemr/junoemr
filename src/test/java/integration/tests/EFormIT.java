@@ -51,11 +51,8 @@ import java.util.Set;
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EFormTests extends SeleniumTestBase
+public class EFormIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 	private static String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 

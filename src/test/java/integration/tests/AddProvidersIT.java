@@ -50,7 +50,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddProvidersTests extends SeleniumTestBase
+public class AddProvidersIT extends SeleniumTestBase
 {
 	public static final ProviderTestData drApple = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]);
 	public static final ProviderTestData drBerry = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[1]);

@@ -55,12 +55,9 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EchartTests extends SeleniumTestBase
+public class EchartIT extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
-
-	@Autowired
-	DatabaseUtil databaseUtil;
 
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException

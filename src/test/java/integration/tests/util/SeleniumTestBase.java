@@ -22,6 +22,8 @@
  */
 package integration.tests.util;
 
+import integration.tests.config.TestConfig;
+import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -37,15 +39,22 @@ import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import org.springframework.context.annotation.Import;
 
+@Import(TestConfig.class)
 public class SeleniumTestBase
 {
 	@LocalServerPort
 	protected int randomTomcatPort;
+
+	@Autowired
+	protected DatabaseUtil databaseUtil;
+
 
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
@@ -93,7 +102,8 @@ public class SeleniumTestBase
 			AuthUtils.TEST_PASSWORD,
 			AuthUtils.TEST_PIN,
 			Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-			driver);
+			driver
+		);
 		driver.manage().window().setSize(new Dimension(1920, 1080));
 		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}
