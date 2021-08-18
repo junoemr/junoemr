@@ -1,7 +1,7 @@
 import PartialDateConverter from "../../lib/common/partialDate/converter/partialDateConverter";
 import PartialDateModelConverter from "../../lib/common/partialDate/converter/partialDateModelConverter";
 
-angular.module('Record.Summary').component('groupNotesController', {
+angular.module('Record.Summary').component('groupNotesComponent', {
 	templateUrl: 'src/record/summary/groupNotes.jsp',
 	bindings: {
 		modalInstance: "<",

@@ -260,7 +260,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			var modalInstance = $uibModal.open(
 				{
-					component: 'groupNotesController',
+					component: 'groupNotesComponent',
 					backdrop: 'static',
 					windowClass: 'notesModal',
 					size: 'lg',
@@ -292,7 +292,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		{
 			var modalInstance = $uibModal.open(
 			{
-				component: 'groupNotesController',
+				component: 'groupNotesComponent',
 				backdrop: 'static',
 				windowClass: 'notesModal',
 				size: size,

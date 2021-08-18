@@ -51,6 +51,7 @@ angular.module('Record').controller('Record.RecordController', [
 	'uxService',
 	'securityService',
 	'billingService',
+	'focusService',
 
 	function(
 		$rootScope,
@@ -71,7 +72,8 @@ angular.module('Record').controller('Record.RecordController', [
 		noteService,
 		uxService,
 		securityService,
-		billingService)
+		billingService,
+		focusService)
 	{
 
 		var controller = this;
@@ -412,6 +414,7 @@ angular.module('Record').controller('Record.RecordController', [
 			if (controller.$storage.hideNote)
 			{
 				controller.$storage.hideNote = false;
+				focusService.focusRef(controller.encounterNoteTextAreaRef);
 			}
 			else
 			{
@@ -636,6 +639,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 			//Need to check if note has been saved yet.
 			controller.$storage.hideNote = false;
+			focusService.focusRef(controller.encounterNoteTextAreaRef);
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 
 			controller.removeEditingNoteFlag();
