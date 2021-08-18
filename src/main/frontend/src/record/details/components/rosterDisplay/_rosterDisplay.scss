@@ -1,5 +1,15 @@
-.rostered-history-button {
-  margin-top: 5px;
-  display: flex;
-  justify-content: center;
+.demographic-details-section.roster-section {
+  .body {
+
+    .juno-typeahead {
+
+      label {
+        width: 136px;
+      }
+    }
+
+    .rostered-history-button {
+      margin-left: 154px;
+    }
+  }
 }

@@ -1,7 +1,7 @@
 .demographic-details-section {
 	@include juno-font-default();
 
-	$field-width: 420px;
+	$field-width: 440px;
 
 	.title {
 		margin: 0 0 8px 0;
@@ -9,7 +9,7 @@
 	}
 
 	.body {
-		max-width: 900px;
+		max-width: 950px;
 		display: flex;
 		flex-flow: row wrap;
 		justify-content: space-between;
@@ -17,8 +17,8 @@
 
 		label {
 			text-align: right;
-			margin-left: 24px;
-			width: 108px;
+			margin-left: 10px;
+			width: 128px;
 		}
 		.juno-input {
 			margin-top: 8px;
@@ -44,45 +44,6 @@
 		.juno-button,
 		.juno-check-box {
 			margin-top: 8px;
-		}
-	}
-
-	.fields {
-		display: flex;
-		flex-wrap: wrap;
-
-		.divider {
-			flex: 1 1 0;
-			max-width: 84px;
-		}
-
-		.column {
-			.juno-input {
-				margin-top: 8px;
-				width: $field-width;
-			}
-			.juno-select {
-				margin-top: 8px;
-				width: $field-width;
-			}
-			.juno-date-select {
-				margin-top: 8px;
-				width: $field-width;
-			}
-			.juno-typeahead {
-				margin-top: 8px;
-				width: $field-width;
-			}
-
-			.juno-button,
-			.juno-check-box {
-				margin-top: 8px;
-			}
-
-			label {
-				min-width: 128px;
-				margin-right: 8px;
-			}
 		}
 	}
 }
