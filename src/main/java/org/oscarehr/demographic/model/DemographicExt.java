@@ -73,7 +73,13 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	
 	@PrePersist
 	@PreUpdate
-	protected void prePersist() {
+	protected void prePersist()
+    {
+        if (key == null || key.isEmpty())
+        {
+            throw new IllegalStateException("DemographicExt key cannot be null");
+        }
+
 		this.dateCreated = new Date();
 		setValue(filterControlCharacters(getValue()));
 	}
