@@ -87,8 +87,8 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 
 		// Medication refills
 		medication.setRepeat(toIntOrNull(importStructure.getNumberOfRefills()));
-		medication.setRefillQuantity(toIntOrNull(importStructure.getRefillQuantity()));
-		medication.setRefillDuration(toIntOrNull(importStructure.getRefillDuration()));
+		medication.setRefillQuantity(toIntOrNull(Util.leadingNum(importStructure.getRefillQuantity())));
+		medication.setRefillDuration(toIntOrNull(Util.leadingNum(importStructure.getRefillDuration())));
 
 		medication.setDrugForm(importStructure.getForm());
 		medication.setRoute(importStructure.getRoute());
