@@ -410,7 +410,7 @@ module.exports = {
 			'./src/inbox/inboxController.js',
 
 			'./src/patient/search/module.js',
-			'./src/patient/search/patientSearchController.js',
+			'./src/patient/search/patientSearchComponent.js',
 			'./src/patient/search/remotePatientResultsController.js',
 
 			'./src/report/module.js',
