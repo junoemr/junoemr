@@ -19,45 +19,46 @@ angular.module('Tickler').component('ticklerAddComponent', {
 		'ticklerService',
 		'focusService',
 		function (
-		$scope,
-		$filter,
-		$stateParams,
-		$http,
-		$httpParamSerializer,
-		demographicService,
-		demographicsService,
-		providerService,
-		ticklerService,
-		focusService)
-	{
-		const controller = this;
-		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+			$scope,
+			$filter,
+			$stateParams,
+			$http,
+			$httpParamSerializer,
+			demographicService,
+			demographicsService,
+			providerService,
+			ticklerService,
+			focusService)
+		{
+			const controller = this;
+			let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
-		// holds the patient typeahead selection
-		controller.demographicSearch = null;
-		controller.isDisabled = false; // Save button enabled by default
+			// holds the patient typeahead selection
+			controller.demographicSearch = null;
+			controller.isDisabled = false; // Save button enabled by default
 
-		controller.defaultTicklerProviderNo = null;
-		controller.defaultTicklerProviderName = null;
+			controller.defaultTicklerProviderNo = null;
+			controller.defaultTicklerProviderName = null;
 
-		controller.tickler = {
-			template:
-			{
-				id: 1,
-				name: ''
-			},
-			serviceDateDate: new Date(),
-			serviceDateTime: "12:00 AM",
-			suggestedTextId: 0,
-			taskAssignedTo: null,
-			taskAssignedToName: null,
-			attachments: null,
-		};
+			controller.tickler = {
+				template:
+					{
+						id: 1,
+						name: ''
+					},
+				serviceDateDate: new Date(),
+				serviceDateTime: "12:00 AM",
+				suggestedTextId: 0,
+				taskAssignedTo: null,
+				taskAssignedToName: null,
+				attachments: null,
+			};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
+		controller.initialDemographicNo = null;
 
 		// initialization
-		controller.$onInit = () =>
+		controller.$onInit = async () =>
 		{
 			controller.setTicklerProvider();
 
@@ -65,17 +66,15 @@ angular.module('Tickler').component('ticklerAddComponent', {
 
 			if (Juno.Common.Util.exists($stateParams.demographicNo) || controller.resolve.presetDemographicNo)
 			{
-				const demographicNo = $stateParams.demographicNo || controller.resolve.presetDemographicNo;
-				demographicService.getDemographic(demographicNo).then(function(data)
-				{
-					controller.demographicSearch = {
-						demographicNo: data.demographicNo,
-						firstName: data.firstName,
-						lastName: data.lastName,
-						name: data.lastName + "," + data.firstName // For display purposes
-					};
-					controller.updateDemographicNo(data);
-				});
+				controller.initialDemographicNo = $stateParams.demographicNo || controller.resolve.presetDemographicNo;
+				const data = await demographicService.getDemographic(controller.initialDemographicNo);
+				controller.demographicSearch = {
+					demographicNo: data.demographicNo,
+					firstName: data.firstName,
+					lastName: data.lastName,
+					name: data.lastName + "," + data.firstName // For display purposes
+				};
+				controller.tickler.demographic = data;
 			}
 
 			ticklerService.getTextSuggestions().then(function(data)
@@ -96,7 +95,14 @@ angular.module('Tickler').component('ticklerAddComponent', {
 
 		controller.$postLink = () =>
 		{
-			focusService.focusRef(controller.demographicSearchRef);
+			if(Juno.Common.Util.isBlank(controller.initialDemographicNo))
+			{
+				focusService.focusRef(controller.demographicSearchRef);
+			}
+			else
+			{
+				focusService.focusRef(controller.providerSearchRef);
+			}
 		}
 
 		controller.close = function close()
@@ -184,16 +190,12 @@ angular.module('Tickler').component('ticklerAddComponent', {
 
 		};
 
-		controller.updateDemographicNo = function updateDemographicNo(demo)
+		controller.updateDemographicNo = async function updateDemographicNo(demo)
 		{
 			if (Juno.Common.Util.exists(demo))
 			{
-				demographicService.getDemographic(demo.demographicNo).then(function(data)
-				{
-					// update the selected value on the tickler object
-					controller.tickler.demographic = data;
-					console.log('set controller.tickler.demographic: ', controller.tickler.demographic);
-				});
+				// update the selected value on the tickler object
+				controller.tickler.demographic = await demographicService.getDemographic(demo.demographicNo);
 			}
 			else
 			{

@@ -78,9 +78,10 @@
 						<div class="form-group">
 							<label>Assign to:</label>
 							<input type="text" ng-model="$ctrl.tickler.taskAssignedToName" placeholder="<bean:message key="tickler.add.provider" bundle="ui"/>"
-								uib-typeahead="pt.providerNo as pt.name for pt in $ctrl.searchProviders($viewValue)"
-								typeahead-on-select="$ctrl.updateProviderNo($item, $model, $label)"
-								class="form-control"
+							       ng-ref="$ctrl.providerSearchRef"
+							       uib-typeahead="pt.providerNo as pt.name for pt in $ctrl.searchProviders($viewValue)"
+							       typeahead-on-select="$ctrl.updateProviderNo($item, $model, $label)"
+							       class="form-control"
 							>
 						</div>
 

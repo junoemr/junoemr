@@ -350,7 +350,7 @@ module.exports = {
 			'./src/tickler/module.js',
 			'./src/tickler/ticklerListController.js',
 			'./src/tickler/ticklerViewController.js',
-			'./src/tickler/ticklerAddController.js',
+			'./src/tickler/ticklerAddComponent.js',
 			'./src/tickler/ticklerNoteController.js',
 			'./src/tickler/ticklerCommentController.js',
 
