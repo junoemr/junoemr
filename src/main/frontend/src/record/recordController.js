@@ -98,11 +98,71 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.recordtabs2 = [];
 		controller.working = false;
 
+		controller.displayPhone = null;
+
+		// phone related constants
+		controller.phone = {
+			cellExtKey: "demo_cell",
+			workPhoneExtensionKey: "wPhoneExt",
+			homePhoneExtensionKey: "hPhoneExt",
+			preferredIndicator: "*",
+		};
 
 		controller.init = function init()
 		{
 			controller.fillMenu();
+			controller.loadPreferredPhone(controller.demographic);
 		};
+
+		// quick and dirty way to show preferred phone
+		controller.loadPreferredPhone = (demographic) =>
+		{
+			// default is home phone
+			controller.displayPhone = controller.formatPhone(
+				demographic.phone,
+				controller.findExtValue(demographic, controller.phone.homePhoneExtensionKey));
+
+			// check work phone
+			if(demographic.alternativePhone && demographic.alternativePhone.endsWith(controller.phone.preferredIndicator))
+			{
+				controller.displayPhone = controller.formatPhone(
+					demographic.alternativePhone,
+					controller.findExtValue(demographic, controller.phone.workPhoneExtensionKey));
+			}
+			else  // check cell
+			{
+				const cellExtValue = controller.findExtValue(demographic, controller.phone.cellExtKey);
+				if(cellExtValue && cellExtValue.endsWith(controller.phone.preferredIndicator))
+				{
+					controller.displayPhone = controller.formatPhone(cellExtValue);
+				}
+			}
+		}
+
+		controller.formatPhone = (number, extension = null) =>
+		{
+			let formatted = Juno.Common.Util.toTrimmedString(number).replace(controller.phone.preferredIndicator, "");
+			if(!Juno.Common.Util.isBlank(extension))
+			{
+				formatted += " Ext: " + Juno.Common.Util.toTrimmedString(extension);
+			}
+			return formatted;
+		}
+
+		controller.findExtValue = (demographic, key) =>
+		{
+			let value = null;
+			if(demographic.extras)
+			{
+				const ext = demographic.extras.find((extra) => extra.key === key);
+				if(ext)
+				{
+					value = ext.value;
+				}
+			}
+			return value;
+		}
+
 
 		//get access rights
 		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
