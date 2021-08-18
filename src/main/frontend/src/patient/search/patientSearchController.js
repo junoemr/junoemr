@@ -51,14 +51,22 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		//=========================================================================
 
 		controller.demographicReadAccess = null;
-		controller.search = {};
 		controller.STATUS_MODE = demographicsService.STATUS_MODE;
 		controller.SEARCH_MODE = demographicsService.SEARCH_MODE;
 		controller.defaultStatus = demographicsService.STATUS_MODE.ACTIVE;
+		controller.defaultSearchType = demographicsService.SEARCH_MODE.Name;
+
+		controller.search = {
+			type: controller.defaultSearchType,
+			term: "",
+			status: controller.defaultStatus,
+			integrator: false,
+			outofdomain: true
+		};
 
 		controller.init = function init()
 		{
-			controller.clearParams();
+
 			if (Juno.Common.Util.exists($stateParams.term))
 			{
 				controller.search.term = $stateParams.term;
@@ -182,26 +190,15 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			controller.tableParams.reload();
 		};
 
-		controller.clearParams = function(searchType)
+		controller.clearSearchParams = function()
 		{
-			// default search type
-			if (!Juno.Common.Util.exists(searchType))
-			{
-				searchType = demographicsService.SEARCH_MODE.Name;
-			}
-
 			// reset the parameters
-			controller.search = {
-				type: searchType,
-				term: '',
-				status: controller.defaultStatus,
-				integrator: false,
-				outofdomain: true
-			};
+			controller.search.term = "";
+			controller.search.status = controller.defaultStatus;
+			controller.search.integrator = false;
+			controller.search.outofdomain = true;
 
-			// update the placeholder
-			controller.searchTermPlaceHolder = (controller.search.type === demographicsService.SEARCH_MODE.DOB) ?
-				"YYYY-MM-DD" : "Search Term";
+			controller.changeSearchType();
 
 			// do the search (if initialized)
 			if (Juno.Common.Util.exists(controller.tableParams))
@@ -210,6 +207,26 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 				controller.tableParams.reload();
 			}
 		};
+
+		controller.changeSearchType = (searchType) =>
+		{
+			// default search type
+			if (!Juno.Common.Util.exists(searchType))
+			{
+				searchType = controller.defaultSearchType;
+			}
+			controller.search.type = searchType;
+
+			// update the placeholder
+			controller.searchTermPlaceHolder = (controller.search.type === demographicsService.SEARCH_MODE.DOB) ?
+				"YYYY-MM-DD" : "Search Term";
+		}
+
+		controller.onChangeSearchType = (searchType) =>
+		{
+			controller.changeSearchType(searchType);
+			controller.tableParams.page(1);
+		}
 
 		controller.toggleParam = function toggleParam(param)
 		{

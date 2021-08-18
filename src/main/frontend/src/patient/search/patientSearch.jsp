@@ -45,7 +45,7 @@
 					<div class="col-sm-3 col-xs-12">
 						<label>Search By</label>
 						<select ng-model="patientSearchCtrl.search.type"
-								ng-change="patientSearchCtrl.clearParams(patientSearchCtrl.search.type)"
+								ng-change="patientSearchCtrl.onChangeSearchType(patientSearchCtrl.search.type)"
 								class="form-control">
 							<option value="{{patientSearchCtrl.SEARCH_MODE.Name}}">
 								<bean:message key="patientsearch.type.name" bundle="ui"/>
@@ -133,7 +133,7 @@
 						</button>
 						<button class="btn btn-default"
 								type="button"
-								ng-click="patientSearchCtrl.clearParams()">
+								ng-click="patientSearchCtrl.clearSearchParams()">
 							<bean:message key="global.clear" bundle="ui"/>
 						</button>
 					</div>
