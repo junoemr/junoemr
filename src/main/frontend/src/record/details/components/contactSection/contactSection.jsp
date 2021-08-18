@@ -63,7 +63,7 @@
 
 			<juno-input ng-model="$ctrl.ngModel.scrHPhoneExt"
 			            label="Ext"
-			            placeholder="00000"
+			            placeholder="0000"
 			            valid-regex="$ctrl.phoneNumberRegex"
 			            component-style="$ctrl.componentStyle"
 			            class="phone-ext">
@@ -89,7 +89,7 @@
 			<div class="phone-ext">
 				<juno-input ng-model="$ctrl.ngModel.scrWPhoneExt"
 				            label="Ext"
-				            placeholder="00000"
+				            placeholder="0000"
 				            valid-regex="$ctrl.phoneNumberRegex"
 				            component-style="$ctrl.componentStyle"
 				            >
