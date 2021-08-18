@@ -260,8 +260,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			var modalInstance = $uibModal.open(
 				{
-					templateUrl: 'src/record/summary/groupNotes.jsp',
-					controller: 'Record.Summary.GroupNotesController as groupNotesCtrl',
+					component: 'groupNotesController',
 					backdrop: 'static',
 					windowClass: 'notesModal',
 					size: 'lg',
@@ -293,8 +292,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		{
 			var modalInstance = $uibModal.open(
 			{
-				templateUrl: 'src/record/summary/groupNotes.jsp',
-				controller: 'Record.Summary.GroupNotesController as groupNotesCtrl',
+				component: 'groupNotesController',
 				backdrop: 'static',
 				windowClass: 'notesModal',
 				size: size,
