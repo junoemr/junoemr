@@ -59,6 +59,8 @@ public abstract class Medication extends AbstractTransientModel
 	private String method;
 	private String route;
 	private Boolean nonAuthoritative;
+	private String regionalIdentifier;
+	private String unit;
 
 
 	// dosage info
@@ -71,6 +73,10 @@ public abstract class Medication extends AbstractTransientModel
 	private Integer repeat;
 	private Boolean longTerm;
 	private Boolean pastMed;
+	
+	private String dosage;
+	private String strengthAmount;
+	private String strengthUnit;
 
 	// refill info
 	private LocalDate lastRefillDate;
@@ -85,6 +91,7 @@ public abstract class Medication extends AbstractTransientModel
 	private String comment;
 
 	// other
+	private Boolean noSubs;
 	private Boolean archived;
 	private String archivedReason;
 	private LocalDateTime archivedDateTime;

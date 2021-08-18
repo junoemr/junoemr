@@ -32,9 +32,9 @@ import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
-import org.oscarehr.dataMigration.model.medication.StandardMedication;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
+import oscar.oscarDemographic.pageUtil.Util;
 import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
 
@@ -55,32 +55,21 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 	@Override
 	public Medication importToJuno(MedicationsAndTreatments importStructure)
 	{
+		// Import all medications as CustomMedications because we don't have a gcnSeqNo in CDS
 		Medication medication;
-		String din = importStructure.getDrugIdentificationNumber();
-		String drugName = importStructure.getDrugName();
+		CustomMedication customMedication = new CustomMedication();
+		customMedication.setCustomName(importStructure.getDrugName());
+		medication = customMedication;
 
-		if(din != null)
-		{
-			StandardMedication standardMedication = new StandardMedication();
-			standardMedication.setRegionalIdentifier(din);
-			standardMedication.setBrandName(drugName);
-			standardMedication.setDosage(importStructure.getDosage());
-			standardMedication.setUnit(importStructure.getDosageUnitOfMeasure());
-			standardMedication.setNoSubs(toBooleanOrNull(importStructure.getSubstitutionNotAllowed()));
+		medication.setRegionalIdentifier(importStructure.getDrugIdentificationNumber());
+		medication.setUnit(importStructure.getDosageUnitOfMeasure());
+		medication.setNoSubs(toBooleanOrNull(importStructure.getSubstitutionNotAllowed()));
 
-			DrugMeasure drugMeasure = importStructure.getStrength();
-			if(drugMeasure != null)
-			{
-				standardMedication.setStrengthAmount(drugMeasure.getAmount());
-				standardMedication.setStrengthUnit(drugMeasure.getUnitOfMeasure());
-			}
-			medication = standardMedication;
-		}
-		else
+		DrugMeasure drugMeasure = importStructure.getStrength();
+		if(drugMeasure != null)
 		{
-			CustomMedication customMedication = new CustomMedication();
-			customMedication.setCustomName(drugName);
-			medication = customMedication;
+			medication.setStrengthAmount(drugMeasure.getAmount());
+			medication.setStrengthUnit(drugMeasure.getUnitOfMeasure());
 		}
 
 		// "dosage" in CDS == takemin/takemax
@@ -117,7 +106,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		medication.setETreatmentType(CDSConstants.TreatmentType.fromValue(importStructure.getTreatmentType()));
 		medication.setRxStatus(CDSConstants.PrescriptionStatus.fromValue(importStructure.getPrescriptionStatus()));
 		medication.setNonAuthoritative(toBooleanOrNull(importStructure.getNonAuthoritativeIndicator()));
-		medication.setDispenseInterval(toIntOrNull(importStructure.getDispenseInterval()));
+		medication.setDispenseInterval(toIntOrNull(Util.leadingNum(importStructure.getDispenseInterval())));
 		medication.setRxEndDate(getEndDate(importStructure));
 		medication.setResidualInfo(generateResidualInfo(importStructure));
 

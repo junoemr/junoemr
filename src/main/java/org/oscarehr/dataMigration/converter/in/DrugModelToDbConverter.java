@@ -79,18 +79,18 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		drug.setTakeMax(input.getTakeMax());
 		drug.setTakeMin(input.getTakeMin());
 
+		drug.setNoSubs(BooleanUtils.toBooleanDefaultIfNull(input.getNoSubs(), false));
+		// dosage column in db == Strength in UI
+		if (input.getStrengthAmount() != null && input.getStrengthUnit() != null)
+		{
+			drug.setDosage(input.getStrengthAmount() + " " + input.getStrengthUnit());
+		}
+
 		if(input instanceof StandardMedication)
 		{
 			StandardMedication standardMedication = (StandardMedication) input;
 			drug.setGcnSeqNo(toIntDefaultIfNull(standardMedication.getGcnSeqNo(), 0));
-			drug.setNoSubs(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getNoSubs(), false));
 			drug.setPrn(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getPrn(), false));
-
-			// dosage column in db == Strength in UI
-			if (standardMedication.getStrengthAmount() != null && standardMedication.getStrengthUnit() != null)
-			{
-				drug.setDosage(standardMedication.getStrengthAmount() + " " + standardMedication.getStrengthUnit());
-			}
 		}
 
 		// unknown start date if null, but start date must be set to something in database
