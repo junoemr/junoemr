@@ -67,7 +67,6 @@ angular.module('Record.Details').component('demographicContactsModal', {
             {
                 ctrl.dataChanged = false;
                 ctrl.contact = angular.copy(ctrl.resolve.demoContact);
-                ctrl.contactOnStart = ctrl.resolve.demoContact;
                 ctrl.demographic = ctrl.resolve.demographic;
                 ctrl.editable = false;
 

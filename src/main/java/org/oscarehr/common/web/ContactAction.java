@@ -161,7 +161,7 @@ public class ContactAction extends DispatchAction {
     			if(id.length()>0 && Integer.parseInt(id)>0) {
     				c = demographicContactDao.find(Integer.parseInt(id));
     			}
-    			 if(id == "" && existingContacts.contains(otherId))
+    			 if("".equals(StringUtils.trimToNull(id)) && existingContacts.contains(otherId))
 				{
 					throw new IllegalStateException("Duplicate Contact");
 				}
