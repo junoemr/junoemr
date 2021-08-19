@@ -1,14 +1,14 @@
 .demographic-details-section {
 	@include juno-font-default();
 
-	$field-width: 440px;
+	$field-width: 430px;
 
 	.title {
 		margin: 0 0 8px 0;
 		color: $color-primary-base;
 	}
 
-	.body {
+	.fields {
 		max-width: 950px;
 		display: flex;
 		flex-flow: row wrap;
@@ -17,33 +17,48 @@
 
 		label {
 			text-align: right;
-			margin-left: 10px;
 			width: 128px;
+		}
+
+		.juno-input-label-left {
+			margin-right: unset;
 		}
 		.juno-input {
 			margin-top: 8px;
 			width: $field-width;
+			gap: 8px;
 		}
+
 		.juno-select {
 			margin-top: 8px;
 			width: $field-width;
+          	gap: 8px;
 		}
 		.juno-date-select {
 			margin-top: 8px;
 			width: $field-width;
+			gap: 8px;
 		}
+
+		.juno-date-select >*:nth-child(2) {
+			justify-content: unset;
+		}
+
 		.juno-typeahead {
 			margin-top: 8px;
 			width: $field-width;
+			gap: 8px;
 		}
 		.mha-patient-connection {
-				margin-top: 8px;
-				width: $field-width;
+			margin-top: 8px;
+			width: $field-width;
+			gap: 8px;
 		}
 
 		.juno-button,
 		.juno-check-box {
 			margin-top: 8px;
+			gap: 8px;
 		}
 	}
 }

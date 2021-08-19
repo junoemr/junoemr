@@ -4,7 +4,7 @@
 		Health Insurance
 	</h4>
 
-	<div class="body">
+	<div class="fields">
 		<div class="hin-fields">
 			<!-- HIN -->
 			<juno-input ng-model="$ctrl.ngModel.hin"

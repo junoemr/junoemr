@@ -1,5 +1,5 @@
 .demographic-details-section.roster-section {
-  .body {
+  .fields {
 
     .juno-typeahead {
 
@@ -9,7 +9,8 @@
     }
 
     .rostered-history-button {
-      margin-left: 154px;
+      display:flex;
+      margin-left: 138px;
     }
   }
 }

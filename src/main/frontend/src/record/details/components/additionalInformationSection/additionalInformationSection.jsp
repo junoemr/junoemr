@@ -3,7 +3,7 @@
 		Additional Information
 	</h4>
 
-	<div class="body">
+	<div class="fields">
 
 		<!-- Waiting List -->
 		<juno-select ng-model="$ctrl.ngModel.waitingListID"
