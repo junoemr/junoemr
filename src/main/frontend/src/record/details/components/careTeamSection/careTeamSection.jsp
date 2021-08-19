@@ -7,30 +7,30 @@
 
 		<!-- MRP -->
 		<juno-select ng-model="$ctrl.ngModel.providerNo"
-						options="$ctrl.doctors"
-						label="MRP"
-						component-style="$ctrl.componentStyle">
+					options="$ctrl.doctors"
+					label="MRP"
+					component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Nurse -->
 		<juno-select ng-model="$ctrl.ngModel.nurse"
-						options="$ctrl.nurses"
-						label="Nurse"
-						component-style="$ctrl.componentStyle">
+					options="$ctrl.nurses"
+					label="Nurse"
+					component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Midwife -->
 		<juno-select ng-model="$ctrl.ngModel.midwife"
-						options="$ctrl.midwives"
-						label="Midwife"
-						component-style="$ctrl.componentStyle">
+					options="$ctrl.midwives"
+					label="Midwife"
+					component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Resident -->
 		<juno-select ng-model="$ctrl.ngModel.resident"
-						options="$ctrl.doctors"
-						label="Resident"
-						component-style="$ctrl.componentStyle">
+					options="$ctrl.doctors"
+					label="Resident"
+					component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Referral Doctor -->
@@ -48,19 +48,19 @@
 
 		<!-- Referral Doctor Number -->
 		<juno-input ng-model="$ctrl.ngModel.scrReferralDocNo"
-						label="Referral Doctor #"
-						placeholder="Referral Doctor #"
-						valid-regex="$ctrl.numberRegex"
-						component-style="$ctrl.componentStyle">
+					label="Referral Doctor #"
+					placeholder="Referral Doctor #"
+					valid-regex="$ctrl.numberRegex"
+					component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<!--- Patient Status -->
 		<div class="select-with-button">
 			<juno-select ng-model="$ctrl.ngModel.patientStatus"
-							options="$ctrl.patientStatusList"
-							label="Patient Status"
-							component-style="$ctrl.componentStyle"
-							on-change="$ctrl.updatePatientStatusDate()">
+						options="$ctrl.patientStatusList"
+						label="Patient Status"
+						component-style="$ctrl.componentStyle"
+						on-change="$ctrl.updatePatientStatusDate()">
 			</juno-select>
 
 			<juno-button ng-click="$ctrl.openAddPatientStatusModal()"
@@ -93,17 +93,17 @@
 
 		<!-- Chart Number-->
 		<juno-input ng-model="$ctrl.ngModel.chartNo"
-						label="Chart Number"
-						placeholder="Chart Number"
-						component-style="$ctrl.componentStyle">
+					label="Chart Number"
+					placeholder="Chart Number"
+					component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<!-- Cytology Number-->
 		<juno-input ng-model="$ctrl.ngModel.scrCytolNum"
-						label="Cytology #"
-						placeholder="Cytology #"
-						valid-regex="$ctrl.numberRegex"
-						component-style="$ctrl.componentStyle">
+					label="Cytology #"
+					placeholder="Cytology #"
+					valid-regex="$ctrl.numberRegex"
+					component-style="$ctrl.componentStyle">
 		</juno-input>
 	</div>
 </div>
