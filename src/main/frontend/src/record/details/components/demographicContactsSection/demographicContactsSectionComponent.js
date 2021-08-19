@@ -103,14 +103,13 @@ angular.module('Record.Details').component('demographicContactsSection', {
                 ctrl.dialog.result.then(
                     function onClose(updatedContact)
                     {
-                        let i;
-                        for (i = 0; i < ctrl.demoContacts.length; i++)
+                        ctrl.demoContacts.forEach((contact, index) =>
                         {
-                            if (ctrl.demoContacts[i].contactId === updatedContact.data.body.contactId)
+                            if (contact.contactId === updatedContact.data.body.contactId)
                             {
-                                ctrl.demoContacts[i] = updatedContact.data.body;
+                                ctrl.demoContacts[index] = updatedContact.data.body;
                             }
-                        }
+                        });
                         ctrl.dialog = null;
                     },
                     function onDismiss()

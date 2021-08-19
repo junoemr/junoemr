@@ -161,7 +161,7 @@ public class ContactAction extends DispatchAction {
     			if(id.length()>0 && Integer.parseInt(id)>0) {
     				c = demographicContactDao.find(Integer.parseInt(id));
     			}
-    			 if("".equals(StringUtils.trimToNull(id)) && existingContacts.contains(otherId))
+    			 if(id.isEmpty() && existingContacts.contains(otherId))
 				{
 					throw new IllegalStateException("Duplicate Contact");
 				}
@@ -371,7 +371,7 @@ public class ContactAction extends DispatchAction {
 			arrayListIds.add(removeSingleId);
 		}
     	
-		if( proContactIds != null && !proContactIds.equals("")|| contactIds != null && !contactIds.equals("")) {
+		if( proContactIds != null || contactIds != null) {
 
 			if(proContactIds != null) {
 				arrayListIds.addAll(Arrays.asList( proContactIds ) );
@@ -385,10 +385,14 @@ public class ContactAction extends DispatchAction {
 		
 		int contactId;
 		for( String id : arrayListIds ) {
-			contactId = Integer.parseInt(id);
-			DemographicContact dc = demographicContactDao.find( contactId );
-			dc.setDeleted(true);
-			demographicContactDao.merge(dc);
+			if (!id.isEmpty())
+			{
+
+				contactId = Integer.parseInt(id);
+				DemographicContact dc = demographicContactDao.find(contactId);
+				dc.setDeleted(true);
+				demographicContactDao.merge(dc);
+			}
 		}
 
     	

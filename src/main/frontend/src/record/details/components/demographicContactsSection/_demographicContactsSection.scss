@@ -30,9 +30,7 @@
       width: 60px;
   }
   .phone {
-    margin-left: 4px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    font-size: 12px;
+    @include juno-font-body-smallest();
+    margin: 2px 0px 2px 4px;
   }
 }

@@ -101,23 +101,21 @@
 	}
 }
 .special-indent {
-	font-family: Hindie, sans-serif;
-	margin-left: 18px !important;
+	@include juno-font-body-small();
+	margin-left: 18px;
 }
 
 .special-indent-extra {
-	margin-left: 22px !important;
+	margin-left: 22px;
 }
 
 .special-indent-extra2 {
-	margin-left: 22px !important;
-	margin-bottom: 16px;
-	font-size: 12px;
+	@include juno-font-body-smallest();
+	margin: 0px 0px 16px 22px;
 }
 
 .manage-button-wrapper {
-	width: 60px !important;
-	float: right;
+	width: 60px;
 }
 
 @media (max-width: 768px) {
