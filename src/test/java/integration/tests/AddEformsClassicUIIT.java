@@ -44,14 +44,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddEformsClassicUIIT extends SeleniumTestBase
 {
 	@Before
-	public void setup()
-	{
+	public void setup() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		SchemaUtils.restoreTable(
+				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
+				"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
+				"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
+				"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
+				"tickler_text_suggest", "validations"
+		);
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
@@ -62,9 +69,11 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		SchemaUtils.restoreTable(
-				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate", "eform_data",
-				"Facility", "issue", "log","measurementType", "LookupList", "LookupListItem", "OscarJob", "OscarJobType",
-				"provider", "ProviderPreference", "roster_status", "secUserRole", "tickler_text_suggest", "validations"
+				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
+				"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
+				"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
+				"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
+				"tickler_text_suggest", "validations"
 		);
 	}
 
@@ -74,6 +83,7 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 	{
 		String subject = "EFormTest";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+		//accessEncounterPage(driver);//driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitleeforms")));
 		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();

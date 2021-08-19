@@ -43,10 +43,10 @@ public class Navigation
 		"&demographicNo=1" +
 		"&curProviderNo=" +
 		"&reason=Tel-Progress+Note&encType=" +
-		"&curDate=2019-4-17" +
+		"&curDate=2021-8-16" +
 		"&appointmentDate=" +
 		"&startTime=" +
-		"&status=";
+		"&status=";//"&curDate=2019-4-17" +
 	public static final String Consultation_URL = "/oscarEncounter/IncomingConsultation.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&userName=doctor+" + AuthUtils.TEST_USER_NAME;
 
 	private static Logger logger = MiscUtils.getLogger();

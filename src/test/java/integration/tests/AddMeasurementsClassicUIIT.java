@@ -44,6 +44,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -52,7 +53,14 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 {
 	@Before
 	public void setup()
+			throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
+		SchemaUtils.restoreTable(
+				"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
+				"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
+				"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
+				"secUserRole", "tickler_text_suggest", "validations");
+
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 	}
@@ -65,9 +73,7 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 				"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
 				"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
 				"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
-				"secUserRole", "tickler_text_suggest", "validations"
-
-		);
+				"secUserRole", "tickler_text_suggest", "validations");
 	}
 
 	public void addMeasurements(String currWindowHandle, String flowsheetName, String flowsheetSelected, String measurementSelected )
@@ -101,6 +107,12 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 		Thread.sleep(5000);
 		String currWindowHandle = driver.getWindowHandle();
 		AddDiseaseRegistryClassicUIIT addDiseaseRegistry = new AddDiseaseRegistryClassicUIIT();
+		/*accessEncounterPage(driver);//driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		Thread.sleep(5000);
+		String currWindowHandle = driver.getWindowHandle();
+		Thread.sleep(100000);
+		AddDiseaseRegistryClassicUITests addDiseaseRegistry = new AddDiseaseRegistryClassicUITests();
+		Thread.sleep(100000);*/
 		addDiseaseRegistry.addDiseaseRegistry();
 
 		//** Add measurements  **

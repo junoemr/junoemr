@@ -59,7 +59,7 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 	@Before
 	public void setup() throws Exception
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
+		SchemaUtils.restoreTable("admission", "appointment", "appointment_status", "demographic", "log", "log_ws_rest", "mygroup",
 			"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
 			"ProviderPreference", "providersite", "secUserRole", "site",
 			"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
@@ -74,6 +74,10 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 	@After
 	public void cleanup() throws Exception
 	{
+		SchemaUtils.restoreTable("admission", "appointment", "appointment_status", "demographic", "log", "log_ws_rest", "mygroup",
+				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
+				"ProviderPreference", "providersite", "secUserRole", "site",
+				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
 	}
 
 	public void selectTimeSlot(String startTimeExpected)
@@ -161,7 +165,12 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void addAppointmentsSchedulePageWeeklyViewTest() {
+	public void addAppointmentsSchedulePageWeeklyViewTest()
+			throws InterruptedException
+	{
+		// open JUNO UI page, Add site to Dr. Apple and Dr. Berry
+		accessAdministrationSectionJUNOUI(driver, "User Management", "Manage Users");
+		addSiteNAssignRole("Apple", siteNames[0]);
 		// open JUNO UI page,
 		accessSectionJUNOUI(driver, "Schedule");
 		//Weekly View - next week

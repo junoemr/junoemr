@@ -138,7 +138,12 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 			throws InterruptedException
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
+		//PageUtil.switchToLastWindow(driver);
+		//driver.switchTo().frame("dynamic-content");
+		driver.switchTo().frame("myFrame");
+		/*driver.findElement(By.linkText("Template Setting")).click();
+		PageUtil.switchToLastWindow(driver);*/
+		switchToNewWindow(driver, By.linkText("Template Setting"), oldWindowHandles);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
 		//15 mins duration 9-12
@@ -154,6 +159,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
+		driver.switchTo().frame("myFrame");
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());
@@ -209,8 +215,9 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 		//Template Code Setting
 		// Delete "A|Academic"
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Code Setting')]"), oldWindowHandles);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "A");
+		driver.switchTo().frame("myFrame");
+		switchToNewWindow(driver, By.xpath(".//a[contains(., 'Template Code Setting')]"), oldWindowHandles);
+		dropdownSelectByValue(driver, By.xpath(".//select[@name='code']"), "A");
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
 		Assert.assertFalse("Template is NOT deleted successfully.",
@@ -266,6 +273,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 
 		//Template Setting for Dr. Apple
 		PageUtil.switchToWindow(currWindowHandle, driver);
+		driver.switchTo().frame("myFrame");
 		dropdownSelectByValue(driver, By.xpath("//select[@name='providerid']"),
 				ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
 		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);

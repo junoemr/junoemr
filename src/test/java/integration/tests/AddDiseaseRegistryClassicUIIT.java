@@ -44,6 +44,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
+import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -80,9 +81,8 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 		String inr = "42731";
 
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(30000);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(4000);
+		Thread.sleep(2000);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
 		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
 		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(painAssistant);
@@ -102,6 +102,8 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 			throws InterruptedException
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+		//accessEncounterPage(driver);
+		//driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
 		Thread.sleep(5000);
 		addDiseaseRegistry();
