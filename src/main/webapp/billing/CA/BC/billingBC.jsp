@@ -75,6 +75,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.dao.BillingBCDao" %>
 <%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
 <%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
+<%@ page import="org.apache.commons.lang.math.NumberUtils" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -187,7 +188,7 @@ if(!authed) {
         }
 
         // appointmentNo = 0 is passed in when direct billing via master record
-        if (OscarProperties.getInstance().isMultisiteEnabled() && !appointmentNo.equals("0"))
+        if (OscarProperties.getInstance().isMultisiteEnabled() && ConversionUtils.hasContent(appointmentNo) && !appointmentNo.equals("0"))
         {
             AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
             Appointment appointment = appointmentManager.getAppointment(info, Integer.parseInt(appointmentNo));
@@ -1161,10 +1162,7 @@ if(wcbneeds != null){%>
                 LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
 
               AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
-              Appointment appt = apptManager.getAppointment(info, Integer.parseInt(bean.getApptNo()));
-
-                //OscarAppointmentDao apptDao = SpringUtils.getBean(OscarAppointmentDao.class);
-                //Appointment appt = apptDao.find(Integer.parseInt(bean.getApptNo()));
+              Appointment appt = apptManager.getAppointment(info, NumberUtils.toInt(bean.getApptNo(), 0));
           %>
           <tr>
               <td></td>

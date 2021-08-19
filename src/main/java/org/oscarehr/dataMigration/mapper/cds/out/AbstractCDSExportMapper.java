@@ -268,7 +268,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		if(indicator != null)
 		{
 			ynIndicator = objectFactory.createYnIndicator();
-			ynIndicator.setBoolean(indicator);
+			ynIndicator.setYnIndicatorsimple(toYnIndicatorString(indicator));
 		}
 		return ynIndicator;
 	}

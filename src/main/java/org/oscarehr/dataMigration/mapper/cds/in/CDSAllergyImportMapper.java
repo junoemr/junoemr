@@ -28,6 +28,7 @@ import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.AdverseReactionSeverity;
+import xml.cds.v5_0.AdverseReactionType;
 import xml.cds.v5_0.AllergiesAndAdverseReactions;
 import xml.cds.v5_0.DateTimeFullOrPartial;
 import xml.cds.v5_0.DrugCode;
@@ -57,14 +58,13 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		allergy.setDescription(getDescriptionOrDefault(importStructure.getOffendingAgentDescription()));
 		allergy.setTypeCode(getTypeCode(importStructure));
 		allergy.setDrugIdentificationNumber(getDin(importStructure));
-		//TODO reaction type?
 		allergy.setStartDate(toNullablePartialDate(importStructure.getStartDate()));
 		allergy.setLifeStage(getLifeStage(importStructure.getLifeStage()));
 		allergy.setSeverityOfReaction(getSeverity(importStructure.getSeverity()));
 		allergy.setReaction(importStructure.getReaction());
 		allergy.setEntryDateTime(getEntryDateTimeWithDefault(importStructure.getRecordedDate()));
 
-		allergy.setAnnotation(importStructure.getNotes());
+		allergy.setAnnotation(generationAnnotation(importStructure.getNotes(), importStructure.getReactionType()));
 
 		allergy.setAgeOfOnset(getResidualDataElementAsLong(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET));
 		String onsetOfReaction = getResidualDataElementAsString(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_ONSET_REACTION);
@@ -73,6 +73,20 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 				RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET, RESIDUAL_INFO_DATA_NAME_ONSET_REACTION));
 
 		return allergy;
+	}
+
+	protected String generationAnnotation(String notes, AdverseReactionType reactionType)
+	{
+		String annotation = "";
+		if (notes != null)
+		{
+			annotation += notes;
+		}
+		if (reactionType != null)
+		{
+			annotation += "\nReaction Type: " + reactionType.value();
+		}
+		return StringUtils.trimToNull(annotation);
 	}
 
 	protected String getDescriptionOrDefault(String dataDescription)

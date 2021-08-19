@@ -79,7 +79,7 @@ public class DemographicToTransferConverter extends AbstractModelConverter<Demog
 		address.setCity(demographic.getCity());
 		address.setPostal(demographic.getPostal());
 
-		transfer.setExtras(demographic.getDemographicExtList().stream()
+		transfer.setExtras(demographic.getDemographicExtSet().stream()
 				.map(demographicExt -> demographicExtConverter.getAsTransferObject(null, demographicExt))
 				.collect(Collectors.toList())
 		);
