@@ -25,6 +25,7 @@
 package org.oscarehr.demographic.model;
 
 import org.oscarehr.common.model.AbstractModel;
+import oscar.util.ConversionUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -75,9 +76,9 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	@PreUpdate
 	protected void prePersist()
     {
-        if (key == null || key.isEmpty())
+        if (!ConversionUtils.hasContent(key))
         {
-            throw new IllegalStateException("DemographicExt key cannot be null");
+            throw new IllegalStateException("DemographicExt key cannot be null or empty");
         }
 
 		this.dateCreated = new Date();
