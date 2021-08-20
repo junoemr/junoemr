@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
@@ -47,14 +48,17 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setDrugName(medication.getDrugName());
 		medicationsAndTreatments.setPrescriptionWrittenDate(toNullableDateTimeFullOrPartial(medication.getWrittenDate()));
 		medicationsAndTreatments.setStartDate(toNullableDateFullOrPartial(medication.getRxStartDate()));
-		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRefillQuantity()));
+		// Medication Refills
+		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRepeat()));
+		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
+		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
+
 		medicationsAndTreatments.setForm(medication.getDrugForm());
 		medicationsAndTreatments.setRoute(medication.getRoute());
 
 		FrequencyCode frequencyCode = medication.getFrequencyCode();
 		medicationsAndTreatments.setFrequency((frequencyCode != null) ? frequencyCode.getCode() : null);
 		medicationsAndTreatments.setDuration(medication.getDuration());
-		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
 		medicationsAndTreatments.setQuantity(medication.getQuantity());
 		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
 		medicationsAndTreatments.setLongTermMedication(toYnIndicator(medication.getLongTerm()));
@@ -70,10 +74,14 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		}
 
 		medicationsAndTreatments.setNotes(medication.getComment());
-		medicationsAndTreatments.setPrescriptionInstructions(medication.getInstructions());
+		medicationsAndTreatments.setPrescriptionInstructions(
+				StringUtils.trimToNull(
+					StringUtils.trimToEmpty(medication.getInstructions()) + "\n" +
+						StringUtils.trimToEmpty(medication.getSpecialInstructions())
+				));
 		medicationsAndTreatments.setPatientCompliance(toYnIndicator(medication.getPatientCompliance()));
-		medicationsAndTreatments.setTreatmentType(medication.getETreatmentType());
-		medicationsAndTreatments.setPrescriptionStatus(medication.getRxStatus());
+		medicationsAndTreatments.setTreatmentType((medication.getETreatmentType() != null) ? medication.getETreatmentType().getValue() : null);
+		medicationsAndTreatments.setPrescriptionStatus((medication.getRxStatus() != null) ? medication.getRxStatus().getValue() : null);
 		medicationsAndTreatments.setNonAuthoritativeIndicator(toStringOrNull(medication.getNonAuthoritative()));
 		medicationsAndTreatments.setPriorPrescriptionReferenceIdentifier(null); //TODO
 		medicationsAndTreatments.setDispenseInterval(toStringOrNull(medication.getDispenseInterval()));

@@ -83,11 +83,17 @@ function newWindow(file,window) {
 </script>
 
 <script>
-function addContact() {
+
+// set focus to the current window
+function setfocus() {
+    this.focus();
+}
+
+function addContact(demographic_no) {
 	var total = jQuery("#contact_num").val();
 	total++;
 	jQuery("#contact_num").val(total);
-	jQuery.ajax({url:'contact.jsp?search=Search&id='+total,async:false, success:function(data) {
+	jQuery.ajax({url:'contact.jsp?search=Search&id='+total+'&demoNo='+demographic_no,async:false, success:function(data) {
 		  jQuery("#contact_container").append(data);
 	}});
 }
@@ -135,13 +141,13 @@ function deleteProContact(id) {
 
 }
 
-function doPersonalSearch(id) {
+function doPersonalSearch(id, demoNo) {
 	var type = jQuery("select[name='contact_"+id+".type']").val();
 	if(type == '<%=DemographicContact.TYPE_DEMOGRAPHIC%>') {
-		search_demographic('contact_'+id+'.contactName','contact_'+id+'.contactId');
+		search_demographic('contact_'+id+'.contactName','contact_'+id+'.contactId', demoNo);
 	}
 	if(type == '<%=DemographicContact.TYPE_CONTACT%>') {
-		search_contact('contact_'+id+'.contactName','contact_'+id+'.contactId');
+		search_contact('contact_'+id+'.contactName','contact_'+id+'.contactId', demoNo);
 	}
 }
 
@@ -162,8 +168,8 @@ function updTklrList() {
     clearInterval(check_demo_no);
 }
 
-function search_demographic(nameEl, valueEl) {
-    var url = '../ticklerPlus/demographicSearch2.jsp?outofdomain=false&form=contactForm&elementName='+nameEl+'&elementId='+valueEl;
+function search_demographic(nameEl, valueEl, demoNo) {
+    var url = '../ticklerPlus/demographicSearch2.jsp?outofdomain=false&form=contactForm&elementName='+nameEl+'&elementId='+valueEl+'&demoNo='+demoNo;
     var popup = window.open(url,'demographic_search');
     demo_no_orig = document.contactForm.elements[valueEl].value;
     //check_demo_no = setInterval("if (demo_no_orig != document.contactForm.elements[valueEl].value) updTklrList()",100);
@@ -190,8 +196,8 @@ function search_provider(nameEl, valueEl) {
 		}
 }
 
-function search_contact(nameEl, valueEl) {
-    var url = 'contactSearch.jsp?form=contactForm&elementName='+nameEl+'&elementId='+valueEl;
+function search_contact(nameEl, valueEl, demoNo) {
+    var url = 'contactSearch.jsp?form=contactForm&elementName='+nameEl+'&elementId='+valueEl+'&demoNo='+demoNo+'&submit=Search';
     var popup = window.open(url,'demographic_search');
     demo_no_orig = document.contactForm.elements[valueEl].value;
     //check_demo_no = setInterval("if (demo_no_orig != document.contactForm.elements[valueEl].value) updTklrList()",100);
@@ -339,7 +345,7 @@ jQuery(document).ready(function() {
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 </head>
 
-<body class="BodyStyle">
+<body onload="setfocus()" class="BodyStyle">
 <!--  -->
 <table class="MainTable" id="scrollNumber1">
 	<tr class="MainTableTopRow">
@@ -371,7 +377,7 @@ jQuery(document).ready(function() {
 			<br />
 			<div id="contact_container"></div>
 			<input type="hidden" id="contact_num" name="contact_num" value="0"/>
-			<a href="#" onclick="addContact();">[ADD]</a>
+			<a href="#" onclick="addContact(<%=demographic_no%>);">[ADD]</a>
 
 			<br/><br/>
 			<b>Professional Contacts:</b>
