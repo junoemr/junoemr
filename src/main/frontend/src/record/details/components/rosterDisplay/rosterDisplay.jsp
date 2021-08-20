@@ -3,7 +3,7 @@
         Rostering/Enrollment
     </h4>
 
-    <div class="fields">
+    <div class="details-fields">
 
         <!-- Family Doctor -->
         <juno-typeahead model="$ctrl.ngModel.scrFamilyDoc"

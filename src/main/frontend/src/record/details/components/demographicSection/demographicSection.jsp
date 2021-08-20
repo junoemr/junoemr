@@ -3,7 +3,7 @@
 		Demographic
 	</h4>
 
-	<div class="fields">
+	<div class="details-fields">
 		<juno-input ng-model="$ctrl.ngModel.lastName"
 		            class = "extra-indent"
 						label="Last Name"

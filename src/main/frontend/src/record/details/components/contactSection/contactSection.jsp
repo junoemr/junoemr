@@ -3,7 +3,7 @@
 		Contact Information
 	</h4>
 
-	<div class="fields">
+	<div class="details-fields">
 		<juno-input ng-model="$ctrl.ngModel.address.address"
 		            label="Address"
 		            placeholder="Enter patient street address"
@@ -131,7 +131,7 @@
 		Additional Contact Information
 	</h4>
 
-		<div class="fields">
+		<div class="details-fields">
 			<juno-input ng-model="$ctrl.ngModel.address2.address"
 			            label="Address"
 			            placeholder="Enter patient street address"

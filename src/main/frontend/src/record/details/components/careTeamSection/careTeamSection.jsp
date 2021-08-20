@@ -3,7 +3,7 @@
 		Care Team
 	</h4>
 
-	<div class="fields">
+	<div class="details-fields">
 
 		<!-- MRP -->
 		<juno-select ng-model="$ctrl.ngModel.providerNo"

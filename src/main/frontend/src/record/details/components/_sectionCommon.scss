@@ -8,58 +8,50 @@
 		color: $color-primary-base;
 	}
 
-	.fields {
-		max-width: 950px;
-		display: flex;
-		flex-flow: row wrap;
-		justify-content: space-between;
-		align-items: center;
+	.details-fields {
+		display: grid;
+      	grid-auto-flow: row;
+		grid-template-columns: 430px 430px;
+        grid-column-gap: 90px;
 
 		label {
 			text-align: right;
 			width: 128px;
-		}
-
-		.juno-input-label-left {
-			margin-right: unset;
+			margin-right: 8px;
 		}
 		
 		.juno-input {
 			margin-top: 8px;
 			width: $field-width;
-			gap: 8px;
 		}
 
 		.juno-select {
 			margin-top: 8px;
 			width: $field-width;
-          	gap: 8px;
 		}
 		.juno-date-select {
 			margin-top: 8px;
 			width: $field-width;
-			gap: 8px;
-		}
-
-		.juno-date-select >*:nth-child(2) {
-			justify-content: unset;
 		}
 
 		.juno-typeahead {
 			margin-top: 8px;
 			width: $field-width;
-			gap: 8px;
 		}
 		.mha-patient-connection {
 			margin-top: 8px;
 			width: $field-width;
-			gap: 8px;
 		}
 
 		.juno-button,
 		.juno-check-box {
 			margin-top: 8px;
-			gap: 8px;
+		}
+	}
+	
+	@media only screen and (max-width: 950px) {
+		.details-fields {
+			grid-template-columns: 430px;
 		}
 	}
 }
