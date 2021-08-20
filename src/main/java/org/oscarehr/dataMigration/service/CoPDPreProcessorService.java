@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 @Service
 public class CoPDPreProcessorService
 {
-	public static final String HL7_TIMESTAMP_BEGINNING_OF_TIME = "19700101";
+	public static final String DEFAULT_DATE = "19000101";
 	private static final Logger logger = MiscUtils.getLogger();
 
 	public boolean looksLikeCoPDFormat(GenericFile genericFile) throws IOException
@@ -79,7 +79,7 @@ public class CoPDPreProcessorService
 	 * @param message the original message string
 	 * @return the formatted and fixed message string
 	 */
-	public String preProcessMessage(String message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	public String preProcessMessage(String message, ImporterExporterFactory.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		Instant instant = Instant.now();
 
@@ -95,7 +95,7 @@ public class CoPDPreProcessorService
 		message = fixDateTimeNumbers(message);
 		instant = printDuration(instant, "fixDateTimeNumbers");
 
-		if(CoPDImportService.IMPORT_SOURCE.WOLF.equals(importSource))
+		if(ImporterExporterFactory.IMPORT_SOURCE.WOLF.equals(importSource))
 		{
 			message = formatWolfZPV5SegmentNames(message);
 			instant = printDuration(instant, "formatWolfZPV5SegmentNames");
@@ -112,7 +112,7 @@ public class CoPDPreProcessorService
 			message = fixBackTickBPMeasurements(message);
 			instant = printDuration(instant, "fixBackTickBPMeasurements");
 		}
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			message = fixTimestamps(message);
 			instant = printDuration(instant, "fixTimestamps");
@@ -121,7 +121,7 @@ public class CoPDPreProcessorService
 			instant = printDuration(instant, "fixTimestampsAttachments");
 		}
 
-		if (CoPDImportService.IMPORT_SOURCE.MEDACCESS.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.MEDACCESS.equals(importSource))
 		{
 			message = formatMedAccessSegments(message);
 			instant = printDuration(instant, "formatMedAccessSegments");
@@ -145,7 +145,7 @@ public class CoPDPreProcessorService
 			instant = printDuration(instant, "fixReferralPractitionerNo");
 		}
 
-		if (CoPDImportService.IMPORT_SOURCE.HEALTHQUEST.equals(importSource))
+		if (ImporterExporterFactory.IMPORT_SOURCE.HEALTHQUEST.equals(importSource))
 		{
 			message = formatHealthQuestSegments(message);
 			instant = printDuration(instant, "formatHealthQuestSegments");
@@ -270,7 +270,7 @@ public class CoPDPreProcessorService
 			Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
 			if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp))
 			{
-				return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				return DEFAULT_DATE;
 			}
 			else if (timeStampMatcher.find())
 			{// look for timestamps with bad hour.
@@ -305,7 +305,7 @@ public class CoPDPreProcessorService
 		{
 			if (timeStamp.contains("00000"))
 			{
-				return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				return DEFAULT_DATE;
 			}
 			return timeStamp;
 		};
@@ -714,10 +714,20 @@ public class CoPDPreProcessorService
 	 */
 	private String formatHealthQuestSegments(String message)
 	{
-		// XML-encoded chars
 		message = message.replaceAll("<OBX.2/>", "");
+		message = fixHealthQuestOBX5(message);
 
 		return message;
+	}
+
+	/**
+	 * Some OBX.5 segments for HEALTHQUEST imports have leading spaces, this is illegal. 
+	 * TrimToEmpty since it either has to be a number or empty
+	 */
+	private String fixHealthQuestOBX5(String message)
+	{
+		Function<String, String> trimOBX5ToEmpty = StringUtils::trimToEmpty;
+		return foreachTag(message, Hl7Const.HL7_SEGMENT_OBX_5, trimOBX5ToEmpty);
 	}
 
 	private String formatWolfFollowupSegments(String message)

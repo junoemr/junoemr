@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.rx.model.Prescription;
@@ -50,7 +50,7 @@ public class MedicationMapper extends AbstractMapper
 
 	public static final int MEDICATION_DRUG_NAME_LENGTH = 60;
 
-	public MedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public MedicationMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}
@@ -250,7 +250,7 @@ public class MedicationMapper extends AbstractMapper
 	{
 		if (hasTimingQuantity(rep) && getServiceDurationUnit(rep, 0) != null)
 		{
-			List<String> durationUnits = Arrays.asList("W", "M", "D", "Y");
+			List<String> durationUnits = Arrays.asList("W", "M", "D", "Y", "H");
 			Integer duration = getServiceDurationQuantity(rep, 0);
 			String durationUnit = translateDurationUnits(getServiceDurationUnit(rep, 0));
 			int repeats = getNumberOfRefills(rep);
@@ -516,14 +516,30 @@ public class MedicationMapper extends AbstractMapper
 	protected String translateDurationUnits(String durationUnit)
 	{
 		HashMap<String, String> durationHash = new HashMap<>();
-
-		durationHash.put("W", "W");
+		
+		durationHash.put("H", "H");
+		durationHash.put("Hr", "H");
+		
 		durationHash.put("D", "D");
-		durationHash.put("M", "M");
-		durationHash.put("Week", "W");
 		durationHash.put("Day", "D");
+		
+		durationHash.put("W", "W");
+		durationHash.put("Week", "W");
+		durationHash.put("Wees", "W");
+		durationHash.put("WK", "W");
+		durationHash.put("Wk", "W");
+		durationHash.put("Wks", "W");
+		
+		durationHash.put("M", "M");
 		durationHash.put("MO30", "M");
+		durationHash.put("MTH", "M");
+		durationHash.put("MTH30", "M");
+		durationHash.put("MTH28", "M");
+		durationHash.put("Month", "M");
+		
 		durationHash.put("Year", "Y");
+		durationHash.put("YR365", "Y");
+		durationHash.put("CY", "Y");
 
 		if (durationHash.containsKey(durationUnit))
 		{

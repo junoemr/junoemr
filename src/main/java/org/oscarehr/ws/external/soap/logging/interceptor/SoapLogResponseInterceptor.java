@@ -34,6 +34,8 @@ import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.log4j.Logger;
+import org.oscarehr.metrics.prometheus.service.SystemMetricsService;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.external.soap.logging.SoapLogBuilder;
 
 import oscar.log.LogAction;
@@ -90,6 +92,11 @@ public class SoapLogResponseInterceptor extends AbstractLoggingInterceptor {
 			Exception ex = message.getContent(Exception.class);
 			logger.error("SOAP response Fault", ex);
 
+			// record request timing metrics
+			SystemMetricsService userMetricsService = SpringUtils.getBean(SystemMetricsService.class);
+			userMetricsService.recordSoapApiRequestLatency(logData.calculateElapsedTimeMilliSeconds());
+
+			// log soap request
 			logData.addErrorData(ex);
 			LogAction.saveSoapLogEntry(logData.buildSoapLog());
 		}
@@ -156,6 +163,11 @@ class SoapLogOutboundCallback implements CachedOutputStreamCallback {
 			}
 			finally
 			{
+				// record timing metrics
+				SystemMetricsService userMetricsService = SpringUtils.getBean(SystemMetricsService.class);
+				userMetricsService.recordSoapApiRequestLatency(logData.calculateElapsedTimeMilliSeconds());
+
+				// log response to log_ws_soap
 				LogAction.saveSoapLogEntry(logData.buildSoapLog());
 			}
 		}

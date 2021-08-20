@@ -180,8 +180,7 @@
 				<td data-title="'<bean:message key="patientsearch.header.dob" bundle="ui"/>'"
 					class="text-center"
 					sortable="'DOB'">
-					{{patient.dob| date: 'yyyy-MM-dd'}}
-				</td>
+					{{patient.formattedDOB}}
 				<td data-title="'<bean:message key="patientsearch.header.doctor" bundle="ui"/>'"
 					sortable="'ProviderName'">
 					{{patient.providerName}}

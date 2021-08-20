@@ -447,8 +447,8 @@
 						   class="list-group-item">
 
 							<div>
-								<span ng-if="$first">{{record.updateUserDisplayName}} created appointment on {{record.formattedCreateDate}} at {{record.formattedCreateTime}}</span>
-								<span ng-if="!$first">{{record.updateUserDisplayName}} updated appointment on {{record.formattedUpdateDate}} at {{record.formattedUpdateTime}}</span>
+								<span ng-if="$last">{{record.updateUserDisplayName}} created appointment on {{record.formattedCreateDate}} at {{record.formattedCreateTime}}</span>
+								<span ng-if="!$last">{{record.updateUserDisplayName}} updated appointment on {{record.formattedUpdateDate}} at {{record.formattedUpdateTime}}</span>
 							</div>
 						</span>
 					</div>

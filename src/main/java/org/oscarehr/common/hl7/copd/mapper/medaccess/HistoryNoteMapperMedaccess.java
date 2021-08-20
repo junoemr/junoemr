@@ -26,7 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
@@ -42,7 +42,7 @@ public class HistoryNoteMapperMedaccess extends HistoryNoteMapper
 {
 	public HistoryNoteMapperMedaccess(ZPD_ZTR message, int providerRep, CoPDRecordData recordData) throws HL7Exception
 	{
-		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDACCESS, recordData);
+		super(message, providerRep, ImporterExporterFactory.IMPORT_SOURCE.MEDACCESS, recordData);
 	}
 
 	@Override

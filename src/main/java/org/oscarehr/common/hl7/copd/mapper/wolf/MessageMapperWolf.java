@@ -25,7 +25,7 @@ package org.oscarehr.common.hl7.copd.mapper.wolf;
 import ca.uhn.hl7v2.HL7Exception;
 import org.oscarehr.common.hl7.copd.mapper.MessageMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.CoPDImportService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
 import org.oscarehr.provider.model.ProviderData;
 
 /**
@@ -36,7 +36,7 @@ public class MessageMapperWolf extends MessageMapper
 {
 	public MessageMapperWolf(ZPD_ZTR message, int providerRep)
 	{
-		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.WOLF);
+		super(message, providerRep, ImporterExporterFactory.IMPORT_SOURCE.WOLF);
 	}
 
 	@Override

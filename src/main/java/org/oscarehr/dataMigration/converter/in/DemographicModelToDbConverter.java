@@ -37,8 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
@@ -101,10 +102,13 @@ public class DemographicModelToDbConverter
 		dbDemographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(input.getPatientStatusDate()));
 		dbDemographic.setLastUpdateUser(SYSTEM_PROVIDER_NO);
 
+		Set<DemographicExt> demographicExtSet = new HashSet<>();
+
 		List<Address> addressList = input.getAddressList();
 		for(Address address : addressList)
 		{
-			// TODO how to handle multiple addresses?
+			// If address is marked as current address then it's the primary address
+			// Otherwise it's an alternative address.
 			if(address.isCurrentAddress())
 			{
 				dbDemographic.setAddress(address.getAddressLinesString());
@@ -112,9 +116,22 @@ public class DemographicModelToDbConverter
 				dbDemographic.setProvince(getProvinceCode(address.getRegionCode(), address.getCountryCode()));
 				dbDemographic.setPostal(address.getPostalCode());
 			}
+			else
+			{
+				DemographicExt altAddress = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_ADDRESS, address.getAddressLinesString());
+				DemographicExt altCity = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_CITY, address.getCity());
+				DemographicExt altProvince = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_PROVINCE, getProvinceCode(address.getRegionCode(), address.getCountryCode()));
+				DemographicExt altPostal = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+						DemographicExt.ALTERNATE_POSTAL, address.getPostalCode());
+				demographicExtSet.add(altAddress);
+				demographicExtSet.add(altCity);
+				demographicExtSet.add(altProvince);
+				demographicExtSet.add(altPostal);
+			}
 		}
-
-		List<DemographicExt> demographicExtList = new ArrayList<>();
 
 		// phone conversions
 		PhoneNumber homePhone = input.getHomePhone();
@@ -126,7 +143,7 @@ public class DemographicModelToDbConverter
 			if(extension != null)
 			{
 				DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_H_PHONE_EXT, extension);
-				demographicExtList.add(ext);
+				demographicExtSet.add(ext);
 			}
 		}
 
@@ -139,7 +156,7 @@ public class DemographicModelToDbConverter
 			if(extension != null)
 			{
 				DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_W_PHONE_EXT, extension);
-				demographicExtList.add(ext);
+				demographicExtSet.add(ext);
 			}
 		}
 
@@ -147,9 +164,9 @@ public class DemographicModelToDbConverter
 		if(cellPhone != null)
 		{
 			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
-			demographicExtList.add(ext);
+			demographicExtSet.add(ext);
 		}
-		dbDemographic.setDemographicExtList(demographicExtList);
+		dbDemographic.setDemographicExtSet(demographicExtSet);
 
 		DemographicCust demographicCust = new DemographicCust();
 		demographicCust.setParsedNotes(input.getPatientNote());

@@ -25,8 +25,10 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.exception.InvalidFrequencyCodeException;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
@@ -37,6 +39,8 @@ import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
@@ -79,37 +83,119 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 			medication = customMedication;
 		}
 
+		// "dosage" in CDS == takemin/takemax
+		String[] dosageMinMax = getDosageMinMax(importStructure.getDosage());
+		if (dosageMinMax != null)
+		{
+			// This will throw an exception if the dosage string is in the forms "X-", "-Y" or "-" or,  if X or Y can't parse to floats
+			// Want this behaviour so that it will fail the patient in these cases, to bring attention to the invalid data
+			medication.setTakeMax(Float.parseFloat(dosageMinMax[0]));
+			medication.setTakeMin(Float.parseFloat(dosageMinMax[1]));
+		}
+
 		medication.setWrittenDate(getWrittenDate(importStructure));
 		medication.setRxStartDate(getStartDate(importStructure));
+
+		// Medication refills
+		medication.setRepeat(toIntOrNull(importStructure.getNumberOfRefills()));
 		medication.setRefillQuantity(toIntOrNull(importStructure.getRefillQuantity()));
+		medication.setRefillDuration(toIntOrNull(importStructure.getRefillDuration()));
+
 		medication.setDrugForm(importStructure.getForm());
 		medication.setRoute(importStructure.getRoute());
 		medication.setFrequencyCode(getFormattedFrequency(importStructure));
 		medication.setDuration(importStructure.getDuration());
 		medication.setDurationUnit(null); //TODO - is there a cds default?
-		medication.setRefillDuration(toIntOrNull(importStructure.getRefillDuration()));
+
 		medication.setQuantity(importStructure.getQuantity());
-		medication.setRefillQuantity(toIntOrNull(importStructure.getRefillQuantity()));
 		medication.setLongTerm(getYIndicator(importStructure.getLongTermMedication()));
 		medication.setPastMed(getYIndicator(importStructure.getPastMedications()));
 		medication.setPrescribingProvider(getPrescribingProvider(importStructure));
 		medication.setComment(importStructure.getNotes());
 		medication.setInstructions(importStructure.getPrescriptionInstructions());
 		medication.setPatientCompliance(getYIndicator(importStructure.getPatientCompliance()));
-		medication.setETreatmentType(importStructure.getTreatmentType());
-		medication.setRxStatus(importStructure.getPrescriptionStatus());
+		medication.setETreatmentType(CDSConstants.TreatmentType.fromValue(importStructure.getTreatmentType()));
+		medication.setRxStatus(CDSConstants.PrescriptionStatus.fromValue(importStructure.getPrescriptionStatus()));
 		medication.setNonAuthoritative(toBooleanOrNull(importStructure.getNonAuthoritativeIndicator()));
-		// TODO importStructure.getPriorPrescriptionReferenceIdentifier();
 		medication.setDispenseInterval(toIntOrNull(importStructure.getDispenseInterval()));
-		// TODO importStructure.getDrugDescription();
-		// TODO importStructure.getProblemCode();
-		// TODO importStructure.getProtocolIdentifier();
-
 		medication.setRxEndDate(getEndDate(importStructure));
-
-		medication.setResidualInfo(importAllResidualInfo(importStructure.getResidualInfo()));
+		medication.setResidualInfo(generateResidualInfo(importStructure));
 
 		return medication;
+	}
+
+	protected List<ResidualInfo> generateResidualInfo(MedicationsAndTreatments importStructure)
+	{
+		List<ResidualInfo> residualInfoList = importAllResidualInfo(importStructure.getResidualInfo());
+		if (residualInfoList == null)
+		{
+			residualInfoList = new ArrayList<>(5); // If residualInfoList is null, max item count is 5
+		}
+
+		// No other place to put the following items.
+		if (importStructure.getPrescriptionIdentifier() != null)
+		{
+			residualInfoList.add(buildResidualInfo("PrescriptionIdentifier", 
+					CDSConstants.ResidualInfoDataType.TEXT.name(), importStructure.getPrescriptionIdentifier()));
+		}
+
+		if (importStructure.getPriorPrescriptionReferenceIdentifier() != null)
+		{
+			residualInfoList.add(buildResidualInfo("PriorPrescriptionReferenceIdentifier",
+					CDSConstants.ResidualInfoDataType.TEXT.name(), importStructure.getPriorPrescriptionReferenceIdentifier()));
+		}
+
+		if (importStructure.getDrugDescription() != null)
+		{
+			residualInfoList.add(buildResidualInfo("DrugDescription",
+					CDSConstants.ResidualInfoDataType.TEXT.name(), importStructure.getDrugDescription()));
+		}
+
+		if (importStructure.getProblemCode() != null)
+		{
+			residualInfoList.add(buildResidualInfo("ProblemCode",
+					CDSConstants.ResidualInfoDataType.TEXT.name(), importStructure.getProblemCode()));
+		}
+
+		if (importStructure.getProtocolIdentifier() != null)
+		{
+			residualInfoList.add(buildResidualInfo("ProtocolIdentifier",
+					CDSConstants.ResidualInfoDataType.TEXT.name(), importStructure.getProtocolIdentifier()));
+		}
+
+		if (residualInfoList.isEmpty())
+		{
+			return null;
+		}
+		return residualInfoList;
+	}
+
+	protected ResidualInfo buildResidualInfo(String contentKey, String contentType,
+	                                                   String contentValue)
+	{
+		ResidualInfo residualInfo = new ResidualInfo();
+		residualInfo.setContentKey(contentKey);
+		residualInfo.setContentType(contentType);
+		residualInfo.setContentValue(contentValue);
+		return residualInfo;
+	}
+
+	protected String getOutsideProviderName(MedicationsAndTreatments.PrescribedBy prescribedBy)
+	{
+		if (prescribedBy == null || prescribedBy.getName() == null)
+		{
+			return null;
+		}
+		return prescribedBy.getName().getFirstName() + " " + prescribedBy.getName().getLastName();
+	}
+
+	protected String getOutsideProviderOhip(MedicationsAndTreatments.PrescribedBy prescribedBy)
+	{
+		if (prescribedBy == null || prescribedBy.getOHIPPhysicianId() == null)
+		{
+			return null;
+		}
+		return prescribedBy.getOHIPPhysicianId();
 	}
 
 	protected FrequencyCode getFormattedFrequency(MedicationsAndTreatments importStructure)
@@ -190,9 +276,17 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		indicator = StringUtils.trimToNull(indicator);
 		if(indicator != null)
 		{
-			if(StringUtils.isNumeric(indicator))
+			if (StringUtils.isNumeric(indicator))
 			{
-				return !"0".equals(indicator);
+				return !indicator.equals("0");
+			}
+			else if (indicator.equals(CDSConstants.Y_INDICATOR_TRUE))
+			{
+				return true;
+			}
+			else if (indicator.equals(CDSConstants.Y_INDICATOR_FALSE))
+			{
+				return false;
 			}
 			else
 			{
@@ -209,6 +303,24 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		if(StringUtils.isNumeric(integerStr))
 		{
 			return Integer.parseInt(integerStr);
+		}
+		return null;
+	}
+
+	/**
+	 * Helper function to split CDS dosage into a 2 string element array
+	 * @param dosage
+	 * @return String Array containing the split dosage, or null
+	 */
+	protected String[] getDosageMinMax(String dosage)
+	{
+		if (dosage != null)
+		{
+			if (dosage.matches(".*-.*"))
+			{
+				return dosage.split("-");
+			}
+			return new String[] {dosage, dosage};
 		}
 		return null;
 	}

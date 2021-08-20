@@ -43,7 +43,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1 and x.deleted=false";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
-		@SuppressWarnings("unchecked")
+
 		List<DemographicContact> dContacts = query.getResultList();
 		return dContacts;
 	}
@@ -105,7 +105,7 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 		DemographicContact dContact = (DemographicContact) query.getSingleResult();
 		return dContact;
 	}
-	
+
 	public List<DemographicContact> findAllByContactIdAndCategoryAndType(int contactId, String category, int type) {
 		String sql = "select x from " + this.modelClass.getName() + " x where x.contactId = ?1 and x.category = ?2 and x.type = ?3";
 		Query query = entityManager.createQuery(sql);

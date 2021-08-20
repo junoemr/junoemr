@@ -25,10 +25,14 @@
 
 package oscar.oscarReport.data;
 
+import org.oscarehr.metrics.prometheus.service.SystemMetricsService;
+import org.oscarehr.util.SpringUtils;
 import oscar.oscarDB.DBPreparedHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -46,6 +50,7 @@ public class RptByExampleData
 	public String connect = null;
 	private DBPreparedHandler accessDB = null;
 	private Properties oscarVariables = null;
+	private SystemMetricsService systemMetricsService = SpringUtils.getBean(SystemMetricsService.class);
 
 	public RptByExampleData()
 	{
@@ -63,7 +68,17 @@ public class RptByExampleData
 
 		accessDB = new DBPreparedHandler();
 
-		this.resultSet = accessDB.queryResults(this.sql);
+		Instant startTime = Instant.now();
+		try
+		{
+			this.systemMetricsService.incrementCurrentRunningRbeCount();
+			this.resultSet = accessDB.queryResults(this.sql);
+		}
+		finally
+		{
+			this.systemMetricsService.decrementCurrentRunningRbeCount();
+			this.systemMetricsService.recordRbeRequestLatency(Duration.between(startTime, Instant.now()).toMillis());
+		}
 
 		if(resultSet != null)
 		{
