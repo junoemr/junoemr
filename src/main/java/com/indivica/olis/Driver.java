@@ -21,6 +21,7 @@ import com.indivica.olis.queries.Query;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.log4j.Logger;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -78,9 +79,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Driver {
-
-	private static OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
+public class Driver
+{
+	private static final Logger logger = MiscUtils.getLogger();
+	private static final OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 
 	public static String submitOLISQuery(HttpServletRequest request, Query query) {
 		try {
@@ -125,15 +127,22 @@ public class Driver {
 				}
 				else
 				{
-					MiscUtils.getLogger().warn("unable to retrieve logged in info from empty request");
+					logger.warn("unable to retrieve logged in info from empty request");
 				}
 
 				logDao.persist(logItem);
 			}
 			catch(Exception e)
 			{
-				MiscUtils.getLogger().error("Couldn't write log message for OLIS query", e);
+				logger.error("Couldn't write log message for OLIS query", e);
 			}
+
+			logger.debug("OLIS Request" +
+					"\nclientTransaction" + message.getTransactionId() +
+					"\nrequest URL: " + olisRequestURL +
+					"\nmessage:\n" + msgInXML +
+					"\nSigned request:\n" + signedRequest
+			);
 
 			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
 			{
@@ -148,9 +157,6 @@ public class Driver {
 
 				String signedData = olisResponse.getHIALResponse().getSignedResponse().getSignedData();
 				String unsignedData = Driver.unsignData(signedData);
-				//MiscUtils.getLogger().info(msgInXML);
-				//MiscUtils.getLogger().info("---------------------------------");			
-				//MiscUtils.getLogger().info(unsignedData);
 
 				if (request != null) {
 					request.setAttribute("msgInXML", msgInXML);
@@ -168,7 +174,7 @@ public class Driver {
 		}
 		catch(Exception e)
 		{
-			MiscUtils.getLogger().error("Can't perform OLIS query due to exception.", e);
+			logger.error("Can't perform OLIS query due to exception.", e);
 
 			// TODO the request is always null right now
 			if(request != null)
@@ -209,7 +215,7 @@ public class Driver {
 				for (ca.ssha._2005.hial.Error error : errorList) {
 					String errorString = "";
 					errorString += "ERROR " + error.getNumber() + " (" + error.getSeverity() + ") : " + error.getMessage();
-					MiscUtils.getLogger().debug(errorString);
+					logger.debug(errorString);
 
 					ArrayOfString details = error.getDetails();
                                         if (details != null) {
@@ -226,7 +232,7 @@ public class Driver {
 				if (request != null) request.setAttribute("olisResponseContent", root.getContent());
 			}
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Couldn't read XML from OLIS response.", e);
+			logger.error("Couldn't read XML from OLIS response.", e);
 			
 			LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 			notifyOlisError(loggedInInfo.getLoggedInProvider(), "Couldn't read XML from OLIS response." + "\n" + e);
@@ -261,7 +267,7 @@ public class Driver {
 			String content = new String(signedContent);
 			return content;
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("error", e);
+			logger.error("error", e);
 		}
 		return null;
 
@@ -286,11 +292,11 @@ public class Driver {
 			Enumeration<String> e = keystore.aliases();
 
 			// print keystore aliases in debug mode.
-			if(MiscUtils.getLogger().isDebugEnabled())
+			if(logger.isDebugEnabled())
 			{
 				while(e.hasMoreElements())
 				{
-					MiscUtils.getLogger().debug("keystore alis: " + e.nextElement());
+					logger.debug("keystore alis: " + e.nextElement());
 				}
 			}
 
@@ -328,7 +334,7 @@ public class Driver {
 			result = new String(signedDataB64);
 
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Can't sign HL7 message for OLIS", e);
+			logger.error("Can't sign HL7 message for OLIS", e);
 		}
 		return result;
 	}
@@ -390,7 +396,7 @@ public class Driver {
 			result = new String(signedDataB64);
 
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Can't sign HL7 message for OLIS", e);
+			logger.error("Can't sign HL7 message for OLIS", e);
 		}
 		return result;
 	}
@@ -438,7 +444,7 @@ public class Driver {
 		}
 		catch(Exception e)
 		{
-			MiscUtils.getLogger().error("Error", e);
+			logger.error("Error", e);
 		}
 	}
 }
