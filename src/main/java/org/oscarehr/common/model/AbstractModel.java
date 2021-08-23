@@ -29,7 +29,7 @@ import org.oscarehr.util.MiscUtils;
 
 public abstract class AbstractModel<T> implements java.io.Serializable
 {
-	private static final long serialVersionUID = 4508055845243431649L;
+	private static final long serialVersionUID = -7759243407470286513L;
 
 	protected static final String OBJECT_NOT_YET_PERISTED="The object is not persisted yet, this operation requires the object to already be persisted.";
 
