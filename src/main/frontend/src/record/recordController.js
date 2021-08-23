@@ -51,6 +51,7 @@ angular.module('Record').controller('Record.RecordController', [
 	'uxService',
 	'securityService',
 	'billingService',
+	'focusService',
 
 	function(
 		$rootScope,
@@ -71,7 +72,8 @@ angular.module('Record').controller('Record.RecordController', [
 		noteService,
 		uxService,
 		securityService,
-		billingService)
+		billingService,
+		focusService)
 	{
 
 		var controller = this;
@@ -97,12 +99,78 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
 		controller.working = false;
+		controller.noteDirty = false;
+		controller.displayPhone = null;
 
-
-		controller.init = function init()
-		{
-			controller.fillMenu();
+		// phone related constants
+		controller.phone = {
+			cellExtKey: "demo_cell",
+			workPhoneExtensionKey: "wPhoneExt",
+			homePhoneExtensionKey: "hPhoneExt",
+			preferredIndicator: "*",
 		};
+
+		controller.$onInit = async () =>
+		{
+			controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
+			await controller.getCurrentNote(true);
+			controller.loadPreferredPhone(controller.demographic);
+
+			controller.fillMenu();
+
+			// init watches after note state initialization
+			$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
+		}
+
+		// quick and dirty way to show preferred phone
+		controller.loadPreferredPhone = (demographic) =>
+		{
+			// default is home phone
+			controller.displayPhone = controller.formatPhone(
+				demographic.phone,
+				controller.findExtValue(demographic, controller.phone.homePhoneExtensionKey));
+
+			// check work phone
+			if(demographic.alternativePhone && demographic.alternativePhone.endsWith(controller.phone.preferredIndicator))
+			{
+				controller.displayPhone = controller.formatPhone(
+					demographic.alternativePhone,
+					controller.findExtValue(demographic, controller.phone.workPhoneExtensionKey));
+			}
+			else  // check cell
+			{
+				const cellExtValue = controller.findExtValue(demographic, controller.phone.cellExtKey);
+				if(cellExtValue && cellExtValue.endsWith(controller.phone.preferredIndicator))
+				{
+					controller.displayPhone = controller.formatPhone(cellExtValue);
+				}
+			}
+		}
+
+		controller.formatPhone = (number, extension = null) =>
+		{
+			let formatted = Juno.Common.Util.toTrimmedString(number).replace(controller.phone.preferredIndicator, "");
+			if(!Juno.Common.Util.isBlank(extension))
+			{
+				formatted += " Ext: " + Juno.Common.Util.toTrimmedString(extension);
+			}
+			return formatted;
+		}
+
+		controller.findExtValue = (demographic, key) =>
+		{
+			let value = null;
+			if(demographic.extras)
+			{
+				const ext = demographic.extras.find((extra) => extra.key === key);
+				if(ext)
+				{
+					value = ext.value;
+				}
+			}
+			return value;
+		}
+
 
 		//get access rights
 		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
@@ -262,17 +330,16 @@ angular.module('Record').controller('Record.RecordController', [
 		};
 
 		// Check if there have been potential changes to a note, display a warning if needed
-		$window.onbeforeunload = function (event) {
-			if (Juno.Common.Util.isDefinedAndNotNull(controller.page.encounterNote))
+		$window.onbeforeunload = function (event)
+		{
+			if (controller.inUnsavedNoteState())
 			{
-				if(controller.page.encounterNote.note.trim().length !== 0 && controller.page.isNoteSaved === false)
-				{
-					return 'You have made changes to a note, but you did not save them yet.\nLeaving the page will revert all changes.';
-				}
+				return 'You have made changes to a note, but you did not save them yet.\nLeaving the page will revert all changes.';
 			}
 		};
 
-		$scope.$on('$destroy', function() {
+		$scope.$on('$destroy', function ()
+		{
 			delete $window.onbeforeunload;
 		});
 
@@ -280,19 +347,24 @@ angular.module('Record').controller('Record.RecordController', [
 		$scope.$on("$stateChangeStart", function(event, data)
 		{
 			// If the encounter note is not null/undefined and the new state is not a child of record, continue
-			if (Juno.Common.Util.isDefinedAndNotNull(controller.page.encounterNote) &&
-				controller.page.isNoteSaved === false && data.name.indexOf('record.') === -1)
+			if (controller.inUnsavedNoteState() && data.name.indexOf('record.') === -1)
 			{
-				if(controller.page.encounterNote.note.trim().length !== 0)
+				const discard = confirm("You have unsaved note data. Are you sure you want to leave?");
+				if (!discard)
 				{
-					var discard = confirm("You have unsaved note data. Are you sure you want to leave?");
-					if (!discard)
-					{
-						event.preventDefault();
-					}
+					event.preventDefault();
 				}
 			}
 		});
+
+		controller.inUnsavedNoteState = () =>
+		{
+			if (Juno.Common.Util.isDefinedAndNotNull(controller.page.encounterNote))
+			{
+				return (controller.noteDirty);
+			}
+			return false;
+		}
 
 		//////AutoSave
 		var saveIntervalSeconds = 2;
@@ -303,18 +375,20 @@ angular.module('Record').controller('Record.RecordController', [
 			if (controller.page.encounterNote.note == controller.page.initNote) return; //user did not input anything, don't save
 
 			console.log("save", controller.page.encounterNote);
-			noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote);
+			noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote).then(() =>
+			{
+				controller.noteDirty = false;
+			});
 		};
 		var skipTmpSave = false;
-		var noteDirty = false;
 
 		var delayTmpSave = function delayTmpSave(newVal, oldVal)
 		{
 			if (!skipTmpSave)
 			{
-				if (newVal != oldVal)
+				if (newVal !== oldVal)
 				{
-					noteDirty = true;
+					controller.noteDirty = true;
 					if (timeout)
 					{
 						$timeout.cancel(timeout);
@@ -323,12 +397,11 @@ angular.module('Record').controller('Record.RecordController', [
 				}
 				else
 				{
-					noteDirty = false;
+					controller.noteDirty = false;
 				}
 			}
 			skipTmpSave = false; // only skip once
 		};
-		$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
 
 		//////
 
@@ -412,6 +485,7 @@ angular.module('Record').controller('Record.RecordController', [
 			if (controller.$storage.hideNote)
 			{
 				controller.$storage.hideNote = false;
+				focusService.focusRef(controller.encounterNoteTextAreaRef);
 			}
 			else
 			{
@@ -469,6 +543,7 @@ angular.module('Record').controller('Record.RecordController', [
 				function success(results)
 				{
 					controller.page.isNoteSaved = true;
+					controller.noteDirty = false;
 					$scope.$broadcast('noteSaved', results);
 					skipTmpSave = true;
 					controller.page.encounterNote = results;
@@ -597,25 +672,17 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		controller.getCurrentNote = function getCurrentNote(showNoteAfterLoadingFlag)
+		controller.getCurrentNote = async function getCurrentNote(showNoteAfterLoadingFlag)
 		{
-			noteService.getCurrentNote($stateParams.demographicNo, $location.search()).then(
-				function success(results)
-				{
-					controller.page.encounterNote = results;
-					controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
-					controller.getIssueNote();
-					$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
-					controller.initAppendNoteEditor();
-					controller.initObservationDate();
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			let results = await noteService.getCurrentNote($stateParams.demographicNo, $location.search());
+			controller.page.encounterNote = results;
+			controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
+			controller.getIssueNote();
+			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
+			controller.initAppendNoteEditor();
+			controller.initObservationDate();
+			return results.note;
 		};
-
-		controller.getCurrentNote(true);
 
 		controller.editNote = function editNote(note)
 		{
@@ -636,6 +703,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 			//Need to check if note has been saved yet.
 			controller.$storage.hideNote = false;
+			focusService.focusRef(controller.encounterNoteTextAreaRef);
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 
 			controller.removeEditingNoteFlag();
@@ -751,29 +819,39 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		controller.insertTemplate = function insertTemplate(item, model, label)
+		controller.insertTemplate = async function insertTemplate(item, model, label)
 		{
-			
-			uxService.getTemplate(
+			try
 			{
-				name: model
-			}).then(
-				function success(results)
-				{
-					if (results.templates !== null)
-					{
-						var template = results.templates[0];
-						controller.page.encounterNote.note = controller.page.encounterNote.note + template.encounterTemplateValue;
-						controller.options = {
-							magicVal: ''
-						};
-					}
+				const results = await uxService.getTemplate({name: model});
 
-				},
-				function error(errors)
+				if (results.templates !== null)
 				{
-					console.log(errors);
-				});
+					const templateValue = results.templates[0].encounterTemplateValue;
+					const currentNote = controller.page.encounterNote.note;
+					const cursorIndex = controller.encounterNoteTextAreaRef.prop("selectionStart");
+
+					let newNoteValue;
+					// attempt to split the current note on the cursor position. the template will be inserted where the cursor is
+					if (!Juno.Common.Util.isBlank(cursorIndex) && currentNote.length > cursorIndex)
+					{
+						newNoteValue = currentNote.substring(0, cursorIndex) + templateValue + currentNote.substring(cursorIndex);
+					}
+					else // append template to the end of the note normally
+					{
+						newNoteValue = (currentNote + "\n" + templateValue).trim();
+					}
+					controller.page.encounterNote.note = newNoteValue;
+
+					controller.options = {
+						magicVal: ''
+					};
+				}
+			}
+			catch(errors)
+			{
+				console.error(errors);
+			}
 		};
 
 		controller.displayWarning = function displayWarning(noteToEdit)
@@ -906,9 +984,6 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
-
-		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
-		controller.init();
 	}
 ]);
 

@@ -25,6 +25,7 @@ package org.oscarehr.common.conversion;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,10 @@ public abstract class AbstractModelConverter<T, K> implements ListModelConverter
 	@Override
 	public List<K> convert(Collection<? extends T> entities)
 	{
+		if (entities == null)
+		{
+			return Collections.emptyList();
+		}
 		return entities.stream().map(this::convert).collect(Collectors.toList());
 	}
 }

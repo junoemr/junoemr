@@ -6,13 +6,13 @@
 	<div class="details-fields">
 		<juno-input ng-model="$ctrl.ngModel.address.address"
 		            label="Address"
-		            placeholder="Enter patient street address"
+		            placeholder="Enter Street Address"
 		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<juno-input ng-model="$ctrl.ngModel.address.city"
 		            label="City"
-		            placeholder="Enter city here"
+		            placeholder="Enter City Here"
 		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
@@ -26,13 +26,12 @@
 
 		<juno-input ng-model="$ctrl.ngModel.address.postal"
 		            label="Postal code"
-		            placeholder="Enter postal code"
+		            placeholder="Enter Postal Code (e.g. K1M 1M4)"
 		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<juno-input ng-model="$ctrl.ngModel.email"
 		            label="Email Address"
-		            placeholder="Email"
 		            invalid="!$ctrl.validations.email()"
 		            component-style="$ctrl.componentStyle">
 		</juno-input>
@@ -63,7 +62,6 @@
 
 			<juno-input ng-model="$ctrl.ngModel.scrHPhoneExt"
 			            label="Ext"
-			            placeholder="0000"
 			            valid-regex="$ctrl.phoneNumberRegex"
 			            component-style="$ctrl.componentStyle"
 			            class="phone-ext">
@@ -89,7 +87,6 @@
 			<div class="phone-ext">
 				<juno-input ng-model="$ctrl.ngModel.scrWPhoneExt"
 				            label="Ext"
-				            placeholder="0000"
 				            valid-regex="$ctrl.phoneNumberRegex"
 				            component-style="$ctrl.componentStyle"
 				            >
@@ -105,7 +102,6 @@
 
 		<juno-input ng-model="$ctrl.ngModel.scrPhoneComment"
 		            label="Phone Comment"
-		            placeholder="Enter phone comment here"
 		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
@@ -134,13 +130,13 @@
 		<div class="details-fields">
 			<juno-input ng-model="$ctrl.ngModel.address2.address"
 			            label="Address"
-			            placeholder="Enter patient street address"
+			            placeholder="Enter Street Address"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
 
 			<juno-input ng-model="$ctrl.ngModel.address2.city"
 			            label="City"
-			            placeholder="Enter city here"
+			            placeholder="Enter City Here"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
 
@@ -154,7 +150,7 @@
 
 			<juno-input ng-model="$ctrl.ngModel.address2.postal"
 			            label="Postal code"
-			            placeholder="Enter postal code"
+			            placeholder="Enter Postal Code (e.g. K1M 1M4)"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
 		</div>

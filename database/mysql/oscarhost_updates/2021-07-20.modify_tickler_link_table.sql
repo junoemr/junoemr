@@ -1,0 +1,3 @@
+ALTER TABLE tickler_link MODIFY COLUMN table_id VARCHAR(256);
+ALTER TABLE tickler_link MODIFY COLUMN table_name VARCHAR(256);
+ALTER TABLE tickler_link ADD COLUMN IF NOT EXISTS meta JSON;

@@ -35,6 +35,7 @@ public abstract class Measurement extends AbstractTransientModel
 {
 	public static final String VALUE_YES = "yes";
 	public static final String VALUE_NO = "no";
+	public static final String DEFAULT_COMMENT = "";
 
 	protected Integer id;
 	protected String measurementValue;

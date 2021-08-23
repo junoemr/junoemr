@@ -114,9 +114,13 @@ import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Map;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -464,8 +468,9 @@ public class CoPDImportService
 		{
 			DemographicCust demographicCust = demographicMapper.getDemographicCust();
 			List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
+			Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtList);
 
-			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtSet);
 		}
 		return demographic;
 	}
@@ -662,8 +667,8 @@ public class CoPDImportService
 			{
 				try
 				{
-					ArrayList<ProviderData> routeProviders = new ArrayList<>(1);
-					routeProviders.add(provider);
+					Map<ProviderData, LocalDateTime> routeProviders = new HashMap<>();
+					routeProviders.put(provider, null);
 
 					labService.persistNewHL7Lab(parser, msg, "CoPD-Import", 0, demographic, routeProviders, ProviderInboxItem.FILE);
 					parser.postUpload();
@@ -724,7 +729,7 @@ public class CoPDImportService
 			}
 			catch (FileAlreadyExistsException e)
 			{
-				logger.warn("SKIPPING: File: " + document.getDocfilename() + " already exists in document directory! skipping.");
+				logger.error("File: " + document.getDocfilename() + " already exists in document directory! This needs to be fixed for the patient to be imported");
 				continue;
 			}
 			documentService.routeToProviderInbox(document.getDocumentNo(), false, true, provider.getId());

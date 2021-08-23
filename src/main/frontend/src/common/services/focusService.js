@@ -22,6 +22,14 @@ angular.module('Common.Services').factory(
 				});
 			};
 
+			focus.focusRef = function element(ref)
+			{
+				$timeout(function()
+				{
+					ref.focus();
+				});
+			};
+
 			// focuses first visible and enabled form input
 			// if selector is provided, only looks within that selector
 			focus.first_form_input = function first_form_element(selector)

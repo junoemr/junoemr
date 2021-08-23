@@ -48,7 +48,7 @@
 			</h5>
 			<i class="icon icon-tele-call"></i>
 			<h5 class="patient-header-info">
-				{{recordCtrl.demographic.phone}}
+				{{recordCtrl.displayPhone}}
 			</h5>
 		</div>
 	</div>
@@ -251,11 +251,12 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<textarea class="form-control input-md col-lg-4 note-editor-textarea"
-							rows="6"
-							ng-model="recordCtrl.page.encounterNote.note"
-							ng-disabled="recordCtrl.page.cannotChange"
-							id="noteEditor{{recordCtrl.demographicNo}}"
-							ng-change="recordCtrl.setEditingNoteFlag()">
+						          ng-ref="recordCtrl.encounterNoteTextAreaRef"
+						          rows="6"
+						          ng-model="recordCtrl.page.encounterNote.note"
+						          ng-disabled="recordCtrl.page.cannotChange"
+						          id="noteEditor{{recordCtrl.demographicNo}}"
+						          ng-change="recordCtrl.setEditingNoteFlag()">
 						</textarea>
 					</div>
 

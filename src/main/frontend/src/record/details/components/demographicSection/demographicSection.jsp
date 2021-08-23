@@ -48,7 +48,7 @@
 				title="Spoken Language"
 				model="$ctrl.ngModel.spokenLanguage"
 				options="$ctrl.spokenLanguages"
-				placeholder="Spoken language"
+				placeholder="Spoken Language"
 				class="justify-content-space-between"
 				label-position="LABEL_POSITION.LEFT"
 				component-style="$ctrl.componentStyle">
