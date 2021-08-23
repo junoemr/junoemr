@@ -109,13 +109,14 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return reportType;
 	}
 
-	protected String reportStatus(HrmDocument.REPORT_STATUS reportStatus)
+	protected HRMDocument.STATUS reportStatus(HrmDocument.REPORT_STATUS reportStatus)
 	{
-		String status = null;
+		HRMDocument.STATUS status = null;
 		if(reportStatus != null)
 		{
-			status = reportStatus.getValue();
+			status = HRMDocument.STATUS.fromValueString(reportStatus.getValue());
 		}
+		
 		return status;
 	}
 
@@ -222,7 +223,6 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 			                          document.getReportFile()));
 		}
 		
-		// TODO: General inbox route?
 		return link;
 	}
 }

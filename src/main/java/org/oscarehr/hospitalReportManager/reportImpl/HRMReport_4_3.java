@@ -90,19 +90,29 @@ public class HRMReport_4_3 implements HRMReport
 	public String getLegalName()
 	{
 		PersonNameStandard name = demographics.getNames();
-		return name.getLegalName().getLastName().getPart() + ", " + name.getLegalName().getFirstName().getPart();
+		return getLegalFirstName() + ", " + getLegalLastName();
 	}
 
 	public String getLegalLastName()
 	{
-		PersonNameStandard name = demographics.getNames();
-		return name.getLegalName().getLastName().getPart();
+		PersonNameStandard.LegalName legalName = demographics.getNames().getLegalName();
+		if (legalName != null && legalName.getLastName() != null)
+		{
+			return legalName.getLastName().getPart();
+		}
+		
+		return "";
 	}
 
 	public String getLegalFirstName()
 	{
-		PersonNameStandard name = demographics.getNames();
-		return name.getLegalName().getFirstName().getPart();
+		PersonNameStandard.LegalName legalName = demographics.getNames().getLegalName();
+		if (legalName != null && legalName.getFirstName() != null)
+		{
+			return legalName.getFirstName().getPart();
+		}
+		
+		return "";
 	}
 
 	public List<String> getLegalOtherNames()
@@ -131,7 +141,7 @@ public class HRMReport_4_3 implements HRMReport
 	public String getDateOfBirthAsString()
 	{
 		List<Integer> dob = getDateOfBirth();
-		return dob.get(0) + "-" + dob.get(1) + "-" + dob.get(2);
+		return dob.get(0) + "-" + String.format("%02d", dob.get(1)) + "-" + String.format("%02d", dob.get(2));
 	}
 
 	public String getHCN()
@@ -156,7 +166,12 @@ public class HRMReport_4_3 implements HRMReport
 
 	public String getGender()
 	{
-		return demographics.getGender().value();
+		if (demographics.getGender() != null)
+		{
+			return demographics.getGender().value();
+		}
+		
+		return "";
 	}
 
 	public String getUniqueVendorIdSequence()
@@ -315,7 +330,14 @@ public class HRMReport_4_3 implements HRMReport
 		if(hrmReport.getPatientRecord().getReportsReceived() != null &&
 				!hrmReport.getPatientRecord().getReportsReceived().isEmpty() &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime() != null)
-			return dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime()).toGregorianCalendar();
+		{
+			XMLGregorianCalendar calendar = dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime());
+			
+			if (calendar != null)
+			{
+				return calendar.toGregorianCalendar();
+			}
+		}
 		return null;
 	}
 
@@ -323,7 +345,7 @@ public class HRMReport_4_3 implements HRMReport
 	{
 		List<String> physicianName = new ArrayList<String>();
 		String physicianHL7String = hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician().getLastName();
-		String[] physicianNameArray = physicianHL7String.split("^");
+		String[] physicianNameArray = physicianHL7String.split("\\^");
 		physicianName.add(physicianNameArray[0]);
 		physicianName.add(physicianNameArray[1]);
 		physicianName.add(physicianNameArray[2]);
@@ -396,10 +418,16 @@ public class HRMReport_4_3 implements HRMReport
 		if(hrmReport.getPatientRecord().getReportsReceived() != null &&
 				!hrmReport.getPatientRecord().getReportsReceived().isEmpty() &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent() != null &&
+				!hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().isEmpty() &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0) != null &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime() != null)
 		{
-			return dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime()).toGregorianCalendar();
+			
+			XMLGregorianCalendar calendar = dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime());
+			if (calendar != null)
+			{
+				return calendar.toGregorianCalendar();
+			}
 		}
 
 		return null;

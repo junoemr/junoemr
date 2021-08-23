@@ -233,7 +233,7 @@ public class HRMService
 				if(relationshipDoc.getId().intValue() != doc.getId().intValue())
 				{
 					if(relationshipDoc.getReportDate().compareTo(oldestDocForTree.getReportDate()) >= 0
-						|| relationshipDoc.getReportStatus().equalsIgnoreCase(HrmDocument.REPORT_STATUS.CANCELLED.getValue()))
+						|| relationshipDoc.getReportStatus().equals(HRMDocument.STATUS.CANCELLED))
 					{
 						doNotShowList.add(oldestDocForTree.getId());
 						oldestDocForTree = relationshipDoc;

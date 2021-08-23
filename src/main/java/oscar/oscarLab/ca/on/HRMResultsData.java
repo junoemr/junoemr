@@ -88,7 +88,7 @@ public class HRMResultsData {
 
 			lbData.dateTime = hrmDocument.get(0).getTimeReceived().toString();
 			lbData.acknowledgedStatus = "U";
-			lbData.reportStatus = hrmDocument.get(0).getReportStatus();
+			lbData.reportStatus = hrmDocument.get(0).getReportStatus().toValueString();
 			lbData.segmentID = hrmDocument.get(0).getId().toString();
 			lbData.setDateObj(hrmDocument.get(0).getReportDate());
 			lbData.patientName = "Not, Assigned";
@@ -224,8 +224,8 @@ public class HRMResultsData {
 		else // try to pick the one that's not canceled.
 		{
 			String cancelledValue = HrmDocument.REPORT_STATUS.CANCELLED.getValue();
-			String currentStatus = currentEntry.getReportStatus();
-			String previousStatus = previousEntry.getReportStatus();
+			String currentStatus = currentEntry.getReportStatus().toValueString();
+			String previousStatus = previousEntry.getReportStatus().toValueString();
 
 			if(!cancelledValue.equals(currentStatus) && cancelledValue.equals(previousStatus))
 			{

@@ -77,7 +77,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 				HRMDocument hrmDocument = entry.getValue().getHrmDocument();
 				List<Integer> duplicateIdList = entry.getValue().getDuplicateIds();
 
-				String reportStatus = hrmDocument.getReportStatus();
+				String reportStatus = hrmDocument.getReportStatus().toValueString();
 				String dispFilename = hrmDocument.getReportType();
 				String dispDocNo    = hrmDocument.getId().toString();
 				String description = hrmDocument.getDescription();

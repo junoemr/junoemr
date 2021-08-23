@@ -41,6 +41,8 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 public class HRMDisplayReportAction extends DispatchAction {
 
@@ -60,8 +62,10 @@ public class HRMDisplayReportAction extends DispatchAction {
 		String hrmDocumentId = request.getParameter("id");
 		
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		Integer demographicNumberForLog = null;
 
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "r", null)) {
+			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, hrmDocumentId, request.getRemoteAddr());
         	throw new SecurityException("missing required security object (_hrm)");
         }
 		
@@ -85,6 +89,11 @@ public class HRMDisplayReportAction extends DispatchAction {
 
                             List<HRMDocumentToDemographic> demographicLinkList = hrmDocumentToDemographicDao.findByHrmDocumentId(document.getId());
                             HRMDocumentToDemographic demographicLink = (demographicLinkList.size() > 0 ? demographicLinkList.get(0) : null);
+                            if (demographicLink != null)
+                            {
+	                            demographicNumberForLog = demographicLink.getDemographicNo();
+                            }
+                            
                             request.setAttribute("demographicLink", demographicLink);
 
                             List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(document.getId());
@@ -156,10 +165,12 @@ public class HRMDisplayReportAction extends DispatchAction {
                             request.setAttribute("dupTimeReceived", dupTimeReceived);
                         }
                     }
-			
+                    
+                    
 		}
 		
 		
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographicNumberForLog, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, hrmDocumentId, request.getRemoteAddr());
 		return mapping.findForward("display");
 	}
 	

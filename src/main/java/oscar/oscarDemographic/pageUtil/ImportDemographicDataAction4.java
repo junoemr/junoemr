@@ -1923,7 +1923,7 @@ import java.util.zip.ZipInputStream;
                         } else {
                             hrmDoc.setTimeReceived(new Date());
                         }
-                        if (repR[i].getHRMResultStatus()!=null) hrmDoc.setReportStatus(repR[i].getHRMResultStatus());
+                        if (repR[i].getHRMResultStatus()!=null) hrmDoc.setReportStatus(HRMDocument.STATUS.fromValueString(repR[i].getHRMResultStatus()));
                         if (repR[i].getClass1()!=null) hrmDoc.setReportType(repR[i].getClass1().toString());
                         if (repR[i].getEventDateTime()!=null) hrmDoc.setReportDate(dateTimeFPtoDate(repR[i].getEventDateTime(), timeShiftInDays));
                         hrmDocDao.persist(hrmDoc);

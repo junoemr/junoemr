@@ -116,7 +116,7 @@ public class EncounterHRMService extends EncounterSectionService
 			HRMDocument hrmDocument = entry.getValue().getHrmDocument();
 			List<Integer> duplicateIdList = entry.getValue().getDuplicateIds();
 
-			String reportStatus = hrmDocument.getReportStatus();
+			HRMDocument.STATUS reportStatus = hrmDocument.getReportStatus();
 			String dispFilename = hrmDocument.getReportType();
 			String dispDocNo = hrmDocument.getId().toString();
 			String description = hrmDocument.getDescription();
@@ -126,8 +126,12 @@ public class EncounterHRMService extends EncounterSectionService
 			{
 				text = dispFilename;
 			}
-
-			if(reportStatus != null && reportStatus.equalsIgnoreCase("C"))
+			
+			if (reportStatus == null)
+			{
+				text = "(Unknown) " + text;
+			}
+			else if(reportStatus.equals(HRMDocument.STATUS.CANCELLED))
 			{
 				text = "(Cancelled) " + text;
 			}

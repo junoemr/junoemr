@@ -29,6 +29,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,8 @@ import oscar.OscarProperties;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -153,6 +156,7 @@ public class HRMSftpService
 			{
 				GenericFile downloadedFile = downloadRemoteFile(sftp, remoteFile, dateSubDirectory);
 				downloadedFiles.add(downloadedFile);
+				LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, remoteFile.getFilename());
 				
 				if (deleteAfterDownload)
 				{
@@ -163,6 +167,7 @@ public class HRMSftpService
 			{
 				// Any exception downloading the file leaves it on the server
 				logger.error("Could not download remote HRM file: " + remoteFile.getFilename(), e);
+				LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_FAILURE, remoteFile.getFilename());
 			}
 		}
 		
@@ -183,8 +188,8 @@ public class HRMSftpService
 	
 	private void removeRemoteFile(ChannelSftp sftp, ChannelSftp.LsEntry remoteFile) throws SftpException
 	{
-		logger.info("Removing remote file: " + remoteFile.getLongname());
-		sftp.rm(remoteFile.getLongname());
+		logger.info("Removing remote file: " + remoteFile.getFilename());
+		sftp.rm(remoteFile.getFilename());
 	}
 	
 	private List<GenericFile> decryptFiles(List<GenericFile> encryptedFiles, LocalDate dateSubDirectory)

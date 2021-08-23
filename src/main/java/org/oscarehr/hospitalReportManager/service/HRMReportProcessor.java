@@ -100,7 +100,7 @@ public class HRMReportProcessor
 			}
 			else
 			{
-				logger.info(String.format("Duplicate report hash (%s) for file: %s", model.getHashData().getReportHash(), model.getReportFile().getPath()));
+				logger.info(String.format("Duplicate report hash (%s) for file: %s", hrmDocument.getReportHash(), hrmDocument.getReportFile()));
 				hrmService.handleDuplicate(hrmDocument);
 			}
 		}

@@ -78,6 +78,7 @@ import org.springframework.stereotype.Component;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import oscar.OscarProperties;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
 
@@ -105,6 +106,8 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Autowired
 	private DashboardDao dashboardDao;
 
+	private static final OscarProperties properties = OscarProperties.getInstance();
+	
 	/**
 	$scope.recordtabs2 = [ 
 	 {id : 0,name : 'Master',url : 'partials/master.html'},
@@ -303,11 +306,15 @@ public class RecordUxService extends AbstractServiceImpl {
 			if( (securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.forms", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.eforms", "r", null)) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS)  ){
 				summaryList.add(new SummaryTo1("Forms",count++,SummaryTo1.FORMS_CODE));
 			}
+			
+			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)) // TODO: security module merge
+			{
+				summaryList.add(new SummaryTo1("HRM Documents", count++, SummaryTo1.HRM_DOCUMENTS));
+			}
 		}
 		return summaryList;
 	}
 	
-
 	private static final Map<String, String> MY_MAP = createMap();
 
     private static Map<String, String> createMap() {
@@ -327,7 +334,8 @@ public class RecordUxService extends AbstractServiceImpl {
 		result.put("incoming","labsDocsSummary");
 		result.put("dssupport","decisionSupportSummary");
 		result.put("allergies","allergiesSummary");
-		result.put("riskfactors","issueNoteSummary"); 
+		result.put("riskfactors","issueNoteSummary");
+		result.put("hrmdocuments", "HRMDocumentSummary");
 		
         return Collections.unmodifiableMap(result);
     }

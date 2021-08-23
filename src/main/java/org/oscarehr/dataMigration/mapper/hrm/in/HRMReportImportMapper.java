@@ -64,7 +64,6 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		model.setParentReport(null);
 		
 		model.setMessageUniqueId(importStructure.getMessageUniqueId());
-		model.setDescription(importStructure.getFirstReportClass());
 		model.setDeliverToUserId(importStructure.getDeliverToUserId());
 		
 		// Despite the name, there is exactly one report per imported HRMReport
@@ -75,6 +74,8 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		model.setCreatedBy(stubProviderFromPersonName(report.getAuthorPhysician()));
 		model.setReportStatus(getStatus(report.getResultStatus()));
 		model.setReportClass(getReportClass(report.getClazz()));
+		model.setDescription(model.getReportClass().getValue());
+		
 		model.setReportSubClass(report.getSubClass());
 		model.setReportFileSchemaVersion(SCHEMA_VERSION);
 		

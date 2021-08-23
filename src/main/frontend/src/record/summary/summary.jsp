@@ -39,7 +39,7 @@
 						module="mod"
 						item-display-count="mod.displaySize"
 						onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
-						enable-add-button="true"
+                        enable-add-button="summaryCtrl.showAddButton(mod)"
 						onclick-add="summaryCtrl.onSummaryModAdd(module, successCallback, dismissCallback)"
 						onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
 						clickable-title="summaryCtrl.isModTitleClickable(mod)"
@@ -114,6 +114,7 @@
 						onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
 						onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
 						clickable-title="summaryCtrl.isModTitleClickable(mod)"
+                        enable-add-button="summaryCtrl.showAddButton(mod)"
 						enable-filter="true"
 				>
 				</summary-module>

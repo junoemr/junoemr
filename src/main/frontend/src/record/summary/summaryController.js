@@ -372,7 +372,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);
 
 			}
-			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
+			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline' || item.type == 'hrm')
 			{
 
 				if (item.type == 'rx')
@@ -386,6 +386,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				else if (item.type == 'prevention')
 				{
 					win = "prevention" + $stateParams.demographicNo;
+				}
+				else if (item.type == 'hrm')
+				{
+					win = "HRM Documents" + $stateParams.demographicNo;
 				}
 				else
 				{
@@ -575,6 +579,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					return false;
 			}
 		};
+		
+		controller.showAddButton = (module) =>
+		{
+			return module.summaryCode !== "hrmdocuments";
+		}
 
 		// called when a child component is initialized. this allows the controller to call select child methods
 		controller.registerEncNoteListFunctions = function(refresh)
