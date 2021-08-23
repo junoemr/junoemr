@@ -395,6 +395,14 @@ public class DemographicManager {
 					ProfessionalSpecialist contactS = specialistDao.find(contactId);
 					demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactS);
 				}
+				else if (demographicContact.getType() == DemographicContact.TYPE_CONTACT)
+				{
+					Contact contactC = contactDao.findActiveContactById(contactId);
+					if (contactC != null)
+					{
+						demographicContactFewTo1 = demographicContactFewConverter.getAsTransferObject(demographicContact, contactC);
+					}
+				}
 				results.add(demographicContactFewTo1);
 			}
 		}

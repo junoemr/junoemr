@@ -122,7 +122,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
             ctrl.manageContacts = function manageContacts()
             {
                 let url = "../demographic/Contact.do?method=manage&demographic_no=" + ctrl.thisDemo;
-                window.open(url, "ManageContacts", "width=960, height=700");
+                window.open(url, "ManageContacts");
             };
         }]
 });

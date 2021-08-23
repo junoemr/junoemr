@@ -170,7 +170,7 @@ function updTklrList() {
 
 function search_demographic(nameEl, valueEl, demoNo) {
     var url = '../ticklerPlus/demographicSearch2.jsp?outofdomain=false&form=contactForm&elementName='+nameEl+'&elementId='+valueEl+'&demoNo='+demoNo;
-    var popup = window.open(url,'demographic_search');
+    var popup = window.open(url,'demographic_search', "width=990, height=500");
     demo_no_orig = document.contactForm.elements[valueEl].value;
     //check_demo_no = setInterval("if (demo_no_orig != document.contactForm.elements[valueEl].value) updTklrList()",100);
 

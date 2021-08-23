@@ -27,8 +27,6 @@
 <%@ page import="java.util.List, org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.oscarehr.common.web.ContactAction" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.Provider" %>
-<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.model.DemographicContact" %>
 <%@ page import="org.oscarehr.common.model.Demographic" %>
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
@@ -40,6 +38,7 @@
 
 <% 
 	List<DemographicContact> demographicContacts = null;
+	List<DemographicContact> testing = null;
 	DemographicDao demographicDao = null;
 	Demographic demographic = null;
 	ContactSpecialtyDao specialtyDao = null;
@@ -49,7 +48,7 @@
 	if ( ! StringUtils.isBlank( demographicNoString ) ) {		
 		demographicDao = SpringUtils.getBean(DemographicDao.class);
 		demographic = demographicDao.getClientByDemographicNo( Integer.parseInt(demographicNoString) );
-		demographicContacts = ContactAction.getDemographicContacts(demographic);
+		demographicContacts = ContactAction.getDemographicProfessionalContacts(demographic, DemographicContact.CATEGORY_PROFESSIONAL);
 		specialtyDao = SpringUtils.getBean(ContactSpecialtyDao.class);
 		specialty = specialtyDao.findAll();
 	}

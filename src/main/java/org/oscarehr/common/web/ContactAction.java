@@ -661,6 +661,11 @@ public class ContactAction extends DispatchAction {
 		return fillContactNames(contacts);
 	}
 
+	public static List<DemographicContact> getDemographicProfessionalContacts(Demographic demographic, String category) {
+		List<DemographicContact> contacts = demographicContactDao.findByDemographicNoAndCategory(demographic.getDemographicNo(), category);
+		return fillContactNames(contacts);
+	}
+
 	public static List<String> getDemographicContactIds(String demographicNo) {
 		List<DemographicContact> contacts = demographicContactDao.findByDemographicNo(Integer.parseInt(demographicNo));
 		List<String> demographicContactIds = new ArrayList<String>();

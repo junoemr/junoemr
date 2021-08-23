@@ -54,7 +54,7 @@
 		providerList = providerDao.getActiveProviders();
 		demographicDao = SpringUtils.getBean(DemographicDao.class);
 		demographic = demographicDao.getClientByDemographicNo( Integer.parseInt(demographicNoString) );
-		demographicContacts = ContactAction.getDemographicContacts(demographic);
+		demographicContacts = ContactAction.getDemographicProfessionalContacts(demographic, DemographicContact.CATEGORY_PROFESSIONAL);
 		contactSpecialtyDao = SpringUtils.getBean(ContactSpecialtyDao.class);
 		specialty = contactSpecialtyDao.findAll();
 	}	
@@ -216,8 +216,9 @@ function renderResponse(html, id) {
 
 //--> reset all list input fields
 jQuery.fn.resetFields = function() {
+
 	// clean search fields and re-focus
-	jQuery('#searchHealthCareTeamInput').val("Last Name, First Name").css('color', 'grey');
+	jQuery('#searchHealthCareTeamInput').val("").css('color', 'grey');
 }
 
 //--> Remove/Edit contact action. Wrapped in a function to re-bind after postback
@@ -298,7 +299,7 @@ jQuery(document).ready( function($) {
 	    }     
 	});
 	
-	jQuery('#searchHealthCareTeamInput').val("Last Name, First Name").css('color','grey')
+	jQuery('#searchHealthCareTeamInput').val("").css('color','grey')
 	.focus(function(){
 	    if(this.value == "Last Name, First Name"){
 	         this.value = "";
@@ -306,7 +307,7 @@ jQuery(document).ready( function($) {
 	    }		
 	}).blur(function(){
 	    if(this.value==""){
-	         this.value = "Last Name, First Name";
+	        // this.value = "Last Name, First Name";
 	         jQuery('#searchHealthCareTeamInput').css('color','grey')
 	    }
 	});
@@ -468,7 +469,7 @@ jQuery(document).ready( function($) {
 			<td class="external" >
 				<input type="text" id="searchHealthCareTeamInput" 
 					name="searchHealthCareTeamInput" 
-					value="" />
+					value="" placeholder="Name"/>
 			</td>
 			
 			<td class="external">

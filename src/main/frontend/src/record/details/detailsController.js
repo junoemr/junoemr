@@ -808,7 +808,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (discard)
 			{
 				var url = "../demographic/Contact.do?method=manage&demographic_no=" + controller.page.demo.demographicNo;
-				window.open(url, "ManageContacts", "width=960, height=700");
+				window.open(url, "ManageContacts");
 			}
 		};
 
