@@ -9,7 +9,7 @@
 		background-color: $dirty-color;
 	}
 	&::placeholder {
-		color: $placeholder-color;
+		color: var(--color-neutral-grey);
 	}
 	&:disabled {
 		background-color: $disabled-color;
@@ -17,16 +17,16 @@
 	}
 }
 @mixin juno-form-colour-scheme-light {
-	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-lightest, $color-neutral-light,
-			$color-neutral-darker, $color-neutral-grey, $color-neutral-white);
+	@include juno-form-colour-scheme(var(--color-neutral-lightest), var(--color-neutral-lightest), var(--color-neutral-light),
+			var(--color-neutral-darker), var(--color-neutral-grey), var(--color-neutral-white));
 }
 @mixin juno-form-colour-scheme-blue {
-	@include juno-form-colour-scheme($color-primary-dark, $color-primary-darker, $color-primary-dark,
-			$color-neutral-white, $color-neutral-light-grey, $color-primary-dark);
+	@include juno-form-colour-scheme(var(--color-primary-dark), var(--color-primary-darker), var(--color-primary-dark),
+			var(--color-neutral-white), var(--color-neutral-light-grey), var(--color-primary-dark));
 }
 @mixin juno-form-colour-scheme-dark {
-	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-light,
-			$color-neutral-darker, $color-neutral-dark, $color-neutral-white);
+	@include juno-form-colour-scheme(var(--color-neutral-lightest), var(--color-neutral-light), var(--color-neutral-light),
+			var(--color-neutral-darker), var(--color-neutral-dark), var(--color-neutral-white));
 }
 
 
