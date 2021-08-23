@@ -62,15 +62,19 @@ public class Contact extends AbstractModel<Integer> {
 	private String country;
 	private String postal;
 	private String residencePhone;
-	private String cellPhone;
-	private String workPhone;
 	private String residencePhoneExtension;
+	private String cellPhone;
 	private String cellPhoneExtension;
+	private String workPhone;
 	private String workPhoneExtension;
 	private String email;
 	private String fax;
 	private String note;
+	private String specialty;
+	private String cpso;
+	private String systemId;
 	boolean deleted=false;
+
 
 	@PreRemove
 	protected void jpa_preventDelete() {

@@ -84,6 +84,12 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
 		exportDemographic.addAddress(buildAddress(input));
 
+		Address alternateAddress = buildAlternativeAddress(input);
+		if (alternateAddress != null)
+		{
+			exportDemographic.addAddress(alternateAddress);
+		}
+
 		// phone conversions
 		if(input.getPhone() != null)
 		{
@@ -128,6 +134,40 @@ public class DemographicDbToModelConverter extends
 		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
 		address.setResidencyStatusCurrent();
 
+		return address;
+	}
+	protected Address buildAlternativeAddress(Demographic input)
+	{
+		DemographicExt altAddressExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_ADDRESS);
+		DemographicExt altCityExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_CITY);
+		DemographicExt altProvinceExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_PROVINCE);
+		DemographicExt altPostalExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_POSTAL);
+
+		Address address = new Address();
+		if (altAddressExt != null)
+		{
+			address.setAddressLine1(altAddressExt.getValue());
+		}
+		if (altCityExt != null)
+		{
+			address.setCity(altCityExt.getValue());
+		}
+		if (altProvinceExt != null)
+		{
+			address.setRegionCode(findRegionCodeValue(altProvinceExt.getValue()));
+			address.setCountryCode(findCountryCodeValue(altProvinceExt.getValue(), COUNTRY_CODE_CANADA));
+		}
+		if (altPostalExt != null)
+		{
+			address.setPostalCode(StringUtils.deleteWhitespace(altPostalExt.getValue()));
+		}
+
+		if (address.getAddressLine1() == null && address.getCity() == null && address.getRegionCode() == null
+			&& address.getCountryCode() == null && address.getPostalCode() == null)
+		{
+			return null;
+		}
+		address.setResidencyStatusPast();
 		return address;
 	}
 

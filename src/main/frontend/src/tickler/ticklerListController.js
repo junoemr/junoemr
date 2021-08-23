@@ -240,13 +240,9 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.addTickler = function()
 		{
-			var windowProps = "height=400,width=600,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
-			//window.open('../tickler/ticklerAdd.jsp','ticklerAdd',windowProps);
-
 			var modalInstance = $uibModal.open(
 			{
-				templateUrl: 'src/tickler/ticklerAdd.jsp',
-				controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
+				component: "ticklerAddComponent",
 				backdrop: 'static',
 				size: 'lg',
 				resolve: {
@@ -257,7 +253,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 			modalInstance.result.then(function(data)
 			{
-				console.log('data from modalInstance ' + data);
 				if (data != null && data == true)
 				{
 					controller.tableParams.reload();
@@ -266,8 +261,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			{
 				alert(reason);
 			});
-
-
 		};
 
 		controller.editTickler = function(tickler)

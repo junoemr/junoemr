@@ -45,6 +45,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
@@ -154,15 +155,12 @@ public class CDSDemographicImportMapperTest
 	@Test
 	public void testMapCareTeamInfo_EnrolledPhysicianMapping_Rostered() throws Exception
 	{
-		String familyDocFName = "famDoc";
-		String familyDocLName = "incorrect";
 
 		String enrolledDocFName = "enrolledDoc";
 		String enrolledDocLName = "correct";
 		String enrolledDocOhip = "12345";
 
 		//set up
-		ObjectFactory objectFactory = new ObjectFactory();
 
 		List<RosterData> rosterDataList = new ArrayList<>();
 		RosterData rosterData = new RosterData();
@@ -175,11 +173,7 @@ public class CDSDemographicImportMapperTest
 		rosterData.setRosterProvider(rosterProvider);
 		rosterDataList.add(rosterData);
 
-		PersonNameSimple familyDoctor = objectFactory.createPersonNameSimple();
-		familyDoctor.setFirstName(familyDocFName);
-		familyDoctor.setLastName(familyDocLName);
-
-		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList, familyDoctor);
+		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList);
 
 		// run the test
 		Demographic demographic = new Demographic();
@@ -193,21 +187,17 @@ public class CDSDemographicImportMapperTest
 	}
 
 	/**
-	 * ensure family physician is used over enrolled physician when patient is not enrolled
+	 * ensure that family doctor is not set when patient is not enrolled
 	 */
 	@Test
 	public void testMapCareTeamInfo_EnrolledPhysicianMapping_RosterTerminated() throws Exception
 	{
-		String familyDocFName = "famDoc";
-		String familyDocLName = "correct";
 
 		String enrolledDocFName = "enrolledDoc";
 		String enrolledDocLName = "incorrect";
 		String enrolledDocOhip = "12345";
 
 		//set up
-		ObjectFactory objectFactory = new ObjectFactory();
-
 		List<RosterData> rosterDataList = new ArrayList<>();
 		RosterData rosterData = new RosterData();
 		rosterData.setRostered(false);
@@ -219,23 +209,104 @@ public class CDSDemographicImportMapperTest
 		rosterData.setRosterProvider(rosterProvider);
 		rosterDataList.add(rosterData);
 
-		PersonNameSimple familyDoctor = objectFactory.createPersonNameSimple();
-		familyDoctor.setFirstName(familyDocFName);
-		familyDoctor.setLastName(familyDocLName);
-
-		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList, familyDoctor);
+		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList);
 
 		// run the test
 		Demographic demographic = new Demographic();
 		cdsDemographicImportMapper.mapCareTeamInfo(importStructure, demographic);
 
 		// check results
-		assertNotNull(demographic.getFamilyDoctor());
-		assertEquals(familyDocFName, demographic.getFamilyDoctor().getFirstName());
-		assertEquals(familyDocLName, demographic.getFamilyDoctor().getLastName());
+		assertNull(demographic.getFamilyDoctor());
 	}
 
-	private Demographics mockCareTeamForEnrolledPhysicianCheck(List<RosterData> rosterDataList, PersonNameSimple familyDoctor) throws Exception
+	/**
+	 * ensure family physician is imported into patient note
+	 * OMD Requirement: Family Doctor goes into demographic note section
+	 *                  because oscar puts family doctor/enrolled physician in the same spot
+	 */
+	@Test
+	public void testFamilyPhysicianPatientNote() throws Exception
+	{
+		String familyDocFName = "famDoc";
+		String familyDocLName = "correct";
+		String expectedNote = "FamilyPhysician: " + familyDocFName + " " + familyDocLName;
+
+		//set up
+		ObjectFactory objectFactory = new ObjectFactory();
+
+		PersonNameSimple familyDoctor = objectFactory.createPersonNameSimple();
+		familyDoctor.setFirstName(familyDocFName);
+		familyDoctor.setLastName(familyDocLName);
+
+		Demographics importStructure = mockFamilyPhysician(familyDoctor);
+
+		// run the test
+		Demographic demographic = new Demographic();
+		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
+
+		// check results
+		assertEquals(expectedNote, demographic.getPatientNote());
+	}
+
+	/**
+	 * ensure if family physician is null it doesn't affect PatientNote
+	 */
+	@Test
+	public void testFamilyPhysicianNullPatientNote() throws Exception
+	{
+		//set up
+		PersonNameSimple familyDoctor = null;
+		Demographics importStructure = mockFamilyPhysician(familyDoctor);
+
+		// run the test
+		Demographic demographic = new Demographic();
+		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
+
+		// check results
+		assertNull(demographic.getPatientNote());
+	}
+
+	/**
+	 * ensure UniqueVendorSequenceId is included in PatientNote
+	 */
+	@Test
+	public void testUniqueVendorIdSequenceIncludedPatientNote() throws Exception
+	{
+		// OMD Requirement:
+		// Family doctor goes into note section
+
+		String vendorId = "TEST_VENDOR_ID";
+		String expectedNote = "UniqueVendorIdSequence: " + vendorId;
+
+		//set up
+		Demographics importStructure = mockUniqueVendorIdSequence(vendorId);
+
+		// run the test
+		Demographic demographic = new Demographic();
+		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
+
+		// check results
+		assertEquals(expectedNote, demographic.getPatientNote());
+	}
+
+	/**
+	 * ensure if UniqueVendorSequenceId is not included, it doesn't effect PatientNote
+	 */
+	@Test
+	public void testUniqueVendorIdSequenceNullPatientNote() throws Exception
+	{
+		//set up
+		Demographics importStructure = mockUniqueVendorIdSequence(null);
+
+		// run the test
+		Demographic demographic = new Demographic();
+		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
+
+		// check results
+		assertNull(demographic.getPatientNote());
+	}
+
+	private Demographics mockCareTeamForEnrolledPhysicianCheck(List<RosterData> rosterDataList) throws Exception
 	{
 		Demographics importStructure = Mockito.mock(Demographics.class);
 		Demographics.Enrolment enrollment = Mockito.mock(Demographics.Enrolment.class);
@@ -249,7 +320,22 @@ public class CDSDemographicImportMapperTest
 		Mockito.when(importStructure.getPrimaryPhysician()).thenReturn(null);
 		Mockito.when(importStructure.getReferredPhysician()).thenReturn(null);
 		Mockito.when(importStructure.getPersonStatusCode()).thenReturn(null);
+
+		return importStructure;
+	}
+
+	private Demographics mockFamilyPhysician(PersonNameSimple familyDoctor) throws Exception
+	{
+		Demographics importStructure = Mockito.mock(Demographics.class);
 		Mockito.when(importStructure.getFamilyPhysician()).thenReturn(familyDoctor);
+
+		return importStructure;
+	}
+
+	private Demographics mockUniqueVendorIdSequence(String uniqueVenderIdSequence) throws Exception
+	{
+		Demographics importStructure = Mockito.mock(Demographics.class);
+		Mockito.when(importStructure.getUniqueVendorIdSequence()).thenReturn(uniqueVenderIdSequence);
 
 		return importStructure;
 	}
