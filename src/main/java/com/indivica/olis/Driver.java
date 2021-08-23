@@ -318,7 +318,7 @@ public class Driver
 			CMSSignedDataGenerator sgen = new CMSSignedDataGenerator();
 
 			// What digest algorithm i must use? SHA1? MD5? RSA?...
-			ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(priv);			
+			ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA256withRSA").setProvider("BC").build(priv);
 			sgen.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build())
 	                     .build(sha1Signer, cert));
 			

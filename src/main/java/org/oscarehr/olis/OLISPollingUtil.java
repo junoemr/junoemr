@@ -139,7 +139,7 @@ public class OLISPollingUtil {
 				
 				if(!response.startsWith("<Response")){
 					logger.error("response does not match, aborting "+response);
-					break;
+					continue;
 				}
 				String timeStampForNextStartDate= OLISPollingUtil.parseAndImportResponse(loggedInInfo, response);
 				logger.info("timeSlot "+timeStampForNextStartDate);
