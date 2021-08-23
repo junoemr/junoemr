@@ -298,19 +298,6 @@ jQuery(document).ready( function($) {
 	    	searchExternalProviders("Search");
 	    }     
 	});
-	
-	jQuery('#searchHealthCareTeamInput').val("").css('color','grey')
-	.focus(function(){
-	    if(this.value == "Last Name, First Name"){
-	         this.value = "";
-	         jQuery('#searchHealthCareTeamInput').css('color','black')
-	    }		
-	}).blur(function(){
-	    if(this.value==""){
-	        // this.value = "Last Name, First Name";
-	         jQuery('#searchHealthCareTeamInput').css('color','grey')
-	    }
-	});
 			
 	jQuery('#searchHealthCareTeamButton').bind("click", function(){
 		searchExternalProviders(this.value);
