@@ -641,7 +641,8 @@ public class ContactAction extends DispatchAction {
 	}
 
 
-	public static List<Contact> searchContacts(String searchMode, String orderBy, String keyword) {
+	public static List<Contact> searchContacts(String searchMode, String orderBy, String keyword)
+	{
 		List<Contact> contacts = contactDao.search(searchMode, orderBy, keyword);
 		return contacts;
 	}

@@ -38,7 +38,6 @@
 
 <% 
 	List<DemographicContact> demographicContacts = null;
-	List<DemographicContact> testing = null;
 	DemographicDao demographicDao = null;
 	Demographic demographic = null;
 	ContactSpecialtyDao specialtyDao = null;
