@@ -67,12 +67,12 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		// Despite the name, there is exactly one report per imported HRMReport
 		ReportsReceived report = importStructure.getDocumentRoot().getPatientRecord().getReportsReceived().get(0);
 		
-		ReportClass clazz = report.getClazz();
-		model.setReportClass(getReportClass(clazz));
+		ReportClass reportClass = report.getClazz();
+		model.setReportClass(fromNullableString(reportClass));
 		
 		// DI (Diagnostic Imaging) and CRT (Cardio-respiratory reports seem to not have an event date time, so use the
-		// observation time of the first procedure in it's place.
-		if (clazz.equals(ReportClass.DIAGNOSTIC_IMAGING_REPORT) || clazz.equals(ReportClass.CARDIO_RESPIRATORY_REPORT) &&
+		// observation time of the first procedure in it's place, if one can be found.
+		if (reportClass.equals(ReportClass.DIAGNOSTIC_IMAGING_REPORT) || reportClass.equals(ReportClass.CARDIO_RESPIRATORY_REPORT) &&
 			toNullableLocalDateTime(report.getEventDateTime()) == null &&
 			importStructure.getObservations() != null && !importStructure.getObservations().isEmpty())
 		{
@@ -86,7 +86,7 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		
 		model.setReceivedDateTime(LocalDateTime.now());
 		model.setCreatedBy(stubProviderFromPersonName(report.getAuthorPhysician()));
-		model.setReportStatus(getStatus(report.getResultStatus()));
+		model.setReportStatus(fromNullableString(report.getResultStatus()));
 		model.setDescription(model.getReportClass().getValue());
 		
 		model.setReportSubClass(report.getSubClass());

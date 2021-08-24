@@ -32,6 +32,7 @@ import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.Demographics;
 import xml.hrm.v4_3.OmdCds;
+import xml.hrm.v4_3.PersonNameSimple;
 import xml.hrm.v4_3.PersonNameStandard;
 import xml.hrm.v4_3.PersonNameStandard.LegalName.OtherName;
 import xml.hrm.v4_3.ReportFormat;
@@ -131,37 +132,65 @@ public class HRMReport_4_3 implements HRMReport
 	{
 		List<Integer> dateOfBirthList = new ArrayList<Integer>();
 		XMLGregorianCalendar fullDate = dateFP(demographics.getDateOfBirth());
-		dateOfBirthList.add(fullDate.getYear());
-		dateOfBirthList.add(fullDate.getMonth());
-		dateOfBirthList.add(fullDate.getDay());
-
+		if (fullDate != null)
+		{
+			dateOfBirthList.add(fullDate.getYear());
+			dateOfBirthList.add(fullDate.getMonth());
+			dateOfBirthList.add(fullDate.getDay());
+		}
+		
 		return dateOfBirthList;
 	}
 
 	public String getDateOfBirthAsString()
 	{
 		List<Integer> dob = getDateOfBirth();
-		return dob.get(0) + "-" + String.format("%02d", dob.get(1)) + "-" + String.format("%02d", dob.get(2));
+		if (dob != null && !dob.isEmpty())
+		{
+			return dob.get(0) + "-" + String.format("%02d", dob.get(1)) + "-" + String.format("%02d", dob.get(2));
+		}
+		
+		return "";
 	}
 
 	public String getHCN()
 	{
-		return demographics.getHealthCard().getNumber();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getNumber();
+		}
+		
+		return "";
 	}
 
 	public String getHCNVersion()
 	{
-		return demographics.getHealthCard().getVersion();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getVersion();
+		}
+		
+		return "";
 	}
 
 	public Calendar getHCNExpiryDate()
 	{
-		return demographics.getHealthCard().getExpirydate().toGregorianCalendar();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getExpirydate().toGregorianCalendar();
+		}
+		
+		return null;
 	}
 
 	public String getHCNProvinceCode()
 	{
-		return demographics.getHealthCard().getProvinceCode();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getProvinceCode();
+		}
+		
+		return "";
 	}
 
 	public String getGender()
@@ -344,14 +373,23 @@ public class HRMReport_4_3 implements HRMReport
 	public List<String> getFirstReportAuthorPhysician()
 	{
 		List<String> physicianName = new ArrayList<String>();
-		String physicianHL7String = hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician().getLastName();
-		String[] physicianNameArray = physicianHL7String.split("\\^");
-		physicianName.add(physicianNameArray[0]);
-		physicianName.add(physicianNameArray[1]);
-		physicianName.add(physicianNameArray[2]);
-		physicianName.add(physicianNameArray[3]);
-		physicianName.add(physicianNameArray[6]);
-
+		PersonNameSimple physicianHL7 = hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician();
+		
+		if (physicianHL7 != null && physicianHL7.getLastName() != null)
+		{
+			String physicianHL7RawString = physicianHL7.getLastName();
+			String[] physicianNameArray = physicianHL7RawString.split("\\^");
+			
+			if (physicianNameArray.length == 7)
+			{
+				physicianName.add(physicianNameArray[0]);
+				physicianName.add(physicianNameArray[1]);
+				physicianName.add(physicianNameArray[2]);
+				physicianName.add(physicianNameArray[3]);
+				physicianName.add(physicianNameArray[6]);
+			}
+		}
+		
 		return physicianName;
 	}
 

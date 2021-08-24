@@ -38,14 +38,14 @@ import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DOC_CLASS_MEDIC
 @Data
 public class HrmDocument extends AbstractTransientModel
 {
-	public enum REPORT_STATUS
+	public enum ReportStatus
 	{
 		SIGNED("S"),
 		CANCELLED("C");
 
 		private final String value;
 
-		REPORT_STATUS(String value)
+		ReportStatus(String value)
 		{
 			this.value = value;
 		}
@@ -55,9 +55,9 @@ public class HrmDocument extends AbstractTransientModel
 			return this.value;
 		}
 
-		public static REPORT_STATUS fromValueString(String value)
+		public static ReportStatus fromValueString(String value)
 		{
-			for(REPORT_STATUS status : REPORT_STATUS.values())
+			for(ReportStatus status : ReportStatus.values())
 			{
 				if(status.getValue().equalsIgnoreCase(value))
 				{
@@ -68,7 +68,7 @@ public class HrmDocument extends AbstractTransientModel
 		}
 	}
 
-	public enum REPORT_CLASS
+	public enum ReportClass
 	{
 		DIAGNOSTIC_IMAGING("Diagnostic Imaging Report"),
 		DIAGNOSTIC_TEST("Diagnostic Test Report"),
@@ -80,7 +80,7 @@ public class HrmDocument extends AbstractTransientModel
 
 		private final String value;
 
-		REPORT_CLASS(String value)
+		ReportClass(String value)
 		{
 			this.value = value;
 		}
@@ -90,9 +90,9 @@ public class HrmDocument extends AbstractTransientModel
 			return this.value;
 		}
 
-		public static REPORT_CLASS fromValueString(String value)
+		public static ReportClass fromValueString(String value)
 		{
-			for(REPORT_CLASS status : REPORT_CLASS.values())
+			for(ReportClass status : ReportClass.values())
 			{
 				if(status.getValue().equalsIgnoreCase(value))
 				{
@@ -101,7 +101,36 @@ public class HrmDocument extends AbstractTransientModel
 			}
 			if(DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE.equalsIgnoreCase(value))
 			{
-				return REPORT_CLASS.MEDICAL_RECORDS;
+				return ReportClass.MEDICAL_RECORDS;
+			}
+			return null;
+		}
+	}
+	
+	public enum DeliveryPrefix
+	{
+		DOCTOR ("D"),
+		NURSE ("N");
+		
+		private final String prefix;
+		
+		DeliveryPrefix(String prefix) {
+			this.prefix = prefix;
+		}
+		
+		public String getPrefixString()
+		{
+			return this.prefix;
+		}
+		
+		public static DeliveryPrefix fromString(String prefixString)
+		{
+			for(DeliveryPrefix deliveryPrefix : DeliveryPrefix.values())
+			{
+				if(deliveryPrefix.getPrefixString().equalsIgnoreCase(prefixString))
+				{
+					return deliveryPrefix;
+				}
 			}
 			return null;
 		}
@@ -116,9 +145,9 @@ public class HrmDocument extends AbstractTransientModel
 	private Provider createdBy;
 
 	private String description;
-	private REPORT_CLASS reportClass;
+	private ReportClass reportClass;
 	private String reportSubClass;
-	private REPORT_STATUS reportStatus;
+	private ReportStatus reportStatus;
 	private GenericFile reportFile;
 	private String reportFileSchemaVersion;
 	private Document document;

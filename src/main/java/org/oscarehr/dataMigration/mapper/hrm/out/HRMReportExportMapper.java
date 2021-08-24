@@ -29,7 +29,6 @@ import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
-import xml.hrm.v4_3.ReportClass;
 import xml.hrm.v4_3.ReportContent;
 import xml.hrm.v4_3.ReportFormat;
 import xml.hrm.v4_3.ReportsReceived;
@@ -102,17 +101,17 @@ public class HRMReportExportMapper extends AbstractHRMExportMapper<ReportsReceiv
 		return contentList;
 	}
 
-	protected ReportClass toReportClass(HrmDocument.REPORT_CLASS exportClass)
+	protected xml.hrm.v4_3.ReportClass toReportClass(HrmDocument.ReportClass exportClass)
 	{
-		ReportClass reportClass = ReportClass.OTHER_LETTER;
+		xml.hrm.v4_3.ReportClass reportClass = xml.hrm.v4_3.ReportClass.OTHER_LETTER;
 		if(exportClass != null)
 		{
-			reportClass = ReportClass.fromValue(exportClass.getValue());
+			reportClass = xml.hrm.v4_3.ReportClass.fromValue(exportClass.getValue());
 		}
 		return reportClass;
 	}
 
-	protected String getReportStatus(HrmDocument.REPORT_STATUS reportStatus)
+	protected String getReportStatus(HrmDocument.ReportStatus reportStatus)
 	{
 		if(reportStatus != null)
 		{

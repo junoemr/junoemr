@@ -33,7 +33,6 @@ import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.springframework.stereotype.Component;
-import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.ReportContent;
 import xml.cds.v5_0.ReportFormat;
 import xml.cds.v5_0.Reports;
@@ -129,17 +128,17 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 		return StringUtils.trimToNull(noteText.toString());
 	}
 
-	protected ReportClass toReportClass(HrmDocument.REPORT_CLASS exportClass)
+	protected xml.cds.v5_0.ReportClass toReportClass(HrmDocument.ReportClass exportClass)
 	{
-		ReportClass reportClass = ReportClass.OTHER_LETTER;
+		xml.cds.v5_0.ReportClass reportClass = xml.cds.v5_0.ReportClass.OTHER_LETTER;
 		if(exportClass != null)
 		{
-			reportClass = ReportClass.fromValue(exportClass.getValue());
+			reportClass = xml.cds.v5_0.ReportClass.fromValue(exportClass.getValue());
 		}
 		return reportClass;
 	}
 
-	protected String getReportStatus(HrmDocument.REPORT_STATUS reportStatus)
+	protected String getReportStatus(HrmDocument.ReportStatus reportStatus)
 	{
 		if(reportStatus != null)
 		{

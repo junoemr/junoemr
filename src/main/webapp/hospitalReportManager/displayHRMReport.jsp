@@ -484,7 +484,13 @@
             String firstName = hrmReport.getLegalFirstName();
             String HCN = hrmReport.getHCN();
             String HCNVersion = hrmReport.getHCNVersion();
-            String HCNProvince = hrmReport.getHCNProvinceCode().replaceAll("\\w{2}-", "");;
+
+            String HCNProvince = hrmReport.getHCNProvinceCode();
+            if (ConversionUtils.hasContent(HCNProvince))
+            {
+            	HCNProvince.replaceAll("\\w{2}-", "");
+            }
+
             String gender = hrmReport.getGender();
             String dateOfBirth = hrmReport.getDateOfBirthAsString();
 
@@ -506,9 +512,13 @@
             Date reportTime = findReportTime(hrmReport);
 
             // I think author is an optional field
-            List<String> authorParts = hrmReport.getFirstReportAuthorPhysician();
-            authorParts.remove(0);
-            String author = StringUtils.trimToNull(String.join(" ", authorParts));
+            String author = "";
+            List<String> authorNameParts = hrmReport.getFirstReportAuthorPhysician();
+            if (authorNameParts != null && !authorNameParts.isEmpty())
+            {
+                authorNameParts.remove(0);
+            }
+            author = StringUtils.trimToNull(String.join(" ", authorNameParts));
         %>
         <b>Name: </b><span class="<%=getFieldClass(lastName)%>"><%=getFieldDisplayValue(lastName)%></span>, <span class="<%=getFieldClass(firstName)%>"><%=getFieldDisplayValue(firstName)%></span> <span class="<%=getFieldClass(gender)%>">(<%=getFieldDisplayValue(gender)%>)</span><br/>
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
@@ -560,7 +570,7 @@
             <% } %>
             <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?hash=<%=noMessageIdHash%>"><%=(hrmReport.getLegalLastName() + "-" + hrmReport.getLegalFirstName() + "-" +  hrmReport.getFirstReportClass() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
             <% } else { %>
-            <div><%=hrmReport.getFirstReportTextContent()%></div>
+            <div class="<%=getFieldClass(hrmReport.getFirstReportTextContent())%>"><%=ConversionUtils.hasContent(hrmReport.getFirstReportTextContent()) ? hrmReport.getFirstReportTextContent() : "NO CONTENT"%></div>
             <% } %>
             <%
                 String confidentialityStatement = (String) request.getAttribute("confidentialityStatement");
@@ -589,11 +599,11 @@
                 <% } %>
                 <tr>
                     <td>Facility:</td>
-                    <td><span class="<%=getFieldClass(sendingFacility)%>"><%=sendingFacility%></span></td>
+                    <td><span class="<%=getFieldClass(sendingFacility)%>"><%=getFieldDisplayValue(sendingFacility)%></span></td>
                 </tr>
                 <tr>
                     <td>Report No:</td>
-                    <td><span class="<%=getFieldClass(reportNumber)%>"><%=reportNumber%></span></td>
+                    <td><span class="<%=getFieldClass(reportNumber)%>"><%=getFieldDisplayValue(reportNumber)%></span></td>
                 </tr>
                 <tr>
                     <td>Status</td>
@@ -688,7 +698,7 @@
                     <td><span class="<%=getFieldClass(deliverToLastName)%>"><%=getFieldDisplayValue(deliverToLastName)%></span>, <span class="<%=getFieldClass(deliverToFirstName)%>"><%=getFieldDisplayValue(deliverToFirstName)%></span></td>
                 </tr>
                 <tr>
-                    <td><%=deliverToId.startsWith("D") ? "CPSID:" : "CNO"%></td>
+                    <td><%=deliverToId.startsWith("N") ? "CNO:" : "CPSID"%></td>
                     <td><span class="<%=getFieldClass(deliverToId)%>"><%=getFieldDisplayValue(deliverToId)%></span></td>
                 </tr>
                 <% } %>
@@ -749,9 +759,15 @@
                     <td colspan="2">Accompanying SubClasses:</td>
                 </tr>
                 <% for (HrmObservation observation: hrmObservations) { %>
+                <%
+                    String mnemonic = observation.getAccompanyingMnemonic();
+                    String subclass = observation.getAccompanyingSubClass();
+                    String description = observation.getAccompanyingDescription();
+                    String observationDate = ConversionUtils.toDateString(observation.getObservationDateTime());
+                %>
                 <tr>
-                    <td><span>(<%=observation.getAccompanyingMnemonic()%>)<%=observation.getAccompanyingSubClass()%> <%= observation.getAccompanyingDescription() %></span></td>
-                    <td><%=(ConversionUtils.toDateString(observation.getObservationDateTime()))%></td>
+                    <td><span class="<%=getFieldClass(mnemonic)%>">(<%=getFieldDisplayValue(mnemonic)%>)</span> <span class="<%=getFieldClass(subclass)%>"><%=getFieldDisplayValue(subclass)%></span> <span class="<%=getFieldClass(description)%>"><%=getFieldDisplayValue(description)%></span></td>
+                    <td class="<%=getFieldClass(observationDate)%>"><%=getFieldDisplayValue(observationDate)%></td>
                 </tr>
                 <% } %>
                 <%--        <tr>
@@ -788,11 +804,11 @@
                             HRMDocumentToProvider hrmDocumentToProvider = HRMDisplayReportAction.getHRMDocumentFromProvider(loggedInInfo.getLoggedInProviderNo(), hrmReportId);
                             if (hrmDocumentToProvider != null && hrmDocumentToProvider.isSignedOff()) {
                         %>
-                        <input type="button" id="signoff<%=hrmReportId %>" value="Revoke Sign-Off" onClick="revokeSignOffHrm('<%=hrmReportId %>')" />
+                        <input type="button" id="signoff<%=hrmReportId %>" value="Revoke Sign-Off" onClick="revokeSignOffHrm('<%=hrmReportId %>')"/>
                         <%
                         } else {
                         %>
-                        <input type="button" id="signoff<%=hrmReportId %>" value="Sign-Off" onClick="signOffHrm('<%=hrmReportId %>')" />
+                        <input type="button" id="signoff<%=hrmReportId %>" value="Sign-Off" onClick="signOffHrm('<%=hrmReportId %>')"/>
                         <%
                             }
                         %>

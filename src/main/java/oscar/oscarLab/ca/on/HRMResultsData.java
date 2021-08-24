@@ -223,7 +223,7 @@ public class HRMResultsData {
 		}
 		else // try to pick the one that's not canceled.
 		{
-			String cancelledValue = HrmDocument.REPORT_STATUS.CANCELLED.getValue();
+			String cancelledValue = HrmDocument.ReportStatus.CANCELLED.getValue();
 			String currentStatus = currentEntry.getReportStatus().toValueString();
 			String previousStatus = previousEntry.getReportStatus().toValueString();
 

@@ -58,8 +58,8 @@ public class HrmDocumentDbToModelConverter extends
 		hrmDocument.setSendingFacilityId(input.getSendingFacilityId());
 		hrmDocument.setSendingFacilityReport(input.getSendingFacilityReportId());
 		hrmDocument.setCreatedBy(null); // TODO not sure how to determine this
-		hrmDocument.setReportStatus(HrmDocument.REPORT_STATUS.fromValueString(input.getReportStatus().toValueString()));
-		hrmDocument.setReportClass(HrmDocument.REPORT_CLASS.fromValueString(input.getReportType()));
+		hrmDocument.setReportStatus(HrmDocument.ReportStatus.fromValueString(input.getReportStatus().toValueString()));
+		hrmDocument.setReportClass(HrmDocument.ReportClass.fromValueString(input.getReportType()));
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
 		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
 

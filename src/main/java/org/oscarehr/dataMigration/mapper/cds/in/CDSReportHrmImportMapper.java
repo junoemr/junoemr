@@ -55,7 +55,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 		HrmDocument document = new HrmDocument();
 
 		document.setDocument(documentImportMapper.importToJuno(importStructure));
-		document.setReportClass(HrmDocument.REPORT_CLASS.fromValueString(getReportClass(importStructure.getClazz())));
+		document.setReportClass(HrmDocument.ReportClass.fromValueString(getReportClass(importStructure.getClazz())));
 		document.setReportSubClass(importStructure.getSubClass());
 		document.setReportDateTime(toNullableLocalDateTime(importStructure.getEventDateTime()));
 		document.setReceivedDateTime(toNullableLocalDateTime(importStructure.getReceivedDateTime()));
@@ -67,7 +67,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 			document.addReviewer(reviewer);
 		}
 
-		document.setReportStatus(HrmDocument.REPORT_STATUS.fromValueString(importStructure.getHRMResultStatus()));
+		document.setReportStatus(HrmDocument.ReportStatus.fromValueString(importStructure.getHRMResultStatus()));
 		document.setObservations(getObservations(importStructure.getOBRContent()));
 		document.addComment(getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()));
 		document.setDescription(CDSConstants.DEFAULT_HRM_DESCRIPTION);

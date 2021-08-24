@@ -99,7 +99,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return null;
 	}
 
-	protected String reportType(HrmDocument.REPORT_CLASS reportClass)
+	protected String reportType(HrmDocument.ReportClass reportClass)
 	{
 		String reportType = null;
 		if(reportClass != null)
@@ -109,7 +109,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return reportType;
 	}
 
-	protected HRMDocument.STATUS reportStatus(HrmDocument.REPORT_STATUS reportStatus)
+	protected HRMDocument.STATUS reportStatus(HrmDocument.ReportStatus reportStatus)
 	{
 		HRMDocument.STATUS status = null;
 		if(reportStatus != null)
@@ -182,21 +182,21 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 	 */
 	protected HRMDocumentToProvider createDeliverToLink(HRMDocument document, String deliverToID)
 	{
-		final String PREFIX_DOCTOR = "D";
-		final String PREFIX_NURSE = "N";
-		
 		ProviderCriteriaSearch searchParams = new ProviderCriteriaSearch();
-		String practitionerNumber = deliverToID.substring(1);
-		
-		switch (deliverToID.substring(0,1))
+		if (!deliverToID.isEmpty())
 		{
-			case PREFIX_NURSE:
-				searchParams.setOntarioCnoNumber(practitionerNumber);
-				break;
-			case PREFIX_DOCTOR:
-			default:
+			String practitionerNumber = deliverToID.substring(1);
+			
+			HrmDocument.DeliveryPrefix prefix = HrmDocument.DeliveryPrefix.fromString(deliverToID.substring(0, 1));
+			
+			if (HrmDocument.DeliveryPrefix.DOCTOR.equals(prefix))
+			{
 				searchParams.setPractitionerNo(practitionerNumber);
-				break;
+			}
+			else if (HrmDocument.DeliveryPrefix.NURSE.equals(prefix))
+			{
+				searchParams.setOntarioCnoNumber(practitionerNumber);
+			}
 		}
 		
 		List<ProviderData> providers = searchProviders(searchParams);
@@ -204,7 +204,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		
 		if (providers == null || providers.size() == 0)
 		{
-			logger.info(String.format("Could not match provider (%s) for HRM document: %s",
+			logger.info(String.format("Could not match provider (%s) for HRM document (unlinked): %s",
 			                          document.getDeliverToUserId(),
 			                          document.getReportFile()));
 		}
@@ -218,7 +218,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		}
 		else
 		{
-			logger.info(String.format("Multiple providers (%s) matched for HRM document: %s",
+			logger.info(String.format("Multiple providers (%s) matched for HRM document (unlinked): %s",
 			                          document.getDeliverToUserId(),
 			                          document.getReportFile()));
 		}

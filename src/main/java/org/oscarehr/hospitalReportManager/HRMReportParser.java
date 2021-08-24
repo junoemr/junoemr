@@ -311,8 +311,8 @@ public class HRMReportParser
 		
 		HRMDocumentSubClassDao hrmDocumentSubClassDao = (HRMDocumentSubClassDao) SpringUtils.getBean("HRMDocumentSubClassDao");
 
-		if(report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.DIAGNOSTIC_IMAGING.getValue())
-				|| report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.CARDIO_RESPIRATORY.getValue()))
+		if(report.getFirstReportClass().equalsIgnoreCase(HrmDocument.ReportClass.DIAGNOSTIC_IMAGING.getValue())
+				|| report.getFirstReportClass().equalsIgnoreCase(HrmDocument.ReportClass.CARDIO_RESPIRATORY.getValue()))
 		{
 			List<HrmObservation> subClassList = report.getObservations();
 
@@ -342,8 +342,8 @@ public class HRMReportParser
 
 	public static Date getAppropriateDateFromReport(HRMReport report)
 	{
-		if(report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.DIAGNOSTIC_IMAGING.getValue())
-				|| report.getFirstReportClass().equalsIgnoreCase(HrmDocument.REPORT_CLASS.CARDIO_RESPIRATORY.getValue()))
+		if(report.getFirstReportClass().equalsIgnoreCase(HrmDocument.ReportClass.DIAGNOSTIC_IMAGING.getValue())
+				|| report.getFirstReportClass().equalsIgnoreCase(HrmDocument.ReportClass.CARDIO_RESPIRATORY.getValue()))
 		{
 			List<HrmObservation> subClassList = report.getObservations();
 			if(!subClassList.isEmpty())

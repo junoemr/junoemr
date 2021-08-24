@@ -33,7 +33,6 @@ import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.ObjectFactory;
 import xml.hrm.v4_3.PersonNameSimple;
-import xml.hrm.v4_3.ReportClass;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,7 +51,7 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 	
 	protected LocalDateTime toNullableLocalDateTime(DateFullOrPartial fullOrPartial)
 	{
-		if(fullOrPartial != null)
+		if (fullOrPartial != null)
 		{
 			return ConversionUtils.fillPartialCalendar(
 					fullOrPartial.getDateTime(),
@@ -65,13 +64,15 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 	
 	protected LocalDate toNullableLocalDate(DateFullOrPartial fullOrPartial)
 	{
-		if(fullOrPartial != null)
+		if (fullOrPartial != null)
 		{
 			LocalDateTime dateTime = ConversionUtils.fillPartialCalendar(
+					fullOrPartial.getDateTime(),
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
 					fullOrPartial.getYearOnly());
-			if(dateTime != null)
+			
+			if (dateTime != null)
 			{
 				return dateTime.toLocalDate();
 			}
@@ -89,7 +90,6 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		return PartialDateTime.from(toNullableLocalDateTime(xmlDate));
 	}
 	
-	// TODO:  This will almost certainly blow up, a reviewer is not a provider, it's just an OHIP number
 	protected List<Reviewer> stubReviewers(String reviewerOHIPNo, DateFullOrPartial reviewDate)
 	{
 		if (reviewerOHIPNo == null)
@@ -101,15 +101,14 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		Reviewer reviewer = new Reviewer();
 		reviewer.setOhipNumber(reviewerOHIPNo);
 		reviewer.setReviewDateTime(toPartialDateTime(reviewDate));
-		reviewer.setFirstName("HRM Document");      // TODO
-		reviewer.setLastName("HRM Document");       // TODO
+		reviewer.setFirstName("Reviewer");
+		reviewer.setLastName("OMD HRM");
 		
 		reviewers.add(reviewer);
 		
 		return reviewers;
 	}
 	
-	// TODO:  This will almost certainly blow up, the Author is a SimpleName, not a provider
 	protected Provider stubProviderFromPersonName(PersonNameSimple name)
 	{
 		if (name == null)
@@ -125,23 +124,23 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 	}
 	
 	
-	protected HrmDocument.REPORT_CLASS getReportClass(ReportClass clazz)
+	protected HrmDocument.ReportClass fromNullableString(xml.hrm.v4_3.ReportClass clazz)
 	{
 		if (clazz == null)
 		{
 			return null;
 		}
 		
-		return HrmDocument.REPORT_CLASS.fromValueString(clazz.value());
+		return HrmDocument.ReportClass.fromValueString(clazz.value());
 	}
 	
-	protected HrmDocument.REPORT_STATUS getStatus(String status)
+	protected HrmDocument.ReportStatus fromNullableString(String status)
 	{
 		if (status == null)
 		{
 			return null;
 		}
 		
-		return HrmDocument.REPORT_STATUS.fromValueString(status);
+		return HrmDocument.ReportStatus.fromValueString(status);
 	}
 }
