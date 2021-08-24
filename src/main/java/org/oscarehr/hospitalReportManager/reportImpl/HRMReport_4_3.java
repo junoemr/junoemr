@@ -402,6 +402,7 @@ public class HRMReport_4_3 implements HRMReport
 				{
 					observation.setObservationDateTime(
 							ConversionUtils.fillPartialCalendar(
+									obrDate.getDateTime(),
 									obrDate.getFullDate(),
 									obrDate.getYearMonth(),
 									obrDate.getYearOnly())

@@ -275,8 +275,8 @@
             width: 70%;
             float: left;
             white-space: pre;
-            background-color: grey;
             margin-right: 24px;
+            overflow-x: scroll;
         }
 
         @media print {
@@ -746,11 +746,11 @@
                     List<HRMDocumentSubClass> subClassesFromDb = (List<HRMDocumentSubClass>) request.getAttribute("subClassList");
                 %>
                 <tr>
-                    <td colspan="2">Accompanying SubClasses</td>
+                    <td colspan="2">Accompanying SubClasses:</td>
                 </tr>
                 <% for (HrmObservation observation: hrmObservations) { %>
                 <tr>
-                    <td><span title="<%=observation.getAccompanyingMnemonic()%>"><%=observation.getAccompanyingSubClass()%> <%= observation.getAccompanyingDescription() %></span></td>
+                    <td><span>(<%=observation.getAccompanyingMnemonic()%>)<%=observation.getAccompanyingSubClass()%> <%= observation.getAccompanyingDescription() %></span></td>
                     <td><%=(ConversionUtils.toDateString(observation.getObservationDateTime()))%></td>
                 </tr>
                 <% } %>

@@ -23,19 +23,19 @@
 
 package org.oscarehr.dataMigration.mapper.hrm.in;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 
+import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 
 import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import xml.hrm.v4_3.ReportClass;
 import xml.hrm.v4_3.ReportsReceived;
 
 import java.io.IOException;
@@ -53,8 +53,6 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 	@Autowired
 	static ProviderDbToModelConverter providerConverter = SpringUtils.getBean(ProviderDbToModelConverter.class);
 	
-	static final Logger logger = MiscUtils.getLogger();
-	
 	private static final String SCHEMA_VERSION = "4.3";
 	
 	@Override
@@ -69,11 +67,26 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		// Despite the name, there is exactly one report per imported HRMReport
 		ReportsReceived report = importStructure.getDocumentRoot().getPatientRecord().getReportsReceived().get(0);
 		
-		model.setReportDateTime(toNullableLocalDateTime(report.getEventDateTime()));
+		ReportClass clazz = report.getClazz();
+		model.setReportClass(getReportClass(clazz));
+		
+		// DI (Diagnostic Imaging) and CRT (Cardio-respiratory reports seem to not have an event date time, so use the
+		// observation time of the first procedure in it's place.
+		if (clazz.equals(ReportClass.DIAGNOSTIC_IMAGING_REPORT) || clazz.equals(ReportClass.CARDIO_RESPIRATORY_REPORT) &&
+			toNullableLocalDateTime(report.getEventDateTime()) == null &&
+			importStructure.getObservations() != null && !importStructure.getObservations().isEmpty())
+		{
+			HrmObservation firstProcedure = importStructure.getObservations().get(0);
+			model.setReportDateTime(firstProcedure.getObservationDateTime());
+		}
+		else
+		{
+			model.setReportDateTime(toNullableLocalDateTime(report.getEventDateTime()));
+		}
+		
 		model.setReceivedDateTime(LocalDateTime.now());
 		model.setCreatedBy(stubProviderFromPersonName(report.getAuthorPhysician()));
 		model.setReportStatus(getStatus(report.getResultStatus()));
-		model.setReportClass(getReportClass(report.getClazz()));
 		model.setDescription(model.getReportClass().getValue());
 		
 		model.setReportSubClass(report.getSubClass());

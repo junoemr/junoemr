@@ -195,40 +195,7 @@ public class HRMReportParser
 		String reportFileData = FileUtils.getStringFromFile(hrmFile.getFileObject());
 		fillDocumentHashData(document, reportFileData);
 	}
-
-	/*private static void routeReportToDemographic(HRMReport report, HRMDocument mergedDocument) {
-		
-		if(report == null) {
-			logger.info("routeReportToDemographic cannot continue, report parameter is null");
-			return;
-		}
-		
-
-		logger.info("Routing Report To Demographic, for file:"+report.getFileLocation());
-		
-		// Search the demographics on the system for a likely match and route it to them automatically
-		org.oscarehr.common.dao.DemographicDao demographicDao = (org.oscarehr.common.dao.DemographicDao) SpringUtils.getBean("demographicDao");
-
-		List<Demographic> matchingDemographicListByName = demographicDao.searchDemographic(report.getLegalName());
-
-		if (matchingDemographicListByName.size() == 1) {
-			// Found a match by name
-			HRMReportParser.routeReportToDemographic(mergedDocument.getId(), matchingDemographicListByName.get(0).getDemographicNo());
-		} else {
-			for (Demographic d : matchingDemographicListByName) {
-
-				if (report.getHCN().equalsIgnoreCase(d.getHin())) { // Check health card no.
-					HRMReportParser.routeReportToDemographic(mergedDocument.getId(), d.getDemographicNo());
-					return;
-				} else if (report.getGender().equalsIgnoreCase(d.getSex()) && report.getDateOfBirthAsString().equalsIgnoreCase(d.getBirthDayAsString())) { // Check dob & sex
-					HRMReportParser.routeReportToDemographic(mergedDocument.getId(), d.getDemographicNo());
-					return;
-				}
-			}
-		}
-	}*/
-
-
+	
 	private static boolean hasSameStatus(HRMReport report, HRMReport loadedReport) {
 		if(report.getResultStatus() != null) {
 			return report.getResultStatus().equalsIgnoreCase(loadedReport.getResultStatus());
@@ -451,7 +418,7 @@ public class HRMReportParser
 		}
 	}
 
-	public static void routeReportToProvider(HRMDocument originalDocument, HRMReport newReport) {
+/*	public static void routeReportToProvider(HRMDocument originalDocument, HRMReport newReport) {
 		routeReportToProvider(newReport, originalDocument.getId());
 	}
 
@@ -465,7 +432,7 @@ public class HRMReportParser
 
 		hrmDocumentToProviderDao.merge(providerRouting);
 
-	}
+	}*/
 
 	public static void signOffOnReport(String providerRoutingId, Integer signOffStatus) {
 		HRMDocumentToProviderDao hrmDocumentToProviderDao = (HRMDocumentToProviderDao) SpringUtils.getBean("HRMDocumentToProviderDao");
@@ -478,7 +445,7 @@ public class HRMReportParser
 		}
 	}
 
-	public static void routeReportToDemographic(Integer reportId, Integer demographicNo) {
+/*	public static void routeReportToDemographic(Integer reportId, Integer demographicNo) {
 		HRMDocumentToDemographicDao hrmDocumentToDemographicDao = (HRMDocumentToDemographicDao) SpringUtils.getBean("HRMDocumentToDemographicDao");
 
 		HRMDocumentToDemographic demographicRouting = new HRMDocumentToDemographic();
@@ -488,5 +455,5 @@ public class HRMReportParser
 
 		hrmDocumentToDemographicDao.merge(demographicRouting);
 
-	}
+	}*/
 }
