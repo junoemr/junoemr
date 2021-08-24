@@ -9,9 +9,12 @@
 package org.oscarehr.olis;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.util.DbConnectionFilter;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.stereotype.Service;
@@ -27,19 +30,22 @@ import java.util.Date;
  * @author Indivica
  */
 @Service
-public class OLISSchedulerJob {
+public class OLISSchedulerJob
+{
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final int DEFAULT_POLLING_FREQUENCY = 60; // minutes
 
-	public void run() {
-		try {
+	public void run()
+	{
+		try
+		{
 			logger.info("starting OLIS poller job");
 			OLISSystemPreferencesDao olisPrefDao = (OLISSystemPreferencesDao) SpringUtils.getBean("OLISSystemPreferencesDao");
 			OLISSystemPreferences olisPrefs = olisPrefDao.getPreferences();
 			if (olisPrefs == null) {
 				// not set to run at all
-				logger.info("Don't need to run right now..no prefs");
+				logger.info("OLISPoller - Cannot run. No entry in OLISSystemPreferences table");
 				return;
 			}
 			Date now = new Date();
@@ -82,10 +88,21 @@ public class OLISSchedulerJob {
 			olisPrefs.setLastRun(new Date());
 			olisPrefDao.merge(olisPrefs);
 
-			OLISPollingUtil.requestResults(null);
-		} catch (Exception e) {
+			LoggedInInfo loggedInInfo = new LoggedInInfo();
+			ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+			SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
+
+			loggedInInfo.setLoggedInProvider(providerDao.getProvider("999998"));
+			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo("999998"));
+
+			OLISPollingUtil.requestResults(loggedInInfo);
+		}
+		catch(Exception e)
+		{
 			logger.error("error", e);
-		} finally {
+		}
+		finally
+		{
 			DbConnectionFilter.releaseAllThreadDbResources();
 		}
 	}

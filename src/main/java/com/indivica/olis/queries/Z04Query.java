@@ -85,6 +85,11 @@ public class Z04Query extends Query {
 		this.testResultCodeList.add(testResultCode);
 	}
 
+	public String getRequestingHicIdNumber()
+	{
+		return requestingHic.getIdNumber();
+	}
+
 	@Override
 	public QueryType getQueryType() {
 		return QueryType.Z04;

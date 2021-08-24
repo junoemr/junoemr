@@ -80,4 +80,8 @@ public class ZRP1 implements Parameter {
 		return "@ZRP.1";
 	}
 
+	public String getIdNumber()
+	{
+		return this.idNumber;
+	}
 }

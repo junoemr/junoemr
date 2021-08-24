@@ -79,8 +79,6 @@ public class OLISPollingUtil {
 	    if (facilityId !=null){
 	    	pollZ06Query(loggedInInfo, defaultStartTime,defaultEndTime,facilityId);
 	    }
-	    
-		
 	}
 	
 	private static void pollZ04Query(LoggedInInfo loggedInInfo, String defaultStartTime,String defaultEndTime){
@@ -135,7 +133,7 @@ public class OLISPollingUtil {
 					    officialfirstName,
 					    officialSecondName);
 				providerQuery.setRequestingHic(zrp1);
-				String response = Driver.submitOLISQuery(null, providerQuery);
+				String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, providerQuery);
 				
 				if(!response.startsWith("<Response")){
 					logger.error("response does not match, aborting "+response);
@@ -191,7 +189,7 @@ public class OLISPollingUtil {
 	    	orc21.setValue(6, 3, "^ISO");    	
 	    	facilityQuery.setOrderingFacilityId(orc21);
 	    	
-	    	String response = Driver.submitOLISQuery(null, facilityQuery);
+	    	String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, facilityQuery);
 	    	
 	    	if(!response.startsWith("<Response")){
 	    		logger.debug("Didn't equal response.  Returning "+response);
