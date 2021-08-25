@@ -332,28 +332,34 @@
 	</div>
 	<div class="wrapper-action col-sm-12" ng-show="consultRequestCtrl.consultReadAccess"><!-- Action Buttons -->
 		<button type="button" class="btn btn-large btn-success action"
+		        ng-disabeld="consultRequestCtrl.loadingQueue.isLoading()"
 				ng-click="consultRequestCtrl.save()">
 			Save
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-success action"
+		        ng-disabeld="consultRequestCtrl.loadingQueue.isLoading()"
 				ng-click="consultRequestCtrl.saveAndPrint()">
 			Save & Print
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-success action"
+		        ng-disabeld="consultRequestCtrl.loadingQueue.isLoading()"
 				ng-click="consultRequestCtrl.saveAndFax()">
 			Save & Fax
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-success action"
+		        ng-disabeld="consultRequestCtrl.loadingQueue.isLoading()"
 				ng-click="consultRequestCtrl.eSend()"
 				ng-show="consultRequestCtrl.eSendEnabled">
 			Save & Send Electronically
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-warning action"
+		        ng-disabeld="consultRequestCtrl.loadingQueue.isLoading()"
 				ng-click="consultRequestCtrl.print(consultRequestCtrl.consult.id)"
 				ng-show="consultRequestCtrl.consult.id">
 			Print Preview
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-default action"
+		        ng-disabeld="consultRequestCtrl.loadingQueue.isLoading()"
 				ng-click="consultRequestCtrl.close()">
 			Close
 		</button>&nbsp;

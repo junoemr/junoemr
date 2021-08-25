@@ -1,3 +1,5 @@
+import LoadingQueue from "../lib/util/LoadingQueue";
+
 angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 	'$scope',
@@ -29,6 +31,8 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 	{
 
 		var controller = this;
+
+		controller.loadingQueue = new LoadingQueue();
 
 		controller.initialize = function()
 		{
@@ -71,6 +75,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
 
 
+			controller.loadingQueue.pushLoadingState();
 			consultService.getLetterheadList().then(
 				function success(results)
 				{
@@ -97,7 +102,10 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				{
 					console.log(errors);
 				}
-			);
+			).finally(() =>
+			{
+				controller.loadingQueue.popLoadingState();
+			});
 
 			//show referringDoctor in list
 			angular.forEach(consult.referringDoctorList, function(referringDoc)
@@ -308,7 +316,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		{
 			if (consult.appointmentHour !== null && consult.appointmentMinute !== null)
 			{
-				apptTime = moment(Date.now());
+				const apptTime = moment(Date.now());
 				apptTime.set('hours', consult.appointmentHour);
 				apptTime.set('minute', consult.appointmentMinute);
 				consult.appointmentTime = apptTime;
@@ -374,6 +382,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			controller.consultSaving = true; //show saving banner
 			controller.setAppointmentTime();
 
+			controller.loadingQueue.pushLoadingState();
 			consultService.saveResponse(consult).then(
 				function success(results)
 				{
@@ -385,7 +394,11 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				function error(errors)
 				{
 					console.log(errors);
-				});
+				}
+			).finally(() =>
+			{
+				controller.loadingQueue.popLoadingState();
+			});
 			controller.consultSaving = false; //hide saving banner
 			controller.consultChanged = -1; //reset change count
 			return true;
@@ -480,166 +493,3 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		};
 	}
 ]);
-
-/* html for fax & print, kept here for easy reference
-<html>
-<style>
-	body{width:800px;font-family:arial,verdana,tahoma,helvetica,sans serif}
-	table{width:100%}
-	th{text-align:left;font-weight:bold;width:1;white-space:nowrap}
-	td{vertical-align:top}
-	label{font-weight:bold}
-	em{font-size:small}
-	.large{font-size:large}
-	.center{text-align:center}
-</style>
-<style media='print'>
-	button{display:none}
-	.noprint{display:none}
-</style>
-<script>
-	function printAttachments(url){
-		window.open('../'+url);
-	}
-</script>
-<body>
-
-<!-- Print preview page exclusive -->
-	<!-- p_buttons -->
-	<button onclick='window.print()'>Print</button>
-	<button onclick='window.close()'>Close</button>
-	<!-- p_buttons -->
-
-	<!-- p_attachments, 1 or more -->
-	<div class='noprint'>
-		<button onclick=printAttachments('"+consult.attachments[i].url+"')>Print attachment</button> "+consult.attachments[i].displayName+"
-	</div>
-	<!-- p_attachments -->
-<!-- Print preview page exclusive -->
-
-	<div class='center'>
-		<label class='large'>"+p_clinicName+"</label><br/>
-		<label>Consultation Response</label><br/>
-	</div>
-	<br/>
-	<table>
-		<tr>
-			<td>
-				<label>Date: </label>"+p_responseDate+"
-			</td>
-			<td rowspan=6 width=10></td>
-			<td>
-				<label>Status: </label>"+p_urgency+"
-			</td>
-		</tr>
-		<tr><td colspan=2></td></tr>
-		<tr>
-			<th>FROM:</th>
-			<th>TO:</th>
-		</tr>
-		<tr>
-			<td>
-				<p class='large'>"+p_letterheadName+"</p>
-				"+p_letterheadAddress+"<br/>
-				<label>Tel: </label>"+p_letterheadPhone+"<br/>
-				<label>Fax: </label>"+p_letterheadFax+"
-			</td>
-			<td>
-				<table>
-					<tr>
-						<th>Referring Doctor:</th>
-						<td>"+p_consultantName+"</td>
-					</tr>
-					<tr>
-						<th>Phone:</th>
-						<td>"+p_consultantPhone+"</td>
-					</tr>
-					<tr>
-						<th>Fax:</th>
-						<td>"+p_consultantFax+"</td>
-					</tr>
-					<tr>
-						<th>Address:</th>
-						<td>"+p_consultantAddress+"</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		<tr><td colspan=2></td></tr>
-		<tr>
-			<td>
-				<table>
-					<tr>
-						<th>Patient:</th>
-						<td>"+p_patientName+"</td>
-					</tr>
-					<tr>
-						<th>Address:</th>
-						<td>"+p_patientAddress+"</td>
-					</tr>
-					<tr>
-						<th>Phone:</th>
-						<td>"+p_patientPhone+"</td>
-					</tr>
-					<tr>
-						<th>Work Phone:</th>
-						<td>"+p_patientWorkPhone+"</td>
-					</tr>
-					<tr>
-						<th>Birthdate:</th>
-						<td>"+p_patientBirthdate+"</td>
-					</tr>
-				</table>
-			</td>
-			<td>
-				<table>
-					<tr>
-						<th>Sex:</th>
-						<td>"+p_patientSex+"</td>
-					</tr>
-					<tr>
-						<th>Health Card No:</th>
-						<td>"+p_patientHealthCardNo+"</td>
-					</tr>
-					<tr>
-						<th>Appointment date:</th>
-						<td>"+p_appointmentDate+"</td>
-					</tr>
-					<tr>
-						<th>Appointment time:</th>
-						<td>"+p_appointmentTime+"</td>
-					</tr>
-					<tr>
-						<th>Chart No:</th>
-						<td>"+p_patientChartNo+"</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-	<br/>
-	<table>
-		<tr><th>Examination:</th></tr>
-		<tr><td>"+p_examination+"<hr></td></tr>
-		<tr><th>Impression:</th></tr>
-		<tr><td>"+p_impression+"<hr></td></tr>
-		<tr><th>Plan:</th></tr>
-		<tr><td>"+p_plan+"<hr></td></tr>
-		<tr><td></td></tr>
-		<tr><th>Reason for consultation: (Date: "+p_referralDate+")</th></tr>
-		<tr><td>"+p_reason+"<hr></td></tr>
-		<tr><th>Pertinent Clinical Information:</th></tr>
-		<tr><td>"+p_clinicalInfo+"<hr></td></tr>
-		<tr><th>Significant Concurrent Problems:</th></tr>
-		<tr><td>"+p_concurrentProblems+"<hr></td></tr>
-		<tr><th>Current Medications:</th></tr>
-		<tr><td>"+p_currentMeds+"<hr></td></tr>
-		<tr><th>Allergies:</th></tr>
-		<tr><td>"+p_allergies+"<hr></td></tr>
-		<tr><td><label>Consultant: </label>"+p_provider+"</td></tr>
-		<tr><td></td></tr>
-		<tr><td><div class='center'><em>Created by: OSCAR The open-source EMR www.oscarcanada.org</em></div></td></tr>
-	</table>
-</body>
-</html>
-*/
