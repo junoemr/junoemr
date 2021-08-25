@@ -624,6 +624,10 @@ public class Demographic implements Serializable
 	 */
 	public String getFamilyDoctor2()
 	{
+		if(familyDoctor2 != null)
+		{
+			return familyDoctor2.replaceAll(">null<", "><");
+		}
 		return familyDoctor2;
 	}
 
