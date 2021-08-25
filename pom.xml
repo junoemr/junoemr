@@ -2109,6 +2109,7 @@
 								<!-- These should already be included by other jsp files -->
 								<exclude>**/*.jspf</exclude>
 							</excludes>
+							<keepSources>true</keepSources>
 							<threads>4</threads>
 							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
 							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>
