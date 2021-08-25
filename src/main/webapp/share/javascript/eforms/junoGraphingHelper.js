@@ -106,7 +106,7 @@ window.Juno.GraphingHelper = window.Juno.GraphingHelper ||
 			}
 			
 			var xBoundsCheck = x >= handle._xMin && x <= handle._xMax;
-			var yBoundsCheck = y >= handle._yMin && x <= handle._yMax;
+			var yBoundsCheck = y >= handle._yMin && y <= handle._yMax;
 			
 			if (xBoundsCheck && yBoundsCheck)
 			{
