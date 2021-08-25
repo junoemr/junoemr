@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
@@ -36,8 +37,16 @@ public class DemographicContactFewConverter {
 	
 	public DemographicContactFewTo1 getAsTransferObject(DemographicContact demographicContact, Object obj) throws ConversionException {
 		DemographicContactFewTo1 demographicContactFewTo1 = new DemographicContactFewTo1();
-		
-		demographicContactFewTo1.setRole(demographicContact.getRole());
+
+		if (NumberUtils.isParsable(demographicContact.getRole()))
+		{
+			demographicContactFewTo1.setRole("Unknown");
+		}
+		else
+		{
+			demographicContactFewTo1.setRole(demographicContact.getRole());
+		}
+
 		demographicContactFewTo1.setConsentToContact(demographicContact.getConsentToContact());
 		demographicContactFewTo1.setEc(demographicContact.getEc());
 		demographicContactFewTo1.setSdm(demographicContact.getSdm());
