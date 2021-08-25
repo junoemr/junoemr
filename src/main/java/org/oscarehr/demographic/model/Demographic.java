@@ -57,6 +57,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -215,7 +216,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private DemographicCust demographicCust;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
-	private List<DemographicExt> demographicExtList;
+	private Set<DemographicExt> demographicExtSet;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
 	@Where(clause="deleted=0")
@@ -863,14 +864,14 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.demographicCust = demographicCust;
 	}
 
-	public List<DemographicExt> getDemographicExtList()
+	public Set<DemographicExt> getDemographicExtSet()
 	{
-		return demographicExtList;
+		return demographicExtSet;
 	}
 
-	public void setDemographicExtList(List<DemographicExt> demographicExtList)
+	public void setDemographicExtSet(Set<DemographicExt> demographicExtSet)
 	{
-		this.demographicExtList = demographicExtList;
+		this.demographicExtSet = demographicExtSet;
 	}
 
 	public List<DemographicMerged> getMergedDemographicsList()

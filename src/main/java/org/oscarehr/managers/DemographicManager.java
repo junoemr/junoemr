@@ -393,9 +393,9 @@ public class DemographicManager {
 		// update MyHealthAccess connection status.
 		demographicService.queueMHAPatientUpdates(demographic, previousDemographic, loggedInInfo);
 
-		if (demographic.getDemographicExtList() != null)
+		if (demographic.getDemographicExtSet() != null)
 		{
-			for (DemographicExt ext : demographic.getDemographicExtList())
+			for (DemographicExt ext : demographic.getDemographicExtSet())
 			{
 				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicId(), ext.getKey());
 				if (existingExt != null)

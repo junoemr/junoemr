@@ -50,5 +50,6 @@ public class JunoProperties
 		private boolean enabled;
 		private String endpoint;
 		private String password;
+		private String storageKeyPrefix = "";
 	}
 }

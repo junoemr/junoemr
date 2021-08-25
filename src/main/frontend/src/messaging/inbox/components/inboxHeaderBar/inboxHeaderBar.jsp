@@ -99,6 +99,19 @@
 			</div>
 		</juno-button>
 
+		<!-- Create Tickler -->
+		<juno-button class="header-button m-l-8"
+		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
+		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+		             component-style="$ctrl.componentStyle"
+		             disabled="!$ctrl.selectedMessageId"
+		             title="{{$ctrl.selectedMessageId ? 'Create message tickler' : 'To create a tickler you must select a message first'}}"
+		             click="$ctrl.openCreateTicklerModal()">
+			<div class="flex-row align-items-center">
+				<i class="icon icon-flag"></i>
+			</div>
+		</juno-button>
+
 		<juno-divider class="item-divider" horizontal="true" slim="true"></juno-divider>
 
 
