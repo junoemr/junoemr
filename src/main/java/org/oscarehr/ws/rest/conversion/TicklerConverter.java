@@ -44,6 +44,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 //this isn't working - not being injected
+@Deprecated
 @Component
 public class TicklerConverter extends AbstractConverter<Tickler, TicklerTo1> {
 	

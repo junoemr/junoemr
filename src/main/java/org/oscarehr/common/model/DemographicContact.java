@@ -71,17 +71,17 @@ public class DemographicContact extends AbstractModel<Integer> {
 	private Date created;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
-	private Boolean deleted;
-	private Integer demographicNo;
+	private boolean deleted;
+	private int demographicNo;
 	private String contactId;
 	private String role;
-	private Integer type;
+	private int type;
 	private String category;
 	private String sdm;
 	private String ec;
 	private String note;
 
-	private Integer facilityId;
+	private int facilityId;
 	private String creator;
 
 	private Boolean consentToContact = true;
@@ -147,11 +147,11 @@ public class DemographicContact extends AbstractModel<Integer> {
 		this.role = role;
 	}
 
-	public Integer getType() {
+	public int getType() {
 		return type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
@@ -222,7 +222,7 @@ public class DemographicContact extends AbstractModel<Integer> {
 		this.setUpdateDate(new Date());
 	}
 
-	public Boolean isConsentToContact() {
+	public boolean isConsentToContact() {
 		return consentToContact;
 	}
 
@@ -230,7 +230,7 @@ public class DemographicContact extends AbstractModel<Integer> {
 		this.consentToContact = consentToContact;
 	}
 
-	public Boolean isActive() {
+	public boolean isActive() {
 		return active;
 	}
 

@@ -4,6 +4,10 @@ import Messageable from "./Messageable";
 import Attachment from "./Attachment";
 import MessageSource from "./MessageSource";
 import MessagingError from "../../error/MessagingError";
+import {MessageableType} from "./MessageableType";
+import {MessageableLocalType} from "./MessageableLocalType";
+import {confidenceLevelToNumber, MessageableMappingConfidence} from "./MessageableMappingConfidence";
+import {pattern} from "angular-ui-router";
 
 export default class Message
 {
@@ -81,6 +85,26 @@ export default class Message
 		throw new MessagingError("Base message cannot be unarchived");
 	}
 
+	/**
+	 * get all participants in this message who map to the local type of demographic.
+	 * @param mappingConfidence - [optional] if provided the messageable must map to demographic with at least the specified confidence.
+	 * @return promise that resolves to a list of messageables who map to local demographics
+	 */
+	public async demographicParticipants(mappingConfidence: MessageableMappingConfidence = null): Promise<Messageable[]>
+	{
+		const demoParticipants: Messageable[] = []
+		for (const participant of this.participants)
+		{
+			if ((await participant.localType()) === MessageableLocalType.DEMOGRAPHIC &&
+				(!mappingConfidence || confidenceLevelToNumber(await participant.localMappingConfidenceLevel()) >= confidenceLevelToNumber(mappingConfidence)))
+			{
+				demoParticipants.push(participant);
+			}
+		}
+
+		return demoParticipants;
+	}
+
 	// ==========================================================================
 	// Setters
 	// ==========================================================================
@@ -142,6 +166,11 @@ export default class Message
 	get recipients(): Messageable[]
 	{
 		return this._recipients;
+	}
+
+	get participants(): Messageable[]
+	{
+		return [this.sender, ...this.recipients];
 	}
 
 	get metaData(): any

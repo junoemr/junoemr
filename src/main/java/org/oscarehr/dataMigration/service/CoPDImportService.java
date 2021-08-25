@@ -116,7 +116,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -464,8 +466,9 @@ public class CoPDImportService
 		{
 			DemographicCust demographicCust = demographicMapper.getDemographicCust();
 			List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
+			Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtList);
 
-			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtSet);
 		}
 		return demographic;
 	}

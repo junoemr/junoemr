@@ -25,23 +25,8 @@
 		</property>
 	</bean>
 
-	<!-- setup JPA -->
-<!--
-	<import resource="classpath:spring_jpa.xml" />
--->
-
-	<!-- setup hibernate -->
-<!--
-	<import resource="classpath:spring_hibernate.xml" />
--->
-
 	<!-- setup managers -->
 	<import resource="classpath:spring_managers.xml" />
-
-	<!-- setup CXF -->
-<!--
-	<import resource="classpath:spring_ws.xml" />
--->
 
 	<bean id="hl7HandlerMSHMappingDao" class="org.oscarehr.common.dao.HL7HandlerMSHMappingDao" autowire="byName" />
 

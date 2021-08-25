@@ -22,6 +22,9 @@
  * Ontario, Canada
  */
 package org.oscarehr.ws.rest.to.model;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -29,16 +32,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="ticklerLink")
 public class TicklerLinkTo1 implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
+	private static final long serialVersionUID = 1L;
 
-    private Integer id;
-   
-    private String tableName;
-    
-    private Long tableId;
-    
-    private Integer ticklerNo;
+
+	private Integer id;
+	private String tableName;
+	private String tableId;
+	private Integer ticklerNo;
+	@Getter
+	@Setter
+	private String meta;
+
 
 	public Integer getId() {
 		return id;
@@ -56,11 +60,11 @@ public class TicklerLinkTo1 implements Serializable {
 		this.tableName = tableName;
 	}
 
-	public Long getTableId() {
+	public String getTableId() {
 		return tableId;
 	}
 
-	public void setTableId(Long tableId) {
+	public void setTableId(String tableId) {
 		this.tableId = tableId;
 	}
 
