@@ -23,6 +23,7 @@ package org.oscarehr.olis;
  * Ontario, Canada
  */
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -218,13 +219,13 @@ public class OLISPollingUtil {
 		String originalFile = "olis_"+uuid.toString()+".response";
 		String hl7Filename = "olis_"+uuid.toString()+".hl7";
 		//write full response to disk, this will make diagnosing issues easier
-		Utilities.saveFile(new ByteArrayInputStream(response.getBytes("UTF-8")), originalFile);
+		Utilities.saveFile(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), originalFile);
 
 		//Get HL7 Content from xml
 		String responseContent =  OLISUtils.getOLISResponseContent(response);
 		//Write HL7 file to disk.
 		String fileLocation = Utilities.saveFile(
-				new ByteArrayInputStream(responseContent.getBytes("UTF-8")), hl7Filename);
+				new ByteArrayInputStream(responseContent.getBytes(StandardCharsets.UTF_8)), hl7Filename);
 
 		String labType = "OLIS_HL7";
 		String serviceName = "OLIS_HL7";
@@ -249,7 +250,7 @@ public class OLISPollingUtil {
 		} catch(FileAlreadyExistsException e) {
 			logger.warn("Lab already in system.");
 		} catch(Exception e) {
-			logger.error( "Failed insert lab into DB: " + fileLocation + " of type: " + labType);
+			logger.error( "Failed insert lab into DB: " + fileLocation + " of type: " + labType, e);
 		}
 		return timeStringForNextStartDate;
 	}

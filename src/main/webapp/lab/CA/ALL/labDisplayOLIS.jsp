@@ -8,9 +8,24 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@ page language="java" errorPage="../../../provider/errorpage.jsp" %>
-<%@ page import="java.util.*,java.sql.*,org.oscarehr.olis.*,org.oscarehr.common.dao.PatientLabRoutingDao, org.oscarehr.util.SpringUtils, org.oscarehr.common.model.PatientLabRouting,oscar.oscarLab.ca.all.*,oscar.oscarLab.ca.all.util.*,oscar.oscarLab.ca.all.parsers.*,oscar.oscarLab.LabRequestReportLink,oscar.oscarMDS.data.ReportStatus,oscar.log.*,org.apache.commons.codec.binary.Base64" %>
-<%@page import="org.oscarehr.util.AppointmentUtil" %>
+<%@ page errorPage="../../../provider/errorpage.jsp" %>
+<%@ page import="org.oscarehr.common.dao.PatientLabRoutingDao" %>
+<%@ page import="org.oscarehr.common.model.PatientLabRouting" %>
+<%@ page import="org.oscarehr.olis.OLISResultsAction" %>
+<%@ page import="org.oscarehr.util.AppointmentUtil" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="oscar.oscarLab.LabRequestReportLink" %>
+<%@ page import="oscar.oscarLab.ca.all.AcknowledgementData" %>
+<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.MessageHandler" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.OLISHL7Handler" %>
+<%@ page import="oscar.oscarMDS.data.ReportStatus" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Set" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>

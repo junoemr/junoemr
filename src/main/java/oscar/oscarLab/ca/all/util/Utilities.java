@@ -89,8 +89,13 @@ public class Utilities
 			    }
 			    if(header.equals("MSH"))
 			    {
-				    if(line.contains("ORU") || line.contains("ORM^002") || line.contains("ORM^O01") || line.contains("MDM^T08")
-						|| line.contains("MDM^T02") || line.contains("MDM^T11"))
+				    if(line.contains("ORU")
+						    || line.contains("ORM^002")
+						    || line.contains("ORM^O01")
+						    || line.contains("MDM^T08")
+						    || line.contains("MDM^T02")
+						    || line.contains("MDM^T11")
+						    || (line.contains("OLIS")))
 				    {
 					    skipMessage = false;
 				    }
