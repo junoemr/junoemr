@@ -192,7 +192,7 @@ function onSubmitForm() {
       dob=d.getYearOfBirth()+"/"+d.getMonthOfBirth()+"/"+d.getDateOfBirth();
       homephone=d.getPhone();
       workphone=d.getPhone2();
-      familydoc=SxmlMisc.getXmlContent(d.getFamilyDoctor(),"family_doc");
+      familydoc=SxmlMisc.getXmlContent(d.getFamilyDoctor2(),"family_doc");
       familydoc = familydoc !=null ? familydoc : "" ;
       age=MyDateFormat.getAge(Integer.parseInt(d.getYearOfBirth()),Integer.parseInt(d.getMonthOfBirth()),Integer.parseInt(d.getDateOfBirth()));
     }
