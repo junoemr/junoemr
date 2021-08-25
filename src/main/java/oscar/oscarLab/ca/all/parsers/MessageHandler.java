@@ -1252,9 +1252,12 @@ public abstract class MessageHandler
 		try
 		{
 			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
+			if(StringUtils.isNotBlank(dob))
+			{
+				DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				java.util.Date date = formatter.parse(dob);
+				age = UtilDateUtilities.calcAge(date);
+			}
 		}
 		catch(ParseException e)
 		{

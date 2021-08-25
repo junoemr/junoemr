@@ -95,7 +95,7 @@ public class Utilities
 						    || line.contains("MDM^T08")
 						    || line.contains("MDM^T02")
 						    || line.contains("MDM^T11")
-						    || (line.contains("OLIS")))
+						    || line.contains("OLIS"))
 				    {
 					    skipMessage = false;
 				    }

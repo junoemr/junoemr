@@ -23,9 +23,39 @@
     Ontario, Canada
 
 --%>
-<%@page import="com.indivica.olis.parameters.*,com.indivica.olis.*,com.indivica.olis.queries.*,org.apache.commons.lang.time.DateUtils"%><%@page 
-import="oscar.OscarProperties,java.net.InetAddress,java.io.*,java.util.List,java.util.*,javax.net.ssl.*,java.security.*,java.security.cert.*"%><%@page
-import="org.oscarehr.util.DbConnectionFilter,java.sql.*,org.oscarehr.util.SpringUtils" %><%@ taglib uri="/WEB-INF/security.tld" prefix="security"%><%
+<%@page import="com.indivica.olis.parameters.OBR22,
+                com.indivica.olis.parameters.PID3,
+                com.indivica.olis.parameters.ZRP1,
+                com.indivica.olis.queries.Query" %>
+<%@page import="com.indivica.olis.queries.Z01Query,
+                org.apache.commons.lang.time.DateUtils,
+                org.oscarehr.util.DbConnectionFilter,
+                org.oscarehr.util.LoggedInInfo,
+                oscar.OscarProperties,
+                javax.net.ssl.KeyManager,
+                javax.net.ssl.KeyManagerFactory,
+                javax.net.ssl.SSLContext" %>
+<%@page import="javax.net.ssl.SSLException,
+                javax.net.ssl.SSLSocket,
+                javax.net.ssl.SSLSocketFactory" %>
+<%@ page import="javax.net.ssl.TrustManager" %>
+<%@ page import="javax.net.ssl.TrustManagerFactory" %>
+<%@ page import="javax.net.ssl.X509TrustManager" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.FileInputStream" %>
+<%@ page import="java.net.InetAddress" %>
+<%@ page import="java.security.KeyStore" %>
+<%@ page import="java.security.PrivateKey" %>
+<%@ page import="java.security.cert.CertificateFactory" %>
+<%@ page import="java.security.cert.X509Certificate" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.LinkedList" %>
+<%@ page import="java.util.List" %>
+<%@ taglib uri="/WEB-INF/security.tld" prefix="security"%><%
 if(session.getAttribute("userrole") == null ){
 	
 	response.sendRedirect("../logout.jsp");
@@ -180,9 +210,8 @@ public String tryZ01Query(int patientNum,String cpso,String lastName,String firs
 		ZRP1 zrp1 = new ZRP1(cpso, "MDL", "ON", "HL70347", lastName,firstName,secondName);
 
 		((Z01Query) query).setRequestingHic(zrp1);
-	
-				
-		com.indivica.olis.Driver.submitOLISQuery(request, query);
+
+		com.indivica.olis.Driver.submitOLISQuery(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider(), request, query);
 		String msgInXML = (String) request.getAttribute("msgInXML");
 		String signedRequest = (String) request.getAttribute("signedRequest");
 		String signedData = (String) request.getAttribute("signedData");

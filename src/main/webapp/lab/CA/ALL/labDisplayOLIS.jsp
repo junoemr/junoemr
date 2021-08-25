@@ -61,7 +61,11 @@ String reqTableID = reqIDL==null ? "" : reqIDL.toString();
 
 PatientLabRoutingDao plrDao = preview ? null : (PatientLabRoutingDao) SpringUtils.getBean("patientLabRoutingDao");
 PatientLabRouting plr = preview ? null : plrDao.findDemographicByLabId(Integer.valueOf(segmentID));
-String demographicID = preview || plr.getDemographicNo() == null ? "" : plr.getDemographicNo().toString();
+String demographicID = null;
+if(plr != null)
+{
+	demographicID = preview || plr.getDemographicNo() == null ? "" : plr.getDemographicNo().toString();
+}
 
 
 if(demographicID != null && !demographicID.equals("")){
@@ -72,8 +76,7 @@ if(demographicID != null && !demographicID.equals("")){
 
 
 boolean ackFlag = false;
-ArrayList ackList = preview ? null : AcknowledgementData.getAcknowledgements(segmentID);
-Factory f;
+ArrayList<ReportStatus> ackList = preview ? null : AcknowledgementData.getAcknowledgements(segmentID);
 MessageHandler handlerMain;
 String hl7 = "";
 
@@ -81,7 +84,7 @@ if (!preview) {
 
 	if (ackList != null){
 	    for (int i=0; i < ackList.size(); i++){
-	        ReportStatus reportStatus = (ReportStatus) ackList.get(i);
+	        ReportStatus reportStatus = ackList.get(i);
 	        if ( reportStatus.getProviderNo().equals(providerNo) && reportStatus.getStatus().equals("A") ){
 	            ackFlag = true;
 	            break;
