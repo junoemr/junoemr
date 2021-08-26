@@ -58,6 +58,7 @@
 <%@ page import="java.text.ParseException" %>
 <%@ page import="java.util.*" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.json.JSONObject" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -1353,6 +1354,13 @@
 					{
 					%>
 					<a href="javascript:reportWindow('../dms/ManageDocument.do?method=display&doc_no=<%=ticklerLink.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
+					<%
+					}
+					else if (ticklerLink.getTableName().equals("message"))
+					{
+						JSONObject metaData = new JSONObject(ticklerLink.getMeta());
+					%>
+					<a href="javascript:reportWindow('../web/#!/messaging/view/<%=metaData.getString("messagingBackend")%>/source/<%=metaData.getString("source")%>/group/<%=metaData.getString("group")%>/message/<%=ticklerLink.getTableId()%>/view')">ATT</a>
 					<%
 					} else
 					{

@@ -690,14 +690,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
 		{
-			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]\d[A-Za-z]\d$/); // Match to Canadian postal code standard
+			const regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]?\d[A-Za-z]\d$/); // Match to Canadian postal code standard
 			if (regex.test(postalCode))
 			{
 				return true;
 			}
 			else
 			{
-				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
+				Juno.Common.Util.errorAlert($uibModal, "Validation", "Invalid/Incomplete Postal Code");
 				return false;
 			}
 		};
@@ -705,7 +705,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//check Chart No (length)
 		controller.checkChartNo = function checkChartNo()
 		{
-			if (controller.page.demo.chartNo == null || controller.page.demo.chartNo == "")
+			if (controller.page.demo.chartNo == null || controller.page.demo.chartNo === "")
 			{
 				chartNo0 = controller.page.demo.chartNo;
 				return;
@@ -738,7 +738,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//check SIN
 		controller.checkSin = function checkSin()
 		{
-			if (controller.page.demo.sin == null || controller.page.demo.sin == "")
+			if (controller.page.demo.sin == null || controller.page.demo.sin === "")
 			{
 				sin0 = controller.page.demo.sin;
 				return;
@@ -765,10 +765,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.validateSin = function validateSin()
 		{
-			if (controller.page.demo.sin == null || controller.page.demo.sin == "") return true;
+			if (controller.page.demo.sin == null || controller.page.demo.sin === "") return true;
 
 			var sin = controller.page.demo.sin.replace(/\s/g, "");
-			if (isNumber(sin) && sin.length == 9)
+			if (isNumber(sin) && sin.length === 9)
 			{
 				var sinNumber = 0;
 				for (var i = 0; i < sin.length; i++)
@@ -776,7 +776,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					var n = Number(sin.charAt(i)) * (i % 2 + 1);
 					sinNumber += n % 10 + Math.floor(n / 10);
 				}
-				if (sinNumber % 10 == 0) return true;
+				if (sinNumber % 10 === 0) return true;
 			}
 			alert("Invalid SIN #");
 			return false;
@@ -840,7 +840,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.macPHRDo = function macPHRDo(func)
 		{
 			var url = null;
-			if (func == "Register")
+			if (func === "Register")
 			{
 				if (!controller.page.macPHRLoggedIn)
 				{
@@ -849,15 +849,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 				url = "../phr/indivo/RegisterIndivo.jsp?demographicNo=" + controller.page.demo.demographicNo;
 			}
-			else if (func == "SendMessage")
+			else if (func === "SendMessage")
 			{
 				url = "../phr/PhrMessage.do?method=createMessage&providerNo=" + user.providerNo + "&demographicNo=" + controller.page.demo.demographicNo;
 			}
-			else if (func == "ViewRecord")
+			else if (func === "ViewRecord")
 			{
 				url = "../demographic/viewPhrRecord.do?demographic_no=" + controller.page.demo.demographicNo;
 			}
-			else if (func == "Verification")
+			else if (func === "Verification")
 			{
 				url = "../phr/PHRVerification.jsp?demographic_no=" + controller.page.demo.demographicNo;
 			}
@@ -868,14 +868,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.appointmentDo = function appointmentDo(func)
 		{
 			var url = null;
-			if (func == "ApptHistory") url = "../demographic/demographiccontrol.jsp?displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&orderby=appttime&demographic_no=" + controller.page.demo.demographicNo + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName);
-			else if (func == "WaitingList") url = "../oscarWaitingList/SetupDisplayPatientWaitingList.do?demographic_no=" + controller.page.demo.demographicNo;
+			if (func === "ApptHistory") url = "../demographic/demographiccontrol.jsp?displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&orderby=appttime&demographic_no=" + controller.page.demo.demographicNo + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName);
+			else if (func === "WaitingList") url = "../oscarWaitingList/SetupDisplayPatientWaitingList.do?demographic_no=" + controller.page.demo.demographicNo;
 			window.open(url, "Appointment", "width=960, height=700");
 		};
 
 		controller.isClinicaidBilling = function isClinicaidBilling()
 		{
-			return controller.page.billregion == "CLINICAID";
+			return controller.page.billregion === "CLINICAID";
 		};
 
 		//billing buttons

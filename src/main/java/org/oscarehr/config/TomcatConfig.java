@@ -108,7 +108,7 @@ public class TomcatConfig
 					manager.setSticky(true);
 					manager.setSessionBackupAsync(true);
 					manager.setLockingMode("none");
-					manager.setStorageKeyPrefix("");
+					manager.setStorageKeyPrefix(junoProperties.getRedisSessionStore().getStorageKeyPrefix());
 
 					context.setManager(manager);
 				}

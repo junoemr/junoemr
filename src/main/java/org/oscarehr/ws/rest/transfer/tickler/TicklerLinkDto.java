@@ -20,25 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.conversion;
 
-import org.springframework.stereotype.Component;
+package org.oscarehr.ws.rest.transfer.tickler;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.Data;
 
-@Component
-public abstract class AbstractModelConverter<T, K> implements ListModelConverter<T, K>
+@Data
+public class TicklerLinkDto
 {
-	@Override
-	public List<K> convert(Collection<? extends T> entities)
-	{
-		if (entities == null)
-		{
-			return Collections.emptyList();
-		}
-		return entities.stream().map(this::convert).collect(Collectors.toList());
-	}
+	protected Integer id;
+	protected Integer ticklerNo;
+	protected String type;
+	protected String linkId;
+	protected String jsonMeta;
 }
