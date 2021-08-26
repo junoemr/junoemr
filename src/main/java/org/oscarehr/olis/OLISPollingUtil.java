@@ -55,6 +55,8 @@ import com.indivica.olis.parameters.ZRP1;
 import com.indivica.olis.queries.Z04Query;
 import com.indivica.olis.queries.Z06Query;
 
+import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
+
 public class OLISPollingUtil {
 
 	private static final Logger logger = MiscUtils.getLogger();
@@ -227,7 +229,7 @@ public class OLISPollingUtil {
 		String fileLocation = Utilities.saveFile(
 				new ByteArrayInputStream(responseContent.getBytes(StandardCharsets.UTF_8)), hl7Filename);
 
-		String labType = "OLIS_HL7";
+		String labType = OLIS_MESSAGE_TYPE;
 		String serviceName = "OLIS_HL7";
 		String providerNumber = "0";
 		String timeStringForNextStartDate = null;

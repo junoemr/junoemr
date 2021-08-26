@@ -48,6 +48,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.OtherIdManager;
@@ -199,13 +200,17 @@ public final class MessageUploader {
 				}
 			}
 
+			if(StringUtils.isNotBlank(obrDate))
+			{
+				throw new IllegalStateException("Lab Date cannot be blank");
+			}
 			try
 			{
 				// reformat date
 				String format = "yyyy-MM-dd HH:mm:ss".substring(0, obrDate.length() - 1);
 				obrDate = UtilDateUtilities.DateToString(UtilDateUtilities.StringToDate(obrDate, format), "yyyy-MM-dd HH:mm:ss");
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				logger.error("Error parsing obr date : ", e);
 				throw e;

@@ -55,6 +55,7 @@ import java.util.regex.Pattern;
  */
 public class OLISHL7Handler extends ORU_R01MessageHandler
 {
+	public static final String OLIS_MESSAGE_TYPE = "OLIS_HL7";
 
 	Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 	protected boolean isFinal = true;
@@ -1328,15 +1329,16 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getMsgType() {
-		return (null);
+	public String getMsgType()
+	{
+		return (OLIS_MESSAGE_TYPE);
 	}
 
 	@Override
 	public String getMsgDate() {
-		//return 
+		//return
 		//Temporary fix until we change how the MessageUploader grabs the observation date.
-		
+
 		try {
 			String dateString = getCollectionDateTime(0);
 			return dateString.substring(0, 19);

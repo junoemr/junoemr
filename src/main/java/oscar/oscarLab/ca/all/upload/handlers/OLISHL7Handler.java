@@ -29,6 +29,8 @@ import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.all.upload.RouteReportResults;
 import oscar.oscarLab.ca.all.util.Utilities;
 
+import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
+
 /**
  * 
  */
@@ -43,10 +45,13 @@ public class OLISHL7Handler implements MessageHandler {
 		logger.info("NEW OLISHL7Handler UPLOAD HANDLER instance just instantiated. ");
 	}
 
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) {
-		return parse(loggedInInfo, serviceName,fileName,fileId, false);
+	@Override
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr)
+	{
+		return parse(loggedInInfo, serviceName, fileName, fileId, false);
 	}
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider) {		
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider)
+	{
 		int i = 0;
 		String lastTimeStampAccessed = null;
 		RouteReportResults results = new RouteReportResults();
@@ -63,7 +68,7 @@ public class OLISHL7Handler implements MessageHandler {
 				if(OLISUtils.isDuplicate(loggedInInfo, msg)) {
 					continue; 
 				}
-				MessageUploader.routeReport(loggedInInfo, serviceName,"OLIS_HL7", msg.replace("\\E\\", "\\SLASHHACK\\").replace("µ", "\\MUHACK\\").replace("\\H\\", "\\.H\\").replace("\\N\\", "\\.N\\"), fileId, results);
+				MessageUploader.routeReport(loggedInInfo.getLoggedInProviderNo(), serviceName, OLIS_MESSAGE_TYPE, msg.replace("\\E\\", "\\SLASHHACK\\").replace("µ", "\\MUHACK\\").replace("\\H\\", "\\.H\\").replace("\\N\\", "\\.N\\"), fileId, results);
 				if (routeToCurrentProvider) {
 					ProviderLabRouting routing = new ProviderLabRouting();
 					routing.route(results.segmentId, loggedInInfo.getLoggedInProviderNo(), DbConnectionFilter.getThreadLocalDbConnection(), "HL7");
@@ -85,7 +90,7 @@ public class OLISHL7Handler implements MessageHandler {
 	//TODO-legacy: check # of results
 	
 	private String getLastUpdateInOLIS(String msg) {
-		oscar.oscarLab.ca.all.parsers.OLISHL7Handler h = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler("OLIS_HL7", msg);
+		oscar.oscarLab.ca.all.parsers.OLISHL7Handler h = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
 		return h.getLastUpdateInOLISUnformated();	
 	}
 }
