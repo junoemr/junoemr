@@ -109,7 +109,6 @@
 	    	
 	    	if( checkAllFields() ) {
 	    		document.contactForm.submit();
-	    		window.close();
 	    	}
   	
 	        //document.forms[0].submit.value="Save";
