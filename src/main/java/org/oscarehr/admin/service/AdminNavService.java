@@ -284,6 +284,16 @@ public class AdminNavService
 		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.labFwdRules"), "frame?frameUrl=" + contextPath + "/admin/labforwardingrules.jsp&useCompat=true"));
 		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.AddNewQueue"), "frame?frameUrl=" + contextPath + "/admin/addQueue.jsp&useCompat=true"));
 
+		if(oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_OLIS))
+		{
+			labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.olisLabCheck"), "frame?frameUrl=" + contextPath + "/olis/checkOLIS.jsp"));
+		}
+
+		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)
+		{
+			labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.olisLabPref"), "frame?frameUrl=" + contextPath + "/olis/Preferences.jsp"));
+		}
+
 		labGroup.setItems(labItems);
 		return labGroup;
 	}
@@ -618,11 +628,6 @@ public class AdminNavService
 		integrationItems.add(new AdminNavItemTo1("REST API", "frame?frameUrl=" + contextPath + "/admin/api/api.jsp"));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("provider.btnSetIntegratorPreferences"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/setProviderStaleDate.do?method=viewIntegratorProperties")));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.sendOruR01"), "frame?frameUrl=" + contextPath + "/lab/CA/ALL/sendOruR01.jsp"));
-
-		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)
-		{
-			integrationItems.add(new AdminNavItemTo1("OLIS Preferences", "frame?frameUrl=" + contextPath + "/olis/Preferences.jsp"));
-		}
 
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.phrconfig"), "frame?frameUrl=" + contextPath + "/admin/MyoscarConfiguration.jsp"));
 

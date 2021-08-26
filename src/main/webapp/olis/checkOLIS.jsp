@@ -29,15 +29,19 @@
                 com.indivica.olis.queries.Query" %>
 <%@page import="com.indivica.olis.queries.Z01Query,
                 org.apache.commons.lang.time.DateUtils,
-                org.oscarehr.util.DbConnectionFilter,
+                org.oscarehr.common.dao.PropertyDao,
+                org.oscarehr.common.model.Property,
+                org.oscarehr.provider.dao.ProviderDataDao,
+                org.oscarehr.provider.model.ProviderData,
                 org.oscarehr.util.LoggedInInfo,
-                oscar.OscarProperties,
+                org.oscarehr.util.SpringUtils" %>
+<%@page import="oscar.OscarProperties,
                 javax.net.ssl.KeyManager,
-                javax.net.ssl.KeyManagerFactory,
-                javax.net.ssl.SSLContext" %>
-<%@page import="javax.net.ssl.SSLException,
-                javax.net.ssl.SSLSocket,
-                javax.net.ssl.SSLSocketFactory" %>
+                javax.net.ssl.KeyManagerFactory" %>
+<%@ page import="javax.net.ssl.SSLContext" %>
+<%@ page import="javax.net.ssl.SSLException" %>
+<%@ page import="javax.net.ssl.SSLSocket" %>
+<%@ page import="javax.net.ssl.SSLSocketFactory" %>
 <%@ page import="javax.net.ssl.TrustManager" %>
 <%@ page import="javax.net.ssl.TrustManagerFactory" %>
 <%@ page import="javax.net.ssl.X509TrustManager" %>
@@ -48,13 +52,11 @@
 <%@ page import="java.security.PrivateKey" %>
 <%@ page import="java.security.cert.CertificateFactory" %>
 <%@ page import="java.security.cert.X509Certificate" %>
-<%@ page import="java.sql.Connection" %>
-<%@ page import="java.sql.PreparedStatement" %>
-<%@ page import="java.sql.ResultSet" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.LinkedList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Optional" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%><%
 if(session.getAttribute("userrole") == null ){
 	
@@ -106,45 +108,47 @@ if(oscarProperties.getProperty("olis_request_url") != null &&  oscarProperties.g
 		</tr>
 	 <%
 	 	String error = null;
-        Connection c = DbConnectionFilter.getThreadLocalDbConnection(); //select only
         try {
 
-            PreparedStatement ps_findConfiguredProviders = c.prepareStatement("select * from provider where practitionerNo != ''");
-            PreparedStatement ps_prop = c.prepareStatement("select * from property where provider_no = ? and name = ?");
-            ResultSet rs = ps_findConfiguredProviders.executeQuery();
-            
-            while (rs.next()) {
-            	String providerNo = rs.getString("provider_no");
-            	String lastName   = rs.getString("last_name");
-            	String firstName  = rs.getString("first_name");
-            	String cpso = rs.getString("practitionerNo");
-            	String officialFirstName = findProp(ps_prop, providerNo, "official_first_name");
-            	String officialLastName = findProp(ps_prop, providerNo, "official_last_name");
-            	String officialSecondName = findProp(ps_prop, providerNo, "official_second_name");
+	        ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+	        PropertyDao propertyDao = SpringUtils.getBean(PropertyDao.class);
 
-            	
+	        List<ProviderData> configuredProviders = providerDao.wherePractitionerNoFilled();
+
+	        for(ProviderData provider: configuredProviders)
+	        {
+		        Optional<Property> officialFirstNameProp = Optional.ofNullable(propertyDao.findByNameAndProvider("official_first_name", provider.getId()));
+		        Optional<Property> officialLastNameProp = Optional.ofNullable(propertyDao.findByNameAndProvider("official_last_name", provider.getId()));
+		        Optional<Property> officialSecondNameProp = Optional.ofNullable(propertyDao.findByNameAndProvider("official_second_name", provider.getId()));
+
+		        String officialLastName = officialFirstNameProp.flatMap((prop) -> Optional.of(prop.getValue())).orElse("");
+		        String officialFirstName = officialLastNameProp.flatMap((prop) -> Optional.of(prop.getValue())).orElse("");
+		        String officialSecondName = officialSecondNameProp.flatMap((prop) -> Optional.of(prop.getValue())).orElse("");
+
+            	String cpso = provider.getPractitionerNo();
             	%>  
             	<tr>
-					<td><%=providerNo%></td>
-					<td><%=lastName%></td>
-					<td><%=firstName%></td>
+					<td><%=provider.getId()%></td>
+					<td><%=provider.getLastName()%></td>
+					<td><%=provider.getFirstName()%></td>
 					<td><%=cpso%></td>
 					<td><%=officialLastName%></td>
 					<td><%=officialFirstName%></td>
 					<td><%=officialSecondName%></td>
-					<%if(cpso != null  ){ %>
-					<td><textarea cols=100 rows=10><%=tryZ01Query(testPatientLookup, cpso, officialLastName, officialFirstName, officialSecondName,request)%></textarea></td>
+					<%if(cpso != null)
+					{ %>
+		            <td><textarea cols=100 rows=10><%=tryZ01Query(testPatientLookup, cpso, officialLastName, officialFirstName, officialSecondName, request)%></textarea></td>
 					<td><textarea cols=100 rows=10><%=request.getAttribute("msgInXML")%></textarea></td>
 					<%
 					request.setAttribute("msgInXML","");
 					}%>
 				</tr>
-            	
-            	
             	<%
             }
-        }catch(Exception e){
-        	error = org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e);      
+        }
+        catch(Exception e)
+        {
+            error = org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e);
         }
 	%>
 	</table>
@@ -157,68 +161,76 @@ if(oscarProperties.getProperty("olis_request_url") != null &&  oscarProperties.g
 <%!
 
 
-public String tryZ01Query(int patientNum,String cpso,String lastName,String firstName, String secondName,HttpServletRequest request)throws Exception{
-	
-		if(lastName == null){
-			return "Provider Record:  Official Last Name Required";
-		}else if(firstName == null){
-			return "Provider Record:  Official First Name Required";
-		}else if(secondName == null){
-			return "Provider Record:  Official Second Name Required";
-		}
-		
-	
-		Query query = new Z01Query();
+public String tryZ01Query(int patientNum,String cpso,String lastName,String firstName, String secondName,HttpServletRequest request)throws Exception
+{
 
-		String[] dateFormat = new String[] {
-				"yyyy-MM-dd"
-		};
+	if(lastName == null)
+	{
+		return "Provider Record:  Official Last Name Required";
+	}
+	else if(firstName == null)
+	{
+		return "Provider Record:  Official First Name Required";
+	}
+	else if(secondName == null)
+	{
+		return "Provider Record:  Official Second Name Required";
+	}
 
-		
-		String startTimePeriod = "2001-01-01";
-		String endTimePeriod = "2014-01-01";
-		
-		java.util.Date startTime = DateUtils.parseDate(startTimePeriod, dateFormat);	
-		java.util.Date endTime = changeToEndOfDay(DateUtils.parseDate(endTimePeriod, dateFormat));
 
-		List<java.util.Date> dateList = new LinkedList<java.util.Date>();
-		dateList.add(startTime);
-		dateList.add(endTime);
+	Z01Query query = new Z01Query();
 
-		OBR22 obr22 = new OBR22();
-		obr22.setValue(dateList);
+	String[] dateFormat = new String[]{
+			"yyyy-MM-dd"
+	};
 
-		((Z01Query) query).setStartEndTimestamp(obr22);
-			
-		PID3 pid3 = null;	
-		if(patientNum == 1){
-				
-			pid3 = new PID3("2000010674", null, null, "JHN", "ON", "HL70347", "F", null);
-			pid3.setValue(7, DateUtils.parseDate("1990-12-12", dateFormat));
 
-		}else if(patientNum ==2){
-			pid3 = new PID3("9999999999", null, null, "JHN", "ON", "HL70347", "M", null);
-			pid3.setValue(7, DateUtils.parseDate("1950-01-01", dateFormat));
+	String startTimePeriod = "2001-01-01";
+	String endTimePeriod = "2014-01-01";
 
-		}
+	java.util.Date startTime = DateUtils.parseDate(startTimePeriod, dateFormat);
+	java.util.Date endTime = changeToEndOfDay(DateUtils.parseDate(endTimePeriod, dateFormat));
 
-		
-		((Z01Query) query).setPatientIdentifier(pid3);
-			
-	
-				
-		ZRP1 zrp1 = new ZRP1(cpso, "MDL", "ON", "HL70347", lastName,firstName,secondName);
+	List<java.util.Date> dateList = new LinkedList<java.util.Date>();
+	dateList.add(startTime);
+	dateList.add(endTime);
 
-		((Z01Query) query).setRequestingHic(zrp1);
+	OBR22 obr22 = new OBR22();
+	obr22.setValue(dateList);
 
-		com.indivica.olis.Driver.submitOLISQuery(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider(), request, query);
-		String msgInXML = (String) request.getAttribute("msgInXML");
-		String signedRequest = (String) request.getAttribute("signedRequest");
-		String signedData = (String) request.getAttribute("signedData");
-		String unsignedData = (String) request.getAttribute("unsignedResponse" );
-			
-		return unsignedData;
-		
+	query.setStartEndTimestamp(obr22);
+
+	PID3 pid3 = null;
+	if(patientNum == 1)
+	{
+
+		pid3 = new PID3("2000010674", null, null, "JHN", "ON", "HL70347", "F", null);
+		pid3.setValue(7, DateUtils.parseDate("1990-12-12", dateFormat));
+
+	}
+	else if(patientNum == 2)
+	{
+		pid3 = new PID3("9999999999", null, null, "JHN", "ON", "HL70347", "M", null);
+		pid3.setValue(7, DateUtils.parseDate("1950-01-01", dateFormat));
+
+	}
+
+
+	query.setPatientIdentifier(pid3);
+
+
+	ZRP1 zrp1 = new ZRP1(cpso, "MDL", "ON", "HL70347", lastName, firstName, secondName);
+
+	query.setRequestingHic(zrp1);
+
+	com.indivica.olis.Driver.submitOLISQuery(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider(), request, query);
+	String msgInXML = (String) request.getAttribute("msgInXML");
+	String signedRequest = (String) request.getAttribute("signedRequest");
+	String signedData = (String) request.getAttribute("signedData");
+	String unsignedData = (String) request.getAttribute("unsignedResponse");
+
+	return unsignedData;
+
 }
 
 
@@ -229,19 +241,6 @@ private java.util.Date changeToEndOfDay(java.util.Date d) throws Exception{
 	c.set(Calendar.MINUTE, 59);
 	c.set(Calendar.SECOND,59);
 	return c.getTime();
-}
-
-public String findProp(PreparedStatement ps,String providerNo, String name) throws Exception{
-	 String retval = null;
-	 ps.setString(1,providerNo);
-	 ps.setString(2,name);
-	 
-	 ResultSet rs = ps.executeQuery();
-	 
-     while (rs.next()) {
-    	 retval = rs.getString("value");
-     }
-     return retval;
 }
 
 public String prob(String s){
@@ -281,13 +280,16 @@ public boolean checkSendingApplicationFormat(String s,OscarProperties p,List<Str
     return correct;
 }
 
-public boolean checkOlisKeystore(String key,String password,OscarProperties p,List<String> errors){
+public boolean checkOlisKeystore(String key,String password,OscarProperties p,List<String> errors)
+{
 	boolean correct = true;
-	if(checkFileCanBeRead(key,p, errors)){
+	if(checkFileCanBeRead(key,p, errors))
+	{
 		String filepath = p.getProperty(key); 
 		PrivateKey priv = null;
 		KeyStore keystore = null;
-		try {
+		try
+		{
 			keystore = KeyStore.getInstance("JKS");
 			// Load the keystore
 			keystore.load(new FileInputStream(filepath), password.toCharArray());
@@ -295,17 +297,19 @@ public boolean checkOlisKeystore(String key,String password,OscarProperties p,Li
 				errors.add(prob(key+" keystore is empty"));
 				return false;
 			}
-			//Enumeration e = keystore.aliases();
-			String name = "olis";
+
+			String keystoreAlias = p.getProperty("olis_ssl_keystore_alias", "olis");
 
 			// Get the private key and the certificate
-			priv = (PrivateKey) keystore.getKey(name, password.toCharArray());
+			priv = (PrivateKey) keystore.getKey(keystoreAlias, password.toCharArray());
 			if(priv == null){
 				errors.add(prob(key+"private key was not loaded"));
 				return false;
 			}
 			
-		}catch(Exception e){
+		}
+		catch(Exception e)
+		{
 			errors.add(prob("Olis keystore error :"+key+" -- "+e.getMessage()));
 			return false;
 		}
