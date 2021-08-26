@@ -88,6 +88,10 @@ public class PatientTo1
 	@Getter
 	@Setter
 	private String demographicNo;
+	@JsonProperty("has_voip_token")
+	@Getter
+	@Setter
+	private Boolean hasVoipToken;
 
 	public PatientTo1()
 	{

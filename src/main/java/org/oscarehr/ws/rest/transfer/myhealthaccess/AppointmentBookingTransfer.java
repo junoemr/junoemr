@@ -20,27 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.myhealthaccess.dto;
+package org.oscarehr.ws.rest.transfer.myhealthaccess;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
+
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AppointmentBookResponseTo1
+public class AppointmentBookingTransfer
 {
-	private static final String SUCCESS_STATUS = "success";
+	// Juno side information.
+	protected String appointmentNo;
+	protected String providerNo;
+	protected String demographicNo;
+	protected String site;
+	protected String reason;
+	protected String notes;
 
-	@JsonProperty("message")
-	private String message;
-	@JsonProperty("status")
-	private String status;
-	@JsonProperty("clinic_appointment_id")
-	private String remoteAppointmentId;
-
-	public boolean isSuccess()
-	{
-		return this.status.equals(SUCCESS_STATUS);
-	}
+	protected MHAAppointment.APPOINTMENT_TYPE type;
+	protected boolean notifyPatient;
+	protected boolean isVirtual;
+	protected UUID remotePatientId;
+	protected ZonedDateTime startDateTime;
+	protected ZonedDateTime endDateTime;
 }

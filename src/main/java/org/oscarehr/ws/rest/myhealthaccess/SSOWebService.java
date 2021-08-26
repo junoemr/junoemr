@@ -25,9 +25,11 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -68,10 +70,28 @@ public class SSOWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<String> getClinicAdminSSOLink(@PathParam("integrationId") String integrationId)
 	{
+		this.securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._APPOINTMENT);
+
 		Integration integration = integrationDao.findOrThrow(Integer.parseInt(integrationId));
 		IntegrationData integrationData = new IntegrationData(integration);
 
 		integrationData = myHealthAccessService.createOrGetUserIntegrationData(integrationData, getLoggedInInfo().getLoggedInSecurity());
-		return RestResponse.successResponse(myHealthAccessService.getTelehealthUrl(integrationData, null, null));
+		return RestResponse.successResponse(myHealthAccessService.getSSORedirectUrl(integrationData, MyHealthAccessService.MHA_HOME_URL));
+	}
+
+	@GET
+	@Path("/appointment/{appointmentId}/session/audio")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<String> getTelehealthAudioCallSSOLink(@PathParam("integrationId") String integrationId, @PathParam("appointmentId") String appointmentId)
+	{
+		this.securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._APPOINTMENT);
+
+		Integration integration = integrationDao.findOrThrow(Integer.parseInt(integrationId));
+		IntegrationData integrationData = new IntegrationData(integration);
+
+		integrationData = myHealthAccessService.createOrGetUserIntegrationData(integrationData, getLoggedInInfo().getLoggedInSecurity());
+		return RestResponse.successResponse(myHealthAccessService.getSSORedirectUrl(
+				integrationData,
+				String.format(MyHealthAccessService.MHA_OD_AUDIO_CALL_URL, appointmentId)));
 	}
 }

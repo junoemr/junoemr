@@ -24,21 +24,27 @@ package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.conversion.GenericConverter;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import org.oscarehr.integration.myhealthaccess.model.MHATelehealthSessionInfo;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.rest.conversion.myhealthaccess.AppointmentBookTransferToAppointmentBookTo1Converter;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.transfer.myhealthaccess.AppointmentBookingTransfer;
 import org.oscarehr.ws.rest.transfer.myhealthaccess.AppointmentTo1;
 import org.oscarehr.ws.rest.transfer.myhealthaccess.TelehealthSessionInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -80,6 +86,22 @@ public class AppointmentWebService extends AbstractServiceImpl
 		{
 			return RestResponse.successResponse(null);
 		}
+	}
+
+	@POST
+	@Path("/appointment")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<AppointmentTo1> bookMhaAppointment(@PathParam("integrationId") Integer integrationId, AppointmentBookingTransfer appointmentBookingTransfer)
+	{
+		this.securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._APPOINTMENT);
+
+		AppointmentBookTo1 appointmentBookTo1 = (new AppointmentBookTransferToAppointmentBookTo1Converter()).convert(appointmentBookingTransfer);
+		appointmentBookTo1.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
+
+		MHAAppointment newAppointment = this.appointmentService.bookMhaAppointment(this.getLoggedInInfo(), appointmentBookTo1);
+
+		return RestResponse.successResponse(new AppointmentTo1(newAppointment));
 	}
 
 	@POST

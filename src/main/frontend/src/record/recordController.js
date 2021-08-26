@@ -29,6 +29,8 @@ import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPati
 import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import {MessageGroup} from "../lib/messaging/model/MessageGroup";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
+import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -78,6 +80,9 @@ angular.module('Record').controller('Record.RecordController', [
 
 		const PATIENT_MESSENGER_NAV_ID = 432543;
 
+		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
 		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 			'../ws/rs');
 
@@ -98,11 +103,31 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.recordtabs2 = [];
 		controller.working = false;
 
+		controller.canMHACallPatient = false;
+		controller.mhaCallPanelOpen = false;
+
 
 		controller.init = function init()
 		{
 			controller.fillMenu();
+			controller.checkIfMhaCallAvailable();
 		};
+
+		/**
+		 * check if patient has the MHA app & they have a strong enough connection to be called from the chart.
+		 */
+		controller.checkIfMhaCallAvailable = async () =>
+		{
+			const mhaConfigService = new MhaConfigService();
+			const mhaPatientService = new MhaPatientService();
+
+			if (await mhaConfigService.mhaEnabled())
+			{
+					let profiles = await mhaPatientService.profilesForDemographic(controller.demographicNo);
+					profiles = profiles.filter((profile) => profile.isConfirmed && profile.hasVoipToken);
+					controller.canMHACallPatient = profiles.length > 0;
+			}
+		}
 
 		//get access rights
 		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
@@ -906,6 +931,20 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
+
+		/**
+		 * open the mha audio call panel.
+		 */
+		controller.openMhaCallPanel = () =>
+		{
+			controller.mhaCallPanelOpen = true;
+		}
+
+		// close the mha audio call panel.
+		$scope.$on(MhaCallPanelEvents.Close, () =>
+		{
+			controller.mhaCallPanelOpen = false;
+		})
 
 		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 		controller.init();
