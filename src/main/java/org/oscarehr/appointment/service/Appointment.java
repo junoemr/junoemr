@@ -424,7 +424,8 @@ public class Appointment
 						details.isConfirmed(),
 						details.getCreatorSecurityId(),
 						details.getBookingSource(),
-						isCritical
+						isCritical,
+						details.getVirtualAppointmentType()
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)

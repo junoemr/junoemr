@@ -72,7 +72,7 @@ public class AppointmentService extends BaseService
 
 		endpoint = restClient.formatEndpoint(endpoint, clinicId, appointmentId);
 		Boolean response = restClient.doPut(endpoint, appointmentTransfer, Boolean.class);
-		if(!response)
+		if (!response)
 		{
 			throw new RuntimeException("Got bad response status: " + response);
 		}
@@ -81,7 +81,8 @@ public class AppointmentService extends BaseService
 	/**
 	 * Book an MHA appointment.
 	 * The booking doesn't even have to be an "appointment" (for example if type is ON_DEMAND_AUDIO_CALL).
-	 * @param loggedInInfo - logged in info
+	 *
+	 * @param loggedInInfo       - logged in info
 	 * @param appointmentBookTo1 - the appointment booking transfer to send.
 	 * @return - mha appointment that was just booked
 	 * @throws InvalidIntegrationException
@@ -108,23 +109,25 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * book a telehealth appointment in MHA.
-	 * @param loggedInInfo - logged in info.
-	 * @param appointment - the appointment to book.
+	 *
+	 * @param loggedInInfo     - logged in info.
+	 * @param appointment      - the appointment to book.
 	 * @param sendNotification - if true the patient is sent a notification of the appointment booking.
 	 * @throws InvalidIntegrationException - if MHA integration invalid
 	 */
 	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification) throws InvalidIntegrationException
 	{
-		bookTelehealthAppointment(loggedInInfo, appointment, sendNotification, null, MHAAppointment.APPOINTMENT_TYPE.REGULAR);
+		bookTelehealthAppointment(loggedInInfo, appointment, sendNotification, null, this.virtualAppointmentTypeToMhaAppointmentType(appointment.getVirtualAppointmentType()));
 	}
 
 	/**
 	 * book a telehealth appointment in MHA.
-	 * @param loggedInInfo - logged in info.
-	 * @param appointment - the appointment to book.
+	 *
+	 * @param loggedInInfo     - logged in info.
+	 * @param appointment      - the appointment to book.
 	 * @param sendNotification - if true the patient is sent a notification of the appointment booking.
-	 * @param remoteId - if provided (can be null) this overrides demographic_no and the appointment will be booked directly for that remote patient id.
-	 * @param appointmentType - the type of the appointment being booked.
+	 * @param remoteId         - if provided (can be null) this overrides demographic_no and the appointment will be booked directly for that remote patient id.
+	 * @param appointmentType  - the type of the appointment being booked.
 	 * @throws InvalidIntegrationException - if MHA integration invalid
 	 */
 	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification, UUID remoteId, MHAAppointment.APPOINTMENT_TYPE appointmentType) throws InvalidIntegrationException
@@ -140,8 +143,9 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * book a one time telehealth appointment in MHA
-	 * @param loggedInInfo - logged in info
-	 * @param appointment - the appointment to book.
+	 *
+	 * @param loggedInInfo     - logged in info
+	 * @param appointment      - the appointment to book.
 	 * @param sendNotification - If true MHA will send a notification to the user. This notification will include the one time link.
 	 * @throws InvalidIntegrationException - if MHA integration invalid
 	 */
@@ -158,9 +162,10 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * send a telehealth appointment notification for the specified appointment, to the patient.
+	 *
 	 * @param integration - the integration under which to perform the action
-	 * @param loginToken - the login token of the user performing the action
-	 * @param remoteId - the appointments remote_id (mha id)
+	 * @param loginToken  - the login token of the user performing the action
+	 * @param remoteId    - the appointments remote_id (mha id)
 	 */
 	public void sendTelehealthAppointmentNotification(Integration integration, String loginToken, String remoteId)
 	{
@@ -174,8 +179,9 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * send a general appointment notification for the specified appointment, to the patient.
-	 * @param integration - the integration under which to perform the action
-	 * @param loginToken - the login token of the user performing the action
+	 *
+	 * @param integration   - the integration under which to perform the action
+	 * @param loginToken    - the login token of the user performing the action
 	 * @param appointmentNo - the appointment no
 	 */
 	public void sendGeneralAppointmentNotification(Integration integration, String loginToken, Integer appointmentNo)
@@ -200,7 +206,8 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * fetch remote appointment from MHA by appointmentNo
-	 * @param integration - the integration to search for the appointment in
+	 *
+	 * @param integration   - the integration to search for the appointment in
 	 * @param appointmentNo - the appointment number to fetch
 	 * @return - a new MHAAppointment object
 	 */
@@ -241,8 +248,9 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * fetch remote appointment from MHA by remoteId
+	 *
 	 * @param integration - the integration to search for the appointment in
-	 * @param remoteId - the remote appointment id to fetch
+	 * @param remoteId    - the remote appointment id to fetch
 	 * @return - the MHAAppointment or null if not found for that remoteId.
 	 */
 	public MHAAppointment getAppointment(Integration integration, String remoteId)
@@ -264,7 +272,8 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * get information about the MHA telehealth session
-	 * @param integration - integration to use when fetching the information
+	 *
+	 * @param integration      - integration to use when fetching the information
 	 * @param mhaAppointmentId - the appointment to get session information for.
 	 * @return telehealth session info
 	 */
@@ -278,7 +287,8 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * get information about the MHA telehealth session
-	 * @param integration - integration to use when fetching the information
+	 *
+	 * @param integration   - integration to use when fetching the information
 	 * @param appointmentNo - the appointment no to get session information for.
 	 * @return telehealth session info
 	 */
@@ -291,9 +301,10 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * link an MHA appointment with an AQS telehealth session
-	 * @param integration - integration on which to perform the link
-	 * @param loggedInInfo - logged in info
-	 * @param mhaAppointment - the MHA appointment to link
+	 *
+	 * @param integration         - integration on which to perform the link
+	 * @param loggedInInfo        - logged in info
+	 * @param mhaAppointment      - the MHA appointment to link
 	 * @param queuedAppointmentId - the queued appointment to link
 	 * @throws InvalidIntegrationException - if the integration is not setup correctly
 	 */
@@ -306,5 +317,27 @@ public class AppointmentService extends BaseService
 				loginToken,
 				new AppointmentAqsLinkTo1(queuedAppointmentId),
 				null);
+	}
+
+	// ==========================================================================
+	// Private Methods
+	// ==========================================================================
+
+	/**
+	 * Maps virtual_type of Juno appointments to the corresponding MHA_APPOINTMENT_TYPE.
+	 * @param virtualAppointmentType - the Juno virtual appointment type.
+	 * @return - the corresponding MHA appointment type.
+	 */
+	private MHAAppointment.APPOINTMENT_TYPE virtualAppointmentTypeToMhaAppointmentType(Appointment.VirtualAppointmentType virtualAppointmentType)
+	{
+		switch(virtualAppointmentType)
+		{
+			case CHAT:
+				return MHAAppointment.APPOINTMENT_TYPE.CHAT;
+			case AUDIO:
+				return MHAAppointment.APPOINTMENT_TYPE.ON_DEMAND_AUDIO_CALL;
+			default:
+				return MHAAppointment.APPOINTMENT_TYPE.REGULAR;
+		}
 	}
 }

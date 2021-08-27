@@ -1,0 +1,2 @@
+ALTER TABLE appointment ADD COLUMN IF NOT EXISTS virtual_type VARCHAR(256) NOT NULL DEFAULT 'NONE';
+UPDATE appointment SET virtual_type = 'VIDEO' WHERE appointment.virtual_type = 'NONE' && appointment.isVirtual = true;

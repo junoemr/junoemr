@@ -82,6 +82,14 @@ public class Appointment extends AbstractModel<Integer> implements Serializable
 		SECURITY_NO
 	}
 
+	public enum VirtualAppointmentType
+	{
+		NONE,
+		VIDEO,
+		AUDIO,
+		CHAT
+	}
+
 	public static final String DONOTBOOK = "Do_Not_Book";
 
 	public static final String DEFAULT_REASON = "Others";
@@ -170,6 +178,12 @@ public class Appointment extends AbstractModel<Integer> implements Serializable
 	@Column(name = "confirmed_by")
 	private String confirmedBy;
 
+	@Getter
+	@Setter
+	@Column(name = "virtual_type")
+	@Enumerated(EnumType.STRING)
+	private VirtualAppointmentType virtualAppointmentType;
+
 	private Integer reasonCode;
 
 	/** default constructor */
@@ -208,6 +222,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable
 		this.creatorSecurityId = appointmentToCopy.creatorSecurityId;
 		this.bookingSource = appointmentToCopy.bookingSource;
 		this.reasonCode = appointmentToCopy.reasonCode;
+		this.virtualAppointmentType = appointmentToCopy.getVirtualAppointmentType();
 	}
 
 	public Integer getReasonCode() {

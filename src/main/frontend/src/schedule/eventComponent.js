@@ -9,6 +9,7 @@ import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
 import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
+import {VirtualAppointmentType, virtualAppointmentTypeOptions} from "../lib/appointment/model/VirtualAppointmentType";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -86,6 +87,7 @@ angular.module('Schedule').component('eventComponent', {
 			controller.reasonCodeList = [];
 
 			$scope.eventUuid = null;
+			$scope.virtualAppointmentOptions = virtualAppointmentTypeOptions();
 
 			$scope.eventData = {
 				startDate: null,
@@ -101,7 +103,8 @@ angular.module('Schedule').component('eventComponent', {
 				virtual: false,
 				bookingSource: null,
 				isSelfBooked: false,
-				creatorSecurityId: null
+				creatorSecurityId: null,
+				virtualAppointmentType: null,
 			};
 
 			controller.repeatBooking =
@@ -356,6 +359,7 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.creatorSecurityId = data.eventData.creatorSecurityId;
 					$scope.eventData.isSelfBooked = data.eventData.tagSelfBooked;
 					$scope.eventData.confirmed = data.eventData.confirmed;
+					$scope.eventData.virtualAppointmentType = data.eventData.virtualAppointmentType;
 
 					controller.checkEventConflicts(); // uses the eventData
 
@@ -439,7 +443,7 @@ angular.module('Schedule').component('eventComponent', {
 											sitesApi.getProviderSiteBySchedule(controller.providerModel.providerNo, $scope.eventData.startDate).then(
 													function success(result)
 													{// assign to schedule site that we are booking in to.
-														let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
+														let site = result.data.body ? controller.siteOptions.find(el => el.uuid === result.data.body.siteId) : null;
 														if (site)
 														{
 															$scope.eventData.site = site.value;
@@ -916,7 +920,8 @@ angular.module('Schedule').component('eventComponent', {
 						creatorSecurityId: $scope.eventData.creatorSecurityId,
 						tagSelfBooked: $scope.eventData.isSelfBooked,
 						sendNotification: sendNotification,
-						confirmed: $scope.eventData.confirmed
+						confirmed: $scope.eventData.confirmed,
+						virtualAppointmentType: $scope.eventData.virtualAppointmentType,
 					},
 					repeatOnDates,
 
@@ -1056,6 +1061,14 @@ angular.module('Schedule').component('eventComponent', {
 							controller.updateRepeatBookingDates();
 						}
 					});
+				$scope.$watch("eventData.virtualAppointmentType", (virtualAppointmentType) =>
+				{
+					$scope.eventData.virtual = virtualAppointmentType && virtualAppointmentType !== VirtualAppointmentType.None;
+				});
+				$scope.$watch("telehealthMode", () =>
+				{
+					controller.updateTelehealthAppointmentOptions();
+				});
 			};
 
 			//=========================================================================
@@ -1565,8 +1578,26 @@ angular.module('Schedule').component('eventComponent', {
 				{
 					console.error(err);
 				}
-
 			};
+
+			/**
+			 * update the list of available telehealth appointment types.
+			 */
+			controller.updateTelehealthAppointmentOptions = () =>
+			{
+				switch ($scope.telehealthMode)
+				{
+					case $scope.TELEHEALTH_MODES.TELEHEALTH:
+						$scope.virtualAppointmentOptions = virtualAppointmentTypeOptions();
+						break;
+					case $scope.TELEHEALTH_MODES.ONE_TIME_TELEHEALTH:
+						$scope.virtualAppointmentOptions = virtualAppointmentTypeOptions().filter((option) => option.value !== VirtualAppointmentType.Chat);
+						break;
+					default:
+						$scope.virtualAppointmentOptions = [];
+						break;
+				}
+			}
 
 			//=========================================================================
 			//  Key Bindings
