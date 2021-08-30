@@ -200,7 +200,7 @@ public final class MessageUploader {
 				}
 			}
 
-			if(StringUtils.isNotBlank(obrDate))
+			if(StringUtils.isBlank(obrDate))
 			{
 				throw new IllegalStateException("Lab Date cannot be blank");
 			}

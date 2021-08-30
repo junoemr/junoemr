@@ -30,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.impl.cookie.DateParseException;
 import org.apache.http.impl.cookie.DateUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -91,11 +93,13 @@ public class OLISPollingUtil {
 	    for (Provider provider : allProvidersList) {
 	    	try {
 	    		String officialLastName  = userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME);
-	    		String officialfirstName = userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME);
+	    		String officialFirstName = userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME);
 				String officialSecondName = userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME);
+				String olisIdType = userPropertyDAO.getStringValue(provider.getProviderNo(), UserProperty.OFFICIAL_OLIS_IDTYPE);
 				
 				//There is no need to query for users without this configured, it will just end in an error.
-	    		if(officialLastName == null || officialLastName.trim().equals("")){ 
+	    		if(StringUtils.isBlank(officialLastName) || StringUtils.isBlank(olisIdType))
+	    		{
 	    			continue;
 	    		}
 	    		
@@ -103,37 +107,22 @@ public class OLISPollingUtil {
 		    	OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(provider.getProviderNo());
 		    	
 		    	// Creating OBR22 for this request.
-		    	OBR22 obr22 = new OBR22();
-		    	List<Date> dateList = new LinkedList<Date>();
-		    	if (olisProviderPreferences != null) {
-		    		if (olisProviderPreferences.getStartTime() == null) {
-		    			olisProviderPreferences.setStartTime(defaultStartTime);
-		    		}
-					obr22.setValue(DateUtils.parseDate(olisProviderPreferences.getStartTime(), dateFormat));				
-		    	}
-		    	else { 
-		    		if (defaultEndTime.equals("")) {
-		    			obr22.setValue(DateUtils.parseDate(defaultStartTime, dateFormat));
-		    		}
-		    		else {
-			    		dateList.add(DateUtils.parseDate(defaultStartTime, dateFormat));
-			    		dateList.add(DateUtils.parseDate(defaultEndTime, dateFormat));			    		
-			    		obr22.setValue(dateList);
-		    		}
-		    		
-		    		olisProviderPreferences = new OLISProviderPreferences();
-		    		olisProviderPreferences.setProviderId(provider.getProviderNo());
-		    	}
+			    OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences, defaultStartTime, defaultEndTime);
+		    	if(olisProviderPreferences == null)
+			    {
+				    olisProviderPreferences = new OLISProviderPreferences();
+				    olisProviderPreferences.setProviderId(provider.getProviderNo());
+			    }
 				providerQuery.setStartEndTimestamp(obr22);
 	
 				// Setting HIC for Z04 Request
 			    ZRP1 zrp1 = new ZRP1(
 					    provider.getPractitionerNo(),
-					    userPropertyDAO.getStringValue(provider.getProviderNo(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+					    olisIdType,
 					    "ON",
 					    "HL70347",
 					    officialLastName,
-					    officialfirstName,
+					    officialFirstName,
 					    officialSecondName);
 				providerQuery.setRequestingHic(zrp1);
 				String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, providerQuery);
@@ -154,38 +143,27 @@ public class OLISPollingUtil {
 				} else {
 					olisProviderPreferencesDao.persist(olisProviderPreferences);
 				}
-	    	} catch (Exception e) {
-	    		logger.error("Error polling OLIS for provider " + provider.getProviderNo(), e);
-	    	}
+		    }
+		    catch(Exception e)
+		    {
+			    logger.error("Error polling OLIS for provider " + provider.getProviderNo(), e);
+		    }
 	    }
 	}
 	
-	private static void pollZ06Query(LoggedInInfo loggedInInfo, String defaultStartTime,String defaultEndTime,String facilityId){
-		try {
+	private static void pollZ06Query(LoggedInInfo loggedInInfo, String defaultStartTime,String defaultEndTime,String facilityId)
+	{
+		try
+		{
 			Z06Query facilityQuery = new Z06Query();
-			OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById("-1");
+			OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(Provider.SYSTEM_PROVIDER_NO);
 			// Creating OBR22 for this request.
-	    	OBR22 obr22 = new OBR22();
-	    	List<Date> dateList = new LinkedList<Date>();
-	    	if (olisProviderPreferences != null) {
-	    		if (olisProviderPreferences.getStartTime() == null) {
-	    			olisProviderPreferences.setStartTime(defaultStartTime);
-	    		}
-	    		obr22.setValue(DateUtils.parseDate(olisProviderPreferences.getStartTime(), dateFormat));				
-	    	}
-	    	else { 
-	    		if (defaultEndTime.equals("")) {
-	    			obr22.setValue(DateUtils.parseDate(defaultStartTime, dateFormat));
-	    		}
-	    		else {
-		    		dateList.add(DateUtils.parseDate(defaultStartTime, dateFormat));
-		    		dateList.add(DateUtils.parseDate(defaultEndTime, dateFormat));			    		
-		    		obr22.setValue(dateList);
-	    		}
-	    		
-	    		olisProviderPreferences = new OLISProviderPreferences();
-	    		olisProviderPreferences.setProviderId("-1");
-	    	}
+			OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences, defaultStartTime, defaultEndTime);
+			if(olisProviderPreferences == null)
+			{
+				olisProviderPreferences = new OLISProviderPreferences();
+				olisProviderPreferences.setProviderId(Provider.SYSTEM_PROVIDER_NO);
+			}
 	    	facilityQuery.setStartEndTimestamp(obr22);
 	    	ORC21 orc21 = new ORC21();
 	    	orc21.setValue(6, 2, "^"+facilityId);
@@ -210,9 +188,11 @@ public class OLISPollingUtil {
 			} else {
 				olisProviderPreferencesDao.persist(olisProviderPreferences);
 			}
-	    } catch (Exception e) { 
-	    	logger.error("Error polling OLIS for facility", e);
-	    }
+		}
+		catch(Exception e)
+		{
+			logger.error("Error polling OLIS for facility", e);
+		}
     }
 	
 	public static String parseAndImportResponse(LoggedInInfo loggedInInfo, String response) throws Exception {
@@ -231,7 +211,7 @@ public class OLISPollingUtil {
 
 		String labType = OLIS_MESSAGE_TYPE;
 		String serviceName = "OLIS_HL7";
-		String providerNumber = "0";
+		String providerNumber = Provider.UNCLAIMED_PROVIDER_NO;
 		String timeStringForNextStartDate = null;
 		try
 		{
@@ -255,5 +235,33 @@ public class OLISPollingUtil {
 			logger.error( "Failed insert lab into DB: " + fileLocation + " of type: " + labType, e);
 		}
 		return timeStringForNextStartDate;
+	}
+
+	private static OBR22 buildRequestStartEndTimestamp(OLISProviderPreferences olisProviderPreferences, String defaultStartTime, String defaultEndTime) throws DateParseException
+	{
+		OBR22 obr22 = new OBR22();
+		if(olisProviderPreferences != null)
+		{
+			if(StringUtils.isBlank(olisProviderPreferences.getStartTime()))
+			{
+				olisProviderPreferences.setStartTime(defaultStartTime);
+			}
+			obr22.setValue(DateUtils.parseDate(olisProviderPreferences.getStartTime(), dateFormat));
+		}
+		else
+		{
+			if(StringUtils.isBlank(defaultEndTime))
+			{
+				obr22.setValue(DateUtils.parseDate(defaultStartTime, dateFormat));
+			}
+			else
+			{
+				List<Date> dateList = new LinkedList<>();
+				dateList.add(DateUtils.parseDate(defaultStartTime, dateFormat));
+				dateList.add(DateUtils.parseDate(defaultEndTime, dateFormat));
+				obr22.setValue(dateList);
+			}
+		}
+		return obr22;
 	}
 }

@@ -105,17 +105,19 @@ public class Driver
 			String olisHL7String = message.getOlisHL7String().replaceAll("\n", "\r");
 			String msgInXML = String.format("<Request xmlns=\"http://www.ssha.ca/2005/HIAL\"><Content><![CDATA[%s]]></Content></Request>", olisHL7String);
 
-			String signedRequest = null;
-
-			if (OscarProperties.getInstance().getProperty("olis_returned_cert") != null) {
+			String signedRequest;
+			if(OscarProperties.getInstance().getProperty("olis_returned_cert") != null)
+			{
 				signedRequest = Driver.signData2(msgInXML);
-			} else {
+			}
+			else
+			{
 				signedRequest = Driver.signData(msgInXML);
 			}
-
 			olisRequest.getHIALRequest().getSignedRequest().setSignedData(signedRequest);
 
-			try {
+			try
+			{
 				OscarLog logItem = new OscarLog();
 				logItem.setAction("OLIS");
 				logItem.setContent("query");
@@ -125,7 +127,10 @@ public class Driver
 				if(request != null)
 				{
 					LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-					if(loggedInInfo.getLoggedInProvider() != null) logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+					if(loggedInInfo.getLoggedInProvider() != null)
+					{
+						logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+					}
 				}
 				else
 				{
@@ -139,11 +144,10 @@ public class Driver
 				logger.error("Couldn't write log message for OLIS query", e);
 			}
 
-			logger.debug("OLIS Request" +
-					"\nclientTransaction" + message.getTransactionId() +
+			logger.info("OLIS Request" +
+					"\nclientTransactionId: " + message.getTransactionId() +
 					"\nrequest URL: " + olisRequestURL +
-					"\nmessage:\n" + msgInXML +
-					"\nSigned request:\n" + signedRequest
+					"\nhl7 request query:\n" + olisHL7String
 			);
 
 			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
@@ -171,7 +175,6 @@ public class Driver
 				readResponseFromXML(request, unsignedData);
 
 				return unsignedData;
-
 			}
 		}
 		catch(Exception e)
