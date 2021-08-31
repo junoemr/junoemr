@@ -14,83 +14,79 @@
  */
 package oscar.oscarLab.ca.all.upload.handlers;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.olis.OLISUtils;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.all.upload.RouteReportResults;
 import oscar.oscarLab.ca.all.util.Utilities;
 
+import java.util.ArrayList;
+
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 
 /**
  * 
  */
-public class OLISHL7Handler implements MessageHandler {
-
-	Logger logger = Logger.getLogger(OLISHL7Handler.class);
-	Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
-	
+public class OLISHL7Handler implements MessageHandler
+{
+	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
 	private int lastSegmentId = 0;
 	
-	public OLISHL7Handler() {
+	public OLISHL7Handler()
+	{
 		logger.info("NEW OLISHL7Handler UPLOAD HANDLER instance just instantiated. ");
 	}
 
 	@Override
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr)
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) throws Exception
 	{
 		return parse(loggedInInfo, serviceName, fileName, fileId, false);
 	}
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider)
+
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider) throws Exception
 	{
-		int i = 0;
 		String lastTimeStampAccessed = null;
 		RouteReportResults results = new RouteReportResults();
-		
-				try {
-			ArrayList<String> messages = Utilities.separateMessages(fileName);
-			
-			for (i = 0; i < messages.size(); i++) {
-				String msg = messages.get(i);
-				logger.info(msg);
-				
-				lastTimeStampAccessed = getLastUpdateInOLIS(msg) ;
-				
-				if(OLISUtils.isDuplicate(loggedInInfo, msg)) {
-					continue; 
-				}
-				MessageUploader.routeReport(loggedInInfo.getLoggedInProviderNo(), serviceName, OLIS_MESSAGE_TYPE, msg.replace("\\E\\", "\\SLASHHACK\\").replace("µ", "\\MUHACK\\").replace("\\H\\", "\\.H\\").replace("\\N\\", "\\.N\\"), fileId, results);
-				if (routeToCurrentProvider) {
-					ProviderLabRouting routing = new ProviderLabRouting();
-					routing.route(results.segmentId, loggedInInfo.getLoggedInProviderNo(), DbConnectionFilter.getThreadLocalDbConnection(), "HL7");
-					this.lastSegmentId = results.segmentId;
-				}
+
+		ArrayList<String> messages = Utilities.separateMessages(fileName);
+
+		for(String msg : messages)
+		{
+			logger.info(msg);
+			oscar.oscarLab.ca.all.parsers.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
+
+			if(!parser.canUpload() || OLISUtils.isDuplicate(loggedInInfo, parser, msg))
+			{
+				continue;
 			}
-			logger.info("Parsed OK");
-		} catch (Exception e) {
-			logger.error("Could not upload message", e);
-			return null;
+			lastTimeStampAccessed = parser.getLastUpdateInOLISUnformated();
+
+			MessageUploader.routeReport(
+					loggedInInfo.getLoggedInProviderNo(),
+					serviceName,
+					parser,
+					OLIS_MESSAGE_TYPE,
+					msg.replace("\\E\\", "\\SLASHHACK\\").replace("µ", "\\MUHACK\\").replace("\\H\\", "\\.H\\").replace("\\N\\", "\\.N\\"),
+					fileId,
+					results);
+			if(routeToCurrentProvider)
+			{
+				ProviderLabRouting routing = new ProviderLabRouting();
+				routing.route(results.segmentId, loggedInInfo.getLoggedInProviderNo(), DbConnectionFilter.getThreadLocalDbConnection(), ProviderLabRoutingModel.LAB_TYPE_LABS);
+				this.lastSegmentId = results.segmentId;
+			}
 		}
+		logger.info("Parsed OK");
 		return lastTimeStampAccessed;
 	}
-	
-	public int getLastSegmentId() {
+
+	public int getLastSegmentId()
+	{
 		return this.lastSegmentId;
-	}
-	//TODO-legacy: check HIN
-	//TODO-legacy: check # of results
-	
-	private String getLastUpdateInOLIS(String msg) {
-		oscar.oscarLab.ca.all.parsers.OLISHL7Handler h = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
-		return h.getLastUpdateInOLISUnformated();	
 	}
 }

@@ -124,17 +124,20 @@ public final class MessageUploader {
 	{
 		return routeReport(loggedInInfo.getLoggedInProviderNo(), serviceName, type, hl7Body, fileId, results);
 	}
+
+	public static String routeReport(String loggedInProviderNo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
+	{
+		MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
+		return routeReport(loggedInProviderNo, serviceName, messageHandler, type, hl7Body, fileId, results);
+	}
 	/**
 	 * Insert the lab into the proper tables of the database
 	 */
-	public static String routeReport(String loggedInProviderNo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
+	public static String routeReport(String loggedInProviderNo, String serviceName, MessageHandler messageHandler, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
 	{
-
 		String retVal;
 		try
 		{
-			MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
-
 			String firstName = messageHandler.getFirstName();
 			String lastName = messageHandler.getLastName();
 			String dob = messageHandler.getDOB();

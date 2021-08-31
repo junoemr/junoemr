@@ -22,19 +22,8 @@ package org.oscarehr.olis;
  * Hamilton
  * Ontario, Canada
  */
-import java.io.File;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
-
+import ca.ssha._2005.hial.Response;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -43,11 +32,20 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.InputSource;
-
-import ca.ssha._2005.hial.Response;
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
+import java.io.File;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.List;
 
 
 public class OLISUtils {
@@ -84,24 +82,13 @@ public class OLISUtils {
 		
 		return root.getContent();
 	}
-	
 
-	
-	
-	
-	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String msg) {
-		oscar.oscarLab.ca.all.parsers.OLISHL7Handler h = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler("OLIS_HL7", msg);
-		return isDuplicate(loggedInInfo, h,msg);
-	}
-	
-	
-	public static boolean isDuplicate(LoggedInInfo loggedInInfo, OLISHL7Handler h,String msg) {
-		
+	public static boolean isDuplicate(LoggedInInfo loggedInInfo, OLISHL7Handler h, String msg)
+	{
 		String sendingFacility = h.getPlacerGroupNumber();//getPerformingFacilityNameOnly();
 		logger.debug("SENDING FACILITY: " +sendingFacility);
 		String accessionNumber = h.getAccessionNum();
 		String hin = h.getHealthNum();
-
 	
 		return isDuplicate(loggedInInfo, sendingFacility,accessionNumber,msg,hin);
 	}
