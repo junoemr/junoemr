@@ -491,6 +491,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					{
 						if (controller.consult.id == null)
 						{
+							controller.consult.id = results.id; // assign id to prevent possible double save
 							$location.path("/record/" + consult.demographicId + "/consult/" + results.id);
 						}
 						deferred.resolve(results.id);
