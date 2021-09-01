@@ -33,13 +33,22 @@ public class OBR22 implements Parameter {
 	}
 
 	@Override
-	public void setValue(Object value) {
-		if (value != null) {
-			if (value instanceof Date) {
+	public void setValue(Object value)
+	{
+		if(value != null)
+		{
+			if(value instanceof Date)
+			{
 				this.value = dateFormatter.format(value);
-			} else if (value instanceof List) {
+			}
+			else if(value instanceof List)
+			{
 				this.value = dateFormatter.format(((List<Date>) value).get(0));
 				this.value += "&" + dateFormatter.format(((List<Date>) value).get(1));
+			}
+			else if (value instanceof String)
+			{
+				this.value = (String) value;
 			}
 		}
 	}

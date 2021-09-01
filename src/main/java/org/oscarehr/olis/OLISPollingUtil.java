@@ -22,17 +22,14 @@ package org.oscarehr.olis;
  * Hamilton
  * Ontario, Canada
  */
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
 
+import com.indivica.olis.Driver;
+import com.indivica.olis.parameters.OBR22;
+import com.indivica.olis.parameters.ORC21;
+import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.queries.Z04Query;
+import com.indivica.olis.queries.Z06Query;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.impl.cookie.DateParseException;
-import org.apache.http.impl.cookie.DateUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
@@ -45,35 +42,35 @@ import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.util.Utilities;
 
-import com.indivica.olis.Driver;
-import com.indivica.olis.parameters.OBR22;
-import com.indivica.olis.parameters.ORC21;
-import com.indivica.olis.parameters.ZRP1;
-import com.indivica.olis.queries.Z04Query;
-import com.indivica.olis.queries.Z06Query;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 
-public class OLISPollingUtil {
-
+public class OLISPollingUtil
+{
+	public static final String OLIS_DATE_FORMAT = "yyyyMMddHHmmssZ";
 	private static final Logger logger = MiscUtils.getLogger();
 	
 	static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
     static OLISSystemPreferencesDao olisSystemPreferencesDao =  SpringUtils.getBean(OLISSystemPreferencesDao.class);  
-    static OLISProviderPreferencesDao olisProviderPreferencesDao =  SpringUtils.getBean(OLISProviderPreferencesDao.class);       
-    static UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
-    static String[] dateFormat = new String[] { "yyyyMMddHHmmssZ" };
-    
-	public OLISPollingUtil() {
+    static OLISProviderPreferencesDao olisProviderPreferencesDao =  SpringUtils.getBean(OLISProviderPreferencesDao.class);
+
+	public OLISPollingUtil()
+	{
 		super();
 	}
 	
-	public static void requestResults(LoggedInInfo loggedInInfo){
+	public static void requestResults(LoggedInInfo loggedInInfo)
+	{
 		OLISSystemPreferences olisSystemPreferences = olisSystemPreferencesDao.getPreferences();
 		String defaultStartTime = oscar.Misc.getStr(olisSystemPreferences.getStartTime(), "").trim();
 	    String defaultEndTime = oscar.Misc.getStr(olisSystemPreferences.getEndTime(), "").trim();
@@ -81,9 +78,10 @@ public class OLISPollingUtil {
 	    pollZ04Query(loggedInInfo, defaultStartTime,defaultEndTime);
 	    
 	    String facilityId = OscarProperties.getInstance().getProperty("olis_polling_facility"); //Most of the time this will default to null.
-	    if (facilityId !=null){
-	    	pollZ06Query(loggedInInfo, defaultStartTime,defaultEndTime,facilityId);
-	    }
+		if(facilityId != null)
+		{
+			pollZ06Query(loggedInInfo, defaultStartTime, defaultEndTime, facilityId);
+		}
 	}
 	
 	private static void pollZ04Query(LoggedInInfo loggedInInfo, String defaultStartTime,String defaultEndTime){
@@ -105,10 +103,10 @@ public class OLISPollingUtil {
 	    		
 	    		Z04Query providerQuery = new Z04Query();
 		    	OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(provider.getProviderNo());
-		    	
+
 		    	// Creating OBR22 for this request.
 			    OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences, defaultStartTime, defaultEndTime);
-		    	if(olisProviderPreferences == null)
+			    if(olisProviderPreferences == null)
 			    {
 				    olisProviderPreferences = new OLISProviderPreferences();
 				    olisProviderPreferences.setProviderId(provider.getProviderNo());
@@ -195,8 +193,8 @@ public class OLISPollingUtil {
 		}
     }
 	
-	public static String parseAndImportResponse(LoggedInInfo loggedInInfo, String response) throws Exception {
-		String timeStampForNextStartDate = null;
+	public static String parseAndImportResponse(LoggedInInfo loggedInInfo, String response) throws Exception
+	{
 		UUID uuid = UUID.randomUUID();
 		String originalFile = "olis_"+uuid.toString()+".response";
 		String hl7Filename = "olis_"+uuid.toString()+".hl7";
@@ -237,31 +235,43 @@ public class OLISPollingUtil {
 		return timeStringForNextStartDate;
 	}
 
-	private static OBR22 buildRequestStartEndTimestamp(OLISProviderPreferences olisProviderPreferences, String defaultStartTime, String defaultEndTime) throws DateParseException
+	private static OBR22 buildRequestStartEndTimestamp(OLISProviderPreferences olisProviderPreferences, String defaultStartTime, String defaultEndTime)
 	{
 		OBR22 obr22 = new OBR22();
 		if(olisProviderPreferences != null)
 		{
-			if(StringUtils.isBlank(olisProviderPreferences.getStartTime()))
-			{
-				olisProviderPreferences.setStartTime(defaultStartTime);
-			}
-			obr22.setValue(DateUtils.parseDate(olisProviderPreferences.getStartTime(), dateFormat));
+			String dateTimeStr = olisProviderPreferences.getOptionalStartDateTime().orElse(defaultStartTime);
+			validateDateTimeString(dateTimeStr);
+			obr22.setValue(dateTimeStr);
 		}
 		else
 		{
+			validateDateTimeString(defaultStartTime);
 			if(StringUtils.isBlank(defaultEndTime))
 			{
-				obr22.setValue(DateUtils.parseDate(defaultStartTime, dateFormat));
+				obr22.setValue(defaultStartTime);
 			}
 			else
 			{
-				List<Date> dateList = new LinkedList<>();
-				dateList.add(DateUtils.parseDate(defaultStartTime, dateFormat));
-				dateList.add(DateUtils.parseDate(defaultEndTime, dateFormat));
+				validateDateTimeString(defaultEndTime);
+				List<String> dateList = new LinkedList<>();
+				dateList.add(defaultStartTime);
+				dateList.add(defaultEndTime);
 				obr22.setValue(dateList);
 			}
 		}
 		return obr22;
+	}
+
+	/**
+	 * basic check to ensure the datetime string is in the correct format
+ 	 */
+	private static void validateDateTimeString(String toValidate)
+	{
+		boolean isValid = toValidate.matches("\\d{14}([+-]\\d+)?");
+		if(!isValid)
+		{
+			throw new IllegalArgumentException("Malformed OLIS date: " + toValidate);
+		}
 	}
 }

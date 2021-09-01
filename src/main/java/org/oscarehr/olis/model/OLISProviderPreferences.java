@@ -8,40 +8,38 @@
  */
 package org.oscarehr.olis.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.util.Optional;
+
 @Entity
-public class OLISProviderPreferences extends AbstractModel<String> {
+@Setter
+public class OLISProviderPreferences extends AbstractModel<String>
+{
 	@Id
 	private String providerId;
 
+	@Getter
 	private String startTime;
 
+
+	public OLISProviderPreferences()
+	{
+		super();
+	}
+
 	@Override
-	public String getId() {
+	public String getId()
+	{
 		return providerId;
 	}
-	
-    public String getProviderId() {
-	    return providerId;
-    }
-	
-	public void setProviderId(String providerNo) {
-		this.providerId = providerNo;
-    }	
 
-	public String getStartTime() {
-    	return startTime;
-    }
-
-	public void setStartTime(String startTime) {
-    	this.startTime = startTime;
-    }
-
-	public OLISProviderPreferences(){
-		super();
+	public Optional<String> getOptionalStartDateTime()
+	{
+		return Optional.ofNullable(this.startTime);
 	}
 }
