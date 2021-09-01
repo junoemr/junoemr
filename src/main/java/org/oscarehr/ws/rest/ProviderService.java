@@ -43,15 +43,15 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
-import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
+import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -252,7 +252,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/provider/{id}/edit_form")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") Integer id)
+	public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") String id)
 	{
 		return RestResponse.successResponse(providerService.getEditFormForProvider(id, getLoggedInInfo().getLoggedInSecurity()));
 	}

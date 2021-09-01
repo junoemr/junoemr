@@ -122,6 +122,10 @@ public class ProviderEditFormTo1 implements Serializable
 	private String lifeLabsClientId;
 	private String eDeliveryIds;
 	private String imdHealthUuid;
+	private String olisOfficialFirstName;
+	private String olisOfficialSecondName;
+	private String olisOfficialLastName;
+	private String olisOfficialIdType;
 
 	/**
 	 * initialize this object using the provided provider data.
