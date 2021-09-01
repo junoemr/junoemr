@@ -1594,7 +1594,6 @@ angular.module('Schedule').component('eventComponent', {
 						$scope.virtualAppointmentOptions = virtualAppointmentTypeOptions().filter((option) => option.value !== VirtualAppointmentType.Chat);
 						break;
 					default:
-						$scope.virtualAppointmentOptions = [];
 						break;
 				}
 			}

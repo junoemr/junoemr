@@ -269,6 +269,10 @@ public class QueuedAppointmentService extends BaseService
 		appointment.setNotes(queuedAppointment.getNotes());
 		appointment.setName(demographic.getDisplayName());
 		appointment.setIsVirtual(queuedAppointment.isVirtual());
+		if (queuedAppointment.isVirtual())
+		{
+			appointment.setVirtualAppointmentType(Appointment.VirtualAppointmentType.VIDEO);
+		}
 		appointment.setReasonCode(queuedAppointment.getReasonTypeId());
 
 		if (queuedAppointment.getCritical() != null && queuedAppointment.isCritical())

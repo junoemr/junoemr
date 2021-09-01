@@ -182,7 +182,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable
 	@Setter
 	@Column(name = "virtual_type")
 	@Enumerated(EnumType.STRING)
-	private VirtualAppointmentType virtualAppointmentType;
+	private VirtualAppointmentType virtualAppointmentType = VirtualAppointmentType.NONE;
 
 	private Integer reasonCode;
 
