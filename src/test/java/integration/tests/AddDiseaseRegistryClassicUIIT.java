@@ -49,20 +49,19 @@ import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser", "validations"
+		};
+	}
+
 	@Before
 	public void setup()
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
-	}
-
-	@After
-	public void cleanup()
-			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
-	{
-		SchemaUtils.restoreTable(
-				"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser", "validations"
-		);
 	}
 
 	public void addDiseaseRegistry()

@@ -30,6 +30,7 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.Alert;
@@ -70,24 +71,26 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	String messageContentExpected =
 			"Password must contain at least 3 of the following: capital chars, lower chars, digits, special chars.";
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole"
+		};
+	}
+
 	@Before
 	public void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
 		loadSpringBeans();
 		databaseUtil.createTestProvider();
 	}
 
-	@After
-	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
-	{
-		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
-	}
-
-	public String passwordValidation(String passwordInput)
+	public String passwordValidation(String passwordInput) throws InterruptedException
 	{
 		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(passwordInput);
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
+		webDriverWait.until(ExpectedConditions.alertIsPresent());
 		Alert alert = driver.switchTo().alert();
 		String alertMessage8Symbols = alert.getText();
 		alert.accept();
@@ -131,6 +134,9 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@value='Update']")).click();
 	}
 
+	// XXX: This is really slow when I run it due to the passwordValidation() method.  After
+	//      accepting the alert, it hangs for a long time.
+	@Ignore
 	@Test
 	public void addLoginRecordsClassicUITest()
 			throws InterruptedException
@@ -171,8 +177,10 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}
 
+	// XXX: This is really slow when I run it due to the passwordValidation() method.  After
+	//      accepting the alert, it hangs for a long time.
+	//@Ignore
 	@Test
-
 	public void addLoginRecordsJUNOUITest()
 			throws InterruptedException
 	{

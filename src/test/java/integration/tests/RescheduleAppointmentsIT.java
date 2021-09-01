@@ -54,6 +54,18 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RescheduleAppointmentsIT extends SeleniumTestBase
 {
+    @Override
+    protected String[] getTablesToRestore()
+    {
+        return new String[]{
+            "admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
+            "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",
+            "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
+            "provider", "provider_recent_demographic_access", "providerbillcenter", "ProviderPreference", "providersite",
+            "secUserRole", "site", "tickler_text_suggest"
+        };
+    }
+
     @Before
     public void setup() throws Exception
     {
@@ -61,16 +73,6 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         databaseUtil.createTestDemographic();
         databaseUtil.createTestProvider();
         databaseUtil.createProviderSite();
-    }
-
-    @After
-    public void cleanup() throws Exception
-    {
-        SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
-                "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",
-                "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
-                "provider", "provider_recent_demographic_access", "providerbillcenter", "ProviderPreference", "providersite",
-                "secUserRole", "site", "tickler_text_suggest" );
     }
 
     @Test

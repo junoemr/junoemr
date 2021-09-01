@@ -51,23 +51,22 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SendMessagesClassicUIIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate", "Facility",
+			"issue", "log", "LookupList", "LookupListItem", "measurementType", "messagelisttbl", "messagetbl", "msgDemoMap",
+			"OscarJob", "OscarJobType", "provider", "providerbillcenter", "ProviderPreference", "secUserRole",
+			"tickler_text_suggest", "validations"
+		};
+	}
+
 	@Before
 	public void setup()
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
-	}
-
-	@After
-	public void cleanup()
-			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
-	{
-		SchemaUtils.restoreTable(
-				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate", "Facility",
-				"issue", "log", "LookupList", "LookupListItem", "measurementType", "messagelisttbl", "messagetbl", "msgDemoMap",
-				"OscarJob", "OscarJobType", "provider", "providerbillcenter", "ProviderPreference", "secUserRole",
-				"tickler_text_suggest", "validations"
-		);
 	}
 
 	@Test

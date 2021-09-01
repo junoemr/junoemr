@@ -25,6 +25,8 @@ package integration.tests.util;
 import integration.tests.config.TestConfig;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -108,6 +110,17 @@ public class SeleniumTestBase
 		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}
 
+	@Before
+	@After
+	public void resetDatabase()
+		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	{
+		if(getTablesToRestore().length > 0)
+		{
+			SchemaUtils.restoreTable(getTablesToRestore());
+		}
+	}
+
 	@After
 	public void closeWebDriver()
 	{
@@ -117,5 +130,10 @@ public class SeleniumTestBase
 	protected static void loadSpringBeans()
 	{
 		DaoTestFixtures.setupBeanFactory();
+	}
+
+	protected String[] getTablesToRestore()
+	{
+		return new String[0];
 	}
 }
