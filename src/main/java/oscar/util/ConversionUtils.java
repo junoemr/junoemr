@@ -831,6 +831,16 @@ public class ConversionUtils {
 		return ZonedDateTime.ofInstant(legacyDate.toInstant(), ZoneId.systemDefault());
 	}
 
+	public static ZonedDateTime toZonedDateTime(String dateString)
+	{
+		return ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+	}
+
+	public static ZonedDateTime toZonedDateTime(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		return ZonedDateTime.parse(dateString, dateTimeFormatter);
+	}
+
 	public static LocalDateTime toNullableLocalDateTime(Date legacyDate)
 	{
 		if(legacyDate == null) return null;

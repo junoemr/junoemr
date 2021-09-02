@@ -90,18 +90,22 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public boolean canUpload()
 	{
+		return "OK".equalsIgnoreCase(getAckStatus());
+	}
+	public String getAckStatus()
+	{
+		String queryAckStatus = null;
 		try
 		{
-			String queryAckStatus = terser.get("/.QAK-2");
-			logger.info("OLIS acknowledgement status: "  + queryAckStatus);
-			return queryAckStatus.equalsIgnoreCase("OK");
+			queryAckStatus = terser.get("/.QAK-2");
 		}
 		catch(HL7Exception e)
 		{
 			logger.error("Terser Error", e);
 		}
-		return false;
+		return queryAckStatus;
 	}
+
 	@Override
 	public void postUpload() {}
 

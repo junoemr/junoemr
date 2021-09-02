@@ -45,12 +45,17 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.util.Utilities;
+import oscar.util.ConversionUtils;
 
+import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
@@ -58,8 +63,11 @@ import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 public class OLISPollingUtil
 {
 	public static final String OLIS_DATE_FORMAT = "yyyyMMddHHmmssZ";
+	private static final OscarProperties props = OscarProperties.getInstance();
+	private static final int DEFAULT_FETCH_PERIOD_MONTHS = 1;
+	private static final int MAX_FETCH_PERIOD_MONTHS = Integer.parseInt(props.getProperty("olis_max_fetch_months", "12")); //max 12
 	private static final Logger logger = MiscUtils.getLogger();
-	
+
 	static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
     static OLISSystemPreferencesDao olisSystemPreferencesDao =  SpringUtils.getBean(OLISSystemPreferencesDao.class);  
     static OLISProviderPreferencesDao olisProviderPreferencesDao =  SpringUtils.getBean(OLISProviderPreferencesDao.class);
@@ -72,24 +80,29 @@ public class OLISPollingUtil
 	public static void requestResults(LoggedInInfo loggedInInfo)
 	{
 		OLISSystemPreferences olisSystemPreferences = olisSystemPreferencesDao.getPreferences();
-		String defaultStartTime = oscar.Misc.getStr(olisSystemPreferences.getStartTime(), "").trim();
-	    String defaultEndTime = oscar.Misc.getStr(olisSystemPreferences.getEndTime(), "").trim();
+		Optional<String> optionalDefaultStartTime = Optional.ofNullable(StringUtils.trimToNull(olisSystemPreferences.getStartTime()));
+		Optional<String> optionalDefaultEndTime = Optional.ofNullable(StringUtils.trimToNull(olisSystemPreferences.getEndTime()));
 	    
-	    pollZ04Query(loggedInInfo, defaultStartTime,defaultEndTime);
+	    pollZ04Query(loggedInInfo, optionalDefaultStartTime, optionalDefaultEndTime);
 	    
-	    String facilityId = OscarProperties.getInstance().getProperty("olis_polling_facility"); //Most of the time this will default to null.
+	    String facilityId = props.getProperty("olis_polling_facility"); //Most of the time this will default to null.
 		if(facilityId != null)
 		{
-			pollZ06Query(loggedInInfo, defaultStartTime, defaultEndTime, facilityId);
+			pollZ06Query(loggedInInfo, optionalDefaultStartTime, optionalDefaultEndTime, facilityId);
 		}
 	}
 	
-	private static void pollZ04Query(LoggedInInfo loggedInInfo, String defaultStartTime,String defaultEndTime){
+	private static void pollZ04Query(LoggedInInfo loggedInInfo,
+	                                 Optional<String> optionalDefaultStartTime,
+	                                 Optional<String> optionalDefaultEndTime)
+	{
 		//Z04Query providerQuery;
 		List<Provider> allProvidersList = providerDao.getActiveProviders();
-	    UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
-	    for (Provider provider : allProvidersList) {
-	    	try {
+		UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
+		for(Provider provider : allProvidersList)
+		{
+			try
+			{
 	    		String officialLastName  = userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME);
 	    		String officialFirstName = userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME);
 				String officialSecondName = userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME);
@@ -105,12 +118,13 @@ public class OLISPollingUtil
 		    	OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(provider.getProviderNo());
 
 		    	// Creating OBR22 for this request.
-			    OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences, defaultStartTime, defaultEndTime);
 			    if(olisProviderPreferences == null)
 			    {
 				    olisProviderPreferences = new OLISProviderPreferences();
 				    olisProviderPreferences.setProviderId(provider.getProviderNo());
 			    }
+			    OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences, optionalDefaultStartTime, optionalDefaultEndTime);
+
 				providerQuery.setStartEndTimestamp(obr22);
 	
 				// Setting HIC for Z04 Request
@@ -124,44 +138,45 @@ public class OLISPollingUtil
 					    officialSecondName);
 				providerQuery.setRequestingHic(zrp1);
 				String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, providerQuery);
-				
-				if(!response.startsWith("<Response")){
-					logger.error("response does not match, aborting "+response);
+
+				if(!response.startsWith("<Response"))
+				{
+					logger.error("response does not match, aborting " + response);
 					continue;
 				}
 				String timeStampForNextStartDate= OLISPollingUtil.parseAndImportResponse(loggedInInfo, response);
 				logger.info("timeSlot "+timeStampForNextStartDate);
-				
-				if(timeStampForNextStartDate != null){
+
+				if(timeStampForNextStartDate != null)
+				{
 					olisProviderPreferences.setStartTime(timeStampForNextStartDate);
 				}
-				
-				if(olisProviderPreferences.getId()!=null) {
-					olisProviderPreferencesDao.merge(olisProviderPreferences);
-				} else {
-					olisProviderPreferencesDao.persist(olisProviderPreferences);
-				}
-		    }
-		    catch(Exception e)
-		    {
-			    logger.error("Error polling OLIS for provider " + provider.getProviderNo(), e);
-		    }
-	    }
+
+				olisProviderPreferencesDao.saveEntity(olisProviderPreferences);
+			}
+			catch(Exception e)
+			{
+				logger.error("Error polling OLIS for provider " + provider.getProviderNo(), e);
+			}
+		}
 	}
-	
-	private static void pollZ06Query(LoggedInInfo loggedInInfo, String defaultStartTime,String defaultEndTime,String facilityId)
+
+	private static void pollZ06Query(LoggedInInfo loggedInInfo,
+	                                 Optional<String> optionalDefaultStartTime,
+	                                 Optional<String> optionalDefaultEndTime, String facilityId)
 	{
 		try
 		{
 			Z06Query facilityQuery = new Z06Query();
 			OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(Provider.SYSTEM_PROVIDER_NO);
 			// Creating OBR22 for this request.
-			OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences, defaultStartTime, defaultEndTime);
 			if(olisProviderPreferences == null)
 			{
 				olisProviderPreferences = new OLISProviderPreferences();
 				olisProviderPreferences.setProviderId(Provider.SYSTEM_PROVIDER_NO);
 			}
+			OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences, optionalDefaultStartTime, optionalDefaultEndTime);
+
 	    	facilityQuery.setStartEndTimestamp(obr22);
 	    	ORC21 orc21 = new ORC21();
 	    	orc21.setValue(6, 2, "^"+facilityId);
@@ -176,16 +191,12 @@ public class OLISPollingUtil
 			}
 	    	
 	    	String timeStampForNextStartDate= OLISPollingUtil.parseAndImportResponse(loggedInInfo, response);
-			
-			if(timeStampForNextStartDate != null){
+
+			if(timeStampForNextStartDate != null)
+			{
 				olisProviderPreferences.setStartTime(timeStampForNextStartDate);
 			}
-			
-			if(olisProviderPreferences.getId()!=null) {
-				olisProviderPreferencesDao.merge(olisProviderPreferences);
-			} else {
-				olisProviderPreferencesDao.persist(olisProviderPreferences);
-			}
+			olisProviderPreferencesDao.saveEntity(olisProviderPreferences);
 		}
 		catch(Exception e)
 		{
@@ -235,32 +246,73 @@ public class OLISPollingUtil
 		return timeStringForNextStartDate;
 	}
 
-	private static OBR22 buildRequestStartEndTimestamp(OLISProviderPreferences olisProviderPreferences, String defaultStartTime, String defaultEndTime)
+	/**
+	 * build the OLIS query parameter containing the date range of the requested results
+	 * @param olisProviderPreferences provider specific olis data
+	 * @param optionalDefaultStartTime default date range start
+	 * @param optionalDefaultEndTime default date range end
+	 * @return the OLIS query parameter
+	 */
+	private static OBR22 buildRequestStartEndTimestamp(@NotNull OLISProviderPreferences olisProviderPreferences,
+	                                                   Optional<String> optionalDefaultStartTime,
+	                                                   Optional<String> optionalDefaultEndTime)
 	{
-		OBR22 obr22 = new OBR22();
-		if(olisProviderPreferences != null)
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT);
+
+		Optional<String> prefStartTime = olisProviderPreferences.getOptionalStartDateTime();
+
+		// provider has a start time, so use this and a max end time if needed.
+		String startTimeStr;
+		String endTimeStr;
+		if(prefStartTime.isPresent())
 		{
-			String dateTimeStr = olisProviderPreferences.getOptionalStartDateTime().orElse(defaultStartTime);
-			validateDateTimeString(dateTimeStr);
-			obr22.setValue(dateTimeStr);
+			startTimeStr = prefStartTime.get();
+			endTimeStr = calcEndDateStr(dateTimeFormatter, startTimeStr);
 		}
 		else
 		{
-			validateDateTimeString(defaultStartTime);
-			if(StringUtils.isBlank(defaultEndTime))
-			{
-				obr22.setValue(defaultStartTime);
-			}
-			else
-			{
-				validateDateTimeString(defaultEndTime);
-				List<String> dateList = new LinkedList<>();
-				dateList.add(defaultStartTime);
-				dateList.add(defaultEndTime);
-				obr22.setValue(dateList);
-			}
+			// use the default start and end time for the initial provider query.
+			startTimeStr = optionalDefaultStartTime
+					.orElseGet(() -> ConversionUtils.toDateTimeString(ZonedDateTime.now().minusMonths(DEFAULT_FETCH_PERIOD_MONTHS), dateTimeFormatter));
+			endTimeStr = optionalDefaultEndTime.orElseGet(() -> calcEndDateStr(dateTimeFormatter, startTimeStr));
+		}
+
+		// build the OLIS query parameter
+		OBR22 obr22 = new OBR22();
+
+		validateDateTimeString(startTimeStr);
+		// only build start date
+		if(StringUtils.isBlank(endTimeStr))
+		{
+			obr22.setValue(startTimeStr);
+		}
+		else // build start and end date
+		{
+			validateDateTimeString(endTimeStr);
+			List<String> dateList = new LinkedList<>();
+			dateList.add(startTimeStr);
+			dateList.add(endTimeStr);
+			obr22.setStringValue(dateList);
 		}
 		return obr22;
+	}
+
+	/**
+	 * calculate the end date required for the olis query, or null if it is not needed
+	 * @param dateTimeFormatter the formatter for the returned string
+	 * @param startTimeStr the start time string
+	 * @return the end time, or null
+	 */
+	private static String calcEndDateStr(DateTimeFormatter dateTimeFormatter, String startTimeStr)
+	{
+		ZonedDateTime zonedStartTime = ConversionUtils.toZonedDateTime(startTimeStr, dateTimeFormatter);
+		ZonedDateTime maxFetchPeriod = ZonedDateTime.now().minusMonths(MAX_FETCH_PERIOD_MONTHS);
+
+		if(zonedStartTime.isBefore(maxFetchPeriod))
+		{
+			return ConversionUtils.toDateTimeString(zonedStartTime.plusMonths(MAX_FETCH_PERIOD_MONTHS), dateTimeFormatter);
+		}
+		return null;
 	}
 
 	/**

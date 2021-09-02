@@ -33,6 +33,7 @@ public class OBR22 implements Parameter {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setValue(Object value)
 	{
 		if(value != null)
@@ -43,14 +44,32 @@ public class OBR22 implements Parameter {
 			}
 			else if(value instanceof List)
 			{
-				this.value = dateFormatter.format(((List<Date>) value).get(0));
-				this.value += "&" + dateFormatter.format(((List<Date>) value).get(1));
+				List<?> valueList = (List<?>) value;
+				if(!valueList.isEmpty() && valueList.get(0) instanceof Date)
+				{
+					this.setDateValue((List<Date>) valueList);
+				}
+				else if(!valueList.isEmpty() && valueList.get(0) instanceof String)
+				{
+					this.setStringValue((List<String>) valueList);
+				}
 			}
 			else if (value instanceof String)
 			{
 				this.value = (String) value;
 			}
 		}
+	}
+
+	public void setStringValue(List<String> value)
+	{
+		this.value = String.join("&", value);
+	}
+
+	public void setDateValue(List<Date> value)
+	{
+		this.value = dateFormatter.format((value).get(0));
+		this.value += "&" + dateFormatter.format((value).get(1));
 	}
 
 	@Override
