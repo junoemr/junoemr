@@ -96,6 +96,7 @@ public class OLISSchedulerJob
 			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo("999998"));
 
 			OLISPollingUtil.requestResults(loggedInInfo);
+			logger.info("===== OLIS JOB COMPLETE....");
 		}
 		catch(Exception e)
 		{

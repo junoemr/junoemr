@@ -22,35 +22,15 @@
  */
 package org.oscarehr.olis.exception;
 
-import lombok.Getter;
-
-public class OLISAckFailedException extends OLISException
+public class OLISException extends RuntimeException
 {
-	@Getter
-	private final String statusCode;
+	public OLISException()
+	{
+		super();
+	}
 
-	public OLISAckFailedException()
-	{
-		this(null, null);
-	}
-	public OLISAckFailedException(String message)
-	{
-		this(message, null);
-	}
-	public OLISAckFailedException(String message, String statusCode)
+	public OLISException(String message)
 	{
 		super(message);
-		this.statusCode = statusCode;
-	}
-
-	@Override
-	public String getMessage()
-	{
-		String superMessage = super.getMessage();
-		if(this.statusCode != null)
-		{
-			return superMessage + " [" + this.statusCode + "]";
-		}
-		return superMessage;
 	}
 }

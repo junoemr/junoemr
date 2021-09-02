@@ -116,6 +116,8 @@ public class Utilities
 			    }
 			    else if(header.equals("PID"))
 			    {
+			    	// OLIS likes to send multiple messages (with multiple PIDs) under the same MSH segment.
+				    // so we need to fake them a bit by treating each PID as a new message and re-using the MSH segment
 				    if(firstPIDflag)
 				    {
 					    messages.add(sb.toString());

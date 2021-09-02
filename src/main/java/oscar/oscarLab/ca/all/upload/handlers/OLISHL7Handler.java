@@ -14,6 +14,7 @@
  */
 package oscar.oscarLab.ca.all.upload.handlers;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.olis.OLISUtils;
@@ -25,9 +26,13 @@ import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.all.upload.RouteReportResults;
 import oscar.oscarLab.ca.all.util.Utilities;
+import oscar.util.ConversionUtils;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import static org.oscarehr.olis.OLISPollingUtil.OLIS_DATE_FORMAT;
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 
 /**
@@ -53,6 +58,7 @@ public class OLISHL7Handler implements MessageHandler
 	{
 		String lastTimeStampAccessed = null;
 		RouteReportResults results = new RouteReportResults();
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT);
 
 		ArrayList<String> messages = Utilities.separateMessages(fileName);
 
@@ -74,7 +80,6 @@ public class OLISHL7Handler implements MessageHandler
 		// process all messages
 		for(String msg : messages)
 		{
-			logger.info("message:\n" + msg);
 			oscar.oscarLab.ca.all.parsers.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
 
 			// skip uploading duplicates
@@ -82,7 +87,8 @@ public class OLISHL7Handler implements MessageHandler
 			{
 				continue;
 			}
-			lastTimeStampAccessed = parser.getLastUpdateInOLISUnformated();
+			// always use the last obr date as the latest timestamp seen
+			lastTimeStampAccessed = getLatest(dateTimeFormatter, lastTimeStampAccessed, StringUtils.trimToNull(parser.getLastUpdateInOLISUnformatted()));
 
 			MessageUploader.routeReport(
 					loggedInInfo.getLoggedInProviderNo(),
@@ -106,5 +112,28 @@ public class OLISHL7Handler implements MessageHandler
 	public int getLastSegmentId()
 	{
 		return this.lastSegmentId;
+	}
+
+	private String getLatest(DateTimeFormatter dateTimeFormatter, String timeStamp1, String timeStamp2)
+	{
+		if(timeStamp1 == null && timeStamp2 == null)
+		{
+			return null;
+		}
+		else if (timeStamp1 == null)
+		{
+			return timeStamp2;
+		}
+		else if (timeStamp2 == null)
+		{
+			return timeStamp1;
+		}
+		else
+		{
+			ZonedDateTime zonedTime1 = ConversionUtils.toZonedDateTime(timeStamp1, dateTimeFormatter);
+			ZonedDateTime zonedTime2 = ConversionUtils.toZonedDateTime(timeStamp2, dateTimeFormatter);
+			ZonedDateTime latest = (zonedTime1.isAfter(zonedTime2)) ? zonedTime1 : zonedTime2;
+			return ConversionUtils.toDateTimeString(latest, dateTimeFormatter);
+		}
 	}
 }

@@ -24,9 +24,11 @@ package org.oscarehr.olis;
  */
 
 import ca.ssha._2005.hial.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.olis.exception.OLISUnknownFacilityException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.OscarAuditLogger;
@@ -48,15 +50,22 @@ import java.io.StringReader;
 import java.util.List;
 
 
-public class OLISUtils {
-	static Logger logger = MiscUtils.getLogger();
-	
-	static Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
-	
-	static final public String CMLIndentifier = "2.16.840.1.113883.3.59.1:5047";// Canadian Medical Laboratories
-	static final public String GammaDyancareIndentifier = "2.16.840.1.113883.3.59.1:5552";// Gamma Dynacare
-	static final public String LifeLabsIndentifier = "2.16.840.1.113883.3.59.1:5687";// LifeLabs
-	static final public String AlphaLabsIndetifier = "2.16.840.1.113883.3.59.1:5254";// Alpha Laboratories"
+public class OLISUtils
+{
+	private static final Logger logger = MiscUtils.getLogger();
+	private static final Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
+
+	private static final String PROVINCIAL_LAB_ON = "2.16.840.1.113883.3.59.1";
+
+	private static final String CMLIndentifier = "5047";// Canadian Medical Laboratories
+	private static final String GammaDyancareIndentifier = "5552";// Gamma Dynacare
+	private static final String LifeLabsIndentifier = "5687";// LifeLabs
+	private static final String AlphaLabsIndetifier = "5254";// Alpha Laboratories"
+
+	private static final String OlisTestingLab5 = "4005";// OLIS conformance testing lab
+	private static final String OlisTestingLab6 = "4006";// OLIS conformance testing lab
+	private static final String OlisTestingLab7 = "4007";// OLIS conformance testing lab
+	private static final String OlisTestingLab8 = "4008";// OLIS conformance testing lab
 
 	public static String getOLISResponseContent(String response) throws Exception{
 		response = response.replaceAll("<Content", "<Content xmlns=\"\" ");
@@ -85,87 +94,124 @@ public class OLISUtils {
 
 	public static boolean isDuplicate(LoggedInInfo loggedInInfo, OLISHL7Handler h, String msg)
 	{
-		String sendingFacility = h.getPlacerGroupNumber();//getPerformingFacilityNameOnly();
-		logger.debug("SENDING FACILITY: " +sendingFacility);
+		String sendingFacility = h.getPlacerGroupNumber();
+		logger.debug("SENDING FACILITY: " + sendingFacility);
 		String accessionNumber = h.getAccessionNum();
 		String hin = h.getHealthNum();
-	
-		return isDuplicate(loggedInInfo, sendingFacility,accessionNumber,msg,hin);
-	}
-	
-	
-	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber,String msg,String hin){
-		logger.debug("Facility "+sendingFacility+" Accession # "+accessionNumber);
 
-		if(sendingFacility != null &&  sendingFacility.equals(CMLIndentifier)){ //.startsWith("CML")){ // CML HealthCare Inc.
-			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber.split("-")[0]);
-			for(Hl7TextInfo dupResult:dupResults) {
-				String dupResultAccessionNum = dupResult.getAccessionNumber();
-				
-				if(dupResultAccessionNum.indexOf("-") != -1){
-					dupResultAccessionNum = dupResultAccessionNum.split("-")[0];
-				}	
-				
+		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, msg, hin);
+	}
+
+	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber, String msg, String hin)
+	{
+		logger.debug("Facility " + sendingFacility + " Accession # " + accessionNumber);
+
+		if(StringUtils.isNotBlank(sendingFacility))
+		{
+			String provincialLab = sendingFacility.split(":")[0];
+			String labIdentifier = sendingFacility.split(":")[1];
+
+			if(!PROVINCIAL_LAB_ON.equals(provincialLab))
+			{
+				throw new OLISUnknownFacilityException(provincialLab + " is not the Ontario laboratory");
+			}
+
+			if(CMLIndentifier.equals(labIdentifier))
+			{
+				String accessionNoPt1 = accessionNumber.split("-")[0];
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNoPt1);
+				for(Hl7TextInfo dupResult : dupResults)
+				{
+					String dupResultAccessionNum = dupResult.getAccessionNumber();
+					if(dupResultAccessionNum.contains("-"))
+					{
+						dupResultAccessionNum = dupResultAccessionNum.split("-")[0];
+					}
+
 					//direct
-				if(dupResultAccessionNum.equals(accessionNumber.split("-")[0])) {
-						if(hin.equals(dupResult.getHealthNumber())) {
+					if(dupResultAccessionNum.equals(accessionNoPt1))
+					{
+						if(hin.equals(dupResult.getHealthNumber()))
+						{
 							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate CML lab skipped - accession " + accessionNumber + "\n" + msg);
 							return true;
 						}
+					}
 				}
-				
 			}
-		}else if( sendingFacility != null && sendingFacility.equals(LifeLabsIndentifier)){//  startsWith("LifeLabs")){ //LifeLabs
+			else if(LifeLabsIndentifier.equals(labIdentifier))
+			{
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5));
+				for(Hl7TextInfo dupResult : dupResults)
+				{
+					logger.debug("LIFELABS " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
 
-			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5));
-			for(Hl7TextInfo dupResult:dupResults) {
-				logger.debug("LIFELABS "+dupResult.getAccessionNumber()+" "+accessionNumber+" == "+dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
-				
-				if(dupResult.getAccessionNumber().equals(accessionNumber.substring(5))) {
-					if(hin.equals(dupResult.getHealthNumber())) {
-						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate LifeLabs lab skipped - accession " + accessionNumber + "\n" + msg);
-						return true;
+					if(dupResult.getAccessionNumber().equals(accessionNumber.substring(5)))
+					{
+						if(hin.equals(dupResult.getHealthNumber()))
+						{
+							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate LifeLabs lab skipped - accession " + accessionNumber + "\n" + msg);
+							return true;
+						}
 					}
 				}
-			}		
 
-			
-		}else if (sendingFacility != null && sendingFacility.equals(GammaDyancareIndentifier)){// startsWith("GAMMA")){ //GAMMA-DYNACARE MEDICAL LABORATORIES
-			String directAcc = accessionNumber.substring(4);
-			directAcc = directAcc.substring(0,2) + "-" + Integer.parseInt(directAcc.substring(2));
-			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(directAcc);
-			
-			for(Hl7TextInfo dupResult:dupResults) {
-				logger.debug(dupResult.getAccessionNumber()+" == "+directAcc+" "+dupResult.getAccessionNumber().equals(directAcc));
 
-				if(dupResult.getAccessionNumber().equals(directAcc)) {
-					if(hin.equals(dupResult.getHealthNumber())) {
-						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate GAMMA lab skipped - accession " + accessionNumber + "\n" + msg);
-						return true;
+			}
+			else if(GammaDyancareIndentifier.equals(labIdentifier))
+			{
+				String directAcc = accessionNumber.substring(4);
+				directAcc = directAcc.substring(0, 2) + "-" + Integer.parseInt(directAcc.substring(2));
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(directAcc);
+
+				for(Hl7TextInfo dupResult : dupResults)
+				{
+					logger.debug(dupResult.getAccessionNumber() + " == " + directAcc + " " + dupResult.getAccessionNumber().equals(directAcc));
+
+					if(dupResult.getAccessionNumber().equals(directAcc))
+					{
+						if(hin.equals(dupResult.getHealthNumber()))
+						{
+							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate GAMMA lab skipped - accession " + accessionNumber + "\n" + msg);
+							return true;
+						}
 					}
 				}
-			}		
+			}
+			else if(AlphaLabsIndetifier.equals(labIdentifier))
+			{
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5));
+				for(Hl7TextInfo dupResult : dupResults)
+				{
+					logger.debug("AlphaLabs " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
 
-		}else if (sendingFacility != null && sendingFacility.equals(AlphaLabsIndetifier)){
-			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5));
-			for(Hl7TextInfo dupResult:dupResults) {
-				logger.debug("AlphaLabs "+dupResult.getAccessionNumber()+" "+accessionNumber+" == "+dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
-				
-				if(dupResult.getAccessionNumber().equals(accessionNumber.substring(5))) {
-					if(hin.equals(dupResult.getHealthNumber())) {
-						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate AlphaLabs lab skipped - accession " + accessionNumber + "\n" + msg);
-						return true;
+					if(dupResult.getAccessionNumber().equals(accessionNumber.substring(5)))
+					{
+						if(hin.equals(dupResult.getHealthNumber()))
+						{
+							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate AlphaLabs lab skipped - accession " + accessionNumber + "\n" + msg);
+							return true;
+						}
 					}
 				}
-			}		
-
+			}
+			else if(OlisTestingLab5.equals(labIdentifier)
+					|| OlisTestingLab6.equals(labIdentifier)
+					|| OlisTestingLab7.equals(labIdentifier)
+					|| OlisTestingLab8.equals(labIdentifier))
+			{
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
+				return !dupResults.isEmpty();
+			}
+			else
+			{
+				throw new OLISUnknownFacilityException("Unknown OLIS Lab facility identifier", labIdentifier);
+			}
 		}
-		
-		
-		
-		return false;	
+		else
+		{
+			throw new OLISUnknownFacilityException("missing facility data");
+		}
+		return false;
 	}
-	
-	
-	
 }

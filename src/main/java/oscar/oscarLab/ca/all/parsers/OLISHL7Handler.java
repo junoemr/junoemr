@@ -734,11 +734,13 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
-	
-	public String getLastUpdateInOLISUnformated() {
-		try {
+
+	public String getLastUpdateInOLISUnformatted()
+	{
+		try
+		{
 			 String date = null;
-			 
+
 			 int obrNum = getOBRCount();
 			 Segment obr = null;
 			 if (obrNum == 1) {
@@ -746,18 +748,20 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			 } else {
 				obr = (Segment) terser.getFinder().getRoot().get("OBR" + obrNum);
 			 }
-			 
+
 			 date = Terser.get(obr, 22, 0,1,1);
-			 
+
 			return date;
-		} catch (HL7Exception e) {
+		}
+		catch(HL7Exception e)
+		{
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 			return "";
 		}
 	}
 	
 	public String getLastUpdateInOLIS() {
-			String date = getLastUpdateInOLISUnformated();
+			String date = getLastUpdateInOLISUnformatted();
 			if (date.length() > 0) return formatDateTime(date);
 			return "";
 	}

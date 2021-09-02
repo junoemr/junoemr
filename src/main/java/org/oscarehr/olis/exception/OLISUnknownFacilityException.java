@@ -24,32 +24,34 @@ package org.oscarehr.olis.exception;
 
 import lombok.Getter;
 
-public class OLISAckFailedException extends OLISException
+public class OLISUnknownFacilityException extends OLISException
 {
 	@Getter
-	private final String statusCode;
+	private final String facilityId;
 
-	public OLISAckFailedException()
+	public OLISUnknownFacilityException()
 	{
 		this(null, null);
 	}
-	public OLISAckFailedException(String message)
+
+	public OLISUnknownFacilityException(String message)
 	{
 		this(message, null);
 	}
-	public OLISAckFailedException(String message, String statusCode)
+
+	public OLISUnknownFacilityException(String message, String facilityId)
 	{
 		super(message);
-		this.statusCode = statusCode;
+		this.facilityId = facilityId;
 	}
 
 	@Override
 	public String getMessage()
 	{
 		String superMessage = super.getMessage();
-		if(this.statusCode != null)
+		if(this.facilityId != null)
 		{
-			return superMessage + " [" + this.statusCode + "]";
+			return superMessage + " [" + this.facilityId + "]";
 		}
 		return superMessage;
 	}
