@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Appointment.BookingSource;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -77,6 +79,9 @@ public final class AppointmentTransfer {
 	private boolean isVirtual;
 	private Calendar currentClinicTime;
 	private Calendar confirmedAt;
+	@Getter
+	@Setter
+	private Appointment.VirtualAppointmentType virtualAppointmentType;
 
 	public Integer getId() {
 		return (id);
