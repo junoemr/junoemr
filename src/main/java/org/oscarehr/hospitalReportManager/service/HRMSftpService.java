@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -77,7 +78,7 @@ public class HRMSftpService
 	@Autowired
 	private HRMReportProcessor processor;
 	
-	public void pullHRMFromSource()
+	public synchronized HRMFetchResults pullHRMFromSource()
 	{
 		JSch jsch = new JSch();
 		Session session = null;
@@ -85,6 +86,8 @@ public class HRMSftpService
 		
 		List<GenericFile> downloadedFiles = null;
 		LocalDate dateSubDirectory = LocalDate.now();
+		
+		HRMFetchResults results = new HRMFetchResults();
 		
 		try
 		{
@@ -107,9 +110,11 @@ public class HRMSftpService
 			                                                               .collect(Collectors.toList());
 			
 			downloadedFiles = downloadFiles(sftp, remoteFiles, dateSubDirectory, true);
+			results.setReportsDownloaded(downloadedFiles.size());
 		}
 		catch (JSchException | SftpException e)
 		{
+			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_LOGIN, LogConst.CON_HRM, LogConst.STATUS_FAILURE, "");
 			logger.error("Error connecting to HRM sftp", e);
 		}
 		finally
@@ -131,9 +136,17 @@ public class HRMSftpService
 			
 			for (GenericFile hrmFile : decryptedFiles)
 			{
-				processor.processHRMFile_43(hrmFile);
+				boolean success = processor.processHRMFile_43(hrmFile);
+				
+				if (success)
+				{
+					results.setReportsProcessed(results.getReportsProcessed() + 1);
+				}
 			}
 		}
+		
+		results.setEndTime(LocalDateTime.now());
+		return results;
 	}
 	
 	/**
@@ -182,6 +195,7 @@ public class HRMSftpService
 		long elapsed = ChronoUnit.MILLIS.between(start, LocalDateTime.now());
 		
 		logger.info(String.format("Downloaded HRM File in %d ms: %s", elapsed, remoteFile.getFilename()));
+		LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, remoteFile.getFilename());
 		
 		return tempFile;
 	}
@@ -231,6 +245,7 @@ public class HRMSftpService
 		catch (Exception e)
 		{
 			logger.error("Could not decrypt file: " + encryptedFile.getPath(), e);
+			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DECRYPT, LogConst.CON_HRM, LogConst.STATUS_FAILURE, encryptedFile.getName());
 			return null;
 		}
 	}

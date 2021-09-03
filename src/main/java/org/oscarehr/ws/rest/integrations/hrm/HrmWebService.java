@@ -21,51 +21,37 @@
  * Canada
  */
 
-package org.oscarehr.config.modules;
+package org.oscarehr.ws.rest.integrations.hrm;
 
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.log4j.Logger;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
 import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import oscar.OscarProperties;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
-@Configuration
-@Conditional(HrmModuleConfig.Condition.class)
-public class HrmModuleConfig
+@Path("/integrations/hrm/")
+@Component("HRMWebService")
+@Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "hrm")
+public class HrmWebService extends AbstractServiceImpl
 {
 	@Autowired
-	HRMScheduleService hrmScheduleService;
+	HRMScheduleService scheduleService;
 	
-	private static final Logger logger = MiscUtils.getLogger();
-	
-	public HrmModuleConfig()
+	@POST
+	@Path("/")
+	public RestResponse<HRMFetchResults> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
 	{
-		logger.info("Loaded HRM module");
-	}
-
-	static class Condition extends ModuleConfigCondition
-	{
-		public OscarProperties.Module getModule()
-		{
-			return OscarProperties.Module.MODULE_HRM;
-		}
-	}
-	
-	@PostConstruct
-	public void startSchedule()
-	{
-		
-		String intervalProp = OscarProperties.getInstance().getProperty("omd.hrm.poll_interval_sec");
-		int frequency = NumberUtils.toInt(intervalProp);
-		
-		if (frequency != 0)
-		{
-			hrmScheduleService.scheduleRegularFetch(frequency);
-		}
+		HRMFetchResults results = scheduleService.scheduleFetchNow();
+		return RestResponse.successResponse(results);
 	}
 }

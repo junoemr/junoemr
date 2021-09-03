@@ -376,6 +376,7 @@ module.exports = {
 			'./src/admin/section/editProviderPage/editProviderAdminComponent.js',
 			'./src/admin/section/manageUserPage/manageUserAdminComponent.js',
 			'./src/admin/section/integrationModules/integrationModulesComponent.js',
+			'./src/admin/section/hrm/hrmAdminComponent.js',
 			'./src/admin/section/iceFall/iceFallAdminComponent.js',
 			'./src/admin/section/iceFall/settings/iceFallAdminSettingsComponent.js',
 			'./src/admin/section/iceFall/activity/iceFallAdminActivityComponent.js',

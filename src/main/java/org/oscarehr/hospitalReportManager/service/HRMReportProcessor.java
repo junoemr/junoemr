@@ -25,6 +25,7 @@ package org.oscarehr.hospitalReportManager.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMapper;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
@@ -39,6 +40,8 @@ import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
 import java.util.List;
@@ -64,7 +67,7 @@ public class HRMReportProcessor
 	@Autowired
 	private DemographicDao demographicDao;
 	
-	public void processHRMFile_43(GenericFile hrmFile)
+	public boolean processHRMFile_43(GenericFile hrmFile)
 	{
 		try
 		{
@@ -103,10 +106,14 @@ public class HRMReportProcessor
 				logger.info(String.format("Duplicate report hash (%s) for file: %s", hrmDocument.getReportHash(), hrmDocument.getReportFile()));
 				hrmService.handleDuplicate(hrmDocument);
 			}
+			
+			return true;
 		}
 		catch (Exception e)
 		{
 			logger.error(String.format("Could not process HRM file: %s", hrmFile.getPath()), e);
+			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_PARSE, LogConst.CON_HRM, LogConst.STATUS_FAILURE, hrmFile.getName());
+			return false;
 		}
 	}
 	
@@ -114,10 +121,29 @@ public class HRMReportProcessor
 	{
 		DemographicCriteriaSearch criteria = new DemographicCriteriaSearch();
 		
+		// Required fields
+		
 		if (ConversionUtils.hasContent(matchingData.getHealthNumber()))
 		{
 			criteria.setHin(matchingData.getHealthNumber());
 		}
+		
+		if (ConversionUtils.hasContent(matchingData.getSexString()))
+		{
+			criteria.setSex(matchingData.getSexString());
+		}
+		
+		if (ConversionUtils.hasContent(matchingData.getLastName()))
+		{
+			criteria.setLastName(matchingData.getLastName());
+		}
+		
+		if (matchingData.getDateOfBirth() != null)
+		{
+			criteria.setDateOfBirth(matchingData.getDateOfBirth());
+		}
+		
+		// Optional fields
 		
 		if (ConversionUtils.hasContent(matchingData.getHealthNumberVersion()))
 		{
@@ -127,11 +153,6 @@ public class HRMReportProcessor
 		if (ConversionUtils.hasContent(matchingData.getHealthNumberProvinceCode()))
 		{
 			criteria.setHealthCardProvince(matchingData.getHealthNumberProvinceCode());
-		}
-		
-		if (matchingData.getDateOfBirth() != null)
-		{
-			criteria.setDateOfBirth(matchingData.getDateOfBirth());
 		}
 		
 		return demographicDao.criteriaSearch(criteria);

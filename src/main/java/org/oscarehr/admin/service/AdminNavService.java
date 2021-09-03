@@ -619,6 +619,11 @@ public class AdminNavService
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("provider.btnSetIntegratorPreferences"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/setProviderStaleDate.do?method=viewIntegratorProperties")));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.sendOruR01"), "frame?frameUrl=" + contextPath + "/lab/CA/ALL/sendOruR01.jsp"));
 
+		if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM))
+		{
+			integrationItems.add(new AdminNavItemTo1("Hospital Report Manager (HRM)", "hrmAdmin"));
+		}
+		
 		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)
 		{
 			integrationItems.add(new AdminNavItemTo1("OLIS Preferences", "frame?frameUrl=" + contextPath + "/olis/Preferences.jsp"));
