@@ -62,11 +62,6 @@ public class OLISUtils
 	private static final String LifeLabsIndentifier = "5687";// LifeLabs
 	private static final String AlphaLabsIndetifier = "5254";// Alpha Laboratories"
 
-	private static final String OlisTestingLab5 = "4005";// OLIS conformance testing lab
-	private static final String OlisTestingLab6 = "4006";// OLIS conformance testing lab
-	private static final String OlisTestingLab7 = "4007";// OLIS conformance testing lab
-	private static final String OlisTestingLab8 = "4008";// OLIS conformance testing lab
-
 	public static String getOLISResponseContent(String response) throws Exception{
 		response = response.replaceAll("<Content", "<Content xmlns=\"\" ");
 		response = response.replaceAll("<Errors", "<Errors xmlns=\"\" ");
@@ -195,17 +190,10 @@ public class OLISUtils
 					}
 				}
 			}
-			else if(OlisTestingLab5.equals(labIdentifier)
-					|| OlisTestingLab6.equals(labIdentifier)
-					|| OlisTestingLab7.equals(labIdentifier)
-					|| OlisTestingLab8.equals(labIdentifier))
+			else
 			{
 				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
 				return !dupResults.isEmpty();
-			}
-			else
-			{
-				throw new OLISUnknownFacilityException("Unknown OLIS Lab facility identifier", labIdentifier);
 			}
 		}
 		else
