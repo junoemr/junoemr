@@ -38,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
@@ -136,6 +137,8 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 			throws InterruptedException
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
+		driver.switchTo().frame("myFrame");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(., 'Template Setting')]")));
 		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
@@ -152,6 +155,8 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
+		driver.switchTo().frame("myFrame");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());

@@ -40,6 +40,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -56,6 +57,9 @@ public class SeleniumTestBase
 
 	@Autowired
 	protected DatabaseUtil databaseUtil;
+
+	@Autowired
+	protected JunoProperties junoProperties;
 
 
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
@@ -96,7 +100,10 @@ public class SeleniumTestBase
 	{
 		FirefoxBinary ffb = new FirefoxBinary();
 		FirefoxOptions ffo = new FirefoxOptions();
-		ffb.addCommandLineOptions("--headless");
+		if(junoProperties.getTest().isHeadless())
+		{
+			ffb.addCommandLineOptions("--headless");
+		}
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		Navigation.doLogin(

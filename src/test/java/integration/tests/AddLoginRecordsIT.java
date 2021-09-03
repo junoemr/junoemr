@@ -177,9 +177,6 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}
 
-	// XXX: This is really slow when I run it due to the passwordValidation() method.  After
-	//      accepting the alert, it hangs for a long time.
-	//@Ignore
 	@Test
 	public void addLoginRecordsJUNOUITest()
 			throws InterruptedException
