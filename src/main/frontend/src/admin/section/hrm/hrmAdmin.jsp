@@ -14,7 +14,7 @@
             <div class="d-flex justify-content-center header">
                 <h4>Schedule Settings</h4>
             </div>
-            <p>JUNO EMR is automatically checking for reports every {{$ctrl.interval}} minutes</p>
+            <p>Juno EMR is automatically checking for reports every {{$ctrl.interval}} minutes</p>
             <p>New reports will be available on both patient eCharts and provider inboxes</p>
         </div>
         <div class="d-flex flex-col justify-content-center align-items-center section">

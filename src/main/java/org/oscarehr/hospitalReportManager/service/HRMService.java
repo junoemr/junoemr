@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -52,6 +53,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.on.HRMResultsData;
 
 @Service
@@ -142,15 +145,31 @@ public class HRMService
 		for(HRMDocumentToProvider documentToProvider : providerLinks)
 		{
 			hrmDocumentToProviderDao.persist(documentToProvider);
+			
+			
+			
+			ProviderLabRouting inboxRouting = new ProviderLabRouting();
+			inboxRouting.routeMagic(documentToProvider.getHrmDocument().getId(),
+			                        documentToProvider.getProviderNo(),
+			                        ProviderLabRoutingModel.LAB_TYPE_HRM,
+			                        documentToProvider.getHrmDocument().getReportDate());
 		}
 	}
 	
 	private void routeToGeneralInbox(HRMDocument hrmDocument)
 	{
-		HRMDocumentToProvider generalInboxLink = new HRMDocumentToProvider();
-		generalInboxLink.setHrmDocument(hrmDocument);
-		generalInboxLink.setProviderNo(ProviderData.SYSTEM_PROVIDER_NO);
-		hrmDocumentToProviderDao.persist(generalInboxLink);
+		// TODO:  This top link here is probably not needed
+/*		HRMDocumentToProvider generalLink = new HRMDocumentToProvider();
+		generalLink.setHrmDocument(hrmDocument);
+		generalLink.setProviderNo(ProviderData.SYSTEM_PROVIDER_NO);
+		hrmDocumentToProviderDao.persist(generalLink);*/
+		
+		
+		ProviderLabRouting inboxRouting = new ProviderLabRouting();
+		inboxRouting.routeMagic(hrmDocument.getId(),
+		                        String.valueOf(ProviderLabRoutingModel.PROVIDER_UNMATCHED),
+		                        ProviderLabRoutingModel.LAB_TYPE_HRM,
+		                        hrmDocument.getReportDate());
 	}
 	
 	public void routeToDemographic(HRMDocument document, Demographic demographic)
@@ -183,6 +202,12 @@ public class HRMService
 				hrmDocumentToProvider.setProvider(provider);
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
 			}
+			
+			ProviderLabRouting inboxRouting = new ProviderLabRouting();
+			inboxRouting.routeMagic(document.getId(),
+			                        String.valueOf(provider.getProviderNo()),
+			                        ProviderLabRoutingModel.LAB_TYPE_HRM,
+			                        document.getReportDate());
 		}
 	}
 
