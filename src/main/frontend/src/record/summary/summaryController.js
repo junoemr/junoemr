@@ -81,7 +81,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.$onInit = () =>
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartRead))
 			{
 				controller.getLeftItems();
 				controller.getRightItems();
@@ -100,11 +100,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.canEdit = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartUpdate);
 		}
 		controller.canCreate = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_CREATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartCreate);
 		}
 
 		controller.openRx = function openRx(demoNo)
@@ -526,25 +526,25 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				module.summaryCode === 'reminders' ||
 				module.summaryCode === 'riskfactors')
 			{
-				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.CPP_NOTE_CREATE)
-					&& securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_ISSUE_CREATE);
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.CppNoteCreate)
+					&& securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterIssueCreate);
 			}
 			else if (module.summaryCode === 'meds')
 			{
-				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RX_CREATE);
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RxCreate);
 			}
 			else if (module.summaryCode === 'allergies')
 			{
-				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.ALLERGY_CREATE);
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.AllergyCreate);
 			}
 			else if (module.summaryCode === 'forms')
 			{
-				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_CREATE)
-					|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_CREATE);
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormCreate)
+					|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformCreate);
 			}
 			else if (module.summaryCode === 'preventions')
 			{
-				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.PREVENTION_CREATE);
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.PreventionCreate);
 			}
 			return enabled;
 		}

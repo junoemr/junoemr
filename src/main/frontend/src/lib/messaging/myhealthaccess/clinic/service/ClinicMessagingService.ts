@@ -254,7 +254,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 
 		if (!searchOptions.group)
 		{
-			searchOptions.group = MessageGroup.all;
+			searchOptions.group = MessageGroup.All;
 		}
 
 		return (await this._mhaClinicMessagingApi.countMessages(
@@ -380,7 +380,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 	 */
 	public async getMessageGroups(): Promise<MessageGroup[]>
 	{
-		return [MessageGroup.received, MessageGroup.sent, MessageGroup.archived];
+		return [MessageGroup.Received, MessageGroup.Sent, MessageGroup.Archived];
 	}
 
 	/**

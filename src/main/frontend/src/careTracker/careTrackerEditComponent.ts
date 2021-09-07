@@ -92,12 +92,12 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.userCanEdit = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_UPDATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CareTrackerUpdate);
 				}
 
 				ctrl.userCanCreate = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_CREATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CareTrackerCreate);
 				}
 
 				ctrl.onAddNewGroup = async (): Promise<void> =>
@@ -136,7 +136,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.onAddIcd9TriggerCode = (): void =>
 				{
-					ctrl.onAddTriggerCode(DxCodingSystem.ICD9);
+					ctrl.onAddTriggerCode(DxCodingSystem.Icd9);
 				}
 
 				ctrl.onAddTriggerCode = async (codingSystem: DxCodingSystem): Promise<void> =>
@@ -172,17 +172,17 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.onAddNewMeasurementItem = (itemGroup): void =>
 				{
-					ctrl.onAddNewItem(itemGroup, CareTrackerItemType.MEASUREMENT);
+					ctrl.onAddNewItem(itemGroup, CareTrackerItemType.Measurement);
 				}
 
 				ctrl.onAddNewPreventionItem = (itemGroup): void =>
 				{
-					ctrl.onAddNewItem(itemGroup, CareTrackerItemType.PREVENTION);
+					ctrl.onAddNewItem(itemGroup, CareTrackerItemType.Prevention);
 				}
 
 				ctrl.onAddNewItem = async (itemGroup, type): Promise<void> =>
 				{
-					const isMeasurementType = (type === CareTrackerItemType.MEASUREMENT);
+					const isMeasurementType = (type === CareTrackerItemType.Measurement);
 					const typeLabel = (isMeasurementType) ? "measurement" : "prevention";
 					const callback = (isMeasurementType) ? ctrl.lookupMeasurements : ctrl.lookupPreventions;
 
@@ -200,19 +200,19 @@ angular.module('CareTracker').component('careTrackerEdit',
 						if(isMeasurementType)
 						{
 							newItem.name = data.name;
-							newItem.type = CareTrackerItemType.MEASUREMENT;
+							newItem.type = CareTrackerItemType.Measurement;
 							newItem.typeCode = data.code;
 							newItem.description = data.description;
 							newItem.guideline = data.instructions;
-							newItem.valueType = CareTrackerItemValueType.STRING;
+							newItem.valueType = CareTrackerItemValueType.String;
 						}
 						else
 						{
 							newItem.name = data.name;
-							newItem.type = CareTrackerItemType.PREVENTION;
+							newItem.type = CareTrackerItemType.Prevention;
 							newItem.typeCode = data.code;
 							newItem.description = data.description;
-							newItem.valueType = CareTrackerItemValueType.STRING;
+							newItem.valueType = CareTrackerItemValueType.String;
 						}
 						itemGroup.careTrackerItems.push(newItem);
 					}
@@ -275,7 +275,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 				ctrl.lookupIcd9Codes = async (searchTerm): Promise<JunoSelectOption[]> =>
 				{
-					const searchResults: DxCodeModel[] = await careTrackerApiService.searchDxCodes(DxCodingSystem.ICD9, searchTerm);
+					const searchResults: DxCodeModel[] = await careTrackerApiService.searchDxCodes(DxCodingSystem.Icd9, searchTerm);
 					return searchResults.map((result: DxCodeModel) =>
 					{
 						return {

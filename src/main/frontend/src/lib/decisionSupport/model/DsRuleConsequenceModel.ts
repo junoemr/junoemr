@@ -37,8 +37,8 @@ export default class DsRuleConsequenceModel
 
     public constructor()
     {
-        this.type = ConsequenceType.ALERT; // default type
-        this.severityLevel = ConsequenceSeverity.RECOMMENDATION;
+        this.type = ConsequenceType.Alert; // default type
+        this.severityLevel = ConsequenceSeverity.Recommendation;
     }
 
     get id(): number

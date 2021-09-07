@@ -73,7 +73,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			}
 			controller.search.status = controller.defaultStatus;
 
-			if (securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ))
+			if (securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
 			{
 				controller.initTable();
 			}

@@ -378,11 +378,11 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		controller.canEdit = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerUpdate);
 		}
 		controller.canDelete = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_DELETE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerDelete);
 		}
 	}
 ]);

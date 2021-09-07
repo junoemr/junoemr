@@ -72,19 +72,19 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 
 		controller.canEditConsults = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate);
 		}
 		controller.canCreateConsults = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_CREATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate);
 		}
 		controller.canAccessDemographics = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
 		}
 		controller.canAccessConsultConfig = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONFIGURE_CONSULT_READ);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConfigureConsultRead);
 		}
 
 		controller.searchPatients = function searchPatients(term)

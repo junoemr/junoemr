@@ -129,27 +129,27 @@ angular.module('CareTracker').component('careTrackerManager',
 
 				ctrl.userCanEdit = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_UPDATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CareTrackerUpdate);
 				}
 				ctrl.userCanEditClinicLevel = (): boolean =>
 				{
-					return ctrl.userCanEdit() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ADMIN_UPDATE);
+					return ctrl.userCanEdit() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.AdminUpdate);
 				}
 				ctrl.userCanCreate = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_CREATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CareTrackerCreate);
 				}
 				ctrl.userCanCreateClinicLevel = (): boolean =>
 				{
-					return ctrl.userCanCreate() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ADMIN_CREATE);
+					return ctrl.userCanCreate() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.AdminCreate);
 				}
 				ctrl.userCanDelete = (): boolean =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CARE_TRACKER_DELETE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CareTrackerDelete);
 				}
 				ctrl.userCanDeleteClinicLevel = (): boolean =>
 				{
-					return ctrl.userCanDelete() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.ADMIN_DELETE);
+					return ctrl.userCanDelete() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.AdminDelete);
 				}
 
 				ctrl.manageProviderLevel = (): boolean =>

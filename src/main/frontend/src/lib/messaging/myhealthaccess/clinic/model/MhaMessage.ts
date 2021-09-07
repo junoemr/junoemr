@@ -24,11 +24,11 @@ export default class MhaMessage extends Message
 	{
 		if (this.sender.type === MessageableType.ClinicProfile)
 		{
-			this._group = MessageGroup.sent;
+			this._group = MessageGroup.Sent;
 		}
 		else
 		{
-			this._group = MessageGroup.received;
+			this._group = MessageGroup.Received;
 		}
 	}
 

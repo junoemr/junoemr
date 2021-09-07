@@ -114,12 +114,12 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 					if(ctrl.newRole)
 					{
 						return securityRolesService.hasSecurityPrivileges(
-							SecurityPermissions.CONFIGURE_SECURITY_ROLES_CREATE);
+							SecurityPermissions.ConfigureSecurityRolesCreate);
 					}
 					else
 					{
 						return !ctrl.isSystemManaged() && securityRolesService.hasSecurityPrivileges(
-							SecurityPermissions.CONFIGURE_SECURITY_ROLES_UPDATE);
+							SecurityPermissions.ConfigureSecurityRolesUpdate);
 					}
 				}
 
@@ -131,7 +131,7 @@ angular.module('Admin.Section').component('securityRoleConfigModal',
 				ctrl.canDelete = () =>
 				{
 					return !ctrl.isLoading && !ctrl.isSystemManaged() && securityRolesService.hasSecurityPrivileges(
-						SecurityPermissions.CONFIGURE_SECURITY_ROLES_DELETE);
+						SecurityPermissions.ConfigureSecurityRolesDelete);
 				}
 
 				ctrl.isSystemManaged = () =>

@@ -97,7 +97,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 // total: 0, // length of data
                 getData: function(params)
                 {
-                	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DOCUMENT_READ, SecurityPermissions.LAB_READ, SecurityPermissions.HRM_READ))
+                	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DocumentRead, SecurityPermissions.LabRead, SecurityPermissions.HrmRead))
 	                {
 		                return inboxService.getDashboardItems(params.count()).then(
 			                function success(results)
@@ -126,7 +126,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
 	    controller.updateK2aActive = async () =>
 	    {
-	    	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2A_READ))
+	    	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2ARead))
 		    {
 			    controller.k2aActive = await k2aService.isK2AInit();
 		    }
@@ -238,7 +238,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         controller.updateTicklers = function updateTicklers()
         {
-        	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_READ))
+        	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerRead))
 	        {
 		        //consider the option to have overdue only or not
 		        ticklerService.search(
@@ -275,7 +275,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         controller.updateMessages = function updateMessages()
         {
-        	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MESSAGE_READ))
+        	if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MessageRead))
 	        {
 		        messageService.getUnread(6).then(
 			        function success(results)
@@ -307,7 +307,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         controller.updateReports = function updateReports()
         {
-	        if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DOCUMENT_READ, SecurityPermissions.LAB_READ, SecurityPermissions.HRM_READ))
+	        if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DocumentRead, SecurityPermissions.LabRead, SecurityPermissions.HrmRead))
 	        {
 		        //TODO-legacy: changed to return 5 since that is all we are using at the moment
 		        inboxService.getDashboardItems(5).then(
@@ -339,7 +339,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         controller.updateFeed = function updateFeed(startPoint, numberOfRows)
         {
-	        if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2A_READ)
+	        if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.K2ARead)
 		        || !controller.k2aActive
 		        || controller.busyLoadingData) return;
             controller.busyLoadingData = true;

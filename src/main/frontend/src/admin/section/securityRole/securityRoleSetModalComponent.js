@@ -102,7 +102,7 @@ angular.module('Admin.Section').component('securityRoleSetModal',
 
 				ctrl.canSave = () =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONFIGURE_SECURITY_ROLES_UPDATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConfigureSecurityRolesUpdate);
 				}
 
 				ctrl.onSave = () =>

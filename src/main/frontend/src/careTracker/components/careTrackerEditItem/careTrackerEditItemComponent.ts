@@ -45,10 +45,10 @@ angular.module('CareTracker').component('careTrackerEditItem',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.valueTypeOptions = [
-					{label: "Text", value: CareTrackerItemValueType.STRING},
-					{label: "Numeric", value: CareTrackerItemValueType.NUMERIC},
-					{label: "Checkbox", value: CareTrackerItemValueType.BOOLEAN},
-					{label: "Date", value: CareTrackerItemValueType.DATE},
+					{label: "Text", value: CareTrackerItemValueType.String},
+					{label: "Numeric", value: CareTrackerItemValueType.Numeric},
+					{label: "Checkbox", value: CareTrackerItemValueType.Boolean},
+					{label: "Date", value: CareTrackerItemValueType.Date},
 				];
 
 				ctrl.isLoading = true;

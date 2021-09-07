@@ -56,11 +56,11 @@ angular.module('Record.Forms').component('formViewComponent', {
 
         ctrl.canOpenForm = (form) =>
         {
-            return (form.id || !form.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_CREATE))
+            return (form.id || !form.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormCreate))
         }
         ctrl.canOpenEForm = (eform) =>
         {
-            return (eform.id || !eform.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_CREATE))
+            return (eform.id || !eform.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformCreate))
         }
 
         ctrl.openEForm = function (form)
@@ -114,11 +114,11 @@ angular.module('Record.Forms').component('formViewComponent', {
         {
             if(type === FORM_CONTROLLER_FORM_TYPES.EFORM)
             {
-                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_DELETE);
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformDelete);
             }
             else if(type === FORM_CONTROLLER_FORM_TYPES.FORM)
             {
-                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_DELETE);
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormDelete);
             }
             return false;
         }
@@ -146,11 +146,11 @@ angular.module('Record.Forms').component('formViewComponent', {
         {
             if(type === FORM_CONTROLLER_FORM_TYPES.EFORM)
             {
-                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_UPDATE);
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformUpdate);
             }
             else if(type === FORM_CONTROLLER_FORM_TYPES.FORM)
             {
-                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_UPDATE);
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormUpdate);
             }
             return false;
         }

@@ -74,7 +74,7 @@ export default class Message
 	 */
 	public archive(): void
 	{
-		this._group = MessageGroup.archived;
+		this._group = MessageGroup.Archived;
 	}
 
 	/**

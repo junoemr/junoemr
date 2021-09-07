@@ -3,8 +3,6 @@ import {BILLING_REGION} from "../billing/billingConstants";
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
 import {MessageGroup} from "../lib/messaging/model/MessageGroup";
-import {MhaIntegrationApi} from "../../generated";
-import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 import {MessageCountMode} from "../lib/provider/settings/model/MessageCountMode";
 
@@ -280,7 +278,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LAB_READ, SecurityPermissions.DOCUMENT_READ, SecurityPermissions.HRM_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LabRead, SecurityPermissions.DocumentRead, SecurityPermissions.HrmRead))
 			{
 				inboxService.getUnAckLabDocCount().then(
 					function success(results)
@@ -295,7 +293,7 @@ angular.module('Layout').component("primaryNavigation", {
 		};
 		ctrl.getUnclaimedInboxCount = function()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LAB_READ, SecurityPermissions.DOCUMENT_READ, SecurityPermissions.HRM_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LabRead, SecurityPermissions.DocumentRead, SecurityPermissions.HrmRead))
 			{
 				inboxService.getInboxCountByStatus(0, "N").then(
 					function success(results)
@@ -312,7 +310,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.updateMhaPatientMessagesCount = async () =>
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MESSAGE_UPDATE))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MessageUpdate))
 			{
 				if (await ctrl.mhaConfigService.mhaEnabled())
 				{
@@ -338,7 +336,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getUnreadMessageCount = async function getUnreadMessageCount()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MESSAGE_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MessageRead))
 			{
 				// oscar message count
 				messageService.getUnreadCount().then(
@@ -359,7 +357,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getOverdueTicklerCount = function getOverdueTicklerCount()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerRead))
 			{
 				ticklerService.search(
 					{
@@ -381,7 +379,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getActiveConsultationCount = function getActiveConsultationCount()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationRead))
 			{
 				// Any consultations that should have ended after this point but haven't need to be alerted for
 				var endDate = moment().subtract(ctrl.consultationLookbackPeriod, "months").toISOString();
@@ -435,7 +433,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.patientSearchEnabled = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
 		}
 
 		// when patient typeahead search button is clicked
@@ -651,7 +649,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.patientCreationEnabled = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_CREATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicCreate);
 		}
 
 		ctrl.newDemographic = function newDemographic(size)

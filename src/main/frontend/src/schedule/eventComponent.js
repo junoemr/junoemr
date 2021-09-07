@@ -278,7 +278,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.$onInit = function init()
 			{
-				if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_READ))
+				if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
 				{
 					$timeout(function ()
 					{
@@ -286,8 +286,8 @@ angular.module('Schedule').component('eventComponent', {
 					});
 				}
 				controller.readOnlyMode = controller.inEditMode() ?
-					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_UPDATE) :
-					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_CREATE);
+					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentUpdate) :
+					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentCreate);
 
 				controller.validations = {
 					appointmentDateOnSameDay: Juno.Validations.validationCustom(() =>
@@ -1115,23 +1115,23 @@ angular.module('Schedule').component('eventComponent', {
 			};
 			controller.isEncounterLinkEnabled = () =>
 			{
-				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ECHART_READ);
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartRead);
 			}
 			controller.isMasterFileLinkEnabled = () =>
 			{
-				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
 			}
 			controller.isBillingLinkEnabled = () =>
 			{
-				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BILLING_READ);
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BillingRead);
 			}
 			controller.isRxLinkEnabled = () =>
 			{
-				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.RX_READ);
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.RxRead);
 			}
 			controller.deleteButtonEnabled = () =>
 			{
-				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_DELETE);
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentDelete);
 			}
 
 			$scope.hasSites = function hasSites()

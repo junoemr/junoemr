@@ -91,15 +91,15 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 
 				ctrl.getAlertClass = (severityLevel: AlertSeverityType): string =>
 				{
-					if(severityLevel === AlertSeverityType.RECOMMENDATION)
+					if(severityLevel === AlertSeverityType.Recommendation)
 					{
 						return "alert-info";
 					}
-					if(severityLevel === AlertSeverityType.WARNING)
+					if(severityLevel === AlertSeverityType.Warning)
 					{
 						return "alert-warning";
 					}
-					if(severityLevel === AlertSeverityType.DANGER)
+					if(severityLevel === AlertSeverityType.Danger)
 					{
 						return "alert-danger";
 					}

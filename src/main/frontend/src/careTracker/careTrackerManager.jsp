@@ -36,7 +36,7 @@
 		</div>
 	</div>
 
-	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
+	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CareTrackerRead">
 		<div ng-repeat="table in $ctrl.tablesConfig"
 		     ng-if="table.visible"
 		     class="care-trackers-list">

@@ -61,15 +61,15 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 
 		controller.canEditConsults = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate);
 		}
 		controller.canCreateConsults = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_CREATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate);
 		}
 		controller.canAccessDemographics = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
 		}
 
 		controller.getTeams = function getTeams()

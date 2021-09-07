@@ -56,32 +56,32 @@ export default class CareTrackerItemModel
 
 	public itemTypeIsPrevention(): boolean
 	{
-		return this.type === CareTrackerItemType.PREVENTION;
+		return this.type === CareTrackerItemType.Prevention;
 	}
 
 	public itemTypeIsMeasurement(): boolean
 	{
-		return this.type === CareTrackerItemType.MEASUREMENT;
+		return this.type === CareTrackerItemType.Measurement;
 	}
 
 	public valueTypeIsBoolean(): boolean
 	{
-		return this.valueType === CareTrackerItemValueType.BOOLEAN;
+		return this.valueType === CareTrackerItemValueType.Boolean;
 	}
 
 	public valueTypeIsFreeText(): boolean
 	{
-		return this.valueType === CareTrackerItemValueType.STRING;
+		return this.valueType === CareTrackerItemValueType.String;
 	}
 
 	public valueTypeIsNumeric(): boolean
 	{
-		return this.valueType === CareTrackerItemValueType.NUMERIC;
+		return this.valueType === CareTrackerItemValueType.Numeric;
 	}
 
 	public valueTypeIsDate(): boolean
 	{
-		return this.valueType === CareTrackerItemValueType.DATE;
+		return this.valueType === CareTrackerItemValueType.Date;
 	}
 
 	public hasAttachedData(): boolean

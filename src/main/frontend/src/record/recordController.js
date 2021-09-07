@@ -104,9 +104,9 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.$onInit = () =>
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
 			{
-				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_NOTE_CREATE);
+				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate);
 				demographicService.getDemographic(controller.demographicNo).then((response) =>
 				{
 					controller.demographic = response;
@@ -115,7 +115,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.fillMenu();
 				});
 			}
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_NOTE_CREATE))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate))
 			{
 				//////AutoSave
 				var saveIntervalSeconds = 2;
@@ -174,8 +174,8 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.canSaveIssues = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_ISSUE_UPDATE)
-				|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.ENCOUNTER_ISSUE_CREATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterIssueUpdate)
+				|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterIssueCreate);
 		}
 
 		//disable click and keypress if user only has read-access

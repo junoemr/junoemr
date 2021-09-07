@@ -47,28 +47,28 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.conditionTypeOptions = [
-					{label: "Months Since is more than", value: ConditionType.MONTHS_SINCE_GT},
-					{label: "Months Since is less than", value: ConditionType.MONTHS_SINCE_LT},
-					{label: "Never Given", value: ConditionType.NEVER_GIVEN},
-					{label: "Last record is exactly", value: ConditionType.VALUE_EQ},
-					{label: "Last record is not", value: ConditionType.VALUE_NE},
-					{label: "Last record is more than", value: ConditionType.VALUE_GT},
-					{label: "Last record is less than", value: ConditionType.VALUE_LT},
-					{label: "Patient age (years) more than", value: ConditionType.PATIENT_AGE_GT},
-					{label: "Patient age (years) less than", value: ConditionType.PATIENT_AGE_LT},
-					{label: "Patient gender matches", value: ConditionType.PATIENT_GENDER_EQ},
-					{label: "Patient gender does not match", value: ConditionType.PATIENT_GENDER_NE},
+					{label: "Months Since is more than", value: ConditionType.MonthsSinceGt},
+					{label: "Months Since is less than", value: ConditionType.MonthsSinceLt},
+					{label: "Never Given", value: ConditionType.NeverGiven},
+					{label: "Last record is exactly", value: ConditionType.ValueEq},
+					{label: "Last record is not", value: ConditionType.ValueNe},
+					{label: "Last record is more than", value: ConditionType.ValueGt},
+					{label: "Last record is less than", value: ConditionType.ValueLt},
+					{label: "Patient age (years) more than", value: ConditionType.PatientAgeGt},
+					{label: "Patient age (years) less than", value: ConditionType.PatientAgeLt},
+					{label: "Patient gender matches", value: ConditionType.PatientGenderEq},
+					{label: "Patient gender does not match", value: ConditionType.PatientGenderNe},
 				];
 
 				ctrl.consequenceTypeOptions = [
-					{label: "Display Alert", value: ConsequenceType.ALERT},
-					{label: "Hide Item", value: ConsequenceType.HIDDEN},
+					{label: "Display Alert", value: ConsequenceType.Alert},
+					{label: "Hide Item", value: ConsequenceType.Hidden},
 				];
 
 				ctrl.consequenceSeverityOptions = [
-					{label: "Recommendation", value: ConsequenceSeverity.RECOMMENDATION},
-					{label: "Warning", value: ConsequenceSeverity.WARNING},
-					{label: "Critical", value: ConsequenceSeverity.DANGER},
+					{label: "Recommendation", value: ConsequenceSeverity.Recommendation},
+					{label: "Warning", value: ConsequenceSeverity.Warning},
+					{label: "Critical", value: ConsequenceSeverity.Danger},
 				];
 
 				ctrl.conditionValueOptions = {
@@ -82,14 +82,14 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 				};
 
 				ctrl.conditionTypesWithTextInput = [
-					ConditionType.MONTHS_SINCE_GT,
-					ConditionType.MONTHS_SINCE_LT,
-					ConditionType.VALUE_LT,
-					ConditionType.VALUE_GT,
-					ConditionType.VALUE_EQ,
-					ConditionType.VALUE_NE,
-					ConditionType.PATIENT_AGE_GT,
-					ConditionType.PATIENT_AGE_LT,
+					ConditionType.MonthsSinceGt,
+					ConditionType.MonthsSinceLt,
+					ConditionType.ValueLt,
+					ConditionType.ValueGt,
+					ConditionType.ValueEq,
+					ConditionType.ValueNe,
+					ConditionType.PatientAgeGt,
+					ConditionType.PatientAgeLt,
 				] as ConditionType[];
 
 				ctrl.$onInit = (): void =>
@@ -120,16 +120,16 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 
 				ctrl.showConditionValueSelect = (condition: DsRuleConditionModel): boolean =>
 				{
-					return (condition.type === ConditionType.PATIENT_GENDER_EQ
-						|| condition.type === ConditionType.PATIENT_GENDER_NE
+					return (condition.type === ConditionType.PatientGenderEq
+						|| condition.type === ConditionType.PatientGenderNe
 					);
 				}
 				ctrl.getConditionValueInputLabel = (condition: DsRuleConditionModel): string =>
 				{
 					switch (condition.type)
 					{
-						case ConditionType.MONTHS_SINCE_LT:
-						case ConditionType.MONTHS_SINCE_GT: return "";
+						case ConditionType.MonthsSinceLt:
+						case ConditionType.MonthsSinceGt: return "";
 					}
 					return "value";
 				}
@@ -137,8 +137,8 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 				{
 					switch (condition.type)
 					{
-						case ConditionType.PATIENT_GENDER_EQ:
-						case ConditionType.PATIENT_GENDER_NE:
+						case ConditionType.PatientGenderEq:
+						case ConditionType.PatientGenderNe:
 						{
 							return ctrl.conditionValueOptions.gender;
 						}
@@ -151,19 +151,19 @@ angular.module('DecisionSupport').component('dsRuleBuilder',
 
 				ctrl.showConsequenceValueInput = (consequence: DsRuleConsequenceModel): boolean =>
 				{
-					return (consequence.type === ConsequenceType.ALERT);
+					return (consequence.type === ConsequenceType.Alert);
 				}
 				ctrl.getConsequenceValueInputLabel = (consequence: DsRuleConsequenceModel): string =>
 				{
 					switch (consequence.type)
 					{
-						case ConsequenceType.ALERT: return "with message";
+						case ConsequenceType.Alert: return "with message";
 					}
 					return "value";
 				}
 				ctrl.showConsequenceSeveritySelect = (consequence: DsRuleConsequenceModel): boolean =>
 				{
-					return (consequence.type === ConsequenceType.ALERT);
+					return (consequence.type === ConsequenceType.Alert);
 				}
 				ctrl.removeConsequence = (consequence: DsRuleConsequenceModel): void =>
 				{

@@ -69,7 +69,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 		controller.$onInit = () =>
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_READ, SecurityPermissions.FORM_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformRead, SecurityPermissions.FormRead))
 			{
 				switch (controller.viewState)
 				{

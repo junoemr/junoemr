@@ -50,7 +50,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.$onInit = () =>
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerRead))
 			{
 				//object which represents all the filters, initialize status.
 				controller.search = {
@@ -390,15 +390,15 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.canEdit = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerUpdate);
 		}
 		controller.canCreate = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_CREATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerCreate);
 		}
 		controller.canDelete = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TICKLER_DELETE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerDelete);
 		}
 	}
 ]);

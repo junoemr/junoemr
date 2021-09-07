@@ -421,12 +421,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			var deferred = $q.defer();
 			var valid = true;
 
-			if (consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_CREATE))
+			if (consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate))
 			{
 				alert("You don't have right to save new consult");
 				valid = false;
 			}
-			else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONSULTATION_UPDATE))
+			else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate))
 			{
 				alert("You don't have right to update consult");
 				valid = false;

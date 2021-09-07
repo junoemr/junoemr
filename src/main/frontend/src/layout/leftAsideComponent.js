@@ -101,7 +101,7 @@ angular.module('Layout').component('leftAside', {
 
 		ctrl.init = async function ()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
 			{
 				await scheduleService.loadEventStatuses();
 			}
@@ -264,17 +264,17 @@ angular.module('Layout').component('leftAside', {
 		ctrl.isRecentPatientViewEnabled = () =>
 		{
 			return securityRolesService.hasSecurityPrivileges(
-				SecurityPermissions.DEMOGRAPHIC_READ, SecurityPermissions.ECHART_READ);
+				SecurityPermissions.DemographicRead, SecurityPermissions.EchartRead);
 		}
 		ctrl.isAppointmentPatientViewEnabled = () =>
 		{
 			return securityRolesService.hasSecurityPrivileges(
-				SecurityPermissions.APPOINTMENT_READ, SecurityPermissions.ECHART_READ);
+				SecurityPermissions.AppointmentRead, SecurityPermissions.EchartRead);
 		}
 		ctrl.isAppointmentQueueViewEnabled = () =>
 		{
 			return ctrl.show_appointment_queue && securityRolesService.hasSecurityPrivileges(
-				SecurityPermissions.APPOINTMENT_READ, SecurityPermissions.AQS_QUEUED_APPOINTMENTS_READ);
+				SecurityPermissions.AppointmentRead, SecurityPermissions.AqsQueuedAppointmentsRead);
 		}
 
 		ctrl.componentEnabled = () =>
@@ -284,7 +284,7 @@ angular.module('Layout').component('leftAside', {
 
 		ctrl.isAppointmentStatusSelectEnabled = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentUpdate);
 		}
 
 		ctrl.refreshRecentPatientList = function ()

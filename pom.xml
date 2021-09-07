@@ -1916,7 +1916,7 @@
 							<output>src/main/frontend/generated/</output>
 							<skipValidateSpec>true</skipValidateSpec>
 							<additionalProperties>
-								<additionalProperty>enumPropertyNaming=original</additionalProperty>
+								<additionalProperty>enumPropertyNaming=PascalCase</additionalProperty>
 							</additionalProperties>
 						</configuration>
 					</execution>

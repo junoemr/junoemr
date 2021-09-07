@@ -115,7 +115,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.$onInit = () =>
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
 			{
 				demographicService.getDemographic($stateParams.demographicNo).then(
 					function success(results)
@@ -332,19 +332,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.canAccessAppointments = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_READ);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead);
 		}
 		controller.canAccessBilling = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BILLING_READ);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BillingRead);
 		}
 		controller.canAccessExport = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_EXPORT_READ);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicExportRead);
 		}
 		controller.canEdit = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DEMOGRAPHIC_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicUpdate);
 		}
 
 		controller.initDemographicVars = function initDemographicVars()

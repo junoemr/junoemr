@@ -35,7 +35,7 @@ export default class DsRuleConditionModel
 
     public constructor()
     {
-        this.type = ConditionType.NEVER_GIVEN; // default type
+        this.type = ConditionType.NeverGiven; // default type
     }
 
     get id(): number

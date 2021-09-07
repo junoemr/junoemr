@@ -87,7 +87,7 @@ angular.module('Admin.Section').component('securityRoleConfig',
 
 				ctrl.canAddRole = () =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.CONFIGURE_SECURITY_ROLES_CREATE);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConfigureSecurityRolesCreate);
 				}
 
 				ctrl.openDetailsModal = (role, newRole) =>
