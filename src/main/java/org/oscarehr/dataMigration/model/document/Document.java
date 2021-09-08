@@ -26,11 +26,13 @@ import lombok.Data;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
+import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.dataMigration.model.provider.Provider;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class Document extends AbstractTransientModel
@@ -65,4 +67,6 @@ public class Document extends AbstractTransientModel
 
 	private String annotation;
 	private Integer programId;
+
+	private List<ResidualInfo> residualInfo;
 }

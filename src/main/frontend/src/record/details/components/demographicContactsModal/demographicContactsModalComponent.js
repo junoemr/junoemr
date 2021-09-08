@@ -4,6 +4,8 @@ import {
     LABEL_POSITION,
 } from "../../../../common/components/junoComponentConstants";
 
+import {DemographicApi} from "../../../../../generated";
+
 angular.module('Record.Details').component('demographicContactsModal', {
     templateUrl: 'src/record/details/components/demographicContactsModal/demographicContactsModal.jsp',
     bindings: {
@@ -13,14 +15,23 @@ angular.module('Record.Details').component('demographicContactsModal', {
         componentStyle: "<",
     },
     controller: [
+        "$scope",
+        "$http",
+        "$httpParamSerializer",
+        "$uibModal",
         "$state",
         "uxService",
         function (
+            $scope,
+            $http,
+            $httpParamSerializer,
+            $uibModal,
             $state,
             uxService,
         )
         {
             const ctrl = this;
+            const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
             const EDIT_TITLE = "Edit contact";
             const NO_EDIT_TITLE = "Editing is currently only available for internal contacts";
 
@@ -42,13 +53,22 @@ angular.module('Record.Details').component('demographicContactsModal', {
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
+            ctrl.phoneNumberRegex = /^[\d-\s()]*$/;
             ctrl.contact = null;
             ctrl.contactType = null;
             ctrl.demo = null;
 
+            ctrl.valid = {
+                email : true,
+                postal: true
+            }
+
             ctrl.$onInit = () =>
             {
-                ctrl.contact = ctrl.resolve.demoContact;
+                ctrl.dataChanged = false;
+                ctrl.contact = angular.copy(ctrl.resolve.demoContact);
+                ctrl.demographic = ctrl.resolve.demographic;
+                ctrl.editable = false;
 
                 switch(ctrl.contact.type)
                 {
@@ -57,7 +77,7 @@ angular.module('Record.Details').component('demographicContactsModal', {
                         ctrl.contactType = ctrl.typesText.INTERNAL_TEXT;
                         break;
                     case ctrl.types.EXTERNAL:
-                        ctrl.title = NO_EDIT_TITLE;
+                        ctrl.title = EDIT_TITLE;
                         ctrl.contactType = ctrl.typesText.EXTERNAL_TEXT;
                         break;
                     case ctrl.types.PROVIDER:
@@ -70,9 +90,9 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 }
             };
 
-            ctrl.onCancel = () =>
+            ctrl.onCancel = (data) =>
             {
-                ctrl.modalInstance.close();
+                ctrl.modalInstance.close(data);
             };
 
             ctrl.edit = () =>
@@ -83,9 +103,42 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 }
                 else
                 {
-                    //not yet implemented
+                    ctrl.externalContactEdit();
                 }
             };
+
+            ctrl.externalContactEdit = function externalContactsEdit()
+            {
+                ctrl.editable = true;
+                ctrl.dataChanged = false;
+            };
+
+            ctrl.save = function save()
+            {
+                ctrl.valid.postal = true;
+                ctrl.valid.email = true;
+
+                if (!ctrl.validate())
+			{
+				Juno.Common.Util.errorAlert($uibModal, 'Error', 'Some fields are invalid, Please correct the highlighted fields');
+				return;
+			}
+
+                ctrl.saving = true;
+                demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact.contactId, ctrl.contact).then(
+                    (data) => {
+                        ctrl.onCancel(data);
+                    },
+                    () => {
+                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not update contacts');
+                    });
+            };
+
+            ctrl.resetEditState = function resetEditState()
+		    {
+			    ctrl.saving = false;
+			    ctrl.dataChanged = false;
+		    };
 
             ctrl.getTabs = function getTabs(contactId)
             {
@@ -96,9 +149,9 @@ angular.module('Record.Details').component('demographicContactsModal', {
                         ctrl.tab.demoId = contactId;
                         ctrl.changeTab(ctrl.tab);
                     },
-                    function error(errors)
+                    function error()
                     {
-                        Juno.Common.Util.alert("Unable to open tab.", errors);
+                        Juno.Common.Util.errorAlert($uibModal, "Error", "Unable to open tab.");
                     });
             };
 
@@ -120,5 +173,36 @@ angular.module('Record.Details').component('demographicContactsModal', {
                     }
                 }
             };
+
+            ctrl.validate = function validate()
+            {
+                if (ctrl.contact.email && (ctrl.contact.email === "" || !ctrl.contact.email.match(/^[^@ ]+@([A-z0-9-]+\.)+[A-z0-9-]+$/)))
+		        {
+		            ctrl.valid.email = false;
+			        return false;
+		        }
+                if (ctrl.contact.postal && (ctrl.contact.postal === "" || !ctrl.contact.postal.match(/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/)))
+                {
+                    ctrl.valid.postal = false;
+			        return false;
+                }
+                else
+                {
+                    return true;
+                }
+            };
+
+		    //monitor data changed
+		    $scope.$watch(function()
+		    {
+		    	return ctrl.contact;
+		    }, function(newValue, oldValue)
+		    {
+		    	if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
+		    	{
+		    		ctrl.dataChanged = true;
+		    	}
+
+	    	}, true);
         }]
 });

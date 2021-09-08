@@ -437,17 +437,18 @@ public class CDSExportMapperTest
 	{
 		assertNull(cdsExportMapper.toYnIndicator(null));
 	}
+
 	@Test
 	public void testToYnIndicator_False()
 	{
 		YnIndicator ynIndicator = cdsExportMapper.toYnIndicator(false);
-		assertFalse(ynIndicator.isBoolean());
+		assertEquals(CDSConstants.Y_INDICATOR_FALSE, ynIndicator.getYnIndicatorsimple());
 	}
 	@Test
 	public void testToYnIndicator_True()
 	{
 		YnIndicator ynIndicator = cdsExportMapper.toYnIndicator(true);
-		assertTrue(ynIndicator.isBoolean());
+		assertEquals(CDSConstants.Y_INDICATOR_TRUE, ynIndicator.getYnIndicatorsimple());
 	}
 
 	@Test

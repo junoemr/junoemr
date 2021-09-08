@@ -38,6 +38,7 @@ import xml.cds.v5_0.OfficialSpokenLanguageCode;
 import xml.cds.v5_0.PersonNamePrefixCode;
 import xml.cds.v5_0.PersonStatus;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
@@ -90,7 +91,25 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 					Demographic.OFFICIAL_LANGUAGE.FRENCH : Demographic.OFFICIAL_LANGUAGE.ENGLISH);
 		}
 		demographic.setSpokenLanguage(fromISO639_2LanguageCode(StringUtils.trimToNull(importStructure.getPreferredSpokenLanguage())));
-		demographic.setPatientNote(StringUtils.trimToNull(importStructure.getNoteAboutPatient()));
+		demographic.setPatientNote(generatePatientNote(importStructure));
+		demographic.setSin(StringUtils.trimToEmpty(importStructure.getSIN()));
+	}
+
+	protected String generatePatientNote(Demographics importStructure)
+	{
+		String note = StringUtils.trimToEmpty(importStructure.getNoteAboutPatient());
+
+		if (importStructure.getUniqueVendorIdSequence() != null)
+		{
+			note += "\nUniqueVendorIdSequence: " + importStructure.getUniqueVendorIdSequence();
+		}
+
+		if(importStructure.getFamilyPhysician() != null)
+		{
+			note += "\nFamilyPhysician: " + importStructure.getFamilyPhysician().getFirstName() + " "
+					+ importStructure.getFamilyPhysician().getLastName();
+		}
+		return StringUtils.trimToNull(note);
 	}
 
 	protected void mapHealthInsuranceInfo(Demographics importStructure, Demographic demographic)
@@ -149,7 +168,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		demographic.setMrpProvider(getImportPrimaryPhysician(importStructure));
 		demographic.setChartNumber(importStructure.getChartNumber());
 		demographic.setPatientStatus(getPatientStatus(importStructure.getPersonStatusCode()));
-		demographic.setPatientStatusDate(LocalDate.now());
+		demographic.setPatientStatusDate(getPatientStatusDateWithDefault(importStructure.getPersonStatusDate()));
 		demographic.setDateJoined(LocalDate.now());
 		demographic.setReferralDoctor(toProvider(importStructure.getReferredPhysician()));
 
@@ -160,16 +179,13 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		}
 
 		/* family doctor import logic
-		* Family doctor field in Oscar is the Family Doctor in CDS when rostered status is "not rostered"
-		* Family doctor field in Oscar is the Enrollment Doctor in CDS when rostered status is "rostered" */
+		* Family doctor field in Oscar is the Enrollment Doctor in CDS when rostered status is "rostered"
+		* FamilyPhysician is just going into the demographic notes to keep logic simple.
+		*/
 		RosterData currentRosterData = demographic.getCurrentRosterData();
 		if(currentRosterData != null && currentRosterData.isRostered())
 		{
 			demographic.setFamilyDoctor(currentRosterData.getRosterProvider());
-		}
-		else
-		{
-			demographic.setFamilyDoctor(toProvider(importStructure.getFamilyPhysician()));
 		}
 	}
 
@@ -250,5 +266,14 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			}
 		}
 		return code;
+	}
+
+	protected LocalDate getPatientStatusDateWithDefault(XMLGregorianCalendar statusDate)
+	{
+		if (statusDate == null)
+		{
+			return LocalDate.now();
+		}
+		return LocalDate.of(statusDate.getYear(), statusDate.getMonth(), statusDate.getDay());
 	}
 }

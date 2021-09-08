@@ -25,4 +25,12 @@
   .color {
         color: #455899; //where do i get this color?
   }
+
+  .manage-button-wrapper {
+      width: 60px;
+  }
+  .phone {
+    @include juno-font-body-smallest();
+    margin: 2px 0px 2px 4px;
+  }
 }

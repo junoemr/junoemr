@@ -49,6 +49,7 @@ import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WEIGHT;
 
 public class MeasurementsMapper extends AbstractMapper
 {
+	
 	protected MeasurementsService measurementsService = SpringUtils.getBean(MeasurementsService.class);
 
 	public MeasurementsMapper(ZPD_ZTR message, int providerRep, ImporterExporterFactory.IMPORT_SOURCE importSource)

@@ -41,10 +41,12 @@ import org.oscarehr.ticklers.service.TicklerService;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.TicklerConverter;
 import org.oscarehr.ws.rest.conversion.TicklerTextSuggestConverter;
+import org.oscarehr.ws.rest.conversion.tickler.TicklerDtoToTicklerConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.TicklerResponse;
 import org.oscarehr.ws.rest.to.model.TicklerTextSuggestTo1;
+import org.oscarehr.ws.rest.transfer.tickler.TicklerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -79,6 +81,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 
 	@Autowired
 	private TicklerNoteService ticklerNoteService;
+
+	@Autowired
+	private TicklerDtoToTicklerConverter ticklerDtoToTicklerConverter;
 
 	@POST
 	@Path("/search")
@@ -348,9 +353,11 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public GenericRESTResponse addTickler(@QueryParam("writeEncounterNote") Boolean writeEncounterNote,
-	                                      Tickler tickler)
+	                                      TicklerDto ticklerDto)
 	{
+		Tickler tickler = ticklerDtoToTicklerConverter.convert(ticklerDto);
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, tickler.getDemographicNo(), SecObjectName._TICKLER);
 
 		tickler.setUpdateDate(new Date());

@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.model.medication;
 
 import lombok.Data;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
@@ -49,7 +50,7 @@ public abstract class Medication extends AbstractTransientModel
 	private LocalDateTime createdDateTime;
 	private Boolean patientCompliance;
 	private LocalDateTime pickupDateTime;
-	private String rxStatus;
+	private CDSConstants.PrescriptionStatus rxStatus;
 
 
 	// prescription details
@@ -58,6 +59,8 @@ public abstract class Medication extends AbstractTransientModel
 	private String method;
 	private String route;
 	private Boolean nonAuthoritative;
+	private String regionalIdentifier;
+	private String unit;
 
 
 	// dosage info
@@ -70,6 +73,10 @@ public abstract class Medication extends AbstractTransientModel
 	private Integer repeat;
 	private Boolean longTerm;
 	private Boolean pastMed;
+	
+	private String dosage;
+	private String strengthAmount;
+	private String strengthUnit;
 
 	// refill info
 	private LocalDate lastRefillDate;
@@ -84,11 +91,12 @@ public abstract class Medication extends AbstractTransientModel
 	private String comment;
 
 	// other
+	private Boolean noSubs;
 	private Boolean archived;
 	private String archivedReason;
 	private LocalDateTime archivedDateTime;
 	private LocalDateTime lastUpdateDateTime;
-	private String eTreatmentType;
+	private CDSConstants.TreatmentType eTreatmentType;
 	private List<ResidualInfo> residualInfo;
 
 	public abstract String getDrugName();

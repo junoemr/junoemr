@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.converter.out;
 
 import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
@@ -39,6 +40,8 @@ import oscar.util.StringUtils;
 
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.trimToNull;
+
 @Component
 public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, Medication>
 {
@@ -53,19 +56,24 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 			return null;
 		}
 		Medication medication;
+		
 		if(input.isCustom())
 		{
 			medication = new CustomMedication();
+			// Here is where you would populate custom medication specific fields
 		}
 		else
 		{
 			medication = new StandardMedication();
-			parseDosageValue(input, (StandardMedication) medication);
+			// Here is where you would populate standard medication specific fields
 		}
+
+		parseDosageValue(input, medication);
 
 		BeanUtils.copyProperties(input, medication,
 				"rxDate", "endDate", "writtenDate", "createDate",
-				"lastRefillDate", "archivedDate", "pickupDateTime", "lastUpdateDate", "freqCode");
+				"lastRefillDate", "archivedDate", "pickupDateTime", "lastUpdateDate", "freqCode",
+				"providerNo", "special", "special_instruction", "eTreatmentType", "rxStatus");
 
 		Map<Integer, org.oscarehr.common.model.PartialDate> partialDateMap = partialDateDao.getAllForTableEntry(
 				org.oscarehr.common.model.PartialDate.TABLE_DRUGS, input.getId());
@@ -91,14 +99,24 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 		medication.setLastUpdateDateTime(ConversionUtils.toNullableLocalDateTime(input.getLastUpdateDate()));
 		medication.setArchivedDateTime(ConversionUtils.toNullableLocalDateTime(input.getArchivedDate()));
 		medication.setFrequencyCode(FrequencyCode.from(input.getFreqCode()));
-
 		medication.setDurationUnit(input.getDurUnit());
+
+		medication.setPrescribingProvider(findProvider(input.getProviderNo()));
+		medication.setInstructions(trimToNull(input.getInstruction()));
+		medication.setSpecialInstructions(trimToNull(input.getSpecialInstruction()));
+		medication.setETreatmentType(CDSConstants.TreatmentType.fromValue(input.getETreatmentType()));
+		medication.setRxStatus(CDSConstants.PrescriptionStatus.fromValue(input.getRxStatus()));
 
 		return medication;
 	}
 
-	// this was basically taken from cds 4 export
-	private void parseDosageValue(Drug input, StandardMedication medication)
+	/**
+	 * Parses out the strength amount and unit from the Dosage column of the database
+	 * Note: this was basically taken from cds 4 export
+	 * @param input Drug to pull the dosage from
+	 * @param medication Medication to populate the Strength Amount and Unit into
+	 */
+	private void parseDosageValue(Drug input, Medication medication)
 	{
 		String rawDosage = input.getDosage();
 		if(StringUtils.filled(rawDosage))

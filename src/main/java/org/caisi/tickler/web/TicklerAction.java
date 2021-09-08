@@ -395,9 +395,9 @@ public class TicklerAction extends DispatchAction {
 		   		 if (ticklerNo >0){
 		   			 try{
 			             TicklerLink tLink = new TicklerLink();
-			             tLink.setTableId(Long.parseLong(docId));
+			             tLink.setTableId(docId);
 			             tLink.setTableName(docType);
-			             tLink.setTicklerNo(new Long(ticklerNo).intValue());
+			             tLink.setTickler(tickler);
 			      
 			             ticklerManager.addTicklerLink(loggedInInfo,tLink);
 		   			 }catch(Exception e){	

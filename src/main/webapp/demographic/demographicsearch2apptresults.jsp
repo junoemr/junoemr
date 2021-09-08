@@ -64,9 +64,7 @@
 <%@page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicMerged" %>
 <%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>
-<%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.time.LocalDate" %>
-<%@ page import="java.time.format.DateTimeParseException" %>
 <%@ page import="java.time.temporal.ChronoUnit" %>
 <%@ page import="org.oscarehr.demographic.service.DemographicService" %>
 
@@ -79,7 +77,7 @@
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 	
 	String curProvider_no = request.getParameter("provider_no");
-	    
+
 	String keyword = request.getParameter("keyword");
 	String searchMode = request.getParameter("search_mode");
 	
@@ -313,7 +311,8 @@ function searchAll() {
 
 var fullname="";
 <%-- RJ 07/10/2006 Need to pass doctor of patient back to referrer --%>
-function addName(demographic_no, lastname, firstname, chartno, messageID, doctorNo, remoteFacilityId) {
+<%-- existingContactDummyParams is there to make this compatible with addNameCaisi() --%>
+function addName(demographic_no, lastname, firstname, chartno, messageID, existingContactsDummyParam, doctorNo, remoteFacilityId) {
   fullname=lastname+","+firstname;
 
    if (remoteFacilityId == '')
@@ -332,11 +331,17 @@ function addName(demographic_no, lastname, firstname, chartno, messageID, doctor
 }
 
 <%if(caisi) {%>
-function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
-  	fullname=lastname+","+firstname;
-  	if(opener.document.<%=request.getParameter("formName")%>!=null){
+function addNameCaisi(demographic_no, lastname, firstname, chartno, messageID, existingContacts) {
+  	fullname = lastname + "," + firstname;
+    if (existingContacts.includes(demographic_no))
+    {
+        alert(fullname + " is alreay recorded as a Contact.");
+        return;
+    }
+    else if(opener.document.<%=request.getParameter("formName")%>!=null)
+    {
       if(opener.document.<%=request.getParameter("formName")%>.elements['<%=request.getParameter("elementName")%>']!=null)
-    	 opener.document.<%=request.getParameter("formName")%>.elements['<%=request.getParameter("elementName")%>'].value=fullname;
+    	 opener.document.<%=request.getParameter("formName")%>.elements['<%=URLEncoder.encode(request.getParameter("elementName"))%>'].value=fullname;
 	  if(opener.document.<%=request.getParameter("formName")%>.elements['<%=request.getParameter("elementId")%>']!=null)
   	     opener.document.<%=request.getParameter("formName")%>.elements['<%=request.getParameter("elementId")%>'].value=demographic_no;
 	}
@@ -423,10 +428,10 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 			bgColor = rowCounter%2==0?"#EEEEFF":"white";
 %>
 <tr style="background-color: <%=bgColor%>" onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';" onMouseout="this.style.backgroundColor='<%=bgColor%>';"
-		onClick="document.forms[0].demographic_no.value=<%=demo.getId()%>;<% if(caisi) { out.print("addNameCaisi");} else { out.print("addName");} %>('<%=demo.getId()%>','<%=URLEncoder.encode(demo.getLastName())%>','<%=URLEncoder.encode(demo.getFirstName())%>','<%=URLEncoder.encode(demo.getChartNo() == null ? "" : demo.getChartNo())%>','<%=request.getParameter("messageId")%>','<%=demo.getProviderNo()%>','')">
+		onClick="document.forms[0].demographic_no.value=<%=demo.getId()%>;<% if(caisi) { out.print("addNameCaisi");} else { out.print("addName");} %>('<%=demo.getId()%>','<%=URLEncoder.encode(demo.getLastName())%>','<%=URLEncoder.encode(demo.getFirstName())%>','<%=URLEncoder.encode(demo.getChartNo() == null ? "" : demo.getChartNo())%>','<%=request.getParameter("messageId")%>','<%=request.getParameter("existingContacts")%>','<%=demo.getProviderNo()%>','')">
 
 		<td class="demoId"><input type="submit" class="mbttn" name="demographic_no" value="<%=demo.getId()%>"
-			onClick="<% if(caisi) {out.print("addNameCaisi");} else {out.print("addName");} %>('<%=demo.getId()%>','<%=URLEncoder.encode(demo.getLastName())%>','<%=URLEncoder.encode(demo.getFirstName())%>','<%=URLEncoder.encode(demo.getChartNo() == null ? "" : demo.getChartNo())%>','<%=request.getParameter("messageId")%>','<%=demo.getProviderNo()%>','')">
+			onClick="<% if(caisi) {out.print("addNameCaisi");} else {out.print("addName");} %>('<%=demo.getId()%>','<%=URLEncoder.encode(demo.getLastName())%>','<%=URLEncoder.encode(demo.getFirstName())%>','<%=URLEncoder.encode(demo.getChartNo() == null ? "" : demo.getChartNo())%>','<%=request.getParameter("messageId")%>','<%=request.getParameter("existingContacts")%>','<%=demo.getProviderNo()%>','')">
         </td>
 		<td class="lastName"><%=Misc.toUpperLowerCase(demo.getLastName())%></td>
 		<td class="firstName"><%=Misc.toUpperLowerCase(demo.getFirstName())%></td>
@@ -454,7 +459,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 		  DemographicTransfer demographicTransfer=matchingDemographicTransferScore.getDemographicTransfer();
 %>
 		   <tr style="background-color: <%=bgColor%>" onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';" onMouseout="this.style.backgroundColor='<%=bgColor%>';"
-			   onClick="document.forms[0].demographic_no.value=<%=demographicTransfer.getCaisiDemographicId()%>;addName('<%=demographicTransfer.getCaisiDemographicId()%>','<%=URLEncoder.encode(demographicTransfer.getLastName())%>','<%=URLEncoder.encode(demographicTransfer.getFirstName())%>','','<%=request.getParameter("messageId")%>','<%=demographicTransfer.getCaisiProviderId()%>','<%=demographicTransfer.getIntegratorFacilityId()%>')">
+			   onClick="document.forms[0].demographic_no.value=<%=demographicTransfer.getCaisiDemographicId()%>;addName('<%=demographicTransfer.getCaisiDemographicId()%>','<%=URLEncoder.encode(demographicTransfer.getLastName())%>','<%=URLEncoder.encode(demographicTransfer.getFirstName())%>','','<%=request.getParameter("messageId")%>', null,'<%=demographicTransfer.getCaisiProviderId()%>','<%=demographicTransfer.getIntegratorFacilityId()%>')">
 			<td class="demoId" colspan="8">
 				<input type="submit" class="mbttn" name="demographic_no" value="Integrator <%=CaisiIntegratorManager.getRemoteFacility(loggedInInfo, loggedInInfo.getCurrentFacility(), demographicTransfer.getIntegratorFacilityId()).getName()%>:<%=demographicTransfer.getCaisiDemographicId()%>" />
             </td>

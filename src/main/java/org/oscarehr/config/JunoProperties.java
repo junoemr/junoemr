@@ -51,6 +51,7 @@ public class JunoProperties
 		private boolean enabled = false;
 		private String endpoint;
 		private String password;
+		private String storageKeyPrefix = "";
 	}
 
 	@Data

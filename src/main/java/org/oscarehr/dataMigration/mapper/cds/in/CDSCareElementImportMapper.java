@@ -90,7 +90,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		{
 			SmokingPacksMeasurement measurement = new SmokingPacksMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(smokingPacks.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(String.valueOf(smokingPacks.getPerDay().longValue()));
+			measurement.setMeasurementValue(String.valueOf(smokingPacks.getPerDay()));
 			measurements.add(measurement);
 		}
 
@@ -189,7 +189,8 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		{
 			DiabetesSelfManagementCollaborativeMeasurement measurement = new DiabetesSelfManagementCollaborativeMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(selfManagementCollaborative.getDate()).atStartOfDay());
-			measurement.setMeasurementValue(selfManagementCollaborative.getDocumentedGoals());
+			measurement.setMeasurementValue(Measurement.VALUE_YES);
+			measurement.setComments(StringUtils.trimToNull(selfManagementCollaborative.getDocumentedGoals()));
 			measurements.add(measurement);
 		}
 

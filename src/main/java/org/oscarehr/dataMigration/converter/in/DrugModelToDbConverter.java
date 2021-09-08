@@ -47,7 +47,8 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		BeanUtils.copyProperties(input, drug,
 				"rxStartDate", "rxEndDate", "writtenDate", "createdDateTime",
 				"lastRefillDate", "archivedDateTime", "pickupDateTime", "lastUpdateDateTime",
-				"gcnSeqNo", "noSubs", "prn", "archived", "startDateUnknown", "repeat", "pastMed");
+				"gcnSeqNo", "noSubs", "prn", "archived", "startDateUnknown", "repeat", "pastMed",
+				"eTreatmentType", "rxStatus");
 
 		drug.setEndDate(ConversionUtils.toNullableLegacyDate(input.getRxEndDate()));
 		drug.setRxDate(ConversionUtils.toNullableLegacyDate(input.getRxStartDate()));
@@ -71,12 +72,24 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		drug.setRepeat(toIntDefaultIfNull(input.getRepeat(), 0));
 		drug.setPosition(0);
 		drug.setPastMed(BooleanUtils.toBooleanDefaultIfNull(input.getPastMed(), false));
+		drug.setETreatmentType((input.getETreatmentType() != null) ? input.getETreatmentType().getValue() : null);
+		drug.setRxStatus((input.getRxStatus() != null) ? input.getRxStatus().getValue() : null);
+
+		// takeMin and takeMax == dosage in UI
+		drug.setTakeMax(input.getTakeMax());
+		drug.setTakeMin(input.getTakeMin());
+
+		drug.setNoSubs(BooleanUtils.toBooleanDefaultIfNull(input.getNoSubs(), false));
+		// dosage column in db == Strength in UI
+		if (input.getStrengthAmount() != null && input.getStrengthUnit() != null)
+		{
+			drug.setDosage(input.getStrengthAmount() + " " + input.getStrengthUnit());
+		}
 
 		if(input instanceof StandardMedication)
 		{
 			StandardMedication standardMedication = (StandardMedication) input;
 			drug.setGcnSeqNo(toIntDefaultIfNull(standardMedication.getGcnSeqNo(), 0));
-			drug.setNoSubs(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getNoSubs(), false));
 			drug.setPrn(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getPrn(), false));
 		}
 
@@ -86,6 +99,9 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 			drug.setStartDateUnknown(true);
 			drug.setRxDate(new Date());
 		}
+
+		drug.setNonAuthoritative(input.getNonAuthoritative());
+		drug.setDispenseInterval(input.getDispenseInterval());
 
 		return drug;
 	}
