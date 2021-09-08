@@ -224,7 +224,7 @@
 							</a>
 						</li>
 						<li>
-							<juno-security-check permissions="$ctrl.SecurityPermissions.MESSAGE_READ">
+							<juno-security-check permissions="$ctrl.SecurityPermissions.MessageRead">
 								<a href="javascript:void(0)"
 								   class="dropdown-toggle"
 								   data-toggle="dropdown">

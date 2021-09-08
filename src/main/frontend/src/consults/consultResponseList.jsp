@@ -32,7 +32,7 @@
 ng-if="consultResponseListCtrl.hideSearchPatient != true">
 	<!-- TODO-legacy -->
 </div>
-<juno-security-check show-placeholder="true" permissions="consultResponseListCtrl.SecurityPermissions.CONSULTATION_READ">
+<juno-security-check show-placeholder="true" permissions="consultResponseListCtrl.SecurityPermissions.ConsultationRead">
 	<div class="col-lg-12">
 		<form name="searchForm" id="search-form">
 

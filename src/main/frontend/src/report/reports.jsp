@@ -24,7 +24,7 @@
 
 --%>
 
-<juno-security-check show-placeholder="true" permissions="reportsCtrl.SecurityPermissions.REPORT_READ">
+<juno-security-check show-placeholder="true" permissions="reportsCtrl.SecurityPermissions.ReportRead">
 	<div class="report-page">
 		<div class="report-page-header" ng-init="reportsCtrl.init()">
 			<div class="flex-row flex-grow align-items-center">

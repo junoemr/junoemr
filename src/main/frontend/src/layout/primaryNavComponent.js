@@ -316,7 +316,8 @@ angular.module('Layout').component("primaryNavigation", {
 				{
 					// MHA message count
 					const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);
-					ctrl.mhaUnreadMessageTotal = await messagingService.countMessages(await messagingService.getDefaultMessageSource(), MessageGroup.Received, true);
+					ctrl.mhaUnreadMessageTotal = await messagingService.countMessages(
+						await messagingService.getDefaultMessageSource(), {group: MessageGroup.Received});
 				}
 			}
 		}

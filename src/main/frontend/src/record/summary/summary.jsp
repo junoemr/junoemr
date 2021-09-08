@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.ECHART_READ">
+<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.EchartRead">
 	<div class="col-xs-12 summary-section">
 		<div class="row">
 			<div class="col-md-3 col-sm-4 col-xs-12" id="summary-section-left">
@@ -80,7 +80,7 @@
 				<div class="col-md-12 note-list">
 					<div class="tab-content">
 						<div class="tab-pane active" id="all">
-							<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.ENCOUNTER_NOTE_READ">
+							<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.EncounterNoteRead">
 								<encounter-note-list
 										user-id="summaryCtrl.user.providerNo"
 										on-edit-cpp="summaryCtrl.onEditCpp(note, successCallback, dismissCallback)"

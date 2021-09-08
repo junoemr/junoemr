@@ -33,7 +33,7 @@
 	<div class="col-md-12 alert alert-success" ng-show="consultRequestCtrl.consultSaving">
 		Saving...
 	</div>
-	<juno-security-check show-placeholder="true" permissions="consultRequestCtrl.SecurityPermissions.CONSULTATION_READ">
+	<juno-security-check show-placeholder="true" permissions="consultRequestCtrl.SecurityPermissions.ConsultationRead">
 		<div class="row">
 			<div id="left_pane" class="col-md-2">
 				<label class="control-label">Patient Details</label>

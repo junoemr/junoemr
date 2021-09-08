@@ -38,7 +38,7 @@
 		Saving...
 	</div>
 
-	<juno-security-check show-placeholder="true" permissions="consultResponseCtrl.SecurityPermissions.CONSULTATION_READ">
+	<juno-security-check show-placeholder="true" permissions="consultResponseCtrl.SecurityPermissions.ConsultationRead">
 		<div id="left_pane" class="col-md-2">
 			<label class="control-label">Patient Details:</label>
 			<div class="demographic">

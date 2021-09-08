@@ -37,7 +37,7 @@
         </div>
     </div>
 
-    <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CARE_TRACKER_READ">
+    <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CareTrackerRead">
         <div class="flex-row">
             <div class="flex-column no-print tracker-nav">
                 <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onCareTrackerSelect(item)">

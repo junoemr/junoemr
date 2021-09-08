@@ -36,7 +36,7 @@
 		</div>
 	</div>
 
-	<juno-security-check show-placeholder="true" permissions="patientSearchCtrl.SecurityPermissions.DEMOGRAPHIC_READ">
+	<juno-security-check show-placeholder="true" permissions="patientSearchCtrl.SecurityPermissions.DemographicRead">
 		<div class="col-lg-12 patient-search-content">
 			<form role="form"
 				  id="search-form"

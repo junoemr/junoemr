@@ -90,7 +90,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			billed: 'B',
 		});
 
-		controller.appointmentReasonDisplayLevel = ProviderSettings.AppointmentReasonDisplayLevelEnum.DEFAULTALL;
+		controller.appointmentReasonDisplayLevel = ProviderSettings.AppointmentReasonDisplayLevelEnum.DefaultAll;
 		controller.appointmentReasons = {};
 
 		//=========================================================================
@@ -216,7 +216,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.init = function init()
 		{
-			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_READ))
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
 			{
 				$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
 
@@ -252,11 +252,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.userCanEditAppointments = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentUpdate);
 		}
 		controller.userCanCreateAppointments = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.APPOINTMENT_CREATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentCreate);
 		}
 
 		$scope.calendar = function calendar()
@@ -1192,12 +1192,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					let formContainerElem = eventElement.find('.inline-flex');
 					/* generate form links */
-					if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.FORM_READ))
+					if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormRead))
 					{
 						controller.buildEventLink(formContainerElem, controller.formLinks.formNameMap, "onclick-open-form");
 					}
 					/* generate eForm links */
-					if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EFORM_READ))
+					if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformRead))
 					{
 						controller.buildEventLink(formContainerElem, controller.formLinks.eFormNameMap, "onclick-open-eform");
 					}

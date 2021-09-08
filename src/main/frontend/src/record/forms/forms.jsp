@@ -21,7 +21,7 @@
  * Canada
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<juno-security-check show-placeholder="true" permissions="[formCtrl.SecurityPermissions.EFORM_READ, formCtrl.SecurityPermissions.FORM_READ]">
+<juno-security-check show-placeholder="true" permissions="[formCtrl.SecurityPermissions.EformRead, formCtrl.SecurityPermissions.FormRead]">
 	<div id="forms-page" class="container-fluid flex-row">
 		<div class="options-panel-place-holder">
 			<div class=" options-panel">

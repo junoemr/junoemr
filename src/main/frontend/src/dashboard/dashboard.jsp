@@ -45,9 +45,9 @@
 			<div class="col-lg-8">
 
 				<juno-security-check permissions="[
-				dashboardCtrl.SecurityPermissions.DOCUMENT_READ,
-				dashboardCtrl.SecurityPermissions.LAB_READ,
-				 dashboardCtrl.SecurityPermissions.HRM_READ]">
+				dashboardCtrl.SecurityPermissions.DocumentRead,
+				dashboardCtrl.SecurityPermissions.LabRead,
+				 dashboardCtrl.SecurityPermissions.HrmRead]">
 					<div class="row dashboard-row">
 						<div class="col-lg-12 col-xs-12">
 							<p>
@@ -140,7 +140,7 @@
 					</div>
 				</juno-security-check>
 
-				<juno-security-check permissions="dashboardCtrl.SecurityPermissions.MESSAGE_READ">
+				<juno-security-check permissions="dashboardCtrl.SecurityPermissions.MessageRead">
 					<div class="row dashboard-row">
 						<div class="col-lg-12 col-xs-12">
 							<!-- il18n problem here -->
@@ -210,7 +210,7 @@
 					</div>
 				</juno-security-check>
 
-				<juno-security-check permissions="dashboardCtrl.SecurityPermissions.TICKLER_READ">
+				<juno-security-check permissions="dashboardCtrl.SecurityPermissions.TicklerRead">
 					<div class="row dashboard-row">
 						<div class="col-lg-12">
 							<!-- this is a bit of a problem for il18n -->
@@ -289,7 +289,7 @@
 				</juno-security-check>
 			</div>
 
-			<juno-security-check permissions="dashboardCtrl.SecurityPermissions.K2A_READ">
+			<juno-security-check permissions="dashboardCtrl.SecurityPermissions.K2ARead">
 				<div ng-if="dashboardCtrl.k2aActive" class="col-lg-3 col-md-12 pull-right">
 					<p class="lead"><bean:message key="dashboard.k2a.header" bundle="ui"/></p>
 					<div id="dashboard-body-right" class="well" ng-show="dashboardCtrl.k2aFeedActive">

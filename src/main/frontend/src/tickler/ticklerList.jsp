@@ -29,7 +29,7 @@
      ng-if="!ticklerListCtrl.inDemographicView()">
 	<!-- TODO-legacy -->
 </div>
-<juno-security-check show-placeholder="true" permissions="ticklerListCtrl.SecurityPermissions.TICKLER_READ">
+<juno-security-check show-placeholder="true" permissions="ticklerListCtrl.SecurityPermissions.TicklerRead">
 	<div class="col-xs-12" id="tickler-list-page">
 		<form name="searchForm" id="search-form" class="no-print">
 			<div class="row search-filters">

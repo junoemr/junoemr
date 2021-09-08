@@ -27,7 +27,7 @@
 		<span>{{$ctrl.careTracker.description}}</span>
 	</div>
 
-	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.CARE_TRACKER_READ, $ctrl.SecurityPermissions.MEASUREMENT_READ, $ctrl.SecurityPermissions.PREVENTION_READ]">
+	<juno-security-check show-placeholder="true" permissions="[$ctrl.SecurityPermissions.CareTrackerRead, $ctrl.SecurityPermissions.MeasurementRead, $ctrl.SecurityPermissions.PreventionRead]">
 		<filter-panel initial-state-expanded="false">
 			<div class="filter-wrapper">
 				<h6>Filter Items</h6>

@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div id="patient-record-page">
-	<juno-security-check permissions="recordCtrl.SecurityPermissions.DEMOGRAPHIC_READ">
+	<juno-security-check permissions="recordCtrl.SecurityPermissions.DemographicRead">
 		<div class="flex-row align-items-center patient-record-header">
 			<div class="flex-row align-items-center">
 				<h3 class="patient-header-name" ng-cloak>
@@ -200,7 +200,7 @@
 	        <div class="include-record-peice" ui-view></div>
 	    </div>
 
-		<juno-security-check permissions="recordCtrl.SecurityPermissions.ENCOUNTER_NOTE_CREATE">
+		<juno-security-check permissions="recordCtrl.SecurityPermissions.EncounterNoteCreate">
 			<div class="row no-print" id="note-editor-container">
 				<div id="note-editor-minimized"
 					class="col-sm-3 col-xs-12 text-center hand-hover"
@@ -243,7 +243,7 @@
 							class="form-control">
 						</div>
 						<div class="col-xs-4 dropup">
-							<juno-security-check permissions="recordCtrl.SecurityPermissions.ENCOUNTER_ISSUE_READ">
+							<juno-security-check permissions="recordCtrl.SecurityPermissions.EncounterIssueRead">
 								<input type="text" class="form-control" placeholder="Assign Issue"
 								       ng-disabled="!recordCtrl.canSaveIssues()"
 								       uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)"

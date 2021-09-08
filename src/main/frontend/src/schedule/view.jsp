@@ -23,7 +23,7 @@
 
 --%>
 <div id="center-panel" class="schedule-center-panel">
-	<juno-security-check show-placeholder="true" permissions="scheduleController.SecurityPermissions.APPOINTMENT_READ">
+	<juno-security-check show-placeholder="true" permissions="scheduleController.SecurityPermissions.AppointmentRead">
 		<div class="flex-column flex-grow schedule-page-header">
 			<div class="schedule-options flex-row flex-grow align-items-center">
 				<h5 ng-show="!isInitialized()">Loading...</h5>

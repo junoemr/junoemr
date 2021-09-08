@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<juno-security-check show-placeholder="true" permissions="detailsCtrl.SecurityPermissions.DEMOGRAPHIC_READ">
+<juno-security-check show-placeholder="true" permissions="detailsCtrl.SecurityPermissions.DemographicRead">
 	<div class="col-xs-12" id="patient-details-page" ng-class="detailsCtrl.pageClasses()">
 		<div class="row">
 				<div class="col-md-10 col-lg-8">

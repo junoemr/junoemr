@@ -29,7 +29,7 @@
 			<h3>User Settings</h3>
 		</div>
 		<div class="pull-right control-right">
-			<juno-security-check permissions="settingsCtrl.SecurityPermissions.PREFERENCE_READ">
+			<juno-security-check permissions="settingsCtrl.SecurityPermissions.PreferenceRead">
 			<button type="button" class="btn btn-default btn-lg"
 			        onClick="window.open('../provider/providerpreference.jsp?provider_no=999998','prefs','width=715,height=680,scrollbars=yes')">
 				<span class="glyphicon glyphicon-cog"></span> Open Classic Preferences
@@ -65,7 +65,7 @@
 	</div>
 	<div class="primary-content-window">
 
-		<juno-security-check show-placeholder="true" permissions="settingsCtrl.SecurityPermissions.PREFERENCE_READ">
+		<juno-security-check show-placeholder="true" permissions="settingsCtrl.SecurityPermissions.PreferenceRead">
 
 			<div class="ui-view-wrapper flex-grow">
 				<ui-view></ui-view>
