@@ -92,6 +92,20 @@ public class SecRoleDao extends AbstractDao<SecRole>
 	    return ((Long) query.getSingleResult() > 0);
     }
 
+	/**
+	 * Don't look up roles by name. for legacy use only
+	 * @param roleName the name of the role
+	 * @return the role
+	 */
+	@Deprecated
+	public SecRole findByRoleName(String roleName)
+	{
+		Query query = entityManager.createQuery("SELECT x FROM SecRole x WHERE x.name = :name");
+		query.setParameter("name", roleName);
+
+		return this.getSingleResultOrNull(query);
+	}
+
     public List<SecRole> findAllOrderByRole()
 	{
 		Query query = entityManager.createQuery("select x from SecRole x order by x.name");

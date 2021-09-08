@@ -29,9 +29,11 @@ import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.security.service.SecuritySetsService;
@@ -44,8 +46,11 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.util.OscarRoleObjectPrivilege;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -99,6 +104,9 @@ public class SecurityInfoManager
 			return null;
 		}
 	}
+
+	@Autowired
+	private SecRoleDao secRoleDao;
 
 	@Autowired
 	private SecUserRoleDao secUserRoleDao;
@@ -208,6 +216,46 @@ public class SecurityInfoManager
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * used by classic security tag system. do not use for new code
+	 * @param roleNames role names separated by ,
+	 * @param objectName the object name
+	 * @param rights the required rights
+	 * @return the role has the required rights
+	 */
+	@Deprecated
+	public boolean hasPrivilege(String roleNames, String objectName, String rights)
+	{
+		Set<String> roleNameSet = new HashSet<>();
+
+		String[] roleNameArr = roleNames.split(",");
+		for(String roleName : roleNameArr)
+		{
+			SecRole role = secRoleDao.findByRoleName(roleName);
+			if(role == null)
+			{
+				// unknown role name, might be the provider ID
+				roleNameSet.add(roleName);
+			}
+			else
+			{
+				// with role inheritance, checking a role also requires us to check parent roles
+				// this is technically more permissive than it should be,
+				// as disabled permissions within the child roles will pass due to checking the parent.
+				do
+				{
+					roleNameSet.add(role.getName());
+					role = role.getParentSecRole();
+				}
+				while(role != null);
+			}
+		}
+
+		String allRoleNames = StringUtils.join(roleNameSet, ",");
+		List privilegeProps = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
+		return OscarRoleObjectPrivilege.checkPrivilege(allRoleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), rights);
 	}
 
 	@Deprecated //deprecated - use Permission enum version
