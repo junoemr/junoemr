@@ -1585,6 +1585,12 @@ angular.module('Schedule').component('eventComponent', {
 			 */
 			controller.updateTelehealthAppointmentOptions = () =>
 			{
+				// virtual appointment type cannot be modified in editMode.
+				if (controller.editMode)
+				{
+					return;
+				}
+
 				switch ($scope.telehealthMode)
 				{
 					case $scope.TELEHEALTH_MODES.TELEHEALTH:
