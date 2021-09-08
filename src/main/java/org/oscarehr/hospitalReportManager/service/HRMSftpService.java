@@ -68,7 +68,7 @@ public class HRMSftpService
 	
 	// LOCAL CONFIG
 	private static final String OMD_DIRECTORY = OscarProperties.getInstance().getProperty("omd.hrm.local_base_directory");
-	private static final String OMD_SFTP_SSH_KEY = Paths.get(OMD_DIRECTORY, OscarProperties.getInstance().getProperty("omd.hrm.private_key_file")).toString();
+	private static final String OMD_SFTP_SSH_KEY = OscarProperties.getInstance().getProperty("omd.hrm.private_key_file");
 	private static final String DECRYPTION_KEY = OscarProperties.getInstance().getProperty("omd.hrm.decryption_key");
 	
 	// UTIL
