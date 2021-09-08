@@ -299,6 +299,12 @@ public final class AppointmentTransfer {
 
 		BeanUtils.copyProperties(this, appointment, ignored.toArray(new String[0]));
 
+		// if virtual type not set default to none.
+		if (appointment.getVirtualAppointmentType() == null)
+		{
+			appointment.setVirtualAppointmentType(Appointment.VirtualAppointmentType.NONE);
+		}
+
 		if (appointmentStartDateTime != null)
 		{
 			appointment.setAppointmentDate(appointmentStartDateTime.getTime());
