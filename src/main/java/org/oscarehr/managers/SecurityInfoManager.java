@@ -262,6 +262,15 @@ public class SecurityInfoManager
 	{
 		try
 		{
+			// if the requested legacy permission is also used in the new system, use the new check instead
+			SecObjectName.OBJECT_NAME objectNameEnum = SecObjectName.OBJECT_NAME.fromValueString(objectName);
+			if(Permission.includesObjectAsValue(objectNameEnum))
+			{
+				SecurityInfoManager.PRIVILEGE_LEVEL privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.fromValueString(privilege);
+				Permission permission = Permission.from(objectNameEnum, privilegeLevel);
+				return hasPrivileges(providerNo, demographicNo, permission);
+			}
+
 			if(demographicNo != null && !isAllowedAccessToPatientRecord(providerNo, demographicNo))
 			{
 				return false;

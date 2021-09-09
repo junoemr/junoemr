@@ -23,27 +23,11 @@
  */
 package org.oscarehr.managers;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v26.message.ORU_R01;
+import ca.uhn.hl7v2.model.v26.message.REF_I12;
+import com.lowagie.text.DocumentException;
 import org.oscarehr.common.dao.ClinicDAO;
-import org.oscarehr.consultations.dao.ConsultDocsDao;
-import org.oscarehr.consultations.dao.ConsultRequestDao;
-import org.oscarehr.consultations.dao.ConsultResponseDao;
-import org.oscarehr.consultations.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
@@ -53,7 +37,6 @@ import org.oscarehr.common.hl7.v2.oscar_to_oscar.OruR01.ObservationData;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.RefI12;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.SendingUtils;
 import org.oscarehr.common.model.Clinic;
-import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.ConsultationResponse;
@@ -66,23 +49,38 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.consultations.ConsultationRequestSearchFilter;
 import org.oscarehr.consultations.ConsultationRequestSearchFilter.SORTDIR;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
+import org.oscarehr.consultations.dao.ConsultDocsDao;
+import org.oscarehr.consultations.dao.ConsultRequestDao;
+import org.oscarehr.consultations.dao.ConsultResponseDao;
+import org.oscarehr.consultations.dao.ConsultResponseDocDao;
+import org.oscarehr.consultations.model.ConsultDocs;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.ConsultationRequestSearchResult;
 import org.oscarehr.ws.rest.to.model.ConsultationResponseSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.lowagie.text.DocumentException;
-
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v26.message.ORU_R01;
-import ca.uhn.hl7v2.model.v26.message.REF_I12;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.log.LogAction;
 import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class ConsultationManager {
@@ -115,7 +113,7 @@ public class ConsultationManager {
 	public final String ENABLED_YES = "Y";
 	
 	public List<ConsultationRequestSearchResult> search(LoggedInInfo loggedInInfo, ConsultationRequestSearchFilter filter) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		List<ConsultationRequestSearchResult> r = new  ArrayList<ConsultationRequestSearchResult>();
 		List<Object[]> result = consultationRequestDao.search(filter);
@@ -129,7 +127,7 @@ public class ConsultationManager {
 	}
 	
 	public List<ConsultationResponseSearchResult> search(LoggedInInfo loggedInInfo, ConsultationResponseSearchFilter filter) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		List<ConsultationResponseSearchResult> r = new  ArrayList<ConsultationResponseSearchResult>();
 		List<Object[]> result = consultationResponseDao.search(filter);
@@ -173,7 +171,7 @@ public class ConsultationManager {
 	}
 	
 	public ConsultationRequest getRequest(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		ConsultationRequest request = consultationRequestDao.find(id);
 		LogAction.addLogSynchronous(loggedInInfo,"ConsultationManager.getRequest", "id="+request.getId());
@@ -182,7 +180,7 @@ public class ConsultationManager {
 	}
 	
 	public ConsultationResponse getResponse(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		ConsultationResponse response = consultationResponseDao.find(id);
 		LogAction.addLogSynchronous(loggedInInfo,"ConsultationManager.getResponse", "id="+response.getId());
@@ -212,7 +210,7 @@ public class ConsultationManager {
 	
 	public void saveConsultationRequest(LoggedInInfo loggedInInfo, ConsultationRequest request) {
 		if (request.getId()==null) { //new consultation request
-			checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
+			securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_CREATE);
 			
 			ProfessionalSpecialist specialist = request.getProfessionalSpecialist();
 			request.setProfessionalSpecialist(null);
@@ -221,7 +219,7 @@ public class ConsultationManager {
 			request.setProfessionalSpecialist(specialist);
 			consultationRequestDao.merge(request);
 		} else {
-			checkPrivilege(loggedInInfo, SecurityInfoManager.UPDATE);
+			securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_UPDATE);
 			
 			consultationRequestDao.merge(request);
 		}
@@ -230,11 +228,11 @@ public class ConsultationManager {
 	
 	public void saveConsultationResponse(LoggedInInfo loggedInInfo, ConsultationResponse response) {
 		if (response.getId()==null) { //new consultation response
-			checkPrivilege(loggedInInfo, SecurityInfoManager.CREATE);
+			securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_CREATE);
 			
 			consultationResponseDao.persist(response);
 		} else {
-			checkPrivilege(loggedInInfo, SecurityInfoManager.UPDATE);
+			securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_UPDATE);
 			
 			consultationResponseDao.merge(response);
 		}
@@ -242,7 +240,7 @@ public class ConsultationManager {
 	}
 	
 	public List<ConsultDocs> getConsultRequestDocs(LoggedInInfo loggedInInfo, Integer requestId) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		List<ConsultDocs> docs = requestDocDao.findByRequestId(requestId);
 		LogAction.addLogSynchronous(loggedInInfo,"ConsultationManager.getConsultRequestDocs", "consult id="+requestId);
@@ -251,7 +249,7 @@ public class ConsultationManager {
 	}
 	
 	public List<ConsultResponseDoc> getConsultResponseDocs(LoggedInInfo loggedInInfo, Integer responseId) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		List<ConsultResponseDoc> docs = responseDocDao.findByResponseId(responseId);
 		LogAction.addLogSynchronous(loggedInInfo,"ConsultationManager.getConsultResponseDocs", "consult id="+responseId);
@@ -260,7 +258,7 @@ public class ConsultationManager {
 	}
 	
 	public void saveConsultRequestDoc(LoggedInInfo loggedInInfo, ConsultDocs doc) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_UPDATE);
 		
 		if (doc.getId()==null) { //new consultation attachment
 			requestDocDao.persist(doc);
@@ -271,7 +269,7 @@ public class ConsultationManager {
 	}
 	
 	public void saveConsultResponseDoc(LoggedInInfo loggedInInfo, ConsultResponseDoc doc) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_UPDATE);
 		
 		if (doc.getId()==null) { //new consultation attachment
 			responseDocDao.persist(doc);
@@ -322,7 +320,7 @@ public class ConsultationManager {
 	 * 	oscar/oscarEncounter/oscarConsultationRequest/pageUtil/EctConsultationFormRequestAction.java
 	 */
 	public void doHl7Send(LoggedInInfo loggedInInfo, Integer consultationRequestId) throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, IOException, HL7Exception, ServletException, DocumentException {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		ConsultationRequest consultationRequest=consultationRequestDao.find(consultationRequestId);
 		ProfessionalSpecialist professionalSpecialist=professionalSpecialistDao.find(consultationRequest.getSpecialistId());
@@ -451,14 +449,8 @@ public class ConsultationManager {
 		return cal.getTime();
 	}
 	
-	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege) {
-		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_con", privilege, null)) {
-			throw new RuntimeException("Access Denied");
-		}
-	}
-	
 	public List<ProfessionalSpecialist> findByService(LoggedInInfo loggedInInfo, String serviceName) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		List<ProfessionalSpecialist> results = professionalSpecialistDao.findByService(serviceName);
 		
@@ -469,7 +461,7 @@ public class ConsultationManager {
 	}
 	
 	public List<ProfessionalSpecialist> findByServiceId(LoggedInInfo loggedInInfo, Integer serviceId) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.CONSULTATION_READ);
 		
 		List<ProfessionalSpecialist> results = professionalSpecialistDao.findByServiceId(serviceId);
 		
