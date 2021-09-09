@@ -27,9 +27,6 @@ package org.oscarehr.common.model;
 
 import com.google.common.collect.Sets;
 
-import java.util.Date;
-import java.util.HashSet;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -40,6 +37,8 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import java.util.Date;
+import java.util.HashSet;
 
 @Entity
 public class DemographicContact extends AbstractModel<Integer> {
@@ -145,6 +144,16 @@ public class DemographicContact extends AbstractModel<Integer> {
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	public Boolean getConsentToContact()
+	{
+		return consentToContact;
+	}
+
+	public void setConsentToContact(Boolean consentToContact)
+	{
+		this.consentToContact = consentToContact;
 	}
 
 	public int getType() {

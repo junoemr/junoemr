@@ -1,6 +1,7 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {LABEL_POSITION} from "../common/components/junoComponentConstants";
 import {ProvidersServiceApi} from "../../generated";
+import LoadingQueue from "../lib/util/LoadingQueue";
 
 angular.module('Consults').controller('Consults.ConsultRequestController', [
 
@@ -51,6 +52,8 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		controller.hours = staticDataService.getHours();
 		controller.minutes = staticDataService.getMinutes();
 
+		controller.loadingQueue = new LoadingQueue();
+
 		controller.parseTime = function parseTime(time)
 		{
 			var tArray = time.split(":");
@@ -70,6 +73,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			controller.labelPosition = LABEL_POSITION;
 
 			//set demographic info
+			controller.loadingQueue.pushLoadingState();
 			demographicService.getDemographic(consult.demographicId).then(
 				function success(results)
 				{
@@ -89,8 +93,13 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function error(errors)
 				{
 					console.error(errors);
-				});
+				}
+			).finally(() =>
+			{
+				controller.loadingQueue.popLoadingState();
+			});
 
+			controller.loadingQueue.pushLoadingState();
 			consultService.getLetterheadList().then(
 				function success(results)
 				{
@@ -115,7 +124,10 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				{
 					console.error(errors);
 				}
-			);
+			).finally(() =>
+			{
+				controller.loadingQueue.popLoadingState();
+			});
 
 			//set specialist list
 			for (var i = 0; i < consult.serviceList.length; i++)
@@ -138,6 +150,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.attachments = Juno.Common.Util.toArray(consult.attachments);
 			Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
 
+			controller.loadingQueue.pushLoadingState();
 			providersServiceApi.getActive().then(
 				function success(results)
 				{
@@ -154,7 +167,10 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				{
 					console.error("Failed to get provider list with error: " + results);
 				}
-			)
+			).finally(() =>
+			{
+				controller.loadingQueue.popLoadingState();
+			});
 		};
 		controller.initialize();
 
@@ -438,6 +454,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 			if(valid)
 			{
+				controller.loadingQueue.pushLoadingState();
 				controller.consultSaving = true; //show saving banner
 				controller.setAppointmentTime();
 
@@ -446,6 +463,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					{
 						if (controller.consult.id == null)
 						{
+							controller.consult.id = results.id; // assign id to prevent possible double save
 							$location.path("/record/" + consult.demographicId + "/consult/" + results.id);
 						}
 						deferred.resolve(results.id);
@@ -461,6 +479,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 							controller.setESendEnabled();
 							controller.consultSaving = false; //hide saving banner
 							controller.consultChanged = 0; //reset change count
+							controller.loadingQueue.popLoadingState();
 						}
 					);
 			}
@@ -485,6 +504,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.saveAndFax = function saveAndFax()
 		{
+			controller.loadingQueue.pushLoadingState();
 			controller.save().then(
 				function success(reqId)
 				{
@@ -497,13 +517,17 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function failure(error)
 				{
 				}
-			);
+			).finally(() =>
+			{
+				controller.loadingQueue.popLoadingState();
+			});
 		};
 
 		controller.eSend = function eSend()
 		{
 			if (controller.eSendEnabled)
 			{
+				controller.loadingQueue.pushLoadingState();
 				consultService.eSendRequest(consult.id).then(
 					function success(results)
 					{
@@ -512,12 +536,16 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					function error(errors)
 					{
 						console.error(errors);
-					});
+					}).finally(() =>
+				{
+					controller.loadingQueue.popLoadingState();
+				});
 			}
 		};
 
 		controller.saveAndPrint = function saveAndPrint()
 		{
+			controller.loadingQueue.pushLoadingState();
 			controller.save().then(
 				function success(reqId)
 				{
@@ -526,7 +554,10 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function failure(error)
 				{
 				}
-			);
+			).finally(() =>
+			{
+				controller.loadingQueue.popLoadingState();
+			});
 		};
 
 		controller.print = function print(reqId)

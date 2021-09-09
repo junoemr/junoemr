@@ -356,22 +356,26 @@
 
 		<div class="wrapper-action col-sm-12"><!-- Action Buttons -->
 			<button type="button" class="btn btn-large btn-warning action"
-					ng-click="consultResponseCtrl.printPreview()"
-					ng-show="consultResponseCtrl.consult.id!=null && consultChanged<=0">
+			        ng-disabled="consultResponseCtrl.loadingQueue.isLoading"
+			        ng-click="consultResponseCtrl.printPreview()"
+			        ng-show="consultResponseCtrl.consult.id!=null && consultChanged<=0">
 				Print Preview
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-warning action"
-					ng-click="consultResponseCtrl.sendFax()"
-					ng-show="consultResponseCtrl.consult.id!=null && consultChanged<=0">
+			        ng-disabled="consultResponseCtrl.loadingQueue.isLoading"
+			        ng-click="consultResponseCtrl.sendFax()"
+			        ng-show="consultResponseCtrl.consult.id!=null && consultChanged<=0">
 				Send Fax
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-primary action"
-					ng-click="consultResponseCtrl.save()"
-					ng-show="consultResponseCtrl.consultChanged>0">
+			        ng-disabled="consultResponseCtrl.loadingQueue.isLoading"
+			        ng-click="consultResponseCtrl.save()"
+			        ng-show="consultResponseCtrl.consultChanged>0">
 				Save
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-default action"
-					ng-click="consultResponseCtrl.close()">
+			        ng-disabled="consultResponseCtrl.loadingQueue.isLoading"
+			        ng-click="consultResponseCtrl.close()">
 				Close
 			</button>&nbsp;
 		</div>

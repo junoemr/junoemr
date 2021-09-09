@@ -100,6 +100,24 @@
 		margin-top: 32px;
 	}
 }
+.special-indent {
+	@include juno-font-body-small();
+	margin-left: 18px;
+}
+
+.special-indent-extra {
+	margin-left: 22px;
+}
+
+.special-indent-extra2 {
+	@include juno-font-body-smallest();
+	margin: 0px 0px 16px 22px;
+}
+
+.manage-button-padding{
+	width: 60px;
+	padding: .6em .5em;
+}
 
 @media (max-width: 768px) {
 	#save-button-top {

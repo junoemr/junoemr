@@ -31,14 +31,14 @@
 		}
 
 		&.field-invalid {
-			border-color: $color-red-base;
+			border-color:  var(--color-red-base);
 
 			&:focus, &:active {
-				border-color: $color-red-base;
+				border-color: var(--color-red-base);
 			}
 		}
-		::placeholder {
-			color: $color-neutral-grey;
+		&::placeholder {
+			color: var(--color-neutral-grey);
 		}
 	}
 }

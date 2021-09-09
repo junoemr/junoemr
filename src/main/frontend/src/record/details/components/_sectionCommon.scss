@@ -1,49 +1,57 @@
 .demographic-details-section {
 	@include juno-font-default();
 
-	$field-width: 420px;
+	$field-width: 430px;
 
 	.title {
 		margin: 0 0 8px 0;
 		color: $color-primary-base;
 	}
 
-	.fields {
-		display: flex;
-		flex-wrap: wrap;
+	.details-fields {
+		display: grid;
+      	grid-auto-flow: row;
+		grid-template-columns: 430px 430px;
+        grid-column-gap: 90px;
 
-		.divider {
-			flex: 1 1 0;
-			max-width: 84px;
+		label {
+			text-align: right;
+			width: 128px;
+			margin-right: 8px;
+		}
+		
+		.juno-input {
+			margin-top: 8px;
+			width: $field-width;
 		}
 
-		.column {
-			.juno-input {
-				margin-top: 8px;
-				width: $field-width;
-			}
-			.juno-select {
-				margin-top: 8px;
-				width: $field-width;
-			}
-			.juno-date-select {
-				margin-top: 8px;
-				width: $field-width;
-			}
-			.juno-typeahead {
-				margin-top: 8px;
-				width: $field-width;
-			}
-			.mha-patient-connection,
-			.juno-button,
-			.juno-check-box {
-				margin-top: 8px;
-			}
+		.juno-select {
+			margin-top: 8px;
+			width: $field-width;
+		}
+		.juno-date-select {
+			margin-top: 8px;
+			width: $field-width;
+		}
 
-			label {
-				min-width: 128px;
-				margin-right: 8px;
-			}
+		.juno-typeahead {
+			margin-top: 8px;
+			width: $field-width;
+		}
+		.mha-patient-connection {
+			margin-top: 8px;
+			width: $field-width;
+		}
+
+		.juno-button,
+		.juno-check-box {
+			margin-top: 8px;
+		}
+	}
+	
+	@media only screen and (max-width: 950px) {
+		.details-fields {
+			grid-template-columns: 430px;
 		}
 	}
 }

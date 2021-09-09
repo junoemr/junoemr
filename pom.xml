@@ -1850,6 +1850,8 @@
 								org.oscarehr.ws.rest.DemographicService
 								org.oscarehr.ws.rest.DemographicsService
 								org.oscarehr.ws.rest.demographic.DemographicCareTrackerWebService
+								org.oscarehr.ws.rest.demographic.DemographicContactWebService
+								org.oscarehr.ws.rest.demographic.DemographicContactsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
 								org.oscarehr.ws.rest.demographic.DemographicDxWebService

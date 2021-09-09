@@ -88,6 +88,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Path("/schedule")
 @Component("scheduleService")
@@ -324,11 +325,11 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/reasons")
 	@Produces("application/json")
-	public RestSearchResponse<LookupListItemTo1> getAppointmentReasons()
+	public RestSearchResponse<LookupListItemTo1> getAppointmentReasons(@QueryParam("active") Boolean active)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
-		List<LookupListItem> items = appointmentManager.getReasons();
+		List<LookupListItem> items = appointmentManager.getReasons(Optional.ofNullable(active));
 
 		LookupListItemConverter converter = new LookupListItemConverter();
 		List<LookupListItemTo1> transferList = converter.getAllAsTransferObjects(getLoggedInInfo(), items);

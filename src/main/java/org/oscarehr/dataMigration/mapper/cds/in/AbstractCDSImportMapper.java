@@ -35,6 +35,7 @@ import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.AddressStructured;
+import xml.cds.v5_0.AddressType;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.DateTimeFullOrPartial;
 import xml.cds.v5_0.LifeStage;
@@ -354,7 +355,17 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 			{
 				address.setAddressLine1(importAddress.getFormatted());
 			}
-			address.setResidencyStatusCurrent(); //TODO how to tell if this is the main address
+
+			if (importAddress.getAddressType() == AddressType.R)
+			{
+				// main address
+				address.setResidencyStatusCurrent();
+			}
+			else
+			{
+				// alternative address
+				address.setResidencyStatusPast();
+			}
 		}
 		return address;
 	}

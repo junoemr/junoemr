@@ -1,80 +1,94 @@
-import PartialDateModel from "../../lib/common/partialDate/model/partialDateModel";
 import PartialDateConverter from "../../lib/common/partialDate/converter/partialDateConverter";
 import PartialDateModelConverter from "../../lib/common/partialDate/converter/partialDateModelConverter";
 
-angular.module('Record.Summary').controller('Record.Summary.GroupNotesController', [
+angular.module('Record.Summary').component('groupNotesComponent', {
+	templateUrl: 'src/record/summary/groupNotes.jsp',
+	bindings: {
+		modalInstance: "<",
+		resolve: "<",
+	},
+	controller: [
+		'$scope',
+		'$uibModal',
+		'$stateParams',
+		'$state',
+		'$interval',
+		'focusService',
+		'noteService',
+		'securityService',
+		'diseaseRegistryService',
 
-	'$scope',
-	'$uibModal',
-	'$uibModalInstance',
-	'$stateParams',
-	'$state',
-	'$interval',
-	'mod',
-	'action',
-	'user',
-	'noteService',
-	'securityService',
-	'diseaseRegistryService',
-
-	function(
-		$scope,
-		$uibModal,
-		$uibModalInstance,
-		$stateParams,
-		$state,
-		$interval,
-		mod,
-		action,
-		user,
-		noteService,
-		securityService,
-		diseaseRegistryService)
-	{
-		const controller = this;
-		controller.page = {};
-		controller.page.title = mod.displayName;
-		controller.page.items = mod.summaryItem;
-		controller.page.quickLists = [];
-
-		//controller.action = action;
-		controller.page.code = mod.summaryCode;
-
-		controller.groupNotesForm = {
-			assignedCMIssues: []
-		};
-		controller.groupNotesForm.encounterNote = {
-			position: 1
-		};
-
-		controller.working = false;
-
-		//set hidden which can can move out of hidden to $scope values
-		controller.groupNotesForm.annotation_attrib = "anno" + new Date().getTime();
-
-		controller.$onInit = () =>
+		function (
+			$scope,
+			$uibModal,
+			$stateParams,
+			$state,
+			$interval,
+			focusService,
+			noteService,
+			securityService,
+			diseaseRegistryService)
 		{
-			diseaseRegistryService.getIssueQuickLists().then(
-				function success(results)
-				{
-					controller.page.quickLists = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			const controller = this;
 
-			controller.displayIssueId(controller.page.code);
+			controller.page = {};
+			controller.page.quickLists = [];
 
-			//action is NULL when new , action is some id when not
-			if (action != null)
+			controller.groupNotesForm = {
+				assignedCMIssues: []
+			};
+			controller.groupNotesForm.encounterNote = {
+				position: 1
+			};
+
+			controller.working = false;
+
+			//set hidden which can can move out of hidden to $scope values
+			controller.groupNotesForm.annotation_attrib = "anno" + new Date().getTime();
+
+			controller.$onInit = () =>
 			{
-				controller.displayGroupNote(controller.page.items, action);
+				controller.page.title = controller.resolve.mod.displayName;
+				controller.page.items = controller.resolve.mod.summaryItem;
+				controller.page.code = controller.resolve.mod.summaryCode;
+
+				controller.action = controller.resolve.action;
+
+				controller.displayIssueId(controller.page.code);
+
+				//action is NULL when new , action is some id when not
+				if (controller.action != null)
+				{
+					controller.displayGroupNote(controller.page.items, controller.action);
+				}
+
+				diseaseRegistryService.getIssueQuickLists().then(
+					function success(results)
+					{
+						controller.page.quickLists = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
+
+				controller.displayIssueId(controller.page.code);
+
+				//action is NULL when new , action is some id when not
+				if (action != null)
+				{
+					controller.displayGroupNote(controller.page.items, action);
+				}
+				else
+				{
+					//new entry
+				}
 			}
-			else
-			{
-				//new entry
-			}
+
+		// Called after this controller's element and its children have been linked. so ref is set up
+		controller.$postLink = () =>
+		{
+			focusService.focusRef(controller.groupNotesFormRef);
 		}
 
 		controller.addDxItem = function addDxItem(item)
@@ -135,7 +149,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						let partialDateConverter = new PartialDateConverter();
 
 						controller.groupNotesForm.encounterNote = results.encounterNote;
-						controller.groupNotesForm.encounterNote.editorNames = mod.editorNames; // Get editor names.
+						controller.groupNotesForm.encounterNote.editorNames = controller.resolve.mod.editorNames; // Get editor names.
 						controller.groupNotesForm.groupNoteExt = results.groupNoteExt;
 
 						let partialStartDateModel = partialDateConverter.convert(results.groupNoteExt.startDate);
@@ -162,7 +176,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 							}
 						}
 
-						action = itemId;
+						controller.action = itemId;
 						controller.setAvailablePositions();
 
 						// controller.removeEditingNoteFlag();
@@ -201,7 +215,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						controller.groupNotesForm.encounterNote = {
 							position: 1
 						};
-						action = itemId;
+						controller.action = itemId;
 					},
 					function error(errors)
 					{
@@ -225,7 +239,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				{
 					controller.availablePositions.push(x + 1);
 				}
-				if (action == null)
+				if (controller.action == null)
 				{
 					controller.availablePositions.push(x + 1);
 				}
@@ -296,7 +310,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			noteService.saveIssueNote($stateParams.demographicNo, groupNotesFormTransfer).then(
 				function success(results)
 				{
-					$uibModalInstance.close(results.body);
+					controller.modalInstance.close(results.body);
 					$state.transitionTo($state.current, $stateParams, {
 						reload: false,
 						inherit: false,
@@ -412,7 +426,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		controller.cancel = function cancel()
 		{
-			$uibModalInstance.dismiss('cancel');
+			controller.modalInstance.dismiss('cancel');
 		};
 
 		//temp load into pop-up
@@ -499,7 +513,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		controller.isSelected = function isSelected(item)
 		{
-			if (item.id == action)
+			if (item.id === controller.action)
 			{
 				return "group-note-selected";
 			}
@@ -547,4 +561,4 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			return startDateValid && resolutionDateValid && procedureDateValid;
 		}
 	}
-]);
+]});

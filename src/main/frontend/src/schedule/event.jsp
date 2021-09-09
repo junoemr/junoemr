@@ -130,7 +130,7 @@
 												<span>B</span>
 											</button>
 											<button type="button" class="btn btn-default"
-											        ng-disabled="eventController.isMasterFileLinkEnabled()"
+											        ng-disabled="!eventController.isMasterFileLinkEnabled()"
 											        ng-click="eventController.openMasterRecord()">
 												<span>M</span>
 											</button>

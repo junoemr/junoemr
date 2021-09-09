@@ -1,121 +1,113 @@
 import {SystemPreferenceApi} from "../../generated";
 import TicklerAttachmentToTicklerLinkDtoConverter from "../lib/tickler/converter/TicklerAttachmentToTicklerLinkDtoConverter";
 
-angular.module('Tickler').controller('Tickler.TicklerAddController', [
+angular.module('Tickler').component('ticklerAddComponent', {
+	templateUrl: 'src/tickler/ticklerAdd.jsp',
+	bindings: {
+		modalInstance: "<",
+		resolve: "<",
+	},
+	controller: [
+		'$scope',
+		'$filter',
+		'$stateParams',
+		'$http',
+		'$httpParamSerializer',
+		'demographicService',
+		'demographicsService',
+		'providerService',
+		'ticklerService',
+		'focusService',
+		function (
+			$scope,
+			$filter,
+			$stateParams,
+			$http,
+			$httpParamSerializer,
+			demographicService,
+			demographicsService,
+			providerService,
+			ticklerService,
+			focusService)
+		{
+			const controller = this;
+			let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
-	'$scope',
-	'$uibModalInstance',
-	'$filter',
-	'$stateParams',
-	'$http',
-	'$httpParamSerializer',
-	'demographicService',
-	'demographicsService',
-	'providerService',
-	'ticklerService',
-	'attachment',
-	'presetDemographicNo',
+			// holds the patient typeahead selection
+			controller.demographicSearch = null;
+			controller.isDisabled = false; // Save button enabled by default
 
-	function(
-		$scope,
-		$uibModalInstance,
-		$filter,
-		$stateParams,
-		$http,
-		$httpParamSerializer,
-		demographicService,
-		demographicsService,
-		providerService,
-		ticklerService,
-		attachment,
-		presetDemographicNo)
-	{
-		var controller = this;
-		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+			controller.defaultTicklerProviderNo = null;
+			controller.defaultTicklerProviderName = null;
 
-		// holds the patient typeahead selection
-		controller.demographicSearch = null;
-		controller.isDisabled = false; // Save button enabled by default
-
-		controller.defaultTicklerProviderNo = null;
-		controller.defaultTicklerProviderName = null;
-		//=========================================================================
-		// Watches
-		//=========================================================================
-
-		// $scope.$watch('controller.demographicSearch',
-
-		// 	function(new_value)
-		// 	{
-		// 		console.log('watching demographicSearch: ', new_value);
-
-		// 		if (Juno.Common.Util.exists(new_value))
-		// 		{
-		// 			controller.updateDemographicNo(new_value);
-		// 		}
-		// 		else
-		// 		{
-		// 			// no selection
-		// 			controller.updateDemographicNo(null);
-		// 		}
-		// 	}, true);
-
-		controller.tickler = {
-			template:
-			{
-				id: 1,
-				name: ''
-			},
-			serviceDateDate: new Date(),
-			serviceDateTime: "12:00 AM",
-			suggestedTextId: 0,
-			taskAssignedTo: null,
-			taskAssignedToName: null,
-			attachments: attachment ? [attachment] : null,
-		};
+			controller.tickler = {
+				template:
+					{
+						id: 1,
+						name: ''
+					},
+				serviceDateDate: new Date(),
+				serviceDateTime: "12:00 AM",
+				suggestedTextId: 0,
+				taskAssignedTo: null,
+				taskAssignedToName: null,
+				attachments: null,
+			};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
+		controller.initialDemographicNo = null;
 
 		// initialization
-		controller.init = function init()
+		controller.$onInit = async () =>
 		{
 			controller.setTicklerProvider();
 
-			if (Juno.Common.Util.exists($stateParams.demographicNo) || presetDemographicNo)
+			controller.tickler.attachments = controller.resolve.attachment ? [controller.resolve.attachment] : null;
+
+			if (Juno.Common.Util.exists($stateParams.demographicNo) || controller.resolve.presetDemographicNo)
 			{
-				const demographicNo = $stateParams.demographicNo || presetDemographicNo;
-				console.log('initializing demographicSearch pre-selected', demographicNo);
-				demographicService.getDemographic(demographicNo).then(function(data)
-				{
-					controller.demographicSearch = {
-						demographicNo: data.demographicNo,
-						firstName: data.firstName,
-						lastName: data.lastName,
-						name: data.lastName + "," + data.firstName // For display purposes
-					};
-					controller.updateDemographicNo(data);
-				});
+				controller.initialDemographicNo = $stateParams.demographicNo || controller.resolve.presetDemographicNo;
+				const data = await demographicService.getDemographic(controller.initialDemographicNo);
+				controller.demographicSearch = {
+					demographicNo: data.demographicNo,
+					firstName: data.firstName,
+					lastName: data.lastName,
+					name: data.lastName + "," + data.firstName // For display purposes
+				};
+				controller.tickler.demographic = data;
 			}
+
+			ticklerService.getTextSuggestions().then(function(data)
+			{
+				controller.textSuggestions = data.content;
+				controller.textSuggestions.unshift(
+					{
+						id: 0,
+						suggestedText: ''
+					});
+			}, function(reason)
+			{
+				alert(reason);
+			});
 
 			$('#timepicker').timepicker({defaultTime: controller.tickler.serviceDateTime});
 		};
 
-		ticklerService.getTextSuggestions().then(function(data)
+		controller.$postLink = () =>
 		{
-			controller.textSuggestions = data.content;
-			controller.textSuggestions.unshift(
+			if(Juno.Common.Util.isBlank(controller.initialDemographicNo))
 			{
-				id: 0,
-				suggestedText: ''
-			});
-		}, function(reason)
-		{
-			alert(reason);
-		});
+				focusService.focusRef(controller.demographicSearchRef);
+			}
+			else
+			{
+				focusService.focusRef(controller.providerSearchRef);
+			}
+		}
 
 		controller.close = function close()
 		{
-			$uibModalInstance.close(false);
+			controller.modalInstance.close(false);
 		};
 
 		controller.validate = function validate()
@@ -186,7 +178,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
             ticklerService.add(tickler, writeEncounter).then(
                 (response) =>
                 {
-                    $uibModalInstance.close(true);
+                    controller.modalInstance.close(true);
                 }).catch((error) =>
                 {
                     alert(error);
@@ -198,16 +190,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		};
 
-		controller.updateDemographicNo = function updateDemographicNo(demo)
+		controller.updateDemographicNo = async function updateDemographicNo(demo)
 		{
 			if (Juno.Common.Util.exists(demo))
 			{
-				demographicService.getDemographic(demo.demographicNo).then(function(data)
-				{
-					// update the selected value on the tickler object
-					controller.tickler.demographic = data;
-					console.log('set controller.tickler.demographic: ', controller.tickler.demographic);
-				});
+				// update the selected value on the tickler object
+				controller.tickler.demographic = await demographicService.getDemographic(demo.demographicNo);
 			}
 			else
 			{
@@ -299,7 +287,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				if (systemPrefApiResponse.data.body !== null)
 				{
 					let providerServiceResponse = await providerService.getProvider(controller.defaultTicklerProviderNo);
-					setTicklerProviderAssignee(providerServiceResponse);
+					controller.setTicklerProviderAssignee(providerServiceResponse);
 				}
 			}
 			catch (error)
@@ -308,7 +296,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			}
 		}
 
-		function setTicklerProviderAssignee(resp)
+		controller.setTicklerProviderAssignee = (resp) =>
 		{
 			let firstName = resp.firstName || "";
 			let lastName = resp.lastName || "";
@@ -325,4 +313,4 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			controller.tickler.taskAssignedToName = controller.defaultTicklerProviderName;
 		}
 	}
-]);
+]});

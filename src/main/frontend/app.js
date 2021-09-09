@@ -55,7 +55,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Settings',
 	'Report',
 	'Patient',
-	'Patient.Search',
 	'Inbox',
 	'Interceptor',
 	'Help',
@@ -299,12 +298,11 @@ oscarApp.config([
 		.state('search',
 		{
 			url: '/search',
-			templateUrl: 'src/patient/search/patientSearch.jsp',
-			controller: 'Patient.Search.PatientSearchController as patientSearchCtrl',
+			component: "patientSearchComponent",
 			params:
 			{
-				term: null
-			}
+				term: null,
+			},
 		})
 		.state('reports',
 		{

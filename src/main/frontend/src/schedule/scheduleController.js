@@ -212,12 +212,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				controller.appointmentReasonDisplayLevel = prefs.appointmentReasonDisplayLevel;
 			});
-		}
 
-		$scope.init = function init()
-		{
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
 			{
+				controller.masterFileEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
+				controller.encounterEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartRead);
+				controller.billingEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.BillingRead);
+				controller.rxEnabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RxRead);
+
 				$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
 
 				Promise.all([
@@ -916,7 +918,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.rotateEventStatus = function rotateEventStatus(calEvent)
 		{
-			if(ctrl.userCanEditAppointments())
+			if(controller.userCanEditAppointments())
 			{
 				$scope.setCalendarLoading(true);
 
@@ -2346,7 +2348,5 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
 			}
 		};
-
-		$scope.init();
 	}
 ]);

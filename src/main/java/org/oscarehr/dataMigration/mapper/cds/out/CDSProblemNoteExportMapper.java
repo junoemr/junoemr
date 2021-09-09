@@ -22,9 +22,13 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.encounterNote.ConcernNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ProblemList;
+import xml.cds.v5_0.StandardCoding;
+
+import java.util.List;
 
 @Component
 public class CDSProblemNoteExportMapper extends AbstractCDSNoteExportMapper<ProblemList, ConcernNote>
@@ -40,7 +44,7 @@ public class CDSProblemNoteExportMapper extends AbstractCDSNoteExportMapper<Prob
 		ProblemList problemList = objectFactory.createProblemList();
 
 		problemList.setProblemDiagnosisDescription(exportStructure.getNoteText());
-		problemList.setDiagnosisCode(null); // not available when exporting from notes
+		problemList.setDiagnosisCode(generateDiagnosisProcedureCode(exportStructure.getDxIssueCodes()));
 		problemList.setProblemDescription(exportStructure.getProblemDescription());
 		problemList.setProblemStatus(exportStructure.getProblemStatus());
 		problemList.setOnsetDate(toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
@@ -49,5 +53,20 @@ public class CDSProblemNoteExportMapper extends AbstractCDSNoteExportMapper<Prob
 		problemList.setNotes(exportStructure.getAnnotation());
 
 		return problemList;
+	}
+
+	/**
+	 * Returns the first code in dxCodesList as a StandardCoding object
+	 * Juno Ongoing Concern Notes support multiple codes, but CDS does not
+	 * @param dxCodes list of DxCodes from the Medical History Note
+	 * @return First DxCode in dxCodesList or null
+	 */
+	protected StandardCoding generateDiagnosisProcedureCode(List<DxCode> dxCodes)
+	{
+		if(dxCodes != null && !dxCodes.isEmpty())
+		{
+			return getStandardCoding(dxCodes.get(0));
+		}
+		return null;
 	}
 }
