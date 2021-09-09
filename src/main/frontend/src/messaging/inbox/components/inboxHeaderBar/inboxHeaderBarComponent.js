@@ -221,8 +221,7 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 
 				$uibModal.open(
 					{
-						templateUrl: 'src/tickler/ticklerAdd.jsp',
-						controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
+						component: 'ticklerAddComponent',
 						backdrop: 'static',
 						size: 'lg',
 						resolve: {

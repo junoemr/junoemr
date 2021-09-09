@@ -250,7 +250,7 @@ public class MedicationMapper extends AbstractMapper
 	{
 		if (hasTimingQuantity(rep) && getServiceDurationUnit(rep, 0) != null)
 		{
-			List<String> durationUnits = Arrays.asList("W", "M", "D", "Y");
+			List<String> durationUnits = Arrays.asList("W", "M", "D", "Y", "H");
 			Integer duration = getServiceDurationQuantity(rep, 0);
 			String durationUnit = translateDurationUnits(getServiceDurationUnit(rep, 0));
 			int repeats = getNumberOfRefills(rep);
@@ -516,14 +516,30 @@ public class MedicationMapper extends AbstractMapper
 	protected String translateDurationUnits(String durationUnit)
 	{
 		HashMap<String, String> durationHash = new HashMap<>();
-
-		durationHash.put("W", "W");
+		
+		durationHash.put("H", "H");
+		durationHash.put("Hr", "H");
+		
 		durationHash.put("D", "D");
-		durationHash.put("M", "M");
-		durationHash.put("Week", "W");
 		durationHash.put("Day", "D");
+		
+		durationHash.put("W", "W");
+		durationHash.put("Week", "W");
+		durationHash.put("Wees", "W");
+		durationHash.put("WK", "W");
+		durationHash.put("Wk", "W");
+		durationHash.put("Wks", "W");
+		
+		durationHash.put("M", "M");
 		durationHash.put("MO30", "M");
+		durationHash.put("MTH", "M");
+		durationHash.put("MTH30", "M");
+		durationHash.put("MTH28", "M");
+		durationHash.put("Month", "M");
+		
 		durationHash.put("Year", "Y");
+		durationHash.put("YR365", "Y");
+		durationHash.put("CY", "Y");
 
 		if (durationHash.containsKey(durationUnit))
 		{

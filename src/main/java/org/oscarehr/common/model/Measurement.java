@@ -72,6 +72,7 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	public static final String MEASUREMENT_UNIT_MMHG = "mmHg";
 	public static final String MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_COLLABORATIVE = "44943-9";
 	public static final String MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_CHALLENGES = "44941-3";
+	
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

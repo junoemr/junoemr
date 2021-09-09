@@ -29,22 +29,31 @@ import {
 }
     from "../../../../common/components/junoComponentConstants";
 
+    import {DemographicApi} from "../../../../../generated";
+
 angular.module('Record.Details').component('demographicContactsSection', {
     templateUrl: 'src/record/details/components/demographicContactsSection/demographicContactsSection.jsp',
     bindings: {
         ngModel: "=",
         componentStyle: "<?"
     },
-    controller: ["staticDataService",
+    controller: [
         "$uibModal",
+        "$http",
+        "$httpParamSerializer",
         "$stateParams",
-        "demographicService",
-        function (staticDataService,
-                  $uibModal,
-                  $stateParams,
-                  demographicService)
+        function ($uibModal,
+                  $http,
+                  $httpParamSerializer,
+                  $stateParams,)
         {
             let ctrl = this;
+            const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
+
+            ctrl.category = {
+                PERSONAL: "personal",
+                PROFESSIONAL: "professional",
+            };
 
             ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.GREY;
             ctrl.LABEL_POSITION = LABEL_POSITION;
@@ -60,45 +69,60 @@ angular.module('Record.Details').component('demographicContactsSection', {
             ctrl.$onInit = () =>
             {
                 ctrl.thisDemo = $stateParams.demographicNo;
-                demographicService.getDemographicContacts(ctrl.thisDemo, "personal").then(
-                    function success(data)
-                    {
-                        ctrl.demoContacts = (data);
+
+                demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PERSONAL).then(
+                    (data) => {
+                        ctrl.demoContacts = (data.data.body);
                     },
-                    function error(error)
-                    {
-                        Juno.Common.Util.alert("Unable to retrieve contacts", error);
+                    () => {
+                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not retrieve personal contacts');
                     });
 
-                demographicService.getDemographicContacts(ctrl.thisDemo, "professional").then(
-                    function success(data)
-                    {
-                        ctrl.demoContactPros = (data);
+                demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PROFESSIONAL).then(
+                    (data) => {
+                        ctrl.demoContactPros = (data.data.body);
                     },
-                    function error(error)
-                    {
-                        Juno.Common.Util.alert("Unable to retrieve contacts", error);
-                    }
-                );
+                    () => {
+                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not retrieve professional contacts');
+                    });
             }
 
             ctrl.openContacts = function (demoContact)
             {
-                $uibModal.open(
+                ctrl.dialog = $uibModal.open(
                     {
                         component: 'demographicContactsModal',
                         backdrop: 'static',
                         windowClass: "juno-modal",
                         resolve: {
                             demoContact: demoContact,
+                            demographic: () => ctrl.thisDemo,
                         }
                     });
+
+                ctrl.dialog.result.then(
+                    function onClose(updatedContact)
+                    {
+                        ctrl.demoContacts.forEach((contact, index) =>
+                        {
+                            if (contact.contactId === updatedContact.data.body.contactId)
+                            {
+                                ctrl.demoContacts[index] = updatedContact.data.body;
+                            }
+                        });
+                        ctrl.dialog = null;
+                    },
+                    function onDismiss()
+                    {
+                        ctrl.dialog = null;
+                    }
+                );
             };
 
             ctrl.manageContacts = function manageContacts()
             {
                 let url = "../demographic/Contact.do?method=manage&demographic_no=" + ctrl.thisDemo;
-                window.open(url, "ManageContacts", "width=960, height=700");
+                window.open(url, "ManageContacts");
             };
         }]
 });

@@ -30,22 +30,12 @@ public class StandardMedication extends Medication
 	// prescription details
 	private String brandName;
 	private String genericName;
-
-	// prescription details
-	private String regionalIdentifier;
-	private String unit;
 	private String unitName;
 
 	private Integer gcnSeqNo;
 	private Boolean prn;
-	private Boolean noSubs;
 	private String atc;
-
-	private String dosage;
-	private String strengthAmount;
-	private String strengthUnit;
-
-
+	
 	@Override
 	public String getDrugName()
 	{

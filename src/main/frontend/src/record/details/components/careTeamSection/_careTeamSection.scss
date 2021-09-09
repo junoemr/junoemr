@@ -1,17 +1,17 @@
 .demographic-details-section.care-team-section{
-	.fields {
-		.column {
-			.select-with-button {
-				display: flex;
-				justify-content: center;
+	.details-fields{
 
-				.juno-select {
-					width: 340px;
-				}
+		.select-with-button {
+			display: flex;
+			justify-content: center;
 
-				.juno-button {
-					margin-left: 4px;
-				}
+			.juno-select {
+				width: 350px;
+			}
+
+			.juno-button {
+				margin-left: 4px;
+				width: 76px
 			}
 		}
 	}
