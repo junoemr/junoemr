@@ -40,6 +40,7 @@ import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
  */
 public class OLISHL7Handler implements MessageHandler
 {
+	public static final String ALL_DUPLICATES_MARKER = "All Labs Duplicates";
 	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
 	private int lastSegmentId = 0;
 	
@@ -56,7 +57,7 @@ public class OLISHL7Handler implements MessageHandler
 
 	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider) throws Exception
 	{
-		String lastTimeStampAccessed = null;
+		String lastTimeStampAccessed = ALL_DUPLICATES_MARKER;
 		RouteReportResults results = new RouteReportResults();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT);
 
@@ -116,6 +117,9 @@ public class OLISHL7Handler implements MessageHandler
 
 	private String getLatest(DateTimeFormatter dateTimeFormatter, String timeStamp1, String timeStamp2)
 	{
+		timeStamp1 = (ALL_DUPLICATES_MARKER.equals(timeStamp1)) ? null : timeStamp1;
+		timeStamp2 = (ALL_DUPLICATES_MARKER.equals(timeStamp2)) ? null : timeStamp2;
+
 		if(timeStamp1 == null && timeStamp2 == null)
 		{
 			return null;

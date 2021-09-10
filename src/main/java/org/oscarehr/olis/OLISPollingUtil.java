@@ -63,6 +63,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
+import static oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler.ALL_DUPLICATES_MARKER;
 
 public class OLISPollingUtil
 {
@@ -180,7 +181,7 @@ public class OLISPollingUtil
 	private static void updateProviderStartTime(@NotNull OLISProviderPreferences olisProviderPreferences, String timeStampForNextStartDate)
 	{
 		logger.info("timeSlot "+timeStampForNextStartDate);
-		if(timeStampForNextStartDate != null)
+		if(StringUtils.isNotBlank(timeStampForNextStartDate) && !ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
 		{
 			olisProviderPreferences.setStartTime(timeStampForNextStartDate);
 		}
