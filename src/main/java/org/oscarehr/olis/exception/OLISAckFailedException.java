@@ -26,8 +26,14 @@ import lombok.Getter;
 
 public class OLISAckFailedException extends OLISException
 {
+	public enum QAKStatus {
+		OK, // data found, no errors
+		NF, // no data found, no errors
+		AE, // application error
+		AR, // application reject
+	}
 	@Getter
-	private final String statusCode;
+	private final QAKStatus statusCode;
 
 	public OLISAckFailedException()
 	{
@@ -40,7 +46,24 @@ public class OLISAckFailedException extends OLISException
 	public OLISAckFailedException(String message, String statusCode)
 	{
 		super(message);
-		this.statusCode = statusCode;
+		this.statusCode = QAKStatus.valueOf(statusCode);
+	}
+
+	public boolean isStatusOK()
+	{
+		return this.getStatusCode().equals(QAKStatus.OK);
+	}
+	public boolean isStatusNotFound()
+	{
+		return this.getStatusCode().equals(QAKStatus.NF);
+	}
+	public boolean isStatusRejection()
+	{
+		return this.getStatusCode().equals(QAKStatus.AR);
+	}
+	public boolean isStatusError()
+	{
+		return this.getStatusCode().equals(QAKStatus.AE);
 	}
 
 	@Override
