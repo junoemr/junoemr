@@ -1353,17 +1353,24 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getMsgDate() {
-		//return
-		//Temporary fix until we change how the MessageUploader grabs the observation date.
-
-		try {
-			String dateString = getCollectionDateTime(0);
-			return dateString.substring(0, 19);
-		} catch (Exception e) {
+	public String getMsgDate()
+	{
+		try
+		{
+			String dateString = get("/.OBR-7");
+			if(dateString.length() == 8)
+			{
+				return formatDate(dateString);
+			}
+			else
+			{
+				return formatDateTime(dateString).substring(0, 19);
+			}
+		}
+		catch(Exception e)
+		{
 			return ("");
 		}
-
 	}
 
 	@Override

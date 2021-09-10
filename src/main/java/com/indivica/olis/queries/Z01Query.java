@@ -9,9 +9,6 @@
 
 package com.indivica.olis.queries;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.indivica.olis.parameters.OBR16;
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.OBR25;
@@ -34,13 +31,16 @@ import com.indivica.olis.parameters.ZPD1;
 import com.indivica.olis.parameters.ZPD3;
 import com.indivica.olis.parameters.ZRP1;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Z01 - Retrieve Laboratory Information for Patient
  * @author jen
  *
  */
-public class Z01Query extends Query {
-
+public class Z01Query extends DateRangeQuery
+{
 	private OBR22 startEndTimestamp = null;
 	private OBR7 earliestLatestObservationDateTime = null;
 	private QRD7 quantityLimitedRequest = null;
@@ -141,6 +141,7 @@ public class Z01Query extends Query {
 		
 	}
 
+	@Override
 	public void setStartEndTimestamp(OBR22 startEndTimestamp) {
     	this.startEndTimestamp = startEndTimestamp;
     }

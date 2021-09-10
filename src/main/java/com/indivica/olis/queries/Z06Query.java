@@ -19,8 +19,8 @@ import com.indivica.olis.parameters.ZPD1;
  * @author jen
  *
  */
-public class Z06Query extends Query {
-
+public class Z06Query extends DateRangeQuery
+{
 	private OBR22 startEndTimestamp = new OBR22(); // mandatory
 	private QRD7 quantityLimitedRequest = null;
 	private ORC21 orderingFacilityId = new ORC21(); // mandatory
@@ -44,7 +44,8 @@ public class Z06Query extends Query {
 		
 		return query;
 	}
-	
+
+	@Override
 	public void setStartEndTimestamp(OBR22 startEndTimestamp) {
     	this.startEndTimestamp = startEndTimestamp;
     }

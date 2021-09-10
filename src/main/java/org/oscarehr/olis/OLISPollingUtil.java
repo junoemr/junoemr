@@ -1,4 +1,3 @@
-package org.oscarehr.olis;
 /**
  * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -22,11 +21,13 @@ package org.oscarehr.olis;
  * Hamilton
  * Ontario, Canada
  */
+package org.oscarehr.olis;
 
 import com.indivica.olis.Driver;
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.ORC21;
 import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.queries.DateRangeQuery;
 import com.indivica.olis.queries.Z04Query;
 import com.indivica.olis.queries.Z06Query;
 import org.apache.commons.lang.StringUtils;
@@ -116,14 +117,7 @@ public class OLISPollingUtil
 	    			continue;
 	    		}
 	    		
-		    	OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(providerId);
-
-		    	// Creating OBR22 for this request.
-			    if(olisProviderPreferences == null)
-			    {
-				    olisProviderPreferences = new OLISProviderPreferences();
-				    olisProviderPreferences.setProviderId(providerId);
-			    }
+		    	OLISProviderPreferences olisProviderPreferences = findOrCreateOLISProviderPrefs(providerId);
 
 				Z04Query providerQuery = new Z04Query();
 				// Setting HIC for Z04 Request
@@ -139,14 +133,8 @@ public class OLISPollingUtil
 
 				logger.info("Query OLIS for provider " + providerId);
 				Pair<ZonedDateTime, ZonedDateTime> startEnd = findStartEndTimestamps(olisProviderPreferences);
-				String timeStampForNextStartDate = queryDateRange(loggedInInfo, providerQuery, startEnd.getLeft(), startEnd.getRight());
-
-				if(timeStampForNextStartDate != null)
-				{
-					olisProviderPreferences.setStartTime(timeStampForNextStartDate);
-				}
-
-				olisProviderPreferencesDao.saveEntity(olisProviderPreferences);
+				String timeStampForNextStartDate = queryAndImportDateRange(loggedInInfo, providerQuery, startEnd.getLeft(), startEnd.getRight());
+				updateProviderStartTime(olisProviderPreferences, timeStampForNextStartDate);
 			}
 			catch(Exception e)
 			{
@@ -154,7 +142,52 @@ public class OLISPollingUtil
 			}
 		}
 	}
-	private static String queryDateRange(LoggedInInfo loggedInInfo, Z04Query query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
+
+	private static void pollZ06Query(LoggedInInfo loggedInInfo, String facilityId)
+	{
+		try
+		{
+			OLISProviderPreferences olisProviderPreferences = findOrCreateOLISProviderPrefs(ProviderData.SYSTEM_PROVIDER_NO);
+
+			Z06Query facilityQuery = new Z06Query();
+			ORC21 orc21 = new ORC21();
+			orc21.setValue(6, 2, "^"+facilityId);
+			orc21.setValue(6, 3, "^ISO");
+			facilityQuery.setOrderingFacilityId(orc21);
+
+			logger.info("Query OLIS for facility " + facilityId);
+			Pair<ZonedDateTime, ZonedDateTime> startEnd = findStartEndTimestamps(olisProviderPreferences);
+			String timeStampForNextStartDate = queryAndImportDateRange(loggedInInfo, facilityQuery, startEnd.getLeft(), startEnd.getRight());
+			updateProviderStartTime(olisProviderPreferences, timeStampForNextStartDate);
+		}
+		catch(Exception e)
+		{
+			logger.error("Error polling OLIS for facility", e);
+		}
+	}
+
+	private static OLISProviderPreferences findOrCreateOLISProviderPrefs(@NotNull String providerId)
+	{
+		OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(providerId);
+		if(olisProviderPreferences == null)
+		{
+			olisProviderPreferences = new OLISProviderPreferences();
+			olisProviderPreferences.setProviderId(providerId);
+		}
+		return olisProviderPreferences;
+	}
+
+	private static void updateProviderStartTime(@NotNull OLISProviderPreferences olisProviderPreferences, String timeStampForNextStartDate)
+	{
+		logger.info("timeSlot "+timeStampForNextStartDate);
+		if(timeStampForNextStartDate != null)
+		{
+			olisProviderPreferences.setStartTime(timeStampForNextStartDate);
+		}
+		olisProviderPreferencesDao.saveEntity(olisProviderPreferences);
+	}
+
+	private static String queryAndImportDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
 	{
 		OBR22 obr22 = buildRequestStartEndTimestamp(startDateTime, endDateTime);
 		query.setStartEndTimestamp(obr22);
@@ -182,7 +215,7 @@ public class OLISPollingUtil
 				if(nextStartDateTime.isBefore(ZonedDateTime.now()))
 				{
 					logger.info("OLIS response returned no data, checking next date range");
-					timeStampForNextStartDate = queryDateRange(loggedInInfo, query, nextStartDateTime, calcEndDate(nextStartDateTime));
+					timeStampForNextStartDate = queryAndImportDateRange(loggedInInfo, query, nextStartDateTime, calcEndDate(nextStartDateTime));
 				}
 				else
 				{
@@ -196,54 +229,10 @@ public class OLISPollingUtil
 				throw olisAckFailedException;
 			}
 		}
-
-		logger.info("timeSlot "+timeStampForNextStartDate);
 		return timeStampForNextStartDate;
 	}
-
-
-	private static void pollZ06Query(LoggedInInfo loggedInInfo, String facilityId)
-	{
-		try
-		{
-			Z06Query facilityQuery = new Z06Query();
-			OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(ProviderData.SYSTEM_PROVIDER_NO);
-			// Creating OBR22 for this request.
-			if(olisProviderPreferences == null)
-			{
-				olisProviderPreferences = new OLISProviderPreferences();
-				olisProviderPreferences.setProviderId(ProviderData.SYSTEM_PROVIDER_NO);
-			}
-			OBR22 obr22 = buildRequestStartEndTimestamp(olisProviderPreferences);
-
-	    	facilityQuery.setStartEndTimestamp(obr22);
-	    	ORC21 orc21 = new ORC21();
-	    	orc21.setValue(6, 2, "^"+facilityId);
-	    	orc21.setValue(6, 3, "^ISO");    	
-	    	facilityQuery.setOrderingFacilityId(orc21);
-	    	
-	    	String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, facilityQuery);
-	    	
-	    	if(!response.startsWith("<Response")){
-	    		logger.debug("Didn't equal response.  Returning "+response);
-				return;
-			}
-	    	
-	    	String timeStampForNextStartDate= OLISPollingUtil.parseAndImportResponse(loggedInInfo, response);
-
-			if(timeStampForNextStartDate != null)
-			{
-				olisProviderPreferences.setStartTime(timeStampForNextStartDate);
-			}
-			olisProviderPreferencesDao.saveEntity(olisProviderPreferences);
-		}
-		catch(Exception e)
-		{
-			logger.error("Error polling OLIS for facility", e);
-		}
-    }
 	
-	public static String parseAndImportResponse(LoggedInInfo loggedInInfo, String response) throws Exception
+	private static String parseAndImportResponse(LoggedInInfo loggedInInfo, String response) throws Exception
 	{
 		UUID uuid = UUID.randomUUID();
 		String originalFile = "olis_"+uuid.toString()+".response";
@@ -274,39 +263,6 @@ public class OLISPollingUtil
 		);
 		logger.info("Lab successfully added.");
 		return timeStringForNextStartDate;
-	}
-
-	/**
-	 * build the OLIS query parameter containing the date range of the requested results
-	 * @param olisProviderPreferences provider specific olis data
-	 * @return the OLIS query parameter
-	 */
-	private static OBR22 buildRequestStartEndTimestamp(@NotNull OLISProviderPreferences olisProviderPreferences)
-	{
-		OLISSystemPreferences olisSystemPreferences = olisSystemPreferencesDao.getPreferences();
-		Optional<String> optionalDefaultStartTime = Optional.ofNullable(StringUtils.trimToNull(olisSystemPreferences.getStartTime()));
-		Optional<String> optionalDefaultEndTime = Optional.ofNullable(StringUtils.trimToNull(olisSystemPreferences.getEndTime()));
-
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT);
-
-		Optional<String> prefStartTime = olisProviderPreferences.getOptionalStartDateTime();
-
-		// provider has a start time, so use this and a max end time if needed.
-		String startTimeStr;
-		String endTimeStr;
-		if(prefStartTime.isPresent())
-		{
-			startTimeStr = prefStartTime.get();
-			endTimeStr = calcEndDateStr(dateTimeFormatter, startTimeStr);
-		}
-		else
-		{
-			// use the default start and end time for the initial provider query.
-			startTimeStr = optionalDefaultStartTime
-					.orElseGet(() -> ConversionUtils.toDateTimeString(ZonedDateTime.now().minusMonths(DEFAULT_FETCH_PERIOD_MONTHS), dateTimeFormatter));
-			endTimeStr = optionalDefaultEndTime.orElseGet(() -> calcEndDateStr(dateTimeFormatter, startTimeStr));
-		}
-		return buildRequestStartEndTimestamp(startTimeStr, endTimeStr);
 	}
 
 	private static Pair<ZonedDateTime, ZonedDateTime> findStartEndTimestamps(@NotNull OLISProviderPreferences olisProviderPreferences)
@@ -349,7 +305,6 @@ public class OLISPollingUtil
 	{
 		OBR22 obr22 = new OBR22();
 
-		validateDateTimeString(startTimeStr);
 		// only build start date
 		if(StringUtils.isBlank(endTimeStr))
 		{
@@ -357,31 +312,12 @@ public class OLISPollingUtil
 		}
 		else // build start and end date
 		{
-			validateDateTimeString(endTimeStr);
 			List<String> dateList = new LinkedList<>();
 			dateList.add(startTimeStr);
 			dateList.add(endTimeStr);
 			obr22.setStringValue(dateList);
 		}
 		return obr22;
-	}
-
-	/**
-	 * calculate the end date required for the olis query, or null if it is not needed
-	 * @param dateTimeFormatter the formatter for the returned string
-	 * @param startTimeStr the start time string
-	 * @return the end time, or null
-	 */
-	private static String calcEndDateStr(DateTimeFormatter dateTimeFormatter, String startTimeStr)
-	{
-		ZonedDateTime zonedStartTime = ConversionUtils.toZonedDateTime(startTimeStr, dateTimeFormatter);
-		ZonedDateTime maxFetchPeriod = ZonedDateTime.now().minusMonths(MAX_FETCH_PERIOD_MONTHS);
-
-		if(zonedStartTime.isBefore(maxFetchPeriod))
-		{
-			return ConversionUtils.toDateTimeString(zonedStartTime.plusMonths(MAX_FETCH_PERIOD_MONTHS), dateTimeFormatter);
-		}
-		return null;
 	}
 
 	private static ZonedDateTime calcEndDate(@NotNull ZonedDateTime zonedStartTime)
@@ -392,17 +328,5 @@ public class OLISPollingUtil
 			return zonedStartTime.plusMonths(MAX_FETCH_PERIOD_MONTHS);
 		}
 		return null;
-	}
-
-	/**
-	 * basic check to ensure the datetime string is in the correct format
- 	 */
-	private static void validateDateTimeString(String toValidate)
-	{
-		boolean isValid = toValidate.matches("\\d{14}([+-]\\d+)?");
-		if(!isValid)
-		{
-			throw new IllegalArgumentException("Malformed OLIS date: " + toValidate);
-		}
 	}
 }
