@@ -24,6 +24,7 @@
 
 package org.oscarehr.integration.clinicaid.service;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 
@@ -376,22 +377,20 @@ public class ClinicaidAPIService
 				
 				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
 				{
+					// If billed from the master file, appointmentNo = 0 aka no/unknown appointment;
 					Integer appointmentNo = NumberUtils.toInt(request.getParameter("appointment_no"), 0);
 					Appointment appointment = appointmentDao.find(appointmentNo);
-					site = siteDao.findByName(appointment.getLocation());
+					if (appointment != null)
+					{
+						site = siteDao.findByName(appointment.getLocation());
+					}
 				}
 				
-				String facilityNumber = getBCFacilityNumber(providerData, Optional.ofNullable(site));
-				if (facilityNumber != null)
-				{
-					data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
-				}
+				Optional<String> facilityNumber = getBCFacilityNumber(providerData, site);
+				facilityNumber.ifPresent(facNo -> data.put("facility_number", StringUtils.trimToEmpty(facNo)));
 				
-				String serviceLocationCode = getBCServiceLocationCode(providerData, Optional.ofNullable(site));
-				if (facilityNumber != null)
-				{
-					data.put("service_location_cd", serviceLocationCode);
-				}
+				Optional<String> serviceLocationCode = getBCServiceLocationCode(providerData, site);
+				serviceLocationCode.ifPresent(slc -> data.put("service_location_cd", slc));
 			}
 
 			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
@@ -420,19 +419,24 @@ public class ClinicaidAPIService
 	 * @param site Optional site associated with the appointment being billing
 	 * @return SLC code as a String of length 1, otherwise null if it can't be determined.
 	 */
-	private String getBCServiceLocationCode(ProviderData provider, Optional<Site> site)
+	private Optional<String> getBCServiceLocationCode(ProviderData provider, @Nullable Site site)
 	{
+		String serviceLocationCode = null;
+		
 		if (ConversionUtils.hasContent(provider.getBillingOpts().getBcServiceLocationCode()))
 		{
-			return provider.getBillingOpts().getBcServiceLocationCode();
+			serviceLocationCode = provider.getBillingOpts().getBcServiceLocationCode();
 		}
-		
-		if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site.isPresent())
+		else if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site != null)
 		{
-			return site.get().getBcServiceLocationCode();
+			serviceLocationCode =  site.getBcServiceLocationCode();
+		}
+		else
+		{
+			serviceLocationCode = OscarProperties.getInstance().getProperty("service_location_code", null);
 		}
 		
-		return OscarProperties.getInstance().getProperty("service_location_code", null);
+		return Optional.ofNullable(serviceLocationCode);
 	}
 	
 	
@@ -444,19 +448,19 @@ public class ClinicaidAPIService
 	 * @param site Optional site associated with the appointment being billed
 	 * @return facilty number if found, otherwise null.
 	 */
-	private String getBCFacilityNumber(ProviderData provider, Optional<Site> site)
+	private Optional<String> getBCFacilityNumber(ProviderData provider, @Nullable Site site)
 	{
 		// Default facility number
 		String facilityNumber = null;
 		
-		if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site.isPresent())
+		if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site != null)
 		{
-			ProviderSitePK key = new ProviderSitePK(String.valueOf(provider.getProviderNo()), site.get().getId());
+			ProviderSitePK key = new ProviderSitePK(String.valueOf(provider.getProviderNo()), site.getId());
 			ProviderSite provSite = provSiteDao.find(key);
 				
 			if (provSite != null && provSite.isBcBCPEligible())
 			{
-				facilityNumber = site.get().getBcFacilityNumber();
+				facilityNumber = site.getBcFacilityNumber();
 			}
 		}
 		else
@@ -468,6 +472,6 @@ public class ClinicaidAPIService
 			}
 		}
 		
-		return facilityNumber;
+		return Optional.ofNullable(facilityNumber);
 	}
 }
