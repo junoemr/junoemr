@@ -77,6 +77,9 @@ public class HRMSftpService
 	@Autowired
 	private HRMReportProcessor processor;
 	
+	@Autowired
+	private HRMScheduleService scheduleController;
+	
 	public synchronized HRMFetchResults pullHRMFromSource()
 	{
 		JSch jsch = new JSch();
@@ -103,13 +106,19 @@ public class HRMSftpService
 			sftp.connect();
 			sftp.cd(REMOTE_PATH);
 			Vector<ChannelSftp.LsEntry> remoteDirectoryContents = sftp.ls(".");
+			results.setLoginSuccess(true);
 			
 			List<ChannelSftp.LsEntry> remoteFiles = remoteDirectoryContents.stream()
 			                                                               .filter(entry -> !entry.getAttrs().isDir())
 			                                                               .collect(Collectors.toList());
 			
 			downloadedFiles = downloadFiles(sftp, remoteFiles, dateSubDirectory, true);
+			
+			boolean allFilesDownloaded = downloadedFiles.size() == remoteFiles.size();
+			results.setDownloadSuccess(allFilesDownloaded);
 			results.setReportsDownloaded(downloadedFiles.size());
+			
+			
 		}
 		catch (JSchException | SftpException e)
 		{
@@ -129,6 +138,8 @@ public class HRMSftpService
 			}
 		}
 		
+		int processedFiles = 0;
+		
 		if (downloadedFiles != null && !downloadedFiles.isEmpty())
 		{
 			List<GenericFile> decryptedFiles = decryptFiles(downloadedFiles, dateSubDirectory);
@@ -136,15 +147,22 @@ public class HRMSftpService
 			for (GenericFile hrmFile : decryptedFiles)
 			{
 				boolean success = processor.processHRMFile_43(hrmFile);
-				
 				if (success)
 				{
-					results.setReportsProcessed(results.getReportsProcessed() + 1);
+					processedFiles++;
 				}
 			}
 		}
 		
+		if (downloadedFiles != null && processedFiles == downloadedFiles.size())
+		{
+			results.setProcessingSuccess(true);
+		}
+		
+		results.setReportsProcessed(processedFiles);
 		results.setEndTime(LocalDateTime.now());
+		
+		scheduleController.setLastFetchResults(results);
 		return results;
 	}
 	
@@ -194,7 +212,6 @@ public class HRMSftpService
 		long elapsed = ChronoUnit.MILLIS.between(start, LocalDateTime.now());
 		
 		logger.info(String.format("Downloaded HRM File in %d ms: %s", elapsed, remoteFile.getFilename()));
-		LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, remoteFile.getFilename());
 		
 		return tempFile;
 	}

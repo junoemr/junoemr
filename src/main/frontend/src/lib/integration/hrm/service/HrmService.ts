@@ -27,14 +27,14 @@ import HrmFetchResults from "../model/HrmFetchResults";
 
 export default class HrmService
 {
-    protected _HRMDocumentAPI: any;
+    protected _HRMSchedulerAPI: any;
 
     // ==========================================================================
     // Public Methods
     // ==========================================================================
 
     public constructor() {
-        this._HRMDocumentAPI = new HrmApi(
+        this._HRMSchedulerAPI = new HrmApi(
             angular.injector(["ng"]).get("$http"),
             angular.injector(["ng"]).get("$httpParamSerializer"),
             API_BASE_PATH);
@@ -42,7 +42,14 @@ export default class HrmService
 
     public async fetchNewHRMDocuments(): Promise<any>
     {
-        const rawResponse = await this._HRMDocumentAPI.fetchNewDocuments();
+        const rawResponse = await this._HRMSchedulerAPI.fetchNewDocuments();
         return new HrmFetchResults(rawResponse.data.body);
     }
+
+    public async getLastResults(): Promise<any>
+    {
+        const rawResponse = await this._HRMSchedulerAPI.getLastFetchStatus();
+        return new HrmFetchResults(rawResponse.data.body);
+    }
+
 }

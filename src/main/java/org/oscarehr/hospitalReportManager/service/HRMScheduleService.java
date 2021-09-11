@@ -23,6 +23,7 @@
 
 package org.oscarehr.hospitalReportManager.service;
 
+import lombok.Synchronized;
 import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
@@ -37,10 +38,12 @@ import java.util.concurrent.TimeoutException;
 public class HRMScheduleService
 {
 	@Autowired
-	private TaskScheduler scheduler;
+	TaskScheduler scheduler;
 	
 	@Autowired
 	HRMSftpService hrmSftpService;
+	
+	private HRMFetchResults lastFetchResults = null;
 	
 	public void scheduleRegularFetch(int intervalSeconds)
 	{
@@ -50,8 +53,22 @@ public class HRMScheduleService
 		scheduler.schedule(() -> hrmSftpService.pullHRMFromSource() , fetchSchedule);
 	}
 	
+	@Synchronized
 	public HRMFetchResults scheduleFetchNow() throws InterruptedException, ExecutionException, TimeoutException
 	{
-		return hrmSftpService.pullHRMFromSource();
+		hrmSftpService.pullHRMFromSource();
+		return this.lastFetchResults;
+	}
+	
+	@Synchronized
+	protected void setLastFetchResults(HRMFetchResults results)
+	{
+		this.lastFetchResults = results;
+	}
+	
+	@Synchronized
+	public HRMFetchResults getLastFetchResults()
+	{
+		return this.lastFetchResults;
 	}
 }

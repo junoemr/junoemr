@@ -41,6 +41,10 @@ public class HRMFetchResults
 	private LocalDateTime startTime = LocalDateTime.now();
 	private LocalDateTime endTime = null;
 	
+	private boolean loginSuccess = false;
+	private boolean downloadSuccess = false;
+	private boolean processingSuccess = false;
+	
 	Duration getDuration()
 	{
 		if (endTime == null)

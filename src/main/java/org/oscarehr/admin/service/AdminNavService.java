@@ -614,14 +614,17 @@ public class AdminNavService
 			integrationItems.add(new AdminNavItemTo1("iMD Health", "imdHealth"));
 		}
 
+
 		integrationItems.add(new AdminNavItemTo1("REST Clients", "frame?frameUrl=" + contextPath + "/admin/api/clients.jsp"));
 		integrationItems.add(new AdminNavItemTo1("REST API", "frame?frameUrl=" + contextPath + "/admin/api/api.jsp"));
+		/*
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("provider.btnSetIntegratorPreferences"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/setProviderStaleDate.do?method=viewIntegratorProperties")));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.sendOruR01"), "frame?frameUrl=" + contextPath + "/lab/CA/ALL/sendOruR01.jsp"));
-
+		*/
+		
 		if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM))
 		{
-			integrationItems.add(new AdminNavItemTo1("Hospital Report Manager (HRM)", "hrmAdmin"));
+			integrationItems.add(new AdminNavItemTo1("Health Report Manager (HRM)", "hrmAdmin"));
 		}
 		
 		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)
@@ -663,7 +666,8 @@ public class AdminNavService
 			integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.Know2ActConfig"), "frame?frameUrl=" + contextPath + "/web/Know2actConfiguration.jsp"));
 		}
 		
-		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.integratorPush"), "frame?frameUrl=" + contextPath + "/admin/integratorPushStatus.jsp"));
+		// integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.integratorPush"), "frame?frameUrl=" + contextPath + "/admin/integratorPushStatus.jsp"));
+		
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.born"), "frame?frameUrl=" + contextPath + "/admin/born.jsp"));
 
 		if (securityInfoManager.isSuperAdmin(providerNo))

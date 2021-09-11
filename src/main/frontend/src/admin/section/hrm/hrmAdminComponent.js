@@ -24,7 +24,8 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";;
 import SystemPreferenceService from "../../../lib/system/service/SystemPreferenceService";
 import HrmService from "../../../lib/integration/hrm/service/HrmService";
-import {HRMFetchResultsStatus} from "../../../lib/integration/hrm/model/HrmFetchResults";
+import {HRMStatus} from "../../../lib/integration/hrm/model/HrmFetchResults";
+import moment from "moment";
 
 angular.module('Admin.Section').component('hrmAdmin',
 	{
@@ -44,15 +45,21 @@ angular.module('Admin.Section').component('hrmAdmin',
 			
 			ctrl.working = false;
 			
+			ctrl.latestResults = null;
+			
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 			
 			ctrl.$onInit = async () => {
-				let propertyValues = await systemPreferenceService.getProperties("omd.hrm.user",
+				ctrl.latestResults = await hrmService.getLastResults();
+				
+				let propertyValues = await systemPreferenceService.getProperties(
+					"omd.hrm.user",
 					"omd.hrm.address",
 					"omd.hrm.port",
 					"omd.hrm.remote_path",
-					"omd.hrm.poll_interval_sec");
+					"omd.hrm.poll_interval_sec"
+				);
 				
 				ctrl.user = propertyValues["omd.hrm.user"];
 				ctrl.address = propertyValues["omd.hrm.address"];
@@ -65,31 +72,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 				try
 				{
 					ctrl.working = true;
-					let message = "";
-					
-					const results = await hrmService.fetchNewHRMDocuments();
-					
-					
-					if (results.statusSummary() === HRMFetchResultsStatus.NEW_DOCUMENTS_FETCHED)
-					{
-						message = `${results.reportsDownloadedCount} reports downloaded
-							${results.reportsProcessedCount()} reports processed
-							
-							(${results.durationMS()}ms)`;
-					}
-					else
-					{
-						message = `No new reports found
-						
-						(${results.durationMS()}ms)`;
-					}
-					
-					Juno.Common.Util.successAlert($uibModal, "Finished", message);
-					
-				}
-				catch (e)
-				{
-					Juno.Common.Util.errorAlert($uibModal, "Error", "There was an error connecting to the OMD HRM service");
+					ctrl.latestResults = await hrmService.fetchNewHRMDocuments();
 				}
 				finally
 				{
@@ -97,6 +80,48 @@ angular.module('Admin.Section').component('hrmAdmin',
 				}
 			}
 			
+			ctrl.getSummaryText = (hrmStatus) =>
+			{
+				if (hrmStatus === HRMStatus.SUCCESS)
+				{
+					return "OK: No problems detected";
+				}
+				else if (hrmStatus === HRMStatus.HAS_ERRORS)
+				{
+					return "WARNING: One or more documents had problems. Consult the security log or contact support for assistance";
+				}
+				else
+				{
+					return "ERROR. Please contact support for assistance";
+				}
+			}
+			
+			ctrl.getSummaryClass = (hrmStatus) =>
+			{
+				
+				if (hrmStatus === HRMStatus.SUCCESS)
+				{
+					return "ok";
+				}
+				else if (hrmStatus === HRMStatus.HAS_ERRORS)
+				{
+					return "warn";
+				}
+				else
+				{
+					return "error";
+				}
+			}
+			
+			ctrl.lastCheckedAsMinutesAgo = () =>
+			{
+				if (ctrl.latestResults)
+				{
+					return "-";
+				}
+				
+				const duration = moment.duration(moment().diff(ctrl.latestResults.endTime));
+				return Math.floor(duration.asMinutes());
+			}
 		}]
-
 	});

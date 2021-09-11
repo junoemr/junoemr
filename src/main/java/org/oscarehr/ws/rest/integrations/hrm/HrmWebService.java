@@ -31,6 +31,7 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -48,10 +49,18 @@ public class HrmWebService extends AbstractServiceImpl
 	HRMScheduleService scheduleService;
 	
 	@POST
-	@Path("/")
+	@Path("/scheduler/")
 	public RestResponse<HRMFetchResults> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
 	{
 		HRMFetchResults results = scheduleService.scheduleFetchNow();
+		return RestResponse.successResponse(results);
+	}
+	
+	@GET
+	@Path("/scheduler/")
+	public RestResponse<HRMFetchResults> getLastFetchStatus() throws InterruptedException, ExecutionException, TimeoutException
+	{
+		HRMFetchResults results = scheduleService.getLastFetchResults();
 		return RestResponse.successResponse(results);
 	}
 }

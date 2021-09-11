@@ -25,56 +25,95 @@ import {Moment} from "moment";
 import moment from "moment";
 import {HRMFetchResults} from "../../../../../generated";
 
-export enum HRMFetchResultsStatus
+export enum HRMStatus
 {
-    NO_DOCUMENTS_FETCHED,
-    NEW_DOCUMENTS_FETCHED
+    ERROR = -1,
+    HAS_ERRORS,
+    SUCCESS
 }
 
-export default class HrmFetchResults {
-
-    private _reportsDownloaded: number;
-    private _reportsProcessed: number;
-    private _startTime: Moment;
-    private _endTime: Moment;
+export default class HrmFetchResults
+{
+    readonly _reportsDownloaded: number;
+    readonly _reportsProcessed: number;
+    readonly _startTime: Moment;
+    readonly _endTime: Moment;
+    readonly _loginSuccess: boolean;
+    readonly _downloadSuccess: boolean;
+    readonly _processingSuccess: boolean;
 
     public constructor(transfer: HRMFetchResults)
     {
         this._reportsProcessed = transfer.reportsProcessed;
         this._reportsDownloaded = transfer.reportsDownloaded;
 
+        this._loginSuccess = transfer.loginSuccess;
+        this._downloadSuccess = transfer.downloadSuccess;
+        this._processingSuccess = transfer.processingSuccess;
+
         this._startTime = moment(transfer.startTime);
         this._endTime = moment(transfer.endTime);
     }
 
-    get reportsDownloadedCount(): number {
+    get reportsDownloadedCount(): number
+    {
         return this._reportsDownloaded;
     }
 
-    get reportsProcessedCount(): number {
+    get reportsProcessedCount(): number
+    {
         return this._reportsProcessed;
     }
 
-    get startTime(): Moment {
+    get startTime(): Moment
+    {
         return this._startTime;
     }
 
-    get endTime(): Moment {
+    get endTime(): Moment
+    {
         return this._endTime;
     }
 
-    public durationMS(): number {
+    public durationMS(): number
+    {
         return this._endTime.diff(this._startTime);
     }
 
-    public statusSummary(): HRMFetchResultsStatus {
-        if (this._reportsDownloaded === 0)
+    public getLoginSummary(): HRMStatus
+    {
+        return this._loginSuccess ? HRMStatus.SUCCESS : HRMStatus.ERROR;
+    }
+
+    public getDownloadSummary(): HRMStatus
+    {
+        if (this._downloadSuccess)
         {
-            return HRMFetchResultsStatus.NO_DOCUMENTS_FETCHED;
+            return HRMStatus.SUCCESS;
         }
         else
         {
-            return HRMFetchResultsStatus.NEW_DOCUMENTS_FETCHED;
+            if (this._reportsDownloaded > 0)
+            {
+                return HRMStatus.HAS_ERRORS;
+            }
+            return HRMStatus.ERROR;
+        }
+    }
+
+    public getProcessingSummary(): HRMStatus
+    {
+        if (this._processingSuccess)
+        {
+            return HRMStatus.SUCCESS;
+        }
+        else
+        {
+            if (this._reportsProcessed > 0)
+            {
+                return HRMStatus.HAS_ERRORS;
+            }
+            return HRMStatus.ERROR;
         }
     }
 }
