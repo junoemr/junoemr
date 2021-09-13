@@ -36,6 +36,7 @@ angular.module('Patient.Search').component('patientSearchComponent',
 		'$state',
 		'$stateParams',
 		'$uibModal',
+		'$timeout',
 		'NgTableParams',
 		'demographicsService',
 		'focusService',
@@ -44,6 +45,7 @@ angular.module('Patient.Search').component('patientSearchComponent',
 			$state,
 			$stateParams,
 			$uibModal,
+			$timeout,
 			NgTableParams,
 			demographicsService,
 			focusService)
@@ -85,10 +87,15 @@ angular.module('Patient.Search').component('patientSearchComponent',
 			};
 			controller.$postLink = () =>
 			{
-				if(controller.searchTermRef)
+				// wrapped in a timeout because ref does not properly initialize at this phase when inside a transclude for some reason
+				$timeout(function ()
 				{
-					focusService.focusRef(controller.searchTermRef);
-				}
+					// could be null if permission check fails
+					if (controller.searchTermRef)
+					{
+						focusService.focusRef(controller.searchTermRef);
+					}
+				}, 0);
 			}
 
 			//=========================================================================

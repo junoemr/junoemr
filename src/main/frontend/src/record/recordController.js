@@ -646,8 +646,8 @@ angular.module('Record').controller('Record.RecordController', [
 
 			var url = "../billing.do?billRegion=" + encodeURIComponent(controller.page.billregion);
 			url += "&billForm=" + encodeURIComponent(controller.page.defaultView);
-			url += "&demographic_name=" + encodeURIComponent(demo.lastName + "," + demo.firstName);
-			url += "&demographic_no=" + demo.demographicNo;
+			url += "&demographic_name=" + encodeURIComponent(controller.demographic.lastName + "," + controller.demographic.firstName);
+			url += "&demographic_no=" + controller.demographicNo;
 			url += "&providerview=" + user.providerNo + "&user_no=" + user.providerNo;
 			url += "&appointment_no=" + apptNo + "&apptProvider_no=" + apptProvider;
 			url += "&appointment_date=" + apptDate + "&start_time=" + apptStartTime;

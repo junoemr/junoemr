@@ -146,7 +146,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		controller.saveEnabled = () =>
 		{
-			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.PREFERENCE_UPDATE);
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.PreferenceUpdate);
 		}
 		controller.save = function()
 		{
