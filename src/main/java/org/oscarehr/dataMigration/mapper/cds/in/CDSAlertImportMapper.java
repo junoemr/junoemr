@@ -47,6 +47,7 @@ public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndS
 		if(reminderNote.getNoteText().isEmpty())
 		{
 			logEvent("Reminder Note [" + reminderNote.getObservationDate() + "] has no text value");
+			reminderNote.setNoteText("Imported Reminder Note with no Description. See annotation for note.");
 		}
 
 		reminderNote.setAnnotation(StringUtils.trimToEmpty(importStructure.getNotes()));

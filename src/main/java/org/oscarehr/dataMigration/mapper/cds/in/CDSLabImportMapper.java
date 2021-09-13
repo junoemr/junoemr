@@ -232,7 +232,11 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	{
 		String name = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
 		String testCode = StringUtils.trimToNull(importLabResults.getLabTestCode());
-
+		/*
+		Return "{testCode} : {name}" if both exist
+		else return "{testCode}" or "{name}" if one exists.
+		If neither exist, return UNKNOWN_OBX_NAME
+		 */
 		if (name != null && testCode != null)
 		{
 			return testCode + " : " + name;
@@ -240,6 +244,10 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		else if (name == null && testCode != null)
 		{
 			return testCode;
+		}
+		else if (name != null)
+		{
+			return name;
 		}
 		return UNKNOWN_OBX_NAME;
 	}
