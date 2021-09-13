@@ -193,7 +193,8 @@ public class OLISPollingUtil
 		OBR22 obr22 = buildRequestStartEndTimestamp(startDateTime, endDateTime);
 		query.setStartEndTimestamp(obr22);
 
-		logger.info("Submit OLIS query for date range: " + ConversionUtils.toDateTimeString(startDateTime) + " to " + ConversionUtils.toDateTimeString(endDateTime));
+		logger.info("Submit OLIS query for date range: " + ConversionUtils.toDateTimeString(startDateTime) +
+				" to " + ((endDateTime != null) ? ConversionUtils.toDateTimeString(endDateTime) : " present"));
 		String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, query);
 
 		if(!response.startsWith("<Response"))
@@ -207,22 +208,19 @@ public class OLISPollingUtil
 		try
 		{
 			timeStampForNextStartDate = OLISPollingUtil.parseAndImportResponse(loggedInInfo, labTempFile);
+
+			// force recursive call attempt if response has labs but all are duplicates. Otherwise polling will get stuck.
+			if(ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
+			{
+				timeStampForNextStartDate = queryAndImportNextDateRange(loggedInInfo, query, startDateTime, endDateTime);
+			}
 		}
 		catch(OLISAckFailedException olisAckFailedException)
 		{
 			// if no results found, and we are not polling up to the current datetime, advance the query dates and try again
 			if(olisAckFailedException.isStatusNotFound())
 			{
-				ZonedDateTime nextStartDateTime = Optional.ofNullable(endDateTime).orElse(startDateTime.plusMonths(MAX_FETCH_PERIOD_MONTHS));
-				if(nextStartDateTime.isBefore(ZonedDateTime.now()))
-				{
-					logger.info("OLIS response returned no data, checking next date range");
-					timeStampForNextStartDate = queryAndImportDateRange(loggedInInfo, query, nextStartDateTime, calcEndDate(nextStartDateTime));
-				}
-				else
-				{
-					logger.info("OLIS response returned no data, up to date");
-				}
+				timeStampForNextStartDate = queryAndImportNextDateRange(loggedInInfo, query, startDateTime, endDateTime);
 			}
 			else
 			{
@@ -243,6 +241,22 @@ public class OLISPollingUtil
 			}
 		}
 
+		return timeStampForNextStartDate;
+	}
+
+	private static String queryAndImportNextDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
+	{
+		String timeStampForNextStartDate = null;
+		ZonedDateTime nextStartDateTime = Optional.ofNullable(endDateTime).orElse(startDateTime.plusMonths(MAX_FETCH_PERIOD_MONTHS));
+		if(nextStartDateTime.isBefore(ZonedDateTime.now()))
+		{
+			logger.info("OLIS response returned no new data, checking next date range...");
+			timeStampForNextStartDate = queryAndImportDateRange(loggedInInfo, query, nextStartDateTime, calcEndDate(nextStartDateTime));
+		}
+		else
+		{
+			logger.info("OLIS response returned no new data, up to date");
+		}
 		return timeStampForNextStartDate;
 	}
 

@@ -37,16 +37,20 @@ public class OLISAckFailedException extends OLISException
 
 	public OLISAckFailedException()
 	{
-		this(null, null);
+		this(null, (QAKStatus) null);
 	}
 	public OLISAckFailedException(String message)
 	{
-		this(message, null);
+		this(message, (QAKStatus) null);
 	}
 	public OLISAckFailedException(String message, String statusCode)
 	{
+		this(message, QAKStatus.valueOf(statusCode));
+	}
+	public OLISAckFailedException(String message, QAKStatus statusCode)
+	{
 		super(message);
-		this.statusCode = QAKStatus.valueOf(statusCode);
+		this.statusCode = statusCode;
 	}
 
 	public boolean isStatusOK()
