@@ -278,6 +278,28 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.$onInit = function init()
 			{
+				// resolve data from opener
+				controller.loadedSettings = controller.resolve.loadedSettings;
+				controller.parentScope = controller.resolve.parentScope;
+				controller.keyBinding = controller.resolve.keyBinding;
+				controller.editMode = controller.resolve.editMode;
+				var focus = controller.resolve.focus;
+				var data = controller.resolve.data;
+
+				$scope.events = data.events;
+				$scope.scheduleId = data.scheduleId;
+
+				controller.sitesEnabled = controller.parentScope.hasSites();
+
+				controller.keyBinding.bindKeyGlobal("ctrl+enter", $scope.keyBindSettings["ctrl+enter"]);
+				controller.keyBinding.bindKeyGlobal("ctrl+shift+enter", $scope.keyBindSettings["ctrl+shift+enter"]);
+
+
+				// load required data
+				controller.loadAppointmentReasons();
+				controller.loadAppointmentTypes();
+				controller.providerModel.loadData(data.scheduleId);
+
 				if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
 				{
 					$timeout(function ()
@@ -307,28 +329,6 @@ angular.module('Schedule').component('eventComponent', {
 						return true;
 					}),
 				};
-
-				// resolve data from opener
-				controller.loadedSettings = controller.resolve.loadedSettings;
-				controller.parentScope = controller.resolve.parentScope;
-				controller.keyBinding = controller.resolve.keyBinding;
-				controller.editMode = controller.resolve.editMode;
-				var focus = controller.resolve.focus;
-				var data = controller.resolve.data;
-
-				$scope.events = data.events;
-				$scope.scheduleId = data.scheduleId;
-
-				controller.sitesEnabled = controller.parentScope.hasSites();
-
-				controller.keyBinding.bindKeyGlobal("ctrl+enter", $scope.keyBindSettings["ctrl+enter"]);
-				controller.keyBinding.bindKeyGlobal("ctrl+shift+enter", $scope.keyBindSettings["ctrl+shift+enter"]);
-
-
-				// load required data
-				controller.loadAppointmentReasons();
-				controller.loadAppointmentTypes();
-				controller.providerModel.loadData(data.scheduleId);
 
 				var momentStart = data.startTime;
 				var momentEnd = data.endTime;
