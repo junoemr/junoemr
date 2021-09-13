@@ -29,7 +29,7 @@
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-			             disabled="$ctrl.isLoading || !$ctrl.userCanCreate()"
+			             disabled="$ctrl.isLoading || !$ctrl.userCanCreateClinicLevel()"
 			             click="$ctrl.onCareTrackerNew()">
 				New Care Tracker
 			</juno-button>

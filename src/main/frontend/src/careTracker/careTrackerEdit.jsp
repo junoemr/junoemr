@@ -47,6 +47,10 @@
 			</div>
 		</div>
 	</div>
+	<div ng-if="$ctrl.careTracker.systemManaged" class="alert alert-info">
+		<i class="icon icon-info-circle"></i>
+		<span>This is a system managed flowsheet and cannot be edited</span>
+	</div>
 	<div class="flex-row flex-grow">
 		<div class="flex-column width-25 row-padding-r">
 			<juno-input label="Care Tracker Name"
