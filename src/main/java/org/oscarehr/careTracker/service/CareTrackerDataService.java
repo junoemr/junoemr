@@ -294,12 +294,20 @@ public class CareTrackerDataService
 			CareTrackerItem careTrackerItem,
 			CareTrackerItemDataCreateTransfer itemData)
 	{
-		// parse numeric types as a double to both ensure their formatting and standardize the double string format. this removes valid cases like '.5'
 		String value = itemData.getValue();
 		if(careTrackerItem.isNumericValueType())
 		{
-			Double numericValue = Double.parseDouble(value);
-			value = String.valueOf(numericValue);
+			// parse numeric types as a double/long to both ensure their formatting and standardize the double string format. this removes valid cases like '.5'
+			if(value.contains("."))
+			{
+				Double numericValue = Double.parseDouble(value);
+				value = String.valueOf(numericValue);
+			}
+			else
+			{
+				Long numericValue = Long.parseLong(value);
+				value = String.valueOf(numericValue);
+			}
 		}
 
 		List<String> validationErrors = measurementsService.getValidationErrors(careTrackerItem.getTypeCode(), value);
