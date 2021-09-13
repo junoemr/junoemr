@@ -40,12 +40,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryResults>, List<Lab>>
 {
 	public static final String UNKNOWN_OBR_NAME = "UNKNOWN TEST TYPE";
-	public static final String UNKNOWN_OBX_ID = "UNKNOWN ID";
+	public static final String UNKNOWN_OBX_ID = "UNKNOWN_ID";
 	public static final String UNKNOWN_OBX_NAME = "UNKNOWN TEST NAME";
 
 	public CDSLabImportMapper()
@@ -255,11 +256,23 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	private String getOBXId(LaboratoryResults importLabResults)
 	{
 		String id = StringUtils.trimToNull(importLabResults.getLabTestCode());
-		if(id == null)
+		if(id != null)
 		{
-			id = UNKNOWN_OBX_ID;
+			// This is the ideal outcome, where the other EMR gave us a LabTestCode
+			return id;
 		}
-		return id;
+
+		String name = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
+		if (name != null)
+		{
+			// Less ideal, use the TestNameReportedByLab as the LabTestCode if it exists
+			return name;
+		}
+
+		// Least ideal, generate a unique LabTestCode
+		// The UUID ensures that each test is considered unique and won't be grouped together with
+		// other labs missing the ID when viewing /lab/CA/ON/labValues.jsp
+		return UNKNOWN_OBX_ID + UUID.randomUUID().toString().replace("-", "");
 	}
 
 	protected Hl7TextInfo.REPORT_STATUS getReportStatusEnum(LaboratoryResults laboratoryResults)
