@@ -112,7 +112,8 @@ public class HRMReportProcessor
 		catch (Exception e)
 		{
 			logger.error(String.format("Could not process HRM file: %s", hrmFile.getPath()), e);
-			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_PARSE, LogConst.CON_HRM, LogConst.STATUS_FAILURE, hrmFile.getName());
+			
+			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, null, LogConst.ACTION_PROCESS, LogConst.CON_HRM, LogConst.STATUS_FAILURE, hrmFile.getName(), null,  e.getMessage());
 			return false;
 		}
 	}

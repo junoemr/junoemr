@@ -37,20 +37,21 @@ angular.module('Admin.Section').component('hrmAdmin',
 			let systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
 			let hrmService = new HrmService();
 			
+			ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
+			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+			
 			ctrl.user = "";
 			ctrl.address = "";
 			ctrl.port = "";
 			ctrl.remotePath = "";
 			ctrl.interval = 0;
-			
 			ctrl.working = false;
-			
 			ctrl.latestResults = null;
 			
-			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
-			
 			ctrl.$onInit = async () => {
+				ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
+				
 				ctrl.latestResults = await hrmService.getLastResults();
 				
 				let propertyValues = await systemPreferenceService.getProperties(
@@ -88,7 +89,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 				}
 				else if (hrmStatus === HRMStatus.HAS_ERRORS)
 				{
-					return "WARNING: One or more documents had problems. Consult the security log or contact support for assistance";
+					return "WARNING: One or more documents had problems. \nConsult the security log or contact support for assistance";
 				}
 				else
 				{
@@ -115,7 +116,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 			
 			ctrl.lastCheckedAsMinutesAgo = () =>
 			{
-				if (ctrl.latestResults)
+				if (!ctrl.latestResults)
 				{
 					return "-";
 				}

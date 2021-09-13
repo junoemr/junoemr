@@ -122,7 +122,7 @@ public class HRMSftpService
 		}
 		catch (JSchException | SftpException e)
 		{
-			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_LOGIN, LogConst.CON_HRM, LogConst.STATUS_FAILURE, "");
+			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_LOGIN, LogConst.CON_HRM, LogConst.STATUS_FAILURE, e.getMessage());
 			logger.error("Error connecting to HRM sftp", e);
 		}
 		finally
@@ -186,7 +186,8 @@ public class HRMSftpService
 			{
 				GenericFile downloadedFile = downloadRemoteFile(sftp, remoteFile, dateSubDirectory);
 				downloadedFiles.add(downloadedFile);
-				LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, remoteFile.getFilename());
+				
+				LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, null, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, remoteFile.getFilename(), null,  null);
 				
 				if (deleteAfterDownload)
 				{
@@ -197,7 +198,7 @@ public class HRMSftpService
 			{
 				// Any exception downloading the file leaves it on the server
 				logger.error("Could not download remote HRM file: " + remoteFile.getFilename(), e);
-				LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_FAILURE, remoteFile.getFilename());
+				LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, null, LogConst.ACTION_DOWNLOAD, LogConst.CON_HRM, LogConst.STATUS_FAILURE, remoteFile.getFilename(), null,  e.getMessage());
 			}
 		}
 		
@@ -261,7 +262,7 @@ public class HRMSftpService
 		catch (Exception e)
 		{
 			logger.error("Could not decrypt file: " + encryptedFile.getPath(), e);
-			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, LogConst.ACTION_DECRYPT, LogConst.CON_HRM, LogConst.STATUS_FAILURE, encryptedFile.getName());
+			LogAction.addLogEntry(Provider.SYSTEM_PROVIDER_NO, null, LogConst.ACTION_PROCESS, LogConst.CON_HRM, LogConst.STATUS_FAILURE, encryptedFile.getName(), null,  "Decryption error");
 			return null;
 		}
 	}

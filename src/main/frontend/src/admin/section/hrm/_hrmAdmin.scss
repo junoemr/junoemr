@@ -31,9 +31,13 @@
           background: $semantic-error-base;
         }
       }
+
+      .status-text {
+        white-space: pre-line;
+      }
     }
 
-    .summary-metrics {
+    .summary-footer {
       p {
         @include juno-font-body-smallest;
         margin: 4px 0 0 0;
