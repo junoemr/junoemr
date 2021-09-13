@@ -386,10 +386,11 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		return '#CCCCFF';
 	};
 
-	this.getEncounterSectionUrl = function getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset)
+	this.getEncounterSectionUrl = function getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset, eChartUUID)
 	{
 		var limitString = "";
 		var offsetString = "";
+		var echartUuidString = "";
 
 		if (limit !== null)
 		{
@@ -401,8 +402,13 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			offsetString = "&offset=" + offset;
 		}
 
+		if(eChartUUID !== null)
+		{
+			echartUuidString = '&eChartUUID=' + eChartUUID;
+		}
+
 		return "../ws/rs/encounterSections/" + demographicNo + "/section/" + sectionName + "/?appointmentNo=" +
-			appointmentNo + limitString + offsetString;
+			appointmentNo + limitString + offsetString + echartUuidString;
 	};
 
 	this.displayNotes = function displayNotes(demographicNo, noteArray, noteToEdit, tmpSave, issues, scrollToBottom, offset)
