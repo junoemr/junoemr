@@ -72,13 +72,13 @@ angular.module('CareTracker').component('careTrackerEdit',
 					if($stateParams.careTrackerId)
 					{
 						ctrl.careTracker = await careTrackerApiService.getCareTracker($stateParams.careTrackerId);
+						ctrl.readOnly = ctrl.careTracker.systemManaged || !ctrl.userCanEdit();
 					}
 					else
 					{
 						ctrl.careTracker = new CareTrackerModel();
+						ctrl.readOnly = ctrl.careTracker.systemManaged || !ctrl.userCanCreate();
 					}
-
-					ctrl.readOnly = ctrl.careTracker.systemManaged || !ctrl.userCanEdit();
 					ctrl.isLoading = false;
 				}
 
@@ -317,6 +317,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 						if (ctrl.isNewCareTracker())
 						{
 							ctrl.careTracker = await careTrackerApiService.createCareTracker(ctrl.careTracker);
+							ctrl.readOnly = ctrl.careTracker.systemManaged || !ctrl.userCanEdit();
 						}
 						else
 						{
