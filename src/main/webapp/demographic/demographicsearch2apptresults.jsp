@@ -311,7 +311,8 @@ function searchAll() {
 
 var fullname="";
 <%-- RJ 07/10/2006 Need to pass doctor of patient back to referrer --%>
-function addName(demographic_no, lastname, firstname, chartno, messageID, doctorNo, remoteFacilityId) {
+<%-- existingContactDummyParams is there to make this compatible with addNameCaisi() --%>
+function addName(demographic_no, lastname, firstname, chartno, messageID, existingContactsDummyParam, doctorNo, remoteFacilityId) {
   fullname=lastname+","+firstname;
 
    if (remoteFacilityId == '')
@@ -458,7 +459,7 @@ function addNameCaisi(demographic_no, lastname, firstname, chartno, messageID, e
 		  DemographicTransfer demographicTransfer=matchingDemographicTransferScore.getDemographicTransfer();
 %>
 		   <tr style="background-color: <%=bgColor%>" onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';" onMouseout="this.style.backgroundColor='<%=bgColor%>';"
-			   onClick="document.forms[0].demographic_no.value=<%=demographicTransfer.getCaisiDemographicId()%>;addName('<%=demographicTransfer.getCaisiDemographicId()%>','<%=URLEncoder.encode(demographicTransfer.getLastName())%>','<%=URLEncoder.encode(demographicTransfer.getFirstName())%>','','<%=request.getParameter("messageId")%>','<%=demographicTransfer.getCaisiProviderId()%>','<%=demographicTransfer.getIntegratorFacilityId()%>')">
+			   onClick="document.forms[0].demographic_no.value=<%=demographicTransfer.getCaisiDemographicId()%>;addName('<%=demographicTransfer.getCaisiDemographicId()%>','<%=URLEncoder.encode(demographicTransfer.getLastName())%>','<%=URLEncoder.encode(demographicTransfer.getFirstName())%>','','<%=request.getParameter("messageId")%>', null,'<%=demographicTransfer.getCaisiProviderId()%>','<%=demographicTransfer.getIntegratorFacilityId()%>')">
 			<td class="demoId" colspan="8">
 				<input type="submit" class="mbttn" name="demographic_no" value="Integrator <%=CaisiIntegratorManager.getRemoteFacility(loggedInInfo, loggedInInfo.getCurrentFacility(), demographicTransfer.getIntegratorFacilityId()).getName()%>:<%=demographicTransfer.getCaisiDemographicId()%>" />
             </td>
