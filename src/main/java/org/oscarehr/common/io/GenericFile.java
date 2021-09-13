@@ -90,6 +90,7 @@ public class GenericFile
 
 	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
 	public static final String HRM_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("HRM_BASE_DIR")).getPath();
+	public static final String LAB_BASE_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("LAB_BASE_DIR")).getPath();
 
 	public static final String LOG_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("LOG_BASE_DIR")).getPath();
 	public static final String LOG_IMPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_IMPORT_DIR")).getPath();
@@ -150,6 +151,10 @@ public class GenericFile
 	public boolean moveToOriginal() throws IOException
 	{
 		return moveFile(DOCUMENT_ORIGINAL_DIR);
+	}
+	public boolean moveToLabs() throws IOException
+	{
+		return moveFile(LAB_BASE_DIR);
 	}
 	public boolean moveToLogImport(String identifier) throws IOException
 	{

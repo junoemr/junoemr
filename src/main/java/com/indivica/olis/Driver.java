@@ -38,8 +38,6 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.Store;
 import org.bouncycastle.util.encoders.Base64;
 import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
@@ -59,10 +57,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -170,8 +166,6 @@ public class Driver
 					request.setAttribute("signedData", signedData);
 					request.setAttribute("unsignedResponse", unsignedData);
 				}
-
-				writeToFile(unsignedData);
 				readResponseFromXML(request, unsignedData);
 
 				return unsignedData;
@@ -437,19 +431,5 @@ public class Driver
 
 		String sentToString = messageData.createSentToString(sendToProviderListData);
 		messageData.sendMessage2(message, "OLIS Retrieval Error", "System", sentToString, "-1", sendToProviderListData, null, null, OscarMsgType.GENERAL_TYPE);
-	}
-
-	static void writeToFile(String data)
-	{
-		try
-		{
-			InputStream inputStream = new ByteArrayInputStream(data.getBytes());
-			GenericFile tempFile = FileFactory.createTempFile(inputStream, "_olis_response.xml");
-			//TODO where to keep these files?
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-		}
 	}
 }

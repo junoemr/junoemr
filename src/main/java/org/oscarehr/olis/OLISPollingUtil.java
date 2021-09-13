@@ -36,6 +36,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.olis.dao.OLISProviderPreferencesDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
@@ -49,7 +51,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
-import oscar.oscarLab.ca.all.util.Utilities;
 import oscar.util.ConversionUtils;
 
 import javax.validation.constraints.NotNull;
@@ -60,7 +61,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 import static oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler.ALL_DUPLICATES_MARKER;
@@ -180,9 +180,9 @@ public class OLISPollingUtil
 
 	private static void updateProviderStartTime(@NotNull OLISProviderPreferences olisProviderPreferences, String timeStampForNextStartDate)
 	{
-		logger.info("timeSlot "+timeStampForNextStartDate);
 		if(StringUtils.isNotBlank(timeStampForNextStartDate) && !ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
 		{
+			logger.info("set provider time slot: "+timeStampForNextStartDate);
 			olisProviderPreferences.setStartTime(timeStampForNextStartDate);
 		}
 		olisProviderPreferencesDao.saveEntity(olisProviderPreferences);
@@ -203,9 +203,10 @@ public class OLISPollingUtil
 		}
 
 		String timeStampForNextStartDate = null;
+		GenericFile labTempFile = writeLabFileTempFile(response);
 		try
 		{
-			timeStampForNextStartDate = OLISPollingUtil.parseAndImportResponse(loggedInInfo, response);
+			timeStampForNextStartDate = OLISPollingUtil.parseAndImportResponse(loggedInInfo, labTempFile);
 		}
 		catch(OLISAckFailedException olisAckFailedException)
 		{
@@ -221,7 +222,6 @@ public class OLISPollingUtil
 				else
 				{
 					logger.info("OLIS response returned no data, up to date");
-
 				}
 			}
 			else
@@ -230,39 +230,49 @@ public class OLISPollingUtil
 				throw olisAckFailedException;
 			}
 		}
+		finally
+		{
+			// don't keep unused files - it will fill up the server fast
+			if(timeStampForNextStartDate == null || ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
+			{
+				labTempFile.deleteFile();
+			}
+			else
+			{
+				labTempFile.moveToLabs();
+			}
+		}
+
 		return timeStampForNextStartDate;
 	}
-	
-	private static String parseAndImportResponse(LoggedInInfo loggedInInfo, String response) throws Exception
-	{
-		UUID uuid = UUID.randomUUID();
-		String originalFile = "olis_"+uuid.toString()+".response";
-		String hl7Filename = "olis_"+uuid.toString()+".hl7";
-		//write full response to disk, this will make diagnosing issues easier
-		Utilities.saveFile(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), originalFile);
 
+	private static GenericFile writeLabFileTempFile(String response) throws Exception
+	{
 		//Get HL7 Content from xml
 		String responseContent =  OLISUtils.getOLISResponseContent(response);
-		//Write HL7 file to disk.
-		String fileLocation = Utilities.saveFile(
-				new ByteArrayInputStream(responseContent.getBytes(StandardCharsets.UTF_8)), hl7Filename);
+		return FileFactory.createTempFile(new ByteArrayInputStream(responseContent.getBytes(StandardCharsets.UTF_8)), "-olis-response.hl7");
+	}
 
+	private static String parseAndImportResponse(LoggedInInfo loggedInInfo, GenericFile labTempFile) throws Exception
+	{
 		String labType = OLIS_MESSAGE_TYPE;
 		String serviceName = "OLIS_HL7";
 		String providerNumber = String.valueOf(ProviderLabRoutingDao.PROVIDER_UNMATCHED);
 		logger.debug("Lab Type: " + labType);
-		logger.debug("Lab file path: " + fileLocation);
+		logger.debug("Lab file path: " + labTempFile.getPath());
 
 		LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
 		String timeStringForNextStartDate = labHandlerService.importLab(
 				labType,
 				loggedInInfo,
 				serviceName,
-				fileLocation,
+				labTempFile.getPath(),
 				providerNumber,
 				null
 		);
-		logger.info("Lab successfully added.");
+
+		String message = (ALL_DUPLICATES_MARKER.equals(timeStringForNextStartDate)) ? "Lab processed, only found duplicates." : "Lab successfully added.";
+		logger.info(message);
 		return timeStringForNextStartDate;
 	}
 
