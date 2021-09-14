@@ -44,6 +44,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.time.LocalDate;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -272,5 +273,66 @@ public class CDSMedicationImportMapperTest
 		medicationsAndTreatments.setQuantity(amount);
 
 		assertEquals(expectedEndDate, cdsMedicationImportMapper.getEndDate(medicationsAndTreatments).toLocalDate());
+	}
+
+	@Test
+	public void testgetDosageMinMax_singleNumber()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "1";
+		String[] expected = {"1", "1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_rangeFull()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "1-2";
+		String[] expected = {"1", "2"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_rangeLowerOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "1-";
+		String[] expected = {"1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_rangeUpperOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "-1";
+		String[] expected = {"", "1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_emptyString()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "";
+		String[] expected = {"", ""};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_dashOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "-";
+		String[] expected = {};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_null()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		assertNull(cdsMedicationImportMapper.getDosageMinMax(null));
 	}
 }

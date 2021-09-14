@@ -22,9 +22,13 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.encounterNote.MedicalHistoryNote;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.PastHealth;
+import xml.cds.v5_0.StandardCoding;
+
+import java.util.List;
 
 @Component
 public class CDSPastHealthExportMapper extends AbstractCDSNoteExportMapper<PastHealth, MedicalHistoryNote>
@@ -40,7 +44,7 @@ public class CDSPastHealthExportMapper extends AbstractCDSNoteExportMapper<PastH
 		PastHealth pastHealth = objectFactory.createPastHealth();
 
 		pastHealth.setPastHealthProblemDescriptionOrProcedures(exportStructure.getNoteText());
-		pastHealth.setDiagnosisProcedureCode(null);//TODO
+		pastHealth.setDiagnosisProcedureCode(generateDiagnosisProcedureCode(exportStructure.getDxIssueCodes())); // TODO: How to deal with multiple codes
 		// use start date field if we can, otherwise use the observation date
 		pastHealth.setOnsetOrEventDate(toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
 		pastHealth.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
@@ -50,6 +54,21 @@ public class CDSPastHealthExportMapper extends AbstractCDSNoteExportMapper<PastH
 		pastHealth.setProblemStatus(exportStructure.getTreatment());
 
 		return pastHealth;
+	}
+
+	/**
+	 * Returns the first code in dxCodesList as a StandardCoding object
+	 * Juno Medical History Notes support multiple codes, but CDS does not
+	 * @param dxCodes list of DxCodes from the Medical History Note
+	 * @return First DxCode in dxCodesList or null
+	 */
+	protected StandardCoding generateDiagnosisProcedureCode(List<DxCode> dxCodes)
+	{
+		if(dxCodes != null && !dxCodes.isEmpty())
+		{
+			return getStandardCoding(dxCodes.get(0));
+		}
+		return null;
 	}
 
 }

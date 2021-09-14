@@ -38,6 +38,7 @@ import static org.oscarehr.prevention.model.PreventionExt.KEY_NAME;
 import static org.oscarehr.prevention.model.PreventionExt.KEY_REASON;
 import static org.oscarehr.prevention.model.PreventionExt.KEY_RESULT;
 import static org.oscarehr.prevention.model.PreventionExt.KEY_ROUTE;
+import static org.oscarehr.prevention.model.PreventionExt.KEY_DIN;
 
 @Component
 public class PreventionModelToDbConverter extends BaseModelToDbConverter<Immunization, Prevention>
@@ -93,6 +94,10 @@ public class PreventionModelToDbConverter extends BaseModelToDbConverter<Immuniz
 		if(input.getResult() != null)
 		{
 			prevention.addExtension(getExt(prevention, KEY_RESULT, input.getResult()));
+		}
+		if (input.getDrugIdentificationNumber() != null)
+		{
+			prevention.addExtension(getExt(prevention, KEY_DIN, input.getDrugIdentificationNumber()));
 		}
 
 		return prevention;

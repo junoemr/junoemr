@@ -31,6 +31,7 @@
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%
 	String id = request.getParameter("id");
+	String demoNo = request.getParameter("demoNo");
     StringUtils.trimToEmpty(id);
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	request.setAttribute("providers",providerDao.getActiveProviders());
@@ -94,7 +95,7 @@
 
 	<input type="hidden" name="contact_<%=id%>.contactId" value="0"/>
 	<input type="text" name="contact_<%=id%>.contactName" id="contact_<%=id%>.contactName" size="20" readonly="readonly"/>
-	<a href="#" onclick="doPersonalSearch('<%=id%>');return false;">${param.search}</a>
+	<a href="#" onclick="doPersonalSearch('<%=id%>', '<%=demoNo%>');return false;">${param.search}</a>
 
 	&nbsp;
 	SDM:<input type="checkbox" name="contact_<%=id%>.sdm"/>

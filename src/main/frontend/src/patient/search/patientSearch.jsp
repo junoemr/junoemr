@@ -26,8 +26,7 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div id="patient-search-page" ng-init="patientSearchCtrl.init()">
-
+<div id="patient-search-page">
 	<div class="patient-search-header vertical-align">
 		<div class="col-lg-12">
 			<h3>
@@ -36,39 +35,39 @@
 		</div>
 	</div>
 
-	<div ng-show="patientSearchCtrl.demographicReadAccess" class="col-lg-12 patient-search-content">
+	<div class="col-lg-12 patient-search-content">
 		<form role="form"
 			  id="search-form"
-			  ng-submit="patientSearchCtrl.searchPatients()">
+			  ng-submit="$ctrl.searchPatients()">
 			<div class="form-group">
 				<div class="row search-filters">
 					<div class="col-sm-3 col-xs-12">
 						<label>Search By</label>
-						<select ng-model="patientSearchCtrl.search.type"
-								ng-change="patientSearchCtrl.clearParams(patientSearchCtrl.search.type)"
+						<select ng-model="$ctrl.search.type"
+								ng-change="$ctrl.onChangeSearchType($ctrl.search.type)"
 								class="form-control">
-							<option value="{{patientSearchCtrl.SEARCH_MODE.Name}}">
+							<option value="{{$ctrl.SEARCH_MODE.Name}}">
 								<bean:message key="patientsearch.type.name" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.SEARCH_MODE.Phone}}">
+							<option value="{{$ctrl.SEARCH_MODE.Phone}}">
 								<bean:message key="patientsearch.type.phone" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.SEARCH_MODE.DOB}}">
+							<option value="{{$ctrl.SEARCH_MODE.DOB}}">
 								<bean:message key="patientsearch.type.dob" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.SEARCH_MODE.Address}}">
+							<option value="{{$ctrl.SEARCH_MODE.Address}}">
 								<bean:message key="patientsearch.type.address" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.SEARCH_MODE.Hin}}">
+							<option value="{{$ctrl.SEARCH_MODE.Hin}}">
 								<bean:message key="patientsearch.type.hin" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.SEARCH_MODE.Email}}">
+							<option value="{{$ctrl.SEARCH_MODE.Email}}">
 								<bean:message key="patientsearch.type.email" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.SEARCH_MODE.ChartNo}}">
+							<option value="{{$ctrl.SEARCH_MODE.ChartNo}}">
 								<bean:message key="patientsearch.type.chartNo" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.SEARCH_MODE.DemographicNo}}">
+							<option value="{{$ctrl.SEARCH_MODE.DemographicNo}}">
 								<bean:message key="patientsearch.type.demographicNo" bundle="ui"/>
 							</option>
 						</select>
@@ -76,22 +75,23 @@
 
 					<div class="col-sm-3 col-xs-12">
 						<label>Search Term</label>
-						<input ng-model="patientSearchCtrl.search.term"
+						<input ng-model="$ctrl.search.term"
+						       ng-ref="$ctrl.searchTermRef"
 							   type="text"
 							   class="form-control"
-							   placeholder="{{patientSearchCtrl.searchTermPlaceHolder}}"/>
+							   placeholder="{{$ctrl.searchTermPlaceHolder}}"/>
 					</div>
 
 					<div class="col-sm-3 col-xs-12">
 						<label>What to Show</label>
-						<select ng-model="patientSearchCtrl.search.status" class="form-control">
-							<option value="{{patientSearchCtrl.STATUS_MODE.ALL}}">
+						<select ng-model="$ctrl.search.status" class="form-control">
+							<option value="{{$ctrl.STATUS_MODE.ALL}}">
 								<bean:message key="patientsearch.showAll" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.STATUS_MODE.ACTIVE}}">
+							<option value="{{$ctrl.STATUS_MODE.ACTIVE}}">
 								<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
 							</option>
-							<option value="{{patientSearchCtrl.STATUS_MODE.INACTIVE}}">
+							<option value="{{$ctrl.STATUS_MODE.INACTIVE}}">
 								<bean:message key="patientsearch.showInactiveOnly" bundle="ui"/>
 							</option>
 						</select>
@@ -106,16 +106,16 @@
 							</a>
 							<ul class="dropdown-menu">
 								<li>
-									<a ng-click="patientSearchCtrl.toggleParam('integrator'); $event.stopPropagation();">
-										<input ng-model="patientSearchCtrl.search.integrator"
+									<a ng-click="$ctrl.toggleParam('integrator'); $event.stopPropagation();">
+										<input ng-model="$ctrl.search.integrator"
 											   type="checkbox"
 											   ng-click="$event.stopPropagation();"/>
 										<bean:message key="patientsearch.includeIntegrator" bundle="ui"/>
 									</a>
 								</li>
 								<li>
-									<a ng-click="patientSearchCtrl.toggleParam('outofdomain'); $event.stopPropagation();">
-										<input ng-model="patientSearchCtrl.search.outofdomain"
+									<a ng-click="$ctrl.toggleParam('outofdomain'); $event.stopPropagation();">
+										<input ng-model="$ctrl.search.outofdomain"
 											   type="checkbox"
 											   ng-click="$event.stopPropagation();"/>
 										<bean:message key="patientsearch.outOfDomain" bundle="ui"/>
@@ -133,7 +133,7 @@
 						</button>
 						<button class="btn btn-default"
 								type="button"
-								ng-click="patientSearchCtrl.clearParams()">
+								ng-click="$ctrl.clearSearchParams()">
 							<bean:message key="global.clear" bundle="ui"/>
 						</button>
 					</div>
@@ -142,14 +142,14 @@
 		</form>
 		<div class="col-xs-6">
 			<button class="btn btn-warning"
-					ng-show="patientSearchCtrl.integratorResults != null && patientSearchCtrl.integratorResults.total > 0"
-					ng-click="patientSearchCtrl.showIntegratorResults()"><span
+					ng-show="$ctrl.integratorResults != null && $ctrl.integratorResults.total > 0"
+					ng-click="$ctrl.showIntegratorResults()"><span
 					class="glyphicon glyphicon-exclamation-sign"></span>
 				<bean:message key="patientsearch.remoteMatches" bundle="ui"/>
 			</button>
 		</div>
 
-		<table ng-table="patientSearchCtrl.tableParams"
+		<table ng-table="$ctrl.tableParams"
 			   show-filter="false"
 			   class="table table-hover table-striped table-bordered"
 			   id="patient-search-table">
@@ -158,7 +158,7 @@
 				ng-mouseover="patient.$selected=true"
 				ng-mouseout="patient.$selected=false"
 				ng-class="{'active': patient.$selected}"
-				ng-click="patientSearchCtrl.loadRecord(patient.demographicNo)">
+				ng-click="$ctrl.loadRecord(patient.demographicNo)">
 
 				<td data-title="'<bean:message key="patientsearch.header.id" bundle="ui"/>'"
 					sortable="'DemographicNo'">
@@ -180,8 +180,7 @@
 				<td data-title="'<bean:message key="patientsearch.header.dob" bundle="ui"/>'"
 					class="text-center"
 					sortable="'DOB'">
-					{{patient.dob| date: 'yyyy-MM-dd'}}
-				</td>
+					{{patient.formattedDOB}}
 				<td data-title="'<bean:message key="patientsearch.header.doctor" bundle="ui"/>'"
 					sortable="'ProviderName'">
 					{{patient.providerName}}
@@ -204,14 +203,5 @@
 			</tbody>
 
 		</table>
-
 	</div>
-
-
-	<div ng-show="patientSearchCtrl.demographicReadAccess !== null && !patientSearchCtrl.demographicReadAccess">
-		<h3 class="text-danger"><span class="glyphicon glyphicon-warning-sign"></span>
-			<bean:message key="patientsearch.access_denied" bundle="ui"/>
-		</h3>
-	</div>
-
 </div>

@@ -1,11 +1,15 @@
 .demographic-contacts-modal {
 
-  .postal-prov {
+  .half-half {
     display: flex;
     align-items: center;
 
     .juno-input {
       width: 172px;
+    }
+    .juno-check-box {
+      margin-top: 28px;
+      margin-left: 16px;
     }
   }
 
@@ -66,14 +70,7 @@
         .juno-button {
           margin-top: 8px;
           width: 64px;
-
-          button {
-            height: 42px;
-          }
-        }
-
-        &:first-child {
-          margin-right: 8px;
+          margin-right: 4px;
         }
       }
     }

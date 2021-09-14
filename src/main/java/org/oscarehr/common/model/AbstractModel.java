@@ -29,6 +29,8 @@ import org.oscarehr.util.MiscUtils;
 
 public abstract class AbstractModel<T> implements java.io.Serializable
 {
+	private static final long serialVersionUID = -7759243407470286513L;
+
 	protected static final String OBJECT_NOT_YET_PERISTED="The object is not persisted yet, this operation requires the object to already be persisted.";
 
 	public abstract T getId();
@@ -56,7 +58,7 @@ public abstract class AbstractModel<T> implements java.io.Serializable
 					return super.hashCode();
 				}
 	        }
-			MiscUtils.getLogger().warn(OBJECT_NOT_YET_PERISTED, new Exception());
+			MiscUtils.getLogger().warn(OBJECT_NOT_YET_PERISTED);
 			return(super.hashCode());
 		}
 
@@ -72,7 +74,7 @@ public abstract class AbstractModel<T> implements java.io.Serializable
 		AbstractModel<T> abstractModel=(AbstractModel<T>)o;
 		if (getId() == null)
 		{
-			MiscUtils.getLogger().warn(OBJECT_NOT_YET_PERISTED, new Exception());
+			MiscUtils.getLogger().warn(OBJECT_NOT_YET_PERISTED);
 		}
 
 		return(getId().equals(abstractModel.getId()));

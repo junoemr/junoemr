@@ -106,7 +106,8 @@ public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immuniz
 	protected ImmunizationType getImmunizationType(Immunization exportStructure)
 	{
 		ImmunizationType immunizationType = null;
-		String preventionType = exportStructure.getPreventionType();
+		// Matching based on generated enum. Enum names can't have dashes so replace dashes with underscores
+		String preventionType = exportStructure.getPreventionType().replaceAll("-", "_");
 		if(EnumUtils.isValidEnumIgnoreCase(ImmunizationType.class, preventionType))
 		{
 			immunizationType = ImmunizationType.valueOf(preventionType.toUpperCase());

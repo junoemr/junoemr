@@ -600,7 +600,7 @@ angular.module('Schedule').component('eventComponent', {
 
 				const defaultAppointmentReason = "Others";
 
-				$scope.scheduleApi.getAppointmentReasons().then(
+				$scope.scheduleApi.getAppointmentReasons(true).then(
 					function success(rawResults)
 					{
 						var results = rawResults.data.body;

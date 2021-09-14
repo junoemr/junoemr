@@ -50,6 +50,7 @@ public class PreventionExt extends AbstractModel<Integer> implements Serializabl
 	public static final String KEY_COMMENT = "comments";
 	public static final String KEY_REASON = "reason";
 	public static final String KEY_RESULT = "result";
+	public static final String KEY_DIN = "din";
 
 	public static final String KEY_RESULT_PENDING = "pending";
 	public static final String KEY_RESULT_NORMAL = "normal";
