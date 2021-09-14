@@ -49,6 +49,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.Optional;
 
 @Path("myhealthaccess/integration/{integrationId}/")
 @Component("PatientWebService")
@@ -75,15 +76,10 @@ public class DemographicWebService extends AbstractServiceImpl
 	{
 		Integration integration = integrationDao.find(integrationId);
 		Demographic demographic = demographicDao.find(Integer.parseInt(demographicNo));
-		try
-		{
-			MHAPatient patient = patientService.getPatient(integration, demographic);
-			return RestResponse.successResponse(new PatientTo1(patient));
-		}
-		catch (RecordNotFoundException | RecordNotUniqueException e)
-		{
-			return RestResponse.successResponse(null);
-		}
+
+		Optional<MHAPatient> patient = patientService.getPatient(integration, demographic);
+		return patient.map((mhaPatient) -> RestResponse.successResponse(new PatientTo1(mhaPatient)))
+				.orElse(RestResponse.successResponse(null));
 	}
 
 	@GET
