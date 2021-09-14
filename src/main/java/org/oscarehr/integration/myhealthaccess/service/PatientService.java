@@ -78,7 +78,7 @@ public class PatientService extends BaseService
 			{
 				try
 				{
-					MHAPatient patient = getConfirmedPatientByDemographicNo(integration, demographicNo);
+					MHAPatient patient = getPatientByDemographicNo(integration, demographicNo);
 					if (patient != null)
 					{
 						return confirmedStatuses.contains(patient.getLinkStatus());
@@ -228,12 +228,12 @@ public class PatientService extends BaseService
 	}
 
 	/**
-	 * get a confirmed MHA patient by demographic number
+	 * get a MHA patient by demographic number
 	 * @param integration - the integration to search
 	 * @param demographicNo - the demographic number to look up.
 	 * @return mha patient object
 	 */
-	public MHAPatient getConfirmedPatientByDemographicNo(Integration integration, Integer demographicNo)
+	public MHAPatient getPatientByDemographicNo(Integration integration, Integer demographicNo)
 	{
 		try
 		{
@@ -288,13 +288,13 @@ public class PatientService extends BaseService
 	 */
 	public MHAPatient getPatient(Integration integration, Demographic demographic)
 	{
-		if (isPatientConfirmed(demographic.getId(), integration))
+		try
 		{
-			return getConfirmedPatientByDemographicNo(integration, demographic.getId());
+			return getPatientByDemographicNo(integration, demographic.getId());
 		}
-		else
+		catch (RecordNotFoundException | RecordNotUniqueException e)
 		{
-			if (StringUtils.trimToNull(demographic.getHin()) != null)
+			if (StringUtils.trimToNull(demographic.getHin()) != null && MHAPatient.isValidProvinceCode(demographic.getHcType()))
 			{
 				return getPatientByHin(
 						integration,
@@ -304,7 +304,7 @@ public class PatientService extends BaseService
 			}
 			else
 			{
-				throw new RecordNotFoundException("Demographic is not confirmed and has no HIN.");
+				throw new RecordNotFoundException("Demographic has no remote id mapping and has no HIN.");
 			}
 		}
 	}
@@ -314,21 +314,7 @@ public class PatientService extends BaseService
 		try
 		{
 			// lookup MHA patient
-			MHAPatient patient = null;
-			// we must consider CLINIC_REJECTED as confirmed to deal with edge case around un_rejecting confirmed patient who's HIN does not match in MHA.
-			if (isPatientConfirmed(demographic.getId(), integration,
-					Arrays.asList(MHAPatient.LINK_STATUS.CONFIRMED, MHAPatient.LINK_STATUS.VERIFIED, MHAPatient.LINK_STATUS.CLINIC_REJECTED)))
-			{
-				patient = getConfirmedPatientByDemographicNo(integration, demographic.getId());
-			}
-			else
-			{
-				patient = getPatientByHin(
-						integration,
-						demographic.getHin(),
-						MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()),
-						demographic.isMarkedAsBCNewborn());
-			}
+			MHAPatient patient = this.getPatient(integration, demographic);
 
 			String action = rejected ? "reject_connection" : "cancel_reject_connection";
 
