@@ -93,7 +93,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 				}
 				else
 				{
-					return "ERROR. Please contact support for assistance";
+					return "ERROR: Please contact support for assistance";
 				}
 			}
 			

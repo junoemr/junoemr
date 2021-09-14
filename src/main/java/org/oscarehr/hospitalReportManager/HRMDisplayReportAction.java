@@ -9,7 +9,6 @@
 
 package org.oscarehr.hospitalReportManager;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +42,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
 
 public class HRMDisplayReportAction extends DispatchAction {
 
@@ -81,9 +81,7 @@ public class HRMDisplayReportAction extends DispatchAction {
                         if (report != null) {
                             request.setAttribute("hrmReport", report);
                             request.setAttribute("hrmReportId", document.getId());
-                            
-                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            request.setAttribute("hrmReportTime", formatter.format(document.getTimeReceived()));
+                            request.setAttribute("hrmReportTime", ConversionUtils.toTimestampString(document.getTimeReceived()));
                             
                             request.setAttribute("hrmDuplicateNum", document.getNumDuplicatesReceived());
 
@@ -165,8 +163,6 @@ public class HRMDisplayReportAction extends DispatchAction {
                             request.setAttribute("dupTimeReceived", dupTimeReceived);
                         }
                     }
-                    
-                    
 		}
 		
 		

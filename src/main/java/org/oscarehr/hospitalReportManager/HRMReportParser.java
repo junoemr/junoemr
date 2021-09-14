@@ -59,11 +59,6 @@ public class HRMReportParser
 			{
 				GenericFile hrmXML = FileFactory.getExistingFile(hrmReportFileLocation);
 				if(!hrmXML.getFileObject().exists())
-				{
-					logger.warn("unable to find the HRM report. checked " + hrmReportFileLocation + ", and in the document_dir");
-					return null;
-				}
-
 				return parseReport(hrmXML, schemaVersion);
 			}
 			catch(SAXException e)
@@ -75,6 +70,7 @@ public class HRMReportParser
 				logger.error("error", e);
 			}
 		}
+		
 		return null;
 	}
 

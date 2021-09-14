@@ -172,6 +172,7 @@ public class HRMSftpService
 	 *
 	 * @param sftp sftp command object
 	 * @param remoteFiles collection of remote files
+	 * @param dateSubDirectory date to use when creating the subdirectory to nest the downloaded files
 	 * @param deleteAfterDownload true to remove each file from the remote server after downloading it
 	 *
 	 * @return a map of temporary files, each associated with it's original filename
