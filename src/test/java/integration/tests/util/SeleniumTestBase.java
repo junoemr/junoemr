@@ -59,10 +59,7 @@ public class SeleniumTestBase
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
-
 	private static final String INTEGRATION_PROPERTIES_FILE = "src/test/resources/integration.properties";
-
-
 
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
