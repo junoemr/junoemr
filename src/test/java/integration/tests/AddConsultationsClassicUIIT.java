@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
@@ -43,8 +42,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
-import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -73,9 +70,6 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 	{
 		String serviceName = "Cardiology";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		/*String currWindowHandle = driver.getWindowHandle();
-		accessEncounterPage(driver);*/
-		//driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		Thread.sleep(5000);
 		String eChartWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]")).click();
@@ -94,13 +88,10 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 
 		//** Verify from Consultations top menu. **
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Consultation_URL);
-		/*PageUtil.switchToWindow(currWindowHandle, driver);
-		driver.findElement(By.id("oscar_aged_consults")).click();*/
 		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 	}
-
 }
 

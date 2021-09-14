@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.apache.commons.lang.StringUtils;
@@ -37,7 +36,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,6 +43,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
+import static integration.tests.util.seleniumUtil.PageUtil.isErrorPage;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -102,17 +101,15 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 	public void addMeasurementsStandardFlowsheetClassicUITest()
 			throws InterruptedException
 	{
+		driver.findElement(By.id("search")).click();
+		PageUtil.switchToLastWindow(driver);
+		driver.findElement(By.xpath("//input[@title='Search active patients']")).click();
+		driver.findElement(By.xpath("//a[@title='Encounter']")).click();
+		PageUtil.switchToLastWindow(driver);
 		// ** Add flowsheets to Disease Registry. **
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		Thread.sleep(5000);
 		String currWindowHandle = driver.getWindowHandle();
 		AddDiseaseRegistryClassicUIIT addDiseaseRegistry = new AddDiseaseRegistryClassicUIIT();
-		/*accessEncounterPage(driver);//driver.get(Navigation.OSCAR_URL + ECHART_URL);
-		Thread.sleep(5000);
-		String currWindowHandle = driver.getWindowHandle();
-		Thread.sleep(100000);
-		AddDiseaseRegistryClassicUITests addDiseaseRegistry = new AddDiseaseRegistryClassicUITests();
-		Thread.sleep(100000);*/
 		addDiseaseRegistry.addDiseaseRegistry();
 
 		//** Add measurements  **
@@ -191,7 +188,7 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.xpath("//span[contains(., '" + iNRSelected + "')]"), driver));
 		Assert.assertTrue("Measurement " + chronicObstructivePulmonarySelected + " from " + flowsheetNameChronicObstructivePulmonary + " is NOT added successfully",
 				PageUtil.isExistsBy(By.xpath("//span[contains(., '" + chronicObstructivePulmonarySelected + "')]"), driver));
-
+/*
 		//** Verify the measurements from eChart Notes **
 		String noteText = driver.findElement(By.id("caseNote_note7")).getText();
 		Assert.assertTrue(hIVSelected + " from " + flowsheetNameHIV + " is NOT added to note successfully",
@@ -209,7 +206,7 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 		Assert.assertTrue(diabetesSelected + " from " + flowsheetNameDiabetes + " is NOT added to note successfully",
 				noteText.contains(noteExpectedA1C));
 	}
-
+*/
 /*
 	@Test
 	public void addMeasurementsCustomizedFlowsheetClassicUITest()
@@ -269,8 +266,10 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 		Thread.sleep(1000);
 		Assert.assertTrue("Measurement Head Circumference is NOT added successfully",
 				PageUtil.isExistsBy(By.xpath("//span[contains(., 'HEAD')]"), driver));
+
+ */
 	}
-*/
+
 	/*@Test
 	public void addMeasurementsCDMIndicatorClassicUITest()
 			throws InterruptedException

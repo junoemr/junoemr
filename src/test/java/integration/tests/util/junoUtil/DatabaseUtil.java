@@ -39,6 +39,9 @@ import org.oscarehr.provider.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import org.springframework.boot.test.context.TestComponent;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;

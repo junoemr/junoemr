@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
@@ -32,16 +31,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.Set;
@@ -115,12 +109,6 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	private void removeExpiryDate(String userName, String providerNo)
 	{
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.getOscarUrl(randomTomcatPort), driver);
-		/*Navigation.doLogin(
-				AuthUtils.TEST_USER_NAME,
-				AuthUtils.TEST_PASSWORD,
-				AuthUtils.TEST_PIN,
-				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);*/
 		String currWindowHandle1 = driver.getWindowHandle();
 		PageUtil.switchToWindow(currWindowHandle1, driver);
 		accessAdministrationSectionClassicUI(driver, "User Management", "Search/Edit/Delete Security Records");
@@ -172,9 +160,6 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		accessLoginApple(currWindowHandle);
 		addLoginRecord(password, drApple.providerNo, pin);
 		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
-		/*Navigation.doLogin(userNameApple, password, pin,
-				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);*/
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]"), driver));
 
 		//Remove expiry date.

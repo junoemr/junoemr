@@ -112,7 +112,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 
 		// window closes, find following URL and verify entry shows
-		driver.get(Navigation.OSCAR_URL + PREVENTION_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_URL);
 
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
@@ -159,7 +159,6 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 	{
 		// *** Add prevention ***
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + EXAM_PREVENTION_URL);
-
 		String originalComments = "I'm a smoking check!";
 
 		// you should be able to do nothing here and hit save, but for testing purposes we'll fill in comments
@@ -167,8 +166,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 
 		// window closes, find following URL and verify entry shows
-		driver.get(Navigation.OSCAR_URL + PREVENTION_URL);
-
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_URL);
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
 		// Click on prevention to edit it

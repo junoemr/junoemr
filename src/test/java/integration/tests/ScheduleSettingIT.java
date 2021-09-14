@@ -25,8 +25,6 @@ package integration.tests;
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
-import integration.tests.util.junoUtil.DatabaseUtil;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.io.IOException;
 import org.junit.After;
@@ -39,9 +37,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -138,11 +134,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 			throws InterruptedException
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		//PageUtil.switchToLastWindow(driver);
-		//driver.switchTo().frame("dynamic-content");
 		driver.switchTo().frame("myFrame");
-		/*driver.findElement(By.linkText("Template Setting")).click();
-		PageUtil.switchToLastWindow(driver);*/
 		switchToNewWindow(driver, By.linkText("Template Setting"), oldWindowHandles);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
@@ -187,17 +179,6 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 			throws Exception
 	{
 		String holidayName = "Happy Monday";
-
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(
-					AuthUtils.TEST_USER_NAME,
-					AuthUtils.TEST_PASSWORD,
-					AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-					driver);
-		}
-
 		// open Schedule Template Setting page
 		accessAdministrationSectionClassicUI(driver, "Schedule Management","Schedule Setting");
 		String currWindowHandle = driver.getWindowHandle();

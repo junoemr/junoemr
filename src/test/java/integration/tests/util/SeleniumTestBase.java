@@ -94,7 +94,7 @@ public class SeleniumTestBase
 	{
 		FirefoxBinary ffb = new FirefoxBinary();
 		FirefoxOptions ffo = new FirefoxOptions();
-		//ffb.addCommandLineOptions("--headless");
+		ffb.addCommandLineOptions("--headless");
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		Navigation.doLogin(

@@ -139,7 +139,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 	@Test
 	public void addAppointmentsSchedulePageTest() throws InterruptedException {
-		Thread.sleep(100000);
+		Thread.sleep(10000);
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
@@ -155,7 +155,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
 
-	/*@Test
+	@Test
 	public void addAppointmentsSchedulePageWeeklyViewTest() throws InterruptedException {
 		//Weekly View - next week
 		driver.findElement(By.xpath("//input[@name='weekview']")).click();
@@ -180,8 +180,6 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
-*/
-/*
 
 	@Test
 	public void addAppointmentsSchedulePageFlipViewTest() throws InterruptedException {
@@ -225,7 +223,6 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
-*/
 
 	@Test
 	public void addAppointmentsSearchToolTest() throws InterruptedException {
@@ -276,7 +273,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.xpath("//img[@title='Here']"), driver));
 	}
 
-	/*@Test
+	@Test
 	public void addAppointmentsGroupViewTest() throws InterruptedException
 	{
 		String groupName = "TestGroup";
@@ -326,6 +323,6 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		Assert.assertTrue(
 				"Appointment with NO demographic selected is NOT added successfully under the second provider.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
-	}*/
+	}
 
 }
