@@ -51,6 +51,7 @@ import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidApiLimitInfoTo1;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
 import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.LoggedInInfo;
@@ -86,6 +87,9 @@ public class ClinicaidAPIService
 	@Autowired
 	private ProviderService providerService;
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+	
 	@Autowired
 	private ClinicDAO clinicDAO;
 
@@ -433,7 +437,7 @@ public class ClinicaidAPIService
 		}
 		else
 		{
-			serviceLocationCode = OscarProperties.getInstance().getProperty("service_location_code", null);
+			serviceLocationCode = systemPreferenceService.getPropertyValue("service_location_code", null);
 		}
 		
 		return Optional.ofNullable(serviceLocationCode);
