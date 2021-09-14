@@ -1,0 +1,2 @@
+UPDATE demographic SET family_doctor=REPLACE(family_doctor, '>null<', '><') WHERE family_doctor LIKE '%null%';
+UPDATE demographic SET family_doctor_2=REPLACE(family_doctor_2, '>null<', '><') WHERE family_doctor_2 LIKE '%null%';
