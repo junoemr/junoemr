@@ -76,7 +76,7 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 
 	public List<ProfessionalSpecialist> findBySearchName(String searchText, int offset, int maxResults, Boolean hideFromView)
 	{
-		String queryString = "SELECT x FROM " + modelClass.getSimpleName() + " x WHERE (x.firstName LIKE :searchText OR x.lastName LIKE :searchText) AND (:hideFromView IS NULL OR x.hideFromView=:hideFromView) ORDER BY x.lastName";
+		String queryString = "SELECT x FROM " + modelClass.getSimpleName() + " x WHERE (x.firstName LIKE :searchText OR x.lastName LIKE :searchText) AND (:hideFromView IS NULL OR x.hideFromView=:hideFromView) ORDER BY x.lastName, x.firstName";
 
 		Query query = entityManager.createQuery(queryString);
 		query.setParameter("searchText", searchText + "%");

@@ -205,4 +205,72 @@ public class CDSConstants
 			return null;
 		}
 	}
+
+	// CT-034
+	public enum TreatmentType
+	{
+		CHRON("CHRON"),
+		ACU("ACU"),
+		ONET("ONET"),
+		PRNLongTerm("PRN Long-term"),
+		PRNShortTerm("PRN Short-term");
+
+		private final String value;
+		TreatmentType(String value)
+		{
+			this.value = value;
+		}
+
+		public String getValue()
+		{
+			return this.value;
+		}
+
+		public static TreatmentType fromValue(String value)
+		{
+			for(TreatmentType status : TreatmentType.values())
+			{
+				if(status.getValue().equalsIgnoreCase(value))
+				{
+					return status;
+				}
+			}
+			return null;
+		}
+	}
+
+	// CT-034
+	public enum PrescriptionStatus
+	{
+		NEW("New"),
+		ACTIVE("Active"),
+		SUSPENDED("Suspended"),
+		ABORTED("Aborted"),
+		COMPLETED("Completed"),
+		OBSOLETE("Obsolete"),
+		NULLIFIED("Nullified");
+
+		private final String value;
+		PrescriptionStatus(String value)
+		{
+			this.value = value;
+		}
+
+		public String getValue()
+		{
+			return this.value;
+		}
+
+		public static PrescriptionStatus fromValue(String value)
+		{
+			for(PrescriptionStatus status : PrescriptionStatus.values())
+			{
+				if(status.getValue().equalsIgnoreCase(value))
+				{
+					return status;
+				}
+			}
+			return null;
+		}
+	}
 }

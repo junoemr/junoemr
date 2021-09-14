@@ -56,6 +56,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /** use &lt;org.oscarehr.appointment.service.Appointment> instead */
 @Deprecated
@@ -419,13 +421,21 @@ public class AppointmentManager {
 		return appointmentStatusDao.findByStatus(status);
 	}
 
-	public List<LookupListItem> getReasons() {
-
-		List<LookupListItem> itemsList = new ArrayList<LookupListItem>();
+	public List<LookupListItem> getReasons(Optional<Boolean> isActive)
+	{
+		List<LookupListItem> itemsList = new ArrayList<>();
 
 		LookupList list = lookupListDao.findByName("reasonCode");
-		if(list != null) {
-			itemsList = list.getItems();
+		if(list != null)
+		{
+			if(isActive.isPresent())
+			{
+				itemsList = list.getItems().stream().filter((item) -> isActive.get().equals(item.isActive())).collect(Collectors.toList());
+			}
+			else
+			{
+				itemsList = list.getItems();
+			}
 		}
 
 		return itemsList;

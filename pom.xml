@@ -221,6 +221,12 @@
 			<version>2.6</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
 			<version>1.3.1</version>
@@ -1855,6 +1861,8 @@
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
+								org.oscarehr.ws.rest.demographic.DemographicContactWebService
+								org.oscarehr.ws.rest.demographic.DemographicContactsWebService
 								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DocumentWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
@@ -2113,6 +2121,7 @@
 								<!-- These should already be included by other jsp files -->
 								<exclude>**/*.jspf</exclude>
 							</excludes>
+							<keepSources>true</keepSources>
 							<threads>4</threads>
 							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
 							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>

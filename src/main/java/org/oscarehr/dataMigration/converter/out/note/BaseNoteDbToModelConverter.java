@@ -42,12 +42,16 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+
+import static org.oscarehr.util.CppUtils.cppCodes;
 
 @Component
 public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 		BaseDbToModelConverter<CaseManagementNote, N>
 {
+	
 	@Autowired
 	private ProviderDataDao providerDao;
 
@@ -97,6 +101,7 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 				.stream()
 				.map((link) -> link.getId().getCaseManagementIssue().getIssue())
 				.distinct()
+				.filter(issue -> !Arrays.asList(cppCodes).contains(issue.getCode()))
 				.forEach((issue) ->
 				{
 					DxCode dxCode = new DxCode();

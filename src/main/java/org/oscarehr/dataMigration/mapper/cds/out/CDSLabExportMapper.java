@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
 import org.oscarehr.dataMigration.model.lab.Lab;
@@ -67,11 +68,22 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 					result.setUnitOfMeasure(labObrResult.getUnits());
 					laboratoryResult.setResult(result);
 				}
-
-				//TODO low/high limits vs text range
+				
 				String range = labObrResult.getRange();
 				LaboratoryResults.ReferenceRange referenceRange = objectFactory.createLaboratoryResultsReferenceRange();
-				referenceRange.setReferenceRangeText(range);
+				String[] splitRange = splitLabReferenceRange(range);
+				
+				// If we can split the range, the set low and high limits.
+				if (splitRange != null)
+				{
+					referenceRange.setLowLimit(splitRange[0]);
+					referenceRange.setHighLimit(splitRange[1]);
+				}
+				else
+				{
+					referenceRange.setReferenceRangeText(range);
+				}
+				
 				laboratoryResult.setReferenceRange(referenceRange);
 
 				laboratoryResult.setLabRequisitionDateTime(toNullableDateTimeFullOrPartial(labObr.getRequestDateTime()));
@@ -99,6 +111,34 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 		}
 
 		return laboratoryResults;
+	}
+	
+	/**
+	 * Helper function to split the LabObrResult reference range string into an array for low and high
+	 * 
+	 * @param range a string representing the lab reference range
+	 * @return      an array if the reference range can be split, otherwise null
+	 */
+	private String[] splitLabReferenceRange(String range)
+	{
+		// If we can split the range, the set high low limit. Else, use text.
+		if (range != null && range.matches(".*-.*"))
+		{
+			String[] splitRange = range.split("-");
+			if (splitRange.length == 2)
+			{
+				splitRange[0] = StringUtils.trimToNull(splitRange[0]);
+				splitRange[1] = StringUtils.trimToNull(splitRange[1]);
+				return splitRange;
+			}
+			else if (splitRange.length == 1)
+			{
+				return new String[] {StringUtils.trimToNull(splitRange[0]), null};
+			} 
+			return null;
+			
+		}
+		return null;
 	}
 
 	private ResultNormalAbnormalFlag getAbnormalFlag(Boolean isAbnormal)

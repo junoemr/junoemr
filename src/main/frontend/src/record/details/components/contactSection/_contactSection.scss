@@ -1,56 +1,61 @@
-.demographic-details-section.contact-section{
-	.fields {
-		.column {
-			.mobile-phone {
-				display: flex;
-				align-items: center;
+.demographic-details-section.contact-section {
 
-				.juno-input {
-					width: 376px;
-				}
-				.juno-check-box {
-					margin-left: 8px;
-				}
+	.mobile-phone {
+		display: flex;
+		align-items: center;
+		width: 430px;
+
+		.juno-input {
+			width: 376px;
+		}
+		.juno-check-box {
+			margin-left: 8px;
+		}
+	}
+
+	.phone-with-ext {
+		display: flex;
+		align-items: center;
+		width: 430px;
+
+		.juno-input {
+			width: 272px;
+		}
+		.phone-ext {
+			margin-left: 0px;
+			.juno-input {
+				width: 100%;
 			}
-
-			.e-messaging-consent {
-				display: flex;
-				align-items: center;
-
-				.juno-select {
-					width: 256px;
-				}
-
-				.consent-date {
-					margin-left: 8px;
-					margin-top: 8px;
-				}
+			label {
+				max-width: 16px;
+				margin-left: 4px;
 			}
+		}
+	}
 
-			.phone-with-ext {
-				display: flex;
-				align-items: center;
+	.phone-with-ext > *:nth-child(2){
+		width: 104px;
+	}
+	.phone-with-ext > *:nth-child(3){
+		margin-left: 8px;
+	}
 
-				.juno-input {
-					width: 248px;
+	.e-messaging-consent {
+		display: flex;
+		align-items: center;
+		width: 440px;
 
-					input {
-						padding: 0 8px 0 16px;
-					}
-				}
-				.phone-ext {
-					.juno-input {
-						width: 128px;
+		.juno-select {
+			width: 290px;
 
-						label {
-							min-width: 32px;
-						}
-					}
-				}
-				.juno-check-box {
-					margin-left: 8px;
-				}
+			label {
+				width: 136px;
 			}
+		}
+
+		.consent-date {
+			margin-left: 8px;
+			margin-top: 8px;
 		}
 	}
 }

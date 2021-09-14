@@ -50,11 +50,7 @@
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
 
-<fmt:parseDate value="${junoEncounterForm.pageData.encounterNoteHideBeforeDate}"
-			   pattern="EEE MMM dd HH:mm:ss z y"
-			   var="encounterNoteHideBeforeDateParsed"/>
-
-<fmt:formatDate value="${encounterNoteHideBeforeDateParsed}"
+<fmt:formatDate value="${junoEncounterForm.pageData.encounterNoteHideBeforeDate}"
 			   pattern="yyyy-MM-dd'T'HH:mm"
 			   var="encounterNoteHideBeforeDateFormatted"/>
 

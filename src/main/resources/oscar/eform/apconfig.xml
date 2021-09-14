@@ -135,12 +135,12 @@
 	<!-- Current eform information -->
 	<databaseap>
 		<ap-name>current_form_id</ap-name>
-		<ap-sql>SELECT '${fid}' AS fid</ap-sql>
+		<ap-sql>SELECT ${fid} AS fid</ap-sql>
 		<ap-output>${fid}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_form_data_id</ap-name>
-		<ap-sql>SELECT '${fdid}' AS fdid</ap-sql>
+		<ap-sql>SELECT ${fdid} AS fdid</ap-sql>
 		<ap-output>${fdid}</ap-output>
 	</databaseap>
 

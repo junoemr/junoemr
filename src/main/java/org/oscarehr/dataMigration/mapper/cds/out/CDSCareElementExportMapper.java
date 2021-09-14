@@ -205,7 +205,7 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	protected DiabetesSelfManagementCollaborative getSelfManagementCollaborative(DiabetesSelfManagementCollaborativeMeasurement exportStructure)
 	{
 		DiabetesSelfManagementCollaborative selfManagementCollaborative = objectFactory.createDiabetesSelfManagementCollaborative();
-		selfManagementCollaborative.setDocumentedGoals(exportStructure.getMeasurementValue());
+		selfManagementCollaborative.setDocumentedGoals(exportStructure.getComments());
 		selfManagementCollaborative.setCodeValue(exportStructure.getMeasurementCode());
 		selfManagementCollaborative.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		return selfManagementCollaborative;

@@ -22,6 +22,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.ws.rest.to.model.ConsultationServiceTo1;
@@ -46,6 +47,15 @@ public class ConsultationServicesToTransferConverter extends AbstractModelConver
 		BeanUtils.copyProperties(domain, transfer, "specialists");
 
 		List<ProfessionalSpecialistTo1> specialists = specialistToTransferConverter.convert(domain.getSpecialists());
+
+		if (specialists != null && specialists.size() > 1)
+		{
+			specialists.sort((specialist1, specialist2) ->
+				StringUtils.compareIgnoreCase(
+						specialist1.getLastName() + specialist1.getFirstName(),
+						specialist2.getLastName() + specialist2.getFirstName())
+			);
+		}
 		transfer.setSpecialists(specialists);
 
 		return transfer;
