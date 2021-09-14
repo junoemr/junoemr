@@ -26,6 +26,7 @@ import integration.tests.util.data.PatientTestCollection;
 import integration.tests.util.data.PatientTestData;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
+import java.util.HashSet;
 import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
