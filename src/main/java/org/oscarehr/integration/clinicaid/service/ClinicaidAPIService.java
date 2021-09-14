@@ -431,7 +431,7 @@ public class ClinicaidAPIService
 		{
 			serviceLocationCode = provider.getBillingOpts().getBcServiceLocationCode();
 		}
-		else if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site != null)
+		else if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site != null && ConversionUtils.hasContent(site.getBcServiceLocationCode()))
 		{
 			serviceLocationCode =  site.getBcServiceLocationCode();
 		}
