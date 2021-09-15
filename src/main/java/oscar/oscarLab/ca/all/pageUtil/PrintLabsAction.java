@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.olis.OLISResultsAction;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -50,6 +51,7 @@ import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import com.lowagie.text.DocumentException;
+import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
 
 /**
  *
@@ -68,19 +70,37 @@ public class PrintLabsAction extends Action{
         String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
         securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.READ, null, "_lab");
 
-        try {
-            MessageHandler handler = Factory.getHandler(request.getParameter("segmentID"));
+        try
+        {
+            String segmentId = request.getParameter("segmentID");
+            MessageHandler handler = Factory.getHandler(segmentId);
             if("CELLPATHR".equals(handler.getHeaders().get(0)))
             {//if it is a VIHA RTF lab
                 response.setContentType("text/rtf");  //octet-stream
-                response.setHeader("Content-Disposition", "attachment; filename=\""+handler.getPatientName().replaceAll("\\s", "_")+"_LabReport.rtf\"");
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + handler.getPatientName().replaceAll("\\s", "_") + "_LabReport.rtf\"");
                 LabPDFCreator pdf = new LabPDFCreator(request, response.getOutputStream());
                 pdf.printRtf();
-            } else {
-	            response.setContentType("application/pdf");  //octet-stream
-	            response.setHeader("Content-Disposition", "attachment; filename=\""+handler.getPatientName().replaceAll("\\s", "_")+"_LabReport.pdf\"");
-	            LabPDFCreator pdf = new LabPDFCreator(request, response.getOutputStream());
-	            pdf.printPdf();
+            }
+            else if(handler instanceof OLISHL7Handler)
+            {
+                //TODO pulled from oscar 19, refactor this somehow
+                String resultUuid = request.getParameter("uuid");
+                if(segmentId == null || segmentId.equals("0"))
+                {
+                    // if viewing in preview from OLIS search, use uuid
+                    handler = OLISResultsAction.searchResultsMap.get(resultUuid);
+                }
+                response.setContentType("application/pdf");  //octet-stream
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + handler.getPatientName().replaceAll("\\s", "_") + "_OLISLabReport.pdf\"");
+                OLISLabPDFCreator pdf = new OLISLabPDFCreator(request, response.getOutputStream());
+                pdf.printPdf();
+            }
+            else
+            {
+                response.setContentType("application/pdf");  //octet-stream
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + handler.getPatientName().replaceAll("\\s", "_") + "_LabReport.pdf\"");
+                LabPDFCreator pdf = new LabPDFCreator(request, response.getOutputStream());
+                pdf.printPdf();
             }
         }catch(DocumentException de) {
             logger.error("DocumentException occurred inside PrintLabsAction", de);

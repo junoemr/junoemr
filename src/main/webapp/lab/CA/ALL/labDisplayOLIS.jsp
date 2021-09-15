@@ -301,7 +301,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
         }
 
         function printPDF(){
-            document.acknowledgeForm.action="PrintOLISLab.do";
+            document.acknowledgeForm.action="PrintPDF.do";
             document.acknowledgeForm.submit();
         }
 
@@ -1471,7 +1471,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         String status = handler.getOBXResultStatus(obr, obx).trim();
                                         String statusMsg = "";
                                         try {
-                                        	 statusMsg = handler.getTestResultStatusMessage(handler.getOBXResultStatus(obr, obx).charAt(0));
+                                        	 statusMsg = OLISHL7Handler.getTestResultStatusMessage(handler.getOBXResultStatus(obr, obx).charAt(0));
                                         }
                                         catch (Exception e) {
                                         	statusMsg = "";

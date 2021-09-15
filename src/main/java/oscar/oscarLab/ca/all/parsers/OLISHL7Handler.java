@@ -1286,7 +1286,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
-	public String getTestResultStatusMessage(char status) {
+	public static String getTestResultStatusMessage(char status) {
 		switch (status) {
 		case 'C':
 			return "Amended";
