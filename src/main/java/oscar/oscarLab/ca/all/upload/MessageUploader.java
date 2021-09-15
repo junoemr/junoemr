@@ -34,23 +34,11 @@
 
 package oscar.oscarLab.ca.all.upload;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.Gender;
 import org.oscarehr.common.OtherIdManager;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
@@ -77,7 +65,6 @@ import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.oscarDemographic.data.DemographicMerged;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
@@ -87,7 +74,22 @@ import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import static org.oscarehr.common.io.FileFactory.createEmbeddedLabFile;
 
@@ -748,5 +750,29 @@ public final class MessageUploader {
 		Document savedDoc = documentService.uploadNewDemographicDocument(document, embeddedLabDoc, null);
 
 		return savedDoc.getDocumentNo();
+	}
+
+	/**
+	 * Taken from Oscar 19 OLIS changes and refactored a bit
+	 */
+	public static Integer willOLISLabReportMatch(String lastName, String firstName, String sex, String dob, String hin)
+	{
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(ConversionUtils.fromDateString(dob));
+
+		List<Demographic> matches = demographicDao.findByAttributes(
+				hin,
+				firstName,
+				lastName,
+				Gender.fromLetterCode(sex),
+				calendar,
+				null, null, null, null, null,
+				0, 2);
+
+		if(matches.size() != 1)
+		{
+			return null;
+		}
+		return matches.get(0).getDemographicNo();
 	}
 }

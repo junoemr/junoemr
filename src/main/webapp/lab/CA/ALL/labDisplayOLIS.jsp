@@ -14,6 +14,7 @@
 <%@ page import="org.oscarehr.olis.OLISResultsAction" %>
 <%@ page import="org.oscarehr.util.AppointmentUtil" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarLab.ca.all.upload.MessageUploader"%>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="oscar.oscarLab.LabRequestReportLink" %>
@@ -26,6 +27,9 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -48,6 +52,8 @@ if(!authed) {
 %>
 
 <%
+	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+
 	String segmentID = request.getParameter("segmentID");
 String originalSegmentID = segmentID;
 String providerNo = request.getParameter("providerNo");
@@ -67,6 +73,7 @@ if(plr != null)
 	demographicID = preview || plr.getDemographicNo() == null ? "" : plr.getDemographicNo().toString();
 }
 
+Integer demographicIDThatWillMatch = null;
 
 if(demographicID != null && !demographicID.equals("")){
     LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr(),demographicID);
@@ -126,6 +133,16 @@ for (String tempId : multiLabId.split(",")) {
 			org.oscarehr.util.MiscUtils.getLogger().error("error",e);
 		}
 	}
+}
+
+if(preview)
+{
+	demographicIDThatWillMatch = MessageUploader.willOLISLabReportMatch(
+			handler.getLastName(),
+			handler.getFirstName(),
+			handler.getSex(),
+			handler.getDOB(),
+			handler.getHealthNum());
 }
 
 // check for errors printing
@@ -284,12 +301,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
         }
 
         function printPDF(){
-            document.acknowledgeForm.action="PrintPDF.do";
+            document.acknowledgeForm.action="PrintOLISLab.do";
             document.acknowledgeForm.submit();
         }
 
 	function linkreq(rptId, reqId) {
-	    var link = "../../LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId;
+	    var link = "../../LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId + "<%=demographicID != null ? "&demographicNo=" + demographicID : ""%>";
 	    window.open(link, "linkwin", "width=500, height=200");
 	}
 
@@ -464,12 +481,25 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                     <td>
                                                                         <div class="FieldData" >
                                                                             <% if ( searchProviderNo == null ) { // we were called from e-chart%>
-                                                                            <a href="javascript:window.close()">
+                                                                            <span><%=handler.getPatientName()%>
+                                                                            	<%
+                                                                            		if(preview) {
+                                                                            			if(demographicIDThatWillMatch != null) {
+                                                                            				Demographic pt =  demographicDao.getDemographicById(demographicIDThatWillMatch);
+                                                                            				if(pt != null) {
+                                                                            				%><a target="_blank" href="<%=request.getContextPath()%>/demographic/demographiccontrol.jsp?demographic_no=<%=demographicIDThatWillMatch %>&displaymode=edit&dboperation=search_detail">(Matched)</a><%
+                                                                            				} } else {
+                                                                            				%>(Unmatched)<%
+                                                                            			}
+                                                                            		}
+                                                                            	%>
+                                                                            </span>
                                                                             <% } else { // we were called from lab module%>
                                                                             <a href="javascript:popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
-                                                                                <% } %>
+
                                                                                 <%=handler.getPatientName()%>
                                                                             </a>
+                                                                              <% } %>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -709,6 +739,30 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                 </div>
                                             </td>
                                         </tr>
+                                          <tr>
+                                            <td valign="top">
+                                                <div class="FieldData">
+                                                    <strong>Abnormal Result(s):</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="FieldData">
+                                                 <%
+													boolean abnormalD = false;
+													for(int x=0;x<handler.getOBRCount();x++) {
+														for(int y=0;y<handler.getOBXCount(x);y++) {
+															if(handler.isOBXAbnormal(x,y)) {
+																abnormalD=true;
+																break;
+															}
+														}
+													}
+												%>
+                                                   <%=abnormalD ?  "<span style='color:red'>Yes</span>" : "No" %>
+                                                </div>
+                                            </td>
+                                        </tr>
+
                                         <tr>
                                             <td></td>
                                         </tr>
@@ -1048,7 +1102,18 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                         <font color="red"><%= ackStatus %></font>
                                                                         <% if ( ackStatus.equals("Acknowledged") ) { %>
                                                                             <%= report.getTimestamp() %>,
-                                                                            <%= ( report.getComment() == null || report.getComment().isEmpty() ? "no comment" : "comment : " + report.getComment() ) %>
+                                                                            <% if(report.getComment() != null) {
+                                                                            	if(report.getComment().equals("")) {
+                                                                            		out.print("no comment");
+                                                                            	} else {
+                                                                            		out.print("comment : "+report.getComment());
+                                                                            	}
+                                                                            } else {
+                                                                            	out.print("no comment");
+
+                                                                            }
+
+                                                                            %>
                                                                         <% } %>
                                                                         <br>
                                                                     <% }
@@ -1550,7 +1615,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
    											%>
    											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
    												<td colspan="7" align="center">
-   													<table style="border: 1px solid black; margin-left 30px;">
+   													<table style="border: 1px solid black; margin-left: 30px;">
    														<tr><th>Agent</th><th>Sensitivity</th> </tr>
    												    <%
 
