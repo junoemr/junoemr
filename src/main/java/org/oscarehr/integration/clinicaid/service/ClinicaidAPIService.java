@@ -437,7 +437,14 @@ public class ClinicaidAPIService
 		}
 		else
 		{
-			serviceLocationCode = systemPreferenceService.getPropertyValue("service_location_code", null);
+			String fullCodeWithDescription = systemPreferenceService.getPreferenceValue("service_location_code", null);
+			
+			// The systemPreference version of the SLC is non-standard at this time because it was mapped from old Oscar settings,
+			// it's stored in the format "<code>|<description>".  We only want the code.
+			if (fullCodeWithDescription != null && fullCodeWithDescription.split("\\|").length == 2)
+			{
+				serviceLocationCode = fullCodeWithDescription.split("\\|")[0];
+			}
 		}
 		
 		return Optional.ofNullable(serviceLocationCode);
