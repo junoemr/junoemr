@@ -1366,7 +1366,7 @@
 		<dependency>
 			<groupId>ca.cloudpractice</groupId>
 			<artifactId>aqs-java-client</artifactId>
-			<version>0.3.6</version>
+			<version>0.4.14</version>
 		</dependency>
 
 		<!-- Memcached session manager -->

@@ -30,8 +30,6 @@ import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
-import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
-import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
