@@ -104,6 +104,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 			@PathParam("demographicNo") Integer demographicNo,
 			@PathParam("sectionName") String sectionName,
 			@QueryParam("appointmentNo") String appointmentNo,
+			@QueryParam("eChartUUID") String eChartUUID,
 			@QueryParam("limit") Integer limit,
 			@QueryParam("offset") Integer offset
 	)
@@ -111,7 +112,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	{
 		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
 
-		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
+		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo, eChartUUID);
 
 		return RestResponse.successResponse(sectionService.getSection(
 				sectionParams,
@@ -130,7 +131,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	)
 			throws EncounterSectionException
 	{
-		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
+		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo, null);
 
 		// This might need to be faster.
 		// It gets all of the values for the sections being searched (documents, eforms, forms)
@@ -197,7 +198,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 				filteredResults.stream().limit(MULTISEARCH_RESULT_COUNT).collect(Collectors.toList()));
 	}
 
-	private EncounterSectionService.SectionParameters getSectionParams(String appointmentNo)
+	private EncounterSectionService.SectionParameters getSectionParams(String appointmentNo, String eChartUUID)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
@@ -232,6 +233,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 		sectionParams.setChartNo(encounterSessionBean.chartNo);
 		sectionParams.setProgramId(programId);
 		sectionParams.setUserName(encounterSessionBean.userName);
+		sectionParams.seteChartUUID(eChartUUID);
 
 		return sectionParams;
 	}

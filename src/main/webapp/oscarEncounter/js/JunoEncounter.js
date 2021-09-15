@@ -348,7 +348,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		return ["SocHistory", "MedHistory", "Concerns", "Reminders"].indexOf(sectionName) !== -1;
 	};
 
-	this.getSectionRemote = function getSectionRemote(sectionName, getAll, disableExpand)
+	this.getSectionRemote = function getSectionRemote(sectionName, getAll, disableExpand, eChartUUID)
 	{
 		var appointmentNo = this.pageData.appointmentNo;
 		var demographicNo = this.pageData.demographicNo;
@@ -366,7 +366,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
-			url: encounterNote.getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset),
+			url: encounterNote.getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset, eChartUUID),
 			success: function (response)
 			{
 				var containerDiv = junoJQuery('#' + sectionName + 'list');
