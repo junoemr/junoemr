@@ -53,6 +53,7 @@ public class QueuedAppointment
 	private QueuedAppointmentStatus status;
 	private String createdBy;
 	private RemoteUserType createdByType;
+	private CommunicationType communicationType;
 
 	/**
 	 * construct a QueuedAppointmentInput form this QueuedAppointment
@@ -68,9 +69,28 @@ public class QueuedAppointment
 		return queuedAppointmentInput;
 	}
 
+	// ==========================================================================
+	// Getters
+	// ==========================================================================
+
 	public Boolean isVirtual()
 	{
 		return this.getVirtual();
+	}
+
+	public Boolean isVideo()
+	{
+		return this.getCommunicationType() != null && this.getCommunicationType() == CommunicationType.VIDEO;
+	}
+
+	public Boolean isAudio()
+	{
+		return this.getCommunicationType() != null && this.getCommunicationType() == CommunicationType.AUDIO;
+	}
+
+	public Boolean isChat()
+	{
+		return this.getCommunicationType() != null && this.getCommunicationType() == CommunicationType.CHAT;
 	}
 
 	public Boolean isCritical()

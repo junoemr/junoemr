@@ -25,6 +25,7 @@ package org.oscarehr.integration.aqs.conversion;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentDto;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.integration.aqs.model.CommunicationType;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.integration.aqs.model.RemoteUserType;
 import org.springframework.beans.BeanUtils;
@@ -42,11 +43,15 @@ public class QueuedAppointmentDtoQueuedAppointmentConverter extends AbstractMode
 	{
 		QueuedAppointment queuedAppointment = new QueuedAppointment();
 
-		BeanUtils.copyProperties(input, queuedAppointment, "id", "integrationPatientId", "extraInfo", "createdByType");
+		BeanUtils.copyProperties(input, queuedAppointment, "id", "integrationPatientId", "extraInfo", "createdByType", "communicationType");
 
 		queuedAppointment.setCreatedByType(new RemoteUserType(input.getCreatedByType()));
 		queuedAppointment.setId(input.getId());
 		queuedAppointment.setDemographicNo(Integer.parseInt(StringUtils.trimToEmpty(input.getIntegrationPatientId())));
+		if (input.getCommunicationType() != null)
+		{
+			queuedAppointment.setCommunicationType(CommunicationType.fromString(input.getCommunicationType().toString()));
+		}
 
 		if (input.getExtraInfo() != null)
 		{

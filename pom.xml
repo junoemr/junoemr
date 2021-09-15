@@ -77,6 +77,17 @@
 			<id>archiva.internal</id>
 			<url>https://mvn.cloudpractice.ca/repository/internal</url>
 		</repository>
+		<repository>
+			<id>openshift.nexus</id>
+			<url>http://nexus.apps.prod.cldmd.net/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/cloudpracticeinc/*</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>

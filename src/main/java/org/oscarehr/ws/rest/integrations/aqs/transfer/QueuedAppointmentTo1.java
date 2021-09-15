@@ -30,6 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.aqs.model.CommunicationType;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
@@ -60,6 +61,7 @@ public class QueuedAppointmentTo1 implements Serializable
 	private Boolean virtual;
 	private Boolean critical;
 	private UUID clinicId;
+	private CommunicationType communicationType;
 
 	public static List<QueuedAppointmentTo1> fromQueuedAppointmentList(List<QueuedAppointment> queuedAppointments)
 	{

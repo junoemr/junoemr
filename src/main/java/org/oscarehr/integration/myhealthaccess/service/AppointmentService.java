@@ -30,6 +30,7 @@ import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.client.RestClientBase;
 import org.oscarehr.integration.myhealthaccess.client.RestClientFactory;
 import org.oscarehr.integration.myhealthaccess.conversion.SessionInfoInboundDtoMHATelehealthSessionInfoConverter;
+import org.oscarehr.integration.myhealthaccess.conversion.VirtualAppointmentTypeToMHAAppointmentTypeConverter;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentAqsLinkTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
@@ -117,7 +118,7 @@ public class AppointmentService extends BaseService
 	 */
 	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification) throws InvalidIntegrationException
 	{
-		bookTelehealthAppointment(loggedInInfo, appointment, sendNotification, null, this.virtualAppointmentTypeToMhaAppointmentType(appointment.getVirtualAppointmentType()));
+		bookTelehealthAppointment(loggedInInfo, appointment, sendNotification, null, (new VirtualAppointmentTypeToMHAAppointmentTypeConverter()).convert(appointment.getVirtualAppointmentType()));
 	}
 
 	/**
@@ -317,27 +318,5 @@ public class AppointmentService extends BaseService
 				loginToken,
 				new AppointmentAqsLinkTo1(queuedAppointmentId),
 				null);
-	}
-
-	// ==========================================================================
-	// Private Methods
-	// ==========================================================================
-
-	/**
-	 * Maps virtual_type of Juno appointments to the corresponding MHA_APPOINTMENT_TYPE.
-	 * @param virtualAppointmentType - the Juno virtual appointment type.
-	 * @return - the corresponding MHA appointment type.
-	 */
-	private MHAAppointment.APPOINTMENT_TYPE virtualAppointmentTypeToMhaAppointmentType(Appointment.VirtualAppointmentType virtualAppointmentType)
-	{
-		switch(virtualAppointmentType)
-		{
-			case CHAT:
-				return MHAAppointment.APPOINTMENT_TYPE.CHAT;
-			case AUDIO:
-				return MHAAppointment.APPOINTMENT_TYPE.ON_DEMAND_AUDIO_CALL;
-			default:
-				return MHAAppointment.APPOINTMENT_TYPE.REGULAR;
-		}
 	}
 }

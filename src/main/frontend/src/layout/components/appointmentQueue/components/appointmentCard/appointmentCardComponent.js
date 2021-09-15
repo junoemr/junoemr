@@ -27,6 +27,7 @@ import {
 	JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN,
 	JUNO_STYLE
 } from "../../../../../common/components/junoComponentConstants";
+import {CommunicationType} from "../../../../../lib/integration/aqs/model/CommunicationType";
 
 angular.module('Layout.Components').component('appointmentCard', {
 	templateUrl: 'src/layout/components/appointmentQueue/components/appointmentCard/appointmentCard.jsp',
@@ -63,6 +64,54 @@ angular.module('Layout.Components').component('appointmentCard', {
 			return classes;
 		}
 
+		ctrl.getLeadingIcon = () =>
+		{
+			if (ctrl.isAppointmentInPerson())
+			{
+				return "icon-here";
+			}
+			else if (ctrl.isAppointmentVideo())
+			{
+				return "icon-video-2";
+			}
+			else if (ctrl.isAppointmentAudio())
+			{
+				return "icon-tele-call";
+			}
+			else if (ctrl.isAppointmentChat())
+			{
+				return "icon-chat";
+			}
+			else
+			{
+				return "icon-question";
+			}
+		}
+
+		ctrl.getLeadingIconTooltip = () =>
+		{
+			if (ctrl.isAppointmentInPerson())
+			{
+				return "In person appointment."
+			}
+			else if (ctrl.isAppointmentVideo())
+			{
+				return "Telehealth appointment.";
+			}
+			else if (ctrl.isAppointmentAudio())
+			{
+				return "Telehealth appointment (audio only).";
+			}
+			else if (ctrl.isAppointmentChat())
+			{
+				return "Virtual chat.";
+			}
+			else
+			{
+				return "Unknown appointment type";
+			}
+		}
+
 		ctrl.onAddBtnClick = () =>
 		{
 			if (ctrl.onAdd)
@@ -77,6 +126,26 @@ angular.module('Layout.Components').component('appointmentCard', {
 			{
 				ctrl.onDelete({});
 			}
+		}
+
+		ctrl.isAppointmentInPerson = () =>
+		{
+			return ctrl.ngModel != null && ctrl.ngModel.communicationType === CommunicationType.InPerson;
+		}
+
+		ctrl.isAppointmentVideo = () =>
+		{
+			return ctrl.ngModel != null && ctrl.ngModel.communicationType === CommunicationType.Video;
+		}
+
+		ctrl.isAppointmentAudio = () =>
+		{
+			return ctrl.ngModel != null && ctrl.ngModel.communicationType === CommunicationType.Audio;
+		}
+
+		ctrl.isAppointmentChat = () =>
+		{
+			return ctrl.ngModel != null && ctrl.ngModel.communicationType === CommunicationType.Chat;
 		}
 	}]
 });
