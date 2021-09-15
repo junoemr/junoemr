@@ -42,6 +42,7 @@ import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.olis.OLISProtocolSocketFactory;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -130,7 +131,7 @@ public class Driver
 				}
 				else
 				{
-					logger.warn("unable to retrieve logged in info from empty request");
+					logItem.setProviderNo(ProviderData.SYSTEM_PROVIDER_NO);
 				}
 
 				logDao.persist(logItem);

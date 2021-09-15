@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.olis.exception.OLISException;
 import org.oscarehr.olis.exception.OLISUnknownFacilityException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -35,6 +36,7 @@ import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.InputSource;
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.GDMLHandler;
 import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
 
 import javax.xml.bind.JAXBContext;
@@ -93,11 +95,13 @@ public class OLISUtils
 		logger.debug("SENDING FACILITY: " + sendingFacility);
 		String accessionNumber = h.getAccessionNum();
 		String hin = h.getHealthNum();
+		String collectionDate = h.getCollectionDateTime(0);
+		collectionDate = collectionDate.substring(0, 10).replaceAll("-", "");
 
-		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, msg, hin);
+		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, msg, hin, collectionDate);
 	}
 
-	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber, String msg, String hin)
+	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber, String msg, String hin, String olisCollectionDate)
 	{
 		logger.debug("Facility " + sendingFacility + " Accession # " + accessionNumber);
 
@@ -128,8 +132,12 @@ public class OLISUtils
 					{
 						if(hin.equals(dupResult.getHealthNumber()))
 						{
-							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate CML lab skipped - accession " + accessionNumber + "\n" + msg);
-							return true;
+							String collectionDate = dupResult.getObrDate().substring(0,10).replaceAll("-", "");
+							if(!StringUtils.isEmpty(collectionDate) && olisCollectionDate.equals(collectionDate))
+							{
+								OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate CML lab skipped - accession " + accessionNumber + "\n" + msg);
+								return true;
+							}
 						}
 					}
 				}
@@ -145,8 +153,12 @@ public class OLISUtils
 					{
 						if(hin.equals(dupResult.getHealthNumber()))
 						{
-							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate LifeLabs lab skipped - accession " + accessionNumber + "\n" + msg);
-							return true;
+							String collectionDate = dupResult.getObrDate().substring(0,10).replaceAll("-", "");
+							if(!StringUtils.isEmpty(collectionDate) && olisCollectionDate.equals(collectionDate))
+							{
+								OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate LifeLabs lab skipped - accession " + accessionNumber + "\n" + msg);
+								return true;
+							}
 						}
 					}
 				}
@@ -155,17 +167,44 @@ public class OLISUtils
 			}
 			else if(GammaDyancareIndentifier.equals(labIdentifier))
 			{
-				String directAcc = accessionNumber.substring(4);
-				directAcc = directAcc.substring(0, 2) + "-" + Integer.parseInt(directAcc.substring(2));
-				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(directAcc);
+				/*
+				 * Expect accession variants (examples):                    (local name reference)
+				 * Fixed:
+				 *    Dynacare -direct          34567890                    variant d8
+				 *    Dynacare -OLIS            20071234567890
+				 * Hl7:
+				 *    Dynacare -direct          12-34567890                 variant d10
+				 *    Dynacare -OLIS            20071234567890
+				 *
+				 *    Dynacare -direct          AA-456789                   variant d6
+				 *    Dynacare -OLIS            2016AA00456789
+				 *
+				 * so below we will check for an OLIS match, as well as the 3 variants within the GDML labs
+				 */
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
+				if(accessionNumber.length() == 14) // hl7 or fixed: Dynacare-OLIS format
+				{
+					String d8 = accessionNumber.substring(6);
+					String d10 = accessionNumber.substring(4, 6) + "-" + accessionNumber.substring(6);
+					String d6 = accessionNumber.substring(4, 6) + "-" + accessionNumber.substring(8);
+
+					dupResults.addAll(hl7TextInfoDao.searchByAccessionNumber(d6, GDMLHandler.GDML_MESSAGE_TYPE));
+					dupResults.addAll(hl7TextInfoDao.searchByAccessionNumber(d8, GDMLHandler.GDML_MESSAGE_TYPE));
+					dupResults.addAll(hl7TextInfoDao.searchByAccessionNumber(d10, GDMLHandler.GDML_MESSAGE_TYPE));
+
+				}
+				else // unknown format, do direct accession comparison only
+				{
+					logger.warn("Unknown GDML accession format from OLIS: " + accessionNumber);
+					dupResults.addAll(hl7TextInfoDao.searchByAccessionNumber(accessionNumber, GDMLHandler.GDML_MESSAGE_TYPE));
+				}
 
 				for(Hl7TextInfo dupResult : dupResults)
 				{
-					logger.debug(dupResult.getAccessionNumber() + " == " + directAcc + " " + dupResult.getAccessionNumber().equals(directAcc));
-
-					if(dupResult.getAccessionNumber().equals(directAcc))
+					if(hin.equals(dupResult.getHealthNumber()))
 					{
-						if(hin.equals(dupResult.getHealthNumber()))
+						String collectionDate = dupResult.getObrDate().substring(0,10).replaceAll("-", "");
+						if(!StringUtils.isEmpty(collectionDate) && olisCollectionDate.equals(collectionDate))
 						{
 							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate GAMMA lab skipped - accession " + accessionNumber + "\n" + msg);
 							return true;

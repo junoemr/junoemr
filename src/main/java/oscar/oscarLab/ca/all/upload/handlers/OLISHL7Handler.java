@@ -74,7 +74,7 @@ public class OLISHL7Handler implements MessageHandler
 
 			if(!parser.canUpload())
 			{
-				throw new OLISAckFailedException("OLIS QAK status is not OK", parser.getAckStatus());
+				throw new OLISAckFailedException("OLIS QAK status is not OK", parser.getAckStatus(), parser.getReportErrors());
 			}
 		}
 

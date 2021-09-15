@@ -23,6 +23,10 @@
 package org.oscarehr.olis.exception;
 
 import lombok.Getter;
+import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class OLISAckFailedException extends OLISException
 {
@@ -34,6 +38,8 @@ public class OLISAckFailedException extends OLISException
 	}
 	@Getter
 	private final QAKStatus statusCode;
+	@Getter
+	private final List<OLISHL7Handler.OLISError> errors;
 
 	public OLISAckFailedException()
 	{
@@ -49,8 +55,17 @@ public class OLISAckFailedException extends OLISException
 	}
 	public OLISAckFailedException(String message, QAKStatus statusCode)
 	{
+		this(message, statusCode, null);
+	}
+	public OLISAckFailedException(String message, String statusCode, List<OLISHL7Handler.OLISError> errors)
+	{
+		this(message, QAKStatus.valueOf(statusCode), errors);
+	}
+	public OLISAckFailedException(String message, QAKStatus statusCode, List<OLISHL7Handler.OLISError> errors)
+	{
 		super(message);
 		this.statusCode = statusCode;
+		this.errors = errors;
 	}
 
 	public boolean isStatusOK()
@@ -73,11 +88,18 @@ public class OLISAckFailedException extends OLISException
 	@Override
 	public String getMessage()
 	{
-		String superMessage = super.getMessage();
+		String message = super.getMessage();
 		if(this.statusCode != null)
 		{
-			return superMessage + " [" + this.statusCode + "]";
+			message = message + " [" + this.statusCode + "]";
 		}
-		return superMessage;
+		if(this.errors != null)
+		{
+			message = message + ":\n" +
+					this.errors.stream()
+							.map(OLISHL7Handler.OLISError::getText)
+							.collect(Collectors.joining("\n"));
+		}
+		return message;
 	}
 }

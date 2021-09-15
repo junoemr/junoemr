@@ -194,7 +194,7 @@ public class OLISPollingUtil
 		query.setStartEndTimestamp(obr22);
 
 		logger.info("Submit OLIS query for date range: " + ConversionUtils.toDateTimeString(startDateTime) +
-				" to " + ((endDateTime != null) ? ConversionUtils.toDateTimeString(endDateTime) : " present"));
+				" to " + ((endDateTime != null) ? ConversionUtils.toDateTimeString(endDateTime) : "present"));
 		String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, query);
 
 		if(!response.startsWith("<Response"))
@@ -350,7 +350,9 @@ public class OLISPollingUtil
 		ZonedDateTime maxFetchPeriod = ZonedDateTime.now().minusMonths(MAX_FETCH_PERIOD_MONTHS);
 		if(zonedStartTime.isBefore(maxFetchPeriod))
 		{
-			return zonedStartTime.plusMonths(MAX_FETCH_PERIOD_MONTHS);
+			// subtract a day to avoid 'max 12 months' error response.
+			// not 100% sure why OLIS sends this if the period is exactly 1 year, but probably timezones somehow
+			return zonedStartTime.plusMonths(MAX_FETCH_PERIOD_MONTHS).minusDays(1);
 		}
 		return null;
 	}
