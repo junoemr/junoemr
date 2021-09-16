@@ -51,7 +51,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddPatientsTests extends SeleniumTestBase
+public class AddPatientsIT extends SeleniumTestBase
 {
 	public static final PatientTestData mom = PatientTestCollection.patientMap.get(patientLNames[0]);
 	public static final PatientTestData dad = PatientTestCollection.patientMap.get(patientLNames[1]);
@@ -93,16 +93,6 @@ public class AddPatientsTests extends SeleniumTestBase
 	public void addPatientsClassicUITest()
 			throws Exception
 	{
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(
-					AuthUtils.TEST_USER_NAME,
-					AuthUtils.TEST_PASSWORD,
-					AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-					driver);
-		}
-
 		// open patient search page
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@title=\"Search for patient records\"]")));
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
@@ -177,13 +167,6 @@ public class AddPatientsTests extends SeleniumTestBase
 	public void addPatientsClassicUIQuickFormTest()
 			throws Exception
 	{
-		// login
-		Navigation.doLogin(
-				AuthUtils.TEST_USER_NAME,
-				AuthUtils.TEST_PASSWORD,
-				AuthUtils.TEST_PIN,
-				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);
 		// open patient search page
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@title=\"Search for patient records\"]")));
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
@@ -213,14 +196,6 @@ public class AddPatientsTests extends SeleniumTestBase
 	public void addPatientsJUNOUITest()
 			throws Exception
 	{
-		// login
-		Navigation.doLogin(
-				AuthUtils.TEST_USER_NAME,
-				AuthUtils.TEST_PASSWORD,
-				AuthUtils.TEST_PIN,
-				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);
-
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title=\"Add a new Patient\"]")));

@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,7 +36,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,34 +44,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddGroupTests.valueOfDrApple;
-import static integration.tests.AddGroupTests.valueOfDrBerry;
-import static integration.tests.AddPatientsTests.mom;
-import static integration.tests.AddProvidersTests.drApple;
-import static integration.tests.AddProvidersTests.drBerry;
-import static integration.tests.ScheduleSettingTests.getDailySchedule;
-import static integration.tests.ScheduleSettingTests.setupSchedule;
-import static integration.tests.ScheduleSettingTests.setupTemplate;
-import static integration.tests.ScheduleSettingTests.templateTitleGeneral;
+import static integration.tests.AddGroupIT.valueOfDrApple;
+import static integration.tests.AddGroupIT.valueOfDrBerry;
+import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.AddProvidersIT.drApple;
+import static integration.tests.AddProvidersIT.drBerry;
+import static integration.tests.ScheduleSettingIT.getDailySchedule;
+import static integration.tests.ScheduleSettingIT.setupSchedule;
+import static integration.tests.ScheduleSettingIT.setupTemplate;
+import static integration.tests.ScheduleSettingIT.templateTitleGeneral;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class AddAppointmentsTests extends SeleniumTestBase
+public class AddAppointmentsIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
-	//static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@Before
 	public void setup() throws Exception
 	{
+		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
+				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
+				"ProviderPreference", "providersite", "secUserRole", "site",
+				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
@@ -144,6 +139,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 
 	@Test
 	public void addAppointmentsSchedulePageTest() throws InterruptedException {
+		Thread.sleep(10000);
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
@@ -168,8 +164,8 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		String xpathAt9 =
-				"//a[contains(., 'Mon,')]/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
+				"//a[contains(., 'Mon.,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='9:00 a.m. - 9:15 a.m.']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t", mom.firstName);//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
@@ -177,14 +173,13 @@ public class AddAppointmentsTests extends SeleniumTestBase
 
 		//Add an appointment at 10:00-10:15 Tuesday with NO demographic selected.
 		String xpathAt10 =
-				"//a[contains(., 'Tue,')]/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
+				"//a[contains(., 'Tue.,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='10:00 a.m. - 10:15 a.m.']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
-
 
 	@Test
 	public void addAppointmentsSchedulePageFlipViewTest() throws InterruptedException {
@@ -236,7 +231,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting");
 		String windowHandleScheduleSetting = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
+ 		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
 		setupSchedule(windowHandleScheduleSetting, AuthUtils.TEST_PROVIDER_ID, templateTitleGeneral, templateTitleGeneral);
 		List<String> daySchedule = getDailySchedule();
 		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.",
@@ -288,8 +283,8 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		//Setup Groups
 		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
-		AddGroupTests addGroupTests = new AddGroupTests();
-		addGroupTests.addGroup(groupName, 2);
+		AddGroupIT addGroupIT = new AddGroupIT();
+		addGroupIT.addGroup(groupName, 2);
 		Assert.assertTrue("Group is Not added successfully.",
 				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
 						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver));
@@ -300,7 +295,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		String xpathAt9 =
 				"//a[contains(.,'" + drApple.lastName + "')]" +
 						"/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
+						"/descendant::td//a[@title='9:00 a.m. - 9:15 a.m.']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t", mom.firstName);//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
@@ -317,7 +312,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		String xpathAt10 =
 				"//a[contains(.,'" + drBerry.lastName + "')]" +
 						"/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
+						"/descendant::td//a[@title='10:00 a.m. - 10:15 a.m.']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",

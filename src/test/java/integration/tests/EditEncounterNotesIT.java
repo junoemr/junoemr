@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import org.junit.After;
 import org.junit.Assert;
@@ -41,23 +40,17 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class EditEncounterNotesTests extends SeleniumTestBase
+
+public class EditEncounterNotesIT extends SeleniumTestBase
 {
-	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
-
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
@@ -76,13 +69,12 @@ public class EditEncounterNotesTests extends SeleniumTestBase
 	@Test
 	public void editEncounterNotesClassicUITest()
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 
-		String newNote = "Testing Note";
-		String editedNote = "Edited Testing Note";
+		String newNote = "Testing Note ";
+		String editedNote = " Edited Testing Note";
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
-
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='caseNote_note']")));
 		driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).sendKeys(newNote);
 		driver.findElement(By.id("saveImg")).click();
@@ -97,17 +89,17 @@ public class EditEncounterNotesTests extends SeleniumTestBase
 	@Test
 	public void editEncounterNotesJUNOUITest()
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + SUMMARY_URL);
 
 		String newNote = "Testing Note JUNO";
 		String editedNote = "Edited Testing Note JUNO";
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditor2")));
-		driver.findElement(By.id("noteEditor2")).sendKeys(newNote);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditor1")));
+		driver.findElement(By.id("noteEditor1")).sendKeys(newNote);
 		driver.findElement(By.id("theSave")).click();
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")));
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")).click();
-		driver.findElement(By.id("noteEditor2")).clear();
-		driver.findElement(By.id("noteEditor2")).sendKeys(editedNote);
+		driver.findElement(By.id("noteEditor1")).clear();
+		driver.findElement(By.id("noteEditor1")).sendKeys(editedNote);
 		driver.findElement(By.id("theSave")).click();
 		String text = driver.findElement(By.xpath("//p[@class='ng-binding']")).getText();
 		Assert.assertTrue("Edited Note is NOT saved in JUNO UI", Pattern.compile(editedNote).matcher(text).find());

@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
@@ -38,9 +37,7 @@ import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
@@ -48,12 +45,9 @@ import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
-{
-	@Autowired
-	DatabaseUtil databaseUtil;
 
+public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
+{
 	@Before
 	public void setup()
 	{
@@ -84,9 +78,8 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 		String inr = "42731";
 
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(30000);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(4000);
+		Thread.sleep(2000);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
 		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
 		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(painAssistant);
@@ -105,7 +98,7 @@ public class AddDiseaseRegistryClassicUITests extends SeleniumTestBase
 	public void addDiseaseRegistryClassicUITest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
 		Thread.sleep(5000);
 		addDiseaseRegistry();

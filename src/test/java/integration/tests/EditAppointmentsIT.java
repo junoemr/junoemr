@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -39,25 +38,20 @@ import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddPatientsTests.dad;
-import static integration.tests.AddPatientsTests.dadFullName;
-import static integration.tests.AddPatientsTests.mom;
+import static integration.tests.AddPatientsIT.dad;
+import static integration.tests.AddPatientsIT.dadFullName;
+import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DatabaseUtil.class)
-public class EditAppointmentsTests extends SeleniumTestBase
-{
-	@Autowired
-	DatabaseUtil databaseUtil;
 
+public class EditAppointmentsIT extends SeleniumTestBase
+{
 	String apptDurationUpdated = "30";
 	String nameUpdated = dadFullName;
 	String reasonCodeUpdated = "Counselling";
@@ -99,7 +93,7 @@ public class EditAppointmentsTests extends SeleniumTestBase
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
-		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+		AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
 		addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle, mom.firstName);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
@@ -157,7 +151,7 @@ public class EditAppointmentsTests extends SeleniumTestBase
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();
-		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+		AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
 		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",

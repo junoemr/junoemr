@@ -4,3 +4,4 @@ export JOB_NAME BUILD_NUMBER
 CATALINA_HOME=/usr/java/apache-tomcat
 rm -rf target
 mvn clean package -Dmaven.test.skip=true $1
+
