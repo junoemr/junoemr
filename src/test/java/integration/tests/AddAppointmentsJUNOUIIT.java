@@ -24,32 +24,33 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddPatientsTests.mom;
+import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.util.data.SiteTestCollection.siteNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
-public class AddAppointmentsJUNOUITests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	static String patientFName = "Test";
 	static String patientLName = "Test";
 	static String patientName = patientLName + "," + patientFName;
@@ -58,6 +59,11 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 	@Before
 	public void setup() throws Exception
 	{
+		SchemaUtils.restoreTable("admission", "appointment", "appointment_status", "demographic", "log", "log_ws_rest", "mygroup",
+			"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
+			"ProviderPreference", "providersite", "secUserRole", "site",
+			"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
+
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
@@ -68,7 +74,7 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 	@After
 	public void cleanup() throws Exception
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
+		SchemaUtils.restoreTable("admission", "appointment", "appointment_status", "demographic", "log", "log_ws_rest", "mygroup",
 				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
 				"ProviderPreference", "providersite", "secUserRole", "site",
 				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
@@ -105,6 +111,7 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		dropdownSelectByVisibleText(driver, By.id("input-event-appt-status"), apptStatus);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-reason-code")));
 		dropdownSelectByVisibleText(driver, By.id("input-reason-code"), "Follow-Up");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='input-site']/option[text()='" + siteName + "']")));
 		dropdownSelectByVisibleText(driver, By.id("input-site"), siteName);
 		driver.findElement(By.id("input-notes")).sendKeys("Appointment Notes");
 		driver.findElement(By.id("input-event_reason")).sendKeys("Appointment Reason");
@@ -158,7 +165,12 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addAppointmentsSchedulePageWeeklyViewTest() {
+	public void addAppointmentsSchedulePageWeeklyViewTest()
+			throws InterruptedException
+	{
+		// open JUNO UI page, Add site to Dr. Apple and Dr. Berry
+		accessAdministrationSectionJUNOUI(driver, "User Management", "Manage Users");
+		addSiteNAssignRole("Apple", siteNames[0]);
 		// open JUNO UI page,
 		accessSectionJUNOUI(driver, "Schedule");
 		//Weekly View - next week
@@ -192,8 +204,8 @@ public class AddAppointmentsJUNOUITests extends SeleniumTestBase
 		//Add Group
 		String testGroup = "TestGroup";
 		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group");
-		AddGroupTests addGroupTests = new AddGroupTests();
-		addGroupTests.addGroup(testGroup, 2);
+		AddGroupIT addGroupIT = new AddGroupIT();
+		addGroupIT.addGroup(testGroup, 2);
 		driver.switchTo().defaultContent();
 		driver.findElement(By.linkText("Schedule")).click();
 

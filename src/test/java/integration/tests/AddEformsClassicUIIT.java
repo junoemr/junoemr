@@ -24,31 +24,37 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
-public class AddEformsClassicUITests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddEformsClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	private static DatabaseUtil databaseUtil;
-
 	@Before
-	public void setup()
-	{
+	public void setup() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		SchemaUtils.restoreTable(
+				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
+				"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
+				"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
+				"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
+				"tickler_text_suggest", "validations"
+		);
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
@@ -59,9 +65,11 @@ public class AddEformsClassicUITests extends SeleniumTestBase
 			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		SchemaUtils.restoreTable(
-				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate", "eform_data",
-				"Facility", "issue", "log","measurementType", "LookupList", "LookupListItem", "OscarJob", "OscarJobType",
-				"provider", "ProviderPreference", "roster_status", "secUserRole", "tickler_text_suggest", "validations"
+				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
+				"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
+				"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
+				"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
+				"tickler_text_suggest", "validations"
 		);
 	}
 
@@ -70,7 +78,7 @@ public class AddEformsClassicUITests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		String subject = "EFormTest";
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitleeforms")));
 		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();
