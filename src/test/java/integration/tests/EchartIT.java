@@ -55,12 +55,9 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EchartTests extends SeleniumTestBase
+public class EchartIT extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
-
-	@Autowired
-	DatabaseUtil databaseUtil;
 
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
@@ -82,40 +79,31 @@ public class EchartTests extends SeleniumTestBase
 	public void testWritingNote()
 			throws InterruptedException
 	{
-		// login
-		if (!Navigation.isLoggedIn(driver))
-		{
-			Navigation.doLogin(
-					AuthUtils.TEST_USER_NAME,
-					AuthUtils.TEST_PASSWORD,
-					AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-					driver);
-		}
-
 		String echartFullUrl = Navigation.getOscarUrl(Integer.toString(randomTomcatPort)) + ECHART_URL;
 		driver.get(echartFullUrl);
-
-
-		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='caseNote_note']")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='caseNote_note']")));
 
 		String source = driver.getPageSource();
-
-		// create new encounter note
 		String noteId = null;
+
 		if (PageUtil.isExistsBy(By.xpath("//textarea[@name='caseNote_note']"), driver))
 		{
 			noteId = driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).getAttribute("id");
 		}
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
-
-		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("newNoteImg")));
 
-		WebElement newNoteButton = driver.findElement(By.id("newNoteImg"));
-		newNoteButton.click();
+		//save the previous note
+		driver.findElement(By.id("saveImg")).click();
+		String noteIdAfterSave = driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).getAttribute("id");
+		Integer stringLength = noteId.length()-1;
+		Integer id1 = Integer.parseInt(noteId.substring(stringLength)) + 1;
+		String noteIdAfterSaveExpected = noteId.substring(0, stringLength) + id1.toString();
+		Assert.assertEquals("Create new note. FAIL", noteIdAfterSave, noteIdAfterSaveExpected);
+
+		// create new encounter note
+		driver.findElement(By.id("newNoteImg")).click();
 
 		WebElement newNote = null;
 		try
@@ -129,7 +117,8 @@ public class EchartTests extends SeleniumTestBase
 
 		if (noteId != null)
 		{
-			Assert.assertEquals("Create new note. FAIL", (noteId + '1'), newNote.getAttribute("id"));
+			String newNoteTest = newNote.getAttribute("id");
+			Assert.assertEquals("Create new note. FAIL", noteId, newNoteTest);
 		}
 		logger.info("Create new note. OK");
 
@@ -157,6 +146,5 @@ public class EchartTests extends SeleniumTestBase
 		Assert.assertTrue("Sign and save note. FAILED",
 				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));
 		logger.info("Sign and save note. OK");
-
 	}
 }

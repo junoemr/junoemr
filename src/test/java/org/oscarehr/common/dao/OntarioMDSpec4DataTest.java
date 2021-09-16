@@ -630,6 +630,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 	    	demographicContact.setCreator(creator);
 	    	demographicContact.setSdm(sdm);
 	    	demographicContact.setEc(ec);
+	    	demographicContact.setFacilityId(1);
 	    	return demographicContact;
 		}
 

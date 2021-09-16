@@ -517,7 +517,7 @@ function popup1(height, width, url, windowName){
             %>
         <tr>
           <td>
-          <% if (curdoc.isPDF()){%> <input class="tightCheckbox<%=i%>"
+          <% if (curdoc.isFaxable()){%> <input class="tightCheckbox<%=i%>"
             type="checkbox" name="docNo" id="docNo<%=curdoc.getDocId()%>"
             value="<%=curdoc.getDocId()%>" style="margin: 0px; padding: 0px;" />
           <%}else{%> &nbsp; <%}%>
@@ -645,7 +645,7 @@ function popup1(height, width, url, windowName){
         onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
 				<% if (faxEnabled) { %>
 				<input type="button"
-					value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
+					value="Fax Documents"
 					onclick="return newWindowForm('<rewrite:reWrite jspPage="faxPDFs.do"/>');" />
 		 		<%
 				}
