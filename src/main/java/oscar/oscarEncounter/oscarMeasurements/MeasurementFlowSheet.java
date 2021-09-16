@@ -258,7 +258,10 @@ public class MeasurementFlowSheet {
 
     public void setToHidden(String measurement){
          FlowSheetItem item = (FlowSheetItem) itemList.get(measurement);
-         item.setHide(true);
+         if (item != null)
+         {
+             item.setHide(true);
+         }
     }
 
 
