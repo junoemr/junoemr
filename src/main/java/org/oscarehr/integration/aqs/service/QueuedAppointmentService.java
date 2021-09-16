@@ -32,6 +32,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.aqs.conversion.CommunicationTypeToVirtualAppointmentTypeConverter;
 import org.oscarehr.integration.aqs.conversion.IntegerToQueuedAppointmentMoveDtoConverter;
 import org.oscarehr.integration.aqs.conversion.QueuedAppointmentDtoQueuedAppointmentConverter;
 import org.oscarehr.integration.aqs.conversion.QueuedAppointmentQueuedAppointmentInputConverter;
@@ -271,22 +272,7 @@ public class QueuedAppointmentService extends BaseService
 		appointment.setName(demographic.getDisplayName());
 		appointment.setIsVirtual(queuedAppointment.isVirtual());
 		appointment.setReasonCode(queuedAppointment.getReasonTypeId());
-
-		if (queuedAppointment.isVirtual())
-		{
-			if (queuedAppointment.isAudio())
-			{
-				appointment.setVirtualAppointmentType(Appointment.VirtualAppointmentType.AUDIO);
-			}
-			else if (queuedAppointment.isChat())
-			{
-				appointment.setVirtualAppointmentType(Appointment.VirtualAppointmentType.CHAT);
-			}
-			else
-			{
-				appointment.setVirtualAppointmentType(Appointment.VirtualAppointmentType.VIDEO);
-			}
-		}
+		appointment.setVirtualAppointmentType((new CommunicationTypeToVirtualAppointmentTypeConverter()).convert(queuedAppointment.getCommunicationType()));
 
 		if (queuedAppointment.getCritical() != null && queuedAppointment.isCritical())
 		{
