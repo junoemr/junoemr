@@ -38,7 +38,9 @@ import ca.uhn.hl7v2.model.v22.segment.OBX;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 
-public class AlphaHandler extends DefaultGenericHandler {
+public class AlphaHandler extends DefaultGenericHandler
+{
+	public static final String ALPHA_MESSAGE_TYPE = "ALPHA";
 
     Logger logger = Logger.getLogger(AlphaHandler.class);
     ca.uhn.hl7v2.model.v22.message.ORU_R01 msg22 = null;
@@ -638,11 +640,12 @@ public class AlphaHandler extends DefaultGenericHandler {
         return("");
     }
     }
-    
-    
-    public String getMsgType(){
-        return("ALPHA");
-    }
+
+
+	public String getMsgType()
+	{
+		return (ALPHA_MESSAGE_TYPE);
+	}
 
     public void debugMSHAndPid() {
         

@@ -62,6 +62,7 @@ import java.util.Map;
  */
 public class PATHL7Handler extends ORU_R01MessageHandler
 {
+	public static final String LIFELABS_MESSAGE_TYPE = "PATHL7";
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     protected ORU_R01 msg;
@@ -140,9 +141,10 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     @Override
     public void postUpload() {}
 
-    public String getMsgType(){
-        return("PATHL7");
-    }
+	public String getMsgType()
+	{
+		return (LIFELABS_MESSAGE_TYPE);
+	}
 
     @Override
     public boolean isSupportEmbeddedPdf()

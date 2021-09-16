@@ -28,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.olis.exception.OLISException;
 import org.oscarehr.olis.exception.OLISUnknownFacilityException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -36,8 +35,11 @@ import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.InputSource;
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.AlphaHandler;
+import oscar.oscarLab.ca.all.parsers.CMLHandler;
 import oscar.oscarLab.ca.all.parsers.GDMLHandler;
 import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -96,7 +98,7 @@ public class OLISUtils
 		String accessionNumber = h.getAccessionNum();
 		String hin = h.getHealthNum();
 		String collectionDate = h.getCollectionDateTime(0);
-		collectionDate = collectionDate.substring(0, 10).replaceAll("-", "");
+		collectionDate = (StringUtils.isNotBlank(collectionDate)) ? collectionDate.substring(0, 10).replaceAll("-", "") : null;
 
 		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, msg, hin, collectionDate);
 	}
@@ -118,52 +120,42 @@ public class OLISUtils
 			if(CMLIndentifier.equals(labIdentifier))
 			{
 				String accessionNoPt1 = accessionNumber.split("-")[0];
-				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNoPt1);
+
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
+				dupResults.addAll(hl7TextInfoDao.searchByAccessionNumber(accessionNoPt1, CMLHandler.CML_MESSAGE_TYPE));
+
 				for(Hl7TextInfo dupResult : dupResults)
 				{
-					String dupResultAccessionNum = dupResult.getAccessionNumber();
-					if(dupResultAccessionNum.contains("-"))
+					if(hin.equals(dupResult.getHealthNumber()))
 					{
-						dupResultAccessionNum = dupResultAccessionNum.split("-")[0];
-					}
-
-					//direct
-					if(dupResultAccessionNum.equals(accessionNoPt1))
-					{
-						if(hin.equals(dupResult.getHealthNumber()))
+						String collectionDate = dupResult.getObrDate().substring(0,10).replaceAll("-", "");
+						if(!StringUtils.isEmpty(collectionDate) && olisCollectionDate.equals(collectionDate))
 						{
-							String collectionDate = dupResult.getObrDate().substring(0,10).replaceAll("-", "");
-							if(!StringUtils.isEmpty(collectionDate) && olisCollectionDate.equals(collectionDate))
-							{
-								OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate CML lab skipped - accession " + accessionNumber + "\n" + msg);
-								return true;
-							}
+							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate CML lab skipped - accession " + accessionNumber + "\n" + msg);
+							return true;
 						}
 					}
 				}
 			}
 			else if(LifeLabsIndentifier.equals(labIdentifier))
 			{
-				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5));
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
+				dupResults.addAll(hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5), PATHL7Handler.LIFELABS_MESSAGE_TYPE));
+
 				for(Hl7TextInfo dupResult : dupResults)
 				{
 					logger.debug("LIFELABS " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
 
-					if(dupResult.getAccessionNumber().equals(accessionNumber.substring(5)))
+					if(hin.equals(dupResult.getHealthNumber()))
 					{
-						if(hin.equals(dupResult.getHealthNumber()))
+						String collectionDate = dupResult.getObrDate().substring(0,10).replaceAll("-", "");
+						if(!StringUtils.isEmpty(collectionDate) && olisCollectionDate.equals(collectionDate))
 						{
-							String collectionDate = dupResult.getObrDate().substring(0,10).replaceAll("-", "");
-							if(!StringUtils.isEmpty(collectionDate) && olisCollectionDate.equals(collectionDate))
-							{
-								OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate LifeLabs lab skipped - accession " + accessionNumber + "\n" + msg);
-								return true;
-							}
+							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate LifeLabs lab skipped - accession " + accessionNumber + "\n" + msg);
+							return true;
 						}
 					}
 				}
-
-
 			}
 			else if(GammaDyancareIndentifier.equals(labIdentifier))
 			{
@@ -214,18 +206,16 @@ public class OLISUtils
 			}
 			else if(AlphaLabsIndetifier.equals(labIdentifier))
 			{
-				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5));
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
+				dupResults.addAll(hl7TextInfoDao.searchByAccessionNumber(accessionNumber.substring(5), AlphaHandler.ALPHA_MESSAGE_TYPE));
+
 				for(Hl7TextInfo dupResult : dupResults)
 				{
 					logger.debug("AlphaLabs " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
-
-					if(dupResult.getAccessionNumber().equals(accessionNumber.substring(5)))
+					if(hin.equals(dupResult.getHealthNumber()))
 					{
-						if(hin.equals(dupResult.getHealthNumber()))
-						{
-							OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate AlphaLabs lab skipped - accession " + accessionNumber + "\n" + msg);
-							return true;
-						}
+						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate AlphaLabs lab skipped - accession " + accessionNumber + "\n" + msg);
+						return true;
 					}
 				}
 			}
