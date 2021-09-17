@@ -72,7 +72,7 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 
 	private final String FINAL_CODE = "F";
 	private final String REPORT_FINAL = "Final";
-	private final String REPORT_PARTIAL = "Partial";
+	private final String REPORT_PARTIAL = "Corrected";
 
 
 	private OLISHL7Handler handler;
@@ -945,7 +945,7 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 		PdfPTable rInfoTable = new PdfPTable(2);
 		cell.setPhrase(new Phrase("Report Status: ", boldFont));
 		rInfoTable.addCell(cell);
-		cell.setPhrase(new Phrase(handler.getOrderStatus() == FINAL_CODE ? REPORT_FINAL : REPORT_PARTIAL, font));
+		cell.setPhrase(new Phrase(FINAL_CODE.equals(handler.getOrderStatus()) ? REPORT_FINAL : REPORT_PARTIAL, font));
 		rInfoTable.addCell(cell);
 
 		cell.setPhrase(new Phrase("Order Id: ", boldFont));

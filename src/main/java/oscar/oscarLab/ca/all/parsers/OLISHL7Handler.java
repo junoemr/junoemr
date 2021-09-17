@@ -42,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2706,7 +2707,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			if (matchFound) {
 				// Get all groups for this match
 				String result = parseParamsAndFormat(matcher.group(1), matcher.group(2), centered);
-				if (result.contains("</center>")) {
+				if (result != null && result.contains("</center>"))
+				{
 					centered = false;
 				}
 				return result == null ? "" : result;
@@ -2715,29 +2717,38 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return "";
 	}
 
-	public static String parseParamsAndFormat(String operator, String operand, boolean centered) {
-		Integer opInt = operand.equals("") ? 1 : Integer.valueOf(operand);
+	public static String parseParamsAndFormat(String operator, String operand, boolean centered)
+	{
+		int opInt = operand.equals("") ? 1 : Integer.parseInt(operand);
 		String result = "";
-		if (operator.equals("SP")) {
-			while (opInt > 0) {
-				if (centered) {
-					result += "</center>";
-					centered = false;
+		switch (operator)
+		{
+			case "SP":
+			{
+				while (opInt > 0)
+				{
+					if (centered)
+					{
+						result += "</center>";
+						centered = false;
+					}
+					result += "<br/>";
+					opInt--;
 				}
-				result += "<br/>";
-				opInt--;
+				break;
 			}
-		} else if (operator.equals("IN")) {
-			// TODO-legacy: Implement
-		} else if (operator.equals("TI")) {
-			// TODO-legacy: Implement
-		} else if (operator.equals("SK")) {
-			while (opInt > 0) {
-				result += "&nbsp;";
-				opInt--;
+			case "IN":
+			case "TI":
+			case "SK":
+			{
+				result = String.join("", Collections.nCopies(opInt, "&nbsp;"));
+				break;
 			}
-		} else {
-			result = null;
+			default:
+			{
+				result = null;
+				break;
+			}
 		}
 		return result;
 	}
