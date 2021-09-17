@@ -24,9 +24,9 @@ if(!authed) {
 }
 %>
 
-<%@page import="org.oscarehr.healthReportManager.model.HRMCategory"%>
+<%@page import="org.oscarehr.hospitalReportManager.model.HRMCategory"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.healthReportManager.dao.HRMCategoryDao"%>
+<%@page import="org.oscarehr.hospitalReportManager.dao.HRMCategoryDao"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%
 	HRMCategoryDao hrmCategoryDao = (HRMCategoryDao) SpringUtils.getBean("HRMCategoryDao");

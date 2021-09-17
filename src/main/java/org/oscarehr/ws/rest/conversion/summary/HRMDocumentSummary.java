@@ -24,9 +24,9 @@
 
 package org.oscarehr.ws.rest.conversion.summary;
 
-import org.oscarehr.healthReportManager.dto.HRMDemographicDocument;
-import org.oscarehr.healthReportManager.model.HRMDocument;
-import org.oscarehr.healthReportManager.service.HRMService;
+import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;

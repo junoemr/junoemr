@@ -25,9 +25,9 @@ if(!authed) {
 %>
 
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.healthReportManager.model.HRMCategory"%>
+<%@page import="org.oscarehr.hospitalReportManager.model.HRMCategory"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.healthReportManager.dao.HRMCategoryDao"%>
+<%@page import="org.oscarehr.hospitalReportManager.dao.HRMCategoryDao"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html:html locale="true">

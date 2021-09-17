@@ -26,7 +26,7 @@ package org.oscarehr.dataMigration.mapper.hrm.in;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-import org.oscarehr.healthReportManager.reportImpl.HRMReport_4_3;
+import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

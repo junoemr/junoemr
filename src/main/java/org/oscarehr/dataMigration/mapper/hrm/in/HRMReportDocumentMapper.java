@@ -26,7 +26,7 @@ package org.oscarehr.dataMigration.mapper.hrm.in;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
-import org.oscarehr.healthReportManager.reportImpl.HRMReport_4_3;
+import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.springframework.stereotype.Component;
 import xml.hrm.v4_3.ReportsReceived;
 

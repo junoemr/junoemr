@@ -38,13 +38,13 @@
 <%@ page import="org.oscarehr.demographic.model.Demographic" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="java.util.Arrays" %>
-<%@ page import="org.oscarehr.healthReportManager.model.HRMDocumentToDemographic" %>
-<%@ page import="org.oscarehr.healthReportManager.model.HRMDocumentComment" %>
-<%@ page import="org.oscarehr.healthReportManager.HRMReport" %>
-<%@ page import="org.oscarehr.healthReportManager.model.HRMDocumentToProvider" %>
-<%@ page import="org.oscarehr.healthReportManager.HRMDisplayReportAction" %>
-<%@ page import="org.oscarehr.healthReportManager.model.HRMDocumentSubClass" %>
-<%@ page import="org.oscarehr.healthReportManager.model.HRMDocument" %>
+<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic" %>
+<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentComment" %>
+<%@ page import="org.oscarehr.hospitalReportManager.HRMReport" %>
+<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider" %>
+<%@ page import="org.oscarehr.hospitalReportManager.HRMDisplayReportAction" %>
+<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass" %>
+<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocument" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!

@@ -29,10 +29,10 @@ import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
-import org.oscarehr.healthReportManager.model.HRMCategory;
-import org.oscarehr.healthReportManager.model.HRMDocument;
-import org.oscarehr.healthReportManager.model.HRMDocumentComment;
-import org.oscarehr.healthReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMCategory;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 

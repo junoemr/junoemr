@@ -23,8 +23,8 @@ import javax.persistence.TemporalType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
-import org.oscarehr.healthReportManager.HRMReport;
-import org.oscarehr.healthReportManager.HRMReportParser;
+import org.oscarehr.hospitalReportManager.HRMReport;
+import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.transaction.annotation.Transactional;
 

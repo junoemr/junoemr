@@ -32,7 +32,7 @@ import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.utility.ProgramAccessCache;
 import org.oscarehr.PMmodule.utility.RoleCache;
 import org.oscarehr.common.jobs.OscarJobUtils;
-import org.oscarehr.healthReportManager.HRMFixMissingReportHelper;
+import org.oscarehr.hospitalReportManager.HRMFixMissingReportHelper;
 import org.oscarehr.threads.WaitListEmailThread;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;

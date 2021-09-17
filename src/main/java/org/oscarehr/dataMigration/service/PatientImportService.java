@@ -66,7 +66,7 @@ import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
 import org.oscarehr.encounterNote.service.ReminderNoteService;
 import org.oscarehr.encounterNote.service.RiskFactorNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
-import org.oscarehr.healthReportManager.service.HRMService;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.prevention.dao.PreventionDao;

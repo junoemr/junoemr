@@ -9,8 +9,8 @@
 
 --%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.util.*, org.oscarehr.hospitalReportManager.*,org.oscarehr.healthReportManager.model.HRMCategory"%>
-<%@ page import="org.oscarehr.healthReportManager.HRMUtil" %>
+<%@page import="java.util.*, org.oscarehr.hospitalReportManager.*,org.oscarehr.hospitalReportManager.model.HRMCategory"%>
+<%@ page import="org.oscarehr.hospitalReportManager.HRMUtil" %>
 
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);

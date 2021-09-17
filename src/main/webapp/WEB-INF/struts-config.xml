@@ -2671,28 +2671,28 @@
 			<forward name="failure" path="/appointment/appointmentTypeList.jsp"/>
 		</action>
 
-		<action path="/hospitalReportManager/Display" type="org.oscarehr.healthReportManager.HRMDisplayReportAction" parameter="method" scope="request" validate="false">
+		<action path="/hospitalReportManager/Display" type="org.oscarehr.hospitalReportManager.HRMDisplayReportAction" parameter="method" scope="request" validate="false">
 			<forward name="display" path="/hospitalReportManager/displayHRMReport.jsp" />
 		</action>
-		<action input="/hospitalReportManager/hrmKeyUploader.jsp" name="hrmKeyUploadForm" path="/hospitalReportManager/hrmKeyUploader" scope="request" type="org.oscarehr.healthReportManager.HRMUploadKeyAction">
+		<action input="/hospitalReportManager/hrmKeyUploader.jsp" name="hrmKeyUploadForm" path="/hospitalReportManager/hrmKeyUploader" scope="request" type="org.oscarehr.hospitalReportManager.HRMUploadKeyAction">
 			<forward name="success" path="/hospitalReportManager/hrmPreferences.jsp" />
 		</action>
-		<action input="/hospitalReportManager/hospitalReportManager.jsp" name="hrmLabUploadForm" path="/hospitalReportManager/UploadLab" scope="request" type="org.oscarehr.healthReportManager.HRMUploadLabAction">
+		<action input="/hospitalReportManager/hospitalReportManager.jsp" name="hrmLabUploadForm" path="/hospitalReportManager/UploadLab" scope="request" type="org.oscarehr.hospitalReportManager.HRMUploadLabAction">
 			<forward name="success" path="/hospitalReportManager/hospitalReportManager.jsp" />
 		</action>
-		<action input="/hospitalReportManager/Display" path="/hospitalReportManager/Modify" type="org.oscarehr.healthReportManager.HRMModifyDocumentAction" parameter="method" scope="request" validate="false">
+		<action input="/hospitalReportManager/Display" path="/hospitalReportManager/Modify" type="org.oscarehr.hospitalReportManager.HRMModifyDocumentAction" parameter="method" scope="request" validate="false">
 			<forward name="ajax" path="/hospitalReportManager/ajaxResponse.jsp" />
 		</action>
-		<action path="/hospitalReportManager/Statement" type="org.oscarehr.healthReportManager.HRMStatementModifyAction" scope="request" validate="false">
+		<action path="/hospitalReportManager/Statement" type="org.oscarehr.hospitalReportManager.HRMStatementModifyAction" scope="request" validate="false">
 			<forward name="success" path="/hospitalReportManager/hospitalReportManager.jsp" />
 		</action>
-		<action path="/hospitalReportManager/Mapping" type="org.oscarehr.healthReportManager.HRMMappingAction" scope="request" validate="false">
+		<action path="/hospitalReportManager/Mapping" type="org.oscarehr.hospitalReportManager.HRMMappingAction" scope="request" validate="false">
 			<forward name="success" path="/hospitalReportManager/hrmShowMapping.jsp" />
 		</action>
-		<action path="/hospitalReportManager/HRMPreferences" type="org.oscarehr.healthReportManager.HRMPreferencesAction" scope="request" validate="false">
+		<action path="/hospitalReportManager/HRMPreferences" type="org.oscarehr.hospitalReportManager.HRMPreferencesAction" scope="request" validate="false">
 			<forward name="success" path="/hospitalReportManager/hrmPreferences.jsp" />
 		</action>
-		<action path="/hospitalReportManager/HRMDownloadFile" type="org.oscarehr.healthReportManager.HRMDownloadFileAction" />
+		<action path="/hospitalReportManager/HRMDownloadFile" type="org.oscarehr.hospitalReportManager.HRMDownloadFileAction" />
 		
 
 
