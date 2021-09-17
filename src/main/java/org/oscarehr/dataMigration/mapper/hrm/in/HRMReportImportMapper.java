@@ -28,7 +28,7 @@ import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
-import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
+import org.oscarehr.healthReportManager.reportImpl.HRMReport_4_3;
 
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.SpringUtils;

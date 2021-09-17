@@ -199,7 +199,7 @@ public class ClinicaidAPIService
 
 		return response;
 	}
-
+	
 	public String buildClinicaidURL(HttpServletRequest request, String action)
 	{
 		String clinicaidLink = sessionManager.getClinicaidDomain();

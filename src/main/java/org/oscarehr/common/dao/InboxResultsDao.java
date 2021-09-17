@@ -23,8 +23,8 @@ import javax.persistence.TemporalType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
-import org.oscarehr.hospitalReportManager.HRMReport;
-import org.oscarehr.hospitalReportManager.HRMReportParser;
+import org.oscarehr.healthReportManager.HRMReport;
+import org.oscarehr.healthReportManager.HRMReportParser;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -389,6 +389,9 @@ public class InboxResultsDao
 						   + "  CASE "
 					       + "    WHEN hrm.id IS NOT NULL THEN hrm.reportFile"
 					       + "    ELSE null"
+						   + "  CASE "
+						   + "    WHEN hrm.id IS NOT NULL THEN hrm.reportSchemaVersion"
+						   + "    ELSE null"
 					       + "  END AS report_file ";
 			
 			if (neverAcknowledgedItems && "N".equals(status))
@@ -617,7 +620,8 @@ public class InboxResultsDao
 		int accessionNumLoc = pos++;
 		int finalResultCountLoc = pos++;
 		int hrmReportFileLoc = pos++;
-
+		int schemaVersion = pos++;
+		
 		HRMReport hrmReport = null;
 		ArrayList<LabResultData> labResults = new ArrayList<LabResultData>();
 
@@ -676,7 +680,7 @@ public class InboxResultsDao
 					lbData.requestingClient = "";
 					lbData.discipline = "HRM";
 
-					hrmReport = HRMReportParser.parseReport(loggedInInfo, getStringValue(r[hrmReportFileLoc]));
+					hrmReport = HRMReportParser.parseRelativeLocation(getStringValue(r[hrmReportFileLoc]), getStringValue(r[schemaVersion]));
 					lbData.reportStatus = hrmReport.getResultStatus();
 				}
 

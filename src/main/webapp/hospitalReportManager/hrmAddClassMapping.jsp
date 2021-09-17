@@ -25,7 +25,7 @@ if(!authed) {
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@page import="java.util.*, org.oscarehr.hospitalReportManager.*, org.oscarehr.hospitalReportManager.model.HRMCategory, org.oscarehr.hospitalReportManager.dao.HRMCategoryDao, org.oscarehr.util.SpringUtils"%>
+<%@page import="java.util.*, org.oscarehr.hospitalReportManager.*, org.oscarehr.healthReportManager.model.HRMCategory, org.oscarehr.healthReportManager.dao.HRMCategoryDao, org.oscarehr.util.SpringUtils"%>
 <%
 	String deepColor = "#CCCCFF", weakColor = "#EEEEFF";
 	String country = request.getLocale().getCountry();

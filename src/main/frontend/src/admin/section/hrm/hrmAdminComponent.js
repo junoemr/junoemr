@@ -78,6 +78,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 				finally
 				{
 					ctrl.working = false;
+					$scope.$apply();
 				}
 			}
 			

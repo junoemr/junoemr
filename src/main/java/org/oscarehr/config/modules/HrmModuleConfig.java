@@ -25,7 +25,7 @@ package org.oscarehr.config.modules;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
+import org.oscarehr.healthReportManager.service.HRMScheduleService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;

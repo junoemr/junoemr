@@ -24,8 +24,9 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
-import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
+import org.oscarehr.healthReportManager.model.HRMFetchResults;
+import org.oscarehr.healthReportManager.service.HRMScheduleService;
+import org.oscarehr.healthReportManager.service.HRMService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class HrmWebService extends AbstractServiceImpl
 	@Autowired
 	HRMScheduleService scheduleService;
 	
+	@Autowired
+	HRMService hrmService;
+	
 	@POST
 	@Path("/scheduler/")
 	public RestResponse<HRMFetchResults> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
@@ -60,7 +64,7 @@ public class HrmWebService extends AbstractServiceImpl
 	@Path("/scheduler/")
 	public RestResponse<HRMFetchResults> getLastFetchStatus() throws InterruptedException, ExecutionException, TimeoutException
 	{
-		HRMFetchResults results = scheduleService.getLastFetchResults();
+		HRMFetchResults results = hrmService.getLastFetchResults();
 		return RestResponse.successResponse(results);
 	}
 }

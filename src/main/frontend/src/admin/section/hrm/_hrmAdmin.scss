@@ -20,15 +20,15 @@
         margin-right: 24px;
 
         &.ok {
-          background: $semantic-success-base;
+          background: var(--color-lime-base)
         }
 
         &.warn {
-          background: $semantic-warning-base;
+          background: var(--color-yellow-base);
         }
 
         &.error {
-          background: $semantic-error-base;
+          background: var(--color-red-base);
         }
       }
 

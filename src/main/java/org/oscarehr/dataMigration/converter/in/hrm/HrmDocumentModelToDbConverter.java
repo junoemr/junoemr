@@ -30,16 +30,18 @@ import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
-import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.oscarehr.healthReportManager.model.HRMDocument;
+import org.oscarehr.healthReportManager.model.HRMDocumentComment;
+import org.oscarehr.healthReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.healthReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,8 +64,8 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setSendingFacilityReportId(input.getSendingFacilityReport());
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
 		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
-
-		hrmDocument.setReportFile(getReportFilePath(input.getReportFile()));
+		
+		hrmDocument.setReportFile(getReportFileRelativePath(input.getReportFile()));
 		hrmDocument.setReportFileSchemaVersion(input.getReportFileSchemaVersion());
 
 		hrmDocument.setDocumentSubClassList(convertSubClassList(hrmDocument, input.getObservations()));
@@ -90,12 +92,16 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return hrmDocument;
 	}
 
-	protected String getReportFilePath(GenericFile file)
+	protected String getReportFileRelativePath(GenericFile file)
 	{
-		if(file != null)
+		if (file != null)
 		{
-			return file.getPath();
+			Path hrmBaseDirectory = Paths.get(GenericFile.HRM_BASE_DIR);
+			Path relativePath = hrmBaseDirectory.relativize(Paths.get(file.getPath()));
+			
+			return relativePath.toString();
 		}
+		
 		return null;
 	}
 
