@@ -34,10 +34,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BasicOscarTests extends SeleniumTestBase
+public class BasicOscarIT extends SeleniumTestBase
 {
 	@Autowired
 	Environment environment;
@@ -50,7 +49,7 @@ public class BasicOscarTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void canLogin() throws Exception
+	public void canLogin()
 	{
 		Navigation.doLogin(
 				AuthUtils.TEST_USER_NAME,
@@ -61,8 +60,4 @@ public class BasicOscarTests extends SeleniumTestBase
 		);
 	}
 
-	/*@Test
-	public void canLogin() throws Exception {
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME,AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-	}*/
 }

@@ -261,7 +261,7 @@ public class DemographicService extends AbstractServiceImpl {
 	{
 		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
 		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
-		demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
+		demographicManager.createDemographic(getLoggedInInfo(), demographic);
 
 		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);

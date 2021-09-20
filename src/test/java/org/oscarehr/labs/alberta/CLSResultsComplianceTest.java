@@ -27,9 +27,15 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
+import org.oscarehr.JunoApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 import oscar.util.ConversionUtils;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class)
 public class CLSResultsComplianceTest {
 
 	static final String SAMPLE_LAB_WITH_ORC_SEGMENTS  = "MSH|^~\\&|LCS|LCA|LIS|TEST9999|199807311532||ORU^R01|3629|P|2.3\r" + 

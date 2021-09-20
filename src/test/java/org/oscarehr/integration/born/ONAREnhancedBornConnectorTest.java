@@ -24,9 +24,8 @@
 package org.oscarehr.integration.born;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Ignore;
 
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
@@ -34,11 +33,11 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
 public class ONAREnhancedBornConnectorTest extends DaoTestFixtures
 {
-	@Before
+	//@Before
 	public void before() throws Exception {
 		SchemaUtils.restoreTable(new String[]{"formONAREnhanced","BornTransmissionLog"});
 		assertEquals(SchemaUtils.loadFileIntoMySQL(System.getProperty("basedir") + "/src/test/resources/initFormONAREnhanced.sql"),0);
