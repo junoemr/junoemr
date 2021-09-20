@@ -23,9 +23,17 @@
 		@include juno-breakpoints(1600px, $screen-nav-md, $screen-nav-sm);
 	}
 
-	.primary-content-window {
-		@extend %juno-primary-view-pane-tabs;
-		@include juno-page-padding-default;
+	.page-fill-wrapper {
+		position: relative;
+
+		.primary-content-window {
+			@include juno-page-padding-default;
+
+			position: absolute;
+			inset: 0;
+
+			overflow-y: auto;
+		}
 	}
 
 	.sub-nav {
@@ -40,6 +48,23 @@
 				}
 			}
 		}
+	}
+
+	.audio-call-panel {
+		position: fixed;
+		right: 16px;
+		bottom: 0;
+
+		@keyframes slide-in {
+			0% {
+				transform: translateY(200px);
+			}
+			100% {
+				transform: translateY(0);
+			}
+		}
+
+		animation: slide-in 1s ease-out;
 	}
 
 	@media (max-width: 1320px) {
@@ -64,6 +89,7 @@
 		}
 	}
 }
+
 #note-editor-container {
 	display: flex;
 	justify-content: center;

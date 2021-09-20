@@ -44,6 +44,7 @@ export default class PatientTo1ToMhaPatientConverter extends AbstractConverter<P
 		mhaPatient.linkStatus = LinkStatus[patientTo1.link_status];
 		mhaPatient.canMessage = patientTo1.can_message_clinic;
 		mhaPatient.demographicNo = patientTo1.remote_id;
+		mhaPatient.hasVoipToken = patientTo1.has_voip_token;
 
 		return mhaPatient;
 	}

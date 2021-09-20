@@ -328,7 +328,7 @@ public class QueuedAppointmentService extends BaseService
 		if (queuedAppointment.isVirtual())
 		{
 			// book the appointment in to MHA
-			mhaAppointmentService.bookTelehealthAppointment(loggedInInfo, newAppointment, false, UUID.fromString(queuedAppointment.getCreatedBy()));
+			mhaAppointmentService.bookTelehealthAppointment(loggedInInfo, newAppointment, false, UUID.fromString(queuedAppointment.getCreatedBy()), MHAAppointment.APPOINTMENT_TYPE.REGULAR);
 
 			// link the mha appointments telehealth session to the AQS telehealth session
 			Integration integration = integrationService.findMhaIntegration(StringUtils.trimToNull(appointment.getLocation()));

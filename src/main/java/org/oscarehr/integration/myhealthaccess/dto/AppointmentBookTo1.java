@@ -25,7 +25,11 @@ package org.oscarehr.integration.myhealthaccess.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import oscar.util.ConversionUtils;
 import oscar.util.Jackson.ZonedDateTimeStringDeserializer;
 import oscar.util.Jackson.ZonedDateTimeStringSerializer;
@@ -33,6 +37,7 @@ import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@NoArgsConstructor
 public class AppointmentBookTo1
 {
 	@JsonProperty("appointment_no")
@@ -55,13 +60,15 @@ public class AppointmentBookTo1
 	String reason;
 	@JsonProperty("notes")
 	String notes;
-	@JsonProperty("type")
+	@JsonProperty("appointment_type")
 	String type;
 	@JsonProperty("status")
 	String status;
 	@JsonProperty("is_virtual")
 	Boolean isVirtual;
 	@JsonProperty("patient_user_id")
+	@Getter
+	@Setter
 	UUID remoteId;
 
 	// one time telehealth booking parameters
@@ -72,10 +79,10 @@ public class AppointmentBookTo1
 
 	public AppointmentBookTo1(Appointment appointment)
 	{
-		this(appointment, false, false, null);
+		this(appointment, false, false, null, MHAAppointment.APPOINTMENT_TYPE.REGULAR);
 	}
 
-	public AppointmentBookTo1(Appointment appointment, Boolean oneTimeTelehealth, Boolean sendOneTimeLink, UUID remoteId)
+	public AppointmentBookTo1(Appointment appointment, Boolean oneTimeTelehealth, Boolean sendOneTimeLink, UUID remoteId, MHAAppointment.APPOINTMENT_TYPE appointmentType)
 	{
 		this.appointmentNo = appointment.getId().toString();
 		this.providerNo = appointment.getProviderNo();
@@ -90,6 +97,7 @@ public class AppointmentBookTo1
 		this.oneTimeTelehealth = oneTimeTelehealth;
 		this.sendOneTimeLink = sendOneTimeLink;
 		this.remoteId = remoteId;
+		this.type = appointmentType.name().toLowerCase();
 	}
 
 	public String getAppointmentNo()

@@ -312,6 +312,7 @@ module.exports = {
 
 			...(glob.sync("./src/integration/**/*.js", {nosort: true})),
 
+			...(glob.sync("./src/record/components/**/*.js", {nosort: true})),
 			'./src/record/module.js',
 			'./src/record/recordController.js',
 			'./src/record/summary/module.js',

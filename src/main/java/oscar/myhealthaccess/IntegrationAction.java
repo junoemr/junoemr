@@ -170,16 +170,20 @@ public class IntegrationAction extends DispatchAction
 		if (appointment != null && appointment.getQueuedAppointmentLink() != null)
 		{
 			// aqs telehealth
-			myHealthAccessURL = myHealthAccessService.getTelehealthUrl(integrationData,
-			                                                           appointmentNo,
+			myHealthAccessURL = myHealthAccessService.getSSORedirectUrl(integrationData,
 			                                                           String.format(MyHealthAccessService.MHA_BASE_AQS_TELEHEALTH_URL,
 			                                                                         appointment.getQueuedAppointmentLink().getQueueId(),
 			                                                                         appointment.getQueuedAppointmentLink().getQueuedAppointmentId()));
 		}
-		else
+		else if (appointmentNo != null)
 		{
 			// regular telehealth
-			myHealthAccessURL = myHealthAccessService.getTelehealthUrl(integrationData, appointmentNo);
+			myHealthAccessURL = myHealthAccessService.getTelehealthUrlForAppointment(integrationData, appointmentNo);
+		}
+		else
+		{
+			// clinic admin home page.
+			myHealthAccessURL = myHealthAccessService.getSSORedirectUrl(integrationData, MyHealthAccessService.MHA_HOME_URL);
 		}
 
 		ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
