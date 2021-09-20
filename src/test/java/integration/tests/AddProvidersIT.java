@@ -38,7 +38,6 @@ import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -50,7 +49,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddProvidersTests extends SeleniumTestBase
+public class AddProvidersIT extends SeleniumTestBase
 {
 	public static final ProviderTestData drApple = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]);
 	public static final ProviderTestData drBerry = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[1]);
@@ -67,16 +66,6 @@ public class AddProvidersTests extends SeleniumTestBase
 	public void addProvidersClassicUITest()
 			throws Exception
 	{
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(
-					AuthUtils.TEST_USER_NAME,
-					AuthUtils.TEST_PASSWORD,
-					AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-					driver);
-		}
-
 		// open administration panel
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);

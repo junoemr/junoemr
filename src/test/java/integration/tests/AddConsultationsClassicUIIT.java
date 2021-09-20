@@ -24,29 +24,29 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
-public class AddConsultationsClassicUITests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddConsultationsClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	private static DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -69,11 +69,11 @@ public class AddConsultationsClassicUITests extends SeleniumTestBase
 			throws InterruptedException
 	{
 		String serviceName = "Cardiology";
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		Thread.sleep(5000);
 		String eChartWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(5000);
+		//Thread.sleep(5000);
 		PageUtil.switchToLastWindow(driver);
 		Thread.sleep(2000);
 		dropdownSelectByVisibleText(driver, By.id("service"), serviceName);
@@ -87,12 +87,11 @@ public class AddConsultationsClassicUITests extends SeleniumTestBase
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 
 		//** Verify from Consultations top menu. **
-		driver.get(Navigation.OSCAR_URL + Consultation_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Consultation_URL);
 		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 	}
-
 }
 
