@@ -32,25 +32,32 @@
 
 package oscar.oscarLab.ca.all.pageUtil;
 
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.styledxmlparser.css.media.MediaDeviceDescription;
+import com.itextpdf.styledxmlparser.css.media.MediaType;
+import com.lowagie.text.DocumentException;
 import java.io.IOException;
-
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.olis.OLISResultsAction;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
-
-import com.lowagie.text.DocumentException;
 import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
 
 /**
@@ -60,65 +67,97 @@ import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
 public class PrintLabsAction extends Action{
     
     Logger logger = Logger.getLogger(PrintLabsAction.class);
-    private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+    private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
     
     /** Creates a new instance of PrintLabsAction */
     public PrintLabsAction() {
     }
-    
-    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
         String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-        securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.READ, null, "_lab");
+        securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, "_lab");
 
         try
         {
             String segmentId = request.getParameter("segmentID");
             MessageHandler handler = Factory.getHandler(segmentId);
+			String filename = GenericFile.getSanitizedFileName(handler.getPatientName());
+
             if("CELLPATHR".equals(handler.getHeaders().get(0)))
             {//if it is a VIHA RTF lab
-                response.setContentType("text/rtf");  //octet-stream
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + handler.getPatientName().replaceAll("\\s", "_") + "_LabReport.rtf\"");
+                response.setContentType("text/rtf");
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "_LabReport.rtf\"");
                 LabPDFCreator pdf = new LabPDFCreator(request, response.getOutputStream());
                 pdf.printRtf();
             }
             else if(handler instanceof OLISHL7Handler)
             {
-                //TODO pulled from oscar 19, refactor this somehow
-                String resultUuid = request.getParameter("uuid");
-                if(segmentId == null || segmentId.equals("0"))
-                {
-                    // if viewing in preview from OLIS search, use uuid
-                    handler = OLISResultsAction.searchResultsMap.get(resultUuid);
-                }
-                response.setContentType("application/pdf");  //octet-stream
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + handler.getPatientName().replaceAll("\\s", "_") + "_OLISLabReport.pdf\"");
-                OLISLabPDFCreator pdf = new OLISLabPDFCreator(request, response.getOutputStream());
-                pdf.printPdf();
+				String labRequestUrl = request.getParameter("labRequestUrl") + "?segmentID=" + segmentId;
+
+				response.setContentType("application/pdf");
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "_OLISLabReport.pdf\"");
+				htmlToPdf(labRequestUrl, request, response.getOutputStream());
             }
             else
             {
-                response.setContentType("application/pdf");  //octet-stream
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + handler.getPatientName().replaceAll("\\s", "_") + "_LabReport.pdf\"");
+                response.setContentType("application/pdf");
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "_LabReport.pdf\"");
                 LabPDFCreator pdf = new LabPDFCreator(request, response.getOutputStream());
                 pdf.printPdf();
             }
-        }catch(DocumentException de) {
-            logger.error("DocumentException occurred inside PrintLabsAction", de);
-            request.setAttribute("printError", new Boolean(true));
-            return mapping.findForward("error");
-        }catch(IOException ioe) {
-            logger.error("IOException occurred inside PrintLabsAction", ioe);
-            request.setAttribute("printError", new Boolean(true));
-            return mapping.findForward("error");
-        }catch(Exception e){
-            logger.error("Unknown Exception occurred inside PrintLabsAction", e);
-            request.setAttribute("printError", new Boolean(true));
-            return mapping.findForward("error");
-        }
-        
+		}
+		catch (DocumentException de)
+		{
+			logger.error("DocumentException occurred inside PrintLabsAction", de);
+			request.setAttribute("printError", true);
+			return mapping.findForward("error");
+		}
+		catch (IOException ioe)
+		{
+			logger.error("IOException occurred inside PrintLabsAction", ioe);
+			request.setAttribute("printError", true);
+			return mapping.findForward("error");
+		}
+		catch (Exception e)
+		{
+			logger.error("Unknown Exception occurred inside PrintLabsAction", e);
+			request.setAttribute("printError", true);
+			return mapping.findForward("error");
+		}
         return null;
-        
     }
-    
+
+	private void htmlToPdf(String urlStr, HttpServletRequest request, OutputStream outputStream)
+		throws IOException
+	{
+		String baseUri = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+		logger.info("Convert to pdf: " + urlStr);
+		logger.info("base URI: " + baseUri);
+
+		URL url = new URL(urlStr);
+		URLConnection connection = url.openConnection();
+		connection.addRequestProperty("user", LoggedInInfo.getLoggedInInfoFromSession(request.getSession()).getLoggedInProviderNo());
+
+		Cookie[] cookies = request.getCookies();
+		if(cookies != null)
+		{
+			connection.addRequestProperty("Cookie",
+				Arrays.stream(cookies)
+					.map((cookie) -> cookie.getName() + "=" + cookie.getValue())
+					.collect(Collectors.joining("; ")));
+		}
+
+		InputStream inputStream = connection.getInputStream();
+
+		ConverterProperties props = new ConverterProperties();
+		props.setMediaDeviceDescription(new MediaDeviceDescription(MediaType.PRINT));
+		props.setBaseUri(baseUri);
+
+		HtmlConverter.convertToPdf(connection.getInputStream(), outputStream, props);
+		inputStream.close();
+
+		logger.info("PDF conversion complete");
+	}
     
 }

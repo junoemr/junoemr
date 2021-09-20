@@ -29,7 +29,6 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="org.oscarehr.common.model.Demographic" %>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -148,7 +147,7 @@ if(preview)
 // check for errors printing
 if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError")){
 %>
-<script language="JavaScript">
+<script>
     alert("The lab could not be printed due to an error. Please see the server logs for more detail.");
 </script>
 <%}
@@ -167,112 +166,400 @@ public String strikeOutInvalidContent(String content, String status) {
         <html:base/>
         <title><%=handler.getPatientName()+" Lab Results"%></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script language="javascript" type="text/javascript" src="../../../share/javascript/Oscar.js" ></script>
-        <link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
+        <script language="javascript" type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/Oscar.js" ></script>
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/css/OscarStandardLayout.css">
         <style type="text/css">
             <!--
-* { word-wrap: break-word; }
-.RollRes     { font-weight: 700; font-size: 8pt; color: white; font-family:
-               Verdana, Arial, Helvetica }
-.RollRes a:link { color: white }
-.RollRes a:hover { color: white }
-.RollRes a:visited { color: white }
-.RollRes a:active { color: white }
-.AbnormalRollRes { font-weight: 700; font-size: 8pt; color: red; font-family:
-               Verdana, Arial, Helvetica }
-.AbnormalRollRes a:link { color: red }
-.AbnormalRollRes a:hover { color: red }
-.AbnormalRollRes a:visited { color: red }
-.AbnormalRollRes a:active { color: red }
-.CorrectedRollRes { font-weight: 700; font-size: 8pt; color: yellow; font-family:
-               Verdana, Arial, Helvetica }
-.CorrectedRollRes a:link { color: yellow }
-.CorrectedRollRes a:hover { color: yellow }
-.CorrectedRollRes a:visited { color: yellow }
-.CorrectedRollRes a:active { color: yellow }
-.AbnormalRes { font-weight: bold; font-size: 8pt; color: red; font-family:
-               Verdana, Arial, Helvetica }
-.AbnormalRes a:link { color: red }
-.AbnormalRes a:hover { color: red }
-.AbnormalRes a:visited { color: red }
-.AbnormalRes a:active { color: red }
-.NormalRes   { font-weight: bold; font-size: 8pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-.NormalRes a:link { color: black }
-.NormalRes a:hover { color: black }
-.NormalRes a:visited { color: black }
-.NormalRes a:active { color: black }
-.HiLoRes     { font-weight: bold; font-size: 8pt; color: blue; font-family:
-               Verdana, Arial, Helvetica }
-.HiLoRes a:link { color: blue }
-.HiLoRes a:hover { color: blue }
-.HiLoRes a:visited { color: blue }
-.HiLoRes a:active { color: blue }
-.CorrectedRes { font-weight: bold; font-size: 8pt; color: #E000D0; font-family:
-               Verdana, Arial, Helvetica }
-.CorrectedRes a:link { color: #6da997 }
-.CorrectedRes a:hover { color: #6da997 }
-.CorrectedRes a:visited { color: #6da997 }
-.CorrectedRes a:active { color: #6da997 }
-.Field       { font-weight: bold; font-size: 8.5pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-div.Field a:link { color: black }
-div.Field a:hover { color: black }
-div.Field a:visited { color: black }
-div.Field a:active { color: black }
-.Field2      { font-weight: bold; font-size: 8pt; color: #ffffff; font-family:
-               Verdana, Arial, Helvetica }
-div.Field2   { font-weight: bold; font-size: 8pt; color: #ffffff; font-family:
-               Verdana, Arial, Helvetica }
-div.FieldData { font-weight: normal; font-size: 8pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-div.Field3   { font-weight: normal; font-size: 8pt; color: black; font-style: italic;
-               font-family: Verdana, Arial, Helvetica }
-div.Title    { font-weight: 800; font-size: 10pt; color: white; font-family:
-               Verdana, Arial, Helvetica; padding-top: 4pt; padding-bottom:
-               2pt }
-div.Title a:link { color: white }
-div.Title a:hover { color: white }
-div.Title a:visited { color: white }
-div.Title a:active { color: white }
-div.Title2   { font-weight: bolder; font-size: 9pt; color: black; text-indent: 5pt;
-               font-family: Verdana, Arial, Helvetica; padding: 10pt 15pt 2pt 2pt}
-div.Title2 a:link { color: black }
-div.Title2 a:hover { color: black }
-div.Title2 a:visited { color: black }
-div.Title2 a:active { color: black }
-.Cell        { background-color: #9999CC; border-left: thin solid #CCCCFF;
-               border-right: thin solid #6666CC;
-               border-top: thin solid #CCCCFF;
-               border-bottom: thin solid #6666CC }
-.Cell2       { background-color: #376c95; border-left-style: none; border-left-width: medium;
-               border-right-style: none; border-right-width: medium;
-               border-top: thin none #bfcbe3; border-bottom-style: none;
-               border-bottom-width: medium }
-.Cell3       { background-color: #add9c7; border-left: thin solid #dbfdeb;
-               border-right: thin solid #5d9987;
-               border-top: thin solid #dbfdeb;
-               border-bottom: thin solid #5d9987 }
-.CellHdr     { background-color: #cbe5d7; border-right-style: none; border-right-width:
-               medium; border-bottom-style: none; border-bottom-width: medium }
-.Nav         { font-weight: bold; font-size: 8pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-.PageLink a:link { font-size: 8pt; color: white }
-.PageLink a:hover { color: red }
-.PageLink a:visited { font-size: 9pt; color: yellow }
-.PageLink a:active { font-size: 12pt; color: yellow }
-.PageLink    { font-family: Verdana }
-.text1       { font-size: 8pt; color: black; font-family: Verdana, Arial, Helvetica }
-div.txt1     { font-size: 8pt; color: black; font-family: Verdana, Arial }
-div.txt2     { font-weight: bolder; font-size: 6pt; color: black; font-family: Verdana, Arial }
-div.Title3   { font-weight: bolder; font-size: 12pt; color: black; font-family:
-               Verdana, Arial }
-.red         { color: red }
-.text2       { font-size: 7pt; color: black; font-family: Verdana, Arial }
-.white       { color: white }
-.title1      { font-size: 9pt; color: black; font-family: Verdana, Arial }
-div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
-               Verdana, Arial, Helvetica }
+            * {
+                word-wrap: break-word;
+            }
+
+            .RollRes {
+                font-weight: 700;
+                font-size: 8pt;
+                color: white;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .RollRes a:link {
+                color: white
+            }
+
+            .RollRes a:hover {
+                color: white
+            }
+
+            .RollRes a:visited {
+                color: white
+            }
+
+            .RollRes a:active {
+                color: white
+            }
+
+            .AbnormalRollRes {
+                font-weight: 700;
+                font-size: 8pt;
+                color: red;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .AbnormalRollRes a:link {
+                color: red
+            }
+
+            .AbnormalRollRes a:hover {
+                color: red
+            }
+
+            .AbnormalRollRes a:visited {
+                color: red
+            }
+
+            .AbnormalRollRes a:active {
+                color: red
+            }
+
+            .CorrectedRollRes {
+                font-weight: 700;
+                font-size: 8pt;
+                color: yellow;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .CorrectedRollRes a:link {
+                color: yellow
+            }
+
+            .CorrectedRollRes a:hover {
+                color: yellow
+            }
+
+            .CorrectedRollRes a:visited {
+                color: yellow
+            }
+
+            .CorrectedRollRes a:active {
+                color: yellow
+            }
+
+            .AbnormalRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: red;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .AbnormalRes a:link {
+                color: red
+            }
+
+            .AbnormalRes a:hover {
+                color: red
+            }
+
+            .AbnormalRes a:visited {
+                color: red
+            }
+
+            .AbnormalRes a:active {
+                color: red
+            }
+
+            .NormalRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .NormalRes a:link {
+                color: black
+            }
+
+            .NormalRes a:hover {
+                color: black
+            }
+
+            .NormalRes a:visited {
+                color: black
+            }
+
+            .NormalRes a:active {
+                color: black
+            }
+
+            .HiLoRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: blue;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .HiLoRes a:link {
+                color: blue
+            }
+
+            .HiLoRes a:hover {
+                color: blue
+            }
+
+            .HiLoRes a:visited {
+                color: blue
+            }
+
+            .HiLoRes a:active {
+                color: blue
+            }
+
+            .CorrectedRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: #E000D0;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .CorrectedRes a:link {
+                color: #6da997
+            }
+
+            .CorrectedRes a:hover {
+                color: #6da997
+            }
+
+            .CorrectedRes a:visited {
+                color: #6da997
+            }
+
+            .CorrectedRes a:active {
+                color: #6da997
+            }
+
+            .Field {
+                font-weight: bold;
+                font-size: 8.5pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Field a:link {
+                color: black
+            }
+
+            div.Field a:hover {
+                color: black
+            }
+
+            div.Field a:visited {
+                color: black
+            }
+
+            div.Field a:active {
+                color: black
+            }
+
+            .Field2 {
+                font-weight: bold;
+                font-size: 8pt;
+                color: #ffffff;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Field2 {
+                font-weight: bold;
+                font-size: 8pt;
+                color: #ffffff;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.FieldData {
+                font-weight: normal;
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Field3 {
+                font-weight: normal;
+                font-size: 8pt;
+                color: black;
+                font-style: italic;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Title {
+                font-weight: 800;
+                font-size: 10pt;
+                color: white;
+                font-family: Verdana, Arial, Helvetica;
+                padding-top: 4pt;
+                padding-bottom: 2pt
+            }
+
+            div.Title a:link {
+                color: white
+            }
+
+            div.Title a:hover {
+                color: white
+            }
+
+            div.Title a:visited {
+                color: white
+            }
+
+            div.Title a:active {
+                color: white
+            }
+
+            div.Title2 {
+                font-weight: bolder;
+                font-size: 9pt;
+                color: black;
+                text-indent: 5pt;
+                font-family: Verdana, Arial, Helvetica;
+                padding: 10pt 15pt 2pt 2pt
+            }
+
+            div.Title2 a:link {
+                color: black
+            }
+
+            div.Title2 a:hover {
+                color: black
+            }
+
+            div.Title2 a:visited {
+                color: black
+            }
+
+            div.Title2 a:active {
+                color: black
+            }
+
+            .Cell {
+                background-color: #9999CC;
+                border-left: thin solid #CCCCFF;
+                border-right: thin solid #6666CC;
+                border-top: thin solid #CCCCFF;
+                border-bottom: thin solid #6666CC
+            }
+
+            .Cell2 {
+                background-color: #376c95;
+                border-left-style: none;
+                border-left-width: medium;
+                border-right-style: none;
+                border-right-width: medium;
+                border-top: thin none #bfcbe3;
+                border-bottom-style: none;
+                border-bottom-width: medium
+            }
+
+            .Cell3 {
+                background-color: #add9c7;
+                border-left: thin solid #dbfdeb;
+                border-right: thin solid #5d9987;
+                border-top: thin solid #dbfdeb;
+                border-bottom: thin solid #5d9987
+            }
+
+            .CellHdr {
+                background-color: #cbe5d7;
+                border-right-style: none;
+                border-right-width: medium;
+                border-bottom-style: none;
+                border-bottom-width: medium
+            }
+
+            .Nav {
+                font-weight: bold;
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .PageLink a:link {
+                font-size: 8pt;
+                color: white
+            }
+
+            .PageLink a:hover {
+                color: red
+            }
+
+            .PageLink a:visited {
+                font-size: 9pt;
+                color: yellow
+            }
+
+            .PageLink a:active {
+                font-size: 12pt;
+                color: yellow
+            }
+
+            .PageLink {
+                font-family: Verdana;
+            }
+
+            .text1 {
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.txt1 {
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            div.txt2 {
+                font-weight: bolder;
+                font-size: 6pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            div.Title3 {
+                font-weight: bolder;
+                font-size: 12pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            .red {
+                color: red
+            }
+
+            .text2 {
+                font-size: 7pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            .white {
+                color: white
+            }
+
+            .title1 {
+                font-size: 9pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            div.Title4 {
+                font-weight: 600;
+                font-size: 8pt;
+                color: white;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            @media print {
+                .no-print {
+                    display: none;
+                }
+            }
             -->
         </style>
         <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
@@ -280,9 +567,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		    jQuery.noConflict();
 		</script>
 
-<script type="text/javascript" src="<%= request.getContextPath() %>/share/jquery/jquery.form.js"></script>
-
-        <script type="text/javaScript">
+        <script type="text/javascript">
         function popupStart(vheight,vwidth,varpage,windowname) {
             var page = varpage;
             windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
@@ -339,14 +624,15 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
             <input type="hidden" name="labType<%= segmentID %>HL7" value="imNotNull" />
             <input type="hidden" name="providerNo" value="<%= providerNo %>" />
         </form>
-        <form name="acknowledgeForm" method="post" action="../../../oscarMDS/UpdateStatus.do">
-            <input type="hidden" name="originalSegmentID" value="<%=originalSegmentID%>" />
+        <form name="acknowledgeForm" method="post" action="<%= request.getContextPath() %>/oscarMDS/UpdateStatus.do">
+            <input type="hidden" name="originalSegmentID" value="<%=originalSegmentID%>"/>
+            <input type="hidden" name="labRequestUrl" value="<%=request.getRequestURL()%>"/>
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                     <td valign="top">
                         <table width="100%" border="0" cellspacing="0" cellpadding="3">
                             <tr>
-                                <td align="left" class="MainTableTopRowRightColumn" width="100%">
+                                <td align="left" class="MainTableTopRowRightColumn no-print" width="100%">
                                 	<input type="hidden" name="labName" value="<%=handler.getAccessionNum() %>"/>
                                     <input type="hidden" name="segmentID" value="<%= segmentID %>"/>
                                     <input type="hidden" name="multiID" value="<%= multiLabId %>" />
@@ -357,15 +643,15 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     <% if ( !ackFlag ) { %>
                                     <input type="submit" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="return getComment();">
                                     <% } %>
-                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '../../../oscarMDS/SelectProvider.jsp', 'providerselect')">
+                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '<%= request.getContextPath() %>/oscarMDS/SelectProvider.jsp', 'providerselect')">
                                     <input type="button" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
                                     <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="printPDF()">
                                     <% if ( demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null")){ %>
-                                    <input type="button" value="Msg" onclick="popup(700,960,'../../../oscarMessenger/SendDemoMessage.do?demographic_no=<%=demographicID%>','msg')"/>
-                                    <input type="button" value="Tickler" onclick="popup(450,600,'../../../tickler/ForwardDemographicTickler.do?docType=HL7&docId=<%= segmentID %>&demographic_no=<%=demographicID%>','tickler')"/>
+                                    <input type="button" value="Msg" onclick="popup(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=<%=demographicID%>','msg')"/>
+                                    <input type="button" value="Tickler" onclick="popup(450,600,'<%= request.getContextPath() %>/tickler/ForwardDemographicTickler.do?docType=HL7&docId=<%= segmentID %>&demographic_no=<%=demographicID%>','tickler')"/>
                                     <% } %>
 
-                                    <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
+                                    <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
 
 				    <input type="button" value="Req# <%=reqTableID%>" title="Link to Requisition" onclick="linkreq('<%=segmentID%>','<%=reqID%>');" />
                                     <span class="Field2"><i>Next Appointment: <%=AppointmentUtil.getNextAppointment(demographicID) %></i></span>
@@ -495,7 +781,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                             	%>
                                                                             </span>
                                                                             <% } else { // we were called from lab module%>
-                                                                            <a href="javascript:popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
+                                                                            <a href="javascript:popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
 
                                                                                 <%=handler.getPatientName()%>
                                                                             </a>
@@ -1707,18 +1993,18 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                         <table width="100%" border="0" cellspacing="0" cellpadding="3" class="MainTableBottomRowRightColumn" bgcolor="#003399">
                             <tr>
-                                <td align="left" width="50%">
+                                <td align="left" width="50%" class="no-print">
                                     <% if ( providerNo != null /*&& ! mDSSegmentData.getAcknowledgedStatus(providerNo) */) { %>
                                     <input type="submit" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="getComment()">
                                     <% } %>
-                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '../../../oscarMDS/SelectProvider.jsp', 'providerselect')">
+                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '<%= request.getContextPath() %>/oscarMDS/SelectProvider.jsp', 'providerselect')">
                                     <input type="button" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
                                     <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="printPDF()">
                                         <indivo:indivoRegistered demographic="<%=demographicID%>" provider="<%=providerNo%>">
                                         <input type="button" value="<bean:message key="global.btnSendToPHR"/>" onClick="sendToPHR('<%=segmentID%>', '<%=demographicID%>')">
                                         </indivo:indivoRegistered>
                                     <% if ( searchProviderNo != null ) { // we were called from e-chart %>
-                                    <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%=segmentID%>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
+                                    <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%=segmentID%>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
                                     <% } %>
                                 </td>
                                 <td width="50%" valign="center" align="left">
