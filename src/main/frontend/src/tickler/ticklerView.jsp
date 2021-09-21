@@ -136,10 +136,10 @@
 						<i class="fa fa-chevron-up" ng-show="ticklerViewCtrl.showComments"
 						   aria-hidden="true"></i>
 					</a>
-					<button class="btn btn-xs btn-success"
-							ng-show="ticklerViewCtrl.ticklerWriteAccess"
-							ng-click="ticklerViewCtrl.addComment()">Add
-					</button>
+                    <button class="btn btn-xs btn-success"
+                            ng-disabled="!ticklerViewCtrl.canEdit()"
+                            ng-click="ticklerViewCtrl.addComment()">Add
+                    </button>
 				</div>
 				<div class="form-group" ng-show="ticklerViewCtrl.showCommentFormControl">
 					<div class="input-group">
