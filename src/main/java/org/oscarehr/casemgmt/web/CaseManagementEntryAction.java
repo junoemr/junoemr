@@ -1579,7 +1579,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		boolean newNote;
 		Date now = new Date();
 
-
 		if (noteId.substring(0, 1).equals("0"))
 		{
 			note = new CaseManagementNote();
