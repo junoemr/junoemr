@@ -96,7 +96,7 @@ public class OLISHL7Handler implements MessageHandler
 					serviceName,
 					parser,
 					OLIS_MESSAGE_TYPE,
-					msg.replace("\\E\\", "\\SLASHHACK\\").replace("µ", "\\MUHACK\\").replace("\\H\\", "\\.H\\").replace("\\N\\", "\\.N\\"),
+					msg,
 					fileId,
 					results);
 			if(routeToCurrentProvider)

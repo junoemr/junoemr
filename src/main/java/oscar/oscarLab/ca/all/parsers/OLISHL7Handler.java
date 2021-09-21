@@ -24,20 +24,6 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.bouncycastle.util.encoders.Base64;
-import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
-import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
-import org.oscarehr.olis.model.OLISRequestNomenclature;
-import org.oscarehr.olis.model.OLISResultNomenclature;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
-import oscar.util.UtilDateUtilities;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,13 +36,27 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.bouncycastle.util.encoders.Base64;
+import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
+import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
+import org.oscarehr.olis.model.OLISRequestNomenclature;
+import org.oscarehr.olis.model.OLISResultNomenclature;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.UtilDateUtilities;
 
 /**
  * @author Adam Balanga
  */
-public class OLISHL7Handler extends ORU_R01MessageHandler
+public class OLISHL7Handler extends MessageHandler
 {
 	public static final String OLIS_MESSAGE_TYPE = "OLIS_HL7";
+
+	public static final String TEXT_HIGHLIGHT_COLOUR = "#767676";
 
 	Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 	protected boolean isFinal = true;
@@ -868,7 +868,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		Parser p = new PipeParser();
 
 		p.setValidationContext(new NoValidation());
-		
+
+		// for legacy purposes. this was previously run pre-upload,
+		// which altered saved lab text to include these values
+		hl7Body = hl7Body.replace("\\E\\", "\\SLASHHACK\\")
+			.replace("µ", "\\MUHACK\\")
+			.replace("\\H\\", "\\.H\\")
+			.replace("\\N\\", "\\.N\\");
+
 		msg = p.parse(hl7Body.replaceAll("\n", "\r\n"));
 		headers = new ArrayList<String>();
 		this.message = msg;
@@ -2055,7 +2062,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			}
 			Structure[] nteSegs = terser.getFinder().getRoot().getAll(segments[k]);
 			Segment nteSeg = (Segment) nteSegs[0];
-			return formatString(getString(Terser.get(nteSeg, 3, 0, 1, 1))).replace(" ", "&nbsp;");
+			return formatString(getString(Terser.get(nteSeg, 3, 0, 1, 1)));
 
 		} catch (Exception e) {
 			logger.error("Could not retrieve OBX comments", e);
@@ -2671,7 +2678,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			return old ? "</center>" : "<br/>";
 
 		} else if (piece.equals(".H")) {
-			return "<span style=\"color:#767676\">";
+			return "<span style=\"color:" + TEXT_HIGHLIGHT_COLOUR + "\">";
 		} else if (piece.equals(".N")) {
 			return "</span>";
 		} else if (piece.equals(".CE")) {
@@ -2693,7 +2700,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		} else if (piece.equals("SLASHHACK")) {
 			return "\\";
 		} else if (piece.equals("MUHACK")) {
-			return "&#181;";
+			return "&#956;";
 		} else {
 			matchFound = false;
 		}
