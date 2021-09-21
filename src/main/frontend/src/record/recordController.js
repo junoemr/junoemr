@@ -30,6 +30,8 @@ import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFa
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import {MessageGroup} from "../lib/messaging/model/MessageGroup";
 import {SecurityPermissions} from "../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
+import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -81,6 +83,9 @@ angular.module('Record').controller('Record.RecordController', [
 
 		const PATIENT_MESSENGER_NAV_ID = 432543;
 
+		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
 		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 			'../ws/rs');
 
@@ -104,6 +109,8 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.noteDirty = false;
 		controller.displayPhone = null;
 		controller.page.cannotChange = true;
+		controller.canMHACallPatient = false;
+		controller.mhaCallPanelOpen = false;
 
 		// phone related constants
 		controller.phone = {
@@ -167,6 +174,8 @@ angular.module('Record').controller('Record.RecordController', [
 					}
 					controller.skipTmpSave = false; // only skip once
 				};
+
+				controller.checkIfMhaCallAvailable();
 				$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
 
 				//////
@@ -183,6 +192,22 @@ angular.module('Record').controller('Record.RecordController', [
 					delete $window.onbeforeunload;
 				});
 
+			}
+		}
+
+		/**
+		 * check if patient has the MHA app & they have a strong enough connection to be called from the eChart.
+		 */
+		controller.checkIfMhaCallAvailable = async () =>
+		{
+			const mhaConfigService = new MhaConfigService();
+			const mhaPatientService = new MhaPatientService();
+
+			if (await mhaConfigService.mhaEnabled())
+			{
+				let profiles = await mhaPatientService.profilesForDemographic(controller.demographicNo);
+				profiles = profiles.filter((profile) => profile.isConfirmed && profile.hasVoipToken);
+				controller.canMHACallPatient = profiles.length > 0;
 			}
 		}
 
@@ -1004,6 +1029,20 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
+
+		/**
+		 * open the mha audio call panel.
+		 */
+		controller.openMhaCallPanel = () =>
+		{
+			controller.mhaCallPanelOpen = true;
+		}
+
+		// close the mha audio call panel.
+		$scope.$on(MhaCallPanelEvents.Close, () =>
+		{
+			controller.mhaCallPanelOpen = false;
+		});
 	}
 ]);
 

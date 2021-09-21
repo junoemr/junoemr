@@ -121,6 +121,7 @@
 
 // patient record
 @import "../src/record/record";
+@import "../src/record/components/mhaCallPanel/mhaCallPanel";
 @import "../src/record/details/details";
 @import "../src/record/details/swipecard";
 @import "../src/record/details/components/mhaPatientConnection/mhaPatientConnection";

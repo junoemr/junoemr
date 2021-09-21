@@ -59,15 +59,16 @@
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
       ng-init="bodyCtrl.init()"
-      id="main-body">
+      id="main-body"
+      class="flex-col">
 
-	<div ng-if="bodyCtrl.isInitialized()">
+	<div ng-if="bodyCtrl.isInitialized()" class="flex-item-grow flex-col">
 		<!-- main navigation bar -->
 		<primary-navigation></primary-navigation>
 
 		<!-- main content pane -->
-		<div class="flex-column" id="index-content">
-			<div class="flex-row flex-grow">
+		<div class="flex-col flex-item-grow" id="index-content">
+			<div class="flex-row flex-item-grow">
 				<left-aside
 						id="content-left-pane"
 						class="no-print"
@@ -77,7 +78,7 @@
 						expand-on="bodyCtrl.showPatientList">
 				</left-aside>
 				<div id="content-center-pane"
-						 class="flex-grow overflow-hidden"
+						 class="flex-col flex-grow overflow-hidden"
 						 ui-view
 						 ng-cloak>
 				</div>

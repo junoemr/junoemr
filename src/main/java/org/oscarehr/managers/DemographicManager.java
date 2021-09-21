@@ -456,9 +456,9 @@ public class DemographicManager {
 		return result;
 	}
 
-	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic, Integer admissionProgramId)
+	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic)
 	{
-		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, admissionProgramId);
+		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, programManager.getDefaultProgramId());
 	}
 	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
 		checkPrivilege(providerNo, Permission.DEMOGRAPHIC_CREATE);

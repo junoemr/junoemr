@@ -3,6 +3,7 @@
 angular.module('Record', [
 	'Common',
 	'Common.Services',
+	'Record.Components',
 	'Record.Details',
 	'Record.Forms',
 	'Record.PHR',
