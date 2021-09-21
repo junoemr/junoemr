@@ -43,12 +43,14 @@ public class Navigation
 		"&demographicNo=1" +
 		"&curProviderNo=" +
 		"&reason=Tel-Progress+Note&encType=" +
-		"&curDate=2019-4-17" +
+		"&curDate=2021-8-16" +
 		"&appointmentDate=" +
 		"&startTime=" +
-		"&status=";
+		"&status=";//"&curDate=2019-4-17" +
+	public static final String SUMMARY_URL = "/web/#!/record/1/summary";//https://ele-bcdemo15.dev.junoemr.com/juno/web/#!/record/140/summary
+	//http://localhost:8080/test_ailin/web/#!/record/1/summary
 	public static final String Consultation_URL = "/oscarEncounter/IncomingConsultation.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&userName=doctor+" + AuthUtils.TEST_USER_NAME;
-
+	public static final String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 	private static Logger logger = MiscUtils.getLogger();
 
 	/**

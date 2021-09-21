@@ -43,7 +43,6 @@ import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -92,16 +91,6 @@ Session ID: 7004a14c-aa65-4887-8c95-fcd555918f3b
 	public void addProvidersClassicUITest()
 			throws Exception
 	{
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(
-					AuthUtils.TEST_USER_NAME,
-					AuthUtils.TEST_PASSWORD,
-					AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-					driver);
-		}
-
 		// open administration panel
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);

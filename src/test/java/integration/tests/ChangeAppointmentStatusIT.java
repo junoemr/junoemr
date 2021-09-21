@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +37,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,6 +49,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 public class ChangeAppointmentStatusIT extends SeleniumTestBase
 {
 	String statusExpectedTD = "To Do";
@@ -111,7 +110,7 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
-		Thread.sleep(10000);//wait for clicking to change the status.
+		Thread.sleep(2000);//wait for clicking to change the status.
 		driver.navigate().refresh();
 		String statusDP = apptStatusHoverOver();
 		Assert.assertEquals("Classic UI: Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);

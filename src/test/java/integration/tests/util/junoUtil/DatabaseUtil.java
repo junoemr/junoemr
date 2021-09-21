@@ -26,6 +26,7 @@ import integration.tests.util.data.PatientTestCollection;
 import integration.tests.util.data.PatientTestData;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
+import java.util.HashSet;
 import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
@@ -37,6 +38,11 @@ import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDate;

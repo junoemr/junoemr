@@ -26,18 +26,14 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.SiteTestCollection;
 import integration.tests.util.data.SiteTestData;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -91,16 +87,6 @@ public class AddSitesIT extends SeleniumTestBase
 	@Test
 	public void addSitesClassicUITest()
 	{
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(
-					AuthUtils.TEST_USER_NAME,
-					AuthUtils.TEST_PASSWORD,
-					AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-					driver);
-		}
-
 		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
 
 		// open administration panel
@@ -116,15 +102,6 @@ public class AddSitesIT extends SeleniumTestBase
 	@Test
 	public void addSitesJUNOUITest()
 	{
-
-		// login
-		Navigation.doLogin(
-				AuthUtils.TEST_USER_NAME,
-				AuthUtils.TEST_PASSWORD,
-				AuthUtils.TEST_PIN,
-				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);
-
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
 		accessSectionJUNOUI(driver, "Admin");
 		addNewSites(siteJuno);

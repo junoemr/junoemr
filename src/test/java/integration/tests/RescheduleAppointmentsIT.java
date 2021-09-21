@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -38,7 +37,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
@@ -52,6 +50,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 public class RescheduleAppointmentsIT extends SeleniumTestBase
 {
     @Override
@@ -100,7 +99,7 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         driver.findElement(By.id("addButton")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
         webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("09:45")));
-        String apptXpath = "//a[@title='9:45 AM - 10:00 AM']/../../td/a[contains(., '" + mom.lastName +"')]";
+        String apptXpath = "//a[@title='9:45 a.m. - 10:00 a.m.']/../../td/a[contains(., '" + mom.lastName +"')]";
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(apptXpath)));
         Assert.assertTrue("Appointment is NOT Cut/Pasted to 9:45am successfully",
                 PageUtil.isExistsBy(By.xpath(apptXpath), driver));
@@ -116,7 +115,7 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         driver.findElement(By.id("addButton")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
         Thread.sleep(2000);
-        String apptCopyXpath = "//a[@title='10:45 AM - 11:00 AM']/../../td/a[contains(., '" + mom.lastName +"')]";
+        String apptCopyXpath = "//a[@title='10:45 a.m. - 11:00 a.m.']/../../td/a[contains(., '" + mom.lastName +"')]";
         Assert.assertTrue("Appointment is NOT Copied/Pasted to 10:45am successfully",
                 PageUtil.isExistsBy(By.xpath(apptCopyXpath), driver));
     }

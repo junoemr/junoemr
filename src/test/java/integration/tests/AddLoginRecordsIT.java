@@ -24,22 +24,16 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
-import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.Set;
@@ -90,14 +84,11 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	{
 		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(passwordInput);
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
-		webDriverWait.until(ExpectedConditions.alertIsPresent());
-		Alert alert = driver.switchTo().alert();
-		String alertMessage8Symbols = alert.getText();
-		alert.accept();
+		String alertMessage8Symbols = driver.switchTo().alert().getText();
 		return alertMessage8Symbols;
 	}
 
-	public void addLoginRecord(String password, String providerNo, String pin)///
+	private void addLoginRecord(String password, String providerNo, String pin)///
 	{
 		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(password);
 		driver.findElement(By.xpath("//input[@name='conPassword']")).sendKeys(password);
@@ -113,7 +104,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
-	public void removeExpiryDate(String userName, String providerNo) throws InterruptedException////
+	private void removeExpiryDate(String userName, String providerNo)
 	{
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.getOscarUrl(randomTomcatPort), driver);
 		String currWindowHandle1 = driver.getWindowHandle();
@@ -126,7 +117,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
-	public void resetPassword(String password, String passwordUpdated)
+	private void resetPassword(String password, String passwordUpdated)
 	{
 		driver.findElement(By.xpath("//input[@name='oldPassword']")).sendKeys(password);
 		driver.findElement(By.xpath("//input[@name='newPassword']")).sendKeys(passwordUpdated);
@@ -134,12 +125,16 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@value='Update']")).click();
 	}
 
-	// XXX: This is really slow when I run it due to the passwordValidation() method.  After
-	//      accepting the alert, it hangs for a long time.
-	@Ignore
+	private void accessLoginApple(String currWindowHandle)
+	{
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		accessAdministrationSectionClassicUI(driver, "User Management", "Add a Login Record");
+		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameApple);
+	}
+
 	@Test
 	public void addLoginRecordsClassicUITest()
-			throws InterruptedException
+		throws InterruptedException
 	{
 		String currWindowHandle = driver.getWindowHandle();
 		//Assign Roles
@@ -148,21 +143,20 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		String message = "Role " + role + " is added. (" + drApple.providerNo + ")";
 		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
 				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
-		driver.close();
 
-		PageUtil.switchToWindow(currWindowHandle, driver);
-		accessAdministrationSectionClassicUI(driver, "User Management", "Add a Login Record");
-		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameApple);
-
+		accessLoginApple(currWindowHandle);
 		//password validation
 		String alertMessage8Symbols = passwordValidation("1234");
 		Assert.assertEquals(message8SymbolsExpected, alertMessage8Symbols);
+		accessLoginApple(currWindowHandle);
 		String alertMessageContent = passwordValidation("12345678");
 		Assert.assertEquals(messageContentExpected, alertMessageContent);
+		accessLoginApple(currWindowHandle);
 		String alertMessageContent1 = passwordValidation("1@345678");
 		Assert.assertEquals(messageContentExpected, alertMessageContent1);
 
 		//Account expired
+		accessLoginApple(currWindowHandle);
 		addLoginRecord(password, drApple.providerNo, pin);
 		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]"), driver));
@@ -173,6 +167,9 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 
 		//Reset password
+		Navigation.doLogin(userNameApple, password, pin,
+				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+				driver);
 		resetPassword(password, passwordUpdated);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}
@@ -189,7 +186,6 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		String message = "Role " + role + " is added. (" + drBerry.providerNo + ")";
 		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
 				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
-		driver.close();
 
 		Set<String> handles = driver.getWindowHandles();
 		PageUtil.switchToWindow(handles.iterator().next(), driver);
@@ -200,10 +196,13 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		//password validation
 		String alertMessage8Symbols = passwordValidation("1234");
 		Assert.assertEquals(message8SymbolsExpected, alertMessage8Symbols);
+		driver.switchTo().alert().accept();
 		String alertMessageContent = passwordValidation("12345678");
 		Assert.assertEquals(messageContentExpected, alertMessageContent);
+		driver.switchTo().alert().accept();
 		String alertMessageContent1 = passwordValidation("1@345678");
 		Assert.assertEquals(messageContentExpected, alertMessageContent1);
+		driver.switchTo().alert().accept();
 
 		//Account expired.
 		addLoginRecord(password, drBerry.providerNo, pin);
@@ -216,6 +215,8 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 
 		//Reset password
+		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+				driver);
 		resetPassword(password, passwordUpdated);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}

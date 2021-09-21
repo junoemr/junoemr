@@ -24,7 +24,6 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
@@ -38,7 +37,6 @@ import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -47,6 +45,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 {
 	@Override
@@ -77,10 +76,10 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 		String hiv = "042";
 		String inr = "42731";
 
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")));
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(30000);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(4000);
+		Thread.sleep(2000);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
 		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
 		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(painAssistant);

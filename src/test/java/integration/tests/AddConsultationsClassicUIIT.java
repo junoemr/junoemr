@@ -72,7 +72,7 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 		Thread.sleep(5000);
 		String eChartWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(5000);
+		//Thread.sleep(5000);
 		PageUtil.switchToLastWindow(driver);
 		Thread.sleep(2000);
 		dropdownSelectByVisibleText(driver, By.id("service"), serviceName);
@@ -92,6 +92,5 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 	}
-
 }
 

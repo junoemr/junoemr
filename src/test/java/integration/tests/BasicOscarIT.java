@@ -29,14 +29,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
-import org.oscarehr.init.OscarPropertiesInitializerWeb;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -53,7 +49,7 @@ public class BasicOscarIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void canLogin() throws Exception
+	public void canLogin()
 	{
 		Navigation.doLogin(
 				AuthUtils.TEST_USER_NAME,
@@ -64,8 +60,4 @@ public class BasicOscarIT extends SeleniumTestBase
 		);
 	}
 
-	/*@Test
-	public void canLogin() throws Exception {
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME,AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-	}*/
 }

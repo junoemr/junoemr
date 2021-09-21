@@ -25,25 +25,17 @@ package integration.tests;
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
-import integration.tests.util.junoUtil.DatabaseUtil;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.io.IOException;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.AuthUtils;
-import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -138,8 +130,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.switchTo().frame("myFrame");
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(., 'Template Setting')]")));
-		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
+		switchToNewWindow(driver, By.linkText("Template Setting"), oldWindowHandles);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
 		//15 mins duration 9-12
@@ -156,7 +147,6 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.switchTo().frame("myFrame");
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());
@@ -179,41 +169,11 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 		driver.findElement(By.xpath("//a[contains(.,'next month')]")).click();
 	}
 
-	/*
-	-------------------------------------------------------------------------------
-Test set: integration.tests.ScheduleSettingIT
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 101.622 s <<< FAILURE! - in integration.tests.ScheduleSettingIT
-setScheduleTest  Time elapsed: 81.123 s  <<< ERROR!
-org.openqa.selenium.NoSuchElementException:
-Unable to locate element: //a[contains(., 'Template Code Setting')]
-For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
-Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
-System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
-Driver info: org.openqa.selenium.firefox.FirefoxDriver
-Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2346139, moz:profile: /tmp/rust_mozprofileeJDABa, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
-Session ID: 45d5c3de-4da7-40a2-80bc-1d5532582e6a
-*** Element info: {Using=xpath, value=//a[contains(., 'Template Code Setting')]}
-    at integration.tests.ScheduleSettingIT.setScheduleTest(ScheduleSettingIT.java:212)
-
-	 */
-	@Ignore
 	@Test
 	public void setScheduleTest()
 			throws Exception
 	{
 		String holidayName = "Happy Monday";
-
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(
-					AuthUtils.TEST_USER_NAME,
-					AuthUtils.TEST_PASSWORD,
-					AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-					driver);
-		}
-
 		// open Schedule Template Setting page
 		accessAdministrationSectionClassicUI(driver, "Schedule Management","Schedule Setting");
 		String currWindowHandle = driver.getWindowHandle();
@@ -231,8 +191,9 @@ Session ID: 45d5c3de-4da7-40a2-80bc-1d5532582e6a
 		//Template Code Setting
 		// Delete "A|Academic"
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Code Setting')]"), oldWindowHandles);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "A");
+		driver.switchTo().frame("myFrame");
+		switchToNewWindow(driver, By.xpath(".//a[contains(., 'Template Code Setting')]"), oldWindowHandles);
+		dropdownSelectByValue(driver, By.xpath(".//select[@name='code']"), "A");
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
 		Assert.assertFalse("Template is NOT deleted successfully.",
@@ -288,6 +249,7 @@ Session ID: 45d5c3de-4da7-40a2-80bc-1d5532582e6a
 
 		//Template Setting for Dr. Apple
 		PageUtil.switchToWindow(currWindowHandle, driver);
+		driver.switchTo().frame("myFrame");
 		dropdownSelectByValue(driver, By.xpath("//select[@name='providerid']"),
 				ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
 		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);

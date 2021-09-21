@@ -140,6 +140,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 	@Test
 	public void addAppointmentsSchedulePageTest() throws InterruptedException {
+		Thread.sleep(10000);
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
@@ -164,8 +165,8 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		String xpathAt9 =
-				"//a[contains(., 'Mon,')]/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
+				"//a[contains(., 'Mon.,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='9:00 a.m. - 9:15 a.m.']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t", mom.firstName);//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
@@ -173,14 +174,13 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 		//Add an appointment at 10:00-10:15 Tuesday with NO demographic selected.
 		String xpathAt10 =
-				"//a[contains(., 'Tue,')]/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
+				"//a[contains(., 'Tue.,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='10:00 a.m. - 10:15 a.m.']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
-
 
 	@Test
 	public void addAppointmentsSchedulePageFlipViewTest() throws InterruptedException {
@@ -232,7 +232,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting");
 		String windowHandleScheduleSetting = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
+ 		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
 		setupSchedule(windowHandleScheduleSetting, AuthUtils.TEST_PROVIDER_ID, templateTitleGeneral, templateTitleGeneral);
 		List<String> daySchedule = getDailySchedule();
 		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.",
@@ -296,7 +296,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		String xpathAt9 =
 				"//a[contains(.,'" + drApple.lastName + "')]" +
 						"/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
+						"/descendant::td//a[@title='9:00 a.m. - 9:15 a.m.']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t", mom.firstName);//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
@@ -313,7 +313,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		String xpathAt10 =
 				"//a[contains(.,'" + drBerry.lastName + "')]" +
 						"/ancestor::tr/following-sibling::tr" +
-						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
+						"/descendant::td//a[@title='10:00 a.m. - 10:15 a.m.']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
