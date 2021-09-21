@@ -23,10 +23,29 @@
  */
 package org.oscarehr.ws.rest;
 
+import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -86,26 +105,6 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
 import oscar.util.ConversionUtils;
-
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
 
 @Path("/notes")
@@ -837,16 +836,16 @@ public class NotesService extends AbstractServiceImpl
 				{
 					HttpSession session = loggedInInfo.getSession();
 
-					CaseManagementNote annotationNote = (CaseManagementNote) session.getAttribute(annotationAttribute);
+					// new annotation created and got it in session attribute
+					org.oscarehr.encounterNote.model.CaseManagementNote annotationNote =
+						(org.oscarehr.encounterNote.model.CaseManagementNote) session.getAttribute(annotationAttribute);
 
 					if (annotationNote != null)
 					{
-						// new annotation created and got it in session attribute
-						caseManagementMgr.saveNoteSimple(annotationNote);
-						CaseManagementNoteLink cml = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE,
-								newNoteId, annotationNote.getId());
+						org.oscarehr.encounterNote.model.CaseManagementNoteLink link = new org.oscarehr.encounterNote.model.CaseManagementNoteLink(annotationNote);
+						link.setLinkedCaseManagementNoteId(Math.toIntExact(caseMangementNote.getId()));
 
-						caseManagementMgr.saveNoteLink(cml);
+						annotationNote = encounterNoteService.saveChartNote(annotationNote, providerNo, demographicNo);
 
 						String annotationSaveStatus = (annotationNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
 						LogAction.addLogEntry(
