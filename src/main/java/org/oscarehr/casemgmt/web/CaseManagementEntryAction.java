@@ -1566,7 +1566,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		String noteTxt = request.getParameter("noteTxt");
 		noteTxt = org.apache.commons.lang.StringUtils.trimToNull(noteTxt);
-		if (noteTxt == null || noteTxt.equals("")) return null;
+		if (noteTxt == null || noteTxt.equals("") || noteTxt.endsWith("Tel-Progress Note]")) return null;
 
 		logger.debug("Saving Note" + request.getParameter("nId"));
 		logger.debug("Text -- " + noteTxt);
@@ -1578,7 +1578,10 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		String noteId = request.getParameter("nId");
 		boolean newNote;
 		Date now = new Date();
-		if (noteId.substring(0, 1).equals("0")) {
+
+
+		if (noteId.substring(0, 1).equals("0"))
+		{
 			note = new CaseManagementNote();
 			note.setDemographic_no(demo);
 			history = new String();
