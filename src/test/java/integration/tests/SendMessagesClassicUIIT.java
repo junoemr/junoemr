@@ -25,22 +25,18 @@ package integration.tests;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import javax.xml.crypto.Data;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -49,11 +45,8 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SendMessagesClassicUITests extends SeleniumTestBase
+public class SendMessagesClassicUIIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -148,7 +141,7 @@ public class SendMessagesClassicUITests extends SeleniumTestBase
 	{
 		String subjectEchart = "Message from eChart";
 		String patientLName = patientLNames[0];
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		Thread.sleep(2000);
 		String currWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.xpath("//div[@id='menuTitlemsgs']//descendant::a[contains(., '+')]")).click();

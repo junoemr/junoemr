@@ -34,6 +34,7 @@ import oscar.util.ConversionUtils;
 import java.util.List;
 
 import static org.oscarehr.prevention.model.PreventionExt.KEY_COMMENT;
+import static org.oscarehr.prevention.model.PreventionExt.KEY_DIN;
 import static org.oscarehr.prevention.model.PreventionExt.KEY_DOSE;
 import static org.oscarehr.prevention.model.PreventionExt.KEY_LOCATION;
 import static org.oscarehr.prevention.model.PreventionExt.KEY_LOT;
@@ -89,6 +90,7 @@ public class PreventionDbToModelConverter extends BaseDbToModelConverter<Prevent
 				case KEY_COMMENT: immunization.setComments(preventionExt.getVal()); break;
 				case KEY_REASON: immunization.setReason(preventionExt.getVal()); break;
 				case KEY_RESULT: immunization.setResult(preventionExt.getVal()); break;
+				case KEY_DIN: immunization.setDrugIdentificationNumber(preventionExt.getVal()); break;
 			}
 		}
 

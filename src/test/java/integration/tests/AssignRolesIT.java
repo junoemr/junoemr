@@ -24,34 +24,34 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.AddProvidersTests.drApple;
+import static integration.tests.AddProvidersIT.drApple;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
-public class AssignRolesTests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
+public class AssignRolesIT extends SeleniumTestBase
 {
     public static String xpathProvider = "(//td[contains(., '" + drApple.providerNo + "')])";
     public static String xpathOption = "//following-sibling::td/select[@name='roleNew']";
     public static String xpathDropdown = xpathProvider + xpathOption;
-
-    @Autowired
-    private DatabaseUtil databaseUtil;
 
     @Before
     public void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException

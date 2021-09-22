@@ -25,7 +25,6 @@ package integration.tests;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
@@ -41,7 +40,6 @@ import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -50,11 +48,8 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVis
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EditCPPNotesClassicTests extends SeleniumTestBase
+public class EditCPPNotesClassicIT extends SeleniumTestBase
 {
-	@Autowired
-	DatabaseUtil databaseUtil;
-
 	@Before
 	public void setup()
 	{
@@ -74,7 +69,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editSocialHistoryTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String socialHistoryInCPP = "Social History Note in CPP";
 		String socialHistoryInEncounter = "Social History Note in Encounter";
 		String editedSocialHistoryNoteInCPP = "Edited Social History Note in CPP";
@@ -85,7 +80,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		Thread.sleep(2000);
 
 		//Add Social History Notes
-		driver.findElement(By.xpath("//div[@id='divR1I1']//descendant::a[@title='Add Item']")).click();
+		driver.findElement(By.xpath("//div[@id='divR1I1']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(socialHistoryInEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
@@ -124,7 +119,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editMedicalHistoryTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String medicalHistoryInCPP = "Medical History Note in CPP";
 		String medicalHistoryInEncounter = "Medical History Note in Encounter";
 		String editedMedicalHistoryNoteInCPP = "Edited Medical History Note in CPP";
@@ -138,7 +133,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		Thread.sleep(2000);
 
 		//Add Medical History Notes
-		driver.findElement(By.xpath("//div[@id='divR1I2']//descendant::a[@title='Add Item']")).click();
+		driver.findElement(By.xpath("//div[@id='divR1I2']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(medicalHistoryInEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
@@ -181,7 +176,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editOngoingConcernsTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String ongoingConcernsInCPP = "Ongoing Concerns Note in CPP";
 		String ongoingConcernsInEncounter = "Ongoing Concerns Note in Encounter";
 		String editedOngoingConcernsNoteInCPP = "Edited Ongoing Concerns History Note in CPP";
@@ -195,7 +190,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 		Thread.sleep(2000);
 
 		//Add Ongoing Concerns Notes
-		driver.findElement(By.xpath("//div[@id='divR2I1']//descendant::a[@title='Add Item']")).click();
+		driver.findElement(By.xpath("//div[@id='divR2I1']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(ongoingConcernsInEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
@@ -239,7 +234,7 @@ public class EditCPPNotesClassicTests extends SeleniumTestBase
 	public void editRemindersTest()
 			throws InterruptedException
 	{
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String remindersInCPP = "Reminders Note in CPP";
 		String remindersInEncounter = "Reminders Note in Encounter";
 		String editedRemindersNoteInCPP = "Edited Reminders History Note in CPP";

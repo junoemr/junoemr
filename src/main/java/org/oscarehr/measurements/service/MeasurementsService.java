@@ -71,10 +71,28 @@ public class MeasurementsService
 	 * @param type - type of measurement
 	 * @param observation - observation value
 	 * @param obsDate - observation date
+	 * @param comment - comment
+	 * @return - a new measurement
+	 */
+	public Measurement createNewMeasurement(Integer demographicNo, String providerNo, String type, String observation, Date obsDate, String comment)
+	{
+		if (comment == null)
+		{
+			comment = org.oscarehr.dataMigration.model.measurement.Measurement.DEFAULT_COMMENT;
+		}
+		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, comment);
+	}
+
+	/**
+	 * create a new measurement (with blank comment and measuring instruction)
+	 * @param demographicNo - demographic to which this measurement belongs
+	 * @param type - type of measurement
+	 * @param observation - observation value
+	 * @param obsDate - observation date
 	 * @return - a new measurement
 	 */
 	public Measurement createNewMeasurement(Integer demographicNo, String providerNo, String type, String observation, Date obsDate)
 	{
-		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, "");
+		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, org.oscarehr.dataMigration.model.measurement.Measurement.DEFAULT_COMMENT);
 	}
 }

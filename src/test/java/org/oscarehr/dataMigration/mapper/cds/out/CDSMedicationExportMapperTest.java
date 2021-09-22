@@ -62,4 +62,41 @@ public class CDSMedicationExportMapperTest
 		assertEquals("true", cdsMedicationExportMapper.toStringOrNull(true));
 	}
 
+	@Test
+	public void testGenerateCDSDosage_Same()
+	{
+		float takeMin = 1.1f;
+		float takeMax = 1.1f;
+		String expected = "1.1";
+		assertEquals(expected, cdsMedicationExportMapper.generateCDSDosage(takeMin, takeMax));
+	}
+	
+	@Test
+	public void testGenerateCDSDosage_DifferentInOrder()
+	{
+		float takeMin = 1.0f;
+		float takeMax = 1.1f;
+		String expected = "1.0 - 1.1";
+		assertEquals(expected, cdsMedicationExportMapper.generateCDSDosage(takeMin, takeMax));
+	}
+
+	@Test
+	public void testGenerateCDSDosage_DifferentOutOfOrder()
+	{
+		float takeMin = 1.1f;
+		float takeMax = 1.0f;
+		String expected = "1.1 - 1.0";
+		assertEquals(expected, cdsMedicationExportMapper.generateCDSDosage(takeMin, takeMax));
+	}
+
+	@Test
+	public void testGenerateCDSDosage_SameZero()
+	{
+		float takeMin = 0;
+		float takeMax = 0;
+		String expected = "0.0";
+		assertEquals(expected, cdsMedicationExportMapper.generateCDSDosage(takeMin, takeMax));
+	}
+
+
 }

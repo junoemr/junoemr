@@ -1,21 +1,21 @@
 .demographic-details-section.health-insurance-section {
-	.fields {
-		.column {
-			.hin-fields {
-				display: flex;
-				align-items: center;
 
-				.hin {
-					.juno-input {
-						width: 340px;
-						margin-right: 4px;
-					}
+	.details-fields {
+
+		.hin-fields {
+			display: flex;
+			align-items: center;
+
+			.hin {
+				.juno-input {
+					width: 340px;
+					margin-right: 4px;
 				}
+			}
 
-				.version {
-					.juno-input {
-						width: 56px;
-					}
+			.version {
+				.juno-input {
+					width: 56px;
 				}
 			}
 		}

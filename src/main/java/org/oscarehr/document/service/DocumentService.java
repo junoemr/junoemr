@@ -27,7 +27,6 @@ package org.oscarehr.document.service;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
@@ -63,6 +62,7 @@ import java.io.InputStream;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static oscar.util.StringUtils.filled;
 
@@ -80,9 +80,6 @@ public class DocumentService
 	private CtlDocumentDao ctlDocumentDao;
 
 	@Autowired
-	private ProviderInboxRoutingDao providerInboxRoutingDao;
-
-	@Autowired
 	private PatientLabRoutingDao patientLabRoutingDao;
 
 	@Autowired
@@ -96,6 +93,7 @@ public class DocumentService
 
 	@Autowired
 	private InboxManager inboxManagerService;
+
 
 	/**
 	 * Create a new document from the given document model and a file
@@ -124,15 +122,15 @@ public class DocumentService
 	{
 		Document dbDocument = uploadNewDemographicDocument(documentModelToDbConverter.convert(documentModel), documentModel.getFile(), demographic.getId());
 
-		String annotation = documentModel.getAnnotation();
-		if (annotation != null)
+		Optional<CaseManagementNote> documentNoteOptional = encounterNoteService.buildBaseAnnotationNote(
+				documentModel.getAnnotation(), documentModel.getResidualInfo());
+		if(documentNoteOptional.isPresent())
 		{
 			ProviderData createdBy = dbDocument.getCreatedBy();
-			CaseManagementNote documentNote = new CaseManagementNote();
+			CaseManagementNote documentNote = documentNoteOptional.get();
 			documentNote.setProvider(createdBy);
 			documentNote.setSigningProvider(createdBy);
 			documentNote.setDemographic(demographic);
-			documentNote.setNote(annotation);
 			documentNote.setObservationDate(dbDocument.getObservationdate());
 			documentNote.setProgramNo(documentModel.getProgramId() != null ? String.valueOf(documentModel.getProgramId()) : null);
 			encounterNoteService.saveDocumentNote(documentNote, dbDocument);
