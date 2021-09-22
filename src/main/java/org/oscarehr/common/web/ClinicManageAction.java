@@ -25,6 +25,7 @@
 
 package org.oscarehr.common.web;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -32,12 +33,18 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.clinic.dao.ClinicBillingAddressDAO;
 import org.oscarehr.clinic.model.ClinicBillingAddress;
+import org.oscarehr.common.dao.BillingBCDao;
+import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
+import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingVisitCodeTo1;
 import oscar.OscarProperties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 public class ClinicManageAction extends DispatchAction
 {
@@ -77,7 +84,16 @@ public class ClinicManageAction extends DispatchAction
 
         frm.set("clinic", clinic);
         frm.set("clinicBillingAddress", clinicBillingAddress);
-
+        
+	    SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
+	    String serviceLocationCode = systemPreferences.getPreferenceValue("service_location_code", "");
+        frm.set("clinicServiceLocationCode", serviceLocationCode);
+        
+	    BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
+	    List<Object[]> rawBCServiceCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+	    List<BCBillingVisitCodeTo1> bcServiceCodes = BCBillingVisitCodeTo1.fromList(rawBCServiceCodes);
+	    request.setAttribute("serviceLocationCodes", bcServiceCodes);
+        
         request.setAttribute("clinicForm", form);
         request.setAttribute("hasCustomBillingAddress", hasCustomBillingAddress);
 
@@ -140,6 +156,13 @@ public class ClinicManageAction extends DispatchAction
         else
         {
             clinicDAO.save(clinicFromForm);
+        }
+        
+        if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
+        {
+	        String bcServiceLocationCode = StringUtils.trimToNull(request.getParameter("clinicServiceLocationCode"));
+	        SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
+	        systemPreferences.setPreferenceValue("service_location_code", bcServiceLocationCode);
         }
 
         request.setAttribute("updateSuccess", "Updated Successfully");

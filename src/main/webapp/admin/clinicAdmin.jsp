@@ -46,17 +46,13 @@
     UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
 %>
 
-<%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*" %>
 <%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="oscar.OscarProperties" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/oscarPropertiestag" prefix="oscarprop" %>
+<%@ include file="/taglibs.jsp" %>
 <html:html locale="true">
     <head>
     <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -81,7 +77,7 @@
 
     <script type="text/javascript" language="JavaScript"
             src="../js/bootstrap-toggle.min.js"></script>
-
+    </head>
 
     <div class="header">
         <h2>Manage Clinic Details</h2>
@@ -140,6 +136,15 @@
                                 <div class="input-field">
                                     <label for="clinic.bcFacilityNumber" maxlength="5">Clinic Facility Number</label>
                                     <html:text property="clinic.bcFacilityNumber"/>
+                                </div>
+                                <div class="input-field">
+                                    <label for="clinicServiceLocationCode">Service Location Code</label>
+                                    <html:select property="clinicServiceLocationCode">
+                                        <html:option value="">None</html:option>
+                                        <c:forEach items="${serviceLocationCodes}" var="code">
+                                            <html:option value="${code.visitType}|${code.visitDescription}">(${code.visitType}) ${code.visitDescription}</html:option>
+                                        </c:forEach>
+                                    </html:select>
                                 </div>
                             </oscarprop:oscarPropertiesCheck>
                             <div class="input-field">
