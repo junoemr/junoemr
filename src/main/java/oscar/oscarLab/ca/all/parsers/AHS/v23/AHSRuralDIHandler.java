@@ -26,32 +26,63 @@ package oscar.oscarLab.ca.all.parsers.AHS.v23;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v23.segment.MSH;
+import com.google.common.collect.Sets;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
+
+import java.util.HashSet;
 
 /**
  * Handler for:
- * combined Rural DI (v2.0) + PDOC (v1.0) Conformance Pack
+ * AHS Rural Diagnostic Imaging
  *
  * @author Robert
  */
-public abstract class AHSRuralDIHandler extends AHSHandler
+public class AHSRuralDIHandler extends AHSHandler
 {
-	public static final String AHS_RURAL_LAB_TYPE = "AHSRDI";
-	protected final ORU_R01 msg;
+	public static final String AHS_RURAL_DI_LAB_TYPE = "AHS-RDI";
 
-	public AHSRuralDIHandler() {
-		super();
-		this.msg = (ORU_R01) this.message;
+	protected static final String CLSDI_SENDING_APPLICATION = "RAD";
+	protected static final HashSet<String> CLSDI_SENDING_FACILITIES = Sets.newHashSet(
+			"AHR-AWLA", // .arad
+			"CHR-CLRH", // .crad
+			"DTHR-DRDH", // .drad
+			"ECHR-ESMH", // .erad
+			"PHR-LMHA", // .lrad
+			"NLHR-NNLA", // .nrad
+			"PCHR-PQEA" // .prad
+	);
+
+	public static boolean handlerTypeMatch(Message message)
+	{
+		String version = message.getVersion();
+		if(version.equals("2.3"))
+		{
+			ORU_R01 msh = (ORU_R01) message;
+			MSH messageHeaderSegment = msh.getMSH();
+
+			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
+			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+
+			return CLSDI_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
+					CLSDI_SENDING_FACILITIES.contains(sendingFacility.toUpperCase());
+		}
+		return false;
 	}
+
+	public AHSRuralDIHandler()
+	{
+		super();
+	}
+
 	public AHSRuralDIHandler(String hl7Body) throws HL7Exception
 	{
 		super(hl7Body);
-		this.msg = (ORU_R01) this.message;
 	}
+
 	public AHSRuralDIHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
-		this.msg = (ORU_R01) this.message;
 	}
 
 	@Override
@@ -62,51 +93,22 @@ public abstract class AHSRuralDIHandler extends AHSHandler
 
     /* ===================================== Hl7 Parsing ====================================== */
 
+	@Override
 	public String getMsgType()
 	{
-		return AHS_RURAL_LAB_TYPE;
-	}
-
-	@Override
-	public String getServiceDate() {
-		try {
-			String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObr8_ObservationEndDateTime().getTimeOfAnEvent().getValue());
-			return (formatDateTime(serviceDate));
-		}
-		catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getOrderStatus()
-	{
-		try
-		{
-			return get("/.OBR-25-1");
-		}
-		catch(Exception e)
-		{
-			return ("");
-		}
+		return AHS_RURAL_DI_LAB_TYPE;
 	}
 
 	@Override
 	public String getFillerOrderNumber()
 	{
-		return get("/.OBR-20");
+		return get("/.OBR-3-1");
 	}
 
 	@Override
 	public String getAccessionNum()
 	{
-		/* Unique for every message. */
-		return getMsgSendingApplication() + "_" + getPatientLocation() + "_" + get("/.MSH-10");
+		return get("/.OBR-20-1");
 	}
 
-	@Override
-	public boolean isUnstructured()
-	{
-		return true;
-	}
 }

@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
 /**
  * Handler for:
@@ -34,8 +35,10 @@ import ca.uhn.hl7v2.model.v23.segment.MSH;
  *
  * @author Robert
  */
-public class AHSRuralDIHandlerV1 extends AHSRuralDIHandler
+public class AHSMeditechHandler extends AHSHandler
 {
+	public static final String AHS_MEDITECH_LAB_TYPE = "AHS-PDOC";
+
 	protected static final String CLSDI_SENDING_APPLICATION = "PDOC";
 	protected static final String CLSDI_SENDING_FACILITY = "PHR-LMHA";
 
@@ -56,21 +59,104 @@ public class AHSRuralDIHandlerV1 extends AHSRuralDIHandler
 		return false;
 	}
 
-	public AHSRuralDIHandlerV1()
+	public AHSMeditechHandler()
 	{
 		super();
 	}
 
-	public AHSRuralDIHandlerV1(String hl7Body) throws HL7Exception
+	public AHSMeditechHandler(String hl7Body) throws HL7Exception
 	{
 		super(hl7Body);
 	}
 
-	public AHSRuralDIHandlerV1(Message msg) throws HL7Exception
+	public AHSMeditechHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
 	}
 
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+
     /* ===================================== Hl7 Parsing ====================================== */
+
+
+	/* ===================================== MSH ====================================== */
+
+	@Override
+	public String getMsgType()
+	{
+		return AHS_MEDITECH_LAB_TYPE;
+	}
+
+	/* ===================================== OBR ====================================== */
+
+	@Override
+	public String getFillerOrderNumber()
+	{
+		// use the status code to fake a lab version
+		return get("/.OBR-25-1");
+	}
+
+	@Override
+	public String getAccessionNum()
+	{
+		// use the filler order number as the unique lab identifier apparently
+		return get("/.OBR-3-1");
+	}
+
+	@Override
+	public String getServiceDate()
+	{
+		return get("/.OBR-7-1");
+	}
+
+	@Override
+	public String getOrderStatus()
+	{
+		return get("/.OBR-25-1");
+	}
+
+	@Override
+	public String getOrderStatusDisplayValue()
+	{
+		if("X".equals(getOrderStatus()))
+		{
+			return "Cancelled";
+		}
+		return "Final";
+	}
+
+	/**
+	 * PDOC labs only send provider info in OBR-28 (cc providers), so the first one is the requesting client
+	 */
+	@Override
+	public String getDocName()
+	{
+		return getResultCopiesTo(0, 0);
+	}
+
+	/**
+	 * PDOC is always unstructured
+	 */
+	@Override
+	public boolean isUnstructured()
+	{
+		return true;
+	}
+
+	/* ===================================== OBX ====================================== */
+
+	@Override
+	public String getTimeStamp(int i, int j)
+	{
+		if (i < 0)
+		{
+			return null;
+		}
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-8-1"));
+	}
 
 }

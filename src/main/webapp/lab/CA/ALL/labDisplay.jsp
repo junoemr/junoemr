@@ -1100,7 +1100,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 														}
 														else
 														{
-															orderStatus = ( handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : (handler.getMsgType().equals("PATHL7") && handler.getOrderStatus().equals("P")) ? "Preliminary": handler.getOrderStatus().equals("X") ? "DELETED": handler.getOrderStatus());
+															orderStatus = handler.getOrderStatusDisplayValue();
 														}
 													%>
 													<%=orderStatus%>
