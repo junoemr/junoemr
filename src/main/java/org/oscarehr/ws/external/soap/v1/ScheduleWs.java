@@ -328,11 +328,47 @@ public class ScheduleWs extends AbstractWs {
 		return (appointment.getId());
 	}
 
-	public void updateAppointment(AppointmentTransfer appointmentTransfer) {
-		Appointment appointment = scheduleManager.getAppointment(getLoggedInInfo(),appointmentTransfer.getId());
-
+	/**
+	 * Updates an appointment using the provided DTO
+	 * @param appointmentTransfer Appointment DTO to be updated
+	 * @throws IllegalArgumentException
+	 */
+	public void updateAppointment(AppointmentTransfer appointmentTransfer)
+	{
+		Appointment appointment = scheduleManager.getAppointment(getLoggedInInfo(), appointmentTransfer.getId());
+		validateAppointmentUpdate(appointment, appointmentTransfer);
 		appointmentTransfer.copyTo(appointment);
 		scheduleManager.updateAppointment(getLoggedInInfo(),appointment);
+	}
+
+	/**
+	 * Validates an update to an appointment ensuring the update is valid
+	 * @param oldAppointment appointment prior to updating
+	 * @param newAppointment appointment after updating
+	 * @throws IllegalArgumentException
+	 */
+	private void validateAppointmentUpdate(Appointment oldAppointment, AppointmentTransfer newAppointment) throws IllegalArgumentException
+	{
+		if (oldAppointment.getIsVirtual())
+		{
+			if (!newAppointment.getIsVirtual())
+			{
+				throw new IllegalArgumentException("Appointment ID: " + oldAppointment.getId() +
+					" can't be updated. Virtual appointments can not be changed to not virtual.");
+			}
+
+			if (!oldAppointment.getLocation().equals(newAppointment.getLocation()))
+			{
+				throw new IllegalArgumentException("Appointment ID: " + oldAppointment.getId() +
+					" can't be updated. Virtual appointments can not change location.");
+			}
+
+			if (oldAppointment.getDemographicNo() != newAppointment.getDemographicNo())
+			{
+				throw new IllegalArgumentException("Appointment ID: " + oldAppointment.getId() +
+					" can't be updated. Virtual appointments can not change demographic.");
+			}
+		}
 	}
 
 	public void cancelAppointment(Integer appointmentId)
