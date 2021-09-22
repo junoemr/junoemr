@@ -385,7 +385,7 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public String getOrderStatusDisplayValue()
 	{
-		String orderStatusCode = getOrderStatus();
+		String orderStatusCode = getString(getOrderStatus());
 		switch (orderStatusCode)
 		{
 			case "F": return "Final";

@@ -28,9 +28,8 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import com.google.common.collect.Sets;
-import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
-
 import java.util.HashSet;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Handler for:
@@ -38,19 +37,19 @@ import java.util.HashSet;
  *
  * @author Robert
  */
-public class AHSRuralDIHandler extends AHSHandler
+public class AHSRuralDIHandler extends AHSRuralBaseHandler
 {
 	public static final String AHS_RURAL_DI_LAB_TYPE = "AHS-RDI";
 
 	protected static final String CLSDI_SENDING_APPLICATION = "RAD";
 	protected static final HashSet<String> CLSDI_SENDING_FACILITIES = Sets.newHashSet(
-			"AHR-AWLA", // .arad
-			"CHR-CLRH", // .crad
-			"DTHR-DRDH", // .drad
-			"ECHR-ESMH", // .erad
-			"PHR-LMHA", // .lrad
-			"NLHR-NNLA", // .nrad
-			"PCHR-PQEA" // .prad
+		"AHR-AWLA", // .arad
+		"CHR-CLRH", // .crad
+		"DTHR-DRDH", // .drad
+		"ECHR-ESMH", // .erad
+		"PHR-LMHA", // .lrad
+		"NLHR-NNLA", // .nrad
+		"PCHR-PQEA" // .prad
 	);
 
 	public static boolean handlerTypeMatch(Message message)
@@ -85,13 +84,9 @@ public class AHSRuralDIHandler extends AHSHandler
 		super(msg);
 	}
 
-	@Override
-	public boolean canUpload()
-	{
-		return true;
-	}
-
     /* ===================================== Hl7 Parsing ====================================== */
+
+	/* ===================================== MSH ====================================== */
 
 	@Override
 	public String getMsgType()
@@ -99,16 +94,14 @@ public class AHSRuralDIHandler extends AHSHandler
 		return AHS_RURAL_DI_LAB_TYPE;
 	}
 
+	/* ===================================== OBR ====================================== */
+
 	@Override
 	public String getFillerOrderNumber()
 	{
-		return get("/.OBR-3-1");
+		return StringUtils.trimToEmpty(get("/.OBR-18-2") + " " + get("/.OBR-4-5"));
 	}
 
-	@Override
-	public String getAccessionNum()
-	{
-		return get("/.OBR-20-1");
-	}
+	/* ===================================== OBX ====================================== */
 
 }

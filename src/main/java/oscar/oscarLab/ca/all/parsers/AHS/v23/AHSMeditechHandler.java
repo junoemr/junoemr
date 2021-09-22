@@ -27,7 +27,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
+import org.oscarehr.util.MiscUtils;
 
 /**
  * Handler for:
@@ -35,7 +35,7 @@ import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
  *
  * @author Robert
  */
-public class AHSMeditechHandler extends AHSHandler
+public class AHSMeditechHandler extends AHSRuralBaseHandler
 {
 	public static final String AHS_MEDITECH_LAB_TYPE = "AHS-PDOC";
 
@@ -74,12 +74,6 @@ public class AHSMeditechHandler extends AHSHandler
 		super(msg);
 	}
 
-	@Override
-	public boolean canUpload()
-	{
-		return true;
-	}
-
     /* ===================================== Hl7 Parsing ====================================== */
 
 
@@ -100,35 +94,6 @@ public class AHSMeditechHandler extends AHSHandler
 		return get("/.OBR-25-1");
 	}
 
-	@Override
-	public String getAccessionNum()
-	{
-		// use the filler order number as the unique lab identifier apparently
-		return get("/.OBR-3-1");
-	}
-
-	@Override
-	public String getServiceDate()
-	{
-		return get("/.OBR-7-1");
-	}
-
-	@Override
-	public String getOrderStatus()
-	{
-		return get("/.OBR-25-1");
-	}
-
-	@Override
-	public String getOrderStatusDisplayValue()
-	{
-		if("X".equals(getOrderStatus()))
-		{
-			return "Cancelled";
-		}
-		return "Final";
-	}
-
 	/**
 	 * PDOC labs only send provider info in OBR-28 (cc providers), so the first one is the requesting client
 	 */
@@ -139,24 +104,22 @@ public class AHSMeditechHandler extends AHSHandler
 	}
 
 	/**
-	 * PDOC is always unstructured
+	 * PDOC labs only send provider info in OBR-28 (cc providers), so the first one is the requesting client
 	 */
 	@Override
-	public boolean isUnstructured()
+	public String getClientRef()
 	{
-		return true;
+		try
+		{
+			return getResultCopiesToProviderNo(0, 0);
+		}
+		catch (HL7Exception e)
+		{
+			MiscUtils.getLogger().error("Could not return doctor id number", e);
+			return ("");
+		}
 	}
 
 	/* ===================================== OBX ====================================== */
-
-	@Override
-	public String getTimeStamp(int i, int j)
-	{
-		if (i < 0)
-		{
-			return null;
-		}
-		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-8-1"));
-	}
 
 }
