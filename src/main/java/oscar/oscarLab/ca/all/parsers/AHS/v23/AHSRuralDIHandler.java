@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,11 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * This software was written for the
- * Department of Family Medicine
- * McMaster University
- * Hamilton
- * Ontario, Canada
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
 package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
@@ -41,8 +40,8 @@ public class AHSRuralDIHandler extends AHSRuralBaseHandler
 {
 	public static final String AHS_RURAL_DI_LAB_TYPE = "AHS-RDI";
 
-	protected static final String CLSDI_SENDING_APPLICATION = "RAD";
-	protected static final HashSet<String> CLSDI_SENDING_FACILITIES = Sets.newHashSet(
+	protected static final String AHS_RDI_SENDING_APPLICATION = "RAD";
+	protected static final HashSet<String> AHS_RDI_SENDING_FACILITIES = Sets.newHashSet(
 		"AHR-AWLA", // .arad
 		"CHR-CLRH", // .crad
 		"DTHR-DRDH", // .drad
@@ -60,11 +59,11 @@ public class AHSRuralDIHandler extends AHSRuralBaseHandler
 			ORU_R01 msh = (ORU_R01) message;
 			MSH messageHeaderSegment = msh.getMSH();
 
-			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
-			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
+			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return CLSDI_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
-					CLSDI_SENDING_FACILITIES.contains(sendingFacility.toUpperCase());
+			return AHS_RDI_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
+				AHS_RDI_SENDING_FACILITIES.contains(sendingFacility.toUpperCase());
 		}
 		return false;
 	}
