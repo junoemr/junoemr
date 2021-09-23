@@ -72,6 +72,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -349,24 +350,22 @@ public class ScheduleWs extends AbstractWs {
 	 */
 	private void validateAppointmentUpdate(Appointment oldAppointment, AppointmentTransfer newAppointment) throws IllegalArgumentException
 	{
+		String errorMessage = "Appointment ID: " + oldAppointment.getId() + " can't be updated. ";
 		if (oldAppointment.getIsVirtual())
 		{
 			if (!newAppointment.getIsVirtual())
 			{
-				throw new IllegalArgumentException("Appointment ID: " + oldAppointment.getId() +
-					" can't be updated. Virtual appointments can not be changed to not virtual.");
+				throw new IllegalArgumentException(errorMessage.concat("Virtual appointments can not be changed to not virtual."));
 			}
 
-			if (!oldAppointment.getLocation().equals(newAppointment.getLocation()))
+			if (!Objects.equals(oldAppointment.getLocation(), newAppointment.getLocation()))
 			{
-				throw new IllegalArgumentException("Appointment ID: " + oldAppointment.getId() +
-					" can't be updated. Virtual appointments can not change location.");
+				throw new IllegalArgumentException(errorMessage.concat("Virtual appointments can not change location."));
 			}
 
 			if (oldAppointment.getDemographicNo() != newAppointment.getDemographicNo())
 			{
-				throw new IllegalArgumentException("Appointment ID: " + oldAppointment.getId() +
-					" can't be updated. Virtual appointments can not change demographic.");
+				throw new IllegalArgumentException(errorMessage.concat("Virtual appointments can not change demographic."));
 			}
 		}
 	}
