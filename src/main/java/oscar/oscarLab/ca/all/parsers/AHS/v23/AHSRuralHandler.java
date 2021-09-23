@@ -124,9 +124,10 @@ public class AHSRuralHandler extends AHSHandler
 	@Override
 	public String getAccessionNum()
 	{
-		// append the service year/month to the accession number to make it unique
+		// append the hin and service year/month/day to the accession number to make it unique
 		String dateStr = formatDate(getString(get("/.OBR-7-1"))); // yyyy-MM-dd
-		return get("/.OBR-20") + "|" + dateStr;
+		String hinStr = getHealthNum();
+		return get("/.OBR-20") + "|" + hinStr + "|" + dateStr;
 	}
 
 	@Override
