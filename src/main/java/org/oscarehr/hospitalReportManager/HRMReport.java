@@ -81,7 +81,7 @@ public interface HRMReport
 	Calendar getFirstReportEventTime();
 
 	List<String> getFirstReportAuthorPhysician();
-
+	
 	String getSendingFacilityId();
 
 	String getSendingFacilityReportNo();

@@ -318,7 +318,8 @@ public class InboxResultsDao
 					       + "  report_status, "
 					       + "  accessionNum, "
 					       + "  final_result_count, "
-					       + "  report_file "
+					       + "  report_file, "
+						   + "  schema_version "
 					       + "FROM ( "
 					
 					       // This side of the union is for labs and documents.  It is grouped by accession number
@@ -389,10 +390,11 @@ public class InboxResultsDao
 						   + "  CASE "
 					       + "    WHEN hrm.id IS NOT NULL THEN hrm.reportFile"
 					       + "    ELSE null"
+						   + "  END AS report_file, "
 						   + "  CASE "
-						   + "    WHEN hrm.id IS NOT NULL THEN hrm.reportSchemaVersion"
+						   + "    WHEN hrm.id IS NOT NULL THEN hrm.reportFileSchemaVersion"
 						   + "    ELSE null"
-					       + "  END AS report_file ";
+					       + "  END AS schema_version ";
 			
 			if (neverAcknowledgedItems && "N".equals(status))
 			{

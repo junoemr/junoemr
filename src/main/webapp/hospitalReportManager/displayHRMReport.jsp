@@ -526,6 +526,8 @@
                 authorNameParts.remove(0);
             }
             author = StringUtils.trimToNull(String.join(" ", authorNameParts));
+
+            String facilityName = (String) request.getAttribute("facilityName");
         %>
         <b>Name: </b><span class="<%=getFieldClass(lastName)%>"><%=getFieldDisplayValue(lastName)%></span>, <span class="<%=getFieldClass(firstName)%>"><%=getFieldDisplayValue(firstName)%></span> <span class="<%=getFieldClass(gender)%>">(<%=getFieldDisplayValue(gender)%>)</span><br/>
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
@@ -565,7 +567,7 @@
                 String noMessageIdHash = org.apache.commons.codec.digest.DigestUtils.md5Hex(noMessageIdFileData);
             %>
             <%
-                List<String> imageFormats = Arrays.asList(".gif", ".jpg", ".jpeg", ".png", ".jpeg");
+                List<String> imageFormats = Arrays.asList(".gif", ".jpg", ".jpeg", ".png", ".jpeg");    // *.tiff is not supported on modern browsers
                 if (hrmReport.getFileExtension() != null && imageFormats.contains(hrmReport.getFileExtension())) {
             %>
             <img src="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?hash=<%=noMessageIdHash%>"/><br/>
@@ -606,7 +608,7 @@
                 <% } %>
                 <tr>
                     <td>Facility:</td>
-                    <td><span class="<%=getFieldClass(sendingFacility)%>"><%=getFieldDisplayValue(sendingFacility)%></span></td>
+                    <td><span class="<%=getFieldClass(facilityName)%>"><%=getFieldDisplayValue(sendingFacility)%></span> <span class="<%=getFieldClass(sendingFacility)%>">(<%=getFieldDisplayValue(sendingFacility)%>)</span></td>
                 </tr>
                 <tr>
                     <td>Report No:</td>
@@ -657,7 +659,7 @@
             </table>
             <table>
                 <tr>
-                    <th>Associated Demographic</th>
+                    <th>Assigned Demographic</th>
                 </tr>
                 <% if (demographicLink != null) {
                     Demographic demographic = demographicDao.find(demographicLink.getDemographicNo());

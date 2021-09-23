@@ -24,17 +24,17 @@
 package org.oscarehr.dataMigration.mapper.hrm.in;
 
 import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.util.SpringUtils;
+import org.oscarehr.integration.clinicaid.dto.v2.MasterNumber;
+import org.oscarehr.integration.clinicaid.service.v2.ClinicAidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.ReportClass;
 import xml.hrm.v4_3.ReportsReceived;
 
@@ -45,13 +45,10 @@ import java.time.LocalDateTime;
 public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3, HrmDocument>
 {
 	@Autowired
-	static HRMReportDocumentMapper documentMapper = new HRMReportDocumentMapper();
+	private HRMReportDocumentMapper documentMapper;
 	
 	@Autowired
-	static ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
-	
-	@Autowired
-	static ProviderDbToModelConverter providerConverter = SpringUtils.getBean(ProviderDbToModelConverter.class);
+	private ClinicAidService clinicAidService;
 	
 	private static final String SCHEMA_VERSION = "4.3";
 	
@@ -92,16 +89,23 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		model.setReportSubClass(report.getSubClass());
 		model.setReportFileSchemaVersion(SCHEMA_VERSION);
 		
-		//model.setSourceFacility(importStructure.getSendingFacilityId());              // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
-		model.setSendingFacilityId(importStructure.getSendingFacilityId());             // TODO: unsure of this.  Source facility in schema is under the xsd:SendingFacility
+		String facilityMasterNumber = importStructure.getSendingFacilityId();
+		model.setSendingFacilityId(facilityMasterNumber);
 		model.setSendingFacilityReport(importStructure.getSendingFacilityReportNo());
+		
+		if (clinicAidService != null && ConversionUtils.hasContent(facilityMasterNumber))
+		{
+			MasterNumber masterNumberLookup = clinicAidService.getOntarioMasterNumber(facilityMasterNumber);
+			if (masterNumberLookup != null)
+			{
+				model.setSendingFacility(masterNumberLookup.getName());
+			}
+		}
 		
 		model.setObservations(importStructure.getObservations());
 		
 		model.setDocument(documentMapper.importToJuno(importStructure));
 		model.setReportFile(FileFactory.getExistingFile(importStructure.getFileLocation()));
-		
-		// Document matching data is mapped at the service level
 		
 		return model;
 	}

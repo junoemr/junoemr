@@ -325,7 +325,7 @@ public class HRMReport_4_1 implements HRMReport
 
 		return physicianName;
 	}
-
+	
 	public String getSendingFacilityId()
 	{
 		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())

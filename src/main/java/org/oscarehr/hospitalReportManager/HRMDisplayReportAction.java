@@ -45,7 +45,7 @@ import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
 public class HRMDisplayReportAction extends DispatchAction {
-
+	
 	private static Logger logger=MiscUtils.getLogger();
 	
 	private static HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
@@ -57,112 +57,119 @@ public class HRMDisplayReportAction extends DispatchAction {
 	private static HRMDocumentCommentDao hrmDocumentCommentDao = (HRMDocumentCommentDao) SpringUtils.getBean("HRMDocumentCommentDao");
 	private static HRMProviderConfidentialityStatementDao hrmProviderConfidentialityStatementDao = (HRMProviderConfidentialityStatementDao) SpringUtils.getBean("HRMProviderConfidentialityStatementDao");
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-    
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String hrmDocumentId = request.getParameter("id");
 		
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		Integer demographicNumberForLog = null;
-
+		
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "r", null)) {
 			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, hrmDocumentId, request.getRemoteAddr());
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+			throw new SecurityException("missing required security object (_hrm)");
+		}
 		
 		if (hrmDocumentId != null) {
-                    HRMDocument document = hrmDocumentDao.findById(Integer.parseInt(hrmDocumentId)).get(0);
-
-                    if (document != null) {
-                        logger.debug("reading reportFile : "+document.getReportFile());
-                        HRMReport report = HRMReportParser.parseReport(document.getReportFile(), document.getReportFileSchemaVersion());
-                        
-                        request.setAttribute("hrmDocument", document);
-
-                        if (report != null) {
-                            request.setAttribute("hrmReport", report);
-                            request.setAttribute("hrmReportId", document.getId());
-                            request.setAttribute("hrmReportTime", ConversionUtils.toTimestampString(document.getTimeReceived()));
-                            
-                            request.setAttribute("hrmDuplicateNum", document.getNumDuplicatesReceived());
-
-                            List<HRMDocumentToDemographic> demographicLinkList = hrmDocumentToDemographicDao.findByHrmDocumentId(document.getId());
-                            HRMDocumentToDemographic demographicLink = (demographicLinkList.size() > 0 ? demographicLinkList.get(0) : null);
-                            if (demographicLink != null)
-                            {
-	                            demographicNumberForLog = demographicLink.getDemographicNo();
-                            }
-                            
-                            request.setAttribute("demographicLink", demographicLink);
-
-                            List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(document.getId());
-                            request.setAttribute("providerLinkList", providerLinkList);
-
-                            List<HRMDocumentSubClass> subClassList = hrmDocumentSubClassDao.getSubClassesByDocumentId(document.getId());
-                            request.setAttribute("subClassList", subClassList);
-
-                            HRMDocumentToProvider thisProviderLink = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(document.getId(), loggedInInfo.getLoggedInProviderNo());
-                            request.setAttribute("thisProviderLink", thisProviderLink);
-
-	                        if(thisProviderLink != null)
-	                        {
-		                        thisProviderLink.setViewed(true);
-		                        hrmDocumentToProviderDao.merge(thisProviderLink);
-	                        }
-
-                            HRMDocumentSubClass hrmDocumentSubClass=null;
-                            if (subClassList!= null)
-                            {
-                            	for (HRMDocumentSubClass temp : subClassList)
-                            	{
-                            		if (temp.isActive())
-                            		{
-                            			hrmDocumentSubClass=temp;
-                            			break;
-                            		}
-                            	}
-                            }
-                            
-                            HRMCategory category = null;
-                            if (hrmDocumentSubClass != null) {
-                                category = hrmCategoryDao.findBySubClassNameMnemonic(hrmDocumentSubClass.getSubClass()+':'+hrmDocumentSubClass.getSubClassMnemonic());
-                            }
-                            else
-                            {
-                            	category=hrmCategoryDao.findBySubClassNameMnemonic("DEFAULT");
-                            }
-                            
-                            request.setAttribute("category", category);                            
-
-                            // Get all the other HRM documents that are either a child, sibling, or parent
-                            List<HRMDocument> allDocumentsWithRelationship = hrmDocumentDao.findAllDocumentsWithRelationship(document.getId());
-                            request.setAttribute("allDocumentsWithRelationship", allDocumentsWithRelationship);
-
-
-                            List<HRMDocumentComment> documentComments = hrmDocumentCommentDao.getCommentsForDocument(Integer.parseInt(hrmDocumentId));
-                            request.setAttribute("hrmDocumentComments", documentComments);
-
-
-                            String confidentialityStatement = hrmProviderConfidentialityStatementDao.getConfidentialityStatementForProvider(loggedInInfo.getLoggedInProviderNo());
-                            request.setAttribute("confidentialityStatement", confidentialityStatement);
-                            
-                            String duplicateLabIdsString=StringUtils.trimToNull(request.getParameter("duplicateLabIds"));
-                            Map<Integer,Date> dupReportDates = new HashMap<Integer,Date>();
-                            Map<Integer,Date> dupTimeReceived = new HashMap<Integer,Date>();
-                            
-                            if (duplicateLabIdsString!=null) {
-                            	String[] duplicateLabIdsStringSplit=duplicateLabIdsString.split(",");
-                            	for (String tempId : duplicateLabIdsStringSplit) {
-                            		HRMDocument doc = hrmDocumentDao.find(Integer.parseInt(tempId));
-                            		dupReportDates.put(Integer.parseInt(tempId),doc.getReportDate());
-                            		dupTimeReceived.put(Integer.parseInt(tempId),doc.getTimeReceived());
-                            	}
-                            
-                            }
-                            
-                            request.setAttribute("dupReportDates",dupReportDates);
-                            request.setAttribute("dupTimeReceived", dupTimeReceived);
-                        }
-                    }
+			HRMDocument document = hrmDocumentDao.findById(Integer.parseInt(hrmDocumentId)).get(0);
+			
+			if (document != null)
+			{
+				try
+				{
+					HRMReport report = HRMReportParser.parseRelativeLocation(document.getReportFile(), document.getReportFileSchemaVersion());
+					request.setAttribute("hrmDocument", document);
+					
+					request.setAttribute("hrmReport", report);
+					request.setAttribute("hrmReportId", document.getId());
+					request.setAttribute("hrmReportTime", ConversionUtils.toTimestampString(document.getTimeReceived()));
+					
+					request.setAttribute("hrmDuplicateNum", document.getNumDuplicatesReceived());
+					request.setAttribute("facilityName", document.getSendingFacility());
+					
+					List<HRMDocumentToDemographic> demographicLinkList = hrmDocumentToDemographicDao.findByHrmDocumentId(document.getId());
+					HRMDocumentToDemographic demographicLink = (demographicLinkList.size() > 0 ? demographicLinkList.get(0) : null);
+					
+					if (demographicLink != null)
+					{
+						demographicNumberForLog = demographicLink.getDemographicNo();
+					}
+					
+					request.setAttribute("demographicLink", demographicLink);
+					
+					List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(document.getId());
+					request.setAttribute("providerLinkList", providerLinkList);
+					
+					List<HRMDocumentSubClass> subClassList = hrmDocumentSubClassDao.getSubClassesByDocumentId(document.getId());
+					request.setAttribute("subClassList", subClassList);
+					
+					HRMDocumentToProvider thisProviderLink = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(document.getId(), loggedInInfo.getLoggedInProviderNo());
+					request.setAttribute("thisProviderLink", thisProviderLink);
+					
+					if (thisProviderLink != null)
+					{
+						thisProviderLink.setViewed(true);
+						hrmDocumentToProviderDao.merge(thisProviderLink);
+					}
+					
+					HRMDocumentSubClass hrmDocumentSubClass = null;
+					if (subClassList != null)
+					{
+						for (HRMDocumentSubClass temp : subClassList)
+						{
+							if (temp.isActive())
+							{
+								hrmDocumentSubClass = temp;
+								break;
+							}
+						}
+					}
+					
+					HRMCategory category = null;
+					if (hrmDocumentSubClass != null)
+					{
+						category = hrmCategoryDao.findBySubClassNameMnemonic(hrmDocumentSubClass.getSubClass() + ':' + hrmDocumentSubClass.getSubClassMnemonic());
+					}
+					else
+					{
+						category = hrmCategoryDao.findBySubClassNameMnemonic("DEFAULT");
+					}
+					
+					request.setAttribute("category", category);
+					
+					// Get all the other HRM documents that are either a child, sibling, or parent
+					List<HRMDocument> allDocumentsWithRelationship = hrmDocumentDao.findAllDocumentsWithRelationship(document.getId());
+					request.setAttribute("allDocumentsWithRelationship", allDocumentsWithRelationship);
+					
+					List<HRMDocumentComment> documentComments = hrmDocumentCommentDao.getCommentsForDocument(Integer.parseInt(hrmDocumentId));
+					request.setAttribute("hrmDocumentComments", documentComments);
+					
+					String confidentialityStatement = hrmProviderConfidentialityStatementDao.getConfidentialityStatementForProvider(loggedInInfo.getLoggedInProviderNo());
+					request.setAttribute("confidentialityStatement", confidentialityStatement);
+					
+					String duplicateLabIdsString = StringUtils.trimToNull(request.getParameter("duplicateLabIds"));
+					Map<Integer, Date> dupReportDates = new HashMap<Integer, Date>();
+					Map<Integer, Date> dupTimeReceived = new HashMap<Integer, Date>();
+					
+					if (duplicateLabIdsString != null)
+					{
+						String[] duplicateLabIdsStringSplit = duplicateLabIdsString.split(",");
+						for (String tempId : duplicateLabIdsStringSplit)
+						{
+							HRMDocument doc = hrmDocumentDao.find(Integer.parseInt(tempId));
+							dupReportDates.put(Integer.parseInt(tempId), doc.getReportDate());
+							dupTimeReceived.put(Integer.parseInt(tempId), doc.getTimeReceived());
+						}
+						
+					}
+					
+					request.setAttribute("dupReportDates", dupReportDates);
+					request.setAttribute("dupTimeReceived", dupTimeReceived);
+				}
+				catch (Exception e)
+				{
+					LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographicNumberForLog, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, hrmDocumentId, request.getRemoteAddr());
+				}
+			}
 		}
 		
 		
