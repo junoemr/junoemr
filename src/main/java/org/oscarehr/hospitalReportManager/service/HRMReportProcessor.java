@@ -105,6 +105,7 @@ public class HRMReportProcessor
 			}
 		}
 		
+		results.setProcessingSuccess(unprocessedFiles != null && processedFiles.get() == unprocessedFiles.size());
 		results.setReportsProcessed(processedFiles.get());
 		results.setEndTime(LocalDateTime.now());
 	}

@@ -513,7 +513,7 @@
             String deliverToFirstName = hrmReport.getDeliverToUserIdFirstName();
             String deliverToId = hrmReport.getDeliverToUserId();
 
-            String sendingFacility = hrmReport.getSendingFacilityId();
+            String sendingFacilityId = hrmReport.getSendingFacilityId();
             String reportNumber = hrmReport.getSendingFacilityReportNo();
 
             Date reportTime = findReportTime(hrmReport);
@@ -608,7 +608,7 @@
                 <% } %>
                 <tr>
                     <td>Facility:</td>
-                    <td><span class="<%=getFieldClass(facilityName)%>"><%=getFieldDisplayValue(sendingFacility)%></span> <span class="<%=getFieldClass(sendingFacility)%>">(<%=getFieldDisplayValue(sendingFacility)%>)</span></td>
+                    <td><span class="<%=getFieldClass(facilityName)%>"><%=getFieldDisplayValue(facilityName)%></span> <span class="<%=getFieldClass(sendingFacilityId)%>">(<%=getFieldDisplayValue(sendingFacilityId)%>)</span></td>
                 </tr>
                 <tr>
                     <td>Report No:</td>
