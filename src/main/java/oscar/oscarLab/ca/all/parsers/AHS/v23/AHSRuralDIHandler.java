@@ -29,6 +29,7 @@ import ca.uhn.hl7v2.model.v23.segment.MSH;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
 import org.apache.commons.lang.StringUtils;
+import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
 /**
  * Handler for:
@@ -36,7 +37,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author Robert
  */
-public class AHSRuralDIHandler extends AHSRuralBaseHandler
+public class AHSRuralDIHandler extends AHSHandler
 {
 	public static final String AHS_RURAL_DI_LAB_TYPE = "AHS-RDI";
 
@@ -96,11 +97,56 @@ public class AHSRuralDIHandler extends AHSRuralBaseHandler
 	/* ===================================== OBR ====================================== */
 
 	@Override
+	public String getAccessionNum()
+	{
+		// use the filler order number as the unique lab identifier apparently
+		return get("/.OBR-3-1");
+	}
+
+	@Override
 	public String getFillerOrderNumber()
 	{
 		return StringUtils.trimToEmpty(get("/.OBR-18-2") + " " + get("/.OBR-4-5"));
 	}
 
+	@Override
+	public boolean isUnstructured()
+	{
+		return true;
+	}
+
+	@Override
+	public String getServiceDate()
+	{
+		return formatDateTime(getString(get("/.OBR-7-1")));
+	}
+
+	@Override
+	public String getOrderStatus()
+	{
+		return get("/.OBR-25-1");
+	}
+
+	@Override
+	public String getOrderStatusDisplayValue()
+	{
+		if("X".equals(getOrderStatus()))
+		{
+			return "Cancelled";
+		}
+		return "Final";
+	}
+
 	/* ===================================== OBX ====================================== */
+
+	@Override
+	public String getTimeStamp(int i, int j)
+	{
+		if (i < 0 || j < 0)
+		{
+			return null;
+		}
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-8-1"));
+	}
 
 }

@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.oscarehr.util.MiscUtils;
+import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
 /**
  * Handler for:
@@ -34,7 +35,7 @@ import org.oscarehr.util.MiscUtils;
  *
  * @author Robert
  */
-public class AHSMeditechHandler extends AHSRuralBaseHandler
+public class AHSMeditechHandler extends AHSHandler
 {
 	public static final String AHS_MEDITECH_LAB_TYPE = "AHS-PDOC";
 
@@ -87,10 +88,45 @@ public class AHSMeditechHandler extends AHSRuralBaseHandler
 	/* ===================================== OBR ====================================== */
 
 	@Override
+	public String getAccessionNum()
+	{
+		// use the filler order number as the unique lab identifier apparently
+		return get("/.OBR-3-1");
+	}
+
+	@Override
 	public String getFillerOrderNumber()
 	{
 		// use the status code to fake a lab version
 		return get("/.OBR-25-1");
+	}
+
+	@Override
+	public boolean isUnstructured()
+	{
+		return true;
+	}
+
+	@Override
+	public String getServiceDate()
+	{
+		return formatDateTime(getString(get("/.OBR-7-1")));
+	}
+
+	@Override
+	public String getOrderStatus()
+	{
+		return get("/.OBR-25-1");
+	}
+
+	@Override
+	public String getOrderStatusDisplayValue()
+	{
+		if("X".equals(getOrderStatus()))
+		{
+			return "Cancelled";
+		}
+		return "Final";
 	}
 
 	/**
@@ -121,4 +157,13 @@ public class AHSMeditechHandler extends AHSRuralBaseHandler
 
 	/* ===================================== OBX ====================================== */
 
+	@Override
+	public String getTimeStamp(int i, int j)
+	{
+		if (i < 0 || j < 0)
+		{
+			return null;
+		}
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-8-1"));
+	}
 }

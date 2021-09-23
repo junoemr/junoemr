@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
+import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
 /**
@@ -56,7 +57,8 @@ public class AHSRuralHandler extends AHSHandler
 		"DTHR-DRDH",
 		"ECHR-EWAA",
 		"PCHR-PQEA",
-		"PHR-LMHA"
+		"PHR-LMHA",
+		"PHR-LLCS" // not in spec, but in samples
 	);
 
 	public static boolean handlerTypeMatch(Message message)
@@ -123,7 +125,7 @@ public class AHSRuralHandler extends AHSHandler
 	public String getAccessionNum()
 	{
 		// append the service year/month to the accession number to make it unique
-		String dateStr = formatDate(getString(get("/.OBR-7-1")));
+		String dateStr = formatDate(getString(get("/.OBR-7-1"))); // yyyy-MM-dd
 		return get("/.OBR-20") + "|" + dateStr;
 	}
 
@@ -136,7 +138,15 @@ public class AHSRuralHandler extends AHSHandler
 	@Override
 	public String getOrderStatus()
 	{
-		return getString(get("/.OBR-25-1"));
+		String originalStatus = getString(get("/.OBR-25-1"));
+
+		// map to the juno standard codes so they show correctly
+		switch (originalStatus)
+		{
+			case "A": return Hl7TextInfo.REPORT_STATUS.P.name(); // partial
+			case "P": return Hl7TextInfo.REPORT_STATUS.E.name(); // preliminary
+			default: return originalStatus;
+		}
 	}
 
 	@Override
@@ -145,14 +155,28 @@ public class AHSRuralHandler extends AHSHandler
 		String orderStatusCode = getString(getOrderStatus());
 		switch (orderStatusCode)
 		{
-			case "A": return "Partial";
+			case "P": return "Partial";
 			case "F": return "Final";
-			case "P": return "Preliminary";
+			case "E": return "Preliminary";
 			case "X": return "Cancelled";
 			default: return orderStatusCode;
 		}
 	}
 
 	/* ===================================== OBX ====================================== */
+
+	@Override
+	public String getOBXResultStatusDisplayValue(int i, int j)
+	{
+		String resultStatusCode = getString(getOBXResultStatus(i, j));
+		switch (resultStatusCode)
+		{
+			case "P": return "Preliminary";
+			case "F": return "Final";
+			case "C": return "Correction";
+			case "D": return "Delete";
+			default: return resultStatusCode;
+		}
+	}
 
 }

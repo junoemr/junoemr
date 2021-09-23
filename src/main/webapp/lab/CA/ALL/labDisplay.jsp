@@ -1544,7 +1544,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		                                            <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
 		                                            <td align="left"><%=handler.getOBXUnits( j, k) %></td>
 		                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-		                                            <td align="center"><%= handler.getOBXResultStatus( j, k) %></td>
+		                                            <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
 		                                            <td align="center" valign="top">
 	                                                <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
@@ -1576,7 +1576,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                    <td align="left" valign="top"><%=handler.getOBXReferenceRange( j, k)%></td>
                                                    <td align="left" valign="top"><%=handler.getOBXUnits( j, k) %></td>
                                                    <td align="center" valign="top"><%= handler.getTimeStamp(j, k) %></td>
-                                                   <td align="center" valign="top"><%= handler.getOBXResultStatus( j, k) %></td>
+                                                   <td align="center" valign="top"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
                                                    <td align="center" valign="top">
    	                                                <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
    	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
@@ -1606,7 +1606,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		                                            <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
 		                                            <td align="left"><%=handler.getOBXUnits( j, k) %></td>
 		                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-		                                            <td align="center"><%= handler.getOBXResultStatus( j, k) %></td>
+		                                            <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
 		                                            <td align="center" valign="top">
 	                                                <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
@@ -1670,7 +1670,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										   <td align="left"><%=handler.getOBXReferenceRange(j, k)%></td>
 										   <td align="left"><%=handler.getOBXUnits(j, k) %></td>
 										   <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-										   <td align="center"><%= handler.getOBXResultStatus(j, k) %></td>
+										   <td align="center"><%= handler.getOBXResultStatusDisplayValue(j, k) %></td>
 										   <td align="center" valign="top">
 											   <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 												   <%
@@ -1746,7 +1746,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												%>
 
                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-                                           <td align="center"><%= handler.getOBXResultStatus(j, k) %></td>
+                                           <td align="center"><%= handler.getOBXResultStatusDisplayValue(j, k) %></td>
 
                                       		<td align="center" valign="top">
 	                                                <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
@@ -1946,7 +1946,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            <td align="left"><%=handler.getOBXUnits( j, k) %></td>
                                            
                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-                                           <td align="center"><%= handler.getOBXResultStatus( j, k) %></td>
+                                           <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
                                       		<td align="center" valign="top">                                           <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
 	                                                </a>

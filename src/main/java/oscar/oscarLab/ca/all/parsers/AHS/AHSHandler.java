@@ -111,8 +111,9 @@ public abstract class AHSHandler extends ORU_R01MessageHandler
 
 
 	@Override
-	public String getHealthNum() {
-		return get("/.PID-2-1");
+	public String getHealthNum()
+	{
+		return getString(get("/.PID-2-1"));
 	}
 
 	/* ===================================== OBR ====================================== */

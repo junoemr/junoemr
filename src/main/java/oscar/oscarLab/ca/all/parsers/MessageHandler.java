@@ -772,6 +772,14 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 *  Return the result status from the jth OBX segment of the ith OBR group, in a human-readable format
+	 */
+	public String getOBXResultStatusDisplayValue(int i, int j)
+	{
+		return getOBXResultStatus(i, j);
+	}
+
+	/**
 	 *  Return the date and time of the observation referred to by the jth obx
 	 *  segment of the ith obr group. If the date and time is not specified
 	 *  within the obx segment it should be specified within the obr segment.
