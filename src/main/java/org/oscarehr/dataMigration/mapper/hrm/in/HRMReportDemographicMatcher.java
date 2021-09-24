@@ -43,6 +43,8 @@ public class HRMReportDemographicMatcher extends AbstractHRMImportMapper<HRMRepo
 	public List<Demographic> importToJuno(HRMReport_4_3 importStructure) throws Exception
 	{
 		DemographicCriteriaSearch searchParams = new DemographicCriteriaSearch();
+		searchParams.setMatchModeExact();
+		searchParams.setJunctionTypeAND();
 		
 		// Required matching params
 		searchParams.setHin(importStructure.getHCN());
