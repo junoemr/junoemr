@@ -869,13 +869,6 @@ public class OLISHL7Handler extends MessageHandler
 
 		p.setValidationContext(new NoValidation());
 
-		// for legacy purposes. this was previously run pre-upload,
-		// which altered saved lab text to include these values
-		hl7Body = hl7Body.replace("\\E\\", "\\SLASHHACK\\")
-			.replace("µ", "\\MUHACK\\")
-			.replace("\\H\\", "\\.H\\")
-			.replace("\\N\\", "\\.N\\");
-
 		msg = p.parse(hl7Body.replaceAll("\n", "\r\n"));
 		headers = new ArrayList<String>();
 		this.message = msg;
@@ -2620,13 +2613,23 @@ public class OLISHL7Handler extends MessageHandler
 
 	boolean centered = false;
 
-	public String formatString(String s) {
+	public String formatString(String str)
+	{
+		if (StringUtils.isEmpty(str))
+		{
+			return "";
+		}
+
+		// for legacy purposes. this was previously run pre-upload,
+		// which altered saved lab text to include these values
+		String s = str.replace("\\E\\", "\\SLASHHACK\\")
+			.replace("\\H\\", "\\.H\\")
+			.replace("\\N\\", "\\.N\\");
+
 		int pos = 0;
 		StringBuilder sb = new StringBuilder();
 		centered = false;
-		if (s == null || s.equals("")) {
-			return "";
-		}
+
 		int pieceStart = 0;
 		int pieceEnd = 0;
 		String op = "";
@@ -2699,8 +2702,8 @@ public class OLISHL7Handler extends MessageHandler
 			return "~";
 		} else if (piece.equals("SLASHHACK")) {
 			return "\\";
-		} else if (piece.equals("MUHACK")) {
-			return "&#956;";
+		} else if (piece.equals("MUHACK")) { // legacy files only
+			return "&#181;";
 		} else {
 			matchFound = false;
 		}

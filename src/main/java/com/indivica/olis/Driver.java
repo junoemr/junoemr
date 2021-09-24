@@ -18,6 +18,32 @@ import ca.ssha.www._2005.hial.OLISStub.HIALRequestSignedRequest;
 import ca.ssha.www._2005.hial.OLISStub.OLISRequest;
 import ca.ssha.www._2005.hial.OLISStub.OLISRequestResponse;
 import com.indivica.olis.queries.Query;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
@@ -49,32 +75,6 @@ import org.oscarehr.util.SpringUtils;
 import org.xml.sax.InputSource;
 import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.StringReader;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Driver
 {
@@ -264,7 +264,7 @@ public class Driver
 
 			CMSProcessableByteArray cpb = (CMSProcessableByteArray) s.getSignedContent();
 			byte[] signedContent = (byte[]) cpb.getContent();
-			String content = new String(signedContent);
+			String content = new String(signedContent, StandardCharsets.ISO_8859_1);
 			return content;
 		} catch (Exception e) {
 			logger.error("error", e);

@@ -219,11 +219,6 @@ public class OLISUtils
 					}
 				}
 			}
-			else
-			{
-				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
-				return !dupResults.isEmpty();
-			}
 		}
 		else
 		{
