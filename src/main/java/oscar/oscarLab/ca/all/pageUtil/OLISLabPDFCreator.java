@@ -369,7 +369,7 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 		//Outputs the request status
 		cell.setPhrase(new Phrase("Request Status: ", boldFont));
 		specimenTable.addCell(cell);
-		cell.setPhrase(new Phrase(handler.getObrStatus(obr), font));
+		cell.setPhrase(new Phrase(handler.getObrStatusDisplayValue(obr), font));
 		specimenTable.addCell(cell);
 
 		//Adds the specimen table to the category table

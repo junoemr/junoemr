@@ -1538,7 +1538,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                 		<% if (!handler.getObrSpecimenSource(obr).equals("")) { %>
                                 			<tr> <td> Specimen Source: </td><td><%=handler.getObrSpecimenSource(obr) %></td> </tr>
                                 		<% } %>
-                                		<tr> <td> Request Status: </td><td> <%=handler.getObrStatus(obr) %></td></tr>
+                                		<tr> <td> Request Status: </td><td> <%=handler.getObrStatusDisplayValue(obr) %></td></tr>
                                 	</table>
 
                                 	</div>

@@ -717,10 +717,8 @@
 							<a href="javascript:popupStart(700,1100,'../dms/inboxManage.do?method=getDocumentsInQueues')" style="color: #FFFFFF;"><bean:message key="inboxmanager.document.pendingDocs"/></a>
 							| <a href="javascript:popupStart(800,1200,'<%=request.getContextPath() %>/dms/incomingDocs.jsp')" style="color: #FFFFFF;" ><bean:message key="inboxmanager.document.incomingDocs"/></a>
 							| <a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/oscarMDS/CreateLab.jsp')" style="color: #FFFFFF;"><bean:message key="global.createLab" /></a>
-							<!-- Hiding this for now until something is worked out to integrate with OLIS
-							<a href="javascript:popupStart(800,1000, '< %=request.getContextPath() %>/olis/Search.jsp')" style="color: #FFFFFF;">< bean:message key="olis.olisSearch" />
+							<a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/olis/Search.jsp')" style="color: #FFFFFF;"><bean:message key="olis.olisSearch" />
 							</a>
-							-->
 							<!--- Hiding this for now until we decide to get the HRM integration working properly
                                 | <a href="javascript:popupPage(400, 400,'< html:rewrite page="/hospitalReportManager/hospitalReportManager.jsp"/>')" style="color: #FFFFFF;">HRM Status/Upload</a>
 								-->

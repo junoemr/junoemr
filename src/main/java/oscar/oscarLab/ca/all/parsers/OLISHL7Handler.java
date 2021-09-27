@@ -114,8 +114,14 @@ public class OLISHL7Handler extends MessageHandler
 		return sourceOrganizations.containsKey(org) ? sourceOrganizations.get(org) : defaultSourceOrganizations.get(org);
 	}
 
-	public String getObrStatus(int index) {
+	public String getObrStatus(int index)
+	{
 		return obrStatus.get(index);
+	}
+
+	public String getObrStatusDisplayValue(int index)
+	{
+		return getTestRequestStatusMessage(getObrStatus(index));
 	}
 
 	public String getObrSpecimenSource(int index) {
@@ -955,10 +961,11 @@ public class OLISHL7Handler extends MessageHandler
 						String s2 = getString(Terser.get(obr, 15, 0, 5, 2)); // getString(terser.get("/.OBR-15-5-2"));
 						String specimen = String.format("%s%s%s", s1, s1.equals("") || s2.equals("") ? "" : " ", s2);
 						obrSpecimenSource.add(specimen);
-						char status = getString(Terser.get(obr, 25, 0, 1, 1)).charAt(0);
-						isFinal &= isStatusFinal(status);
-						isCorrected |= status == 'C';
-						obrStatus.add(getTestRequestStatusMessage(status));
+						String status = getString(Terser.get(obr, 25, 0, 1, 1));
+						char statusChar = status.charAt(0);
+						isFinal &= isStatusFinal(statusChar);
+						isCorrected |= statusChar == 'C';
+						obrStatus.add(status);
 
 						String parent = getString(Terser.get(obr, 26, 0, 2, 1));
 						if (!"".equals(parent)) {
@@ -1308,23 +1315,23 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	public String getTestRequestStatusMessage(char status) {
+	public String getTestRequestStatusMessage(String status) {
 		switch (status) {
-		case 'A':
+		case "A":
 			return "Some, but not all, results available";
-		case 'C':
+		case "C":
 			return "Correction to results";
-		case 'E':
+		case "E":
 			return "OLIS has expired the test request because no activity has occurred within a reasonable amount of time.";
-		case 'F':
+		case "F":
 			return "Final results; results stored and verified. Can only be changed with a corrected result.";
-		case 'I':
+		case "I":
 			return "No results available; specimen received, procedure incomplete.";
-		case 'O':
+		case "O":
 			return "Order received; specimen not yet received. ";
-		case 'P':
+		case "P":
 			return "Preliminary: A verified early result is available, final results not yet obtained.";
-		case 'X':
+		case "X":
 			return "No results available; Order canceled";
 		default:
 			return "";
@@ -1356,21 +1363,27 @@ public class OLISHL7Handler extends MessageHandler
 	@Override
 	public String getMsgDate()
 	{
-		try
+		String dateString;
+
+		// labs with status O do not have obr-7 filled. all others should
+		if("O".equals(getObrStatus(0)))
 		{
-			String dateString = get("/.OBR-7");
-			if(dateString.length() == 8)
-			{
-				return formatDate(dateString);
-			}
-			else
-			{
-				return formatDateTime(dateString).substring(0, 19);
-			}
+			// TODO figure out the correct date to use in this case
+			dateString = get("/.ORC-9");
 		}
-		catch(Exception e)
+		else
 		{
-			return ("");
+			dateString = get("/.OBR(0)-7-1");
+		}
+
+		// handle date or datetime formatting
+		if(dateString.length() == 8)
+		{
+			return formatDate(dateString);
+		}
+		else
+		{
+			return formatDateTime(dateString).substring(0, 19);
 		}
 	}
 

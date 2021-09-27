@@ -219,6 +219,13 @@ public class OLISUtils
 					}
 				}
 			}
+			else
+			{
+				//TODO figure out OLIS duplicates vs revisions (with matching accession) detection
+				// need to check duplicates because sometimes the first lab of a provider query will be the last lab from the previous query
+				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
+				return !dupResults.isEmpty();
+			}
 		}
 		else
 		{
