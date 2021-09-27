@@ -1025,7 +1025,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                             </td>
                                             <td>
                                                 <div class="FieldData">
-                                                    <%= ( (String) ( handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : "Partial") )%>
+                                                    <%= handler.getOrderStatusDisplayValue()%>
                                                 </div>
                                             </td>
                                         </tr>

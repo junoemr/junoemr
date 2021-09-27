@@ -268,13 +268,12 @@ function filterResults(select) {
 						
 						<td style="width:200px;">
 						<%
-						Integer obrCount = result.getOBRCount();
 						String tests = result.getTestList();
 						%>
 						
 						<%=tests %>
 						</td>
-						<td><%= ( (String) ( result.getOrderStatus().equals("F") ? "Final" : result.getOrderStatus().equals("C") ? "Corrected" : "Partial") )%></td>
+						<td><%= result.getOrderStatusDisplayValue()%></td>
 						<td> <%=result.getShortDocName() %> </td>
 						<td> <%=result.getAdmittingProviderNameShort()%></td>
 						 

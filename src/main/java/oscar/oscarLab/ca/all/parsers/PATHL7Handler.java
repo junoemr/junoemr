@@ -381,6 +381,23 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         }
     }
 
+	/**
+	 *  Return the status of the report in a human-readable format
+	 */
+	@Override
+	public String getOrderStatusDisplayValue()
+	{
+		String orderStatusCode = getString(getOrderStatus());
+		switch (orderStatusCode)
+		{
+			case "F": return "Final";
+			case "C": return "Corrected";
+			case "P": return "Preliminary";
+			case "X": return "DELETED";
+			default: return orderStatusCode;
+		}
+	}
+
     public String getClientRef(){
         String docNum = "";
         int i = 0;
