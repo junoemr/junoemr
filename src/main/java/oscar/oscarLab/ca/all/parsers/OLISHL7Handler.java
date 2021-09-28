@@ -20,10 +20,25 @@ import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.Varies;
+import ca.uhn.hl7v2.model.v231.segment.MSH;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.bouncycastle.util.encoders.Base64;
+import org.oscarehr.common.hl7.OLIS.model.v231.message.ERP_R09;
+import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
+import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
+import org.oscarehr.olis.model.OLISRequestNomenclature;
+import org.oscarehr.olis.model.OLISResultNomenclature;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,18 +51,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.bouncycastle.util.encoders.Base64;
-import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
-import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
-import org.oscarehr.olis.model.OLISRequestNomenclature;
-import org.oscarehr.olis.model.OLISResultNomenclature;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import oscar.util.UtilDateUtilities;
 
 /**
  * @author Adam Balanga
@@ -55,8 +58,10 @@ import oscar.util.UtilDateUtilities;
 public class OLISHL7Handler extends MessageHandler
 {
 	public static final String OLIS_MESSAGE_TYPE = "OLIS_HL7";
-
 	public static final String TEXT_HIGHLIGHT_COLOUR = "#767676";
+
+	protected static final String OLIS_SENDING_APPLICATION_ID = "OLIS";
+	protected static final String OLIS_SENDING_APPLICATION_ID_TYPE = "X500";
 
 	Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 	protected boolean isFinal = true;
@@ -68,6 +73,23 @@ public class OLISHL7Handler extends MessageHandler
 	private HashMap<String, String> sourceOrganizations;
 
 	private HashMap<String, String> defaultSourceOrganizations;
+
+	public static boolean handlerTypeMatch(Message message)
+	{
+		String version = message.getVersion();
+		if (version.equals("2.3.1"))
+		{
+			ERP_R09 msh = (ERP_R09) message;
+			MSH messageHeaderSegment = msh.getMSH();
+
+			String sendingApplicationId = messageHeaderSegment.getMsh3_SendingApplication().getHd2_UniversalID().getValue();
+			String sendingApplicationIdType = messageHeaderSegment.getMsh3_SendingApplication().getHd3_UniversalIDType().getValue();
+
+			return OLIS_SENDING_APPLICATION_ID.equalsIgnoreCase(sendingApplicationId) &&
+				OLIS_SENDING_APPLICATION_ID_TYPE.equalsIgnoreCase(sendingApplicationIdType);
+		}
+		return false;
+	}
 
 	private void initDefaultSourceOrganizations() {
 		defaultSourceOrganizations = new HashMap<String, String>();
@@ -133,6 +155,11 @@ public class OLISHL7Handler extends MessageHandler
 	/** Creates a new instance of OLISHL7Handler */
 	public OLISHL7Handler() {
 		super();
+	}
+
+	public OLISHL7Handler(String hl7message) throws HL7Exception
+	{
+		init(hl7message);
 	}
 
 	String[] getDentistLicenceNumber() {

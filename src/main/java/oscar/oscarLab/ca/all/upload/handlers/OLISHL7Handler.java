@@ -69,7 +69,7 @@ public class OLISHL7Handler implements MessageHandler
 		// so if the ack is bad fail the batch.
 		if(!messages.isEmpty())
 		{
-			String messageWithQAK = messages.get(0);
+			String messageWithQAK = Utilities.fixLineBreaks(messages.get(0), "\\.br\\");
 			oscar.oscarLab.ca.all.parsers.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, messageWithQAK);
 
 			if(!parser.canUpload())
@@ -81,6 +81,7 @@ public class OLISHL7Handler implements MessageHandler
 		// process all messages
 		for(String msg : messages)
 		{
+			msg = Utilities.fixLineBreaks(msg, "\\.br\\");
 			oscar.oscarLab.ca.all.parsers.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
 
 			// skip uploading duplicates

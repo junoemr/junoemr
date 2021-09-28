@@ -48,9 +48,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utilities
 {
+	public static final String NEW_LINE = "\r\n";
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private Utilities()
@@ -122,11 +125,11 @@ public class Utilities
 				    {
 					    messages.add(sb.toString());
 					    sb.delete(0, sb.length());
-					    sb.append(mshSeg + "\r\n");
+					    sb.append(mshSeg + NEW_LINE);
 				    }
 				    firstPIDflag = true;
 			    }
-			    sb.append(line + "\r\n");
+			    sb.append(line + NEW_LINE);
 		    }
 		}
 
@@ -138,7 +141,34 @@ public class Utilities
 
 		return messages;
 	}
-    
+
+	public static String fixLineBreaks(String originalHl7, String marker)
+	{
+		Pattern validSegmentPattern = Pattern.compile("^[a-zA-Z0-9]{3}\\|.*$");
+
+		StringBuilder stringBuilder = new StringBuilder();
+		boolean firstRun = true;
+
+		String[] lines = Pattern.compile(NEW_LINE).split(originalHl7);
+		for(String line : lines)
+		{
+			Matcher matcher = validSegmentPattern.matcher(line);
+			if(matcher.matches())
+			{
+				if(!firstRun)
+				{
+					stringBuilder.append(NEW_LINE);
+				}
+			}
+			else
+			{
+				stringBuilder.append(marker);
+			}
+			stringBuilder.append(line);
+			firstRun = false;
+		}
+		return stringBuilder.toString();
+	}
     
     /**
      * 

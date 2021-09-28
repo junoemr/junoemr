@@ -59,7 +59,8 @@ public class OLISAckFailedException extends OLISException
 	}
 	public OLISAckFailedException(String message, String statusCode, List<OLISHL7Handler.OLISError> errors)
 	{
-		this(message, QAKStatus.valueOf(statusCode), errors);
+		this(message, QAKStatus.
+				valueOf(statusCode), errors);
 	}
 	public OLISAckFailedException(String message, QAKStatus statusCode, List<OLISHL7Handler.OLISError> errors)
 	{
