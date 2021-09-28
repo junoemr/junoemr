@@ -16,7 +16,7 @@ import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -32,16 +32,25 @@ import java.util.Date;
 @Service
 public class OLISSchedulerJob
 {
+	@Autowired
+	private OLISSystemPreferencesDao olisPrefDao;
+
+	@Autowired
+	private ProviderDao providerDao;
+
+	@Autowired
+	private SecurityDao securityDao;
 
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final int DEFAULT_POLLING_FREQUENCY = 60; // minutes
+
+	// olis recommends 30 minute polling interval
+	private static final int DEFAULT_POLLING_FREQUENCY = 30; // minutes
 
 	public void run()
 	{
 		try
 		{
 			logger.info("starting OLIS poller job");
-			OLISSystemPreferencesDao olisPrefDao = (OLISSystemPreferencesDao) SpringUtils.getBean("OLISSystemPreferencesDao");
 			OLISSystemPreferences olisPrefs = olisPrefDao.getPreferences();
 			if (olisPrefs == null) {
 				// not set to run at all
@@ -89,9 +98,6 @@ public class OLISSchedulerJob
 			olisPrefDao.merge(olisPrefs);
 
 			LoggedInInfo loggedInInfo = new LoggedInInfo();
-			ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-			SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
-
 			loggedInInfo.setLoggedInProvider(providerDao.getProvider("999998"));
 			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo("999998"));
 

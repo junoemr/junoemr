@@ -24,7 +24,9 @@
 package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.olis.OLISSchedulerJob;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -40,6 +42,9 @@ public class OlisModuleConfig
 
 	@Autowired
 	protected OLISSchedulerJob olisSchedulerJob;
+
+	@Autowired
+	protected SystemPreferenceService systemPreferenceService;
 
 	public OlisModuleConfig()
 	{
@@ -57,7 +62,10 @@ public class OlisModuleConfig
 	@Scheduled(fixedDelayString = "${omd.olis.poll_interval_sec}000")
 	public void pullOLISReports()
 	{
-		logger.info("Initialize OLIS scheduler job");
-		olisSchedulerJob.run();
+		if(systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_POLLING_ENABLED, false))
+		{
+			logger.info("Initialize OLIS scheduler job");
+			olisSchedulerJob.run();
+		}
 	}
 }

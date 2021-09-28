@@ -263,6 +263,16 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/billing',
 			component: 'systemPropertiesBilling',
 		})
+		.state('admin.labConfig',
+			{
+				url: '/labConfig',
+				component: 'labConfig',
+			})
+		.state('admin.labConfig.olis',
+			{
+				url: '/olis',
+				component: 'olisConfig',
+			})
 		.state('ticklers',
 		{
 			url: '/ticklers',

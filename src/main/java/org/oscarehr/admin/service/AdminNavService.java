@@ -281,6 +281,7 @@ public class AdminNavService
 			labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.oldLabUpload"), "frame?frameUrl=" + contextPath + "/lab/CA/BC/LabUpload.jsp"));
 		}
 
+		labItems.add(new AdminNavItemTo1("Lab Configuration", "labConfig/olis"));
 		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.labFwdRules"), "frame?frameUrl=" + contextPath + "/admin/labforwardingrules.jsp&useCompat=true"));
 		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.AddNewQueue"), "frame?frameUrl=" + contextPath + "/admin/addQueue.jsp&useCompat=true"));
 
