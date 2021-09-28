@@ -351,13 +351,14 @@ public class ScheduleWs extends AbstractWs {
 	private void validateAppointmentUpdate(Appointment oldAppointment, AppointmentTransfer newAppointment) throws IllegalArgumentException
 	{
 		String errorMessage = "Appointment ID: " + oldAppointment.getId() + " can't be updated. ";
+
+		if (oldAppointment.getIsVirtual() != newAppointment.getIsVirtual())
+		{
+			throw new IllegalArgumentException(errorMessage.concat("Appointments can not change their isVirtual value."));
+		}
+
 		if (oldAppointment.getIsVirtual())
 		{
-			if (!newAppointment.getIsVirtual())
-			{
-				throw new IllegalArgumentException(errorMessage.concat("Virtual appointments can not be changed to not virtual."));
-			}
-
 			if (!Objects.equals(oldAppointment.getLocation(), newAppointment.getLocation()))
 			{
 				throw new IllegalArgumentException(errorMessage.concat("Virtual appointments can not change location."));
