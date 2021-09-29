@@ -30,8 +30,10 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 
 		},
 		controller: [
+			'labService',
 			'systemPreferenceService',
-			function (systemPreferenceService)
+			function (labService,
+			          systemPreferenceService)
 		{
 			const ctrl = this;
 			ctrl.loadingQueue = new LoadingQueue();
@@ -47,6 +49,13 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			ctrl.setPollingEnabled = (value: boolean) =>
 			{
 				systemPreferenceService.setPreference(ctrl.pollingPropName, value.toString());
+			}
+
+			ctrl.manualLabPull = async () =>
+			{
+				ctrl.loadingQueue.pushLoadingState();
+				await labService.triggerLabPull();
+				ctrl.loadingQueue.popLoadingState();
 			}
 
 			ctrl.labSearch = () =>

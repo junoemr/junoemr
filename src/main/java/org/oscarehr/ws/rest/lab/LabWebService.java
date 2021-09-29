@@ -21,12 +21,14 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.lab;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.ProviderLabRoutingConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.ProviderLabRoutingTransfer;
@@ -41,9 +43,10 @@ import java.util.List;
 @Path("/lab")
 @Component("LabWebService")
 @Produces("application/json")
+@Tag(name = "lab")
 public class LabWebService extends AbstractServiceImpl
 {
-    private static Logger logger = MiscUtils.getLogger();
+    private static final Logger logger = MiscUtils.getLogger();
 
     @Autowired
     private ProviderLabRoutingDao providerLabRoutingDao;
@@ -59,11 +62,11 @@ public class LabWebService extends AbstractServiceImpl
 
         ProviderLabRoutingTransfer transfer = null;
 
-        if (!providerLabRoutingModel.isEmpty())
+        if(!providerLabRoutingModel.isEmpty())
         {
             transfer = converter.convert(providerLabRoutingModel.get(providerLabRoutingModel.size() - 1));
         }
 
-            return RestResponse.successResponse(transfer);
+        return RestResponse.successResponse(transfer);
     }
 }

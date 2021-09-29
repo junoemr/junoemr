@@ -1873,6 +1873,8 @@
 								org.oscarehr.ws.rest.demographic.DemographicContactsWebService
 								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DocumentWebService
+								org.oscarehr.ws.rest.lab.LabWebService
+								org.oscarehr.ws.rest.lab.olis.OlisLabWebService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
 								org.oscarehr.ws.rest.DemographicService
                                 org.oscarehr.ws.rest.DemographicsService
