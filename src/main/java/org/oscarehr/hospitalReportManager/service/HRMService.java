@@ -25,7 +25,6 @@ package org.oscarehr.hospitalReportManager.service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -62,7 +61,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
-import oscar.oscarLab.ca.on.HRMResultsData;
+import oscar.util.ConversionUtils;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -293,22 +292,41 @@ public class HRMService
 			String facilityId = doc.getSendingFacilityId();
 			String facilityReportId = doc.getSendingFacilityReportId();
 			String deliverToUserId = doc.getDeliverToUserId();
-
+			
 			// filter duplicate reports
 			String duplicateKey;
-			if(!HRMFileParser.SCHEMA_VERSION.equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
+			if (!HRMFileParser.SCHEMA_VERSION.equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
 			{
 				HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
-				if(hrmReport != null)
+				if (hrmReport != null)
 				{
 					facilityId = hrmReport.getSendingFacilityId();
 					facilityReportId = hrmReport.getSendingFacilityReportNo();
 					deliverToUserId = hrmReport.getDeliverToUserId();
 				}
 			}
-
+			
+			// The commented code below is legacy behaviour kept in for reference (for now).
+			// Previously if a message matched on the set { facility, reportId, deliverToUser }, some overly complicated
+			// logic was applied to determine duplication/versioning.
+			
+			// Now, a duplicate is simply an exact match on the contents of the message, minus the transactional segment
+			// and there is no versioning system.
+			
+			
+			if (ConversionUtils.hasContent(doc.getReportLessTransactionInfoHash()))
+			{
+				duplicateKey = doc.getReportLessTransactionInfoHash();
+			}
+			else
+			{
+				// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
+				duplicateKey = String.valueOf(doc.getId());
+			}
+			
+			/*
 			// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
-			if(facilityId == null && facilityReportId == null)
+			if (facilityId == null && facilityReportId == null)
 			{
 				duplicateKey = String.valueOf(doc.getId());
 			}
@@ -316,7 +334,18 @@ public class HRMService
 			{
 				// the key = SendingFacility+':'+ReportNumber+':'+DeliverToUserID as per HRM spec can be used to signify duplicate report
 				duplicateKey = facilityId + ':' + facilityReportId + ':' + deliverToUserId;
+			}*/
+			
+			if (!out.containsKey(duplicateKey))
+			{
+				HRMDemographicDocument demographicDocument = new HRMDemographicDocument();
+				demographicDocument.setHrmDocument(doc);
+				out.put(duplicateKey, demographicDocument);
+				
+				labReports.put(duplicateKey, doc);
 			}
+		}
+/*
 
 			List<HRMDocument> relationshipDocs = hrmDocumentDao.findAllDocumentsWithRelationship(doc.getId());
 
@@ -395,6 +424,7 @@ public class HRMService
 				}
 			}
 		}
+*/
 
 		return out;
 	}
