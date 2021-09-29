@@ -68,9 +68,12 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.integration.model.CmeJs;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +122,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 	@Autowired
 	private EncounterService encounterService;
+
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 
 /*
 	@Autowired
@@ -307,6 +313,11 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 
 		String cmeJs = OscarProperties.getInstance().getCmeJs();
+		boolean hasOceanToolBar = systemPreferenceService.isPreferenceEnabled(UserProperty.OCEAN_TOOLBAR_ENABLED, false);
+		if (hasOceanToolBar)
+		{
+			cmeJs = CmeJs.OCEAN_TOOLBAR.label;
+		}
 
 		List<EncounterTemplate> encounterTemplates = encounterTemplateDao.findAll();
 
