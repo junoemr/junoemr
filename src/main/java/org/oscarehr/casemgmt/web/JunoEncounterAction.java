@@ -312,7 +312,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		);
 
 
-		String cmeJs = OscarProperties.getInstance().getCmeJs();
+		String cmeJs = CmeJs.DEFAULT.label;
 		boolean hasOceanToolBar = systemPreferenceService.isPreferenceEnabled(UserProperty.OCEAN_TOOLBAR_ENABLED, false);
 		if (hasOceanToolBar)
 		{
