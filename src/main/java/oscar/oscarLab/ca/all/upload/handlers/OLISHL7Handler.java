@@ -52,10 +52,10 @@ public class OLISHL7Handler implements MessageHandler
 	@Override
 	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) throws Exception
 	{
-		return parse(loggedInInfo, serviceName, fileName, fileId, false);
+		return parse(loggedInInfo, serviceName, fileName, fileId, false, true);
 	}
 
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider) throws Exception
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider, boolean checkQAKStatus) throws Exception
 	{
 		String lastTimeStampAccessed = ALL_DUPLICATES_MARKER;
 		RouteReportResults results = new RouteReportResults();
@@ -67,7 +67,7 @@ public class OLISHL7Handler implements MessageHandler
 		// The message is spit up so that each PID becomes its own message in the system,
 		// with a copy of the initial MSH segment (OLIS only sends 1 in the results batch).
 		// so if the ack is bad fail the batch.
-		if(!messages.isEmpty())
+		if(checkQAKStatus && !messages.isEmpty())
 		{
 			String messageWithQAK = Utilities.fixLineBreaks(messages.get(0), "\\.br\\");
 			oscar.oscarLab.ca.all.parsers.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, messageWithQAK);
