@@ -18,32 +18,6 @@ import ca.ssha.www._2005.hial.OLISStub.HIALRequestSignedRequest;
 import ca.ssha.www._2005.hial.OLISStub.OLISRequest;
 import ca.ssha.www._2005.hial.OLISStub.OLISRequestResponse;
 import com.indivica.olis.queries.Query;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
@@ -68,13 +42,31 @@ import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.olis.OLISProtocolSocketFactory;
+import org.oscarehr.olis.OLISUtils;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.xml.sax.InputSource;
 import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Driver
 {
@@ -186,25 +178,14 @@ public class Driver
 		}
 	}
 
-	public static void readResponseFromXML(HttpServletRequest request, String olisResponse) {
-
-		olisResponse = olisResponse.replaceAll("<Content", "<Content xmlns=\"\" ");
-		olisResponse = olisResponse.replaceAll("<Errors", "<Errors xmlns=\"\" ");
-
-		try {
-			DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-
-			Source schemaFile = new StreamSource(new File(OscarProperties.getInstance().getProperty("olis_response_schema")));
-			factory.newSchema(schemaFile);
-
-			JAXBContext jc = JAXBContext.newInstance("ca.ssha._2005.hial");
-			Unmarshaller u = jc.createUnmarshaller();
-			@SuppressWarnings("unchecked")
-			Response root = ((JAXBElement<Response>) u.unmarshal(new InputSource(new StringReader(olisResponse)))).getValue();
-
-			if (root.getErrors() != null) {
-				List<String> errorStringList = new LinkedList<String>();
+	public static void readResponseFromXML(HttpServletRequest request, String olisResponse)
+	{
+		try
+		{
+			Response root = OLISUtils.getOLISResponse(olisResponse);
+			if (root.getErrors() != null)
+			{
+				List<String> errorStringList = new LinkedList<>();
 
 				// Read all the errors
 				ArrayOfError errors = root.getErrors();
@@ -225,14 +206,24 @@ public class Driver
 
 					errorStringList.add(errorString);
 				}
-				if (request != null) request.setAttribute("errors", errorStringList);
-			} else if (root.getContent() != null) {
-				if (request != null) request.setAttribute("olisResponseContent", root.getContent());
+				if (request != null)
+				{
+					request.setAttribute("errors", errorStringList);
+				}
 			}
-		} catch (Exception e) {
+			else if(root.getContent() != null)
+			{
+				if(request != null)
+				{
+					request.setAttribute("olisResponseContent", root.getContent());
+				}
+			}
+		}
+		catch(Exception e)
+		{
 			logger.error("Couldn't read XML from OLIS response.", e);
-			
-			LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			notifyOlisError(loggedInInfo.getLoggedInProvider(), "Couldn't read XML from OLIS response." + "\n" + e);
 		}
 	}

@@ -34,6 +34,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.AlphaHandler;
 import oscar.oscarLab.ca.all.parsers.CMLHandler;
@@ -43,13 +44,14 @@ import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.List;
 
@@ -66,29 +68,27 @@ public class OLISUtils
 	private static final String LifeLabsIndentifier = "5687";// LifeLabs
 	private static final String AlphaLabsIndetifier = "5254";// Alpha Laboratories"
 
-	public static String getOLISResponseContent(String response) throws Exception{
+	public static Response getOLISResponse(String response) throws ParserConfigurationException, JAXBException, SAXException
+	{
 		response = response.replaceAll("<Content", "<Content xmlns=\"\" ");
 		response = response.replaceAll("<Errors", "<Errors xmlns=\"\" ");
-		
+
 		DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-		
-		InputStream is = OLISPoller.class.getResourceAsStream("/org/oscarehr/olis/response.xsd");
-		
-		Source schemaFile = new StreamSource(is);
-	
-		if(OscarProperties.getInstance().getProperty("olis_response_schema") != null){
-			schemaFile = new StreamSource(new File(OscarProperties.getInstance().getProperty("olis_response_schema")));
-		}
-		
+
+		Source schemaFile = new StreamSource(new File(OscarProperties.getInstance().getProperty("olis_response_schema")));
 		factory.newSchema(schemaFile);
 
 		JAXBContext jc = JAXBContext.newInstance("ca.ssha._2005.hial");
 		Unmarshaller u = jc.createUnmarshaller();
 		@SuppressWarnings("unchecked")
 		Response root = ((JAXBElement<Response>) u.unmarshal(new InputSource(new StringReader(response)))).getValue();
-		
-		return root.getContent();
+		return root;
+	}
+
+	public static String getOLISResponseContent(String response) throws ParserConfigurationException, JAXBException, SAXException
+	{
+		return getOLISResponse(response).getContent();
 	}
 
 	public static boolean isDuplicate(LoggedInInfo loggedInInfo, OLISHL7Handler h, String msg)
