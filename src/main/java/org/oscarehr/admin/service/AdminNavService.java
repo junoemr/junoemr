@@ -281,19 +281,9 @@ public class AdminNavService
 			labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.oldLabUpload"), "frame?frameUrl=" + contextPath + "/lab/CA/BC/LabUpload.jsp"));
 		}
 
-		labItems.add(new AdminNavItemTo1("Lab Configuration", "labConfig/olis"));
+		labItems.add(new AdminNavItemTo1("Lab Integration Configurations", "labConfig/olis"));
 		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.labFwdRules"), "frame?frameUrl=" + contextPath + "/admin/labforwardingrules.jsp&useCompat=true"));
 		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.AddNewQueue"), "frame?frameUrl=" + contextPath + "/admin/addQueue.jsp&useCompat=true"));
-
-		if(oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_OLIS))
-		{
-			labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.olisLabCheck"), "frame?frameUrl=" + contextPath + "/olis/checkOLIS.jsp"));
-		}
-
-		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)
-		{
-			labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.olisLabPref"), "frame?frameUrl=" + contextPath + "/olis/Preferences.jsp"));
-		}
 
 		labGroup.setItems(labItems);
 		return labGroup;

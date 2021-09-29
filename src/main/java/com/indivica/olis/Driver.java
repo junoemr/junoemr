@@ -120,7 +120,6 @@ public class Driver
 				logItem.setContent("query");
 				logItem.setData(olisHL7String);
 
-				// TODO the request is always null right now
 				if(request != null)
 				{
 					LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -176,7 +175,6 @@ public class Driver
 		{
 			logger.error("Can't perform OLIS query due to exception.", e);
 
-			// TODO the request is always null right now
 			if(request != null)
 			{
 				request.setAttribute("searchException", e);

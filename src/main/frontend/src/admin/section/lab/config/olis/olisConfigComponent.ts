@@ -51,9 +51,9 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 
 			ctrl.labSearch = () =>
 			{
-				var win = "revision";
-				var url = "../olis/Search.jsp";
-				window.open(url, win, "scrollbars=yes, location=no, width=1024, height=800");
+				const target = "_blank";
+				const url = "../olis/Search.jsp";
+				window.open(url, target, "scrollbars=yes, location=no, width=1024, height=800");
 			};
 		}],
 	}
