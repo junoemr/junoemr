@@ -24,9 +24,9 @@
 package org.oscarehr.ws.rest.integrations.aqs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -57,7 +57,7 @@ public class QueuedAppointmentsWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<QueuedAppointmentTo1>> getAppointmentsInQueue(@PathParam("queueId") UUID queueId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.AQS_QUEUED_APPOINTMENTS_READ);
 		return RestResponse.successResponse(QueuedAppointmentTo1.fromQueuedAppointmentList(appointmentService.getAppointmentsInQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 

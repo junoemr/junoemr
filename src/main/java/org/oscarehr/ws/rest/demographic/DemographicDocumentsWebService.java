@@ -30,6 +30,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferOutbound;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -82,11 +83,7 @@ public class DemographicDocumentsWebService extends AbstractServiceImpl
 	public RestResponse<List<DocumentTransferOutbound>> searchDocuments(
 			@PathParam("demographicNo") String demographicNo) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(
-				getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ,
-				Integer.parseInt(demographicNo),
-				"_edoc");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Integer.parseInt(demographicNo), Permission.DOCUMENT_READ);
 
 		Demographic demo = demographicDao.findOrThrow(Integer.parseInt(demographicNo));
 

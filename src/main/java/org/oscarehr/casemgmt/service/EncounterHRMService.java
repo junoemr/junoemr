@@ -23,26 +23,27 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
+import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
+import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.service.HRMService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
+import org.springframework.beans.factory.annotation.Autowired;
+import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
+import oscar.util.StringUtils;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.oscarehr.casemgmt.dto.EncounterNotes;
-import org.oscarehr.casemgmt.dto.EncounterSectionNote;
-import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
-import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.model.SecObjectName;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
-import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
-import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.service.HRMService;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import oscar.OscarProperties;
-import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
 
 public class EncounterHRMService extends EncounterSectionService
 {
@@ -97,16 +98,15 @@ public class EncounterHRMService extends EncounterSectionService
 
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
-		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), SecObjectName._HRM,
-			SecurityInfoManager.READ, sectionParams.getDemographicNo())
-			|| !OscarProperties.getInstance().hasHRMDocuments())
+		Integer demographicNo = Integer.parseInt(sectionParams.getDemographicNo());
+		if(!securityInfoManager.hasPrivileges(
+				sectionParams.getLoggedInInfo().getLoggedInProviderNo(), demographicNo, Permission.HRM_READ)
+				|| !OscarProperties.getInstance().hasHRMDocuments())
 		{
 			return EncounterNotes.noNotes();
 		}
 
-		Map<String, HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(
-			Integer.parseInt(sectionParams.getDemographicNo())
-		);
+		Map<String, HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(demographicNo);
 
 		List<EncounterSectionNote> out = new ArrayList<>();
 		for (Entry<String, HRMDemographicDocument> entry: demographicDocuments.entrySet())

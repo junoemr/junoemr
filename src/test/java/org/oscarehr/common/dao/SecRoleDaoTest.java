@@ -26,25 +26,25 @@
  */
 package org.oscarehr.common.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -98,28 +98,6 @@ public class SecRoleDaoTest extends DaoTestFixtures
 			}
 		}
 		assertTrue(true);
-	}
-
-	@Test
-	public void testFindByName() throws Exception {
-		
-		String name1 = "alpha";
-		String name2 = "bravo";
-		
-		SecRole secRole1 = new SecRole();
-		EntityDataGenerator.generateTestDataForModelClass(secRole1);
-		secRole1.setName(name1);
-		dao.persist(secRole1);
-		
-		SecRole secRole2 = new SecRole();
-		EntityDataGenerator.generateTestDataForModelClass(secRole2);
-		secRole2.setName(name2);
-		dao.persist(secRole2);
-		
-		SecRole expectedResult = secRole1;
-		SecRole result = dao.findByName(name1);
-		
-		assertEquals(expectedResult, result);	
 	}
 
 	@Test 

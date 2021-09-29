@@ -31,7 +31,8 @@ angular.module('Common.Components').component('junoDateSelect', {
 		labelPosition: "<?",
 		componentStyle: "<?",
 		showAge: "<?",
-		onValidityChange: "&?"
+		onValidityChange: "&?",
+		change: "&?",
 	},
 	controller: ["$scope", function ($scope)
 	{
@@ -56,11 +57,11 @@ angular.module('Common.Components').component('junoDateSelect', {
 			ctrl.updateDateFields();
 		};
 
-		ctrl.$doCheck = () =>
+		$scope.$watch("$ctrl.ngModel", () =>
 		{
 			ctrl.updateDateFields();
 			ctrl.onInvalidStateChange();
-		}
+		});
 
 		ctrl.updateDateFields = () =>
 		{
@@ -73,6 +74,16 @@ angular.module('Common.Components').component('junoDateSelect', {
 				ctrl.monthValid = true;
 				ctrl.dayValid = true;
 			}
+			else if (!ctrl.ngModel) // reset
+			{
+				ctrl.year = "";
+				ctrl.month = "";
+				ctrl.day = "";
+
+				ctrl.yearValid = true;
+				ctrl.monthValid = false;
+				ctrl.dayValid = false;
+			}
 
 			ctrl.fieldsBlank = ctrl.allFieldsBlank()
 		}
@@ -81,7 +92,6 @@ angular.module('Common.Components').component('junoDateSelect', {
 		{
 			ctrl.year = ctrl.onDateChange(field, true);
 			ctrl.yearValid = ctrl.year < 9999;
-
 		}
 
 		ctrl.onMonthChange = (field) =>
@@ -110,6 +120,11 @@ angular.module('Common.Components').component('junoDateSelect', {
 			}
 
 			ctrl.fieldsBlank = ctrl.allFieldsBlank();
+
+			if(ctrl.change)
+			{
+				ctrl.change({value: ctrl.ngModel});
+			}
 
 			return field;
 		}

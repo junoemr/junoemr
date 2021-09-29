@@ -34,22 +34,19 @@
 
 package oscar.oscarDemographic.data;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.common.dao.RecycleBinDao;
-import org.oscarehr.common.dao.SecObjPrivilegeDao;
 import org.oscarehr.common.model.RecycleBin;
-import org.oscarehr.common.model.SecObjPrivilege;
-import org.oscarehr.common.model.SecObjPrivilegePrimaryKey;
+import org.oscarehr.demographic.dao.DemographicMergedDao;
+import org.oscarehr.security.dao.SecObjPrivilegeDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.log.LogAction;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -85,19 +82,6 @@ public class DemographicMerged {
         dm.setLastUpdateDate(new Date());
         dao.persist(dm);
         
-        //only if it doesn't exist
-        if(secObjPrivilegeDao.find(new SecObjPrivilegePrimaryKey("_all","_eChart$"+demographic_no)) == null) {
-	        SecObjPrivilege sop = new SecObjPrivilege();
-	        SecObjPrivilegePrimaryKey pk = new SecObjPrivilegePrimaryKey();
-	        pk.setRoleUserGroup("_all");
-	        pk.setObjectName("_eChart$"+demographic_no);
-	        sop.setId(pk);
-	        sop.setPrivilege("|or|");
-	        sop.setPriority(0);
-	        sop.setProviderNo("0");
-	        secObjPrivilegeDao.persist(sop);
-        }
-        
         LogAction.addLogSynchronous(loggedInInfo, "DemographicMerged.Merge", "demographic_no="+demographic_no);
 
   
@@ -116,14 +100,6 @@ public class DemographicMerged {
     	 String privilege = "";
          String priority = "";
          String provider_no = "";
-    	
-    	List<SecObjPrivilege> sops = this.secObjPrivilegeDao.findByRoleUserGroupAndObjectName("_all", "_eChart$"+demographic_no);
-    	for(SecObjPrivilege sop:sops) {
-    		privilege = sop.getPrivilege();
-    		priority = String.valueOf(sop.getPriority());
-    		provider_no = sop.getProviderNo();
-    		secObjPrivilegeDao.remove(sop.getId());
-    	}
     	
     	RecycleBin rb = new RecycleBin();
     	rb.setProviderNo(curUser_no);

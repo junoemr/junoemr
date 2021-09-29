@@ -21,6 +21,7 @@
 
 package com.quatro.model.security;
 
+@Deprecated
 public class Secobjprivilege implements java.io.Serializable {
 
 	// Fields

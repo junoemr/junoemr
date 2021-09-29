@@ -30,6 +30,7 @@ import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarAppointmentRepeating;
 import org.oscarehr.schedule.exception.ScheduleException;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
@@ -74,6 +75,8 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<AppointmentTo1> getAppointment(@PathParam("appointmentNo") Integer appointmentNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
+
 		AppointmentConverter converter = new AppointmentConverter(true, true);
 		Appointment appointment = appointmentManager.getAppointment(getLoggedInInfo(), appointmentNo);
 		return RestResponse.successResponse(converter.getAsTransferObject(getLoggedInInfo(), appointment));
@@ -85,6 +88,8 @@ public class AppointmentService extends AbstractServiceImpl
 	@Consumes("application/json")
 	public RestResponse<CalendarAppointment> addAppointment(CalendarAppointment calendarAppointment)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_CREATE);
+
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
@@ -118,6 +123,8 @@ public class AppointmentService extends AbstractServiceImpl
 	@Consumes("application/json")
 	public RestResponse<CalendarAppointment> addRepeatingAppointment(CalendarAppointmentRepeating calendarAppointmentContainer)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_CREATE);
+
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointmentContainer.getAppointment());
@@ -151,6 +158,8 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws ScheduleException
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_UPDATE);
+
 		AppointmentConverter converter = new AppointmentConverter();
 
 		String siteName = calendarAppointment.getSite();
@@ -186,6 +195,8 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Integer> deleteAppointment(@PathParam("appointmentNo") Integer appointmentNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_DELETE);
+
 		appointmentManager.deleteAppointment(getLoggedInInfo(), appointmentNo);
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
@@ -203,6 +214,8 @@ public class AppointmentService extends AbstractServiceImpl
 	public RestResponse<String> setStatus(@PathParam("appointmentNo") Integer appointmentNo,
 	                                      String statusCode)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_UPDATE);
+
 		Appointment appointment = appointmentManager.updateAppointmentStatus(getLoggedInInfo(), appointmentNo, statusCode);
 
 		return RestResponse.successResponse(appointment.getAppointmentStatus());
@@ -214,6 +227,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<String> setNextStatus(@PathParam("appointmentNo") Integer appointmentNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_UPDATE);
 		String newStatus = appointmentManager.rotateStatus(getLoggedInInfo(), appointmentNo);
 
 		return RestResponse.successResponse(newStatus);
@@ -225,6 +239,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestSearchResponse<AppointmentEditRecord> getEditHistory(@PathParam("appointmentNo") Integer appointmentNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 		List<AppointmentEditRecord> editList = appointmentManager.getAppointmentEdits(appointmentNo);
 		return RestSearchResponse.successResponseOnePage(editList);
 	}
